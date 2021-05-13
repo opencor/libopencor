@@ -53,7 +53,7 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_PATH} CACHE INTERNAL "Internalis
 
 # Hide the CMake options that are not directly relevant to libOpenCOR.
 
-if(WINDOWS)
+if(WIN32)
     mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
 elseif(APPLE)
     mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
