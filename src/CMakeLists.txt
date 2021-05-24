@@ -28,11 +28,17 @@ set(SOURCE_FILES
 )
 
 set(API_HEADER_FILES
-    api/libopencor/version.h
+    ${CMAKE_SOURCE_DIR}/src/api/libopencor/version.h
 )
 
 set(API_MODULE_FILE
-    api/libopencor/module/libopencor
+    ${CMAKE_SOURCE_DIR}/src/api/libopencor/module/libopencor
+)
+
+include_directories(
+    ${CMAKE_CURRENT_BINARY_DIR}/api
+    api
+    api/libcellml/module
 )
 
 add_library(${CMAKE_PROJECT_NAME}
@@ -40,13 +46,6 @@ add_library(${CMAKE_PROJECT_NAME}
     ${API_HEADER_FILES}
     ${API_MODULE_FILE}
     ${EXPORT_HEADER_FILE}
-)
-
-target_include_directories(${CMAKE_PROJECT_NAME}
-    PUBLIC
-    ${CMAKE_CURRENT_BINARY_DIR}/api
-    api
-    api/libcellml/module
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
@@ -61,3 +60,7 @@ generate_export_header(${CMAKE_PROJECT_NAME}
     EXPORT_FILE_NAME ${EXPORT_HEADER_FILE}
     BASE_NAME LIBOPENCOR
 )
+
+# Build our different bindings.
+
+add_subdirectory(bindings)

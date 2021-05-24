@@ -61,6 +61,10 @@ elseif(APPLE)
     mark_as_advanced(CMAKE_OSX_SYSROOT)
 endif()
 
+# Enable Python bindings through pybind11.
+
+add_subdirectory(extern/pybind11)
+
 # Build libOpenCOR.
 
 add_subdirectory(src)
