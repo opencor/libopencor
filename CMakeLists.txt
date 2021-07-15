@@ -39,6 +39,8 @@ if(DEFINED BINDINGS_PYTHON)
     if(Python_Development_FOUND)
         set(LIBOPENCOR_BINDINGS_PYTHON "${BINDINGS_PYTHON}" CACHE BOOL "${DOCSTRING}" FORCE)
     else()
+        set(IGNORE_ME ${BINDINGS_PYTHON})
+
         message(WARNING "Python bindings were requested but development files for Python were not found.")
     endif()
 
