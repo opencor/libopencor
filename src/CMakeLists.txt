@@ -17,7 +17,7 @@ include(GenerateExportHeader)
 # Configure the version file.
 
 foreach(VERSION_PART PROJECT_VERSION_MAJOR PROJECT_VERSION_MINOR PROJECT_VERSION_PATCH)
-    if("${${VERSION_PART}}" LESS "10")
+    if(${${VERSION_PART}} LESS 10)
         set(${VERSION_PART}_PAD 0)
     endif()
 endforeach()
@@ -25,7 +25,7 @@ endforeach()
 set(LIBOPENCOR_VERSION 0x${PROJECT_VERSION_MAJOR_PAD}${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR_PAD}${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH_PAD}${PROJECT_VERSION_PATCH})
 set(LIBOPENCOR_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-configure_file(version.cpp.in "${CMAKE_CURRENT_BINARY_DIR}/version.cpp")
+configure_file(version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
 
 # Build libOpenCOR.
 
@@ -34,11 +34,11 @@ set(SOURCE_FILES
 )
 
 set(API_HEADER_FILES
-    ${CMAKE_SOURCE_DIR}/src/api/libopencor/version.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/version.h
 )
 
 set(API_MODULE_FILE
-    ${CMAKE_SOURCE_DIR}/src/api/libopencor/module/libopencor
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/module/libopencor
 )
 
 include_directories(
