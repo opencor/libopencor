@@ -61,6 +61,18 @@ elseif(APPLE)
     mark_as_advanced(CMAKE_OSX_SYSROOT)
 endif()
 
+# Update our submodules as needed.
+
+find_package(Git REQUIRED)
+
+execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                RESULT_VARIABLE GIT_SUBMODULE_RESULT)
+
+if(NOT GIT_SUBMODULE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Git submodules could not be updated.")
+endif()
+
 # Enable Python bindings through pybind11.
 
 add_subdirectory(extern/pybind11)
