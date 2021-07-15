@@ -19,7 +19,31 @@ project(libOpenCOR
     LANGUAGES CXX
 )
 
+# Check the environment we are dealing with.
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+include(environmentchecks)
+
 # Rebrand the CMake options that are relevant to libOpenCOR.
+
+# BINDINGS_PYTHON ==> LIBOPENCOR_BINDINGS_PYTHON
+
+set(DOCSTRING "Buid Python wrappers.")
+
+if(Python_Development_FOUND)
+    set(LIBOPENCOR_BINDINGS_PYTHON ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED BINDINGS_PYTHON)
+    if(Python_Development_FOUND)
+        set(LIBOPENCOR_BINDINGS_PYTHON "${BINDINGS_PYTHON}" CACHE BOOL "${DOCSTRING}" FORCE)
+    else()
+        message(WARNING "Python bindings were requested but development files for Python were not found.")
+    endif()
+
+    unset(BINDINGS_PYTHON CACHE)
+endif()
 
 # CMAKE_BUILD_TYPE ==> LIBOPENCOR_BUILD_TYPE.
 
@@ -77,7 +101,16 @@ endif()
 
 # Enable Python bindings through pybind11.
 
-add_subdirectory(extern/pybind11)
+if(LIBOPENCOR_BINDINGS_PYTHON)
+    add_subdirectory(extern/pybind11)
+
+    mark_as_advanced(
+        PYBIND11_FINDPYTHON
+        PYBIND11_INSTALL
+        PYBIND11_NOPYTHON
+        PYBIND11_TEST
+    )
+endif()
 
 # Build libOpenCOR.
 

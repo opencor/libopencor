@@ -12,8 +12,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build our different bindings.
-
-if(LIBOPENCOR_BINDINGS_PYTHON)
-    add_subdirectory(python)
-endif()
+find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
