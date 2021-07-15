@@ -61,7 +61,7 @@ elseif(APPLE)
     mark_as_advanced(CMAKE_OSX_SYSROOT)
 endif()
 
-# Update our submodules as needed.
+# Update our submodules.
 
 find_package(Git REQUIRED)
 
