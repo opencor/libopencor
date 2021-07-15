@@ -67,9 +67,11 @@ find_package(Git REQUIRED)
 
 execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                RESULT_VARIABLE GIT_SUBMODULE_RESULT)
+                RESULT_VARIABLE RESULT
+                OUTPUT_QUIET
+                ERROR_QUIET)
 
-if(NOT GIT_SUBMODULE_RESULT EQUAL 0)
+if(NOT RESULT EQUAL 0)
     message(FATAL_ERROR "Git submodules could not be updated.")
 endif()
 
