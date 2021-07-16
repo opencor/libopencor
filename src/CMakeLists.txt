@@ -60,7 +60,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 
 # Generate the export header file.
 
-set(EXPORT_HEADER_FILE "${CMAKE_CURRENT_BINARY_DIR}/api/libopencor/export.h")
+set(EXPORT_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/api/libopencor/export.h)
 
 generate_export_header(${CMAKE_PROJECT_NAME}
     EXPORT_FILE_NAME ${EXPORT_HEADER_FILE}
