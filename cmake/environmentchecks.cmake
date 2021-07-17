@@ -13,3 +13,13 @@
 # limitations under the License.
 
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
+
+# Hide the CMake options that are not directly relevant to libOpenCOR.
+
+if(WIN32)
+    mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
+elseif(APPLE)
+    mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
+    mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
+    mark_as_advanced(CMAKE_OSX_SYSROOT)
+endif()

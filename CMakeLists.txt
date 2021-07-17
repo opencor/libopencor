@@ -27,7 +27,7 @@ include(environmentchecks)
 
 # Rebrand the CMake options that are relevant to libOpenCOR.
 
-# BINDINGS_PYTHON ==> LIBOPENCOR_BINDINGS_PYTHON
+# BINDINGS_PYTHON ==> LIBOPENCOR_BINDINGS_PYTHON.
 
 set(DOCSTRING "Buid Python wrappers.")
 
@@ -41,7 +41,7 @@ if(DEFINED BINDINGS_PYTHON)
     else()
         set(IGNORE_ME ${BINDINGS_PYTHON})
 
-        message(WARNING "Python bindings were requested but development files for Python were not found.")
+        message(WARNING "Python bindings were requested but development files for Python could not be found.")
     endif()
 
     unset(BINDINGS_PYTHON CACHE)
@@ -77,7 +77,7 @@ file(TO_CMAKE_PATH ${LIBOPENCOR_INSTALL_PREFIX} CMAKE_INSTALL_PREFIX_PATH)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_PATH} CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX, manipulate via LIBOPENCOR_INSTALL_PREFIX.")
 
-# BUILD_SHARED ==> LIBOPENCOR_BUILD_SHARED
+# BUILD_SHARED ==> LIBOPENCOR_BUILD_SHARED.
 
 set(DOCSTRING "Build shared libraries.")
 
@@ -90,16 +90,6 @@ if(DEFINED BUILD_SHARED)
 endif()
 
 set(BUILD_SHARED_LIBS ${LIBOPENCOR_BUILD_SHARED} CACHE INTERNAL "Internalise BUILD_SHARED_LIBS, manipulate via LIBOPENCOR_BUILD_SHARED" FORCE)
-
-# Hide the CMake options that are not directly relevant to libOpenCOR.
-
-if(WIN32)
-    mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
-elseif(APPLE)
-    mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
-    mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
-    mark_as_advanced(CMAKE_OSX_SYSROOT)
-endif()
 
 # Update our submodules.
 
