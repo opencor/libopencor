@@ -47,7 +47,13 @@ include_directories(
     api/libcellml/module
 )
 
-add_library(${CMAKE_PROJECT_NAME}
+if(LIBOPENCOR_BUILD_SHARED)
+    set(LIBRARY_TYPE SHARED)
+else()
+    set(LIBRARY_TYPE STATIC)
+endif()
+
+add_library(${CMAKE_PROJECT_NAME} ${LIBRARY_TYPE}
     ${SOURCE_FILES}
     ${API_HEADER_FILES}
     ${API_MODULE_FILE}
@@ -55,7 +61,9 @@ add_library(${CMAKE_PROJECT_NAME}
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+    DEBUG_POSTFIX d
     PREFIX ""
+    VERSION ${PROJECT_VERSION}
 )
 
 # Generate the export header file.
