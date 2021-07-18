@@ -46,14 +46,7 @@ include_directories(
     api
     api/libopencor/module
 )
-
-if(LIBOPENCOR_BUILD_SHARED)
-    set(LIBRARY_TYPE SHARED)
-else()
-    set(LIBRARY_TYPE STATIC)
-endif()
-
-add_library(${CMAKE_PROJECT_NAME} ${LIBRARY_TYPE}
+add_library(${CMAKE_PROJECT_NAME}
     ${EXPORT_HEADER_FILE}
     ${SOURCE_FILES}
     ${API_HEADER_FILES}
