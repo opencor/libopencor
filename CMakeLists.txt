@@ -91,6 +91,30 @@ endif()
 
 set(BUILD_SHARED_LIBS ${LIBOPENCOR_BUILD_SHARED} CACHE INTERNAL "Internalise BUILD_SHARED_LIBS, manipulate via LIBOPENCOR_BUILD_SHARED" FORCE)
 
+# COMPILER_CACHE ==> LIBOPENCOR_COMPILER_CACHE.
+
+set(DOCSTRING "Enable compiler cache.")
+
+if((WIN32 AND CLCACHE_AVAILABLE) OR (NOT WIN32 AND CCACHE_AVAILABLE))
+    set(LIBOPENCOR_COMPILER_CACHE ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED COMPILER_CACHE)
+    if((WIN32 AND CLCACHE_AVAILABLE) OR (NOT WIN32 AND CCACHE_AVAILABLE))
+        set(LIBOPENCOR_COMPILER_CACHE "${COMPILER_CACHE}" CACHE BOOL "${DOCSTRING}" FORCE)
+    else()
+        if(WIN32)
+            set(COMPILER_CACHE_TOOL clcache)
+        else()
+            set(COMPILER_CACHE_TOOL ccache)
+        endif()
+
+        message(WARNING "Compiler cache is requested but ${COMPILER_CACHE_TOOL} could not be found.")
+    endif()
+
+    unset(COMPILER_CACHE CACHE)
+endif()
+
 # Update our submodules.
 
 find_package(Git REQUIRED)
@@ -103,6 +127,27 @@ execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
 
 if(NOT RESULT EQUAL 0)
     message(FATAL_ERROR "Git submodules could not be updated.")
+endif()
+
+# Enable clcache/ccache.
+
+if(LIBOPENCOR_COMPILER_CACHE)
+    if(WIN32)
+        if(CLCACHE_EXE)
+            set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
+
+            execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/clcachewrapper.c
+                            RESULT_VARIABLE RESULT OUTPUT_QUIET ERROR_QUIET)
+
+            if(RESULT EQUAL 0)
+                set(CMAKE_CXX_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
+            endif()
+        endif()
+    else()
+        if(CCACHE_EXE)
+            set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_EXE})
+        endif()
+    endif()
 endif()
 
 # Enable Python bindings through pybind11.

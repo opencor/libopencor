@@ -12,14 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if(WIN32)
+    find_program(CLCACHE_EXE clcache)
+else()
+    find_program(CCACHE_EXE ccache)
+endif()
+
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
+
+if(WIN32)
+    if(CLCACHE_EXE)
+        set(CLCACHE_AVAILABLE TRUE CACHE INTERNAL "Executable required to cache compilations.")
+    endif()
+else()
+    if(CCACHE_EXE)
+        set(CCACHE_AVAILABLE TRUE CACHE INTERNAL "Executable required to cache compilations.")
+    endif()
+endif()
 
 # Hide the CMake options that are not directly relevant to libOpenCOR.
 
 if(WIN32)
+    mark_as_advanced(CLCACHE_EXE)
     mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
-elseif(APPLE)
-    mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
-    mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
-    mark_as_advanced(CMAKE_OSX_SYSROOT)
+else()
+    mark_as_advanced(CCACHE_EXE)
+
+    if(APPLE)
+        mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
+        mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
+        mark_as_advanced(CMAKE_OSX_SYSROOT)
+    endif()
 endif()
