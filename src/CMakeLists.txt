@@ -44,7 +44,7 @@ set(API_MODULE_FILE
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/api
     api
-    api/libcellml/module
+    api/libopencor/module
 )
 
 if(LIBOPENCOR_BUILD_SHARED)
