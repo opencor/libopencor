@@ -12,19 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(WIN32)
-    find_program(CLCACHE_EXE clcache)
-else()
-    find_program(CCACHE_EXE ccache)
-endif()
+# Look for various packages and programs.
 
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
 if(WIN32)
+    find_program(CLCACHE_EXE clcache)
+
     if(CLCACHE_EXE)
         set(CLCACHE_AVAILABLE TRUE CACHE INTERNAL "Executable required to cache compilations.")
     endif()
 else()
+    find_program(CCACHE_EXE ccache)
+
     if(CCACHE_EXE)
         set(CCACHE_AVAILABLE TRUE CACHE INTERNAL "Executable required to cache compilations.")
     endif()
