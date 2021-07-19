@@ -29,9 +29,9 @@ include(environmentchecks)
 
 # BINDINGS_PYTHON ==> LIBOPENCOR_BINDINGS_PYTHON.
 
-set(DOCSTRING "Buid Python wrappers.")
-
 if(Python_Development_FOUND)
+    set(DOCSTRING "Buid Python wrappers.")
+
     set(LIBOPENCOR_BINDINGS_PYTHON ON CACHE BOOL "${DOCSTRING}")
 endif()
 
@@ -91,9 +91,9 @@ set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_PATH} CACHE INTERNAL "Internalis
 
 # COMPILER_CACHE ==> LIBOPENCOR_COMPILER_CACHE.
 
-set(DOCSTRING "Enable compiler cache.")
-
 if((WIN32 AND CLCACHE_AVAILABLE) OR (NOT WIN32 AND CCACHE_AVAILABLE))
+    set(DOCSTRING "Enable compiler cache.")
+
     set(LIBOPENCOR_COMPILER_CACHE ON CACHE BOOL "${DOCSTRING}")
 endif()
 
