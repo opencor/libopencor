@@ -4,7 +4,7 @@
 Python bindings
 ===============
 
-You can currently install libOpenCOR from this repository using:
+You can install libOpenCOR from this repository using:
 
 .. code-block:: bash
 
