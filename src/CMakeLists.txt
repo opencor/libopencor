@@ -46,11 +46,12 @@ include_directories(
     api
     api/libopencor/module
 )
+
 add_library(${CMAKE_PROJECT_NAME}
-    ${EXPORT_HEADER_FILE}
     ${SOURCE_FILES}
     ${API_HEADER_FILES}
     ${API_MODULE_FILE}
+    ${EXPORT_HEADER_FILE}
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
