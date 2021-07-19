@@ -132,6 +132,18 @@ if(DEFINED COMPILER_CACHE)
     unset(COMPILER_CACHE CACHE)
 endif()
 
+# WARNINGS_AS_ERRORS ==> LIBOPENCOR_WARNINGS_AS_ERRORS.
+
+set(DOCSTRING "Treat warnings as errors (this only applies to libOpenCOR's codebase).")
+
+set(LIBOPENCOR_WARNINGS_AS_ERRORS ON CACHE BOOL "${DOCSTRING}")
+
+if(DEFINED WARNINGS_AS_ERRORS)
+    set(LIBOPENCOR_WARNINGS_AS_ERRORS "${WARNINGS_AS_ERRORS}" CACHE BOOL "${DOCSTRING}" FORCE)
+endif()
+
+unset(WARNINGS_AS_ERRORS CACHE)
+
 # Update our submodules.
 
 find_package(Git REQUIRED)

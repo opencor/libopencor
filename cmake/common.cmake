@@ -12,6 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+function(configure_warnings_as_errors TARGET)
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        set(COMPILE_OPTIONS /W4 /WX)
+    elseif(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+           OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+           OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+        set(COMPILE_OPTIONS -Wall -W -Werror)
+    endif()
+
+    if(COMPILE_OPTIONS)
+        target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
+    endif()
+endfunction()
+
 function(configure_clang_and_clang_tidy TARGET)
     # Configure Clang.
 
@@ -51,6 +65,10 @@ function(configure_clang_and_clang_tidy TARGET)
 
         string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")
 
+        if(LIBOPENCOR_WARNINGS_AS_ERRORS)
+            set(CLANG_TIDY_WARNINGS_AS_ERRORS ";-warnings-as-errors=${CLANG_TIDY_CHECKS}")
+        endif()
+
         if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
             set(HEADER_FILTER_DIR ..)
         else()
@@ -70,7 +88,7 @@ function(configure_clang_and_clang_tidy TARGET)
         endif()
 
         set_target_properties(${TARGET} PROPERTIES
-            CXX_CLANG_TIDY "${CLANG_TIDY_EXE}${EXTRA_ARG};-checks=${CLANG_TIDY_CHECKS};-header-filter=${HEADER_FILTER_DIR}.*"
+            CXX_CLANG_TIDY "${CLANG_TIDY_EXE}${EXTRA_ARG};-checks=${CLANG_TIDY_CHECKS};-header-filter=${HEADER_FILTER_DIR}.*${CLANG_TIDY_WARNINGS_AS_ERRORS}"
         )
     endif()
 endfunction()

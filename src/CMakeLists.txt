@@ -67,6 +67,12 @@ generate_export_header(${CMAKE_PROJECT_NAME}
     BASE_NAME LIBOPENCOR
 )
 
+# Treat warnings as errors.
+
+if(LIBOPENCOR_WARNINGS_AS_ERRORS)
+    configure_warnings_as_errors(${CMAKE_PROJECT_NAME})
+endif()
+
 # Use Clang-Tidy.
 
 if(LIBOPENCOR_CLANG_TIDY)
