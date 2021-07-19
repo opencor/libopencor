@@ -30,6 +30,12 @@ else()
     endif()
 endif()
 
+find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
+
+if(CLANG_TIDY_EXE)
+    set(CLANG_TIDY_AVAILABLE TRUE CACHE INTERNAL "Executable required to perform static analysis.")
+endif()
+
 # Hide the CMake options that are not directly relevant to libOpenCOR.
 
 if(WIN32)
@@ -44,3 +50,5 @@ else()
         mark_as_advanced(CMAKE_OSX_SYSROOT)
     endif()
 endif()
+
+mark_as_advanced(CLANG_TIDY_EXE)

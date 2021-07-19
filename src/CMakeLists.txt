@@ -67,6 +67,12 @@ generate_export_header(${CMAKE_PROJECT_NAME}
     BASE_NAME LIBOPENCOR
 )
 
+# Use Clang-Tidy.
+
+if(LIBOPENCOR_CLANG_TIDY)
+    configure_clang_and_clang_tidy(${CMAKE_PROJECT_NAME})
+endif()
+
 # Build our different bindings.
 
 add_subdirectory(bindings)

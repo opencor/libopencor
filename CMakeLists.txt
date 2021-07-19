@@ -23,6 +23,7 @@ project(libOpenCOR
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+include(common)
 include(environmentchecks)
 
 # Rebrand the CMake options that are relevant to libOpenCOR.
@@ -58,6 +59,24 @@ if(DEFINED BUILD_SHARED_LIBS)
 endif()
 
 set(BUILD_SHARED_LIBS ${LIBOPENCOR_BUILD_SHARED_LIBS} CACHE INTERNAL "Internalise BUILD_SHARED_LIBS, manipulate via LIBOPENCOR_BUILD_SHARED_LIBS." FORCE)
+
+# CLANG_TIDY ==> LIBOPENCOR_CLANG_TIDY.
+
+if(CLANG_TIDY_AVAILABLE)
+    set(DOCSTRING "Enable Clang-Tidy.")
+
+    set(LIBOPENCOR_CLANG_TIDY OFF CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED CLANG_TIDY)
+    if(CLANG_TIDY_AVAILABLE)
+        set(LIBOPENCOR_CLANG_TIDY "${CLANG_TIDY}" CACHE BOOL "${DOCSTRING}" FORCE)
+    else()
+        message(WARNING "Clang-Tidy is requested but not found!")
+    endif()
+
+    unset(CLANG_TIDY CACHE)
+endif()
 
 # [CMAKE_]BUILD_TYPE ==> LIBOPENCOR_BUILD_TYPE.
 
