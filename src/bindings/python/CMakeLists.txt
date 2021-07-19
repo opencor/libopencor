@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Prevent some warnings about an inconsistent DLL linkage.
+
+if(WIN32)
+    add_definitions(-D${CMAKE_PROJECT_NAME}_EXPORTS)
+endif()
+
 # Build our Python bindings.
 
 set(PYTHON_MODULE _libopencor)
