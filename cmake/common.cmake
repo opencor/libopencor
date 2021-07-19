@@ -24,9 +24,7 @@ function(configure_clang_and_clang_tidy TARGET)
             -Weverything
         )
 
-        set_target_properties(${TARGET} PROPERTIES
-            COMPILE_OPTIONS "${COMPILE_OPTIONS}"
-        )
+        target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
     endif()
 
     # Configure Clang-Tidy.
