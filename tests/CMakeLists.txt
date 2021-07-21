@@ -43,6 +43,12 @@ foreach(TEST ${TESTS})
     add_test(NAME ${TEST_TARGET}
              COMMAND ${TEST_TARGET})
 
+    if(MSVC)
+        set_tests_properties(${TEST_TARGET} PROPERTIES
+            ENVIRONMENT "PATH=$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>\;$<TARGET_FILE_DIR:gtest_main>"
+        )
+    endif()
+
     # Treat warnings as errors.
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
