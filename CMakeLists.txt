@@ -206,3 +206,20 @@ endif()
 # Build libOpenCOR.
 
 add_subdirectory(src)
+
+# Enable unit tests.
+
+if(LIBOPENCOR_UNIT_TESTS)
+    enable_testing()
+
+    set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+
+    add_subdirectory(extern/googletest)
+    add_subdirectory(tests)
+
+    mark_as_advanced(
+        BUILD_GMOCK
+        INSTALL_GTEST
+    )
+endif()

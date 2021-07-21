@@ -38,6 +38,14 @@ function(configure_clang_and_clang_tidy TARGET)
             -Weverything
         )
 
+        if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
+            list(APPEND COMPILE_OPTIONS
+                -Wno-c++98-compat
+                -Wno-c++98-compat-pedantic
+                -Wno-global-constructors
+            )
+        endif()
+
         target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
     endif()
 
@@ -47,12 +55,28 @@ function(configure_clang_and_clang_tidy TARGET)
         # The full list of Clang-Tidy checks can be found at
         # https://clang.llvm.org/extra/clang-tidy/checks/list.html.
 
+        if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
+            set(DISABLED_CERT_CHECKS
+                -cert-err58-cpp
+            )
+            set(DISABLED_CPPCOREGUIDELINES_CHECKS
+                -cppcoreguidelines-avoid-non-const-global-variables
+                -cppcoreguidelines-owning-memory
+            )
+            set(DISABLED_FUCHSIA_CHECKS
+                -fuchsia-statically-constructed-objects
+            )
+        endif()
+
         set(CLANG_TIDY_CHECKS
             -*
             bugprone-*
             cert-*
+            ${DISABLED_CERT_CHECKS}
             cppcoreguidelines-*
+            ${DISABLED_CPPCOREGUIDELINES_CHECKS}
             fuchsia-*
+            ${DISABLED_FUCHSIA_CHECKS}
             google-*
             hicpp-*
             llvm-*

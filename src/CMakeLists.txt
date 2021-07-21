@@ -59,6 +59,12 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
 )
 
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/module>
+)
+
 # Generate the export header file.
 
 generate_export_header(${CMAKE_PROJECT_NAME}
