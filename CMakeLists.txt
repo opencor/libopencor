@@ -19,6 +19,12 @@ project(libOpenCOR
     LANGUAGES CXX
 )
 
+# Enable C++11 and later.
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # Check the environment we are dealing with.
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
