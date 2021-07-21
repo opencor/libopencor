@@ -26,7 +26,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Check the environment we are dealing with.
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(common)
 include(environmentchecks)
@@ -42,7 +42,7 @@ endif()
 
 if(DEFINED BINDINGS_PYTHON)
     if(Python_Development_FOUND)
-        set(LIBOPENCOR_BINDINGS_PYTHON "${BINDINGS_PYTHON}" CACHE BOOL "${DOCSTRING}" FORCE)
+        set(LIBOPENCOR_BINDINGS_PYTHON ${BINDINGS_PYTHON} CACHE BOOL "${DOCSTRING}" FORCE)
     else()
         set(IGNORE_ME ${BINDINGS_PYTHON})
 
@@ -72,7 +72,7 @@ endif()
 
 if(DEFINED CLANG_TIDY)
     if(CLANG_TIDY_AVAILABLE)
-        set(LIBOPENCOR_CLANG_TIDY "${CLANG_TIDY}" CACHE BOOL "${DOCSTRING}" FORCE)
+        set(LIBOPENCOR_CLANG_TIDY ${CLANG_TIDY} CACHE BOOL "${DOCSTRING}" FORCE)
     else()
         message(WARNING "Clang-Tidy is requested but not found!")
     endif()
@@ -119,7 +119,7 @@ endif()
 
 if(DEFINED COMPILER_CACHE)
     if((WIN32 AND CLCACHE_AVAILABLE) OR (NOT WIN32 AND CCACHE_AVAILABLE))
-        set(LIBOPENCOR_COMPILER_CACHE "${COMPILER_CACHE}" CACHE BOOL "${DOCSTRING}" FORCE)
+        set(LIBOPENCOR_COMPILER_CACHE ${COMPILER_CACHE} CACHE BOOL "${DOCSTRING}" FORCE)
     else()
         if(WIN32)
             set(COMPILER_CACHE_TOOL clcache)
@@ -139,7 +139,7 @@ set(DOCSTRING "Enable unit tests.")
 set(LIBOPENCOR_UNIT_TESTS ON CACHE BOOL "${DOCSTRING}")
 
 if(DEFINED UNIT_TESTS)
-    set(LIBOPENCOR_UNIT_TESTS "${UNIT_TESTS}" CACHE BOOL "${DOCSTRING}" FORCE)
+    set(LIBOPENCOR_UNIT_TESTS ${UNIT_TESTS} CACHE BOOL "${DOCSTRING}" FORCE)
 endif()
 
 unset(UNIT_TESTS CACHE)
@@ -150,7 +150,7 @@ set(DOCSTRING "Treat warnings as errors (this only applies to libOpenCOR's codeb
 set(LIBOPENCOR_WARNINGS_AS_ERRORS ON CACHE BOOL "${DOCSTRING}")
 
 if(DEFINED WARNINGS_AS_ERRORS)
-    set(LIBOPENCOR_WARNINGS_AS_ERRORS "${WARNINGS_AS_ERRORS}" CACHE BOOL "${DOCSTRING}" FORCE)
+    set(LIBOPENCOR_WARNINGS_AS_ERRORS ${WARNINGS_AS_ERRORS} CACHE BOOL "${DOCSTRING}" FORCE)
 endif()
 
 unset(WARNINGS_AS_ERRORS CACHE)
@@ -190,7 +190,7 @@ if(LIBOPENCOR_COMPILER_CACHE)
     endif()
 endif()
 
-# Enable Python bindings through pybind11.
+# Enable Python bindings.
 
 if(LIBOPENCOR_BINDINGS_PYTHON)
     add_subdirectory(extern/pybind11)
