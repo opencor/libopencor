@@ -51,7 +51,7 @@ foreach(TEST ${TESTS})
 
     if(MSVC)
         set_tests_properties(${TEST_TARGET} PROPERTIES
-            ENVIRONMENT "PATH=$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>\;$<TARGET_FILE_DIR:gtest_main>"
+            ENVIRONMENT "PATH=$<TARGET_FILE_DIR:gtest_main>\;$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>"
         )
     endif()
 

@@ -25,11 +25,11 @@ endforeach()
 set(LIBOPENCOR_VERSION 0x${PROJECT_VERSION_MAJOR_PAD}${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR_PAD}${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH_PAD}${PROJECT_VERSION_PATCH})
 set(LIBOPENCOR_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
 
-configure_file(version.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
+configure_file(version.in.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
 
 # Build libOpenCOR.
 
-set(EXPORT_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/api/libopencor/export.h)
+set(API_EXPORT_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/api/libopencor/export.h)
 
 set(SOURCE_FILES
     ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
@@ -48,9 +48,9 @@ include_directories(
 
 add_library(${CMAKE_PROJECT_NAME}
     ${SOURCE_FILES}
+    ${API_EXPORT_HEADER_FILE}
     ${API_HEADER_FILES}
     ${API_MODULE_FILE}
-    ${EXPORT_HEADER_FILE}
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
@@ -68,7 +68,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
 # Generate the export header file.
 
 generate_export_header(${CMAKE_PROJECT_NAME}
-    EXPORT_FILE_NAME ${EXPORT_HEADER_FILE}
+    EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
     BASE_NAME LIBOPENCOR
 )
 
