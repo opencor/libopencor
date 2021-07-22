@@ -29,7 +29,13 @@ include(version/tests.cmake)
 foreach(TEST ${TESTS})
     # Build our test.
 
-    set(TEST_TARGET ${TEST}_tests)
+    if(DEFINED ${TEST}_CATEGORY)
+        set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
+    else()
+        set(TEST_CATEGORY)
+    endif()
+
+    set(TEST_TARGET ${TEST_CATEGORY}${TEST}_tests)
 
     add_executable(${TEST_TARGET}
         ${${TEST}_SOURCE_FILES}
