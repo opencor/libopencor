@@ -24,28 +24,27 @@ endif()
 
 include(version/tests.cmake)
 
-# Build our different tests.
+# Prepare our different tests.
 
 foreach(TEST ${TESTS})
-    # Build our test.
-
     if(DEFINED ${TEST}_CATEGORY)
         set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
     else()
         set(TEST_CATEGORY)
     endif()
 
-    set(TEST_TARGET ${TEST_CATEGORY}${TEST}_tests)
+    prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES})
+endforeach()
 
-    add_executable(${TEST_TARGET}
-        ${${TEST}_SOURCE_FILES}
-    )
+# Prepare the tests for our header files.
 
-    target_link_libraries(${TEST_TARGET}
-        gtest_main
-        ${CMAKE_PROJECT_NAME}
-    )
+include(header_files/tests.cmake)
 
+# Add our prepared tests after sorting them.
+
+list(SORT TEST_TARGETS)
+
+foreach(TEST_TARGET ${TEST_TARGETS})
     add_test(NAME ${TEST_TARGET}
              COMMAND ${TEST_TARGET})
 
@@ -53,17 +52,5 @@ foreach(TEST ${TESTS})
         set_tests_properties(${TEST_TARGET} PROPERTIES
             ENVIRONMENT "PATH=$<TARGET_FILE_DIR:gtest_main>\;$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>"
         )
-    endif()
-
-    # Treat warnings as errors.
-
-    if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-        configure_warnings_as_errors(${TEST_TARGET})
-    endif()
-
-    # Use Clang-Tidy.
-
-    if(LIBOPENCOR_CLANG_TIDY)
-        configure_clang_and_clang_tidy(${TEST_TARGET})
     endif()
 endforeach()

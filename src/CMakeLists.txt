@@ -65,6 +65,8 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/module>
 )
 
+set(API_HEADER_FILES ${API_HEADER_FILES} PARENT_SCOPE)
+
 # Generate the export header file.
 
 generate_export_header(${CMAKE_PROJECT_NAME}
