@@ -20,7 +20,7 @@ limitations under the License.
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(_libopencor, m) {
+PYBIND11_MODULE(libopencor, m) {
     m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";
 
     // Version

@@ -12,26 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Prevent some warnings about an inconsistent DLL linkage.
-
-if(WIN32)
-    add_definitions(-D${CMAKE_PROJECT_NAME}_EXPORTS)
+if(LIBOPENCOR_BINDINGS_PYTHON)
+    add_subdirectory(python)
 endif()
-
-# Build our Python bindings.
-
-set(PYTHON_TARGET Python_${CMAKE_PROJECT_NAME})
-
-pybind11_add_module(${PYTHON_TARGET}
-    ${SOURCE_FILES}
-    ${API_HEADER_FILES}
-    ${API_MODULE_FILE}
-    ${EXPORT_HEADER_FILE}
-    python.cpp
-)
-
-set_target_properties(${PYTHON_TARGET} PROPERTIES
-    OUTPUT_NAME libopencor
-)
-
-configure_file(libopencor/__init__.py libopencor/__init__.py COPYONLY)

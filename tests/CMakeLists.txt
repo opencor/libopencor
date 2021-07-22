@@ -41,8 +41,10 @@ endforeach()
 include(header_files/tests.cmake)
 
 # Add our prepared tests after sorting them.
+message(">>> TEST_TARGETS: >${TEST_TARGETS}<")
 
 list(SORT TEST_TARGETS)
+message(">>> TEST_TARGETS: >${TEST_TARGETS}<")
 
 foreach(TEST_TARGET ${TEST_TARGETS})
     add_test(NAME ${TEST_TARGET}
@@ -54,3 +56,7 @@ foreach(TEST_TARGET ${TEST_TARGETS})
         )
     endif()
 endforeach()
+
+# Add our Python tests.
+
+add_subdirectory(bindings)
