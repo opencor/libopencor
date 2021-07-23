@@ -28,8 +28,8 @@ class VersionTests(unittest.TestCase):
 
         # std::string versionString()
 
-        self.assertIsInstance(libopencor.versionString(), str)
-        self.assertNotEqual(libopencor.versionString(), "")
+        self.assertIsInstance(libopencor.version_string(), str)
+        self.assertNotEqual(libopencor.version_string(), "")
 
 
 if __name__ == "__main__":

@@ -31,7 +31,11 @@ pybind11_add_module(${PYTHON_TARGET}
 )
 
 set_target_properties(${PYTHON_TARGET} PROPERTIES
-    OUTPUT_NAME libopencor
+    OUTPUT_NAME libopencor/libopencor
 )
 
 configure_file(libopencor/__init__.py libopencor/__init__.py COPYONLY)
+
+# Install our Python bindings.
+
+install(TARGETS ${PYTHON_TARGET} DESTINATION .)

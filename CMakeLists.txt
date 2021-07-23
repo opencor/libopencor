@@ -15,7 +15,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(libOpenCOR
-    VERSION 0.0.0
+    VERSION 0.1.0
 )
 
 # Enable C++11 and later.

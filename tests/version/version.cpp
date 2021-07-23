@@ -20,6 +20,6 @@ limitations under the License.
 
 TEST(Version, basic)
 {
-    EXPECT_EQ(0x000000U, libOpenCOR::version());
-    EXPECT_EQ("0.0.0", libOpenCOR::versionString());
+    EXPECT_EQ(0x000100U, libOpenCOR::version());
+    EXPECT_EQ("0.1.0", libOpenCOR::versionString());
 }
