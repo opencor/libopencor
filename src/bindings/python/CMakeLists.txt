@@ -20,16 +20,10 @@ endif()
 
 # Build our Python bindings.
 
-set(PYTHON_MODULE _libopencor)
-
-pybind11_add_module(${PYTHON_MODULE}
+pybind11_add_module(_libopencor
     ${SOURCE_FILES}
     ${API_HEADER_FILES}
     ${API_MODULE_FILE}
     ${EXPORT_HEADER_FILE}
     version.cpp
 )
-
-# Install our Python bindings.
-
-install(TARGETS ${PYTHON_MODULE} DESTINATION .)

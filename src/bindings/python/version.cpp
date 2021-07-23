@@ -22,6 +22,9 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(_libopencor, m) {
     m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";
+
+    // Version
+
     m.def("version", &libOpenCOR::version, "Get the version number of libOpenCOR.");
     m.def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.");
 }
