@@ -61,15 +61,19 @@ endif()
 # Hide the CMake options that are not directly relevant to libOpenCOR.
 
 if(WIN32)
-    mark_as_advanced(CLCACHE_EXE)
-    mark_as_advanced(CMAKE_CONFIGURATION_TYPES)
+    mark_as_advanced(
+        CLCACHE_EXE
+        CMAKE_CONFIGURATION_TYPES
+    )
 else()
     mark_as_advanced(CCACHE_EXE)
 
     if(APPLE)
-        mark_as_advanced(CMAKE_OSX_ARCHITECTURES)
-        mark_as_advanced(CMAKE_OSX_DEPLOYMENT_TARGET)
-        mark_as_advanced(CMAKE_OSX_SYSROOT)
+        mark_as_advanced(
+            CMAKE_OSX_ARCHITECTURES
+            CMAKE_OSX_DEPLOYMENT_TARGET
+            CMAKE_OSX_SYSROOT
+        )
     endif()
 endif()
 

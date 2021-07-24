@@ -31,15 +31,18 @@ configure_file(version.in.cpp ${CMAKE_CURRENT_BINARY_DIR}/version.cpp)
 
 set(API_EXPORT_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/api/libopencor/export.h)
 
-set(SOURCE_FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
-)
-
 set(API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/version.h
 )
 
 set(API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/module/libopencor)
+
+set(SOURCE_FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/version.cpp
+)
+
+set(HEADER_FILES
+)
 
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}/api
@@ -47,10 +50,11 @@ include_directories(
 )
 
 add_library(${CMAKE_PROJECT_NAME}
-    ${SOURCE_FILES}
     ${API_EXPORT_HEADER_FILE}
     ${API_HEADER_FILES}
     ${API_MODULE_FILE}
+    ${SOURCE_FILES}
+    ${HEADER_FILES}
 )
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
