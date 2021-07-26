@@ -56,7 +56,20 @@ if(CLANG_FORMAT_EXE)
 endif()
 
 if(CLANG_TIDY_EXE)
-    set(CLANG_TIDY_AVAILABLE TRUE CACHE INTERNAL "Executable required to perform static analysis.")
+    set(CLANG_TIDY_MINIMUM_VERSION 12)
+
+    execute_process(COMMAND ${CLANG_TIDY_EXE} --version
+                    OUTPUT_VARIABLE CLANG_TIDY_VERSION
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_QUIET)
+
+    string(REGEX REPLACE "^.*LLVM version ([.0-9]+).*$" "\\1" CLANG_TIDY_VERSION "${CLANG_TIDY_VERSION}")
+
+    if(CLANG_TIDY_VERSION VERSION_LESS CLANG_TIDY_MINIMUM_VERSION)
+        message(WARNING "Clang-Tidy ${CLANG_TIDY_VERSION} was found, but version ${CLANG_TIDY_MINIMUM_VERSION}+ is needed to perform static analysis.")
+    else()
+        set(CLANG_TIDY_AVAILABLE TRUE CACHE INTERNAL "Executable required to perform static analysis.")
+    endif()
 endif()
 
 # Hide the CMake options that are not directly relevant to libOpenCOR.
