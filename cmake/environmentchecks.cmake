@@ -45,7 +45,7 @@ if(CLANG_FORMAT_EXE)
                     OUTPUT_STRIP_TRAILING_WHITESPACE
                     ERROR_QUIET)
 
-    string(REGEX REPLACE "^.*clang-format version ([.0-9]+).*" "\\1" CLANG_FORMAT_VERSION "${CLANG_FORMAT_VERSION}")
+    string(REGEX REPLACE "^.*clang-format version ([.0-9]+).*$" "\\1" CLANG_FORMAT_VERSION "${CLANG_FORMAT_VERSION}")
 
     if(CLANG_FORMAT_VERSION VERSION_LESS CLANG_FORMAT_MINIMUM_VERSION)
         message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to use ClangFormat.")
