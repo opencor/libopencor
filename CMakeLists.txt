@@ -229,12 +229,28 @@ endif()
 # Note: we don't format API_EXPORT_HEADER_FILE since it's generated.
 
 if(CLANG_FORMAT_EXE)
-    set(FILES_TO_FORMAT
+    set(GIT_FILES
         ${GIT_API_HEADER_FILES}
         ${GIT_API_MODULE_FILE}
         ${GIT_SOURCE_FILES}
         ${GIT_HEADER_FILES}
         ${GIT_TESTS_SOURCE_FILES}
         ${GIT_TESTS_HEADER_FILES}
+    )
+
+    set(CHECK_CODE_FORMATTING_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/checkcodeformatting.cmake)
+
+    configure_file(cmake/checkcodeformatting.in.cmake
+                   ${CHECK_CODE_FORMATTING_SCRIPT} @ONLY)
+
+    if(CLANG_FORMAT_TESTING_AVAILABLE)
+        add_custom_target(test_clang_format
+            COMMAND ${CMAKE_COMMAND} -P ${CHECK_CODE_FORMATTING_SCRIPT}
+        )
+    endif()
+
+    add_custom_target(format_code
+        COMMAND ${CLANG_FORMAT_EXE} -i ${GIT_FILES}
+        COMMENT "The codebase has been formatted using ClangFormat."
     )
 endif()
