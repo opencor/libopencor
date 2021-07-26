@@ -35,12 +35,9 @@ find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
 
 if(CLANG_FORMAT_EXE)
-    # Note: Git is needed so that we can `git diff` the result of ClangFormat on
-    #       our codebase.
-
     set(CLANG_FORMAT_MINIMUM_VERSION 12)
 
-    execute_process(COMMAND ${CLANG_FORMAT_EXE} -version
+    execute_process(COMMAND ${CLANG_FORMAT_EXE} --version
                     OUTPUT_VARIABLE CLANG_FORMAT_VERSION
                     OUTPUT_STRIP_TRAILING_WHITESPACE
                     ERROR_QUIET)
@@ -48,7 +45,7 @@ if(CLANG_FORMAT_EXE)
     string(REGEX REPLACE "^.*clang-format version ([.0-9]+).*$" "\\1" CLANG_FORMAT_VERSION "${CLANG_FORMAT_VERSION}")
 
     if(CLANG_FORMAT_VERSION VERSION_LESS CLANG_FORMAT_MINIMUM_VERSION)
-        message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to use ClangFormat.")
+        message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to format the codebase and/or run the ClangFormat test.")
     else()
         set(CLANG_FORMAT_AVAILABLE TRUE CACHE INTERNAL "Executable required to format the codebase.")
 
