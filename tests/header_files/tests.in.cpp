@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <libopencor/@API_HEADER_NAME@.h>
+#include <libopencor/@GIT_API_HEADER_NAME@.h>
 
 #include "gtest/gtest.h"
 
-TEST(APIHeaderFiles, @API_HEADER_NAME@)
+TEST(APIHeaderFiles, @GIT_API_HEADER_NAME@)
 {
 }

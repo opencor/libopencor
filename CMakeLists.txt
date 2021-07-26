@@ -223,3 +223,18 @@ if(LIBOPENCOR_UNIT_TESTS)
         INSTALL_GTEST
     )
 endif()
+
+# Add some custom targets to test the formatting of our codebase and to format
+# it.
+# Note: we don't format API_EXPORT_HEADER_FILE since it's generated.
+
+if(CLANG_FORMAT_EXE)
+    set(FILES_TO_FORMAT
+        ${GIT_API_HEADER_FILES}
+        ${GIT_API_MODULE_FILE}
+        ${GIT_SOURCE_FILES}
+        ${GIT_HEADER_FILES}
+        ${GIT_TESTS_SOURCE_FILES}
+        ${GIT_TESTS_HEADER_FILES}
+    )
+endif()

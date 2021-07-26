@@ -26,6 +26,9 @@ include(version/tests.cmake)
 
 # Prepare our different tests.
 
+set(GIT_TESTS_SOURCE_FILES)
+set(GIT_TESTS_HEADER_FILES)
+
 foreach(TEST ${TESTS})
     if(DEFINED ${TEST}_CATEGORY)
         set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
@@ -34,7 +37,13 @@ foreach(TEST ${TESTS})
     endif()
 
     prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES})
+
+    list(APPEND GIT_TESTS_SOURCE_FILES ${${TEST}_SOURCE_FILES})
+    list(APPEND GIT_TESTS_HEADER_FILES ${${TEST}_HEADER_FILES})
 endforeach()
+
+set(GIT_TESTS_SOURCE_FILES ${GIT_TESTS_SOURCE_FILES} PARENT_SCOPE)
+set(GIT_TESTS_HEADER_FILES ${GIT_TESTS_HEADER_FILES} PARENT_SCOPE)
 
 # Prepare the tests for our header files.
 

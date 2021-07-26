@@ -14,10 +14,10 @@
 
 # Go through our API header files and generate a test file for each of them.
 
-foreach(API_HEADER_FILE ${API_HEADER_FILES})
-    get_filename_component(API_HEADER_NAME ${API_HEADER_FILE} NAME_WE)
+foreach(GIT_API_HEADER_FILE ${GIT_API_HEADER_FILES})
+    get_filename_component(GIT_API_HEADER_NAME ${GIT_API_HEADER_FILE} NAME_WE)
 
-    set(TEST_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/header_files/${API_HEADER_NAME}.cpp)
+    set(TEST_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/header_files/${GIT_API_HEADER_NAME}.cpp)
 
     configure_file(header_files/tests.in.cpp ${TEST_SOURCE_FILE})
 
