@@ -34,7 +34,7 @@ find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
 
-if(CLANG_FORMAT_EXE AND GIT_EXE)
+if(CLANG_FORMAT_EXE)
     # Note: Git is needed so that we can `git diff` the result of ClangFormat on
     #       our codebase.
 
@@ -48,9 +48,13 @@ if(CLANG_FORMAT_EXE AND GIT_EXE)
     string(REGEX REPLACE "^.*clang-format version ([.0-9]+).*" "\\1" CLANG_FORMAT_VERSION "${CLANG_FORMAT_VERSION}")
 
     if(CLANG_FORMAT_VERSION VERSION_LESS CLANG_FORMAT_MINIMUM_VERSION)
-        message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to run the ClangFormat test.")
+        message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to use ClangFormat.")
     else()
-        set(CLANG_FORMAT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run the ClangFormat test are available.")
+        set(CLANG_FORMAT_AVAILABLE TRUE CACHE INTERNAL "Executable required to format the codebase.")
+
+        if(GIT_EXE)
+            set(CLANG_FORMAT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run the ClangFormat test.")
+        endif()
     endif()
 endif()
 

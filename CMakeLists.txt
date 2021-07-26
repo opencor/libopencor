@@ -228,7 +228,7 @@ endif()
 # it.
 # Note: we don't format API_EXPORT_HEADER_FILE since it's generated.
 
-if(CLANG_FORMAT_EXE)
+if(CLANG_FORMAT_AVAILABLE)
     set(GIT_FILES
         ${GIT_API_HEADER_FILES}
         ${GIT_API_MODULE_FILE}
