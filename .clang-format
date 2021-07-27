@@ -74,7 +74,7 @@ IncludeCategories:
 IndentCaseLabels: false
 IndentCaseBlocks: false
 IndentGotoLabels: false
-IndentPPDirectives: BeforeHash
+IndentPPDirectives: AfterHash
 IndentExternBlock: AfterExternBlock
 IndentRequires: true
 IndentWidth: 4
