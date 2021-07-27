@@ -10,7 +10,7 @@ You can install libOpenCOR from this repository using:
 
     pip install git+https://github.com/opencor/libopencor.git
 
-Then, you can import libOpenCOR using:
+Then, you can import it using:
 
 .. code-block:: python
 
