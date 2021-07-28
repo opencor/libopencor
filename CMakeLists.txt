@@ -85,7 +85,7 @@ endif()
 set(DOCSTRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ...")
 
 if(DEFINED BUILD_TYPE)
-    set(LIBOPENCOR_BUILD_TYPE ${BUILD_TYPE} CACHE STRING "${DOCSTRING}" FORCE)
+    set(LIBOPENCOR_BUILD_TYPE "${BUILD_TYPE}" CACHE STRING "${DOCSTRING}" FORCE)
 
     unset(BUILD_TYPE CACHE)
 else()
