@@ -14,16 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Do memory checks using Valgrind's Memcheck tool.
-# Note: based on the former runMemcheck.py script available in KDevelop (see
-#       https://invent.kde.org/kdevelop/kdevelop/-/blob/3973/veritas/tests/runMemcheck.py)
-#       and http://mail.python.org/pipermail/python-list/2002-August/157829.html
-#       for the which() method (although the link doesn't work anymore).
+# Do memory checks using Memcheck from Valgrind.
+# Note: this script is based on the runMemcheck.py script that used to be part
+#       of KDevelop (see
+#       https://invent.kde.org/kdevelop/kdevelop/-/blob/3973/veritas/tests/runMemcheck.py).
 
 
 import math
 import multiprocessing
 import os
+import shutil
 import sys
 import xml.dom.minidom
 
@@ -134,26 +134,9 @@ def run_test(valgrind, test, test_path):
     return False
 
 
-def which(app_name):
-    if 'PATH' not in os.environ or os.environ['PATH'] == '':
-        path_environ = os.defpath
-    else:
-        path_environ = os.environ['PATH']
-
-    paths = path_environ.split(os.pathsep)
-
-    for path in paths:
-        app_path = path + os.sep + app_name
-
-        if os.access(app_path, os.X_OK):
-            return app_path
-
-    return None
-
-
 if __name__ == '__main__':
     if len(sys.argv) > 2:
-        valgrind = which('valgrind')
+        valgrind = shutil.which('valgrind')
 
         if valgrind == None:
             sys.stderr.write('-- Valgrind could not be found.\n')
