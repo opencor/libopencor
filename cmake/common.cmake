@@ -139,9 +139,9 @@ function(prepare_test TEST_TARGET)
         configure_warnings_as_errors(${TEST_TARGET})
     endif()
 
-    # Use Clang-Tidy for the given test.
+    # Analyse the code of the given test.
 
-    if(LIBOPENCOR_CLANG_TIDY)
+    if(LIBOPENCOR_CODE_ANALYSIS)
         configure_clang_and_clang_tidy(${TEST_TARGET})
     endif()
 endfunction()

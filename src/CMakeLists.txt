@@ -107,9 +107,9 @@ if(LIBOPENCOR_WARNINGS_AS_ERRORS)
     configure_warnings_as_errors(${CMAKE_PROJECT_NAME})
 endif()
 
-# Use Clang-Tidy.
+# Analyse the code.
 
-if(LIBOPENCOR_CLANG_TIDY)
+if(LIBOPENCOR_CODE_ANALYSIS)
     configure_clang_and_clang_tidy(${CMAKE_PROJECT_NAME})
 endif()
 

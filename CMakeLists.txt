@@ -46,7 +46,7 @@ if(DEFINED BINDINGS_PYTHON)
     else()
         set(IGNORE_ME ${BINDINGS_PYTHON})
 
-        message(WARNING "Python bindings are requested but development files for Python could not be found.")
+        message(WARNING "Python bindings are requested but Python development files could not be found.")
     endif()
 
     unset(BINDINGS_PYTHON CACHE)
@@ -62,23 +62,6 @@ if(DEFINED BUILD_SHARED_LIBS)
 endif()
 
 set(BUILD_SHARED_LIBS ${LIBOPENCOR_BUILD_SHARED_LIBS} CACHE INTERNAL "Internalise BUILD_SHARED_LIBS, manipulate via LIBOPENCOR_BUILD_SHARED_LIBS." FORCE)
-
-# CLANG_TIDY ==> LIBOPENCOR_CLANG_TIDY.
-
-if(CLANG_TIDY_AVAILABLE)
-    set(DOCSTRING "Enable Clang-Tidy.")
-    set(LIBOPENCOR_CLANG_TIDY OFF CACHE BOOL "${DOCSTRING}")
-endif()
-
-if(DEFINED CLANG_TIDY)
-    if(CLANG_TIDY_AVAILABLE)
-        set(LIBOPENCOR_CLANG_TIDY ${CLANG_TIDY} CACHE BOOL "${DOCSTRING}" FORCE)
-    else()
-        message(WARNING "Clang-Tidy is requested but not found!")
-    endif()
-
-    unset(CLANG_TIDY CACHE)
-endif()
 
 # [CMAKE_]BUILD_TYPE ==> LIBOPENCOR_BUILD_TYPE.
 
@@ -110,27 +93,44 @@ file(TO_CMAKE_PATH ${LIBOPENCOR_INSTALL_PREFIX} CMAKE_INSTALL_PREFIX_PATH)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_PATH} CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX, manipulate via LIBOPENCOR_INSTALL_PREFIX." FORCE)
 
-# COMPILER_CACHE ==> LIBOPENCOR_COMPILER_CACHE.
+# CODE_ANALYSIS ==> LIBOPENCOR_CODE_ANALYSIS.
 
-if(CLCACHE_AVAILABLE OR CCACHE_AVAILABLE)
-    set(DOCSTRING "Enable compiler cache.")
-    set(LIBOPENCOR_COMPILER_CACHE ON CACHE BOOL "${DOCSTRING}")
+if(CLANG_TIDY_AVAILABLE)
+    set(DOCSTRING "Enable code analysis.")
+    set(LIBOPENCOR_CODE_ANALYSIS OFF CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED COMPILER_CACHE)
-    if(CLCACHE_AVAILABLE OR CCACHE_AVAILABLE)
-        set(LIBOPENCOR_COMPILER_CACHE ${COMPILER_CACHE} CACHE BOOL "${DOCSTRING}" FORCE)
+if(DEFINED CODE_ANALYSIS)
+    if(CLANG_TIDY_AVAILABLE)
+        set(LIBOPENCOR_CODE_ANALYSIS ${CODE_ANALYSIS} CACHE BOOL "${DOCSTRING}" FORCE)
     else()
-        if(WIN32)
-            set(COMPILER_CACHE_TOOL clcache)
-        else()
-            set(COMPILER_CACHE_TOOL ccache)
-        endif()
-
-        message(WARNING "Compiler cache is requested but ${COMPILER_CACHE_TOOL} could not be found.")
+        message(WARNING "Code analysis is requested but clang-tidy could not be found.")
     endif()
 
-    unset(COMPILER_CACHE CACHE)
+    unset(CODE_ANALYSIS CACHE)
+endif()
+
+# COMPILER_CACHING ==> LIBOPENCOR_COMPILER_CACHING.
+
+if(CLCACHE_AVAILABLE OR CCACHE_AVAILABLE)
+    set(DOCSTRING "Enable compiler caching.")
+    set(LIBOPENCOR_COMPILER_CACHING ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED COMPILER_CACHING)
+    if(CLCACHE_AVAILABLE OR CCACHE_AVAILABLE)
+        set(LIBOPENCOR_COMPILER_CACHING ${COMPILER_CACHING} CACHE BOOL "${DOCSTRING}" FORCE)
+    else()
+        if(WIN32)
+            set(COMPILER_CACHING_TOOL clcache)
+        else()
+            set(COMPILER_CACHING_TOOL ccache)
+        endif()
+
+        message(WARNING "Compiler caching is requested but ${COMPILER_CACHING_TOOL} could not be found.")
+    endif()
+
+    unset(COMPILER_CACHING CACHE)
 endif()
 
 # MEMORY_CHECKS ==> LIBOPENCOR_MEMORY_CHECKS
@@ -153,16 +153,16 @@ if(DEFINED MEMORY_CHECKS)
     unset(MEMORY_CHECKS CACHE)
 endif()
 
-# UNIT_TESTS ==> LIBOPENCOR_UNIT_TESTS.
+# UNIT_TESTING ==> LIBOPENCOR_UNIT_TESTING.
 
-set(DOCSTRING "Enable unit tests.")
-set(LIBOPENCOR_UNIT_TESTS ON CACHE BOOL "${DOCSTRING}")
+set(DOCSTRING "Enable unit testing.")
+set(LIBOPENCOR_UNIT_TESTING ON CACHE BOOL "${DOCSTRING}")
 
-if(DEFINED UNIT_TESTS)
-    set(LIBOPENCOR_UNIT_TESTS ${UNIT_TESTS} CACHE BOOL "${DOCSTRING}" FORCE)
+if(DEFINED UNIT_TESTING)
+    set(LIBOPENCOR_UNIT_TESTING ${UNIT_TESTING} CACHE BOOL "${DOCSTRING}" FORCE)
+
+    unset(UNIT_TESTING CACHE)
 endif()
-
-unset(UNIT_TESTS CACHE)
 
 # WARNINGS_AS_ERRORS ==> LIBOPENCOR_WARNINGS_AS_ERRORS.
 
@@ -171,9 +171,9 @@ set(LIBOPENCOR_WARNINGS_AS_ERRORS ON CACHE BOOL "${DOCSTRING}")
 
 if(DEFINED WARNINGS_AS_ERRORS)
     set(LIBOPENCOR_WARNINGS_AS_ERRORS ${WARNINGS_AS_ERRORS} CACHE BOOL "${DOCSTRING}" FORCE)
-endif()
 
-unset(WARNINGS_AS_ERRORS CACHE)
+    unset(WARNINGS_AS_ERRORS CACHE)
+endif()
 
 # Make sure that the configuration is sound.
 
@@ -182,8 +182,8 @@ if(LIBOPENCOR_MEMORY_CHECKS)
         message(SEND_ERROR "Configuration confusion: memory checks have been requested but so has a release build.")
     endif()
 
-    if(NOT LIBOPENCOR_UNIT_TESTS)
-        message(SEND_ERROR "Configuration confusion: memory checks have been requested but not unit tests.")
+    if(NOT LIBOPENCOR_UNIT_TESTING)
+        message(SEND_ERROR "Configuration confusion: memory checks have been requested but not unit testing.")
     endif()
 endif()
 
@@ -203,7 +203,7 @@ endif()
 
 # Enable clcache/ccache.
 
-if(LIBOPENCOR_COMPILER_CACHE)
+if(LIBOPENCOR_COMPILER_CACHING)
     if(CLCACHE_EXE)
         set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
 
@@ -235,9 +235,9 @@ endif()
 
 add_subdirectory(src)
 
-# Enable unit tests.
+# Enable unit testing.
 
-if(LIBOPENCOR_UNIT_TESTS)
+if(LIBOPENCOR_UNIT_TESTING)
     enable_testing()
 
     set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
@@ -272,7 +272,7 @@ if(CLANG_FORMAT_AVAILABLE)
                    ${CHECK_CODE_FORMATTING_SCRIPT} @ONLY)
 
     if(CLANG_FORMAT_TESTING_AVAILABLE)
-        add_custom_target(test_clang_format
+        add_custom_target(check_code_formatting
             COMMAND ${CMAKE_COMMAND} -P ${CHECK_CODE_FORMATTING_SCRIPT}
         )
     endif()
