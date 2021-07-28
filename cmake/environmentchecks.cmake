@@ -33,6 +33,7 @@ endif()
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
+find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
 if(CLANG_FORMAT_EXE)
     set(CLANG_FORMAT_MINIMUM_VERSION 12)
@@ -72,6 +73,10 @@ if(CLANG_TIDY_EXE)
     endif()
 endif()
 
+if(VALGRIND_EXE)
+    set(VALGRIND_AVAILABLE TRUE CACHE INTERNAL "Executable required to run memory checks.")
+endif()
+
 # Hide the CMake options that are not directly relevant to libOpenCOR.
 
 if(WIN32)
@@ -95,4 +100,5 @@ mark_as_advanced(
     CLANG_FORMAT_EXE
     CLANG_TIDY_EXE
     GIT_EXE
+    VALGRIND_EXE
 )

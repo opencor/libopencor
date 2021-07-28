@@ -133,6 +133,26 @@ if(DEFINED COMPILER_CACHE)
     unset(COMPILER_CACHE CACHE)
 endif()
 
+# MEMORY_CHECKS ==> LIBOPENCOR_MEMORY_CHECKS
+
+set(DOCSTRING "Enable memory checks.")
+
+if(VALGRIND_AVAILABLE)
+    set(LIBOPENCOR_MEMORY_CHECKS ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED MEMORY_CHECKS)
+    if(MEMORY_CHECKS)
+        if(VALGRIND_AVAILABLE)
+            set(LIBOPENCOR_MEMORY_CHECKS "${MEMORY_CHECKS}" CACHE BOOL "${DOCSTRING}" FORCE)
+        else()
+            message(WARNING "Memory checks are requested but Valgrind could not be found.")
+        endif()
+    endif()
+
+    unset(MEMORY_CHECKS CACHE)
+endif()
+
 # UNIT_TESTS ==> LIBOPENCOR_UNIT_TESTS.
 
 set(DOCSTRING "Enable unit tests.")
