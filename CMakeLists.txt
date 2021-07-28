@@ -175,6 +175,18 @@ endif()
 
 unset(WARNINGS_AS_ERRORS CACHE)
 
+# Make sure that the configuration is sound.
+
+if(LIBOPENCOR_MEMORY_CHECKS)
+    if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Release")
+        message(SEND_ERROR "Configuration confusion: memory checks have been requested but so has a release build.")
+    endif()
+
+    if(NOT LIBOPENCOR_UNIT_TESTS)
+        message(SEND_ERROR "Configuration confusion: memory checks have been requested but not unit tests.")
+    endif()
+endif()
+
 # Update our submodules.
 
 find_package(Git REQUIRED)
