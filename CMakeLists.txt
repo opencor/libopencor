@@ -279,6 +279,6 @@ if(CLANG_FORMAT_AVAILABLE)
 
     add_custom_target(format_code
         COMMAND ${CLANG_FORMAT_EXE} -i ${GIT_FILES}
-        COMMENT "The codebase has been formatted using ClangFormat."
+        COMMENT "Formatting the codebase..."
     )
 endif()
