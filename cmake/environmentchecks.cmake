@@ -41,9 +41,10 @@ find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
 include(CheckCXXCompilerFlag)
 
-set(GCC_COVERAGE_COMPILER_FLAGS "-fprofile-arcs -ftest-coverage")
+set(COVERAGE_COMPILER_FLAGS "-fprofile-arcs -ftest-coverage")
+set(CMAKE_REQUIRED_FLAGS ${COVERAGE_COMPILER_FLAGS})
 
-check_cxx_compiler_flag(${GCC_COVERAGE_COMPILER_FLAGS} GCC_COVERAGE_COMPILER_FLAGS_OK)
+check_cxx_compiler_flag(${COVERAGE_COMPILER_FLAGS} COVERAGE_COMPILER_FLAGS_OK)
 
 # Determine what is available.
 
@@ -85,7 +86,7 @@ if(CLANG_TIDY_EXE)
     endif()
 endif()
 
-if(FIND_EXE AND GCOV_EXE AND GCC_COVERAGE_COMPILER_FLAGS_OK AND Python_Interpreter_FOUND)
+if(FIND_EXE AND GCOV_EXE AND COVERAGE_COMPILER_FLAGS_OK AND Python_Interpreter_FOUND)
     set(COVERAGE_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run coverage testing.")
 endif()
 
