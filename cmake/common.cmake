@@ -117,31 +117,31 @@ function(configure_clang_and_clang_tidy TARGET)
     endif()
 endfunction()
 
-function(prepare_test TEST_TARGET)
+function(prepare_test TARGET)
     # Prepare the given test.
 
-    add_executable(${TEST_TARGET}
+    add_executable(${TARGET}
         ${ARGN}
     )
 
-    target_link_libraries(${TEST_TARGET}
+    target_link_libraries(${TARGET}
         gtest_main
         ${CMAKE_PROJECT_NAME}
     )
 
-    list(APPEND TEST_TARGETS "${TEST_TARGET}")
+    list(APPEND TEST_TARGETS "${TARGET}")
 
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)
 
     # Treat warnings as errors for the given test.
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-        configure_warnings_as_errors(${TEST_TARGET})
+        configure_warnings_as_errors(${TARGET})
     endif()
 
     # Analyse the code of the given test.
 
     if(LIBOPENCOR_CODE_ANALYSIS)
-        configure_clang_and_clang_tidy(${TEST_TARGET})
+        configure_clang_and_clang_tidy(${TARGET})
     endif()
 endfunction()
