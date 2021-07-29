@@ -195,6 +195,12 @@ endif()
 
 # Make sure that the configuration is sound.
 
+if(LIBOPENCOR_COVERAGE)
+    if(NOT LIBOPENCOR_UNIT_TESTING)
+        message(SEND_ERROR "Configuration confusion: coverage has been requested but not unit testing.")
+    endif()
+endif()
+
 if(LIBOPENCOR_MEMORY_CHECKS)
     if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Release")
         message(SEND_ERROR "Configuration confusion: memory checks have been requested but so has a release build.")
