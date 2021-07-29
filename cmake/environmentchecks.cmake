@@ -34,6 +34,7 @@ find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
 find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
+find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
@@ -86,7 +87,7 @@ if(CLANG_TIDY_EXE)
     endif()
 endif()
 
-if(FIND_EXE AND GCOV_EXE AND COVERAGE_COMPILER_FLAGS_OK AND Python_Interpreter_FOUND)
+if(FIND_EXE AND GCOV_EXE AND GCOVR_EXE AND COVERAGE_COMPILER_FLAGS_OK)
     set(COVERAGE_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run coverage testing.")
 endif()
 
@@ -118,6 +119,7 @@ mark_as_advanced(
     CLANG_TIDY_EXE
     FIND_EXE
     GCOV_EXE
+    GCOVR_EXE
     GIT_EXE
     VALGRIND_EXE
 )
