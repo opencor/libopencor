@@ -16,8 +16,6 @@ limitations under the License.
 
 #include "libopencor/version.h"
 
-#include <string>
-
 namespace libOpenCOR {
 
 unsigned int version()
