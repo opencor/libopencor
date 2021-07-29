@@ -133,6 +133,24 @@ if(DEFINED COMPILER_CACHING)
     unset(COMPILER_CACHING CACHE)
 endif()
 
+# COVERAGE ==> LIBOPENCOR_COVERAGE
+
+set(DOCSTRING "Enable coverage testing.")
+
+if(COVERAGE_TESTING_AVAILABLE)
+    set(LIBOPENCOR_COVERAGE ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED COVERAGE)
+    if(COVERAGE_TESTING_AVAILABLE)
+        set(LIBOPENCOR_COVERAGE "${COVERAGE}" CACHE BOOL "${DOCSTRING}" FORCE)
+    else()
+        message(WARNING "Coverage testing is requested but gcov or its requirements could not be found.")
+    endif()
+
+    unset(COVERAGE CACHE)
+endif()
+
 # MEMORY_CHECKS ==> LIBOPENCOR_MEMORY_CHECKS
 
 set(DOCSTRING "Enable memory checks.")

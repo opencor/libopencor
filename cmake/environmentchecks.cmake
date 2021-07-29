@@ -32,8 +32,20 @@ endif()
 
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
+find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
+find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
+
+# Check some compiler flags
+
+include(CheckCXXCompilerFlag)
+
+set(CMAKE_REQUIRED_FLAGS "-fprofile-arcs -ftest-coverage")
+
+check_cxx_compiler_flag(${CMAKE_REQUIRED_FLAGS} GCC_COVERAGE_COMPILER_FLAGS_OK)
+
+# Determine what is available.
 
 if(CLANG_FORMAT_EXE)
     set(CLANG_FORMAT_MINIMUM_VERSION 12)
@@ -73,6 +85,10 @@ if(CLANG_TIDY_EXE)
     endif()
 endif()
 
+if(FIND_EXE AND GCOV_EXE AND GCC_COVERAGE_COMPILER_FLAGS_OK AND Python_Interpreter_FOUND)
+    set(COVERAGE_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run coverage testing.")
+endif()
+
 if(VALGRIND_EXE)
     set(VALGRIND_AVAILABLE TRUE CACHE INTERNAL "Executable required to run memory checks.")
 endif()
@@ -99,6 +115,8 @@ endif()
 mark_as_advanced(
     CLANG_FORMAT_EXE
     CLANG_TIDY_EXE
+    FIND_EXE
+    GCOV_EXE
     GIT_EXE
     VALGRIND_EXE
 )
