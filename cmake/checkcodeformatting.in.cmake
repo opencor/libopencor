@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Ignore differences in line endings on Windows.
-# Note: indeed, Windows uses CRLF line endings while our codebase uses LF line
+# Note: indeed, Windows uses CRLF line endings while our code uses LF line
 #       endings (i.e. UNIX style).
 
 if(WIN32)
@@ -56,7 +56,7 @@ if(BADLY_FORMATTED_FILES)
         message(STATUS " - ${BADLY_FORMATTED_FILE}")
     endforeach()
 
-    message(FATAL_ERROR "Please correct the codebase's formatting by running the 'format_code' target.")
+    message(FATAL_ERROR "Please correct the code's formatting by running the 'format_code' target.")
 else()
     message(STATUS "${GIT_FILES_COUNT} files out of ${GIT_FILES_COUNT} files are properly formatted.")
 endif()

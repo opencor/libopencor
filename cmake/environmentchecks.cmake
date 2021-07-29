@@ -46,9 +46,9 @@ if(CLANG_FORMAT_EXE)
     string(REGEX REPLACE "^.*clang-format version ([.0-9]+).*$" "\\1" CLANG_FORMAT_VERSION "${CLANG_FORMAT_VERSION}")
 
     if(CLANG_FORMAT_VERSION VERSION_LESS CLANG_FORMAT_MINIMUM_VERSION)
-        message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to format the codebase and/or run the ClangFormat test.")
+        message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to format the code and/or run the ClangFormat test.")
     else()
-        set(CLANG_FORMAT_AVAILABLE TRUE CACHE INTERNAL "Executable required to format the codebase.")
+        set(CLANG_FORMAT_AVAILABLE TRUE CACHE INTERNAL "Executable required to format the code.")
 
         if(GIT_EXE)
             set(CLANG_FORMAT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run the ClangFormat test.")

@@ -166,7 +166,7 @@ endif()
 
 # WARNINGS_AS_ERRORS ==> LIBOPENCOR_WARNINGS_AS_ERRORS.
 
-set(DOCSTRING "Treat warnings as errors (this only applies to libOpenCOR's codebase).")
+set(DOCSTRING "Treat warnings as errors.")
 set(LIBOPENCOR_WARNINGS_AS_ERRORS ON CACHE BOOL "${DOCSTRING}")
 
 if(DEFINED WARNINGS_AS_ERRORS)
@@ -252,8 +252,7 @@ if(LIBOPENCOR_UNIT_TESTING)
     )
 endif()
 
-# Add some custom targets to test the formatting of our codebase and to format
-# it.
+# Add some custom targets to test the formatting of our code and to format it.
 # Note: we don't format API_EXPORT_HEADER_FILE since it's generated.
 
 if(CLANG_FORMAT_AVAILABLE)
@@ -279,6 +278,6 @@ if(CLANG_FORMAT_AVAILABLE)
 
     add_custom_target(format_code
         COMMAND ${CLANG_FORMAT_EXE} -i ${GIT_FILES}
-        COMMENT "Formatting the codebase..."
+        COMMENT "Formatting the code..."
     )
 endif()
