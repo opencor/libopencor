@@ -23,8 +23,10 @@ namespace libOpenCOR {
 unsigned int version()
 {
     // clang-format off
-    return @LIBOPENCOR_VERSION@;
+    static const unsigned int LIBOPENCOR_VERSION = @LIBOPENCOR_VERSION@;
     // clang-format on
+
+    return LIBOPENCOR_VERSION;
 }
 
 std::string versionString()
