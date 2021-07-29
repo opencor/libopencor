@@ -37,26 +37,27 @@ foreach(GIT_FILE ${GIT_FILES})
     endif()
 endforeach()
 
-# Output the outcome of our checks.
+# Output the summary of our checks.
+
+message(STATUS "Summary:")
 
 list(LENGTH GIT_FILES GIT_FILES_COUNT)
+list(LENGTH BADLY_FORMATTED_FILES BADLY_FORMATTED_FILES_COUNT)
+
+math(EXPR PROPERLY_FORMATTED_FILES_PERCENTAGE "100*(${GIT_FILES_COUNT}-${BADLY_FORMATTED_FILES_COUNT})/${GIT_FILES_COUNT}")
+
+message("     ${PROPERLY_FORMATTED_FILES_PERCENTAGE}% files properly formatted, ${BADLY_FORMATTED_FILES_COUNT} files badly formatted out of ${GIT_FILES_COUNT}.")
 
 if(BADLY_FORMATTED_FILES)
-    list(LENGTH BADLY_FORMATTED_FILES BADLY_FORMATTED_FILES_COUNT)
-
-    if(BADLY_FORMATTED_FILES_COUNT EQUAL 1)
-        message(STATUS "1 file out of ${GIT_FILES_COUNT} files is not properly formatted:")
-    else()
-        message(STATUS "${BADLY_FORMATTED_FILES_COUNT} files out of ${GIT_FILES_COUNT} files are not properly formatted:")
-    endif()
+    message("")
+    message("     The badly formatted files are:")
 
     foreach(BADLY_FORMATTED_FILE ${BADLY_FORMATTED_FILES})
         string(REPLACE "@PROJECT_SOURCE_DIR@/" "" BADLY_FORMATTED_FILE "${BADLY_FORMATTED_FILE}")
 
-        message(STATUS " - ${BADLY_FORMATTED_FILE}")
+        message("      - ${BADLY_FORMATTED_FILE}")
     endforeach()
 
+    message("")
     message(FATAL_ERROR "Please correct the code's formatting by running the 'format_code' target.")
-else()
-    message(STATUS "${GIT_FILES_COUNT} files out of ${GIT_FILES_COUNT} files are properly formatted.")
 endif()
