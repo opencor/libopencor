@@ -41,9 +41,9 @@ find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
 include(CheckCXXCompilerFlag)
 
-set(CMAKE_REQUIRED_FLAGS "-fprofile-arcs -ftest-coverage")
+set(GCC_COVERAGE_COMPILER_FLAGS "-fprofile-arcs -ftest-coverage")
 
-check_cxx_compiler_flag(${CMAKE_REQUIRED_FLAGS} GCC_COVERAGE_COMPILER_FLAGS_OK)
+check_cxx_compiler_flag(${GCC_COVERAGE_COMPILER_FLAGS} GCC_COVERAGE_COMPILER_FLAGS_OK)
 
 # Determine what is available.
 
