@@ -113,6 +113,20 @@ if(LIBOPENCOR_CODE_ANALYSIS)
     configure_clang_and_clang_tidy(${CMAKE_PROJECT_NAME})
 endif()
 
+# Get ready for coverage.
+
+if(LIBOPENCOR_COVERAGE)
+    # Update our compilation and linking flags.
+
+    append_target_property(${CMAKE_PROJECT_NAME} COMPILE_FLAGS ${COVERAGE_COMPILER_FLAGS})
+    append_target_property(${CMAKE_PROJECT_NAME} LINK_FLAGS ${COVERAGE_COMPILER_FLAGS})
+
+    # Share some paths with our tests.
+
+    set(GCOV_ANALYSIS_PATH "${CMAKE_CURRENT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/${CMAKE_PROJECT_NAME}.dir" PARENT_SCOPE)
+    set(GCOV_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}" PARENT_SCOPE)
+endif()
+
 # Build our different bindings.
 
 add_subdirectory(bindings)

@@ -117,6 +117,18 @@ function(configure_clang_and_clang_tidy TARGET)
     endif()
 endfunction()
 
+function(append_target_property TARGET PROPERTY VALUE)
+    get_target_property(OLD_VALUE ${TARGET} ${PROPERTY})
+
+    if(OLD_VALUE)
+        set(NEW_VALUE "${OLD_VALUE} ${VALUE}")
+    else()
+        set(NEW_VALUE "${VALUE}")
+    endif()
+
+    set_target_properties(${TARGET} PROPERTIES ${PROPERTY} "${NEW_VALUE}")
+endfunction()
+
 function(prepare_test TARGET)
     # Prepare the given test.
 
