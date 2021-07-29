@@ -48,7 +48,7 @@ class Frame:
         res = ''
 
         if self.function:
-            res += '      ' + self.function
+            res += '     ' + self.function
 
         if self.file and self.line:
             res += ' (' + self.file + ':' + self.line + ')'
