@@ -197,17 +197,17 @@ endif()
 
 if(LIBOPENCOR_COVERAGE)
     if(NOT LIBOPENCOR_UNIT_TESTING)
-        message(SEND_ERROR "Configuration confusion: coverage has been requested but not unit testing.")
+        message(SEND_ERROR "Configuration confusion: coverage is requested which means that unit testing should also be requested.")
     endif()
 endif()
 
 if(LIBOPENCOR_MEMORY_CHECKS)
     if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Release")
-        message(SEND_ERROR "Configuration confusion: memory checks have been requested but so has a release build.")
+        message(SEND_ERROR "Configuration confusion: memory checks are requested which means that a release build cannot also be requested.")
     endif()
 
     if(NOT LIBOPENCOR_UNIT_TESTING)
-        message(SEND_ERROR "Configuration confusion: memory checks have been requested but not unit testing.")
+        message(SEND_ERROR "Configuration confusion: memory checks are requested which means that unit testing should also be requested.")
     endif()
 endif()
 

@@ -64,32 +64,31 @@ foreach(TEST_TARGET ${TEST_TARGETS})
     endif()
 endforeach()
 
-# Get ready for coverage in our tests.
+# Run our coverage tests.
 
 if(LIBOPENCOR_COVERAGE)
     # Clean our old coverage data.
 
     add_custom_target(clean_coverage_data
-                      COMMAND ${FIND_EXE} ${GCOV_ANALYSIS_PATH} -type f -name '*.gcda' -print | xargs /bin/rm -f
+                      COMMAND ${FIND_EXE} ${GCOV_ANALYSIS_PATH} -type f -name "*.gcda" -print | xargs /bin/rm -f
                       COMMENT "Cleaning old coverage data...")
 
     # Clean our old coverage data when building libOpenCOR.
 
     add_dependencies(${CMAKE_PROJECT_NAME} clean_coverage_data)
 
-    # Add a target to prepare our covereage tests.
+    # Prepare for coverage.
 
     add_custom_target(prepare_coverage
                       DEPENDS clean_coverage_data ${TEST_TARGETS}
                       COMMAND ${CMAKE_CTEST_COMMAND} > /dev/null
-                      COMMENT "Preparing for coverage tests...")
+                      COMMENT "Preparing for coverage...")
 
-    # Add a target for our coverage tests.
+    # Run our coverage tests.
 
     add_custom_target(coverage
                       COMMAND ${GCOVR_EXE} -r ${GCOV_PREFIX_PATH} --gcov-executable=${GCOV_EXE} ${GCOV_ANALYSIS_PATH}
                       DEPENDS prepare_coverage
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                       COMMENT "Running coverage tests...")
 endif()
 
@@ -97,7 +96,7 @@ endif()
 
 add_subdirectory(bindings)
 
-# Add a target for our memory checks.
+# Run our memory checks.
 
 if(LIBOPENCOR_MEMORY_CHECKS)
     add_custom_target(memory_checks
