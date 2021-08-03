@@ -36,6 +36,8 @@ find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
 find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
 find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
+find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov)
+find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata)
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
 # Check some compiler flags
@@ -47,6 +49,11 @@ set(COVERAGE_LINKER_FLAGS "${COVERAGE_COMPILER_FLAGS}")
 set(CMAKE_REQUIRED_FLAGS ${COVERAGE_COMPILER_FLAGS})
 
 check_cxx_compiler_flag(${COVERAGE_COMPILER_FLAGS} COVERAGE_COMPILER_FLAGS_OK)
+
+set(LLVM_COVERAGE_COMPILER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+set(CMAKE_REQUIRED_FLAGS ${LLVM_COVERAGE_COMPILER_FLAGS})
+
+check_cxx_compiler_flag(${LLVM_COVERAGE_COMPILER_FLAGS} LLVM_COVERAGE_COMPILER_FLAGS_OK)
 
 # Determine what is available.
 
@@ -92,6 +99,10 @@ if(FIND_EXE AND GCOV_EXE AND GCOVR_EXE AND COVERAGE_COMPILER_FLAGS_OK)
     set(COVERAGE_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run coverage testing.")
 endif()
 
+if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND LLVM_COVERAGE_COMPILER_FLAGS_OK)
+    set(LLVM_COVERAGE_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run LLVM coverage testing.")
+endif()
+
 if(VALGRIND_EXE)
     set(VALGRIND_AVAILABLE TRUE CACHE INTERNAL "Executable required to run memory checks.")
 endif()
@@ -122,5 +133,7 @@ mark_as_advanced(
     GCOV_EXE
     GCOVR_EXE
     GIT_EXE
+    LLVM_COV_EXE
+    LLVM_PROFDATA_EXE
     VALGRIND_EXE
 )

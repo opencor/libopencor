@@ -151,6 +151,24 @@ file(TO_CMAKE_PATH ${LIBOPENCOR_INSTALL_PREFIX} CMAKE_INSTALL_PREFIX_PATH)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_PATH} CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX, manipulate via LIBOPENCOR_INSTALL_PREFIX." FORCE)
 
+# LLVM_COVERAGE ==> LIBOPENCOR_LLVM_COVERAGE
+
+set(DOCSTRING "Enable LLVM coverage testing.")
+
+if(LLVM_COVERAGE_TESTING_AVAILABLE)
+    set(LIBOPENCOR_LLVM_COVERAGE ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED LLVM_COVERAGE)
+    if(LLVM_COVERAGE_TESTING_AVAILABLE)
+        set(LIBOPENCOR_LLVM_COVERAGE "${LLVM_COVERAGE}" CACHE BOOL "${DOCSTRING}" FORCE)
+    else()
+        message(WARNING "LLVM coverage testing is requested but llvm-cov or its requirements could not be found.")
+    endif()
+
+    unset(LLVM_COVERAGE CACHE)
+endif()
+
 # MEMORY_CHECKS ==> LIBOPENCOR_MEMORY_CHECKS
 
 set(DOCSTRING "Enable memory checks.")
@@ -198,6 +216,12 @@ endif()
 if(LIBOPENCOR_COVERAGE)
     if(NOT LIBOPENCOR_UNIT_TESTING)
         message(SEND_ERROR "Configuration confusion: coverage is requested which means that unit testing should also be requested.")
+    endif()
+endif()
+
+if(LIBOPENCOR_LLVM_COVERAGE)
+    if(NOT LIBOPENCOR_UNIT_TESTING)
+        message(SEND_ERROR "Configuration confusion: LLVM coverage is requested which means that unit testing should also be requested.")
     endif()
 endif()
 
@@ -334,6 +358,10 @@ endif()
 
 if(DEFINED LIBOPENCOR_INSTALL_PREFIX)
     message("    - LIBOPENCOR_INSTALL_PREFIX:     ${LIBOPENCOR_INSTALL_PREFIX}")
+endif()
+
+if(DEFINED LIBOPENCOR_LLVM_COVERAGE)
+    message("    - LIBOPENCOR_LLVM_COVERAGE:      ${LIBOPENCOR_LLVM_COVERAGE}")
 endif()
 
 if(DEFINED LIBOPENCOR_MEMORY_CHECKS)
