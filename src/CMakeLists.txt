@@ -130,6 +130,13 @@ if(LIBOPENCOR_COVERAGE)
     set(GCOV_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)
 endif()
 
+# Get ready for LLVM coverage.
+
+if(LIBOPENCOR_LLVM_COVERAGE)
+    append_target_property(${CMAKE_PROJECT_NAME} COMPILE_FLAGS ${LLVM_COVERAGE_COMPILER_FLAGS})
+    append_target_property(${CMAKE_PROJECT_NAME} LINK_FLAGS ${LLVM_COVERAGE_LINKER_FLAGS})
+endif()
+
 # Build our different bindings.
 
 add_subdirectory(bindings)

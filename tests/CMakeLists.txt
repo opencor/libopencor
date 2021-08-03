@@ -92,6 +92,50 @@ if(LIBOPENCOR_COVERAGE)
                       COMMENT "Running coverage tests...")
 endif()
 
+# Run our LLVM coverage tests.
+
+if(LIBOPENCOR_LLVM_COVERAGE)
+    # Clean our old LLVM coverage data.
+
+    set(PROFRAW_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.profraw)
+
+    foreach(TEST_TARGET ${TEST_TARGETS})
+        list(APPEND COMMANDS COMMAND LLVM_PROFILE_FILE=${PROFRAW_FILE} ./${TEST_TARGET} > /dev/null 2> /dev/null)
+    endforeach()
+
+    add_custom_target(clean_llvm_coverage_data
+                      COMMAND ${FIND_EXE} ${CMAKE_CURRENT_BINARY_DIR} -type f -name "${CMAKE_PROJECT_NAME}.prof*" -print | xargs /bin/rm -f
+                      COMMENT "Cleaning old LLVM coverage data...")
+
+    # Clean our old LLVM coverage data when building libOpenCOR.
+
+    add_dependencies(${CMAKE_PROJECT_NAME} clean_llvm_coverage_data)
+
+    # Prepare for LLVM coverage.
+
+    set(PROFDATA_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.profdata)
+
+    add_custom_target(prepare_llvm_coverage
+                      ${COMMANDS}
+                      COMMAND ${LLVM_PROFDATA_EXE} merge -sparse ${PROFRAW_FILE} -o ${PROFDATA_FILE}
+                      DEPENDS clean_llvm_coverage_data ${TEST_TARGETS}
+                      COMMENT "Preparing for LLVM coverage...")
+
+    # Run our LLVM coverage tests.
+
+    add_custom_target(llvm_coverage
+                      COMMAND ${LLVM_COV_EXE} report $<TARGET_FILE:${CMAKE_PROJECT_NAME}> -instr-profile=${PROFDATA_FILE} -use-color
+                      DEPENDS prepare_llvm_coverage
+                      COMMENT "Running LLVM coverage tests...")
+
+    # Run our LLVM coverage report.
+
+    add_custom_target(llvm_coverage_report
+                      COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> -instr-profile=${PROFDATA_FILE} -format=html -o llvm_coverage_report
+                      DEPENDS prepare_llvm_coverage
+                      COMMENT "Running LLVM coverage report...")
+endif()
+
 # Add our Python tests.
 
 add_subdirectory(bindings)
