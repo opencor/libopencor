@@ -16,20 +16,18 @@ limitations under the License.
 
 #include "libopencor/version.h"
 
+#include "version_p.h"
+
 namespace libOpenCOR {
 
 unsigned int version()
 {
-    // clang-format off
-    static const unsigned int LIBOPENCOR_VERSION = @LIBOPENCOR_VERSION@;
-    // clang-format on
-
     return LIBOPENCOR_VERSION;
 }
 
 std::string versionString()
 {
-    return "@LIBOPENCOR_VERSION_STRING@";
+    return LIBOPENCOR_VERSION_STRING;
 }
 
 } // namespace libOpenCOR
