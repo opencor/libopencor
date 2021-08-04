@@ -189,6 +189,26 @@ if(DEFINED MEMORY_CHECKS)
     unset(MEMORY_CHECKS CACHE)
 endif()
 
+# PYTHON_COVERAGE ==> LIBOPENCOR_PYTHON_COVERAGE.
+
+set(DOCSTRING "Enable Python coverage testing.")
+
+if(PYTHON_COVERAGE_TESTING_AVAILABLE)
+    set(LIBOPENCOR_PYTHON_COVERAGE ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED PYTHON_COVERAGE)
+    if(PYTHON_COVERAGE)
+        if(PYTHON_COVERAGE_TESTING_AVAILABLE)
+            set(LIBOPENCOR_PYTHON_COVERAGE "${PYTHON_COVERAGE}" CACHE BOOL "${DOCSTRING}" FORCE)
+        elseif(PYTHON_COVERAGE)
+            message(WARNING "Python coverage testing is requested but Python and/or the Python coverage package could not be found.")
+        endif()
+    endif()
+
+    unset(PYTHON_COVERAGE CACHE)
+endif()
+
 # UNIT_TESTING ==> LIBOPENCOR_UNIT_TESTING.
 
 set(DOCSTRING "Enable unit testing.")
@@ -371,6 +391,10 @@ endif()
 
 if(DEFINED LIBOPENCOR_MEMORY_CHECKS)
     message("    - LIBOPENCOR_MEMORY_CHECKS:      ${LIBOPENCOR_MEMORY_CHECKS}")
+endif()
+
+if(DEFINED LIBOPENCOR_PYTHON_COVERAGE)
+    message("    - LIBOPENCOR_PYTHON_COVERAGE:    ${LIBOPENCOR_PYTHON_COVERAGE}")
 endif()
 
 if(DEFINED LIBOPENCOR_UNIT_TESTING)
