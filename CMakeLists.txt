@@ -117,7 +117,7 @@ if(DEFINED COMPILER_CACHING)
     unset(COMPILER_CACHING CACHE)
 endif()
 
-# COVERAGE ==> LIBOPENCOR_COVERAGE
+# COVERAGE ==> LIBOPENCOR_COVERAGE.
 
 set(DOCSTRING "Enable coverage testing.")
 
@@ -151,7 +151,7 @@ file(TO_CMAKE_PATH ${LIBOPENCOR_INSTALL_PREFIX} CMAKE_INSTALL_PREFIX_PATH)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_PATH} CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX, manipulate via LIBOPENCOR_INSTALL_PREFIX." FORCE)
 
-# LLVM_COVERAGE ==> LIBOPENCOR_LLVM_COVERAGE
+# LLVM_COVERAGE ==> LIBOPENCOR_LLVM_COVERAGE.
 
 set(DOCSTRING "Enable LLVM coverage testing.")
 
@@ -169,7 +169,7 @@ if(DEFINED LLVM_COVERAGE)
     unset(LLVM_COVERAGE CACHE)
 endif()
 
-# MEMORY_CHECKS ==> LIBOPENCOR_MEMORY_CHECKS
+# MEMORY_CHECKS ==> LIBOPENCOR_MEMORY_CHECKS.
 
 set(DOCSTRING "Enable memory checks.")
 
@@ -235,18 +235,22 @@ if(LIBOPENCOR_MEMORY_CHECKS)
     endif()
 endif()
 
-# Update our submodules.
+if(LIBOPENCOR_PYTHON_COVERAGE)
+    if(NOT LIBOPENCOR_BINDINGS_PYTHON)
+        message(SEND_ERROR "Configuration confusion: Python coverage is requested which means that Python bindings should also be requested.")
+    endif()
+endif()
+
+# Initialise our submodules.
 
 find_package(Git REQUIRED)
 
 execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                 RESULT_VARIABLE RESULT
-                OUTPUT_QUIET
-                ERROR_QUIET)
+                OUTPUT_QUIET ERROR_QUIET)
 
 if(NOT RESULT EQUAL 0)
-    message(FATAL_ERROR "Git submodules could not be updated.")
+    message(FATAL_ERROR "Git submodules could not be initialised.")
 endif()
 
 # Enable clcache/ccache.
@@ -256,7 +260,8 @@ if(LIBOPENCOR_COMPILER_CACHING)
         set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
 
         execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/clcachewrapper.c
-                        RESULT_VARIABLE RESULT OUTPUT_QUIET ERROR_QUIET)
+                        RESULT_VARIABLE RESULT
+                        OUTPUT_QUIET ERROR_QUIET)
 
         if(RESULT EQUAL 0)
             set(CMAKE_CXX_COMPILER_LAUNCHER ${CLCACHEWRAPPER})

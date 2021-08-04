@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Run our Python tests.
+
 set(TEST_SOURCE_FILES
     version_tests.py
 )
@@ -32,16 +34,7 @@ foreach(TEST_SOURCE_FILE ${TEST_SOURCE_FILES})
     add_test(NAME ${TEST_SOURCE_FILE_NAME}
              COMMAND ${Python_EXECUTABLE} ${TEST_SOURCE_FILE})
 
-    set_tests_properties(${TEST_SOURCE_FILE_NAME} PROPERTIES ENVIRONMENT
-        "${RUN_PYTHON_ENVIRONMENT}"
+    set_tests_properties(${TEST_SOURCE_FILE_NAME} PROPERTIES
+        ENVIRONMENT "${RUN_PYTHON_ENVIRONMENT}"
     )
-
-    # set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-    #     ${CMAKE_CURRENT_BINARY_DIR}/${TEST_SOURCE_FILE}
-    #     ${CMAKE_CURRENT_BINARY_DIR}/${TEST_SOURCE_FILE}c
-    # )
 endforeach()
-
-# set_property(DIRECTORY APPEND PROPERTY ADDITIONAL_MAKE_CLEAN_FILES
-#     ${CMAKE_CURRENT_BINARY_DIR}/__pycache__
-# )

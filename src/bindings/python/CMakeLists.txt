@@ -20,9 +20,9 @@ endif()
 
 # Build our Python bindings.
 
-set(PYTHON_TARGET Python_${CMAKE_PROJECT_NAME})
+set(PYTHON_BINDINGS_TARGET Python_${CMAKE_PROJECT_NAME})
 
-pybind11_add_module(${PYTHON_TARGET}
+pybind11_add_module(${PYTHON_BINDINGS_TARGET}
     ${SOURCE_FILES}
     ${API_HEADER_FILES}
     ${API_MODULE_FILE}
@@ -30,7 +30,7 @@ pybind11_add_module(${PYTHON_TARGET}
     python.cpp
 )
 
-set_target_properties(${PYTHON_TARGET} PROPERTIES
+set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
     OUTPUT_NAME libopencor/libopencor
 )
 
@@ -38,4 +38,4 @@ configure_file(libopencor/__init__.py libopencor/__init__.py COPYONLY)
 
 # Install our Python bindings.
 
-install(TARGETS ${PYTHON_TARGET} DESTINATION .)
+install(TARGETS ${PYTHON_BINDINGS_TARGET} DESTINATION .)

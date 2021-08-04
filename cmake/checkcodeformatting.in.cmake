@@ -29,8 +29,7 @@ foreach(GIT_FILE ${GIT_FILES})
     execute_process(COMMAND "@CLANG_FORMAT_EXE@" "${GIT_FILE}"
                     COMMAND "@GIT_EXE@" diff --no-index ${GIT_DIFF_OPTION_FOR_WINDOWS} -- "${GIT_FILE}" -
                     RESULT_VARIABLE RESULT
-                    OUTPUT_QUIET
-                    ERROR_QUIET)
+                    OUTPUT_QUIET ERROR_QUIET)
 
     if(NOT RESULT EQUAL 0)
         list(APPEND BADLY_FORMATTED_FILES ${GIT_FILE})

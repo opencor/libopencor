@@ -80,8 +80,8 @@ if(LIBOPENCOR_COVERAGE)
     # Prepare for coverage.
 
     add_custom_target(prepare_coverage
-                      DEPENDS clean_coverage_data ${TEST_TARGETS}
                       COMMAND ${CMAKE_CTEST_COMMAND} > /dev/null
+                      DEPENDS clean_coverage_data ${TEST_TARGETS}
                       COMMENT "Preparing for coverage...")
 
     # Run our coverage tests.
