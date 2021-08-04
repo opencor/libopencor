@@ -17,7 +17,6 @@ import unittest
 
 
 class VersionTests(unittest.TestCase):
-
     def test_version(self):
         import libopencor
 
