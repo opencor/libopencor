@@ -20,7 +20,7 @@ endif()
 
 # Build our Python bindings.
 
-set(PYTHON_BINDINGS_TARGET Python_${CMAKE_PROJECT_NAME})
+set(PYTHON_BINDINGS_TARGET Python_${CMAKE_PROJECT_NAME} CACHE INTERNAL "The name of the Python bindings target.")
 
 pybind11_add_module(${PYTHON_BINDINGS_TARGET}
     ${SOURCE_FILES}
@@ -35,6 +35,12 @@ set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
 )
 
 configure_file(libopencor/__init__.py libopencor/__init__.py COPYONLY)
+
+# Get ready for our Python coverage tests.
+
+if(LIBOPENCOR_PYTHON_COVERAGE)
+    set(PYTHON_COVERAGE_WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "The directory for the Python coverage script to run in.")
+endif()
 
 # Install our Python bindings.
 
