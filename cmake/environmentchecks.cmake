@@ -104,22 +104,6 @@ if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND LLVM_COVERAGE_COMPILER_FL
     set(LLVM_COVERAGE_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run LLVM coverage testing.")
 endif()
 
-if(Python_Interpreter_FOUND)
-    message(STATUS "Performing Test HAS_PYTHON_COVERAGE")
-
-    execute_process(COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_python_packages.py coverage
-                    RESULT_VARIABLE RESULT
-                    OUTPUT_QUIET ERROR_QUIET)
-
-    if(RESULT EQUAL 0)
-        set(PYTHON_COVERAGE_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable and package required to run Python coverage testing.")
-
-        message(STATUS "Performing Test HAS_PYTHON_COVERAGE - Success")
-    else()
-        message(STATUS "Performing Test HAS_PYTHON_COVERAGE - Failed")
-    endif()
-endif()
-
 if(VALGRIND_EXE)
     set(VALGRIND_AVAILABLE TRUE CACHE INTERNAL "Executable required to run memory checks.")
 endif()

@@ -38,21 +38,3 @@ foreach(TEST_SOURCE_FILE ${TEST_SOURCE_FILES})
         ENVIRONMENT "${RUN_PYTHON_ENVIRONMENT}"
     )
 endforeach()
-
-# Run our Python coverage tests.
-
-if(LIBOPENCOR_PYTHON_COVERAGE)
-    configure_file(runner.py runner.py)
-
-    add_custom_target(python_coverage
-                      COMMAND ${CMAKE_COMMAND} -E env "${RUN_PYTHON_ENVIRONMENT}" ${Python_EXECUTABLE} runner.py
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                      DEPENDS ${PYTHON_BINDINGS_TARGET}
-                      COMMENT "Running Python coverage tests...")
-
-    add_custom_target(python_coverage_report
-                      COMMAND ${CMAKE_COMMAND} -E env ${RUN_PYTHON_ENVIRONMENT} ${Python_EXECUTABLE} runner.py html
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                      DEPENDS ${PYTHON_BINDINGS_TARGET}
-                      COMMENT "Running Python coverage tests with HTML report...")
-endif()
