@@ -33,23 +33,23 @@ include(environmentchecks)
 
 # Rebrand the CMake options that are relevant to libOpenCOR.
 
-# BINDINGS_PYTHON ==> LIBOPENCOR_BINDINGS_PYTHON.
+# PYTHON_BINDINGS ==> LIBOPENCOR_PYTHON_BINDINGS.
 
 if(Python_Development_FOUND)
     set(DOCSTRING "Buid Python wrappers.")
-    set(LIBOPENCOR_BINDINGS_PYTHON ON CACHE BOOL "${DOCSTRING}")
+    set(LIBOPENCOR_PYTHON_BINDINGS ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED BINDINGS_PYTHON)
+if(DEFINED PYTHON_BINDINGS)
     if(Python_Development_FOUND)
-        set(LIBOPENCOR_BINDINGS_PYTHON ${BINDINGS_PYTHON} CACHE BOOL "${DOCSTRING}" FORCE)
+        set(LIBOPENCOR_PYTHON_BINDINGS ${PYTHON_BINDINGS} CACHE BOOL "${DOCSTRING}" FORCE)
     else()
-        set(IGNORE_ME ${BINDINGS_PYTHON})
+        set(IGNORE_ME ${PYTHON_BINDINGS})
 
         message(WARNING "Python bindings are requested but Python development files could not be found.")
     endif()
 
-    unset(BINDINGS_PYTHON CACHE)
+    unset(PYTHON_BINDINGS CACHE)
 endif()
 
 # BUILD_SHARED_LIBS ==> LIBOPENCOR_BUILD_SHARED_LIBS.
@@ -268,7 +268,7 @@ endif()
 
 # Enable Python bindings.
 
-if(LIBOPENCOR_BINDINGS_PYTHON)
+if(LIBOPENCOR_PYTHON_BINDINGS)
     add_subdirectory(extern/pybind11)
 
     mark_as_advanced(
@@ -332,8 +332,8 @@ endif()
 
 message(STATUS "Configuration summary:")
 
-if(DEFINED LIBOPENCOR_BINDINGS_PYTHON)
-    message("    - LIBOPENCOR_BINDINGS_PYTHON:    ${LIBOPENCOR_BINDINGS_PYTHON}")
+if(DEFINED LIBOPENCOR_PYTHON_BINDINGS)
+    message("    - LIBOPENCOR_PYTHON_BINDINGS:    ${LIBOPENCOR_PYTHON_BINDINGS}")
 endif()
 
 if(DEFINED LIBOPENCOR_BUILD_SHARED_LIBS)

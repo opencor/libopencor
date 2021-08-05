@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(LIBOPENCOR_BINDINGS_PYTHON)
+if(LIBOPENCOR_PYTHON_BINDINGS)
     add_subdirectory(python)
 endif()

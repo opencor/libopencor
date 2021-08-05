@@ -14,6 +14,6 @@
 
 # Build our different bindings.
 
-if(LIBOPENCOR_BINDINGS_PYTHON)
+if(LIBOPENCOR_PYTHON_BINDINGS)
     add_subdirectory(python)
 endif()
