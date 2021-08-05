@@ -117,22 +117,22 @@ if(DEFINED COMPILER_CACHING)
     unset(COMPILER_CACHING CACHE)
 endif()
 
-# COVERAGE ==> LIBOPENCOR_COVERAGE.
+# COVERAGE_GCOV ==> LIBOPENCOR_COVERAGE_GCOV.
 
-set(DOCSTRING "Enable coverage testing.")
+set(DOCSTRING "Enable coverage testing using gcov.")
 
-if(COVERAGE_TESTING_AVAILABLE)
-    set(LIBOPENCOR_COVERAGE ON CACHE BOOL "${DOCSTRING}")
+if(COVERAGE_GCOV_TESTING_AVAILABLE)
+    set(LIBOPENCOR_COVERAGE_GCOV ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED COVERAGE)
-    if(COVERAGE_TESTING_AVAILABLE)
-        set(LIBOPENCOR_COVERAGE "${COVERAGE}" CACHE BOOL "${DOCSTRING}" FORCE)
+if(DEFINED COVERAGE_GCOV)
+    if(COVERAGE_GCOV_TESTING_AVAILABLE)
+        set(LIBOPENCOR_COVERAGE_GCOV "${COVERAGE_GCOV}" CACHE BOOL "${DOCSTRING}" FORCE)
     else()
-        message(WARNING "Coverage testing is requested but gcov or its requirements could not be found.")
+        message(WARNING "Coverage testing using gcov is requested but gcov or its requirements could not be found.")
     endif()
 
-    unset(COVERAGE CACHE)
+    unset(COVERAGE_GCOV CACHE)
 endif()
 
 # [CMAKE_]INSTALL_PREFIX ==> LIBOPENCOR_INSTALL_PREFIX.
@@ -151,22 +151,22 @@ file(TO_CMAKE_PATH ${LIBOPENCOR_INSTALL_PREFIX} CMAKE_INSTALL_PREFIX_PATH)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_PATH} CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX, manipulate via LIBOPENCOR_INSTALL_PREFIX." FORCE)
 
-# LLVM_COVERAGE ==> LIBOPENCOR_LLVM_COVERAGE.
+# COVERAGE_LLVM_COV ==> LIBOPENCOR_COVERAGE_LLVM_COV.
 
-set(DOCSTRING "Enable LLVM coverage testing.")
+set(DOCSTRING "Enable coverage testing using llvm-cov.")
 
-if(LLVM_COVERAGE_TESTING_AVAILABLE)
-    set(LIBOPENCOR_LLVM_COVERAGE ON CACHE BOOL "${DOCSTRING}")
+if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
+    set(LIBOPENCOR_COVERAGE_LLVM_COV ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED LLVM_COVERAGE)
-    if(LLVM_COVERAGE_TESTING_AVAILABLE)
-        set(LIBOPENCOR_LLVM_COVERAGE "${LLVM_COVERAGE}" CACHE BOOL "${DOCSTRING}" FORCE)
+if(DEFINED COVERAGE_LLVM_COV)
+    if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
+        set(LIBOPENCOR_COVERAGE_LLVM_COV "${COVERAGE_LLVM_COV}" CACHE BOOL "${DOCSTRING}" FORCE)
     else()
-        message(WARNING "LLVM coverage testing is requested but llvm-cov or its requirements could not be found.")
+        message(WARNING "Coverage testing using llvm-cov is requested but llvm-cov or its requirements could not be found.")
     endif()
 
-    unset(LLVM_COVERAGE CACHE)
+    unset(COVERAGE_LLVM_COV CACHE)
 endif()
 
 # MEMORY_CHECKS ==> LIBOPENCOR_MEMORY_CHECKS.
@@ -213,15 +213,15 @@ endif()
 
 # Make sure that the configuration is sound.
 
-if(LIBOPENCOR_COVERAGE)
+if(LIBOPENCOR_COVERAGE_GCOV)
     if(NOT LIBOPENCOR_UNIT_TESTING)
-        message(SEND_ERROR "Configuration confusion: coverage is requested which means that unit testing should also be requested.")
+        message(SEND_ERROR "Configuration confusion: coverage using gcov is requested which means that unit testing should also be requested.")
     endif()
 endif()
 
-if(LIBOPENCOR_LLVM_COVERAGE)
+if(LIBOPENCOR_COVERAGE_LLVM_COV)
     if(NOT LIBOPENCOR_UNIT_TESTING)
-        message(SEND_ERROR "Configuration confusion: LLVM coverage is requested which means that unit testing should also be requested.")
+        message(SEND_ERROR "Configuration confusion: coverage using llvm-cov is requested which means that unit testing should also be requested.")
     endif()
 endif()
 
@@ -352,16 +352,16 @@ if(DEFINED LIBOPENCOR_COMPILER_CACHING)
     message("    - LIBOPENCOR_COMPILER_CACHING:   ${LIBOPENCOR_COMPILER_CACHING}")
 endif()
 
-if(DEFINED LIBOPENCOR_COVERAGE)
-    message("    - LIBOPENCOR_COVERAGE:           ${LIBOPENCOR_COVERAGE}")
+if(DEFINED LIBOPENCOR_COVERAGE_GCOV)
+    message("    - LIBOPENCOR_COVERAGE_GCOV:      ${LIBOPENCOR_COVERAGE_GCOV}")
 endif()
 
 if(DEFINED LIBOPENCOR_INSTALL_PREFIX)
     message("    - LIBOPENCOR_INSTALL_PREFIX:     ${LIBOPENCOR_INSTALL_PREFIX}")
 endif()
 
-if(DEFINED LIBOPENCOR_LLVM_COVERAGE)
-    message("    - LIBOPENCOR_LLVM_COVERAGE:      ${LIBOPENCOR_LLVM_COVERAGE}")
+if(DEFINED LIBOPENCOR_COVERAGE_LLVM_COV)
+    message("    - LIBOPENCOR_COVERAGE_LLVM_COV:  ${LIBOPENCOR_COVERAGE_LLVM_COV}")
 endif()
 
 if(DEFINED LIBOPENCOR_MEMORY_CHECKS)
