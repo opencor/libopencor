@@ -64,6 +64,10 @@ foreach(TEST_TARGET ${TEST_TARGETS})
     endif()
 endforeach()
 
+# Add our bindings tests.
+
+add_subdirectory(bindings)
+
 # Run our coverage tests using gcov.
 
 if(LIBOPENCOR_COVERAGE_GCOV)
@@ -135,10 +139,6 @@ if(LIBOPENCOR_COVERAGE_LLVM_COV)
                       DEPENDS prepare_coverage_llvm_cov
                       COMMENT "Running coverage report using llvm-cov...")
 endif()
-
-# Add our bindings tests.
-
-add_subdirectory(bindings)
 
 # Run our memory checks.
 

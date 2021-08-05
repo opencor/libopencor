@@ -33,25 +33,6 @@ include(environmentchecks)
 
 # Rebrand the CMake options that are relevant to libOpenCOR.
 
-# PYTHON_BINDINGS ==> LIBOPENCOR_PYTHON_BINDINGS.
-
-if(Python_Development_FOUND)
-    set(DOCSTRING "Buid Python wrappers.")
-    set(LIBOPENCOR_PYTHON_BINDINGS ON CACHE BOOL "${DOCSTRING}")
-endif()
-
-if(DEFINED PYTHON_BINDINGS)
-    if(Python_Development_FOUND)
-        set(LIBOPENCOR_PYTHON_BINDINGS ${PYTHON_BINDINGS} CACHE BOOL "${DOCSTRING}" FORCE)
-    else()
-        set(IGNORE_ME ${PYTHON_BINDINGS})
-
-        message(WARNING "Python bindings are requested but Python development files could not be found.")
-    endif()
-
-    unset(PYTHON_BINDINGS CACHE)
-endif()
-
 # BUILD_SHARED_LIBS ==> LIBOPENCOR_BUILD_SHARED_LIBS.
 
 set(DOCSTRING "Build shared libraries.")
@@ -119,9 +100,8 @@ endif()
 
 # COVERAGE_GCOV ==> LIBOPENCOR_COVERAGE_GCOV.
 
-set(DOCSTRING "Enable coverage testing using gcov.")
-
 if(COVERAGE_GCOV_TESTING_AVAILABLE)
+    set(DOCSTRING "Enable coverage testing using gcov.")
     set(LIBOPENCOR_COVERAGE_GCOV ON CACHE BOOL "${DOCSTRING}")
 endif()
 
@@ -133,6 +113,23 @@ if(DEFINED COVERAGE_GCOV)
     endif()
 
     unset(COVERAGE_GCOV CACHE)
+endif()
+
+# COVERAGE_LLVM_COV ==> LIBOPENCOR_COVERAGE_LLVM_COV.
+
+if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
+    set(DOCSTRING "Enable coverage testing using llvm-cov.")
+    set(LIBOPENCOR_COVERAGE_LLVM_COV ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED COVERAGE_LLVM_COV)
+    if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
+        set(LIBOPENCOR_COVERAGE_LLVM_COV "${COVERAGE_LLVM_COV}" CACHE BOOL "${DOCSTRING}" FORCE)
+    else()
+        message(WARNING "Coverage testing using llvm-cov is requested but llvm-cov or its requirements could not be found.")
+    endif()
+
+    unset(COVERAGE_LLVM_COV CACHE)
 endif()
 
 # [CMAKE_]INSTALL_PREFIX ==> LIBOPENCOR_INSTALL_PREFIX.
@@ -151,29 +148,10 @@ file(TO_CMAKE_PATH ${LIBOPENCOR_INSTALL_PREFIX} CMAKE_INSTALL_PREFIX_PATH)
 
 set(CMAKE_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX_PATH} CACHE INTERNAL "Internalise CMAKE_INSTALL_PREFIX, manipulate via LIBOPENCOR_INSTALL_PREFIX." FORCE)
 
-# COVERAGE_LLVM_COV ==> LIBOPENCOR_COVERAGE_LLVM_COV.
-
-set(DOCSTRING "Enable coverage testing using llvm-cov.")
-
-if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
-    set(LIBOPENCOR_COVERAGE_LLVM_COV ON CACHE BOOL "${DOCSTRING}")
-endif()
-
-if(DEFINED COVERAGE_LLVM_COV)
-    if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
-        set(LIBOPENCOR_COVERAGE_LLVM_COV "${COVERAGE_LLVM_COV}" CACHE BOOL "${DOCSTRING}" FORCE)
-    else()
-        message(WARNING "Coverage testing using llvm-cov is requested but llvm-cov or its requirements could not be found.")
-    endif()
-
-    unset(COVERAGE_LLVM_COV CACHE)
-endif()
-
 # MEMORY_CHECKS ==> LIBOPENCOR_MEMORY_CHECKS.
 
-set(DOCSTRING "Enable memory checks.")
-
 if(VALGRIND_AVAILABLE)
+    set(DOCSTRING "Enable memory checks.")
     set(LIBOPENCOR_MEMORY_CHECKS ON CACHE BOOL "${DOCSTRING}")
 endif()
 
@@ -187,6 +165,25 @@ if(DEFINED MEMORY_CHECKS)
     endif()
 
     unset(MEMORY_CHECKS CACHE)
+endif()
+
+# PYTHON_BINDINGS ==> LIBOPENCOR_PYTHON_BINDINGS.
+
+if(Python_Development_FOUND)
+    set(DOCSTRING "Buid Python wrappers.")
+    set(LIBOPENCOR_PYTHON_BINDINGS ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED PYTHON_BINDINGS)
+    if(Python_Development_FOUND)
+        set(LIBOPENCOR_PYTHON_BINDINGS ${PYTHON_BINDINGS} CACHE BOOL "${DOCSTRING}" FORCE)
+    else()
+        set(IGNORE_ME ${PYTHON_BINDINGS})
+
+        message(WARNING "Python bindings are requested but Python development files could not be found.")
+    endif()
+
+    unset(PYTHON_BINDINGS CACHE)
 endif()
 
 # UNIT_TESTING ==> LIBOPENCOR_UNIT_TESTING.
@@ -332,10 +329,6 @@ endif()
 
 message(STATUS "Configuration summary:")
 
-if(DEFINED LIBOPENCOR_PYTHON_BINDINGS)
-    message("    - LIBOPENCOR_PYTHON_BINDINGS:    ${LIBOPENCOR_PYTHON_BINDINGS}")
-endif()
-
 if(DEFINED LIBOPENCOR_BUILD_SHARED_LIBS)
     message("    - LIBOPENCOR_BUILD_SHARED_LIBS:  ${LIBOPENCOR_BUILD_SHARED_LIBS}")
 endif()
@@ -356,16 +349,20 @@ if(DEFINED LIBOPENCOR_COVERAGE_GCOV)
     message("    - LIBOPENCOR_COVERAGE_GCOV:      ${LIBOPENCOR_COVERAGE_GCOV}")
 endif()
 
-if(DEFINED LIBOPENCOR_INSTALL_PREFIX)
-    message("    - LIBOPENCOR_INSTALL_PREFIX:     ${LIBOPENCOR_INSTALL_PREFIX}")
-endif()
-
 if(DEFINED LIBOPENCOR_COVERAGE_LLVM_COV)
     message("    - LIBOPENCOR_COVERAGE_LLVM_COV:  ${LIBOPENCOR_COVERAGE_LLVM_COV}")
 endif()
 
+if(DEFINED LIBOPENCOR_INSTALL_PREFIX)
+    message("    - LIBOPENCOR_INSTALL_PREFIX:     ${LIBOPENCOR_INSTALL_PREFIX}")
+endif()
+
 if(DEFINED LIBOPENCOR_MEMORY_CHECKS)
     message("    - LIBOPENCOR_MEMORY_CHECKS:      ${LIBOPENCOR_MEMORY_CHECKS}")
+endif()
+
+if(DEFINED LIBOPENCOR_PYTHON_BINDINGS)
+    message("    - LIBOPENCOR_PYTHON_BINDINGS:    ${LIBOPENCOR_PYTHON_BINDINGS}")
 endif()
 
 if(DEFINED LIBOPENCOR_UNIT_TESTING)
