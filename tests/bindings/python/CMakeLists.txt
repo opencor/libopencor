@@ -42,7 +42,7 @@ endforeach()
 # Run our Python coverage tests.
 
 if(LIBOPENCOR_PYTHON_COVERAGE)
-    configure_file(runner.py runner.py @ONLY)
+    configure_file(runner.py runner.py)
 
     add_custom_target(python_coverage
                       COMMAND ${CMAKE_COMMAND} -E env "${RUN_PYTHON_ENVIRONMENT}" ${Python_EXECUTABLE} runner.py
