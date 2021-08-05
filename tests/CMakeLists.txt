@@ -136,7 +136,7 @@ if(LIBOPENCOR_LLVM_COVERAGE)
                       COMMENT "Running LLVM coverage report...")
 endif()
 
-# Add our Python tests.
+# Add our bindings tests.
 
 add_subdirectory(bindings)
 
