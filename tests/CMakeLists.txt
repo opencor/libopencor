@@ -12,57 +12,69 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Configure GoogleTest.
+# Run our tests.
 
-if(APPLE)
-    set_target_properties(gtest gtest_main
-        PROPERTIES MACOSX_RPATH ON
-    )
-endif()
+if(LIBOPENCOR_UNIT_TESTING)
+    # Configure GoogleTest.
 
-# Include our different tests.
-
-include(version/tests.cmake)
-
-# Prepare our different tests.
-
-set(GIT_TESTS_SOURCE_FILES)
-set(GIT_TESTS_HEADER_FILES)
-
-foreach(TEST ${TESTS})
-    if(DEFINED ${TEST}_CATEGORY)
-        set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
-    else()
-        set(TEST_CATEGORY)
-    endif()
-
-    prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES})
-
-    list(APPEND GIT_TESTS_SOURCE_FILES ${${TEST}_SOURCE_FILES})
-    list(APPEND GIT_TESTS_HEADER_FILES ${${TEST}_HEADER_FILES})
-endforeach()
-
-set(GIT_TESTS_SOURCE_FILES ${GIT_TESTS_SOURCE_FILES} PARENT_SCOPE)
-set(GIT_TESTS_HEADER_FILES ${GIT_TESTS_HEADER_FILES} PARENT_SCOPE)
-
-# Prepare the tests for our header files.
-
-include(header_files/tests.cmake)
-
-# Add our prepared tests after sorting them.
-
-list(SORT TEST_TARGETS)
-
-foreach(TEST_TARGET ${TEST_TARGETS})
-    add_test(NAME ${TEST_TARGET}
-             COMMAND ${TEST_TARGET})
-
-    if(MSVC)
-        set_tests_properties(${TEST_TARGET} PROPERTIES
-            ENVIRONMENT "PATH=$<TARGET_FILE_DIR:gtest_main>\;$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>"
+    if(APPLE)
+        set_target_properties(gtest gtest_main
+            PROPERTIES MACOSX_RPATH ON
         )
     endif()
-endforeach()
+
+    # Include our different tests.
+
+    include(version/tests.cmake)
+
+    # Prepare our different tests.
+
+    set(GIT_TESTS_SOURCE_FILES)
+    set(GIT_TESTS_HEADER_FILES)
+
+    foreach(TEST ${TESTS})
+        if(DEFINED ${TEST}_CATEGORY)
+            set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
+        else()
+            set(TEST_CATEGORY)
+        endif()
+
+        prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES})
+
+        list(APPEND GIT_TESTS_SOURCE_FILES ${${TEST}_SOURCE_FILES})
+        list(APPEND GIT_TESTS_HEADER_FILES ${${TEST}_HEADER_FILES})
+    endforeach()
+
+    set(GIT_TESTS_SOURCE_FILES ${GIT_TESTS_SOURCE_FILES} PARENT_SCOPE)
+    set(GIT_TESTS_HEADER_FILES ${GIT_TESTS_HEADER_FILES} PARENT_SCOPE)
+
+    # Prepare the tests for our header files.
+
+    include(header_files/tests.cmake)
+
+    # Add our prepared tests after sorting them.
+
+    list(SORT TEST_TARGETS)
+
+    foreach(TEST_TARGET ${TEST_TARGETS})
+        add_test(NAME ${TEST_TARGET}
+                COMMAND ${TEST_TARGET})
+
+        if(MSVC)
+            set_tests_properties(${TEST_TARGET} PROPERTIES
+                ENVIRONMENT "PATH=$<TARGET_FILE_DIR:gtest_main>\;$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>"
+            )
+        endif()
+    endforeach()
+
+    # Run our unit testing.
+
+    add_custom_target(unit_testing
+                      COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
+                      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                      USES_TERMINAL
+                      COMMENT "Running unit testing...")
+endif()
 
 # Add our bindings tests.
 

@@ -289,13 +289,16 @@ if(LIBOPENCOR_UNIT_TESTING)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
     add_subdirectory(extern/googletest)
-    add_subdirectory(tests)
 
     mark_as_advanced(
         BUILD_GMOCK
         INSTALL_GTEST
     )
 endif()
+
+# Run our tests.
+
+add_subdirectory(tests)
 
 # Add some custom targets to test the formatting of our code and to format it.
 # Note: we don't format API_EXPORT_HEADER_FILE since it's generated.
