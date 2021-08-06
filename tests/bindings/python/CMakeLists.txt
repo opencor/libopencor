@@ -15,13 +15,24 @@
 # Run our Python tests.
 
 if(WIN32)
-    set(PYTHON_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>\;%PATH%;PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python")
+    list(APPEND COMMANDS COMMAND SET PATH=$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>\;%PATH%)
+    list(APPEND COMMANDS COMMAND SET PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python)
 else()
-    set(PYTHON_ENVIRONMENT "PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python")
+    list(APPEND COMMANDS COMMAND export PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python)
 endif()
 
 add_custom_target(python_unit_testing
-                  COMMAND ${PYTHON_ENVIRONMENT} ${PYTEST_EXE}
+                  ${COMMANDS}
+                  COMMAND ${PYTEST_EXE}
                   USES_TERMINAL
                   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                   COMMENT "Running Python unit testing...")
+
+if(PYTHON_UNIT_TESTING_REPORT_AVAILABLE)
+    add_custom_target(python_unit_testing_report
+                      ${COMMANDS}
+                      COMMAND ${PYTEST_EXE} --html=${CMAKE_CURRENT_BINARY_DIR}/report.html
+                      USES_TERMINAL
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                      COMMENT "Running Python unit testing report...")
+endif()

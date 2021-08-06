@@ -109,6 +109,22 @@ if(PYTEST_EXE)
     set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable and package required to run Python unit testing.")
 endif()
 
+if(Python_EXECUTABLE AND PYTHON_UNIT_TESTING_AVAILABLE)
+    message(STATUS "Performing Test HAS_PYTHON_PYTEST_HTML")
+
+    execute_process(COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_python_packages.py pytest-html
+                    RESULT_VARIABLE RESULT
+                    OUTPUT_QUIET ERROR_QUIET)
+
+    if(RESULT EQUAL 0)
+        set(PYTHON_UNIT_TESTING_REPORT_AVAILABLE TRUE CACHE INTERNAL "Executable and package required to run Python unit testing.")
+
+        message(STATUS "Performing Test HAS_PYTHON_PYTEST_HTML - Success")
+    else()
+        message(STATUS "Performing Test HAS_PYTHON_PYTEST_HTML - Failed")
+    endif()
+endif()
+
 if(VALGRIND_EXE)
     set(VALGRIND_AVAILABLE TRUE CACHE INTERNAL "Executable required to run memory checks.")
 endif()
