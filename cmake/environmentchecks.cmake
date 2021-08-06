@@ -141,5 +141,6 @@ mark_as_advanced(
     GIT_EXE
     LLVM_COV_EXE
     LLVM_PROFDATA_EXE
+    PYTEST_EXE
     VALGRIND_EXE
 )
