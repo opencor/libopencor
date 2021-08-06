@@ -38,6 +38,7 @@ find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
 find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov)
 find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata)
+find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
 # Check some compiler flags
@@ -102,6 +103,10 @@ endif()
 
 if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
     set(COVERAGE_LLVM_COV_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run coverage testing using llvm-cov.")
+endif()
+
+if(PYTEST_EXE)
+    set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable and package required to run Python unit testing.")
 endif()
 
 if(VALGRIND_EXE)

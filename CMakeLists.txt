@@ -186,6 +186,25 @@ if(DEFINED PYTHON_BINDINGS)
     unset(PYTHON_BINDINGS CACHE)
 endif()
 
+# PYTHON_UNIT_TESTING ==> LIBOPENCOR_PYTHON_UNIT_TESTING.
+
+if(PYTHON_UNIT_TESTING_AVAILABLE)
+    set(DOCSTRING "Enable Python unit testing.")
+    set(LIBOPENCOR_PYTHON_UNIT_TESTING ON CACHE BOOL "${DOCSTRING}")
+endif()
+
+if(DEFINED PYTHON_UNIT_TESTING)
+    if(PYTHON_UNIT_TESTING)
+        if(PYTHON_UNIT_TESTING_AVAILABLE)
+            set(LIBOPENCOR_PYTHON_UNIT_TESTING "${PYTHON_UNIT_TESTING}" CACHE BOOL "${DOCSTRING}" FORCE)
+        else()
+            message(WARNING "Python unit testing is requested but Python and/or the Python pytest package could not be found.")
+        endif()
+    endif()
+
+    unset(PYTHON_UNIT_TESTING CACHE)
+endif()
+
 # UNIT_TESTING ==> LIBOPENCOR_UNIT_TESTING.
 
 set(DOCSTRING "Enable unit testing.")
@@ -229,6 +248,12 @@ if(LIBOPENCOR_MEMORY_CHECKS)
 
     if(NOT LIBOPENCOR_UNIT_TESTING)
         message(SEND_ERROR "Configuration confusion: memory checks are requested which means that unit testing should also be requested.")
+    endif()
+endif()
+
+if(LIBOPENCOR_PYTHON_UNIT_TESTING)
+    if(NOT LIBOPENCOR_PYTHON_BINDINGS)
+        message(SEND_ERROR "Configuration confusion: Python unit testing is requested which means that Python bindings should also be requested.")
     endif()
 endif()
 
@@ -333,43 +358,47 @@ endif()
 message(STATUS "Configuration summary:")
 
 if(DEFINED LIBOPENCOR_BUILD_SHARED_LIBS)
-    message("    - LIBOPENCOR_BUILD_SHARED_LIBS:  ${LIBOPENCOR_BUILD_SHARED_LIBS}")
+    message("    - LIBOPENCOR_BUILD_SHARED_LIBS:   ${LIBOPENCOR_BUILD_SHARED_LIBS}")
 endif()
 
 if(DEFINED LIBOPENCOR_BUILD_TYPE)
-    message("    - LIBOPENCOR_BUILD_TYPE:         ${LIBOPENCOR_BUILD_TYPE}")
+    message("    - LIBOPENCOR_BUILD_TYPE:          ${LIBOPENCOR_BUILD_TYPE}")
 endif()
 
 if(DEFINED LIBOPENCOR_CODE_ANALYSIS)
-    message("    - LIBOPENCOR_CODE_ANALYSIS:      ${LIBOPENCOR_CODE_ANALYSIS}")
+    message("    - LIBOPENCOR_CODE_ANALYSIS:       ${LIBOPENCOR_CODE_ANALYSIS}")
 endif()
 
 if(DEFINED LIBOPENCOR_COMPILER_CACHING)
-    message("    - LIBOPENCOR_COMPILER_CACHING:   ${LIBOPENCOR_COMPILER_CACHING}")
+    message("    - LIBOPENCOR_COMPILER_CACHING:    ${LIBOPENCOR_COMPILER_CACHING}")
 endif()
 
 if(DEFINED LIBOPENCOR_COVERAGE_GCOV)
-    message("    - LIBOPENCOR_COVERAGE_GCOV:      ${LIBOPENCOR_COVERAGE_GCOV}")
+    message("    - LIBOPENCOR_COVERAGE_GCOV:       ${LIBOPENCOR_COVERAGE_GCOV}")
 endif()
 
 if(DEFINED LIBOPENCOR_COVERAGE_LLVM_COV)
-    message("    - LIBOPENCOR_COVERAGE_LLVM_COV:  ${LIBOPENCOR_COVERAGE_LLVM_COV}")
+    message("    - LIBOPENCOR_COVERAGE_LLVM_COV:   ${LIBOPENCOR_COVERAGE_LLVM_COV}")
 endif()
 
 if(DEFINED LIBOPENCOR_INSTALL_PREFIX)
-    message("    - LIBOPENCOR_INSTALL_PREFIX:     ${LIBOPENCOR_INSTALL_PREFIX}")
+    message("    - LIBOPENCOR_INSTALL_PREFIX:      ${LIBOPENCOR_INSTALL_PREFIX}")
 endif()
 
 if(DEFINED LIBOPENCOR_MEMORY_CHECKS)
-    message("    - LIBOPENCOR_MEMORY_CHECKS:      ${LIBOPENCOR_MEMORY_CHECKS}")
+    message("    - LIBOPENCOR_MEMORY_CHECKS:       ${LIBOPENCOR_MEMORY_CHECKS}")
 endif()
 
 if(DEFINED LIBOPENCOR_PYTHON_BINDINGS)
-    message("    - LIBOPENCOR_PYTHON_BINDINGS:    ${LIBOPENCOR_PYTHON_BINDINGS}")
+    message("    - LIBOPENCOR_PYTHON_BINDINGS:     ${LIBOPENCOR_PYTHON_BINDINGS}")
+endif()
+
+if(DEFINED LIBOPENCOR_PYTHON_UNIT_TESTING)
+    message("    - LIBOPENCOR_PYTHON_UNIT_TESTING: ${LIBOPENCOR_PYTHON_UNIT_TESTING}")
 endif()
 
 if(DEFINED LIBOPENCOR_UNIT_TESTING)
-    message("    - LIBOPENCOR_UNIT_TESTING:       ${LIBOPENCOR_UNIT_TESTING}")
+    message("    - LIBOPENCOR_UNIT_TESTING:        ${LIBOPENCOR_UNIT_TESTING}")
 endif()
 
 if(DEFINED LIBOPENCOR_WARNINGS_AS_ERRORS)
