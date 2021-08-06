@@ -14,27 +14,14 @@
 
 # Run our Python tests.
 
-set(TEST_SOURCE_FILES
-    version_tests.py
-)
-
 if(WIN32)
     set(RUN_PYTHON_ENVIRONMENT "PATH=$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>\;%PATH%;PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python")
 else()
     set(RUN_PYTHON_ENVIRONMENT "PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python")
 endif()
 
-foreach(TEST_SOURCE_FILE ${TEST_SOURCE_FILES})
-    configure_file(${TEST_SOURCE_FILE} ${TEST_SOURCE_FILE} COPYONLY)
-
-    get_filename_component(TEST_SOURCE_FILE_NAME ${TEST_SOURCE_FILE} NAME_WE)
-
-    set(TEST_SOURCE_FILE_NAME python_${TEST_SOURCE_FILE_NAME})
-
-    add_test(NAME ${TEST_SOURCE_FILE_NAME}
-             COMMAND ${Python_EXECUTABLE} ${TEST_SOURCE_FILE})
-
-    set_tests_properties(${TEST_SOURCE_FILE_NAME} PROPERTIES
-        ENVIRONMENT "${RUN_PYTHON_ENVIRONMENT}"
-    )
-endforeach()
+add_custom_target(python_unit_testing
+                  COMMAND ${RUN_PYTHON_ENVIRONMENT} ${PYTEST_EXE}
+                  USES_TERMINAL
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                  COMMENT "Running Python unit testing...")

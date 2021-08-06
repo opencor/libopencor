@@ -13,23 +13,15 @@
 # limitations under the License.
 
 
-import unittest
+import libopencor
+import pytest
 
 
-class VersionTests(unittest.TestCase):
-    def test_version(self):
-        import libopencor
-
-        # unsigned int version()
-
-        self.assertIsInstance(libopencor.version(), int)
-        self.assertGreater(libopencor.version(), 0)
-
-        # std::string versionString()
-
-        self.assertIsInstance(libopencor.version_string(), str)
-        self.assertNotEqual(libopencor.version_string(), "")
+def test_version():
+    assert isinstance(libopencor.version(), int)
+    assert libopencor.version() > 0
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_version_string():
+    assert isinstance(libopencor.version_string(), str)
+    assert libopencor.version_string() != ''
