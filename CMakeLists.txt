@@ -229,12 +229,20 @@ endif()
 # Make sure that the configuration is sound.
 
 if(LIBOPENCOR_COVERAGE_GCOV)
+    if(NOT LIBOPENCOR_BUILD_SHARED_LIBS)
+        message(SEND_ERROR "Configuration confusion: coverage using gcov is requested which means that a static library cannot be requested.")
+    endif()
+
     if(NOT LIBOPENCOR_UNIT_TESTING)
         message(SEND_ERROR "Configuration confusion: coverage using gcov is requested which means that unit testing should also be requested.")
     endif()
 endif()
 
 if(LIBOPENCOR_COVERAGE_LLVM_COV)
+    if(NOT LIBOPENCOR_BUILD_SHARED_LIBS)
+        message(SEND_ERROR "Configuration confusion: coverage using llvm-cov is requested which means that a static library cannot be requested.")
+    endif()
+
     if(NOT LIBOPENCOR_UNIT_TESTING)
         message(SEND_ERROR "Configuration confusion: coverage using llvm-cov is requested which means that unit testing should also be requested.")
     endif()
