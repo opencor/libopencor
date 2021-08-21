@@ -36,13 +36,14 @@ include(environmentchecks)
 # BUILD_SHARED_LIBS ==> LIBOPENCOR_BUILD_SHARED_LIBS.
 
 set(DOCSTRING "Build shared libraries.")
-set(LIBOPENCOR_BUILD_SHARED_LIBS ON CACHE BOOL "${DOCSTRING}")
 
 if(DEFINED BUILD_SHARED_LIBS)
     set(LIBOPENCOR_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS} CACHE BOOL "${DOCSTRING}" FORCE)
-endif()
 
-set(BUILD_SHARED_LIBS ${LIBOPENCOR_BUILD_SHARED_LIBS} CACHE INTERNAL "Internalise BUILD_SHARED_LIBS, manipulate via LIBOPENCOR_BUILD_SHARED_LIBS." FORCE)
+    unset(BUILD_SHARED_LIBS CACHE)
+else()
+    set(LIBOPENCOR_BUILD_SHARED_LIBS ON CACHE BOOL "${DOCSTRING}")
+endif()
 
 # [CMAKE_]BUILD_TYPE ==> LIBOPENCOR_BUILD_TYPE.
 
@@ -178,8 +179,6 @@ if(DEFINED PYTHON_BINDINGS)
     if(Python_Development_FOUND)
         set(LIBOPENCOR_PYTHON_BINDINGS ${PYTHON_BINDINGS} CACHE BOOL "${DOCSTRING}" FORCE)
     else()
-        set(IGNORE_ME ${PYTHON_BINDINGS})
-
         message(WARNING "Python bindings are requested but Python development files could not be found.")
     endif()
 
