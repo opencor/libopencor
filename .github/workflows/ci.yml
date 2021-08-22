@@ -23,4 +23,5 @@ jobs:
         run: |
           echo "Name: ${{ matrix.name }}"
           echo "OS:   ${{ matrix.os }}"
-      - uses: actions/checkout@v2
+      - name: Check out libOpenCOR
+        uses: actions/checkout@v2
