@@ -1,0 +1,26 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [ $default-branch ]
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "Windows CI"
+            os: windows-latest
+          - name: "Ubuntu CI"
+            os: ubuntu-latest
+          - name: "macOS CI"
+            os: macos-latest
+    steps:
+      - name: Environment
+        run: |
+          echo "Name: ${{ matrix.name }}"
+          echo "OS:   ${{ matrix.os }}"
+      - uses: actions/checkout@v2
