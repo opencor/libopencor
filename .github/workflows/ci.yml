@@ -6,17 +6,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  ci:
+  build:
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: "Windows CI"
+          - name: "Windows"
             os: windows-latest
-          - name: "Ubuntu CI"
+          - name: "Linux"
             os: ubuntu-latest
-          - name: "macOS CI"
+          - name: "macOS"
             os: macos-latest
     steps:
       - name: Environment
