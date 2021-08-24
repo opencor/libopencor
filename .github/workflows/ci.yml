@@ -20,10 +20,6 @@ jobs:
           - name: "macOS"
             os: macos-latest
     steps:
-      - name: Environment
-        run: |
-          echo "Name: ${{ matrix.name }}"
-          echo "OS:   ${{ matrix.os }}"
       - name: Install dependencies
         uses: lukka/get-cmake@latest
       - name: Check out libOpenCOR
