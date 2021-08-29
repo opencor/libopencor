@@ -16,17 +16,13 @@
 
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
-if(WIN32)
-    find_program(CLCACHE_EXE clcache)
+find_program(BUILDCACHE_EXE buildcache)
 
-    if(CLCACHE_EXE)
-        set(CLCACHE_AVAILABLE TRUE CACHE INTERNAL "Executable required to cache compilations.")
-    endif()
-else()
-    find_program(CCACHE_EXE ccache)
-
-    if(CCACHE_EXE)
-        set(CCACHE_AVAILABLE TRUE CACHE INTERNAL "Executable required to cache compilations.")
+if(NOT BUILDCACHE_EXE)
+    if(WIN32)
+        find_program(CLCACHE_EXE clcache)
+    else()
+        find_program(CCACHE_EXE ccache)
     endif()
 endif()
 
@@ -58,6 +54,10 @@ set(CMAKE_REQUIRED_FLAGS ${COVERAGE_LLVM_COV_COMPILER_FLAGS})
 check_cxx_compiler_flag(${COVERAGE_LLVM_COV_COMPILER_FLAGS} COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
 
 # Determine what is available.
+
+if(BUILDCACHE_EXE OR CLCACHE_EXE OR CCACHE_EXE)
+    set(COMPILER_CACHING_AVAILABLE TRUE CACHE INTERNAL "Executable required to cache compilations.")
+endif()
 
 if(CLANG_FORMAT_EXE)
     set(CLANG_FORMAT_MINIMUM_VERSION 12)
