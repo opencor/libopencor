@@ -13,24 +13,39 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows Release'
+          - name: 'Windows Static Release'
             os: windows-2016
-            mode: Release
+            build_shared_libs: OFF
+            build_type: Release
+          - name: 'Windows Shared Release'
+            os: windows-2016
+            build_shared_libs: ON
+            build_type: Release
           - name: 'Windows Debug'
             os: windows-2016
-            mode: Debug
-          - name: 'Linux Release'
+            build_type: Debug
+          - name: 'Linux Static Release'
             os: ubuntu-20.04
-            mode: Release
+            build_shared_libs: OFF
+            build_type: Release
+          - name: 'Linux Shared Release'
+            os: ubuntu-20.04
+            build_shared_libs: ON
+            build_type: Release
           - name: 'Linux Debug'
             os: ubuntu-20.04
-            mode: Debug
-          - name: 'macOS Release'
+            build_type: Debug
+          - name: 'macOS Static Release'
             os: macos-11
-            mode: Release
+            build_shared_libs: OFF
+            build_type: Release
+          - name: 'macOS Shared Release'
+            os: macos-11
+            build_shared_libs: ON
+            build_type: Release
           - name: 'macOS Debug'
             os: macos-11
-            mode: Debug
+            build_type: Debug
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
       BUILDCACHE_DIRECT_MODE: true
@@ -42,8 +57,16 @@ jobs:
       - name: Install buildcache
         uses: mikehardy/buildcache-action@v1
       - name: Build libOpenCOR
+        if: ${{ contains(matrix.name, 'Release') }}
         run: |
           mkdir build
           cd build
-          cmake -G Ninja -DBUILD_TYPE=${{ matrix.mode }} ..
+          cmake -G Ninja -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} -DBUILD_TYPE=${{ matrix.build_type }} ..
+          ninja
+      - name: Build libOpenCOR
+        if: ${{ contains(matrix.name, 'Debug') }}
+        run: |
+          mkdir build
+          cd build
+          cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} ..
           ninja
