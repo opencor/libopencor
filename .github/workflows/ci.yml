@@ -13,12 +13,24 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows'
+          - name: 'Windows Release'
             os: windows-2016
-          - name: 'Linux'
+            mode: Release
+          - name: 'Windows Debug'
+            os: windows-2016
+            mode: Debug
+          - name: 'Linux Release'
             os: ubuntu-20.04
-          - name: 'macOS'
+            mode: Release
+          - name: 'Linux Debug'
+            os: ubuntu-20.04
+            mode: Debug
+          - name: 'macOS Release'
             os: macos-11
+            mode: Release
+          - name: 'macOS Debug'
+            os: macos-11
+            mode: Debug
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
       BUILDCACHE_DIRECT_MODE: true
@@ -33,5 +45,5 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja ..
+          cmake -G Ninja -DBUILD_TYPE=${{ matrix.mode }} ..
           ninja
