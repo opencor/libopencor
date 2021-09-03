@@ -149,6 +149,7 @@ else()
 endif()
 
 mark_as_advanced(
+    BUILDCACHE_EXE
     CLANG_FORMAT_EXE
     CLANG_TIDY_EXE
     FIND_EXE
