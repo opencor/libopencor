@@ -117,7 +117,7 @@ function(configure_clang_and_clang_tidy TARGET)
     endif()
 endfunction()
 
-function(append_target_property TARGET PROPERTY VALUE)
+function(add_target_property TARGET PROPERTY VALUE)
     get_target_property(OLD_VALUE ${TARGET} ${PROPERTY})
 
     if(OLD_VALUE)

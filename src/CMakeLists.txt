@@ -121,8 +121,8 @@ endif()
 if(LIBOPENCOR_COVERAGE_GCOV)
     # Update our compilation and linking flags.
 
-    append_target_property(${CMAKE_PROJECT_NAME} COMPILE_FLAGS ${COVERAGE_GCOV_COMPILER_FLAGS})
-    append_target_property(${CMAKE_PROJECT_NAME} LINK_FLAGS ${COVERAGE_GCOV_LINKER_FLAGS})
+    add_target_property(${CMAKE_PROJECT_NAME} COMPILE_FLAGS ${COVERAGE_GCOV_COMPILER_FLAGS})
+    add_target_property(${CMAKE_PROJECT_NAME} LINK_FLAGS ${COVERAGE_GCOV_LINKER_FLAGS})
 
     # Share some paths with our tests.
 
@@ -133,8 +133,8 @@ endif()
 # Get ready for coverage using llvm-cov.
 
 if(LIBOPENCOR_COVERAGE_LLVM_COV)
-    append_target_property(${CMAKE_PROJECT_NAME} COMPILE_FLAGS ${COVERAGE_LLVM_COV_COMPILER_FLAGS})
-    append_target_property(${CMAKE_PROJECT_NAME} LINK_FLAGS ${COVERAGE_LLVM_COV_LINKER_FLAGS})
+    add_target_property(${CMAKE_PROJECT_NAME} COMPILE_FLAGS ${COVERAGE_LLVM_COV_COMPILER_FLAGS})
+    add_target_property(${CMAKE_PROJECT_NAME} LINK_FLAGS ${COVERAGE_LLVM_COV_LINKER_FLAGS})
 endif()
 
 # Build our different bindings.
