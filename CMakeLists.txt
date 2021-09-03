@@ -45,6 +45,8 @@ else()
     set(LIBOPENCOR_BUILD_SHARED_LIBS ON CACHE BOOL "${DOCSTRING}")
 endif()
 
+set(BUILD_SHARED_LIBS ${LIBOPENCOR_BUILD_SHARED_LIBS} CACHE INTERNAL "Internalise BUILD_SHARED_LIBS, manipulate via LIBOPENCOR_BUILD_SHARED_LIBS." FORCE)
+
 # [CMAKE_]BUILD_TYPE ==> LIBOPENCOR_BUILD_TYPE.
 
 set(DOCSTRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ...")
