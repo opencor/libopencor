@@ -12,6 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+function(replace_compiler_flag OLD NEW)
+    set(OLD "(^| )${OLD}($| )")
+
+    if(NOT "${NEW}" STREQUAL "")
+        set(NEW " ${NEW} ")
+    endif()
+
+    foreach(VAR CMAKE_CXX_FLAGS
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_CXX_FLAGS_MINSIZEREL
+        CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+        if("${${VAR}}" MATCHES "${OLD}")
+            string(REGEX REPLACE "${OLD}" "${NEW}" ${VAR} "${${VAR}}")
+        endif()
+
+        set(${VAR} "${${VAR}}" PARENT_SCOPE)
+    endforeach()
+endfunction()
+
 function(treat_warnings_as_errors TARGET)
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         set(COMPILE_OPTIONS /W4 /WX)
