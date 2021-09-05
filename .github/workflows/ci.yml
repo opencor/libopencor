@@ -58,6 +58,9 @@ jobs:
         uses: mikehardy/buildcache-action@v1
         with:
           cache_key: ${{ matrix.name }}
+      - name: Configure MSVC
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Build libOpenCOR
         run: |
           mkdir build
