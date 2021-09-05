@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function(configure_warnings_as_errors TARGET)
+function(treat_warnings_as_errors TARGET)
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         set(COMPILE_OPTIONS /W4 /WX)
     elseif(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -148,7 +148,7 @@ function(prepare_test TARGET)
     # Treat warnings as errors for the given test.
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-        configure_warnings_as_errors(${TARGET})
+        treat_warnings_as_errors(${TARGET})
     endif()
 
     # Analyse the code of the given test.

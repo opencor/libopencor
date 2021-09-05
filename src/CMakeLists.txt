@@ -107,7 +107,7 @@ generate_export_header(${CMAKE_PROJECT_NAME}
 # Treat warnings as errors.
 
 if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-    configure_warnings_as_errors(${CMAKE_PROJECT_NAME})
+    treat_warnings_as_errors(${CMAKE_PROJECT_NAME})
 endif()
 
 # Analyse the code.
