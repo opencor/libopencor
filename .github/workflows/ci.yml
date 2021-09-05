@@ -59,16 +59,8 @@ jobs:
         with:
           cache_key: ${{ matrix.name }}
       - name: Build libOpenCOR
-        if: ${{ contains(matrix.name, 'Release') }}
         run: |
           mkdir build
           cd build
           cmake -G Ninja -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} -DBUILD_TYPE=${{ matrix.build_type }} ..
-          ninja
-      - name: Build libOpenCOR
-        if: ${{ contains(matrix.name, 'Debug') }}
-        run: |
-          mkdir build
-          cd build
-          cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} ..
           ninja
