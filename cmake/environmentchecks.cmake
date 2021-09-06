@@ -19,7 +19,7 @@ find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Developme
 find_program(BUILDCACHE_EXE buildcache)
 
 if(NOT BUILDCACHE_EXE)
-    if(WIN32)
+    if(MSVC)
         find_program(CLCACHE_EXE clcache)
     else()
         find_program(CCACHE_EXE ccache)
@@ -131,7 +131,7 @@ endif()
 
 # Hide the CMake options that are not directly relevant to libOpenCOR.
 
-if(WIN32)
+if(MSVC)
     mark_as_advanced(
         CLCACHE_EXE
         CMAKE_CONFIGURATION_TYPES

@@ -89,13 +89,11 @@ if(DEFINED COMPILER_CACHING)
     if(COMPILER_CACHING_AVAILABLE)
         set(LIBOPENCOR_COMPILER_CACHING ${COMPILER_CACHING} CACHE BOOL "${DOCSTRING}" FORCE)
     else()
-        if(WIN32)
-            set(COMPILER_CACHING_TOOL clcache)
-        else()
-            set(COMPILER_CACHING_TOOL ccache)
+        if(MSVC)
+            set(CLCACHE ", clcache")
         endif()
 
-        message(WARNING "Compiler caching is requested but buildcache or ${COMPILER_CACHING_TOOL} could not be found.")
+        message(WARNING "Compiler caching is requested but buildcache${CLCACHE} or ccache could not be found.")
     endif()
 
     unset(COMPILER_CACHING CACHE)
@@ -297,26 +295,24 @@ endif()
 if(LIBOPENCOR_COMPILER_CACHING)
     if(BUILDCACHE_EXE)
         set(CMAKE_CXX_COMPILER_LAUNCHER ${BUILDCACHE_EXE})
-    else()
-        if(CLCACHE_EXE)
-            set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
+    elseif(CLCACHE_EXE)
+        set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
 
-            execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/clcachewrapper.c
-                            RESULT_VARIABLE RESULT
-                            OUTPUT_QUIET ERROR_QUIET)
+        execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/clcachewrapper.c
+                        RESULT_VARIABLE RESULT
+                        OUTPUT_QUIET ERROR_QUIET)
 
-            if(RESULT EQUAL 0)
-                set(CMAKE_CXX_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
-            endif()
-        else()
-            set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_EXE})
+        if(RESULT EQUAL 0)
+            set(CMAKE_CXX_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
         endif()
+    else()
+        set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_EXE})
     endif()
 endif()
 
 # On Windows, if we are using MSVC then replace some compiler flags.
 
-if(WIN32 AND MSVC)
+if(MSVC)
     # If we are treating warnings as errors then remove the /W3 option since it
     # will eventually be replaced with the /W4 and /WX options (see
     # treat_warnings_as_errors()).
