@@ -48,6 +48,7 @@ jobs:
             build_type: Debug
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
+      BUILDCACHE_DEBUG: -1
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
     steps:
