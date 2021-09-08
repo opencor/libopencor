@@ -13,39 +13,54 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows Static Release'
+          - name: 'Windows static library'
             os: windows-2016
             build_shared_libs: OFF
             build_type: Release
-          - name: 'Windows Shared Release'
+          - name: 'Windows shared library'
             os: windows-2016
             build_shared_libs: ON
             build_type: Release
-          - name: 'Windows Debug'
-            os: windows-2016
-            build_type: Debug
-          - name: 'Linux Static Release'
+          - name: 'Linux static library'
             os: ubuntu-20.04
             build_shared_libs: OFF
             build_type: Release
-          - name: 'Linux Shared Release'
+          - name: 'Linux shared library'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Release
-          - name: 'Linux Debug'
-            os: ubuntu-20.04
-            build_type: Debug
-          - name: 'macOS Static Release'
+          - name: 'macOS static library'
             os: macos-11
             build_shared_libs: OFF
             build_type: Release
-          - name: 'macOS Shared Release'
+          - name: 'macOS shared library'
             os: macos-11
             build_shared_libs: ON
             build_type: Release
-          - name: 'macOS Debug'
-            os: macos-11
+          - name: 'Unit testing'
+            os: ubuntu-20.04
             build_type: Debug
+            target: unit_testing
+          - name: 'Python unit testing'
+            os: ubuntu-20.04
+            build_type: Debug
+            target: python_unit_testing
+          - name: 'Code formatting'
+            os: macos-11
+            build_type: Release
+            target: code_formatting
+          - name: 'Coverage using gcov'
+            os: ubuntu-20.04
+            build_type: Release
+            target: coverage_gcov
+          - name: 'Coverage using llvm-cov'
+            os: macos-11
+            build_type: Release
+            target: coverage_llvm_cov
+          - name: 'Memory checks'
+            os: ubuntu-20.04
+            build_type: Debug
+            target: memory_checks
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
       BUILDCACHE_DEBUG: -1
