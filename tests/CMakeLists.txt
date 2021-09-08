@@ -71,6 +71,7 @@ if(LIBOPENCOR_UNIT_TESTING)
 
     add_target(unit_testing
                COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
+               DEPENDS ${TEST_TARGETS}
                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                USES_TERMINAL
                COMMENT "Running unit testing...")
