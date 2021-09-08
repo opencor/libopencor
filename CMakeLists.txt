@@ -255,8 +255,6 @@ endif()
 
 # Update our submodules.
 
-find_package(Git REQUIRED)
-
 execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --recursive --remote
                 RESULT_VARIABLE RESULT
                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
