@@ -21,18 +21,18 @@ else()
     list(APPEND COMMANDS COMMAND export PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python)
 endif()
 
-add_custom_target(python_unit_testing
-                  ${COMMANDS}
-                  COMMAND ${PYTEST_EXE}
-                  USES_TERMINAL
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                  COMMENT "Running Python unit testing...")
+add_target(python_unit_testing
+           ${COMMANDS}
+           COMMAND ${PYTEST_EXE}
+           USES_TERMINAL
+           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+           COMMENT "Running Python unit testing...")
 
 if(PYTHON_UNIT_TESTING_REPORT_AVAILABLE)
-    add_custom_target(python_unit_testing_report
-                      ${COMMANDS}
-                      COMMAND ${PYTEST_EXE} --html=${CMAKE_CURRENT_BINARY_DIR}/report.html
-                      USES_TERMINAL
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                      COMMENT "Running Python unit testing report...")
+    add_target(python_unit_testing_report
+               ${COMMANDS}
+               COMMAND ${PYTEST_EXE} --html=${CMAKE_CURRENT_BINARY_DIR}/report.html
+               USES_TERMINAL
+               WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+               COMMENT "Running Python unit testing report...")
 endif()

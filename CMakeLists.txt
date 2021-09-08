@@ -386,13 +386,14 @@ if(CLANG_FORMAT_AVAILABLE)
                    ${CHECK_CODE_FORMATTING_SCRIPT} @ONLY)
 
     if(CLANG_FORMAT_TESTING_AVAILABLE)
-        add_custom_target(check_code_formatting
-                          COMMAND ${CMAKE_COMMAND} -P ${CHECK_CODE_FORMATTING_SCRIPT})
+        add_target(check_code_formatting
+                   COMMAND ${CMAKE_COMMAND} -P ${CHECK_CODE_FORMATTING_SCRIPT}
+                   COMMENT "Checking code formatting...")
     endif()
 
-    add_custom_target(format_code
-                      COMMAND ${CLANG_FORMAT_EXE} -i ${GIT_FILES}
-                      COMMENT "Formatting the code...")
+    add_target(format_code
+               COMMAND ${CLANG_FORMAT_EXE} -i ${GIT_FILES}
+               COMMENT "Formatting the code...")
 endif()
 
 # Summary of our configuration.
@@ -446,3 +447,14 @@ endif()
 if(DEFINED LIBOPENCOR_WARNINGS_AS_ERRORS)
     message("    - LIBOPENCOR_WARNINGS_AS_ERRORS:  ${LIBOPENCOR_WARNINGS_AS_ERRORS}")
 endif()
+
+# Summary of available targets.
+
+message(STATUS "Available targets:")
+
+get_property(TARGETS GLOBAL PROPERTY TARGETS)
+list(SORT TARGETS)
+
+foreach(TARGET ${TARGETS})
+    message("    - ${TARGET}")
+endforeach()

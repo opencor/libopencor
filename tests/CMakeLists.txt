@@ -69,11 +69,11 @@ if(LIBOPENCOR_UNIT_TESTING)
 
     # Run our unit testing.
 
-    add_custom_target(unit_testing
-                      COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
-                      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                      USES_TERMINAL
-                      COMMENT "Running unit testing...")
+    add_target(unit_testing
+               COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
+               WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+               USES_TERMINAL
+               COMMENT "Running unit testing...")
 endif()
 
 # Add our bindings tests.
@@ -102,10 +102,10 @@ if(LIBOPENCOR_COVERAGE_GCOV)
 
     # Run our coverage tests using gcov.
 
-    add_custom_target(coverage_gcov
-                      COMMAND ${GCOVR_EXE} -r ${GCOV_PREFIX_PATH} --gcov-executable=${GCOV_EXE} ${GCOV_ANALYSIS_PATH}
-                      DEPENDS prepare_coverage_gcov
-                      COMMENT "Running coverage tests using gcov...")
+    add_target(coverage_gcov
+               COMMAND ${GCOVR_EXE} -r ${GCOV_PREFIX_PATH} --gcov-executable=${GCOV_EXE} ${GCOV_ANALYSIS_PATH}
+               DEPENDS prepare_coverage_gcov
+               COMMENT "Running coverage tests using gcov...")
 endif()
 
 # Run our coverage tests using llvm-cov.
@@ -139,25 +139,25 @@ if(LIBOPENCOR_COVERAGE_LLVM_COV)
 
     # Run our coverage tests using llvm-cov.
 
-    add_custom_target(coverage_llvm_cov
-                      COMMAND ${LLVM_COV_EXE} report $<TARGET_FILE:${CMAKE_PROJECT_NAME}> -instr-profile=${PROFDATA_FILE} -use-color
-                      DEPENDS prepare_coverage_llvm_cov
-                      COMMENT "Running coverage tests using llvm-cov...")
+    add_target(coverage_llvm_cov
+               COMMAND ${LLVM_COV_EXE} report $<TARGET_FILE:${CMAKE_PROJECT_NAME}> -instr-profile=${PROFDATA_FILE} -use-color
+               DEPENDS prepare_coverage_llvm_cov
+               COMMENT "Running coverage tests using llvm-cov...")
 
     # Run our coverage report using llvm-cov.
 
-    add_custom_target(coverage_llvm_cov_report
-                      COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> -instr-profile=${PROFDATA_FILE} -format=html -o coverage_llvm_cov_report
-                      DEPENDS prepare_coverage_llvm_cov
-                      COMMENT "Running coverage report using llvm-cov...")
+    add_target(coverage_llvm_cov_report
+               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> -instr-profile=${PROFDATA_FILE} -format=html -o coverage_llvm_cov_report
+               DEPENDS prepare_coverage_llvm_cov
+               COMMENT "Running coverage report using llvm-cov...")
 endif()
 
 # Run our memory checks.
 
 if(LIBOPENCOR_MEMORY_CHECKS)
-    add_custom_target(memory_checks
-                      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/memorychecks
-                      COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/memorychecks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
-                      DEPENDS ${TEST_TARGETS} ${prepare_memcheck}
-                      COMMENT "Running memory checks...")
+    add_target(memory_checks
+               COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/memorychecks
+               COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/memorychecks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
+               DEPENDS ${TEST_TARGETS} ${prepare_memcheck}
+               COMMENT "Running memory checks...")
 endif()

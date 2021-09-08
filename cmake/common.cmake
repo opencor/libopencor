@@ -137,6 +137,13 @@ function(configure_clang_and_clang_tidy TARGET)
     endif()
 endfunction()
 
+macro(add_target TARGET)
+    add_custom_target(${TARGET} ${ARGN})
+
+    get_property(TARGETS GLOBAL PROPERTY TARGETS)
+    set_property(GLOBAL PROPERTY TARGETS "${TARGETS};${TARGET}")
+endmacro()
+
 function(add_target_property TARGET PROPERTY VALUE)
     get_target_property(OLD_VALUE ${TARGET} ${PROPERTY})
 
