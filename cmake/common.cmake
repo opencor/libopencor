@@ -56,13 +56,14 @@ function(configure_clang_and_clang_tidy TARGET)
 
         set(COMPILE_OPTIONS
             -Weverything
+            -Wno-exit-time-destructors
+            -Wno-global-constructors
         )
 
         if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
             list(APPEND COMPILE_OPTIONS
                 -Wno-c++98-compat
                 -Wno-c++98-compat-pedantic
-                -Wno-global-constructors
             )
         endif()
 
