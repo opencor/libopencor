@@ -39,8 +39,6 @@ set(DOCSTRING "Build shared libraries.")
 
 if(DEFINED BUILD_SHARED_LIBS)
     set(LIBOPENCOR_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS} CACHE BOOL "${DOCSTRING}" FORCE)
-
-    unset(BUILD_SHARED_LIBS CACHE)
 else()
     set(LIBOPENCOR_BUILD_SHARED_LIBS ON CACHE BOOL "${DOCSTRING}")
 endif()
@@ -53,8 +51,6 @@ set(DOCSTRING "Choose the type of build, options are: None Debug Release RelWith
 
 if(DEFINED BUILD_TYPE)
     set(LIBOPENCOR_BUILD_TYPE "${BUILD_TYPE}" CACHE STRING "${DOCSTRING}" FORCE)
-
-    unset(BUILD_TYPE CACHE)
 else()
     set(LIBOPENCOR_BUILD_TYPE "Debug" CACHE STRING "${DOCSTRING}")
 endif()
@@ -68,15 +64,13 @@ if(CLANG_TIDY_AVAILABLE)
     set(LIBOPENCOR_CODE_ANALYSIS OFF CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED CODE_ANALYSIS)
-    if(CLANG_TIDY_AVAILABLE)
-        set(LIBOPENCOR_CODE_ANALYSIS ${CODE_ANALYSIS} CACHE BOOL "${DOCSTRING}" FORCE)
-    else()
-        message(SEND_ERROR "Code analysis is requested but clang-tidy could not be found.")
-    endif()
-
-    unset(CODE_ANALYSIS CACHE)
+if(DEFINED CODE_ANALYSIS AND CLANG_TIDY_AVAILABLE)
+    set(LIBOPENCOR_CODE_ANALYSIS "${CODE_ANALYSIS}" CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(CODE_ANALYSIS)
+    message(SEND_ERROR "Code analysis is requested but clang-tidy could not be found.")
 endif()
+
+unset(CODE_ANALYSIS CACHE)
 
 # COMPILER_CACHING ==> LIBOPENCOR_COMPILER_CACHING.
 
@@ -85,19 +79,17 @@ if(COMPILER_CACHING_AVAILABLE)
     set(LIBOPENCOR_COMPILER_CACHING ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED COMPILER_CACHING)
-    if(COMPILER_CACHING_AVAILABLE)
-        set(LIBOPENCOR_COMPILER_CACHING ${COMPILER_CACHING} CACHE BOOL "${DOCSTRING}" FORCE)
-    else()
-        if(MSVC)
-            set(CLCACHE ", clcache")
-        endif()
-
-        message(SEND_ERROR "Compiler caching is requested but buildcache${CLCACHE} or ccache could not be found.")
+if(DEFINED COMPILER_CACHING AND COMPILER_CACHING_AVAILABLE)
+    set(LIBOPENCOR_COMPILER_CACHING ${COMPILER_CACHING} CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(COMPILER_CACHING)
+    if(MSVC)
+        set(CLCACHE ", clcache")
     endif()
 
-    unset(COMPILER_CACHING CACHE)
+    message(SEND_ERROR "Compiler caching is requested but buildcache${CLCACHE} or ccache could not be found.")
 endif()
+
+unset(COMPILER_CACHING CACHE)
 
 # COVERAGE_GCOV ==> LIBOPENCOR_COVERAGE_GCOV.
 
@@ -106,15 +98,13 @@ if(COVERAGE_GCOV_TESTING_AVAILABLE)
     set(LIBOPENCOR_COVERAGE_GCOV ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED COVERAGE_GCOV)
-    if(COVERAGE_GCOV_TESTING_AVAILABLE)
-        set(LIBOPENCOR_COVERAGE_GCOV "${COVERAGE_GCOV}" CACHE BOOL "${DOCSTRING}" FORCE)
-    else()
-        message(SEND_ERROR "Coverage testing using gcov is requested but gcov or its requirements could not be found.")
-    endif()
-
-    unset(COVERAGE_GCOV CACHE)
+if(DEFINED COVERAGE_GCOV AND COVERAGE_GCOV_TESTING_AVAILABLE)
+    set(LIBOPENCOR_COVERAGE_GCOV "${COVERAGE_GCOV}" CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(COVERAGE_GCOV)
+    message(SEND_ERROR "Coverage testing using gcov is requested but gcov or its requirements could not be found.")
 endif()
+
+unset(COVERAGE_GCOV CACHE)
 
 # COVERAGE_LLVM_COV ==> LIBOPENCOR_COVERAGE_LLVM_COV.
 
@@ -123,15 +113,13 @@ if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
     set(LIBOPENCOR_COVERAGE_LLVM_COV ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED COVERAGE_LLVM_COV)
-    if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
-        set(LIBOPENCOR_COVERAGE_LLVM_COV "${COVERAGE_LLVM_COV}" CACHE BOOL "${DOCSTRING}" FORCE)
-    else()
-        message(SEND_ERROR "Coverage testing using llvm-cov is requested but llvm-cov or its requirements could not be found.")
-    endif()
-
-    unset(COVERAGE_LLVM_COV CACHE)
+if(DEFINED COVERAGE_LLVM_COV AND COVERAGE_LLVM_COV_TESTING_AVAILABLE)
+    set(LIBOPENCOR_COVERAGE_LLVM_COV "${COVERAGE_LLVM_COV}" CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(COVERAGE_LLVM_COV)
+    message(SEND_ERROR "Coverage testing using llvm-cov is requested but llvm-cov or its requirements could not be found.")
 endif()
+
+unset(COVERAGE_LLVM_COV CACHE)
 
 # [CMAKE_]INSTALL_PREFIX ==> LIBOPENCOR_INSTALL_PREFIX.
 
@@ -139,8 +127,6 @@ set(DOCSTRING "Install path prefix, prepended onto install directories.")
 
 if(DEFINED INSTALL_PREFIX)
     set(LIBOPENCOR_INSTALL_PREFIX ${INSTALL_PREFIX} CACHE PATH "${DOCSTRING}" FORCE)
-
-    unset(INSTALL_PREFIX CACHE)
 else()
     set(LIBOPENCOR_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "${DOCSTRING}")
 endif()
@@ -156,17 +142,13 @@ if(VALGRIND_AVAILABLE)
     set(LIBOPENCOR_MEMORY_CHECKS ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED MEMORY_CHECKS)
-    if(MEMORY_CHECKS)
-        if(VALGRIND_AVAILABLE)
-            set(LIBOPENCOR_MEMORY_CHECKS "${MEMORY_CHECKS}" CACHE BOOL "${DOCSTRING}" FORCE)
-        else()
-            message(SEND_ERROR "Memory checks are requested but Valgrind could not be found.")
-        endif()
-    endif()
-
-    unset(MEMORY_CHECKS CACHE)
+if(DEFINED MEMORY_CHECKS AND VALGRIND_AVAILABLE)
+    set(LIBOPENCOR_MEMORY_CHECKS "${MEMORY_CHECKS}" CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(MEMORY_CHECKS)
+    message(SEND_ERROR "Memory checks are requested but Valgrind could not be found.")
 endif()
+
+unset(MEMORY_CHECKS CACHE)
 
 # PYTHON_BINDINGS ==> LIBOPENCOR_PYTHON_BINDINGS.
 
@@ -175,15 +157,13 @@ if(Python_Development_FOUND)
     set(LIBOPENCOR_PYTHON_BINDINGS ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED PYTHON_BINDINGS)
-    if(Python_Development_FOUND)
-        set(LIBOPENCOR_PYTHON_BINDINGS ${PYTHON_BINDINGS} CACHE BOOL "${DOCSTRING}" FORCE)
-    else()
-        message(SEND_ERROR "Python bindings are requested but Python development files could not be found.")
-    endif()
-
-    unset(PYTHON_BINDINGS CACHE)
+if(DEFINED PYTHON_BINDINGS AND Python_Development_FOUND)
+    set(LIBOPENCOR_PYTHON_BINDINGS ${PYTHON_BINDINGS} CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(PYTHON_BINDINGS)
+    message(SEND_ERROR "Python bindings are requested but Python development files could not be found.")
 endif()
+
+unset(PYTHON_BINDINGS CACHE)
 
 # PYTHON_UNIT_TESTING ==> LIBOPENCOR_PYTHON_UNIT_TESTING.
 
@@ -192,17 +172,13 @@ if(PYTHON_UNIT_TESTING_AVAILABLE)
     set(LIBOPENCOR_PYTHON_UNIT_TESTING ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED PYTHON_UNIT_TESTING)
-    if(PYTHON_UNIT_TESTING)
-        if(PYTHON_UNIT_TESTING_AVAILABLE)
-            set(LIBOPENCOR_PYTHON_UNIT_TESTING "${PYTHON_UNIT_TESTING}" CACHE BOOL "${DOCSTRING}" FORCE)
-        else()
-            message(SEND_ERROR "Python unit testing is requested but Python and/or the Python pytest package could not be found.")
-        endif()
-    endif()
-
-    unset(PYTHON_UNIT_TESTING CACHE)
+if(DEFINED PYTHON_UNIT_TESTING AND PYTHON_UNIT_TESTING_AVAILABLE)
+    set(LIBOPENCOR_PYTHON_UNIT_TESTING "${PYTHON_UNIT_TESTING}" CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(PYTHON_UNIT_TESTING)
+    message(SEND_ERROR "Python unit testing is requested but Python and/or the Python pytest package could not be found.")
 endif()
+
+unset(PYTHON_UNIT_TESTING CACHE)
 
 # UNIT_TESTING ==> LIBOPENCOR_UNIT_TESTING.
 
@@ -211,9 +187,9 @@ set(LIBOPENCOR_UNIT_TESTING ON CACHE BOOL "${DOCSTRING}")
 
 if(DEFINED UNIT_TESTING)
     set(LIBOPENCOR_UNIT_TESTING ${UNIT_TESTING} CACHE BOOL "${DOCSTRING}" FORCE)
-
-    unset(UNIT_TESTING CACHE)
 endif()
+
+unset(UNIT_TESTING CACHE)
 
 # WARNINGS_AS_ERRORS ==> LIBOPENCOR_WARNINGS_AS_ERRORS.
 
@@ -222,9 +198,9 @@ set(LIBOPENCOR_WARNINGS_AS_ERRORS ON CACHE BOOL "${DOCSTRING}")
 
 if(DEFINED WARNINGS_AS_ERRORS)
     set(LIBOPENCOR_WARNINGS_AS_ERRORS ${WARNINGS_AS_ERRORS} CACHE BOOL "${DOCSTRING}" FORCE)
-
-    unset(WARNINGS_AS_ERRORS CACHE)
 endif()
+
+unset(WARNINGS_AS_ERRORS CACHE)
 
 # Make sure that the configuration is sound.
 
