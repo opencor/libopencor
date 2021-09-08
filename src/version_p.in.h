@@ -21,8 +21,8 @@ limitations under the License.
 namespace libOpenCOR {
 
 // clang-format off
-static unsigned int LIBOPENCOR_VERSION = @LIBOPENCOR_VERSION@;
+static const unsigned int LIBOPENCOR_VERSION = @LIBOPENCOR_VERSION@;
 // clang-format on
-static std::string LIBOPENCOR_VERSION_STRING = "@LIBOPENCOR_VERSION_STRING@";
+static const std::string LIBOPENCOR_VERSION_STRING = "@LIBOPENCOR_VERSION_STRING@";
 
 } // namespace libOpenCOR
