@@ -39,26 +39,32 @@ jobs:
             build_type: Release
           - name: 'Unit testing'
             os: ubuntu-20.04
+            build_shared_libs: ON
             build_type: Debug
             target: unit_testing
           - name: 'Python unit testing'
             os: ubuntu-20.04
+            build_shared_libs: ON
             build_type: Debug
             target: python_unit_testing
           - name: 'Code formatting'
             os: macos-11
+            build_shared_libs: OFF
             build_type: Release
             target: code_formatting
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
+            build_shared_libs: ON
             build_type: Release
             target: coverage_gcov
           - name: 'Coverage using llvm-cov'
             os: macos-11
+            build_shared_libs: ON
             build_type: Release
             target: coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
+            build_shared_libs: ON
             build_type: Debug
             target: memory_checks
     env:
