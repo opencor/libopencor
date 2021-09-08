@@ -108,6 +108,7 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
+        if: ${{ matrix.target != 'code_formatting' }}
         uses: mikehardy/buildcache-action@v1
         with:
           cache_key: ${{ matrix.name }}
@@ -117,6 +118,9 @@ jobs:
       - name: Install pytest
         if: ${{ matrix.python_bindings == 'ON' }}
         run: pip install pytest
+      - name: Install ClangFormat
+        if: ${{ matrix.target == 'code_formatting' }}
+        run: brew install clang-format
       - name: Build libOpenCOR
         run: |
           mkdir build
