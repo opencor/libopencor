@@ -114,7 +114,7 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Configure Python
+      - name: Install pytest
         if: ${{ matrix.python_bindings == 'ON' }}
         run: pip install pytest
       - name: Build libOpenCOR
