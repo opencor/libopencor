@@ -86,7 +86,7 @@ if(LIBOPENCOR_COVERAGE_GCOV)
     # Clean our old gcov-based coverage data.
 
     add_custom_target(clean_coverage_gcov_data
-                      COMMAND ${FIND_EXE} ${GCOV_ANALYSIS_PATH} -type f -name "*.gcda" -print | xargs /bin/rm -f
+                      COMMAND ${FIND_EXE} ${GCOV_ANALYSIS_PATH} -type f -name \"*.gcda\" -print | xargs /bin/rm -f
                       COMMENT "Cleaning old gcov-based coverage data...")
 
     # Clean our old gcov-based coverage data when building libOpenCOR.
@@ -120,7 +120,7 @@ if(LIBOPENCOR_COVERAGE_LLVM_COV)
     endforeach()
 
     add_custom_target(clean_coverage_llvm_cov_data
-                      COMMAND ${FIND_EXE} ${CMAKE_CURRENT_BINARY_DIR} -type f -name "${CMAKE_PROJECT_NAME}.prof*" -print | xargs /bin/rm -f
+                      COMMAND ${FIND_EXE} ${CMAKE_CURRENT_BINARY_DIR} -type f -name \"${CMAKE_PROJECT_NAME}.prof*\" -print | xargs /bin/rm -f
                       COMMENT "Cleaning old llvm-cov-based coverage data...")
 
     # Clean our old llvm-cov-based coverage data when building libOpenCOR.
