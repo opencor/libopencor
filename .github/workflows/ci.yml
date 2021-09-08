@@ -18,71 +18,84 @@ jobs:
             build_shared_libs: OFF
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
           - name: 'Windows shared library'
             os: windows-2016
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
           - name: 'Linux static library'
             os: ubuntu-20.04
             build_shared_libs: OFF
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
           - name: 'Linux shared library'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
           - name: 'macOS static library'
             os: macos-11
             build_shared_libs: OFF
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
           - name: 'macOS shared library'
             os: macos-11
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Debug
             code_analysis: OFF
+            python_bindings: OFF
             target: unit_testing
           - name: 'Python unit testing'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Debug
             code_analysis: OFF
+            python_bindings: ON
             target: python_unit_testing
           - name: 'Code formatting'
             os: macos-11
             build_shared_libs: OFF
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
             target: code_formatting
           - name: 'Code analysis'
             os: macos-11
             build_shared_libs: OFF
             build_type: Release
             code_analysis: ON
+            python_bindings: OFF
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
             target: coverage_gcov
           - name: 'Coverage using llvm-cov'
             os: macos-11
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
+            python_bindings: OFF
             target: coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Debug
             code_analysis: OFF
+            python_bindings: OFF
             target: memory_checks
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
@@ -101,9 +114,12 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
+      - name: Configure Python
+        if: ${{ matrix.python_bindings == 'ON' }}
+        run: pip install pytest
       - name: Build libOpenCOR
         run: |
           mkdir build
           cd build
-          cmake -G Ninja -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} ..
+          cmake -G Ninja -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} ..
           ninja ${{ matrix.target }}
