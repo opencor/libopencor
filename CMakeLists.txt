@@ -380,14 +380,14 @@ if(CLANG_FORMAT_AVAILABLE)
         ${GIT_TESTS_HEADER_FILES}
     )
 
-    set(CHECK_CODE_FORMATTING_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/checkcodeformatting.cmake)
+    set(CODE_FORMATTING_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/codeformatting.cmake)
 
-    configure_file(cmake/checkcodeformatting.in.cmake
-                   ${CHECK_CODE_FORMATTING_SCRIPT} @ONLY)
+    configure_file(cmake/codeformatting.in.cmake
+                   ${CODE_FORMATTING_SCRIPT} @ONLY)
 
     if(CLANG_FORMAT_TESTING_AVAILABLE)
-        add_target(check_code_formatting
-                   COMMAND ${CMAKE_COMMAND} -P ${CHECK_CODE_FORMATTING_SCRIPT}
+        add_target(code_formatting
+                   COMMAND ${CMAKE_COMMAND} -P ${CODE_FORMATTING_SCRIPT}
                    COMMENT "Checking code formatting...")
     endif()
 
