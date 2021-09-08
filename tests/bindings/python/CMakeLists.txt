@@ -12,10 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Retrieve our Python bindings target.
-
-get_property(PYTHON_BINDINGS_TARGET GLOBAL PROPERTY PYTHON_BINDINGS_TARGET)
-
 # Run our Python tests.
 
 if(WIN32)

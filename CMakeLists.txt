@@ -428,7 +428,6 @@ endif()
 
 message(STATUS "Available targets:")
 
-get_property(TARGETS GLOBAL PROPERTY TARGETS)
 list(SORT TARGETS)
 
 foreach(TARGET ${TARGETS})

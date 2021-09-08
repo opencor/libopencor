@@ -20,7 +20,7 @@ endif()
 
 # Build our Python bindings.
 
-set(PYTHON_BINDINGS_TARGET Python_${CMAKE_PROJECT_NAME})
+set(PYTHON_BINDINGS_TARGET Python_${CMAKE_PROJECT_NAME} CACHE INTERNAL "Python bindings target.")
 
 pybind11_add_module(${PYTHON_BINDINGS_TARGET}
     ${SOURCE_FILES}
@@ -35,10 +35,6 @@ set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
 )
 
 configure_file(libopencor/__init__.py libopencor/__init__.py COPYONLY)
-
-# Make sure that our Python tests can depend on our Python bindings target.
-
-set_property(GLOBAL PROPERTY PYTHON_BINDINGS_TARGET ${PYTHON_BINDINGS_TARGET})
 
 # Install our Python bindings.
 

@@ -141,8 +141,7 @@ endfunction()
 macro(add_target TARGET)
     add_custom_target(${TARGET} ${ARGN})
 
-    get_property(TARGETS GLOBAL PROPERTY TARGETS)
-    set_property(GLOBAL PROPERTY TARGETS "${TARGETS};${TARGET}")
+    set(TARGETS "${TARGETS};${TARGET}" CACHE INTERNAL "Available targets.")
 endmacro()
 
 function(add_target_property TARGET PROPERTY VALUE)
