@@ -112,15 +112,15 @@ jobs:
         uses: mikehardy/buildcache-action@v1
         with:
           cache_key: ${{ matrix.name }}
-      - name: Configure MSVC
-        if: ${{ runner.os == 'Windows' }}
-        uses: ilammy/msvc-dev-cmd@v1
       - name: Install pytest
         if: ${{ matrix.python_bindings == 'ON' }}
         run: pip install pytest
       - name: Install ClangFormat
         if: ${{ matrix.target == 'code_formatting' }}
         run: brew install clang-format
+      - name: Configure MSVC
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Build libOpenCOR
         run: |
           mkdir build
