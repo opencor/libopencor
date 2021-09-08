@@ -17,55 +17,73 @@ jobs:
             os: windows-2016
             build_shared_libs: OFF
             build_type: Release
+            code_analysis: OFF
           - name: 'Windows shared library'
             os: windows-2016
             build_shared_libs: ON
             build_type: Release
+            code_analysis: OFF
           - name: 'Linux static library'
             os: ubuntu-20.04
             build_shared_libs: OFF
             build_type: Release
+            code_analysis: OFF
           - name: 'Linux shared library'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Release
+            code_analysis: OFF
           - name: 'macOS static library'
             os: macos-11
             build_shared_libs: OFF
             build_type: Release
+            code_analysis: OFF
           - name: 'macOS shared library'
             os: macos-11
             build_shared_libs: ON
             build_type: Release
+            code_analysis: OFF
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Debug
+            code_analysis: OFF
             target: unit_testing
           - name: 'Python unit testing'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Debug
+            code_analysis: OFF
             target: python_unit_testing
           - name: 'Code formatting'
             os: macos-11
             build_shared_libs: OFF
             build_type: Release
+            code_analysis: OFF
+            target: code_formatting
+          - name: 'Code analysis'
+            os: macos-11
+            build_shared_libs: OFF
+            build_type: Release
+            code_analysis: ON
             target: code_formatting
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Release
+            code_analysis: OFF
             target: coverage_gcov
           - name: 'Coverage using llvm-cov'
             os: macos-11
             build_shared_libs: ON
             build_type: Release
+            code_analysis: OFF
             target: coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Debug
+            code_analysis: OFF
             target: memory_checks
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
@@ -88,5 +106,5 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} -DBUILD_TYPE=${{ matrix.build_type }} ..
+          cmake -G Ninja -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} ..
           ninja ${{ matrix.target }}
