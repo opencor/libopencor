@@ -26,14 +26,18 @@ if(NOT BUILDCACHE_EXE)
     endif()
 endif()
 
-find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
-find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
+find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format
+             PATHS /usr/local/opt/llvm/bin)
+find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy
+             PATHS /usr/local/opt/llvm/bin)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
 find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
 find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
-find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov)
-find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata)
+find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov
+             PATHS /usr/local/opt/llvm/bin)
+find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata
+             PATHS /usr/local/opt/llvm/bin)
 find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
