@@ -91,35 +91,35 @@ endif()
 
 unset(COMPILER_CACHING CACHE)
 
-# COVERAGE_GCOV ==> LIBOPENCOR_COVERAGE_GCOV.
+# CODE_COVERAGE_GCOV ==> LIBOPENCOR_CODE_COVERAGE_GCOV.
 
-if(COVERAGE_GCOV_TESTING_AVAILABLE)
-    set(DOCSTRING "Enable coverage testing using gcov.")
-    set(LIBOPENCOR_COVERAGE_GCOV ON CACHE BOOL "${DOCSTRING}")
+if(CODE_COVERAGE_GCOV_TESTING_AVAILABLE)
+    set(DOCSTRING "Enable code coverage testing using gcov.")
+    set(LIBOPENCOR_CODE_COVERAGE_GCOV ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED COVERAGE_GCOV AND COVERAGE_GCOV_TESTING_AVAILABLE)
-    set(LIBOPENCOR_COVERAGE_GCOV "${COVERAGE_GCOV}" CACHE BOOL "${DOCSTRING}" FORCE)
-elseif(COVERAGE_GCOV)
-    message(SEND_ERROR "Coverage testing using gcov is requested but gcov or its requirements could not be found.")
+if(DEFINED CODE_COVERAGE_GCOV AND CODE_COVERAGE_GCOV_TESTING_AVAILABLE)
+    set(LIBOPENCOR_CODE_COVERAGE_GCOV "${CODE_COVERAGE_GCOV}" CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(CODE_COVERAGE_GCOV)
+    message(SEND_ERROR "Code coverage testing using gcov is requested but gcov or its requirements could not be found.")
 endif()
 
-unset(COVERAGE_GCOV CACHE)
+unset(CODE_COVERAGE_GCOV CACHE)
 
-# COVERAGE_LLVM_COV ==> LIBOPENCOR_COVERAGE_LLVM_COV.
+# CODE_COVERAGE_LLVM_COV ==> LIBOPENCOR_CODE_COVERAGE_LLVM_COV.
 
-if(COVERAGE_LLVM_COV_TESTING_AVAILABLE)
-    set(DOCSTRING "Enable coverage testing using llvm-cov.")
-    set(LIBOPENCOR_COVERAGE_LLVM_COV ON CACHE BOOL "${DOCSTRING}")
+if(CODE_COVERAGE_LLVM_COV_TESTING_AVAILABLE)
+    set(DOCSTRING "Enable code coverage testing using llvm-cov.")
+    set(LIBOPENCOR_CODE_COVERAGE_LLVM_COV ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED COVERAGE_LLVM_COV AND COVERAGE_LLVM_COV_TESTING_AVAILABLE)
-    set(LIBOPENCOR_COVERAGE_LLVM_COV "${COVERAGE_LLVM_COV}" CACHE BOOL "${DOCSTRING}" FORCE)
-elseif(COVERAGE_LLVM_COV)
-    message(SEND_ERROR "Coverage testing using llvm-cov is requested but llvm-cov or its requirements could not be found.")
+if(DEFINED CODE_COVERAGE_LLVM_COV AND CODE_COVERAGE_LLVM_COV_TESTING_AVAILABLE)
+    set(LIBOPENCOR_CODE_COVERAGE_LLVM_COV "${CODE_COVERAGE_LLVM_COV}" CACHE BOOL "${DOCSTRING}" FORCE)
+elseif(CODE_COVERAGE_LLVM_COV)
+    message(SEND_ERROR "Code coverage testing using llvm-cov is requested but llvm-cov or its requirements could not be found.")
 endif()
 
-unset(COVERAGE_LLVM_COV CACHE)
+unset(CODE_COVERAGE_LLVM_COV CACHE)
 
 # [CMAKE_]INSTALL_PREFIX ==> LIBOPENCOR_INSTALL_PREFIX.
 
@@ -204,23 +204,23 @@ unset(WARNINGS_AS_ERRORS CACHE)
 
 # Make sure that the configuration is sound.
 
-if(LIBOPENCOR_COVERAGE_GCOV)
+if(LIBOPENCOR_CODE_COVERAGE_GCOV)
     if(NOT LIBOPENCOR_BUILD_SHARED_LIBS)
-        message(SEND_ERROR "Configuration confusion: coverage using gcov is requested which means that a static library cannot be requested.")
+        message(SEND_ERROR "Configuration confusion: code coverage using gcov is requested which means that a static library cannot be requested.")
     endif()
 
     if(NOT LIBOPENCOR_UNIT_TESTING)
-        message(SEND_ERROR "Configuration confusion: coverage using gcov is requested which means that unit testing should also be requested.")
+        message(SEND_ERROR "Configuration confusion: code coverage using gcov is requested which means that unit testing should also be requested.")
     endif()
 endif()
 
-if(LIBOPENCOR_COVERAGE_LLVM_COV)
+if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
     if(NOT LIBOPENCOR_BUILD_SHARED_LIBS)
-        message(SEND_ERROR "Configuration confusion: coverage using llvm-cov is requested which means that a static library cannot be requested.")
+        message(SEND_ERROR "Configuration confusion: code coverage using llvm-cov is requested which means that a static library cannot be requested.")
     endif()
 
     if(NOT LIBOPENCOR_UNIT_TESTING)
-        message(SEND_ERROR "Configuration confusion: coverage using llvm-cov is requested which means that unit testing should also be requested.")
+        message(SEND_ERROR "Configuration confusion: code coverage using llvm-cov is requested which means that unit testing should also be requested.")
     endif()
 endif()
 
@@ -375,51 +375,51 @@ endif()
 message(STATUS "Configuration summary:")
 
 if(DEFINED LIBOPENCOR_BUILD_SHARED_LIBS)
-    message(STATUS " - LIBOPENCOR_BUILD_SHARED_LIBS:   ${LIBOPENCOR_BUILD_SHARED_LIBS}")
+    message(STATUS " - LIBOPENCOR_BUILD_SHARED_LIBS:      ${LIBOPENCOR_BUILD_SHARED_LIBS}")
 endif()
 
 if(DEFINED LIBOPENCOR_BUILD_TYPE)
-    message(STATUS " - LIBOPENCOR_BUILD_TYPE:          ${LIBOPENCOR_BUILD_TYPE}")
+    message(STATUS " - LIBOPENCOR_BUILD_TYPE:             ${LIBOPENCOR_BUILD_TYPE}")
 endif()
 
 if(DEFINED LIBOPENCOR_CODE_ANALYSIS)
-    message(STATUS " - LIBOPENCOR_CODE_ANALYSIS:       ${LIBOPENCOR_CODE_ANALYSIS}")
+    message(STATUS " - LIBOPENCOR_CODE_ANALYSIS:          ${LIBOPENCOR_CODE_ANALYSIS}")
 endif()
 
 if(DEFINED LIBOPENCOR_COMPILER_CACHING)
-    message(STATUS " - LIBOPENCOR_COMPILER_CACHING:    ${LIBOPENCOR_COMPILER_CACHING}")
+    message(STATUS " - LIBOPENCOR_COMPILER_CACHING:       ${LIBOPENCOR_COMPILER_CACHING}")
 endif()
 
-if(DEFINED LIBOPENCOR_COVERAGE_GCOV)
-    message(STATUS " - LIBOPENCOR_COVERAGE_GCOV:       ${LIBOPENCOR_COVERAGE_GCOV}")
+if(DEFINED LIBOPENCOR_CODE_COVERAGE_GCOV)
+    message(STATUS " - LIBOPENCOR_CODE_COVERAGE_GCOV:     ${LIBOPENCOR_CODE_COVERAGE_GCOV}")
 endif()
 
-if(DEFINED LIBOPENCOR_COVERAGE_LLVM_COV)
-    message(STATUS " - LIBOPENCOR_COVERAGE_LLVM_COV:   ${LIBOPENCOR_COVERAGE_LLVM_COV}")
+if(DEFINED LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+    message(STATUS " - LIBOPENCOR_CODE_COVERAGE_LLVM_COV: ${LIBOPENCOR_CODE_COVERAGE_LLVM_COV}")
 endif()
 
 if(DEFINED LIBOPENCOR_INSTALL_PREFIX)
-    message(STATUS " - LIBOPENCOR_INSTALL_PREFIX:      ${LIBOPENCOR_INSTALL_PREFIX}")
+    message(STATUS " - LIBOPENCOR_INSTALL_PREFIX:         ${LIBOPENCOR_INSTALL_PREFIX}")
 endif()
 
 if(DEFINED LIBOPENCOR_MEMORY_CHECKS)
-    message(STATUS " - LIBOPENCOR_MEMORY_CHECKS:       ${LIBOPENCOR_MEMORY_CHECKS}")
+    message(STATUS " - LIBOPENCOR_MEMORY_CHECKS:          ${LIBOPENCOR_MEMORY_CHECKS}")
 endif()
 
 if(DEFINED LIBOPENCOR_PYTHON_BINDINGS)
-    message(STATUS " - LIBOPENCOR_PYTHON_BINDINGS:     ${LIBOPENCOR_PYTHON_BINDINGS}")
+    message(STATUS " - LIBOPENCOR_PYTHON_BINDINGS:        ${LIBOPENCOR_PYTHON_BINDINGS}")
 endif()
 
 if(DEFINED LIBOPENCOR_PYTHON_UNIT_TESTING)
-    message(STATUS " - LIBOPENCOR_PYTHON_UNIT_TESTING: ${LIBOPENCOR_PYTHON_UNIT_TESTING}")
+    message(STATUS " - LIBOPENCOR_PYTHON_UNIT_TESTING:    ${LIBOPENCOR_PYTHON_UNIT_TESTING}")
 endif()
 
 if(DEFINED LIBOPENCOR_UNIT_TESTING)
-    message(STATUS " - LIBOPENCOR_UNIT_TESTING:        ${LIBOPENCOR_UNIT_TESTING}")
+    message(STATUS " - LIBOPENCOR_UNIT_TESTING:           ${LIBOPENCOR_UNIT_TESTING}")
 endif()
 
 if(DEFINED LIBOPENCOR_WARNINGS_AS_ERRORS)
-    message(STATUS " - LIBOPENCOR_WARNINGS_AS_ERRORS:  ${LIBOPENCOR_WARNINGS_AS_ERRORS}")
+    message(STATUS " - LIBOPENCOR_WARNINGS_AS_ERRORS:     ${LIBOPENCOR_WARNINGS_AS_ERRORS}")
 endif()
 
 # Summary of available targets.
