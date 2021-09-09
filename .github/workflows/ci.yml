@@ -18,56 +18,56 @@ jobs:
             build_shared_libs: OFF
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
           - name: 'Windows shared library'
             os: windows-2016
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
           - name: 'Linux static library'
             os: ubuntu-20.04
             build_shared_libs: OFF
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
           - name: 'Linux shared library'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
           - name: 'macOS static library'
             os: macos-11
             build_shared_libs: OFF
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
           - name: 'macOS shared library'
             os: macos-11
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Debug
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
             target: unit_testing
           - name: 'Python unit testing'
@@ -75,8 +75,8 @@ jobs:
             build_shared_libs: ON
             build_type: Debug
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: ON
             target: python_unit_testing
           - name: 'Code formatting'
@@ -84,8 +84,8 @@ jobs:
             build_shared_libs: OFF
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
             target: code_formatting
           - name: 'Code analysis'
@@ -93,34 +93,34 @@ jobs:
             build_shared_libs: OFF
             build_type: Release
             code_analysis: ON
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: ON
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: ON
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
-            target: coverage_gcov
+            target: code_coverage_gcov
           - name: 'Coverage using llvm-cov'
             os: macos-11
             build_shared_libs: ON
             build_type: Release
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: ON
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: ON
             python_bindings: OFF
-            target: coverage_llvm_cov
+            target: code_coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
             build_shared_libs: ON
             build_type: Debug
             code_analysis: OFF
-            coverage_gcov: OFF
-            coverage_llvm_cov: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             python_bindings: OFF
             target: memory_checks
     env:
@@ -145,7 +145,7 @@ jobs:
         if: ${{ matrix.target == 'code_formatting' }}
         run: brew install clang-format
       - name: Install gcovr
-        if: ${{ matrix.target == 'coverage_gcov' }}
+        if: ${{ matrix.target == 'code_coverage_gcov' }}
         run: sudo apt install gcovr
       - name: Install Valgrind
         if: ${{ matrix.target == 'memory_checks' }}
@@ -157,5 +157,5 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCOVERAGE_GCOV=${{ matrix.coverage_gcov }} -DCOVERAGE_LLVM_COV=${{ matrix.coverage_llvm_cov }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} ..
+          cmake -G Ninja -DBUILD_SHARED_LIBS=${{ matrix.build_shared_libs }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} ..
           ninja ${{ matrix.target }}
