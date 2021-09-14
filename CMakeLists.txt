@@ -31,6 +31,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(common)
 include(environmentchecks)
 
+# Initialise/reset our available targets.
+
+set(TARGETS "" CACHE INTERNAL "Available targets.")
+
 # Rebrand the CMake options that are relevant to libOpenCOR.
 
 # BUILD_SHARED_LIBS ==> LIBOPENCOR_BUILD_SHARED_LIBS.
@@ -425,8 +429,6 @@ endif()
 # Summary of available targets.
 
 message(STATUS "Available targets:")
-
-list(SORT TARGETS)
 
 foreach(TARGET ${TARGETS})
     message(STATUS " - ${TARGET}")
