@@ -125,7 +125,7 @@ if(Python_Development_FOUND)
 endif()
 
 if(PYTHON_BINDINGS_AVAILABLE AND PYTEST_EXE)
-    set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run Python unit testing.")
+    set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable required to run Python unit testing.")
 endif()
 
 if(Python_EXECUTABLE AND PYTHON_UNIT_TESTING_AVAILABLE)
