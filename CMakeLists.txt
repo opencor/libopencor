@@ -148,15 +148,15 @@ unset(MEMORY_CHECKS CACHE)
 
 # PYTHON_BINDINGS ==> LIBOPENCOR_PYTHON_BINDINGS.
 
-if(Python_Development_FOUND)
-    set(DOCSTRING "Buid Python wrappers.")
+if(PYTHON_BINDINGS_AVAILABLE)
+    set(DOCSTRING "Buid Python bindings.")
     set(LIBOPENCOR_PYTHON_BINDINGS ON CACHE BOOL "${DOCSTRING}")
 endif()
 
-if(DEFINED PYTHON_BINDINGS AND Python_Development_FOUND)
+if(DEFINED PYTHON_BINDINGS AND PYTHON_BINDINGS_AVAILABLE)
     set(LIBOPENCOR_PYTHON_BINDINGS ${PYTHON_BINDINGS} CACHE BOOL "${DOCSTRING}" FORCE)
 elseif(PYTHON_BINDINGS)
-    message(SEND_ERROR "Python bindings are requested but Python development files could not be found.")
+    message(SEND_ERROR "Python bindings are requested but Python could not be found.")
 endif()
 
 unset(PYTHON_BINDINGS CACHE)

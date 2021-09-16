@@ -109,8 +109,12 @@ if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_CO
     set(CODE_COVERAGE_LLVM_COV_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run code coverage testing using llvm-cov.")
 endif()
 
-if(PYTEST_EXE)
-    set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable and package required to run Python unit testing.")
+if(Python_Development_FOUND)
+    set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
+endif()
+
+if(PYTHON_BINDINGS_AVAILABLE AND PYTEST_EXE)
+    set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run Python unit testing.")
 endif()
 
 if(Python_EXECUTABLE AND PYTHON_UNIT_TESTING_AVAILABLE)
