@@ -263,17 +263,6 @@ if(NOT RESULT EQUAL 0)
     message(FATAL_ERROR "Git submodules could not be initialised.")
 endif()
 
-# Update our submodules.
-
-execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --recursive --remote
-                RESULT_VARIABLE RESULT
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                OUTPUT_QUIET ERROR_QUIET)
-
-if(NOT RESULT EQUAL 0)
-    message(FATAL_ERROR "Git submodules could not be updated.")
-endif()
-
 # Enable compiler caching.
 
 if(LIBOPENCOR_COMPILER_CACHING)
