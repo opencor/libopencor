@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(LIBOPENCOR_JAVASCRIPT_UNIT_TESTING)
-    add_subdirectory(javascript)
-endif()
+# Run our JavaScript tests.
 
-if(LIBOPENCOR_PYTHON_UNIT_TESTING)
-    add_subdirectory(python)
-endif()
+add_target(javascript_unit_testing
+           COMMAND echo "Running JavaScript unit testing..."
+           DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
+           USES_TERMINAL
+           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+           COMMENT "Running JavaScript unit testing...")

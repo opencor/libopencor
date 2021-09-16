@@ -12,10 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(LIBOPENCOR_JAVASCRIPT_UNIT_TESTING)
-    add_subdirectory(javascript)
-endif()
+# Build our JavaScript bindings.
 
-if(LIBOPENCOR_PYTHON_UNIT_TESTING)
-    add_subdirectory(python)
-endif()
+set(JAVASCRIPT_BINDINGS_TARGET JavaScript_${CMAKE_PROJECT_NAME} CACHE INTERNAL "JavaScript bindings target.")
+
+add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
+                  COMMAND echo "Building JavaScript bindings..."
+                  DEPENDS ${CMAKE_PROJECT_NAME}
+                  USES_TERMINAL
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                  COMMENT "Building JavaScript bindings...")
+
+# Install our JavaScript bindings.
+
+# install(TARGETS ${JAVASCRIPT_BINDINGS_TARGET} DESTINATION .)
