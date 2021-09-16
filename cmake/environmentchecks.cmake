@@ -30,6 +30,7 @@ find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format
              PATHS /usr/local/opt/llvm/bin)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy
              PATHS /usr/local/opt/llvm/bin)
+find_program(EMCC_EXE NAMES ${PREFERRED_EMSCRIPTEN_NAMES} emcc)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
 find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
 find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
@@ -38,6 +39,8 @@ find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov
              PATHS /usr/local/opt/llvm/bin)
 find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata
              PATHS /usr/local/opt/llvm/bin)
+find_program(NODE_EXE NAMES ${PREFERRED_NODE_NAMES} node)
+find_program(NPM_EXE NAMES ${PREFERRED_NPM_NAMES} npm)
 find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
@@ -109,6 +112,14 @@ if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_CO
     set(CODE_COVERAGE_LLVM_COV_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run code coverage testing using llvm-cov.")
 endif()
 
+if(EMCC_EXE)
+    set(JAVASCRIPT_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build JavaScript bindings.")
+endif()
+
+if(JAVASCRIPT_BINDINGS_AVAILABLE AND NODE_EXE AND NPM_EXE)
+    set(JAVASCRIPT_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run JavaScript unit testing.")
+endif()
+
 if(Python_Development_FOUND)
     set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
 endif()
@@ -160,12 +171,15 @@ mark_as_advanced(
     BUILDCACHE_EXE
     CLANG_FORMAT_EXE
     CLANG_TIDY_EXE
+    EMCMAKE_EXE
     FIND_EXE
     GCOV_EXE
     GCOVR_EXE
     GIT_EXE
     LLVM_COV_EXE
     LLVM_PROFDATA_EXE
+    NODE_EXE
+    NPM_EXE
     PYTEST_EXE
     VALGRIND_EXE
 )
