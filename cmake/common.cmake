@@ -141,9 +141,11 @@ endfunction()
 macro(add_target TARGET)
     add_custom_target(${TARGET} ${ARGN})
 
-    set(TARGETS "${TARGETS};${TARGET}" CACHE INTERNAL "Available targets.")
+    set(TARGETS "${TARGETS};${TARGET}")
 
     list(SORT TARGETS)
+
+    set(TARGETS "${TARGETS}" CACHE INTERNAL "Available targets.")
 endmacro()
 
 function(add_target_property TARGET PROPERTY VALUE)
