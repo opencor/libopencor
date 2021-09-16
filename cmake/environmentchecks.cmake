@@ -30,7 +30,7 @@ find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format
              PATHS /usr/local/opt/llvm/bin)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy
              PATHS /usr/local/opt/llvm/bin)
-find_program(EMCC_EXE NAMES ${PREFERRED_EMSCRIPTEN_NAMES} emcc)
+find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
 find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
 find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
@@ -112,7 +112,7 @@ if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_CO
     set(CODE_COVERAGE_LLVM_COV_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run code coverage testing using llvm-cov.")
 endif()
 
-if(EMCC_EXE)
+if(EMCMAKE_EXE)
     set(JAVASCRIPT_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build JavaScript bindings.")
 endif()
 
