@@ -264,6 +264,12 @@ if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
     endif()
 endif()
 
+if(LIBOPENCOR_JAVASCRIPT_UNIT_TESTING)
+    if(NOT LIBOPENCOR_JAVASCRIPT_BINDINGS)
+        message(SEND_ERROR "Configuration confusion: JavaScript unit testing is requested which means that JavaScript bindings should also be requested.")
+    endif()
+endif()
+
 if(LIBOPENCOR_MEMORY_CHECKS)
     if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Release")
         message(SEND_ERROR "Configuration confusion: memory checks are requested which means that a release build cannot also be requested.")
@@ -271,12 +277,6 @@ if(LIBOPENCOR_MEMORY_CHECKS)
 
     if(NOT LIBOPENCOR_UNIT_TESTING)
         message(SEND_ERROR "Configuration confusion: memory checks are requested which means that unit testing should also be requested.")
-    endif()
-endif()
-
-if(LIBOPENCOR_JAVASCRIPT_UNIT_TESTING)
-    if(NOT LIBOPENCOR_JAVASCRIPT_BINDINGS)
-        message(SEND_ERROR "Configuration confusion: JavaScript unit testing is requested which means that JavaScript bindings should also be requested.")
     endif()
 endif()
 
