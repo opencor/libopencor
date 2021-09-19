@@ -14,7 +14,6 @@
 
 
 import libopencor
-import pytest
 
 
 def test_version():
