@@ -12,17 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build our JavaScript bindings.
+set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
 
-set(JAVASCRIPT_BINDINGS_TARGET JavaScript_${CMAKE_PROJECT_NAME} CACHE INTERNAL "JavaScript bindings target.")
+if(EMSCRIPTEN)
+    # Build our JavaScript bindings.
 
-add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
-                  COMMAND echo "Building JavaScript bindings..."
-                  DEPENDS ${CMAKE_PROJECT_NAME}
-                  USES_TERMINAL
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                  COMMENT "Building JavaScript bindings...")
+    add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
+                      COMMAND echo "Building JavaScript bindings..."
+                      DEPENDS ${CMAKE_PROJECT_NAME}
+                      USES_TERMINAL
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                      COMMENT "Building JavaScript bindings...")
+else()
+    # Build our JavaScript bindings using Emscripten.
 
-# Install our JavaScript bindings.
+    set(JAVASCRIPT_BINDINGS_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/build)
 
-# install(TARGETS ${JAVASCRIPT_BINDINGS_TARGET} DESTINATION .)
+    add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
+                      COMMAND ${CMAKE_COMMAND} -E rm -fr ${JAVASCRIPT_BINDINGS_BUILD_DIR}
+                      COMMAND mkdir ${JAVASCRIPT_BINDINGS_BUILD_DIR}
+                      COMMAND cd ${JAVASCRIPT_BINDINGS_BUILD_DIR}
+                      COMMAND ${EMCMAKE_EXE} ${CMAKE_COMMAND} -G ${CMAKE_GENERATOR} ${CMAKE_SOURCE_DIR}
+                      COMMAND ${CMAKE_COMMAND} --build .
+                      DEPENDS ${CMAKE_PROJECT_NAME}
+                      USES_TERMINAL
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                      COMMENT "Building our JavaScript bindings using Emscripten...")
+
+    # Install our JavaScript bindings.
+
+    set(JAVASCRIPT_BINDINGS_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+    string(REPLACE "${CMAKE_SOURCE_DIR}" "" JAVASCRIPT_BINDINGS_BINARY_DIR "${JAVASCRIPT_BINDINGS_BINARY_DIR}")
+
+    install(PROGRAMS ${JAVASCRIPT_BINDINGS_BUILD_DIR}/${JAVASCRIPT_BINDINGS_BINARY_DIR}/${CMAKE_PROJECT_NAME}.js
+                     ${JAVASCRIPT_BINDINGS_BUILD_DIR}/${JAVASCRIPT_BINDINGS_BINARY_DIR}/${CMAKE_PROJECT_NAME}.wasm
+            DESTINATION .)
+endif()

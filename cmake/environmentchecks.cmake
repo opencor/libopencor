@@ -14,7 +14,9 @@
 
 # Look for various packages and programs.
 
-find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
+if(NOT EMSCRIPTEN)
+    find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
+endif()
 
 find_program(BUILDCACHE_EXE buildcache)
 
@@ -26,39 +28,43 @@ if(NOT BUILDCACHE_EXE)
     endif()
 endif()
 
-find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format
-             PATHS /usr/local/opt/llvm/bin)
-find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy
-             PATHS /usr/local/opt/llvm/bin)
-find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
-find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
-find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
-find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
-find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
-find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov
-             PATHS /usr/local/opt/llvm/bin)
-find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata
-             PATHS /usr/local/opt/llvm/bin)
-find_program(NODE_EXE NAMES ${PREFERRED_NODE_NAMES} node)
-find_program(NPM_EXE NAMES ${PREFERRED_NPM_NAMES} npm)
-find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
-find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
+if(NOT EMSCRIPTEN)
+    find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format
+                PATHS /usr/local/opt/llvm/bin)
+    find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy
+                PATHS /usr/local/opt/llvm/bin)
+    find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
+    find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
+    find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
+    find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
+    find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
+    find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov
+                PATHS /usr/local/opt/llvm/bin)
+    find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata
+                PATHS /usr/local/opt/llvm/bin)
+    find_program(NODE_EXE NAMES ${PREFERRED_NODE_NAMES} node)
+    find_program(NPM_EXE NAMES ${PREFERRED_NPM_NAMES} npm)
+    find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
+    find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
+endif()
 
 # Check some compiler flags
 
-include(CheckCXXCompilerFlag)
+if(NOT EMSCRIPTEN)
+    include(CheckCXXCompilerFlag)
 
-set(CODE_COVERAGE_GCOV_COMPILER_FLAGS "--coverage")
-set(CODE_COVERAGE_GCOV_LINKER_FLAGS "${CODE_COVERAGE_GCOV_COMPILER_FLAGS}")
-set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_GCOV_COMPILER_FLAGS})
+    set(CODE_COVERAGE_GCOV_COMPILER_FLAGS "--coverage")
+    set(CODE_COVERAGE_GCOV_LINKER_FLAGS "${CODE_COVERAGE_GCOV_COMPILER_FLAGS}")
+    set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_GCOV_COMPILER_FLAGS})
 
-check_cxx_compiler_flag(${CODE_COVERAGE_GCOV_COMPILER_FLAGS} CODE_COVERAGE_GCOV_COMPILER_FLAGS_OK)
+    check_cxx_compiler_flag(${CODE_COVERAGE_GCOV_COMPILER_FLAGS} CODE_COVERAGE_GCOV_COMPILER_FLAGS_OK)
 
-set(CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
-set(CODE_COVERAGE_LLVM_COV_LINKER_FLAGS "-fprofile-instr-generate")
-set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS})
+    set(CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+    set(CODE_COVERAGE_LLVM_COV_LINKER_FLAGS "-fprofile-instr-generate")
+    set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS})
 
-check_cxx_compiler_flag(${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS} CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
+    check_cxx_compiler_flag(${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS} CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
+endif()
 
 # Determine what is available.
 

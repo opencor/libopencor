@@ -14,10 +14,10 @@
 
 # Build our different bindings.
 
-if(LIBOPENCOR_JAVASCRIPT_BINDINGS)
+if(LIBOPENCOR_JAVASCRIPT_BINDINGS OR EMSCRIPTEN)
     add_subdirectory(javascript)
 endif()
 
-if(LIBOPENCOR_PYTHON_BINDINGS)
+if(LIBOPENCOR_PYTHON_BINDINGS AND NOT EMSCRIPTEN)
     add_subdirectory(python)
 endif()
