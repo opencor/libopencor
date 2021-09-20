@@ -17,12 +17,16 @@ set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "
 if(EMSCRIPTEN)
     # Build our JavaScript bindings.
 
-    add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
-                      COMMAND echo "Building JavaScript bindings..."
-                      DEPENDS ${CMAKE_PROJECT_NAME}
-                      USES_TERMINAL
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                      COMMENT "Building JavaScript bindings...")
+    add_executable(${JAVASCRIPT_BINDINGS_TARGET}
+        javascript.cpp
+    )
+
+    target_link_libraries(${JAVASCRIPT_BINDINGS_TARGET} PUBLIC ${CMAKE_PROJECT_NAME})
+
+    set_target_properties(${JAVASCRIPT_BINDINGS_TARGET} PROPERTIES
+        LINK_FLAGS "--bind"
+        OUTPUT_NAME libopencor
+    )
 else()
     # Build our JavaScript bindings using Emscripten.
 
@@ -45,7 +49,7 @@ else()
 
     string(REPLACE "${CMAKE_SOURCE_DIR}" "" JAVASCRIPT_BINDINGS_BINARY_DIR "${JAVASCRIPT_BINDINGS_BINARY_DIR}")
 
-    install(PROGRAMS ${JAVASCRIPT_BINDINGS_BUILD_DIR}/${JAVASCRIPT_BINDINGS_BINARY_DIR}/${CMAKE_PROJECT_NAME}.js
-                     ${JAVASCRIPT_BINDINGS_BUILD_DIR}/${JAVASCRIPT_BINDINGS_BINARY_DIR}/${CMAKE_PROJECT_NAME}.wasm
+    install(PROGRAMS ${JAVASCRIPT_BINDINGS_BUILD_DIR}/${JAVASCRIPT_BINDINGS_BINARY_DIR}/libopencor.js
+                     ${JAVASCRIPT_BINDINGS_BUILD_DIR}/${JAVASCRIPT_BINDINGS_BINARY_DIR}/libopencor.wasm
             DESTINATION .)
 endif()
