@@ -19,7 +19,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: OFF
           - name: 'Windows shared library'
@@ -28,7 +27,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: ON
           - name: 'Linux static library'
@@ -37,7 +35,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: OFF
           - name: 'Linux shared library'
@@ -46,7 +43,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: ON
           - name: 'macOS static library'
@@ -55,7 +51,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: OFF
           - name: 'macOS shared library'
@@ -64,7 +59,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: ON
           - name: 'Unit testing'
@@ -73,27 +67,15 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: ON
             target: unit_testing
-          - name: 'JavaScript unit testing'
-            os: ubuntu-20.04
-            build_type: Debug
-            code_analysis: OFF
-            code_coverage_gcov: OFF
-            code_coverage_llvm_cov: OFF
-            javascript_bindings: ON
-            python_bindings: OFF
-            shared_libs: ON
-            target: javascript_unit_testing
           - name: 'Python unit testing'
             os: ubuntu-20.04
             build_type: Debug
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: ON
             shared_libs: ON
             target: python_unit_testing
@@ -103,7 +85,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: OFF
             target: code_formatting
@@ -113,7 +94,6 @@ jobs:
             code_analysis: ON
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: OFF
           - name: 'Coverage using gcov'
@@ -122,7 +102,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: ON
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: ON
             target: code_coverage_gcov
@@ -132,7 +111,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: ON
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: ON
             target: code_coverage_llvm_cov
@@ -142,7 +120,6 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
-            javascript_bindings: OFF
             python_bindings: OFF
             shared_libs: ON
             target: memory_checks
@@ -161,9 +138,6 @@ jobs:
         uses: mikehardy/buildcache-action@v1
         with:
           cache_key: ${{ matrix.name }}
-      - name: Install Emscripten
-        if: ${{ matrix.javascript_bindings == 'ON' }}
-        uses: mymindstorm/setup-emsdk@v9
       - name: Install pytest
         if: ${{ matrix.python_bindings == 'ON' }}
         run: pip install pytest
@@ -183,5 +157,5 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_bindings }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DSHARED_LIBS=${{ matrix.shared_libs }} ..
+          cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DSHARED_LIBS=${{ matrix.shared_libs }} ..
           ninja ${{ matrix.target }}
