@@ -52,7 +52,7 @@ if(BADLY_FORMATTED_FILES)
     message("     The badly formatted files are:")
 
     foreach(BADLY_FORMATTED_FILE ${BADLY_FORMATTED_FILES})
-        string(REPLACE "@PROJECT_SOURCE_DIR@/" "" BADLY_FORMATTED_FILE "${BADLY_FORMATTED_FILE}")
+        string(REPLACE "@CMAKE_SOURCE_DIR@/" "" BADLY_FORMATTED_FILE "${BADLY_FORMATTED_FILE}")
 
         message("      - ${BADLY_FORMATTED_FILE}")
     endforeach()
