@@ -115,6 +115,17 @@ endif()
 
 unset(COMPILER_CACHING CACHE)
 
+# DOCUMENTATION ==> LIBOPENCOR_DOCUMENTATION.
+
+set(DOCSTRING "Generate the documentation.")
+set(LIBOPENCOR_DOCUMENTATION ON CACHE BOOL "${DOCSTRING}")
+
+if(DEFINED DOCUMENTATION)
+    set(LIBOPENCOR_DOCUMENTATION ${DOCUMENTATION} CACHE BOOL "${DOCSTRING}" FORCE)
+endif()
+
+unset(DOCUMENTATION CACHE)
+
 # [CMAKE_]INSTALL_PREFIX ==> LIBOPENCOR_INSTALL_PREFIX.
 
 set(DOCSTRING "Install path prefix, prepended onto install directories.")
@@ -331,6 +342,10 @@ endif()
 # Run our tests.
 
 add_subdirectory(tests)
+
+# Generate our documentation.
+
+add_subdirectory(doc)
 
 # Add some custom targets to test the formatting of our code and to format it.
 # Note: we don't format API_EXPORT_HEADER_FILE since it's generated.
