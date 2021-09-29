@@ -24,6 +24,8 @@ if(LIBOPENCOR_DOCUMENTATION)
             ${EXTERNAL_PROJECT_BUILD_DIR}/doc/general
         GIT_REPOSITORY
             https://github.com/opencor/general-documentation
+        CMAKE_ARGS
+            -DMODE=${CMAKE_PROJECT_NAME}
         INSTALL_COMMAND
             ${CMAKE_COMMAND} -E copy_directory ${EXTERNAL_PROJECT_BUILD_DIR}/Build/GeneralDocumentationBuild/html
                                                ${CMAKE_BINARY_DIR}/doc/html
