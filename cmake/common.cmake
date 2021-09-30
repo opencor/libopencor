@@ -188,3 +188,25 @@ function(prepare_test TARGET)
         configure_clang_and_clang_tidy(${TARGET})
     endif()
 endfunction()
+
+#===============================================================================
+
+function(build_documentation DOCUMENTATION_NAME)
+    # Build the given documentation as an external project and have it copied to
+    # our final documentation directory.
+
+    set(DOCUMENTATION_BUILD ${DOCUMENTATION_NAME}DocumentationBuild)
+
+    ExternalProject_Add(${DOCUMENTATION_BUILD}
+        SOURCE_DIR
+            ${EXTERNAL_PROJECT_BUILD_DIR}/doc/${DOCUMENTATION_NAME}
+        GIT_REPOSITORY
+            https://github.com/opencor/libopencor-${DOCUMENTATION_NAME}-documentation
+        CMAKE_ARGS
+            -DPYTHON_EXECUTABLE=${PYTHON_EXE}
+            -DSPHINX_EXECUTABLE=${SPHINX_EXE}
+        INSTALL_COMMAND
+            ${CMAKE_COMMAND} -E copy_directory ${EXTERNAL_PROJECT_BUILD_DIR}/Build/${DOCUMENTATION_BUILD}/html
+                                               ${CMAKE_BINARY_DIR}/doc/html/${DOCUMENTATION_NAME}
+    )
+endfunction()

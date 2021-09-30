@@ -13,6 +13,8 @@
 # limitations under the License.
 
 if(LIBOPENCOR_DOCUMENTATION)
+    # General documentation.
+
     include(ExternalProject)
 
     set(EXTERNAL_PROJECT_BUILD_DIR ${CMAKE_BINARY_DIR}/ext)
@@ -30,4 +32,9 @@ if(LIBOPENCOR_DOCUMENTATION)
             ${CMAKE_COMMAND} -E copy_directory ${EXTERNAL_PROJECT_BUILD_DIR}/Build/GeneralDocumentationBuild/html
                                                ${CMAKE_BINARY_DIR}/doc/html
     )
+
+    # User and developer documentations.
+
+    build_documentation(user ${BUILD_OPENCOR})
+    build_documentation(developer ${BUILD_OPENCOR})
 endif()

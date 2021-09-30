@@ -39,9 +39,20 @@ find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov
 find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata
             PATHS /usr/local/opt/llvm/bin)
 find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
+find_program(SPHINX_EXE NAMES ${PREFERRED_SPHINX_NAMES} sphinx-build sphinx-build2)
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
-# Check some compiler flags
+# Create some aliases.
+
+if(Python_EXECUTABLE)
+    set(PYTHON_EXE ${Python_EXECUTABLE})
+endif()
+
+if(Python_Development_FOUND)
+    set(PYTHON_DEVELOPMENT_FOUND ${Python_Development_FOUND})
+endif()
+
+# Check some compiler flags.
 
 include(CheckCXXCompilerFlag)
 
@@ -109,7 +120,11 @@ if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_CO
     set(CODE_COVERAGE_LLVM_COV_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run code coverage testing using llvm-cov.")
 endif()
 
-if(Python_Development_FOUND)
+if(PYTHON_EXE AND SPHINX_EXE)
+    set(DOCUMENTATION_AVAILABLE TRUE CACHE INTERNAL "Executables required to generate the documentation.")
+endif()
+
+if(PYTHON_DEVELOPMENT_FOUND)
     set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
 endif()
 
@@ -117,10 +132,10 @@ if(PYTHON_BINDINGS_AVAILABLE AND PYTEST_EXE)
     set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable required to run Python unit testing.")
 endif()
 
-if(Python_EXECUTABLE AND PYTHON_UNIT_TESTING_AVAILABLE)
+if(PYTHON_EXE AND PYTHON_UNIT_TESTING_AVAILABLE)
     message(STATUS "Performing Test HAS_PYTHON_PYTEST_HTML")
 
-    execute_process(COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_python_packages.py pytest-html
+    execute_process(COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_python_packages.py pytest-html
                     RESULT_VARIABLE RESULT
                     OUTPUT_QUIET ERROR_QUIET)
 
