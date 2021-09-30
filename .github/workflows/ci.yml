@@ -19,56 +19,84 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: OFF
+            unit_testing: OFF
           - name: 'Windows shared library'
             os: windows-2016
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: OFF
           - name: 'Linux static library'
             os: ubuntu-20.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: OFF
+            unit_testing: OFF
           - name: 'Linux shared library'
             os: ubuntu-20.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: OFF
           - name: 'macOS static library'
             os: macos-11
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: OFF
+            unit_testing: OFF
           - name: 'macOS shared library'
             os: macos-11
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: OFF
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_type: Debug
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: ON
             target: unit_testing
           - name: 'Python unit testing'
             os: ubuntu-20.04
@@ -76,8 +104,12 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: ON
+            python_unit_testing: ON
             shared_libs: ON
+            unit_testing: OFF
             target: python_unit_testing
           - name: 'Code formatting'
             os: macos-11
@@ -85,8 +117,12 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: OFF
+            unit_testing: OFF
             target: code_formatting
           - name: 'Code analysis'
             os: macos-11
@@ -94,16 +130,24 @@ jobs:
             code_analysis: ON
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: OFF
+            unit_testing: OFF
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: ON
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: ON
             target: code_coverage_gcov
           - name: 'Coverage using llvm-cov'
             os: macos-11
@@ -111,8 +155,12 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: ON
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: ON
             target: code_coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
@@ -120,9 +168,25 @@ jobs:
             code_analysis: OFF
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: ON
             python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: ON
             target: memory_checks
+          - name: 'Documentation'
+            os: ubuntu-20.04
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: ON
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
       BUILDCACHE_DEBUG: -1
@@ -134,13 +198,15 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        if: ${{ matrix.target != 'code_formatting' }}
         uses: mikehardy/buildcache-action@v1
         with:
           cache_key: ${{ matrix.name }}
       - name: Install pytest
         if: ${{ matrix.python_bindings == 'ON' }}
         run: pip install pytest
+      - name: Install Sphinx
+        if: ${{ matrix.documentation == 'ON' }}
+        run: pip install sphinx
       - name: Install ClangFormat
         if: ${{ matrix.target == 'code_formatting' }}
         run: brew install clang-format
@@ -157,5 +223,5 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DSHARED_LIBS=${{ matrix.shared_libs }} ..
+          cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
           ninja ${{ matrix.target }}
