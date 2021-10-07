@@ -211,10 +211,10 @@ jobs:
         if: ${{ matrix.target == 'code_formatting' }}
         run: brew install clang-format
       - name: Install gcovr
-        if: ${{ matrix.target == 'code_coverage_gcov' }}
+        if: ${{ matrix.code_coverage_gcov == 'ON' }}
         run: sudo apt install gcovr
       - name: Install Valgrind
-        if: ${{ matrix.target == 'memory_checks' }}
+        if: ${{ matrix.memory_checks == 'ON' }}
         run: sudo apt install valgrind
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
