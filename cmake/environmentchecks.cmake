@@ -14,6 +14,7 @@
 
 # Look for various packages and programs.
 
+find_package(Doxygen)
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
 find_program(BUILDCACHE_EXE buildcache)
@@ -43,6 +44,10 @@ find_program(SPHINX_EXE NAMES ${PREFERRED_SPHINX_NAMES} sphinx-build sphinx-buil
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
 
 # Create some aliases.
+
+if(DOXYGEN_EXECUTABLE)
+    set(DOXYGEN_EXE ${DOXYGEN_EXECUTABLE})
+endif()
 
 if(Python_EXECUTABLE)
     set(PYTHON_EXE ${Python_EXECUTABLE})
@@ -120,7 +125,7 @@ if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_CO
     set(CODE_COVERAGE_LLVM_COV_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run code coverage testing using llvm-cov.")
 endif()
 
-if(PYTHON_EXE AND SPHINX_EXE)
+if(DOXYGEN_EXE AND PYTHON_EXE AND SPHINX_EXE)
     set(DOCUMENTATION_AVAILABLE TRUE CACHE INTERNAL "Executables required to generate the documentation.")
 endif()
 
