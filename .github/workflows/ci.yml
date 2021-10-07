@@ -216,6 +216,9 @@ jobs:
       - name: Install Valgrind
         if: ${{ matrix.memory_checks == 'ON' }}
         run: sudo apt install valgrind
+      - name: Install Doxygen
+        if: ${{ matrix.documentation == 'ON' }}
+        run: sudo apt install doxygen
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
