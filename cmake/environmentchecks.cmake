@@ -182,5 +182,6 @@ mark_as_advanced(
     LLVM_COV_EXE
     LLVM_PROFDATA_EXE
     PYTEST_EXE
+    SPHINX_EXE
     VALGRIND_EXE
 )
