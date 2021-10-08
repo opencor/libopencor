@@ -195,7 +195,7 @@ function(build_documentation DOCUMENTATION_NAME)
     # Build the given documentation as an external project and have it copied to
     # our final documentation directory.
 
-    set(DOCUMENTATION_BUILD ${DOCUMENTATION_NAME}DocumentationBuild)
+    set(DOCUMENTATION_BUILD ${DOCUMENTATION_NAME}_documentation)
 
     ExternalProject_Add(${DOCUMENTATION_BUILD}
         SOURCE_DIR

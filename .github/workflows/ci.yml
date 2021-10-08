@@ -187,6 +187,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
+            target: documentation
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
       BUILDCACHE_DEBUG: -1
