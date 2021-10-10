@@ -40,9 +40,11 @@ if(LIBOPENCOR_DOCUMENTATION)
 
     # API documentation.
 
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+
     add_custom_target(api_documentation
                       COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/doc/html/api/
-                      COMMAND ${DOXYGEN_EXE}
+                      COMMAND ${DOXYGEN_EXE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
                       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
     # Generate our documentation.
