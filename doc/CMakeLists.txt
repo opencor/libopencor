@@ -38,9 +38,19 @@ if(LIBOPENCOR_DOCUMENTATION)
     build_documentation(user ${BUILD_OPENCOR})
     build_documentation(developer ${BUILD_OPENCOR})
 
+    # API documentation.
+
+    add_custom_target(api_documentation
+                      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/doc/html/api/
+                      COMMAND ${DOXYGEN_EXE}
+                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
     # Generate our documentation.
 
     add_target(documentation
-               DEPENDS general_documentation user_documentation developer_documentation
+               DEPENDS general_documentation
+                       user_documentation
+                       api_documentation
+                       developer_documentation
                COMMENT "Generating the documentation...")
 endif()
