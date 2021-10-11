@@ -23,8 +23,6 @@ limitations under the License.
 namespace libOpenCOR {
 
 /**
- * @brief Get the version number of libOpenCOR.
- *
  * Return the version of libOpenCOR as a number.
  *
  * @return A number to represent the version of libOpenCOR.
@@ -32,8 +30,6 @@ namespace libOpenCOR {
 LIBOPENCOR_EXPORT unsigned int version();
 
 /**
- * @brief Get the version string of libOpenCOR.
- *
  * Return the version of libOpenCOR as a string. The version string is in the
  * format x.y.z, where the "."s are literal, and x,y and z represent counting
  * numbers, in which case x is the major version, y the minor version, and z the
