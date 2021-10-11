@@ -25,7 +25,7 @@ namespace libOpenCOR {
 /**
  * Return the version of libOpenCOR as a number.
  *
- * @return A number to represent the version of libOpenCOR.
+ * @return A number that represents the version of libOpenCOR.
  */
 LIBOPENCOR_EXPORT unsigned int version();
 
@@ -35,7 +35,7 @@ LIBOPENCOR_EXPORT unsigned int version();
  * numbers, in which case x is the major version, y the minor version, and z the
  * patch level.
  *
- * @return A string to represent the version of libOpenCOR.
+ * @return A string that represents the version of libOpenCOR.
  */
 LIBOPENCOR_EXPORT std::string versionString();
 
