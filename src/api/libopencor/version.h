@@ -20,6 +20,10 @@ limitations under the License.
 
 #include "libopencor/export.h"
 
+/**
+ * Some functions to retrieve the version of libOpenCOR.
+ */
+
 namespace libOpenCOR {
 
 /**
