@@ -31,6 +31,7 @@ namespace libOpenCOR {
  *
  * @return A number that represents the version of libOpenCOR.
  */
+
 LIBOPENCOR_EXPORT unsigned int version();
 
 /**
@@ -41,6 +42,7 @@ LIBOPENCOR_EXPORT unsigned int version();
  *
  * @return A string that represents the version of libOpenCOR.
  */
+
 LIBOPENCOR_EXPORT std::string versionString();
 
 } // namespace libOpenCOR
