@@ -40,11 +40,17 @@ if(LIBOPENCOR_DOCUMENTATION)
 
     # API documentation.
 
+    string(TIMESTAMP CURRENT_YEAR "%Y")
+
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/footer.in.html ${CMAKE_CURRENT_BINARY_DIR}/footer.html)
 
     add_custom_target(api_documentation
                       COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/doc/html/api/
                       COMMAND ${DOXYGEN_EXE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+                      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doc/html/res/pics/twitter.png ${CMAKE_BINARY_DIR}/doc/html/api/twitter.png
+                      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doc/html/res/pics/vpr.png ${CMAKE_BINARY_DIR}/doc/html/api/vpr.png
+                      COMMAND ${PATCH_EXE} ${CMAKE_BINARY_DIR}/doc/html/api/resize.js ${CMAKE_CURRENT_SOURCE_DIR}/resize.js.patch
                       DEPENDS general_documentation
                       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
