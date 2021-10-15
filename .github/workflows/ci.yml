@@ -194,6 +194,17 @@ jobs:
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
     steps:
+      - name: Export PATH on macOS
+        if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
+        run: |
+          ls -a ~
+          echo "export PATH=/usr/local/opt/llvm/bin:\$PATH" >> ~/.bashrc
+      - name: Check Clang and llvm-cov
+        if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
+        run: |
+          clang++ --version
+          llvm-cov --version
+          false
       - name: Check out libOpenCOR
         uses: actions/checkout@v2
       - name: Install CMake and Ninja
