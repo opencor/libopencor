@@ -176,7 +176,7 @@ jobs:
             unit_testing: ON
             target: memory_checks
           - name: 'Documentation'
-            os: ubuntu-20.04
+            os: macos-11
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -207,7 +207,7 @@ jobs:
         run: pip install pytest
       - name: Install Sphinx
         if: ${{ matrix.documentation == 'ON' }}
-        run: pip install sphinx
+        run: pip3 install sphinx
       - name: Install ClangFormat
         if: ${{ matrix.target == 'code_formatting' }}
         run: brew install clang-format
@@ -219,7 +219,7 @@ jobs:
         run: sudo apt install valgrind
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
-        run: sudo apt install doxygen
+        run: brew install doxygen
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
