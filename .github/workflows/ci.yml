@@ -226,13 +226,10 @@ jobs:
       - name: Check clang and llvm-cov
         if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
         run: |
-          which clang
           clang --version
-          which clang++
           clang++ --version
           ls /usr/local/opt/llvm/bin
-          which llvm-cov
-          llvm-cov --version
+          /usr/local/opt/llvm/bin/llvm-cov --version
       - name: Build libOpenCOR
         run: |
           mkdir build
