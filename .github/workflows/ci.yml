@@ -161,7 +161,8 @@ jobs:
             python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
-            cxx: CXX=/usr/local/opt/llvm/bin/clang++
+            # cxx: PATH=/usr/local/opt/llvm/bin:$PATH CXX=/usr/local/opt/llvm/bin/clang++
+            cxx: PATH=/usr/local/opt/llvm/bin:$PATH
             target: code_coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
