@@ -197,7 +197,7 @@ jobs:
       - name: Export PATH on macOS
         if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
         run: |
-          export PATH=/usr/local/opt/llvm/bin:$PATH
+          echo "export PATH=/usr/local/opt/llvm/bin:\$PATH" >> ~/.zshrc
       - name: Check Clang and llvm-cov
         if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
         run: |
