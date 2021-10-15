@@ -228,8 +228,8 @@ jobs:
         run: |
           clang --version
           clang++ --version
-          ls /usr/local/opt/llvm/bin
           /usr/local/opt/llvm/bin/llvm-cov --version
+          brew list
       - name: Build libOpenCOR
         run: |
           mkdir build
