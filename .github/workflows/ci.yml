@@ -161,6 +161,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
+            cxx: CXX=/usr/local/opt/llvm/bin/clang++
             target: code_coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
@@ -187,7 +188,6 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
-            cxx: CXX=/usr/local/opt/llvm/bin/clang++
             target: documentation
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
