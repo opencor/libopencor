@@ -224,7 +224,7 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
       - name: Check clang and llvm-cov
-        if: ${{ runner.target == 'code_coverage_llvm_cov' }}
+        if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
         run: |
           which clang
           clang --version
