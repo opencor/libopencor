@@ -136,6 +136,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
+            context: PATH=/usr/local/opt/llvm/bin:$PATH
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_type: Release
@@ -161,8 +162,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
-            # cxx: PATH=/usr/local/opt/llvm/bin:$PATH CXX=/usr/local/opt/llvm/bin/clang++
-            cxx: PATH=/usr/local/opt/llvm/bin:$PATH
+            context: PATH=/usr/local/opt/llvm/bin:$PATH CXX=/usr/local/opt/llvm/bin/clang++
             target: code_coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
@@ -229,5 +229,5 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.cxx }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
           ninja ${{ matrix.target }}
