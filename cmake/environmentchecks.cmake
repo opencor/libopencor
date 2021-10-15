@@ -127,7 +127,18 @@ if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_CO
 endif()
 
 if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
-    set(DOCUMENTATION_AVAILABLE TRUE CACHE INTERNAL "Executables required to generate the documentation.")
+    set(DOXYGEN_MINIMUM_VERSION 1.9)
+
+    execute_process(COMMAND ${DOXYGEN_EXE} --version
+                    OUTPUT_VARIABLE DOXYGEN_VERSION
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_QUIET)
+
+    if(DOXYGEN_VERSION VERSION_LESS DOXYGEN_MINIMUM_VERSION)
+        message(WARNING "ClangFormat ${DOXYGEN_VERSION} was found, but version ${DOXYGEN_MINIMUM_VERSION}+ is needed to generate the documentation.")
+    else()
+        set(DOCUMENTATION_AVAILABLE TRUE CACHE INTERNAL "Executables required to generate the documentation.")
+    endif()
 endif()
 
 if(PYTHON_DEVELOPMENT_FOUND)
