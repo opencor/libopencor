@@ -230,6 +230,7 @@ jobs:
           clang --version
           which clang++
           clang++ --version
+          ls /usr/local/opt/llvm/bin
           which llvm-cov
           llvm-cov --version
       - name: Build libOpenCOR
