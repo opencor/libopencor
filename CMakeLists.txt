@@ -366,7 +366,7 @@ if(CLANG_FORMAT_AVAILABLE)
 
     set(CODE_FORMATTING_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/codeformatting.cmake)
 
-    configure_file(cmake/codeformatting.in.cmake ${CODE_FORMATTING_SCRIPT} @ONLY)
+    configure_file(cmake/codeformatting.cmake.in ${CODE_FORMATTING_SCRIPT} @ONLY)
 
     if(CLANG_FORMAT_TESTING_AVAILABLE)
         add_target(code_formatting
