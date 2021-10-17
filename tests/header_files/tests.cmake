@@ -19,7 +19,7 @@ foreach(GIT_API_HEADER_FILE ${GIT_API_HEADER_FILES})
 
     set(TEST_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/header_files/${GIT_API_HEADER_NAME}.cpp)
 
-    configure_file(header_files/tests.in.cpp ${TEST_SOURCE_FILE})
+    configure_file(header_files/tests.cpp.in ${TEST_SOURCE_FILE})
 
     list(APPEND TEST_SOURCE_FILES ${TEST_SOURCE_FILE})
 endforeach()
