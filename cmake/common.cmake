@@ -189,8 +189,6 @@ function(prepare_test TARGET)
     endif()
 endfunction()
 
-#===============================================================================
-
 function(build_documentation DOCUMENTATION_NAME)
     # Build the given documentation as an external project and have it copied to
     # our final documentation directory.
