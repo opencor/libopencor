@@ -90,6 +90,8 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/module>
+    $<INSTALL_INTERFACE:include/>
+    $<INSTALL_INTERFACE:include/libopencor/module>
 )
 
 set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
@@ -144,6 +146,7 @@ add_subdirectory(bindings)
 # Install libOpenCOR itself.
 
 install(TARGETS ${CMAKE_PROJECT_NAME}
+        EXPORT ${CMAKE_PROJECT_NAME}Targets
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
@@ -155,4 +158,35 @@ install(FILES ${API_HEADER_FILES}
 
 install(FILES ${API_MODULE_FILE}
         DESTINATION include/libopencor/module
+        COMPONENT development)
+
+# Install libOpenCOR's CMake files.
+
+include(CMakePackageConfigHelpers)
+
+if(WIN32)
+    set(CMAKE_PACKAGE_DIR cmake/${PROJECT_NAME})
+else()
+    set(CMAKE_PACKAGE_DIR lib/cmake/${PROJECT_NAME})
+endif()
+
+install(EXPORT ${CMAKE_PROJECT_NAME}Targets
+        FILE ${CMAKE_PROJECT_NAME}Targets.cmake
+        DESTINATION ${CMAKE_PACKAGE_DIR}
+        COMPONENT development)
+
+set(CONFIG_CMAKE_IN_FILE ${PROJECT_SOURCE_DIR}/cmake/config.cmake.in)
+set(CONFIG_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake)
+
+configure_package_config_file(${CONFIG_CMAKE_IN_FILE} ${CONFIG_CMAKE_FILE}
+                              INSTALL_DESTINATION ${CMAKE_PACKAGE_DIR})
+
+set(CONFIG_VERSION_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake)
+
+write_basic_package_version_file(${CONFIG_VERSION_CMAKE_FILE}
+                                 COMPATIBILITY SameMajorVersion)
+
+install(FILES ${CONFIG_CMAKE_FILE}
+              ${CONFIG_VERSION_CMAKE_FILE}
+        DESTINATION ${CMAKE_PACKAGE_DIR}
         COMPONENT development)
