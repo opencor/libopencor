@@ -140,3 +140,19 @@ endif()
 # Build our different bindings.
 
 add_subdirectory(bindings)
+
+# Install libOpenCOR itself.
+
+install(TARGETS ${CMAKE_PROJECT_NAME}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        COMPONENT runtime)
+
+install(FILES ${API_HEADER_FILES}
+        DESTINATION include/libopencor
+        COMPONENT development)
+
+install(FILES ${API_MODULE_FILE}
+        DESTINATION include/libopencor/module
+        COMPONENT development)
