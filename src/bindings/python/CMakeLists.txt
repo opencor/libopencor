@@ -29,7 +29,7 @@ pybind11_add_module(${PYTHON_BINDINGS_TARGET}
 target_link_libraries(${PYTHON_BINDINGS_TARGET} PUBLIC ${CMAKE_PROJECT_NAME})
 
 set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
-    OUTPUT_NAME libopencor/libopencor
+    OUTPUT_NAME ${CMAKE_PROJECT_NAME_LC}/${CMAKE_PROJECT_NAME_LC}
 )
 
-configure_file(libopencor/__init__.py libopencor/__init__.py COPYONLY)
+configure_file(${CMAKE_PROJECT_NAME_LC}/__init__.py ${CMAKE_PROJECT_NAME_LC}/__init__.py COPYONLY)

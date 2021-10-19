@@ -33,17 +33,17 @@ configure_file(${VERSION_P_HEADER_FILE_IN} ${VERSION_P_HEADER_FILE})
 # Build libOpenCOR.
 
 set(GIT_API_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/version.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
 
-set(API_EXPORT_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/api/libopencor/export.h)
+set(API_EXPORT_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/api/${CMAKE_PROJECT_NAME_LC}/export.h)
 
 set(API_HEADER_FILES
     ${GIT_API_HEADER_FILES}
     ${API_EXPORT_HEADER_FILE}
 )
 
-set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/module/libopencor)
+set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/module/${CMAKE_PROJECT_NAME_LC})
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(GIT_SOURCE_FILES
@@ -89,9 +89,9 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/libopencor/module>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/module>
     $<INSTALL_INTERFACE:include/>
-    $<INSTALL_INTERFACE:include/libopencor/module>
+    $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>
 )
 
 set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
@@ -153,11 +153,11 @@ install(TARGETS ${CMAKE_PROJECT_NAME}
         COMPONENT runtime)
 
 install(FILES ${API_HEADER_FILES}
-        DESTINATION include/libopencor
+        DESTINATION include/${CMAKE_PROJECT_NAME_LC}
         COMPONENT development)
 
 install(FILES ${API_MODULE_FILE}
-        DESTINATION include/libopencor/module
+        DESTINATION include/${CMAKE_PROJECT_NAME_LC}/module
         COMPONENT development)
 
 # Install libOpenCOR's CMake files.

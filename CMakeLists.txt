@@ -18,6 +18,8 @@ project(libOpenCOR
     VERSION 0.1.0
 )
 
+string(TOLOWER ${CMAKE_PROJECT_NAME} CMAKE_PROJECT_NAME_LC)
+
 # Enable C++11 and later.
 
 set(CMAKE_CXX_STANDARD 11)
