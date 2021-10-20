@@ -41,15 +41,17 @@ set(TARGETS "" CACHE INTERNAL "Available targets.")
 
 # [CMAKE_]BUILD_TYPE ==> LIBOPENCOR_BUILD_TYPE.
 
-set(DOCSTRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ...")
+if(NOT IS_MULTI_CONFIG)
+    set(DOCSTRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel ...")
 
-if(DEFINED BUILD_TYPE)
-    set(LIBOPENCOR_BUILD_TYPE "${BUILD_TYPE}" CACHE STRING "${DOCSTRING}" FORCE)
-else()
-    set(LIBOPENCOR_BUILD_TYPE "Release" CACHE STRING "${DOCSTRING}")
+    if(DEFINED BUILD_TYPE)
+        set(LIBOPENCOR_BUILD_TYPE "${BUILD_TYPE}" CACHE STRING "${DOCSTRING}" FORCE)
+    else()
+        set(LIBOPENCOR_BUILD_TYPE "Release" CACHE STRING "${DOCSTRING}")
+    endif()
+
+    set(CMAKE_BUILD_TYPE ${LIBOPENCOR_BUILD_TYPE} CACHE INTERNAL "Internalise CMAKE_BUILD_TYPE, manipulate via LIBOPENCOR_BUILD_TYPE." FORCE)
 endif()
-
-set(CMAKE_BUILD_TYPE ${LIBOPENCOR_BUILD_TYPE} CACHE INTERNAL "Internalise CMAKE_BUILD_TYPE, manipulate via LIBOPENCOR_BUILD_TYPE." FORCE)
 
 unset(BUILD_TYPE CACHE)
 
