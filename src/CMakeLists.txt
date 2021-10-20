@@ -190,3 +190,13 @@ install(FILES ${CONFIG_CMAKE_FILE}
               ${CONFIG_VERSION_CMAKE_FILE}
         DESTINATION ${CMAKE_PACKAGE_DIR}
         COMPONENT development)
+
+# Uninstall libOpenCOR.
+
+set(UNINSTALL_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
+
+configure_file(${PROJECT_SOURCE_DIR}/cmake/uninstall.cmake.in ${UNINSTALL_CMAKE_FILE} @ONLY)
+
+add_target(uninstall
+           COMMAND ${CMAKE_COMMAND} -P ${UNINSTALL_CMAKE_FILE}
+           COMMENT "Uninstall the project...")
