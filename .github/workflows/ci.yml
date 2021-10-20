@@ -25,6 +25,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
+            install_and_uninstall: ON
           - name: 'Windows shared library'
             os: windows-2016
             build_type: Release
@@ -37,6 +38,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: ON
             unit_testing: OFF
+            install_and_uninstall: ON
           - name: 'Linux static library'
             os: ubuntu-20.04
             build_type: Release
@@ -49,6 +51,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
+            install_and_uninstall: ON
           - name: 'Linux shared library'
             os: ubuntu-20.04
             build_type: Release
@@ -61,6 +64,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: ON
             unit_testing: OFF
+            install_and_uninstall: ON
           - name: 'macOS static library'
             os: macos-11
             build_type: Release
@@ -73,6 +77,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
+            install_and_uninstall: ON
           - name: 'macOS shared library'
             os: macos-11
             build_type: Release
@@ -85,6 +90,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: ON
             unit_testing: OFF
+            install_and_uninstall: ON
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_type: Debug
@@ -229,5 +235,15 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
           ninja ${{ matrix.target }}
+      - name: Install libOpenCOR
+        if: ${{ matrix.install_and_uninstall == 'ON' }}
+        run: |
+          cd build
+          ninja install
+      - name: Uninstall libOpenCOR
+        if: ${{ matrix.install_and_uninstall == 'ON' }}
+        run: |
+          cd build
+          ninja uninstall
