@@ -35,7 +35,7 @@ include(environmentchecks)
 
 # Initialise/reset our available targets.
 
-set(TARGETS "" CACHE INTERNAL "Available targets.")
+set(TARGETS "install" CACHE INTERNAL "Useful targets.")
 
 # Rebrand the CMake options that are relevant to libOpenCOR.
 
@@ -441,7 +441,7 @@ endif()
 
 # Summary of available targets.
 
-message(STATUS "Available targets:")
+message(STATUS "Useful targets:")
 
 foreach(TARGET ${TARGETS})
     message(STATUS " - ${TARGET}")
