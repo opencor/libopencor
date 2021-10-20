@@ -383,6 +383,10 @@ if(CLANG_FORMAT_AVAILABLE)
                COMMENT "Formatting the code...")
 endif()
 
+# Package libOpenCOR.
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/cmake/packaging)
+
 # Summary of our configuration.
 
 message(STATUS "Configuration summary:")

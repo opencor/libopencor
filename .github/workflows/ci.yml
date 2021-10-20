@@ -16,30 +16,30 @@ jobs:
           - name: 'Windows static library'
             os: windows-2016
             build_type: Release
-            install_and_uninstall: ON
+            install_uninstall_and_package: ON
           - name: 'Windows shared library'
             os: windows-2016
             build_type: Release
             shared_libs: ON
-            install_and_uninstall: ON
+            install_uninstall_and_package: ON
           - name: 'Linux static library'
             os: ubuntu-20.04
             build_type: Release
-            install_and_uninstall: ON
+            install_uninstall_and_package: ON
           - name: 'Linux shared library'
             os: ubuntu-20.04
             build_type: Release
             shared_libs: ON
-            install_and_uninstall: ON
+            install_uninstall_and_package: ON
           - name: 'macOS static library'
             os: macos-11
             build_type: Release
-            install_and_uninstall: ON
+            install_uninstall_and_package: ON
           - name: 'macOS shared library'
             os: macos-11
             build_type: Release
             shared_libs: ON
-            install_and_uninstall: ON
+            install_uninstall_and_package: ON
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_type: Debug
@@ -131,12 +131,17 @@ jobs:
           ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
           ninja ${{ matrix.target }}
       - name: Install libOpenCOR
-        if: ${{ matrix.install_and_uninstall == 'ON' }}
+        if: ${{ matrix.install_uninstall_and_package == 'ON' }}
         run: |
           cd build
           ninja install
       - name: Uninstall libOpenCOR
-        if: ${{ matrix.install_and_uninstall == 'ON' }}
+        if: ${{ matrix.install_uninstall_and_package == 'ON' }}
         run: |
           cd build
           ninja uninstall
+      - name: Package libOpenCOR
+        if: ${{ matrix.install_uninstall_and_package == 'ON' }}
+        run: |
+          cd build
+          cpack
