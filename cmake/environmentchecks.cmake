@@ -12,6 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Make sure that we are building libOpenCOR in 64-bit mode.
+# Note: normally, we would check the value of CMAKE_SIZEOF_VOID_P, but in some
+#       cases it may not be set (e.g. when generating an Xcode project file), so
+#       we determine and retrieve that value ourselves.
+
+try_run(ARCHITECTURE_RUN ARCHITECTURE_COMPILE
+        ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake/architecture.c
+        RUN_OUTPUT_VARIABLE ARCHITECTURE)
+
+if(NOT ARCHITECTURE_COMPILE)
+    message(FATAL_ERROR "We could not determine your architecture. Please clean your ${CMAKE_PROJECT_NAME} environment and try again.")
+elseif(NOT ${ARCHITECTURE} EQUAL 64)
+    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built in 64-bit mode.")
+endif()
+
 # Check whether we are dealing with a single or multiple configuration.
 
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
