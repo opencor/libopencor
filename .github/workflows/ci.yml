@@ -294,10 +294,10 @@ jobs:
           cpack
       - name: pip install libOpenCOR
         if: ${{ matrix.pip_install == 'ON' }}
-        run: pip install .
+        run: pip3 install .
       - name: Test libOpenCOR Python
         if: ${{ matrix.pip_install == 'ON' }}
-        run: python -c "import libopencor as oc; print(oc.version_string())"
+        run: python3 -c "import libopencor as oc; print(oc.version_string())"
       - name: pip uninstall libOpenCOR
         if: ${{ matrix.pip_install == 'ON' }}
-        run: pip uninstall -y libopencor
+        run: pip3 uninstall -y libopencor
