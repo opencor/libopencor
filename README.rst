@@ -13,19 +13,3 @@ Here are a few links, which you might find useful:
 You might also be interested in our `users <https://groups.google.com/forum/#!forum/opencor-users>`__ and/or `developers <https://groups.google.com/forum/#!forum/opencor-developers>`__ mailing lists, as well as in our `published article <https://dx.doi.org/10.3389/fphys.2015.00026>`__.
 
 Please `contact us <https://opencor.ws/libopencor/user/contactUs.html>`__ if you have any questions about libOpenCOR.
-
-===============
-Python bindings
-===============
-
-You can install libOpenCOR from this repository using:
-
-.. code-block:: bash
-
-    pip install git+https://github.com/opencor/libopencor.git
-
-Then, you can import it using:
-
-.. code-block:: python
-
-    import libopencor as oc
