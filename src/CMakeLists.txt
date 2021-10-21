@@ -149,16 +149,13 @@ install(TARGETS ${CMAKE_PROJECT_NAME}
         EXPORT ${CMAKE_PROJECT_NAME}Targets
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        COMPONENT runtime)
+        ARCHIVE DESTINATION lib)
 
 install(FILES ${API_HEADER_FILES}
-        DESTINATION include/${CMAKE_PROJECT_NAME_LC}
-        COMPONENT development)
+        DESTINATION include/${CMAKE_PROJECT_NAME_LC})
 
 install(FILES ${API_MODULE_FILE}
-        DESTINATION include/${CMAKE_PROJECT_NAME_LC}/module
-        COMPONENT development)
+        DESTINATION include/${CMAKE_PROJECT_NAME_LC}/module)
 
 # Install libOpenCOR's CMake files.
 
@@ -172,8 +169,7 @@ endif()
 
 install(EXPORT ${CMAKE_PROJECT_NAME}Targets
         FILE ${CMAKE_PROJECT_NAME}Targets.cmake
-        DESTINATION ${CMAKE_PACKAGE_DIR}
-        COMPONENT development)
+        DESTINATION ${CMAKE_PACKAGE_DIR})
 
 set(CONFIG_CMAKE_IN_FILE ${PROJECT_SOURCE_DIR}/cmake/config.cmake.in)
 set(CONFIG_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake)
@@ -188,8 +184,7 @@ write_basic_package_version_file(${CONFIG_VERSION_CMAKE_FILE}
 
 install(FILES ${CONFIG_CMAKE_FILE}
               ${CONFIG_VERSION_CMAKE_FILE}
-        DESTINATION ${CMAKE_PACKAGE_DIR}
-        COMPONENT development)
+        DESTINATION ${CMAKE_PACKAGE_DIR})
 
 # Uninstall libOpenCOR.
 
