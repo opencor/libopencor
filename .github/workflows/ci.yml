@@ -91,6 +91,45 @@ jobs:
             shared_libs: ON
             unit_testing: OFF
             install_uninstall_and_package: ON
+          - name: 'Windows Python'
+            os: windows-2016
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            pip_install: ON
+          - name: 'Linux Python'
+            os: ubuntu-20.04
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            pip_install: ON
+          - name: 'macOS Python'
+            os: macos-11
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            pip_install: ON
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_type: Debug
@@ -232,6 +271,7 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
       - name: Build libOpenCOR
+        if: ${{ matrix.pip_install != 'ON' }}
         run: |
           mkdir build
           cd build
@@ -252,3 +292,12 @@ jobs:
         run: |
           cd build
           cpack
+      - name: pip install libOpenCOR
+        if: ${{ matrix.pip_install == 'ON' }}
+        run: pip install .
+      - name: Test libOpenCOR Python
+        if: ${{ matrix.pip_install == 'ON' }}
+        run: python -c "import libopencor as oc; print(oc.version_string())"
+      - name: pip uninstall libOpenCOR
+        if: ${{ matrix.pip_install == 'ON' }}
+        run: pip uninstall -y libopencor
