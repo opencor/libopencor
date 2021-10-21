@@ -297,7 +297,7 @@ jobs:
         run: pip3 install .
       - name: Test libOpenCOR Python
         if: ${{ matrix.pip_install == 'ON' }}
-        run: python3 -c "import libopencor as oc; print(oc.version_string())"
+        run: python3 -c "import libopencor as oc; print(f\"This is libOpenCOR version {oc.version_string()}.\")"
       - name: pip uninstall libOpenCOR
         if: ${{ matrix.pip_install == 'ON' }}
         run: pip3 uninstall -y libopencor
