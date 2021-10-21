@@ -16,63 +16,156 @@ jobs:
           - name: 'Windows static library'
             os: windows-2016
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'Windows shared library'
             os: windows-2016
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'Linux static library'
             os: ubuntu-20.04
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'Linux shared library'
             os: ubuntu-20.04
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'macOS static library'
             os: macos-11
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'macOS shared library'
             os: macos-11
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
+            unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_type: Debug
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
           - name: 'Python unit testing'
             os: ubuntu-20.04
             build_type: Debug
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
             python_bindings: ON
             python_unit_testing: ON
             shared_libs: ON
+            unit_testing: OFF
             target: python_unit_testing
           - name: 'Code formatting'
             os: macos-11
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
             target: code_formatting
           - name: 'Code analysis'
             os: macos-11
             build_type: Release
             code_analysis: ON
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
             context: PATH=/usr/local/opt/llvm/bin:$PATH
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_type: Release
+            code_analysis: OFF
             code_coverage_gcov: ON
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
             target: code_coverage_gcov
           - name: 'Coverage using llvm-cov'
             os: macos-11
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
             code_coverage_llvm_cov: ON
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
             context: PATH=/usr/local/opt/llvm/bin:$PATH CXX=/usr/local/opt/llvm/bin/clang++
@@ -80,14 +173,28 @@ jobs:
           - name: 'Memory checks'
             os: ubuntu-20.04
             build_type: Debug
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
             memory_checks: ON
+            python_bindings: OFF
+            python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
             target: memory_checks
           - name: 'Documentation'
             os: macos-11
             build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
             documentation: ON
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
             target: documentation
     env:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
