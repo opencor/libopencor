@@ -3,6 +3,7 @@ Here are a few links, which you might find useful:
 
 - `What is new? <https://opencor.ws/libopencor/whatIsNew.html>`__
 
+- `API documentation <https://opencor.ws/libopencor/api/index.html>`__
 - `User documentation <https://opencor.ws/libopencor/user/index.html>`__
 - `Developer documentation <https://opencor.ws/libopencor/developer/index.html>`__
 
