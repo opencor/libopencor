@@ -152,7 +152,7 @@ endif()
 if(PYTHON_EXE AND PYTHON_UNIT_TESTING_AVAILABLE)
     message(STATUS "Performing Test HAS_PYTHON_PYTEST_HTML")
 
-    execute_process(COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check_python_packages.py pytest-html
+    execute_process(COMMAND ${PYTHON_EXE} ${CMAKE_SOURCE_DIR}/cmake/check_python_packages.py pytest-html
                     RESULT_VARIABLE RESULT
                     OUTPUT_QUIET ERROR_QUIET)
 
