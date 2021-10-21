@@ -1,4 +1,6 @@
 build/
+_skbuild/
+**/libopencor.egg-info/
 
 .DS_Store
 CMakeLists.txt.user
