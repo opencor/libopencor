@@ -19,8 +19,7 @@ if(LIBOPENCOR_UNIT_TESTING)
 
     if(APPLE)
         set_target_properties(gtest gtest_main
-            PROPERTIES MACOSX_RPATH ON
-        )
+                              PROPERTIES MACOSX_RPATH ON)
     endif()
 
     # Include our different tests.
@@ -62,8 +61,7 @@ if(LIBOPENCOR_UNIT_TESTING)
 
         if(MSVC)
             set_tests_properties(${TEST_TARGET} PROPERTIES
-                ENVIRONMENT "PATH=$<TARGET_FILE_DIR:gtest_main>\;$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>"
-            )
+                                 ENVIRONMENT "PATH=$<TARGET_FILE_DIR:gtest_main>\;$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>")
         endif()
     endforeach()
 

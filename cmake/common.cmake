@@ -164,13 +164,11 @@ function(prepare_test TARGET)
     # Prepare the given test.
 
     add_executable(${TARGET}
-        ${ARGN}
-    )
+                   ${ARGN})
 
     target_link_libraries(${TARGET}
-        gtest_main
-        ${CMAKE_PROJECT_NAME}
-    )
+                          gtest_main
+                          ${CMAKE_PROJECT_NAME})
 
     list(APPEND TEST_TARGETS "${TARGET}")
 
@@ -196,15 +194,10 @@ function(build_documentation DOCUMENTATION_NAME)
     set(DOCUMENTATION_BUILD ${DOCUMENTATION_NAME}_documentation)
 
     ExternalProject_Add(${DOCUMENTATION_BUILD}
-        SOURCE_DIR
-            ${EXTERNAL_PROJECT_BUILD_DIR}/doc/${DOCUMENTATION_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/libopencor-${DOCUMENTATION_NAME}-documentation
-        CMAKE_ARGS
-            -DPYTHON_EXECUTABLE=${PYTHON_EXE}
-            -DSPHINX_EXECUTABLE=${SPHINX_EXE}
-        INSTALL_COMMAND
-            ${CMAKE_COMMAND} -E copy_directory ${EXTERNAL_PROJECT_BUILD_DIR}/Build/${DOCUMENTATION_BUILD}/html
-                                               ${CMAKE_BINARY_DIR}/doc/html/${DOCUMENTATION_NAME}
-    )
+                        SOURCE_DIR ${EXTERNAL_PROJECT_BUILD_DIR}/doc/${DOCUMENTATION_NAME}
+                        GIT_REPOSITORY https://github.com/opencor/libopencor-${DOCUMENTATION_NAME}-documentation
+                        CMAKE_ARGS -DPYTHON_EXECUTABLE=${PYTHON_EXE}
+                                   -DSPHINX_EXECUTABLE=${SPHINX_EXE}
+                        INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${EXTERNAL_PROJECT_BUILD_DIR}/Build/${DOCUMENTATION_BUILD}/html
+                                                                           ${CMAKE_BINARY_DIR}/doc/html/${DOCUMENTATION_NAME})
 endfunction()

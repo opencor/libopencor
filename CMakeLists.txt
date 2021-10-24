@@ -15,8 +15,7 @@
 cmake_minimum_required(VERSION 3.15)
 
 project(libOpenCOR
-    VERSION 0.1.0
-)
+        VERSION 0.1.0)
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} CMAKE_PROJECT_NAME_LC)
 
@@ -319,12 +318,10 @@ endif()
 if(LIBOPENCOR_PYTHON_BINDINGS)
     add_subdirectory(extern/pybind11)
 
-    mark_as_advanced(
-        PYBIND11_FINDPYTHON
-        PYBIND11_INSTALL
-        PYBIND11_NOPYTHON
-        PYBIND11_TEST
-    )
+    mark_as_advanced(PYBIND11_FINDPYTHON
+                     PYBIND11_INSTALL
+                     PYBIND11_NOPYTHON
+                     PYBIND11_TEST)
 endif()
 
 # Build libOpenCOR.
@@ -341,10 +338,8 @@ if(LIBOPENCOR_UNIT_TESTING)
 
     add_subdirectory(extern/googletest)
 
-    mark_as_advanced(
-        BUILD_GMOCK
-        INSTALL_GTEST
-    )
+    mark_as_advanced(BUILD_GMOCK
+                     INSTALL_GTEST)
 endif()
 
 # Run our tests.

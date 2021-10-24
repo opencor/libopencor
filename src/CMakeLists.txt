@@ -67,32 +67,27 @@ set(HEADER_FILES
     ${VERSION_P_HEADER_FILE}
 )
 
-include_directories(
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}/api
-    api
-)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}
+                    ${CMAKE_CURRENT_BINARY_DIR}/api
+                    api)
 
 add_library(${CMAKE_PROJECT_NAME}
-    ${API_HEADER_FILES}
-    ${API_MODULE_FILE}
-    ${SOURCE_FILES}
-    ${HEADER_FILES}
-)
+            ${API_HEADER_FILES}
+            ${API_MODULE_FILE}
+            ${SOURCE_FILES}
+            ${HEADER_FILES})
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-    DEBUG_POSTFIX d
-    PREFIX ""
-    VERSION ${PROJECT_VERSION}
-)
+                      DEBUG_POSTFIX d
+                      PREFIX ""
+                      VERSION ${PROJECT_VERSION})
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/module>
-    $<INSTALL_INTERFACE:include/>
-    $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>
-)
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/module>
+                           $<INSTALL_INTERFACE:include/>
+                           $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>)
 
 set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
 set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
@@ -102,9 +97,8 @@ set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 # Generate the export header file.
 
 generate_export_header(${CMAKE_PROJECT_NAME}
-    EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
-    BASE_NAME LIBOPENCOR
-)
+                       EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
+                       BASE_NAME LIBOPENCOR)
 
 # Treat warnings as errors.
 

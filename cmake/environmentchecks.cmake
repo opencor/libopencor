@@ -187,34 +187,28 @@ endif()
 # Hide the CMake options that are not directly relevant to libOpenCOR.
 
 if(MSVC)
-    mark_as_advanced(
-        CLCACHE_EXE
-        CMAKE_CONFIGURATION_TYPES
-    )
+    mark_as_advanced(CLCACHE_EXE
+                     CMAKE_CONFIGURATION_TYPES)
 else()
     mark_as_advanced(CCACHE_EXE)
 
     if(APPLE)
-        mark_as_advanced(
-            CMAKE_OSX_ARCHITECTURES
-            CMAKE_OSX_DEPLOYMENT_TARGET
-            CMAKE_OSX_SYSROOT
-        )
+        mark_as_advanced(CMAKE_OSX_ARCHITECTURES
+                         CMAKE_OSX_DEPLOYMENT_TARGET
+                         CMAKE_OSX_SYSROOT)
     endif()
 endif()
 
-mark_as_advanced(
-    BUILDCACHE_EXE
-    CLANG_FORMAT_EXE
-    CLANG_TIDY_EXE
-    FIND_EXE
-    GCOV_EXE
-    GCOVR_EXE
-    GIT_EXE
-    LLVM_COV_EXE
-    LLVM_PROFDATA_EXE
-    PATCH_EXE
-    PYTEST_EXE
-    SPHINX_EXE
-    VALGRIND_EXE
-)
+mark_as_advanced(BUILDCACHE_EXE
+                 CLANG_FORMAT_EXE
+                 CLANG_TIDY_EXE
+                 FIND_EXE
+                 GCOV_EXE
+                 GCOVR_EXE
+                 GIT_EXE
+                 LLVM_COV_EXE
+                 LLVM_PROFDATA_EXE
+                 PATCH_EXE
+                 PYTEST_EXE
+                 SPHINX_EXE
+                 VALGRIND_EXE)

@@ -23,14 +23,12 @@ endif()
 set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
 
 pybind11_add_module(${PYTHON_BINDINGS_TARGET}
-    python.cpp
-)
+                    python.cpp)
 
 target_link_libraries(${PYTHON_BINDINGS_TARGET} ${CMAKE_PROJECT_NAME})
 
 set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
-    OUTPUT_NAME ${CMAKE_PROJECT_NAME_LC}/${CMAKE_PROJECT_NAME_LC}
-)
+                      OUTPUT_NAME ${CMAKE_PROJECT_NAME_LC}/${CMAKE_PROJECT_NAME_LC})
 
 # Install our Python bindings.
 

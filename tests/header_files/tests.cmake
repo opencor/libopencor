@@ -25,5 +25,4 @@ foreach(GIT_API_HEADER_FILE ${GIT_API_HEADER_FILES})
 endforeach()
 
 prepare_test(api_header_files_tests
-    ${TEST_SOURCE_FILES}
-)
+             ${TEST_SOURCE_FILES})
