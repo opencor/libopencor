@@ -23,5 +23,5 @@ setup(
     package_dir={'': 'src/bindings/python'},
     cmake_args=['-DPYTHON_BINDINGS=ON'],
     cmake_install_dir='src/bindings/python/libopencor',
-    include_package_data=True,
+    exclude_package_data={'': ['bin/*', 'cmake/*', 'include/*', 'lib/*']},
 )
