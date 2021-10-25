@@ -23,13 +23,18 @@ endif()
 set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
 
 pybind11_add_module(${PYTHON_BINDINGS_TARGET}
+                    ${API_HEADER_FILES}
+                    ${SOURCE_FILES}
+                    ${HEADER_FILES}
                     python.cpp)
-
-target_link_libraries(${PYTHON_BINDINGS_TARGET}
-                      PUBLIC ${CMAKE_PROJECT_NAME})
 
 set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
                       OUTPUT_NAME ${CMAKE_PROJECT_NAME_LC}/${CMAKE_PROJECT_NAME_LC})
+
+target_include_directories(${PYTHON_BINDINGS_TARGET} PUBLIC
+                           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src/api>
+                           $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api>
+                           $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
 
 # Make it possible to unit test our Python bindings using our CMake target.
 
