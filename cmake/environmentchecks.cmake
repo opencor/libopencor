@@ -32,9 +32,11 @@ endif()
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 # Look for various packages and programs.
+message(">>> PREFERRED_PYTHON_VERSION: >${PREFERRED_PYTHON_VERSION}<")
 
 find_package(Doxygen)
-find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
+find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development
+             PATHS C:/hostedtoolcache/windows/Python/3.7.9/x64)
 
 find_program(BUILDCACHE_EXE buildcache)
 
@@ -159,6 +161,7 @@ endif()
 if(PYTHON_DEVELOPMENT_FOUND)
     set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
 endif()
+message(">>> PYTHON_EXE: >${PYTHON_EXE}<")
 
 if(PYTHON_BINDINGS_AVAILABLE AND PYTEST_EXE)
     set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable required to run Python unit testing.")
