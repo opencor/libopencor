@@ -159,6 +159,7 @@ endif()
 if(PYTHON_DEVELOPMENT_FOUND)
     set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
 endif()
+message(">>> PYTHON_EXE: >${PYTHON_EXE}<")
 
 if(PYTHON_BINDINGS_AVAILABLE AND PYTEST_EXE)
     set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable required to run Python unit testing.")
