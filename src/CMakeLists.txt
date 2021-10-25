@@ -73,7 +73,6 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
 
 add_library(${CMAKE_PROJECT_NAME}
             ${API_HEADER_FILES}
-            ${API_MODULE_FILE}
             ${SOURCE_FILES}
             ${HEADER_FILES})
 
