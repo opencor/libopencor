@@ -300,7 +300,9 @@ jobs:
           cpack
       - name: pip install libOpenCOR
         if: ${{ matrix.pip_install == 'ON' }}
-        run: pip3 install .
+        run: |
+          echo $PATH
+          pip3 install .
       - name: Test libOpenCOR Python
         if: ${{ matrix.pip_install == 'ON' }}
         run: python3 -c "import libopencor as oc; print(f'This is libOpenCOR version {oc.version_string()}.')"
