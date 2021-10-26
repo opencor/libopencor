@@ -277,8 +277,16 @@ jobs:
           echo %PATH%
           python3 --version
           python --version
-      - name: Build libOpenCOR
-        if: ${{ matrix.pip_install != 'ON' }}
+      - name: Build libOpenCOR (Windows)
+        if: ${{ matrix.pip_install != 'ON' && runner.os == 'Windows' }}
+        shell: cmd
+        run: |
+          mkdir build
+          cd build
+          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+          ninja ${{ matrix.target }}
+      - name: Build libOpenCOR (Linux and macOS)
+        if: ${{ matrix.pip_install != 'ON' && runner.os != 'Windows' }}
         run: |
           mkdir build
           cd build
