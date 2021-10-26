@@ -270,10 +270,11 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Windows environemtn
+      - name: Windows environment
         if: ${{ runner.os == 'Windows' }}
+        shell: cmd
         run: |
-          path
+          echo %path%
           python3 --version
       - name: Build libOpenCOR
         if: ${{ matrix.pip_install != 'ON' }}
