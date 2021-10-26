@@ -36,7 +36,7 @@ message(">>> PREFERRED_PYTHON_VERSION: >${PREFERRED_PYTHON_VERSION}<")
 
 find_package(Doxygen)
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development
-             PATHS C:\hostedtoolcache\windows\Python\3.7.9\x64)
+             PATHS C:/hostedtoolcache/windows/Python/3.7.9/x64)
 
 find_program(BUILDCACHE_EXE buildcache)
 

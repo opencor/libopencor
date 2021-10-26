@@ -277,7 +277,7 @@ jobs:
           echo %PATH%
           python3 --version
           python --version
-          dir /s C:\hostedtoolcache\windows\Python
+          # dir /s C:\hostedtoolcache\windows\Python
       - name: Build libOpenCOR
         if: ${{ matrix.pip_install != 'ON' }}
         run: |
