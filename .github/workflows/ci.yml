@@ -240,6 +240,7 @@ jobs:
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
+      PREFERRED_PYTHON_VERSION: 3.7.9
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v2
