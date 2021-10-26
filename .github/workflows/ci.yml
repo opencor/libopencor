@@ -275,9 +275,11 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         shell: cmd
         run: |
-          echo %path%
+          echo %PATH%
           python3 --version
           python --version
+          echo %PREFERRED_PYTHON_VERSION%
+          dir /s C:\hostedtoolcache\windows\Python
       - name: Build libOpenCOR
         if: ${{ matrix.pip_install != 'ON' }}
         run: |
