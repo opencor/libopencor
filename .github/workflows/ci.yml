@@ -276,6 +276,7 @@ jobs:
         run: |
           echo %path%
           python3 --version
+          python --version
       - name: Build libOpenCOR
         if: ${{ matrix.pip_install != 'ON' }}
         run: |
