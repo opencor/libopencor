@@ -240,7 +240,6 @@ jobs:
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
-      PREFERRED_PYTHON_VERSION: 3.7.9
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v2
@@ -278,7 +277,6 @@ jobs:
           echo %PATH%
           python3 --version
           python --version
-          echo %PREFERRED_PYTHON_VERSION%
           dir /s C:\hostedtoolcache\windows\Python
       - name: Build libOpenCOR
         if: ${{ matrix.pip_install != 'ON' }}

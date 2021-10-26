@@ -32,9 +32,10 @@ endif()
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 # Look for various packages and programs.
+message(">>> PREFERRED_PYTHON_VERSION: >${PREFERRED_PYTHON_VERSION}<")
 
 find_package(Doxygen)
-find_package(Python 3.7.9 COMPONENTS Interpreter Development)
+find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
 find_program(BUILDCACHE_EXE buildcache)
 
