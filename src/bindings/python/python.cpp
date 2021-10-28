@@ -18,7 +18,14 @@ limitations under the License.
 
 #include <pybind11/pybind11.h>
 
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
 PYBIND11_MODULE(module, m) {
+    // Version.
+
+    m.attr("__version__") = MACRO_STRINGIFY(PROJECT_VERSION);
+
     // Documentation.
 
     m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";
