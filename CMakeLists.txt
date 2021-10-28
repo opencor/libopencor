@@ -55,7 +55,9 @@ add_subdirectory(extern/pybind11)
 
 mark_as_advanced(PYBIND11_FINDPYTHON
                  PYBIND11_INSTALL
+                 PYBIND11_INTERNALS_VERSION
                  PYBIND11_NOPYTHON
+                 PYBIND11_PYTHON_VERSION
                  PYBIND11_TEST)
 
 # Check the environment we are dealing with.
