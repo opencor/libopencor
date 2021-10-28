@@ -68,10 +68,6 @@ if(PYTHON_EXECUTABLE)
     set(PYTHON_EXE ${PYTHON_EXECUTABLE})
 endif()
 
-if(PYTHON_LIBRARY)
-    set(PYTHON_LIB ${PYTHON_LIBRARY})
-endif()
-
 # Check some compiler flags.
 
 include(CheckCXXCompilerFlag)
@@ -155,7 +151,7 @@ if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
     endif()
 endif()
 
-if(PYTHON_LIB)
+if(PYTHON_BINDINGS)
     set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
 endif()
 
