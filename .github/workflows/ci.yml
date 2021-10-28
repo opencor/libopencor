@@ -103,7 +103,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
-            pip_install: ON
+            pip_install_test_and_uninstall: ON
           - name: 'Linux Python'
             os: ubuntu-20.04
             build_type: Release
@@ -116,7 +116,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
-            pip_install: ON
+            pip_install_test_and_uninstall: ON
           - name: 'macOS Python'
             os: macos-11
             build_type: Release
@@ -129,7 +129,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
-            pip_install: ON
+            pip_install_test_and_uninstall: ON
           - name: 'Unit testing'
             os: ubuntu-20.04
             build_type: Debug
@@ -272,23 +272,8 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Windows environment
-        if: ${{ runner.os == 'Windows' }}
-        shell: cmd
-        run: |
-          echo %PATH%
-          python3 --version
-          python --version
-      - name: Build libOpenCOR (Windows)
-        if: ${{ matrix.pip_install != 'ON' && runner.os == 'Windows' }}
-        shell: cmd
-        run: |
-          mkdir build
-          cd build
-          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
-          ninja ${{ matrix.target }}
-      - name: Build libOpenCOR (Linux and macOS)
-        if: ${{ matrix.pip_install != 'ON' && runner.os != 'Windows' }}
+      - name: Build libOpenCOR
+        if: ${{ matrix.pip_install_test_and_uninstall != 'ON' }}
         run: |
           mkdir build
           cd build
@@ -310,13 +295,11 @@ jobs:
           cd build
           cpack
       - name: pip install libOpenCOR
-        if: ${{ matrix.pip_install == 'ON' }}
-        run: |
-          echo $PATH
-          pip3 install .
+        if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
+        run: pip3 install .
       - name: Test libOpenCOR Python
-        if: ${{ matrix.pip_install == 'ON' }}
+        if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: python3 -c "import libopencor as oc; print(f'This is libOpenCOR version {oc.version_string()}.')"
       - name: pip uninstall libOpenCOR
-        if: ${{ matrix.pip_install == 'ON' }}
+        if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: pip3 uninstall -y libopencor
