@@ -18,7 +18,7 @@ limitations under the License.
 
 #include <pybind11/pybind11.h>
 
-PYBIND11_MODULE(libopencor, m) {
+PYBIND11_MODULE(module, m) {
     // Documentation.
 
     m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";

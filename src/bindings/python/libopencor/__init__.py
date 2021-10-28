@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .libopencor import __doc__
-from .libopencor import version, version_string
+from .module import __doc__
+from .module import version, version_string
 
 __all__ = (
     # Version.

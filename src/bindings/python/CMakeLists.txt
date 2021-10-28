@@ -23,7 +23,7 @@ pybind11_add_module(${PYTHON_BINDINGS_TARGET}
                     python.cpp)
 
 set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
-                      OUTPUT_NAME ${CMAKE_PROJECT_NAME_LC}/${CMAKE_PROJECT_NAME_LC})
+                      OUTPUT_NAME ${CMAKE_PROJECT_NAME_LC}/module)
 
 target_include_directories(${PYTHON_BINDINGS_TARGET} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src/api>
