@@ -25,11 +25,28 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Check the environment we are dealing with.
+# Some common CMake functions/macros.
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(common)
+
+# Enable Python bindings.
+# Note: we let pybind11 look for Python for us since it seems to be doing a
+#       better job of it when building libOpenCOR Python using GitHub Actions.
+#       Indeed, on GHA Windows, Python 3.7.9 is the official version, yet CMake
+#       finds and uses Python 3.10.0, which causes problems when we then test
+#       our Python bindings since we use the official version of Python.
+
+add_subdirectory(extern/pybind11)
+
+mark_as_advanced(PYBIND11_FINDPYTHON
+                 PYBIND11_INSTALL
+                 PYBIND11_NOPYTHON
+                 PYBIND11_TEST)
+
+# Check the environment we are dealing with.
+
 include(environmentchecks)
 
 # Initialise/reset our available targets.
@@ -311,17 +328,6 @@ if(MSVC)
     if(BUILDCACHE_EXE OR CLCACHE_EXE)
         replace_compiler_flag("/Zi" "/Z7")
     endif()
-endif()
-
-# Enable Python bindings.
-
-if(LIBOPENCOR_PYTHON_BINDINGS)
-    add_subdirectory(extern/pybind11)
-
-    mark_as_advanced(PYBIND11_FINDPYTHON
-                     PYBIND11_INSTALL
-                     PYBIND11_NOPYTHON
-                     PYBIND11_TEST)
 endif()
 
 # Build libOpenCOR.

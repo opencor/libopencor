@@ -34,7 +34,6 @@ get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 # Look for various packages and programs.
 
 find_package(Doxygen)
-find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
 find_program(BUILDCACHE_EXE buildcache)
 
@@ -65,12 +64,12 @@ if(DOXYGEN_EXECUTABLE)
     set(DOXYGEN_EXE ${DOXYGEN_EXECUTABLE})
 endif()
 
-if(Python_EXECUTABLE)
-    set(PYTHON_EXE ${Python_EXECUTABLE})
+if(PYTHON_EXECUTABLE)
+    set(PYTHON_EXE ${PYTHON_EXECUTABLE})
 endif()
 
-if(Python_Development_FOUND)
-    set(PYTHON_DEVELOPMENT_FOUND ${Python_Development_FOUND})
+if(PYTHON_LIBRARY)
+    set(PYTHON_LIB ${PYTHON_LIBRARY})
 endif()
 
 # Check some compiler flags.
@@ -156,7 +155,7 @@ if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
     endif()
 endif()
 
-if(PYTHON_DEVELOPMENT_FOUND)
+if(PYTHON_LIB)
     set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
 endif()
 
