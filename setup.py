@@ -18,6 +18,8 @@ setup(
     name='libopencor',
     version='0.1.0',
     description='libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.',
+    author='libOpenCOR contributors',
+    url='https://opencor.ws/libopencor',
     license='Apache 2.0',
     packages=['libopencor'],
     package_dir={'': 'src/bindings/python'},
