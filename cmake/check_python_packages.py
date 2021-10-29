@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import subprocess
+import pkg_resources
 import sys
 
-output = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
-installed_packages = [line.decode().split('==')[0] for line in output.split()]
+installed_packages = {pkg.key for pkg in pkg_resources.working_set}
 
 for package in sys.argv[1:]:
     if package not in installed_packages:
