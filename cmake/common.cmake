@@ -138,6 +138,27 @@ function(configure_clang_and_clang_tidy TARGET)
     endif()
 endfunction()
 
+function(check_python_package PACKAGE AVAILABLE)
+    set(PACKAGE_VARIABLE "HAS_PYTHON_${PACKAGE}")
+
+    string(TOUPPER "${PACKAGE_VARIABLE}" PACKAGE_VARIABLE)
+    string(REPLACE "-" "_" PACKAGE_VARIABLE "${PACKAGE_VARIABLE}")
+
+    message(STATUS "Performing Test ${PACKAGE_VARIABLE}")
+
+    execute_process(COMMAND ${PYTHON_EXE} ${CMAKE_SOURCE_DIR}/cmake/check_python_package.py ${PACKAGE}
+                    RESULT_VARIABLE RESULT
+                    OUTPUT_QUIET ERROR_QUIET)
+
+    if(RESULT EQUAL 0)
+        set(${AVAILABLE} TRUE PARENT_SCOPE)
+
+        message(STATUS "Performing Test ${PACKAGE_VARIABLE} - Success")
+    else()
+        message(STATUS "Performing Test ${PACKAGE_VARIABLE} - Failed")
+    endif()
+endfunction()
+
 macro(add_target TARGET)
     add_custom_target(${TARGET} ${ARGN})
 

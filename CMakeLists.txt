@@ -160,7 +160,7 @@ endif()
 if(DEFINED DOCUMENTATION AND DOCUMENTATION_AVAILABLE)
     set(LIBOPENCOR_DOCUMENTATION ${DOCUMENTATION} CACHE BOOL "${DOCSTRING}" FORCE)
 elseif(DOCUMENTATION)
-    message(SEND_ERROR "Documentation is requested but Doxygen, patch, Python and/or Sphinx could not be found.")
+    message(SEND_ERROR "Documentation is requested but Doxygen, patch, Python, some Python packages and/or Sphinx could not be found.")
 endif()
 
 unset(DOCUMENTATION CACHE)

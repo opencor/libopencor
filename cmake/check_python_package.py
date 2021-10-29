@@ -17,8 +17,7 @@ import sys
 
 installed_packages = {pkg.key for pkg in pkg_resources.working_set}
 
-for package in sys.argv[1:]:
-    if package not in installed_packages:
-        sys.exit(1)
+if sys.argv[1] not in installed_packages:
+    sys.exit(1)
 
 sys.exit(0)

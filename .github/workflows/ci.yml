@@ -252,9 +252,6 @@ jobs:
       - name: Install pytest
         if: ${{ matrix.python_bindings == 'ON' }}
         run: pip install pytest
-      - name: Install Sphinx
-        if: ${{ matrix.documentation == 'ON' }}
-        run: pip3 install sphinx
       - name: Install ClangFormat
         if: ${{ matrix.target == 'code_formatting' }}
         run: brew install clang-format
@@ -264,6 +261,12 @@ jobs:
       - name: Install Valgrind
         if: ${{ matrix.memory_checks == 'ON' }}
         run: sudo apt install valgrind
+      - name: Install Sphinx
+        if: ${{ matrix.documentation == 'ON' }}
+        run: pip3 install sphinx
+      - name: Install Sphinx packages
+        if: ${{ matrix.documentation == 'ON' }}
+        run: pip3 install sphinx-copybutton sphinx-inline-tabs
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: brew install doxygen

@@ -147,7 +147,12 @@ if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
     if(DOXYGEN_VERSION VERSION_LESS DOXYGEN_MINIMUM_VERSION)
         message(WARNING "ClangFormat ${DOXYGEN_VERSION} was found, but version ${DOXYGEN_MINIMUM_VERSION}+ is needed to generate the documentation.")
     else()
-        set(DOCUMENTATION_AVAILABLE TRUE CACHE INTERNAL "Executables required to generate the documentation.")
+        check_python_package(sphinx-copybutton PYTHON_SPHINX_COPY_BUTTON_AVAILABLE)
+        check_python_package(sphinx-inline-tabs PYTHON_SPHINX_INLINE_TABS_AVAILABLE)
+
+        if(PYTHON_SPHINX_COPY_BUTTON_AVAILABLE AND PYTHON_SPHINX_INLINE_TABS_AVAILABLE)
+            set(DOCUMENTATION_AVAILABLE TRUE CACHE INTERNAL "Executables and packages required to generate the documentation.")
+        endif()
     endif()
 endif()
 
@@ -160,18 +165,10 @@ if(PYTHON_BINDINGS_AVAILABLE AND PYTEST_EXE)
 endif()
 
 if(PYTHON_EXE AND PYTHON_UNIT_TESTING_AVAILABLE)
-    message(STATUS "Performing Test HAS_PYTHON_PYTEST_HTML")
+    check_python_package(pytest-html PYTHON_PYTEST_HTML_AVAILABLE)
 
-    execute_process(COMMAND ${PYTHON_EXE} ${CMAKE_SOURCE_DIR}/cmake/check_python_packages.py pytest-html
-                    RESULT_VARIABLE RESULT
-                    OUTPUT_QUIET ERROR_QUIET)
-
-    if(RESULT EQUAL 0)
+    if(PYTHON_PYTEST_HTML_AVAILABLE)
         set(PYTHON_UNIT_TESTING_REPORT_AVAILABLE TRUE CACHE INTERNAL "Executable and package required to run Python unit testing.")
-
-        message(STATUS "Performing Test HAS_PYTHON_PYTEST_HTML - Success")
-    else()
-        message(STATUS "Performing Test HAS_PYTHON_PYTEST_HTML - Failed")
     endif()
 endif()
 
