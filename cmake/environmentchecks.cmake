@@ -156,7 +156,7 @@ if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
     endif()
 endif()
 
-if(PYTHON_BINDINGS)
+if(PYTHON_LIBRARIES)
     set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
 endif()
 
