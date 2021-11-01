@@ -7,21 +7,300 @@ on:
 
 jobs:
   ci:
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - name: "Windows CI"
-            os: windows-latest
-          - name: "Ubuntu CI"
-            os: ubuntu-latest
-          - name: "macOS CI"
-            os: macos-latest
+          - name: 'Windows static library'
+            os: windows-2016
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            install_uninstall_and_package: ON
+          - name: 'Windows shared library'
+            os: windows-2016
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: OFF
+            install_uninstall_and_package: ON
+          - name: 'Linux static library'
+            os: ubuntu-20.04
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            install_uninstall_and_package: ON
+          - name: 'Linux shared library'
+            os: ubuntu-20.04
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: OFF
+            install_uninstall_and_package: ON
+          - name: 'macOS static library'
+            os: macos-11
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            install_uninstall_and_package: ON
+          - name: 'macOS shared library'
+            os: macos-11
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: OFF
+            install_uninstall_and_package: ON
+          - name: 'Windows Python'
+            os: windows-2016
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            pip_install_test_and_uninstall: ON
+          - name: 'Linux Python'
+            os: ubuntu-20.04
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            pip_install_test_and_uninstall: ON
+          - name: 'macOS Python'
+            os: macos-11
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            pip_install_test_and_uninstall: ON
+          - name: 'Unit testing'
+            os: ubuntu-20.04
+            build_type: Debug
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            target: unit_testing
+          - name: 'Python unit testing'
+            os: ubuntu-20.04
+            build_type: Debug
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: ON
+            python_unit_testing: ON
+            shared_libs: ON
+            unit_testing: OFF
+            target: python_unit_testing
+          - name: 'Code formatting'
+            os: macos-11
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            target: code_formatting
+          - name: 'Code analysis'
+            os: macos-11
+            build_type: Release
+            code_analysis: ON
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            context: PATH=/usr/local/opt/llvm/bin:$PATH
+          - name: 'Coverage using gcov'
+            os: ubuntu-20.04
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: ON
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            target: code_coverage_gcov
+          - name: 'Coverage using llvm-cov'
+            os: macos-11
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: ON
+            documentation: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            context: PATH=/usr/local/opt/llvm/bin:$PATH CXX=/usr/local/opt/llvm/bin/clang++
+            target: code_coverage_llvm_cov
+          - name: 'Memory checks'
+            os: ubuntu-20.04
+            build_type: Debug
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            memory_checks: ON
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            target: memory_checks
+          - name: 'Documentation'
+            os: macos-11
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: ON
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            target: documentation
+    env:
+      BUILDCACHE_COMPRESS_FORMAT: ZSTD
+      BUILDCACHE_DEBUG: -1
+      BUILDCACHE_DIRECT_MODE: true
+      BUILDCACHE_LOG_FILE: ""
     steps:
-      - name: Environment
-        run: |
-          echo "Name: ${{ matrix.name }}"
-          echo "OS:   ${{ matrix.os }}"
       - name: Check out libOpenCOR
         uses: actions/checkout@v2
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+      - name: Install buildcache
+        uses: mikehardy/buildcache-action@v1
+        with:
+          cache_key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage_gcov }}-${{ matrix.code_coverage_llvm_cov }}-${{ matrix.documentation }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
+      - name: Install pytest
+        if: ${{ matrix.python_bindings == 'ON' }}
+        run: pip install pytest
+      - name: Install ClangFormat
+        if: ${{ matrix.target == 'code_formatting' }}
+        run: brew install clang-format
+      - name: Install gcovr
+        if: ${{ matrix.code_coverage_gcov == 'ON' }}
+        run: sudo apt install gcovr
+      - name: Install Valgrind
+        if: ${{ matrix.memory_checks == 'ON' }}
+        run: sudo apt install valgrind
+      - name: Install Sphinx
+        if: ${{ matrix.documentation == 'ON' }}
+        run: pip3 install sphinx
+      - name: Install Sphinx packages
+        if: ${{ matrix.documentation == 'ON' }}
+        run: pip3 install sphinx-copybutton sphinx-inline-tabs
+      - name: Install Doxygen
+        if: ${{ matrix.documentation == 'ON' }}
+        run: brew install doxygen
+      - name: Configure MSVC
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Build libOpenCOR
+        if: ${{ matrix.pip_install_test_and_uninstall != 'ON' }}
+        run: |
+          mkdir build
+          cd build
+          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+          ninja ${{ matrix.target }}
+      - name: Install libOpenCOR
+        if: ${{ matrix.install_uninstall_and_package == 'ON' }}
+        run: |
+          cd build
+          ninja install
+      - name: Uninstall libOpenCOR
+        if: ${{ matrix.install_uninstall_and_package == 'ON' }}
+        run: |
+          cd build
+          ninja uninstall
+      - name: Package libOpenCOR
+        if: ${{ matrix.install_uninstall_and_package == 'ON' }}
+        run: |
+          cd build
+          cpack
+      - name: pip install libOpenCOR
+        if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
+        run: pip3 install .
+      - name: Test libOpenCOR Python
+        if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
+        run: python3 -c "import libopencor as oc; print(f'This is libOpenCOR version {oc.version_string()}.')"
+      - name: pip uninstall libOpenCOR
+        if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
+        run: pip3 uninstall -y libopencor

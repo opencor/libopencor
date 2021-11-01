@@ -1,0 +1,277 @@
+:root {
+    --background-color: rgb(255, 255, 255);
+    --color: rgb(54, 96, 146);
+
+    --color-0_05: rgb(245, 247, 249);
+    --color-0_13: rgb(229, 234, 241);
+    --color-0_39: rgb(177, 193, 213);
+
+    --initial-0_39: rgb(156, 156, 156);
+
+    --glow-color: yellow;
+
+    --copyright-border-top-color: rgba(161, 161, 161, 0.39);
+    --copyright-background-color: rgb(229, 229, 229);
+    --copyright-color: rgb(161, 161, 161);
+}
+
+a {
+    color: var(--color) !important;
+}
+
+body {
+    background-color: var(--background-color);
+}
+
+body,
+div,
+#nav-tree .label {
+    font-family: "Arial", "Sans-Serif" !important;
+}
+
+div.line {
+    font-family: monospace, fixed !important;
+}
+
+div.copyright {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 19px;
+    border-top: 1px solid var(--copyright-border-top-color);
+    background-color: var(--copyright-background-color);
+    color: var(--copyright-color);
+}
+
+div.copyright div {
+    display: table-cell;
+    position: fixed;
+    bottom: 2px;
+}
+
+div.copyright div.center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+}
+
+div.copyright div.left {
+    left: 4px;
+    font-size: 9pt;
+    font-weight: bold;
+    line-height: normal;
+}
+
+div.copyright div.right {
+    right: 4px;
+}
+
+div.copyright div a.copyright:hover {
+    margin: 0;
+    border: 0;
+    background: none;
+}
+
+div.copyright div img.twitter {
+    position: relative;
+    top: -15px;
+    border: 0;
+}
+
+div.copyright div img.vpr {
+    position: relative;
+    top: 1px;
+    border: 0;
+}
+
+div.directory {
+    border-color: var(--color);
+}
+
+div.directory td.desc {
+    border-left: 1px solid var(--color-0_13);
+}
+
+div.header,
+div.sm-dox,
+div.ui-resizable-e,
+#main-nav ul,
+#main-nav a,
+#nav-tree,
+#nav-tree div.item {
+    background-image: none;
+}
+
+div.header {
+    border-bottom: 1px solid var(--color);
+    background-color: var(--color-0_05);
+}
+
+div.line.glow {
+    background-color: var(--glow-color);
+    box-shadow: 0 0 10px var(--glow-color);
+}
+
+div.sm-dox {
+    padding-top: 1px;
+}
+
+div.title {
+    color: var(--color);
+}
+
+ul.sm-dox a:hover {
+    color: var(--background-color) !important;
+    border-radius: 0;
+}
+
+div.ui-resizable-e {
+    background-color: var(--color-0_13);
+}
+
+h1.glow, h2.glow, h3.glow, h4.glow, h5.glow, h6.glow {
+    text-shadow: 0 0 15px var(--glow-color);
+}
+
+h2.groupheader {
+    border-bottom: 1px solid var(--color);
+    color: var(--color);
+}
+
+span.icon {
+    background-color: var(--color);
+}
+
+td.entry a.el {
+    vertical-align: middle !important;
+}
+
+tr.even {
+    background-color: var(--color-0_05);
+}
+
+.memberdecls td.glow, .fieldtable tr.glow {
+    background-color: var(--glow-color);
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+.memitem.glow {
+    box-shadow: 0 0 15px var(--glow-color);
+}
+
+.memItemLeft,
+.memItemRight {
+    background-color: var(--color-0_05);
+}
+
+.memSeparator {
+    border-bottom: 1px solid var(--color-0_39);
+}
+
+.memdoc {
+    border-bottom: 1px solid var(--color);
+    border-left: 1px solid var(--color);
+    border-right: 1px solid var(--color);
+}
+
+.memproto,
+.memtitle {
+    border-top: 1px solid var(--color);
+    border-left: 1px solid var(--color);
+    border-right: 1px solid var(--color);
+    background-image: none;
+    background-color: var(--color-0_05);
+}
+
+#main-nav {
+    padding-bottom: 1px;
+    border-bottom: 1px solid var(--color);
+}
+
+#main-nav ul {
+    padding: 0;
+}
+
+#main-nav a {
+    color: var(--color);
+    text-shadow: none;
+}
+
+#main-nav a:hover {
+    background-color: var(--color);
+    color: var(--background-color);
+}
+
+#main-nav ul.sm-nowrap {
+    padding: 5px 0;
+}
+
+#MSearchBox {
+    border: 1px solid var(--color);
+    border-radius: 5px;
+    box-shadow: none;
+}
+
+#MSearchClose:hover {
+    background-color: transparent !important;
+}
+
+#MSearchField {
+    color: var(--initial-0_39);
+}
+
+#MSearchResultsWindow {
+    margin-top: 3px;
+    border-color: var(--color);
+    border-radius: 5px;
+    background-color: var(--color-0_05);
+}
+
+#MSearchSelectWindow {
+    margin-top: 3px;
+    border-color: var(--color);
+    padding: 4px 0;
+}
+
+#MSearchSelectWindow a.SelectItem {
+    color: var(--color);
+}
+
+#MSearchSelectWindow a.SelectItem:hover {
+    background-color: var(--color);
+    color: var(--background-color);
+}
+
+#nav-tree {
+    background-color: var(--color-0_05);
+}
+
+#nav-tree div.item {
+    color: var(--color);
+}
+
+#nav-tree div.item.selected {
+    background-color: var(--color);
+    text-shadow: none;
+}
+
+#nav-tree div.item.selected a {
+    color: var(--background-color) !important;
+}
+
+#side-nav {
+    padding: 0;
+}
+
+#titlearea {
+    width: auto;
+    height: 23px;
+    border: 0;
+    padding: 3px;
+    background-color: var(--color);
+    color: var(--background-color);
+    font-size: 15pt;
+    font-weight: bold;
+    line-height: normal;
+}
