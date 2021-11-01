@@ -13,11 +13,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows'
+          - name: 'Windows wheels'
             os: windows-2016
-          - name: 'Linux'
+          - name: 'Linux wheels'
             os: ubuntu-20.04
-          - name: 'macOS'
+          - name: 'macOS wheels'
             os: macos-11
     steps:
       - name: Check out libOpenCOR
