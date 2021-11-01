@@ -30,7 +30,6 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_ARCHS: auto64
-          CIBW_SKIP: cp*
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
