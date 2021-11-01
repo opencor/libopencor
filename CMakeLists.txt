@@ -45,11 +45,11 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(common)
 
 # Enable Python bindings.
-# Note: we let pybind11 look for Python for us since it seems to be doing a
+# Note: we get pybind11 to look for Python for us since it seems to be doing a
 #       better job of it when building libOpenCOR Python using GitHub Actions.
 #       Indeed, on GHA Windows, Python 3.7.9 is the official version, yet CMake
-#       finds and uses Python 3.10.0, which causes problems when we then test
-#       our Python bindings since we use the official version of Python.
+#       finds and uses Python 3.10.0, which causes problems when we then want to
+#       test our Python bindings since we use the official version of Python.
 
 add_subdirectory(extern/pybind11)
 
@@ -67,8 +67,6 @@ include(environmentchecks)
 # Initialise/reset our available targets.
 
 set(TARGETS "install" CACHE INTERNAL "Useful targets.")
-
-# Rebrand the CMake options that are relevant to libOpenCOR.
 
 # [CMAKE_]BUILD_TYPE ==> LIBOPENCOR_BUILD_TYPE.
 
@@ -332,8 +330,8 @@ if(MSVC)
     endif()
 endif()
 
-# If we compile with MinGW (e.g., to build our wheels), we need to define _hypot
-# (see https://github.com/Theano/Theano/issues/4926).
+# If we are using MinGW (e.g., to build our wheels using GitHub Actions) then we
+# need to define _hypot (see https://github.com/Theano/Theano/issues/4926).
 
 if (MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_hypot=hypot")
