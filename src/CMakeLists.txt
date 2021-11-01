@@ -164,7 +164,7 @@ install(EXPORT ${CMAKE_PROJECT_NAME}Targets
         FILE ${CMAKE_PROJECT_NAME}Targets.cmake
         DESTINATION ${CMAKE_PACKAGE_DIR})
 
-set(CONFIG_CMAKE_IN_FILE ${PROJECT_SOURCE_DIR}/cmake/config.cmake.in)
+set(CONFIG_CMAKE_IN_FILE ${PROJECT_SOURCE_DIR}/cmake/packaging/config.cmake.in)
 set(CONFIG_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake)
 
 configure_package_config_file(${CONFIG_CMAKE_IN_FILE} ${CONFIG_CMAKE_FILE}
@@ -183,7 +183,7 @@ install(FILES ${CONFIG_CMAKE_FILE}
 
 set(UNINSTALL_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
 
-configure_file(${PROJECT_SOURCE_DIR}/cmake/uninstall.cmake.in ${UNINSTALL_CMAKE_FILE} @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/uninstall.cmake.in ${UNINSTALL_CMAKE_FILE} @ONLY)
 
 add_target(uninstall
            COMMAND ${CMAKE_COMMAND} -P ${UNINSTALL_CMAKE_FILE}
