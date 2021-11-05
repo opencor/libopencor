@@ -93,6 +93,21 @@ set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
+# Get ready to build external projects.
+
+include(ExternalProject)
+
+if(CMAKE_CXX_COMPILER_LAUNCHER)
+    set(CMAKE_ARGS
+        -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
+    )
+endif()
+
+# Build our different third-party libraries as external projects and statically
+# link them to libOpenCOR.
+
+add_subdirectory(3rdparty)
+
 # Generate the export header file.
 
 generate_export_header(${CMAKE_PROJECT_NAME}
