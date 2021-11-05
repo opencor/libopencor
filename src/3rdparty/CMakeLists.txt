@@ -11,3 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# Build our different third-party libraries as external projects and statically
+# link them to libOpenCOR.
+
+add_subdirectory(libCellML)

@@ -97,9 +97,16 @@ set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
 include(ExternalProject)
 
+if(WIN32)
+    set(EP_BUILD_TYPE ${CMAKE_BUILD_TYPE})
+else()
+    set(EP_BUILD_TYPE Release)
+endif()
+
 if(CMAKE_CXX_COMPILER_LAUNCHER)
     set(CMAKE_ARGS
         -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
+        -DBUILD_TYPE=${EP_BUILD_TYPE}
     )
 endif()
 
