@@ -18,7 +18,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(Version, basic)
+TEST(Version, tests)
 {
     EXPECT_EQ(0x000100U, libOpenCOR::version());
     EXPECT_EQ("0.1.0", libOpenCOR::versionString());
