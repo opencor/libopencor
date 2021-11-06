@@ -188,8 +188,8 @@ function(prepare_test TARGET)
                    ${ARGN})
 
     target_link_libraries(${TARGET}
-                          gtest_main
-                          ${CMAKE_PROJECT_NAME})
+                          PRIVATE gtest_main
+                          PRIVATE ${CMAKE_PROJECT_NAME})
 
     list(APPEND TEST_TARGETS "${TARGET}")
 
