@@ -18,7 +18,7 @@ set(EP_SOURCE_DIR ${CMAKE_BINARY_DIR}/libCellML)
 set(EP_INSTALL_DIR ${EP_SOURCE_DIR}/install)
 
 if(WIN32)
-    if(RELEASE_MODE)
+    if(NOT "${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
         set(DEBUG_TAG)
     else()
         set(DEBUG_TAG d)
