@@ -14,11 +14,17 @@
 
 # Build libCellML as an external project.
 
-set(EP_SOURCE_DIR ${CMAKE_BINARY_DIR}/libCellML)
-set(EP_INSTALL_DIR ${EP_SOURCE_DIR}/install)
+set(PACKAGE_NAME libCellML)
+set(PACKAGE_VERSION 0.2.0)
+set(PACKAGE_REPOSITORY libcellml)
+set(GIT_TAG libopencor)
+set(RELEASE_TAG libopencor)
+
+set(SOURCE_DIR ${CMAKE_BINARY_DIR}/libCellML)
+set(INSTALL_DIR ${SOURCE_DIR}/install)
 
 if(WIN32)
-    if(NOT "${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
+    if(RELEASE_MODE)
         set(DEBUG_TAG)
     else()
         set(DEBUG_TAG d)
@@ -29,15 +35,19 @@ else()
     set(STATIC_LIBRARY ${CMAKE_STATIC_LIBRARY_PREFIX}cellml${CMAKE_STATIC_LIBRARY_SUFFIX})
 endif()
 
-ExternalProject_Add(libCellML
+set(SHA1_FILES
+    lib/${STATIC_LIBRARY}
+)
+
+ExternalProject_Add(${PACKAGE_NAME}
     SOURCE_DIR
-        ${EP_SOURCE_DIR}
+        ${SOURCE_DIR}
     INSTALL_DIR
-        ${EP_INSTALL_DIR}
+        ${INSTALL_DIR}
     GIT_REPOSITORY
-        https://github.com/opencor/libcellml
+        https://github.com/opencor/${PACKAGE_REPOSITORY}
     GIT_TAG
-        libopencor
+        ${GIT_TAG}
     CMAKE_GENERATOR
         ${CMAKE_GENERATOR}
     CMAKE_ARGS
@@ -54,12 +64,20 @@ ExternalProject_Add(libCellML
         <INSTALL_DIR>/lib/${STATIC_LIBRARY}
 )
 
+# Package our external project.
+
+create_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                    PACKAGE_REPOSITORY ${PACKAGE_REPOSITORY}
+                    RELEASE_TAG ${RELEASE_TAG}
+                    PACKAGED_FILES include ${SHA1_FILES}
+                    SHA1_FILES ${SHA1_FILES})
+
 # Statically link libCellML to libOpenCOR.
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-                           $<BUILD_INTERFACE:${EP_INSTALL_DIR}/include>)
+                           $<BUILD_INTERFACE:${INSTALL_DIR}/include>)
 
 add_dependencies(${CMAKE_PROJECT_NAME} libCellML)
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
-                      PRIVATE ${EP_INSTALL_DIR}/lib/${STATIC_LIBRARY})
+                      PRIVATE ${INSTALL_DIR}/lib/${STATIC_LIBRARY})

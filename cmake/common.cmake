@@ -159,6 +159,40 @@ function(check_python_package PACKAGE AVAILABLE)
     endif()
 endfunction()
 
+function(create_package_file PACKAGE_NAME PACKAGE_VERSION)
+    # Parse our different arguments.
+
+    set(OPTIONS)
+    set(ONE_VALUE_KEYWORDS
+        PACKAGE_REPOSITORY
+        RELEASE_TAG
+    )
+    set(MULTI_VALUE_KEYWORDS
+        PACKAGED_FILES
+        SHA1_FILES
+    )
+
+    cmake_parse_arguments(ARG "${OPTIONS}" "${ONE_VALUE_KEYWORDS}" "${MULTI_VALUE_KEYWORDS}" ${ARGN})
+
+    # Make sure that we have at least one SHA-1 file.
+
+    list(LENGTH ARG_SHA1_FILES ARG_SHA1_FILES_COUNT)
+
+    if(ARG_SHA1_FILES_COUNT EQUAL 0)
+        message(FATAL_ERROR "The ${PACKAGE_NAME} package must have at least one SHA-1 file.")
+    endif()
+
+    # Configure and run a CMake script to do the packaging for us, once the
+    # corresponding target has been built.
+
+    set(CREATE_PACKAGE_SCRIPT ${CMAKE_BINARY_DIR}/cmake/create${PACKAGE_NAME}package.cmake)
+
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/createpackage.cmake.in ${CREATE_PACKAGE_SCRIPT} @ONLY)
+
+    add_custom_command(TARGET ${PACKAGE_NAME} POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -P ${CREATE_PACKAGE_SCRIPT})
+endfunction()
+
 macro(add_target TARGET)
     add_custom_target(${TARGET} ${ARGN})
 
