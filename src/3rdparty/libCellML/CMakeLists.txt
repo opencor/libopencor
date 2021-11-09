@@ -19,7 +19,6 @@ set(PACKAGE_VERSION 0.2.0)
 set(PACKAGE_REPOSITORY libcellml)
 set(GIT_TAG libopencor)
 set(RELEASE_TAG libopencor)
-
 set(SOURCE_DIR ${CMAKE_BINARY_DIR}/libCellML)
 set(INSTALL_DIR ${SOURCE_DIR}/install)
 

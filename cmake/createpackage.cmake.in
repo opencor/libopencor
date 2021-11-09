@@ -39,12 +39,10 @@ execute_process(COMMAND ${CMAKE_COMMAND} -E tar -czf ${PACKAGE_FILE} @ARG_PACKAG
                 RESULT_VARIABLE RESULT
                 OUTPUT_QUIET)
 
-# Make sure that the package exists.
+# Calculate the SHA-1 value of our package, if it exists, and let people know
+# how we should call the retrieve_package_file() function.
 
 if(RESULT EQUAL 0 AND EXISTS ${PACKAGE_FILE})
-    # Calculate the SHA-1 value of our package and let people know how we should
-    # call the retrieve_package_file() function.
-
     file(SHA1 ${PACKAGE_FILE} SHA1_VALUE)
 
     string(REPLACE ";" "\n                                  "
@@ -52,9 +50,8 @@ if(RESULT EQUAL 0 AND EXISTS ${PACKAGE_FILE})
 
     message("To retrieve the @PACKAGE_NAME@ package, use:
 retrieve_package_file(\$\{PACKAGE_NAME\} \$\{PACKAGE_VERSION\}
+                      \$\{PACKAGE_REPOSITORY\} \$\{RELEASE_TAG\}
                       \$\{INSTALL_DIR\} ${SHA1_VALUE}
-                      PACKAGE_REPOSITORY \$\{PACKAGE_REPOSITORY\}
-                      RELEASE_TAG \$\{RELEASE_TAG\}
                       SHA1_FILES \$\{SHA1_FILES\}
                       SHA1_VALUES ${SHA1_VALUES})")
 else()
