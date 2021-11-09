@@ -41,9 +41,17 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(WIN32)
         if(RELEASE_MODE)
-            message("Retrieve libCellML...")
+            retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                  ${INSTALL_DIR} ab6d22984d373b135dfe06b5835c5b2776a97d92
+                                  SHA1_FILES ${SHA1_FILES}
+                                  SHA1_VALUES 335aaa3c4de92eaa75b95089b9ff2e6815ca5483)
         else()
-            message("Retrieve libCellML...")
+            retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                  ${INSTALL_DIR} 6524fe386dda33ca78e4e955bcbf5de864523eac
+                                  SHA1_FILES ${SHA1_FILES}
+                                  SHA1_VALUES c3ae15e4d6eaab9b3fb4372c2c4bf8f78c5a29a6)
         endif()
     elseif(APPLE)
         retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
@@ -52,7 +60,11 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
                               SHA1_FILES ${SHA1_FILES}
                               SHA1_VALUES 56f31665a2e9576c5b32601000f4ae6df7aa9f19)
     else()
-        message("Retrieve libCellML...")
+        retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                              ${INSTALL_DIR} cd010dc89b63aa83830106c19d6830a38c2aad99
+                              SHA1_FILES ${SHA1_FILES}
+                              SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
