@@ -12,27 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Check whether we are using the compiler that was used to generate prebuilt
-# versions of our third-party libraries.
-
-set(VALID_PREBUILT_COMPILER FALSE)
-
-if(WIN32)
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-        set(VALID_PREBUILT_COMPILER TRUE)
-    endif()
-elseif(APPLE)
-    if(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-       OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-        set(VALID_PREBUILT_COMPILER TRUE)
-    endif()
-else()
-    if(   "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"
-       OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-       set(VALID_PREBUILT_COMPILER TRUE)
-    endif()
-endif()
-
 # Determine whether we are building in release mode.
 # Note: this only makes sense if we are not in a multi-configuration mode, i.e.
 #       IS_MULTI_CONFIG is equal to FALSE, which is likely to be the case when

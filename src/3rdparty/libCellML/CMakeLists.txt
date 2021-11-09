@@ -38,7 +38,7 @@ set(SHA1_FILES
 
 # Either retrieve or build libCellML.
 
-if(LIBOPENCOR_PREBUILT_LIBCELLML AND VALID_PREBUILT_COMPILER)
+if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(WIN32)
         if(RELEASE_MODE)
             retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
@@ -104,7 +104,7 @@ endif()
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${INSTALL_DIR}/include>)
 
-if(NOT LIBOPENCOR_PREBUILT_LIBCELLML OR NOT VALID_PREBUILT_COMPILER)
+if(NOT LIBOPENCOR_PREBUILT_LIBCELLML)
     add_dependencies(${CMAKE_PROJECT_NAME} libCellML)
 endif()
 

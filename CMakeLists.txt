@@ -341,13 +341,6 @@ if(MSVC)
     endif()
 endif()
 
-# If we are using MinGW (e.g., to build our wheels using GitHub Actions) then we
-# need to define _hypot (see https://github.com/Theano/Theano/issues/4926).
-
-if(MINGW)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_hypot=hypot")
-endif()
-
 # Build libOpenCOR.
 
 add_subdirectory(src)
