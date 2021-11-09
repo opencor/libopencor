@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build libCellML as an external project.
-
 set(PACKAGE_NAME libCellML)
 set(PACKAGE_VERSION 0.2.0)
 set(PACKAGE_REPOSITORY libcellml)
@@ -38,45 +36,65 @@ set(SHA1_FILES
     lib/${STATIC_LIBRARY}
 )
 
-ExternalProject_Add(${PACKAGE_NAME}
-    SOURCE_DIR
-        ${SOURCE_DIR}
-    INSTALL_DIR
-        ${INSTALL_DIR}
-    GIT_REPOSITORY
-        https://github.com/opencor/${PACKAGE_REPOSITORY}
-    GIT_TAG
-        ${GIT_TAG}
-    CMAKE_GENERATOR
-        ${CMAKE_GENERATOR}
-    CMAKE_ARGS
-        ${CMAKE_ARGS}
-        -DBINDINGS_PYTHON=OFF
-        -DBUILD_SHARED=OFF
-        -DCOVERAGE=OFF
-        -DINSTALL_PREFIX=<INSTALL_DIR>
-        -DLLVM_COVERAGE=OFF
-        -DMEMCHECK=OFF
-        -DPYTHON_COVERAGE=OFF
-        -DUNIT_TESTS=OFF
-    BUILD_BYPRODUCTS
-        <INSTALL_DIR>/lib/${STATIC_LIBRARY}
-)
+# Either retrieve or build libCellML.
 
-# Package our external project.
+if(LIBOPENCOR_PREBUILT_LIBCELLML)
+    if(WIN32)
+        if(RELEASE_MODE)
+            message("Retrieve libCellML...")
+        else()
+            message("Retrieve libCellML...")
+        endif()
+    elseif(APPLE)
+        retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                              ${INSTALL_DIR} 062a5e703058fcedf795f99b9bed8a08b3978f5c
+                              SHA1_FILES ${SHA1_FILES}
+                              SHA1_VALUES 56f31665a2e9576c5b32601000f4ae6df7aa9f19)
+    else()
+        message("Retrieve libCellML...")
+    endif()
+else()
+    ExternalProject_Add(${PACKAGE_NAME}
+        SOURCE_DIR
+            ${SOURCE_DIR}
+        INSTALL_DIR
+            ${INSTALL_DIR}
+        GIT_REPOSITORY
+            https://github.com/opencor/${PACKAGE_REPOSITORY}
+        GIT_TAG
+            ${GIT_TAG}
+        CMAKE_GENERATOR
+            ${CMAKE_GENERATOR}
+        CMAKE_ARGS
+            ${CMAKE_ARGS}
+            -DBINDINGS_PYTHON=OFF
+            -DBUILD_SHARED=OFF
+            -DCOVERAGE=OFF
+            -DINSTALL_PREFIX=<INSTALL_DIR>
+            -DLLVM_COVERAGE=OFF
+            -DMEMCHECK=OFF
+            -DPYTHON_COVERAGE=OFF
+            -DUNIT_TESTS=OFF
+        BUILD_BYPRODUCTS
+            <INSTALL_DIR>/lib/${STATIC_LIBRARY}
+    )
 
-create_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                    PACKAGE_REPOSITORY ${PACKAGE_REPOSITORY}
-                    RELEASE_TAG ${RELEASE_TAG}
-                    PACKAGED_FILES include ${SHA1_FILES}
-                    SHA1_FILES ${SHA1_FILES})
+    create_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                        PACKAGE_REPOSITORY ${PACKAGE_REPOSITORY}
+                        RELEASE_TAG ${RELEASE_TAG}
+                        PACKAGED_FILES include ${SHA1_FILES}
+                        SHA1_FILES ${SHA1_FILES})
+endif()
 
 # Statically link libCellML to libOpenCOR.
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${INSTALL_DIR}/include>)
 
-add_dependencies(${CMAKE_PROJECT_NAME} libCellML)
+if(NOT LIBOPENCOR_PREBUILT_LIBCELLML)
+    add_dependencies(${CMAKE_PROJECT_NAME} libCellML)
+endif()
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
                       PRIVATE ${INSTALL_DIR}/lib/${STATIC_LIBRARY})
