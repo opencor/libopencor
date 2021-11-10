@@ -252,3 +252,19 @@ if(CMAKE_C_COMPILER_LAUNCHER AND CMAKE_CXX_COMPILER_LAUNCHER)
         -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
     )
 endif()
+
+# Get ready to use nmake/make for some third-party libraries (e.g., OpenSSL).
+
+if(WIN32)
+    set(MAKE_NMAKE_COMMAND nmake)
+else()
+    set(MAKE_NMAKE_COMMAND make)
+
+    include(ProcessorCount)
+
+    ProcessorCount(PROCESSOR_COUNT)
+
+    if(NOT PROCESSOR_COUNT EQUAL 0)
+        set(MAKE_NMAKE_COMMAND ${MAKE_NMAKE_COMMAND} -j ${PROCESSOR_COUNT})
+    endif()
+endif()
