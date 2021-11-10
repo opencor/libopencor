@@ -94,8 +94,7 @@ else()
     )
 
     create_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                        PACKAGE_REPOSITORY ${PACKAGE_REPOSITORY}
-                        RELEASE_TAG ${RELEASE_TAG}
+                        ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
                         PACKAGED_FILES include ${SHA1_FILES}
                         SHA1_FILES ${SHA1_FILES})
 endif()

@@ -12,14 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function(create_package_file PACKAGE_NAME PACKAGE_VERSION)
+function(create_package_file PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG)
     # Parse our different arguments.
 
     set(OPTIONS)
-    set(ONE_VALUE_KEYWORDS
-        PACKAGE_REPOSITORY
-        RELEASE_TAG
-    )
+    set(ONE_VALUE_KEYWORDS)
     set(MULTI_VALUE_KEYWORDS
         PACKAGED_FILES
         SHA1_FILES
