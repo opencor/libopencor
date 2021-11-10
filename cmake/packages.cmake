@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-function(create_package_file PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG)
+function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG)
     # Parse our different arguments.
 
     set(OPTIONS)
@@ -102,7 +102,7 @@ function(check_sha1_file INSTALL_DIR SHA1_FILE SHA1_VALUE OK)
     set(${OK} ${OK_VALUE} PARENT_SCOPE)
 endfunction()
 
-function(retrieve_package_file PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG INSTALL_DIR SHA1_VALUE)
+function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG INSTALL_DIR SHA1_VALUE)
     # Parse our different arguments.
 
     set(OPTIONS)
