@@ -143,8 +143,7 @@ function(retrieve_package_file PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY R
         set(FULL_PACKAGE_FILE ${INSTALL_DIR}/${PACKAGE_FILE})
         set(PACKAGE_URL "https://github.com/opencor/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
 
-        file(DOWNLOAD ${PACKAGE_URL} ${FULL_PACKAGE_FILE}
-             SHOW_PROGRESS STATUS STATUS)
+        file(DOWNLOAD ${PACKAGE_URL} ${FULL_PACKAGE_FILE} STATUS STATUS)
 
         # Uncompress the package, should we have managed to retrieve it.
 
@@ -153,9 +152,7 @@ function(retrieve_package_file PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY R
         if(${STATUS_CODE} EQUAL 0)
             check_sha1_file(${INSTALL_DIR} ${PACKAGE_FILE} ${SHA1_VALUE} OK)
 
-            if(OK)
-                message(STATUS "Retrieving ${PACKAGE_NAME} package - Success")
-            else()
+            if(NOT OK)
                 message(STATUS "Retrieving ${PACKAGE_NAME} package - Failed")
                 message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) does not have the expected SHA-1 value.")
             endif()
@@ -164,6 +161,11 @@ function(retrieve_package_file PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY R
                             WORKING_DIRECTORY ${INSTALL_DIR}
                             RESULT_VARIABLE RESULT
                             OUTPUT_QUIET ERROR_QUIET)
+
+            if(NOT RESULT EQUAL 0)
+                message(STATUS "Retrieving ${PACKAGE_NAME} package - Failed")
+                message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) could not be uncompressed.")
+            endif()
 
             file(REMOVE ${FULL_PACKAGE_FILE})
         else()
@@ -178,24 +180,23 @@ function(retrieve_package_file PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY R
         # Check that the package's files, if we managed to uncompress the
         # package, have the expected SHA-1 values.
 
-        if(RESULT EQUAL 0)
-            check_sha1_files(${INSTALL_DIR} ${ARG_SHA1_FILES} ${ARG_SHA1_VALUES} OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
+        check_sha1_files(${INSTALL_DIR} "${ARG_SHA1_FILES}" "${ARG_SHA1_VALUES}" OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
 
-            if(NOT OK)
-                message(STATUS "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) is invalid:")
-
-                foreach(SHA1_FILE ${ARG_SHA1_FILES})
-                    if(${SHA1_FILE} IN_LIST INVALID_SHA1_FILES)
-                        message(STATUS " - ${SHA1_FILE} does not have the expected SHA-1 value.")
-                    elseif(${SHA1_FILE} IN_LIST MISSING_SHA1_FILES)
-                        message(STATUS " - ${SHA1_FILE} is missing.")
-                    endif()
-                endforeach()
-
-                message(FATAL_ERROR)
-            endif()
+        if(OK)
+            message(STATUS "Retrieving ${PACKAGE_NAME} package - Success")
         else()
-            message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) could not be uncompressed.")
+            message(STATUS "Retrieving ${PACKAGE_NAME} package - Failed")
+            message(STATUS "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) is invalid:")
+
+            foreach(SHA1_FILE ${ARG_SHA1_FILES})
+                if(${SHA1_FILE} IN_LIST INVALID_SHA1_FILES)
+                    message(STATUS " - ${SHA1_FILE} does not have the expected SHA-1 value.")
+                elseif(${SHA1_FILE} IN_LIST MISSING_SHA1_FILES)
+                    message(STATUS " - ${SHA1_FILE} is missing.")
+                endif()
+            endforeach()
+
+            message(FATAL_ERROR)
         endif()
     endif()
 endfunction()
