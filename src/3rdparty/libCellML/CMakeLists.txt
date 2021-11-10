@@ -27,13 +27,13 @@ if(WIN32)
         set(DEBUG_TAG d)
     endif()
 
-    set(STATIC_LIBRARY libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
+    set(STATIC_LIBRARY lib/libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
 else()
-    set(STATIC_LIBRARY ${CMAKE_STATIC_LIBRARY_PREFIX}cellml${CMAKE_STATIC_LIBRARY_SUFFIX})
+    set(STATIC_LIBRARY lib/${CMAKE_STATIC_LIBRARY_PREFIX}cellml${CMAKE_STATIC_LIBRARY_SUFFIX})
 endif()
 
 set(SHA1_FILES
-    lib/${STATIC_LIBRARY}
+    ${STATIC_LIBRARY}
 )
 
 # Either retrieve or build libCellML.
@@ -90,7 +90,7 @@ else()
             -DPYTHON_COVERAGE=OFF
             -DUNIT_TESTS=OFF
         BUILD_BYPRODUCTS
-            <INSTALL_DIR>/lib/${STATIC_LIBRARY}
+            <INSTALL_DIR>/${STATIC_LIBRARY}
     )
 
     create_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
@@ -109,4 +109,4 @@ if(NOT LIBOPENCOR_PREBUILT_LIBCELLML)
 endif()
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
-                      PRIVATE ${INSTALL_DIR}/lib/${STATIC_LIBRARY})
+                      PRIVATE ${INSTALL_DIR}/${STATIC_LIBRARY})
