@@ -56,9 +56,9 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     elseif(APPLE)
         retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
                               ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                              ${INSTALL_DIR} 062a5e703058fcedf795f99b9bed8a08b3978f5c
+                              ${INSTALL_DIR} f4bf2a8d6279b2e98d4508b2d508bb1df6e67708
                               SHA1_FILES ${SHA1_FILES}
-                              SHA1_VALUES 56f31665a2e9576c5b32601000f4ae6df7aa9f19)
+                              SHA1_VALUES 5e50877d730583360fab06be3feaa5bfec76ccc8)
     else()
         retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
                               ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
