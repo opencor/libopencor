@@ -93,23 +93,6 @@ set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
-# Get ready to build external projects.
-
-include(ExternalProject)
-
-if(WIN32)
-    set(EP_BUILD_TYPE ${CMAKE_BUILD_TYPE})
-else()
-    set(EP_BUILD_TYPE Release)
-endif()
-
-if(CMAKE_CXX_COMPILER_LAUNCHER)
-    set(CMAKE_ARGS
-        -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
-        -DBUILD_TYPE=${EP_BUILD_TYPE}
-    )
-endif()
-
 # Build our different third-party libraries as external projects and statically
 # link them to libOpenCOR.
 

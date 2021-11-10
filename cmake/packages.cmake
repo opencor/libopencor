@@ -200,6 +200,10 @@ function(retrieve_package_file PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY R
     endif()
 endfunction()
 
+# Get ready to build external projects.
+
+include(ExternalProject)
+
 # Determine whether we are building in release mode.
 # Note: this only makes sense if we are not in a multi-configuration mode, i.e.
 #       IS_MULTI_CONFIG is equal to FALSE, which is likely to be the case when
@@ -223,4 +227,28 @@ elseif(APPLE)
     set(TARGET_PLATFORM macos)
 else()
     set(TARGET_PLATFORM linux)
+endif()
+
+# Build our third-party libraries the same way that we build libOpenCOR.
+# Note: the build type on Linux/macOS is always Release since we don't need to
+#       debug third-party libraries and a debug library can use release
+#       libraries.
+
+if(WIN32)
+    set(EP_BUILD_TYPE ${LIBOPENCOR_BUILD_TYPE})
+else()
+    set(EP_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_ARGS
+    -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+    -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+    -DBUILD_TYPE=${EP_BUILD_TYPE}
+)
+
+if(CMAKE_C_COMPILER_LAUNCHER AND CMAKE_CXX_COMPILER_LAUNCHER)
+    list(APPEND CMAKE_ARGS
+        -DCMAKE_C_COMPILER_LAUNCHER=${CMAKE_C_COMPILER_LAUNCHER}
+        -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
+    )
 endif()
