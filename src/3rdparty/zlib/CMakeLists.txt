@@ -11,3 +11,69 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+set(PACKAGE_NAME zlib)
+set(PACKAGE_VERSION 1.2.11)
+set(PACKAGE_REPOSITORY zlib)
+set(GIT_TAG v1.2.11-libopencor)
+set(RELEASE_TAG v1.2.11-libopencor)
+set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
+
+if(WIN32)
+    if(RELEASE_MODE)
+        set(DEBUG_TAG)
+    else()
+        set(DEBUG_TAG d)
+    endif()
+
+    set(STATIC_LIBRARY lib/zlib${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
+else()
+    set(STATIC_LIBRARY lib/${CMAKE_STATIC_LIBRARY_PREFIX}z${CMAKE_STATIC_LIBRARY_SUFFIX})
+endif()
+
+set(SHA1_FILES
+    ${STATIC_LIBRARY}
+)
+
+# Either retrieve or build zlib.
+
+if(LIBOPENCOR_PREBUILT_ZLIB)
+    if(WIN32)
+        if(RELEASE_MODE)
+            message(">>> Retrieving zlib...")
+        else()
+            message(">>> Retrieving zlib...")
+        endif()
+    elseif(APPLE)
+        message(">>> Retrieving zlib...")
+    else()
+        message(">>> Retrieving zlib...")
+    endif()
+else()
+    if(WIN32)
+        set(PACKAGE_C_FLAGS "${CMAKE_C_FLAGS} /wd4267")
+    endif()
+
+    ExternalProject_Add(${PACKAGE_NAME}
+        GIT_REPOSITORY
+            https://github.com/opencor/${PACKAGE_REPOSITORY}
+        GIT_TAG
+            ${GIT_TAG}
+        GIT_SHALLOW
+        CMAKE_CACHE_ARGS
+            -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
+        CMAKE_GENERATOR
+            ${CMAKE_GENERATOR}
+        CMAKE_ARGS
+            ${CMAKE_ARGS}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+        BUILD_BYPRODUCTS
+            ${INSTALL_DIR}/${STATIC_LIBRARY}
+    )
+
+    create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                   ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                   PACKAGED_FILES include ${SHA1_FILES}
+                   SHA1_FILES ${SHA1_FILES})
+endif()
