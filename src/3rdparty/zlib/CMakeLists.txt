@@ -40,14 +40,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_ZLIB)
     if(WIN32)
         if(RELEASE_MODE)
-            message(">>> Retrieving zlib...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             c4be57eacfb7b16300032b1899ed7e58140ce839
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES c4151de005db5a70d308f37ff539779f50982a38)
         else()
-            message(">>> Retrieving zlib...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             8d21ae751d6d1e049c80dd73a729636461651f6a
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES a7f3f70e5469c2262a110a1d79d3052f9b681abb)
         endif()
     elseif(APPLE)
-        message(">>> Retrieving zlib...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         48fe846a4d708e208eaf7f992d2596ad82cf863d
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 82c44538bc862239311fd4da5ed795dd62dfe681)
     else()
-        message(">>> Retrieving zlib...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         342d1bbd140f7b5f0a25fef0eea19c0fa758cb79
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES d8031204aefc9e5bcfe6669610ff143cfdd9a986)
     endif()
 else()
     if(WIN32)
