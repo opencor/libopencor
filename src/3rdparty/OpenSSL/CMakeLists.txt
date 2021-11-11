@@ -17,8 +17,7 @@ set(PACKAGE_VERSION 1.1.1l)
 set(PACKAGE_REPOSITORY openssl)
 set(GIT_TAG OpenSSL_1_1_1l)
 set(RELEASE_TAG OpenSSL_1_1_1l-libopencor)
-set(SOURCE_DIR ${CMAKE_BINARY_DIR}/OpenSSL)
-set(INSTALL_DIR ${SOURCE_DIR}/install)
+set(INSTALL_DIR ${CMAKE_BINARY_DIR}/OpenSSL)
 
 if(WIN32)
     set(CRYPTO_STATIC_LIBRARY lib/libcrypto_static${CMAKE_STATIC_LIBRARY_SUFFIX})
@@ -73,10 +72,6 @@ else()
     endif()
 
     ExternalProject_Add(${PACKAGE_NAME}
-        SOURCE_DIR
-            ${SOURCE_DIR}
-        INSTALL_DIR
-            ${INSTALL_DIR}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
@@ -89,8 +84,8 @@ else()
         INSTALL_COMMAND
             ${MAKE_NMAKE_COMMAND} install_sw
         BUILD_BYPRODUCTS
-            <INSTALL_DIR>/${CRYPTO_STATIC_LIBRARY}
-            <INSTALL_DIR>/${SSL_STATIC_LIBRARY}
+            ${INSTALL_DIR}/${CRYPTO_STATIC_LIBRARY}
+            ${INSTALL_DIR}/${SSL_STATIC_LIBRARY}
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}

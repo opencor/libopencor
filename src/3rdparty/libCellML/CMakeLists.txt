@@ -17,8 +17,7 @@ set(PACKAGE_VERSION 0.2.0)
 set(PACKAGE_REPOSITORY libcellml)
 set(GIT_TAG libopencor)
 set(RELEASE_TAG libopencor)
-set(SOURCE_DIR ${CMAKE_BINARY_DIR}/libCellML)
-set(INSTALL_DIR ${SOURCE_DIR}/install)
+set(INSTALL_DIR ${CMAKE_BINARY_DIR}/libCellML)
 
 if(WIN32)
     if(RELEASE_MODE)
@@ -68,10 +67,6 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
-        SOURCE_DIR
-            ${SOURCE_DIR}
-        INSTALL_DIR
-            ${INSTALL_DIR}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
@@ -84,13 +79,13 @@ else()
             -DBINDINGS_PYTHON=OFF
             -DBUILD_SHARED=OFF
             -DCOVERAGE=OFF
-            -DINSTALL_PREFIX=<INSTALL_DIR>
+            -DINSTALL_PREFIX=${INSTALL_DIR}
             -DLLVM_COVERAGE=OFF
             -DMEMCHECK=OFF
             -DPYTHON_COVERAGE=OFF
             -DUNIT_TESTS=OFF
         BUILD_BYPRODUCTS
-            <INSTALL_DIR>/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
