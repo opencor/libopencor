@@ -43,7 +43,7 @@ function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_
                        COMMAND ${CMAKE_COMMAND} -P ${CREATE_PACKAGE_SCRIPT})
 endfunction()
 
-function(check_sha1_files INSTALL_DIR SHA1_FILES SHA1_VALUES OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
+function(check_sha1_files PACKAGE_NAME SHA1_FILES SHA1_VALUES OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
     # By default, everything is OK.
 
     set(OK_VALUE TRUE)
@@ -62,7 +62,7 @@ function(check_sha1_files INSTALL_DIR SHA1_FILES SHA1_VALUES OK INVALID_SHA1_FIL
             list(GET SHA1_FILES ${I} SHA1_FILE)
             list(GET SHA1_VALUES ${I} SHA1_VALUE)
 
-            set(REAL_SHA1_FILE ${INSTALL_DIR}/${SHA1_FILE})
+            set(REAL_SHA1_FILE ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}/${SHA1_FILE})
 
             if(EXISTS ${REAL_SHA1_FILE})
                 file(SHA1 ${REAL_SHA1_FILE} REAL_SHA1_VALUE)
@@ -94,15 +94,15 @@ function(check_sha1_files INSTALL_DIR SHA1_FILES SHA1_VALUES OK INVALID_SHA1_FIL
     set(${MISSING_SHA1_FILES} ${MISSING_SHA1_FILES_VALUE} PARENT_SCOPE)
 endfunction()
 
-function(check_sha1_file INSTALL_DIR SHA1_FILE SHA1_VALUE OK)
+function(check_sha1_file PACKAGE_NAME SHA1_FILE SHA1_VALUE OK)
     # Convenience function to check one SHA-1 file.
 
-    check_sha1_files(${INSTALL_DIR} ${SHA1_FILE} ${SHA1_VALUE} OK_VALUE INVALID_SHA1_FILES_VALUE MISSING_SHA1_FILES_VALUE)
+    check_sha1_files(${PACKAGE_NAME} ${SHA1_FILE} ${SHA1_VALUE} OK_VALUE INVALID_SHA1_FILES_VALUE MISSING_SHA1_FILES_VALUE)
 
     set(${OK} ${OK_VALUE} PARENT_SCOPE)
 endfunction()
 
-function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG INSTALL_DIR SHA1_VALUE)
+function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG SHA1_VALUE)
     # Parse our different arguments.
 
     set(OPTIONS)
@@ -126,13 +126,15 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
 
     # Create our installation directory, if needed.
 
+    set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
+
     if(NOT EXISTS ${INSTALL_DIR})
         file(MAKE_DIRECTORY ${INSTALL_DIR})
     endif()
 
     # Check whether the package has already been retrieved.
 
-    check_sha1_files(${INSTALL_DIR} "${ARG_SHA1_FILES}" "${ARG_SHA1_VALUES}" OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
+    check_sha1_files(${PACKAGE_NAME} "${ARG_SHA1_FILES}" "${ARG_SHA1_VALUES}" OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
 
     if(NOT OK)
         # Retrieve the package.
@@ -150,7 +152,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         list(GET STATUS 0 STATUS_CODE)
 
         if(${STATUS_CODE} EQUAL 0)
-            check_sha1_file(${INSTALL_DIR} ${PACKAGE_FILE} ${SHA1_VALUE} OK)
+            check_sha1_file(${PACKAGE_NAME} ${PACKAGE_FILE} ${SHA1_VALUE} OK)
 
             if(NOT OK)
                 message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
@@ -180,7 +182,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         # Check that the package's files, if we managed to uncompress the
         # package, have the expected SHA-1 values.
 
-        check_sha1_files(${INSTALL_DIR} "${ARG_SHA1_FILES}" "${ARG_SHA1_VALUES}" OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
+        check_sha1_files(${PACKAGE_NAME} "${ARG_SHA1_FILES}" "${ARG_SHA1_VALUES}" OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
 
         if(OK)
             message(STATUS "Retrieving Package ${PACKAGE_NAME} - Success")
