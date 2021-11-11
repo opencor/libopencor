@@ -40,14 +40,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBCURL)
     if(WIN32)
         if(RELEASE_MODE)
-            message(">>> Retrieving libcurl...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             b50dc97d2554b6d684de735e10ad922c8ea9f1f4
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES b48d851d698330786b0f2c5c38db15b4ab4d6523)
         else()
-            message(">>> Retrieving libcurl...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             a251be70c7334009c49a12ddbabc85b0c2a5d14c
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES 067338ce85a7c64ef7c1489b854ea16c3d120b86)
         endif()
     elseif(APPLE)
-        message(">>> Retrieving libcurl...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         34a35493797ae85a8607e691ac1e687ca2dec550
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES cc3e922325223f7f4a8b56f6af7ec42a3f0f3f8d)
     else()
-        message(">>> Retrieving libcurl...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         7c12dbc93648b8630ee1a2abfb668caa7592b7c4
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES cb35dc824ca1645eee67926f3182304c171d3fc3)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
