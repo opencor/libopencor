@@ -23,7 +23,7 @@ if(WIN32)
     if(RELEASE_MODE)
         set(DEBUG_TAG)
     else()
-        set(DEBUG_TAG d)
+        set(DEBUG_TAG -d)
     endif()
 
     set(STATIC_LIBRARY lib/libcurl${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
