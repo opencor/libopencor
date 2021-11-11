@@ -49,7 +49,7 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
 else()
     find_package(Perl REQUIRED QUIET)
 
-    set(CONFIG_OPTIONS no-pic no-shared no-threads --prefix=${INSTALL_DIR})
+    set(CONFIG_OPTIONS no-pic no-shared no-tests no-threads --prefix=${INSTALL_DIR})
 
     if(WIN32)
         list(APPEND CONFIG_OPTIONS no-asm)
