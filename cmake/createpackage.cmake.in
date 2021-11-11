@@ -51,7 +51,7 @@ if(RESULT EQUAL 0 AND EXISTS ${PACKAGE_FILE})
     message("To retrieve the @PACKAGE_NAME@ package, use:
 retrieve_package(\$\{PACKAGE_NAME\} \$\{PACKAGE_VERSION\}
                  \$\{PACKAGE_REPOSITORY\} \$\{RELEASE_TAG\}
-                 \$\{INSTALL_DIR\} ${SHA1_VALUE}
+                 ${SHA1_VALUE}
                  SHA1_FILES \$\{SHA1_FILES\}
                  SHA1_VALUES ${SHA1_VALUES})")
 else()

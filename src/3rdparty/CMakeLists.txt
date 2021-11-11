@@ -19,3 +19,4 @@ include(packages)
 
 add_subdirectory(libCellML)
 add_subdirectory(OpenSSL)
+add_subdirectory(zlib)

@@ -17,7 +17,7 @@ set(PACKAGE_VERSION 0.2.0)
 set(PACKAGE_REPOSITORY libcellml)
 set(GIT_TAG libopencor)
 set(RELEASE_TAG libopencor)
-set(INSTALL_DIR ${CMAKE_BINARY_DIR}/libCellML)
+set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
 if(WIN32)
     if(RELEASE_MODE)
@@ -42,26 +42,26 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ${INSTALL_DIR} ab6d22984d373b135dfe06b5835c5b2776a97d92
+                         ab6d22984d373b135dfe06b5835c5b2776a97d92
                          SHA1_FILES ${SHA1_FILES}
                          SHA1_VALUES 335aaa3c4de92eaa75b95089b9ff2e6815ca5483)
         else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ${INSTALL_DIR} 6524fe386dda33ca78e4e955bcbf5de864523eac
+                         6524fe386dda33ca78e4e955bcbf5de864523eac
                          SHA1_FILES ${SHA1_FILES}
                          SHA1_VALUES c3ae15e4d6eaab9b3fb4372c2c4bf8f78c5a29a6)
         endif()
     elseif(APPLE)
     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                     ${INSTALL_DIR} f4bf2a8d6279b2e98d4508b2d508bb1df6e67708
+                     f4bf2a8d6279b2e98d4508b2d508bb1df6e67708
                      SHA1_FILES ${SHA1_FILES}
                      SHA1_VALUES 5e50877d730583360fab06be3feaa5bfec76ccc8)
     else()
     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                     ${INSTALL_DIR} cd010dc89b63aa83830106c19d6830a38c2aad99
+                     cd010dc89b63aa83830106c19d6830a38c2aad99
                      SHA1_FILES ${SHA1_FILES}
                      SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
     endif()
