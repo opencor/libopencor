@@ -37,14 +37,34 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_OPENSSL)
     if(WIN32)
         if(RELEASE_MODE)
-            message(">>> Retrieve the OpenSSL package...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             ${INSTALL_DIR} 2396d2043778d84fd6d9370da0e069255aa74ee7
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES 16ea3b7ba3fc198efd4457c70f0b7ff9983fe90b
+                                         00855e72eeb37584b3c396192941a938fd19b063)
         else()
-            message(">>> Retrieve the OpenSSL package...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             ${INSTALL_DIR} 2f2bdd45270d39e72aad5fc8ac15f52dcb91abf7
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES b5267fa182f655a35d6ee4d7b4e536515672e00f
+                                         2ff863091fc65738f50e604d2c00244e3acf9313)
         endif()
     elseif(APPLE)
-        message(">>> Retrieve the OpenSSL package...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         ${INSTALL_DIR} dc863a1aa7b310c6ab27d1b740f7d50838e85086
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES ee1b0d58ed6dd8be5c7014e0d4517dd376458428
+                                     4da4b3295ff7e8c47be5b66c1b1814e0db1fd617)
     else()
-        message(">>> Retrieve the OpenSSL package...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         ${INSTALL_DIR} 9dc97c29174509c42636858631ef5a7908c87553
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 592914a5e4315aa37b7500c940f736bc9d6c6a2a
+                                     537926b7ce87bcf2a84a4dee0155c11df21c5050)
     endif()
 else()
     find_package(Perl REQUIRED QUIET)
