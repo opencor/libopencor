@@ -21,8 +21,8 @@ set(SOURCE_DIR ${CMAKE_BINARY_DIR}/OpenSSL)
 set(INSTALL_DIR ${SOURCE_DIR}/install)
 
 if(WIN32)
-    set(CRYPTO_STATIC_LIBRARY lib/libcrypto${CMAKE_STATIC_LIBRARY_SUFFIX})
-    set(SSL_STATIC_LIBRARY lib/libssl${CMAKE_STATIC_LIBRARY_SUFFIX})
+    set(CRYPTO_STATIC_LIBRARY lib/libcrypto_static${CMAKE_STATIC_LIBRARY_SUFFIX})
+    set(SSL_STATIC_LIBRARY lib/libssl_static${CMAKE_STATIC_LIBRARY_SUFFIX})
 else()
     set(CRYPTO_STATIC_LIBRARY lib/${CMAKE_STATIC_LIBRARY_PREFIX}crypto${CMAKE_STATIC_LIBRARY_SUFFIX})
     set(SSL_STATIC_LIBRARY lib/${CMAKE_STATIC_LIBRARY_PREFIX}ssl${CMAKE_STATIC_LIBRARY_SUFFIX})
@@ -50,7 +50,7 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
 else()
     find_package(Perl REQUIRED QUIET)
 
-    set(CONFIG_OPTIONS --prefix=${INSTALL_DIR})
+    set(CONFIG_OPTIONS no-pic no-shared no-threads --prefix=${INSTALL_DIR})
 
     if(WIN32)
         list(APPEND CONFIG_OPTIONS no-asm)
@@ -61,8 +61,6 @@ else()
             set(PLATFORM debug-VC-WIN64A)
         endif()
     else()
-        list(APPEND CONFIG_OPTIONS shared)
-
         if(APPLE)
             set(PLATFORM darwin64-x86_64-cc)
 
