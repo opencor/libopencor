@@ -12,32 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Determine whether we are building in release mode.
-# Note: this only makes sense if we are not in a multi-configuration mode, i.e.
-#       IS_MULTI_CONFIG is equal to FALSE, which is likely to be the case when
-#       building a third-party library.
-
-if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
-    set(RELEASE_MODE FALSE)
-else()
-    set(RELEASE_MODE TRUE)
-endif()
-
-# Determine the platform on which we are.
-
-if(WIN32)
-    if(RELEASE_MODE)
-        set(TARGET_PLATFORM windows.release)
-    else()
-        set(TARGET_PLATFORM windows.debug)
-    endif()
-elseif(APPLE)
-    set(TARGET_PLATFORM macos)
-else()
-    set(TARGET_PLATFORM linux)
-endif()
-
 # Build our different third-party libraries as external projects and statically
 # link them to libOpenCOR.
 
+include(packages)
+
 add_subdirectory(libCellML)
+add_subdirectory(OpenSSL)

@@ -17,8 +17,7 @@ set(PACKAGE_VERSION 0.2.0)
 set(PACKAGE_REPOSITORY libcellml)
 set(GIT_TAG libopencor)
 set(RELEASE_TAG libopencor)
-set(SOURCE_DIR ${CMAKE_BINARY_DIR}/libCellML)
-set(INSTALL_DIR ${SOURCE_DIR}/install)
+set(INSTALL_DIR ${CMAKE_BINARY_DIR}/libCellML)
 
 if(WIN32)
     if(RELEASE_MODE)
@@ -27,13 +26,13 @@ if(WIN32)
         set(DEBUG_TAG d)
     endif()
 
-    set(STATIC_LIBRARY libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
+    set(STATIC_LIBRARY lib/libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
 else()
-    set(STATIC_LIBRARY ${CMAKE_STATIC_LIBRARY_PREFIX}cellml${CMAKE_STATIC_LIBRARY_SUFFIX})
+    set(STATIC_LIBRARY lib/${CMAKE_STATIC_LIBRARY_PREFIX}cellml${CMAKE_STATIC_LIBRARY_SUFFIX})
 endif()
 
 set(SHA1_FILES
-    lib/${STATIC_LIBRARY}
+    ${STATIC_LIBRARY}
 )
 
 # Either retrieve or build libCellML.
@@ -41,41 +40,38 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(WIN32)
         if(RELEASE_MODE)
-            retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                  ${INSTALL_DIR} ab6d22984d373b135dfe06b5835c5b2776a97d92
-                                  SHA1_FILES ${SHA1_FILES}
-                                  SHA1_VALUES 335aaa3c4de92eaa75b95089b9ff2e6815ca5483)
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         ${INSTALL_DIR} ab6d22984d373b135dfe06b5835c5b2776a97d92
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 335aaa3c4de92eaa75b95089b9ff2e6815ca5483)
         else()
-            retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                  ${INSTALL_DIR} 6524fe386dda33ca78e4e955bcbf5de864523eac
-                                  SHA1_FILES ${SHA1_FILES}
-                                  SHA1_VALUES c3ae15e4d6eaab9b3fb4372c2c4bf8f78c5a29a6)
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         ${INSTALL_DIR} 6524fe386dda33ca78e4e955bcbf5de864523eac
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES c3ae15e4d6eaab9b3fb4372c2c4bf8f78c5a29a6)
         endif()
     elseif(APPLE)
-        retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                              ${INSTALL_DIR} 062a5e703058fcedf795f99b9bed8a08b3978f5c
-                              SHA1_FILES ${SHA1_FILES}
-                              SHA1_VALUES 56f31665a2e9576c5b32601000f4ae6df7aa9f19)
+    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                     ${INSTALL_DIR} f4bf2a8d6279b2e98d4508b2d508bb1df6e67708
+                     SHA1_FILES ${SHA1_FILES}
+                     SHA1_VALUES 5e50877d730583360fab06be3feaa5bfec76ccc8)
     else()
-        retrieve_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                              ${INSTALL_DIR} cd010dc89b63aa83830106c19d6830a38c2aad99
-                              SHA1_FILES ${SHA1_FILES}
-                              SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
+    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                     ${INSTALL_DIR} cd010dc89b63aa83830106c19d6830a38c2aad99
+                     SHA1_FILES ${SHA1_FILES}
+                     SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
-        SOURCE_DIR
-            ${SOURCE_DIR}
-        INSTALL_DIR
-            ${INSTALL_DIR}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
             ${GIT_TAG}
+        GIT_SHALLOW
         CMAKE_GENERATOR
             ${CMAKE_GENERATOR}
         CMAKE_ARGS
@@ -83,20 +79,19 @@ else()
             -DBINDINGS_PYTHON=OFF
             -DBUILD_SHARED=OFF
             -DCOVERAGE=OFF
-            -DINSTALL_PREFIX=<INSTALL_DIR>
+            -DINSTALL_PREFIX=${INSTALL_DIR}
             -DLLVM_COVERAGE=OFF
             -DMEMCHECK=OFF
             -DPYTHON_COVERAGE=OFF
             -DUNIT_TESTS=OFF
         BUILD_BYPRODUCTS
-            <INSTALL_DIR>/lib/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
 
-    create_package_file(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                        PACKAGE_REPOSITORY ${PACKAGE_REPOSITORY}
-                        RELEASE_TAG ${RELEASE_TAG}
-                        PACKAGED_FILES include ${SHA1_FILES}
-                        SHA1_FILES ${SHA1_FILES})
+    create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                   ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                   PACKAGED_FILES include ${SHA1_FILES}
+                   SHA1_FILES ${SHA1_FILES})
 endif()
 
 # Statically link libCellML to libOpenCOR.
@@ -109,4 +104,4 @@ if(NOT LIBOPENCOR_PREBUILT_LIBCELLML)
 endif()
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
-                      PRIVATE ${INSTALL_DIR}/lib/${STATIC_LIBRARY})
+                      PRIVATE ${INSTALL_DIR}/${STATIC_LIBRARY})

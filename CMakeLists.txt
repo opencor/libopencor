@@ -32,11 +32,15 @@ if(NOT RESULT EQUAL 0)
     message(FATAL_ERROR "Git submodules could not be retrieved.")
 endif()
 
-# Enable C++11 and later.
+# Enable C++11 which, on macOS, means that we can deploy on OS X 10.9 and later.
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(APPLE AND "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
+endif()
 
 # Some common CMake functions/macros.
 
@@ -205,6 +209,17 @@ endif()
 
 unset(PREBUILT_LIBCELLML CACHE)
 
+# PREBUILT_OPENSSL ==> LIBOPENCOR_PREBUILT_OPENSSL.
+
+set(DOCSTRING "Use the prebuilt version of OpenSSL.")
+set(LIBOPENCOR_PREBUILT_OPENSSL ON CACHE BOOL "${DOCSTRING}")
+
+if(DEFINED PREBUILT_OPENSSL)
+    set(LIBOPENCOR_PREBUILT_OPENSSL ${PREBUILT_OPENSSL} CACHE BOOL "${DOCSTRING}" FORCE)
+endif()
+
+unset(PREBUILT_OPENSSL CACHE)
+
 # PYTHON_BINDINGS ==> LIBOPENCOR_PYTHON_BINDINGS.
 
 if(PYTHON_BINDINGS_AVAILABLE)
@@ -309,38 +324,6 @@ if(LIBOPENCOR_PYTHON_UNIT_TESTING)
     endif()
 endif()
 
-# Enable compiler caching.
-
-if(LIBOPENCOR_COMPILER_CACHING)
-    if(BUILDCACHE_EXE)
-        set(CMAKE_CXX_COMPILER_LAUNCHER ${BUILDCACHE_EXE})
-    elseif(CLCACHE_EXE)
-        set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
-
-        execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/clcachewrapper.c
-                        RESULT_VARIABLE RESULT
-                        OUTPUT_QUIET ERROR_QUIET)
-
-        if(RESULT EQUAL 0)
-            set(CMAKE_CXX_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
-        endif()
-    else()
-        set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_EXE})
-    endif()
-endif()
-
-# On Windows, if we are using MSVC then replace some compiler flags.
-
-if(MSVC)
-    # Replace the /Zi option (i.e. enable debugging information), if present,
-    # with the /Z7 option (i.e. enable old-style debugging information)
-    # otherwise caching (be it with buildcache or clcache) won't work.
-
-    if(BUILDCACHE_EXE OR CLCACHE_EXE)
-        replace_compiler_flag("/Zi" "/Z7")
-    endif()
-endif()
-
 # Build libOpenCOR.
 
 add_subdirectory(src)
@@ -413,6 +396,10 @@ endif()
 
 if(DEFINED LIBOPENCOR_PREBUILT_LIBCELLML)
     message(STATUS " - LIBOPENCOR_PREBUILT_LIBCELLML:      ${LIBOPENCOR_PREBUILT_LIBCELLML}")
+endif()
+
+if(DEFINED LIBOPENCOR_PREBUILT_OPENSSL)
+    message(STATUS " - LIBOPENCOR_PREBUILT_OPENSSL:        ${LIBOPENCOR_PREBUILT_OPENSSL}")
 endif()
 
 if(DEFINED LIBOPENCOR_PYTHON_BINDINGS)

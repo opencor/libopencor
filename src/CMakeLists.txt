@@ -12,7 +12,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include(GenerateExportHeader)
+# Enable compiler caching.
+
+if(LIBOPENCOR_COMPILER_CACHING)
+    if(BUILDCACHE_EXE)
+        set(CMAKE_C_COMPILER_LAUNCHER ${BUILDCACHE_EXE})
+        set(CMAKE_CXX_COMPILER_LAUNCHER ${BUILDCACHE_EXE})
+    elseif(CLCACHE_EXE)
+        set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
+
+        execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/clcachewrapper.c
+                        RESULT_VARIABLE RESULT
+                        OUTPUT_QUIET ERROR_QUIET)
+
+        if(RESULT EQUAL 0)
+            set(CMAKE_C_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
+            set(CMAKE_CXX_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
+        endif()
+    else()
+        set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_EXE})
+        set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_EXE})
+    endif()
+endif()
+
+# On Windows, if we are using MSVC then replace some compiler flags.
+
+if(MSVC)
+    # Replace the /Zi option (i.e. enable debugging information), if present,
+    # with the /Z7 option (i.e. enable old-style debugging information)
+    # otherwise caching (be it with buildcache or clcache) won't work.
+
+    if(BUILDCACHE_EXE OR CLCACHE_EXE)
+        replace_compiler_flag("/Zi" "/Z7")
+    endif()
+endif()
 
 # Configure the version file.
 
@@ -93,29 +126,14 @@ set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
-# Get ready to build external projects.
-
-include(ExternalProject)
-
-if(WIN32)
-    set(EP_BUILD_TYPE ${CMAKE_BUILD_TYPE})
-else()
-    set(EP_BUILD_TYPE Release)
-endif()
-
-if(CMAKE_CXX_COMPILER_LAUNCHER)
-    set(CMAKE_ARGS
-        -DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}
-        -DBUILD_TYPE=${EP_BUILD_TYPE}
-    )
-endif()
-
 # Build our different third-party libraries as external projects and statically
 # link them to libOpenCOR.
 
 add_subdirectory(3rdparty)
 
 # Generate the export header file.
+
+include(GenerateExportHeader)
 
 generate_export_header(${CMAKE_PROJECT_NAME}
                        EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
