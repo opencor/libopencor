@@ -17,6 +17,12 @@
 
 include(packages)
 
-add_subdirectory(libCellML)
+# Prerequisite for some third-party libraries.
+
 add_subdirectory(OpenSSL)
 add_subdirectory(zlib)
+
+# Required third-party libraries.
+
+add_subdirectory(libCellML)
+add_subdirectory(libcurl)
