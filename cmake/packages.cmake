@@ -137,7 +137,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
     if(NOT OK)
         # Retrieve the package.
 
-        message(STATUS "Retrieving ${PACKAGE_NAME} package")
+        message(STATUS "Retrieving Package ${PACKAGE_NAME}")
 
         set(PACKAGE_FILE ${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM}.tar.gz)
         set(FULL_PACKAGE_FILE ${INSTALL_DIR}/${PACKAGE_FILE})
@@ -153,7 +153,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
             check_sha1_file(${INSTALL_DIR} ${PACKAGE_FILE} ${SHA1_VALUE} OK)
 
             if(NOT OK)
-                message(STATUS "Retrieving ${PACKAGE_NAME} package - Failed")
+                message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
                 message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) does not have the expected SHA-1 value.")
             endif()
 
@@ -163,7 +163,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
                             OUTPUT_QUIET ERROR_QUIET)
 
             if(NOT RESULT EQUAL 0)
-                message(STATUS "Retrieving ${PACKAGE_NAME} package - Failed")
+                message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
                 message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) could not be uncompressed.")
             endif()
 
@@ -173,7 +173,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
             # Note: this is in case we had an HTTP/S error of sorts, in which
             #       case we would end up with an empty file.
 
-            message(STATUS "Retrieving ${PACKAGE_NAME} package - Failed")
+            message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
             message(FATAL_ERROR "The ${PACKAGE_NAME} package could not be retrieved from ${PACKAGE_URL}.")
         endif()
 
@@ -183,9 +183,9 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         check_sha1_files(${INSTALL_DIR} "${ARG_SHA1_FILES}" "${ARG_SHA1_VALUES}" OK INVALID_SHA1_FILES MISSING_SHA1_FILES)
 
         if(OK)
-            message(STATUS "Retrieving ${PACKAGE_NAME} package - Success")
+            message(STATUS "Retrieving Package ${PACKAGE_NAME} - Success")
         else()
-            message(STATUS "Retrieving ${PACKAGE_NAME} package - Failed")
+            message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
             message(STATUS "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) is invalid:")
 
             foreach(SHA1_FILE ${ARG_SHA1_FILES})
