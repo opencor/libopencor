@@ -35,7 +35,7 @@ set(SHA1_FILES
     ${STATIC_LIBRARY}
 )
 
-# Either retrieve or build zlib.
+# Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_ZLIB)
     if(WIN32)

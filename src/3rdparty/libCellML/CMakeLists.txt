@@ -35,7 +35,7 @@ set(SHA1_FILES
     ${STATIC_LIBRARY}
 )
 
-# Either retrieve or build libCellML.
+# Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(WIN32)
@@ -94,7 +94,7 @@ else()
                    SHA1_FILES ${SHA1_FILES})
 endif()
 
-# Statically link libCellML to libOpenCOR.
+# Statically link our package to libOpenCOR.
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${INSTALL_DIR}/include>)
