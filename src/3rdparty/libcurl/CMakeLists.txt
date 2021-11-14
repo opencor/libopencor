@@ -98,7 +98,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${INSTALL_DIR}/include>)
 
 if(NOT LIBOPENCOR_PREBUILT_LIBCURL)
-    add_dependencies(${CMAKE_PROJECT_NAME} libcurl)
+    add_dependencies(${CMAKE_PROJECT_NAME} ${PACKAGE_NAME})
 endif()
 
 target_link_libraries(${CMAKE_PROJECT_NAME}
