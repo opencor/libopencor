@@ -62,6 +62,7 @@ else()
             ${CMAKE_ARGS}
             -DBUILD_SHARED_LIBS=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DLIBXML2_WITH_PYTHON=OFF
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
