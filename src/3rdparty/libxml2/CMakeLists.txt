@@ -40,14 +40,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBXML2)
     if(WIN32)
         if(RELEASE_MODE)
-            message("Retrieving libxml2...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             6e559df5321d5989df944e722acd79a33c192396
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES 5b7e4c95cd30a1fa0490c2a33b404d9426fee0ef)
         else()
-            message("Retrieving libxml2...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             6cc1d86d5c7404d565e270e6578fcb1df7ad5404
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES 82f846a469a7155e792bed561a34f9058c1e4ad8)
         endif()
     elseif(APPLE)
-        message("Retrieving libxml2...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         0d68bcfa5d08d81b57b6d859a9b3c6c5f3420366
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES bd086be502e83e36a8f44566b0be56f239d959eb)
     else()
-        message("Retrieving libxml2...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         9bd976336cec2d49ce9ed0bf53538ea5751ba503
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES d9575cbb9efb21de992fb4b9e2e43fb480db1a39)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
