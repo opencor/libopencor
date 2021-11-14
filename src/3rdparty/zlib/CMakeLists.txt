@@ -82,7 +82,6 @@ else()
             ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
