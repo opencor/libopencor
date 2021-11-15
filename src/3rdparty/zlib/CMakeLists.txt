@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(PACKAGE_NAME zlib)
+set(PACKAGE_NAME zlib-ng)
 set(PACKAGE_VERSION 2.0.5)
 set(PACKAGE_REPOSITORY zlib-ng)
 set(GIT_TAG 2.0.5)
