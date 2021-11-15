@@ -18,18 +18,7 @@ set(PACKAGE_REPOSITORY libsbml)
 set(GIT_TAG v5.19.0-libopencor)
 set(RELEASE_TAG v5.19.0-libopencor)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
-
-if(WIN32)
-    if(RELEASE_MODE)
-        set(DEBUG_TAG)
-    else()
-        set(DEBUG_TAG d)
-    endif()
-
-    set(STATIC_LIBRARY lib/libsbml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
-else()
-    set(STATIC_LIBRARY lib/${CMAKE_STATIC_LIBRARY_PREFIX}sbml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
-endif()
+set(STATIC_LIBRARY lib/libsbml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
     ${STATIC_LIBRARY}
@@ -61,6 +50,7 @@ else()
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DENABLE_L3V2EXTENDEDMATH=OFF
             -DLIBXML_LIBRARY=${LIBXML2_LIBRARY}
             -DWITH_BZIP2=OFF
             -DWITH_CPP_NAMESPACE=ON
