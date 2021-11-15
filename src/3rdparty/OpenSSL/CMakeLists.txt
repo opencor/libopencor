@@ -32,7 +32,7 @@ set(SHA1_FILES
     ${SSL_STATIC_LIBRARY}
 )
 
-# Either retrieve or build OpenSSL.
+# Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_OPENSSL)
     if(WIN32)
@@ -114,6 +114,6 @@ else()
                    SHA1_FILES ${SHA1_FILES})
 endif()
 
-# Let other third-party libraries find and use OpenSSL.
+# Let other third-party libraries find and use our package.
 
 set(OPENSSL_ROOT_DIR ${INSTALL_DIR} PARENT_SCOPE)

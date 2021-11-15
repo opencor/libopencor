@@ -17,8 +17,9 @@
 
 include(packages)
 
-# Prerequisite for some third-party libraries.
+# Prerequisite third-party libraries.
 
+add_subdirectory(libxml2)
 add_subdirectory(OpenSSL)
 add_subdirectory(zlib)
 
