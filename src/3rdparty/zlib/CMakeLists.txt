@@ -92,3 +92,7 @@ else()
                    PACKAGED_FILES include ${SHA1_FILES}
                    SHA1_FILES ${SHA1_FILES})
 endif()
+
+# Let other third-party libraries find and use our package.
+
+set(ZLIB_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} PARENT_SCOPE)

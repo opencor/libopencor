@@ -42,26 +42,26 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             498b333778aba57304e3878748918d72576b4f84
+                             b6f7374ef7ece62d0a3eb3f55e0d8a49d5831f8d
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES f314af007e69c72497634ec6c9087a0535de0324)
+                             SHA1_VALUES 4333f52a1ea0d8be47d4e3b5b8c7a2e1cbd400c4)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             58d9ff7dadd8cbff467fed136a8998bcf0bd226e
+                             8726e4331940c9049c82cbb1b8d9d693e6454527
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 10c3fa7106b14e3217bf42197d40eca0492e046c)
+                             SHA1_VALUES 088404266713b5419ad1784605c4702d04ac8a95)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         0e0e21b584fc328377fe6fcb9b8a057c577b766e
+                         7b32b9d52d1a616cd90a9aca3161f079593b18b0
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 3808b6d047c0fb2a167495acfddbc0e180a28df9)
+                         SHA1_VALUES a98359bd3f5b11792b373e2b41511860923090d4)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         6f7433caf51dc2e3d9dc100d724f014aac6c39e9
+                         0f2a05e4f0bb2d4b0c5498333dbe61d5f095dad8
                          SHA1_FILES ${SHA1_FILES}
                          SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
     endif()
@@ -86,6 +86,7 @@ else()
             -DMEMCHECK=OFF
             -DPYTHON_COVERAGE=OFF
             -DUNIT_TESTS=OFF
+            -DZLIB_LIBRARY_RELEASE=${ZLIB_LIBRARY}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
