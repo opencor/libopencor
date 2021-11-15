@@ -40,30 +40,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(WIN32)
         if(RELEASE_MODE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ab6d22984d373b135dfe06b5835c5b2776a97d92
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 335aaa3c4de92eaa75b95089b9ff2e6815ca5483)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             498b333778aba57304e3878748918d72576b4f84
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES f314af007e69c72497634ec6c9087a0535de0324)
         else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         6524fe386dda33ca78e4e955bcbf5de864523eac
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES c3ae15e4d6eaab9b3fb4372c2c4bf8f78c5a29a6)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             58d9ff7dadd8cbff467fed136a8998bcf0bd226e
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES 10c3fa7106b14e3217bf42197d40eca0492e046c)
         endif()
     elseif(APPLE)
-    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                     f4bf2a8d6279b2e98d4508b2d508bb1df6e67708
-                     SHA1_FILES ${SHA1_FILES}
-                     SHA1_VALUES 5e50877d730583360fab06be3feaa5bfec76ccc8)
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         0e0e21b584fc328377fe6fcb9b8a057c577b766e
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 3808b6d047c0fb2a167495acfddbc0e180a28df9)
     else()
-    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                     cd010dc89b63aa83830106c19d6830a38c2aad99
-                     SHA1_FILES ${SHA1_FILES}
-                     SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         6f7433caf51dc2e3d9dc100d724f014aac6c39e9
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
