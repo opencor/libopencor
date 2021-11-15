@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libxml2)
-set(PACKAGE_VERSION 2.9.12)
+set(PACKAGE_VERSION 2.9.10)
 set(PACKAGE_REPOSITORY libxml2)
-set(GIT_TAG v2.9.12)
-set(RELEASE_TAG v2.9.12)
+set(GIT_TAG v2.9.10-1)
+set(RELEASE_TAG v2.9.10-1)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
 if(WIN32)
@@ -42,28 +42,28 @@ if(LIBOPENCOR_PREBUILT_LIBXML2)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             6e559df5321d5989df944e722acd79a33c192396
+                             1858ce703a3c1e17e7cd1619ce6944eaa60c4185
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 5b7e4c95cd30a1fa0490c2a33b404d9426fee0ef)
+                             SHA1_VALUES 494503b9903db9cf7f010114f346dcd34250d63b)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             6cc1d86d5c7404d565e270e6578fcb1df7ad5404
+                             79b036176a032cc0239ecdfb47640732d2f5603c
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 82f846a469a7155e792bed561a34f9058c1e4ad8)
+                             SHA1_VALUES 99dc4576ce1d946d280bef7c7b7f82c3b30f73a4)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         0d68bcfa5d08d81b57b6d859a9b3c6c5f3420366
+                         6d3be28a779c4028ecec7e543d0464cb3dfbd904
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES bd086be502e83e36a8f44566b0be56f239d959eb)
+                         SHA1_VALUES 2d7e391563a662035ca9ca2817e0ec1b45fb9221)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         9bd976336cec2d49ce9ed0bf53538ea5751ba503
+                         ec304220c2c61d5cbdc0bc038d0a8cfd990cb5f9
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES d9575cbb9efb21de992fb4b9e2e43fb480db1a39)
+                         SHA1_VALUES 6a3f95fdd5291eebebf72db991b635fca622f9aa)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
@@ -78,9 +78,15 @@ else()
             ${CMAKE_ARGS}
             -DBUILD_SHARED_LIBS=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DLIBXML2_WITH_DEBUG=OFF
             -DLIBXML2_WITH_ICONV=OFF
+            -DLIBXML2_WITH_LEGACY=OFF
             -DLIBXML2_WITH_LZMA=OFF
+            -DLIBXML2_WITH_MODULES=OFF
+            -DLIBXML2_WITH_PROGRAMS=OFF
             -DLIBXML2_WITH_PYTHON=OFF
+            -DLIBXML2_WITH_TESTS=OFF
+            -DLIBXML2_WITH_ZLIB=OFF
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
@@ -90,3 +96,7 @@ else()
                    PACKAGED_FILES include ${SHA1_FILES}
                    SHA1_FILES ${SHA1_FILES})
 endif()
+
+# Let other third-party libraries find and use our package.
+
+set(LIBXML2_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} PARENT_SCOPE)
