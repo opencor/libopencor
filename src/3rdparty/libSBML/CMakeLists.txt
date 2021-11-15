@@ -50,7 +50,6 @@ else()
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DENABLE_L3V2EXTENDEDMATH=OFF
             -DLIBXML_LIBRARY=${LIBXML2_LIBRARY}
             -DWITH_BZIP2=OFF
             -DWITH_CPP_NAMESPACE=ON
