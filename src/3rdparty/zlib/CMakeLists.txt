@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME zlib)
-set(PACKAGE_VERSION 1.2.11)
-set(PACKAGE_REPOSITORY zlib)
-set(GIT_TAG v1.2.11-libopencor)
-set(RELEASE_TAG v1.2.11-libopencor)
+set(PACKAGE_VERSION 2.0.5)
+set(PACKAGE_REPOSITORY zlib-ng)
+set(GIT_TAG 2.0.5)
+set(RELEASE_TAG 2.0.5)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
 if(WIN32)
@@ -83,6 +83,7 @@ else()
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DZLIB_COMPAT=ON
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
