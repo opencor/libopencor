@@ -21,7 +21,7 @@ include(packages)
 
 add_subdirectory(libxml2)
 add_subdirectory(OpenSSL)
-add_subdirectory(zlib-ng)
+add_subdirectory(zlib)
 
 add_subdirectory(libSBML)
 
