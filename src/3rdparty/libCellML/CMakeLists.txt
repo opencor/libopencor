@@ -42,26 +42,26 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b6f7374ef7ece62d0a3eb3f55e0d8a49d5831f8d
+                             d4a220665a24fa098965b939985e82ab3b6f5c1a
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 4333f52a1ea0d8be47d4e3b5b8c7a2e1cbd400c4)
+                             SHA1_VALUES eb07cda06dd86136d2605ab1d25e6f7349b27f4d)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             8726e4331940c9049c82cbb1b8d9d693e6454527
+                             a2a2c5c332cbc7d58a0c22a88b2f77faa5e69c64
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 088404266713b5419ad1784605c4702d04ac8a95)
+                             SHA1_VALUES d85c545e5e5f13dbae7821c0d64e47228035a7d6)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         7b32b9d52d1a616cd90a9aca3161f079593b18b0
+                         32293b097684bec198adad98f14f1cfab3e5dae3
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES a98359bd3f5b11792b373e2b41511860923090d4)
+                         SHA1_VALUES a2129be2485d9129db2bef969dda9340043f52f1)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         0f2a05e4f0bb2d4b0c5498333dbe61d5f095dad8
+                         3f5dc9cb2ee1a199aed8d163836752a3b2662ac0
                          SHA1_FILES ${SHA1_FILES}
                          SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
     endif()
