@@ -42,28 +42,28 @@ if(LIBOPENCOR_PREBUILT_ZLIB)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c4be57eacfb7b16300032b1899ed7e58140ce839
+                             dfb058d42898b15cbacdddbd3875cc2f02fb297f
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES c4151de005db5a70d308f37ff539779f50982a38)
+                             SHA1_VALUES dcf45e1cf4fec62a386c2a75b29ddfd5d4e30955)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             8d21ae751d6d1e049c80dd73a729636461651f6a
+                             561ce9b9e7f75a3043cf4b4fd5743d77c686d5b0
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES a7f3f70e5469c2262a110a1d79d3052f9b681abb)
+                             SHA1_VALUES 0bc8fb57ab3977170a5733aec92df111eaf63139)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         48fe846a4d708e208eaf7f992d2596ad82cf863d
+                         848650c0c2e7240fe24844735c2c9fbc62a331b3
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 82c44538bc862239311fd4da5ed795dd62dfe681)
+                         SHA1_VALUES 67a44fb59ea06538801af8b06458a99b52aa6722)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         342d1bbd140f7b5f0a25fef0eea19c0fa758cb79
+                         30213b557e2e536e74f45734854d2a161c16fee9
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES d8031204aefc9e5bcfe6669610ff143cfdd9a986)
+                         SHA1_VALUES 53f750bd1f650da5cf304b3817703750b2e14332)
     endif()
 else()
     if(WIN32)
