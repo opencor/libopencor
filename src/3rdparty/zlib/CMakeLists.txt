@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(PACKAGE_NAME zlib-ng)
+set(PACKAGE_NAME zlib)
 set(PACKAGE_VERSION 2.0.5)
 set(PACKAGE_REPOSITORY zlib-ng)
 set(GIT_TAG 2.0.5)
@@ -42,26 +42,26 @@ if(LIBOPENCOR_PREBUILT_ZLIB)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             dfb058d42898b15cbacdddbd3875cc2f02fb297f
+                             e178578102b6c57eb3aebd5eee507ae6634e338a
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES dcf45e1cf4fec62a386c2a75b29ddfd5d4e30955)
+                             SHA1_VALUES 889a5cb57b5c2c7bc15e51e3d025d1cee9ebe5d1)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             561ce9b9e7f75a3043cf4b4fd5743d77c686d5b0
+                             ee447da8e87927f39f03bf68203fd066db9b02ff
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 0bc8fb57ab3977170a5733aec92df111eaf63139)
+                             SHA1_VALUES 047d7825f3c4c0e29d04d8f4a74682a4a21d681f)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         848650c0c2e7240fe24844735c2c9fbc62a331b3
+                         bb08e24bcf5c88fe218f0d63684262a4dfa2e54e
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 67a44fb59ea06538801af8b06458a99b52aa6722)
+                         SHA1_VALUES 2e57232a8559f3c2dc68db61c2f81b99e74a0e63)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         30213b557e2e536e74f45734854d2a161c16fee9
+                         148d428549eedb05008c69e3b6f9dbdbc6554cbf
                          SHA1_FILES ${SHA1_FILES}
                          SHA1_VALUES 53f750bd1f650da5cf304b3817703750b2e14332)
     endif()
