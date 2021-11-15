@@ -19,17 +19,11 @@ set(GIT_TAG libopencor)
 set(RELEASE_TAG libopencor)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
-if(WIN32)
-    if(RELEASE_MODE)
-        set(DEBUG_TAG)
-    else()
-        set(DEBUG_TAG d)
-    endif()
-
-    set(STATIC_LIBRARY lib/libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
-else()
-    set(STATIC_LIBRARY lib/${CMAKE_STATIC_LIBRARY_PREFIX}cellml${CMAKE_STATIC_LIBRARY_SUFFIX})
+if(WIN32 AND NOT RELEASE_MODE)
+    set(DEBUG_TAG d)
 endif()
+
+set(STATIC_LIBRARY lib/libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
     ${STATIC_LIBRARY}
