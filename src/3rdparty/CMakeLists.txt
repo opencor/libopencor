@@ -17,11 +17,13 @@
 
 include(packages)
 
-# Prerequisite third-party libraries.
+# Prerequisite third-party libraries, respecting their own prerequisites.
 
 add_subdirectory(libxml2)
 add_subdirectory(OpenSSL)
 add_subdirectory(zlib)
+
+add_subdirectory(libSBML)
 
 # Required third-party libraries.
 
