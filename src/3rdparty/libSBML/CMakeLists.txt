@@ -29,14 +29,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBSBML)
     if(WIN32)
         if(RELEASE_MODE)
-            message("Retrieveing libSBML...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             7ec10246a30050aacc07842756f62ea33fdfc9b7
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES dfbc06f97e91999f1b53b36acc10f506d6e1250c)
         else()
-            message("Retrieveing libSBML...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             9e80ec456b4f4cdb780d6ddd5b2faaaa298de0d8
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES d9c6e9911682c9f3d7c6b7b02a624e2198ae2031)
         endif()
     elseif(APPLE)
-        message("Retrieveing libSBML...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         de7caa9e16ff4e30b5a64d96bf34c5c49a251f65
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 4d08de8699bf7db9263e2fc71482c46cdf03db26)
     else()
-        message("Retrieveing libSBML...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         f181e3bff33395a081a36a9946b9b26f61fc7090
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 78ea2181e9b5850541306de9ca6dee0f511cf17b)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
