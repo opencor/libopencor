@@ -49,10 +49,10 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         dc863a1aa7b310c6ab27d1b740f7d50838e85086
+                         43b19276d82b8835332e0d274d8baeccc3cce5d1
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES ee1b0d58ed6dd8be5c7014e0d4517dd376458428
-                                     4da4b3295ff7e8c47be5b66c1b1814e0db1fd617)
+                         SHA1_VALUES 25fade4fec3b03e0f52aad81c924535d5d7cdd96
+                                     c43d1543d6361a8a07d7166ba4976baca3662837)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
