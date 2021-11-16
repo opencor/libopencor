@@ -32,14 +32,16 @@ if(NOT RESULT EQUAL 0)
     message(FATAL_ERROR "Git submodules could not be retrieved.")
 endif()
 
-# Enable C++11 which, on macOS, means that we can deploy on OS X 10.9 and later.
+# Enable C++11.
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# On macOS, deploy on macOS 10.13 and later.
+
 if(APPLE AND "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.9)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.13)
 endif()
 
 # Some common CMake functions/macros.
