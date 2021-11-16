@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(PACKAGE_NAME libSBML)
-set(PACKAGE_VERSION 5.19.0)
-set(PACKAGE_REPOSITORY libsbml)
-set(GIT_TAG v5.19.0-libopencor)
-set(RELEASE_TAG v5.19.0-libopencor)
+set(PACKAGE_NAME libNuML)
+set(PACKAGE_VERSION 1.1.4)
+set(PACKAGE_REPOSITORY NuML)
+set(GIT_TAG v1.1.4-libopencor)
+set(RELEASE_TAG v1.1.4-libopencor)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
-set(STATIC_LIBRARY lib/libsbml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(STATIC_LIBRARY lib/libnuml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
     ${STATIC_LIBRARY}
@@ -27,52 +27,62 @@ set(SHA1_FILES
 
 # Either retrieve or build our package.
 
-if(LIBOPENCOR_PREBUILT_LIBSBML)
+if(LIBOPENCOR_PREBUILT_LIBNUML)
     if(WIN32)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7ec10246a30050aacc07842756f62ea33fdfc9b7
+                             8ca4be16fc0fc09be4f0ce78063a2a8c17d3c041
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES dfbc06f97e91999f1b53b36acc10f506d6e1250c)
+                             SHA1_VALUES da081654ea5610de59bc8ac872823d66b9537472)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             9e80ec456b4f4cdb780d6ddd5b2faaaa298de0d8
+                             67b386141e4685300ed633fe4b8419dcc6bdb2b7
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES d9c6e9911682c9f3d7c6b7b02a624e2198ae2031)
+                             SHA1_VALUES c31e7b596226781cb17eee2e4d031db8ca8a107c)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         de7caa9e16ff4e30b5a64d96bf34c5c49a251f65
+                         ba4d284d4fd761c6c7c22ad0caf29dedb06a41d8
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 4d08de8699bf7db9263e2fc71482c46cdf03db26)
+                         SHA1_VALUES a3e85c78909012f61a10df6d2341fb2da5633cba)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         f181e3bff33395a081a36a9946b9b26f61fc7090
+                         b3e3caa2d3532572201085e69ba4e0d57225736f
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 78ea2181e9b5850541306de9ca6dee0f511cf17b)
+                         SHA1_VALUES 1ddef2fc9ab8b20c749549e89470105aece62419)
     endif()
 else()
+    set(EXTRA_LIBS ${LIBXML2_LIBRARY})
+
+    if(WIN32)
+        string(APPEND EXTRA_LIBS |Ws2_32)
+    endif()
+
     ExternalProject_Add(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
+        SOURCE_SUBDIR
+            libnuml
         CMAKE_GENERATOR
             ${CMAKE_GENERATOR}
+        LIST_SEPARATOR
+            |
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DLIBXML_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
-            -DLIBXML_LIBRARY=${LIBXML2_LIBRARY}
-            -DWITH_BZIP2=OFF
+            -DEXTRA_LIBS=${EXTRA_LIBS}
+            -DLIBSBML_INCLUDE_DIR=${LIBSBML_INCLUDE_DIR}
+            -DLIBSBML_LIBRARY=${LIBSBML_LIBRARY}
+            -DLIBSBML_STATIC=ON
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
-            -DWITH_ZLIB=OFF
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
@@ -82,8 +92,3 @@ else()
                    PACKAGED_FILES include ${SHA1_FILES}
                    SHA1_FILES ${SHA1_FILES})
 endif()
-
-# Let other third-party libraries find and use our package.
-
-set(LIBSBML_INCLUDE_DIR ${INSTALL_DIR}/include PARENT_SCOPE)
-set(LIBSBML_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} PARENT_SCOPE)
