@@ -40,6 +40,12 @@ if(LIBOPENCOR_PREBUILT_LIBNUML)
         message("Retrieving libNuML...")
     endif()
 else()
+    set(EXTRA_LIBS ${LIBXML2_LIBRARY})
+
+    if(WIN32)
+        string(APPEND EXTRA_LIBS |Ws2_32)
+    endif()
+
     ExternalProject_Add(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
@@ -50,10 +56,12 @@ else()
             libnuml
         CMAKE_GENERATOR
             ${CMAKE_GENERATOR}
+        LIST_SEPARATOR
+            |
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DEXTRA_LIBS=${LIBXML2_LIBRARY}
+            -DEXTRA_LIBS=${EXTRA_LIBS}
             -DLIBSBML_INCLUDE_DIR=${LIBSBML_INCLUDE_DIR}
             -DLIBSBML_LIBRARY=${LIBSBML_LIBRARY}
             -DLIBSBML_STATIC=ON
