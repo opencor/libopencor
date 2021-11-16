@@ -97,4 +97,5 @@ endif()
 
 # Let other third-party libraries find and use our package.
 
+set(LIBXML2_INCLUDE_DIR ${INSTALL_DIR}/include/libxml2 PARENT_SCOPE)
 set(LIBXML2_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} PARENT_SCOPE)
