@@ -23,9 +23,9 @@ add_subdirectory(libxml2)
 add_subdirectory(OpenSSL)
 add_subdirectory(zlib)
 
-add_subdirectory(libSBML)
+add_subdirectory(libSBML) # Requires libxml2.
 
 # Required third-party libraries.
 
-add_subdirectory(libCellML)
-add_subdirectory(libcurl)
+add_subdirectory(libCellML) # Requires libxml2 and zlib.
+add_subdirectory(libcurl) # Requires OpenSSL.

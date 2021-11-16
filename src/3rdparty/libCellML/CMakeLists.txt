@@ -36,26 +36,26 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d4a220665a24fa098965b939985e82ab3b6f5c1a
+                             f12b23cafe2ae13a6a217223a2a8b18ef42405f6
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES eb07cda06dd86136d2605ab1d25e6f7349b27f4d)
+                             SHA1_VALUES 42a470ae095c2b8632f118f79a9a366a0a122cd5)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a2a2c5c332cbc7d58a0c22a88b2f77faa5e69c64
+                             2c697bf2f4e9682fcf9f4f151df6d0bca1099ae5
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES d85c545e5e5f13dbae7821c0d64e47228035a7d6)
+                             SHA1_VALUES 7638b990d3c753b46d0897067353f97e9ad39983)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         32293b097684bec198adad98f14f1cfab3e5dae3
+                         893d3cf69c720c693af1659b0319efb846703cea
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES a2129be2485d9129db2bef969dda9340043f52f1)
+                         SHA1_VALUES 196898a324bdc45ca5a6baca1e99d5075b1c270f)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         3f5dc9cb2ee1a199aed8d163836752a3b2662ac0
+                         cf0fb2b804a809afeb9984b049e1c2f7c2205571
                          SHA1_FILES ${SHA1_FILES}
                          SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
     endif()
@@ -75,12 +75,13 @@ else()
             -DBUILD_TYPE=${EP_CMAKE_BUILD_TYPE}
             -DCOVERAGE=OFF
             -DINSTALL_PREFIX=${INSTALL_DIR}
+            -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
             -DLIBXML2_LIBRARY=${LIBXML2_LIBRARY}
             -DLLVM_COVERAGE=OFF
             -DMEMCHECK=OFF
             -DPYTHON_COVERAGE=OFF
             -DUNIT_TESTS=OFF
-            -DZLIB_LIBRARY_RELEASE=${ZLIB_LIBRARY}
+            -DZLIB_ROOT=${ZLIB_ROOT}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
