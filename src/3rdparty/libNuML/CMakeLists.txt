@@ -30,14 +30,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBNUML)
     if(WIN32)
         if(RELEASE_MODE)
-            message("Retrieving libNuML...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             8ca4be16fc0fc09be4f0ce78063a2a8c17d3c041
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES da081654ea5610de59bc8ac872823d66b9537472)
         else()
-            message("Retrieving libNuML...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             67b386141e4685300ed633fe4b8419dcc6bdb2b7
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES c31e7b596226781cb17eee2e4d031db8ca8a107c)
         endif()
     elseif(APPLE)
-        message("Retrieving libNuML...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         ba4d284d4fd761c6c7c22ad0caf29dedb06a41d8
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES a3e85c78909012f61a10df6d2341fb2da5633cba)
     else()
-        message("Retrieving libNuML...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         b3e3caa2d3532572201085e69ba4e0d57225736f
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 1ddef2fc9ab8b20c749549e89470105aece62419)
     endif()
 else()
     set(EXTRA_LIBS ${LIBXML2_LIBRARY})
