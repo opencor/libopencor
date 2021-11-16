@@ -85,6 +85,9 @@ else()
             -DWITH_SWIG=OFF
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
+        DEPENDS
+            libSBML
+            libxml2
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}

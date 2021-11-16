@@ -78,6 +78,8 @@ else()
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
+        DEPENDS
+            OpenSSL
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}

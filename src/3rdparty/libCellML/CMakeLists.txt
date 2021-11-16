@@ -84,6 +84,9 @@ else()
             -DZLIB_ROOT=${ZLIB_ROOT}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
+        DEPENDS
+            libxml2
+            zlib
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}

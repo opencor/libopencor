@@ -75,6 +75,8 @@ else()
             -DWITH_ZLIB=OFF
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
+        DEPENDS
+            libxml2
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
