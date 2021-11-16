@@ -49,9 +49,9 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         34a35493797ae85a8607e691ac1e687ca2dec550
+                         880b4d6e06772ef79831b2f2e20bae3eaf2aba13
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES cc3e922325223f7f4a8b56f6af7ec42a3f0f3f8d)
+                         SHA1_VALUES ee52e27f3b1f2de57034437ae1dc8fb91e5f108e)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
