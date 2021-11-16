@@ -82,3 +82,8 @@ else()
                    PACKAGED_FILES include ${SHA1_FILES}
                    SHA1_FILES ${SHA1_FILES})
 endif()
+
+# Let other third-party libraries find and use our package.
+
+set(LIBSBML_INCLUDE_DIR ${INSTALL_DIR}/include PARENT_SCOPE)
+set(LIBSBML_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} PARENT_SCOPE)
