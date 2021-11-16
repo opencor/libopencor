@@ -57,7 +57,7 @@ if(LIBOPENCOR_UNIT_TESTING)
 
     foreach(TEST_TARGET ${TEST_TARGETS})
         add_test(NAME ${TEST_TARGET}
-                COMMAND ${TEST_TARGET})
+                 COMMAND ${TEST_TARGET})
 
         if(MSVC)
             set_tests_properties(${TEST_TARGET} PROPERTIES
