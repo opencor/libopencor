@@ -256,6 +256,12 @@ if(CMAKE_C_COMPILER_LAUNCHER AND CMAKE_CXX_COMPILER_LAUNCHER)
     )
 endif()
 
+if(APPLE)
+    list(APPEND CMAKE_ARGS
+        -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+    )
+endif()
+
 # Get ready to use nmake/make for some third-party libraries (e.g., OpenSSL).
 
 if(WIN32)

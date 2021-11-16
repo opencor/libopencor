@@ -45,9 +45,9 @@ if(LIBOPENCOR_PREBUILT_LIBNUML)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ba4d284d4fd761c6c7c22ad0caf29dedb06a41d8
+                         e507c6d61a3061576782feca508af83def585d22
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES a3e85c78909012f61a10df6d2341fb2da5633cba)
+                         SHA1_VALUES 1da15183b4759b48d74903724530b412c1107878)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -85,6 +85,9 @@ else()
             -DWITH_SWIG=OFF
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
+        DEPENDS
+            libSBML
+            libxml2
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}

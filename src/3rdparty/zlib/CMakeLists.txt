@@ -53,9 +53,9 @@ if(LIBOPENCOR_PREBUILT_ZLIB)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         bb08e24bcf5c88fe218f0d63684262a4dfa2e54e
+                         e8070b1f887d485f028d103c784631e773cf7f74
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 2e57232a8559f3c2dc68db61c2f81b99e74a0e63)
+                         SHA1_VALUES 2f6446c09a295410425cb48152eb6cda36b4d6db)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}

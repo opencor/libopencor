@@ -49,9 +49,9 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         893d3cf69c720c693af1659b0319efb846703cea
+                         95d9d1105dde075988a0083f188fde859ab43248
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 196898a324bdc45ca5a6baca1e99d5075b1c270f)
+                         SHA1_VALUES 60ae23588adba6c3456907d67c277cfb97ca05b0)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -84,6 +84,9 @@ else()
             -DZLIB_ROOT=${ZLIB_ROOT}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
+        DEPENDS
+            libxml2
+            zlib
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
