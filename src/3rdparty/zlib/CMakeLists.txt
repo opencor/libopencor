@@ -94,4 +94,4 @@ endif()
 
 # Let other third-party libraries find and use our package.
 
-set(ZLIB_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} PARENT_SCOPE)
+set(ZLIB_ROOT ${INSTALL_DIR} PARENT_SCOPE)

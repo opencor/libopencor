@@ -81,7 +81,7 @@ else()
             -DMEMCHECK=OFF
             -DPYTHON_COVERAGE=OFF
             -DUNIT_TESTS=OFF
-            -DZLIB_LIBRARY_RELEASE=${ZLIB_LIBRARY}
+            -DZLIB_ROOT=${ZLIB_ROOT}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${STATIC_LIBRARY}
     )
