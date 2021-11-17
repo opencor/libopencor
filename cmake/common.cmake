@@ -168,9 +168,7 @@ function(statically_link_third_party_libraries TARGET)
                                    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${THIRD_PARTY_LIBRARY}>
                                    $<BUILD_INTERFACE:${${THIRD_PARTY_LIBRARY_UC}_INCLUDE_DIR}>)
 
-        if(NOT LIBOPENCOR_PREBUILT_${THIRD_PARTY_LIBRARY_UC})
-            add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
-        endif()
+        add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
 
         target_link_libraries(${TARGET}
                               PRIVATE ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY})
