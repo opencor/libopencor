@@ -80,6 +80,7 @@ else()
             ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
+            -DBUILD_SHARED_LIBS=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DZLIB_COMPAT=ON
         BUILD_BYPRODUCTS
