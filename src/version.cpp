@@ -20,7 +20,9 @@ limitations under the License.
 
 #include "libcellml/version.h"
 
-#include "sedml/common/libsedml-version.h"
+#include "libsedmlbegin.h"
+    #include "sedml/common/libsedml-version.h"
+#include "libsedmlend.h"
 
 namespace libOpenCOR {
 
@@ -46,7 +48,7 @@ std::string libcellmlVersionString()
 
 unsigned int libsedmlVersion()
 {
-    return libsedml::getLibSEDMLVersion();
+    return static_cast<unsigned int>(libsedml::getLibSEDMLVersion());
 }
 
 std::string libsedmlVersionString()
