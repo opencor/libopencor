@@ -59,7 +59,7 @@ else()
     set(EXTRA_LIBS ${LIBXML2_LIBRARY})
 
     if(WIN32)
-        string(APPEND EXTRA_LIBS |Ws2_32)
+        string(APPEND EXTRA_LIBS |WS2_32)
     endif()
 
     ExternalProject_Add(${PACKAGE_NAME}
