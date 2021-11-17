@@ -109,6 +109,8 @@ else()
                    SHA1_FILES ${SHA1_FILES})
 endif()
 
-# Let other third-party libraries find and use our package.
+# Let others find and use our package.
 
-set(OPENSSL_ROOT_DIR ${INSTALL_DIR} PARENT_SCOPE)
+set(OPENSSL_ROOT_DIR ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(OPENSSL_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
+set(OPENSSL_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")

@@ -159,6 +159,22 @@ function(check_python_package PACKAGE AVAILABLE)
     endif()
 endfunction()
 
+function(statically_link_third_party_libraries TARGET)
+    foreach(THIRD_PARTY_LIBRARY libCellML libcurl)
+        string(TOUPPER "${THIRD_PARTY_LIBRARY}" THIRD_PARTY_LIBRARY_UC)
+
+        target_include_directories(${TARGET} PUBLIC
+                                   $<BUILD_INTERFACE:${${THIRD_PARTY_LIBRARY_UC}_INCLUDE_DIR}>)
+
+        if(NOT LIBOPENCOR_PREBUILT_${THIRD_PARTY_LIBRARY_UC})
+            add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
+        endif()
+
+        target_link_libraries(${TARGET}
+                              PRIVATE ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY})
+    endforeach()
+endfunction()
+
 macro(add_target TARGET)
     add_custom_target(${TARGET} ${ARGN})
 
