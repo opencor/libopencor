@@ -30,14 +30,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBSEDML)
     if(WIN32)
         if(RELEASE_MODE)
-            message("Retrieving libSEDML...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             15715abd1004b65c2c95f70a615be768a67456ca
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES f0f472585bc09ac8605f8014b3fe8c53214e5727)
         else()
-            message("Retrieving libSEDML...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                            ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                            fd5dd3ff18a99faee23fad00159d804cc96c7205
+                            SHA1_FILES ${SHA1_FILES}
+                            SHA1_VALUES e8dbe5b0f96a0a1bea889fef11592e5d620b1f9f)
         endif()
     elseif(APPLE)
-        message("Retrieving libSEDML...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         646cb5820a6ac5cb9c74345636f753a487081878
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 0de08f9ccea10c8eebf4369abd7d04b1dacd88f8)
     else()
-        message("Retrieving libSEDML...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         9553b9f350b21db13d4cde2c11fddf1609d34707
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES a9b12cdc27aae2bcb612f7ccf782b5e980da6aa6)
     endif()
 else()
     set(EXTRA_LIBS ${LIBXML2_LIBRARY})
