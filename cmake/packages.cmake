@@ -201,6 +201,12 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
             message(FATAL_ERROR)
         endif()
     endif()
+
+    # Create a dummy target for our package.
+    # Note: this is needed so that we can build a package that depends on other
+    #       packages that have been retrieved.
+
+    add_custom_target(${PACKAGE_NAME})
 endfunction()
 
 # Get ready to build external projects.
