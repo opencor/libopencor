@@ -21,7 +21,7 @@ limitations under the License.
 #include "libopencor/version.h"
 
 #include "libsedmlbegin.h"
-    #include "sedml/common/libsedml-version.h"
+#include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
 namespace libOpenCOR {
