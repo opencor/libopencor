@@ -36,4 +36,6 @@ PYBIND11_MODULE(module, m) {
     m.def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.");
     m.def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.");
     m.def("libcellml_version_string", &libOpenCOR::libcellmlVersionString, "Get the version string of libCellML.");
+    m.def("libsedml_version", &libOpenCOR::libsedmlVersion, "Get the version number of libSEDML.");
+    m.def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.");
 }
