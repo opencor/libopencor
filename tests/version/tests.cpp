@@ -18,8 +18,14 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(Version, tests)
+TEST(Version, libOpenCOR)
 {
     EXPECT_EQ(0x000100U, libOpenCOR::version());
     EXPECT_EQ("0.1.0", libOpenCOR::versionString());
+}
+
+TEST(Version, libCellML)
+{
+    EXPECT_EQ(0x000200U, libOpenCOR::libcellmlVersion());
+    EXPECT_EQ("0.2.0", libOpenCOR::libcellmlVersionString());
 }
