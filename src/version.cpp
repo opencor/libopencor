@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "version_p.h"
 
+#include "libcellml/version.h"
+
 namespace libOpenCOR {
 
 unsigned int version()
@@ -28,6 +30,16 @@ unsigned int version()
 std::string versionString()
 {
     return LIBOPENCOR_VERSION_STRING;
+}
+
+unsigned int libcellmlVersion()
+{
+    return libcellml::version();
+}
+
+std::string libcellmlVersionString()
+{
+    return libcellml::versionString();
 }
 
 } // namespace libOpenCOR

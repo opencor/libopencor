@@ -126,10 +126,13 @@ set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
-# Build our different third-party libraries as external projects and statically
-# link them to libOpenCOR.
+# Build our different third-party libraries.
 
 add_subdirectory(3rdparty)
+
+# Statically link some third-party libraries to libOpenCOR.
+
+statically_link_third_party_libraries(${CMAKE_PROJECT_NAME})
 
 # Generate the export header file.
 

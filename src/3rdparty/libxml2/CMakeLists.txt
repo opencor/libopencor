@@ -95,7 +95,8 @@ else()
                    SHA1_FILES ${SHA1_FILES})
 endif()
 
-# Let other third-party libraries find and use our package.
+# Let others find and use our package.
 
-set(LIBXML2_INCLUDE_DIR ${INSTALL_DIR}/include/libxml2 PARENT_SCOPE)
-set(LIBXML2_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} PARENT_SCOPE)
+set(LIBXML2_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBXML2_INCLUDE_DIR ${INSTALL_DIR}/include/libxml2 CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
+set(LIBXML2_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")

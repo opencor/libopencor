@@ -85,7 +85,8 @@ else()
                    SHA1_FILES ${SHA1_FILES})
 endif()
 
-# Let other third-party libraries find and use our package.
+# Let others find and use our package.
 
-set(LIBSBML_INCLUDE_DIR ${INSTALL_DIR}/include PARENT_SCOPE)
-set(LIBSBML_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} PARENT_SCOPE)
+set(LIBSBML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBSBML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
+set(LIBSBML_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")

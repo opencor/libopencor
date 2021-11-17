@@ -88,14 +88,8 @@ else()
                    SHA1_FILES ${SHA1_FILES})
 endif()
 
-# Statically link our package to libOpenCOR.
+# Let others find and use our package.
 
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-                           $<BUILD_INTERFACE:${INSTALL_DIR}/include>)
-
-if(NOT LIBOPENCOR_PREBUILT_LIBCURL)
-    add_dependencies(${CMAKE_PROJECT_NAME} ${PACKAGE_NAME})
-endif()
-
-target_link_libraries(${CMAKE_PROJECT_NAME}
-                      PRIVATE ${INSTALL_DIR}/${STATIC_LIBRARY})
+set(LIBCURL_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBCURL_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
+set(LIBCURL_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
