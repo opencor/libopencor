@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/version.h"
-
 #include "version_p.h"
 
 #include "libcellml/version.h"
+
+#include "libopencor/version.h"
 
 #include "libsedmlbegin.h"
     #include "sedml/common/libsedml-version.h"

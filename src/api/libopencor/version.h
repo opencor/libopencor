@@ -16,9 +16,9 @@ limitations under the License.
 
 #pragma once
 
-#include <string>
-
 #include "libopencor/export.h"
+
+#include <string>
 
 /**
  * Some functions to retrieve the version of libOpenCOR.
