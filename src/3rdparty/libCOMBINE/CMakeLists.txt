@@ -59,6 +59,7 @@ else()
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DBUILD_TEST=OFF
             -DEXTRA_LIBS=${EXTRA_LIBS}
             -DLIBCOMBINE_SHARED_VERSION=OFF
             -DLIBCOMBINE_SKIP_SHARED_LIBRARY=ON
