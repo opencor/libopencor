@@ -14,24 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
-
-#include <libopencor>
-
-TEST(Version, libOpenCOR)
-{
-    EXPECT_EQ(0x000100U, libOpenCOR::version());
-    EXPECT_EQ("0.1.0", libOpenCOR::versionString());
-}
-
-TEST(Version, libCellML)
-{
-    EXPECT_EQ(0x000200U, libOpenCOR::libcellmlVersion());
-    EXPECT_EQ("0.2.0", libOpenCOR::libcellmlVersionString());
-}
-
-TEST(Version, libSEDML)
-{
-    EXPECT_EQ(404, libOpenCOR::libsedmlVersion());
-    EXPECT_EQ("0.4.4", libOpenCOR::libsedmlVersionString());
-}
+#if __APPLE__
+    #pragma clang diagnostic pop
+#endif

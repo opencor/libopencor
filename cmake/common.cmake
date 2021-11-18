@@ -101,6 +101,7 @@ function(configure_clang_and_clang_tidy TARGET)
             google-*
             hicpp-*
             llvm-*
+            -llvm-include-order
             misc-*
             modernize-*
             -modernize-use-trailing-return-type
@@ -160,18 +161,22 @@ function(check_python_package PACKAGE AVAILABLE)
 endfunction()
 
 function(statically_link_third_party_libraries TARGET)
-    foreach(THIRD_PARTY_LIBRARY libCellML libcurl)
+    foreach(THIRD_PARTY_LIBRARY libCellML libcurl libNuML libSBML libSEDML)
         string(TOUPPER "${THIRD_PARTY_LIBRARY}" THIRD_PARTY_LIBRARY_UC)
 
         target_include_directories(${TARGET} PUBLIC
+                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${THIRD_PARTY_LIBRARY}>
                                    $<BUILD_INTERFACE:${${THIRD_PARTY_LIBRARY_UC}_INCLUDE_DIR}>)
 
-        if(NOT LIBOPENCOR_PREBUILT_${THIRD_PARTY_LIBRARY_UC})
-            add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
-        endif()
+        add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
 
         target_link_libraries(${TARGET}
                               PRIVATE ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY})
+
+        foreach(DEFINITION ${${THIRD_PARTY_LIBRARY_UC}_DEFINITIONS})
+            target_compile_definitions(${TARGET}
+                                       PRIVATE ${DEFINITION})
+        endforeach()
     endforeach()
 endfunction()
 

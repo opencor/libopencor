@@ -14,11 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/version.h"
-
 #include "version_p.h"
 
 #include "libcellml/version.h"
+
+#include "libopencor/version.h"
+
+#include "libsedmlbegin.h"
+#include "sedml/common/libsedml-version.h"
+#include "libsedmlend.h"
 
 namespace libOpenCOR {
 
@@ -40,6 +44,16 @@ unsigned int libcellmlVersion()
 std::string libcellmlVersionString()
 {
     return libcellml::versionString();
+}
+
+unsigned int libsedmlVersion()
+{
+    return static_cast<unsigned int>(libsedml::getLibSEDMLVersion());
+}
+
+std::string libsedmlVersionString()
+{
+    return libsedml::getLibSEDMLDottedVersion();
 }
 
 } // namespace libOpenCOR

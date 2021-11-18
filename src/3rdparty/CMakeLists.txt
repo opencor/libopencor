@@ -31,3 +31,4 @@ add_subdirectory(libNuML) # Requires libSBML and libxml2.
 
 add_subdirectory(libCellML) # Requires libxml2 and zlib.
 add_subdirectory(libcurl) # Requires OpenSSL.
+add_subdirectory(libSEDML) # Requires libNuML, libSBML and libxml2.
