@@ -30,14 +30,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_ZIPPER)
     if(WIN32)
         if(RELEASE_MODE)
-            message("Retrieving zipper...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             e3cc97b76a186b42de47c3d4d064e7d42e5377da
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES 69942417d3029f2b1e33edc7ccfcce36afc98d26)
         else()
-            message("Retrieving zipper...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             aaa78da05fba41b1841fcf27149c14196bb6cbaa
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES adff3fa12e376f4103fd28125bbd578c3ec3ad60)
         endif()
     elseif(APPLE)
-        message("Retrieving zipper...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         2d9fa06079853a44120239f21c976334487ece3c
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 54a00e531d57b23662eceffeee4704870a2f4ce3)
     else()
-        message("Retrieving zipper...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         012f9c4c7af7e093b8bbbdff752ae0f0bd16b1e6
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 90a98c32492466a09e10b0c5fae4f2e64475e3c2)
     endif()
 else()
     # Set some compilation flags and/or ignore some warnings
