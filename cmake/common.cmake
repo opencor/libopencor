@@ -172,6 +172,11 @@ function(statically_link_third_party_libraries TARGET)
 
         target_link_libraries(${TARGET}
                               PRIVATE ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY})
+
+        foreach(DEFINITION ${${THIRD_PARTY_LIBRARY_UC}_DEFINITIONS})
+            target_compile_definitions(${TARGET}
+                                       PRIVATE ${DEFINITION})
+        endforeach()
     endforeach()
 endfunction()
 
