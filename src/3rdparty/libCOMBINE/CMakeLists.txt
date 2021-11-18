@@ -93,6 +93,7 @@ else()
         DEPENDS
             libSBML
             libxml2
+            zipper
             zlib
     )
 
