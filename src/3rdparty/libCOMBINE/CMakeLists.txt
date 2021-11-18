@@ -30,14 +30,30 @@ set(SHA1_FILES
 if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
     if(WIN32)
         if(RELEASE_MODE)
-            message("Retrieving libCOMBINE...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             8fde9db85dc96e7e151e2533f118bd4936aa192d
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES 67eadcb0fcf91b64672f64e296dd633d27a9287f)
         else()
-            message("Retrieving libCOMBINE...")
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             f112f45a75959e6512f59006879ef14f36b09d47
+                             SHA1_FILES ${SHA1_FILES}
+                             SHA1_VALUES 254bbd8aed65e874e7db117029e739850d905354)
         endif()
     elseif(APPLE)
-        message("Retrieving libCOMBINE...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         c0035b6a46bb5f84fb28181079aec819d5c81150
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES b631c526c0d59e860646ee85c7794574ff7c785a)
     else()
-        message("Retrieving libCOMBINE...")
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         854acaf7db0c25fbcf4c89b64e85ee367e404a74
+                         SHA1_FILES ${SHA1_FILES}
+                         SHA1_VALUES 9870103b1a4cffd037b3824cd591d9cd9e749c76)
     endif()
 else()
     set(EXTRA_LIBS ${LIBXML2_LIBRARY})
