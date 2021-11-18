@@ -36,6 +36,10 @@ PYBIND11_MODULE(module, m) {
     m.def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.");
     m.def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.");
     m.def("libcellml_version_string", &libOpenCOR::libcellmlVersionString, "Get the version string of libCellML.");
+    m.def("libcombine_version", &libOpenCOR::libcombineVersion, "Get the version number of libCOMBINE.");
+    m.def("libcombine_version_string", &libOpenCOR::libcombineVersionString, "Get the version string of libCOMBINE.");
+    m.def("libcurl_version", &libOpenCOR::libcurlVersion, "Get the version number of libcurl.");
+    m.def("libcurl_version_string", &libOpenCOR::libcurlVersionString, "Get the version string of libcurl.");
     m.def("libsedml_version", &libOpenCOR::libsedmlVersion, "Get the version number of libSEDML.");
     m.def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.");
 }
