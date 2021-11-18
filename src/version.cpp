@@ -20,13 +20,15 @@ limitations under the License.
 
 #include "libcellml/version.h"
 
+#include "libcombinebegin.h"
+#include "omex/common/libcombine-version.h"
+#include "libcombineend.h"
+
 #include "libopencor/version.h"
 
 #include "libsedmlbegin.h"
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
-
-#include "omex/common/libcombine-version.h"
 
 namespace libOpenCOR {
 
