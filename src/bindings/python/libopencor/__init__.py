@@ -16,17 +16,15 @@ from .module import __version__, __doc__
 from .module import version, version_string, \
     libcellml_version, libcellml_version_string, \
     libcombine_version, libcombine_version_string, \
+    libcurl_version, libcurl_version_string, \
     libsedml_version, libsedml_version_string
 
 __all__ = (
     # Version.
 
-    'version',
-    'version_string',
-    'libcellml_version',
-    'libcellml_version_string',
-    'libcombine_version',
-    'libcombine_version_string',
-    'libsedml_version',
-    'libsedml_version_string',
+    'version', 'version_string',
+    'libcellml_version', 'libcellml_version_string',
+    'libcombine_version', 'libcombine_version_string',
+    'libcurl_version', 'libcurl_version_string',
+    'libsedml_version', 'libsedml_version_string',
 )

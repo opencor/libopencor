@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "version_p.h"
 
+#include "curl/curlver.h"
+
 #include "libcellml/version.h"
 
 #include "libopencor/version.h"
@@ -56,6 +58,16 @@ unsigned int libcombineVersion()
 std::string libcombineVersionString()
 {
     return libcombine::getLibCombineDottedVersion();
+}
+
+unsigned int libcurlVersion()
+{
+    return LIBCURL_VERSION_NUM;
+}
+
+std::string libcurlVersionString()
+{
+    return LIBCURL_VERSION;
 }
 
 unsigned int libsedmlVersion()

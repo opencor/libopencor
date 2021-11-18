@@ -46,6 +46,16 @@ def test_libcombine_version_string():
     assert libopencor.libcombine_version_string() != ''
 
 
+def test_libcurl_version():
+    assert isinstance(libopencor.libcurl_version(), int)
+    assert libopencor.libcurl_version() > 0
+
+
+def test_libcurl_version_string():
+    assert isinstance(libopencor.libcurl_version_string(), str)
+    assert libopencor.libcurl_version_string() != ''
+
+
 def test_libsedml_version():
     assert isinstance(libopencor.libsedml_version(), int)
     assert libopencor.libsedml_version() > 0
