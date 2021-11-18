@@ -19,10 +19,16 @@ foreach(GIT_API_HEADER_FILE ${GIT_API_HEADER_FILES})
 
     set(TEST_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/header_files/${GIT_API_HEADER_NAME}.cpp)
 
-    configure_file(header_files/tests.cpp.in ${TEST_SOURCE_FILE})
+    configure_file(${CMAKE_CURRENT_LIST_DIR}/tests.cpp.in ${TEST_SOURCE_FILE})
 
     list(APPEND TEST_SOURCE_FILES ${TEST_SOURCE_FILE})
 endforeach()
 
 prepare_test(api_header_files_tests
              ${TEST_SOURCE_FILES})
+
+# Track our template for code formatting.
+
+list(APPEND GIT_TESTS_SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/tests.cpp.in)
+
+set(GIT_TESTS_SOURCE_FILES ${GIT_TESTS_SOURCE_FILES} PARENT_SCOPE)
