@@ -27,6 +27,8 @@ add_subdirectory(libSBML) # Requires libxml2.
 
 add_subdirectory(libNuML) # Requires libSBML and libxml2.
 
+add_subdirectory(zipper)
+
 # Required third-party libraries.
 
 add_subdirectory(libCellML) # Requires libxml2 and zlib.
