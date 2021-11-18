@@ -33,5 +33,5 @@ add_subdirectory(zipper) # Requires zlib.
 
 add_subdirectory(libCellML) # Requires libxml2 and zlib.
 add_subdirectory(libcurl) # Requires OpenSSL.
-add_subdirectory(libCOMBINE) # Requires zipper.
+add_subdirectory(libCOMBINE) # Requires libSBML, libxml2, zipper and zlib.
 add_subdirectory(libSEDML) # Requires libNuML, libSBML and libxml2.
