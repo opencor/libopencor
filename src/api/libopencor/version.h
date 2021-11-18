@@ -65,6 +65,25 @@ LIBOPENCOR_EXPORT unsigned int libcellmlVersion();
 LIBOPENCOR_EXPORT std::string libcellmlVersionString();
 
 /**
+ * Return the version of libCOMBINE as a number.
+ *
+ * @return A number that represents the version of libCOMBINE.
+ */
+
+LIBOPENCOR_EXPORT unsigned int libcombineVersion();
+
+/**
+ * Return the version of libCOMBINE as a string. The version string is in the
+ * format x.y.z, where the "."s are literal, and x,y and z represent counting
+ * numbers, in which case x is the major version, y the minor version, and z the
+ * patch level.
+ *
+ * @return A string that represents the version of libCOMBINE.
+ */
+
+LIBOPENCOR_EXPORT std::string libcombineVersionString();
+
+/**
  * Return the version of libSEDML as a number.
  *
  * @return A number that represents the version of libSEDML.

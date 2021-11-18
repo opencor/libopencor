@@ -30,6 +30,12 @@ TEST(Version, libCellML)
     EXPECT_EQ("0.2.0", libOpenCOR::libcellmlVersionString());
 }
 
+TEST(Version, libCOMBINE)
+{
+    EXPECT_EQ(213, libOpenCOR::libcombineVersion());
+    EXPECT_EQ("0.2.13", libOpenCOR::libcombineVersionString());
+}
+
 TEST(Version, libSEDML)
 {
     EXPECT_EQ(404, libOpenCOR::libsedmlVersion());

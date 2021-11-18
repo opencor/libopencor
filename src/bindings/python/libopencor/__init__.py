@@ -13,7 +13,10 @@
 # limitations under the License.
 
 from .module import __version__, __doc__
-from .module import version, version_string, libcellml_version, libcellml_version_string, libsedml_version, libsedml_version_string
+from .module import version, version_string, \
+    libcellml_version, libcellml_version_string, \
+    libcombine_version, libcombine_version_string, \
+    libsedml_version, libsedml_version_string
 
 __all__ = (
     # Version.
@@ -22,6 +25,8 @@ __all__ = (
     'version_string',
     'libcellml_version',
     'libcellml_version_string',
+    'libcombine_version',
+    'libcombine_version_string',
     'libsedml_version',
     'libsedml_version_string',
 )

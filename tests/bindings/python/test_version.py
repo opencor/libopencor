@@ -36,6 +36,16 @@ def test_libcellml_version_string():
     assert libopencor.libcellml_version_string() != ''
 
 
+def test_libcombine_version():
+    assert isinstance(libopencor.libcombine_version(), int)
+    assert libopencor.libcombine_version() > 0
+
+
+def test_libcombine_version_string():
+    assert isinstance(libopencor.libcombine_version_string(), str)
+    assert libopencor.libcombine_version_string() != ''
+
+
 def test_libsedml_version():
     assert isinstance(libopencor.libsedml_version(), int)
     assert libopencor.libsedml_version() > 0

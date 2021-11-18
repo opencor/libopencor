@@ -24,6 +24,8 @@ limitations under the License.
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
+#include "omex/common/libcombine-version.h"
+
 namespace libOpenCOR {
 
 unsigned int version()
@@ -44,6 +46,16 @@ unsigned int libcellmlVersion()
 std::string libcellmlVersionString()
 {
     return libcellml::versionString();
+}
+
+unsigned int libcombineVersion()
+{
+    return static_cast<unsigned int>(libcombine::getLibCombineVersion());
+}
+
+std::string libcombineVersionString()
+{
+    return libcombine::getLibCombineDottedVersion();
 }
 
 unsigned int libsedmlVersion()
