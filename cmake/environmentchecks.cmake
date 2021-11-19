@@ -63,6 +63,7 @@ if(NOT BUILDCACHE_EXE)
     endif()
 endif()
 
+find_program(BLACK_EXE NAMES ${PREFERRED_BLACK_NAMES} black)
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
@@ -127,6 +128,10 @@ if(CLANG_FORMAT_EXE)
             set(CHECK_CODE_FORMATTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to check code formatting.")
         endif()
     endif()
+endif()
+
+if(BLACK_EXE)
+    set(PYTHON_FORMATTING_AVAILABLE TRUE CACHE INTERNAL "Executable required to check Python code formatting and format the Python code.")
 endif()
 
 if(CLANG_TIDY_EXE)
@@ -209,7 +214,8 @@ else()
     endif()
 endif()
 
-mark_as_advanced(BUILDCACHE_EXE
+mark_as_advanced(BLACK_EXE
+                 BUILDCACHE_EXE
                  CLANG_FORMAT_EXE
                  CLANG_TIDY_EXE
                  FIND_EXE

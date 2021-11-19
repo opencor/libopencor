@@ -39,3 +39,20 @@ if(FORMAT_CODE_AVAILABLE)
                COMMAND ${CLANG_FORMAT_EXE} -i ${GIT_FILES}
                COMMENT "Formatting the code...")
 endif()
+
+# Add some custom targets to test the formatting of our Python code and to
+# format it.
+
+if(PYTHON_FORMATTING_AVAILABLE)
+    set(EXCLUDE_EXTERN --exclude extern/)
+
+    add_target(check_python_code_formatting
+               COMMAND ${BLACK_EXE} --check ${EXCLUDE_EXTERN} .
+               WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+               COMMENT "Checking Python code formatting...")
+
+    add_target(format_python_code
+               COMMAND ${BLACK_EXE} ${EXCLUDE_EXTERN} .
+               WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+               COMMENT "Formatting the Python code...")
+endif()
