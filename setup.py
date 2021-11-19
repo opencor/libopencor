@@ -16,15 +16,15 @@
 from skbuild import setup
 
 setup(
-    name='libopencor',
-    version='0.1.0',
-    description='libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.',
-    author='libOpenCOR contributors',
-    url='https://opencor.ws/libopencor',
-    license='Apache 2.0',
-    packages=['libopencor'],
-    package_dir={'': 'src/bindings/python'},
-    cmake_args=['-DPYTHON_BINDINGS=ON', '-DSHARED_LIBS=OFF'],
-    cmake_install_dir='src/bindings/python/libopencor',
-    exclude_package_data={'': ['bin/*', 'cmake/*', 'include/*', 'lib/*']},
+    name="libopencor",
+    version="0.1.0",
+    description="libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.",
+    author="libOpenCOR contributors",
+    url="https://opencor.ws/libopencor",
+    license="Apache 2.0",
+    packages=["libopencor"],
+    package_dir={"": "src/bindings/python"},
+    cmake_args=["-DPYTHON_BINDINGS=ON", "-DSHARED_LIBS=OFF"],
+    cmake_install_dir="src/bindings/python/libopencor",
+    exclude_package_data={"": ["bin/*", "cmake/*", "include/*", "lib/*"]},
 )

@@ -15,7 +15,7 @@
 # Add some custom targets to test the formatting of our code and to format it.
 # Note: we don't format API_EXPORT_HEADER_FILE since it's generated.
 
-if(CLANG_FORMAT_AVAILABLE)
+if(FORMAT_CODE_AVAILABLE)
     set(GIT_FILES
         ${GIT_API_HEADER_FILES}
         ${GIT_API_MODULE_FILE}
@@ -29,8 +29,8 @@ if(CLANG_FORMAT_AVAILABLE)
 
     configure_file(codeformatting.cmake.in ${CODE_FORMATTING_SCRIPT} @ONLY)
 
-    if(CLANG_FORMAT_TESTING_AVAILABLE)
-        add_target(code_formatting
+    if(CHECK_CODE_FORMATTING_AVAILABLE)
+        add_target(check_code_formatting
                    COMMAND ${CMAKE_COMMAND} -P ${CODE_FORMATTING_SCRIPT}
                    COMMENT "Checking code formatting...")
     endif()
@@ -38,4 +38,21 @@ if(CLANG_FORMAT_AVAILABLE)
     add_target(format_code
                COMMAND ${CLANG_FORMAT_EXE} -i ${GIT_FILES}
                COMMENT "Formatting the code...")
+endif()
+
+# Add some custom targets to test the formatting of our Python code and to
+# format it.
+
+if(PYTHON_FORMATTING_AVAILABLE)
+    set(EXCLUDE_EXTERN --exclude extern/)
+
+    add_target(check_python_code_formatting
+               COMMAND ${BLACK_EXE} --check ${EXCLUDE_EXTERN} .
+               WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+               COMMENT "Checking Python code formatting...")
+
+    add_target(format_python_code
+               COMMAND ${BLACK_EXE} ${EXCLUDE_EXTERN} .
+               WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+               COMMENT "Formatting the Python code...")
 endif()

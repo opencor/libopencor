@@ -40,45 +40,45 @@ def child_node_data(dom, tag):
 
 class Frame:
     def __init__(self, frame_node):
-        self.function = child_node_data(frame_node, 'fn')
-        self.file = child_node_data(frame_node, 'file')
-        self.line = child_node_data(frame_node, 'line')
+        self.function = child_node_data(frame_node, "fn")
+        self.file = child_node_data(frame_node, "file")
+        self.line = child_node_data(frame_node, "line")
 
     def __str__(self):
-        res = ''
+        res = ""
 
         if self.function:
-            res += '     ' + self.function
+            res += "     " + self.function
 
         if self.file and self.line:
-            res += ' (' + self.file + ':' + self.line + ')'
+            res += " (" + self.file + ":" + self.line + ")"
 
-        res += '\n'
+        res += "\n"
 
         return res
 
 
 class BackTrace:
     def __init__(self, error_node):
-        self.kind = error_node.getElementsByTagName('kind')[0].firstChild.data
+        self.kind = error_node.getElementsByTagName("kind")[0].firstChild.data
         self.stack = []
 
-        for frame in error_node.getElementsByTagName('frame'):
-            if child_node_data(frame, 'fn'):
+        for frame in error_node.getElementsByTagName("frame"):
+            if child_node_data(frame, "fn"):
                 self.stack.append(Frame(frame))
 
     def is_leak(self):
-        if self.kind != 'Leak_DefinitelyLost':
+        if self.kind != "Leak_DefinitelyLost":
             return False
 
         for frame in self.stack:
-            if '::TestBody' in frame.function or 'libOpenCOR::' in frame.function:
+            if "::TestBody" in frame.function or "libOpenCOR::" in frame.function:
                 return True
 
         return False
 
     def __str__(self):
-        out = '   Traceback (most recent call first):\n'
+        out = "   Traceback (most recent call first):\n"
 
         for frame in self.stack:
             out += str(frame)
@@ -89,7 +89,7 @@ class BackTrace:
 def parse_errors(output):
     res = []
     dom = xml.dom.minidom.parseString(output)
-    error = dom.getElementsByTagName('error')
+    error = dom.getElementsByTagName("error")
 
     for stack in error:
         back_trace = BackTrace(stack)
@@ -101,32 +101,36 @@ def parse_errors(output):
 
 
 def garbage(line):
-    return not line.startswith('<unknown program name>') and not line.startswith('profiling:')
+    return not line.startswith("<unknown program name>") and not line.startswith(
+        "profiling:"
+    )
 
 
 def memcheck(valgrind, test, test_path):
     os.system(
-        valgrind + f' --tool=memcheck --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 {test_path} 1>{test}.txt 2>{test}.err 3>{test}.xml')
+        valgrind
+        + f" --tool=memcheck --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 {test_path} 1>{test}.txt 2>{test}.err 3>{test}.xml"
+    )
 
-    return ''.join(list(filter(garbage, open(f'{test}.xml').readlines())))
+    return "".join(list(filter(garbage, open(f"{test}.xml").readlines())))
 
 
 def run_test(valgrind, test, test_path):
-    sys.stdout.write(f'-- Checking memory in {test} - ')
+    sys.stdout.write(f"-- Checking memory in {test} - ")
 
     if not os.access(test_path, os.X_OK):
-        sys.stdout.write('not found\n')
+        sys.stdout.write("not found\n")
 
         return False
 
     errors = parse_errors(memcheck(valgrind, test, test_path))
 
     if len(errors) == 0:
-        sys.stdout.write('Success\n')
+        sys.stdout.write("Success\n")
 
         return True
 
-    sys.stdout.write('Failed\n')
+    sys.stdout.write("Failed\n")
 
     for error in errors:
         sys.stderr.write(str(error))
@@ -134,12 +138,12 @@ def run_test(valgrind, test, test_path):
     return False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     if len(sys.argv) > 2:
-        valgrind = shutil.which('valgrind')
+        valgrind = shutil.which("valgrind")
 
         if valgrind == None:
-            sys.stderr.write('-- Valgrind could not be found.\n')
+            sys.stderr.write("-- Valgrind could not be found.\n")
 
             sys.exit(3)
 
@@ -148,7 +152,10 @@ if __name__ == '__main__':
         tests = sys.argv[2:]
 
         with multiprocessing.Pool(multiprocessing.cpu_count()) as process:
-            results = process.starmap(run_test, [(valgrind, test, os.path.join(tests_dir, test)) for test in tests])
+            results = process.starmap(
+                run_test,
+                [(valgrind, test, os.path.join(tests_dir, test)) for test in tests],
+            )
 
         successes = []
         failures = []
@@ -163,22 +170,24 @@ if __name__ == '__main__':
 
         total = len(successes) + len(failures)
 
-        sys.stdout.write('-- Summary:\n')
+        sys.stdout.write("-- Summary:\n")
         sys.stdout.write(
-            f'     {math.ceil(100.0 * len(successes) / total)}% tests passed, {len(failures)} tests failed out of {total}.\n')
+            f"     {math.ceil(100.0 * len(successes) / total)}% tests passed, {len(failures)} tests failed out of {total}.\n"
+        )
 
         if len(failures):
-            sys.stdout.write('\n')
-            sys.stdout.write('     The failed tests are:\n')
+            sys.stdout.write("\n")
+            sys.stdout.write("     The failed tests are:\n")
 
             for failure in failures:
-                sys.stdout.write(f'      - {failure}\n')
+                sys.stdout.write(f"      - {failure}\n")
 
-            sys.stdout.write('\n')
+            sys.stdout.write("\n")
 
         sys.exit(exit_code)
     else:
         sys.stderr.write(
-            f'Usage: python3 {os.path.basename(sys.argv[0])} test_exectable_dir test_executable_1 [test_exectuable_2 ...]')
+            f"Usage: python3 {os.path.basename(sys.argv[0])} test_exectable_dir test_executable_1 [test_exectuable_2 ...]"
+        )
 
         sys.exit(1)
