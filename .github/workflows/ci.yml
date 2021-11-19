@@ -263,14 +263,14 @@ jobs:
         with:
           cache_key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage_gcov }}-${{ matrix.code_coverage_llvm_cov }}-${{ matrix.documentation }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
       - name: Install pytest
-        if: ${{ matrix.python_bindings == 'ON' }}
-        run: pip install pytest
+        if: ${{ matrix.target == 'python_unit_testing' }}
+        run: pip3 install pytest
       - name: Install ClangFormat
         if: ${{ matrix.target == 'check_code_formatting' }}
         run: brew install clang-format
       - name: Install Black
         if: ${{ matrix.target == 'check_python_code_formatting' }}
-        run: pip install black
+        run: pip3 install black
       - name: Install gcovr
         if: ${{ matrix.code_coverage_gcov == 'ON' }}
         run: sudo apt install gcovr
