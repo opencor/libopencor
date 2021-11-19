@@ -15,7 +15,7 @@
 # Add some custom targets to test the formatting of our code and to format it.
 # Note: we don't format API_EXPORT_HEADER_FILE since it's generated.
 
-if(CLANG_FORMAT_AVAILABLE)
+if(FORMAT_CODE_AVAILABLE)
     set(GIT_FILES
         ${GIT_API_HEADER_FILES}
         ${GIT_API_MODULE_FILE}
@@ -29,8 +29,8 @@ if(CLANG_FORMAT_AVAILABLE)
 
     configure_file(codeformatting.cmake.in ${CODE_FORMATTING_SCRIPT} @ONLY)
 
-    if(CLANG_FORMAT_TESTING_AVAILABLE)
-        add_target(code_formatting
+    if(CHECK_CODE_FORMATTING_AVAILABLE)
+        add_target(check_code_formatting
                    COMMAND ${CMAKE_COMMAND} -P ${CODE_FORMATTING_SCRIPT}
                    COMMENT "Checking code formatting...")
     endif()
