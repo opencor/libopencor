@@ -170,7 +170,7 @@ jobs:
             unit_testing: OFF
             target: check_code_formatting
           - name: 'Python code formatting'
-            os: macos-11
+            os: ubuntu-20.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
