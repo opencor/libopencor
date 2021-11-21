@@ -32,8 +32,8 @@ endif()
 
 # Make sure that we are building libOpenCOR in 64-bit mode.
 # Note: normally, we would check the value of CMAKE_SIZEOF_VOID_P, but in some
-#       cases it may not be set (e.g. when generating an Xcode project file), so
-#       we determine and retrieve that value ourselves.
+#       cases it may not be set (e.g., when generating an Xcode project file),
+#       so we determine and retrieve that value ourselves.
 
 try_run(ARCHITECTURE_RUN ARCHITECTURE_COMPILE
         ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake/architecture.c
