@@ -106,7 +106,7 @@ check_cxx_compiler_flag(${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS} CODE_COVERAGE_L
 # Determine what is available.
 
 if(BUILDCACHE_EXE OR CLCACHE_EXE OR CCACHE_EXE)
-    set(COMPILER_CACHING_AVAILABLE TRUE CACHE INTERNAL "Executable required to cache compilations.")
+    set(COMPILER_CACHING_AVAILABLE TRUE CACHE INTERNAL "Compiler caching is available.")
 endif()
 
 if(CLANG_FORMAT_EXE)
@@ -122,16 +122,16 @@ if(CLANG_FORMAT_EXE)
     if(CLANG_FORMAT_VERSION VERSION_LESS CLANG_FORMAT_MINIMUM_VERSION)
         message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to check code formatting and/or format the code.")
     else()
-        set(FORMAT_CODE_AVAILABLE TRUE CACHE INTERNAL "Executable required to format the code.")
+        set(FORMAT_CODE_AVAILABLE TRUE CACHE INTERNAL "Format code is available.")
 
         if(GIT_EXE)
-            set(CHECK_CODE_FORMATTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to check code formatting.")
+            set(CHECK_CODE_FORMATTING_AVAILABLE TRUE CACHE INTERNAL "Check code formatting is available.")
         endif()
     endif()
 endif()
 
 if(BLACK_EXE)
-    set(PYTHON_FORMATTING_AVAILABLE TRUE CACHE INTERNAL "Executable required to check Python code formatting and format the Python code.")
+    set(PYTHON_FORMATTING_AVAILABLE TRUE CACHE INTERNAL "Python formatting is available.")
 endif()
 
 if(CLANG_TIDY_EXE)
@@ -147,16 +147,16 @@ if(CLANG_TIDY_EXE)
     if(CLANG_TIDY_VERSION VERSION_LESS CLANG_TIDY_MINIMUM_VERSION)
         message(WARNING "Clang-Tidy ${CLANG_TIDY_VERSION} was found, but version ${CLANG_TIDY_MINIMUM_VERSION}+ is needed to perform static analysis.")
     else()
-        set(CLANG_TIDY_AVAILABLE TRUE CACHE INTERNAL "Executable required to perform static analysis.")
+        set(CODE_ANALYSIS_AVAILABLE TRUE CACHE INTERNAL "Code analysis is available.")
     endif()
 endif()
 
 if(FIND_EXE AND GCOV_EXE AND GCOVR_EXE AND CODE_COVERAGE_GCOV_COMPILER_FLAGS_OK)
-    set(CODE_COVERAGE_GCOV_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run code coverage testing using gcov.")
+    set(CODE_COVERAGE_GCOV_AVAILABLE TRUE CACHE INTERNAL "Code coverage using gcov is available.")
 endif()
 
 if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
-    set(CODE_COVERAGE_LLVM_COV_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executables required to run code coverage testing using llvm-cov.")
+    set(CODE_COVERAGE_LLVM_COV_AVAILABLE TRUE CACHE INTERNAL "Code coverage using llvm-cov is available.")
 endif()
 
 if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
@@ -174,29 +174,29 @@ if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
         check_python_package(sphinx-inline-tabs PYTHON_SPHINX_INLINE_TABS_AVAILABLE)
 
         if(PYTHON_SPHINX_COPY_BUTTON_AVAILABLE AND PYTHON_SPHINX_INLINE_TABS_AVAILABLE)
-            set(DOCUMENTATION_AVAILABLE TRUE CACHE INTERNAL "Executables and packages required to generate the documentation.")
+            set(DOCUMENTATION_AVAILABLE TRUE CACHE INTERNAL "Documentation is available.")
         endif()
     endif()
 endif()
 
 if(PYTHON_LIBRARIES)
-    set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Executable required to build Python bindings.")
+    set(PYTHON_BINDINGS_AVAILABLE TRUE CACHE INTERNAL "Python bindings are available.")
 endif()
 
 if(PYTHON_BINDINGS_AVAILABLE AND PYTEST_EXE)
-    set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Executable required to run Python unit testing.")
+    set(PYTHON_UNIT_TESTING_AVAILABLE TRUE CACHE INTERNAL "Python unit testing is available.")
 endif()
 
 if(PYTHON_EXE AND PYTHON_UNIT_TESTING_AVAILABLE)
     check_python_package(pytest-html PYTHON_PYTEST_HTML_AVAILABLE)
 
     if(PYTHON_PYTEST_HTML_AVAILABLE)
-        set(PYTHON_UNIT_TESTING_REPORT_AVAILABLE TRUE CACHE INTERNAL "Executable and package required to run Python unit testing.")
+        set(PYTHON_UNIT_TESTING_REPORT_AVAILABLE TRUE CACHE INTERNAL "Python unit testing report is available.")
     endif()
 endif()
 
 if(VALGRIND_EXE)
-    set(VALGRIND_AVAILABLE TRUE CACHE INTERNAL "Executable required to run memory checks.")
+    set(MEMORY_CHECKS_AVAILABLE TRUE CACHE INTERNAL "Memory checks are available.")
 endif()
 
 # Hide the CMake options that are not directly relevant to libOpenCOR.
