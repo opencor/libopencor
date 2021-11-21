@@ -157,7 +157,7 @@ endif()
 if(LIBOPENCOR_MEMORY_CHECKS)
     add_target(memory_checks
                COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/memory_checks
-               COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/memory_checks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
+               COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/memory_checks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
                DEPENDS ${TEST_TARGETS}
                COMMENT "Running memory checks...")
 endif()
