@@ -195,7 +195,7 @@ if(PYTHON_EXE AND PYTHON_UNIT_TESTING_AVAILABLE)
     endif()
 endif()
 
-if(VALGRIND_EXE)
+if(PYTHON_EXE AND VALGRIND_EXE)
     set(MEMORY_CHECKS_AVAILABLE TRUE CACHE INTERNAL "Memory checks are available.")
 endif()
 
