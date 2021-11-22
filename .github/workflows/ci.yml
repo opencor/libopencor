@@ -157,7 +157,7 @@ jobs:
             unit_testing: OFF
             target: python_unit_testing
           - name: 'Code formatting'
-            os: macos-11
+            os: ubuntu-20.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
