@@ -168,7 +168,7 @@ if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
                     ERROR_QUIET)
 
     if(DOXYGEN_VERSION VERSION_LESS DOXYGEN_MINIMUM_VERSION)
-        message(WARNING "ClangFormat ${DOXYGEN_VERSION} was found, but version ${DOXYGEN_MINIMUM_VERSION}+ is needed to generate the documentation.")
+        message(WARNING "Doxygen ${DOXYGEN_VERSION} was found, but version ${DOXYGEN_MINIMUM_VERSION}+ is needed to generate the documentation.")
     else()
         check_python_package(sphinx-copybutton PYTHON_SPHINX_COPY_BUTTON_AVAILABLE)
         check_python_package(sphinx-inline-tabs PYTHON_SPHINX_INLINE_TABS_AVAILABLE)
