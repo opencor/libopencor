@@ -36,9 +36,7 @@ target_include_directories(${PYTHON_BINDINGS_TARGET} PUBLIC
 
 statically_link_third_party_libraries(${PYTHON_BINDINGS_TARGET})
 
-# Make it possible to unit test our Python bindings using our CMake target.
-
-configure_file(${CMAKE_PROJECT_NAME_LC}/__init__.py ${CMAKE_PROJECT_NAME_LC}/__init__.py COPYONLY)
+add_subdirectory(${CMAKE_PROJECT_NAME_LC})
 
 # Install our Python bindings.
 
