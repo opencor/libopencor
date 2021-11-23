@@ -12,6 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Copy our Python tests over.
+
+file(GLOB PYTHON_TESTS "*.py")
+
+foreach(PYTHON_TEST ${PYTHON_TESTS})
+    get_filename_component(PYTHON_TEST_FILE ${PYTHON_TEST} NAME)
+
+    configure_file(${PYTHON_TEST_FILE} ${PYTHON_BINDINGS_DIR}/${PYTHON_TEST_FILE} COPYONLY)
+endforeach()
+
 # Run our Python tests.
 
 if(WIN32)
@@ -21,24 +31,20 @@ else()
     list(APPEND COMMANDS COMMAND export PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python)
 endif()
 
-set(TEMPORARY_FILES __pycache__ default.profraw)
-
 add_target(python_unit_testing
            ${COMMANDS}
            COMMAND ${PYTEST_EXE}
-           COMMAND ${CMAKE_COMMAND} -E rm -fr ${TEMPORARY_FILES}
            DEPENDS ${PYTHON_BINDINGS_TARGET}
            USES_TERMINAL
-           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+           WORKING_DIRECTORY ${PYTHON_BINDINGS_DIR}
            COMMENT "Running Python unit testing...")
 
 if(PYTHON_UNIT_TESTING_REPORT_AVAILABLE)
     add_target(python_unit_testing_report
                ${COMMANDS}
                COMMAND ${PYTEST_EXE} --html=${CMAKE_CURRENT_BINARY_DIR}/report.html
-               COMMAND ${CMAKE_COMMAND} -E rm -fr ${TEMPORARY_FILES}
                DEPENDS ${PYTHON_BINDINGS_TARGET}
                USES_TERMINAL
-               WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+               WORKING_DIRECTORY ${PYTHON_BINDINGS_DIR}
                COMMENT "Running Python unit testing report...")
 endif()
