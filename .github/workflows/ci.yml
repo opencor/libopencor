@@ -237,7 +237,7 @@ jobs:
             unit_testing: ON
             target: memory_checks
           - name: 'Documentation'
-            os: macos-11
+            os: ubuntu-20.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -303,7 +303,9 @@ jobs:
         run: pip3 install sphinx-copybutton sphinx-inline-tabs
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
-        run: brew install doxygen
+        run: |
+          wget https://github.com/opencor/gha/releases/download/ci/doxygen.1.9.2.linux.tar.gz -O - | tar -xz
+          sudo mv doxygen /usr/local/bin
       - name: Build libOpenCOR
         if: ${{ matrix.pip_install_test_and_uninstall != 'ON' }}
         run: |
