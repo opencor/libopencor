@@ -98,9 +98,11 @@ function(configure_clang_and_clang_tidy TARGET)
             ${DISABLED_CPPCOREGUIDELINES_CHECKS}
             fuchsia-*
             ${DISABLED_FUCHSIA_CHECKS}
+            -fuchsia-default-arguments-calls
             google-*
             hicpp-*
             llvm-*
+            -llvm-header-guard
             -llvm-include-order
             misc-*
             modernize-*
