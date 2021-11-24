@@ -15,18 +15,23 @@
 # Make sure that we are using a supported compiler.
 
 if(WIN32)
-    if(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    if(    NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"
+       AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using MSVC on Windows.")
     endif()
 elseif(APPLE)
-    if(    NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-       AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+    if(    NOT(   "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
+               OR "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
+       AND NOT(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+               OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"))
         message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using (Apple) Clang on macOS.")
     endif()
 else()
-    if(    NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"
-       AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using GCC/G++ on Linux.")
+    if(    (    NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"
+            AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+       AND (    NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
+            AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using GCC/G++ or Clang on Linux.")
     endif()
 endif()
 

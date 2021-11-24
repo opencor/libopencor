@@ -14,6 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#if __APPLE__
+#if __clang__
     #pragma clang diagnostic pop
 #endif
