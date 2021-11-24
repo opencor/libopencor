@@ -184,7 +184,7 @@ jobs:
             unit_testing: OFF
             target: check_python_code_formatting
           - name: 'Code analysis'
-            os: macos-11
+            os: ubuntu-20.04
             build_type: Release
             code_analysis: ON
             code_coverage_gcov: OFF
@@ -195,7 +195,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
-            context: PATH=/usr/local/opt/llvm/bin:$PATH
+            context: PATH=$GITHUB_WORKSPACE:$PATH CXX=/usr/local/bin/clang
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_type: Release
@@ -266,9 +266,23 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
+      - name: Install Clang
+        if: ${{ matrix.name == 'Code analysis' }}
+        run: |
+          wget https://github.com/opencor/gha/releases/download/ci/clang.13.0.0.linux.tar.gz -O - | tar -xz
+          sudo mv clang /usr/local/bin
+          wget https://github.com/opencor/gha/releases/download/ci/clang-include.13.0.0.tar.gz -O - | tar -xz
+          sudo mv include/* /usr/local/include
       - name: Install ClangFormat
         if: ${{ matrix.target == 'check_code_formatting' }}
-        run: wget https://github.com/opencor/gha/releases/download/ci/clang-format.13.0.0.linux.tar.gz -O - | tar -xz
+        run: |
+          wget https://github.com/opencor/gha/releases/download/ci/clang-format.13.0.0.linux.tar.gz -O - | tar -xz
+          sudo mv clang-format /usr/local/bin
+      - name: Install Clang-Tidy
+        if: ${{ matrix.name == 'Code analysis' }}
+        run: |
+          wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.13.0.0.linux.tar.gz -O - | tar -xz
+          sudo mv clang-tidy /usr/local/bin
       - name: Install Black
         if: ${{ matrix.target == 'check_python_code_formatting' }}
         run: pip3 install black
