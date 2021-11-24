@@ -35,9 +35,9 @@ endfunction()
 function(treat_warnings_as_errors TARGET)
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         set(COMPILE_OPTIONS /W4 /WX)
-    elseif(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-           OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-           OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"))
+    elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+           OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+           OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
         set(COMPILE_OPTIONS -Wall -W -Werror)
     endif()
 
@@ -49,7 +49,7 @@ endfunction()
 function(configure_clang_and_clang_tidy TARGET)
     # Configure Clang.
 
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+    if(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
        OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
         # The full list of diagnostic flags for Clang can be found at
         # https://clang.llvm.org/docs/DiagnosticsReference.html.
@@ -72,7 +72,7 @@ function(configure_clang_and_clang_tidy TARGET)
 
     # Configure Clang-Tidy.
 
-    if(CLANG_TIDY_AVAILABLE)
+    if(CODE_ANALYSIS_AVAILABLE)
         # The full list of Clang-Tidy checks can be found at
         # https://clang.llvm.org/extra/clang-tidy/checks/list.html.
 

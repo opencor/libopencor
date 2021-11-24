@@ -263,9 +263,9 @@ jobs:
         uses: mikehardy/buildcache-action@v1
         with:
           cache_key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage_gcov }}-${{ matrix.code_coverage_llvm_cov }}-${{ matrix.documentation }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
-      - name: Install pytest
-        if: ${{ matrix.target == 'python_unit_testing' }}
-        run: pip3 install pytest
+      - name: Configure MSVC
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Install ClangFormat
         if: ${{ matrix.target == 'check_code_formatting' }}
         run: wget https://github.com/opencor/gha/releases/download/ci/clang-format.13.0.0.linux.tar.gz -O - | tar -xz
@@ -278,6 +278,9 @@ jobs:
       - name: Install Valgrind
         if: ${{ matrix.memory_checks == 'ON' }}
         run: sudo apt install valgrind
+      - name: Install pytest
+        if: ${{ matrix.target == 'python_unit_testing' }}
+        run: pip3 install pytest
       - name: Install Sphinx
         if: ${{ matrix.documentation == 'ON' }}
         run: pip3 install sphinx
@@ -287,9 +290,6 @@ jobs:
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: brew install doxygen
-      - name: Configure MSVC
-        if: ${{ runner.os == 'Windows' }}
-        uses: ilammy/msvc-dev-cmd@v1
       - name: Build libOpenCOR
         if: ${{ matrix.pip_install_test_and_uninstall != 'ON' }}
         run: |
