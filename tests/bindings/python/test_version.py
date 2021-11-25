@@ -64,3 +64,13 @@ def test_libsedml_version():
 def test_libsedml_version_string():
     assert isinstance(libopencor.libsedml_version_string(), str)
     assert libopencor.libsedml_version_string() != ""
+
+
+def test_sundials_version():
+    assert isinstance(libopencor.sundials_version(), int)
+    assert libopencor.sundials_version() > 0
+
+
+def test_sundials_version_string():
+    assert isinstance(libopencor.sundials_version_string(), str)
+    assert libopencor.sundials_version_string() != ""

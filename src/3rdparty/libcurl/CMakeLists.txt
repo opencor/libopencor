@@ -23,10 +23,10 @@ if(WIN32 AND NOT RELEASE_MODE)
     set(DEBUG_TAG -d)
 endif()
 
-set(STATIC_LIBRARY lib/libcurl${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(LIBCURL_LIBRARY lib/libcurl${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
-    ${STATIC_LIBRARY}
+    ${LIBCURL_LIBRARY}
 )
 
 # Either retrieve or build our package.
@@ -77,7 +77,7 @@ else()
             -DCMAKE_USE_OPENSSL=ON
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
         BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${LIBCURL_LIBRARY}
         DEPENDS
             OpenSSL
     )
@@ -92,4 +92,7 @@ endif()
 
 set(LIBCURL_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBCURL_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBCURL_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBCURL_LIBRARIES
+    ${INSTALL_DIR}/${LIBCURL_LIBRARY}
+    CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
+)

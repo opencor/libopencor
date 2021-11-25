@@ -24,13 +24,13 @@ if(WIN32)
         set(DEBUG_TAG d)
     endif()
 
-    set(STATIC_LIBRARY lib/zlibstatic${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
+    set(ZLIB_LIBRARY lib/zlibstatic${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
 else()
-    set(STATIC_LIBRARY lib/libz${CMAKE_STATIC_LIBRARY_SUFFIX})
+    set(ZLIB_LIBRARY lib/libz${CMAKE_STATIC_LIBRARY_SUFFIX})
 endif()
 
 set(SHA1_FILES
-    ${STATIC_LIBRARY}
+    ${ZLIB_LIBRARY}
 )
 
 # Either retrieve or build our package.
@@ -84,7 +84,7 @@ else()
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DZLIB_COMPAT=ON
         BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${ZLIB_LIBRARY}
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
@@ -97,4 +97,7 @@ endif()
 
 set(ZLIB_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(ZLIB_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(ZLIB_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(ZLIB_LIBRARIES
+    ${INSTALL_DIR}/${ZLIB_LIBRARY}
+    CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
+)

@@ -19,10 +19,10 @@ set(GIT_TAG v5.19.0-libopencor)
 set(RELEASE_TAG v5.19.0-libopencor)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
-set(STATIC_LIBRARY lib/libsbml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(LIBSBML_LIBRARY lib/libsbml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
-    ${STATIC_LIBRARY}
+    ${LIBSBML_LIBRARY}
 )
 
 # Either retrieve or build our package.
@@ -76,7 +76,7 @@ else()
             -DWITH_SWIG=OFF
             -DWITH_ZLIB=OFF
         BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${LIBSBML_LIBRARY}
         DEPENDS
             libxml2
     )
@@ -91,5 +91,8 @@ endif()
 
 set(LIBSBML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBSBML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBSBML_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSBML_LIBRARIES
+    ${INSTALL_DIR}/${LIBSBML_LIBRARY}
+    CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
+)
 set(LIBSBML_DEFINITIONS LIBSBML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")

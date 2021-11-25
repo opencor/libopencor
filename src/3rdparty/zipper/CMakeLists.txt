@@ -19,10 +19,10 @@ set(GIT_TAG v0.9.1)
 set(RELEASE_TAG v0.9.1)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
-set(STATIC_LIBRARY lib/libZipper-static${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(ZIPPER_LIBRARY lib/libZipper-static${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
-    ${STATIC_LIBRARY}
+    ${ZIPPER_LIBRARY}
 )
 
 # Either retrieve or build our package.
@@ -79,7 +79,7 @@ else()
             -DLIBZ_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
             -DLIBZ_LIBRARY=${ZLIB_LIBRARY}
         BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${ZIPPER_LIBRARY}
         DEPENDS
             zlib
     )
@@ -94,4 +94,7 @@ endif()
 
 set(ZIPPER_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(ZIPPER_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(ZIPPER_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(ZIPPER_LIBRARIES
+    ${INSTALL_DIR}/${ZIPPER_LIBRARY}
+    CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
+)

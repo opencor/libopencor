@@ -23,10 +23,10 @@ if(WIN32 AND NOT RELEASE_MODE)
     set(DEBUG_TAG d)
 endif()
 
-set(STATIC_LIBRARY lib/libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(LIBCELLML_LIBRARY lib/libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
-    ${STATIC_LIBRARY}
+    ${LIBCELLML_LIBRARY}
 )
 
 # Either retrieve or build our package.
@@ -83,7 +83,7 @@ else()
             -DUNIT_TESTS=OFF
             -DZLIB_ROOT=${ZLIB_ROOT}
         BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${LIBCELLML_LIBRARY}
         DEPENDS
             libxml2
             zlib
@@ -99,4 +99,7 @@ endif()
 
 set(LIBCELLML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBCELLML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBCELLML_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBCELLML_LIBRARIES
+    ${INSTALL_DIR}/${LIBCELLML_LIBRARY}
+    CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
+)

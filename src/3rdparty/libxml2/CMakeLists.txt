@@ -27,10 +27,10 @@ if(WIN32)
     endif()
 endif()
 
-set(STATIC_LIBRARY lib/libxml2${OS_TAG}${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(LIBXML2_LIBRARY lib/libxml2${OS_TAG}${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
-    ${STATIC_LIBRARY}
+    ${LIBXML2_LIBRARY}
 )
 
 # Either retrieve or build our package.
@@ -86,7 +86,7 @@ else()
             -DLIBXML2_WITH_TESTS=OFF
             -DLIBXML2_WITH_ZLIB=OFF
         BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${LIBXML2_LIBRARY}
     )
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
@@ -99,4 +99,7 @@ endif()
 
 set(LIBXML2_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBXML2_INCLUDE_DIR ${INSTALL_DIR}/include/libxml2 CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBXML2_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBXML2_LIBRARIES
+    ${INSTALL_DIR}/${LIBXML2_LIBRARY}
+    CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
+)

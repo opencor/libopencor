@@ -24,6 +24,8 @@ from .module import (
     libcurl_version_string,
     libsedml_version,
     libsedml_version_string,
+    sundials_version,
+    sundials_version_string,
 )
 
 __all__ = (
@@ -38,4 +40,6 @@ __all__ = (
     "libcurl_version_string",
     "libsedml_version",
     "libsedml_version_string",
+    "sundials_version",
+    "sundials_version_string",
 )

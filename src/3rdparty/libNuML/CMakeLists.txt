@@ -19,10 +19,10 @@ set(GIT_TAG v1.1.4-libopencor)
 set(RELEASE_TAG v1.1.4-libopencor)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
-set(STATIC_LIBRARY lib/libnuml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(LIBNUML_LIBRARY lib/libnuml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
-    ${STATIC_LIBRARY}
+    ${LIBNUML_LIBRARY}
 )
 
 # Either retrieve or build our package.
@@ -86,7 +86,7 @@ else()
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
         BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${LIBNUML_LIBRARY}
         DEPENDS
             libSBML
             libxml2
@@ -102,5 +102,8 @@ endif()
 
 set(LIBNUML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBNUML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBNUML_LIBRARY ${INSTALL_DIR}/${STATIC_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBNUML_LIBRARIES
+    ${INSTALL_DIR}/${LIBNUML_LIBRARY}
+    CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
+)
 set(LIBNUML_DEFINITIONS LIBNUML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")
