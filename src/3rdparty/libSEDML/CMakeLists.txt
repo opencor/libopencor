@@ -19,10 +19,10 @@ set(GIT_TAG v0.4.4)
 set(RELEASE_TAG v0.4.4-libopencor)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
-set(STATIC_LIBRARY lib/libsedml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
+set(LIBSEDML_LIBRARY lib/libsedml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 set(SHA1_FILES
-    ${STATIC_LIBRARY}
+    ${LIBSEDML_LIBRARY}
 )
 
 # Either retrieve or build our package.
@@ -88,7 +88,7 @@ else()
             -DWITH_SWIG=OFF
             -DWITH_ZLIB=OFF
         BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${STATIC_LIBRARY}
+            ${INSTALL_DIR}/${LIBSEDML_LIBRARY}
         DEPENDS
             libNuML
             libSBML
@@ -106,7 +106,7 @@ endif()
 set(LIBSEDML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBSEDML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LIBSEDML_LIBRARIES
-    ${INSTALL_DIR}/${STATIC_LIBRARY}
+    ${INSTALL_DIR}/${LIBSEDML_LIBRARY}
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
 set(LIBSEDML_DEFINITIONS LIBSEDML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")
