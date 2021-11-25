@@ -80,6 +80,8 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
         message(">>> Retrieving SUNDIALS...")
     endif()
 else()
+    set(EP_CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_FPRINTF_OUTPUT")
+
     ExternalProject_Add(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
@@ -92,6 +94,9 @@ else()
             ${CMAKE_ARGS}
             -DBUILD_SHARED_LIBS=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DEXAMPLES_ENABLE_C=OFF
+        CMAKE_CACHE_ARGS
+            -DCMAKE_C_FLAGS:STRING=${EP_CMAKE_C_FLAGS}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${ARKODE_LIBRARY}
             ${INSTALL_DIR}/${CVODE_LIBRARY}
