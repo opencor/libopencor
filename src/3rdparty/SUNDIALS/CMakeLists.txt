@@ -226,7 +226,7 @@ endif()
 # Let others find and use our package.
 
 set(SUNDIALS_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
-set(SUNDIALS_INCLUDE_DIR ${INSTALL_DIR}/include/sundials CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
+set(SUNDIALS_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(SUNDIALS_LIBRARIES
     ${INSTALL_DIR}/${ARKODE_LIBRARY}
     ${INSTALL_DIR}/${CVODE_LIBRARY}
