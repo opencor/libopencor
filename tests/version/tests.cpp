@@ -47,3 +47,9 @@ TEST(Version, libSEDML)
     EXPECT_EQ(404U, libOpenCOR::libsedmlVersion());
     EXPECT_EQ("0.4.4", libOpenCOR::libsedmlVersionString());
 }
+
+TEST(Version, SUNDIALS)
+{
+    EXPECT_EQ(0x050800U, libOpenCOR::sundialsVersion());
+    EXPECT_EQ("5.8.0", libOpenCOR::sundialsVersionString());
+}

@@ -42,4 +42,6 @@ PYBIND11_MODULE(module, m) {
     m.def("libcurl_version_string", &libOpenCOR::libcurlVersionString, "Get the version string of libcurl.");
     m.def("libsedml_version", &libOpenCOR::libsedmlVersion, "Get the version number of libSEDML.");
     m.def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.");
+    m.def("sundials_version", &libOpenCOR::sundialsVersion, "Get the version number of SUNDIALS.");
+    m.def("sundials_version_string", &libOpenCOR::sundialsVersionString, "Get the version string of SUNDIALS.");
 }

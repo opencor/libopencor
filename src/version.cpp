@@ -30,6 +30,12 @@ limitations under the License.
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
+#include "sundialsbegin.h"
+#include "sundials/sundials_version.h"
+#include "sundialsend.h"
+
+#include <array>
+
 namespace libOpenCOR {
 
 unsigned int version()
@@ -80,6 +86,37 @@ unsigned int libsedmlVersion()
 std::string libsedmlVersionString()
 {
     return libsedml::getLibSEDMLDottedVersion();
+}
+
+unsigned int sundialsVersion()
+{
+    static const int MAJOR = 65536;
+    static const int MINOR = 256;
+    static const int LABEL_SIZE = 10;
+
+    int major = 0;
+    int minor = 0;
+    int patch = 0;
+    std::array<char, LABEL_SIZE> label {""};
+
+    SUNDIALSGetVersionNumber(&major, &minor, &patch, label.data(), LABEL_SIZE);
+
+    return static_cast<unsigned int>(MAJOR * major + MINOR * minor + patch);
+}
+
+std::string sundialsVersionString()
+{
+    static const int VERSION_SIZE = 25;
+
+    std::array<char, VERSION_SIZE> version {""};
+
+    SUNDIALSGetVersion(version.data(), VERSION_SIZE);
+
+    std::string res {std::begin(version), std::end(version)};
+
+    res.erase(res.find_last_not_of('\0') + 1, std::string::npos);
+
+    return res;
 }
 
 } // namespace libOpenCOR
