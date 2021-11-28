@@ -14,9 +14,9 @@
 
 set(PACKAGE_NAME LLVMClang)
 set(PACKAGE_VERSION 13.0.0)
-set(PACKAGE_REPOSITORY llvmclang)
-set(GIT_TAG v13.0.0)
-set(RELEASE_TAG v13.0.0)
+set(PACKAGE_REPOSITORY llvm-project)
+set(GIT_TAG llvmorg-13.0.0)
+set(RELEASE_TAG llvmorg-13.0.0)
 set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
 
 set(LLVMCLANG_LIBRARY lib/${CMAKE_STATIC_LIBRARY_PREFIX}llvmclang${CMAKE_STATIC_LIBRARY_SUFFIX})
@@ -46,11 +46,12 @@ else()
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
+        SOURCE_SUBDIR
+            llvm
         CMAKE_GENERATOR
             ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
-            -DBUILD_SHARED_LIBS=OFF
             -DCLANG_BUILD_TOOLS=OFF
             -DCLANG_ENABLE_ARCMT=OFF
             -DCLANG_ENABLE_STATIC_ANALYZER=OFF
@@ -60,6 +61,7 @@ else()
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DLIBCLANG_BUILD_STATIC=ON
             -DLLVM_BUILD_RUNTIME=OFF
             -DLLVM_BUILD_RUNTIMES=OFF
             -DLLVM_BUILD_UTILS=OFF
@@ -75,6 +77,7 @@ else()
             -DLLVM_ENABLE_PEDANTIC=OFF
             -DLLVM_ENABLE_PIC=OFF
             -DLLVM_ENABLE_PLUGINS=OFF
+            -DLLVM_ENABLE_PROJECTS="clang"
             -DLLVM_ENABLE_TERMINFO=OFF
             -DLLVM_ENABLE_WARNINGS=OFF
             -DLLVM_ENABLE_ZLIB=OFF
