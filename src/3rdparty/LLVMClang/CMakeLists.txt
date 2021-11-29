@@ -77,7 +77,7 @@ else()
             -DLLVM_ENABLE_PEDANTIC=OFF
             -DLLVM_ENABLE_PIC=OFF
             -DLLVM_ENABLE_PLUGINS=OFF
-            -DLLVM_ENABLE_PROJECTS="clang"
+            -DLLVM_ENABLE_PROJECTS=clang
             -DLLVM_ENABLE_TERMINFO=OFF
             -DLLVM_ENABLE_WARNINGS=OFF
             -DLLVM_ENABLE_ZLIB=OFF
