@@ -163,7 +163,7 @@ function(check_python_package PACKAGE AVAILABLE)
 endfunction()
 
 function(statically_link_third_party_libraries TARGET)
-    foreach(THIRD_PARTY_LIBRARY libCellML libCOMBINE libcurl libNuML libSBML libSEDML SUNDIALS)
+    foreach(THIRD_PARTY_LIBRARY libCellML libCOMBINE libcurl libNuML libSBML libSEDML LLVMClang SUNDIALS)
         string(TOUPPER "${THIRD_PARTY_LIBRARY}" THIRD_PARTY_LIBRARY_UC)
 
         target_include_directories(${TARGET} PUBLIC
