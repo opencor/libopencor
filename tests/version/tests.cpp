@@ -24,6 +24,12 @@ TEST(Version, libOpenCOR)
     EXPECT_EQ("0.1.0", libOpenCOR::versionString());
 }
 
+TEST(Version, Clang)
+{
+    EXPECT_EQ(0x130000U, libOpenCOR::clangVersion());
+    EXPECT_EQ("13.0.0", libOpenCOR::clangVersionString());
+}
+
 TEST(Version, libCellML)
 {
     EXPECT_EQ(0x000200U, libOpenCOR::libcellmlVersion());
@@ -46,6 +52,12 @@ TEST(Version, libSEDML)
 {
     EXPECT_EQ(404U, libOpenCOR::libsedmlVersion());
     EXPECT_EQ("0.4.4", libOpenCOR::libsedmlVersionString());
+}
+
+TEST(Version, LLVM)
+{
+    EXPECT_EQ(0x130000U, libOpenCOR::llvmVersion());
+    EXPECT_EQ("13.0.0", libOpenCOR::llvmVersionString());
 }
 
 TEST(Version, SUNDIALS)

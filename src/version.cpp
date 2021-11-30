@@ -16,6 +16,10 @@ limitations under the License.
 
 #include "version_p.h"
 
+#include "clangbegin.h"
+#include "clang/Basic/Version.h"
+#include "clangend.h"
+
 #include "curl/curlver.h"
 
 #include "libcellml/version.h"
@@ -30,13 +34,37 @@ limitations under the License.
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
+#include "llvm/Config/llvm-config.h"
+
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
 #include "sundialsend.h"
 
 #include <array>
+#include <cmath>
 
 namespace libOpenCOR {
+
+static const unsigned int MAJOR_10 = 1048576;
+static const unsigned int MAJOR_01 = 65536;
+static const unsigned int MINOR_10 = 4096;
+static const unsigned int MINOR_01 = 256;
+static const unsigned int PATCH_10 = 16;
+static const unsigned int PATCH_01 = 1;
+
+unsigned int firstDigit(unsigned int pTwoDigitNumber)
+{
+    static const double ONE_TENTH = 0.1;
+
+    return static_cast<unsigned int>(floor(ONE_TENTH * pTwoDigitNumber));
+}
+
+unsigned int secondDigit(unsigned int pTwoDigitNumber)
+{
+    static const unsigned int TEN = 10;
+
+    return pTwoDigitNumber % TEN;
+}
 
 unsigned int version()
 {
@@ -46,6 +74,18 @@ unsigned int version()
 std::string versionString()
 {
     return LIBOPENCOR_VERSION_STRING;
+}
+
+unsigned int clangVersion()
+{
+    return static_cast<unsigned int>(MAJOR_10 * firstDigit(CLANG_VERSION_MAJOR) + MAJOR_01 * secondDigit(CLANG_VERSION_MAJOR)
+                                     + MINOR_10 * firstDigit(CLANG_VERSION_MINOR) + MINOR_01 * secondDigit(CLANG_VERSION_MINOR)
+                                     + PATCH_10 * firstDigit(CLANG_VERSION_PATCHLEVEL) + PATCH_01 * secondDigit(CLANG_VERSION_PATCHLEVEL));
+}
+
+std::string clangVersionString()
+{
+    return CLANG_VERSION_STRING;
 }
 
 unsigned int libcellmlVersion()
@@ -86,6 +126,18 @@ unsigned int libsedmlVersion()
 std::string libsedmlVersionString()
 {
     return libsedml::getLibSEDMLDottedVersion();
+}
+
+unsigned int llvmVersion()
+{
+    return static_cast<unsigned int>(MAJOR_10 * firstDigit(LLVM_VERSION_MAJOR) + MAJOR_01 * secondDigit(LLVM_VERSION_MAJOR)
+                                     + MINOR_10 * firstDigit(LLVM_VERSION_MINOR) + MINOR_01 * secondDigit(LLVM_VERSION_MINOR)
+                                     + PATCH_10 * firstDigit(LLVM_VERSION_PATCH) + PATCH_01 * secondDigit(LLVM_VERSION_PATCH));
+}
+
+std::string llvmVersionString()
+{
+    return LLVM_VERSION_STRING;
 }
 
 unsigned int sundialsVersion()

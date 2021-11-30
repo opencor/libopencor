@@ -16,6 +16,8 @@ from .module import __doc__, __version__
 from .module import (
     version,
     version_string,
+    clang_version,
+    clang_version_string,
     libcellml_version,
     libcellml_version_string,
     libcombine_version,
@@ -24,6 +26,8 @@ from .module import (
     libcurl_version_string,
     libsedml_version,
     libsedml_version_string,
+    llvm_version,
+    llvm_version_string,
     sundials_version,
     sundials_version_string,
 )
@@ -32,6 +36,8 @@ __all__ = (
     # Version.
     "version",
     "version_string",
+    "clang_version",
+    "clang_version_string",
     "libcellml_version",
     "libcellml_version_string",
     "libcombine_version",
@@ -40,6 +46,8 @@ __all__ = (
     "libcurl_version_string",
     "libsedml_version",
     "libsedml_version_string",
+    "llvm_version",
+    "llvm_version_string",
     "sundials_version",
     "sundials_version_string",
 )
