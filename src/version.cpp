@@ -41,11 +41,26 @@ limitations under the License.
 #include "sundialsend.h"
 
 #include <array>
+#include <cmath>
 
 namespace libOpenCOR {
 
-static const int MAJOR = 65536;
-static const int MINOR = 256;
+static const unsigned int MAJOR_10 = 1048576;
+static const unsigned int MAJOR_01 = 65536;
+static const unsigned int MINOR_10 = 4096;
+static const unsigned int MINOR_01 = 256;
+static const unsigned int PATCH_10 = 16;
+static const unsigned int PATCH_01 = 1;
+
+unsigned int firstDigit(unsigned int pTwoDigitNumber)
+{
+    return static_cast<unsigned int>(floor(0.1 * pTwoDigitNumber));
+}
+
+unsigned int secondDigit(unsigned int pTwoDigitNumber)
+{
+    return pTwoDigitNumber % 10;
+}
 
 unsigned int version()
 {
@@ -59,7 +74,9 @@ std::string versionString()
 
 unsigned int clangVersion()
 {
-    return static_cast<unsigned int>(MAJOR * CLANG_VERSION_MAJOR + MINOR * CLANG_VERSION_MINOR + CLANG_VERSION_PATCHLEVEL);
+    return static_cast<unsigned int>(MAJOR_10 * firstDigit(CLANG_VERSION_MAJOR) + MAJOR_01 * secondDigit(CLANG_VERSION_MAJOR)
+                                     + MINOR_10 * firstDigit(CLANG_VERSION_MINOR) + MINOR_01 * secondDigit(CLANG_VERSION_MINOR)
+                                     + PATCH_10 * firstDigit(CLANG_VERSION_PATCHLEVEL) + PATCH_01 * secondDigit(CLANG_VERSION_PATCHLEVEL));
 }
 
 std::string clangVersionString()
@@ -109,7 +126,9 @@ std::string libsedmlVersionString()
 
 unsigned int llvmVersion()
 {
-    return static_cast<unsigned int>(MAJOR * LLVM_VERSION_MAJOR + MINOR * LLVM_VERSION_MINOR + LLVM_VERSION_PATCH);
+    return static_cast<unsigned int>(MAJOR_10 * firstDigit(LLVM_VERSION_MAJOR) + MAJOR_01 * secondDigit(LLVM_VERSION_MAJOR)
+                                     + MINOR_10 * firstDigit(LLVM_VERSION_MINOR) + MINOR_01 * secondDigit(LLVM_VERSION_MINOR)
+                                     + PATCH_10 * firstDigit(LLVM_VERSION_PATCH) + PATCH_01 * secondDigit(LLVM_VERSION_PATCH));
 }
 
 std::string llvmVersionString()
@@ -119,6 +138,8 @@ std::string llvmVersionString()
 
 unsigned int sundialsVersion()
 {
+    static const int MAJOR = 65536;
+    static const int MINOR = 256;
     static const int LABEL_SIZE = 10;
 
     int major = 0;
