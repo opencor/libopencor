@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "version_p.h"
 
+#include "clang/Basic/Version.h"
+
 #include "curl/curlver.h"
 
 #include "libcellml/version.h"
@@ -30,6 +32,8 @@ limitations under the License.
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
+#include "llvm/Config/llvm-config.h"
+
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
 #include "sundialsend.h"
@@ -37,6 +41,9 @@ limitations under the License.
 #include <array>
 
 namespace libOpenCOR {
+
+static const int MAJOR = 65536;
+static const int MINOR = 256;
 
 unsigned int version()
 {
@@ -46,6 +53,16 @@ unsigned int version()
 std::string versionString()
 {
     return LIBOPENCOR_VERSION_STRING;
+}
+
+unsigned int clangVersion()
+{
+    return static_cast<unsigned int>(MAJOR * CLANG_VERSION_MAJOR + MINOR * CLANG_VERSION_MINOR + CLANG_VERSION_PATCHLEVEL);
+}
+
+std::string clangVersionString()
+{
+    return CLANG_VERSION_STRING;
 }
 
 unsigned int libcellmlVersion()
@@ -88,10 +105,18 @@ std::string libsedmlVersionString()
     return libsedml::getLibSEDMLDottedVersion();
 }
 
+unsigned int llvmVersion()
+{
+    return static_cast<unsigned int>(MAJOR * LLVM_VERSION_MAJOR + MINOR * LLVM_VERSION_MINOR + LLVM_VERSION_PATCH);
+}
+
+std::string llvmVersionString()
+{
+    return LLVM_VERSION_STRING;
+}
+
 unsigned int sundialsVersion()
 {
-    static const int MAJOR = 65536;
-    static const int MINOR = 256;
     static const int LABEL_SIZE = 10;
 
     int major = 0;

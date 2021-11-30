@@ -32,9 +32,9 @@ if(NOT RESULT EQUAL 0)
     message(FATAL_ERROR "Git submodules could not be retrieved.")
 endif()
 
-# Enable C++11.
+# Enable C++14.
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 

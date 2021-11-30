@@ -26,6 +26,16 @@ def test_version_string():
     assert libopencor.version_string() != ""
 
 
+def test_clang_version():
+    assert isinstance(libopencor.clang_version(), int)
+    assert libopencor.clang_version() > 0
+
+
+def test_clang_version_string():
+    assert isinstance(libopencor.clang_version_string(), str)
+    assert libopencor.clang_version_string() != ""
+
+
 def test_libcellml_version():
     assert isinstance(libopencor.libcellml_version(), int)
     assert libopencor.libcellml_version() > 0
@@ -64,6 +74,16 @@ def test_libsedml_version():
 def test_libsedml_version_string():
     assert isinstance(libopencor.libsedml_version_string(), str)
     assert libopencor.libsedml_version_string() != ""
+
+
+def test_llvm_version():
+    assert isinstance(libopencor.llvm_version(), int)
+    assert libopencor.llvm_version() > 0
+
+
+def test_llvm_version_string():
+    assert isinstance(libopencor.llvm_version_string(), str)
+    assert libopencor.llvm_version_string() != ""
 
 
 def test_sundials_version():
