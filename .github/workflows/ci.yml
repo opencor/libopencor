@@ -14,7 +14,7 @@ jobs:
       matrix:
         include:
           - name: 'Windows static library'
-            os: windows-2016
+            os: windows-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -27,7 +27,7 @@ jobs:
             unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'Windows shared library'
-            os: windows-2016
+            os: windows-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -40,7 +40,7 @@ jobs:
             unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'Linux static library'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -53,7 +53,7 @@ jobs:
             unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'Linux shared library'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -66,7 +66,7 @@ jobs:
             unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'macOS static library'
-            os: macos-11
+            os: macos-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -79,7 +79,7 @@ jobs:
             unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'macOS shared library'
-            os: macos-11
+            os: macos-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -92,7 +92,7 @@ jobs:
             unit_testing: OFF
             install_uninstall_and_package: ON
           - name: 'Windows Python'
-            os: windows-2016
+            os: windows-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -105,7 +105,7 @@ jobs:
             unit_testing: OFF
             pip_install_test_and_uninstall: ON
           - name: 'Linux Python'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -118,7 +118,7 @@ jobs:
             unit_testing: OFF
             pip_install_test_and_uninstall: ON
           - name: 'macOS Python'
-            os: macos-11
+            os: macos-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -131,7 +131,7 @@ jobs:
             unit_testing: OFF
             pip_install_test_and_uninstall: ON
           - name: 'Unit testing'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Debug
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -144,7 +144,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
           - name: 'Python unit testing'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Debug
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -157,7 +157,7 @@ jobs:
             unit_testing: OFF
             target: python_unit_testing
           - name: 'Code formatting'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -171,7 +171,7 @@ jobs:
             context: PATH=$GITHUB_WORKSPACE:$PATH
             target: check_code_formatting
           - name: 'Python code formatting'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -184,7 +184,7 @@ jobs:
             unit_testing: OFF
             target: check_python_code_formatting
           - name: 'Code analysis'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Release
             code_analysis: ON
             code_coverage_gcov: OFF
@@ -197,7 +197,7 @@ jobs:
             unit_testing: OFF
             context: PATH=$GITHUB_WORKSPACE:$PATH CXX=/usr/local/bin/clang
           - name: 'Coverage using gcov'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: ON
@@ -210,7 +210,7 @@ jobs:
             unit_testing: ON
             target: code_coverage_gcov
           - name: 'Coverage using llvm-cov'
-            os: macos-11
+            os: macos-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -224,7 +224,7 @@ jobs:
             context: PATH=/usr/local/opt/llvm/bin:$PATH CXX=/usr/local/opt/llvm/bin/clang++
             target: code_coverage_llvm_cov
           - name: 'Memory checks'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Debug
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -237,7 +237,7 @@ jobs:
             unit_testing: ON
             target: memory_checks
           - name: 'Documentation'
-            os: ubuntu-20.04
+            os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
