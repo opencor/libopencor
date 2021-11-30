@@ -16,7 +16,9 @@ limitations under the License.
 
 #include "version_p.h"
 
+#include "clangbegin.h"
 #include "clang/Basic/Version.h"
+#include "clangend.h"
 
 #include "curl/curlver.h"
 
