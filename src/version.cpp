@@ -54,12 +54,16 @@ static const unsigned int PATCH_01 = 1;
 
 unsigned int firstDigit(unsigned int pTwoDigitNumber)
 {
-    return static_cast<unsigned int>(floor(0.1 * pTwoDigitNumber));
+    static const double ONE_TENTH = 0.1;
+
+    return static_cast<unsigned int>(floor(ONE_TENTH * pTwoDigitNumber));
 }
 
 unsigned int secondDigit(unsigned int pTwoDigitNumber)
 {
-    return pTwoDigitNumber % 10;
+    static const unsigned int TEN = 10;
+
+    return pTwoDigitNumber % TEN;
 }
 
 unsigned int version()
