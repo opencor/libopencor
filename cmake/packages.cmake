@@ -62,7 +62,7 @@ function(check_sha1_files PACKAGE_NAME SHA1_FILES SHA1_VALUES OK INVALID_SHA1_FI
             list(GET SHA1_FILES ${I} SHA1_FILE)
             list(GET SHA1_VALUES ${I} SHA1_VALUE)
 
-            set(REAL_SHA1_FILE ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}/${SHA1_FILE})
+            set(REAL_SHA1_FILE ${PREBUILT_DIR}/${PACKAGE_NAME}/${SHA1_FILE})
 
             if(EXISTS ${REAL_SHA1_FILE})
                 file(SHA1 ${REAL_SHA1_FILE} REAL_SHA1_VALUE)
@@ -126,7 +126,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
 
     # Create our installation directory, if needed.
 
-    set(INSTALL_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_NAME})
+    set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
     if(NOT EXISTS ${INSTALL_DIR})
         file(MAKE_DIRECTORY ${INSTALL_DIR})
@@ -209,10 +209,6 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
     add_custom_target(${PACKAGE_NAME})
 endfunction()
 
-# Get ready to build external projects.
-
-include(ExternalProject)
-
 # Determine whether we are building in release mode.
 # Note: this only makes sense if we are not in a multi-configuration mode, i.e.
 #       IS_MULTI_CONFIG is equal to FALSE, which is likely to be the case when
@@ -236,6 +232,20 @@ elseif(APPLE)
     set(TARGET_PLATFORM macos)
 else()
     set(TARGET_PLATFORM linux)
+endif()
+
+# Get ready to build external projects.
+
+include(ExternalProject)
+
+set(PREBUILT_DIR ${CMAKE_SOURCE_DIR}/prebuilt)
+
+if(WIN32)
+    if(RELEASE_MODE)
+        set(PREBUILT_DIR ${PREBUILT_DIR}/release)
+    else()
+        set(PREBUILT_DIR ${PREBUILT_DIR}/debug)
+    endif()
 endif()
 
 # Build our third-party libraries the same way that we build libOpenCOR.
