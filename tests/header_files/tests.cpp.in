@@ -19,7 +19,7 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 // clang-format off
-TEST(HeaderFiles, @GIT_API_HEADER_NAME@)
+TEST(HeaderFilesTest, @GIT_API_HEADER_NAME@)
 // clang-format on
 {
 }
