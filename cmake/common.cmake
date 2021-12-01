@@ -214,6 +214,9 @@ function(prepare_test TARGET)
                           PRIVATE gtest_main
                           PRIVATE ${CMAKE_PROJECT_NAME})
 
+    target_include_directories(${TARGET} PUBLIC
+                               $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
+
     list(APPEND TEST_TARGETS "${TARGET}")
 
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)
