@@ -34,6 +34,61 @@ protected:
     libOpenCOR::Compiler *mCompiler = nullptr;
 };
 
-TEST_F(CompilerTest, xxx)
+TEST_F(CompilerTest, basic)
 {
+    // To compiler an empty string is nonsensical, but still allowed.
+
+    EXPECT_TRUE(mCompiler->compile(""));
+
+    // Add "void" to our string.
+
+    EXPECT_FALSE(mCompiler->compile("void"));
+
+    // Add an identifier to our string.
+
+    EXPECT_FALSE(mCompiler->compile("void function"));
+
+    // Add a "(" to our string.
+
+    EXPECT_FALSE(mCompiler->compile("void function("));
+
+    // Add a ")" to our string.
+
+    EXPECT_FALSE(mCompiler->compile("void function()"));
+
+    // Add a "{" to our string.
+
+    EXPECT_FALSE(mCompiler->compile("void function() {"));
+
+    // Add a "}" to our string, making it a valid void function.
+
+    EXPECT_TRUE(mCompiler->compile("void function() {}"));
+
+    // Make the function a double function.
+
+    EXPECT_FALSE(mCompiler->compile("double function() {}"));
+
+    // Add "return" to our string.
+
+    EXPECT_FALSE(mCompiler->compile("double function() { return"));
+
+    // Add "3.0" to our string.
+
+    EXPECT_FALSE(mCompiler->compile("double function() { return 3.0"));
+
+    // Add ";" to our string.
+
+    EXPECT_FALSE(mCompiler->compile("double function() { return 3.0;"));
+
+    // Add a "}" to our string, making it a valid double function.
+
+    EXPECT_TRUE(mCompiler->compile("double function() { return 3.0; }"));
+
+    // Use an invalid function name.
+
+    EXPECT_FALSE(mCompiler->compile("double .function() { return 3.0; }"));
+
+    // Return an invalid statement.
+
+    EXPECT_FALSE(mCompiler->compile("double function() { return 3.0*/a; }"));
 }
