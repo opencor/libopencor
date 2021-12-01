@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if [ "$1" = "all" ]; then
+    echo "\033[44;37;1mCleaning all of libOpenCOR...\033[0m"
+else
+    echo "\033[44;37;1mCleaning libOpenCOR...\033[0m"
+fi
+
+appDir=$(cd $(dirname $0); pwd)/..
+
+for i in _skbuild build src/bindings/python/libopencor.egg-info; do
+    rm -fr $appDir/$i
+done
+
+if [ "$1" = "all" ]; then
+    rm -fr $appDir/prebuilt/* > /dev/null 2>&1
+fi
+
+echo "\033[42;37;1mAll done!\033[0m"
