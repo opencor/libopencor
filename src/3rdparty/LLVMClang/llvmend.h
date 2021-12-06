@@ -14,29 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include <string>
-
-namespace llvm {
-
-class ExecutionEngine;
-
-} // namespace llvm
-
-namespace libOpenCOR {
-
-class Compiler
-{
-public:
-    ~Compiler();
-
-    bool compile(const std::string &pCode);
-
-    void *function(const std::string &pName);
-
-private:
-    llvm::ExecutionEngine *mExecutionEngine = nullptr;
-};
-
-} // namespace libOpenCOR
+#ifdef __clang__
+    #pragma clang diagnostic pop
+#endif

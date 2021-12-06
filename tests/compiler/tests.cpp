@@ -39,6 +39,7 @@ TEST_F(CompilerTest, basic)
     // To compiler an empty string is nonsensical, but still allowed.
 
     EXPECT_TRUE(mCompiler->compile(""));
+    EXPECT_EQ(nullptr, mCompiler->function(""));
 
     // Add "void" to our string.
 
@@ -63,6 +64,7 @@ TEST_F(CompilerTest, basic)
     // Add a "}" to our string, making it a valid void function.
 
     EXPECT_TRUE(mCompiler->compile("void function() {}"));
+    EXPECT_NE(nullptr, mCompiler->function("function"));
 
     // Make the function a double function.
 
@@ -83,6 +85,7 @@ TEST_F(CompilerTest, basic)
     // Add a "}" to our string, making it a valid double function.
 
     EXPECT_TRUE(mCompiler->compile("double function() { return 3.0; }"));
+    EXPECT_NE(nullptr, mCompiler->function("function"));
 
     // Use an invalid function name.
 
