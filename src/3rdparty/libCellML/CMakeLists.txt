@@ -72,7 +72,6 @@ else()
             ${CMAKE_ARGS}
             -DBINDINGS_PYTHON=OFF
             -DBUILD_SHARED=OFF
-            -DBUILD_TYPE=${EP_CMAKE_BUILD_TYPE}
             -DCOVERAGE=OFF
             -DINSTALL_PREFIX=${INSTALL_DIR}
             -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
