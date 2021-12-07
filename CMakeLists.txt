@@ -432,6 +432,50 @@ if(LIBOPENCOR_MEMORY_CHECKS)
     endif()
 endif()
 
+if(NOT LIBOPENCOR_PREBUILT_LIBNUML)
+    if(LIBOPENCOR_PREBUILT_LIBSEDML)
+        message(SEND_ERROR "Configuration confusion: libNuML is to be built which means that libSEDML should also be built.")
+    endif()
+endif()
+
+if(NOT LIBOPENCOR_PREBUILT_LIBSBML)
+    if(   LIBOPENCOR_PREBUILT_LIBCOMBINE
+       OR LIBOPENCOR_PREBUILT_LIBNUML
+       OR LIBOPENCOR_PREBUILT_LIBSEDML)
+        message(SEND_ERROR "Configuration confusion: libSBML is to be built which means that libCOMBINE, libNuML and libSEDML should also be built.")
+    endif()
+endif()
+
+if(NOT LIBOPENCOR_PREBUILT_LIBXML2)
+    if(   LIBOPENCOR_PREBUILT_LIBCELLML
+       OR LIBOPENCOR_PREBUILT_LIBCOMBINE
+       OR LIBOPENCOR_PREBUILT_LIBNUML
+       OR LIBOPENCOR_PREBUILT_LIBSBML
+       OR LIBOPENCOR_PREBUILT_LIBSEDML)
+        message(SEND_ERROR "Configuration confusion: libxml2 is to be built which means that libCellML, libCOMBINE, libNuML, libSBML and libSEDML should also be built.")
+    endif()
+endif()
+
+if(NOT LIBOPENCOR_PREBUILT_OPENSSL)
+    if(LIBOPENCOR_PREBUILT_LIBCURL)
+        message(SEND_ERROR "Configuration confusion: OpenSSL is to be built which means that libcurl should also be built.")
+    endif()
+endif()
+
+if(NOT LIBOPENCOR_PREBUILT_ZIPPER)
+    if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
+        message(SEND_ERROR "Configuration confusion: zipper is to be built which means that libCOMBINE should also be built.")
+    endif()
+endif()
+
+if(NOT LIBOPENCOR_PREBUILT_ZLIB)
+    if(   LIBOPENCOR_PREBUILT_LIBCELLML
+       OR LIBOPENCOR_PREBUILT_LIBCOMBINE
+       OR LIBOPENCOR_PREBUILT_ZIPPER)
+        message(SEND_ERROR "Configuration confusion: zlib is to be built which means that libCellML, libCOMBINE and zipper should also be built.")
+    endif()
+endif()
+
 if(LIBOPENCOR_PYTHON_UNIT_TESTING)
     if(NOT LIBOPENCOR_PYTHON_BINDINGS)
         message(SEND_ERROR "Configuration confusion: Python unit testing is requested which means that Python bindings should also be requested.")
