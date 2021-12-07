@@ -15,8 +15,8 @@
 set(PACKAGE_NAME libCellML)
 set(PACKAGE_VERSION 0.2.0)
 set(PACKAGE_REPOSITORY libcellml)
-set(GIT_TAG libopencor)
-set(RELEASE_TAG libopencor)
+set(GIT_TAG v0.2.0-dev-libopencor)
+set(RELEASE_TAG v0.2.0-dev-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
