@@ -15,8 +15,8 @@
 set(PACKAGE_NAME libCellML)
 set(PACKAGE_VERSION 0.2.0)
 set(PACKAGE_REPOSITORY libcellml)
-set(GIT_TAG libopencor)
-set(RELEASE_TAG libopencor)
+set(GIT_TAG v0.2.0-dev-libopencor)
+set(RELEASE_TAG v0.2.0-dev-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -36,28 +36,28 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f12b23cafe2ae13a6a217223a2a8b18ef42405f6
+                             d326fc1d79813d3d90a6247ce162bbf1b9190715
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 42a470ae095c2b8632f118f79a9a366a0a122cd5)
+                             SHA1_VALUES fa36f0a151e29ded0b7f1bad762663c82f43600f)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             2c697bf2f4e9682fcf9f4f151df6d0bca1099ae5
+                             cde5ae29c1ac7df3e2dacda7274fdc541e455e98
                              SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 7638b990d3c753b46d0897067353f97e9ad39983)
+                             SHA1_VALUES 22142c4365215b7af220bab1d89a4f151461fd77)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         95d9d1105dde075988a0083f188fde859ab43248
+                         fa171be5c631b67d9b0582ccc8220fb2aae0697f
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 60ae23588adba6c3456907d67c277cfb97ca05b0)
+                         SHA1_VALUES 7f68d9e07221b93e3a287df29a09fc8e689aea1a)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         cf0fb2b804a809afeb9984b049e1c2f7c2205571
+                         3d9b9318f5184d7fbb80092ebeaa0ffe3aabcf04
                          SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 58cfcb61f88f33fd472fb4f32b6f6cb67bc50618)
+                         SHA1_VALUES f4a3eb0ceae8ce5987cbc0fc60bd2428952d3741)
     endif()
 else()
     ExternalProject_Add(${PACKAGE_NAME}
@@ -72,7 +72,6 @@ else()
             ${CMAKE_ARGS}
             -DBINDINGS_PYTHON=OFF
             -DBUILD_SHARED=OFF
-            -DBUILD_TYPE=${EP_CMAKE_BUILD_TYPE}
             -DCOVERAGE=OFF
             -DINSTALL_PREFIX=${INSTALL_DIR}
             -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
@@ -99,7 +98,4 @@ endif()
 
 set(LIBCELLML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBCELLML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBCELLML_LIBRARIES
-    ${INSTALL_DIR}/${LIBCELLML_LIBRARY}
-    CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
-)
+set(LIBCELLML_LIBRARY ${INSTALL_DIR}/${LIBCELLML_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")

@@ -173,7 +173,7 @@ function(statically_link_third_party_libraries TARGET)
         add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
 
         target_link_libraries(${TARGET}
-                              PRIVATE ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES})
+                              PRIVATE ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY} ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES})
 
         foreach(DEFINITION ${${THIRD_PARTY_LIBRARY_UC}_DEFINITIONS})
             target_compile_definitions(${TARGET}
