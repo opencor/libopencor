@@ -123,7 +123,7 @@ bool Compiler::compile(const std::string &pCode)
 
     // Retrieve the LLVM bitcode module.
 
-    std::unique_ptr<llvm::Module> module = codeGenerationAction->takeModule();
+    auto module = codeGenerationAction->takeModule();
 
     // Initialise the native target (and its ASM printer), so not only can we
     // then create an execution engine, but more importantly its data layout
