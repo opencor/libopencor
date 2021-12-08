@@ -214,6 +214,8 @@ function(prepare_test TARGET)
                           PRIVATE gtest_main
                           PRIVATE ${CMAKE_PROJECT_NAME})
 
+    statically_link_third_party_libraries(${TARGET})
+
     list(APPEND TEST_TARGETS "${TARGET}")
 
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)
