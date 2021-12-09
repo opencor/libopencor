@@ -57,6 +57,7 @@ get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 # Look for various packages and programs.
 
 find_package(Doxygen)
+find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
 find_program(BUILDCACHE_EXE buildcache)
 
@@ -88,8 +89,12 @@ if(DOXYGEN_EXECUTABLE)
     set(DOXYGEN_EXE ${DOXYGEN_EXECUTABLE})
 endif()
 
-if(PYTHON_EXECUTABLE)
-    set(PYTHON_EXE ${PYTHON_EXECUTABLE})
+if(Python_EXECUTABLE)
+    set(PYTHON_EXE ${Python_EXECUTABLE})
+endif()
+
+if(Python_LIBRARIES)
+    set(PYTHON_LIBRARIES ${Python_LIBRARIES})
 endif()
 
 # Check some compiler flags.
