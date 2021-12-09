@@ -14,7 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifdef __clang__
+#if defined(_MSC_VER)
+    #pragma warning(push)
+    #pragma warning(disable: 4244)
+#elif defined(__clang__)
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
     #pragma clang diagnostic ignored "-Wcomma"
@@ -31,11 +34,11 @@ limitations under the License.
     #pragma clang diagnostic ignored "-Wshadow"
     #pragma clang diagnostic ignored "-Wshadow-field"
     #pragma clang diagnostic ignored "-Wshadow-field-in-constructor"
+    #pragma clang diagnostic ignored "-Wshift-sign-overflow"
     #pragma clang diagnostic ignored "-Wshorten-64-to-32"
     #pragma clang diagnostic ignored "-Wsign-conversion"
     #pragma clang diagnostic ignored "-Wsigned-enum-bitfield"
     #pragma clang diagnostic ignored "-Wswitch-enum"
     #pragma clang diagnostic ignored "-Wundefined-func-template"
     #pragma clang diagnostic ignored "-Wunused-parameter"
-    #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif

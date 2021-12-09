@@ -14,4 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "llvmbegin.h"
+#include "utils.h"
+
+#include <cmath>
+
+namespace libOpenCOR {
+
+bool fuzzyCompare(double pNb1, double pNb2)
+{
+    static const double ONE_TRILLION = 1000000000000.0;
+
+    return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
+}
+
+} // namespace libOpenCOR

@@ -17,7 +17,6 @@ limitations under the License.
 #include "compiler.h"
 
 #include "clangbegin.h"
-#include "clang/Basic/Diagnostic.h"
 #include "clang/CodeGen/CodeGenAction.h"
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
@@ -28,47 +27,33 @@ limitations under the License.
 #include "clangend.h"
 
 #include "llvmbegin.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
 #include "llvm/Support/Host.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm-c/Core.h"
 #include "llvmend.h"
 
-namespace libOpenCOR {
+#include <iostream>
 
-Compiler::~Compiler()
-{
-    delete mExecutionEngine;
-}
+namespace libOpenCOR {
 
 bool Compiler::compile(const std::string &pCode)
 {
     // Reset ourselves.
 
-    delete mExecutionEngine;
+    mLljit.reset(nullptr);
 
-    mExecutionEngine = nullptr;
-
-    // Create a compiler instance.
-
-    clang::CompilerInstance compilerInstance;
-
-    // Create and set the compiler instance's diagnostics engine and make sure
-    // that it doesn't output anything on the console.
+    // Create a diagnostics engine.
 
     auto diagnosticOtpions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(new clang::DiagnosticOptions());
-    auto diagnosticsEngine = clang::CompilerInstance::createDiagnostics(&*diagnosticOtpions,
-                                                                        new clang::TextDiagnosticPrinter(llvm::nulls(),
-                                                                                                         &*diagnosticOtpions));
+    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(new clang::DiagnosticsEngine(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs()),
+                                                                                                             &*diagnosticOtpions,
+                                                                                                             new clang::TextDiagnosticPrinter(llvm::nulls(), &*diagnosticOtpions)));
 
-    compilerInstance.setDiagnostics(&*diagnosticsEngine);
-    compilerInstance.setVerboseOutputStream(llvm::nulls());
+    diagnosticsEngine->setWarningsAsErrors(true);
 
     // Get a driver object and ask it not to check that input files exist.
 
-    clang::driver::Driver driver("clang",
-                                 llvm::sys::getProcessTriple(),
-                                 *diagnosticsEngine);
+    clang::driver::Driver driver("clang", llvm::sys::getProcessTriple(), *diagnosticsEngine);
 
     driver.setCheckInputsExist(false);
 
@@ -76,54 +61,72 @@ bool Compiler::compile(const std::string &pCode)
 
     static const char *DummyFileName = "dummy.c";
 
-    llvm::SmallVector<const char *, 16> compilationArguments;
-
-    compilationArguments.push_back("clang");
-    compilationArguments.push_back("-fsyntax-only");
+    std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only",
 #ifdef NDEBUG
-    compilationArguments.push_back("-O3");
+                                                      "-O3",
 #else
-    compilationArguments.push_back("-g");
-    compilationArguments.push_back("-O0");
+                                                      "-g", "-O0",
 #endif
-    compilationArguments.push_back("-fno-math-errno");
-    compilationArguments.push_back("-Wall");
-    compilationArguments.push_back("-W");
-    compilationArguments.push_back("-Werror");
-    compilationArguments.push_back(DummyFileName);
+                                                      "-fno-math-errno",
+                                                      DummyFileName};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments));
 
+    if (!compilation) {
+        return false;
+    }
+
+    // The compilation object should have only one command, so if it doesn't
+    // then something went wrong.
+
+    clang::driver::JobList &jobs = compilation->getJobs();
+
+    if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
+        return false;
+    }
+
+    // Retrieve the command name and make sure that it is "clang".
+
+    static const std::string Clang = "clang";
+
+    auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
+
+    if (command.getCreator().getName() != Clang) {
+        return false;
+    }
+
     // Create a compiler invocation object.
 
-    auto compilerInvocation = std::make_unique<clang::CompilerInvocation>();
-
-    clang::CompilerInvocation::CreateFromArgs(*compilerInvocation,
-                                              llvm::cast<clang::driver::Command>(*compilation->getJobs().begin()).getArguments(),
-                                              *diagnosticsEngine);
+    auto compilerInvocation = clang::createInvocationFromCommandLine(compilationArguments, diagnosticsEngine.get());
 
     // Map our code to a memory buffer.
 
     compilerInvocation->getPreprocessorOpts().addRemappedFile(DummyFileName,
                                                               llvm::MemoryBuffer::getMemBuffer(pCode).release());
 
-    // Have our compiler instance use our compiler invocation object.
+    // Create a compiler instance.
 
+    clang::CompilerInstance compilerInstance;
+
+    compilerInstance.setDiagnostics(diagnosticsEngine.get());
     compilerInstance.setInvocation(std::move(compilerInvocation));
+    compilerInstance.setVerboseOutputStream(llvm::nulls());
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
-    std::unique_ptr<clang::CodeGenAction> codeGenerationAction(new clang::EmitLLVMOnlyAction(llvm::unwrap(LLVMGetGlobalContext())));
+    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction(llvm::unwrap(LLVMGetGlobalContext())));
 
-    if (!compilerInstance.ExecuteAction(*codeGenerationAction)) {
-        // The code couldn't be compiled.
-
+    if (!compilerInstance.ExecuteAction(*codeGenAction)) {
         return false;
     }
 
     // Retrieve the LLVM bitcode module.
 
-    auto module = codeGenerationAction->takeModule();
+    auto module = codeGenAction->takeModule();
+
+    if (!module) {
+        return false;
+    }
 
     // Initialise the native target (and its ASM printer), so not only can we
     // then create an execution engine, but more importantly its data layout
@@ -132,9 +135,33 @@ bool Compiler::compile(const std::string &pCode)
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
-    // Create and keep track of an execution engine.
+    // Create an ORC-based JIT and keep track of it (so that we can use it in
+    // function().
 
-    mExecutionEngine = llvm::EngineBuilder(std::move(module)).setEngineKind(llvm::EngineKind::JIT).create();
+    auto lljit = llvm::orc::LLJITBuilder().create();
+
+    if (!lljit) {
+        return false;
+    }
+
+    mLljit = std::move(*lljit);
+
+    // Add a JIT dynamic library to our ORC-based JIT.
+
+    auto jitDylib = mLljit->createJITDylib("main");
+
+    if (!jitDylib) {
+        return false;
+    }
+
+    // Add our LLVM bitcode module to our ORC-based JIT.
+
+    auto llvmContext = std::make_unique<llvm::LLVMContext>();
+    auto threadSafeModule = llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext));
+
+    if (mLljit->addIRModule(std::move(threadSafeModule))) {
+        return false;
+    }
 
     return true;
 }
@@ -143,8 +170,12 @@ void *Compiler::function(const std::string &pName)
 {
     // Return the address of the requested function.
 
-    if (mExecutionEngine != nullptr) {
-        return reinterpret_cast<void *>(mExecutionEngine->getFunctionAddress(pName)); // NOLINT
+    if (mLljit != nullptr) {
+        auto symbol = mLljit->lookup(pName);
+
+        if (symbol) {
+            return reinterpret_cast<void *>(symbol->getAddress());
+        }
     }
 
     return nullptr;

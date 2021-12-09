@@ -64,6 +64,7 @@ function(configure_clang_and_clang_tidy TARGET)
         if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
             list(APPEND COMPILE_OPTIONS
                 -Wno-c++98-compat-pedantic
+                -Wno-weak-vtables
             )
         endif()
 
@@ -82,10 +83,18 @@ function(configure_clang_and_clang_tidy TARGET)
             )
             set(DISABLED_CPPCOREGUIDELINES_CHECKS
                 -cppcoreguidelines-avoid-non-const-global-variables
+                -cppcoreguidelines-non-private-member-variables-in-classes
                 -cppcoreguidelines-owning-memory
+                -cppcoreguidelines-pro-type-reinterpret-cast
             )
             set(DISABLED_FUCHSIA_CHECKS
                 -fuchsia-statically-constructed-objects
+            )
+            set(MISC_CHECKS
+                -misc-non-private-member-variables-in-classes
+            )
+            set(READABILITY_CHECKS
+                -readability-function-cognitive-complexity
             )
         endif()
 
@@ -105,10 +114,12 @@ function(configure_clang_and_clang_tidy TARGET)
             -llvm-header-guard
             -llvm-include-order
             misc-*
+            ${MISC_CHECKS}
             modernize-*
             -modernize-use-trailing-return-type
             performance-*
             readability-*
+            ${READABILITY_CHECKS}
         )
 
         string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")

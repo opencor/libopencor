@@ -14,4 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "llvmbegin.h"
+#pragma once
+
+namespace libOpenCOR {
+
+bool fuzzyCompare(double pNb1, double pNb2);
+
+} // namespace libOpenCOR
