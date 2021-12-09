@@ -217,6 +217,8 @@ function(prepare_test TARGET)
     target_include_directories(${TARGET} PUBLIC
                                $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 
+    statically_link_third_party_libraries(${TARGET})
+
     list(APPEND TEST_TARGETS "${TARGET}")
 
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)
