@@ -12,15 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(LIBOPENCOR_UNIT_TESTING)
-    # Configure GoogleTest.
-
-    if(APPLE)
-        set_target_properties(gtest gtest_main
-                              PROPERTIES MACOSX_RPATH ON)
-    endif()
-endif()
-
 # Include our different tests.
 
 include(version/tests.cmake)
