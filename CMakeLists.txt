@@ -50,22 +50,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(common)
 
-# Enable Python bindings.
-# Note: we get pybind11 to look for Python for us since it seems to be doing a
-#       better job of it when building libOpenCOR Python using GitHub Actions.
-#       Indeed, on GHA Windows, Python 3.7.9 is the official version, yet CMake
-#       finds and uses Python 3.10.0, which causes problems when we then want to
-#       test our Python bindings since we use the official version of Python.
-
-add_subdirectory(extern/pybind11)
-
-mark_as_advanced(PYBIND11_FINDPYTHON
-                 PYBIND11_INSTALL
-                 PYBIND11_INTERNALS_VERSION
-                 PYBIND11_NOPYTHON
-                 PYBIND11_PYTHON_VERSION
-                 PYBIND11_TEST)
-
 # Check the environment we are dealing with.
 
 include(environmentchecks)
@@ -480,6 +464,26 @@ if(LIBOPENCOR_PYTHON_UNIT_TESTING)
     if(NOT LIBOPENCOR_PYTHON_BINDINGS)
         message(SEND_ERROR "Configuration confusion: Python unit testing is requested which means that Python bindings should also be requested.")
     endif()
+endif()
+
+# Enable Python bindings.
+# Note: we unset Python_FOUND so that pybind11 can look for Python on our behalf
+#       and thus allow our Windows Python CI test to work as expected using
+#       GitHub Actions. Indeed, on GHA Windows, Python 3.7.9 is the official
+#       version, yet CMake finds and uses Python 3.10.0, which causes problems
+#       when we then want to test our Python bindings since we use the official
+#       version of Python.
+
+if(LIBOPENCOR_PYTHON_BINDINGS)
+    unset(Python_FOUND)
+
+    add_subdirectory(extern/pybind11)
+
+    mark_as_advanced(PYBIND11_FINDPYTHON
+                     PYBIND11_INSTALL
+                     PYBIND11_INTERNALS_VERSION
+                     PYBIND11_NOPYTHON
+                     PYBIND11_TEST)
 endif()
 
 # Build libOpenCOR.
