@@ -31,6 +31,7 @@ limitations under the License.
     #pragma warning(disable: 4996)
 #elif defined(__GNUC__)
     #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wredundant-move"
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 #else
     #pragma clang diagnostic push
