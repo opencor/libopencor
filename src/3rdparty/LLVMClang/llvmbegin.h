@@ -17,12 +17,18 @@ limitations under the License.
 #if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable: 4100)
+    #pragma warning(disable: 4127)
+    #pragma warning(disable: 4146)
     #pragma warning(disable: 4244)
     #pragma warning(disable: 4245)
     #pragma warning(disable: 4267)
+    #pragma warning(disable: 4291)
     #pragma warning(disable: 4324)
+    #pragma warning(disable: 4389)
     #pragma warning(disable: 4458)
+    #pragma warning(disable: 4459)
     #pragma warning(disable: 4624)
+    #pragma warning(disable: 4996)
 #elif defined(__clang__)
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
