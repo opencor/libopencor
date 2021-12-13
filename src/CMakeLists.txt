@@ -144,17 +144,9 @@ generate_export_header(${CMAKE_PROJECT_NAME}
                        EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
                        BASE_NAME LIBOPENCOR)
 
-# Treat warnings as errors.
+# Configure the compiler and various tools.
 
-if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-    treat_warnings_as_errors(${CMAKE_PROJECT_NAME})
-endif()
-
-# Analyse the code.
-
-if(LIBOPENCOR_CODE_ANALYSIS)
-    configure_clang_and_clang_tidy(${CMAKE_PROJECT_NAME})
-endif()
+configure_compiler_and_tools(${CMAKE_PROJECT_NAME})
 
 # Get ready for code coverage using gcov.
 

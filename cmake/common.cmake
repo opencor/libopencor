@@ -32,112 +32,118 @@ function(replace_compiler_flag OLD NEW)
     endforeach()
 endfunction()
 
-function(treat_warnings_as_errors TARGET)
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-        set(COMPILE_OPTIONS /W4 /WX)
-    elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-           OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-           OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-        set(COMPILE_OPTIONS -Wall -W -Werror)
+function(configure_compiler_and_tools TARGET)
+    # Treat warnings as errors.
+
+    if(LIBOPENCOR_WARNINGS_AS_ERRORS)
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+            set(COMPILE_OPTIONS /W4 /WX)
+        elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+            OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+            OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+            set(COMPILE_OPTIONS -Wall -W -Werror)
+        endif()
+
+        if(COMPILE_OPTIONS)
+            target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
+        endif()
     endif()
 
-    if(COMPILE_OPTIONS)
-        target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
-    endif()
-endfunction()
+    # Analyse the code.
 
-function(configure_clang_and_clang_tidy TARGET)
-    # Configure Clang.
+    if(LIBOPENCOR_CODE_ANALYSIS)
+        # Configure Clang.
 
-    if(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-       OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-        # The full list of diagnostic flags for Clang can be found at
-        # https://clang.llvm.org/docs/DiagnosticsReference.html.
+        if(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+        OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+            # The full list of diagnostic flags for Clang can be found at
+            # https://clang.llvm.org/docs/DiagnosticsReference.html.
 
-        set(COMPILE_OPTIONS
-            -Weverything
-            -Wno-c++98-compat
-            -Wno-exit-time-destructors
-            -Wno-global-constructors
-        )
+            set(COMPILE_OPTIONS
+                -Weverything
+                -Wno-c++98-compat
+                -Wno-exit-time-destructors
+                -Wno-global-constructors
+            )
 
-        if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
-            list(APPEND COMPILE_OPTIONS
-                -Wno-c++98-compat-pedantic
+            if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
+                list(APPEND COMPILE_OPTIONS
+                    -Wno-c++98-compat-pedantic
+                )
+            endif()
+
+            target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
+        endif()
+
+        # Configure Clang-Tidy.
+
+        if(CODE_ANALYSIS_AVAILABLE)
+            # The full list of Clang-Tidy checks can be found at
+            # https://clang.llvm.org/extra/clang-tidy/checks/list.html.
+
+            if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
+                set(DISABLED_CERT_CHECKS
+                    -cert-err58-cpp
+                )
+                set(DISABLED_CPPCOREGUIDELINES_CHECKS
+                    -cppcoreguidelines-avoid-non-const-global-variables
+                    -cppcoreguidelines-owning-memory
+                )
+                set(DISABLED_FUCHSIA_CHECKS
+                    -fuchsia-statically-constructed-objects
+                )
+            endif()
+
+            set(CLANG_TIDY_CHECKS
+                -*
+                bugprone-*
+                cert-*
+                ${DISABLED_CERT_CHECKS}
+                cppcoreguidelines-*
+                ${DISABLED_CPPCOREGUIDELINES_CHECKS}
+                fuchsia-*
+                ${DISABLED_FUCHSIA_CHECKS}
+                -fuchsia-default-arguments-calls
+                google-*
+                hicpp-*
+                llvm-*
+                -llvm-header-guard
+                -llvm-include-order
+                misc-*
+                modernize-*
+                -modernize-use-trailing-return-type
+                performance-*
+                readability-*
+            )
+
+            string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")
+
+            if(LIBOPENCOR_WARNINGS_AS_ERRORS)
+                set(CLANG_TIDY_WARNINGS_AS_ERRORS ";-warnings-as-errors=${CLANG_TIDY_CHECKS}")
+            endif()
+
+            if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
+                set(HEADER_FILTER_DIR ..)
+            else()
+                set(HEADER_FILTER_DIR ${CMAKE_SOURCE_DIR})
+            endif()
+
+            set(HEADER_FILTER_DIR "${HEADER_FILTER_DIR}/src/")
+
+            string(REPLACE "." "\\\." HEADER_FILTER_DIR "${HEADER_FILTER_DIR}")
+            string(REPLACE "/" "\\\/" HEADER_FILTER_DIR "${HEADER_FILTER_DIR}")
+
+            if(MSVC)
+                # Extra argument for Clang-Tidy when using MSVC.
+                # See https://gitlab.kitware.com/cmake/cmake/-/issues/20512#note_722771.
+
+                set(EXTRA_ARG ";--extra-arg=/EHsc")
+            endif()
+
+            set_target_properties(${TARGET} PROPERTIES
+                CXX_CLANG_TIDY "${CLANG_TIDY_EXE}${EXTRA_ARG};-checks=${CLANG_TIDY_CHECKS};-header-filter=${HEADER_FILTER_DIR}.*${CLANG_TIDY_WARNINGS_AS_ERRORS}"
             )
         endif()
-
-        target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
-    endif()
-
-    # Configure Clang-Tidy.
-
-    if(CODE_ANALYSIS_AVAILABLE)
-        # The full list of Clang-Tidy checks can be found at
-        # https://clang.llvm.org/extra/clang-tidy/checks/list.html.
-
-        if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
-            set(DISABLED_CERT_CHECKS
-                -cert-err58-cpp
-            )
-            set(DISABLED_CPPCOREGUIDELINES_CHECKS
-                -cppcoreguidelines-avoid-non-const-global-variables
-                -cppcoreguidelines-owning-memory
-            )
-            set(DISABLED_FUCHSIA_CHECKS
-                -fuchsia-statically-constructed-objects
-            )
-        endif()
-
-        set(CLANG_TIDY_CHECKS
-            -*
-            bugprone-*
-            cert-*
-            ${DISABLED_CERT_CHECKS}
-            cppcoreguidelines-*
-            ${DISABLED_CPPCOREGUIDELINES_CHECKS}
-            fuchsia-*
-            ${DISABLED_FUCHSIA_CHECKS}
-            -fuchsia-default-arguments-calls
-            google-*
-            hicpp-*
-            llvm-*
-            -llvm-header-guard
-            -llvm-include-order
-            misc-*
-            modernize-*
-            -modernize-use-trailing-return-type
-            performance-*
-            readability-*
-        )
-
-        string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")
-
-        if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-            set(CLANG_TIDY_WARNINGS_AS_ERRORS ";-warnings-as-errors=${CLANG_TIDY_CHECKS}")
-        endif()
-
-        if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
-            set(HEADER_FILTER_DIR ..)
-        else()
-            set(HEADER_FILTER_DIR ${CMAKE_SOURCE_DIR})
-        endif()
-
-        set(HEADER_FILTER_DIR "${HEADER_FILTER_DIR}/src/")
-
-        string(REPLACE "." "\\\." HEADER_FILTER_DIR "${HEADER_FILTER_DIR}")
-        string(REPLACE "/" "\\\/" HEADER_FILTER_DIR "${HEADER_FILTER_DIR}")
-
-        if(MSVC)
-            # Extra argument for Clang-Tidy when using MSVC.
-            # See https://gitlab.kitware.com/cmake/cmake/-/issues/20512#note_722771.
-
-            set(EXTRA_ARG ";--extra-arg=/EHsc")
-        endif()
-
-        set_target_properties(${TARGET} PROPERTIES
-            CXX_CLANG_TIDY "${CLANG_TIDY_EXE}${EXTRA_ARG};-checks=${CLANG_TIDY_CHECKS};-header-filter=${HEADER_FILTER_DIR}.*${CLANG_TIDY_WARNINGS_AS_ERRORS}"
-        )
     endif()
 endfunction()
 
@@ -223,17 +229,9 @@ function(prepare_test TARGET)
 
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)
 
-    # Treat warnings as errors for the given test.
+    # Configure the compiler and various tools.
 
-    if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-        treat_warnings_as_errors(${TARGET})
-    endif()
-
-    # Analyse the code of the given test.
-
-    if(LIBOPENCOR_CODE_ANALYSIS)
-        configure_clang_and_clang_tidy(${TARGET})
-    endif()
+    configure_compiler_and_tools(${TARGET})
 endfunction()
 
 function(build_documentation DOCUMENTATION_NAME)
