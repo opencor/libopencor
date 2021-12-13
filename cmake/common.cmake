@@ -33,10 +33,6 @@ function(replace_compiler_flag OLD NEW)
 endfunction()
 
 function(configure_compiler_and_tools TARGET)
-    # Build with position independent code.
-
-    set_property(TARGET ${TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
-
     # Treat warnings as errors.
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
