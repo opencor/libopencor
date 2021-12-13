@@ -29,7 +29,10 @@ limitations under the License.
     #pragma warning(disable: 4459)
     #pragma warning(disable: 4624)
     #pragma warning(disable: 4996)
-#elif defined(__clang__)
+#elif defined(__GNUC__)
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-parameter"
+#else
     #pragma clang diagnostic push
     #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
     #pragma clang diagnostic ignored "-Wcomma"

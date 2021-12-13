@@ -16,6 +16,8 @@ limitations under the License.
 
 #if defined(_MSC_VER)
     #pragma warning(pop)
-#elif defined(__clang__)
+#elif defined(__GNUC__)
+    #pragma GCC diagnostic pop
+#else
     #pragma clang diagnostic pop
 #endif
