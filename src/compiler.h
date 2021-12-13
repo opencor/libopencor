@@ -16,27 +16,23 @@ limitations under the License.
 
 #pragma once
 
+#include "llvmbegin.h"
+#include "llvm/ExecutionEngine/Orc/LLJIT.h"
+#include "llvmend.h"
+
 #include <string>
-
-namespace llvm {
-
-class ExecutionEngine;
-
-} // namespace llvm
 
 namespace libOpenCOR {
 
 class Compiler
 {
 public:
-    ~Compiler();
-
     bool compile(const std::string &pCode);
 
     void *function(const std::string &pName);
 
 private:
-    llvm::ExecutionEngine *mExecutionEngine = nullptr;
+    std::unique_ptr<llvm::orc::LLJIT> mLljit;
 };
 
 } // namespace libOpenCOR

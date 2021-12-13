@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#if defined(_MSC_VER)
-    #pragma warning(pop)
-#elif defined(__GNUC__)
-    #pragma GCC diagnostic pop
-#else
-    #pragma clang diagnostic pop
-#endif
+#pragma once
+
+namespace libOpenCOR {
+
+bool fuzzyCompare(double pNb1, double pNb2);
+
+} // namespace libOpenCOR

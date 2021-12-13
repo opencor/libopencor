@@ -17,6 +17,7 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 #include "compiler.h"
+#include "utils.h"
 
 class CompilerTest: public testing::Test
 {
@@ -36,7 +37,11 @@ protected:
 
 TEST_F(CompilerTest, basic)
 {
-    // To compiler an empty string is nonsensical, but still allowed.
+    // Cannot retrieve a function if nothing has been compiled.
+
+    EXPECT_EQ(nullptr, mCompiler->function(""));
+
+    // To compile an empty string is nonsensical, but still possible.
 
     EXPECT_TRUE(mCompiler->compile(""));
     EXPECT_EQ(nullptr, mCompiler->function(""));
@@ -86,6 +91,7 @@ TEST_F(CompilerTest, basic)
 
     EXPECT_TRUE(mCompiler->compile("double function() { return 3.0; }"));
     EXPECT_NE(nullptr, mCompiler->function("function"));
+    EXPECT_TRUE(libOpenCOR::fuzzyCompare(3.0, reinterpret_cast<double (*)()>(mCompiler->function("function"))()));
 
     // Use an invalid function name.
 
@@ -93,5 +99,25 @@ TEST_F(CompilerTest, basic)
 
     // Return an invalid statement.
 
-    EXPECT_FALSE(mCompiler->compile("double function() { return 3.0*/a; }"));
+    EXPECT_FALSE(mCompiler->compile("double function() { return 3.0+*-/a; }"));
+}
+
+TEST_F(CompilerTest, severalFunctions)
+{
+    EXPECT_TRUE(mCompiler->compile("double function1() { return 3.0; }"
+                                   "double function2() { return 5.0; }"
+                                   "double function3() { return 7.0; }"));
+    EXPECT_NE(nullptr, mCompiler->function("function1"));
+    EXPECT_NE(nullptr, mCompiler->function("function2"));
+    EXPECT_NE(nullptr, mCompiler->function("function3"));
+    EXPECT_TRUE(libOpenCOR::fuzzyCompare(3.0, reinterpret_cast<double (*)()>(mCompiler->function("function1"))()));
+    EXPECT_TRUE(libOpenCOR::fuzzyCompare(5.0, reinterpret_cast<double (*)()>(mCompiler->function("function2"))()));
+    EXPECT_TRUE(libOpenCOR::fuzzyCompare(7.0, reinterpret_cast<double (*)()>(mCompiler->function("function3"))()));
+}
+
+TEST_F(CompilerTest, severalParameters)
+{
+    EXPECT_TRUE(mCompiler->compile("double function(double a, double b, double c) { return a*b*c; }"));
+    EXPECT_NE(nullptr, mCompiler->function("function"));
+    EXPECT_TRUE(libOpenCOR::fuzzyCompare(105.0, reinterpret_cast<double (*)(double, double, double)>(mCompiler->function("function"))(3.0, 5.0, 7.0)));
 }

@@ -33,6 +33,10 @@ function(replace_compiler_flag OLD NEW)
 endfunction()
 
 function(configure_compiler_and_tools TARGET)
+    # Build with position independent code.
+
+    set_property(TARGET ${TARGET} PROPERTY POSITION_INDEPENDENT_CODE ON)
+
     # Treat warnings as errors.
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
@@ -69,6 +73,7 @@ function(configure_compiler_and_tools TARGET)
             if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
                 list(APPEND COMPILE_OPTIONS
                     -Wno-c++98-compat-pedantic
+                    -Wno-weak-vtables
                 )
             endif()
 
@@ -87,10 +92,18 @@ function(configure_compiler_and_tools TARGET)
                 )
                 set(DISABLED_CPPCOREGUIDELINES_CHECKS
                     -cppcoreguidelines-avoid-non-const-global-variables
+                    -cppcoreguidelines-non-private-member-variables-in-classes
                     -cppcoreguidelines-owning-memory
+                    -cppcoreguidelines-pro-type-reinterpret-cast
                 )
                 set(DISABLED_FUCHSIA_CHECKS
                     -fuchsia-statically-constructed-objects
+                )
+                set(MISC_CHECKS
+                    -misc-non-private-member-variables-in-classes
+                )
+                set(READABILITY_CHECKS
+                    -readability-function-cognitive-complexity
                 )
             endif()
 
@@ -110,10 +123,12 @@ function(configure_compiler_and_tools TARGET)
                 -llvm-header-guard
                 -llvm-include-order
                 misc-*
+                ${MISC_CHECKS}
                 modernize-*
                 -modernize-use-trailing-return-type
                 performance-*
                 readability-*
+                ${READABILITY_CHECKS}
             )
 
             string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")
