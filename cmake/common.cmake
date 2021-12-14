@@ -55,7 +55,7 @@ function(configure_compiler_and_tools TARGET)
         # Configure Clang.
 
         if(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-        OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+           OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
             # The full list of diagnostic flags for Clang can be found at
             # https://clang.llvm.org/docs/DiagnosticsReference.html.
 
