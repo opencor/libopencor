@@ -1028,4 +1028,10 @@ if(WIN32)
         version
         CACHE INTERNAL "${PACKAGE_NAME}'s system libraries."
     )
+elseif(NOT APPLE)
+    set(LLVMCLANG_SYSTEM_LIBRARIES
+        dl
+        pthread
+        CACHE INTERNAL "${PACKAGE_NAME}'s system libraries."
+    )
 endif()
