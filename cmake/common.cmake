@@ -45,7 +45,8 @@ function(configure_compiler_and_tools TARGET)
         endif()
 
         if(COMPILE_OPTIONS)
-            target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
+            target_compile_options(${TARGET} PRIVATE
+                                   ${COMPILE_OPTIONS})
         endif()
     endif()
 
@@ -73,7 +74,8 @@ function(configure_compiler_and_tools TARGET)
                 )
             endif()
 
-            target_compile_options(${TARGET} PRIVATE ${COMPILE_OPTIONS})
+            target_compile_options(${TARGET} PRIVATE
+                                   ${COMPILE_OPTIONS})
         endif()
 
         # Configure Clang-Tidy.
@@ -183,8 +185,8 @@ function(link_against_external_libraries TARGET)
     # Link against version.dll if we are on Windows (needed by Clang).
 
     if(WIN32)
-        target_link_libraries(${TARGET}
-                              PRIVATE version)
+        target_link_libraries(${TARGET} PRIVATE
+                              version)
     endif()
 
     # Link against our third-party libraries.
@@ -198,12 +200,13 @@ function(link_against_external_libraries TARGET)
                                    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${THIRD_PARTY_LIBRARY}>
                                    $<BUILD_INTERFACE:${${THIRD_PARTY_LIBRARY_UC}_INCLUDE_DIR}>)
 
-        target_link_libraries(${TARGET}
-                              PRIVATE ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY} ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES})
+        target_link_libraries(${TARGET} PRIVATE
+                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY}
+                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES})
 
         foreach(DEFINITION ${${THIRD_PARTY_LIBRARY_UC}_DEFINITIONS})
-            target_compile_definitions(${TARGET}
-                                       PRIVATE ${DEFINITION})
+            target_compile_definitions(${TARGET} PRIVATE
+                                       ${DEFINITION})
         endforeach()
     endforeach()
 endfunction()
@@ -236,9 +239,9 @@ function(prepare_test TARGET)
     add_executable(${TARGET}
                    ${ARGN})
 
-    target_link_libraries(${TARGET}
-                          PRIVATE gtest_main
-                          PRIVATE ${CMAKE_PROJECT_NAME})
+    target_link_libraries(${TARGET} PRIVATE
+                          gtest_main
+                          ${CMAKE_PROJECT_NAME})
 
     target_include_directories(${TARGET} PUBLIC
                                $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
