@@ -179,7 +179,9 @@ function(check_python_package PACKAGE AVAILABLE)
     endif()
 endfunction()
 
-function(statically_link_third_party_libraries TARGET)
+function(link_against_external_libraries TARGET)
+    # Link against our third-party libraries.
+
     foreach(THIRD_PARTY_LIBRARY libCellML libCOMBINE libcurl libNuML libSBML libSEDML LLVMClang SUNDIALS)
         string(TOUPPER "${THIRD_PARTY_LIBRARY}" THIRD_PARTY_LIBRARY_UC)
 
@@ -234,7 +236,7 @@ function(prepare_test TARGET)
     target_include_directories(${TARGET} PUBLIC
                                $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 
-    statically_link_third_party_libraries(${TARGET})
+    link_against_external_libraries(${TARGET})
 
     list(APPEND TEST_TARGETS "${TARGET}")
 

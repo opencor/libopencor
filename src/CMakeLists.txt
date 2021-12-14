@@ -134,9 +134,9 @@ set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
 add_subdirectory(3rdparty)
 
-# Statically link some third-party libraries to libOpenCOR.
+# Link some external libraries to libOpenCOR.
 
-statically_link_third_party_libraries(${CMAKE_PROJECT_NAME})
+link_against_external_libraries(${CMAKE_PROJECT_NAME})
 
 # Generate the export header file.
 
