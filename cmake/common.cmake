@@ -183,7 +183,8 @@ function(link_against_external_libraries TARGET)
     # Link against version.dll if we are on Windows (needed by Clang).
 
     if(WIN32)
-        target_link_libraries(version)
+        target_link_libraries(${TARGET}
+                              PRIVATE version)
     endif()
 
     # Link against our third-party libraries.
