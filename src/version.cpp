@@ -34,7 +34,9 @@ limitations under the License.
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
+#include "llvmbegin.h"
 #include "llvm/Config/llvm-config.h"
+#include "llvmend.h"
 
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
