@@ -180,6 +180,12 @@ function(check_python_package PACKAGE AVAILABLE)
 endfunction()
 
 function(link_against_external_libraries TARGET)
+    # Link against version.dll if we are on Windows (needed by Clang).
+
+    if(WIN32)
+        target_link_libraries(version)
+    endif()
+
     # Link against our third-party libraries.
 
     foreach(THIRD_PARTY_LIBRARY libCellML libCOMBINE libcurl libNuML libSBML libSEDML LLVMClang SUNDIALS)
