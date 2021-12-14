@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build our Python bindings, making sure that some of our third-party libraries
-# are statically linked to it.
+# Build our Python bindings and make sure that they are linked against our
+# third-party libraries.
 
 set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
 
@@ -34,7 +34,7 @@ target_include_directories(${PYTHON_BINDINGS_TARGET} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api>
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
 
-link_against_external_libraries(${PYTHON_BINDINGS_TARGET})
+link_against_third_party_libraries(${PYTHON_BINDINGS_TARGET})
 
 add_subdirectory(${CMAKE_PROJECT_NAME_LC})
 

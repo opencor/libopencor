@@ -1023,3 +1023,9 @@ set(LLVMCLANG_LIBRARIES
     ${INSTALL_DIR}/${LLVM_XRAY_LIBRARY}
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
+if(WIN32)
+    set(LLVMCLANG_SYSTEM_LIBRARIES
+        version
+        CACHE INTERNAL "${PACKAGE_NAME}'s system libraries."
+    )
+endif()

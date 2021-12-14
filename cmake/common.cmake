@@ -181,16 +181,7 @@ function(check_python_package PACKAGE AVAILABLE)
     endif()
 endfunction()
 
-function(link_against_external_libraries TARGET)
-    # Link against version.dll if we are on Windows (needed by Clang).
-
-    if(WIN32)
-        target_link_libraries(${TARGET} PRIVATE
-                              version)
-    endif()
-
-    # Link against our third-party libraries.
-
+function(link_against_third_party_libraries TARGET)
     foreach(THIRD_PARTY_LIBRARY libCellML libCOMBINE libcurl libNuML libSBML libSEDML LLVMClang SUNDIALS)
         string(TOUPPER "${THIRD_PARTY_LIBRARY}" THIRD_PARTY_LIBRARY_UC)
 
@@ -202,7 +193,8 @@ function(link_against_external_libraries TARGET)
 
         target_link_libraries(${TARGET} PRIVATE
                               ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY}
-                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES})
+                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES}
+                              ${${THIRD_PARTY_LIBRARY_UC}_SYSTEM_LIBRARIES})
 
         foreach(DEFINITION ${${THIRD_PARTY_LIBRARY_UC}_DEFINITIONS})
             target_compile_definitions(${TARGET} PRIVATE
@@ -246,7 +238,7 @@ function(prepare_test TARGET)
     target_include_directories(${TARGET} PUBLIC
                                $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 
-    link_against_external_libraries(${TARGET})
+    link_against_third_party_libraries(${TARGET})
 
     list(APPEND TEST_TARGETS "${TARGET}")
 
