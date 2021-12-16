@@ -32,7 +32,7 @@ function(replace_compiler_flag OLD NEW)
     endforeach()
 endfunction()
 
-function(configure_compiler_and_tools TARGET)
+function(configure_target TARGET)
     # Treat warnings as errors.
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
@@ -158,6 +158,28 @@ function(configure_compiler_and_tools TARGET)
             )
         endif()
     endif()
+
+    # Link the target against our different third-party libraries.
+
+    foreach(THIRD_PARTY_LIBRARY libCellML libCOMBINE libcurl libNuML libSBML libSEDML LLVMClang SUNDIALS)
+        string(TOUPPER "${THIRD_PARTY_LIBRARY}" THIRD_PARTY_LIBRARY_UC)
+
+        add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
+
+        target_include_directories(${TARGET} PUBLIC
+                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${THIRD_PARTY_LIBRARY}>
+                                   $<BUILD_INTERFACE:${${THIRD_PARTY_LIBRARY_UC}_INCLUDE_DIR}>)
+
+        target_link_libraries(${TARGET} PRIVATE
+                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY}
+                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES}
+                              ${${THIRD_PARTY_LIBRARY_UC}_SYSTEM_LIBRARIES})
+
+        foreach(DEFINITION ${${THIRD_PARTY_LIBRARY_UC}_DEFINITIONS})
+            target_compile_definitions(${TARGET} PRIVATE
+                                       ${DEFINITION})
+        endforeach()
+    endforeach()
 endfunction()
 
 function(check_python_package PACKAGE AVAILABLE)
@@ -179,28 +201,6 @@ function(check_python_package PACKAGE AVAILABLE)
     else()
         message(STATUS "Performing Test ${PACKAGE_VARIABLE} - Failed")
     endif()
-endfunction()
-
-function(link_against_third_party_libraries TARGET)
-    foreach(THIRD_PARTY_LIBRARY libCellML libCOMBINE libcurl libNuML libSBML libSEDML LLVMClang SUNDIALS)
-        string(TOUPPER "${THIRD_PARTY_LIBRARY}" THIRD_PARTY_LIBRARY_UC)
-
-        add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
-
-        target_include_directories(${TARGET} PUBLIC
-                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${THIRD_PARTY_LIBRARY}>
-                                   $<BUILD_INTERFACE:${${THIRD_PARTY_LIBRARY_UC}_INCLUDE_DIR}>)
-
-        target_link_libraries(${TARGET} PRIVATE
-                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY}
-                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES}
-                              ${${THIRD_PARTY_LIBRARY_UC}_SYSTEM_LIBRARIES})
-
-        foreach(DEFINITION ${${THIRD_PARTY_LIBRARY_UC}_DEFINITIONS})
-            target_compile_definitions(${TARGET} PRIVATE
-                                       ${DEFINITION})
-        endforeach()
-    endforeach()
 endfunction()
 
 macro(add_target TARGET)
@@ -238,15 +238,11 @@ function(prepare_test TARGET)
     target_include_directories(${TARGET} PUBLIC
                                $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 
-    link_against_third_party_libraries(${TARGET})
+    configure_target(${TARGET})
 
     list(APPEND TEST_TARGETS "${TARGET}")
 
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)
-
-    # Configure the compiler and various tools.
-
-    configure_compiler_and_tools(${TARGET})
 endfunction()
 
 function(build_documentation DOCUMENTATION_NAME)

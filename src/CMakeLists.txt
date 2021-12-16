@@ -134,9 +134,9 @@ set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
 add_subdirectory(3rdparty)
 
-# Link OpenCOR against our different third-party libraries.
+# Configure OpenCOR.
 
-link_against_third_party_libraries(${CMAKE_PROJECT_NAME})
+configure_target(${CMAKE_PROJECT_NAME})
 
 # Generate the export header file.
 
@@ -145,10 +145,6 @@ include(GenerateExportHeader)
 generate_export_header(${CMAKE_PROJECT_NAME}
                        EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
                        BASE_NAME LIBOPENCOR)
-
-# Configure the compiler and various tools.
-
-configure_compiler_and_tools(${CMAKE_PROJECT_NAME})
 
 # Get ready for code coverage using gcov.
 
