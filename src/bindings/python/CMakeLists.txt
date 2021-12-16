@@ -34,7 +34,7 @@ target_include_directories(${PYTHON_BINDINGS_TARGET} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api>
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
 
-link_against_third_party_libraries(${PYTHON_BINDINGS_TARGET})
+configure_target(${PYTHON_BINDINGS_TARGET})
 
 add_subdirectory(${CMAKE_PROJECT_NAME_LC})
 
