@@ -231,6 +231,8 @@ function(prepare_test TARGET)
     add_executable(${TARGET}
                    ${ARGN})
 
+    add_dependencies(${TARGET} ${CMAKE_PROJECT_NAME})
+
     target_include_directories(${TARGET} PUBLIC
                                $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 
