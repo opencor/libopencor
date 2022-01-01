@@ -19,12 +19,6 @@ set(GIT_TAG v1.1.4-libopencor)
 set(RELEASE_TAG v1.1.4-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
-set(LIBNUML_LIBRARY lib/libnuml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-set(SHA1_FILES
-    ${LIBNUML_LIBRARY}
-)
-
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LIBNUML)
@@ -32,37 +26,31 @@ if(LIBOPENCOR_PREBUILT_LIBNUML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             8ca4be16fc0fc09be4f0ce78063a2a8c17d3c041
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES da081654ea5610de59bc8ac872823d66b9537472)
+                             593d2cb56b33efa28c63eeca58848e60e46e849c)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             67b386141e4685300ed633fe4b8419dcc6bdb2b7
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES c31e7b596226781cb17eee2e4d031db8ca8a107c)
+                             8eb1e5391a0c5bebc1bb865a8e450f005bf3bd85)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e507c6d61a3061576782feca508af83def585d22
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 1da15183b4759b48d74903724530b412c1107878)
+                         afcefed644c01fb7b500c5b9ff1d2d69226e9dce)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b3e3caa2d3532572201085e69ba4e0d57225736f
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 1ddef2fc9ab8b20c749549e89470105aece62419)
+                         092a4eba9c06dfee03ece8ef006d903f05b12034)
     endif()
 else()
+    # Build our package.
+
     set(EXTRA_LIBS ${LIBXML2_LIBRARY})
 
     if(WIN32)
         string(APPEND EXTRA_LIBS |WS2_32)
     endif()
 
-    ExternalProject_Add(${PACKAGE_NAME}
+    build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
@@ -85,22 +73,33 @@ else()
             -DLIBSBML_STATIC=ON
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
-        BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${LIBNUML_LIBRARY}
-        DEPENDS
-            libSBML
-            libxml2
     )
+
+    # Patch one of our CMake configuration files (see
+    # https://github.com/NuML/NuML/issues/24).
+
+    if(WIN32)
+        set(LIBRARY_PREFIX lib)
+    endif()
+
+    fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config.cmake)
+
+    # Create our package.
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   PACKAGED_FILES include ${SHA1_FILES}
-                   SHA1_FILES ${SHA1_FILES})
+                   include lib)
 endif()
 
-# Let others find and use our package.
+# Make our package accessible.
+
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
 
 set(LIBNUML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBNUML_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
+set(LIBNUML_CMAKE_PACKAGE_NAME ${LIBRARY_PREFIX}numl-static CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBNUML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBNUML_LIBRARY ${INSTALL_DIR}/${LIBNUML_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBNUML_LIBRARY ${LIBRARY_PREFIX}numl-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBNUML_DEFINITIONS LIBNUML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")

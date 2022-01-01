@@ -19,20 +19,6 @@ set(GIT_TAG 2.0.5)
 set(RELEASE_TAG 2.0.5)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
-if(WIN32)
-    if(NOT RELEASE_MODE)
-        set(DEBUG_TAG d)
-    endif()
-
-    set(ZLIB_LIBRARY lib/zlibstatic${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
-else()
-    set(ZLIB_LIBRARY lib/libz${CMAKE_STATIC_LIBRARY_SUFFIX})
-endif()
-
-set(SHA1_FILES
-    ${ZLIB_LIBRARY}
-)
-
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_ZLIB)
@@ -40,42 +26,30 @@ if(LIBOPENCOR_PREBUILT_ZLIB)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e178578102b6c57eb3aebd5eee507ae6634e338a
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 889a5cb57b5c2c7bc15e51e3d025d1cee9ebe5d1)
+                             e93075a81154fbd87c0fa62607fb16182b776f52)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             ee447da8e87927f39f03bf68203fd066db9b02ff
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 047d7825f3c4c0e29d04d8f4a74682a4a21d681f)
+                             d05e91b486b822804c8f2246161dc136318fca9f)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e8070b1f887d485f028d103c784631e773cf7f74
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 2f6446c09a295410425cb48152eb6cda36b4d6db)
+                         4e5a99875e7ce0736161635f8d8a251511b18b2c)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         148d428549eedb05008c69e3b6f9dbdbc6554cbf
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 53f750bd1f650da5cf304b3817703750b2e14332)
+                         7ebc404bc150d5763c1c6fc27438ef7fe517f576)
     endif()
 else()
-    if(WIN32)
-        set(PACKAGE_C_FLAGS "/wd4267 ${CMAKE_C_FLAGS}")
-    endif()
+    # Build our package.
 
-    ExternalProject_Add(${PACKAGE_NAME}
+    build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
-        CMAKE_CACHE_ARGS
-            -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         CMAKE_GENERATOR
             ${CMAKE_GENERATOR}
         CMAKE_ARGS
@@ -83,18 +57,31 @@ else()
             -DBUILD_SHARED_LIBS=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DZLIB_COMPAT=ON
-        BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${ZLIB_LIBRARY}
     )
+
+    # Create our package.
+
+    file(GLOB STATIC_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    string(REPLACE "${INSTALL_DIR}/" "" STATIC_LIBRARIES "${STATIC_LIBRARIES}")
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   PACKAGED_FILES include ${SHA1_FILES}
-                   SHA1_FILES ${SHA1_FILES})
+                   include ${STATIC_LIBRARIES})
 endif()
 
-# Let others find and use our package.
+# Make our package accessible.
+
+if(WIN32)
+    set(LIBRARY_SUFFIX libstatic)
+
+    if(NOT RELEASE_MODE)
+        set(LIBRARY_SUFFIX "${LIBRARY_SUFFIX}d")
+    endif()
+else()
+    set(LIBRARY_PREFIX lib)
+endif()
 
 set(ZLIB_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(ZLIB_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(ZLIB_LIBRARY ${INSTALL_DIR}/${ZLIB_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(ZLIB_LIBRARY zlib::${LIBRARY_PREFIX}z${LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(ZLIB_LIBRARY_FILE ${INSTALL_DIR}/lib/${LIBRARY_PREFIX}z${LIBRARY_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")

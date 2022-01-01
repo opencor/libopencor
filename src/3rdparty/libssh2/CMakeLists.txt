@@ -12,38 +12,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(PACKAGE_NAME libcurl)
-set(PACKAGE_VERSION 7.80.0)
-set(PACKAGE_REPOSITORY curl)
-set(GIT_TAG curl-7_80_0)
-set(RELEASE_TAG curl-7_80_0)
+set(PACKAGE_NAME libssh2)
+set(PACKAGE_VERSION 1.10.0)
+set(PACKAGE_REPOSITORY libssh2)
+set(GIT_TAG libssh2-1.10.0)
+set(RELEASE_TAG libssh2-1.10.0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
-
-if(WIN32 AND NOT RELEASE_MODE)
-    set(DEBUG_TAG -d)
-endif()
 
 # Either retrieve or build our package.
 
-if(LIBOPENCOR_PREBUILT_LIBCURL)
+if(LIBOPENCOR_PREBUILT_LIBSSH2)
     if(WIN32)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             3f29c9ef7e298885c6eac1718d1604daa73603ca)
+                             c1d65dcaabb155bd64f14a73f3e3db999460fef2)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e81248d52122810c1ba26fa41bf92cb9a9f26991)
+                             866a43d6c6b6100b5c7d4382c0622c1d74e59882)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         234085dfc8bd3e88ecb58cb8eda32eb98c1e32bf)
+                         6cc26820b2898c76827aa0914001d2d4945de3d4)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         4990696a2c31e312acb407377c50eda5ae905693)
+                         109b96e388f8ebe968418ed9bdfd850a8dcce6cb)
     endif()
 else()
     # Build our package.
@@ -58,28 +54,28 @@ else()
             ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
-            -DBUILD_CURL_EXE=OFF
-            -DBUILD_SHARED_LIBS=OFF
-            -DBUILD_TESTING=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DCMAKE_USE_OPENSSL=ON
-            -DLIBSSH2_INCLUDE_DIR=${LIBSSH2_INCLUDE_DIR}
-            -DLIBSSH2_LIBRARY=${LIBSSH2_LIBRARY_FILE}
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
-            -DZLIB_ROOT=${ZLIB_ROOT}
     )
 
-    # Patch one of our CMake configuration files since it references some
-    # absolute paths.
+    # Patch some of our CMake configuration files since they reference absolute
+    # paths.
 
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/CURL/CURLTargets.cmake)
+    if(RELEASE_MODE)
+        set(PACKAGE_MODE release)
+    else()
+        set(PACKAGE_MODE debug)
+    endif()
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/Libssh2Config-${PACKAGE_MODE}.cmake)
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REPLACE "${LIBSSH2_LIBRARY_FILE}" "${LIBSSH2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "OpenSSL::Crypto" "OpenSSL::libcrypto" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "OpenSSL::SSL" "OpenSSL::libssl" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "ZLIB::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "${PACKAGE_NAME}" "OpenSSL" OPENSSL_INSTALL_DIR "${INSTALL_DIR}")
+    string(REPLACE
+           "${OPENSSL_INSTALL_DIR}/lib/libssl${CMAKE_STATIC_LIBRARY_SUFFIX};${OPENSSL_INSTALL_DIR}/lib/libcrypto${CMAKE_STATIC_LIBRARY_SUFFIX}"
+           "OpenSSL::libcrypto;OpenSSL::libssl"
+           FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
@@ -95,8 +91,9 @@ endif()
 
 # Make our package accessible.
 
-set(LIBCURL_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
-set(LIBCURL_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
-set(LIBCURL_CMAKE_PACKAGE_NAME CURL CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
-set(LIBCURL_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBCURL_LIBRARY CURL::libcurl CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSSH2_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBSSH2_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
+set(LIBSSH2_CMAKE_PACKAGE_NAME Libssh2 CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
+set(LIBSSH2_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
+set(LIBSSH2_LIBRARY Libssh2::libssh2 CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSSH2_LIBRARY_FILE ${INSTALL_DIR}/lib/${PACKAGE_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")

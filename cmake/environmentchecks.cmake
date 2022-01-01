@@ -59,6 +59,15 @@ get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 find_package(Doxygen)
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
+if(NOT WIN32 AND NOT APPLE)
+    # Some third-party libraries get built with threads support (and so do our
+    # tests, though this can be disabled by setting GTEST_DISABLE_PTHREADS to
+    # ON), so make sure that it's present since libOpenCOR will need to be
+    # linked against pthreads as a result.
+
+    find_package(Threads REQUIRED)
+endif()
+
 find_program(BUILDCACHE_EXE buildcache)
 
 if(NOT BUILDCACHE_EXE)

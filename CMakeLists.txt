@@ -56,7 +56,7 @@ include(environmentchecks)
 
 # Initialise/reset our available targets.
 
-set(TARGETS "install" CACHE INTERNAL "Useful targets.")
+set(TARGETS "install" CACHE INTERNAL "Available targets.")
 
 # [CMAKE_]BUILD_TYPE ==> LIBOPENCOR_BUILD_TYPE.
 
@@ -252,6 +252,17 @@ endif()
 
 unset(PREBUILT_LIBSEDML CACHE)
 
+# PREBUILT_LIBSSH2 ==> LIBOPENCOR_PREBUILT_LIBSSH2.
+
+set(DOCSTRING "Use the prebuilt version of libssh2.")
+set(LIBOPENCOR_PREBUILT_LIBSSH2 ON CACHE BOOL "${DOCSTRING}")
+
+if(DEFINED PREBUILT_LIBSSH2)
+    set(LIBOPENCOR_PREBUILT_LIBSSH2 ${PREBUILT_LIBSSH2} CACHE BOOL "${DOCSTRING}" FORCE)
+endif()
+
+unset(PREBUILT_LIBSSH2 CACHE)
+
 # PREBUILT_LIBXML2 ==> LIBOPENCOR_PREBUILT_LIBXML2.
 
 set(DOCSTRING "Use the prebuilt version of libxml2.")
@@ -416,53 +427,32 @@ if(LIBOPENCOR_MEMORY_CHECKS)
     endif()
 endif()
 
-if(NOT LIBOPENCOR_PREBUILT_LIBNUML)
-    if(LIBOPENCOR_PREBUILT_LIBSEDML)
-        message(SEND_ERROR "Configuration confusion: libNuML is to be built which means that libSEDML should also be built.")
-    endif()
-endif()
-
-if(NOT LIBOPENCOR_PREBUILT_LIBSBML)
-    if(   LIBOPENCOR_PREBUILT_LIBCOMBINE
-       OR LIBOPENCOR_PREBUILT_LIBNUML
-       OR LIBOPENCOR_PREBUILT_LIBSEDML)
-        message(SEND_ERROR "Configuration confusion: libSBML is to be built which means that libCOMBINE, libNuML and libSEDML should also be built.")
-    endif()
-endif()
-
-if(NOT LIBOPENCOR_PREBUILT_LIBXML2)
-    if(   LIBOPENCOR_PREBUILT_LIBCELLML
-       OR LIBOPENCOR_PREBUILT_LIBCOMBINE
-       OR LIBOPENCOR_PREBUILT_LIBNUML
-       OR LIBOPENCOR_PREBUILT_LIBSBML
-       OR LIBOPENCOR_PREBUILT_LIBSEDML)
-        message(SEND_ERROR "Configuration confusion: libxml2 is to be built which means that libCellML, libCOMBINE, libNuML, libSBML and libSEDML should also be built.")
-    endif()
-endif()
-
-if(NOT LIBOPENCOR_PREBUILT_OPENSSL)
-    if(LIBOPENCOR_PREBUILT_LIBCURL)
-        message(SEND_ERROR "Configuration confusion: OpenSSL is to be built which means that libcurl should also be built.")
-    endif()
-endif()
-
-if(NOT LIBOPENCOR_PREBUILT_ZIPPER)
-    if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
-        message(SEND_ERROR "Configuration confusion: zipper is to be built which means that libCOMBINE should also be built.")
-    endif()
-endif()
-
-if(NOT LIBOPENCOR_PREBUILT_ZLIB)
-    if(   LIBOPENCOR_PREBUILT_LIBCELLML
-       OR LIBOPENCOR_PREBUILT_LIBCOMBINE
-       OR LIBOPENCOR_PREBUILT_ZIPPER)
-        message(SEND_ERROR "Configuration confusion: zlib is to be built which means that libCellML, libCOMBINE and zipper should also be built.")
-    endif()
-endif()
-
 if(LIBOPENCOR_PYTHON_UNIT_TESTING)
     if(NOT LIBOPENCOR_PYTHON_BINDINGS)
         message(SEND_ERROR "Configuration confusion: Python unit testing is requested which means that Python bindings should also be requested.")
+    endif()
+endif()
+
+# Determine whether we are building in release mode.
+# Note: this only makes sense if we are not in a multi-configuration mode, i.e.
+#       IS_MULTI_CONFIG is equal to FALSE, which is likely to be the case when
+#       building a third-party library.
+
+if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
+    set(RELEASE_MODE FALSE)
+else()
+    set(RELEASE_MODE TRUE)
+endif()
+
+# Location of our prebuilt packages.
+
+set(PREBUILT_DIR ${CMAKE_SOURCE_DIR}/prebuilt)
+
+if(WIN32)
+    if(RELEASE_MODE)
+        set(PREBUILT_DIR ${PREBUILT_DIR}/release)
+    else()
+        set(PREBUILT_DIR ${PREBUILT_DIR}/debug)
     endif()
 endif()
 
@@ -578,6 +568,10 @@ endif()
 
 if(DEFINED LIBOPENCOR_PREBUILT_LIBSEDML)
     message(STATUS " - LIBOPENCOR_PREBUILT_LIBSEDML:       ${LIBOPENCOR_PREBUILT_LIBSEDML}")
+endif()
+
+if(DEFINED LIBOPENCOR_PREBUILT_LIBSSH2)
+    message(STATUS " - LIBOPENCOR_PREBUILT_LIBSSH2:        ${LIBOPENCOR_PREBUILT_LIBSSH2}")
 endif()
 
 if(DEFINED LIBOPENCOR_PREBUILT_LIBXML2)
