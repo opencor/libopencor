@@ -65,7 +65,7 @@ if(LIBOPENCOR_PREBUILT_ZLIB)
     endif()
 else()
     if(WIN32)
-        set(PACKAGE_C_FLAGS "${CMAKE_C_FLAGS} /wd4267")
+        set(PACKAGE_C_FLAGS "/wd4267 ${CMAKE_C_FLAGS}")
     endif()
 
     ExternalProject_Add(${PACKAGE_NAME}

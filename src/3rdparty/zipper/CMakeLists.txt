@@ -59,7 +59,7 @@ else()
     # Set some compilation flags and/or ignore some warnings
 
     if(APPLE)
-        set(PACKAGE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-implicit-function-declaration")
+        set(PACKAGE_C_FLAGS "-Wno-implicit-function-declaration ${CMAKE_C_FLAGS}")
     endif()
 
     ExternalProject_Add(${PACKAGE_NAME}

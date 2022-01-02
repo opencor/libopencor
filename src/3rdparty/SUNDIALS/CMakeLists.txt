@@ -176,7 +176,7 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
                                      98c4c274a6d0984dacb82160042e074eef471f30)
     endif()
 else()
-    set(EP_CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNO_FPRINTF_OUTPUT")
+    set(PACKAGE_C_FLAGS "-DNO_FPRINTF_OUTPUT ${CMAKE_C_FLAGS}")
 
     ExternalProject_Add(${PACKAGE_NAME}
         GIT_REPOSITORY
@@ -192,7 +192,7 @@ else()
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DEXAMPLES_ENABLE_C=OFF
         CMAKE_CACHE_ARGS
-            -DCMAKE_C_FLAGS:STRING=${EP_CMAKE_C_FLAGS}
+            -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         BUILD_BYPRODUCTS
             ${INSTALL_DIR}/${ARKODE_LIBRARY}
             ${INSTALL_DIR}/${CVODE_LIBRARY}
