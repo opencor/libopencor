@@ -288,7 +288,7 @@ jobs:
         run: pip3 install black
       - name: Install gcovr
         if: ${{ matrix.code_coverage_gcov == 'ON' }}
-        run: sudo apt install gcovr
+        run: pip3 install gcovr
       - name: Install Valgrind
         if: ${{ matrix.memory_checks == 'ON' }}
         run: sudo apt install valgrind

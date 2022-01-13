@@ -19,12 +19,6 @@ set(GIT_TAG v0.4.4)
 set(RELEASE_TAG v0.4.4-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
-set(LIBSEDML_LIBRARY lib/libsedml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-set(SHA1_FILES
-    ${LIBSEDML_LIBRARY}
-)
-
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LIBSEDML)
@@ -32,37 +26,31 @@ if(LIBOPENCOR_PREBUILT_LIBSEDML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             15715abd1004b65c2c95f70a615be768a67456ca
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES f0f472585bc09ac8605f8014b3fe8c53214e5727)
+                             637fb779f1fdc33cfa9473801d04fc1c5d0117ab)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                            ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                            fd5dd3ff18a99faee23fad00159d804cc96c7205
-                            SHA1_FILES ${SHA1_FILES}
-                            SHA1_VALUES e8dbe5b0f96a0a1bea889fef11592e5d620b1f9f)
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             0337f1c756bebd4338585e606f75f404a21d3d79)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         646cb5820a6ac5cb9c74345636f753a487081878
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 0de08f9ccea10c8eebf4369abd7d04b1dacd88f8)
+                         e771693f8c3aacf8298ca4b63b510007ff58ab8d)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         9553b9f350b21db13d4cde2c11fddf1609d34707
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES a9b12cdc27aae2bcb612f7ccf782b5e980da6aa6)
+                         984335b4205c66591dd733d615977deefd100644)
     endif()
 else()
+    # Build our package.
+
     set(EXTRA_LIBS ${LIBXML2_LIBRARY})
 
     if(WIN32)
         string(APPEND EXTRA_LIBS |WS2_32)
     endif()
 
-    ExternalProject_Add(${PACKAGE_NAME}
+    build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
@@ -87,23 +75,45 @@ else()
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
             -DWITH_ZLIB=OFF
-        BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${LIBSEDML_LIBRARY}
-        DEPENDS
-            libNuML
-            libSBML
-            libxml2
     )
+
+    # Patch one of our CMake configuration files since it references some
+    # absolute paths.
+
+    if(WIN32)
+        set(LIBRARY_PREFIX lib)
+    endif()
+
+    if(RELEASE_MODE)
+        set(PACKAGE_MODE release)
+    else()
+        set(PACKAGE_MODE debug)
+    endif()
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}sedml-static-config-${PACKAGE_MODE}.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REGEX REPLACE ";[^;]*${LIBNUML_LIBRARY}" ";${LIBNUML_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
+    # Create our package.
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   PACKAGED_FILES include ${SHA1_FILES}
-                   SHA1_FILES ${SHA1_FILES})
+                   include lib)
 endif()
 
-# Let others find and use our package.
+# Make our package accessible.
+
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
 
 set(LIBSEDML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBSEDML_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
+set(LIBSEDML_CMAKE_PACKAGE_NAME ${LIBRARY_PREFIX}sedml-static CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBSEDML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBSEDML_LIBRARY ${INSTALL_DIR}/${LIBSEDML_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSEDML_LIBRARY ${LIBRARY_PREFIX}sedml-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBSEDML_DEFINITIONS LIBSEDML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")

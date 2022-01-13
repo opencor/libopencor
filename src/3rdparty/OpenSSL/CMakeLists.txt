@@ -19,14 +19,6 @@ set(GIT_TAG OpenSSL_1_1_1l)
 set(RELEASE_TAG OpenSSL_1_1_1l-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
-set(CRYPTO_STATIC_LIBRARY lib/libcrypto${CMAKE_STATIC_LIBRARY_SUFFIX})
-set(SSL_STATIC_LIBRARY lib/libssl${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-set(SHA1_FILES
-    ${CRYPTO_STATIC_LIBRARY}
-    ${SSL_STATIC_LIBRARY}
-)
-
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_OPENSSL)
@@ -34,34 +26,24 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             2396d2043778d84fd6d9370da0e069255aa74ee7
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 16ea3b7ba3fc198efd4457c70f0b7ff9983fe90b
-                                         00855e72eeb37584b3c396192941a938fd19b063)
+                             bd5e6cef0a5c2e60b92c30ce928f6171ba6263df)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             2f2bdd45270d39e72aad5fc8ac15f52dcb91abf7
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES b5267fa182f655a35d6ee4d7b4e536515672e00f
-                                         2ff863091fc65738f50e604d2c00244e3acf9313)
+                             f89cb6a2933346bf01bae2baddcfd277067fce7d)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         43b19276d82b8835332e0d274d8baeccc3cce5d1
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 25fade4fec3b03e0f52aad81c924535d5d7cdd96
-                                     c43d1543d6361a8a07d7166ba4976baca3662837)
+                         293b8004a816974aee9d9ef78c22e15e0a0171c2)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         9dc97c29174509c42636858631ef5a7908c87553
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 592914a5e4315aa37b7500c940f736bc9d6c6a2a
-                                     537926b7ce87bcf2a84a4dee0155c11df21c5050)
+                         8d9e42e0275f0c9ed70b2559e2ae9cecd90163ba)
     endif()
 else()
+    # Build our package.
+
     find_package(Perl REQUIRED QUIET)
 
     set(CONFIG_OPTIONS no-pic no-shared no-tests no-threads --prefix=${INSTALL_DIR})
@@ -86,7 +68,7 @@ else()
         endif()
     endif()
 
-    ExternalProject_Add(${PACKAGE_NAME}
+    build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
@@ -98,23 +80,24 @@ else()
             ${MAKE_NMAKE_COMMAND}
         INSTALL_COMMAND
             ${MAKE_NMAKE_COMMAND} install_sw
-        BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${CRYPTO_STATIC_LIBRARY}
-            ${INSTALL_DIR}/${SSL_STATIC_LIBRARY}
     )
+
+    # Create our package.
+
+    file(GLOB STATIC_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    string(REPLACE "${INSTALL_DIR}/" "" STATIC_LIBRARIES "${STATIC_LIBRARIES}")
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   PACKAGED_FILES include ${SHA1_FILES}
-                   SHA1_FILES ${SHA1_FILES})
+                   include ${STATIC_LIBRARIES})
 endif()
 
-# Let others find and use our package.
+# Make our package accessible.
 
 set(OPENSSL_ROOT_DIR ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(OPENSSL_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(OPENSSL_LIBRARIES
-    ${INSTALL_DIR}/${CRYPTO_STATIC_LIBRARY}
-    ${INSTALL_DIR}/${SSL_STATIC_LIBRARY}
+    OpenSSL::libcrypto
+    OpenSSL::libssl
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
