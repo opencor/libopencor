@@ -35,11 +35,11 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         6cc26820b2898c76827aa0914001d2d4945de3d4)
+                         00b1ebfcf345bc9cdffd6dd86c3c973213ed9b65)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         109b96e388f8ebe968418ed9bdfd850a8dcce6cb)
+                         b521dff4196484186f916f0bf44a76d84e915162)
     endif()
 else()
     # Build our package.

@@ -39,11 +39,11 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         234085dfc8bd3e88ecb58cb8eda32eb98c1e32bf)
+                         127a83b0c7bbeaca2ab389b37812b0465b1e0a68)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         4990696a2c31e312acb407377c50eda5ae905693)
+                         071f250f26f97391b78ad9095986dfb4a9aa0b0c)
     endif()
 else()
     # Build our package.
