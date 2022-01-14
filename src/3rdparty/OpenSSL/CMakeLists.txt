@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME OpenSSL)
-set(PACKAGE_VERSION 1.1.1l)
+set(PACKAGE_VERSION 1.1.1m)
 set(PACKAGE_REPOSITORY openssl)
-set(GIT_TAG OpenSSL_1_1_1l)
-set(RELEASE_TAG OpenSSL_1_1_1l-libopencor)
+set(GIT_TAG OpenSSL_1_1_1m)
+set(RELEASE_TAG OpenSSL_1_1_1m-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
