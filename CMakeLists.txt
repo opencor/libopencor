@@ -433,6 +433,27 @@ if(LIBOPENCOR_PYTHON_UNIT_TESTING)
     endif()
 endif()
 
+# Build the packages that depend on built packages.
+# Note: see src/3rdparty/CMakelists.txt for our packages' dependencies.
+
+set(DEPENDENT_PACKAGES "" CACHE INTERNAL "Dependent packages to be built.")
+
+check_dependent_packages(libxml2 libSBML libNuML libCellML libCOMBINE libSEDML)
+check_dependent_packages(OpenSSL libssh2 libcurl)
+check_dependent_packages(zlib zipper libCellML libCOMBINE libcurl)
+check_dependent_packages(libSBML libNuML libCOMBINE libSEDML)
+check_dependent_packages(libNuML libSEDML)
+check_dependent_packages(libssh2 libcurl)
+check_dependent_packages(zipper libCOMBINE)
+
+if(NOT "${DEPENDENT_PACKAGES}" STREQUAL "")
+    message(STATUS "The following packages are also be built:")
+
+    foreach(DEPENDENT_PACKAGE ${DEPENDENT_PACKAGES})
+        message(STATUS " - ${DEPENDENT_PACKAGE}")
+    endforeach()
+endif()
+
 # Determine whether we are building in release mode.
 # Note: this only makes sense if we are not in a multi-configuration mode, i.e.
 #       IS_MULTI_CONFIG is equal to FALSE, which is likely to be the case when
