@@ -26,7 +26,7 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             193bd685e15dc5cfb8c1db7c0bf85318b3347853)
+                             bd5e6cef0a5c2e60b92c30ce928f6171ba6263df)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -35,11 +35,11 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         0ae3d39b95bbfbcff656bb3196fdd8fb91f7da00)
+                         293b8004a816974aee9d9ef78c22e15e0a0171c2)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         83b65f7c626f4315a2ad32c9099b0d2d2288ade7)
+                         8d9e42e0275f0c9ed70b2559e2ae9cecd90163ba)
     endif()
 else()
     # Build our package.
@@ -56,6 +56,19 @@ else()
         else()
             set(PLATFORM debug-VC-WIN64A)
         endif()
+
+        # Patch the generated makefile since it contains non-escaped paths that
+        # result in our build to fail. (Not sure why this is the case, but
+        # that's the situation!)
+
+        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
+
+        set(PATCH_COMMANDS
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
+        )
     else()
         if(APPLE)
             set(PLATFORM darwin64-x86_64-cc)
@@ -76,6 +89,7 @@ else()
         GIT_SHALLOW
         CONFIGURE_COMMAND
             ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
+        ${PATCH_COMMANDS}
         BUILD_COMMAND
             ${MAKE_NMAKE_COMMAND}
         INSTALL_COMMAND
