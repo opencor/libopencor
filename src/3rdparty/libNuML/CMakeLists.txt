@@ -58,8 +58,6 @@ else()
         GIT_SHALLOW
         SOURCE_SUBDIR
             libnuml
-        CMAKE_GENERATOR
-            ${CMAKE_GENERATOR}
         LIST_SEPARATOR
             |
         CMAKE_ARGS
