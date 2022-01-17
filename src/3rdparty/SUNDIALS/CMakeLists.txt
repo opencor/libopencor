@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME SUNDIALS)
-set(PACKAGE_VERSION 5.8.0)
+set(PACKAGE_VERSION 6.1.0)
 set(PACKAGE_REPOSITORY sundials)
-set(GIT_TAG v5.8.0-libopencor)
-set(RELEASE_TAG v5.8.0-libopencor)
+set(GIT_TAG v6.1.0-libopencor)
+set(RELEASE_TAG v6.1.0-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
