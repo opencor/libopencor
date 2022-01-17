@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME SUNDIALS)
-set(PACKAGE_VERSION 5.8.0)
+set(PACKAGE_VERSION 6.1.0)
 set(PACKAGE_REPOSITORY sundials)
-set(GIT_TAG v5.8.0-libopencor)
-set(RELEASE_TAG v5.8.0-libopencor)
+set(GIT_TAG v6.1.0-libopencor)
+set(RELEASE_TAG v6.1.0-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             3fe4ad9884a39f804324c8ff1e5d397447cf5290)
+                             5e906b9f2ad23c8a0c74b6ca36b467cc68e5fd0b)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             8c27449dcd97a55facc59880be65218d8a6a4607)
+                             35f1edeb37160b573ab7e7c8744132770a69a418)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         57423b930dccc9b0d9433a0583abba72903f499d)
+                         3b2b6b1fa13280e11801572e0ba97d1b9f507a67)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         c8e96551912f18eec4cfb8a246225d463325c26f)
+                         b9e3fcc71f866998c99f49018fa50b0cb79f5a78)
     endif()
 else()
     # Build our package.
@@ -57,9 +57,20 @@ else()
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DBUILD_SHARED_LIBS=OFF
+            -DBUILD_TESTING=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DEXAMPLES_ENABLE_C=OFF
     )
+
+    # Patch one of our CMake configuration files due to a bug in SUNDIALS 6.1.0.
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE_REPOSITORY}/SUNDIALSConfig.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "if( AND NOT TARGET caliper)" "if(OFF AND NOT TARGET caliper)" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     # Create our package.
 
