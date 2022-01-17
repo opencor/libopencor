@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME OpenSSL)
-set(PACKAGE_VERSION 1.1.1l)
+set(PACKAGE_VERSION 1.1.1m)
 set(PACKAGE_REPOSITORY openssl)
-set(GIT_TAG OpenSSL_1_1_1l)
-set(RELEASE_TAG OpenSSL_1_1_1l-libopencor)
+set(GIT_TAG OpenSSL_1_1_1m)
+set(RELEASE_TAG OpenSSL_1_1_1m-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             bd5e6cef0a5c2e60b92c30ce928f6171ba6263df)
+                             193f41b83ac87d604702b57cb32201799d758c8d)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f89cb6a2933346bf01bae2baddcfd277067fce7d)
+                             d6ff692b137342f2e0f3d33884bc727f579f43da)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         293b8004a816974aee9d9ef78c22e15e0a0171c2)
+                         fb27f5f3471d541f04658514a88bbdae4acd7663)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         8d9e42e0275f0c9ed70b2559e2ae9cecd90163ba)
+                         a6f2ffa9b5fa9af965121c047de7fb89b8187cff)
     endif()
 else()
     # Build our package.
@@ -56,6 +56,19 @@ else()
         else()
             set(PLATFORM debug-VC-WIN64A)
         endif()
+
+        # Patch the generated makefile since it contains non-escaped paths that
+        # result in our build to fail. (Not sure why this is the case, but
+        # that's the situation!)
+
+        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
+
+        set(PATCH_COMMANDS
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
+        )
     else()
         if(APPLE)
             set(PLATFORM darwin64-x86_64-cc)
@@ -76,6 +89,7 @@ else()
         GIT_SHALLOW
         CONFIGURE_COMMAND
             ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
+        ${PATCH_COMMANDS}
         BUILD_COMMAND
             ${MAKE_NMAKE_COMMAND}
         INSTALL_COMMAND

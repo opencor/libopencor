@@ -56,8 +56,6 @@ else()
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
-        CMAKE_GENERATOR
-            ${CMAKE_GENERATOR}
         LIST_SEPARATOR
             |
         CMAKE_ARGS

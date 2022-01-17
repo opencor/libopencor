@@ -30,20 +30,20 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             3f29c9ef7e298885c6eac1718d1604daa73603ca)
+                             20281fa9c60911000992aac9a8cd50712d165b8c)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e81248d52122810c1ba26fa41bf92cb9a9f26991)
+                             f4decd8ca15bd20da406cb147f45a9838a77a67d)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         234085dfc8bd3e88ecb58cb8eda32eb98c1e32bf)
+                         e3139b08ce8f8770168ffc485901a24273234b85)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         4990696a2c31e312acb407377c50eda5ae905693)
+                         5d0eb78f5fd2c9848f6ab18b1edff7784bd40816)
     endif()
 else()
     # Build our package.
@@ -54,8 +54,6 @@ else()
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
-        CMAKE_GENERATOR
-            ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DBUILD_CURL_EXE=OFF

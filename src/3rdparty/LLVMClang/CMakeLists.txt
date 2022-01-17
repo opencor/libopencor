@@ -52,8 +52,6 @@ else()
         GIT_SHALLOW
         SOURCE_SUBDIR
             llvm
-        CMAKE_GENERATOR
-            ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCLANG_BUILD_TOOLS=OFF
