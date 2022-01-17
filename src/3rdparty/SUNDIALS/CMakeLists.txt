@@ -62,6 +62,16 @@ else()
             -DEXAMPLES_ENABLE_C=OFF
     )
 
+    # Patch one of our CMake configuration files due to a bug in SUNDIALS 6.1.0.
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE_REPOSITORY}/SUNDIALSConfig.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "if( AND NOT TARGET caliper)" "if(OFF AND NOT TARGET caliper)" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
     # Create our package.
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
