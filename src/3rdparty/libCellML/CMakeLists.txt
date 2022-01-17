@@ -23,12 +23,6 @@ if(WIN32 AND NOT RELEASE_MODE)
     set(DEBUG_TAG d)
 endif()
 
-set(LIBCELLML_LIBRARY lib/libcellml${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-set(SHA1_FILES
-    ${LIBCELLML_LIBRARY}
-)
-
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LIBCELLML)
@@ -36,38 +30,30 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d326fc1d79813d3d90a6247ce162bbf1b9190715
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES fa36f0a151e29ded0b7f1bad762663c82f43600f)
+                             9ef05b4acc8c2d45cd1b46900f09622b9a40db3e)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             cde5ae29c1ac7df3e2dacda7274fdc541e455e98
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 22142c4365215b7af220bab1d89a4f151461fd77)
+                             31e549121dddf8f622e571caf83e38d2b9bd186d)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         fa171be5c631b67d9b0582ccc8220fb2aae0697f
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 7f68d9e07221b93e3a287df29a09fc8e689aea1a)
+                         c0e5103ddf29953d4670eb5354b5d1b8343a7296)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         3d9b9318f5184d7fbb80092ebeaa0ffe3aabcf04
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES f4a3eb0ceae8ce5987cbc0fc60bd2428952d3741)
+                         5bbb4db47f7bd0e2158784daba7d8ed5705ff312)
     endif()
 else()
-    ExternalProject_Add(${PACKAGE_NAME}
+    # Build our package.
+
+    build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
-        CMAKE_GENERATOR
-            ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DBINDINGS_PYTHON=OFF
@@ -75,27 +61,68 @@ else()
             -DCOVERAGE=OFF
             -DINSTALL_PREFIX=${INSTALL_DIR}
             -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
-            -DLIBXML2_LIBRARY=${LIBXML2_LIBRARY}
+            -DLIBXML2_LIBRARY=${LIBXML2_LIBRARY_FILE}
             -DLLVM_COVERAGE=OFF
             -DMEMCHECK=OFF
             -DPYTHON_COVERAGE=OFF
             -DUNIT_TESTS=OFF
             -DZLIB_ROOT=${ZLIB_ROOT}
-        BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${LIBCELLML_LIBRARY}
-        DEPENDS
-            libxml2
-            zlib
     )
+
+    # Patch one of our CMake configuration files since it references some
+    # absolute paths.
+
+    if(WIN32)
+        set(CONFIG_FILE ${INSTALL_DIR}/${PACKAGE}/CMake/libcellml-targets.cmake)
+    else()
+        set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/libcellml-targets.cmake)
+    endif()
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "${PREBUILT_DIR}" "\${_IMPORT_PREFIX}/.." FILE_CONTENTS "${FILE_CONTENTS}")
+
+    if(RELEASE_MODE)
+        string(REPLACE ";\\$<LINK_ONLY:\\$<\\$<CONFIG:DEBUG>:cellml_debug_utilities>>" "" FILE_CONTENTS "${FILE_CONTENTS}")
+    endif()
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
+    # Create our package.
+
+    if(WIN32)
+        set(CMAKE_DIR ${PACKAGE_NAME}/CMake)
+
+        # The below is a temporary fix for the debug version of libCellML on
+        # Windows (see https://github.com/cellml/libcellml/issues/980).
+
+        if(NOT RELEASE_MODE)
+            set(DEBUG_UTILITIES_LIBRARY cellml_debug_utilities.lib)
+
+            file(COPY ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/src/${DEBUG_UTILITIES_LIBRARY}
+                 DESTINATION ${INSTALL_DIR}/lib)
+        endif()
+    else()
+        set(CMAKE_DIR lib/cmake)
+    endif()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   PACKAGED_FILES include ${SHA1_FILES}
-                   SHA1_FILES ${SHA1_FILES})
+                   ${CMAKE_DIR} include lib)
 endif()
 
-# Let others find and use our package.
+# Make our package accessible.
 
 set(LIBCELLML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBCELLML_CMAKE_DIR ${INSTALL_DIR}/${CMAKE_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
+set(LIBCELLML_CMAKE_PACKAGE_NAME ${PACKAGE_NAME} CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBCELLML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBCELLML_LIBRARY ${INSTALL_DIR}/${LIBCELLML_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBCELLML_LIBRARY cellml CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+
+if(WIN32 AND NOT RELEASE_MODE)
+    # The below is a temporary fix for the debug version of libCellML on Windows
+    # (see https://github.com/cellml/libcellml/issues/980).
+
+    file(COPY ${INSTALL_DIR}/lib/${DEBUG_UTILITIES_LIBRARY}
+         DESTINATION ${CMAKE_BINARY_DIR})
+endif()

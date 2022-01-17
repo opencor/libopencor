@@ -13,19 +13,11 @@
 # limitations under the License.
 
 set(PACKAGE_NAME OpenSSL)
-set(PACKAGE_VERSION 1.1.1l)
+set(PACKAGE_VERSION 1.1.1m)
 set(PACKAGE_REPOSITORY openssl)
-set(GIT_TAG OpenSSL_1_1_1l)
-set(RELEASE_TAG OpenSSL_1_1_1l-libopencor)
+set(GIT_TAG OpenSSL_1_1_1m)
+set(RELEASE_TAG OpenSSL_1_1_1m-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
-
-set(CRYPTO_STATIC_LIBRARY lib/libcrypto${CMAKE_STATIC_LIBRARY_SUFFIX})
-set(SSL_STATIC_LIBRARY lib/libssl${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-set(SHA1_FILES
-    ${CRYPTO_STATIC_LIBRARY}
-    ${SSL_STATIC_LIBRARY}
-)
 
 # Either retrieve or build our package.
 
@@ -34,34 +26,24 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             2396d2043778d84fd6d9370da0e069255aa74ee7
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 16ea3b7ba3fc198efd4457c70f0b7ff9983fe90b
-                                         00855e72eeb37584b3c396192941a938fd19b063)
+                             193f41b83ac87d604702b57cb32201799d758c8d)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             2f2bdd45270d39e72aad5fc8ac15f52dcb91abf7
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES b5267fa182f655a35d6ee4d7b4e536515672e00f
-                                         2ff863091fc65738f50e604d2c00244e3acf9313)
+                             d6ff692b137342f2e0f3d33884bc727f579f43da)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         43b19276d82b8835332e0d274d8baeccc3cce5d1
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 25fade4fec3b03e0f52aad81c924535d5d7cdd96
-                                     c43d1543d6361a8a07d7166ba4976baca3662837)
+                         fb27f5f3471d541f04658514a88bbdae4acd7663)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         9dc97c29174509c42636858631ef5a7908c87553
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 592914a5e4315aa37b7500c940f736bc9d6c6a2a
-                                     537926b7ce87bcf2a84a4dee0155c11df21c5050)
+                         a6f2ffa9b5fa9af965121c047de7fb89b8187cff)
     endif()
 else()
+    # Build our package.
+
     find_package(Perl REQUIRED QUIET)
 
     set(CONFIG_OPTIONS no-pic no-shared no-tests no-threads --prefix=${INSTALL_DIR})
@@ -74,6 +56,19 @@ else()
         else()
             set(PLATFORM debug-VC-WIN64A)
         endif()
+
+        # Patch the generated makefile since it contains non-escaped paths that
+        # result in our build to fail. (Not sure why this is the case, but
+        # that's the situation!)
+
+        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
+
+        set(PATCH_COMMANDS
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
+        )
     else()
         if(APPLE)
             set(PLATFORM darwin64-x86_64-cc)
@@ -86,7 +81,7 @@ else()
         endif()
     endif()
 
-    ExternalProject_Add(${PACKAGE_NAME}
+    build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
@@ -94,27 +89,29 @@ else()
         GIT_SHALLOW
         CONFIGURE_COMMAND
             ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
+        ${PATCH_COMMANDS}
         BUILD_COMMAND
             ${MAKE_NMAKE_COMMAND}
         INSTALL_COMMAND
             ${MAKE_NMAKE_COMMAND} install_sw
-        BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${CRYPTO_STATIC_LIBRARY}
-            ${INSTALL_DIR}/${SSL_STATIC_LIBRARY}
     )
+
+    # Create our package.
+
+    file(GLOB STATIC_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    string(REPLACE "${INSTALL_DIR}/" "" STATIC_LIBRARIES "${STATIC_LIBRARIES}")
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   PACKAGED_FILES include ${SHA1_FILES}
-                   SHA1_FILES ${SHA1_FILES})
+                   include ${STATIC_LIBRARIES})
 endif()
 
-# Let others find and use our package.
+# Make our package accessible.
 
 set(OPENSSL_ROOT_DIR ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(OPENSSL_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(OPENSSL_LIBRARIES
-    ${INSTALL_DIR}/${CRYPTO_STATIC_LIBRARY}
-    ${INSTALL_DIR}/${SSL_STATIC_LIBRARY}
+    OpenSSL::libcrypto
+    OpenSSL::libssl
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )

@@ -19,12 +19,6 @@ set(GIT_TAG v5.19.0-libopencor)
 set(RELEASE_TAG v5.19.0-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
-set(LIBSBML_LIBRARY lib/libsbml-static${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-set(SHA1_FILES
-    ${LIBSBML_LIBRARY}
-)
-
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LIBSBML)
@@ -32,38 +26,30 @@ if(LIBOPENCOR_PREBUILT_LIBSBML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7ec10246a30050aacc07842756f62ea33fdfc9b7
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES dfbc06f97e91999f1b53b36acc10f506d6e1250c)
+                             e82e863465aaa51ccd4698e1a61a8ebfc3863c89)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             9e80ec456b4f4cdb780d6ddd5b2faaaa298de0d8
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES d9c6e9911682c9f3d7c6b7b02a624e2198ae2031)
+                             c4d2851e5b1b382c31a855bc86c8f1954b2e2d13)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e65e2402660de7b3b33c67e345e2c57d6b098699
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 2a4d8fa86b159318c59ac0218968b09f77dbfd07)
+                         3c36ca6ef46bcecff122bb3c474d520b9fe42e20)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         f181e3bff33395a081a36a9946b9b26f61fc7090
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 78ea2181e9b5850541306de9ca6dee0f511cf17b)
+                         0438219566070922fd56fc4fb643052f375b1a1d)
     endif()
 else()
-    ExternalProject_Add(${PACKAGE_NAME}
+    # Build our package.
+
+    build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
-        CMAKE_GENERATOR
-            ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
@@ -75,24 +61,27 @@ else()
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
             -DWITH_ZLIB=OFF
-        BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${LIBSBML_LIBRARY}
-        DEPENDS
-            libxml2
     )
+
+    # Create our package.
+
+    file(GLOB STATIC_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    string(REPLACE "${INSTALL_DIR}/" "" STATIC_LIBRARIES "${STATIC_LIBRARIES}")
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   PACKAGED_FILES include ${SHA1_FILES}
-                   SHA1_FILES ${SHA1_FILES})
+                   include lib/cmake ${STATIC_LIBRARIES})
 endif()
 
-# Let others find and use our package.
+# Make our package accessible.
+
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
 
 set(LIBSBML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBSBML_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
+set(LIBSBML_CMAKE_PACKAGE_NAME ${LIBRARY_PREFIX}sbml-static CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBSBML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBSBML_LIBRARY ${INSTALL_DIR}/${LIBSBML_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
-set(LIBSBML_DEFINITIONS
-    LIBSBML_STATIC
-    CACHE INTERNAL "${PACKAGE_NAME}'s definitions."
-)
+set(LIBSBML_LIBRARY ${LIBRARY_PREFIX}sbml-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSBML_DEFINITIONS LIBSBML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")

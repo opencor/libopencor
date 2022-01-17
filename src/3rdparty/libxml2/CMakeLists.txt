@@ -19,20 +19,6 @@ set(GIT_TAG v2.9.10-1)
 set(RELEASE_TAG v2.9.10-1)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
-if(WIN32)
-    set(OS_TAG s)
-
-    if(NOT RELEASE_MODE)
-        set(DEBUG_TAG d)
-    endif()
-endif()
-
-set(LIBXML2_LIBRARY lib/libxml2${OS_TAG}${DEBUG_TAG}${CMAKE_STATIC_LIBRARY_SUFFIX})
-
-set(SHA1_FILES
-    ${LIBXML2_LIBRARY}
-)
-
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LIBXML2)
@@ -40,38 +26,30 @@ if(LIBOPENCOR_PREBUILT_LIBXML2)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             1858ce703a3c1e17e7cd1619ce6944eaa60c4185
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 494503b9903db9cf7f010114f346dcd34250d63b)
+                             c493f3bac523004b4444a1c9149af616830dcc9f)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             79b036176a032cc0239ecdfb47640732d2f5603c
-                             SHA1_FILES ${SHA1_FILES}
-                             SHA1_VALUES 99dc4576ce1d946d280bef7c7b7f82c3b30f73a4)
+                             3dadeefeb9bf805210f6f0f323df748f07cf0954)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         06178306e9fcb9b0ac4981fddc2d0aa7f3b7fec0
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES bf3c4512630a1621697cbe30ce9a09f95dcec398)
+                         ea5f5c1c76ff69e15d0736c909ad8501d9639862)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ec304220c2c61d5cbdc0bc038d0a8cfd990cb5f9
-                         SHA1_FILES ${SHA1_FILES}
-                         SHA1_VALUES 6a3f95fdd5291eebebf72db991b635fca622f9aa)
+                         61f53fe549446b2f0957e37a6d451f04e3eb29e2)
     endif()
 else()
-    ExternalProject_Add(${PACKAGE_NAME}
+    # Build our package.
+
+    build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
-        CMAKE_GENERATOR
-            ${CMAKE_GENERATOR}
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DBUILD_SHARED_LIBS=OFF
@@ -85,18 +63,29 @@ else()
             -DLIBXML2_WITH_PYTHON=OFF
             -DLIBXML2_WITH_TESTS=OFF
             -DLIBXML2_WITH_ZLIB=OFF
-        BUILD_BYPRODUCTS
-            ${INSTALL_DIR}/${LIBXML2_LIBRARY}
     )
+
+    # Create our package.
+
+    file(GLOB STATIC_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    string(REPLACE "${INSTALL_DIR}/" "" STATIC_LIBRARIES "${STATIC_LIBRARIES}")
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   PACKAGED_FILES include ${SHA1_FILES}
-                   SHA1_FILES ${SHA1_FILES})
+                   include ${STATIC_LIBRARIES})
 endif()
 
-# Let others find and use our package.
+# Make our package accessible.
+
+if(WIN32)
+    set(LIBRARY_SUFFIX s)
+
+    if(NOT RELEASE_MODE)
+        set(LIBRARY_SUFFIX "${LIBRARY_SUFFIX}d")
+    endif()
+endif()
 
 set(LIBXML2_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBXML2_INCLUDE_DIR ${INSTALL_DIR}/include/libxml2 CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBXML2_LIBRARY ${INSTALL_DIR}/${LIBXML2_LIBRARY} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBXML2_LIBRARY libxml2::libxml2${LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBXML2_LIBRARY_FILE ${INSTALL_DIR}/lib/libxml2${LIBRARY_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
