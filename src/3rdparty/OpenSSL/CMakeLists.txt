@@ -26,7 +26,7 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             bd5e6cef0a5c2e60b92c30ce928f6171ba6263df)
+                             193bd685e15dc5cfb8c1db7c0bf85318b3347853)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -35,11 +35,11 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         293b8004a816974aee9d9ef78c22e15e0a0171c2)
+                         0ae3d39b95bbfbcff656bb3196fdd8fb91f7da00)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         8d9e42e0275f0c9ed70b2559e2ae9cecd90163ba)
+                         83b65f7c626f4315a2ad32c9099b0d2d2288ade7)
     endif()
 else()
     # Build our package.
