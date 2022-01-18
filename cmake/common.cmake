@@ -40,10 +40,10 @@ function(replace_compiler_flag OLD NEW)
     endif()
 
     foreach(VAR CMAKE_CXX_FLAGS
-        CMAKE_CXX_FLAGS_DEBUG
-        CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_CXX_FLAGS_MINSIZEREL
-        CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+                CMAKE_CXX_FLAGS_RELEASE
+                CMAKE_CXX_FLAGS_MINSIZEREL
+                CMAKE_CXX_FLAGS_RELWITHDEBINFO
+                CMAKE_CXX_FLAGS_DEBUG)
         if("${${VAR}}" MATCHES "${OLD}")
             string(REGEX REPLACE "${OLD}" "${NEW}" ${VAR} "${${VAR}}")
         endif()
@@ -59,14 +59,14 @@ function(configure_target TARGET)
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
             set(COMPILE_OPTIONS /W4 /WX)
         elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-            OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-            OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+               OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
+               OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
             set(COMPILE_OPTIONS -Wall -W -Werror)
         endif()
 
         if(COMPILE_OPTIONS)
-            target_compile_options(${TARGET} PRIVATE
-                                   ${COMPILE_OPTIONS})
+            target_compile_options(${TARGET}
+                                   PRIVATE ${COMPILE_OPTIONS})
         endif()
     endif()
 
@@ -94,8 +94,8 @@ function(configure_target TARGET)
                 )
             endif()
 
-            target_compile_options(${TARGET} PRIVATE
-                                   ${COMPILE_OPTIONS})
+            target_compile_options(${TARGET}
+                                   PRIVATE ${COMPILE_OPTIONS})
         endif()
 
         # Configure Clang-Tidy.
@@ -179,27 +179,78 @@ function(configure_target TARGET)
         endif()
     endif()
 
-    # Link the target against our different third-party libraries.
+    # Statically link our packages to the target.
 
-    foreach(THIRD_PARTY_LIBRARY libCellML libCOMBINE libcurl libNuML libSBML libSEDML LLVMClang SUNDIALS)
-        string(TOUPPER "${THIRD_PARTY_LIBRARY}" THIRD_PARTY_LIBRARY_UC)
+    foreach(PACKAGE ${PACKAGES})
+        string(TOUPPER "${PACKAGE}" PACKAGE_UC)
 
-        add_dependencies(${TARGET} ${THIRD_PARTY_LIBRARY})
+        if(    "${${PACKAGE_UC}_CMAKE_DIR}" STREQUAL ""
+           AND "${${PACKAGE_UC}_CMAKE_PACKAGE_NAME}" STREQUAL "")
+            # There are no CMake configuration files, so manually configure the
+            # package using targets of the form <PACKAGE_NAME>::<LIBRARY_NAME>.
 
-        target_include_directories(${TARGET} PUBLIC
-                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${THIRD_PARTY_LIBRARY}>
-                                   $<BUILD_INTERFACE:${${THIRD_PARTY_LIBRARY_UC}_INCLUDE_DIR}>)
+            foreach(PACKAGE_LIBRARY ${${PACKAGE_UC}_LIBRARY} ${${PACKAGE_UC}_LIBRARIES})
+                if(NOT TARGET ${PACKAGE_LIBRARY})
+                    add_library(${PACKAGE_LIBRARY} STATIC IMPORTED)
 
-        target_link_libraries(${TARGET} PRIVATE
-                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARY}
-                              ${${THIRD_PARTY_LIBRARY_UC}_LIBRARIES}
-                              ${${THIRD_PARTY_LIBRARY_UC}_SYSTEM_LIBRARIES})
+                    if(RELEASE_MODE)
+                        set(LIBRARY_BUILD_TYPE RELEASE)
+                    else()
+                        set(LIBRARY_BUILD_TYPE DEBUG)
+                    endif()
 
-        foreach(DEFINITION ${${THIRD_PARTY_LIBRARY_UC}_DEFINITIONS})
-            target_compile_definitions(${TARGET} PRIVATE
-                                       ${DEFINITION})
+                    set_property(TARGET ${PACKAGE_LIBRARY}
+                                 APPEND PROPERTY IMPORTED_CONFIGURATIONS ${LIBRARY_BUILD_TYPE})
+
+                    string(REPLACE "::" ";" PACKAGE_LIBRARY_LIST ${PACKAGE_LIBRARY})
+                    list(GET PACKAGE_LIBRARY_LIST 1 PACKAGE_LIBRARY_NAME)
+
+                    set_target_properties(${PACKAGE_LIBRARY} PROPERTIES
+                        IMPORTED_LOCATION_${LIBRARY_BUILD_TYPE} "${PREBUILT_DIR}/${PACKAGE}/lib/${PACKAGE_LIBRARY_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+                    )
+                endif()
+            endforeach()
+        else()
+            # There are some CMake configuration files, so use them to configure the
+            # package.
+
+            find_package(${${PACKAGE_UC}_CMAKE_PACKAGE_NAME} REQUIRED
+                         PATHS ${${PACKAGE_UC}_CMAKE_DIR}
+                         NO_SYSTEM_ENVIRONMENT_PATH
+                         NO_CMAKE_ENVIRONMENT_PATH
+                         NO_CMAKE_SYSTEM_PATH)
+        endif()
+
+        target_include_directories(${TARGET}
+                                   PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${PACKAGE}>
+                                   PUBLIC $<BUILD_INTERFACE:${${PACKAGE_UC}_INCLUDE_DIR}>)
+
+        target_link_libraries(${TARGET}
+                              PRIVATE ${${PACKAGE_UC}_LIBRARY} ${${PACKAGE_UC}_LIBRARIES})
+
+        foreach(DEFINITION ${${PACKAGE_UC}_DEFINITIONS})
+            target_compile_definitions(${TARGET}
+                                       PRIVATE ${DEFINITION})
         endforeach()
     endforeach()
+
+    # Mark as advanced the CMake variables set by our various packages.
+
+    mark_as_advanced(CURL_DIR
+                     Clang_DIR
+                     LLVM_DIR
+                     Libssh2_DIR
+                     SUNDIALS_DIR
+                     combine-static_DIR
+                     libCellML_DIR
+                     numl-static_DIR
+                     sbml-static_DIR
+                     sedml-static_DIR)
+
+    # Give access to some internal headers.
+
+    target_include_directories(${TARGET}
+                               PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 endfunction()
 
 function(check_python_package PACKAGE AVAILABLE)
@@ -266,9 +317,9 @@ function(statically_link_third_party_libraries TARGET)
                          NO_CMAKE_SYSTEM_PATH)
         endif()
 
-        target_include_directories(${TARGET} PUBLIC
-                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${PACKAGE}>
-                                   $<BUILD_INTERFACE:${${PACKAGE_UC}_INCLUDE_DIR}>)
+        target_include_directories(${TARGET}
+                                   PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${PACKAGE}>
+                                   PUBLIC $<BUILD_INTERFACE:${${PACKAGE_UC}_INCLUDE_DIR}>)
 
         target_link_libraries(${TARGET}
                               PRIVATE ${${PACKAGE_UC}_LIBRARY} ${${PACKAGE_UC}_LIBRARIES})
@@ -326,9 +377,9 @@ function(prepare_test TARGET)
     target_include_directories(${TARGET} PUBLIC
                                $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 
-    target_link_libraries(${TARGET} PRIVATE
-                          gtest_main
-                          ${CMAKE_PROJECT_NAME})
+    target_link_libraries(${TARGET}
+                          PRIVATE gtest_main
+                          PRIVATE ${CMAKE_PROJECT_NAME})
 
     configure_target(${TARGET})
 
