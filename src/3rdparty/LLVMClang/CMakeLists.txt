@@ -233,15 +233,3 @@ set(LLVMCLANG_LIBRARIES
     LLVMXRay
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
-if(WIN32)
-    set(LLVMCLANG_SYSTEM_LIBRARIES
-        version
-        CACHE INTERNAL "${PACKAGE_NAME}'s system libraries."
-    )
-elseif(NOT APPLE)
-    set(LLVMCLANG_SYSTEM_LIBRARIES
-        dl
-        pthread
-        CACHE INTERNAL "${PACKAGE_NAME}'s system libraries."
-    )
-endif()
