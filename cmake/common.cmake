@@ -304,9 +304,6 @@ function(prepare_test TARGET)
 
     add_dependencies(${TARGET} ${CMAKE_PROJECT_NAME})
 
-    target_include_directories(${TARGET} PUBLIC
-                               $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
-
     target_link_libraries(${TARGET} PRIVATE
                           gtest_main
                           ${CMAKE_PROJECT_NAME})
