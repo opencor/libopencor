@@ -18,49 +18,49 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(Version, libOpenCOR)
+TEST(VersionTest, libOpenCOR)
 {
     EXPECT_EQ(0x000100U, libOpenCOR::version());
     EXPECT_EQ("0.1.0", libOpenCOR::versionString());
 }
 
-TEST(Version, Clang)
+TEST(VersionTest, Clang)
 {
     EXPECT_EQ(0x130000U, libOpenCOR::clangVersion());
     EXPECT_EQ("13.0.0", libOpenCOR::clangVersionString());
 }
 
-TEST(Version, libCellML)
+TEST(VersionTest, libCellML)
 {
     EXPECT_EQ(0x000200U, libOpenCOR::libcellmlVersion());
     EXPECT_EQ("0.2.0", libOpenCOR::libcellmlVersionString());
 }
 
-TEST(Version, libCOMBINE)
+TEST(VersionTest, libCOMBINE)
 {
     EXPECT_EQ(213U, libOpenCOR::libcombineVersion());
     EXPECT_EQ("0.2.13", libOpenCOR::libcombineVersionString());
 }
 
-TEST(Version, libcurl)
+TEST(VersionTest, libcurl)
 {
     EXPECT_EQ(0x075000U, libOpenCOR::libcurlVersion());
     EXPECT_EQ("7.80.0-DEV", libOpenCOR::libcurlVersionString());
 }
 
-TEST(Version, libSEDML)
+TEST(VersionTest, libSEDML)
 {
     EXPECT_EQ(404U, libOpenCOR::libsedmlVersion());
     EXPECT_EQ("0.4.4", libOpenCOR::libsedmlVersionString());
 }
 
-TEST(Version, LLVM)
+TEST(VersionTest, LLVM)
 {
     EXPECT_EQ(0x130000U, libOpenCOR::llvmVersion());
     EXPECT_EQ("13.0.0", libOpenCOR::llvmVersionString());
 }
 
-TEST(Version, SUNDIALS)
+TEST(VersionTest, SUNDIALS)
 {
     EXPECT_EQ(0x060100U, libOpenCOR::sundialsVersion());
     EXPECT_EQ("6.1.0", libOpenCOR::sundialsVersionString());
