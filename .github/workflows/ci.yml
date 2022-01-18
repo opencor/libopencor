@@ -24,7 +24,8 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: OFF
-            unit_testing: OFF
+            unit_testing: ON
+            target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Windows shared library'
             os: windows-latest
@@ -37,7 +38,8 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: ON
-            unit_testing: OFF
+            unit_testing: ON
+            target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux static library'
             os: ubuntu-latest
@@ -50,7 +52,8 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: OFF
-            unit_testing: OFF
+            unit_testing: ON
+            target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux shared library'
             os: ubuntu-latest
@@ -63,7 +66,8 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: ON
-            unit_testing: OFF
+            unit_testing: ON
+            target: unit_testing
             install_uninstall_and_package: ON
           - name: 'macOS static library'
             os: macos-latest
@@ -76,7 +80,8 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: OFF
-            unit_testing: OFF
+            unit_testing: ON
+            target: unit_testing
             install_uninstall_and_package: ON
           - name: 'macOS shared library'
             os: macos-latest
@@ -89,7 +94,8 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: ON
-            unit_testing: OFF
+            unit_testing: ON
+            target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Windows Python'
             os: windows-latest
@@ -130,19 +136,6 @@ jobs:
             shared_libs: OFF
             unit_testing: OFF
             pip_install_test_and_uninstall: ON
-          - name: 'Unit testing'
-            os: ubuntu-latest
-            build_type: Debug
-            code_analysis: OFF
-            code_coverage_gcov: OFF
-            code_coverage_llvm_cov: OFF
-            documentation: OFF
-            memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
-            shared_libs: ON
-            unit_testing: ON
-            target: unit_testing
           - name: 'Python unit testing'
             os: ubuntu-latest
             build_type: Debug
