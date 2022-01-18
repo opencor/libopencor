@@ -26,7 +26,7 @@ if(LIBOPENCOR_UNIT_TESTING)
     endforeach()
 
     prepare_test(api_header_files_tests
-                ${TEST_SOURCE_FILES})
+                 ${TEST_SOURCE_FILES})
 endif()
 
 # Track our template for code formatting.

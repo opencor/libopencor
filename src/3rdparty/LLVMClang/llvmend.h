@@ -14,12 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <libopencor/@GIT_API_HEADER_NAME@.h>
-
-#include "gtest/gtest.h"
-
-// clang-format off
-TEST(HeaderFilesTest, @GIT_API_HEADER_NAME@)
-// clang-format on
-{
-}
+#if defined(_MSC_VER)
+    #pragma warning(pop)
+#elif defined(__clang__)
+    #pragma clang diagnostic pop
+#endif
