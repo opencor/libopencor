@@ -105,10 +105,11 @@ jobs:
             code_coverage_llvm_cov: OFF
             documentation: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_bindings: ON
+            python_unit_testing: ON
             shared_libs: OFF
             unit_testing: OFF
+            target: python_unit_testing
             pip_install_test_and_uninstall: ON
           - name: 'Linux Python'
             os: ubuntu-latest
@@ -118,10 +119,11 @@ jobs:
             code_coverage_llvm_cov: OFF
             documentation: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_bindings: ON
+            python_unit_testing: ON
             shared_libs: OFF
             unit_testing: OFF
+            target: python_unit_testing
             pip_install_test_and_uninstall: ON
           - name: 'macOS Python'
             os: macos-latest
@@ -131,24 +133,12 @@ jobs:
             code_coverage_llvm_cov: OFF
             documentation: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
-            shared_libs: OFF
-            unit_testing: OFF
-            pip_install_test_and_uninstall: ON
-          - name: 'Python unit testing'
-            os: ubuntu-latest
-            build_type: Debug
-            code_analysis: OFF
-            code_coverage_gcov: OFF
-            code_coverage_llvm_cov: OFF
-            documentation: OFF
-            memory_checks: OFF
             python_bindings: ON
             python_unit_testing: ON
-            shared_libs: ON
+            shared_libs: OFF
             unit_testing: OFF
             target: python_unit_testing
+            pip_install_test_and_uninstall: ON
           - name: 'Code formatting'
             os: ubuntu-latest
             build_type: Release
@@ -300,7 +290,6 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/ci/doxygen.1.9.2.linux.tar.gz -O - | tar -xz
           sudo mv doxygen /usr/local/bin
       - name: Build libOpenCOR
-        if: ${{ matrix.pip_install_test_and_uninstall != 'ON' }}
         run: |
           mkdir build
           cd build
