@@ -249,8 +249,8 @@ function(configure_target TARGET)
 
     # Give access to some internal headers (needed for our tests).
 
-    target_include_directories(${TARGET}
-                               PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
+    target_include_directories(${TARGET} PUBLIC
+                               $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 endfunction()
 
 function(check_python_package PACKAGE AVAILABLE)
