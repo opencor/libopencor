@@ -127,6 +127,14 @@ target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<INSTALL_INTERFACE:include/>
                            $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>)
 
+if(MSVC)
+    # Ignore some linking warnings on Windows that have nothing to do with
+    # libOpenCOR.
+
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+                            "-ignore:4199")
+endif()
+
 set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
 set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
