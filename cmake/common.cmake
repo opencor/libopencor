@@ -300,6 +300,7 @@ function(prepare_test TARGET)
     # Prepare the given test.
 
     add_executable(${TARGET}
+                   ${INTERNAL_FILES}
                    ${ARGN})
 
     add_dependencies(${TARGET} ${CMAKE_PROJECT_NAME})
