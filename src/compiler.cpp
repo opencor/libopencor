@@ -61,7 +61,7 @@ bool Compiler::compile(const std::string &pCode)
 
     constexpr char const *DummyFileName = "dummy.c";
 
-    std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only",
+    std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only", // NOLINT
 #ifdef NDEBUG
                                                       "-O3",
 #else
@@ -70,7 +70,7 @@ bool Compiler::compile(const std::string &pCode)
                                                       "-fno-math-errno",
                                                       DummyFileName};
 
-    std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments));
+    std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments)); // NOLINT
 
     if (!compilation) {
         return false;
@@ -114,7 +114,7 @@ bool Compiler::compile(const std::string &pCode)
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
-    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction(llvm::unwrap(LLVMGetGlobalContext())));
+    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction(llvm::unwrap(LLVMGetGlobalContext()))); // NOLINT
 
     if (!compilerInstance.ExecuteAction(*codeGenAction)) {
         return false;
@@ -159,11 +159,7 @@ bool Compiler::compile(const std::string &pCode)
     auto llvmContext = std::make_unique<llvm::LLVMContext>();
     auto threadSafeModule = llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext));
 
-    if (mLljit->addIRModule(std::move(threadSafeModule))) {
-        return false;
-    }
-
-    return true;
+    return !mLljit->addIRModule(std::move(threadSafeModule));
 }
 
 void *Compiler::function(const std::string &pName)
@@ -174,7 +170,7 @@ void *Compiler::function(const std::string &pName)
         auto symbol = mLljit->lookup(pName);
 
         if (symbol) {
-            return reinterpret_cast<void *>(symbol->getAddress());
+            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
         }
     }
 
