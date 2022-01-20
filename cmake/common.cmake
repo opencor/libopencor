@@ -61,7 +61,7 @@ function(configure_target TARGET)
         elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-            set(COMPILE_OPTIONS -Wall -W -Werror)
+            set(COMPILE_OPTIONS -Wall -W -Werror -Wno-unknown-warning-option)
         endif()
 
         if(COMPILE_OPTIONS)
