@@ -113,6 +113,10 @@ endif()
 
 # Make our package accessible.
 
+if(NOT WIN32)
+    set(_STATIC "_static")
+endif()
+
 set(LLVMCLANG_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LLVMCLANG_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
 set(LLVMCLANG_CMAKE_PACKAGE_NAME Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
@@ -153,7 +157,7 @@ set(LLVMCLANG_LIBRARIES
     clangToolingRefactoring
     clangToolingSyntax
     clangTransformer
-    libclang
+    libclang${_STATIC}
     LLVMAggressiveInstCombine
     LLVMAnalysis
     LLVMAsmParser
