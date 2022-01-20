@@ -35,10 +35,13 @@ limitations under the License.
     #pragma GCC diagnostic ignored "-Wunused-parameter"
 #else
     #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
     #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+    #pragma clang diagnostic ignored "-Wcast-align"
     #pragma clang diagnostic ignored "-Wcomma"
     #pragma clang diagnostic ignored "-Wdeprecated"
     #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+    #pragma clang diagnostic ignored "-Wduplicate-enum"
     #pragma clang diagnostic ignored "-Wextra-semi"
     #pragma clang diagnostic ignored "-Wextra-semi-stmt"
     #pragma clang diagnostic ignored "-Wimplicit-int-conversion"
@@ -54,7 +57,9 @@ limitations under the License.
     #pragma clang diagnostic ignored "-Wshorten-64-to-32"
     #pragma clang diagnostic ignored "-Wsign-conversion"
     #pragma clang diagnostic ignored "-Wsigned-enum-bitfield"
+    #pragma clang diagnostic ignored "-Wsuggest-destructor-override"
     #pragma clang diagnostic ignored "-Wswitch-enum"
     #pragma clang diagnostic ignored "-Wundefined-func-template"
     #pragma clang diagnostic ignored "-Wunused-parameter"
+    #pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
