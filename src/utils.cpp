@@ -22,7 +22,7 @@ namespace libOpenCOR {
 
 bool fuzzyCompare(double pNb1, double pNb2)
 {
-    static const double ONE_TRILLION = 1000000000000.0;
+    constexpr double ONE_TRILLION = 1000000000000.0;
 
     return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
 }

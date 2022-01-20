@@ -59,7 +59,7 @@ bool Compiler::compile(const std::string &pCode)
 
     // Get a compilation object to which we pass some arguments.
 
-    static const char *DummyFileName = "dummy.c";
+    constexpr char const *DummyFileName = "dummy.c";
 
     std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only",
 #ifdef NDEBUG
@@ -87,11 +87,11 @@ bool Compiler::compile(const std::string &pCode)
 
     // Retrieve the command name and make sure that it is "clang".
 
-    static const std::string Clang = "clang";
+    constexpr char const *Clang = "clang";
 
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
 
-    if (command.getCreator().getName() != Clang) {
+    if (strcmp(command.getCreator().getName(), Clang) != 0) {
         return false;
     }
 
