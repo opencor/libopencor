@@ -152,7 +152,7 @@ function(configure_target TARGET)
             string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")
 
             if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-                set(CLANG_TIDY_WARNINGS_AS_ERRORS ";-warnings-as-errors=${CLANG_TIDY_CHECKS}")
+                set(CLANG_TIDY_WARNINGS_AS_ERRORS "--warnings-as-errors=${CLANG_TIDY_CHECKS}")
             endif()
 
             if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
@@ -170,11 +170,19 @@ function(configure_target TARGET)
                 # Extra argument for Clang-Tidy when using MSVC.
                 # See https://gitlab.kitware.com/cmake/cmake/-/issues/20512#note_722771.
 
-                set(EXTRA_ARG ";--extra-arg=/EHsc")
+                set(EXTRA_ARG "--extra-arg=/EHsc")
             endif()
 
+            set(CXX_CLANG_TIDY
+                ${CLANG_TIDY_EXE}
+                "--checks=${CLANG_TIDY_CHECKS}"
+                ${EXTRA_ARG}
+                "--header-filter=${HEADER_FILTER_DIR}.*"
+                ${CLANG_TIDY_WARNINGS_AS_ERRORS}
+            )
+
             set_target_properties(${TARGET} PROPERTIES
-                CXX_CLANG_TIDY "${CLANG_TIDY_EXE}${EXTRA_ARG};-checks=${CLANG_TIDY_CHECKS};-header-filter=${HEADER_FILTER_DIR}.*${CLANG_TIDY_WARNINGS_AS_ERRORS}"
+                CXX_CLANG_TIDY "${CXX_CLANG_TIDY}"
             )
         endif()
     endif()
