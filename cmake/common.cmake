@@ -105,6 +105,9 @@ function(configure_target TARGET)
             # https://clang.llvm.org/extra/clang-tidy/checks/list.html.
 
             if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
+                set(DISABLED_BUGPRONE_CHECKS
+                    -bugprone-reserved-identifier
+                )
                 set(DISABLED_CERT_CHECKS
                     -cert-err58-cpp
                 )
@@ -128,6 +131,7 @@ function(configure_target TARGET)
             set(CLANG_TIDY_CHECKS
                 -*
                 bugprone-*
+                ${DISABLED_BUGPRONE_CHECKS}
                 cert-*
                 ${DISABLED_CERT_CHECKS}
                 cppcoreguidelines-*
