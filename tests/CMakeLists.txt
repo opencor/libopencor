@@ -14,6 +14,7 @@
 
 # Include our different tests.
 
+include(compiler/tests.cmake)
 include(version/tests.cmake)
 
 # Prepare our different tests.

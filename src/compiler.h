@@ -16,16 +16,23 @@ limitations under the License.
 
 #pragma once
 
+#include "llvmbegin.h"
+#include "llvm/ExecutionEngine/Orc/LLJIT.h"
+#include "llvmend.h"
+
 #include <string>
 
 namespace libOpenCOR {
 
-// clang-format off
-constexpr unsigned int LIBOPENCOR_VERSION = @LIBOPENCOR_VERSION@;
-// clang-format on
-constexpr const char *LIBOPENCOR_VERSION_STRING = "@LIBOPENCOR_VERSION_STRING@";
+class Compiler
+{
+public:
+    bool compile(const std::string &pCode);
 
-unsigned int firstDigit(unsigned int pTwoDigitNumber);
-unsigned int secondDigit(unsigned int pTwoDigitNumber);
+    void *function(const std::string &pName);
+
+private:
+    std::unique_ptr<llvm::orc::LLJIT> mLljit;
+};
 
 } // namespace libOpenCOR

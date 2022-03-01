@@ -14,18 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include "utils.h"
 
-#include <string>
+#include <cmath>
 
 namespace libOpenCOR {
 
-// clang-format off
-constexpr unsigned int LIBOPENCOR_VERSION = @LIBOPENCOR_VERSION@;
-// clang-format on
-constexpr const char *LIBOPENCOR_VERSION_STRING = "@LIBOPENCOR_VERSION_STRING@";
+bool fuzzyCompare(double pNb1, double pNb2)
+{
+    constexpr double ONE_TRILLION = 1000000000000.0;
 
-unsigned int firstDigit(unsigned int pTwoDigitNumber);
-unsigned int secondDigit(unsigned int pTwoDigitNumber);
+    return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
+}
 
 } // namespace libOpenCOR

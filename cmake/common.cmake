@@ -61,7 +61,7 @@ function(configure_target TARGET)
         elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-            set(COMPILE_OPTIONS -Wall -W -Werror)
+            set(COMPILE_OPTIONS -Wall -W -Werror -Wno-unknown-warning-option)
         endif()
 
         if(COMPILE_OPTIONS)
@@ -90,6 +90,7 @@ function(configure_target TARGET)
             if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
                 list(APPEND COMPILE_OPTIONS
                     -Wno-c++98-compat-pedantic
+                    -Wno-weak-vtables
                 )
             endif()
 
@@ -104,21 +105,33 @@ function(configure_target TARGET)
             # https://clang.llvm.org/extra/clang-tidy/checks/list.html.
 
             if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
+                set(DISABLED_BUGPRONE_CHECKS
+                    -bugprone-reserved-identifier
+                )
                 set(DISABLED_CERT_CHECKS
                     -cert-err58-cpp
                 )
                 set(DISABLED_CPPCOREGUIDELINES_CHECKS
                     -cppcoreguidelines-avoid-non-const-global-variables
+                    -cppcoreguidelines-non-private-member-variables-in-classes
                     -cppcoreguidelines-owning-memory
+                    -cppcoreguidelines-pro-type-reinterpret-cast
                 )
                 set(DISABLED_FUCHSIA_CHECKS
                     -fuchsia-statically-constructed-objects
+                )
+                set(MISC_CHECKS
+                    -misc-non-private-member-variables-in-classes
+                )
+                set(READABILITY_CHECKS
+                    -readability-function-cognitive-complexity
                 )
             endif()
 
             set(CLANG_TIDY_CHECKS
                 -*
                 bugprone-*
+                ${DISABLED_BUGPRONE_CHECKS}
                 cert-*
                 ${DISABLED_CERT_CHECKS}
                 cppcoreguidelines-*
@@ -132,16 +145,18 @@ function(configure_target TARGET)
                 -llvm-header-guard
                 -llvm-include-order
                 misc-*
+                ${MISC_CHECKS}
                 modernize-*
                 -modernize-use-trailing-return-type
                 performance-*
                 readability-*
+                ${READABILITY_CHECKS}
             )
 
             string(REPLACE ";" "," CLANG_TIDY_CHECKS "${CLANG_TIDY_CHECKS}")
 
             if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-                set(CLANG_TIDY_WARNINGS_AS_ERRORS ";-warnings-as-errors=${CLANG_TIDY_CHECKS}")
+                set(CLANG_TIDY_WARNINGS_AS_ERRORS "--warnings-as-errors=${CLANG_TIDY_CHECKS}")
             endif()
 
             if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
@@ -159,11 +174,19 @@ function(configure_target TARGET)
                 # Extra argument for Clang-Tidy when using MSVC.
                 # See https://gitlab.kitware.com/cmake/cmake/-/issues/20512#note_722771.
 
-                set(EXTRA_ARG ";--extra-arg=/EHsc")
+                set(EXTRA_ARG "--extra-arg=/EHsc")
             endif()
 
+            set(CXX_CLANG_TIDY
+                ${CLANG_TIDY_EXE}
+                "--checks=${CLANG_TIDY_CHECKS}"
+                ${EXTRA_ARG}
+                "--header-filter=${HEADER_FILTER_DIR}.*"
+                ${CLANG_TIDY_WARNINGS_AS_ERRORS}
+            )
+
             set_target_properties(${TARGET} PROPERTIES
-                CXX_CLANG_TIDY "${CLANG_TIDY_EXE}${EXTRA_ARG};-checks=${CLANG_TIDY_CHECKS};-header-filter=${HEADER_FILTER_DIR}.*${CLANG_TIDY_WARNINGS_AS_ERRORS}"
+                CXX_CLANG_TIDY "${CXX_CLANG_TIDY}"
             )
         endif()
     endif()
@@ -235,6 +258,11 @@ function(configure_target TARGET)
                      numl-static_DIR
                      sbml-static_DIR
                      sedml-static_DIR)
+
+    # Give access to some internal headers (needed for our tests).
+
+    target_include_directories(${TARGET} PUBLIC
+                               $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 endfunction()
 
 function(check_python_package PACKAGE AVAILABLE)
@@ -284,7 +312,10 @@ function(prepare_test TARGET)
     # Prepare the given test.
 
     add_executable(${TARGET}
+                   ${INTERNAL_FILES}
                    ${ARGN})
+
+    add_dependencies(${TARGET} ${CMAKE_PROJECT_NAME})
 
     target_link_libraries(${TARGET} PRIVATE
                           gtest_main

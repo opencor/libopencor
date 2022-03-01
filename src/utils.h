@@ -16,16 +16,8 @@ limitations under the License.
 
 #pragma once
 
-#include <string>
-
 namespace libOpenCOR {
 
-// clang-format off
-constexpr unsigned int LIBOPENCOR_VERSION = @LIBOPENCOR_VERSION@;
-// clang-format on
-constexpr const char *LIBOPENCOR_VERSION_STRING = "@LIBOPENCOR_VERSION_STRING@";
-
-unsigned int firstDigit(unsigned int pTwoDigitNumber);
-unsigned int secondDigit(unsigned int pTwoDigitNumber);
+bool fuzzyCompare(double pNb1, double pNb2);
 
 } // namespace libOpenCOR
