@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME zlib)
-set(PACKAGE_VERSION 2.0.5)
+set(PACKAGE_VERSION 2.0.6)
 set(PACKAGE_REPOSITORY zlib-ng)
-set(GIT_TAG 2.0.5)
-set(RELEASE_TAG 2.0.5)
+set(GIT_TAG 2.0.6)
+set(RELEASE_TAG 2.0.6)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
