@@ -61,7 +61,7 @@ bool Compiler::compile(const std::string &pCode)
 
     constexpr char const *DummyFileName = "dummy.c";
 
-    std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only", // NOLINT
+    std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only",
 #ifdef NDEBUG
                                                       "-O3",
 #else
@@ -70,7 +70,7 @@ bool Compiler::compile(const std::string &pCode)
                                                       "-fno-math-errno",
                                                       DummyFileName};
 
-    std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments)); // NOLINT
+    std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments));
 
     if (!compilation) {
         return false;
@@ -95,26 +95,39 @@ bool Compiler::compile(const std::string &pCode)
         return false;
     }
 
-    // Create a compiler invocation object.
+    // Prevent the Clang driver from asking CC1 to leak memory, this by removing
+    // -disable-free from the command arguments.
 
-    auto compilerInvocation = clang::createInvocationFromCommandLine(compilationArguments, diagnosticsEngine.get());
+    auto commandArguments = command.getArguments();
+    auto *commandArgument = find(commandArguments, llvm::StringRef("-disable-free"));
 
-    // Map our code to a memory buffer.
-
-    compilerInvocation->getPreprocessorOpts().addRemappedFile(DummyFileName,
-                                                              llvm::MemoryBuffer::getMemBuffer(pCode).release());
+    if (commandArgument != commandArguments.end()) {
+        commandArguments.erase(commandArgument);
+    }
 
     // Create a compiler instance.
 
     clang::CompilerInstance compilerInstance;
 
     compilerInstance.setDiagnostics(diagnosticsEngine.get());
-    compilerInstance.setInvocation(std::move(compilerInvocation));
     compilerInstance.setVerboseOutputStream(llvm::nulls());
+
+    // Create a compiler invocation object.
+
+    if (!clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
+                                                   commandArguments,
+                                                   *diagnosticsEngine)) {
+        return false;
+    }
+
+    // Map our code to a memory buffer.
+
+    compilerInstance.getInvocation().getPreprocessorOpts().addRemappedFile(DummyFileName,
+                                                                           llvm::MemoryBuffer::getMemBuffer(pCode).release());
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
-    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction(llvm::unwrap(LLVMGetGlobalContext()))); // NOLINT
+    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction(llvm::unwrap(LLVMGetGlobalContext())));
 
     if (!compilerInstance.ExecuteAction(*codeGenAction)) {
         return false;
