@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSEDML)
-set(PACKAGE_VERSION 0.4.4)
+set(PACKAGE_VERSION 2.0.27)
 set(PACKAGE_REPOSITORY libSEDML)
-set(GIT_TAG v0.4.4)
-set(RELEASE_TAG v0.4.4-libopencor)
+set(GIT_TAG v2.0.27)
+set(RELEASE_TAG v2.0.27)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
