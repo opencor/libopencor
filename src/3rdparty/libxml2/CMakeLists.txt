@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libxml2)
-set(PACKAGE_VERSION 2.9.10)
+set(PACKAGE_VERSION 2.9.13)
 set(PACKAGE_REPOSITORY libxml2)
-set(GIT_TAG v2.9.10-1)
-set(RELEASE_TAG v2.9.10-1)
+set(GIT_TAG v2.9.13)
+set(RELEASE_TAG v2.9.13)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
