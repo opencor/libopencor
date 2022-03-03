@@ -25,6 +25,12 @@ endif()
 
 # Either retrieve or build our package.
 
+if(WIN32)
+    set(CMAKE_DIR ${PACKAGE_NAME}/CMake)
+else()
+    set(CMAKE_DIR lib/cmake)
+endif()
+
 if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(WIN32)
         if(RELEASE_MODE)
@@ -91,8 +97,6 @@ else()
     # Create our package.
 
     if(WIN32)
-        set(CMAKE_DIR ${PACKAGE_NAME}/CMake)
-
         # The below is a temporary fix for the debug version of libCellML on
         # Windows (see https://github.com/cellml/libcellml/issues/980).
 
@@ -102,8 +106,6 @@ else()
             file(COPY ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/src/${DEBUG_UTILITIES_LIBRARY}
                  DESTINATION ${INSTALL_DIR}/lib)
         endif()
-    else()
-        set(CMAKE_DIR lib/cmake)
     endif()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
