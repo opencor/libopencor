@@ -21,10 +21,6 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
-if(WIN32)
-    set(LIBRARY_PREFIX lib)
-endif()
-
 if(LIBOPENCOR_PREBUILT_LIBSEDML)
     if(WIN32)
         if(RELEASE_MODE)
@@ -78,23 +74,6 @@ else()
             -DWITH_ZLIB=OFF
     )
 
-    # Patch one of our CMake configuration files since it references some
-    # absolute paths.
-
-    if(RELEASE_MODE)
-        set(PACKAGE_MODE release)
-    else()
-        set(PACKAGE_MODE debug)
-    endif()
-
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}sedml-static-config-${PACKAGE_MODE}.cmake)
-
-    file(READ ${CONFIG_FILE} FILE_CONTENTS)
-
-    string(REGEX REPLACE ";[^;]*${LIBNUML_LIBRARY}" ";${LIBNUML_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-
-    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
-
     # Create our package.
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
@@ -105,8 +84,6 @@ endif()
 # Make our package accessible.
 
 set(LIBSEDML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
-set(LIBSEDML_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
-set(LIBSEDML_CMAKE_PACKAGE_NAME ${LIBRARY_PREFIX}sedml-static CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBSEDML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBSEDML_LIBRARY ${LIBRARY_PREFIX}sedml-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSEDML_LIBRARY libSEDML::libsedml-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBSEDML_DEFINITIONS LIBSEDML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")
