@@ -21,6 +21,10 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
+
 if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
     if(WIN32)
         if(RELEASE_MODE)
@@ -79,10 +83,6 @@ else()
     # Patch some of our CMake configuration files (see
     # https://github.com/sbmlteam/libCombine/issues/49).
 
-    if(WIN32)
-        set(LIBRARY_PREFIX lib)
-    endif()
-
     if(RELEASE_MODE)
         set(PACKAGE_MODE release)
     else()
@@ -108,10 +108,6 @@ else()
 endif()
 
 # Make our package accessible.
-
-if(WIN32)
-    set(LIBRARY_PREFIX lib)
-endif()
 
 set(LIBCOMBINE_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBCOMBINE_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")

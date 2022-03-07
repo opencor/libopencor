@@ -21,6 +21,10 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
+
 if(LIBOPENCOR_PREBUILT_LIBNUML)
     if(WIN32)
         if(RELEASE_MODE)
@@ -76,10 +80,6 @@ else()
     # Patch one of our CMake configuration files (see
     # https://github.com/NuML/NuML/issues/24).
 
-    if(WIN32)
-        set(LIBRARY_PREFIX lib)
-    endif()
-
     fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config.cmake)
 
     # Create our package.
@@ -90,10 +90,6 @@ else()
 endif()
 
 # Make our package accessible.
-
-if(WIN32)
-    set(LIBRARY_PREFIX lib)
-endif()
 
 set(LIBNUML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBNUML_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")

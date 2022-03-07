@@ -21,6 +21,10 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
+
 if(LIBOPENCOR_PREBUILT_LIBSEDML)
     if(WIN32)
         if(RELEASE_MODE)
@@ -77,10 +81,6 @@ else()
     # Patch one of our CMake configuration files since it references some
     # absolute paths.
 
-    if(WIN32)
-        set(LIBRARY_PREFIX lib)
-    endif()
-
     if(RELEASE_MODE)
         set(PACKAGE_MODE release)
     else()
@@ -103,10 +103,6 @@ else()
 endif()
 
 # Make our package accessible.
-
-if(WIN32)
-    set(LIBRARY_PREFIX lib)
-endif()
 
 set(LIBSEDML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBSEDML_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
