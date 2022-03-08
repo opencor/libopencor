@@ -80,8 +80,7 @@ else()
             -DZIPPER_LIBRARY=${ZIPPER_LIBRARY}
     )
 
-    # Patch some of our CMake configuration files (see
-    # https://github.com/sbmlteam/libCombine/issues/49).
+    # Patch some of our CMake configuration files.
 
     if(RELEASE_MODE)
         set(PACKAGE_MODE release)

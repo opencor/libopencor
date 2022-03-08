@@ -58,8 +58,7 @@ else()
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
     )
 
-    # Patch some of our CMake configuration files since they reference absolute
-    # paths.
+    # Patch some of our CMake configuration files.
 
     if(RELEASE_MODE)
         set(PACKAGE_MODE release)

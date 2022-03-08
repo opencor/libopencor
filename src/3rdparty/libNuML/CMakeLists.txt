@@ -77,8 +77,7 @@ else()
             -DWITH_SWIG=OFF
     )
 
-    # Patch one of our CMake configuration files (see
-    # https://github.com/NuML/NuML/issues/24).
+    # Patch some of our CMake configuration files.
 
     fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config.cmake)
 

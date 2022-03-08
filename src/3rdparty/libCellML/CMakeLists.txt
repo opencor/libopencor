@@ -75,8 +75,7 @@ else()
             -DZLIB_ROOT=${ZLIB_ROOT}
     )
 
-    # Patch one of our CMake configuration files since it references some
-    # absolute paths.
+    # Patch some of our CMake configuration files.
 
     if(WIN32)
         set(CONFIG_FILE ${INSTALL_DIR}/${PACKAGE}/CMake/libcellml-targets.cmake)
