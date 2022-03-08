@@ -38,14 +38,14 @@ TEST(VersionTest, libCellML)
 
 TEST(VersionTest, libCOMBINE)
 {
-    EXPECT_EQ(213U, libOpenCOR::libcombineVersion());
-    EXPECT_EQ("0.2.13", libOpenCOR::libcombineVersionString());
+    EXPECT_EQ(215U, libOpenCOR::libcombineVersion());
+    EXPECT_EQ("0.2.15", libOpenCOR::libcombineVersionString());
 }
 
 TEST(VersionTest, libcurl)
 {
-    EXPECT_EQ(0x075000U, libOpenCOR::libcurlVersion());
-    EXPECT_EQ("7.80.0-DEV", libOpenCOR::libcurlVersionString());
+    EXPECT_EQ(0x075200U, libOpenCOR::libcurlVersion());
+    EXPECT_EQ("7.82.0-DEV", libOpenCOR::libcurlVersionString());
 }
 
 TEST(VersionTest, libSEDML)
