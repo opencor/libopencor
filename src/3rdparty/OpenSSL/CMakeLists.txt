@@ -96,6 +96,12 @@ else()
             ${MAKE_NMAKE_COMMAND} install_sw
     )
 
+    # On Linux, we need to rename the library folder from lib64 to lib.
+
+    if(NOT WIN32 AND NOT APPLE)
+        file(RENAME "${INSTALL_DIR}/lib64" "${INSTALL_DIR}/lib")
+    endif()
+
     # Create our package.
 
     file(GLOB STATIC_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
