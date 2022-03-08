@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCOMBINE)
-set(PACKAGE_VERSION 0.2.13b)
+set(PACKAGE_VERSION 0.2.15)
 set(PACKAGE_REPOSITORY libCombine)
-set(GIT_TAG v0.2.13b)
-set(RELEASE_TAG v0.2.13b)
+set(GIT_TAG v0.2.15)
+set(RELEASE_TAG v0.2.15)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -77,10 +77,18 @@ else()
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
             -DZIPPER_INCLUDE_DIR=${ZIPPER_INCLUDE_DIR}
-            -DZIPPER_LIBRARY=${ZIPPER_LIBRARY}
+            -DZIPPER_LIBRARY=${ZIPPER_LIBRARY_FILE}
     )
 
     # Patch some of our CMake configuration files.
+
+    file(GLOB CMAKE_FILES "${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}/*.cmake")
+
+    foreach(CMAKE_FILE ${CMAKE_FILES})
+        string(REPLACE "Combine" "combine" NEW_CMAKE_FILE "${CMAKE_FILE}")
+
+        file(RENAME ${CMAKE_FILE} ${NEW_CMAKE_FILE})
+    endforeach()
 
     if(RELEASE_MODE)
         set(PACKAGE_MODE release)
@@ -92,6 +100,7 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
+    string(REPLACE "${LIBXML2_LIBRARY_FILE}" "${LIBXML2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "${ZIPPER_LIBRARY_FILE}" "${ZIPPER_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "${ZLIB_LIBRARY_FILE}" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
 
