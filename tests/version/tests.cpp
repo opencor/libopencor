@@ -50,8 +50,8 @@ TEST(VersionTest, libcurl)
 
 TEST(VersionTest, libSEDML)
 {
-    EXPECT_EQ(20028U, libOpenCOR::libsedmlVersion());
-    EXPECT_EQ("2.0.28", libOpenCOR::libsedmlVersionString());
+    EXPECT_EQ(20029U, libOpenCOR::libsedmlVersion());
+    EXPECT_EQ("2.0.29", libOpenCOR::libsedmlVersionString());
 }
 
 TEST(VersionTest, LLVM)
