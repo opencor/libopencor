@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_ZIPPER)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             4eec957233eeecfd4bbfcd5fe6bf97e9510b70a6)
+                             9037032ccc474fb8352a0389313d11b9e91cb258)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a7bfd4a37c25663711436a4b9eb380dad881768e)
+                             54ba74fc3000c0758879187840a5e9e3e0c28f92)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e11433dde389afb5df7719950d1d61648760af5b)
+                         e26ffff9ee9196347db8c67381f47c24277a19c4)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b3aa96681cbfd4b69d07edbd49dac336a7d7515f)
+                         fb9ba6787cf13f9edb9a55b5f63df0ffb8a7cdab)
     endif()
 else()
     # Build our package.
