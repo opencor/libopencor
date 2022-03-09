@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME SUNDIALS)
-set(PACKAGE_VERSION 6.1.0)
+set(PACKAGE_VERSION 6.1.1)
 set(PACKAGE_REPOSITORY sundials)
-set(GIT_TAG v6.1.0-libopencor)
-set(RELEASE_TAG v6.1.0-libopencor)
+set(GIT_TAG v6.1.1-libopencor)
+set(RELEASE_TAG v6.1.1-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             5e906b9f2ad23c8a0c74b6ca36b467cc68e5fd0b)
+                             2581f9cf68ee3133364d4666b45fc5437c2b5182)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             35f1edeb37160b573ab7e7c8744132770a69a418)
+                             a6bd3429b77eba4c294738b7701cf449b2a2dc07)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         3b2b6b1fa13280e11801572e0ba97d1b9f507a67)
+                         d9f796497bef40c0cba1ec12f5307f2ce4dede40)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b9e3fcc71f866998c99f49018fa50b0cb79f5a78)
+                         3a3f6019f9fe67603891aae236111c305b8bc0bf)
     endif()
 else()
     # Build our package.
@@ -61,16 +61,6 @@ else()
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DEXAMPLES_ENABLE_C=OFF
     )
-
-    # Patch one of our CMake configuration files due to a bug in SUNDIALS 6.1.0.
-
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE_REPOSITORY}/SUNDIALSConfig.cmake)
-
-    file(READ ${CONFIG_FILE} FILE_CONTENTS)
-
-    string(REPLACE "if( AND NOT TARGET caliper)" "if(OFF AND NOT TARGET caliper)" FILE_CONTENTS "${FILE_CONTENTS}")
-
-    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     # Create our package.
 

@@ -274,7 +274,9 @@ jobs:
         run: pip3 install gcovr
       - name: Install Valgrind
         if: ${{ matrix.memory_checks == 'ON' }}
-        run: sudo apt install valgrind
+        run: |
+          sudo apt update
+          sudo apt install valgrind
       - name: Install pytest
         if: ${{ matrix.target == 'python_unit_testing' }}
         run: pip3 install pytest

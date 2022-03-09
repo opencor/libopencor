@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME zlib)
-set(PACKAGE_VERSION 2.0.5)
+set(PACKAGE_VERSION 2.0.6)
 set(PACKAGE_REPOSITORY zlib-ng)
-set(GIT_TAG 2.0.5)
-set(RELEASE_TAG 2.0.5)
+set(GIT_TAG 2.0.6)
+set(RELEASE_TAG 2.0.6)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_ZLIB)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e93075a81154fbd87c0fa62607fb16182b776f52)
+                             9a9deebd91fc65d80c351c6232009787cd75e4d4)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d05e91b486b822804c8f2246161dc136318fca9f)
+                             515ebd07c104c80c9dbd31698fd0819512358435)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         4e5a99875e7ce0736161635f8d8a251511b18b2c)
+                         36c02336dba035a149b6aa45106bc48dc0a86410)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         7ebc404bc150d5763c1c6fc27438ef7fe517f576)
+                         e1e531a45445aaa5ee1b74590f1f57103e38feec)
     endif()
 else()
     # Build our package.

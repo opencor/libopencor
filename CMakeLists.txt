@@ -443,7 +443,7 @@ check_dependent_packages(libssh2 libcurl)
 check_dependent_packages(zipper libCOMBINE)
 
 if(NOT "${DEPENDENT_PACKAGES}" STREQUAL "")
-    message(STATUS "The following packages are also be built:")
+    message(STATUS "The following packages are also to be built:")
 
     foreach(DEPENDENT_PACKAGE ${DEPENDENT_PACKAGES})
         message(STATUS " - ${DEPENDENT_PACKAGE}")

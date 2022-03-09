@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libcurl)
-set(PACKAGE_VERSION 7.80.0)
+set(PACKAGE_VERSION 7.82.0)
 set(PACKAGE_REPOSITORY curl)
-set(GIT_TAG curl-7_80_0)
-set(RELEASE_TAG curl-7_80_0)
+set(GIT_TAG curl-7_82_0)
+set(RELEASE_TAG curl-7_82_0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -30,20 +30,20 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             20281fa9c60911000992aac9a8cd50712d165b8c)
+                             c9c3d7a5889cd4d5476b0e09e98a7d9c27bf3fed)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f4decd8ca15bd20da406cb147f45a9838a77a67d)
+                             b191b0c9238c9d83471f6ba75f767ad78c33c261)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e3139b08ce8f8770168ffc485901a24273234b85)
+                         a6da8293d2ed012239d5008733cbf88387d03f30)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         5d0eb78f5fd2c9848f6ab18b1edff7784bd40816)
+                         a1e99effc0bd8061624ca9fcddb59653d726b50e)
     endif()
 else()
     # Build our package.
@@ -60,15 +60,14 @@ else()
             -DBUILD_SHARED_LIBS=OFF
             -DBUILD_TESTING=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DCMAKE_USE_OPENSSL=ON
+            -DCURL_USE_OPENSSL=ON
             -DLIBSSH2_INCLUDE_DIR=${LIBSSH2_INCLUDE_DIR}
             -DLIBSSH2_LIBRARY=${LIBSSH2_LIBRARY_FILE}
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
             -DZLIB_ROOT=${ZLIB_ROOT}
     )
 
-    # Patch one of our CMake configuration files since it references some
-    # absolute paths.
+    # Patch some of our CMake configuration files.
 
     set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/CURL/CURLTargets.cmake)
 

@@ -25,25 +25,31 @@ endif()
 
 # Either retrieve or build our package.
 
+if(WIN32)
+    set(CMAKE_DIR ${PACKAGE_NAME}/CMake)
+else()
+    set(CMAKE_DIR lib/cmake)
+endif()
+
 if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(WIN32)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             9ef05b4acc8c2d45cd1b46900f09622b9a40db3e)
+                             a25a1e5a3eaa9781bbc677d0481bfd894e156266)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             31e549121dddf8f622e571caf83e38d2b9bd186d)
+                             3b58953618aec0f5b258d0cc0862648da167936f)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         c0e5103ddf29953d4670eb5354b5d1b8343a7296)
+                         e75bf3e070039db90ed4c2e9b95811d4d3a0273e)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         5bbb4db47f7bd0e2158784daba7d8ed5705ff312)
+                         07859f0f5f265c4886dbadd0a31f3a80958eb10d)
     endif()
 else()
     # Build our package.
@@ -69,8 +75,7 @@ else()
             -DZLIB_ROOT=${ZLIB_ROOT}
     )
 
-    # Patch one of our CMake configuration files since it references some
-    # absolute paths.
+    # Patch some of our CMake configuration files.
 
     if(WIN32)
         set(CONFIG_FILE ${INSTALL_DIR}/${PACKAGE}/CMake/libcellml-targets.cmake)
@@ -91,8 +96,6 @@ else()
     # Create our package.
 
     if(WIN32)
-        set(CMAKE_DIR ${PACKAGE_NAME}/CMake)
-
         # The below is a temporary fix for the debug version of libCellML on
         # Windows (see https://github.com/cellml/libcellml/issues/980).
 
@@ -102,8 +105,6 @@ else()
             file(COPY ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/src/${DEBUG_UTILITIES_LIBRARY}
                  DESTINATION ${INSTALL_DIR}/lib)
         endif()
-    else()
-        set(CMAKE_DIR lib/cmake)
     endif()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}

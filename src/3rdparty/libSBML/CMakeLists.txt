@@ -21,25 +21,29 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
+
 if(LIBOPENCOR_PREBUILT_LIBSBML)
     if(WIN32)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e82e863465aaa51ccd4698e1a61a8ebfc3863c89)
+                             452ea2a4bcc54f1f914cb43b57b947558300e9c9)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c4d2851e5b1b382c31a855bc86c8f1954b2e2d13)
+                             cd81dd3602036562874125844895c92d1645356f)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         3c36ca6ef46bcecff122bb3c474d520b9fe42e20)
+                         7d3f577d982a2be927f13656277e38fde85e3df6)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         0438219566070922fd56fc4fb643052f375b1a1d)
+                         0c61e084ac5f209c7d35e985443a1aef62f7a25c)
     endif()
 else()
     # Build our package.
@@ -56,12 +60,28 @@ else()
             -DLIBSBML_SHARED_VERSION=OFF
             -DLIBSBML_SKIP_SHARED_LIBRARY=ON
             -DLIBXML_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
-            -DLIBXML_LIBRARY=${LIBXML2_LIBRARY}
+            -DLIBXML_LIBRARY=${LIBXML2_LIBRARY_FILE}
             -DWITH_BZIP2=OFF
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
             -DWITH_ZLIB=OFF
     )
+
+    # Patch some of our CMake configuration files.
+
+    if(RELEASE_MODE)
+        set(PACKAGE_MODE release)
+    else()
+        set(PACKAGE_MODE debug)
+    endif()
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}sbml-static-config-${PACKAGE_MODE}.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "${LIBXML2_LIBRARY_FILE}" "${LIBXML2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     # Create our package.
 
@@ -74,10 +94,6 @@ else()
 endif()
 
 # Make our package accessible.
-
-if(WIN32)
-    set(LIBRARY_PREFIX lib)
-endif()
 
 set(LIBSBML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBSBML_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")

@@ -13,38 +13,42 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCOMBINE)
-set(PACKAGE_VERSION 0.2.13b)
+set(PACKAGE_VERSION 0.2.15)
 set(PACKAGE_REPOSITORY libCombine)
-set(GIT_TAG v0.2.13b)
-set(RELEASE_TAG v0.2.13b)
+set(GIT_TAG v0.2.15)
+set(RELEASE_TAG v0.2.15)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
+
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
 
 if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
     if(WIN32)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c89d331a2b830f3adf1821851f17ca80bf840008)
+                             123a68d8022c114a370f6a17cc48e03be928d61d)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             eff165b52343d540b9e9fa9c7fc5e47deb41113a)
+                             d2c2298f822bc2bd08f37b7412f13d30d6011de5)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         bceb0f1f3169d7228b88d9644238e119c6cd94f1)
+                         3d8dadeb3e65fe8c030eb81c4c66e9a7e2c56798)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         f47de2193b3ff9b333ef6d25b54c6e4ee905c948)
+                         ebdd0bfe0b04b680a9b33450fefbf9e90ed1a524)
     endif()
 else()
     # Build our package.
 
-    set(EXTRA_LIBS ${LIBXML2_LIBRARY})
+    set(EXTRA_LIBS ${LIBXML2_LIBRARY_FILE})
 
     if(WIN32)
         string(APPEND EXTRA_LIBS |WS2_32)
@@ -61,27 +65,30 @@ else()
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
             -DBUILD_TEST=OFF
             -DEXTRA_LIBS=${EXTRA_LIBS}
             -DLIBCOMBINE_SHARED_VERSION=OFF
             -DLIBCOMBINE_SKIP_SHARED_LIBRARY=ON
-            -DLIBSBML_INCLUDE_DIR=${LIBSBML_INCLUDE_DIR}
-            -DLIBSBML_LIBRARY=${LIBSBML_LIBRARY}
+            -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
             -DLIBSBML_STATIC=ON
             -DLIBZ_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
             -DLIBZ_LIBRARY=${ZLIB_LIBRARY_FILE}
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
             -DZIPPER_INCLUDE_DIR=${ZIPPER_INCLUDE_DIR}
-            -DZIPPER_LIBRARY=${ZIPPER_LIBRARY}
+            -DZIPPER_LIBRARY=${ZIPPER_LIBRARY_FILE}
     )
 
-    # Patch some of our CMake configuration files (see
-    # https://github.com/sbmlteam/libCombine/issues/49).
+    # Patch some of our CMake configuration files.
 
-    if(WIN32)
-        set(LIBRARY_PREFIX lib)
-    endif()
+    file(GLOB INSTALLED_FILES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}" "${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}/*.cmake")
+
+    foreach(INSTALLED_FILE ${INSTALLED_FILES})
+        string(REPLACE "Combine" "combine" NEW_INSTALLED_FILE "${INSTALLED_FILE}")
+
+        file(RENAME ${INSTALLED_FILE} ${NEW_INSTALLED_FILE})
+    endforeach()
 
     if(RELEASE_MODE)
         set(PACKAGE_MODE release)
@@ -93,8 +100,18 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
+    string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "${LIBXML2_LIBRARY_FILE}" "${LIBXML2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "${ZIPPER_LIBRARY_FILE}" "${ZIPPER_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "${ZLIB_LIBRARY_FILE}" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REGEX REPLACE ";[^;]*${ZIPPER_LIBRARY}" ";${ZIPPER_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}combine-static-config.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
@@ -108,10 +125,6 @@ else()
 endif()
 
 # Make our package accessible.
-
-if(WIN32)
-    set(LIBRARY_PREFIX lib)
-endif()
 
 set(LIBCOMBINE_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBCOMBINE_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")

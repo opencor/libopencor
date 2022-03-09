@@ -161,7 +161,7 @@ bool Compiler::compile(const std::string &pCode)
 
     // Add a JIT dynamic library to our ORC-based JIT.
 
-    auto jitDylib = mLljit->createJITDylib("main");
+    auto jitDylib = mLljit->createJITDylib("libOpenCOR");
 
     if (!jitDylib) {
         return false;
@@ -179,7 +179,7 @@ void *Compiler::function(const std::string &pName)
 {
     // Return the address of the requested function.
 
-    if (mLljit != nullptr) {
+    if ((mLljit != nullptr) && !pName.empty()) {
         auto symbol = mLljit->lookup(pName);
 
         if (symbol) {
