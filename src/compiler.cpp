@@ -179,7 +179,7 @@ void *Compiler::function(const std::string &pName)
 {
     // Return the address of the requested function.
 
-    if ((mLljit != nullptr) && (pName != "")) {
+    if ((mLljit != nullptr) && !pName.empty()) {
         auto symbol = mLljit->lookup(pName);
 
         if (symbol) {
