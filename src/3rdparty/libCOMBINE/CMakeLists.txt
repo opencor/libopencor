@@ -82,12 +82,12 @@ else()
 
     # Patch some of our CMake configuration files.
 
-    file(GLOB CMAKE_FILES "${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}/*.cmake")
+    file(GLOB INSTALLED_FILES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}" "${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}/*.cmake")
 
-    foreach(CMAKE_FILE ${CMAKE_FILES})
-        string(REPLACE "Combine" "combine" NEW_CMAKE_FILE "${CMAKE_FILE}")
+    foreach(INSTALLED_FILE ${INSTALLED_FILES})
+        string(REPLACE "Combine" "combine" NEW_INSTALLED_FILE "${INSTALLED_FILE}")
 
-        file(RENAME ${CMAKE_FILE} ${NEW_CMAKE_FILE})
+        file(RENAME ${INSTALLED_FILE} ${NEW_INSTALLED_FILE})
     endforeach()
 
     if(RELEASE_MODE)
@@ -100,9 +100,18 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
+    string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "${LIBXML2_LIBRARY_FILE}" "${LIBXML2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "${ZIPPER_LIBRARY_FILE}" "${ZIPPER_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "${ZLIB_LIBRARY_FILE}" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}combine-static-config.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
@@ -121,5 +130,5 @@ set(LIBCOMBINE_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root direct
 set(LIBCOMBINE_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
 set(LIBCOMBINE_CMAKE_PACKAGE_NAME ${LIBRARY_PREFIX}combine-static CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBCOMBINE_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBCOMBINE_LIBRARY ${LIBRARY_PREFIX}Combine-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBCOMBINE_LIBRARY ${LIBRARY_PREFIX}combine-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBCOMBINE_DEFINITIONS LIBCOMBINE_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")
