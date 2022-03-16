@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             945a22c025cea0fae8cb271c060bdb14ba370f55)
+                             6e10dd871c36b6e1ba386ad94c96f12c559c5b31)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c5c82ddf68c6fa444d7616a4c3fcf0cbfccb9c3d)
+                             b7237f10ac0814b5ac9404677735d7543553fe07)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e2760792e25d85fa50bac76e618b1e9035795784)
+                         009db278ff067ac04a4432f03580a449b43fc5f2)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e7eb995bdf4d6469104fe4841d68a43526997b1d)
+                         fd0c2b3d7238d7fa891aff992c1e7a5883d09252)
     endif()
 else()
     # Build our package.
