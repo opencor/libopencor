@@ -17,15 +17,10 @@ if(LIBOPENCOR_DOCUMENTATION)
 
     include(ExternalProject)
 
-    set(EXTERNAL_PROJECT_BUILD_DIR ${CMAKE_BINARY_DIR}/ext)
-
-    set_property(DIRECTORY PROPERTY EP_BASE ${EXTERNAL_PROJECT_BUILD_DIR})
-
     ExternalProject_Add(general_documentation
-                        SOURCE_DIR ${EXTERNAL_PROJECT_BUILD_DIR}/doc/general
                         GIT_REPOSITORY https://github.com/opencor/general-documentation
                         CMAKE_ARGS -DMODE=${CMAKE_PROJECT_NAME}
-                        INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${EXTERNAL_PROJECT_BUILD_DIR}/Build/general_documentation/html
+                        INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/doc/general_documentation-prefix/src/general_documentation-build/html
                                                                            ${CMAKE_BINARY_DIR}/doc/html)
 
     # User and developer documentations.
