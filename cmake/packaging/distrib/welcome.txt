@@ -1,3 +1,0 @@
-This program is going to guide you through the installation of libOpenCOR on your machine. Just follow the instructions and everything should be fine.
-
-The libOpenCOR team
