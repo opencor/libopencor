@@ -1,6 +1,0 @@
-build/
-_skbuild/
-*.egg-info/
-
-.DS_Store
-CMakeLists.txt.user
