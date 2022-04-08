@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libNuML)
-set(PACKAGE_VERSION 1.1.4)
+set(PACKAGE_VERSION 1.1.5)
 set(PACKAGE_REPOSITORY NuML)
-set(GIT_TAG v1.1.4-libopencor)
-set(RELEASE_TAG v1.1.4-libopencor)
+set(GIT_TAG v1.1.5-libopencor)
+set(RELEASE_TAG v1.1.5-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
