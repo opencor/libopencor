@@ -44,10 +44,8 @@ if(LIBOPENCOR_PREBUILT_LIBSEDML)
 else()
     # Build our package.
 
-    set(EXTRA_LIBS ${LIBXML2_LIBRARY_FILE})
-
     if(WIN32)
-        string(APPEND EXTRA_LIBS |WS2_32)
+        set(DEXTRA_LIBS WS2_32)
     endif()
 
     build_package(${PACKAGE_NAME}
@@ -56,18 +54,13 @@ else()
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
-        LIST_SEPARATOR
-            |
         CMAKE_ARGS
             -DBUILD_TESTS=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
-            -DEXTRA_LIBS=${EXTRA_LIBS}
+            ${DEXTRA_LIBS}
             -DLIBNUML_ROOT=${LIBNUML_CMAKE_DIR}
-            -DLIBNUML_STATIC=ON
             -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
-            -DLIBSBML_STATIC=ON
             -DLIBSEDML_SHARED_VERSION=OFF
             -DLIBSEDML_SKIP_SHARED_LIBRARY=ON
             -DWITH_CPP_NAMESPACE=ON

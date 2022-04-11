@@ -12,6 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+function(check_dependent_packages PACKAGE)
+    string(TOUPPER "${PACKAGE}" PACKAGE_UC)
+
+    if(NOT LIBOPENCOR_PREBUILT_${PACKAGE_UC})
+        foreach(DEPENDENT_PACKAGE ${ARGN})
+            string(TOUPPER "${DEPENDENT_PACKAGE}" DEPENDENT_PACKAGE_UC)
+
+            if(LIBOPENCOR_PREBUILT_${DEPENDENT_PACKAGE_UC})
+                set(LIBOPENCOR_PREBUILT_${DEPENDENT_PACKAGE_UC} OFF CACHE BOOL "${LIBOPENCOR_PREBUILT_${PACKAGE_UC}_DOCSTRING}" FORCE)
+
+                set(DEPENDENT_PACKAGES "${DEPENDENT_PACKAGES};${DEPENDENT_PACKAGE}")
+
+                list(SORT DEPENDENT_PACKAGES)
+
+                set(DEPENDENT_PACKAGES "${DEPENDENT_PACKAGES}" CACHE INTERNAL "Dependent packages to be built.")
+            endif()
+        endforeach()
+    endif()
+endfunction()
+
 function(build_package PACKAGE_NAME)
     # Configure and run a CMake script to build the package for us.
 

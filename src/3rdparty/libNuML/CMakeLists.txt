@@ -48,10 +48,8 @@ if(LIBOPENCOR_PREBUILT_LIBNUML)
 else()
     # Build our package.
 
-    set(EXTRA_LIBS ${LIBXML2_LIBRARY_FILE})
-
     if(WIN32)
-        string(APPEND EXTRA_LIBS |WS2_32)
+        set(DEXTRA_LIBS WS2_32)
     endif()
 
     build_package(${PACKAGE_NAME}
@@ -62,36 +60,18 @@ else()
         GIT_SHALLOW
         SOURCE_SUBDIR
             libnuml
-        LIST_SEPARATOR
-            |
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
-            -DEXTRA_LIBS=${EXTRA_LIBS}
+            ${DEXTRA_LIBS}
             -DLIBNUML_SHARED_VERSION=OFF
             -DLIBNUML_SKIP_SHARED_LIBRARY=ON
             -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
-            -DLIBSBML_STATIC=ON
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
     )
 
     # Patch some of our CMake configuration files.
-
-    if(RELEASE_MODE)
-        set(PACKAGE_MODE release)
-    else()
-        set(PACKAGE_MODE debug)
-    endif()
-
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config-${PACKAGE_MODE}.cmake)
-
-    file(READ ${CONFIG_FILE} FILE_CONTENTS)
-
-    string(REPLACE "${LIBXML2_LIBRARY_FILE}" "${LIBXML2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-
-    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config.cmake)
 
