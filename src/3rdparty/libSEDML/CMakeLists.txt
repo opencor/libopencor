@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSEDML)
-set(PACKAGE_VERSION 2.0.29)
+set(PACKAGE_VERSION 2.0.30)
 set(PACKAGE_REPOSITORY libSEDML)
-set(GIT_TAG v2.0.29)
-set(RELEASE_TAG v2.0.29)
+set(GIT_TAG v2.0.30-libopencor)
+set(RELEASE_TAG v2.0.30-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,28 +26,26 @@ if(LIBOPENCOR_PREBUILT_LIBSEDML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             02ff49448cbde0d088c71111857c2becc9741e04)
+                             e6e9e64656cb78039e1f93b95a869eb2b54ab8bf)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d38beb1b3d16ad45311243f04bd505d456406ce3)
+                             0ea8f0d46e00641374515593cb493b0b3a56920c)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         66b2a3f56e7f7bb99e291f81479b6b5195cebc58)
+                         66c3e0582f47c0ec2903ccbb5e3dfcdf08c46c0e)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         1207326e4c5dd4f47a9b710aa6c5aa69109f9a70)
+                         73f017250ef2c9d1ca59df2019db2548fcb939db)
     endif()
 else()
     # Build our package.
 
-    set(EXTRA_LIBS ${LIBXML2_LIBRARY_FILE})
-
     if(WIN32)
-        string(APPEND EXTRA_LIBS |WS2_32)
+        set(DEXTRA_LIBS WS2_32)
     endif()
 
     build_package(${PACKAGE_NAME}
@@ -56,18 +54,13 @@ else()
         GIT_TAG
             ${GIT_TAG}
         GIT_SHALLOW
-        LIST_SEPARATOR
-            |
         CMAKE_ARGS
             -DBUILD_TESTS=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
-            -DEXTRA_LIBS=${EXTRA_LIBS}
+            ${DEXTRA_LIBS}
             -DLIBNUML_ROOT=${LIBNUML_CMAKE_DIR}
-            -DLIBNUML_STATIC=ON
             -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
-            -DLIBSBML_STATIC=ON
             -DLIBSEDML_SHARED_VERSION=OFF
             -DLIBSEDML_SKIP_SHARED_LIBRARY=ON
             -DWITH_CPP_NAMESPACE=ON

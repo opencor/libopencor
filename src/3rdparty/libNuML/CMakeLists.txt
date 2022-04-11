@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libNuML)
-set(PACKAGE_VERSION 1.1.4)
+set(PACKAGE_VERSION 1.1.5)
 set(PACKAGE_REPOSITORY NuML)
-set(GIT_TAG v1.1.4-libopencor)
-set(RELEASE_TAG v1.1.4-libopencor)
+set(GIT_TAG v1.1.5-libopencor)
+set(RELEASE_TAG v1.1.5-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -30,28 +30,26 @@ if(LIBOPENCOR_PREBUILT_LIBNUML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             87c3ec4afb0aea7cd503a894b8f3fe780658ef7e)
+                             eb361d32ca5849f43533fee499e98c88ae4e86ad)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             09f99c8a61d6f8ecee697d09a79b3f643ca1ba33)
+                             d6af0240531f276adc645e6fc1ba22b1345d747c)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         7e8955b8ea419fd32057878c97c4aff10470ca96)
+                         07e03f7566ffafd3af0fa43e4735c798be739381)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         1c7833a2de830b6d5f11ef4b816037f8a6885e68)
+                         c13decf8c23376e696d48c1f02ea4cca586a9eb2)
     endif()
 else()
     # Build our package.
 
-    set(EXTRA_LIBS ${LIBXML2_LIBRARY_FILE})
-
     if(WIN32)
-        string(APPEND EXTRA_LIBS |WS2_32)
+        set(DEXTRA_LIBS WS2_32)
     endif()
 
     build_package(${PACKAGE_NAME}
@@ -62,36 +60,18 @@ else()
         GIT_SHALLOW
         SOURCE_SUBDIR
             libnuml
-        LIST_SEPARATOR
-            |
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
-            -DEXTRA_LIBS=${EXTRA_LIBS}
+            ${DEXTRA_LIBS}
             -DLIBNUML_SHARED_VERSION=OFF
             -DLIBNUML_SKIP_SHARED_LIBRARY=ON
             -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
-            -DLIBSBML_STATIC=ON
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
     )
 
     # Patch some of our CMake configuration files.
-
-    if(RELEASE_MODE)
-        set(PACKAGE_MODE release)
-    else()
-        set(PACKAGE_MODE debug)
-    endif()
-
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config-${PACKAGE_MODE}.cmake)
-
-    file(READ ${CONFIG_FILE} FILE_CONTENTS)
-
-    string(REPLACE "${LIBXML2_LIBRARY_FILE}" "${LIBXML2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-
-    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config.cmake)
 
