@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME LLVMClang)
-set(PACKAGE_VERSION 13.0.1)
+set(PACKAGE_VERSION 14.0.1)
 set(PACKAGE_REPOSITORY llvm-project)
-set(GIT_TAG llvmorg-13.0.1)
-set(RELEASE_TAG llvmorg-13.0.1)
+set(GIT_TAG llvmorg-14.0.1)
+set(RELEASE_TAG llvmorg-14.0.1)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -123,6 +123,7 @@ set(LLVMCLANG_CMAKE_PACKAGE_NAME Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake p
 set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LLVMCLANG_LIBRARIES
     clangAnalysis
+    clangAnalysisFlowSensitive
     clangAPINotes
     clangAST
     clangASTMatchers
@@ -173,11 +174,13 @@ set(LLVMCLANG_LIBRARIES
     LLVMCoroutines
     LLVMCoverage
     LLVMDebugInfoCodeView
+    LLVMDebuginfod
     LLVMDebugInfoDWARF
     LLVMDebugInfoGSYM
     LLVMDebugInfoMSF
     LLVMDebugInfoPDB
     LLVMDemangle
+    LLVMDiff
     LLVMDlltoolDriver
     LLVMDWARFLinker
     LLVMDWP
@@ -234,6 +237,7 @@ set(LLVMCLANG_LIBRARIES
     LLVMX86Desc
     LLVMX86Disassembler
     LLVMX86Info
+    LLVMX86TargetMCA
     LLVMXRay
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
