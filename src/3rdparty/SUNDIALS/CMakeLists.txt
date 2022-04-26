@@ -57,9 +57,9 @@ else()
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DBUILD_SHARED_LIBS=OFF
-            -DBUILD_TESTING=OFF
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DEXAMPLES_ENABLE_C=OFF
+            -DEXAMPLES_INSTALL=OFF
     )
 
     # Create our package.
