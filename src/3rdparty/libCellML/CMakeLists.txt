@@ -61,9 +61,9 @@ else()
             ${GIT_TAG}
         GIT_SHALLOW
         CMAKE_ARGS
-            ${CMAKE_ARGS}
             -DBINDINGS_PYTHON=OFF
             -DBUILD_SHARED=OFF
+            ${CMAKE_ARGS}
             -DCOVERAGE=OFF
             -DINSTALL_PREFIX=${INSTALL_DIR}
             -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}

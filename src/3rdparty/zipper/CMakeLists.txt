@@ -57,9 +57,9 @@ else()
         CMAKE_CACHE_ARGS
             -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         CMAKE_ARGS
+            -DBUILD_TEST=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DBUILD_TEST=OFF
             -DLIBZ_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
             -DLIBZ_LIBRARY=${ZLIB_LIBRARY_FILE}
     )

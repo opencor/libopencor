@@ -53,7 +53,6 @@ else()
         SOURCE_SUBDIR
             llvm
         CMAKE_ARGS
-            ${CMAKE_ARGS}
             -DCLANG_BUILD_TOOLS=OFF
             -DCLANG_ENABLE_ARCMT=OFF
             -DCLANG_ENABLE_STATIC_ANALYZER=OFF
@@ -62,6 +61,7 @@ else()
             -DCLANG_PLUGIN_SUPPORT=OFF
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
+            ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DLIBCLANG_BUILD_STATIC=ON
             -DLLVM_BUILD_RUNTIME=OFF
