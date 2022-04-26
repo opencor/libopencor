@@ -13,33 +13,37 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSEDML)
-set(PACKAGE_VERSION 2.0.30)
+set(PACKAGE_VERSION 2.0.31)
 set(PACKAGE_REPOSITORY libSEDML)
-set(GIT_TAG v2.0.30-libopencor)
-set(RELEASE_TAG v2.0.30-libopencor)
+set(GIT_TAG v2.0.31-libopencor)
+set(RELEASE_TAG v2.0.31-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
+
+if(WIN32)
+    set(LIBRARY_PREFIX lib)
+endif()
 
 if(LIBOPENCOR_PREBUILT_LIBSEDML)
     if(WIN32)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e6e9e64656cb78039e1f93b95a869eb2b54ab8bf)
+                             6aebfa74ad197aedd9d04df5715f46b296160933)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             0ea8f0d46e00641374515593cb493b0b3a56920c)
+                             2a0ba91a8748a226e119f199f33c4f96207d758c)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         66c3e0582f47c0ec2903ccbb5e3dfcdf08c46c0e)
+                         7b64cbdf7a98f75a10b96728907c99705a5c23e3)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         73f017250ef2c9d1ca59df2019db2548fcb939db)
+                         7426f81c96bf618124610d61fe598dfe8adb4600)
     endif()
 else()
     # Build our package.
@@ -68,16 +72,37 @@ else()
             -DWITH_ZLIB=OFF
     )
 
+    # Patch some of our CMake configuration files.
+
+    if(RELEASE_MODE)
+        set(PACKAGE_MODE release)
+    else()
+        set(PACKAGE_MODE debug)
+    endif()
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}sedml-static-config-${PACKAGE_MODE}.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REGEX REPLACE "  IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE \"[^\"]*\"\n" "" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
     # Create our package.
+
+    file(GLOB STATIC_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    string(REPLACE "${INSTALL_DIR}/" "" STATIC_LIBRARIES "${STATIC_LIBRARIES}")
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   include lib)
+                   include lib/cmake ${STATIC_LIBRARIES})
 endif()
 
 # Make our package accessible.
 
 set(LIBSEDML_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
+set(LIBSEDML_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
+set(LIBSEDML_CMAKE_PACKAGE_NAME ${LIBRARY_PREFIX}sedml-static CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBSEDML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBSEDML_LIBRARY libSEDML::libsedml-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSEDML_LIBRARY ${LIBRARY_PREFIX}sedml-static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBSEDML_DEFINITIONS LIBSEDML_STATIC CACHE INTERNAL "${PACKAGE_NAME}'s definitions.")
