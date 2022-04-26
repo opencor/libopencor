@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             2581f9cf68ee3133364d4666b45fc5437c2b5182)
+                             09f9d72512c03240420ce1eb33237628d4088fa2)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a6bd3429b77eba4c294738b7701cf449b2a2dc07)
+                             d82fc0e2312ab6dda73cff32c12e456246fd441e)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         d9f796497bef40c0cba1ec12f5307f2ce4dede40)
+                         ef844d27b82a63b7167f3165e45ce78d20c3a7cf)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         3a3f6019f9fe67603891aae236111c305b8bc0bf)
+                         8981017b0c0cd67bd0a5ba4a02e78f397bb0938a)
     endif()
 else()
     # Build our package.
