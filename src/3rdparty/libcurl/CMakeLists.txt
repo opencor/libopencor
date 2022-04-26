@@ -55,10 +55,10 @@ else()
             ${GIT_TAG}
         GIT_SHALLOW
         CMAKE_ARGS
-            ${CMAKE_ARGS}
             -DBUILD_CURL_EXE=OFF
             -DBUILD_SHARED_LIBS=OFF
             -DBUILD_TESTING=OFF
+            ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DCURL_USE_OPENSSL=ON
             -DLIBSSH2_INCLUDE_DIR=${LIBSSH2_INCLUDE_DIR}

@@ -59,10 +59,10 @@ else()
             ${GIT_TAG}
         GIT_SHALLOW
         CMAKE_ARGS
+            -DBUILD_TEST=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
-            -DBUILD_TEST=OFF
             ${DEXTRA_LIBS}
             -DLIBCOMBINE_SHARED_VERSION=OFF
             -DLIBCOMBINE_SKIP_SHARED_LIBRARY=ON

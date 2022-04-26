@@ -51,8 +51,8 @@ else()
             ${GIT_TAG}
         GIT_SHALLOW
         CMAKE_ARGS
-            ${CMAKE_ARGS}
             -DBUILD_SHARED_LIBS=OFF
+            ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DLIBXML2_WITH_DEBUG=OFF
             -DLIBXML2_WITH_ICONV=OFF
