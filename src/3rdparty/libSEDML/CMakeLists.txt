@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSEDML)
-set(PACKAGE_VERSION 2.0.30)
+set(PACKAGE_VERSION 2.0.31)
 set(PACKAGE_REPOSITORY libSEDML)
-set(GIT_TAG v2.0.30-libopencor)
-set(RELEASE_TAG v2.0.30-libopencor)
+set(GIT_TAG v2.0.31-libopencor)
+set(RELEASE_TAG v2.0.31-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
