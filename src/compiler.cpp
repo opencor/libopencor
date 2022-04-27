@@ -44,10 +44,10 @@ bool Compiler::compile(const std::string &pCode)
 
     // Create a diagnostics engine.
 
-    auto diagnosticOtpions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(new clang::DiagnosticOptions());
+    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(new clang::DiagnosticOptions());
     auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(new clang::DiagnosticsEngine(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs()),
-                                                                                                             &*diagnosticOtpions,
-                                                                                                             new clang::TextDiagnosticPrinter(llvm::nulls(), &*diagnosticOtpions)));
+                                                                                                             &*diagnosticOptions,
+                                                                                                             new clang::TextDiagnosticPrinter(llvm::nulls(), &*diagnosticOptions)));
 
     diagnosticsEngine->setWarningsAsErrors(true);
 
