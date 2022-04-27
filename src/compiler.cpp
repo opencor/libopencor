@@ -149,7 +149,7 @@ bool Compiler::compile(const std::string &pCode)
     llvm::InitializeNativeTargetAsmPrinter();
 
     // Create an ORC-based JIT and keep track of it (so that we can use it in
-    // function().
+    // function()).
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 
