@@ -50,8 +50,8 @@ TEST(VersionTest, libcurl)
 
 TEST(VersionTest, libSEDML)
 {
-    EXPECT_EQ(20030U, libOpenCOR::libsedmlVersion());
-    EXPECT_EQ("2.0.30", libOpenCOR::libsedmlVersionString());
+    EXPECT_EQ(20031U, libOpenCOR::libsedmlVersion());
+    EXPECT_EQ("2.0.31", libOpenCOR::libsedmlVersionString());
 }
 
 TEST(VersionTest, LLVM)
@@ -62,6 +62,6 @@ TEST(VersionTest, LLVM)
 
 TEST(VersionTest, SUNDIALS)
 {
-    EXPECT_EQ(0x060101U, libOpenCOR::sundialsVersion());
-    EXPECT_EQ("6.1.1", libOpenCOR::sundialsVersionString());
+    EXPECT_EQ(0x060200U, libOpenCOR::sundialsVersion());
+    EXPECT_EQ("6.2.0", libOpenCOR::sundialsVersionString());
 }

@@ -51,9 +51,9 @@ else()
             ${GIT_TAG}
         GIT_SHALLOW
         CMAKE_ARGS
-            ${CMAKE_ARGS}
             -DBUILD_EXAMPLES=OFF
             -DBUILD_TESTING=OFF
+            ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
     )
