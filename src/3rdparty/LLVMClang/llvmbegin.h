@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(_MSC_VER)
     #pragma warning(push)
     #pragma warning(disable: 4100)
     #pragma warning(disable: 4127)
@@ -29,7 +29,7 @@ limitations under the License.
     #pragma warning(disable: 4459)
     #pragma warning(disable: 4624)
     #pragma warning(disable: 4996)
-#elif defined(__GNUC__) && !defined(__clang__)
+#elif defined(__GNUC__)
     #pragma GCC diagnostic push
     #pragma GCC diagnostic ignored "-Wredundant-move"
     #pragma GCC diagnostic ignored "-Wunused-parameter"

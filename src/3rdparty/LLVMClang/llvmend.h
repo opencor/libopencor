@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(_MSC_VER)
     #pragma warning(pop)
-#elif defined(__GNUC__) && !defined(__clang__)
+#elif defined(__GNUC__)
     #pragma GCC diagnostic pop
 #else
     #pragma clang diagnostic pop
