@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME OpenSSL)
-set(PACKAGE_VERSION 3.0.2)
+set(PACKAGE_VERSION 3.0.3)
 set(PACKAGE_REPOSITORY openssl)
-set(GIT_TAG openssl-3.0.2-libopencor)
-set(RELEASE_TAG openssl-3.0.2-libopencor)
+set(GIT_TAG openssl-3.0.3-libopencor)
+set(RELEASE_TAG openssl-3.0.3-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
