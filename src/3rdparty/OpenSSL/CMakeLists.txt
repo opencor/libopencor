@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME OpenSSL)
-set(PACKAGE_VERSION 3.0.2)
+set(PACKAGE_VERSION 3.0.3)
 set(PACKAGE_REPOSITORY openssl)
-set(GIT_TAG openssl-3.0.2-libopencor)
-set(RELEASE_TAG openssl-3.0.2-libopencor)
+set(GIT_TAG openssl-3.0.3-libopencor)
+set(RELEASE_TAG openssl-3.0.3-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             1ba3f0988d056ba1572d4084faf8fcde627814d6)
+                             a5ff6059a0376e2a5803afab6c00c22bdfb1ecfc)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             eb7d77b5997162af2b4e305838482eacdb8ffacb)
+                             4f375a3dda98e703c25e24cb762e7651f79895ec)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         dfdcec75eb98f55daa6a92fbc15ea4f229657f14)
+                         847b9b0e0c70bf4b458796c453d8c03c4b0d4252)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         910dfb2ae7b2e7948730739c3ca67eb51af3a3a3)
+                         84caa21d18d539b65d1894fba501cc8afba2c3af)
     endif()
 else()
     # Build our package.
