@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME LLVMClang)
-set(PACKAGE_VERSION 14.0.1)
+set(PACKAGE_VERSION 14.0.3)
 set(PACKAGE_REPOSITORY llvm-project)
-set(GIT_TAG llvmorg-14.0.1)
-set(RELEASE_TAG llvmorg-14.0.1)
+set(GIT_TAG llvmorg-14.0.3)
+set(RELEASE_TAG llvmorg-14.0.3)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
