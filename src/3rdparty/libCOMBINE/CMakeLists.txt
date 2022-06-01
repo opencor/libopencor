@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCOMBINE)
-set(PACKAGE_VERSION 0.2.15)
+set(PACKAGE_VERSION 0.2.17)
 set(PACKAGE_REPOSITORY libCombine)
-set(GIT_TAG v0.2.15)
-set(RELEASE_TAG v0.2.15)
+set(GIT_TAG v0.2.17)
+set(RELEASE_TAG v0.2.17)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -67,12 +67,12 @@ else()
             -DLIBCOMBINE_SHARED_VERSION=OFF
             -DLIBCOMBINE_SKIP_SHARED_LIBRARY=ON
             -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
-            -DLIBZ_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
-            -DLIBZ_LIBRARY=${ZLIB_LIBRARY_FILE}
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
             -DZIPPER_INCLUDE_DIR=${ZIPPER_INCLUDE_DIR}
             -DZIPPER_LIBRARY=${ZIPPER_LIBRARY_FILE}
+            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
+            -DZLIB_LIBRARY=${ZLIB_LIBRARY_FILE}
     )
 
     # Patch some of our CMake configuration files.
@@ -95,7 +95,6 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REGEX REPLACE "  IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE \"[^\"]*\"\n" "" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
@@ -105,10 +104,10 @@ else()
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
     string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "ZIPPER::ZIPPER" "${ZIPPER_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "ZLIB::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
-
-    fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}combine-static-config.cmake)
 
     # Create our package.
 

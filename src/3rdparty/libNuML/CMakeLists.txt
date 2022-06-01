@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libNuML)
-set(PACKAGE_VERSION 1.1.5)
+set(PACKAGE_VERSION 1.1.6)
 set(PACKAGE_REPOSITORY NuML)
-set(GIT_TAG v1.1.5-libopencor)
-set(RELEASE_TAG v1.1.5-libopencor)
+set(GIT_TAG v1.1.6-libopencor)
+set(RELEASE_TAG v1.1.6-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -73,7 +73,15 @@ else()
 
     # Patch some of our CMake configuration files.
 
-    fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config.cmake)
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-config.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "find_dependency(LIBSBML)" "string(REPLACE \"libNuML\" \"libSBML\" REAL_LIBSBML_CMAKE_DIR \"\${LIBSBML_CMAKE_DIR}\")\nfind_dependency(\${LIBSBML_LIBRARY_NAME} PATHS \${REAL_LIBSBML_CMAKE_DIR})" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
+    fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-targets.cmake)
 
     # Create our package.
 

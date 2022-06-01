@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libcurl)
-set(PACKAGE_VERSION 7.82.0)
+set(PACKAGE_VERSION 7.83.1)
 set(PACKAGE_REPOSITORY curl)
-set(GIT_TAG curl-7_82_0)
-set(RELEASE_TAG curl-7_82_0)
+set(GIT_TAG curl-7_83_1)
+set(RELEASE_TAG curl-7_83_1)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
