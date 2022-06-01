@@ -77,7 +77,9 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REPLACE "find_dependency(LIBSBML)" "string(REPLACE \"libNuML\" \"libSBML\" REAL_LIBSBML_CMAKE_DIR \"\${LIBSBML_CMAKE_DIR}\")\nfind_dependency(\${LIBSBML_LIBRARY_NAME} PATHS \${REAL_LIBSBML_CMAKE_DIR})" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "LIBSBML_CMAKE_DIR" "LIBNUML_CMAKE_DIR" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "find_dependency(LIBSBML)" "string(REPLACE \"libNuML\" \"libSBML\" LIBSBML_CMAKE_DIR \"\${LIBNUML_CMAKE_DIR}\")\nfind_dependency(\${LIBSBML_LIBRARY_NAME} PATHS \${LIBSBML_CMAKE_DIR})" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
@@ -87,7 +89,7 @@ else()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   include lib)
+                   include lib share/cmake)
 endif()
 
 # Make our package accessible.
