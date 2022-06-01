@@ -16,9 +16,29 @@
 
 include(packages)
 
-# Build the packages that depend on built packages.
+# Keep track of which packages are to be built.
 
-set(DEPENDENT_PACKAGES "" CACHE INTERNAL "Dependent packages to be built.")
+set(PACKAGES_TO_BUILD)
+
+foreach(PACKAGE libCellML libCOMBINE libcurl libNuML libSBML libSEDML libssh2 libxml2 LLVMClang OpenSSL SUNDIALS zipper zlib)
+    string(TOUPPER "${PACKAGE}" PACKAGE_UC)
+
+    if(NOT LIBOPENCOR_PREBUILT_${PACKAGE_UC})
+        set(PACKAGES_TO_BUILD "${PACKAGES_TO_BUILD};${PACKAGE}")
+    endif()
+endforeach()
+
+if(NOT "${PACKAGES_TO_BUILD}" STREQUAL "")
+    message(STATUS "The following packages are to be built:")
+
+    foreach(PACKAGE_TO_BUILD ${PACKAGES_TO_BUILD})
+        message(STATUS " - ${PACKAGE_TO_BUILD}")
+    endforeach()
+endif()
+
+# Keep track of which dependent packages are to be built.
+
+set(DEPENDENT_PACKAGES_TO_BUILD "" CACHE INTERNAL "Dependent packages to be built.")
 
 check_dependent_packages(libxml2 libCellML libSBML)
 check_dependent_packages(OpenSSL libcurl libssh2)
@@ -28,17 +48,17 @@ check_dependent_packages(libNuML libSEDML)
 check_dependent_packages(libssh2 libcurl)
 check_dependent_packages(zipper libCOMBINE)
 
-if(NOT "${DEPENDENT_PACKAGES}" STREQUAL "")
-    message(STATUS "The following packages are also to be built:")
+if(NOT "${DEPENDENT_PACKAGES_TO_BUILD}" STREQUAL "")
+    message(STATUS "The following dependent packages are also to be built:")
 
-    foreach(DEPENDENT_PACKAGE ${DEPENDENT_PACKAGES})
-        message(STATUS " - ${DEPENDENT_PACKAGE}")
+    foreach(DEPENDENT_PACKAGE_TO_BUILD ${DEPENDENT_PACKAGES_TO_BUILD})
+        message(STATUS " - ${DEPENDENT_PACKAGE_TO_BUILD}")
     endforeach()
 endif()
 
 # Initialise/reset our available packages.
 
-set(PACKAGES "" CACHE INTERNAL "Available packages.")
+set(AVAILABLE_PACKAGES "" CACHE INTERNAL "Available packages.")
 
 # Prerequisite third-party libraries, respecting their own prerequisites.
 

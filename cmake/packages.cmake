@@ -22,11 +22,11 @@ function(check_dependent_packages PACKAGE)
             if(LIBOPENCOR_PREBUILT_${DEPENDENT_PACKAGE_UC})
                 set(LIBOPENCOR_PREBUILT_${DEPENDENT_PACKAGE_UC} OFF CACHE BOOL "${LIBOPENCOR_PREBUILT_${PACKAGE_UC}_DOCSTRING}" FORCE)
 
-                set(DEPENDENT_PACKAGES "${DEPENDENT_PACKAGES};${DEPENDENT_PACKAGE}")
+                set(DEPENDENT_PACKAGES_TO_BUILD "${DEPENDENT_PACKAGES_TO_BUILD};${DEPENDENT_PACKAGE}")
 
-                list(SORT DEPENDENT_PACKAGES)
+                list(SORT DEPENDENT_PACKAGES_TO_BUILD)
 
-                set(DEPENDENT_PACKAGES "${DEPENDENT_PACKAGES}" CACHE INTERNAL "Dependent packages to be built.")
+                set(DEPENDENT_PACKAGES_TO_BUILD "${DEPENDENT_PACKAGES_TO_BUILD}" CACHE INTERNAL "Dependent packages to be built.")
             endif()
         endforeach()
     endif()
@@ -106,11 +106,11 @@ endfunction()
 function(add_package PACKAGE)
     add_subdirectory(${PACKAGE})
 
-    set(PACKAGES "${PACKAGES};${PACKAGE}")
+    set(AVAILABLE_PACKAGES "${AVAILABLE_PACKAGES};${PACKAGE}")
 
-    list(SORT PACKAGES)
+    list(SORT AVAILABLE_PACKAGES)
 
-    set(PACKAGES "${PACKAGES}" CACHE INTERNAL "Available packages.")
+    set(AVAILABLE_PACKAGES "${AVAILABLE_PACKAGES}" CACHE INTERNAL "Available packages.")
 endfunction()
 
 function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG SHA1_VALUE)

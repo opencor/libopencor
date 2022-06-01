@@ -173,17 +173,17 @@ function(configure_target TARGET)
 
     # Statically link our packages to the target.
 
-    foreach(PACKAGE ${PACKAGES})
-        string(TOUPPER "${PACKAGE}" PACKAGE_UC)
+    foreach(AVAILABLE_PACKAGE ${AVAILABLE_PACKAGES})
+        string(TOUPPER "${AVAILABLE_PACKAGE}" AVAILABLE_PACKAGE_UC)
 
-        if(    "${${PACKAGE_UC}_CMAKE_DIR}" STREQUAL ""
-           AND "${${PACKAGE_UC}_CMAKE_PACKAGE_NAME}" STREQUAL "")
+        if(    "${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR}" STREQUAL ""
+           AND "${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}" STREQUAL "")
             # There are no CMake configuration files, so manually configure the
             # package using targets of the form <PACKAGE_NAME>::<LIBRARY_NAME>.
 
-            foreach(PACKAGE_LIBRARY ${${PACKAGE_UC}_LIBRARY} ${${PACKAGE_UC}_LIBRARIES})
-                if(NOT TARGET ${PACKAGE_LIBRARY})
-                    add_library(${PACKAGE_LIBRARY} STATIC IMPORTED)
+            foreach(AVAILABLE_PACKAGE_LIBRARY ${${AVAILABLE_PACKAGE_UC}_LIBRARY} ${${AVAILABLE_PACKAGE_UC}_LIBRARIES})
+                if(NOT TARGET ${AVAILABLE_PACKAGE_LIBRARY})
+                    add_library(${AVAILABLE_PACKAGE_LIBRARY} STATIC IMPORTED)
 
                     if(RELEASE_MODE)
                         set(LIBRARY_BUILD_TYPE RELEASE)
@@ -191,14 +191,14 @@ function(configure_target TARGET)
                         set(LIBRARY_BUILD_TYPE DEBUG)
                     endif()
 
-                    set_property(TARGET ${PACKAGE_LIBRARY}
+                    set_property(TARGET ${AVAILABLE_PACKAGE_LIBRARY}
                                  APPEND PROPERTY IMPORTED_CONFIGURATIONS ${LIBRARY_BUILD_TYPE})
 
-                    string(REPLACE "::" ";" PACKAGE_LIBRARY_LIST ${PACKAGE_LIBRARY})
+                    string(REPLACE "::" ";" PACKAGE_LIBRARY_LIST ${AVAILABLE_PACKAGE_LIBRARY})
                     list(GET PACKAGE_LIBRARY_LIST 1 PACKAGE_LIBRARY_NAME)
 
-                    set_target_properties(${PACKAGE_LIBRARY} PROPERTIES
-                        IMPORTED_LOCATION_${LIBRARY_BUILD_TYPE} "${PREBUILT_DIR}/${PACKAGE}/lib/${PACKAGE_LIBRARY_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
+                    set_target_properties(${AVAILABLE_PACKAGE_LIBRARY} PROPERTIES
+                        IMPORTED_LOCATION_${LIBRARY_BUILD_TYPE} "${PREBUILT_DIR}/${AVAILABLE_PACKAGE}/lib/${PACKAGE_LIBRARY_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
                     )
                 endif()
             endforeach()
@@ -206,23 +206,23 @@ function(configure_target TARGET)
             # There are some CMake configuration files, so use them to configure the
             # package.
 
-            find_package(${${PACKAGE_UC}_CMAKE_PACKAGE_NAME} REQUIRED
-                         PATHS ${${PACKAGE_UC}_CMAKE_DIR}
+            find_package(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME} REQUIRED
+                         PATHS ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR}
                          NO_SYSTEM_ENVIRONMENT_PATH
                          NO_CMAKE_ENVIRONMENT_PATH
                          NO_CMAKE_SYSTEM_PATH)
         endif()
 
         target_include_directories(${TARGET} PRIVATE
-                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${PACKAGE}>
-                                   $<BUILD_INTERFACE:${${PACKAGE_UC}_INCLUDE_DIR}>)
+                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${AVAILABLE_PACKAGE}>
+                                   $<BUILD_INTERFACE:${${AVAILABLE_PACKAGE_UC}_INCLUDE_DIR}>)
 
         target_link_libraries(${TARGET} PRIVATE
-                              ${${PACKAGE_UC}_LIBRARY} ${${PACKAGE_UC}_LIBRARIES})
+                              ${${AVAILABLE_PACKAGE_UC}_LIBRARY} ${${AVAILABLE_PACKAGE_UC}_LIBRARIES})
 
-        if(${PACKAGE_UC}_DEFINITIONS)
+        if(${AVAILABLE_PACKAGE_UC}_DEFINITIONS)
             target_compile_definitions(${TARGET} PRIVATE
-                                       ${${PACKAGE_UC}_DEFINITIONS})
+                                       ${${AVAILABLE_PACKAGE_UC}_DEFINITIONS})
         endif()
     endforeach()
 
