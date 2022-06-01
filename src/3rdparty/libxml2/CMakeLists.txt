@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libxml2)
-set(PACKAGE_VERSION 2.9.13)
+set(PACKAGE_VERSION 2.9.14)
 set(PACKAGE_REPOSITORY libxml2)
-set(GIT_TAG v2.9.13)
-set(RELEASE_TAG v2.9.13)
+set(GIT_TAG v2.9.14)
+set(RELEASE_TAG v2.9.14)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_LIBXML2)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             1a7e19d0d22d22ed1958662eeb61e89861d23430)
+                             906431e2dae3bc0c8ae38f10abcd5c369113d867)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             622f878df5af33d223f9f48fef2165deec647e78)
+                             f3d81350cf77e3ed1c3d77f7cd857c9d272af282)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         50b6368f7b23b0fc30fb40748b9df850b51ab2d4)
+                         b7ff7646e76eb5bbbcb294425c54046df6a406a5)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         a06be58ebc7c2bafbd13269a700d7dc1d8d9859c)
+                         a62e26373d4ef02a96b236a26e26239634d0740e)
     endif()
 else()
     # Build our package.

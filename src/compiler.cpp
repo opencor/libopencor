@@ -159,14 +159,6 @@ bool Compiler::compile(const std::string &pCode)
 
     mLljit = std::move(*lljit);
 
-    // Add a JIT dynamic library to our ORC-based JIT.
-
-    auto jitDylib = mLljit->createJITDylib("libOpenCOR");
-
-    if (!jitDylib) {
-        return false;
-    }
-
     // Add our LLVM bitcode module to our ORC-based JIT.
 
     auto llvmContext = std::make_unique<llvm::LLVMContext>();

@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libcurl)
-set(PACKAGE_VERSION 7.82.0)
+set(PACKAGE_VERSION 7.83.1)
 set(PACKAGE_REPOSITORY curl)
-set(GIT_TAG curl-7_82_0)
-set(RELEASE_TAG curl-7_82_0)
+set(GIT_TAG curl-7_83_1)
+set(RELEASE_TAG curl-7_83_1)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -30,20 +30,20 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a5ba2ef23715d27e1a2f84ecd6178f0d5abacd6d)
+                             7b6994f4dbf03e709acb1b3c5e7981aa12decbca)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             937efdc33666b0af5a038db4abaa9a17ec445875)
+                             50c8c43bc5bbcaf1ff3c349a2ec5c86b1ad58818)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         4e98924d83177d5138f90aa990875bc5598bb500)
+                         8476306e95a657dc0a224b19797b9cdea5215c5f)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         60264a4b7a018b94b7b86d658b2a06641ad051a6)
+                         44fdecb49b230962022d6727a92ca5c72f31461f)
     endif()
 else()
     # Build our package.
