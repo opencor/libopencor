@@ -38,7 +38,7 @@ endif()
 
 # Initialise/reset our available packages.
 
-set(PACKAGES "" CACHE INTERNAL "Available packages.")
+set(AVAILABLE_PACKAGES "" CACHE INTERNAL "Available packages.")
 
 # Prerequisite third-party libraries, respecting their own prerequisites.
 

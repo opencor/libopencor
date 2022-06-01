@@ -106,11 +106,11 @@ endfunction()
 function(add_package PACKAGE)
     add_subdirectory(${PACKAGE})
 
-    set(PACKAGES "${PACKAGES};${PACKAGE}")
+    set(AVAILABLE_PACKAGES "${AVAILABLE_PACKAGES};${PACKAGE}")
 
-    list(SORT PACKAGES)
+    list(SORT AVAILABLE_PACKAGES)
 
-    set(PACKAGES "${PACKAGES}" CACHE INTERNAL "Available packages.")
+    set(AVAILABLE_PACKAGES "${AVAILABLE_PACKAGES}" CACHE INTERNAL "Available packages.")
 endfunction()
 
 function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG SHA1_VALUE)
