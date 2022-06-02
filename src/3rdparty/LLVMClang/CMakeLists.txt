@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME LLVMClang)
-set(PACKAGE_VERSION 13.0.1)
+set(PACKAGE_VERSION 14.0.3)
 set(PACKAGE_REPOSITORY llvm-project)
-set(GIT_TAG llvmorg-13.0.1)
-set(RELEASE_TAG llvmorg-13.0.1)
+set(GIT_TAG release/14.0.3-libopencor)
+set(RELEASE_TAG llvmorg-14.0.3)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,20 +26,20 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             25ef73adf996d70e521e562ca33cd30ac26d2188)
+                             63d1685ef2e1f33f59a159c045cbb7c235388dc6)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d8470e1c32bb1efb4a52add5bc1b07987b8befad)
+                             d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b3c162c9708ea37497c9501a45024279c09def3c)
+                         b77f772559f5feac52fae65914efd0df841feb87)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ca0dfa372b2b5d49253d36a1629d1de77d33cf18)
+                         82671a7a518d11fc3b7e15026d9189f0ef714fbe)
     endif()
 else()
     # Build our package.
@@ -59,6 +59,7 @@ else()
             -DCLANG_INCLUDE_DOCS=OFF
             -DCLANG_INCLUDE_TESTS=OFF
             -DCLANG_PLUGIN_SUPPORT=OFF
+            -DCLANG_TOOLING_BUILD_AST_INTROSPECTION=OFF
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
             ${CMAKE_ARGS}
@@ -123,6 +124,7 @@ set(LLVMCLANG_CMAKE_PACKAGE_NAME Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake p
 set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LLVMCLANG_LIBRARIES
     clangAnalysis
+    clangAnalysisFlowSensitive
     clangAPINotes
     clangAST
     clangASTMatchers
@@ -173,11 +175,13 @@ set(LLVMCLANG_LIBRARIES
     LLVMCoroutines
     LLVMCoverage
     LLVMDebugInfoCodeView
+    LLVMDebuginfod
     LLVMDebugInfoDWARF
     LLVMDebugInfoGSYM
     LLVMDebugInfoMSF
     LLVMDebugInfoPDB
     LLVMDemangle
+    LLVMDiff
     LLVMDlltoolDriver
     LLVMDWARFLinker
     LLVMDWP
@@ -234,6 +238,7 @@ set(LLVMCLANG_LIBRARIES
     LLVMX86Desc
     LLVMX86Disassembler
     LLVMX86Info
+    LLVMX86TargetMCA
     LLVMXRay
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
