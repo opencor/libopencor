@@ -15,7 +15,7 @@
 set(PACKAGE_NAME LLVMClang)
 set(PACKAGE_VERSION 14.0.3)
 set(PACKAGE_REPOSITORY llvm-project)
-set(GIT_TAG llvmorg-14.0.3)
+set(GIT_TAG release/14.0.3-libopencor)
 set(RELEASE_TAG llvmorg-14.0.3)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
