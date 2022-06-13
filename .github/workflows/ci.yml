@@ -237,6 +237,7 @@ jobs:
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
+      DOXYGEN_VERSION: 1.9.4
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v2
@@ -289,7 +290,7 @@ jobs:
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/ci/doxygen.1.9.2.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/doxygen.$DOXYGEN_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv doxygen /usr/local/bin
       - name: Build libOpenCOR
         run: |
