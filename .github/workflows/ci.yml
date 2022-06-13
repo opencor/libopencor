@@ -238,6 +238,7 @@ jobs:
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
       DOXYGEN_VERSION: 1.9.4
+      LLVMCLANG_VERSION: 13.0.0
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v2
@@ -253,19 +254,19 @@ jobs:
       - name: Install Clang
         if: ${{ matrix.name == 'Code analysis' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/ci/clang.13.0.0.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang /usr/local/bin
-          wget https://github.com/opencor/gha/releases/download/ci/clang-include.13.0.0.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang-include.$LLVMCLANG_VERSION.tar.gz -O - | tar -xz
           sudo mv include/* /usr/local/include
       - name: Install ClangFormat
         if: ${{ matrix.target == 'check_code_formatting' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/ci/clang-format.13.0.0.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang-format.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang-format /usr/local/bin
       - name: Install Clang-Tidy
         if: ${{ matrix.name == 'Code analysis' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.13.0.0.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Black
         if: ${{ matrix.target == 'check_python_code_formatting' }}
