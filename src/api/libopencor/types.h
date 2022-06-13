@@ -16,5 +16,12 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
-#include "libopencor/version.h"
+#include <memory>
+
+namespace libOpenCOR {
+
+class File;
+
+using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @c File pointer. */
+
+} // namespace libcellml

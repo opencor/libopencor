@@ -14,7 +14,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
 #include "libopencor/file.h"
-#include "libopencor/version.h"
+
+namespace libOpenCOR {
+
+/**
+ * Private implementation.
+ */
+
+struct File::FileImpl
+{
+    std::string mFileNameOrUrl;
+};
+
+/**
+ * Public implementation.
+ */
+
+File::File(const std::string &pFileNameOrUrl)
+    : mPimpl(new FileImpl())
+{
+    mPimpl->mFileNameOrUrl = pFileNameOrUrl;
+}
+
+File::~File()
+{
+    delete mPimpl;
+}
+
+FilePtr File::create(const std::string &pFileNameOrUrl)
+{
+    return std::shared_ptr<File> {new File {pFileNameOrUrl}};
+}
+
+} // namespace libOpenCOR
