@@ -131,15 +131,17 @@ if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
 
     # Run our code coverage tests using llvm-cov.
 
+    set(LLVM_COV_OPTIONS -ignore-filename-regex="prebuilt.*" -instr-profile=${PROFDATA_FILE})
+
     add_target(code_coverage_llvm_cov
-               COMMAND ${LLVM_COV_EXE} report $<TARGET_FILE:${CMAKE_PROJECT_NAME}> -instr-profile=${PROFDATA_FILE} -use-color
+               COMMAND ${LLVM_COV_EXE} report $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -use-color
                DEPENDS prepare_code_coverage_llvm_cov
                COMMENT "Running code coverage tests using llvm-cov...")
 
     # Run our code coverage report using llvm-cov.
 
     add_target(code_coverage_llvm_cov_report
-               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> -instr-profile=${PROFDATA_FILE} -format=html -o code_coverage_llvm_cov_report
+               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -format=html -o code_coverage_llvm_cov_report
                DEPENDS prepare_code_coverage_llvm_cov
                COMMENT "Running code coverage report using llvm-cov...")
 endif()
