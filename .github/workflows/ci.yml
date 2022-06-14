@@ -238,7 +238,7 @@ jobs:
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
       DOXYGEN_VERSION: 1.9.4
-      LLVMCLANG_VERSION: 13.0.0
+      LLVMCLANG_VERSION: 14.0.5
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v2
@@ -256,7 +256,7 @@ jobs:
         run: |
           wget https://github.com/opencor/gha/releases/download/ci/clang.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang /usr/local/bin
-          wget https://github.com/opencor/gha/releases/download/ci/clang-include.$LLVMCLANG_VERSION.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang-include.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv include/* /usr/local/include
       - name: Install ClangFormat
         if: ${{ matrix.target == 'check_code_formatting' }}
