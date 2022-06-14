@@ -37,11 +37,19 @@ function(configure_target TARGET)
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-            set(COMPILE_OPTIONS /W4 /WX)
+            set(COMPILE_OPTIONS
+                /W4
+                /WX
+            )
         elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-            set(COMPILE_OPTIONS -Wall -W -Werror -Wno-unknown-warning-option)
+            set(COMPILE_OPTIONS
+                -Wall
+                -W
+                -Werror
+                -Wno-unknown-warning-option
+            )
         endif()
 
         if(COMPILE_OPTIONS)
