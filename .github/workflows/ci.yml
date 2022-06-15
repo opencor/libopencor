@@ -333,11 +333,13 @@ jobs:
         run: |
           cd build
           ninja ${{ matrix.target }}
+          if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100%" | wc -l | sed 's/ //g'` -eq 1 ]; then exit 0; else exit 1; fi
       - name: Coverage using llvm-cov
         if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
+          if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
       - name: Memory checks
         if: ${{ matrix.target == 'memory_checks' }}
         run: |
