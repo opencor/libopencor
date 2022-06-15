@@ -311,6 +311,11 @@ function(prepare_test TARGET)
 
     configure_target(${TARGET})
 
+    if(NOT LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   NLLVMCOV)
+    endif()
+
     list(APPEND TEST_TARGETS "${TARGET}")
 
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)

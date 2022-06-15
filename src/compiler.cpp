@@ -72,38 +72,48 @@ bool Compiler::compile(const std::string &pCode)
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments));
 
+#ifdef NLLVMCOV
     if (!compilation) {
         return false;
     }
+#endif
 
     // The compilation object should have only one command, so if it doesn't
     // then something went wrong.
 
     clang::driver::JobList &jobs = compilation->getJobs();
 
+#ifdef NLLVMCOV
     if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
         return false;
     }
+#endif
 
     // Retrieve the command name and make sure that it is "clang".
 
-    constexpr char const *Clang = "clang";
-
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
+
+#ifdef NLLVMCOV
+    constexpr char const *Clang = "clang";
 
     if (strcmp(command.getCreator().getName(), Clang) != 0) {
         return false;
     }
+#endif
 
     // Prevent the Clang driver from asking CC1 to leak memory, this by removing
     // -disable-free from the command arguments.
 
     auto commandArguments = command.getArguments();
+#ifdef NLLVMCOV
     auto *commandArgument = find(commandArguments, llvm::StringRef("-disable-free"));
 
     if (commandArgument != commandArguments.end()) {
         commandArguments.erase(commandArgument);
     }
+#else
+    commandArguments.erase(find(commandArguments, llvm::StringRef("-disable-free")));
+#endif
 
     // Create a compiler instance.
 
@@ -114,11 +124,18 @@ bool Compiler::compile(const std::string &pCode)
 
     // Create a compiler invocation object.
 
-    if (!clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
-                                                   commandArguments,
-                                                   *diagnosticsEngine)) {
+#ifdef NLLVMCOV
+    bool res =
+#endif
+        clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
+                                                  commandArguments,
+                                                  *diagnosticsEngine);
+
+#ifdef NLLVMCOV
+    if (!res) {
         return false;
     }
+#endif
 
     // Map our code to a memory buffer.
 
@@ -137,9 +154,11 @@ bool Compiler::compile(const std::string &pCode)
 
     auto module = codeGenAction->takeModule();
 
+#ifdef NLLVMCOV
     if (!module) {
         return false;
     }
+#endif
 
     // Initialise the native target (and its ASM printer), so not only can we
     // then create an execution engine, but more importantly its data layout
@@ -153,9 +172,11 @@ bool Compiler::compile(const std::string &pCode)
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 
+#ifdef NLLVMCOV
     if (!lljit) {
         return false;
     }
+#endif
 
     mLljit = std::move(*lljit);
 

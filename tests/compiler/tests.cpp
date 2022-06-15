@@ -71,6 +71,10 @@ TEST_F(CompilerTest, basic)
     EXPECT_TRUE(mCompiler->compile("void function() {}"));
     EXPECT_NE(nullptr, mCompiler->function("function"));
 
+    // Make sure that we cannot retrieve a non-existing function.
+
+    EXPECT_EQ(nullptr, mCompiler->function("undefined"));
+
     // Make the function a double function.
 
     EXPECT_FALSE(mCompiler->compile("double function() {}"));
