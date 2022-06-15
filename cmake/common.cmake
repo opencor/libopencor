@@ -37,11 +37,19 @@ function(configure_target TARGET)
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
         if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-            set(COMPILE_OPTIONS /W4 /WX)
+            set(COMPILE_OPTIONS
+                /W4
+                /WX
+            )
         elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
                OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
-            set(COMPILE_OPTIONS -Wall -W -Werror -Wno-unknown-warning-option)
+            set(COMPILE_OPTIONS
+                -Wall
+                -W
+                -Werror
+                -Wno-unknown-warning-option
+            )
         endif()
 
         if(COMPILE_OPTIONS)
@@ -292,7 +300,7 @@ function(prepare_test TARGET)
     # Prepare the given test.
 
     add_executable(${TARGET}
-                   ${INTERNAL_FILES}
+                   ${INTERNAL_SOURCE_FILES}
                    ${ARGN})
 
     add_dependencies(${TARGET} ${CMAKE_PROJECT_NAME})
@@ -302,6 +310,11 @@ function(prepare_test TARGET)
                           ${CMAKE_PROJECT_NAME})
 
     configure_target(${TARGET})
+
+    if(NOT LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   NLLVMCOV)
+    endif()
 
     list(APPEND TEST_TARGETS "${TARGET}")
 
