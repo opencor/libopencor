@@ -293,11 +293,60 @@ jobs:
         run: |
           wget https://github.com/opencor/gha/releases/download/ci/doxygen.$DOXYGEN_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv doxygen /usr/local/bin
-      - name: Build libOpenCOR
+      - name: Configure libOpenCOR
         run: |
           mkdir build
           cd build
           ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+      - name: Build libOpenCOR
+        if: ${{ matrix.target == 'unit_testing' }}
+        run: |
+          cd build
+          ninja
+      - name: Unit testing
+        if: ${{ matrix.target == 'unit_testing' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Python unit testing
+        if: ${{ matrix.target == 'python_unit_testing' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Code formatting
+        if: ${{ matrix.target == 'check_code_formatting' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Python code formatting
+        if: ${{ matrix.target == 'check_python_code_formatting' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Code analysis
+        if: ${{ matrix.name == 'Code analysis' }}
+        run: |
+          cd build
+          ninja
+      - name: Coverage using gcov
+        if: ${{ matrix.target == 'code_coverage_gcov' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Coverage using llvm-cov
+        if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Memory checks
+        if: ${{ matrix.target == 'memory_checks' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Documentation
+        if: ${{ matrix.target == 'documentation' }}
+        run: |
+          cd build
           ninja ${{ matrix.target }}
       - name: Install libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
