@@ -237,6 +237,8 @@ jobs:
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
+      DOXYGEN_VERSION: 1.9.4
+      LLVMCLANG_VERSION: 14.0.5
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v2
@@ -252,19 +254,19 @@ jobs:
       - name: Install Clang
         if: ${{ matrix.name == 'Code analysis' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/ci/clang.13.0.0.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang /usr/local/bin
-          wget https://github.com/opencor/gha/releases/download/ci/clang-include.13.0.0.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang-include.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv include/* /usr/local/include
       - name: Install ClangFormat
         if: ${{ matrix.target == 'check_code_formatting' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/ci/clang-format.13.0.0.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang-format.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang-format /usr/local/bin
       - name: Install Clang-Tidy
         if: ${{ matrix.name == 'Code analysis' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.13.0.0.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Black
         if: ${{ matrix.target == 'check_python_code_formatting' }}
@@ -289,13 +291,64 @@ jobs:
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/ci/doxygen.1.9.2.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/ci/doxygen.$DOXYGEN_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv doxygen /usr/local/bin
-      - name: Build libOpenCOR
+      - name: Configure libOpenCOR
         run: |
           mkdir build
           cd build
           ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+      - name: Build libOpenCOR
+        if: ${{ matrix.target == 'unit_testing' }}
+        run: |
+          cd build
+          ninja
+      - name: Unit testing
+        if: ${{ matrix.target == 'unit_testing' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Python unit testing
+        if: ${{ matrix.target == 'python_unit_testing' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Code formatting
+        if: ${{ matrix.target == 'check_code_formatting' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Python code formatting
+        if: ${{ matrix.target == 'check_python_code_formatting' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Code analysis
+        if: ${{ matrix.name == 'Code analysis' }}
+        run: |
+          cd build
+          ninja
+      - name: Coverage using gcov
+        if: ${{ matrix.target == 'code_coverage_gcov' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+          if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100%" | wc -l | sed 's/ //g'` -eq 1 ]; then exit 0; else exit 1; fi
+      - name: Coverage using llvm-cov
+        if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+          if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
+      - name: Memory checks
+        if: ${{ matrix.target == 'memory_checks' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: Documentation
+        if: ${{ matrix.target == 'documentation' }}
+        run: |
+          cd build
           ninja ${{ matrix.target }}
       - name: Install libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}

@@ -45,6 +45,7 @@ limitations under the License.
     #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
     #pragma clang diagnostic ignored "-Wduplicate-enum"
     #pragma clang diagnostic ignored "-Wenum-enum-conversion"
+    #pragma clang diagnostic ignored "-Wexit-time-destructors"
     #pragma clang diagnostic ignored "-Wextra-semi"
     #pragma clang diagnostic ignored "-Wextra-semi-stmt"
     #pragma clang diagnostic ignored "-Wimplicit-int-conversion"
