@@ -105,10 +105,8 @@ endif()
 if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
     # Clean our old llvm-cov-based code coverage data.
 
-    set(PROFRAW_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.profraw)
-
     foreach(TEST_TARGET ${TEST_TARGETS})
-        list(APPEND COMMANDS COMMAND LLVM_PROFILE_FILE=${PROFRAW_FILE} ./${TEST_TARGET} > /dev/null 2> /dev/null)
+        list(APPEND COMMANDS COMMAND LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_${TEST_TARGET}.profraw ./${TEST_TARGET} > /dev/null 2> /dev/null)
     endforeach()
 
     add_custom_target(clean_code_coverage_llvm_cov_data
@@ -125,7 +123,7 @@ if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
 
     add_custom_target(prepare_code_coverage_llvm_cov
                       ${COMMANDS}
-                      COMMAND ${LLVM_PROFDATA_EXE} merge -sparse ${PROFRAW_FILE} -o ${PROFDATA_FILE}
+                      COMMAND ${LLVM_PROFDATA_EXE} merge -sparse ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_*.profraw -o ${PROFDATA_FILE}
                       DEPENDS clean_code_coverage_llvm_cov_data ${TEST_TARGETS}
                       COMMENT "Preparing for llvm-cov-based code coverage...")
 
