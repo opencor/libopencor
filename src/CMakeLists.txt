@@ -124,7 +124,9 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
-                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api>)
+target_include_directories(${CMAKE_PROJECT_NAME} INTERFACE
+                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/module>
                            $<INSTALL_INTERFACE:include/>
                            $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>)

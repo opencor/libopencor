@@ -246,11 +246,6 @@ function(configure_target TARGET)
                      numl-static_DIR
                      sbml-static_DIR
                      sedml-static_DIR)
-
-    # Give access to some internal headers (needed for our tests).
-
-    target_include_directories(${TARGET} PUBLIC
-                               $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
 endfunction()
 
 function(check_python_package PACKAGE AVAILABLE)
