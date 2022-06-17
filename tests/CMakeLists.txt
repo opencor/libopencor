@@ -15,12 +15,23 @@
 # Include our different tests.
 
 include(compiler/tests.cmake)
+include(file/tests.cmake)
 include(version/tests.cmake)
 
 # Prepare our different tests.
 
 set(GIT_TESTS_SOURCE_FILES)
 set(GIT_TESTS_HEADER_FILES)
+
+set(RESOURCE_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/res)
+
+set(UTILS_SOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+set(UTILS_HEADER_FILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/utils.h.in)
+set(UTILS_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/utils.h)
+
+configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
+
+include_directories(${CMAKE_BINARY_DIR})
 
 foreach(TEST ${TESTS})
     if(LIBOPENCOR_UNIT_TESTING)
@@ -30,12 +41,15 @@ foreach(TEST ${TESTS})
             set(TEST_CATEGORY)
         endif()
 
-        prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES})
+        prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES} ${UTILS_SOURCE_FILE})
     endif()
 
     list(APPEND GIT_TESTS_SOURCE_FILES ${${TEST}_SOURCE_FILES})
     list(APPEND GIT_TESTS_HEADER_FILES ${${TEST}_HEADER_FILES})
 endforeach()
+
+list(APPEND GIT_TESTS_SOURCE_FILES ${UTILS_SOURCE_FILE})
+list(APPEND GIT_TESTS_HEADER_FILES ${UTILS_HEADER_FILE_IN})
 
 set(GIT_TESTS_SOURCE_FILES ${GIT_TESTS_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_TESTS_HEADER_FILES ${GIT_TESTS_HEADER_FILES} PARENT_SCOPE)

@@ -59,7 +59,7 @@ bool Compiler::compile(const std::string &pCode)
 
     // Get a compilation object to which we pass some arguments.
 
-    constexpr char const *DummyFileName = "dummy.c";
+    static constexpr const char *DUMMY_FILE_NAME = "dummy.c";
 
     std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only",
 #ifdef NDEBUG
@@ -68,7 +68,7 @@ bool Compiler::compile(const std::string &pCode)
                                                       "-g", "-O0",
 #endif
                                                       "-fno-math-errno",
-                                                      DummyFileName};
+                                                      DUMMY_FILE_NAME};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments));
 
@@ -94,9 +94,9 @@ bool Compiler::compile(const std::string &pCode)
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
 
 #ifdef NLLVMCOV
-    constexpr char const *Clang = "clang";
+    static constexpr const char *CLANG = "clang";
 
-    if (strcmp(command.getCreator().getName(), Clang) != 0) {
+    if (strcmp(command.getCreator().getName(), CLANG) != 0) {
         return false;
     }
 #endif
@@ -139,7 +139,7 @@ bool Compiler::compile(const std::string &pCode)
 
     // Map our code to a memory buffer.
 
-    compilerInstance.getInvocation().getPreprocessorOpts().addRemappedFile(DummyFileName,
+    compilerInstance.getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
                                                                            llvm::MemoryBuffer::getMemBuffer(pCode).release());
 
     // Compile the given code, resulting in an LLVM bitcode module.
@@ -196,7 +196,7 @@ void *Compiler::function(const std::string &pName)
         auto symbol = mLljit->lookup(pName);
 
         if (symbol) {
-            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
+            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
         }
     }
 

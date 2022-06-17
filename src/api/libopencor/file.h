@@ -37,7 +37,7 @@ public:
      *
      * A file can be of one of the following types:
      *  - LOCAL: a file that is locally stored; or
-     *  - REMOTE: a profile that is remotely stored.
+     *  - REMOTE: a file that is remotely stored.
      */
 
     enum class Type
@@ -47,13 +47,17 @@ public:
     };
 
     /**
-     * Constructors and destructor.
+     * Constructors, destructor and assignment operators.
      */
 
-    File(const File &pRhs) = delete;
-    File(File &&pRhs) noexcept = delete;
-    File &operator=(File pRhs) = delete;
-    ~File();
+    File() = delete; /**< No default constructor allowed, @private. */
+    ~File() = default; /**< Default destructor, @private. */
+
+    File(const File &pOther) = delete; /**< No copy constructor allowed, @private. */
+    File(File &&) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    File &operator=(const File &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    File &operator=(File &&) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
      * @brief Create a @c File object.
@@ -61,8 +65,8 @@ public:
      * Factory method to create a @c File:
      *
      * ```
-     * FilePtr localFile = libOpenCOR::File::create("/some/path/file.txt");
-     * FilePtr remoteFile = libOpenCOR::File::create("https://domain.com/file.txt");
+     * auto localFile = libOpenCOR::File::create("/some/path/file.txt");
+     * auto remoteFile = libOpenCOR::File::create("https://domain.com/file.txt");
      * ```
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
@@ -71,6 +75,16 @@ public:
      */
 
     static FilePtr create(const std::string &pFileNameOrUrl);
+
+    /**
+     * @brief Get the type for this @c File.
+     *
+     * Return the type for this @c File.
+     *
+     * @return The type as a @c Type.
+     */
+
+    Type type() const;
 
     /**
      * @brief Get the file name for this @c File.
@@ -94,21 +108,12 @@ public:
 
     std::string url() const;
 
-    /**
-     * @brief Get the type for this @c File.
-     *
-     * Return the type for this @c File.
-     *
-     * @return The type as a @c Type.
-     */
-
-    Type type() const;
-
 private:
-    explicit File(const std::string &pFileNameOrUrl);
+    explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private*/
 
-    struct FileImpl;
-    FileImpl *mPimpl;
+    struct Impl; /**< Forward declaration of the implementation class, @private. */
+
+    std::unique_ptr<Impl> mPimpl;
 };
 
 } // namespace libOpenCOR
