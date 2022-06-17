@@ -138,8 +138,11 @@ if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
 
     # Run our code coverage report using llvm-cov.
 
+    set(COVERAGE_REPORT_DIR code_coverage_llvm_cov_report)
+
     add_target(code_coverage_llvm_cov_report
-               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -format=html -o code_coverage_llvm_cov_report
+               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -format=html -o ${COVERAGE_REPORT_DIR}
+               COMMAND echo "The coverage report can be found at ${CMAKE_CURRENT_BINARY_DIR}/${COVERAGE_REPORT_DIR}/index.html."
                DEPENDS prepare_code_coverage_llvm_cov
                COMMENT "Running code coverage report using llvm-cov...")
 endif()
