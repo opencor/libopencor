@@ -105,12 +105,8 @@ endif()
 if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
     # Clean our old llvm-cov-based code coverage data.
 
-    foreach(TEST_TARGET ${TEST_TARGETS})
-        list(APPEND COMMANDS COMMAND LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_${TEST_TARGET}.profraw ./${TEST_TARGET} > /dev/null 2> /dev/null)
-    endforeach()
-
     add_custom_target(clean_code_coverage_llvm_cov_data
-                      COMMAND ${FIND_EXE} ${CMAKE_CURRENT_BINARY_DIR} -type f -name \"${CMAKE_PROJECT_NAME}.prof*\" -print | xargs /bin/rm -f
+                      COMMAND ${FIND_EXE} ${CMAKE_CURRENT_BINARY_DIR} -type f -name \"${CMAKE_PROJECT_NAME}*.prof*\" -print | xargs /bin/rm -f
                       COMMENT "Cleaning old llvm-cov-based code coverage data...")
 
     # Clean our old llvm-cov-based code coverage data when building libOpenCOR.
@@ -119,11 +115,15 @@ if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
 
     # Prepare for llvm-cov-based code coverage.
 
+    foreach(TEST_TARGET ${TEST_TARGETS})
+        list(APPEND COMMANDS COMMAND LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_${TEST_TARGET}.profraw ./${TEST_TARGET} > /dev/null 2> /dev/null)
+    endforeach()
+
     set(PROFDATA_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.profdata)
 
     add_custom_target(prepare_code_coverage_llvm_cov
                       ${COMMANDS}
-                      COMMAND ${LLVM_PROFDATA_EXE} merge -sparse ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_*.profraw -o ${PROFDATA_FILE}
+                      COMMAND ${LLVM_PROFDATA_EXE} merge -sparse ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}*.profraw -o ${PROFDATA_FILE}
                       DEPENDS clean_code_coverage_llvm_cov_data ${TEST_TARGETS}
                       COMMENT "Preparing for llvm-cov-based code coverage...")
 
