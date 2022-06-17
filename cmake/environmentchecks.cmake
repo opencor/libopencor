@@ -55,6 +55,18 @@ endif()
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 # Look for various packages and programs.
+# Note: when it comes to finding Python, we try to use the registry after the
+#       environment variables on Windows and to find frameworks after standard
+#       libraries or headers on macOS. (On GitHub Actions, it helps finding the
+#       correct version of Python on Windows.)
+
+if(NOT DEFINED Python_FIND_REGISTRY)
+    set(Python_FIND_REGISTRY "LAST")
+endif()
+
+if(NOT DEFINED Python_FIND_FRAMEWORK)
+    set(Python_FIND_FRAMEWORK "LAST")
+endif()
 
 find_package(Doxygen)
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)

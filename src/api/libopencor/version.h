@@ -32,7 +32,7 @@ namespace libOpenCOR {
  * @return A number that represents the version of libOpenCOR.
  */
 
-LIBOPENCOR_EXPORT unsigned int version();
+unsigned int LIBOPENCOR_EXPORT version();
 
 /**
  * Return the version of libOpenCOR as a string. The version string is in the
@@ -43,7 +43,7 @@ LIBOPENCOR_EXPORT unsigned int version();
  * @return A string that represents the version of libOpenCOR.
  */
 
-LIBOPENCOR_EXPORT std::string versionString();
+std::string LIBOPENCOR_EXPORT versionString();
 
 /**
  * Return the version of Clang as a number.
@@ -51,7 +51,7 @@ LIBOPENCOR_EXPORT std::string versionString();
  * @return A number that represents the version of Clang.
  */
 
-LIBOPENCOR_EXPORT unsigned int clangVersion();
+unsigned int LIBOPENCOR_EXPORT clangVersion();
 
 /**
  * Return the version of Clang as a string. The version string is in the format
@@ -62,7 +62,7 @@ LIBOPENCOR_EXPORT unsigned int clangVersion();
  * @return A string that represents the version of Clang.
  */
 
-LIBOPENCOR_EXPORT std::string clangVersionString();
+std::string LIBOPENCOR_EXPORT clangVersionString();
 
 /**
  * Return the version of libCellML as a number.
@@ -70,7 +70,7 @@ LIBOPENCOR_EXPORT std::string clangVersionString();
  * @return A number that represents the version of libCellML.
  */
 
-LIBOPENCOR_EXPORT unsigned int libcellmlVersion();
+unsigned int LIBOPENCOR_EXPORT libcellmlVersion();
 
 /**
  * Return the version of libCellML as a string. The version string is in the
@@ -81,7 +81,7 @@ LIBOPENCOR_EXPORT unsigned int libcellmlVersion();
  * @return A string that represents the version of libCellML.
  */
 
-LIBOPENCOR_EXPORT std::string libcellmlVersionString();
+std::string LIBOPENCOR_EXPORT libcellmlVersionString();
 
 /**
  * Return the version of libCOMBINE as a number.
@@ -89,7 +89,7 @@ LIBOPENCOR_EXPORT std::string libcellmlVersionString();
  * @return A number that represents the version of libCOMBINE.
  */
 
-LIBOPENCOR_EXPORT unsigned int libcombineVersion();
+unsigned int LIBOPENCOR_EXPORT libcombineVersion();
 
 /**
  * Return the version of libCOMBINE as a string. The version string is in the
@@ -100,7 +100,7 @@ LIBOPENCOR_EXPORT unsigned int libcombineVersion();
  * @return A string that represents the version of libCOMBINE.
  */
 
-LIBOPENCOR_EXPORT std::string libcombineVersionString();
+std::string LIBOPENCOR_EXPORT libcombineVersionString();
 
 /**
  * Return the version of libcurl as a number.
@@ -108,7 +108,7 @@ LIBOPENCOR_EXPORT std::string libcombineVersionString();
  * @return A number that represents the version of libcurl.
  */
 
-LIBOPENCOR_EXPORT unsigned int libcurlVersion();
+unsigned int LIBOPENCOR_EXPORT libcurlVersion();
 
 /**
  * Return the version of libcurl as a string. The version string is in the
@@ -119,7 +119,7 @@ LIBOPENCOR_EXPORT unsigned int libcurlVersion();
  * @return A string that represents the version of libcurl.
  */
 
-LIBOPENCOR_EXPORT std::string libcurlVersionString();
+std::string LIBOPENCOR_EXPORT libcurlVersionString();
 
 /**
  * Return the version of libSEDML as a number.
@@ -127,7 +127,7 @@ LIBOPENCOR_EXPORT std::string libcurlVersionString();
  * @return A number that represents the version of libSEDML.
  */
 
-LIBOPENCOR_EXPORT unsigned int libsedmlVersion();
+unsigned int LIBOPENCOR_EXPORT libsedmlVersion();
 
 /**
  * Return the version of libSEDML as a string. The version string is in the
@@ -138,7 +138,7 @@ LIBOPENCOR_EXPORT unsigned int libsedmlVersion();
  * @return A string that represents the version of libSEDML.
  */
 
-LIBOPENCOR_EXPORT std::string libsedmlVersionString();
+std::string LIBOPENCOR_EXPORT libsedmlVersionString();
 
 /**
  * Return the version of LLVM as a number.
@@ -146,7 +146,7 @@ LIBOPENCOR_EXPORT std::string libsedmlVersionString();
  * @return A number that represents the version of LLVM.
  */
 
-LIBOPENCOR_EXPORT unsigned int llvmVersion();
+unsigned int LIBOPENCOR_EXPORT llvmVersion();
 
 /**
  * Return the version of LLVM as a string. The version string is in the format
@@ -157,7 +157,7 @@ LIBOPENCOR_EXPORT unsigned int llvmVersion();
  * @return A string that represents the version of LLVM.
  */
 
-LIBOPENCOR_EXPORT std::string llvmVersionString();
+std::string LIBOPENCOR_EXPORT llvmVersionString();
 
 /**
  * Return the version of SUNDIALS as a number.
@@ -165,7 +165,7 @@ LIBOPENCOR_EXPORT std::string llvmVersionString();
  * @return A number that represents the version of SUNDIALS.
  */
 
-LIBOPENCOR_EXPORT unsigned int sundialsVersion();
+unsigned int LIBOPENCOR_EXPORT sundialsVersion();
 
 /**
  * Return the version of SUNDIALS as a string. The version string is in the
@@ -176,6 +176,6 @@ LIBOPENCOR_EXPORT unsigned int sundialsVersion();
  * @return A string that represents the version of SUNDIALS.
  */
 
-LIBOPENCOR_EXPORT std::string sundialsVersionString();
+std::string LIBOPENCOR_EXPORT sundialsVersionString();
 
 } // namespace libOpenCOR

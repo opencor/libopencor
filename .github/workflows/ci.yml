@@ -282,6 +282,9 @@ jobs:
       - name: Install pytest
         if: ${{ matrix.target == 'python_unit_testing' }}
         run: pip3 install pytest
+      - name: Install pytest-html
+        if: ${{ matrix.target == 'python_unit_testing' }}
+        run: pip3 install pytest-html
       - name: Install Sphinx
         if: ${{ matrix.documentation == 'ON' }}
         run: pip3 install sphinx
@@ -313,6 +316,11 @@ jobs:
         run: |
           cd build
           ninja ${{ matrix.target }}
+      - name: Python unit testing report
+        if: ${{ matrix.target == 'python_unit_testing' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}_report
       - name: Code formatting
         if: ${{ matrix.target == 'check_code_formatting' }}
         run: |
@@ -340,6 +348,11 @@ jobs:
           cd build
           ninja ${{ matrix.target }}
           if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
+      - name: Coverage report using llvm-cov
+        if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}_report
       - name: Memory checks
         if: ${{ matrix.target == 'memory_checks' }}
         run: |
