@@ -54,7 +54,7 @@ if(LIBOPENCOR_UNIT_TESTING)
         add_test(NAME ${TEST_TARGET}
                  COMMAND ${TEST_TARGET})
 
-        if(MSVC)
+        if(BUILDING_USING_MSVC)
             set_tests_properties(${TEST_TARGET} PROPERTIES
                                  ENVIRONMENT "PATH=$<TARGET_FILE_DIR:gtest_main>\;$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>")
         endif()

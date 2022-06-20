@@ -35,9 +35,9 @@ if(LIBOPENCOR_COMPILER_CACHING)
     endif()
 endif()
 
-# On Windows, if we are using MSVC then replace some compiler flags.
+# Replace some compilers when building using MSVC.
 
-if(MSVC)
+if(BUILDING_USING_MSVC)
     # Replace the /Zi option (i.e. enable debugging information), if present,
     # with the /Z7 option (i.e. enable old-style debugging information)
     # otherwise caching (be it with buildcache or clcache) won't work.
@@ -131,7 +131,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} INTERFACE
                            $<INSTALL_INTERFACE:include/>
                            $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>)
 
-if(MSVC)
+if(BUILDING_USING_MSVC)
     # Ignore some linking warnings on Windows that have nothing to do with
     # libOpenCOR.
 

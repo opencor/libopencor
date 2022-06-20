@@ -15,23 +15,30 @@
 # Make sure that we are using a supported compiler.
 
 if(WIN32)
-    if(    NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"
-       AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    if(    "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"
+       AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        set(BUILDING_USING_MSVC TRUE)
+    else()
         message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using MSVC on Windows.")
     endif()
 elseif(APPLE)
-    if(    NOT(   "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
-               OR "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang")
-       AND NOT(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-               OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"))
+    if(   (    "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
+           AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+       OR (    "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang"
+           AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"))
+        set(BUILDING_USING_CLANG TRUE)
+    else()
         message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using (Apple) Clang on macOS.")
     endif()
 else()
-    if(    (    NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"
-            AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-       AND (    NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
-            AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
-        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using GCC/G++ or Clang on Linux.")
+    if(    "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"
+       AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        set(BUILDING_USING_GNU TRUE)
+    elseif(    "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
+           AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(BUILDING_USING_CLANG TRUE)
+    else()
+        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using GNU or Clang on Linux.")
     endif()
 endif()
 
@@ -83,7 +90,7 @@ endif()
 find_program(BUILDCACHE_EXE buildcache)
 
 if(NOT BUILDCACHE_EXE)
-    if(MSVC)
+    if(BUILDING_USING_MSVC)
         find_program(CLCACHE_EXE clcache)
     else()
         find_program(CCACHE_EXE ccache)
@@ -139,7 +146,7 @@ check_cxx_compiler_flag(${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS} CODE_COVERAGE_L
 if(BUILDCACHE_EXE OR CLCACHE_EXE OR CCACHE_EXE)
     set(COMPILER_CACHING_AVAILABLE TRUE)
 else()
-    if(MSVC)
+    if(BUILDING_USING_MSVC)
         set(COMPILER_CACHING_ERROR_MESSAGE "Compiler caching is requested but neither buildcache nor clcache could be found.")
     else()
         set(COMPILER_CACHING_ERROR_MESSAGE "Compiler caching is requested but neither buildcache nor ccache could be found.")
@@ -254,7 +261,7 @@ endif()
 
 # Hide the CMake options that are not directly relevant to libOpenCOR.
 
-if(MSVC)
+if(BUILDING_USING_MSVC)
     mark_as_advanced(CLCACHE_EXE
                      CMAKE_CONFIGURATION_TYPES)
 else()
