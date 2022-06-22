@@ -47,9 +47,11 @@ File::File(const std::string &pFileNameOrUrl)
         // We are dealing with a URL representing a local file, so retrieve its
         // actual path.
 
+        static const size_t SCHEME_LENGTH = 7;
+
         mPimpl->mFileName = pFileNameOrUrl;
 
-        mPimpl->mFileName.erase(0, 7);
+        mPimpl->mFileName.erase(0, SCHEME_LENGTH);
 
         // On Windows, we also need to remove the leading "/" and replace all
         // the other "/"s with "\"s.
@@ -61,9 +63,10 @@ File::File(const std::string &pFileNameOrUrl)
         std::regex_search(mPimpl->mFileName, match, WINDOWS_PATH_REGEX);
 
         if ((match.size() == 1) && (match.position(0) == 0)) {
+            static const size_t SLASH_LENGTH = 1;
             static const auto FORWARD_SLASH_REGEX = std::regex("/");
 
-            mPimpl->mFileName.erase(0, 1);
+            mPimpl->mFileName.erase(0, SLASH_LENGTH);
 
             mPimpl->mFileName = std::regex_replace(mPimpl->mFileName, FORWARD_SLASH_REGEX, "\\");
         }
@@ -71,9 +74,8 @@ File::File(const std::string &pFileNameOrUrl)
         // We are dealing with either a local file name or a URL.
 
         CURLU *url = curl_url();
-        CURLUcode rc = curl_url_set(url, CURLUPART_URL, pFileNameOrUrl.c_str(), 0);
 
-        if (rc == CURLUE_OK) {
+        if (curl_url_set(url, CURLUPART_URL, pFileNameOrUrl.c_str(), 0) == CURLUE_OK) {
             // We were able to get a URL, which means that we are dealing with a
             // remote file.
 

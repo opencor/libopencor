@@ -70,6 +70,7 @@ function(configure_target TARGET)
                 -Wno-c++98-compat
                 -Wno-exit-time-destructors
                 -Wno-global-constructors
+                -Wno-padded
             )
 
             if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
