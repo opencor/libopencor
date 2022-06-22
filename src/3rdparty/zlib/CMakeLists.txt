@@ -39,7 +39,7 @@ if(LIBOPENCOR_PREBUILT_ZLIB)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e1e531a45445aaa5ee1b74590f1f57103e38feec)
+                         d17822e429031b71cb4e6c0df4cb7fc161909a98)
     endif()
 else()
     # Build our package.

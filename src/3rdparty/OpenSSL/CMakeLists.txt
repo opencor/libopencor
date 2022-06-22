@@ -39,7 +39,7 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         84caa21d18d539b65d1894fba501cc8afba2c3af)
+                         c92a3b7b1314c9e0d0e3c63bbe5ffee5c0bbc40e)
     endif()
 else()
     # Build our package.

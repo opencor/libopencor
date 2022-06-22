@@ -49,7 +49,7 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         cd2b7b09ba3357d1c68b2f03efa0855712cb84c4)
+                         a50f04510b7455c8a0242826a15f463a51185224)
     endif()
 else()
     # Build our package.

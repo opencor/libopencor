@@ -39,7 +39,7 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         a118d3e34f49a4a673e7761073b87aa3c9181ae0)
+                         4c6240ae1329b2b5eb09b813484decbd970367a2)
     endif()
 else()
     # Build our package.
