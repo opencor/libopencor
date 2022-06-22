@@ -56,13 +56,13 @@ File::File(const std::string &pFileNameOrUrl)
         // On Windows, we also need to remove the leading "/" and replace all
         // the other "/"s with "\"s.
 
-        static const auto WINDOWS_PATH_REGEX = std::regex("/[A-Z]:/.*");
+        static const auto WINDOWS_PATH_REGEX = std::regex("^/[A-Z]:/.*");
 
         std::smatch match;
 
         std::regex_search(mPimpl->mFileName, match, WINDOWS_PATH_REGEX);
 
-        if ((match.size() == 1) && (match.position(0) == 0)) {
+        if (!match.empty()) {
             static const size_t SLASH_LENGTH = 1;
             static const auto FORWARD_SLASH_REGEX = std::regex("/");
 
