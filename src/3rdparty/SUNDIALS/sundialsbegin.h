@@ -15,6 +15,6 @@ limitations under the License.
 */
 
 #ifdef __clang__
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wreserved-id-macro"
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wreserved-id-macro"
 #endif

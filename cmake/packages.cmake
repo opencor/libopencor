@@ -106,11 +106,21 @@ endfunction()
 function(add_package PACKAGE)
     add_subdirectory(${PACKAGE})
 
+    # Keep track of the package.
+
     set(AVAILABLE_PACKAGES "${AVAILABLE_PACKAGES};${PACKAGE}")
 
     list(SORT AVAILABLE_PACKAGES)
 
     set(AVAILABLE_PACKAGES "${AVAILABLE_PACKAGES}" CACHE INTERNAL "Available packages.")
+
+    # Keep track of the package's (special) header files.
+
+    file(GLOB PACKAGE_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${PACKAGE}/*.h")
+
+    set(THIRD_PARTY_HEADER_FILES "${THIRD_PARTY_HEADER_FILES};${PACKAGE_HEADER_FILES}")
+
+    set(THIRD_PARTY_HEADER_FILES "${THIRD_PARTY_HEADER_FILES}" CACHE INTERNAL "Third-party (special) header files.")
 endfunction()
 
 function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG SHA1_VALUE)

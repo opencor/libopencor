@@ -47,6 +47,10 @@ if(BUILDING_USING_MSVC)
     endif()
 endif()
 
+# Build our different third-party libraries.
+
+add_subdirectory(3rdparty)
+
 # Configure the version file.
 
 foreach(VERSION_PART PROJECT_VERSION_MAJOR PROJECT_VERSION_MINOR PROJECT_VERSION_PATCH)
@@ -102,6 +106,7 @@ set(INTERNAL_HEADER_FILES
 
 set(GIT_HEADER_FILES
     ${INTERNAL_HEADER_FILES}
+    ${THIRD_PARTY_HEADER_FILES}
     ${VERSION_HEADER_FILE_IN}
 )
 
@@ -152,10 +157,6 @@ if(WIN32 AND LIBOPENCOR_SHARED_LIBS)
 else()
     set(INTERNAL_SOURCE_FILES PARENT_SCOPE)
 endif()
-
-# Build our different third-party libraries.
-
-add_subdirectory(3rdparty)
 
 # Configure OpenCOR.
 
