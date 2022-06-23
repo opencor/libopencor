@@ -16,7 +16,11 @@ limitations under the License.
 
 #include <libopencor>
 
+#include "file_p.h"
+
 #include <pybind11/pybind11.h>
+
+namespace py = pybind11;
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -30,6 +34,29 @@ PYBIND11_MODULE(module, m)
     // Documentation.
 
     m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";
+
+    // File API.
+
+    py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
+
+    py::enum_<libOpenCOR::File::Type>(file, "Type")
+        .value("Local", libOpenCOR::File::Type::LOCAL)
+        .value("Remote", libOpenCOR::File::Type::REMOTE)
+        .export_values();
+
+    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
+        .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
+        .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
+        .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.");
+
+    file.def("__repr__", [](const libOpenCOR::File &pFile) {
+            if (pFile.type() == libOpenCOR::File::Type::LOCAL) {
+                return "Local file: " + pFile.fileName();
+            }
+
+            return "Remote file: " + pFile.url();
+        },
+        "Get the string representation of this File object.");
 
     // Version API.
 

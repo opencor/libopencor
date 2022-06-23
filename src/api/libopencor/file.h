@@ -77,9 +77,9 @@ public:
     static FilePtr create(const std::string &pFileNameOrUrl);
 
     /**
-     * @brief Get the type for this @c File.
+     * @brief Get the type of this @c File.
      *
-     * Return the type for this @c File.
+     * Return the type of this @c File.
      *
      * @return The type as a @c Type.
      */

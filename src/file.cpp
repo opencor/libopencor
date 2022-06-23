@@ -16,26 +16,13 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
+#include "file_p.h"
+
 #include <regex>
 
 #include <curl/curl.h>
 
 namespace libOpenCOR {
-
-/**
- * Private implementation.
- */
-
-struct File::Impl
-{
-    Type mType = Type::LOCAL;
-    std::string mFileName;
-    std::string mUrl;
-};
-
-/**
- * Public implementation.
- */
 
 File::File(const std::string &pFileNameOrUrl)
     : mPimpl(std::make_unique<Impl>())

@@ -14,6 +14,9 @@
 
 from .module import __doc__, __version__
 from .module import (
+    # File API.
+    File,
+    # Version API.
     version,
     version_string,
     clang_version,
@@ -33,7 +36,9 @@ from .module import (
 )
 
 __all__ = (
-    # Version.
+    # File API.
+    "File",
+    # Version API.
     "version",
     "version_string",
     "clang_version",
