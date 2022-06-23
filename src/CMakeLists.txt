@@ -147,7 +147,7 @@ if(BUILDING_USING_MSVC)
     # libOpenCOR.
 
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-                            "-ignore:4199")
+                          "-ignore:4199")
 endif()
 
 set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
