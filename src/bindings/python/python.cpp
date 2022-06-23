@@ -21,7 +21,8 @@ limitations under the License.
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
-PYBIND11_MODULE(module, m) {
+PYBIND11_MODULE(module, m)
+{
     // Version.
 
     m.attr("__version__") = MACRO_STRINGIFY(PROJECT_VERSION);
