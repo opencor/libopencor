@@ -35,7 +35,7 @@ if(LIBOPENCOR_COMPILER_CACHING)
     endif()
 endif()
 
-# Replace some compilers when building using MSVC.
+# Replace some compiler flags when building using MSVC.
 
 if(BUILDING_USING_MSVC)
     # Replace the /Zi option (i.e. enable debugging information), if present,
