@@ -423,6 +423,12 @@ if(LIBOPENCOR_MEMORY_CHECKS)
     endif()
 endif()
 
+if(LIBOPENCOR_PYTHON_BINDINGS)
+    if(LIBOPENCOR_SHARED_LIBS)
+        message(SEND_ERROR "Configuration confusion: Python bindings are requested which means that a shared library cannot be requested.")
+    endif()
+endif()
+
 if(LIBOPENCOR_PYTHON_UNIT_TESTING)
     if(NOT LIBOPENCOR_PYTHON_BINDINGS)
         message(SEND_ERROR "Configuration confusion: Python unit testing is requested which means that Python bindings should also be requested.")
