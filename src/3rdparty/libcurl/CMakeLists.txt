@@ -43,7 +43,7 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         a96e22b2c664526daaa2cd4f7fecc465d592ecdf)
+                         a1251435ea2228af7e87a9f6ed1d7bd89a7592a1)
     endif()
 else()
     # Build our package.

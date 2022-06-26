@@ -43,7 +43,7 @@ if(LIBOPENCOR_PREBUILT_LIBSEDML)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         bf12630517620ea1035a3df7cb9a3ece98d42bb8)
+                         bb61dc520bc85b9f31f25e97f2e4e5d5d5d2a93a)
     endif()
 else()
     # Build our package.
