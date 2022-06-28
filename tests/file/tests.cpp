@@ -28,7 +28,7 @@ TEST(FileTest, windowsFile)
 {
     auto file = libOpenCOR::File::create(WINDOWS_FILE);
 
-    EXPECT_EQ(libOpenCOR::File::Type::LOCAL, file->type());
+    EXPECT_EQ(libOpenCOR::File::Type::UNDEFINED, file->type());
     EXPECT_EQ(WINDOWS_FILE, file->fileName());
     EXPECT_EQ("", file->url());
 }
@@ -37,7 +37,7 @@ TEST(FileTest, unixFile)
 {
     auto file = libOpenCOR::File::create(UNIX_FILE);
 
-    EXPECT_EQ(libOpenCOR::File::Type::LOCAL, file->type());
+    EXPECT_EQ(libOpenCOR::File::Type::UNDEFINED, file->type());
     EXPECT_EQ(UNIX_FILE, file->fileName());
     EXPECT_EQ("", file->url());
 }
@@ -46,7 +46,7 @@ TEST(FileTest, urlBasedWindowsFile)
 {
     auto file = libOpenCOR::File::create(URL_BASED_WINDOWS_FILE);
 
-    EXPECT_EQ(libOpenCOR::File::Type::LOCAL, file->type());
+    EXPECT_EQ(libOpenCOR::File::Type::UNDEFINED, file->type());
     EXPECT_EQ(WINDOWS_FILE, file->fileName());
     EXPECT_EQ("", file->url());
 }
@@ -55,7 +55,7 @@ TEST(FileTest, urlBasedUnixFile)
 {
     auto file = libOpenCOR::File::create(URL_BASED_UNIX_FILE);
 
-    EXPECT_EQ(libOpenCOR::File::Type::LOCAL, file->type());
+    EXPECT_EQ(libOpenCOR::File::Type::UNDEFINED, file->type());
     EXPECT_EQ(UNIX_FILE, file->fileName());
     EXPECT_EQ("", file->url());
 }
@@ -64,7 +64,7 @@ TEST(FileTest, remoteFile)
 {
     auto file = libOpenCOR::File::create(REMOTE_FILE);
 
-    EXPECT_EQ(libOpenCOR::File::Type::REMOTE, file->type());
+    EXPECT_EQ(libOpenCOR::File::Type::UNDEFINED, file->type());
     EXPECT_EQ("", file->fileName());
     EXPECT_EQ(REMOTE_FILE, file->url());
 }

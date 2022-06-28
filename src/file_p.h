@@ -22,7 +22,7 @@ namespace libOpenCOR {
 
 struct File::Impl: public Logger::Impl
 {
-    Type mType = Type::LOCAL;
+    Type mType = Type::UNDEFINED;
     std::string mFileName;
     std::string mUrl;
 };

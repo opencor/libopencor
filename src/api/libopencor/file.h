@@ -37,14 +37,20 @@ public:
      * @brief The type of a file.
      *
      * A file can be of one of the following types:
-     *  - LOCAL: a file that is locally stored; or
-     *  - REMOTE: a file that is remotely stored.
+     *  - UNDEFINED: the file has yet to be resolved (@sa resolve());
+     *  - CELLML_FILE: the file is a CellML file;
+     *  - SEDML_FILE: the file is a SED-ML file;
+     *  - COMBINE_ARCHIVE: the file is a COMBINE archive; or
+     *  - UNKNOWN: the type of the file is unknown.
      */
 
     enum class Type
     {
-        LOCAL,
-        REMOTE
+        UNDEFINED,
+        CELLML_FILE,
+        SEDML_FILE,
+        COMBINE_ARCHIVE,
+        UNKNOWN
     };
 
     /**

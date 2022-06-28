@@ -40,8 +40,11 @@ PYBIND11_MODULE(module, m)
     py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
 
     py::enum_<libOpenCOR::File::Type>(file, "Type")
-        .value("Local", libOpenCOR::File::Type::LOCAL)
-        .value("Remote", libOpenCOR::File::Type::REMOTE)
+        .value("Undefined", libOpenCOR::File::Type::UNDEFINED)
+        .value("CellmlFile", libOpenCOR::File::Type::CELLML_FILE)
+        .value("SedmlFile", libOpenCOR::File::Type::SEDML_FILE)
+        .value("CombineArchive", libOpenCOR::File::Type::COMBINE_ARCHIVE)
+        .value("Unknown", libOpenCOR::File::Type::UNKNOWN)
         .export_values();
 
     file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
@@ -50,8 +53,10 @@ PYBIND11_MODULE(module, m)
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.");
 
     file.def("__repr__", [](const libOpenCOR::File &pFile) {
-            if (pFile.type() == libOpenCOR::File::Type::LOCAL) {
-                return "Local file: " + pFile.fileName();
+            auto fileName = pFile.fileName();
+
+            if (!fileName.empty()) {
+                return "Local file: " + fileName;
             }
 
             return "Remote file: " + pFile.url();

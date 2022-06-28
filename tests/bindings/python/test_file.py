@@ -26,7 +26,7 @@ REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c
 def test_windows_file():
     f = File(WINDOWS_FILE)
 
-    assert f.type == File.Type.Local
+    assert f.type == File.Type.Undefined
     assert f.file_name == WINDOWS_FILE
     assert f.url == ""
     assert repr(f) == "Local file: " + WINDOWS_FILE
@@ -35,7 +35,7 @@ def test_windows_file():
 def test_unix_file():
     f = File(UNIX_FILE)
 
-    assert f.type == File.Type.Local
+    assert f.type == File.Type.Undefined
     assert f.file_name == UNIX_FILE
     assert f.url == ""
     assert repr(f) == "Local file: " + UNIX_FILE
@@ -44,7 +44,7 @@ def test_unix_file():
 def test_url_based_windows_file():
     f = File(URL_BASED_WINDOWS_FILE)
 
-    assert f.type == File.Type.Local
+    assert f.type == File.Type.Undefined
     assert f.file_name == WINDOWS_FILE
     assert f.url == ""
     assert repr(f) == "Local file: " + WINDOWS_FILE
@@ -53,7 +53,7 @@ def test_url_based_windows_file():
 def test_url_based_unix_file():
     f = File(URL_BASED_UNIX_FILE)
 
-    assert f.type == File.Type.Local
+    assert f.type == File.Type.Undefined
     assert f.file_name == UNIX_FILE
     assert f.url == ""
     assert repr(f) == "Local file: " + UNIX_FILE
@@ -62,7 +62,7 @@ def test_url_based_unix_file():
 def test_remote_file():
     f = File(REMOTE_FILE)
 
-    assert f.type == File.Type.Remote
+    assert f.type == File.Type.Undefined
     assert f.file_name == ""
     assert f.url == REMOTE_FILE
     assert repr(f) == "Remote file: " + REMOTE_FILE

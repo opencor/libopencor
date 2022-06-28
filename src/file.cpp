@@ -58,20 +58,15 @@ File::File(const std::string &pFileNameOrUrl)
             mPimpl->mFileName = std::regex_replace(mPimpl->mFileName, FORWARD_SLASH_REGEX, "\\");
         }
     } else {
-        // We are dealing with either a local file name or a URL.
+        // If we can get a URL from pFileNameOrUrl then it means that we are
+        // dealing with a remote file otherwise we are dealing with a local
+        // file.
 
         CURLU *url = curl_url();
 
         if (curl_url_set(url, CURLUPART_URL, pFileNameOrUrl.c_str(), 0) == CURLUE_OK) {
-            // We were able to get a URL, which means that we are dealing with a
-            // remote file.
-
-            mPimpl->mType = Type::REMOTE;
             mPimpl->mUrl = pFileNameOrUrl;
         } else {
-            // We didn't get a URL, which means that we are dealing with a local
-            // file.
-
             mPimpl->mFileName = pFileNameOrUrl;
         }
 
