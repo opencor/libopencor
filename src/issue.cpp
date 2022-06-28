@@ -14,17 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/file.h"
+#include "libopencor/issue.h"
 
-#include "logger_p.h"
+#include "issue_p.h"
 
 namespace libOpenCOR {
 
-struct File::Impl: public Logger::Impl
+Issue::Issue(Issue::Type pType)
+    : mPimpl(std::make_unique<Impl>())
 {
-    Type mType = Type::LOCAL;
-    std::string mFileName;
-    std::string mUrl;
-};
+    mPimpl->mType = pType;
+}
+
+IssuePtr Issue::Impl::create(Issue::Type pType)
+{
+    return std::shared_ptr<Issue> {new Issue {pType}};
+}
+
+Issue::Type Issue::type() const
+{
+    return mPimpl->mType;
+}
 
 } // namespace libOpenCOR

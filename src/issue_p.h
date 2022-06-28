@@ -14,17 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/file.h"
-
-#include "logger_p.h"
+#include "libopencor/types.h"
 
 namespace libOpenCOR {
 
-struct File::Impl: public Logger::Impl
+struct Issue::Impl
 {
-    Type mType = Type::LOCAL;
-    std::string mFileName;
-    std::string mUrl;
+    Type mType = Type::MESSAGE;
+
+    static IssuePtr create(Type pType);
 };
 
 } // namespace libOpenCOR

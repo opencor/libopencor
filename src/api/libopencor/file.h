@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/export.h"
+#include "libopencor/logger.h"
 #include "libopencor/types.h"
 
 #include <string>
@@ -29,7 +30,7 @@ namespace libOpenCOR {
  * The File class is for representing a local or a remote file.
  */
 
-class LIBOPENCOR_EXPORT File
+class LIBOPENCOR_EXPORT File: public Logger
 {
 public:
     /**
@@ -92,7 +93,7 @@ public:
      * Return the file name for this @c File. If @c File is remote then we return
      * the file name for its local copy.
      *
-     * @return The file name as a @c std::string.
+     * @return The file name of this @c File as a @c std::string.
      */
 
     std::string fileName() const;
@@ -103,7 +104,7 @@ public:
      * Return the URL for this @c File. If @c File is remote then we return an
      * empty string.
      *
-     * @return The URL as a @c std::string.
+     * @return The URL of this @c File as a @c std::string.
      */
 
     std::string url() const;

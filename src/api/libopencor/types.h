@@ -21,7 +21,9 @@ limitations under the License.
 namespace libOpenCOR {
 
 class File;
+class Issue;
 
 using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @c File pointer. */
+using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @c Issue pointer. */
 
 } // namespace libcellml
