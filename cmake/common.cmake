@@ -33,6 +33,13 @@ function(replace_compiler_flag OLD NEW)
 endfunction()
 
 function(configure_target TARGET)
+    # Ignore some MSVC warnings.
+
+    if(BUILDING_USING_MSVC)
+        target_compile_options(${TARGET} PRIVATE
+                                /wd4251)
+    endif()
+
     # Treat warnings as errors.
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)

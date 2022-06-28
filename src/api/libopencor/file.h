@@ -111,7 +111,9 @@ public:
 private:
     explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private*/
 
-#include "pimpl.h"
+    struct Impl; /**< Forward declaration of the implementation class, @private. */
+
+    std::unique_ptr<Impl> mPimpl;
 };
 
 } // namespace libOpenCOR
