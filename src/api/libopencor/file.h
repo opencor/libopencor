@@ -42,7 +42,7 @@ public:
      *  - COMBINE_ARCHIVE: the file is a COMBINE archive; or
      *  - UNKNOWN: the type of the file is unknown.
      *
-     * @sa resolve
+     * @sa resolve()
      */
 
     enum class Type
@@ -70,7 +70,7 @@ public:
     /**
      * @brief Create a @c File object.
      *
-     * Factory method to create a @c File:
+     * Factory method to create a @c File object:
      *
      * ```
      * auto localFile = libOpenCOR::File::create("/some/path/file.txt");
@@ -85,9 +85,9 @@ public:
     static FilePtr create(const std::string &pFileNameOrUrl);
 
     /**
-     * @brief Get the type of this @c File.
+     * @brief Get the type of this file.
      *
-     * Return the type of this @c File.
+     * Return the type of this file.
      *
      * @return The type as a @c Type.
      */
@@ -95,23 +95,23 @@ public:
     Type type() const;
 
     /**
-     * @brief Get the file name for this @c File.
+     * @brief Get the file name of this file.
      *
-     * Return the file name for this @c File. If @c File is remote then we return
-     * the file name for its local copy.
+     * Return the file name of this file. If the file is remote then we return
+     * the file name of its local copy.
      *
-     * @return The file name of this @c File as a @c std::string.
+     * @return The file name, as a @c std::string, of this file.
      */
 
     std::string fileName() const;
 
     /**
-     * @brief Get the URL for this @c File.
+     * @brief Get the URL of this file.
      *
-     * Return the URL for this @c File. If @c File is remote then we return an
-     * empty string.
+     * Return the URL of this file. If the file is local then we return an empty
+     * string.
      *
-     * @return The URL of this @c File as a @c std::string.
+     * @return The URL, as a @c std::string, of this file.
      */
 
     std::string url() const;
