@@ -16,11 +16,9 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
-#include "logger_p.h"
-
 namespace libOpenCOR {
 
-struct File::Impl: public Logger::Impl
+struct File::Impl
 {
     Type mType = Type::UNDEFINED;
     std::string mFileName;

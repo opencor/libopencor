@@ -17,7 +17,6 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/export.h"
-#include "libopencor/logger.h"
 #include "libopencor/types.h"
 
 #include <string>
@@ -30,7 +29,7 @@ namespace libOpenCOR {
  * The File class is for representing a local or a remote file.
  */
 
-class LIBOPENCOR_EXPORT File: public Logger
+class LIBOPENCOR_EXPORT File
 {
 public:
     /**
@@ -60,7 +59,7 @@ public:
      */
 
     File() = delete; /**< No default constructor allowed, @private. */
-    ~File(); /**< Default destructor, @private. */
+    ~File() = default; /**< Default destructor, @private. */
 
     File(const File &pOther) = delete; /**< No copy constructor allowed, @private. */
     File(File &&) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -131,8 +130,7 @@ private:
 
     struct Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    std::unique_ptr<Impl> mPimpl;
 };
 
 } // namespace libOpenCOR
