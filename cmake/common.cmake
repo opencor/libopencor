@@ -130,8 +130,8 @@ function(configure_target TARGET)
                 cppcoreguidelines-*
                 ${DISABLED_CPPCOREGUIDELINES_CHECKS}
                 fuchsia-*
-                ${DISABLED_FUCHSIA_CHECKS}
                 -fuchsia-default-arguments-calls
+                ${DISABLED_FUCHSIA_CHECKS}
                 google-*
                 hicpp-*
                 llvm-*
