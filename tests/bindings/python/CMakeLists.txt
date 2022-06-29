@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Configure our utilities.
+
+configure_file(utils.py.in utils.py)
+
 # Copy our Python tests over.
 
 file(GLOB PYTHON_TESTS "*.py")
@@ -26,9 +30,9 @@ endforeach()
 
 if(WIN32)
     list(APPEND COMMANDS COMMAND SET PATH=$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>\;%PATH%)
-    list(APPEND COMMANDS COMMAND SET PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python)
+    list(APPEND COMMANDS COMMAND SET PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python:${CMAKE_CURRENT_BINARY_DIR})
 else()
-    list(APPEND COMMANDS COMMAND export PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python)
+    list(APPEND COMMANDS COMMAND export PYTHONPATH=${PROJECT_BINARY_DIR}/src/bindings/python:${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
 add_target(python_unit_testing

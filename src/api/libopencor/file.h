@@ -52,7 +52,7 @@ public:
         CELLML_FILE,
         SEDML_FILE,
         COMBINE_ARCHIVE,
-        UNKNOWN
+        UNKNOWN_FILE
     };
 
     /**
@@ -116,6 +116,15 @@ public:
      */
 
     std::string url() const;
+
+    /**
+     * @brief Resolve this @c File.
+     *
+     * Retrieve the contents of this @c File and determine its type, i.e. a
+     * CellML file, a SED-ML file, a COMBINE archive, or an unknown file.
+     */
+
+    void resolve();
 
 private:
     explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private*/

@@ -19,7 +19,6 @@
 #       of KDevelop (see
 #       https://invent.kde.org/kdevelop/kdevelop/-/blob/3973/veritas/tests/runMemcheck.py).
 
-
 import math
 import multiprocessing
 import os

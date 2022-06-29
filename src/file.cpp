@@ -24,6 +24,10 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+void File::Impl::resolve()
+{
+}
+
 File::File(const std::string &pFileNameOrUrl)
     : Logger(new Impl())
 {
@@ -109,6 +113,11 @@ std::string File::fileName() const
 std::string File::url() const
 {
     return pimpl()->mUrl;
+}
+
+void File::resolve()
+{
+    pimpl()->resolve();
 }
 
 } // namespace libOpenCOR

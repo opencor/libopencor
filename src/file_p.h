@@ -25,6 +25,8 @@ struct File::Impl: public Logger::Impl
     Type mType = Type::UNDEFINED;
     std::string mFileName;
     std::string mUrl;
+
+    void resolve();
 };
 
 } // namespace libOpenCOR

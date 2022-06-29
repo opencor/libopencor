@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from libopencor import File
+import utils
 
 
 WINDOWS_FILE = "C:\\some\\path\\file.txt"
@@ -21,6 +21,13 @@ UNIX_FILE = "/some/path/file.txt"
 URL_BASED_WINDOWS_FILE = "file:///C:/some/path/file.txt"
 URL_BASED_UNIX_FILE = "file:///some/path/file.txt"
 REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.cellml"
+UNKNOWN_FILE = "unknown_file.txt"
+CELLML_1_X_FILE = "cellml_1_x.cellml"
+SEDML_1_X_FILE = "cellml_1_x.sedml"
+COMBINE_1_X_ARCHIVE = "cellml_1_x.omex"
+CELLML_2_FILE = "cellml_2.cellml"
+SEDML_2_FILE = "cellml_2.sedml"
+COMBINE_2_ARCHIVE = "cellml_2.omex"
 
 
 def test_windows_file():
@@ -66,3 +73,59 @@ def test_remote_file():
     assert f.file_name == ""
     assert f.url == REMOTE_FILE
     assert repr(f) == "Remote file: " + REMOTE_FILE
+
+
+def test_cellml_1_x_file():
+    f = File(utils.resource_path(CELLML_1_X_FILE))
+
+    f.resolve()
+
+    assert f.type == File.Type.CellmlFile
+
+
+def test_sedml_1_x_file():
+    f = File(utils.resource_path(SEDML_1_X_FILE))
+
+    f.resolve()
+
+    assert f.type == File.Type.SedmlFile
+
+
+def test_combine_1_x_archive():
+    f = File(utils.resource_path(COMBINE_1_X_ARCHIVE))
+
+    f.resolve()
+
+    assert f.type == File.Type.CombineArchive
+
+
+def test_cellml_2_file():
+    f = File(utils.resource_path(CELLML_2_FILE))
+
+    f.resolve()
+
+    assert f.type == File.Type.CellmlFile
+
+
+def test_sedml_2_file():
+    f = File(utils.resource_path(SEDML_2_FILE))
+
+    f.resolve()
+
+    assert f.type == File.Type.SedmlFile
+
+
+def test_combine_2_archive():
+    f = File(utils.resource_path(COMBINE_2_ARCHIVE))
+
+    f.resolve()
+
+    assert f.type == File.Type.CombineArchive
+
+
+def test_unknown_file():
+    f = File(utils.resource_path(UNKNOWN_FILE))
+
+    f.resolve()
+
+    assert f.type == File.Type.UnknownFile
