@@ -71,11 +71,15 @@ public:
     IssuePtr issue(size_t pIndex) const;
 
 protected:
-    explicit Logger(); /**< Constructor, @private. */
-
     struct Impl; /**< Forward declaration of the implementation class, @private. */
 
-    std::unique_ptr<Impl> mPimpl;
+    explicit Logger(Impl *pPimpl); /**< Constructor, @private. */
+
+    Impl *pimpl(); /**< Implementation getter, @private. */
+    const Impl *pimpl() const; /**< Constant implementation getter, @private. */
+
+private:
+    Impl *mPimpl;
 };
 
 } // namespace libOpenCOR

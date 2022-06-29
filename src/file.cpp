@@ -25,10 +25,12 @@ limitations under the License.
 namespace libOpenCOR {
 
 File::File(const std::string &pFileNameOrUrl)
-    : mPimpl(std::make_unique<Impl>())
+    : Logger(new Impl())
 {
     // By default, we assume that we are dealing with a local file, but it may
     // be in the form of a URL, i.e. starting with "file://".
+
+    auto *pimpl = File::pimpl();
 
     if (pFileNameOrUrl.find("file://") == 0) {
         // We are dealing with a URL representing a local file, so retrieve its
@@ -36,9 +38,9 @@ File::File(const std::string &pFileNameOrUrl)
 
         static const size_t SCHEME_LENGTH = 7;
 
-        mPimpl->mFileName = pFileNameOrUrl;
+        pimpl->mFileName = pFileNameOrUrl;
 
-        mPimpl->mFileName.erase(0, SCHEME_LENGTH);
+        pimpl->mFileName.erase(0, SCHEME_LENGTH);
 
         // On Windows, we also need to remove the leading "/" and replace all
         // the other "/"s with "\"s.
@@ -47,15 +49,15 @@ File::File(const std::string &pFileNameOrUrl)
 
         std::smatch match;
 
-        std::regex_search(mPimpl->mFileName, match, WINDOWS_PATH_REGEX);
+        std::regex_search(pimpl->mFileName, match, WINDOWS_PATH_REGEX);
 
         if (!match.empty()) {
             static const size_t SLASH_LENGTH = 1;
             static const auto FORWARD_SLASH_REGEX = std::regex("/");
 
-            mPimpl->mFileName.erase(0, SLASH_LENGTH);
+            pimpl->mFileName.erase(0, SLASH_LENGTH);
 
-            mPimpl->mFileName = std::regex_replace(mPimpl->mFileName, FORWARD_SLASH_REGEX, "\\");
+            pimpl->mFileName = std::regex_replace(pimpl->mFileName, FORWARD_SLASH_REGEX, "\\");
         }
     } else {
         // If we can get a URL from pFileNameOrUrl then it means that we are
@@ -65,13 +67,28 @@ File::File(const std::string &pFileNameOrUrl)
         CURLU *url = curl_url();
 
         if (curl_url_set(url, CURLUPART_URL, pFileNameOrUrl.c_str(), 0) == CURLUE_OK) {
-            mPimpl->mUrl = pFileNameOrUrl;
+            pimpl->mUrl = pFileNameOrUrl;
         } else {
-            mPimpl->mFileName = pFileNameOrUrl;
+            pimpl->mFileName = pFileNameOrUrl;
         }
 
         curl_url_cleanup(url);
     }
+}
+
+File::~File()
+{
+    delete pimpl();
+}
+
+File::Impl *File::pimpl()
+{
+    return reinterpret_cast<File::Impl *>(Logger::pimpl());
+}
+
+const File::Impl *File::pimpl() const
+{
+    return reinterpret_cast<File::Impl const *>(Logger::pimpl());
 }
 
 FilePtr File::create(const std::string &pFileNameOrUrl)
@@ -81,17 +98,17 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
 
 File::Type File::type() const
 {
-    return mPimpl->mType;
+    return pimpl()->mType;
 }
 
 std::string File::fileName() const
 {
-    return mPimpl->mFileName;
+    return pimpl()->mFileName;
 }
 
 std::string File::url() const
 {
-    return mPimpl->mUrl;
+    return pimpl()->mUrl;
 }
 
 } // namespace libOpenCOR

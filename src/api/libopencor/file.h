@@ -60,7 +60,7 @@ public:
      */
 
     File() = delete; /**< No default constructor allowed, @private. */
-    ~File() = default; /**< Default destructor, @private. */
+    ~File(); /**< Default destructor, @private. */
 
     File(const File &pOther) = delete; /**< No copy constructor allowed, @private. */
     File(File &&) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -122,7 +122,8 @@ private:
 
     struct Impl; /**< Forward declaration of the implementation class, @private. */
 
-    std::unique_ptr<Impl> mPimpl;
+    Impl *pimpl();
+    const Impl *pimpl() const;
 };
 
 } // namespace libOpenCOR

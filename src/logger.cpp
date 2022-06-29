@@ -30,9 +30,19 @@ void Logger::Impl::removeAllIssues()
     mIssues.clear();
 }
 
-Logger::Logger()
-    : mPimpl(std::make_unique<Impl>())
+Logger::Logger(Impl *pPimpl)
+    : mPimpl(pPimpl)
 {
+}
+
+Logger::Impl *Logger::pimpl()
+{
+    return mPimpl;
+}
+
+const Logger::Impl *Logger::pimpl() const
+{
+    return mPimpl;
 }
 
 size_t Logger::issueCount() const
