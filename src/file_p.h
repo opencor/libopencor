@@ -21,10 +21,19 @@ namespace libOpenCOR {
 struct File::Impl
 {
     Type mType = Type::UNDEFINED;
+
     std::string mFileName;
     std::string mUrl;
 
-    void resolve();
+    char *mContents = nullptr;
+    size_t mContentsSize = 0;
+
+    ~Impl();
+
+    void reset();
+
+    File::Status retrieveContents();
+    File::Status resolve();
 };
 
 } // namespace libOpenCOR

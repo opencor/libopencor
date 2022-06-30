@@ -16,8 +16,12 @@ limitations under the License.
 
 #pragma once
 
+#include <string>
+
 namespace libOpenCOR {
 
 bool fuzzyCompare(double pNb1, double pNb2);
+
+std::string temporaryFileName();
 
 } // namespace libOpenCOR

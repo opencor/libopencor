@@ -16,54 +16,82 @@ from libopencor import File
 import utils
 
 
-WINDOWS_FILE = "C:\\some\\path\\file.txt"
-UNIX_FILE = "/some/path/file.txt"
-URL_BASED_WINDOWS_FILE = "file:///C:/some/path/file.txt"
-URL_BASED_UNIX_FILE = "file:///some/path/file.txt"
+WINDOWS_LOCAL_FILE = "C:\\some\\path\\file.txt"
+UNIX_LOCAL_FILE = "/some/path/file.txt"
+URL_BASED_WINDOWS_LOCAL_FILE = "file:///C:/some/path/file.txt"
+URL_BASED_UNIX_LOCAL_FILE = "file:///some/path/file.txt"
 REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.cellml"
-UNKNOWN_FILE = "unknown_file.txt"
-CELLML_1_X_FILE = "cellml_1_x.cellml"
-SEDML_1_X_FILE = "cellml_1_x.sedml"
-COMBINE_1_X_ARCHIVE = "cellml_1_x.omex"
-CELLML_2_FILE = "cellml_2.cellml"
-SEDML_2_FILE = "cellml_2.sedml"
-COMBINE_2_ARCHIVE = "cellml_2.omex"
+
+NON_EXISTING_LOCAL_FILE = "non_existing_file.txt"
+UNKNOWN_LOCAL_FILE = "unknown_file.txt"
+CELLML_1_X_LOCAL_FILE = "cellml_1_x.cellml"
+SEDML_1_X_LOCAL_FILE = "cellml_1_x.sedml"
+COMBINE_1_X_LOCAL_ARCHIVE = "cellml_1_x.omex"
+CELLML_2_LOCAL_FILE = "cellml_2.cellml"
+SEDML_2_LOCAL_FILE = "cellml_2.sedml"
+COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex"
+
+# ---GRY--- THE BELOW URLS ARE TO BE UPDATED BEFORE MERGING...
+NON_EXISTING_REMOTE_FILE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_existing_file.txt"
+)
+UNKNOWN_REMOTE_FILE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/unknown_file.txt"
+)
+CELLML_1_X_REMOTE_FILE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.cellml"
+)
+SEDML_1_X_REMOTE_FILE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.sedml"
+)
+COMBINE_1_X_REMOTE_ARCHIVE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.omex"
+)
+CELLML_2_REMOTE_FILE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.cellml"
+)
+SEDML_2_REMOTE_FILE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.sedml"
+)
+COMBINE_2_REMOTE_ARCHIVE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.omex"
+)
 
 
 def test_windows_file():
-    f = File(WINDOWS_FILE)
+    f = File(WINDOWS_LOCAL_FILE)
 
     assert f.type == File.Type.Undefined
-    assert f.file_name == WINDOWS_FILE
+    assert f.file_name == WINDOWS_LOCAL_FILE
     assert f.url == ""
-    assert repr(f) == "Local file: " + WINDOWS_FILE
+    assert repr(f) == "Local file: " + WINDOWS_LOCAL_FILE
 
 
 def test_unix_file():
-    f = File(UNIX_FILE)
+    f = File(UNIX_LOCAL_FILE)
 
     assert f.type == File.Type.Undefined
-    assert f.file_name == UNIX_FILE
+    assert f.file_name == UNIX_LOCAL_FILE
     assert f.url == ""
-    assert repr(f) == "Local file: " + UNIX_FILE
+    assert repr(f) == "Local file: " + UNIX_LOCAL_FILE
 
 
 def test_url_based_windows_file():
-    f = File(URL_BASED_WINDOWS_FILE)
+    f = File(URL_BASED_WINDOWS_LOCAL_FILE)
 
     assert f.type == File.Type.Undefined
-    assert f.file_name == WINDOWS_FILE
+    assert f.file_name == WINDOWS_LOCAL_FILE
     assert f.url == ""
-    assert repr(f) == "Local file: " + WINDOWS_FILE
+    assert repr(f) == "Local file: " + WINDOWS_LOCAL_FILE
 
 
 def test_url_based_unix_file():
-    f = File(URL_BASED_UNIX_FILE)
+    f = File(URL_BASED_UNIX_LOCAL_FILE)
 
     assert f.type == File.Type.Undefined
-    assert f.file_name == UNIX_FILE
+    assert f.file_name == UNIX_LOCAL_FILE
     assert f.url == ""
-    assert repr(f) == "Local file: " + UNIX_FILE
+    assert repr(f) == "Local file: " + UNIX_LOCAL_FILE
 
 
 def test_remote_file():
@@ -75,57 +103,111 @@ def test_remote_file():
     assert repr(f) == "Remote file: " + REMOTE_FILE
 
 
-def test_cellml_1_x_file():
-    f = File(utils.resource_path(CELLML_1_X_FILE))
+def test_non_existing_local_file():
+    f = File(utils.resource_path(NON_EXISTING_LOCAL_FILE))
 
-    f.resolve()
-
-    assert f.type == File.Type.CellmlFile
+    assert f.resolve() == File.Status.NonExistingLocalFile
 
 
-def test_sedml_1_x_file():
-    f = File(utils.resource_path(SEDML_1_X_FILE))
+def test_unknown_local_file():
+    f = File(utils.resource_path(UNKNOWN_LOCAL_FILE))
 
-    f.resolve()
-
-    assert f.type == File.Type.SedmlFile
-
-
-def test_combine_1_x_archive():
-    f = File(utils.resource_path(COMBINE_1_X_ARCHIVE))
-
-    f.resolve()
-
-    assert f.type == File.Type.CombineArchive
-
-
-def test_cellml_2_file():
-    f = File(utils.resource_path(CELLML_2_FILE))
-
-    f.resolve()
-
-    assert f.type == File.Type.CellmlFile
-
-
-def test_sedml_2_file():
-    f = File(utils.resource_path(SEDML_2_FILE))
-
-    f.resolve()
-
-    assert f.type == File.Type.SedmlFile
-
-
-def test_combine_2_archive():
-    f = File(utils.resource_path(COMBINE_2_ARCHIVE))
-
-    f.resolve()
-
-    assert f.type == File.Type.CombineArchive
-
-
-def test_unknown_file():
-    f = File(utils.resource_path(UNKNOWN_FILE))
-
-    f.resolve()
-
+    assert f.resolve() == File.Status.Ok
     assert f.type == File.Type.UnknownFile
+
+
+def test_cellml_1_x_local_file():
+    f = File(utils.resource_path(CELLML_1_X_LOCAL_FILE))
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CellmlFile
+
+
+def test_sedml_1_x_local_file():
+    f = File(utils.resource_path(SEDML_1_X_LOCAL_FILE))
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.SedmlFile
+
+
+def test_combine_1_x_local_archive():
+    f = File(utils.resource_path(COMBINE_1_X_LOCAL_ARCHIVE))
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CombineArchive
+
+
+def test_cellml_2_local_file():
+    f = File(utils.resource_path(CELLML_2_LOCAL_FILE))
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CellmlFile
+
+
+def test_sedml_2_local_file():
+    f = File(utils.resource_path(SEDML_2_LOCAL_FILE))
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.SedmlFile
+
+
+def test_combine_2_local_archive():
+    f = File(utils.resource_path(COMBINE_2_LOCAL_ARCHIVE))
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CombineArchive
+
+
+def test_non_existing_remote_file():
+    f = File(NON_EXISTING_REMOTE_FILE)
+
+    assert f.resolve() == File.Status.NonExistingLocalFile
+
+
+def test_unknown_remote_file():
+    f = File(UNKNOWN_REMOTE_FILE)
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.UnknownFile
+
+
+def test_cellml_1_x_remote_file():
+    f = File(CELLML_1_X_REMOTE_FILE)
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CellmlFile
+
+
+def test_sedml_1_x_remote_file():
+    f = File(SEDML_1_X_REMOTE_FILE)
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.SedmlFile
+
+
+def test_combine_1_x_remote_archive():
+    f = File(COMBINE_1_X_REMOTE_ARCHIVE)
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CombineArchive
+
+
+def test_cellml_2_remote_file():
+    f = File(CELLML_2_REMOTE_FILE)
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CellmlFile
+
+
+def test_sedml_2_remote_file():
+    f = File(SEDML_2_REMOTE_FILE)
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.SedmlFile
+
+
+def test_combine_2_remote_archive():
+    f = File(COMBINE_2_REMOTE_ARCHIVE)
+
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CombineArchive

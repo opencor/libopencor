@@ -47,13 +47,21 @@ PYBIND11_MODULE(module, m)
         .value("UnknownFile", libOpenCOR::File::Type::UNKNOWN_FILE)
         .export_values();
 
+    py::enum_<libOpenCOR::File::Status>(file, "Status")
+        .value("Ok", libOpenCOR::File::Status::OK)
+        .value("NonExistingLocalFile", libOpenCOR::File::Status::NON_EXISTING_LOCAL_FILE)
+        .value("NonExistingRemoteFile", libOpenCOR::File::Status::NON_EXISTING_REMOTE_FILE)
+        .value("NonExistingRemoteFile", libOpenCOR::File::Status::NON_DOWNLOADABLE_REMOTE_FILE)
+        .export_values();
+
     file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
         .def("resolve", &libOpenCOR::File::resolve, "Resolve this File object.");
 
-    file.def("__repr__", [](const libOpenCOR::File &pFile) {
+    file.def(
+        "__repr__", [](const libOpenCOR::File &pFile) {
             auto fileName = pFile.fileName();
 
             if (!fileName.empty()) {

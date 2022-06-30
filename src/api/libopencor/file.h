@@ -55,6 +55,24 @@ public:
     };
 
     /**
+     * @brief The status of an action on a file.
+     *
+     * An action on a file can have one of the following statuses:
+     *  - OK: the action completed successfully;
+     *  - NON_EXISTING_LOCAL_FILE: the action tried to access a local file, but it does not exist;
+     *  - NON_EXISTING_REMOTE_FILE: the action tried to access a remote file, but it does not exist; or
+     *  - NON_DOWNLOADABLE_REMOTE_FILE: the action tried to download a remote file, but it failed.
+     */
+
+    enum class Status
+    {
+        OK,
+        NON_EXISTING_LOCAL_FILE,
+        NON_EXISTING_REMOTE_FILE,
+        NON_DOWNLOADABLE_REMOTE_FILE
+    };
+
+    /**
      * Constructors, destructor and assignment operators.
      */
 
@@ -121,9 +139,13 @@ public:
      *
      * Retrieve the contents of this @c File and determine its type, i.e. a
      * CellML file, a SED-ML file, a COMBINE archive, or an unknown file.
+     *
+     * @sa Status
+     *
+     * @return The status as a @c Status.
      */
 
-    void resolve();
+    Status resolve();
 
 private:
     explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private*/
