@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#if defined(_MSC_VER) && !defined(__clang__)
+#if defined(_MSC_VER)
 #    pragma warning(push)
 #    pragma warning(disable: 4100)
 #    pragma warning(disable: 4127)
@@ -33,7 +33,7 @@ limitations under the License.
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wredundant-move"
 #    pragma GCC diagnostic ignored "-Wunused-parameter"
-#else
+#elif defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
 #    pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
