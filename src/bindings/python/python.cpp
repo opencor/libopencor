@@ -49,9 +49,8 @@ PYBIND11_MODULE(module, m)
 
     py::enum_<libOpenCOR::File::Status>(file, "Status")
         .value("Ok", libOpenCOR::File::Status::OK)
-        .value("NonExistingLocalFile", libOpenCOR::File::Status::NON_EXISTING_LOCAL_FILE)
-        .value("NonExistingRemoteFile", libOpenCOR::File::Status::NON_EXISTING_REMOTE_FILE)
-        .value("NonExistingRemoteFile", libOpenCOR::File::Status::NON_DOWNLOADABLE_REMOTE_FILE)
+        .value("NonRetrievableLocalFile", libOpenCOR::File::Status::NON_RETRIEVABLE_LOCAL_FILE)
+        .value("NonRetrievableRemoteFile", libOpenCOR::File::Status::NON_RETRIEVABLE_REMOTE_FILE)
         .export_values();
 
     file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))

@@ -26,4 +26,8 @@ std::string temporaryFileName();
 
 std::string canonicalPath(const std::string &pPath);
 
+std::string downloadFile(const std::string &pUrl);
+
+std::tuple<char *, size_t> fileContents(const std::string &pFileName);
+
 } // namespace libOpenCOR

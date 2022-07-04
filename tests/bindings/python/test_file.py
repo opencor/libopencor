@@ -22,7 +22,7 @@ URL_BASED_WINDOWS_LOCAL_FILE = "file:///C:/some/path/file.txt"
 URL_BASED_UNIX_LOCAL_FILE = "file:///some/path/file.txt"
 REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.cellml"
 
-NON_EXISTING_LOCAL_FILE = "non_existing_file.txt"
+NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.txt"
 UNKNOWN_LOCAL_FILE = "unknown_file.txt"
 CELLML_1_X_LOCAL_FILE = "cellml_1_x.cellml"
 SEDML_1_X_LOCAL_FILE = "cellml_1_x.sedml"
@@ -32,8 +32,8 @@ SEDML_2_LOCAL_FILE = "cellml_2.sedml"
 COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex"
 
 # ---GRY--- THE BELOW URLS ARE TO BE UPDATED BEFORE MERGING...
-NON_EXISTING_REMOTE_FILE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_existing_file.txt"
+NON_RETRIEVABLE_REMOTE_FILE = (
+    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_retrievable_file.txt"
 )
 UNKNOWN_REMOTE_FILE = (
     "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/unknown_file.txt"
@@ -103,10 +103,10 @@ def test_remote_file():
     assert repr(f) == "Remote file: " + REMOTE_FILE
 
 
-def test_non_existing_local_file():
-    f = File(utils.resource_path(NON_EXISTING_LOCAL_FILE))
+def test_non_retrievable_local_file():
+    f = File(utils.resource_path(NON_RETRIEVABLE_LOCAL_FILE))
 
-    assert f.resolve() == File.Status.NonExistingLocalFile
+    assert f.resolve() == File.Status.NonRetrievableLocalFile
 
 
 def test_unknown_local_file():
@@ -158,10 +158,10 @@ def test_combine_2_local_archive():
     assert f.type == File.Type.CombineArchive
 
 
-def test_non_existing_remote_file():
-    f = File(NON_EXISTING_REMOTE_FILE)
+def test_non_retrievable_remote_file():
+    f = File(NON_RETRIEVABLE_REMOTE_FILE)
 
-    assert f.resolve() == File.Status.NonExistingLocalFile
+    assert f.resolve() == File.Status.NonRetrievableLocalFile
 
 
 def test_unknown_remote_file():

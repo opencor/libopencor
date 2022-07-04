@@ -26,7 +26,7 @@ static constexpr const char *URL_BASED_WINDOWS_LOCAL_FILE = "file:///C:/some/pat
 static constexpr const char *URL_BASED_UNIX_LOCAL_FILE = "file:///some/path/file.txt";
 static constexpr const char *REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.cellml";
 
-static constexpr const char *NON_EXISTING_LOCAL_FILE = "non_existing_file.txt";
+static constexpr const char *NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.txt";
 static constexpr const char *UNKNOWN_LOCAL_FILE = "unknown_file.txt";
 static constexpr const char *CELLML_1_X_LOCAL_FILE = "cellml_1_x.cellml";
 static constexpr const char *SEDML_1_X_LOCAL_FILE = "cellml_1_x.sedml";
@@ -36,7 +36,7 @@ static constexpr const char *SEDML_2_LOCAL_FILE = "cellml_2.sedml";
 static constexpr const char *COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex";
 
 //---GRY--- THE BELOW URLS ARE TO BE UPDATED BEFORE MERGING...
-static constexpr const char *NON_EXISTING_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_existing_file.txt";
+static constexpr const char *NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_retrievable_file.txt";
 static constexpr const char *UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/unknown_file.txt";
 static constexpr const char *CELLML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.cellml";
 static constexpr const char *SEDML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.sedml";
@@ -90,11 +90,11 @@ TEST(FileTest, remoteFile)
     EXPECT_EQ(file->url(), REMOTE_FILE);
 }
 
-TEST(FileTest, resolveNonExistingLocalFile)
+TEST(FileTest, resolveNonRetrievableLocalFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(NON_EXISTING_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(NON_RETRIEVABLE_LOCAL_FILE));
 
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_EXISTING_LOCAL_FILE);
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_LOCAL_FILE);
 }
 
 TEST(FileTest, resolveUnknownLocalFile)
@@ -153,11 +153,11 @@ TEST(FileTest, resolveCombine2LocalArchive)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
 
-TEST(FileTest, resolveNonExistingRemoteFile)
+TEST(FileTest, resolveNonRetrievableRemoteFile)
 {
-    auto file = libOpenCOR::File::create(NON_EXISTING_REMOTE_FILE);
+    auto file = libOpenCOR::File::create(NON_RETRIEVABLE_REMOTE_FILE);
 
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_EXISTING_REMOTE_FILE);
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_REMOTE_FILE);
 }
 
 TEST(FileTest, resolveUnknownRemoteFile)

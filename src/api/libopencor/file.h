@@ -59,17 +59,15 @@ public:
      *
      * An action on a file can have one of the following statuses:
      *  - OK: the action completed successfully;
-     *  - NON_EXISTING_LOCAL_FILE: the action tried to access a local file, but it does not exist;
-     *  - NON_EXISTING_REMOTE_FILE: the action tried to access a remote file, but it does not exist; or
-     *  - NON_DOWNLOADABLE_REMOTE_FILE: the action tried to download a remote file, but it failed.
+     *  - NON_RETRIEVABLE_LOCAL_FILE: the action could not retrieve the contents of a local file;
+     *  - NON_RETRIEVABLE_REMOTE_FILE: the action could not retrieve the contents of a remote file.
      */
 
     enum class Status
     {
         OK,
-        NON_EXISTING_LOCAL_FILE,
-        NON_EXISTING_REMOTE_FILE,
-        NON_DOWNLOADABLE_REMOTE_FILE
+        NON_RETRIEVABLE_LOCAL_FILE,
+        NON_RETRIEVABLE_REMOTE_FILE
     };
 
     /**

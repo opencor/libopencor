@@ -18,12 +18,15 @@ limitations under the License.
 
 #include <cmath>
 #include <filesystem>
+#include <fstream>
 
 #ifdef _MSC_VER
 #    include <process.h>
 #else
 #    include <unistd.h>
 #endif
+
+#include <curl/curl.h>
 
 namespace libOpenCOR {
 
@@ -107,7 +110,81 @@ std::string temporaryFileName()
 
 std::string canonicalPath(const std::string &pPath)
 {
-    return std::filesystem::canonical(pPath).string();
+    std::error_code errorCode;
+    auto res = std::filesystem::canonical(pPath, errorCode);
+
+    if (errorCode.value() == 0) {
+        return res.string();
+    }
+
+    return pPath;
+}
+
+static size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUserData)
+{
+    size_t realDataSize = pSize * pDataSize;
+
+    reinterpret_cast<std::ofstream *>(pUserData)->write(reinterpret_cast<char *>(pData), realDataSize);
+
+    return realDataSize;
+}
+
+std::string downloadFile(const std::string &pUrl)
+{
+    // Note: we assume that we are always able to open a temporary file. This
+    //       should not only always be the case, but there is also no way to
+    //       reproducibly test the case where we wouldn't be able to open a
+    //       temporary file. Still, we use an assert to make sure that we are
+    //       indeed able to open it.
+
+    auto res = temporaryFileName();
+
+    std::ofstream file(res, std::ios_base::binary);
+
+    assert(file.is_open());
+
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
+    auto *curl = curl_easy_init();
+
+    curl_easy_setopt(curl, CURLOPT_URL, pUrl.c_str());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void *>(&file));
+
+    if (curl_easy_perform(curl) == CURLE_OK) {
+        static const int64_t HTTP_OK = 200;
+
+        int64_t responseCode = 0;
+
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode); // NOLINT(cppcoreguidelines-pro-type-vararg, hicpp-vararg)
+
+        if (responseCode != HTTP_OK) {
+            remove(res.c_str());
+
+            res = {};
+        }
+    }
+
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+
+    return res;
+}
+
+std::tuple<char *, size_t> fileContents(const std::string &pFileName)
+{
+    std::ifstream file(pFileName, std::ios_base::binary);
+
+    if (!file.is_open()) {
+        return {};
+    }
+
+    auto size = std::filesystem::file_size(pFileName);
+    auto contents = new char[size];
+
+    file.read(contents, size);
+
+    return std::make_tuple(contents, size);
 }
 
 } // namespace libOpenCOR

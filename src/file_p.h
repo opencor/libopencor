@@ -30,7 +30,7 @@ struct File::Impl
     std::string mUrl;
 
     char *mContents = nullptr;
-    size_t mContentsSize = 0;
+    size_t mSize = 0;
 
     CellmlFile *mCellmlFile = nullptr;
     SedmlFile *mSedmlFile = nullptr;
