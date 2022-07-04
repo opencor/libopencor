@@ -87,8 +87,8 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/compiler.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
 )
 
 set(GIT_API_SOURCE_FILES
@@ -109,8 +109,8 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/compiler.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
 )
 
 set(GIT_HEADER_FILES
@@ -124,7 +124,8 @@ set(HEADER_FILES
     ${VERSION_HEADER_FILE}
 )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(misc
+                    ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(${CMAKE_PROJECT_NAME}
             ${API_HEADER_FILES}
