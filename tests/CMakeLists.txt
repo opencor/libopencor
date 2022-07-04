@@ -32,6 +32,10 @@ set(UTILS_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/utils.h)
 configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/misc
+                    ${CMAKE_SOURCE_DIR}/src/support
+                    ${CMAKE_SOURCE_DIR}/src/support/cellml
+                    ${CMAKE_SOURCE_DIR}/src/support/combine
+                    ${CMAKE_SOURCE_DIR}/src/support/sedml
                     ${CMAKE_BINARY_DIR})
 
 foreach(TEST ${TESTS})
