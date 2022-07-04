@@ -25,4 +25,9 @@ CombineFileManager *CombineFileManager::instance()
     return &instance;
 }
 
+CombineArchive *CombineFileManager::combineArchive(const std::string &pFileName)
+{
+    return static_cast<CombineArchive *>(file(pFileName));
+}
+
 } // namespace libOpenCOR

@@ -16,12 +16,20 @@ limitations under the License.
 
 #pragma once
 
+#include "supportedfile.h"
+
+#include <map>
 #include <string>
 
 namespace libOpenCOR {
 
 class SupportedFileManager
 {
+public:
+    SupportedFile *file(const std::string &pFileName);
+
+private:
+    std::map<std::string, SupportedFile *> mFiles;
 };
 
 } // namespace libOpenCOR

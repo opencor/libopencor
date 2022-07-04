@@ -25,4 +25,9 @@ SedmlFileManager *SedmlFileManager::instance()
     return &instance;
 }
 
+SedmlFile *SedmlFileManager::sedmlFile(const std::string &pFileName)
+{
+    return static_cast<SedmlFile *>(file(pFileName));
+}
+
 } // namespace libOpenCOR

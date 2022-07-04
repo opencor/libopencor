@@ -14,8 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "supportedfile.h"
+#include "supportedfilemanager.h"
+#include "utils.h"
 
 namespace libOpenCOR {
+
+SupportedFile *SupportedFileManager::file(const std::string &pFileName)
+{
+    return mFiles[canonicalPath(pFileName)];
+}
 
 } // namespace libOpenCOR

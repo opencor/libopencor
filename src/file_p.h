@@ -18,6 +18,10 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+class CellmlFile;
+class SedmlFile;
+class CombineArchive;
+
 struct File::Impl
 {
     Type mType = Type::UNRESOLVED;
@@ -27,6 +31,10 @@ struct File::Impl
 
     char *mContents = nullptr;
     size_t mContentsSize = 0;
+
+    CellmlFile *mCellmlFile = nullptr;
+    SedmlFile *mSedmlFile = nullptr;
+    CombineArchive *mCombineArchive = nullptr;
 
     ~Impl();
 

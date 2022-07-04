@@ -16,6 +16,7 @@ limitations under the License.
 
 #pragma once
 
+#include "sedmlfile.h"
 #include "supportedfilemanager.h"
 
 namespace libOpenCOR {
@@ -32,6 +33,8 @@ public:
     SedmlFileManager &operator=(SedmlFileManager &&) noexcept = delete;
 
     static SedmlFileManager *instance();
+
+    SedmlFile *sedmlFile(const std::string &pFileName);
 };
 
 } // namespace libOpenCOR

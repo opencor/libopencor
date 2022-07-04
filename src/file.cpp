@@ -16,7 +16,10 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
+#include "cellmlfilemanager.h"
+#include "combinefilemanager.h"
 #include "file_p.h"
+#include "sedmlfilemanager.h"
 #include "utils.h"
 
 #include <fstream>
@@ -136,7 +139,13 @@ File::Status File::Impl::resolve()
         // The file contents could be retrieved so now check whether it's a
         // CellML file.
 
-        //---GRY--- TO BE DONE...
+        mCellmlFile = CellmlFileManager::instance()->cellmlFile(mFileName);
+        mSedmlFile = (mCellmlFile != nullptr) ?
+                         nullptr :
+                         SedmlFileManager::instance()->sedmlFile(mFileName);
+        mCombineArchive = (mSedmlFile != nullptr) ?
+                              nullptr :
+                              CombineFileManager::instance()->combineArchive(mFileName);
     }
 
     return res;

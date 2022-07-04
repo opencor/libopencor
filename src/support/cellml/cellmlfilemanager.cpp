@@ -25,4 +25,9 @@ CellmlFileManager *CellmlFileManager::instance()
     return &instance;
 }
 
+CellmlFile *CellmlFileManager::cellmlFile(const std::string &pFileName)
+{
+    return static_cast<CellmlFile *>(file(pFileName));
+}
+
 } // namespace libOpenCOR

@@ -16,6 +16,7 @@ limitations under the License.
 
 #pragma once
 
+#include "cellmlfile.h"
 #include "supportedfilemanager.h"
 
 namespace libOpenCOR {
@@ -32,6 +33,8 @@ public:
     CellmlFileManager &operator=(CellmlFileManager &&) noexcept = delete;
 
     static CellmlFileManager *instance();
+
+    CellmlFile *cellmlFile(const std::string &pFileName);
 };
 
 } // namespace libOpenCOR

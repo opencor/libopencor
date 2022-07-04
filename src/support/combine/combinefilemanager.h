@@ -16,6 +16,7 @@ limitations under the License.
 
 #pragma once
 
+#include "combinearchive.h"
 #include "supportedfilemanager.h"
 
 namespace libOpenCOR {
@@ -32,6 +33,8 @@ public:
     CombineFileManager &operator=(CombineFileManager &&) noexcept = delete;
 
     static CombineFileManager *instance();
+
+    CombineArchive *combineArchive(const std::string &pFileName);
 };
 
 } // namespace libOpenCOR
