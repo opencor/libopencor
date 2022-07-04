@@ -105,4 +105,9 @@ std::string temporaryFileName()
     return {};
 }
 
+std::string canonicalPath(const std::string &pPath)
+{
+    return std::filesystem::canonical(pPath).string();
+}
+
 } // namespace libOpenCOR

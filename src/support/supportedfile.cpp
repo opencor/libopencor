@@ -15,13 +15,12 @@ limitations under the License.
 */
 
 #include "supportedfile.h"
-
-#include <filesystem>
+#include "utils.h"
 
 namespace libOpenCOR {
 
 SupportedFile::SupportedFile(const std::string &pFileName)
-    : mFileName(std::filesystem::canonical(pFileName).string())
+    : mFileName(canonicalPath(pFileName))
 {
 }
 
