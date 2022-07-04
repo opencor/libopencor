@@ -40,7 +40,7 @@ PYBIND11_MODULE(module, m)
     py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
 
     py::enum_<libOpenCOR::File::Type>(file, "Type")
-        .value("Undefined", libOpenCOR::File::Type::UNDEFINED)
+        .value("Undefined", libOpenCOR::File::Type::UNRESOLVED)
         .value("CellmlFile", libOpenCOR::File::Type::CELLML_FILE)
         .value("SedmlFile", libOpenCOR::File::Type::SEDML_FILE)
         .value("CombineArchive", libOpenCOR::File::Type::COMBINE_ARCHIVE)

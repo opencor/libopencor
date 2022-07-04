@@ -20,7 +20,7 @@ namespace libOpenCOR {
 
 struct File::Impl
 {
-    Type mType = Type::UNDEFINED;
+    Type mType = Type::UNRESOLVED;
 
     std::string mFileName;
     std::string mUrl;
