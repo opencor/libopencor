@@ -39,7 +39,7 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         82671a7a518d11fc3b7e15026d9189f0ef714fbe)
+                         c6fa29ae4bf02a42249b74fbf21e28795ab057a6)
     endif()
 else()
     # Build our package.
