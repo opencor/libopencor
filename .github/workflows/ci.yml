@@ -251,6 +251,9 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
+      - name: Install LLVM
+        if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
+        run: brew install llvm
       - name: Install Clang
         if: ${{ matrix.name == 'Code analysis' }}
         run: |
