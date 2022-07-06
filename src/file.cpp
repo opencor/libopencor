@@ -16,10 +16,10 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
-#include "cellmlfilemanager.h"
-#include "combinefilemanager.h"
+#include "cellmlsupport.h"
+#include "combinesupport.h"
 #include "file_p.h"
-#include "sedmlfilemanager.h"
+#include "sedmlsupport.h"
 #include "utils.h"
 
 #include <regex>
@@ -88,15 +88,9 @@ File::Status File::Impl::resolve()
 
     if (res == File::Status::OK) {
         // The file contents could be retrieved so now check whether it's a
-        // CellML file.
+        // CellML file, a SED-ML file, or a COMBINE archive.
 
-        mCellmlFile = CellmlFileManager::instance()->cellmlFile(mFileName);
-        mSedmlFile = (mCellmlFile != nullptr) ?
-                         nullptr :
-                         SedmlFileManager::instance()->sedmlFile(mFileName);
-        mCombineArchive = (mSedmlFile != nullptr) ?
-                              nullptr :
-                              CombineFileManager::instance()->combineArchive(mFileName);
+        //---GRY--- TO BE DONE...
     }
 
     return res;

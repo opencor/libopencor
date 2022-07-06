@@ -14,14 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include "supportedfile.h"
+#include "sedmlsupport.h"
 
 namespace libOpenCOR {
+namespace Support {
 
-class CellmlFile: public SupportedFile
-{
-};
-
+} // namespace Support
 } // namespace libOpenCOR

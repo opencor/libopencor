@@ -89,14 +89,9 @@ set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/supportedfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/supportedfilemanager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfilemanager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinefilemanager.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfilemanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlsupport.cpp
 )
 
 set(GIT_API_SOURCE_FILES
@@ -119,14 +114,9 @@ set(SOURCE_FILES
 set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/supportedfile.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/supportedfilemanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfilemanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinefilemanager.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfilemanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlsupport.h
 )
 
 set(GIT_HEADER_FILES
@@ -142,9 +132,6 @@ set(HEADER_FILES
 
 include_directories(misc
                     support
-                    support/cellml
-                    support/combine
-                    support/sedml
                     ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(${CMAKE_PROJECT_NAME}

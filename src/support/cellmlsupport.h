@@ -14,20 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedmlfilemanager.h"
+#pragma once
 
 namespace libOpenCOR {
+namespace Support {
 
-SedmlFileManager *SedmlFileManager::instance()
-{
-    static SedmlFileManager instance;
-
-    return &instance;
-}
-
-SedmlFile *SedmlFileManager::sedmlFile(const std::string &pFileName)
-{
-    return static_cast<SedmlFile *>(file(pFileName));
-}
-
+} // namespace Support
 } // namespace libOpenCOR
