@@ -40,7 +40,6 @@ struct File::Impl
 
     void reset();
 
-    File::Status retrieveContents();
     File::Status resolve();
 };
 

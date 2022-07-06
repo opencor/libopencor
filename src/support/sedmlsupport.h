@@ -16,8 +16,12 @@ limitations under the License.
 
 #pragma once
 
+#include <string>
+
 namespace libOpenCOR {
 namespace Support {
+
+bool isSedmlFile(const std::string &pFileName);
 
 } // namespace Support
 } // namespace libOpenCOR

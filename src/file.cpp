@@ -22,6 +22,7 @@ limitations under the License.
 #include "sedmlsupport.h"
 #include "utils.h"
 
+#include <filesystem>
 #include <regex>
 
 #include <curl/curl.h>
@@ -48,11 +49,11 @@ void File::Impl::reset()
     mSize = 0;
 }
 
-File::Status File::Impl::retrieveContents()
+File::Status File::Impl::resolve()
 {
     reset();
 
-    // Download a local copy of the remote file, if appropriate.
+    // Download a local copy of the remote file, if needed.
 
     if (mFileName.empty()) {
         mFileName = downloadFile(mUrl);
@@ -62,38 +63,30 @@ File::Status File::Impl::retrieveContents()
         }
     }
 
-    // Retrieve the contents of the local file or of the local copy of a remote
-    // file.
+    // Check whether the file is a CellML file, a SED-ML file, or a COMBINE
+    // archive, but first make sure that it exists.
 
-    if (!mFileName.empty()) {
-        auto [mContents, mSize] = fileContents(mFileName);
+    if (!std::filesystem::exists(mFileName.c_str())) {
+        // We assume that the local copy of a remote file always exists. So, if
+        // the file doesn't exist then it's because we are dealing with a
+        // non-existing local file.
 
-        if ((mContents == nullptr) && (mSize == 0)) {
-            // We assume that we are always able to open the local copy of a
-            // remote file. So, if we can't open it, it's because we are dealing
-            // with a non-existing local file.
+        assert(mUrl.empty());
 
-            assert(mUrl.empty());
+        return File::Status::NON_RETRIEVABLE_LOCAL_FILE;
+    }
 
-            return File::Status::NON_RETRIEVABLE_LOCAL_FILE;
-        }
+    if (Support::isCellmlFile(mFileName)) {
+        mType = Type::CELLML_FILE;
+    } else if (Support::isSedmlFile(mFileName)) {
+        mType = Type::SEDML_FILE;
+    } else if (Support::isCombineArchive(mFileName)) {
+        mType = Type::COMBINE_ARCHIVE;
+    } else {
+        mType = Type::UNKNOWN_FILE;
     }
 
     return File::Status::OK;
-}
-
-File::Status File::Impl::resolve()
-{
-    auto res = retrieveContents();
-
-    if (res == File::Status::OK) {
-        // The file contents could be retrieved so now check whether it's a
-        // CellML file, a SED-ML file, or a COMBINE archive.
-
-        //---GRY--- TO BE DONE...
-    }
-
-    return res;
 }
 
 File::File(const std::string &pFileNameOrUrl)
