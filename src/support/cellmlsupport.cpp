@@ -15,15 +15,31 @@ limitations under the License.
 */
 
 #include "cellmlsupport.h"
+#include "utils.h"
+
+#include <libcellml>
 
 namespace libOpenCOR {
 namespace Support {
 
 bool isCellmlFile(const std::string &pFileName)
 {
-    (void) pFileName;
+    // Retrieve the contents of the file.
 
-    return false;
+    auto [contents, size] = fileContents(pFileName);
+
+    if ((contents == nullptr) && (size == 0)) {
+        return false;
+    }
+
+    // Try to parse the file contents.
+
+    auto parser = libcellml::Parser::create();
+    auto model = parser->parseModel(contents);
+
+    delete[] contents;
+
+    return parser->issueCount() == 0;
 }
 
 } // namespace Support

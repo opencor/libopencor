@@ -63,18 +63,20 @@ File::Status File::Impl::resolve()
         }
     }
 
-    // Check whether the file is a CellML file, a SED-ML file, or a COMBINE
-    // archive, but first make sure that it exists.
+    // Make sure that the (local) file exists.
 
     if (!std::filesystem::exists(mFileName.c_str())) {
         // We assume that the local copy of a remote file always exists. So, if
-        // the file doesn't exist then it's because we are dealing with a
-        // non-existing local file.
+        // the file doesn't exist then it's because we are dealing with a local
+        // file that doesn't exist.
 
         assert(mUrl.empty());
 
         return File::Status::NON_RETRIEVABLE_LOCAL_FILE;
     }
+
+    // Check whether the local/remote file is a CellML file, a SED-ML file, a
+    // COMBINE archive, or an unknown file.
 
     if (Support::isCellmlFile(mFileName)) {
         mType = Type::CELLML_FILE;

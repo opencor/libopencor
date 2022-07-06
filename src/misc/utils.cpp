@@ -156,7 +156,7 @@ std::string downloadFile(const std::string &pUrl)
 
         int64_t responseCode = 0;
 
-        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode); // NOLINT(cppcoreguidelines-pro-type-vararg, hicpp-vararg)
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
 
         if (responseCode != HTTP_OK) {
             remove(res.c_str());
@@ -180,9 +180,11 @@ std::tuple<char *, size_t> fileContents(const std::string &pFileName)
     }
 
     auto size = std::filesystem::file_size(pFileName);
-    auto contents = new char[size];
+    auto contents = new char[size+1];
 
     file.read(contents, size);
+
+    contents[size] = 0;
 
     return std::make_tuple(contents, size);
 }
