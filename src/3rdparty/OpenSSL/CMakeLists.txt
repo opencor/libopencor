@@ -39,14 +39,14 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         84caa21d18d539b65d1894fba501cc8afba2c3af)
+                         f3f1619acc385df0165fbb932fdf23f5b6eb5179)
     endif()
 else()
     # Build our package.
 
     find_package(Perl REQUIRED QUIET)
 
-    set(CONFIG_OPTIONS no-pic no-shared no-tests no-threads --prefix=${INSTALL_DIR})
+    set(CONFIG_OPTIONS no-shared no-tests no-threads --prefix=${INSTALL_DIR})
 
     if(WIN32)
         list(APPEND CONFIG_OPTIONS no-asm)
@@ -113,12 +113,16 @@ else()
 endif()
 
 # Make our package accessible.
+# Note: the order in which we list the OpenSSL libraries in OPENSSL_LIBRARIES
+#       should not matter, but as it happens it does when building our Python
+#       bindings on Linux. Indeed, if libcrypto is listed before libssl then our
+#       Python module will report that SRP_Calc_A is undefined.
 
 set(OPENSSL_ROOT_DIR ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(OPENSSL_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(OPENSSL_LIBRARIES
-    OpenSSL::libcrypto
     OpenSSL::libssl
+    OpenSSL::libcrypto
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
 set(OPENSSL_LIBCRYPTO_LIBRARY OpenSSL::libcrypto CACHE INTERNAL "${PACKAGE_NAME}'s libcrypto library.")

@@ -39,7 +39,7 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         8981017b0c0cd67bd0a5ba4a02e78f397bb0938a)
+                         b0d953dffcab7be7440d148bf334cac7913914dd)
     endif()
 else()
     # Build our package.

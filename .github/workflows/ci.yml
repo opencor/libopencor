@@ -178,7 +178,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
-            context: PATH=$GITHUB_WORKSPACE:$PATH CXX=/usr/local/bin/clang
+            context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_type: Release
@@ -204,7 +204,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
-            context: PATH=/usr/local/opt/llvm/bin:$PATH CXX=/usr/local/opt/llvm/bin/clang++
+            context: PATH=/usr/local/opt/llvm/bin:$PATH CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++
             target: code_coverage_llvm_cov
           - name: 'Memory checks'
             os: ubuntu-20.04
@@ -251,6 +251,9 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
+      - name: Install LLVM
+        if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
+        run: brew install llvm
       - name: Install Clang
         if: ${{ matrix.name == 'Code analysis' }}
         run: |

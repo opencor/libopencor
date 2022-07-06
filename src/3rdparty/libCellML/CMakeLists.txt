@@ -15,8 +15,8 @@
 set(PACKAGE_NAME libCellML)
 set(PACKAGE_VERSION 0.2.0)
 set(PACKAGE_REPOSITORY libcellml)
-set(GIT_TAG v0.2.0-dev-libopencor)
-set(RELEASE_TAG v0.2.0-dev-libopencor)
+set(GIT_TAG 2022-07-05)
+set(RELEASE_TAG 2022-07-05)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -36,20 +36,20 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             40602d38b14f28aa50c85ea27687fe7852bc4e00)
+                             52a15acf3f4603d4ccf24fd77a126a433e919271)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             be92b9c44767b1cbe286af13f8e8e8b25791fe7d)
+                             e947c3661b55648ebcb436ff3637195655320c0d)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         bf23afac309ce45efb7e8adc89fa11adfcdc534d)
+                         9c0f17f02a1cb6718bd39f17505161af3e5421c7)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         cd2b7b09ba3357d1c68b2f03efa0855712cb84c4)
+                         343f6a9c6fede41c39fe86e1ebf0466e985d08ec)
     endif()
 else()
     # Build our package.
