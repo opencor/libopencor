@@ -16,14 +16,18 @@ limitations under the License.
 
 #include "combinesupport.h"
 
+#include <combine/combinearchive.h>
+
 namespace libOpenCOR {
 namespace Support {
 
 bool isCombineArchive(const std::string &pFileName)
 {
-    (void) pFileName;
+    // Try to retrieve a COMBINE archive.
 
-    return false;
+    auto combineArchive = libcombine::CombineArchive();
+
+    return combineArchive.initializeFromArchive(pFileName.c_str());
 }
 
 } // namespace Support
