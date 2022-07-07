@@ -32,30 +32,14 @@ SEDML_2_LOCAL_FILE = "cellml_2.sedml"
 COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex"
 
 # ---GRY--- THE BELOW URLS ARE TO BE UPDATED BEFORE MERGING...
-NON_RETRIEVABLE_REMOTE_FILE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_retrievable_file.txt"
-)
-UNKNOWN_REMOTE_FILE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/unknown_file.txt"
-)
-CELLML_1_X_REMOTE_FILE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.cellml"
-)
-SEDML_1_X_REMOTE_FILE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.sedml"
-)
-COMBINE_1_X_REMOTE_ARCHIVE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.omex"
-)
-CELLML_2_REMOTE_FILE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.cellml"
-)
-SEDML_2_REMOTE_FILE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.sedml"
-)
-COMBINE_2_REMOTE_ARCHIVE = (
-    "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.omex"
-)
+NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_retrievable_file.txt"
+UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/unknown_file.txt"
+CELLML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.cellml"
+SEDML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.sedml"
+COMBINE_1_X_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.omex"
+CELLML_2_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.cellml"
+SEDML_2_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.sedml"
+COMBINE_2_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.omex"
 
 
 def test_windows_file():
