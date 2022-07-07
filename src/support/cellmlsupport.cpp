@@ -19,8 +19,7 @@ limitations under the License.
 
 #include <libcellml>
 
-namespace libOpenCOR {
-namespace Support {
+namespace libOpenCOR::Support {
 
 bool isCellmlFile(const std::string &pFileName)
 {
@@ -35,12 +34,9 @@ bool isCellmlFile(const std::string &pFileName)
     // Try to parse the file contents.
 
     auto parser = libcellml::Parser::create();
-    auto model = parser->parseModel(contents);
-
-    delete[] contents;
+    auto model = parser->parseModel(contents.get());
 
     return parser->issueCount() == 0;
 }
 
-} // namespace Support
-} // namespace libOpenCOR
+} // namespace libOpenCOR::Support

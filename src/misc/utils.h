@@ -16,6 +16,7 @@ limitations under the License.
 
 #pragma once
 
+#include <memory>
 #include <string>
 
 namespace libOpenCOR {
@@ -28,6 +29,6 @@ std::string canonicalPath(const std::string &pPath);
 
 std::string downloadFile(const std::string &pUrl);
 
-std::tuple<char *, size_t> fileContents(const std::string &pFileName);
+std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFileName);
 
 } // namespace libOpenCOR

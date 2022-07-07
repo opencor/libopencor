@@ -21,14 +21,13 @@ limitations under the License.
 #include "sedml/SedReader.h"
 #include "libsedmlend.h"
 
-namespace libOpenCOR {
-namespace Support {
+namespace libOpenCOR::Support {
 
 bool isSedmlFile(const std::string &pFileName)
 {
     // Try to retrieve a SED-ML document.
 
-    auto sedmlDocument = libsedml::readSedML(pFileName.c_str());
+    auto *sedmlDocument = libsedml::readSedML(pFileName.c_str());
 
     // A non-SED-ML file results in our SED-ML document having at least one
     // error, the first of which being of id libsedml::SedNotSchemaConformant
@@ -42,5 +41,4 @@ bool isSedmlFile(const std::string &pFileName)
                && (sedmlDocument->getError(0)->getErrorId() != XMLContentEmpty));
 }
 
-} // namespace Support
-} // namespace libOpenCOR
+} // namespace libOpenCOR::Support

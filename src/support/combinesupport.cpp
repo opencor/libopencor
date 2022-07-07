@@ -18,8 +18,7 @@ limitations under the License.
 
 #include <combine/combinearchive.h>
 
-namespace libOpenCOR {
-namespace Support {
+namespace libOpenCOR::Support {
 
 bool isCombineArchive(const std::string &pFileName)
 {
@@ -27,8 +26,7 @@ bool isCombineArchive(const std::string &pFileName)
 
     auto combineArchive = libcombine::CombineArchive();
 
-    return combineArchive.initializeFromArchive(pFileName.c_str());
+    return combineArchive.initializeFromArchive(pFileName);
 }
 
-} // namespace Support
-} // namespace libOpenCOR
+} // namespace libOpenCOR::Support

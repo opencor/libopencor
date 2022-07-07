@@ -177,7 +177,7 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: OFF
-            unit_testing: OFF
+            unit_testing: ON
             context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
@@ -238,7 +238,7 @@ jobs:
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
       DOXYGEN_VERSION: 1.9.4
-      LLVMCLANG_VERSION: 14.0.5
+      LLVMCLANG_VERSION: 14.0.6
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v2

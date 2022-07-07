@@ -41,7 +41,7 @@ void File::Impl::reset()
     // well as clearning our contents, if any.
 
     if (!mUrl.empty() && !mFileName.empty()) {
-        remove(mFileName.c_str());
+        remove(mFileName.c_str()); // NOLINT(cert-err33-c)
 
         mFileName = {};
     }

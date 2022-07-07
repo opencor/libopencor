@@ -75,6 +75,7 @@ function(configure_target TARGET)
             set(COMPILE_OPTIONS
                 -Weverything
                 -Wno-c++98-compat
+                -Wno-disabled-macro-expansion
                 -Wno-exit-time-destructors
                 -Wno-global-constructors
                 -Wno-padded

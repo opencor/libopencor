@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-static constexpr const char *WINDOWS_LOCAL_FILE = "C:\\some\\path\\file.txt";
+static constexpr const char *WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
 static constexpr const char *UNIX_LOCAL_FILE = "/some/path/file.txt";
 static constexpr const char *URL_BASED_WINDOWS_LOCAL_FILE = "file:///C:/some/path/file.txt";
 static constexpr const char *URL_BASED_UNIX_LOCAL_FILE = "file:///some/path/file.txt";
