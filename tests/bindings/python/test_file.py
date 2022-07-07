@@ -150,7 +150,7 @@ def test_combine_2_local_archive():
 def test_non_retrievable_remote_file():
     f = File(NON_RETRIEVABLE_REMOTE_FILE)
 
-    assert f.resolve() == File.Status.NonRetrievableLocalFile
+    assert f.resolve() == File.Status.NonRetrievableRemoteFile
 
 
 def test_unknown_remote_file():
