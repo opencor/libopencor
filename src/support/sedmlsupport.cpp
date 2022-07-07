@@ -16,8 +16,10 @@ limitations under the License.
 
 #include "sedmlsupport.h"
 
+#include "libsedmlbegin.h"
 #include "sedml/SedDocument.h"
 #include "sedml/SedReader.h"
+#include "libsedmlend.h"
 
 namespace libOpenCOR {
 namespace Support {
