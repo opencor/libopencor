@@ -16,14 +16,28 @@ limitations under the License.
 
 #include "sedmlsupport.h"
 
+#include "sedml/SedDocument.h"
+#include "sedml/SedReader.h"
+
 namespace libOpenCOR {
 namespace Support {
 
 bool isSedmlFile(const std::string &pFileName)
 {
-    (void) pFileName;
+    // Try to retrieve a SED-ML document.
 
-    return false;
+    auto sedmlDocument = libsedml::readSedML(pFileName.c_str());
+
+    // A non-SED-ML file results in our SED-ML document having at least one
+    // error, the first of which being of id libsedml::SedNotSchemaConformant
+    // (e.g., a CellML file, i.e. an XML file, but not a SED-ML one) or
+    // XMLContentEmpty (e.g., a COMBINE archive, i.e. not an XML file). So, we
+    // use these facts to determine whether our current SED-ML document is
+    // indeed a SED-ML file.
+
+    return    (sedmlDocument->getNumErrors() == 0)
+           || (   (sedmlDocument->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
+               && (sedmlDocument->getError(0)->getErrorId() != XMLContentEmpty));
 }
 
 } // namespace Support
