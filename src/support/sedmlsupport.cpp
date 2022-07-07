@@ -35,8 +35,8 @@ bool isSedmlFile(const std::string &pFileName)
     // use these facts to determine whether our current SED-ML document is
     // indeed a SED-ML file.
 
-    return    (sedmlDocument->getNumErrors() == 0)
-           || (   (sedmlDocument->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
+    return (sedmlDocument->getNumErrors() == 0)
+           || ((sedmlDocument->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
                && (sedmlDocument->getError(0)->getErrorId() != XMLContentEmpty));
 }
 

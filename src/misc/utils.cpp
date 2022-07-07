@@ -181,7 +181,7 @@ std::tuple<char *, size_t> fileContents(const std::string &pFileName)
     }
 
     auto size = std::filesystem::file_size(pFileName);
-    auto contents = new char[size+1];
+    auto contents = new char[size + 1];
 
     file.read(contents, size);
 
