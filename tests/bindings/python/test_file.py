@@ -24,9 +24,10 @@ REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c
 
 NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.txt"
 UNKNOWN_LOCAL_FILE = "unknown_file.txt"
-CELLML_1_X_LOCAL_FILE = "cellml_1_x.cellml"
-SEDML_1_X_LOCAL_FILE = "cellml_1_x.sedml"
-COMBINE_1_X_LOCAL_ARCHIVE = "cellml_1_x.omex"
+# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+# CELLML_1_X_LOCAL_FILE = "cellml_1_x.cellml"
+# SEDML_1_X_LOCAL_FILE = "cellml_1_x.sedml"
+# COMBINE_1_X_LOCAL_ARCHIVE = "cellml_1_x.omex"
 CELLML_2_LOCAL_FILE = "cellml_2.cellml"
 SEDML_2_LOCAL_FILE = "cellml_2.sedml"
 COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex"
@@ -34,9 +35,10 @@ COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex"
 # ---GRY--- THE BELOW URLS ARE TO BE UPDATED BEFORE MERGING...
 NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_retrievable_file.txt"
 UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/unknown_file.txt"
-CELLML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.cellml"
-SEDML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.sedml"
-COMBINE_1_X_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.omex"
+# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+# CELLML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.cellml"
+# SEDML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.sedml"
+# COMBINE_1_X_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.omex"
 CELLML_2_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.cellml"
 SEDML_2_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.sedml"
 COMBINE_2_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_2.omex"
@@ -100,25 +102,28 @@ def test_unknown_local_file():
     assert f.type == File.Type.UnknownFile
 
 
-def test_cellml_1_x_local_file():
-    f = File(utils.resource_path(CELLML_1_X_LOCAL_FILE))
+# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+# def test_cellml_1_x_local_file():
+#     f = File(utils.resource_path(CELLML_1_X_LOCAL_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.CellmlFile
-
-
-def test_sedml_1_x_local_file():
-    f = File(utils.resource_path(SEDML_1_X_LOCAL_FILE))
-
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.SedmlFile
+#     assert f.resolve() == File.Status.Ok
+#     assert f.type == File.Type.CellmlFile
 
 
-def test_combine_1_x_local_archive():
-    f = File(utils.resource_path(COMBINE_1_X_LOCAL_ARCHIVE))
+# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+# def test_sedml_1_x_local_file():
+#     f = File(utils.resource_path(SEDML_1_X_LOCAL_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.CombineArchive
+#     assert f.resolve() == File.Status.Ok
+#     assert f.type == File.Type.SedmlFile
+
+
+# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+# def test_combine_1_x_local_archive():
+#     f = File(utils.resource_path(COMBINE_1_X_LOCAL_ARCHIVE))
+
+#     assert f.resolve() == File.Status.Ok
+#     assert f.type == File.Type.CombineArchive
 
 
 def test_cellml_2_local_file():
@@ -155,25 +160,28 @@ def test_unknown_remote_file():
     assert f.type == File.Type.UnknownFile
 
 
-def test_cellml_1_x_remote_file():
-    f = File(CELLML_1_X_REMOTE_FILE)
+# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+# def test_cellml_1_x_remote_file():
+#     f = File(CELLML_1_X_REMOTE_FILE)
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.CellmlFile
-
-
-def test_sedml_1_x_remote_file():
-    f = File(SEDML_1_X_REMOTE_FILE)
-
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.SedmlFile
+#     assert f.resolve() == File.Status.Ok
+#     assert f.type == File.Type.CellmlFile
 
 
-def test_combine_1_x_remote_archive():
-    f = File(COMBINE_1_X_REMOTE_ARCHIVE)
+# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+# def test_sedml_1_x_remote_file():
+#     f = File(SEDML_1_X_REMOTE_FILE)
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.CombineArchive
+#     assert f.resolve() == File.Status.Ok
+#     assert f.type == File.Type.SedmlFile
+
+
+# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+# def test_combine_1_x_remote_archive():
+#     f = File(COMBINE_1_X_REMOTE_ARCHIVE)
+
+#     assert f.resolve() == File.Status.Ok
+#     assert f.type == File.Type.CombineArchive
 
 
 def test_cellml_2_remote_file():
