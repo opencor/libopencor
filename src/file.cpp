@@ -22,6 +22,7 @@ limitations under the License.
 #include "sedmlsupport.h"
 #include "utils.h"
 
+#include <cassert>
 #include <filesystem>
 #include <regex>
 

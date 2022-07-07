@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "utils.h"
 
+#include <cassert>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
