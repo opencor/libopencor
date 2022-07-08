@@ -23,16 +23,9 @@ namespace libOpenCOR::Support {
 
 bool isCellmlFile(const std::string &pFileName)
 {
-    // Retrieve the contents of the file.
-
-    auto [contents, size] = fileContents(pFileName);
-
-    if ((contents == nullptr) && (size == 0)) {
-        return false;
-    }
-
     // Try to parse the file contents.
 
+    auto [contents, size] = fileContents(pFileName);
     auto parser = libcellml::Parser::create();
     auto model = parser->parseModel(contents.get());
 

@@ -23,9 +23,7 @@ namespace libOpenCOR {
 
 bool fuzzyCompare(double pNb1, double pNb2);
 
-std::string temporaryFileName();
-
-std::string canonicalPath(const std::string &pPath);
+std::string uniqueFileName();
 
 std::string downloadFile(const std::string &pUrl);
 

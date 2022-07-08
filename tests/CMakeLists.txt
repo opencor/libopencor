@@ -88,6 +88,13 @@ endif()
 
 add_subdirectory(bindings)
 
+# Let libOpenCOR if coverage is enabled.
+
+if(LIBOPENCOR_CODE_COVERAGE_GCOV OR LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+                               COVERAGE_ENABLED)
+endif()
+
 # Run our code coverage tests using gcov.
 
 if(LIBOPENCOR_CODE_COVERAGE_GCOV)
@@ -157,7 +164,7 @@ if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
     set(COVERAGE_REPORT_DIR code_coverage_llvm_cov_report)
 
     add_target(code_coverage_llvm_cov_report
-               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -format=html -show-line-counts-or-regions -o ${COVERAGE_REPORT_DIR}
+               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -format=html -show-branches=count -show-line-counts-or-regions -o ${COVERAGE_REPORT_DIR}
                COMMAND echo "The coverage report can be found at ${CMAKE_CURRENT_BINARY_DIR}/${COVERAGE_REPORT_DIR}/index.html."
                DEPENDS prepare_code_coverage_llvm_cov
                COMMENT "Running code coverage report using llvm-cov...")

@@ -28,6 +28,8 @@ static constexpr const char *REMOTE_FILE = "https://models.physiomeproject.org/w
 
 static constexpr const char *NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.txt";
 static constexpr const char *UNKNOWN_LOCAL_FILE = "unknown_file.txt";
+static constexpr const char *SBML_LOCAL_FILE = "sbml.sbml";
+static constexpr const char *ERROR_SEDML_LOCAL_FILE = "error.sedml";
 /*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
 static constexpr const char *CELLML_1_X_LOCAL_FILE = "cellml_1_x.cellml";
 static constexpr const char *SEDML_1_X_LOCAL_FILE = "cellml_1_x.sedml";
@@ -40,6 +42,8 @@ static constexpr const char *COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex";
 //---GRY--- THE BELOW URLS ARE TO BE UPDATED BEFORE MERGING...
 static constexpr const char *NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/non_retrievable_file.txt";
 static constexpr const char *UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/unknown_file.txt";
+static constexpr const char *SBML_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/sbml.sbml";
+static constexpr const char *ERROR_SEDML_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/error.sedml";
 /*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
 static constexpr const char *CELLML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.cellml";
 static constexpr const char *SEDML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/agarny/libopencor/issue152/tests/res/cellml_1_x.sedml";
@@ -109,6 +113,22 @@ TEST(FileTest, resolveUnknownLocalFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
 }
 
+TEST(FileTest, resolveSbmlLocalFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(SBML_LOCAL_FILE));
+
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+}
+
+TEST(FileTest, resolveErrorSedmlLocalFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(ERROR_SEDML_LOCAL_FILE));
+
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
+}
+
 /*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
 TEST(FileTest, resolveCellml1xLocalFile)
 {
@@ -172,6 +192,22 @@ TEST(FileTest, resolveUnknownRemoteFile)
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+}
+
+TEST(FileTest, resolveSbmlRemoteFile)
+{
+    auto file = libOpenCOR::File::create(SBML_REMOTE_FILE);
+
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+}
+
+TEST(FileTest, resolveErrorSedmlRemoteFile)
+{
+    auto file = libOpenCOR::File::create(ERROR_SEDML_REMOTE_FILE);
+
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
 /*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.

@@ -22,7 +22,6 @@ limitations under the License.
 #include "sedmlsupport.h"
 #include "utils.h"
 
-#include <cassert>
 #include <filesystem>
 #include <regex>
 
@@ -67,13 +66,15 @@ File::Status File::Impl::resolve()
     // Make sure that the (local) file exists.
 
     if (!std::filesystem::exists(mFileName.c_str())) {
-        // We assume that the local copy of a remote file always exists. So, if
-        // the file doesn't exist then it's because we are dealing with a local
-        // file that doesn't exist.
+#ifndef COVERAGE_ENABLED
+        if (mUrl.empty()) {
+#endif
+            return File::Status::NON_RETRIEVABLE_LOCAL_FILE;
+#ifndef COVERAGE_ENABLED
+        }
 
-        assert(mUrl.empty());
-
-        return File::Status::NON_RETRIEVABLE_LOCAL_FILE;
+        return File::Status::NON_RETRIEVABLE_REMOTE_FILE;
+#endif
     }
 
     // Check whether the local/remote file is a CellML file, a SED-ML file, a
