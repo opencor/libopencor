@@ -25,8 +25,13 @@ bool isCombineArchive(const std::string &pFileName)
     // Try to retrieve a COMBINE archive.
 
     auto combineArchive = libcombine::CombineArchive();
+    auto res = combineArchive.initializeFromArchive(pFileName);
 
-    return combineArchive.initializeFromArchive(pFileName);
+    if (res) {
+        combineArchive.cleanUp();
+    }
+
+    return res;
 }
 
 } // namespace libOpenCOR::Support
