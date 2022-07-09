@@ -29,9 +29,6 @@ struct File::Impl
     std::string mFileName;
     std::string mUrl;
 
-    char *mContents = nullptr;
-    size_t mSize = 0;
-
     CellmlFile *mCellmlFile = nullptr;
     SedmlFile *mSedmlFile = nullptr;
     CombineArchive *mCombineArchive = nullptr;

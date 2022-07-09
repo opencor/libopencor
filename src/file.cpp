@@ -44,9 +44,6 @@ void File::Impl::reset()
 
         mFileName = {};
     }
-
-    delete[] mContents;
-    mSize = 0;
 }
 
 File::Status File::Impl::resolve()
