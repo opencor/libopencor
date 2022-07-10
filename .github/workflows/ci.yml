@@ -178,7 +178,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: ON
-            context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang
+            context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang++
           - name: 'Coverage using gcov'
             os: ubuntu-20.04
             build_type: Release
@@ -259,6 +259,7 @@ jobs:
         run: |
           wget https://github.com/opencor/gha/releases/download/ci/clang.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang /usr/local/bin
+          sudo cp /usr/local/bin/clang /usr/local/bin/clang++
           wget https://github.com/opencor/gha/releases/download/ci/clang-include.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv include/* /usr/local/include
       - name: Install ClangFormat
