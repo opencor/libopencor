@@ -16,7 +16,7 @@ limitations under the License.
 
 #if defined(_MSC_VER)
 #    pragma warning(push)
-#    pragma warning(disable: 2143)
+// #    pragma warning(disable: 4005)
 #elif defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wheader-hygiene"
