@@ -18,10 +18,8 @@ limitations under the License.
 
 #include <string>
 
-namespace libOpenCOR {
-namespace Support {
+namespace libOpenCOR::Support {
 
 bool isCombineArchive(const std::string &pFileName);
 
-} // namespace Support
-} // namespace libOpenCOR
+} // namespace libOpenCOR::Support
