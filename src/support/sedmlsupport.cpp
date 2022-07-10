@@ -40,7 +40,7 @@ bool isSedmlFile(const std::string &pFileName)
                || ((sedmlDocument->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
                    && (sedmlDocument->getError(0)->getErrorId() != XMLContentEmpty));
 
-    delete sedmlDocument;
+    delete sedmlDocument; // NOLINT(cppcoreguidelines-owning-memory)
 
     return res;
 }

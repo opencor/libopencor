@@ -147,7 +147,7 @@ std::string downloadFile(const std::string &pUrl)
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    auto ok = false;
+    auto res = false;
     auto *curl = curl_easy_init();
 
     curl_easy_setopt(curl, CURLOPT_URL, pUrl.c_str());
@@ -165,7 +165,7 @@ std::string downloadFile(const std::string &pUrl)
 
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
 
-        ok = responseCode == HTTP_OK;
+        res = responseCode == HTTP_OK;
 #ifndef COVERAGE_ENABLED
     }
 #endif
@@ -173,7 +173,7 @@ std::string downloadFile(const std::string &pUrl)
     curl_easy_cleanup(curl);
     curl_global_cleanup();
 
-    if (ok) {
+    if (res) {
         return fileName;
     }
 
