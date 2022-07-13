@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSEDML)
-set(PACKAGE_VERSION 2.0.31)
+set(PACKAGE_VERSION 2.0.32)
 set(PACKAGE_REPOSITORY libSEDML)
-set(GIT_TAG v2.0.31-libopencor)
-set(RELEASE_TAG v2.0.31-libopencor)
+set(GIT_TAG v2.0.32-libopencor)
+set(RELEASE_TAG v2.0.32-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -71,6 +71,46 @@ else()
             -DWITH_SWIG=OFF
             -DWITH_ZLIB=OFF
     )
+
+    # Patch some of our CMake configuration files.
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}sedml-static-config.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "find_dependency(LIBNUML)" "string(REPLACE \"libSEDML\" \"libNuML\" LIBNUML_CMAKE_DIR \"\${LIBSEDML_CMAKE_DIR}\")\nfind_dependency(\${LIBNUML_LIBRARY_NAME} PATHS \${LIBNUML_CMAKE_DIR})" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "find_dependency(LIBSBML)" "string(REPLACE \"libSEDML\" \"libSBML\" LIBSBML_CMAKE_DIR \"\${LIBSEDML_CMAKE_DIR}\")\nfind_dependency(\${LIBSBML_LIBRARY_NAME} PATHS \${LIBSBML_CMAKE_DIR})" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}sedml-static-targets.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REGEX REPLACE "INTERFACE_LINK_LIBRARIES \\\"[^\\\"]*\\\"" "INTERFACE_LINK_LIBRARIES \"\"" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
+    if(RELEASE_MODE)
+        set(PACKAGE_MODE release)
+    else()
+        set(PACKAGE_MODE debug)
+    endif()
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}sedml-static-targets-${PACKAGE_MODE}.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "${PACKAGE_NAME}" "libNuML" LIBNUML_INSTALL_DIR "${INSTALL_DIR}")
+    string(REPLACE "${PACKAGE_NAME}" "libSBML" LIBSBML_INSTALL_DIR "${INSTALL_DIR}")
+
+    string(REPLACE "${LIBNUML_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../libNuML" RELATIVE_LIBNUML_LIBRARY_FILE "${LIBNUML_LIBRARY_FILE}")
+    string(REPLACE "${LIBSBML_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../libSBML" RELATIVE_LIBSBML_LIBRARY_FILE "${LIBSBML_LIBRARY_FILE}")
+
+    string(REPLACE "IMPORTED_LOCATION_RELEASE" "IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE \"${RELATIVE_LIBNUML_LIBRARY_FILE};${RELATIVE_LIBSBML_LIBRARY_FILE}\"\n  IMPORTED_LOCATION_RELEASE" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     # Create our package.
 
