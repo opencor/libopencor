@@ -15,8 +15,8 @@
 set(PACKAGE_NAME zipper)
 set(PACKAGE_VERSION 0.9.1)
 set(PACKAGE_REPOSITORY zipper)
-set(GIT_TAG v0.9.1)
-set(RELEASE_TAG v0.9.1)
+set(GIT_TAG 6f54c03)
+set(RELEASE_TAG 6f54c03)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -60,8 +60,8 @@ else()
             -DBUILD_TEST=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DLIBZ_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
-            -DLIBZ_LIBRARY=${ZLIB_LIBRARY_FILE}
+            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
+            -DZLIB_LIBRARY=${ZLIB_LIBRARY_FILE}
     )
 
     # Create our package.
