@@ -85,7 +85,7 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REPLACE "${PREBUILT_DIR}" "\${_IMPORT_PREFIX}/.." FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
 
     if(RELEASE_MODE)
         string(REPLACE ";\\$<LINK_ONLY:\\$<\\$<CONFIG:DEBUG>:cellml_debug_utilities>>" "" FILE_CONTENTS "${FILE_CONTENTS}")

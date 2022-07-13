@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCOMBINE)
-set(PACKAGE_VERSION 0.2.17)
+set(PACKAGE_VERSION 0.2.18)
 set(PACKAGE_REPOSITORY libCombine)
-set(GIT_TAG v0.2.17)
-set(RELEASE_TAG v0.2.17)
+set(GIT_TAG v0.2.18)
+set(RELEASE_TAG v0.2.18)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -30,20 +30,20 @@ if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             fbf440807de51048731701c6d0097ae602473428)
+                             9f3fef52e16805c74280dcda4b1f852b31272074)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a62261eccf3126e24441a883da58cdcf58f16ce8)
+                             d3f0b0647a22e6f475fcf16363e22b9f640ff1e3)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         4917e5166aada821e2f67b24546ad707ff8b10a8)
+                         022d5b8c11c3ff3af41d930a4adb2e9b5d610f2a)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         640f9a75ad76dbcb009de4a091c5d01d12201249)
+                         ba2ae8971a29d8192df9067b5a0a4006134bada4)
     endif()
 else()
     # Build our package.
@@ -85,27 +85,45 @@ else()
         file(RENAME ${INSTALLED_FILE} ${NEW_INSTALLED_FILE})
     endforeach()
 
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}combine-static-config.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REGEX REPLACE "foreach \\\(library .* \\\)" "foreach (library)" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}combine-static-targets.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REGEX REPLACE "INTERFACE_LINK_LIBRARIES \\\"[^\\\"]*\\\"" "INTERFACE_LINK_LIBRARIES \"\"" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
     if(RELEASE_MODE)
         set(PACKAGE_MODE release)
     else()
         set(PACKAGE_MODE debug)
     endif()
 
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}combine-static-config-${PACKAGE_MODE}.cmake)
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}combine-static-targets-${PACKAGE_MODE}.cmake)
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
+    string(REPLACE "${PACKAGE_NAME}" "libSBML" LIBSBML_INSTALL_DIR "${INSTALL_DIR}")
+    string(REPLACE "${PACKAGE_NAME}" "zipper" ZIPPER_INSTALL_DIR "${INSTALL_DIR}")
+    string(REPLACE "${PACKAGE_NAME}" "zlib" ZLIB_INSTALL_DIR "${INSTALL_DIR}")
+
+    string(REPLACE "${LIBSBML_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../libSBML" RELATIVE_LIBSBML_LIBRARY_FILE "${LIBSBML_LIBRARY_FILE}")
+    string(REPLACE "${ZIPPER_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../zipper" RELATIVE_ZIPPER_LIBRARY_FILE "${ZIPPER_LIBRARY_FILE}")
+    string(REPLACE "${ZLIB_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../zlib" RELATIVE_ZLIB_LIBRARY_FILE "${ZLIB_LIBRARY_FILE}")
+
+    string(REPLACE "IMPORTED_LOCATION_RELEASE" "IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE \"${RELATIVE_LIBSBML_LIBRARY_FILE};${RELATIVE_ZIPPER_LIBRARY_FILE};${RELATIVE_ZLIB_LIBRARY_FILE}\"\n  IMPORTED_LOCATION_RELEASE" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
-
-    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
-
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}combine-static-config.cmake)
-
-    file(READ ${CONFIG_FILE} FILE_CONTENTS)
-
-    string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "ZIPPER::ZIPPER" "${ZIPPER_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "ZLIB::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
