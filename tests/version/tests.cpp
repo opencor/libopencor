@@ -38,8 +38,8 @@ TEST(VersionTest, libCellML)
 
 TEST(VersionTest, libCOMBINE)
 {
-    EXPECT_EQ(217U, libOpenCOR::libcombineVersion());
-    EXPECT_EQ("0.2.17", libOpenCOR::libcombineVersionString());
+    EXPECT_EQ(218U, libOpenCOR::libcombineVersion());
+    EXPECT_EQ("0.2.18", libOpenCOR::libcombineVersionString());
 }
 
 TEST(VersionTest, libcurl)
@@ -50,8 +50,8 @@ TEST(VersionTest, libcurl)
 
 TEST(VersionTest, libSEDML)
 {
-    EXPECT_EQ(20031U, libOpenCOR::libsedmlVersion());
-    EXPECT_EQ("2.0.31", libOpenCOR::libsedmlVersionString());
+    EXPECT_EQ(20032U, libOpenCOR::libsedmlVersion());
+    EXPECT_EQ("2.0.32", libOpenCOR::libsedmlVersionString());
 }
 
 TEST(VersionTest, LLVM)

@@ -49,7 +49,7 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         343f6a9c6fede41c39fe86e1ebf0466e985d08ec)
+                         c2c26e2430ba62e1caa704a2eb516d45aec13273)
     endif()
 else()
     # Build our package.
@@ -85,7 +85,7 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REPLACE "${PREBUILT_DIR}" "\${_IMPORT_PREFIX}/.." FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
 
     if(RELEASE_MODE)
         string(REPLACE ";\\$<LINK_ONLY:\\$<\\$<CONFIG:DEBUG>:cellml_debug_utilities>>" "" FILE_CONTENTS "${FILE_CONTENTS}")
