@@ -152,8 +152,8 @@ std::string downloadFile(const std::string &pUrl)
 
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_URL, pUrl.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void *>(&file)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 
 #ifndef COVERAGE_ENABLED
     if (curl_easy_perform(curl) == CURLE_OK) {
