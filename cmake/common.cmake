@@ -310,6 +310,15 @@ function(prepare_test TARGET)
                           gtest_main
                           ${CMAKE_PROJECT_NAME})
 
+    if(BUILDING_USING_MSVC)
+        # Ask the linker to ignore the redefinition of some symbols, which
+        # occurs as a result of having ${INTERNAL_SOURCE_FILES} in
+        # add_executable() above.
+
+        target_link_options(${TARGET} PRIVATE
+                            /FORCE)
+    endif()
+
     configure_target(${TARGET})
 
     if(NOT LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
