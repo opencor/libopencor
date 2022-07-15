@@ -48,10 +48,6 @@ if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
 else()
     # Build our package.
 
-    if(WIN32)
-        set(DEXTRA_LIBS WS2_32)
-    endif()
-
     build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
             https://github.com/opencor/${PACKAGE_REPOSITORY}
@@ -63,7 +59,6 @@ else()
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
-            ${DEXTRA_LIBS}
             -DLIBCOMBINE_SHARED_VERSION=OFF
             -DLIBCOMBINE_SKIP_SHARED_LIBRARY=ON
             -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
