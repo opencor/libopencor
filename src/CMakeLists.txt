@@ -181,6 +181,16 @@ generate_export_header(${CMAKE_PROJECT_NAME}
                        EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
                        BASE_NAME LIBOPENCOR)
 
+# Don't allow unresolved symbols.
+# Note: MSVC doesn't allow unresolved symbols, so we only need to look for them
+#       if we are building using GNU or Clang.
+
+if(BUILDING_USING_GNU)
+    SET(CMAKE_SHARED_LINKER_FLAGS -Wl,--no-undefined)
+elseif(BUILDING_USING_CLANG)
+    SET(CMAKE_SHARED_LINKER_FLAGS -Wl,-undefined,error)
+endif()
+
 # Get ready for code coverage using gcov.
 
 if(LIBOPENCOR_CODE_COVERAGE_GCOV)
