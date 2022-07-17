@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSBML)
-set(PACKAGE_VERSION 5.19.5)
+set(PACKAGE_VERSION 5.19.6)
 set(PACKAGE_REPOSITORY libsbml)
-set(GIT_TAG v5.19.5-libopencor)
-set(RELEASE_TAG v5.19.5-libopencor)
+set(GIT_TAG v5.19.6-libopencor)
+set(RELEASE_TAG v5.19.6-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
