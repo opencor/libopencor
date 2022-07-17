@@ -30,20 +30,20 @@ if(LIBOPENCOR_PREBUILT_LIBNUML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             243158c8670f845f0504bfdf9b0d20f844d75bf2)
+                             63f2fa40ee63cbacd8a2bf539c0d17649267dcef)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             cf77a17ecc61680826ab7a3fb7517c393f9262fb)
+                             1de0db1d70c2111519cc5fdad82661016318a2d8)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         f363829a0be37a770a225eea04a17cb93e7481ce)
+                         5a0bf2a3be1528568466f2f5a8f204761242544b)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         40af930954701c70d270a075ee157aec4283c224)
+                         14107eb0bb61fb63de5ec04ba889fdce0cc700de)
     endif()
 else()
     # Build our package.
@@ -59,7 +59,6 @@ else()
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DEXTRA_LIBS=${LIBXML2_LIBRARY_FILE}
             -DLIBNUML_SHARED_VERSION=OFF
             -DLIBNUML_SKIP_SHARED_LIBRARY=ON
             -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
@@ -80,6 +79,23 @@ else()
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-targets.cmake)
+
+    if(RELEASE_MODE)
+        set(PACKAGE_MODE release)
+    else()
+        set(PACKAGE_MODE debug)
+    endif()
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-targets-${PACKAGE_MODE}.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "${PACKAGE_NAME}" "libxml2" LIBXML2_INSTALL_DIR "${INSTALL_DIR}")
+    string(REPLACE "${LIBXML2_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../libxml2" RELATIVE_LIBXML2_LIBRARY_FILE "${LIBXML2_LIBRARY_FILE}")
+
+    string(REPLACE "IMPORTED_LOCATION_RELEASE" "IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE \"${RELATIVE_LIBXML2_LIBRARY_FILE}\"\n  IMPORTED_LOCATION_RELEASE" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     # Create our package.
 
