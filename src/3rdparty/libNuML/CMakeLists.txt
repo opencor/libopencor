@@ -80,6 +80,23 @@ else()
 
     fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-targets.cmake)
 
+    if(RELEASE_MODE)
+        set(PACKAGE_MODE release)
+    else()
+        set(PACKAGE_MODE debug)
+    endif()
+
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-targets-${PACKAGE_MODE}.cmake)
+
+    file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    string(REPLACE "${PACKAGE_NAME}" "libxml2" LIBXML2_INSTALL_DIR "${INSTALL_DIR}")
+    string(REPLACE "${LIBXML2_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../libxml2" RELATIVE_LIBXML2_LIBRARY_FILE "${LIBXML2_LIBRARY_FILE}")
+
+    string(REPLACE "IMPORTED_LOCATION_RELEASE" "IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE \"${RELATIVE_LIBXML2_LIBRARY_FILE}\"\n  IMPORTED_LOCATION_RELEASE" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
+
     # Create our package.
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
