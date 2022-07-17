@@ -240,6 +240,13 @@ function(configure_target TARGET)
         endif()
     endforeach()
 
+    # For some reasons, libNuML needs to be linked last when building using GNU.
+
+    if(BUILDING_USING_GNU)
+        target_link_libraries(${TARGET} PRIVATE
+                              ${LIBNUML_LIBRARY_FILE})
+    endif()
+
     # Mark as advanced the CMake variables set by our various packages.
 
     mark_as_advanced(CURL_DIR
