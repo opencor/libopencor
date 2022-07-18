@@ -14,7 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifdef __clang__
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wreserved-id-macro"
-#endif
+#pragma once
+
+#include <memory>
+#include <string>
+
+namespace libOpenCOR {
+
+bool fuzzyCompare(double pNb1, double pNb2);
+
+std::string uniqueFileName();
+
+std::string downloadFile(const std::string &pUrl);
+
+std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFileName);
+
+} // namespace libOpenCOR

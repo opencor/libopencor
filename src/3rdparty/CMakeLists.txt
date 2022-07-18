@@ -56,9 +56,10 @@ if(NOT "${DEPENDENT_PACKAGES_TO_BUILD}" STREQUAL "")
     endforeach()
 endif()
 
-# Initialise/reset our available packages.
+# Initialise/reset our available packages and third-party (special) header files.
 
 set(AVAILABLE_PACKAGES "" CACHE INTERNAL "Available packages.")
+set(THIRD_PARTY_HEADER_FILES "" CACHE INTERNAL "Third-party (special) header files.")
 
 # Prerequisite third-party libraries, respecting their own prerequisites.
 

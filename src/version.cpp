@@ -47,23 +47,23 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-constexpr unsigned int MAJOR_10 = 1048576;
-constexpr unsigned int MAJOR_01 = 65536;
-constexpr unsigned int MINOR_10 = 4096;
-constexpr unsigned int MINOR_01 = 256;
-constexpr unsigned int PATCH_10 = 16;
-constexpr unsigned int PATCH_01 = 1;
+static constexpr unsigned int MAJOR_10 = 1048576;
+static constexpr unsigned int MAJOR_01 = 65536;
+static constexpr unsigned int MINOR_10 = 4096;
+static constexpr unsigned int MINOR_01 = 256;
+static constexpr unsigned int PATCH_10 = 16;
+static constexpr unsigned int PATCH_01 = 1;
 
 unsigned int firstDigit(unsigned int pTwoDigitNumber)
 {
-    constexpr double ONE_TENTH = 0.1;
+    static constexpr double ONE_TENTH = 0.1;
 
     return static_cast<unsigned int>(floor(ONE_TENTH * pTwoDigitNumber));
 }
 
 unsigned int secondDigit(unsigned int pTwoDigitNumber)
 {
-    constexpr unsigned int TEN = 10;
+    static constexpr unsigned int TEN = 10;
 
     return pTwoDigitNumber % TEN;
 }
@@ -144,9 +144,9 @@ std::string llvmVersionString()
 
 unsigned int sundialsVersion()
 {
-    constexpr int MAJOR = 65536;
-    constexpr int MINOR = 256;
-    constexpr int LABEL_SIZE = 10;
+    static constexpr int MAJOR = 65536;
+    static constexpr int MINOR = 256;
+    static constexpr int LABEL_SIZE = 10;
 
     int major = 0;
     int minor = 0;
@@ -160,7 +160,7 @@ unsigned int sundialsVersion()
 
 std::string sundialsVersionString()
 {
-    constexpr int VERSION_SIZE = 25;
+    static constexpr int VERSION_SIZE = 25;
 
     std::array<char, VERSION_SIZE> version {""};
 

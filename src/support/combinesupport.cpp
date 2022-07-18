@@ -14,17 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "utils.h"
+#include "combinesupport.h"
 
-#include <cmath>
+#include <combine/combinearchive.h>
 
-namespace libOpenCOR {
+namespace libOpenCOR::Support {
 
-bool fuzzyCompare(double pNb1, double pNb2)
+bool isCombineArchive(const std::string &pFileName)
 {
-    constexpr double ONE_TRILLION = 1000000000000.0;
+    // Try to retrieve a COMBINE archive.
 
-    return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
+    auto combineArchive = libcombine::CombineArchive();
+    auto res = combineArchive.initializeFromArchive(pFileName);
+
+    if (res) {
+        combineArchive.cleanUp();
+    }
+
+    return res;
 }
 
-} // namespace libOpenCOR
+} // namespace libOpenCOR::Support

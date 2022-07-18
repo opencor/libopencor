@@ -16,12 +16,17 @@ limitations under the License.
 
 #include <libopencor>
 
+#include "file_p.h"
+
 #include <pybind11/pybind11.h>
+
+namespace py = pybind11;
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
-PYBIND11_MODULE(module, m) {
+PYBIND11_MODULE(module, m)
+{
     // Version.
 
     m.attr("__version__") = MACRO_STRINGIFY(PROJECT_VERSION);
@@ -29,6 +34,42 @@ PYBIND11_MODULE(module, m) {
     // Documentation.
 
     m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";
+
+    // File API.
+
+    py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
+
+    py::enum_<libOpenCOR::File::Type>(file, "Type")
+        .value("Undefined", libOpenCOR::File::Type::UNRESOLVED)
+        .value("CellmlFile", libOpenCOR::File::Type::CELLML_FILE)
+        .value("SedmlFile", libOpenCOR::File::Type::SEDML_FILE)
+        .value("CombineArchive", libOpenCOR::File::Type::COMBINE_ARCHIVE)
+        .value("UnknownFile", libOpenCOR::File::Type::UNKNOWN_FILE)
+        .export_values();
+
+    py::enum_<libOpenCOR::File::Status>(file, "Status")
+        .value("Ok", libOpenCOR::File::Status::OK)
+        .value("NonRetrievableLocalFile", libOpenCOR::File::Status::NON_RETRIEVABLE_LOCAL_FILE)
+        .value("NonRetrievableRemoteFile", libOpenCOR::File::Status::NON_RETRIEVABLE_REMOTE_FILE)
+        .export_values();
+
+    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
+        .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
+        .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
+        .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
+        .def("resolve", &libOpenCOR::File::resolve, "Resolve this File object.");
+
+    file.def(
+        "__repr__", [](const libOpenCOR::File &pFile) {
+            auto fileName = pFile.fileName();
+
+            if (!fileName.empty()) {
+                return "Local file: " + fileName;
+            }
+
+            return "Remote file: " + pFile.url();
+        },
+        "Get the string representation of this File object.");
 
     // Version API.
 

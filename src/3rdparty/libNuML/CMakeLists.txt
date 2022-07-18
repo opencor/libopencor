@@ -30,20 +30,20 @@ if(LIBOPENCOR_PREBUILT_LIBNUML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             63f2fa40ee63cbacd8a2bf539c0d17649267dcef)
+                             f694750cb885e0ca0acdcff12ee7571f5e35b04e)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             1de0db1d70c2111519cc5fdad82661016318a2d8)
+                             0abbdf5216c660ce6f19953d9cd80c9954f6f5c6)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         5a0bf2a3be1528568466f2f5a8f204761242544b)
+                         b1aa08c1f2bb41298675165a1608bf6029743a5a)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         14107eb0bb61fb63de5ec04ba889fdce0cc700de)
+                         826470e27e446414a9d1269efa89d935c8a1eb55)
     endif()
 else()
     # Build our package.
@@ -79,23 +79,6 @@ else()
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     fix_import_prefix(${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-targets.cmake)
-
-    if(RELEASE_MODE)
-        set(PACKAGE_MODE release)
-    else()
-        set(PACKAGE_MODE debug)
-    endif()
-
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${LIBRARY_PREFIX}numl-static-targets-${PACKAGE_MODE}.cmake)
-
-    file(READ ${CONFIG_FILE} FILE_CONTENTS)
-
-    string(REPLACE "${PACKAGE_NAME}" "libxml2" LIBXML2_INSTALL_DIR "${INSTALL_DIR}")
-    string(REPLACE "${LIBXML2_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../libxml2" RELATIVE_LIBXML2_LIBRARY_FILE "${LIBXML2_LIBRARY_FILE}")
-
-    string(REPLACE "IMPORTED_LOCATION_RELEASE" "IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE \"${RELATIVE_LIBXML2_LIBRARY_FILE}\"\n  IMPORTED_LOCATION_RELEASE" FILE_CONTENTS "${FILE_CONTENTS}")
-
-    file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     # Create our package.
 

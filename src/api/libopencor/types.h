@@ -14,7 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifdef __clang__
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wreserved-id-macro"
-#endif
+#pragma once
+
+#include <memory>
+
+namespace libOpenCOR {
+
+class File;
+
+using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @c File pointer. */
+
+} // namespace libcellml

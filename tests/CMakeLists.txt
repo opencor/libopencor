@@ -15,12 +15,25 @@
 # Include our different tests.
 
 include(compiler/tests.cmake)
+include(file/tests.cmake)
 include(version/tests.cmake)
 
 # Prepare our different tests.
 
 set(GIT_TESTS_SOURCE_FILES)
 set(GIT_TESTS_HEADER_FILES)
+
+set(RESOURCE_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/res)
+
+set(UTILS_SOURCE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp)
+set(UTILS_HEADER_FILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/utils.h.in)
+set(UTILS_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/utils.h)
+
+configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
+
+include_directories(${CMAKE_SOURCE_DIR}/src/misc
+                    ${CMAKE_SOURCE_DIR}/src/support
+                    ${CMAKE_BINARY_DIR})
 
 foreach(TEST ${TESTS})
     if(LIBOPENCOR_UNIT_TESTING)
@@ -30,12 +43,15 @@ foreach(TEST ${TESTS})
             set(TEST_CATEGORY)
         endif()
 
-        prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES})
+        prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES} ${UTILS_SOURCE_FILE})
     endif()
 
     list(APPEND GIT_TESTS_SOURCE_FILES ${${TEST}_SOURCE_FILES})
     list(APPEND GIT_TESTS_HEADER_FILES ${${TEST}_HEADER_FILES})
 endforeach()
+
+list(APPEND GIT_TESTS_SOURCE_FILES ${UTILS_SOURCE_FILE})
+list(APPEND GIT_TESTS_HEADER_FILES ${UTILS_HEADER_FILE_IN})
 
 set(GIT_TESTS_SOURCE_FILES ${GIT_TESTS_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_TESTS_HEADER_FILES ${GIT_TESTS_HEADER_FILES} PARENT_SCOPE)
@@ -54,7 +70,7 @@ if(LIBOPENCOR_UNIT_TESTING)
         add_test(NAME ${TEST_TARGET}
                  COMMAND ${TEST_TARGET})
 
-        if(MSVC)
+        if(BUILDING_USING_MSVC)
             set_tests_properties(${TEST_TARGET} PROPERTIES
                                  ENVIRONMENT "PATH=$<TARGET_FILE_DIR:gtest_main>\;$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>")
         endif()
@@ -71,6 +87,13 @@ endif()
 # Add our bindings tests.
 
 add_subdirectory(bindings)
+
+# Let libOpenCOR know if coverage is enabled.
+
+if(LIBOPENCOR_CODE_COVERAGE_GCOV OR LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+                               COVERAGE_ENABLED)
+endif()
 
 # Run our code coverage tests using gcov.
 
@@ -141,7 +164,7 @@ if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
     set(COVERAGE_REPORT_DIR code_coverage_llvm_cov_report)
 
     add_target(code_coverage_llvm_cov_report
-               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -format=html -o ${COVERAGE_REPORT_DIR}
+               COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -format=html -show-branches=count -show-line-counts-or-regions -o ${COVERAGE_REPORT_DIR}
                COMMAND echo "The coverage report can be found at ${CMAKE_CURRENT_BINARY_DIR}/${COVERAGE_REPORT_DIR}/index.html."
                DEPENDS prepare_code_coverage_llvm_cov
                COMMENT "Running code coverage report using llvm-cov...")

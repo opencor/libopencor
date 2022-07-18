@@ -30,20 +30,20 @@ if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             5394f7d0bfd8bdc96a1578a8df194606638bd8eb)
+                             01169dc3d311eebcac4fac86950d8c3bd7a224e7)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             830eeda4157e1748f4835b91de5f1fa39145eea2)
+                             c7f7141c7fcf9d9a22d786b103e9a2308d7e5d3c)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         fb0aa0aed43e86ef31cc0fe91a66a471fe27d9fe)
+                         1b7ec9932dd53f37e5bad7ae20f98a2c1f32f342)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         8d78325280db4723699157ba9235fb8906baea80)
+                         18ebd3acc651040f127f94284ed5241e2bb38380)
     endif()
 else()
     # Build our package.
@@ -109,17 +109,6 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REPLACE "${PACKAGE_NAME}" "libSBML" LIBSBML_INSTALL_DIR "${INSTALL_DIR}")
-    string(REPLACE "${PACKAGE_NAME}" "libxml2" LIBXML2_INSTALL_DIR "${INSTALL_DIR}")
-    string(REPLACE "${PACKAGE_NAME}" "zipper" ZIPPER_INSTALL_DIR "${INSTALL_DIR}")
-    string(REPLACE "${PACKAGE_NAME}" "zlib" ZLIB_INSTALL_DIR "${INSTALL_DIR}")
-
-    string(REPLACE "${LIBSBML_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../libSBML" RELATIVE_LIBSBML_LIBRARY_FILE "${LIBSBML_LIBRARY_FILE}")
-    string(REPLACE "${LIBXML2_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../libxml2" RELATIVE_LIBXML2_LIBRARY_FILE "${LIBXML2_LIBRARY_FILE}")
-    string(REPLACE "${ZIPPER_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../zipper" RELATIVE_ZIPPER_LIBRARY_FILE "${ZIPPER_LIBRARY_FILE}")
-    string(REPLACE "${ZLIB_INSTALL_DIR}" "\${_IMPORT_PREFIX}/../zlib" RELATIVE_ZLIB_LIBRARY_FILE "${ZLIB_LIBRARY_FILE}")
-
-    string(REPLACE "IMPORTED_LOCATION_RELEASE" "IMPORTED_LINK_INTERFACE_LIBRARIES_RELEASE \"${RELATIVE_LIBSBML_LIBRARY_FILE};${RELATIVE_LIBXML2_LIBRARY_FILE};${RELATIVE_ZIPPER_LIBRARY_FILE};${RELATIVE_ZLIB_LIBRARY_FILE}\"\n  IMPORTED_LOCATION_RELEASE" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "Combine" "combine" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")

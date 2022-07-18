@@ -15,5 +15,5 @@ limitations under the License.
 */
 
 #ifdef __clang__
-    #pragma clang diagnostic pop
+#    pragma clang diagnostic pop
 #endif

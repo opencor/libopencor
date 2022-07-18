@@ -14,7 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifdef __clang__
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wreserved-id-macro"
-#endif
+#include "libopencor/file.h"
+
+namespace libOpenCOR {
+
+class CellmlFile;
+class SedmlFile;
+class CombineArchive;
+
+struct File::Impl
+{
+    Type mType = Type::UNRESOLVED;
+
+    std::string mFileName;
+    std::string mUrl;
+
+    CellmlFile *mCellmlFile = nullptr;
+    SedmlFile *mSedmlFile = nullptr;
+    CombineArchive *mCombineArchive = nullptr;
+
+    ~Impl();
+
+    void reset();
+
+    File::Status resolve();
+};
+
+} // namespace libOpenCOR

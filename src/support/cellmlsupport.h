@@ -16,8 +16,10 @@ limitations under the License.
 
 #pragma once
 
-namespace libOpenCOR {
+#include <string>
 
-bool fuzzyCompare(double pNb1, double pNb2);
+namespace libOpenCOR::Support {
 
-} // namespace libOpenCOR
+bool isCellmlFile(const std::string &pFileName);
+
+} // namespace libOpenCOR::Support

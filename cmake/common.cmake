@@ -33,17 +33,22 @@ function(replace_compiler_flag OLD NEW)
 endfunction()
 
 function(configure_target TARGET)
+    # Ignore some MSVC warnings.
+
+    if(BUILDING_USING_MSVC)
+        target_compile_options(${TARGET} PRIVATE
+                                /wd4251)
+    endif()
+
     # Treat warnings as errors.
 
     if(LIBOPENCOR_WARNINGS_AS_ERRORS)
-        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+        if(BUILDING_USING_MSVC)
             set(COMPILE_OPTIONS
                 /W4
                 /WX
             )
-        elseif(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-               OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-               OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+        elseif(BUILDING_USING_GNU OR BUILDING_USING_CLANG)
             set(COMPILE_OPTIONS
                 -Wall
                 -W
@@ -63,16 +68,17 @@ function(configure_target TARGET)
     if(LIBOPENCOR_CODE_ANALYSIS)
         # Configure Clang.
 
-        if(   "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
-           OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
+        if(BUILDING_USING_CLANG)
             # The full list of diagnostic flags for Clang can be found at
             # https://clang.llvm.org/docs/DiagnosticsReference.html.
 
             set(COMPILE_OPTIONS
                 -Weverything
                 -Wno-c++98-compat
+                -Wno-disabled-macro-expansion
                 -Wno-exit-time-destructors
                 -Wno-global-constructors
+                -Wno-padded
             )
 
             if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
@@ -125,8 +131,8 @@ function(configure_target TARGET)
                 cppcoreguidelines-*
                 ${DISABLED_CPPCOREGUIDELINES_CHECKS}
                 fuchsia-*
-                ${DISABLED_FUCHSIA_CHECKS}
                 -fuchsia-default-arguments-calls
+                ${DISABLED_FUCHSIA_CHECKS}
                 google-*
                 hicpp-*
                 llvm-*
@@ -158,8 +164,8 @@ function(configure_target TARGET)
             string(REPLACE "." "\\\." HEADER_FILTER_DIR "${HEADER_FILTER_DIR}")
             string(REPLACE "/" "\\\/" HEADER_FILTER_DIR "${HEADER_FILTER_DIR}")
 
-            if(MSVC)
-                # Extra argument for Clang-Tidy when using MSVC.
+            if(BUILDING_USING_MSVC)
+                # Extra argument for Clang-Tidy when building using MSVC.
                 # See https://gitlab.kitware.com/cmake/cmake/-/issues/20512#note_722771.
 
                 set(EXTRA_ARG "--extra-arg=/EHsc")
@@ -234,6 +240,13 @@ function(configure_target TARGET)
         endif()
     endforeach()
 
+    # For some reasons, libNuML needs to be linked last when building using GNU.
+
+    if(BUILDING_USING_GNU)
+        target_link_libraries(${TARGET} PRIVATE
+                              ${LIBNUML_LIBRARY_FILE})
+    endif()
+
     # Mark as advanced the CMake variables set by our various packages.
 
     mark_as_advanced(CURL_DIR
@@ -303,6 +316,15 @@ function(prepare_test TARGET)
     target_link_libraries(${TARGET} PRIVATE
                           gtest_main
                           ${CMAKE_PROJECT_NAME})
+
+    if(BUILDING_USING_MSVC)
+        # Ask the linker to ignore the redefinition of some symbols, which
+        # occurs as a result of having ${INTERNAL_SOURCE_FILES} in
+        # add_executable() above.
+
+        target_link_options(${TARGET} PRIVATE
+                            /FORCE)
+    endif()
 
     configure_target(${TARGET})
 

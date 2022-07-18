@@ -19,7 +19,6 @@
 #       of KDevelop (see
 #       https://invent.kde.org/kdevelop/kdevelop/-/blob/3973/veritas/tests/runMemcheck.py).
 
-
 import math
 import multiprocessing
 import os
@@ -72,7 +71,7 @@ class BackTrace:
             return False
 
         for frame in self.stack:
-            if "::TestBody" in frame.function or "libOpenCOR::" in frame.function:
+            if "libOpenCOR::" in frame.function:
                 return True
 
         return False
@@ -131,9 +130,11 @@ def run_test(valgrind, test, test_path):
         return True
 
     sys.stdout.write("Failed\n")
+    sys.stderr.write("---------------------------------------\n")
 
     for error in errors:
         sys.stderr.write(str(error))
+        sys.stderr.write("---------------------------------------\n")
 
     return False
 

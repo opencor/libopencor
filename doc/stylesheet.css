@@ -184,6 +184,10 @@ tr.even {
     background-color: var(--color-0_05);
 }
 
+.paramname {
+    color: var(--color) !important;
+}
+
 #main-nav {
     padding-bottom: 1px;
     border-bottom: 1px solid var(--color);

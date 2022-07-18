@@ -35,9 +35,9 @@ if(LIBOPENCOR_COMPILER_CACHING)
     endif()
 endif()
 
-# On Windows, if we are using MSVC then replace some compiler flags.
+# Replace some compiler flags when building using MSVC.
 
-if(MSVC)
+if(BUILDING_USING_MSVC)
     # Replace the /Zi option (i.e. enable debugging information), if present,
     # with the /Z7 option (i.e. enable old-style debugging information)
     # otherwise caching (be it with buildcache or clcache) won't work.
@@ -46,6 +46,10 @@ if(MSVC)
         replace_compiler_flag("/Zi" "/Z7")
     endif()
 endif()
+
+# Build our different third-party libraries.
+
+add_subdirectory(3rdparty)
 
 # Configure the version file.
 
@@ -65,7 +69,12 @@ configure_file(${VERSION_HEADER_FILE_IN} ${VERSION_HEADER_FILE})
 
 # Build libOpenCOR.
 
+if(NOT WIN32 AND NOT APPLE)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif()
+
 set(GIT_API_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/file.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
 
@@ -80,26 +89,41 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/compiler.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlsupport.cpp
 )
 
-set(GIT_SOURCE_FILES
-    ${INTERNAL_SOURCE_FILES}
+set(GIT_API_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
 )
 
+set(GIT_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
+    ${GIT_API_SOURCE_FILES}
+    ${INTERNAL_SOURCE_FILES}
+    ${PYTHON_SOURCE_FILES}
+)
+
 set(SOURCE_FILES
-    ${GIT_SOURCE_FILES}
+    ${GIT_API_SOURCE_FILES}
+    ${INTERNAL_SOURCE_FILES}
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/compiler.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlsupport.h
 )
 
 set(GIT_HEADER_FILES
     ${INTERNAL_HEADER_FILES}
+    ${THIRD_PARTY_HEADER_FILES}
     ${VERSION_HEADER_FILE_IN}
 )
 
@@ -108,7 +132,9 @@ set(HEADER_FILES
     ${VERSION_HEADER_FILE}
 )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(misc
+                    support
+                    ${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(${CMAKE_PROJECT_NAME}
             ${API_HEADER_FILES}
@@ -129,14 +155,6 @@ target_include_directories(${CMAKE_PROJECT_NAME} INTERFACE
                            $<INSTALL_INTERFACE:include/>
                            $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>)
 
-if(MSVC)
-    # Ignore some linking warnings on Windows that have nothing to do with
-    # libOpenCOR.
-
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
-                            "-ignore:4199")
-endif()
-
 set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
 set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
@@ -151,10 +169,6 @@ else()
     set(INTERNAL_SOURCE_FILES PARENT_SCOPE)
 endif()
 
-# Build our different third-party libraries.
-
-add_subdirectory(3rdparty)
-
 # Configure OpenCOR.
 
 configure_target(${CMAKE_PROJECT_NAME})
@@ -166,6 +180,16 @@ include(GenerateExportHeader)
 generate_export_header(${CMAKE_PROJECT_NAME}
                        EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
                        BASE_NAME LIBOPENCOR)
+
+# Don't allow unresolved symbols.
+# Note: MSVC doesn't allow unresolved symbols, so we only need to look for them
+#       if we are building using GNU or Clang.
+
+if(BUILDING_USING_GNU)
+    SET(CMAKE_SHARED_LINKER_FLAGS -Wl,--no-undefined)
+elseif(BUILDING_USING_CLANG)
+    SET(CMAKE_SHARED_LINKER_FLAGS -Wl,-undefined,error)
+endif()
 
 # Get ready for code coverage using gcov.
 

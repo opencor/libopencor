@@ -48,6 +48,7 @@ if(LIBOPENCOR_DOCUMENTATION)
     # Generate our documentation.
 
     add_target(documentation
+               COMMAND echo "The documentation can be found at ${CMAKE_BINARY_DIR}/doc/html/index.html."
                DEPENDS general_documentation
                        api_documentation
                        user_documentation

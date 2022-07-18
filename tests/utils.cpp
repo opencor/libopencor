@@ -14,7 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifdef __clang__
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wreserved-id-macro"
-#endif
+#include "tests/utils.h"
+
+namespace libOpenCOR {
+
+std::string resourcePath(const std::string &resourceRelativePath)
+{
+    return std::string(RESOURCE_LOCATION) + "/" + resourceRelativePath;
+}
+
+} // namespace libOpenCOR

@@ -44,15 +44,13 @@ endif()
 # format it.
 
 if(PYTHON_FORMATTING_AVAILABLE)
-    set(EXCLUDE_EXTERN --exclude extern/)
-
     add_target(check_python_code_formatting
-               COMMAND ${BLACK_EXE} --check ${EXCLUDE_EXTERN} .
+               COMMAND ${BLACK_EXE} --check .
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Checking Python code formatting...")
 
     add_target(format_python_code
-               COMMAND ${BLACK_EXE} ${EXCLUDE_EXTERN} .
+               COMMAND ${BLACK_EXE} .
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Formatting the Python code...")
 endif()

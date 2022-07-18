@@ -16,12 +16,13 @@
 # third-party libraries.
 
 set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
+set(PYTHON_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/python.cpp
+    CACHE INTERNAL "Python source files."
+)
 
 pybind11_add_module(${PYTHON_BINDINGS_TARGET}
-                    ${API_HEADER_FILES}
-                    ${SOURCE_FILES}
-                    ${HEADER_FILES}
-                    python.cpp)
+                    ${PYTHON_SOURCE_FILES})
 
 set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
                       OUTPUT_NAME ${CMAKE_PROJECT_NAME_LC}/module)
@@ -34,7 +35,8 @@ target_include_directories(${PYTHON_BINDINGS_TARGET} PRIVATE
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api>
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
 
-configure_target(${PYTHON_BINDINGS_TARGET})
+target_link_libraries(${PYTHON_BINDINGS_TARGET} PRIVATE
+                      $<TARGET_NAME:${CMAKE_PROJECT_NAME}>)
 
 add_subdirectory(${CMAKE_PROJECT_NAME_LC})
 
