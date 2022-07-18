@@ -88,7 +88,7 @@ endif()
 
 add_subdirectory(bindings)
 
-# Let libOpenCOR if coverage is enabled.
+# Let libOpenCOR know if coverage is enabled.
 
 if(LIBOPENCOR_CODE_COVERAGE_GCOV OR LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
