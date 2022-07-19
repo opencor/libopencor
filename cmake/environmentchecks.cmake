@@ -119,10 +119,14 @@ endif()
 
 if(Python_EXECUTABLE)
     set(PYTHON_EXE ${Python_EXECUTABLE})
+elseif(Python3_EXECUTABLE)
+    set(PYTHON_EXE ${Python3_EXECUTABLE})
 endif()
 
 if(Python_LIBRARIES)
     set(PYTHON_LIBRARIES ${Python_LIBRARIES})
+elseif(Python3_LIBRARY)
+    set(PYTHON_LIBRARIES ${Python3_LIBRARY})
 endif()
 
 # Check some compiler flags.
