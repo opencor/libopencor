@@ -36,6 +36,9 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_ARCHS: auto64
+          CIBW_ENVIRONMENT_MACOS: >
+            _PYTHON_HOST_PLATFORM=macosx-10.15-x86_64
+          MACOSX_DEPLOYMENT_TARGET: 10.15
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
