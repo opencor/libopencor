@@ -90,6 +90,11 @@ File::Status File::Impl::resolve()
     return File::Status::OK;
 }
 
+File::Status File::Impl::instantiate()
+{
+    return File::Status::NON_INSTANTIABLE_FILE;
+}
+
 File::File(const std::string &pFileNameOrUrl)
     : mPimpl(std::make_unique<Impl>())
 {
@@ -163,6 +168,11 @@ std::string File::url() const
 File::Status File::resolve()
 {
     return mPimpl->resolve();
+}
+
+File::Status File::instantiate()
+{
+    return mPimpl->instantiate();
 }
 
 } // namespace libOpenCOR

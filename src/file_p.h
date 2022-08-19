@@ -38,6 +38,7 @@ struct File::Impl
     void reset();
 
     File::Status resolve();
+    File::Status instantiate();
 };
 
 } // namespace libOpenCOR
