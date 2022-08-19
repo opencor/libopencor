@@ -36,8 +36,7 @@ File::Impl::~Impl()
 
 void File::Impl::reset()
 {
-    // Reset ourself which means removing the local copy of a remote file, as
-    // well as clearning our contents, if any.
+    mType = Type::UNRESOLVED;
 
     if (!mUrl.empty() && !mFileName.empty()) {
         remove(mFileName.c_str()); // NOLINT(cert-err33-c)
