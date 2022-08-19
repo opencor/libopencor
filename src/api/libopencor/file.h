@@ -63,13 +63,15 @@ public:
      *    of a local file;
      *  - NON_RETRIEVABLE_REMOTE_FILE: the action could not retrieve the
      *    contents of a remote file.
+     *  - NON_INSTANTIABLE_FILE: the action could not instantiate a file.
      */
 
     enum class Status
     {
         OK,
         NON_RETRIEVABLE_LOCAL_FILE,
-        NON_RETRIEVABLE_REMOTE_FILE
+        NON_RETRIEVABLE_REMOTE_FILE,
+        NON_INSTANTIABLE_FILE
     };
 
     /**
@@ -146,6 +148,20 @@ public:
      */
 
     Status resolve();
+
+    /**
+     * @brief Instantiate this @c File.
+     *
+     * Instantiate this @c File and generate the runtime associated with the
+     * CellML file that is associated with this @c File, be it directly or
+     * indirectly.
+     *
+     * @sa Status, runtime()
+     *
+     * @return The status as a @c Status.
+     */
+
+    Status instantiate();
 
 private:
     explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private*/

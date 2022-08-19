@@ -51,13 +51,15 @@ PYBIND11_MODULE(module, m)
         .value("Ok", libOpenCOR::File::Status::OK)
         .value("NonRetrievableLocalFile", libOpenCOR::File::Status::NON_RETRIEVABLE_LOCAL_FILE)
         .value("NonRetrievableRemoteFile", libOpenCOR::File::Status::NON_RETRIEVABLE_REMOTE_FILE)
+        .value("NonInstantiableFile", libOpenCOR::File::Status::NON_INSTANTIABLE_FILE)
         .export_values();
 
     file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
-        .def("resolve", &libOpenCOR::File::resolve, "Resolve this File object.");
+        .def("resolve", &libOpenCOR::File::resolve, "Resolve this File object.")
+        .def("instantiate", &libOpenCOR::File::instantiate, "Instantiate this File object.");
 
     file.def(
         "__repr__", [](const libOpenCOR::File &pFile) {
