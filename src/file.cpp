@@ -56,22 +56,14 @@ File::Status File::Impl::resolve()
         mFileName = downloadFile(mUrl);
 
         if (mFileName.empty()) {
-            return File::Status::NON_RETRIEVABLE_REMOTE_FILE;
+            return File::Status::NON_RETRIEVABLE_FILE;
         }
     }
 
     // Make sure that the (local) file exists.
 
     if (!std::filesystem::exists(mFileName.c_str())) {
-#ifndef COVERAGE_ENABLED
-        if (mUrl.empty()) {
-#endif
-            return File::Status::NON_RETRIEVABLE_LOCAL_FILE;
-#ifndef COVERAGE_ENABLED
-        }
-
-        return File::Status::NON_RETRIEVABLE_REMOTE_FILE;
-#endif
+        return File::Status::NON_RETRIEVABLE_FILE;
     }
 
     // Check whether the local/remote file is a CellML file, a SED-ML file, a

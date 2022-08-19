@@ -48,7 +48,7 @@ COMBINE_2_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/opencor/libopencor
 def test_resolve_non_retrievable_local_file():
     f = File(utils.resource_path(NON_RETRIEVABLE_LOCAL_FILE))
 
-    assert f.resolve() == File.Status.NonRetrievableLocalFile
+    assert f.resolve() == File.Status.NonRetrievableFile
 
 
 def test_resolve_unknown_local_file():
@@ -120,7 +120,7 @@ def test_resolve_combine_2_local_archive():
 def test_resolve_non_retrievable_remote_file():
     f = File(NON_RETRIEVABLE_REMOTE_FILE)
 
-    assert f.resolve() == File.Status.NonRetrievableRemoteFile
+    assert f.resolve() == File.Status.NonRetrievableFile
 
 
 def test_resolve_unknown_remote_file():
