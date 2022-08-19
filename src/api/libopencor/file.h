@@ -59,8 +59,10 @@ public:
      *
      * An action on a file can have one of the following statuses:
      *  - OK: the action completed successfully;
-     *  - NON_RETRIEVABLE_LOCAL_FILE: the action could not retrieve the contents of a local file;
-     *  - NON_RETRIEVABLE_REMOTE_FILE: the action could not retrieve the contents of a remote file.
+     *  - NON_RETRIEVABLE_LOCAL_FILE: the action could not retrieve the contents
+     *    of a local file;
+     *  - NON_RETRIEVABLE_REMOTE_FILE: the action could not retrieve the
+     *    contents of a remote file.
      */
 
     enum class Status
@@ -135,10 +137,10 @@ public:
     /**
      * @brief Resolve this @c File.
      *
-     * Retrieve the contents of this @c File and determine its type, i.e. a
+     * Retrieve the contents of this @c File and determine its @c Type, i.e. a
      * CellML file, a SED-ML file, a COMBINE archive, or an unknown file.
      *
-     * @sa Status
+     * @sa Status, type()
      *
      * @return The status as a @c Status.
      */
