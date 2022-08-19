@@ -49,8 +49,7 @@ PYBIND11_MODULE(module, m)
 
     py::enum_<libOpenCOR::File::Status>(file, "Status")
         .value("Ok", libOpenCOR::File::Status::OK)
-        .value("NonRetrievableLocalFile", libOpenCOR::File::Status::NON_RETRIEVABLE_LOCAL_FILE)
-        .value("NonRetrievableRemoteFile", libOpenCOR::File::Status::NON_RETRIEVABLE_REMOTE_FILE)
+        .value("NonRetrievableFile", libOpenCOR::File::Status::NON_RETRIEVABLE_FILE)
         .value("NonInstantiableFile", libOpenCOR::File::Status::NON_INSTANTIABLE_FILE)
         .export_values();
 

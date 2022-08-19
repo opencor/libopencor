@@ -50,7 +50,7 @@ TEST(ResolveFileTest, resolveNonRetrievableLocalFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(NON_RETRIEVABLE_LOCAL_FILE));
 
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_LOCAL_FILE);
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
 }
 
 TEST(ResolveFileTest, resolveUnknownLocalFile)
@@ -131,7 +131,7 @@ TEST(ResolveFileTest, resolveNonRetrievableRemoteFile)
 {
     auto file = libOpenCOR::File::create(NON_RETRIEVABLE_REMOTE_FILE);
 
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_REMOTE_FILE);
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
 }
 
 TEST(ResolveFileTest, resolveUnknownRemoteFile)

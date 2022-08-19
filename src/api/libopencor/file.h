@@ -59,18 +59,15 @@ public:
      *
      * An action on a file can have one of the following statuses:
      *  - OK: the action completed successfully;
-     *  - NON_RETRIEVABLE_LOCAL_FILE: the action could not retrieve the contents
-     *    of a local file;
-     *  - NON_RETRIEVABLE_REMOTE_FILE: the action could not retrieve the
-     *    contents of a remote file.
+     *  - NON_RETRIEVABLE_FILE: the action could not retrieve the contents of a
+     *    file;
      *  - NON_INSTANTIABLE_FILE: the action could not instantiate a file.
      */
 
     enum class Status
     {
         OK,
-        NON_RETRIEVABLE_LOCAL_FILE,
-        NON_RETRIEVABLE_REMOTE_FILE,
+        NON_RETRIEVABLE_FILE,
         NON_INSTANTIABLE_FILE
     };
 
