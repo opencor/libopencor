@@ -19,10 +19,10 @@ limitations under the License.
 namespace libOpenCOR {
 
 namespace Support {
-    class CellmlFile;
-    class SedmlFile;
-    class CombineArchive;
-}
+class CellmlFile;
+class SedmlFile;
+class CombineArchive;
+} // namespace Support
 
 struct File::Impl
 {

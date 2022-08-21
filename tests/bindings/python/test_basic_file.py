@@ -22,6 +22,7 @@ URL_BASED_WINDOWS_LOCAL_FILE = "file:///C:/some/path/file.txt"
 URL_BASED_UNIX_LOCAL_FILE = "file:///some/path/file.txt"
 REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.cellml"
 
+
 def test_basic_windows_file():
     f = File(WINDOWS_LOCAL_FILE)
 
