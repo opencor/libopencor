@@ -16,18 +16,18 @@ from libopencor import File
 import utils
 
 
-NON_RESOLVABLE_LOCAL_FILE = "non_resolvable_file.txt"
+NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.txt"
 
-NON_RESOLVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/non_resolvable_file.txt"
-
-
-def test_instantiate_non_resolvable_local_file():
-    f = File(utils.resource_path(NON_RESOLVABLE_LOCAL_FILE))
-
-    assert f.instantiate() == File.Status.NonInstantiableFile
+NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/non_retrievable_file.txt"
 
 
-def test_instantiate_non_resolvable_remote_file():
-    f = File(utils.resource_path(NON_RESOLVABLE_REMOTE_FILE))
+def test_instantiate_non_retrievable_local_file():
+    f = File(utils.resource_path(NON_RETRIEVABLE_LOCAL_FILE))
 
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert f.instantiate() == File.Status.NonRetrievableFile
+
+
+def test_instantiate_non_retrievable_remote_file():
+    f = File(NON_RETRIEVABLE_REMOTE_FILE)
+
+    assert f.instantiate() == File.Status.NonRetrievableFile

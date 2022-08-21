@@ -20,20 +20,20 @@ limitations under the License.
 
 #include <libopencor>
 
-static constexpr const char *NON_RESOLVABLE_LOCAL_FILE = "non_resolvable_file.txt";
+static constexpr const char *NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.txt";
 
-static constexpr const char *NON_RESOLVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/non_resolvable_file.txt";
+static constexpr const char *NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/non_retrievable_file.txt";
 
-TEST(InstantiateFileTest, instantiateNonResolvableLocalFile)
+TEST(InstantiateFileTest, instantiateNonRetrievableLocalFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(NON_RESOLVABLE_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(NON_RETRIEVABLE_LOCAL_FILE));
 
-    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
+    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
 }
 
-TEST(InstantiateFileTest, instantiateNonResolvableRemoteFile)
+TEST(InstantiateFileTest, instantiateNonRetrievableRemoteFile)
 {
-    auto file = libOpenCOR::File::create(NON_RESOLVABLE_REMOTE_FILE);
+    auto file = libOpenCOR::File::create(NON_RETRIEVABLE_REMOTE_FILE);
 
-    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
+    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
 }
