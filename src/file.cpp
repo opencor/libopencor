@@ -17,6 +17,9 @@ limitations under the License.
 #include "libopencor/file.h"
 
 #include "file_p.h"
+#include "cellmlfile.h"
+#include "combinearchive.h"
+#include "sedmlfile.h"
 #include "support.h"
 #include "utils.h"
 
@@ -41,6 +44,14 @@ void File::Impl::reset()
 
         mFileName = {};
     }
+
+    delete mCellmlFile;
+    delete mSedmlFile;
+    delete mCombineArchive;
+
+    mCellmlFile = nullptr;
+    mSedmlFile = nullptr;
+    mCombineArchive = nullptr;
 }
 
 File::Status File::Impl::resolve()

@@ -14,33 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/file.h"
+#include "cellmlfile.h"
 
-namespace libOpenCOR {
-
-namespace Support {
-    class CellmlFile;
-    class SedmlFile;
-    class CombineArchive;
-}
-
-struct File::Impl
-{
-    Type mType = Type::UNRESOLVED;
-
-    std::string mFileName;
-    std::string mUrl;
-
-    Support::CellmlFile *mCellmlFile = nullptr;
-    Support::SedmlFile *mSedmlFile = nullptr;
-    Support::CombineArchive *mCombineArchive = nullptr;
-
-    ~Impl();
-
-    void reset();
-
-    File::Status resolve();
-    File::Status instantiate();
-};
-
-} // namespace libOpenCOR
+namespace libOpenCOR::Support {
+} // namespace libOpenCOR::Support
