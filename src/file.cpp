@@ -88,6 +88,28 @@ File::Status File::Impl::resolve()
 
 File::Status File::Impl::instantiate()
 {
+    // Make sure that the file has been resolved.
+
+    if (mType == Type::UNRESOLVED) {
+        auto res = resolve();
+
+        if (res != File::Status::OK) {
+            return res;
+        }
+    }
+
+    // Make sure that we are not dealing with an unknown file.
+
+    if (mType == Type::UNKNOWN_FILE) {
+        return File::Status::NON_INSTANTIABLE_FILE;
+    }
+
+    // Generate some C code for the CellML file.
+
+    if (mType == Type::CELLML_FILE) {
+        return File::Status::OK;
+    }
+
     return File::Status::NON_INSTANTIABLE_FILE;
 }
 
