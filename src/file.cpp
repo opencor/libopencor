@@ -62,15 +62,11 @@ File::Status File::Impl::resolve()
 
     if (mFileName.empty()) {
         mFileName = downloadFile(mUrl);
-
-        if (mFileName.empty()) {
-            return File::Status::NON_RETRIEVABLE_FILE;
-        }
     }
 
     // Make sure that the (local) file exists.
 
-    if (!std::filesystem::exists(mFileName.c_str())) {
+    if (mFileName.empty() || !std::filesystem::exists(mFileName.c_str())) {
         return File::Status::NON_RETRIEVABLE_FILE;
     }
 
