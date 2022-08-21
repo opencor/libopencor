@@ -16,10 +16,8 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
-#include "cellmlsupport.h"
-#include "combinesupport.h"
 #include "file_p.h"
-#include "sedmlsupport.h"
+#include "support.h"
 #include "utils.h"
 
 #include <filesystem>

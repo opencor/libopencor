@@ -91,9 +91,7 @@ set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlsupport.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.cpp
 )
 
 set(GIT_API_SOURCE_FILES
@@ -116,9 +114,7 @@ set(SOURCE_FILES
 set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlsupport.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.h
 )
 
 set(GIT_HEADER_FILES

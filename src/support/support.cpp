@@ -14,14 +14,44 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedmlsupport.h"
+#include "support.h"
+#include "utils.h"
+
+#include <combine/combinearchive.h>
+
+#include <libcellml>
 
 #include "libsedmlbegin.h"
-#include "sedml/SedDocument.h"
-#include "sedml/SedReader.h"
+#include <sedml/SedDocument.h>
+#include <sedml/SedReader.h>
 #include "libsedmlend.h"
 
 namespace libOpenCOR::Support {
+
+bool isCellmlFile(const std::string &pFileName)
+{
+    // Try to parse the file contents.
+
+    auto [contents, size] = fileContents(pFileName);
+    auto parser = libcellml::Parser::create();
+    auto model = parser->parseModel(contents.get());
+
+    return parser->issueCount() == 0;
+}
+
+bool isCombineArchive(const std::string &pFileName)
+{
+    // Try to retrieve a COMBINE archive.
+
+    auto combineArchive = libcombine::CombineArchive();
+    auto res = combineArchive.initializeFromArchive(pFileName);
+
+    if (res) {
+        combineArchive.cleanUp();
+    }
+
+    return res;
+}
 
 bool isSedmlFile(const std::string &pFileName)
 {
