@@ -220,15 +220,10 @@ else()
 endif()
 
 if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
-    set(DOXYGEN_MINIMUM_VERSION 1.9)
+    set(EXPECTED_DOXYGEN_VERSION 1.9.3)
 
-    execute_process(COMMAND ${DOXYGEN_EXE} --version
-                    OUTPUT_VARIABLE DOXYGEN_VERSION
-                    OUTPUT_STRIP_TRAILING_WHITESPACE
-                    ERROR_QUIET)
-
-    if(DOXYGEN_VERSION VERSION_LESS DOXYGEN_MINIMUM_VERSION)
-        set(DOCUMENTATION_AVAILABLE_ERROR_MESSAGE "Documentation is requested and Doxygen ${DOXYGEN_VERSION} was found, but version ${DOXYGEN_MINIMUM_VERSION}+ is needed.")
+    if(NOT DOXYGEN_VERSION VERSION_EQUAL EXPECTED_DOXYGEN_VERSION)
+        set(DOCUMENTATION_AVAILABLE_ERROR_MESSAGE "Documentation is requested and Doxygen ${DOXYGEN_VERSION} was found, but version ${EXPECTED_DOXYGEN_VERSION} is needed.")
     else()
         check_python_package(sphinx-copybutton PYTHON_SPHINX_COPY_BUTTON_AVAILABLE)
         check_python_package(sphinx-inline-tabs PYTHON_SPHINX_INLINE_TABS_AVAILABLE)

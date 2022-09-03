@@ -138,6 +138,7 @@ jobs:
             shared_libs: OFF
             unit_testing: OFF
             target: python_unit_testing
+            pip_install_prerequisites: sudo pip3 install cmake scikit-build
             pip_install_test_and_uninstall: ON
           - name: 'Code formatting'
             os: ubuntu-20.04
@@ -237,7 +238,7 @@ jobs:
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_DIRECT_MODE: true
       BUILDCACHE_LOG_FILE: ""
-      DOXYGEN_VERSION: 1.9.4
+      DOXYGEN_VERSION: 1.9.3
       LLVMCLANG_VERSION: 14.0.6
     steps:
       - name: Check out libOpenCOR
@@ -384,7 +385,9 @@ jobs:
           cpack
       - name: pip install libOpenCOR
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
-        run: pip3 install .
+        run: |
+          ${{ matrix.pip_install_prerequisites }}
+          pip3 install .
       - name: Test libOpenCOR Python
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: python3 -c "import libopencor as oc; print(f'This is libOpenCOR version {oc.version_string()}.')"
