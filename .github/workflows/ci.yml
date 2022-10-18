@@ -42,7 +42,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux static library'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -56,7 +56,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux shared library'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -112,7 +112,7 @@ jobs:
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
           - name: 'Linux Python'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -141,7 +141,7 @@ jobs:
             pip_install_prerequisites: sudo pip3 install cmake scikit-build
             pip_install_test_and_uninstall: ON
           - name: 'Code formatting'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -155,7 +155,7 @@ jobs:
             context: PATH=$GITHUB_WORKSPACE:$PATH
             target: check_code_formatting
           - name: 'Python code formatting'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -168,7 +168,7 @@ jobs:
             unit_testing: OFF
             target: check_python_code_formatting
           - name: 'Code analysis'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: ON
             code_coverage_gcov: OFF
@@ -181,7 +181,7 @@ jobs:
             unit_testing: ON
             context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang++
           - name: 'Coverage using gcov'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: ON
@@ -208,7 +208,7 @@ jobs:
             context: PATH=/usr/local/opt/llvm/bin:$PATH CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++
             target: code_coverage_llvm_cov
           - name: 'Memory checks'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Debug
             code_analysis: OFF
             code_coverage_gcov: OFF
@@ -221,7 +221,7 @@ jobs:
             unit_testing: ON
             target: memory_checks
           - name: 'Documentation'
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage_gcov: OFF
