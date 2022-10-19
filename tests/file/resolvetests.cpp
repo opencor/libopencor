@@ -24,11 +24,11 @@ static constexpr const char *NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.
 static constexpr const char *UNKNOWN_LOCAL_FILE = "unknown_file.txt";
 static constexpr const char *SBML_LOCAL_FILE = "sbml.sbml";
 static constexpr const char *ERROR_SEDML_LOCAL_FILE = "error.sedml";
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
 static constexpr const char *CELLML_1_X_LOCAL_FILE = "cellml_1_x.cellml";
+*/
 static constexpr const char *SEDML_1_X_LOCAL_FILE = "cellml_1_x.sedml";
 static constexpr const char *COMBINE_1_X_LOCAL_ARCHIVE = "cellml_1_x.omex";
-*/
 static constexpr const char *CELLML_2_LOCAL_FILE = "cellml_2.cellml";
 static constexpr const char *SEDML_2_LOCAL_FILE = "cellml_2.sedml";
 static constexpr const char *COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex";
@@ -37,11 +37,11 @@ static constexpr const char *NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubus
 static constexpr const char *UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt";
 static constexpr const char *SBML_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/sbml.sbml";
 static constexpr const char *ERROR_SEDML_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/error.sedml";
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
 static constexpr const char *CELLML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_1_x.cellml";
+*/
 static constexpr const char *SEDML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_1_x.sedml";
 static constexpr const char *COMBINE_1_X_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_1_x.omex";
-*/
 static constexpr const char *CELLML_2_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 static constexpr const char *SEDML_2_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml";
 static constexpr const char *COMBINE_2_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex";
@@ -77,7 +77,7 @@ TEST(ResolveFileTest, resolveErrorSedmlLocalFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
 TEST(ResolveFileTest, resolveCellml1xLocalFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(CELLML_1_X_LOCAL_FILE));
@@ -85,6 +85,7 @@ TEST(ResolveFileTest, resolveCellml1xLocalFile)
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
+*/
 
 TEST(ResolveFileTest, resolveSedml1xLocalFile)
 {
@@ -101,7 +102,6 @@ TEST(ResolveFileTest, resolveCombine1xLocalArchive)
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
-*/
 
 TEST(ResolveFileTest, resolveCellml2LocalFile)
 {
@@ -158,7 +158,7 @@ TEST(ResolveFileTest, resolveErrorSedmlRemoteFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.0/1.1.
+/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
 TEST(ResolveFileTest, resolveCellml1xRemoteFile)
 {
     auto file = libOpenCOR::File::create(CELLML_1_X_REMOTE_FILE);
@@ -166,6 +166,7 @@ TEST(ResolveFileTest, resolveCellml1xRemoteFile)
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
+*/
 
 TEST(ResolveFileTest, resolveSedml1xRemoteFile)
 {
@@ -182,7 +183,6 @@ TEST(ResolveFileTest, resolveCombine1xRemoteArchive)
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
-*/
 
 TEST(ResolveFileTest, resolveCellml2RemoteFile)
 {

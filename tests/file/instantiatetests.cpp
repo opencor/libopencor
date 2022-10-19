@@ -22,17 +22,13 @@ limitations under the License.
 
 static constexpr const char *NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.txt";
 static constexpr const char *CELLML_2_LOCAL_FILE = "cellml_2.cellml";
-/*---GRY--- TO BE ENABLED WHEN WE SUPPORT SED-ML FILES AND COMBINE ARCHIVES.
 static constexpr const char *SEDML_2_LOCAL_FILE = "cellml_2.sedml";
 static constexpr const char *COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex";
-*/
 
 static constexpr const char *NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/non_retrievable_file.txt";
 static constexpr const char *CELLML_2_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
-/*---GRY--- TO BE ENABLED WHEN WE SUPPORT SED-ML FILES AND COMBINE ARCHIVES.
 static constexpr const char *SEDML_2_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml";
 static constexpr const char *COMBINE_2_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex";
-*/
 
 TEST(InstantiateFileTest, instantiateNonRetrievableLocalFile)
 {
@@ -48,21 +44,19 @@ TEST(InstantiateFileTest, instantiateCellml2LocalFile)
     EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::OK);
 }
 
-/*---GRY--- TO BE ENABLED WHEN WE SUPPORT SED-ML FILES AND COMBINE ARCHIVES.
 TEST(InstantiateFileTest, instantiateSedml2LocalFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(SEDML_2_LOCAL_FILE));
 
-    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
 }
 
 TEST(InstantiateFileTest, instantiateCombine2LocalArchive)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(COMBINE_2_LOCAL_ARCHIVE));
 
-    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
 }
-*/
 
 TEST(InstantiateFileTest, instantiateNonRetrievableRemoteFile)
 {
@@ -75,21 +69,22 @@ TEST(InstantiateFileTest, instantiateCellml2RemoteFile)
 {
     auto file = libOpenCOR::File::create(CELLML_2_REMOTE_FILE);
 
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::OK);
 }
 
-/*---GRY--- TO BE ENABLED WHEN WE SUPPORT SED-ML FILES AND COMBINE ARCHIVES.
 TEST(InstantiateFileTest, instantiateSedml2RemoteFile)
 {
     auto file = libOpenCOR::File::create(SEDML_2_REMOTE_FILE);
 
-    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
 }
 
 TEST(InstantiateFileTest, instantiateCombine2RemoteArchive)
 {
     auto file = libOpenCOR::File::create(COMBINE_2_REMOTE_ARCHIVE);
 
-    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
 }
-*/
