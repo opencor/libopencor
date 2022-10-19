@@ -47,8 +47,8 @@ static int getTimeOfDay(TimeVal &pTimeVal)
 {
     // Based off https://stackoverflow.com/a/58162122.
 
-    std::chrono::system_clock::duration duration = std::chrono::system_clock::now().time_since_epoch();
-    std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+    const std::chrono::system_clock::duration duration = std::chrono::system_clock::now().time_since_epoch();
+    const std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
 
     pTimeVal.seconds = static_cast<uint64_t>(seconds.count());
     pTimeVal.microeconds = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(duration - seconds).count());
@@ -127,7 +127,7 @@ std::string uniqueFileName()
 
 static size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
-    size_t realDataSize = pSize * pDataSize;
+    const size_t realDataSize = pSize * pDataSize;
 
     reinterpret_cast<std::ofstream *>(pUserData)->write(reinterpret_cast<char *>(pData), static_cast<std::streamsize>(realDataSize)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 
@@ -194,7 +194,7 @@ std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFil
 #endif
 
     auto size = std::filesystem::file_size(pFileName);
-    std::shared_ptr<char[]> contents(new char[size + 1]); // NOLINT(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
+    const std::shared_ptr<char[]> contents(new char[size + 1]); // NOLINT(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 
     file.read(contents.get(), static_cast<std::streamsize>(size));
 

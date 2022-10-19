@@ -61,14 +61,14 @@ bool Compiler::compile(const std::string &pCode)
 
     static constexpr const char *DUMMY_FILE_NAME = "dummy.c";
 
-    std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only",
+    const std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only",
 #ifdef NDEBUG
-                                                      "-O3",
+                                                            "-O3",
 #else
-                                                      "-g", "-O0",
+                                                            "-g", "-O0",
 #endif
-                                                      "-fno-math-errno",
-                                                      DUMMY_FILE_NAME};
+                                                            "-fno-math-errno",
+                                                            DUMMY_FILE_NAME};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments));
 
