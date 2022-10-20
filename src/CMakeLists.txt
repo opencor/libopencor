@@ -144,9 +144,11 @@ add_library(${CMAKE_PROJECT_NAME}
             ${HEADER_FILES})
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                      CXX_VISIBILITY_PRESET hidden
                       DEBUG_POSTFIX d
                       PREFIX ""
-                      VERSION ${PROJECT_VERSION})
+                      VERSION ${PROJECT_VERSION}
+                      VISIBILITY_INLINES_HIDDEN 1)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
