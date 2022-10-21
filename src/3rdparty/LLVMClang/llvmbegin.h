@@ -67,6 +67,7 @@ limitations under the License.
 #    pragma clang diagnostic ignored "-Wswitch-enum"
 #    pragma clang diagnostic ignored "-Wtautological-type-limit-compare"
 #    pragma clang diagnostic ignored "-Wundefined-func-template"
+#    pragma clang diagnostic ignored "-Wunused-but-set-variable"
 #    pragma clang diagnostic ignored "-Wunused-parameter"
 #    pragma clang diagnostic ignored "-Wweak-vtables"
 #endif
