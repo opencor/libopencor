@@ -19,6 +19,7 @@ limitations under the License.
 #include "file_p.h"
 #include "cellmlfile.h"
 #include "combinearchive.h"
+#include "compiler.h"
 #include "sedmlfile.h"
 #include "support.h"
 #include "utils.h"
@@ -27,6 +28,8 @@ limitations under the License.
 #include <regex>
 
 #include <curl/curl.h>
+
+#include <libcellml>
 
 namespace libOpenCOR {
 
@@ -104,10 +107,48 @@ File::Status File::Impl::instantiate()
         return File::Status::NON_INSTANTIABLE_FILE;
     }
 
-    // Generate some C code for the CellML file.
+    // Generate and compile some C code for the CellML file.
 
     if (mType == Type::CELLML_FILE) {
-        return File::Status::OK;
+        auto [contents, size] = fileContents(mFileName);
+        auto parser = libcellml::Parser::create();
+        auto model = parser->parseModel(contents.get());
+
+        if (parser->issueCount() == 0) {
+            auto analyser = libcellml::Analyser::create();
+
+            analyser->analyseModel(model);
+
+            if (analyser->issueCount() == 0) {
+                auto generator = libcellml::Generator::create();
+                auto generatorProfile = libcellml::GeneratorProfile::create();
+
+                generatorProfile->setOriginCommentString("");
+                generatorProfile->setImplementationHeaderString("");
+                generatorProfile->setImplementationVersionString("");
+                generatorProfile->setImplementationStateCountString("");
+                generatorProfile->setImplementationVariableCountString("");
+                generatorProfile->setImplementationLibcellmlVersionString("");
+                generatorProfile->setImplementationVoiInfoString("");
+                generatorProfile->setImplementationStateInfoString("");
+                generatorProfile->setImplementationVariableInfoString("");
+                generatorProfile->setImplementationCreateStatesArrayMethodString("");
+                generatorProfile->setImplementationCreateVariablesArrayMethodString("");
+                generatorProfile->setImplementationDeleteArrayMethodString("");
+
+                generator->setModel(analyser->model());
+                generator->setProfile(generatorProfile);
+
+                auto compiler = new Compiler();
+                auto compiled = compiler->compile(generator->implementationCode());
+
+                delete compiler;
+
+                if (compiled) {
+                    return File::Status::OK;
+                }
+            }
+        }
     }
 
     return File::Status::NON_INSTANTIABLE_FILE;
