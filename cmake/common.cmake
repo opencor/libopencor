@@ -309,9 +309,7 @@ function(prepare_test TARGET)
 
     add_executable(${TARGET}
                    ${INTERNAL_SOURCE_FILES}
-                   ${ARGN}
-                   ${CMAKE_SOURCE_DIR}/src/misc/compiler.cpp
-                   ${CMAKE_SOURCE_DIR}/src/misc/utils.cpp)
+                   ${ARGN})
 
     add_dependencies(${TARGET} ${CMAKE_PROJECT_NAME})
 
