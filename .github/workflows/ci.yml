@@ -137,6 +137,7 @@ jobs:
             python_unit_testing: ON
             shared_libs: OFF
             unit_testing: OFF
+            context: PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
             target: python_unit_testing
             pip_install_prerequisites: sudo pip3 install cmake scikit-build
             pip_install_test_and_uninstall: ON
