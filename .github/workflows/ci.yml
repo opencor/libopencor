@@ -284,18 +284,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt install valgrind
-      - name: Install pytest
+      - name: Install pytest and pytest-html
         if: ${{ matrix.target == 'python_unit_testing' }}
-        run: pip3 install pytest
-      - name: Install pytest-html
-        if: ${{ matrix.target == 'python_unit_testing' }}
-        run: pip3 install pytest-html
-      - name: Install Sphinx
+        run: pip3 install pytest pytest-html
+      - name: Install Sphinx and some Sphinx packages
         if: ${{ matrix.documentation == 'ON' }}
-        run: pip3 install sphinx
-      - name: Install Sphinx packages
-        if: ${{ matrix.documentation == 'ON' }}
-        run: pip3 install sphinx-copybutton sphinx-inline-tabs
+        run: pip3 install sphinx sphinx-copybutton sphinx-inline-tabs
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |
