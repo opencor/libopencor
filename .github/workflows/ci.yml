@@ -137,6 +137,7 @@ jobs:
             python_unit_testing: ON
             shared_libs: OFF
             unit_testing: OFF
+            context: PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
             target: python_unit_testing
             pip_install_prerequisites: sudo pip3 install cmake scikit-build
             pip_install_test_and_uninstall: ON
@@ -246,7 +247,7 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: mikehardy/buildcache-action@v1
+        uses: mikehardy/buildcache-action@v2
         with:
           cache_key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage_gcov }}-${{ matrix.code_coverage_llvm_cov }}-${{ matrix.documentation }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
       - name: Configure MSVC
@@ -284,18 +285,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt install valgrind
-      - name: Install pytest
+      - name: Install pytest and pytest-html
         if: ${{ matrix.target == 'python_unit_testing' }}
-        run: pip3 install pytest
-      - name: Install pytest-html
-        if: ${{ matrix.target == 'python_unit_testing' }}
-        run: pip3 install pytest-html
-      - name: Install Sphinx
+        run: pip3 install pytest pytest-html
+      - name: Install Sphinx and some Sphinx packages
         if: ${{ matrix.documentation == 'ON' }}
-        run: pip3 install sphinx
-      - name: Install Sphinx packages
-        if: ${{ matrix.documentation == 'ON' }}
-        run: pip3 install sphinx-copybutton sphinx-inline-tabs
+        run: pip3 install sphinx sphinx-copybutton sphinx-inline-tabs
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |
