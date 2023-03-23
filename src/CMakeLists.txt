@@ -169,7 +169,7 @@ else()
     set(INTERNAL_SOURCE_FILES PARENT_SCOPE)
 endif()
 
-# Configure OpenCOR.
+# Configure libOpenCOR.
 
 configure_target(${CMAKE_PROJECT_NAME})
 
