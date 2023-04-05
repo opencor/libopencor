@@ -119,11 +119,3 @@ set(LIBCELLML_CMAKE_DIR ${INSTALL_DIR}/${CMAKE_DIR} CACHE INTERNAL "${PACKAGE_NA
 set(LIBCELLML_CMAKE_PACKAGE_NAME ${PACKAGE_NAME} CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBCELLML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LIBCELLML_LIBRARY cellml CACHE INTERNAL "${PACKAGE_NAME}'s library.")
-
-if(WIN32 AND NOT RELEASE_MODE)
-    # The below is a temporary fix for the debug version of libCellML on Windows
-    # (see https://github.com/cellml/libcellml/issues/980).
-
-    file(COPY ${INSTALL_DIR}/lib/${DEBUG_UTILITIES_LIBRARY}
-         DESTINATION ${CMAKE_BINARY_DIR})
-endif()
