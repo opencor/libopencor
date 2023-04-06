@@ -142,9 +142,11 @@ add_library(${CMAKE_PROJECT_NAME}
             ${HEADER_FILES})
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                      CXX_VISIBILITY_PRESET hidden
                       DEBUG_POSTFIX d
                       PREFIX ""
-                      VERSION ${PROJECT_VERSION})
+                      VERSION ${PROJECT_VERSION}
+                      VISIBILITY_INLINES_HIDDEN 1)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
@@ -160,14 +162,9 @@ set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
-if(WIN32 AND LIBOPENCOR_SHARED_LIBS)
-    # Internal source files are needed when building tests on Windows using the
-    # shared version of libOpenCOR.
+# Internal source files needed when building tests.
 
-    set(INTERNAL_SOURCE_FILES ${INTERNAL_SOURCE_FILES} PARENT_SCOPE)
-else()
-    set(INTERNAL_SOURCE_FILES PARENT_SCOPE)
-endif()
+set(INTERNAL_SOURCE_FILES ${INTERNAL_SOURCE_FILES} PARENT_SCOPE)
 
 # Configure libOpenCOR.
 

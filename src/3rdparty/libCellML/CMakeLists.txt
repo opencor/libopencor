@@ -13,10 +13,10 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCellML)
-set(PACKAGE_VERSION 0.2.0)
+set(PACKAGE_VERSION 0.4.0)
 set(PACKAGE_REPOSITORY libcellml)
-set(GIT_TAG 2022-07-05)
-set(RELEASE_TAG 2022-07-05)
+set(GIT_TAG 2023-04-06)
+set(RELEASE_TAG 2023-04-06)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -36,20 +36,20 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             52a15acf3f4603d4ccf24fd77a126a433e919271)
+                             10f76fe303776ecf0c54a67329fcf846a532abcb)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e947c3661b55648ebcb436ff3637195655320c0d)
+                             4a1dff2dd362577a1c6ceaf041b9fa809d0f555e)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         9c0f17f02a1cb6718bd39f17505161af3e5421c7)
+                         2b4773cf641176d7216cbd5aad615ed79140f137)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         c2c26e2430ba62e1caa704a2eb516d45aec13273)
+                         4f147a28239ced4b3b82f3697ba41e7290487671)
     endif()
 else()
     # Build our package.
@@ -87,25 +87,13 @@ else()
 
     string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
 
-    if(RELEASE_MODE)
-        string(REPLACE ";\\$<LINK_ONLY:\\$<\\$<CONFIG:DEBUG>:cellml_debug_utilities>>" "" FILE_CONTENTS "${FILE_CONTENTS}")
-    endif()
+    foreach(LIBRARY libxml2 zlib)
+        string(REPLACE "${PREBUILT_DIR}/${LIBRARY}" "\${_IMPORT_PREFIX}/../${LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    endforeach()
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     # Create our package.
-
-    if(WIN32)
-        # The below is a temporary fix for the debug version of libCellML on
-        # Windows (see https://github.com/cellml/libcellml/issues/980).
-
-        if(NOT RELEASE_MODE)
-            set(DEBUG_UTILITIES_LIBRARY cellml_debug_utilities.lib)
-
-            file(COPY ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/src/${DEBUG_UTILITIES_LIBRARY}
-                 DESTINATION ${INSTALL_DIR}/lib)
-        endif()
-    endif()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -119,11 +107,3 @@ set(LIBCELLML_CMAKE_DIR ${INSTALL_DIR}/${CMAKE_DIR} CACHE INTERNAL "${PACKAGE_NA
 set(LIBCELLML_CMAKE_PACKAGE_NAME ${PACKAGE_NAME} CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBCELLML_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LIBCELLML_LIBRARY cellml CACHE INTERNAL "${PACKAGE_NAME}'s library.")
-
-if(WIN32 AND NOT RELEASE_MODE)
-    # The below is a temporary fix for the debug version of libCellML on Windows
-    # (see https://github.com/cellml/libcellml/issues/980).
-
-    file(COPY ${INSTALL_DIR}/lib/${DEBUG_UTILITIES_LIBRARY}
-         DESTINATION ${CMAKE_BINARY_DIR})
-endif()
