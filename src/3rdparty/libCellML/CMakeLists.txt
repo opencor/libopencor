@@ -36,20 +36,20 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f622c4b19bfe8a554cb3f7eba851fa980016973d)
+                             10f76fe303776ecf0c54a67329fcf846a532abcb)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             24610475358b4d2fd1e9e2e344e4708525dbb11a)
+                             4a1dff2dd362577a1c6ceaf041b9fa809d0f555e)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         89dafcb93278dccf00f5d5a61e3a3e5e3d74c044)
+                         2b4773cf641176d7216cbd5aad615ed79140f137)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         a5fc19b4d6b4b2fa530da6de066f70580c4b7aaf)
+                         4f147a28239ced4b3b82f3697ba41e7290487671)
     endif()
 else()
     # Build our package.
@@ -87,9 +87,9 @@ else()
 
     string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
 
-    if(RELEASE_MODE)
-        string(REPLACE ";\\$<LINK_ONLY:\\$<\\$<CONFIG:DEBUG>:cellml_debug_utilities>>" "" FILE_CONTENTS "${FILE_CONTENTS}")
-    endif()
+    foreach(LIBRARY libxml2 zlib)
+        string(REPLACE "${PREBUILT_DIR}/${LIBRARY}" "\${_IMPORT_PREFIX}/../${LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    endforeach()
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
