@@ -13,7 +13,7 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCellML)
-set(PACKAGE_VERSION 0.2.0)
+set(PACKAGE_VERSION 0.4.0)
 set(PACKAGE_REPOSITORY libcellml)
 set(GIT_TAG 2023-04-06)
 set(RELEASE_TAG 2023-04-06)
@@ -36,20 +36,20 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             52a15acf3f4603d4ccf24fd77a126a433e919271)
+                             f622c4b19bfe8a554cb3f7eba851fa980016973d)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e947c3661b55648ebcb436ff3637195655320c0d)
+                             24610475358b4d2fd1e9e2e344e4708525dbb11a)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         9c0f17f02a1cb6718bd39f17505161af3e5421c7)
+                         89dafcb93278dccf00f5d5a61e3a3e5e3d74c044)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         c2c26e2430ba62e1caa704a2eb516d45aec13273)
+                         a5fc19b4d6b4b2fa530da6de066f70580c4b7aaf)
     endif()
 else()
     # Build our package.
@@ -94,18 +94,6 @@ else()
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
     # Create our package.
-
-    if(WIN32)
-        # The below is a temporary fix for the debug version of libCellML on
-        # Windows (see https://github.com/cellml/libcellml/issues/980).
-
-        if(NOT RELEASE_MODE)
-            set(DEBUG_UTILITIES_LIBRARY cellml_debug_utilities.lib)
-
-            file(COPY ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/src/${DEBUG_UTILITIES_LIBRARY}
-                 DESTINATION ${INSTALL_DIR}/lib)
-        endif()
-    endif()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
