@@ -30,12 +30,14 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/*---GRY--- THE BELOW METHOD IS TO BE ENABLED ONCE WE ACTUALLY MAKE USE OF IT IN libOpenCOR.
 bool fuzzyCompare(double pNb1, double pNb2)
 {
     static constexpr double ONE_TRILLION = 1000000000000.0;
 
     return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
 }
+*/
 
 using TimeVal = struct
 {
