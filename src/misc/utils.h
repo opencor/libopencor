@@ -21,7 +21,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/*---GRY--- THE BELOW METHOD IS TO BE ENABLED ONCE WE ACTUALLY MAKE USE OF IT IN libOpenCOR.
 bool fuzzyCompare(double pNb1, double pNb2);
+*/
 
 std::string uniqueFileName();
 

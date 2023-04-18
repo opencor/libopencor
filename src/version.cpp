@@ -54,14 +54,14 @@ static constexpr unsigned int MINOR_01 = 256;
 static constexpr unsigned int PATCH_10 = 16;
 static constexpr unsigned int PATCH_01 = 1;
 
-unsigned int firstDigit(unsigned int pTwoDigitNumber)
+inline unsigned int firstDigit(unsigned int pTwoDigitNumber)
 {
     static constexpr double ONE_TENTH = 0.1;
 
     return static_cast<unsigned int>(floor(ONE_TENTH * pTwoDigitNumber));
 }
 
-unsigned int secondDigit(unsigned int pTwoDigitNumber)
+inline unsigned int secondDigit(unsigned int pTwoDigitNumber)
 {
     static constexpr unsigned int TEN = 10;
 

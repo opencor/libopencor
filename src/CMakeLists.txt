@@ -89,7 +89,8 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    #---GRY--- THE BELOW FILE IS TO BE ADDED ONCE WE ACTUALLY MAKE USE OF THE COMPILER IN libOpenCOR.
+    # ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
@@ -115,7 +116,8 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    #---GRY--- THE BELOW FILE IS TO BE ADDED ONCE WE ACTUALLY MAKE USE OF THE COMPILER IN libOpenCOR.
+    # ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
@@ -148,7 +150,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                       DEBUG_POSTFIX d
                       PREFIX ""
                       VERSION ${PROJECT_VERSION}
-                      VISIBILITY_INLINES_HIDDEN 1)
+                      VISIBILITY_INLINES_HIDDEN ON)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
@@ -163,10 +165,6 @@ set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
 set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
-
-# Internal source files needed when building tests.
-
-set(INTERNAL_SOURCE_FILES ${INTERNAL_SOURCE_FILES} PARENT_SCOPE)
 
 # Configure libOpenCOR.
 

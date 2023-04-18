@@ -15,8 +15,8 @@
 set(PACKAGE_NAME libCellML)
 set(PACKAGE_VERSION 0.4.0)
 set(PACKAGE_REPOSITORY libcellml)
-set(GIT_TAG 2023-04-06)
-set(RELEASE_TAG 2023-04-06)
+set(GIT_TAG 2023-04-17)
+set(RELEASE_TAG 2023-04-17)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -36,20 +36,20 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             10f76fe303776ecf0c54a67329fcf846a532abcb)
+                             38258a57e91ac842c26bb57e933f5add2cdfc75a)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             4a1dff2dd362577a1c6ceaf041b9fa809d0f555e)
+                             f3a8bb581eb00a4e06dd9a698511101b1b32a39d)
         endif()
     elseif(APPLE)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         2b4773cf641176d7216cbd5aad615ed79140f137)
+                         d9f1bff8a4cbd4981d6197ea4ea398ad937e62ee)
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         4f147a28239ced4b3b82f3697ba41e7290487671)
+                         b3357a159127ff3dbd55eb9f34ba1f0ae23f48b3)
     endif()
 else()
     # Build our package.
