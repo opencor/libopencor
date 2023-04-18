@@ -180,8 +180,7 @@ function(configure_target TARGET)
             )
 
             set_target_properties(${TARGET} PROPERTIES
-                CXX_CLANG_TIDY "${CXX_CLANG_TIDY}"
-            )
+                                  CXX_CLANG_TIDY "${CXX_CLANG_TIDY}")
         endif()
     endif()
 
@@ -212,8 +211,7 @@ function(configure_target TARGET)
                     list(GET PACKAGE_LIBRARY_LIST 1 PACKAGE_LIBRARY_NAME)
 
                     set_target_properties(${AVAILABLE_PACKAGE_LIBRARY} PROPERTIES
-                        IMPORTED_LOCATION_${LIBRARY_BUILD_TYPE} "${PREBUILT_DIR}/${AVAILABLE_PACKAGE}/lib/${PACKAGE_LIBRARY_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}"
-                    )
+                                          IMPORTED_LOCATION_${LIBRARY_BUILD_TYPE} "${PREBUILT_DIR}/${AVAILABLE_PACKAGE}/lib/${PACKAGE_LIBRARY_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}")
                 endif()
             endforeach()
         else()
@@ -308,7 +306,6 @@ function(prepare_test TARGET)
     # Prepare the given test.
 
     add_executable(${TARGET}
-                   ${INTERNAL_SOURCE_FILES}
                    ${ARGN})
 
     add_dependencies(${TARGET} ${CMAKE_PROJECT_NAME})
@@ -316,15 +313,6 @@ function(prepare_test TARGET)
     target_link_libraries(${TARGET} PRIVATE
                           gtest_main
                           ${CMAKE_PROJECT_NAME})
-
-    if(BUILDING_USING_MSVC)
-        # Ask the linker to ignore the redefinition of some symbols, which
-        # occurs as a result of having ${INTERNAL_SOURCE_FILES} in
-        # add_executable() above.
-
-        target_link_options(${TARGET} PRIVATE
-                            /FORCE)
-    endif()
 
     configure_target(${TARGET})
 

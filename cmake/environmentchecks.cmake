@@ -139,7 +139,9 @@ endif()
 
 include(CheckCXXCompilerFlag)
 
-set(CODE_COVERAGE_GCOV_COMPILER_FLAGS "--coverage")
+set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+
+set(CODE_COVERAGE_GCOV_COMPILER_FLAGS "-fprofile-arcs -ftest-coverage")
 set(CODE_COVERAGE_GCOV_LINKER_FLAGS "${CODE_COVERAGE_GCOV_COMPILER_FLAGS}")
 set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_GCOV_COMPILER_FLAGS})
 
@@ -150,6 +152,8 @@ set(CODE_COVERAGE_LLVM_COV_LINKER_FLAGS "-fprofile-instr-generate")
 set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS})
 
 check_cxx_compiler_flag(${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS} CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
+
+set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
 
 # Determine what is available.
 
@@ -210,13 +214,13 @@ endif()
 if(FIND_EXE AND GCOV_EXE AND GCOVR_EXE AND CODE_COVERAGE_GCOV_COMPILER_FLAGS_OK)
     set(CODE_COVERAGE_GCOV_AVAILABLE TRUE)
 else()
-    set(CODE_COVERAGE_GCOV_ERROR_MESSAGE "Code coverage testing using gcov is requested but the find, gcov and/or gcovr tools could not be found, and/or the --coverage compiler/linker flag is not supported.")
+    set(CODE_COVERAGE_GCOV_ERROR_MESSAGE "Code coverage testing using gcov is requested but the find, gcov and/or gcovr tools could not be found, and/or the -fprofile-arcs and -ftest-coverage compiler/linker flags are not supported.")
 endif()
 
 if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
     set(CODE_COVERAGE_LLVM_COV_AVAILABLE TRUE)
 else()
-    set(CODE_COVERAGE_LLVM_COV_ERROR_MESSAGE "Code coverage testing using llvm-cov is requested but the find, llvm-cov and/or llvm-profdata tools could not be found, and/or the -fprofile-instr-generate -fcoverage-mapping compiler/linker flags are not supported.")
+    set(CODE_COVERAGE_LLVM_COV_ERROR_MESSAGE "Code coverage testing using llvm-cov is requested but the find, llvm-cov and/or llvm-profdata tools could not be found, and/or the -fprofile-instr-generate and -fcoverage-mapping compiler/linker flags are not supported.")
 endif()
 
 if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)

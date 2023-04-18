@@ -89,7 +89,8 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    #---GRY--- THE BELOW FILE IS TO BE ADDED ONCE WE ACTUALLY MAKE USE OF THE COMPILER IN libOpenCOR.
+    # ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.cpp
@@ -114,7 +115,8 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    #---GRY--- THE BELOW FILE IS TO BE ADDED ONCE WE ACTUALLY MAKE USE OF THE COMPILER IN libOpenCOR.
+    # ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.h
@@ -142,9 +144,11 @@ add_library(${CMAKE_PROJECT_NAME}
             ${HEADER_FILES})
 
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                      CXX_VISIBILITY_PRESET hidden
                       DEBUG_POSTFIX d
                       PREFIX ""
-                      VERSION ${PROJECT_VERSION})
+                      VERSION ${PROJECT_VERSION}
+                      VISIBILITY_INLINES_HIDDEN ON)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
@@ -159,15 +163,6 @@ set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
 set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
 set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
 set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
-
-if(WIN32 AND LIBOPENCOR_SHARED_LIBS)
-    # Internal source files are needed when building tests on Windows using the
-    # shared version of libOpenCOR.
-
-    set(INTERNAL_SOURCE_FILES ${INTERNAL_SOURCE_FILES} PARENT_SCOPE)
-else()
-    set(INTERNAL_SOURCE_FILES PARENT_SCOPE)
-endif()
 
 # Configure libOpenCOR.
 
