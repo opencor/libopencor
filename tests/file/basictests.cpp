@@ -23,7 +23,7 @@ limitations under the License.
 static constexpr auto WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
 static constexpr auto UNIX_LOCAL_FILE = "/some/path/file.txt";
 
-TEST(BasicFileTest, windowsFile)
+TEST(BasicFileTest, windowsLocalFile)
 {
     auto file = libOpenCOR::File::create(WINDOWS_LOCAL_FILE);
 
@@ -32,7 +32,7 @@ TEST(BasicFileTest, windowsFile)
     EXPECT_EQ(file->url(), "");
 }
 
-TEST(BasicFileTest, unixFile)
+TEST(BasicFileTest, unixLocalFile)
 {
     auto file = libOpenCOR::File::create(UNIX_LOCAL_FILE);
 
@@ -41,7 +41,7 @@ TEST(BasicFileTest, unixFile)
     EXPECT_EQ(file->url(), "");
 }
 
-TEST(BasicFileTest, urlBasedWindowsFile)
+TEST(BasicFileTest, urlBasedWindowsLocalFile)
 {
     auto file = libOpenCOR::File::create("file:///C:/some/path/file.txt");
 
@@ -50,7 +50,7 @@ TEST(BasicFileTest, urlBasedWindowsFile)
     EXPECT_EQ(file->url(), "");
 }
 
-TEST(BasicFileTest, urlBasedUnixFile)
+TEST(BasicFileTest, urlBasedUnixLocalFile)
 {
     auto file = libOpenCOR::File::create("file:///some/path/file.txt");
 
@@ -61,11 +61,9 @@ TEST(BasicFileTest, urlBasedUnixFile)
 
 TEST(BasicFileTest, remoteFile)
 {
-    static constexpr auto REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.cellml";
-
-    auto file = libOpenCOR::File::create(REMOTE_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
     EXPECT_EQ(file->fileName(), "");
-    EXPECT_EQ(file->url(), REMOTE_FILE);
+    EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
 }

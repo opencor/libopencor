@@ -33,6 +33,9 @@ static constexpr auto CELLML_2_FILE = "cellml_2.cellml";
 static constexpr auto SEDML_2_FILE = "cellml_2.sedml";
 static constexpr auto COMBINE_2_ARCHIVE = "cellml_2.omex";
 
+static constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+static constexpr auto NOT_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/not_cellml_2.cellml";
+
 std::string resourcePath(const std::string &resourceRelativePath);
 
 } // namespace libOpenCOR

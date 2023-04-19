@@ -20,11 +20,26 @@ limitations under the License.
 
 #include <libopencor>
 
-static constexpr auto UNDERCONSTRAINED_CELLML_LOCAL_FILE = "underconstrained.cellml";
-
-TEST(CoverageTest, underconstrainedCellmlLocalFile)
+TEST(CoverageTest, underconstrainedCellmlFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(UNDERCONSTRAINED_CELLML_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("underconstrained.cellml"));
 
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
+}
+
+TEST(CoverageTest, remoteFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
+
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
+    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::OK);
+}
+
+TEST(CoverageTest, notRemoteFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::NOT_REMOTE_FILE);
+
+    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
+    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
 }

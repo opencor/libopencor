@@ -30,5 +30,9 @@ SEDML_2_FILE = "cellml_2.sedml"
 COMBINE_2_ARCHIVE = "cellml_2.omex"
 
 
+REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+NOT_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/not_cellml_2.cellml"
+
+
 def resource_path(relative_path=""):
     return RESOURCE_LOCATION + "/" + relative_path
