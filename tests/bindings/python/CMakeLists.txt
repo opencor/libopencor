@@ -52,3 +52,14 @@ if(PYTHON_UNIT_TESTING_REPORT_AVAILABLE)
                WORKING_DIRECTORY ${PYTHON_BINDINGS_DIR}
                COMMENT "Running Python unit testing report...")
 endif()
+
+if(PYTHON_CODE_COVERAGE_AVAILABLE)
+    add_target(python_code_coverage
+               ${COMMANDS}
+               COMMAND ${COVERAGE_EXE} run -m pytest
+               COMMAND ${COVERAGE_EXE} report -m
+               DEPENDS ${PYTHON_BINDINGS_TARGET}
+               USES_TERMINAL
+               WORKING_DIRECTORY ${PYTHON_BINDINGS_DIR}
+               COMMENT "Running Python code coverage testing...")
+endif()
