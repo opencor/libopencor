@@ -16,6 +16,10 @@ limitations under the License.
 
 #pragma once
 
+#ifdef UNIT_TESTING_ENABLED
+#include "libopencor/export.h"
+#endif
+
 #include "llvmbegin.h"
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
 #include "llvmend.h"
@@ -24,7 +28,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+#ifdef UNIT_TESTING_ENABLED
+class LIBOPENCOR_EXPORT Compiler
+#else
 class Compiler
+#endif
 {
 public:
     bool compile(const std::string &pCode);

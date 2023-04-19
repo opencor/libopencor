@@ -83,6 +83,13 @@ if(LIBOPENCOR_UNIT_TESTING)
                COMMENT "Running unit testing...")
 endif()
 
+# Let libOpenCOR know if unit testing is enabled.
+
+if(LIBOPENCOR_UNIT_TESTING OR LIBOPENCOR_PYTHON_UNIT_TESTING)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+                               UNIT_TESTING_ENABLED)
+endif()
+
 # Add our bindings tests.
 
 add_subdirectory(bindings)
