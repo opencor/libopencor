@@ -33,7 +33,7 @@ bool isCellmlFile(const std::string &pFileName)
     // Try to parse the file contents as a CellML 2.0 file.
 
     auto [contents, size] = fileContents(pFileName);
-    auto rawContents = contents.get();
+    auto *rawContents = contents.get();
     auto parser = libcellml::Parser::create();
 
     parser->parseModel(rawContents);

@@ -111,7 +111,7 @@ File::Status File::Impl::instantiate()
     //       file.
 
     auto [contents, size] = fileContents(mFileName);
-    auto rawContents = contents.get();
+    auto *rawContents = contents.get();
     auto parser = libcellml::Parser::create();
     auto model = parser->parseModel(rawContents);
 
