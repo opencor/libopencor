@@ -44,12 +44,12 @@ endif()
 # format it.
 
 if(PYTHON_FORMATTING_AVAILABLE)
-    add_target(check_python_code_formatting
+    add_target(python_check_code_formatting
                COMMAND ${BLACK_EXE} --check .
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Checking Python code formatting...")
 
-    add_target(format_python_code
+    add_target(python_format_code
                COMMAND ${BLACK_EXE} .
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Formatting the Python code...")

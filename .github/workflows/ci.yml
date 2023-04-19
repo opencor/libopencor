@@ -167,7 +167,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: OFF
             unit_testing: OFF
-            target: check_python_code_formatting
+            target: python_check_code_formatting
           - name: 'Code analysis'
             os: ubuntu-22.04
             build_type: Release
@@ -275,7 +275,7 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Black
-        if: ${{ matrix.target == 'check_python_code_formatting' }}
+        if: ${{ matrix.target == 'python_check_code_formatting' }}
         run: pip3 install black
       - name: Install gcovr
         if: ${{ matrix.code_coverage_gcov == 'ON' }}
@@ -327,7 +327,7 @@ jobs:
           cd build
           ninja ${{ matrix.target }}
       - name: Python code formatting
-        if: ${{ matrix.target == 'check_python_code_formatting' }}
+        if: ${{ matrix.target == 'python_check_code_formatting' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
