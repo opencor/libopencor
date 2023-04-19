@@ -116,6 +116,7 @@ set(SOURCE_FILES
 
 set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/unittestingexport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
