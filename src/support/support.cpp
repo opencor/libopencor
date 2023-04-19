@@ -30,13 +30,27 @@ namespace libOpenCOR::Support {
 
 bool isCellmlFile(const std::string &pFileName)
 {
-    // Try to parse the file contents.
+    // Try to parse the file contents as a CellML 2.0 file.
 
     auto [contents, size] = fileContents(pFileName);
+    auto rawContents = contents.get();
     auto parser = libcellml::Parser::create();
-    auto model = parser->parseModel(contents.get());
 
-    return parser->issueCount() == 0;
+    parser->parseModel(rawContents);
+
+    if (parser->issueCount() != 0) {
+        // We couldn't parse the file contents as a CellML 2.0 file, so maybe it is a CellML 1.x file?
+        // Note: we check for the number of errors rather than the number of issues since the parser generates a message
+        //       about it trying to represent the model in CellML 2.0.
+
+        parser = libcellml::Parser::create(false);
+
+        parser->parseModel(rawContents);
+
+        return parser->errorCount() == 0;
+    }
+
+    return true;
 }
 
 bool isCombineArchive(const std::string &pFileName)
