@@ -51,7 +51,6 @@ TEST(ResolveFileTest, resolveErrorSedmlFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
 TEST(ResolveFileTest, resolveCellml1xFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_1_X_FILE));
@@ -59,7 +58,6 @@ TEST(ResolveFileTest, resolveCellml1xFile)
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
-*/
 
 TEST(ResolveFileTest, resolveSedml1xFile)
 {

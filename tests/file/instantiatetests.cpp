@@ -48,14 +48,12 @@ TEST(InstantiateFileTest, instantiateErrorSedmlFile)
     EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
 }
 
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
 TEST(InstantiateFileTest, instantiateCellml1xFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_1_X_FILE));
 
     EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::OK);
 }
-*/
 
 TEST(InstantiateFileTest, instantiateSedml1xFile)
 {

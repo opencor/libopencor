@@ -43,12 +43,11 @@ def test_resolve_error_sedml_local_file():
     assert f.type == File.Type.SedmlFile
 
 
-# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
-# def test_resolve_cellml_1_x_local_file():
-#     f = File(utils.resource_path(CELLML_1_X_FILE))
+def test_resolve_cellml_1_x_local_file():
+    f = File(utils.resource_path(CELLML_1_X_FILE))
 
-#     assert f.resolve() == File.Status.Ok
-#     assert f.type == File.Type.CellmlFile
+    assert f.resolve() == File.Status.Ok
+    assert f.type == File.Type.CellmlFile
 
 
 def test_resolve_sedml_1_x_local_file():

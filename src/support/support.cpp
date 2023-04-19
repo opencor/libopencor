@@ -38,10 +38,8 @@ bool isCellmlFile(const std::string &pFileName)
 
     parser->parseModel(rawContents);
 
-    if (parser->issueCount() != 0) {
+    if (parser->errorCount() != 0) {
         // We couldn't parse the file contents as a CellML 2.0 file, so maybe it is a CellML 1.x file?
-        // Note: we check for the number of errors rather than the number of issues since the parser generates a message
-        //       about it trying to represent the model in CellML 2.0.
 
         parser = libcellml::Parser::create(false);
 

@@ -40,11 +40,10 @@ def test_instantiate_error_sedml_local_file():
     assert f.instantiate() == File.Status.NonInstantiableFile
 
 
-# ---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
-# def test_instantiate_cellml_1_x_local_file():
-#     f = File(utils.resource_path(CELLML_1_X_FILE))
+def test_instantiate_cellml_1_x_local_file():
+    f = File(utils.resource_path(CELLML_1_X_FILE))
 
-#     assert f.instantiate() == File.Status.Ok
+    assert f.instantiate() == File.Status.Ok
 
 
 def test_instantiate_sedml_1_x_local_file():

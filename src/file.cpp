@@ -111,13 +111,23 @@ File::Status File::Impl::instantiate()
     //       file.
 
     auto [contents, size] = fileContents(mFileName);
+    auto rawContents = contents.get();
     auto parser = libcellml::Parser::create();
-    auto model = parser->parseModel(contents.get());
+    auto model = parser->parseModel(rawContents);
+
+    if (parser->errorCount() != 0) {
+        // We couldn't parse the file contents as a CellML 2.0 file, so this means that we are dealing with a CellML 1.x
+        // file, hence we should use a non-strict parser instead.
+
+        parser = libcellml::Parser::create(false);
+        model = parser->parseModel(rawContents);
+    }
+
     auto analyser = libcellml::Analyser::create();
 
     analyser->analyseModel(model);
 
-    if (analyser->issueCount() != 0) {
+    if (analyser->errorCount() != 0) {
         return File::Status::NON_INSTANTIABLE_FILE;
     }
 
