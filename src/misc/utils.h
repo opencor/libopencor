@@ -16,14 +16,20 @@ limitations under the License.
 
 #pragma once
 
+#ifdef UNIT_TESTING_ENABLED
+#include "libopencor/export.h"
+#endif
+
 #include <memory>
 #include <string>
 
 namespace libOpenCOR {
 
-/*---GRY--- THE BELOW METHOD IS TO BE ENABLED ONCE WE ACTUALLY MAKE USE OF IT IN libOpenCOR.
+#ifdef UNIT_TESTING_ENABLED
+bool LIBOPENCOR_EXPORT fuzzyCompare(double pNb1, double pNb2);
+#else
 bool fuzzyCompare(double pNb1, double pNb2);
-*/
+#endif
 
 std::string uniqueFileName();
 
