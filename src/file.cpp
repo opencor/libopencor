@@ -100,54 +100,55 @@ File::Status File::Impl::instantiate()
         }
     }
 
-    // Make sure that we are not dealing with an unknown file.
+    // Make sure that we are dealing with a CellML file.
 
-    if (mType == Type::UNKNOWN_FILE) {
+    if (mType != Type::CELLML_FILE) {
         return File::Status::NON_INSTANTIABLE_FILE;
     }
 
-    // Generate and compile some C code for the CellML file.
+    // Generate and compile the C code for the CellML file.
+    // Note: no need to check whether the parsing was fine since it's a prequisite to a file being considered a CellML
+    //       file.
 
-    if (mType == Type::CELLML_FILE) {
-        auto [contents, size] = fileContents(mFileName);
-        auto parser = libcellml::Parser::create();
-        auto model = parser->parseModel(contents.get());
+    auto [contents, size] = fileContents(mFileName);
+    auto parser = libcellml::Parser::create();
+    auto model = parser->parseModel(contents.get());
+    auto analyser = libcellml::Analyser::create();
 
-        if (parser->issueCount() == 0) {
-            auto analyser = libcellml::Analyser::create();
+    analyser->analyseModel(model);
 
-            analyser->analyseModel(model);
-
-            if (analyser->issueCount() == 0) {
-                auto generator = libcellml::Generator::create();
-                auto generatorProfile = libcellml::GeneratorProfile::create();
-
-                generatorProfile->setOriginCommentString("");
-                generatorProfile->setImplementationHeaderString("");
-                generatorProfile->setImplementationVersionString("");
-                generatorProfile->setImplementationStateCountString("");
-                generatorProfile->setImplementationVariableCountString("");
-                generatorProfile->setImplementationLibcellmlVersionString("");
-                generatorProfile->setImplementationVoiInfoString("");
-                generatorProfile->setImplementationStateInfoString("");
-                generatorProfile->setImplementationVariableInfoString("");
-                generatorProfile->setImplementationCreateStatesArrayMethodString("");
-                generatorProfile->setImplementationCreateVariablesArrayMethodString("");
-                generatorProfile->setImplementationDeleteArrayMethodString("");
-
-                generator->setModel(analyser->model());
-                generator->setProfile(generatorProfile);
-
-                auto compiler = std::make_unique<Compiler>();
-
-                if (compiler->compile(generator->implementationCode())) {
-                    return File::Status::OK;
-                }
-            }
-        }
+    if (analyser->issueCount() != 0) {
+        return File::Status::NON_INSTANTIABLE_FILE;
     }
 
-    return File::Status::NON_INSTANTIABLE_FILE;
+    auto generator = libcellml::Generator::create();
+    auto generatorProfile = libcellml::GeneratorProfile::create();
+
+    generatorProfile->setOriginCommentString("");
+    generatorProfile->setImplementationHeaderString("");
+    generatorProfile->setImplementationVersionString("");
+    generatorProfile->setImplementationStateCountString("");
+    generatorProfile->setImplementationVariableCountString("");
+    generatorProfile->setImplementationLibcellmlVersionString("");
+    generatorProfile->setImplementationVoiInfoString("");
+    generatorProfile->setImplementationStateInfoString("");
+    generatorProfile->setImplementationVariableInfoString("");
+    generatorProfile->setImplementationCreateStatesArrayMethodString("");
+    generatorProfile->setImplementationCreateVariablesArrayMethodString("");
+    generatorProfile->setImplementationDeleteArrayMethodString("");
+
+    generator->setModel(analyser->model());
+    generator->setProfile(generatorProfile);
+
+    auto compiler = std::make_unique<Compiler>();
+
+#ifdef NLLVMCOV
+    if (!compiler->compile(generator->implementationCode())) {
+        return File::Status::NON_INSTANTIABLE_FILE;
+    }
+#endif
+
+    return File::Status::OK;
 }
 
 File::File(const std::string &pFileNameOrUrl)
