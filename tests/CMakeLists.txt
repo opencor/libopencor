@@ -14,8 +14,7 @@
 
 # Include our different tests.
 
-#---GRY--- THE BELOW TEST IS TO BE ENABLED ONCE WE ACTUALLY MAKE USE OF THE COMPILER IN libOpenCOR.
-# include(compiler/tests.cmake)
+include(compiler/tests.cmake)
 include(file/tests.cmake)
 include(version/tests.cmake)
 
