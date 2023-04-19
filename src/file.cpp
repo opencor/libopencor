@@ -138,12 +138,9 @@ File::Status File::Impl::instantiate()
                 generator->setModel(analyser->model());
                 generator->setProfile(generatorProfile);
 
-                auto compiler = new Compiler();
-                auto compiled = compiler->compile(generator->implementationCode());
+                auto compiler = std::make_unique<Compiler>();
 
-                delete compiler;
-
-                if (compiled) {
+                if (compiler->compile(generator->implementationCode())) {
                     return File::Status::OK;
                 }
             }
