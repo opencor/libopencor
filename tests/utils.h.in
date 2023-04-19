@@ -22,6 +22,19 @@ namespace libOpenCOR {
 
 static constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
 
+static constexpr auto NON_RETRIEVABLE_FILE = "non_retrievable_file.txt";
+static constexpr auto UNKNOWN_FILE = "unknown_file.txt";
+static constexpr auto SBML_FILE = "sbml.sbml";
+static constexpr auto ERROR_SEDML_FILE = "error.sedml";
+/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
+static constexpr auto CELLML_1_X_FILE = "cellml_1_x.cellml";
+*/
+static constexpr auto SEDML_1_X_FILE = "cellml_1_x.sedml";
+static constexpr auto COMBINE_1_X_ARCHIVE = "cellml_1_x.omex";
+static constexpr auto CELLML_2_FILE = "cellml_2.cellml";
+static constexpr auto SEDML_2_FILE = "cellml_2.sedml";
+static constexpr auto COMBINE_2_ARCHIVE = "cellml_2.omex";
+
 std::string resourcePath(const std::string &resourceRelativePath);
 
 } // namespace libOpenCOR

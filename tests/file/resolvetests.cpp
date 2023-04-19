@@ -20,189 +20,82 @@ limitations under the License.
 
 #include <libopencor>
 
-static constexpr const char *NON_RETRIEVABLE_LOCAL_FILE = "non_retrievable_file.txt";
-static constexpr const char *UNKNOWN_LOCAL_FILE = "unknown_file.txt";
-static constexpr const char *SBML_LOCAL_FILE = "sbml.sbml";
-static constexpr const char *ERROR_SEDML_LOCAL_FILE = "error.sedml";
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
-static constexpr const char *CELLML_1_X_LOCAL_FILE = "cellml_1_x.cellml";
-*/
-static constexpr const char *SEDML_1_X_LOCAL_FILE = "cellml_1_x.sedml";
-static constexpr const char *COMBINE_1_X_LOCAL_ARCHIVE = "cellml_1_x.omex";
-static constexpr const char *CELLML_2_LOCAL_FILE = "cellml_2.cellml";
-static constexpr const char *SEDML_2_LOCAL_FILE = "cellml_2.sedml";
-static constexpr const char *COMBINE_2_LOCAL_ARCHIVE = "cellml_2.omex";
-
-static constexpr const char *NON_RETRIEVABLE_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/non_retrievable_file.txt";
-static constexpr const char *UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt";
-static constexpr const char *SBML_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/sbml.sbml";
-static constexpr const char *ERROR_SEDML_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/error.sedml";
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
-static constexpr const char *CELLML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_1_x.cellml";
-*/
-static constexpr const char *SEDML_1_X_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_1_x.sedml";
-static constexpr const char *COMBINE_1_X_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_1_x.omex";
-static constexpr const char *CELLML_2_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
-static constexpr const char *SEDML_2_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml";
-static constexpr const char *COMBINE_2_REMOTE_ARCHIVE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex";
-
-TEST(ResolveFileTest, resolveNonRetrievableLocalFile)
+TEST(ResolveFileTest, resolveNonRetrievableFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(NON_RETRIEVABLE_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::NON_RETRIEVABLE_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
 }
 
-TEST(ResolveFileTest, resolveUnknownLocalFile)
+TEST(ResolveFileTest, resolveUnknownFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(UNKNOWN_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
 }
 
-TEST(ResolveFileTest, resolveSbmlLocalFile)
+TEST(ResolveFileTest, resolveSbmlFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(SBML_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SBML_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
 }
 
-TEST(ResolveFileTest, resolveErrorSedmlLocalFile)
+TEST(ResolveFileTest, resolveErrorSedmlFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(ERROR_SEDML_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_SEDML_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
 /*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
-TEST(ResolveFileTest, resolveCellml1xLocalFile)
+TEST(ResolveFileTest, resolveCellml1xFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(CELLML_1_X_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_1_X_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
 */
 
-TEST(ResolveFileTest, resolveSedml1xLocalFile)
+TEST(ResolveFileTest, resolveSedml1xFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(SEDML_1_X_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_1_X_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
-TEST(ResolveFileTest, resolveCombine1xLocalArchive)
+TEST(ResolveFileTest, resolveCombine1xArchive)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(COMBINE_1_X_LOCAL_ARCHIVE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_1_X_ARCHIVE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
 
-TEST(ResolveFileTest, resolveCellml2LocalFile)
+TEST(ResolveFileTest, resolveCellml2File)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(CELLML_2_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
 
-TEST(ResolveFileTest, resolveSedml2LocalFile)
+TEST(ResolveFileTest, resolveSedml2File)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(SEDML_2_LOCAL_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
-TEST(ResolveFileTest, resolveCombine2LocalArchive)
+TEST(ResolveFileTest, resolveCombine2Archive)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(COMBINE_2_LOCAL_ARCHIVE));
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
-}
-
-TEST(ResolveFileTest, resolveNonRetrievableRemoteFile)
-{
-    auto file = libOpenCOR::File::create(NON_RETRIEVABLE_REMOTE_FILE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
-}
-
-TEST(ResolveFileTest, resolveUnknownRemoteFile)
-{
-    auto file = libOpenCOR::File::create(UNKNOWN_REMOTE_FILE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-}
-
-TEST(ResolveFileTest, resolveSbmlRemoteFile)
-{
-    auto file = libOpenCOR::File::create(SBML_REMOTE_FILE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-}
-
-TEST(ResolveFileTest, resolveErrorSedmlRemoteFile)
-{
-    auto file = libOpenCOR::File::create(ERROR_SEDML_REMOTE_FILE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
-}
-
-/*---GRY--- TO BE ENABLED WHEN libCellML SUPPORTS CellML 1.X.
-TEST(ResolveFileTest, resolveCellml1xRemoteFile)
-{
-    auto file = libOpenCOR::File::create(CELLML_1_X_REMOTE_FILE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
-}
-*/
-
-TEST(ResolveFileTest, resolveSedml1xRemoteFile)
-{
-    auto file = libOpenCOR::File::create(SEDML_1_X_REMOTE_FILE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
-}
-
-TEST(ResolveFileTest, resolveCombine1xRemoteArchive)
-{
-    auto file = libOpenCOR::File::create(COMBINE_1_X_REMOTE_ARCHIVE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
-}
-
-TEST(ResolveFileTest, resolveCellml2RemoteFile)
-{
-    auto file = libOpenCOR::File::create(CELLML_2_REMOTE_FILE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
-}
-
-TEST(ResolveFileTest, resolveSedml2RemoteFile)
-{
-    auto file = libOpenCOR::File::create(SEDML_2_REMOTE_FILE);
-
-    EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
-}
-
-TEST(ResolveFileTest, resolveCombine2RemoteArchive)
-{
-    auto file = libOpenCOR::File::create(COMBINE_2_REMOTE_ARCHIVE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::OK);
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);

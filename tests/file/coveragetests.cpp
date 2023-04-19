@@ -21,9 +21,6 @@ limitations under the License.
 #include <libopencor>
 
 static constexpr const char *UNDERCONSTRAINED_CELLML_LOCAL_FILE = "underconstrained.cellml";
-/*---GRY--- TO BE ENABLED ONCE IT HAS BEEN MERGED IN THE MASTER BRANCH.
-static constexpr const char *UNDERCONSTRAINED_CELLML_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/underconstrained.cellml";
-*/
 
 TEST(CoverageTest, underconstrainedCellmlLocalFile)
 {
@@ -31,12 +28,3 @@ TEST(CoverageTest, underconstrainedCellmlLocalFile)
 
     EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
 }
-
-/*---GRY--- TO BE ENABLED ONCE IT HAS BEEN MERGED IN THE MASTER BRANCH.
-TEST(CoverageTest, underconstrainedCellmlRemoteFile)
-{
-    auto file = libOpenCOR::File::create(UNDERCONSTRAINED_CELLML_REMOTE_FILE);
-
-    EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
-}
-*/
