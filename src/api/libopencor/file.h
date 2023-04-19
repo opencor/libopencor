@@ -59,8 +59,7 @@ public:
      *
      * An action on a file can have one of the following statuses:
      *  - OK: the action completed successfully;
-     *  - NON_RETRIEVABLE_FILE: the action could not retrieve the contents of a
-     *    file;
+     *  - NON_RETRIEVABLE_FILE: the action could not retrieve the contents of a file;
      *  - NON_INSTANTIABLE_FILE: the action could not instantiate a file.
      */
 
@@ -72,7 +71,7 @@ public:
     };
 
     /**
-     * Constructors, destructor and assignment operators.
+     * Constructors, destructor, and assignment operators.
      */
 
     File() = delete; /**< No default constructor allowed, @private. */
@@ -114,8 +113,7 @@ public:
     /**
      * @brief Get the file name of this file.
      *
-     * Return the file name of this file. If the file is remote then we return
-     * the file name of its local copy.
+     * Return the file name of this file. If the file is remote then we return the file name of its local copy.
      *
      * @return The file name, as a @c std::string, of this file.
      */
@@ -125,8 +123,7 @@ public:
     /**
      * @brief Get the URL of this file.
      *
-     * Return the URL of this file. If the file is local then we return an empty
-     * string.
+     * Return the URL of this file. If the file is local then we return an empty string.
      *
      * @return The URL, as a @c std::string, of this file.
      */
@@ -136,8 +133,8 @@ public:
     /**
      * @brief Resolve this @c File.
      *
-     * Retrieve the contents of this @c File and determine its @c Type, i.e. a
-     * CellML file, a SED-ML file, a COMBINE archive, or an unknown file.
+     * Retrieve the contents of this @c File and determine its @c Type, i.e. a CellML file, a SED-ML file, a COMBINE
+     * archive, or an unknown file.
      *
      * @sa Status, type()
      *
@@ -149,9 +146,8 @@ public:
     /**
      * @brief Instantiate this @c File.
      *
-     * Instantiate this @c File and generate the runtime associated with the
-     * CellML file that is associated with this @c File, be it directly or
-     * indirectly.
+     * Instantiate this @c File and generate the runtime associated with the CellML file that is associated with this
+     * @c File, be it directly or indirectly.
      *
      * @sa Status, runtime()
      *

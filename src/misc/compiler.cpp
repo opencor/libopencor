@@ -78,8 +78,7 @@ bool Compiler::compile(const std::string &pCode)
     }
 #endif
 
-    // The compilation object should have only one command, so if it doesn't
-    // then something went wrong.
+    // The compilation object should have only one command, so if it doesn't then something went wrong.
 
     clang::driver::JobList &jobs = compilation->getJobs();
 
@@ -101,8 +100,8 @@ bool Compiler::compile(const std::string &pCode)
     }
 #endif
 
-    // Prevent the Clang driver from asking CC1 to leak memory, this by removing
-    // -disable-free from the command arguments.
+    // Prevent the Clang driver from asking CC1 to leak memory, this by removing -disable-free from the command
+    // arguments.
 
     auto commandArguments = command.getArguments();
 #ifdef NLLVMCOV
@@ -160,15 +159,13 @@ bool Compiler::compile(const std::string &pCode)
     }
 #endif
 
-    // Initialise the native target (and its ASM printer), so not only can we
-    // then create an execution engine, but more importantly its data layout
-    // will match that of our target platform.
+    // Initialise the native target (and its ASM printer), so not only can we then create an execution engine, but more
+    // importantly its data layout will match that of our target platform.
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
-    // Create an ORC-based JIT and keep track of it (so that we can use it in
-    // function()).
+    // Create an ORC-based JIT and keep track of it (so that we can use it in function()).
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 

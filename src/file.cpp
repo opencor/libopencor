@@ -73,8 +73,7 @@ File::Status File::Impl::resolve()
         return File::Status::NON_RETRIEVABLE_FILE;
     }
 
-    // Check whether the local/remote file is a CellML file, a SED-ML file, a
-    // COMBINE archive, or an unknown file.
+    // Check whether the local/remote file is a CellML file, a SED-ML file, a COMBINE archive, or an unknown file.
 
     if (Support::isCellmlFile(mFileName)) {
         mType = Type::CELLML_FILE;
@@ -157,12 +156,11 @@ File::Status File::Impl::instantiate()
 File::File(const std::string &pFileNameOrUrl)
     : mPimpl(std::make_unique<Impl>())
 {
-    // By default, we assume that we are dealing with a local file, but it may
-    // be in the form of a URL, i.e. starting with "file://".
+    // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
+    // with "file://".
 
     if (pFileNameOrUrl.find("file://") == 0) {
-        // We are dealing with a URL representing a local file, so retrieve its
-        // actual path.
+        // We are dealing with a URL representing a local file, so retrieve its actual path.
 
         static const size_t SCHEME_LENGTH = 7;
 
@@ -170,8 +168,7 @@ File::File(const std::string &pFileNameOrUrl)
 
         mPimpl->mFileName.erase(0, SCHEME_LENGTH);
 
-        // On Windows, we also need to remove the leading "/" and replace all
-        // the other "/"s with "\"s.
+        // On Windows, we also need to remove the leading "/" and replace all the other "/"s with "\"s.
 
         static const auto WINDOWS_PATH_REGEX = std::regex("^/[A-Z]:/.*");
 
@@ -188,9 +185,8 @@ File::File(const std::string &pFileNameOrUrl)
             mPimpl->mFileName = std::regex_replace(mPimpl->mFileName, FORWARD_SLASH_REGEX, "\\");
         }
     } else {
-        // If we can get a URL from pFileNameOrUrl then it means that we are
-        // dealing with a remote file otherwise we are dealing with a local
-        // file.
+        // If we can get a URL from pFileNameOrUrl then it means that we are dealing with a remote file otherwise we are
+        // dealing with a local file.
 
         CURLU *url = curl_url();
 

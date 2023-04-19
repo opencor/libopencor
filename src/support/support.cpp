@@ -59,12 +59,10 @@ bool isSedmlFile(const std::string &pFileName)
 
     auto *sedmlDocument = libsedml::readSedML(pFileName.c_str());
 
-    // A non-SED-ML file results in our SED-ML document having at least one
-    // error, the first of which being of id libsedml::SedNotSchemaConformant
-    // (e.g., a CellML file, i.e. an XML file, but not a SED-ML one) or
-    // XMLContentEmpty (e.g., a COMBINE archive, i.e. not an XML file). So, we
-    // use these facts to determine whether our current SED-ML document is
-    // indeed a SED-ML file.
+    // A non-SED-ML file results in our SED-ML document having at least one error, the first of which being of id
+    // libsedml::SedNotSchemaConformant (e.g., a CellML file, i.e. an XML file, but not a SED-ML one) or XMLContentEmpty
+    // (e.g., a COMBINE archive, i.e. not an XML file). So, we use these facts to determine whether our current SED-ML
+    // document is indeed a SED-ML file.
 
     auto res = (sedmlDocument->getNumErrors() == 0)
                || ((sedmlDocument->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)

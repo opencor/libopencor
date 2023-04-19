@@ -35,9 +35,8 @@ namespace libOpenCOR {
 unsigned int LIBOPENCOR_EXPORT version();
 
 /**
- * Return the version of libOpenCOR as a string. The version string is in the
- * format x.y.z, where the "."s are literal, and x,y and z represent counting
- * numbers, in which case x is the major version, y the minor version, and z the
+ * Return the version of libOpenCOR as a string. The version string is in the format x.y.z, where the "."s are literal,
+ * and x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the
  * patch level.
  *
  * @return A string that represents the version of libOpenCOR.
@@ -54,9 +53,8 @@ std::string LIBOPENCOR_EXPORT versionString();
 unsigned int LIBOPENCOR_EXPORT clangVersion();
 
 /**
- * Return the version of Clang as a string. The version string is in the format
- * x.y.z, where the "."s are literal, and x,y and z represent counting numbers,
- * in which case x is the major version, y the minor version, and z the patch
+ * Return the version of Clang as a string. The version string is in the format x.y.z, where the "."s are literal, and
+ * x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the patch
  * level.
  *
  * @return A string that represents the version of Clang.
@@ -73,9 +71,8 @@ std::string LIBOPENCOR_EXPORT clangVersionString();
 unsigned int LIBOPENCOR_EXPORT libcellmlVersion();
 
 /**
- * Return the version of libCellML as a string. The version string is in the
- * format x.y.z, where the "."s are literal, and x,y and z represent counting
- * numbers, in which case x is the major version, y the minor version, and z the
+ * Return the version of libCellML as a string. The version string is in the format x.y.z, where the "."s are literal,
+ * and x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the
  * patch level.
  *
  * @return A string that represents the version of libCellML.
@@ -92,9 +89,8 @@ std::string LIBOPENCOR_EXPORT libcellmlVersionString();
 unsigned int LIBOPENCOR_EXPORT libcombineVersion();
 
 /**
- * Return the version of libCOMBINE as a string. The version string is in the
- * format x.y.z, where the "."s are literal, and x,y and z represent counting
- * numbers, in which case x is the major version, y the minor version, and z the
+ * Return the version of libCOMBINE as a string. The version string is in the format x.y.z, where the "."s are literal,
+ * and x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the
  * patch level.
  *
  * @return A string that represents the version of libCOMBINE.
@@ -111,9 +107,8 @@ std::string LIBOPENCOR_EXPORT libcombineVersionString();
 unsigned int LIBOPENCOR_EXPORT libcurlVersion();
 
 /**
- * Return the version of libcurl as a string. The version string is in the
- * format x.y.z, where the "."s are literal, and x,y and z represent counting
- * numbers, in which case x is the major version, y the minor version, and z the
+ * Return the version of libcurl as a string. The version string is in the format x.y.z, where the "."s are literal,
+ * and x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the
  * patch level.
  *
  * @return A string that represents the version of libcurl.
@@ -130,9 +125,8 @@ std::string LIBOPENCOR_EXPORT libcurlVersionString();
 unsigned int LIBOPENCOR_EXPORT libsedmlVersion();
 
 /**
- * Return the version of libSEDML as a string. The version string is in the
- * format x.y.z, where the "."s are literal, and x,y and z represent counting
- * numbers, in which case x is the major version, y the minor version, and z the
+ * Return the version of libSEDML as a string. The version string is in the format x.y.z, where the "."s are literal,
+ * and x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the
  * patch level.
  *
  * @return A string that represents the version of libSEDML.
@@ -149,9 +143,8 @@ std::string LIBOPENCOR_EXPORT libsedmlVersionString();
 unsigned int LIBOPENCOR_EXPORT llvmVersion();
 
 /**
- * Return the version of LLVM as a string. The version string is in the format
- * x.y.z, where the "."s are literal, and x,y and z represent counting numbers,
- * in which case x is the major version, y the minor version, and z the patch
+ * Return the version of LLVM as a string. The version string is in the format x.y.z, where the "."s are literal, and
+ * x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the patch
  * level.
  *
  * @return A string that represents the version of LLVM.
@@ -168,9 +161,8 @@ std::string LIBOPENCOR_EXPORT llvmVersionString();
 unsigned int LIBOPENCOR_EXPORT sundialsVersion();
 
 /**
- * Return the version of SUNDIALS as a string. The version string is in the
- * format x.y.z, where the "."s are literal, and x,y and z represent counting
- * numbers, in which case x is the major version, y the minor version, and z the
+ * Return the version of SUNDIALS as a string. The version string is in the format x.y.z, where the "."s are literal,
+ * and x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the
  * patch level.
  *
  * @return A string that represents the version of SUNDIALS.
