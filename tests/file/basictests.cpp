@@ -20,11 +20,8 @@ limitations under the License.
 
 #include <libopencor>
 
-static constexpr const char *WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
-static constexpr const char *UNIX_LOCAL_FILE = "/some/path/file.txt";
-static constexpr const char *URL_BASED_WINDOWS_LOCAL_FILE = "file:///C:/some/path/file.txt";
-static constexpr const char *URL_BASED_UNIX_LOCAL_FILE = "file:///some/path/file.txt";
-static constexpr const char *REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.cellml";
+static constexpr auto WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
+static constexpr auto UNIX_LOCAL_FILE = "/some/path/file.txt";
 
 TEST(BasicFileTest, windowsFile)
 {
@@ -46,7 +43,7 @@ TEST(BasicFileTest, unixFile)
 
 TEST(BasicFileTest, urlBasedWindowsFile)
 {
-    auto file = libOpenCOR::File::create(URL_BASED_WINDOWS_LOCAL_FILE);
+    auto file = libOpenCOR::File::create("file:///C:/some/path/file.txt");
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
     EXPECT_EQ(file->fileName(), WINDOWS_LOCAL_FILE);
@@ -55,7 +52,7 @@ TEST(BasicFileTest, urlBasedWindowsFile)
 
 TEST(BasicFileTest, urlBasedUnixFile)
 {
-    auto file = libOpenCOR::File::create(URL_BASED_UNIX_LOCAL_FILE);
+    auto file = libOpenCOR::File::create("file:///some/path/file.txt");
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
     EXPECT_EQ(file->fileName(), UNIX_LOCAL_FILE);
@@ -64,6 +61,8 @@ TEST(BasicFileTest, urlBasedUnixFile)
 
 TEST(BasicFileTest, remoteFile)
 {
+    static constexpr auto REMOTE_FILE = "https://models.physiomeproject.org/workspace/noble_1962/rawfile/c70f8962407db00673f1fdcac9f35a2593781c17/noble_1962.cellml";
+
     auto file = libOpenCOR::File::create(REMOTE_FILE);
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);

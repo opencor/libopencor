@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-static constexpr const char *UNDERCONSTRAINED_CELLML_LOCAL_FILE = "underconstrained.cellml";
+static constexpr auto UNDERCONSTRAINED_CELLML_LOCAL_FILE = "underconstrained.cellml";
 
 TEST(CoverageTest, underconstrainedCellmlLocalFile)
 {
