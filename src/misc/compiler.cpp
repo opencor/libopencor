@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "compiler.h"
 
+#include <iostream>
+
 #include "clangbegin.h"
 #include "clang/CodeGen/CodeGenAction.h"
 #include "clang/Driver/Compilation.h"
@@ -31,8 +33,6 @@ limitations under the License.
 #include "llvm/Support/TargetSelect.h"
 #include "llvm-c/Core.h"
 #include "llvmend.h"
-
-#include <iostream>
 
 namespace libOpenCOR {
 

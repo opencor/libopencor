@@ -18,11 +18,11 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include <string>
+
 #include "llvmbegin.h"
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
 #include "llvmend.h"
-
-#include <string>
 
 namespace libOpenCOR {
 

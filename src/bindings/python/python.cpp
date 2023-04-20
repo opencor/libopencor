@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <libopencor>
-
 #include "file_p.h"
+
+#include <libopencor>
 
 #include <pybind11/pybind11.h>
 

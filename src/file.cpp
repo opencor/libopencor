@@ -16,10 +16,10 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
-#include "file_p.h"
 #include "cellmlfile.h"
 #include "combinearchive.h"
 #include "compiler.h"
+#include "file_p.h"
 #include "sedmlfile.h"
 #include "support.h"
 #include "utils.h"

@@ -16,6 +16,9 @@ limitations under the License.
 
 #include "version.h"
 
+#include <array>
+#include <cmath>
+
 #include "clangbegin.h"
 #include "clang/Basic/Version.h"
 #include "clangend.h"
@@ -41,9 +44,6 @@ limitations under the License.
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
 #include "sundialsend.h"
-
-#include <array>
-#include <cmath>
 
 namespace libOpenCOR {
 
