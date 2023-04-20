@@ -47,8 +47,8 @@ static int getTimeOfDay(TimeVal &pTimeVal)
 {
     // Based off https://stackoverflow.com/a/58162122.
 
-    const std::chrono::system_clock::duration duration = std::chrono::system_clock::now().time_since_epoch();
-    const std::chrono::seconds seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+    const auto duration = std::chrono::system_clock::now().time_since_epoch();
+    const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
 
     pTimeVal.seconds = static_cast<uint64_t>(seconds.count());
     pTimeVal.microeconds = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(duration - seconds).count());
@@ -75,7 +75,9 @@ std::string uniqueFileName()
 
     static const std::string LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     static const uint64_t LETTERS_SIZE = LETTERS.size();
+
     static auto testFile = (std::filesystem::temp_directory_path() / "libOpenCOR_XXXXXX.tmp").string();
+
     static const size_t XXXXXX_POS = testFile.size() - 6 - 4;
     static constexpr uint64_t MICROSECONDS_SHIFT = 16U;
     static constexpr uint64_t PID_SHIFT = 32U;
@@ -124,7 +126,7 @@ std::string uniqueFileName()
 
 static size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
-    const size_t realDataSize = pSize * pDataSize;
+    const auto realDataSize = pSize * pDataSize;
 
     reinterpret_cast<std::ofstream *>(pUserData)->write(reinterpret_cast<char *>(pData), static_cast<std::streamsize>(realDataSize)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 
@@ -190,7 +192,7 @@ std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFil
     }
 #endif
 
-    auto size = std::filesystem::file_size(pFileName);
+    const auto size = std::filesystem::file_size(pFileName);
     const std::shared_ptr<char[]> contents(new char[size + 1]); // NOLINT(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 
     file.read(contents.get(), static_cast<std::streamsize>(size));
