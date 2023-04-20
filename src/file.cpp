@@ -106,9 +106,7 @@ File::Status File::Impl::instantiate()
         return File::Status::NON_INSTANTIABLE_FILE;
     }
 
-    // Generate and compile the C code for the CellML file.
-    // Note: no need to check whether the parsing was fine since it's a prequisite to a file being considered a CellML
-    //       file.
+    // Generate and compile the C code associated with the CellML file.
 
     auto [contents, size] = fileContents(mFileName);
     auto *rawContents = contents.get();
@@ -118,6 +116,9 @@ File::Status File::Impl::instantiate()
     if (parser->errorCount() != 0) {
         // We couldn't parse the file contents as a CellML 2.0 file, so this means that we are dealing with a CellML 1.x
         // file, hence we should use a non-strict parser instead.
+        // Note: we don't need to check whether the parsing was fine since it's a prequisite to a file being considered
+        //       a CellML file. We just didn't know whether it was a CellML 1.x file or a CellML 2.0 file. So, now that
+        //       we know that it's not a CellML 2.0 file, it means that it can only be a CellML 1.x file.
 
         parser = libcellml::Parser::create(false);
         model = parser->parseModel(rawContents);
@@ -156,6 +157,8 @@ File::Status File::Impl::instantiate()
     if (!compiler->compile(generator->implementationCode())) {
         return File::Status::NON_INSTANTIABLE_FILE;
     }
+#else
+    compiler->compile(generator->implementationCode());
 #endif
 
     return File::Status::OK;
