@@ -57,10 +57,10 @@ elseif(NOT ${ARCHITECTURE} EQUAL 64)
     message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built in 64-bit mode.")
 endif()
 
-# Make sure that we are building libOpenCOR for macOS 10.15 and later.
+# Make sure that we are building libOpenCOR for the version of macOS that we are after.
 
-if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET VERSION_GREATER_EQUAL 10.15)
-    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built for macOS 10.15 and later.")
+if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET VERSION_GREATER_EQUAL ${MACOS_DEPLOYMENT_TARGET})
+    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built for macOS ${MACOS_DEPLOYMENT_TARGET} and later.")
 endif()
 
 # Check whether we are dealing with a single or multiple configuration.

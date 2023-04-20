@@ -40,8 +40,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # On macOS, deploy on macOS 10.15 and later.
 
+set(MACOS_DEPLOYMENT_TARGET 10.15)
+
 if(APPLE AND "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_DEPLOYMENT_TARGET})
 endif()
 
 # Some common CMake functions/macros.
