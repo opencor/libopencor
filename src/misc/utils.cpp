@@ -67,9 +67,8 @@ std::string uniqueFileName()
     // Note: ATTEMPTS_MIN is equal to 62x62x62 where 62 is the number of characters in LETTERS.
 
 #ifndef COVERAGE_ENABLED
-    static const uint64_t ATTEMPTS_MIN = 238328U;
-
-    uint64_t maxAttempts = (ATTEMPTS_MIN < TMP_MAX) ? TMP_MAX : ATTEMPTS_MIN;
+    static constexpr uint64_t ATTEMPTS_MIN = 238328U;
+    static constexpr uint64_t MAX_ATTEMPTS = (ATTEMPTS_MIN < TMP_MAX) ? TMP_MAX : ATTEMPTS_MIN;
 #endif
 
     // Get some more or less random data.
@@ -78,12 +77,12 @@ std::string uniqueFileName()
     static const uint64_t LETTERS_SIZE = LETTERS.size();
     static auto testFile = (std::filesystem::temp_directory_path() / "libOpenCOR_XXXXXX.tmp").string();
     static const size_t XXXXXX_POS = testFile.size() - 6 - 4;
-    static const uint64_t MICROSECONDS_SHIFT = 16U;
-    static const uint64_t PID_SHIFT = 32U;
+    static constexpr uint64_t MICROSECONDS_SHIFT = 16U;
+    static constexpr uint64_t PID_SHIFT = 32U;
 #ifndef COVERAGE_ENABLED
-    static const uint64_t VALUE_SHIFT = 7777U;
+    static constexpr uint64_t VALUE_SHIFT = 7777U;
 #endif
-    static const uint64_t XXXXXX_POS_SHIFT = 6U;
+    static constexpr uint64_t XXXXXX_POS_SHIFT = 6U;
 
     TimeVal timeVal;
 
@@ -100,7 +99,7 @@ std::string uniqueFileName()
     std::string res;
 
 #ifndef COVERAGE_ENABLED
-    for (uint64_t attempt = 0; attempt < maxAttempts; value += VALUE_SHIFT, ++attempt) {
+    for (uint64_t attempt = 0; attempt < MAX_ATTEMPTS; value += VALUE_SHIFT, ++attempt) {
 #endif
         uint64_t val = value;
 
@@ -158,7 +157,7 @@ std::string downloadFile(const std::string &pUrl)
 #else
     curl_easy_perform(curl);
 #endif
-        static const int64_t HTTP_OK = 200;
+        static constexpr int64_t HTTP_OK = 200;
 
         int64_t responseCode = 0;
 

@@ -173,7 +173,7 @@ File::File(const std::string &pFileNameOrUrl)
     if (pFileNameOrUrl.find("file://") == 0) {
         // We are dealing with a URL representing a local file, so retrieve its actual path.
 
-        static const size_t SCHEME_LENGTH = 7;
+        static constexpr size_t SCHEME_LENGTH = 7;
 
         mPimpl->mFileName = pFileNameOrUrl;
 
@@ -188,7 +188,7 @@ File::File(const std::string &pFileNameOrUrl)
         std::regex_search(mPimpl->mFileName, match, WINDOWS_PATH_REGEX);
 
         if (!match.empty()) {
-            static const size_t SLASH_LENGTH = 1;
+            static constexpr size_t SLASH_LENGTH = 1;
             static const auto FORWARD_SLASH_REGEX = std::regex("/");
 
             mPimpl->mFileName.erase(0, SLASH_LENGTH);

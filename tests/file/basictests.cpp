@@ -20,8 +20,8 @@ limitations under the License.
 
 #include <libopencor>
 
-static constexpr auto WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
-static constexpr auto UNIX_LOCAL_FILE = "/some/path/file.txt";
+inline constexpr auto WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
+inline constexpr auto UNIX_LOCAL_FILE = "/some/path/file.txt";
 
 TEST(BasicFileTest, windowsLocalFile)
 {
