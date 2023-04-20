@@ -16,10 +16,10 @@ limitations under the License.
 
 #pragma once
 
-#include <string>
+#ifdef UNIT_TESTING_ENABLED
+#    include "libopencor/export.h"
 
-namespace libOpenCOR::Support {
-
-bool isSedmlFile(const std::string &pFileName);
-
-} // namespace libOpenCOR::Support
+#    define LIBOPENCOR_UNIT_TESTING_EXPORT LIBOPENCOR_EXPORT
+#else
+#    define LIBOPENCOR_UNIT_TESTING_EXPORT
+#endif

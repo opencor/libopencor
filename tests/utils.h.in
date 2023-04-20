@@ -20,7 +20,21 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-static constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
+inline constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
+
+inline constexpr auto NON_RETRIEVABLE_FILE = "non_retrievable_file.txt";
+inline constexpr auto UNKNOWN_FILE = "unknown_file.txt";
+inline constexpr auto SBML_FILE = "sbml.sbml";
+inline constexpr auto ERROR_SEDML_FILE = "error.sedml";
+inline constexpr auto CELLML_1_X_FILE = "cellml_1_x.cellml";
+inline constexpr auto SEDML_1_X_FILE = "cellml_1_x.sedml";
+inline constexpr auto COMBINE_1_X_ARCHIVE = "cellml_1_x.omex";
+inline constexpr auto CELLML_2_FILE = "cellml_2.cellml";
+inline constexpr auto SEDML_2_FILE = "cellml_2.sedml";
+inline constexpr auto COMBINE_2_ARCHIVE = "cellml_2.omex";
+
+inline constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+inline constexpr auto NOT_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/not_cellml_2.cellml";
 
 std::string resourcePath(const std::string &resourceRelativePath);
 

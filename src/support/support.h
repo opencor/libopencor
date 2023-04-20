@@ -16,19 +16,12 @@ limitations under the License.
 
 #pragma once
 
-#include "unittestingexport.h"
-
-#include <memory>
 #include <string>
 
-namespace libOpenCOR {
+namespace libOpenCOR::Support {
 
-bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
+bool isCellmlFile(const std::string &pFileName);
+bool isCombineArchive(const std::string &pFileName);
+bool isSedmlFile(const std::string &pFileName);
 
-std::string uniqueFileName();
-
-std::string downloadFile(const std::string &pUrl);
-
-std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFileName);
-
-} // namespace libOpenCOR
+} // namespace libOpenCOR::Support

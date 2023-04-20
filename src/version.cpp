@@ -16,6 +16,9 @@ limitations under the License.
 
 #include "version.h"
 
+#include <array>
+#include <cmath>
+
 #include "clangbegin.h"
 #include "clang/Basic/Version.h"
 #include "clangend.h"
@@ -42,17 +45,14 @@ limitations under the License.
 #include "sundials/sundials_version.h"
 #include "sundialsend.h"
 
-#include <array>
-#include <cmath>
-
 namespace libOpenCOR {
 
-static constexpr unsigned int MAJOR_10 = 1048576;
-static constexpr unsigned int MAJOR_01 = 65536;
-static constexpr unsigned int MINOR_10 = 4096;
-static constexpr unsigned int MINOR_01 = 256;
-static constexpr unsigned int PATCH_10 = 16;
-static constexpr unsigned int PATCH_01 = 1;
+inline constexpr unsigned int MAJOR_10 = 1048576;
+inline constexpr unsigned int MAJOR_01 = 65536;
+inline constexpr unsigned int MINOR_10 = 4096;
+inline constexpr unsigned int MINOR_01 = 256;
+inline constexpr unsigned int PATCH_10 = 16;
+inline constexpr unsigned int PATCH_01 = 1;
 
 inline unsigned int firstDigit(unsigned int pTwoDigitNumber)
 {

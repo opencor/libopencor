@@ -14,12 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include <string>
+#include "sedmlfile.h"
 
 namespace libOpenCOR::Support {
-
-bool isCellmlFile(const std::string &pFileName);
-
 } // namespace libOpenCOR::Support

@@ -16,10 +16,10 @@ limitations under the License.
 
 #pragma once
 
-#include <string>
-
 namespace libOpenCOR::Support {
 
-bool isCombineArchive(const std::string &pFileName);
+class CellmlFile
+{
+};
 
 } // namespace libOpenCOR::Support

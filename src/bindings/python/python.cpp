@@ -14,9 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <libopencor>
-
 #include "file_p.h"
+
+#include <libopencor>
 
 #include <pybind11/pybind11.h>
 
@@ -40,7 +40,7 @@ PYBIND11_MODULE(module, m)
     py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
 
     py::enum_<libOpenCOR::File::Type>(file, "Type")
-        .value("Undefined", libOpenCOR::File::Type::UNRESOLVED)
+        .value("Unresolved", libOpenCOR::File::Type::UNRESOLVED)
         .value("CellmlFile", libOpenCOR::File::Type::CELLML_FILE)
         .value("SedmlFile", libOpenCOR::File::Type::SEDML_FILE)
         .value("CombineArchive", libOpenCOR::File::Type::COMBINE_ARCHIVE)
@@ -49,15 +49,16 @@ PYBIND11_MODULE(module, m)
 
     py::enum_<libOpenCOR::File::Status>(file, "Status")
         .value("Ok", libOpenCOR::File::Status::OK)
-        .value("NonRetrievableLocalFile", libOpenCOR::File::Status::NON_RETRIEVABLE_LOCAL_FILE)
-        .value("NonRetrievableRemoteFile", libOpenCOR::File::Status::NON_RETRIEVABLE_REMOTE_FILE)
+        .value("NonRetrievableFile", libOpenCOR::File::Status::NON_RETRIEVABLE_FILE)
+        .value("NonInstantiableFile", libOpenCOR::File::Status::NON_INSTANTIABLE_FILE)
         .export_values();
 
     file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
-        .def("resolve", &libOpenCOR::File::resolve, "Resolve this File object.");
+        .def("resolve", &libOpenCOR::File::resolve, "Resolve this File object.")
+        .def("instantiate", &libOpenCOR::File::instantiate, "Instantiate this File object.");
 
     file.def(
         "__repr__", [](const libOpenCOR::File &pFile) {

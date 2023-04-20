@@ -89,12 +89,12 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    #---GRY--- THE BELOW FILE IS TO BE ADDED ONCE WE ACTUALLY MAKE USE OF THE COMPILER IN libOpenCOR.
-    # ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlsupport.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.cpp
 )
 
 set(GIT_API_SOURCE_FILES
@@ -115,12 +115,13 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    #---GRY--- THE BELOW FILE IS TO BE ADDED ONCE WE ACTUALLY MAKE USE OF THE COMPILER IN libOpenCOR.
-    # ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/unittestingexport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlsupport.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinesupport.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlsupport.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.h
 )
 
 set(GIT_HEADER_FILES

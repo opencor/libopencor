@@ -18,5 +18,21 @@ import os
 RESOURCE_LOCATION = "${RESOURCE_LOCATION}"
 
 
+NON_RETRIEVABLE_FILE = "non_retrievable_file.txt"
+UNKNOWN_FILE = "unknown_file.txt"
+SBML_FILE = "sbml.sbml"
+ERROR_SEDML_FILE = "error.sedml"
+CELLML_1_X_FILE = "cellml_1_x.cellml"
+SEDML_1_X_FILE = "cellml_1_x.sedml"
+COMBINE_1_X_ARCHIVE = "cellml_1_x.omex"
+CELLML_2_FILE = "cellml_2.cellml"
+SEDML_2_FILE = "cellml_2.sedml"
+COMBINE_2_ARCHIVE = "cellml_2.omex"
+
+
+REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+NOT_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/not_cellml_2.cellml"
+
+
 def resource_path(relative_path=""):
     return RESOURCE_LOCATION + "/" + relative_path

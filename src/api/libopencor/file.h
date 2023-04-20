@@ -35,43 +35,36 @@ public:
     /**
      * @brief The type of a file.
      *
-     * A file can be of one of the following types:
-     *  - UNRESOLVED: the file has yet to be resolved;
-     *  - CELLML_FILE: the file is a CellML file;
-     *  - SEDML_FILE: the file is a SED-ML file;
-     *  - COMBINE_ARCHIVE: the file is a COMBINE archive; or
-     *  - UNKNOWN: the type of the file is unknown.
+     * The type of a file, i.e. whether it is unresolved, a CellML file, a SED-ML file, a COMBINE archive, or unknown.
      *
      * @sa resolve()
      */
 
     enum class Type
     {
-        UNRESOLVED,
-        CELLML_FILE,
-        SEDML_FILE,
-        COMBINE_ARCHIVE,
-        UNKNOWN_FILE
+        UNRESOLVED, /**< The file has yet to be resolved. */
+        CELLML_FILE, /**< The file is a CellML file. */
+        SEDML_FILE, /**< The file is a SED-ML file. */
+        COMBINE_ARCHIVE, /**< The file is a COMBINE archive. */
+        UNKNOWN_FILE /**< The type of the file is unknown. */
     };
 
     /**
      * @brief The status of an action on a file.
      *
-     * An action on a file can have one of the following statuses:
-     *  - OK: the action completed successfully;
-     *  - NON_RETRIEVABLE_LOCAL_FILE: the action could not retrieve the contents of a local file;
-     *  - NON_RETRIEVABLE_REMOTE_FILE: the action could not retrieve the contents of a remote file.
+     * The status of an action on a file, i.e. whether it was successful, unable to retrieve the contents of a file, or
+     * unable to instantiate a file.
      */
 
     enum class Status
     {
-        OK,
-        NON_RETRIEVABLE_LOCAL_FILE,
-        NON_RETRIEVABLE_REMOTE_FILE
+        OK, /**< The action completed successfully. */
+        NON_RETRIEVABLE_FILE, /**< The action could not retrieve the contents of a file. */
+        NON_INSTANTIABLE_FILE /**< The action could not instantiate a file. */
     };
 
     /**
-     * Constructors, destructor and assignment operators.
+     * Constructors, destructor, and assignment operators.
      */
 
     File() = delete; /**< No default constructor allowed, @private. */
@@ -113,8 +106,7 @@ public:
     /**
      * @brief Get the file name of this file.
      *
-     * Return the file name of this file. If the file is remote then we return
-     * the file name of its local copy.
+     * Return the file name of this file. If the file is remote then we return the file name of its local copy.
      *
      * @return The file name, as a @c std::string, of this file.
      */
@@ -124,8 +116,7 @@ public:
     /**
      * @brief Get the URL of this file.
      *
-     * Return the URL of this file. If the file is local then we return an empty
-     * string.
+     * Return the URL of this file. If the file is local then we return an empty string.
      *
      * @return The URL, as a @c std::string, of this file.
      */
@@ -135,15 +126,28 @@ public:
     /**
      * @brief Resolve this @c File.
      *
-     * Retrieve the contents of this @c File and determine its type, i.e. a
-     * CellML file, a SED-ML file, a COMBINE archive, or an unknown file.
+     * Retrieve the contents of this @c File and determine its @c Type, i.e. a CellML file, a SED-ML file, a COMBINE
+     * archive, or an unknown file.
      *
-     * @sa Status
+     * @sa Status, type()
      *
      * @return The status as a @c Status.
      */
 
     Status resolve();
+
+    /**
+     * @brief Instantiate this @c File.
+     *
+     * Instantiate this @c File and generate the runtime associated with the CellML file that is associated with this
+     * @c File, be it directly or indirectly.
+     *
+     * @sa Status, runtime()
+     *
+     * @return The status as a @c Status.
+     */
+
+    Status instantiate();
 
 private:
     explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private*/

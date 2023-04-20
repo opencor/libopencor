@@ -18,9 +18,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+namespace Support {
 class CellmlFile;
 class SedmlFile;
 class CombineArchive;
+} // namespace Support
 
 struct File::Impl
 {
@@ -29,15 +31,16 @@ struct File::Impl
     std::string mFileName;
     std::string mUrl;
 
-    CellmlFile *mCellmlFile = nullptr;
-    SedmlFile *mSedmlFile = nullptr;
-    CombineArchive *mCombineArchive = nullptr;
+    Support::CellmlFile *mCellmlFile = nullptr;
+    Support::SedmlFile *mSedmlFile = nullptr;
+    Support::CombineArchive *mCombineArchive = nullptr;
 
     ~Impl();
 
     void reset();
 
     File::Status resolve();
+    File::Status instantiate();
 };
 
 } // namespace libOpenCOR

@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "compiler.h"
 
+#include <iostream>
+
 #include "clangbegin.h"
 #include "clang/CodeGen/CodeGenAction.h"
 #include "clang/Driver/Compilation.h"
@@ -31,8 +33,6 @@ limitations under the License.
 #include "llvm/Support/TargetSelect.h"
 #include "llvm-c/Core.h"
 #include "llvmend.h"
-
-#include <iostream>
 
 namespace libOpenCOR {
 
@@ -59,18 +59,17 @@ bool Compiler::compile(const std::string &pCode)
 
     // Get a compilation object to which we pass some arguments.
 
-    static constexpr const char *DUMMY_FILE_NAME = "dummy.c";
-
-    std::vector<const char *> compilationArguments = {"clang", "-fsyntax-only",
+    static constexpr auto DUMMY_FILE_NAME = "dummy.c";
+    static const std::vector<const char *> COMPILATION_ARGUMENTS = {"clang", "-fsyntax-only",
 #ifdef NDEBUG
-                                                      "-O3",
+                                                                    "-O3",
 #else
-                                                      "-g", "-O0",
+                                                                    "-g", "-O0",
 #endif
-                                                      "-fno-math-errno",
-                                                      DUMMY_FILE_NAME};
+                                                                    "-fno-math-errno",
+                                                                    DUMMY_FILE_NAME};
 
-    std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(compilationArguments));
+    std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
 
 #ifdef NLLVMCOV
     if (!compilation) {
@@ -78,8 +77,7 @@ bool Compiler::compile(const std::string &pCode)
     }
 #endif
 
-    // The compilation object should have only one command, so if it doesn't
-    // then something went wrong.
+    // The compilation object should have only one command, so if it doesn't then something went wrong.
 
     clang::driver::JobList &jobs = compilation->getJobs();
 
@@ -94,15 +92,15 @@ bool Compiler::compile(const std::string &pCode)
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
 
 #ifdef NLLVMCOV
-    static constexpr const char *CLANG = "clang";
+    static constexpr auto CLANG = "clang";
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
         return false;
     }
 #endif
 
-    // Prevent the Clang driver from asking CC1 to leak memory, this by removing
-    // -disable-free from the command arguments.
+    // Prevent the Clang driver from asking CC1 to leak memory, this by removing -disable-free from the command
+    // arguments.
 
     auto commandArguments = command.getArguments();
 #ifdef NLLVMCOV
@@ -160,15 +158,13 @@ bool Compiler::compile(const std::string &pCode)
     }
 #endif
 
-    // Initialise the native target (and its ASM printer), so not only can we
-    // then create an execution engine, but more importantly its data layout
-    // will match that of our target platform.
+    // Initialise the native target (and its ASM printer), so not only can we then create an execution engine, but more
+    // importantly its data layout will match that of our target platform.
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
-    // Create an ORC-based JIT and keep track of it (so that we can use it in
-    // function()).
+    // Create an ORC-based JIT and keep track of it (so that we can use it in function()).
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 

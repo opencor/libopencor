@@ -12,14 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(TEST file)
+from libopencor import File
+import utils
 
-list(APPEND TESTS ${TEST})
 
-set(${TEST}_CATEGORY api)
-set(${TEST}_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/coveragetests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/instantiatetests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/resolvetests.cpp
-)
+def test_underconstrained_cellml_file():
+    f = File(utils.resource_path("underconstrained.cellml"))
+
+    assert f.resolve() == File.Status.Ok
+    assert f.instantiate() == File.Status.NonInstantiableFile
+
+
+def test_remote_file():
+    f = File(utils.REMOTE_FILE)
+
+    assert f.resolve() == File.Status.Ok
+    assert f.instantiate() == File.Status.Ok
+
+
+def test_note_remote_file():
+    f = File(utils.NOT_REMOTE_FILE)
+
+    assert f.resolve() == File.Status.NonRetrievableFile
+    assert f.instantiate() == File.Status.NonRetrievableFile

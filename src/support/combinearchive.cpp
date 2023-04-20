@@ -14,24 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "combinesupport.h"
-
-#include <combine/combinearchive.h>
+#include "combinearchive.h"
 
 namespace libOpenCOR::Support {
-
-bool isCombineArchive(const std::string &pFileName)
-{
-    // Try to retrieve a COMBINE archive.
-
-    auto combineArchive = libcombine::CombineArchive();
-    auto res = combineArchive.initializeFromArchive(pFileName);
-
-    if (res) {
-        combineArchive.cleanUp();
-    }
-
-    return res;
-}
-
 } // namespace libOpenCOR::Support

@@ -16,15 +16,17 @@ limitations under the License.
 
 #pragma once
 
+#include "unittestingexport.h"
+
+#include <string>
+
 #include "llvmbegin.h"
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
 #include "llvmend.h"
 
-#include <string>
-
 namespace libOpenCOR {
 
-class Compiler
+class LIBOPENCOR_UNIT_TESTING_EXPORT Compiler
 {
 public:
     bool compile(const std::string &pCode);

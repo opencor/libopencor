@@ -14,8 +14,7 @@
 
 # Include our different tests.
 
-#---GRY--- THE BELOW TEST IS TO BE ENABLED ONCE WE ACTUALLY MAKE USE OF THE COMPILER IN libOpenCOR.
-# include(compiler/tests.cmake)
+include(compiler/tests.cmake)
 include(file/tests.cmake)
 include(version/tests.cmake)
 
@@ -33,7 +32,6 @@ set(UTILS_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/utils.h)
 configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/misc
-                    ${CMAKE_SOURCE_DIR}/src/support
                     ${CMAKE_BINARY_DIR})
 
 foreach(TEST ${TESTS})
@@ -83,6 +81,13 @@ if(LIBOPENCOR_UNIT_TESTING)
                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                USES_TERMINAL
                COMMENT "Running unit testing...")
+endif()
+
+# Let libOpenCOR know if unit testing is enabled.
+
+if(LIBOPENCOR_UNIT_TESTING OR LIBOPENCOR_PYTHON_UNIT_TESTING)
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+                               UNIT_TESTING_ENABLED)
 endif()
 
 # Add our bindings tests.

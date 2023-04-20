@@ -14,22 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "cellmlsupport.h"
-#include "utils.h"
-
-#include <libcellml>
+#include "cellmlfile.h"
 
 namespace libOpenCOR::Support {
-
-bool isCellmlFile(const std::string &pFileName)
-{
-    // Try to parse the file contents.
-
-    auto [contents, size] = fileContents(pFileName);
-    auto parser = libcellml::Parser::create();
-    auto model = parser->parseModel(contents.get());
-
-    return parser->issueCount() == 0;
-}
-
 } // namespace libOpenCOR::Support
