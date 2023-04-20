@@ -35,39 +35,32 @@ public:
     /**
      * @brief The type of a file.
      *
-     * A file can be of one of the following types:
-     *  - UNRESOLVED: the file has yet to be resolved;
-     *  - CELLML_FILE: the file is a CellML file;
-     *  - SEDML_FILE: the file is a SED-ML file;
-     *  - COMBINE_ARCHIVE: the file is a COMBINE archive; or
-     *  - UNKNOWN: the type of the file is unknown.
+     * The type of a file, i.e. whether it is unresolved, a CellML file, a SED-ML file, a COMBINE archive, or unknown.
      *
      * @sa resolve()
      */
 
     enum class Type
     {
-        UNRESOLVED,
-        CELLML_FILE,
-        SEDML_FILE,
-        COMBINE_ARCHIVE,
-        UNKNOWN_FILE
+        UNRESOLVED, /**< The file has yet to be resolved. */
+        CELLML_FILE, /**< The file is a CellML file. */
+        SEDML_FILE, /**< The file is a SED-ML file. */
+        COMBINE_ARCHIVE, /**< The file is a COMBINE archive. */
+        UNKNOWN_FILE /**< The type of the file is unknown. */
     };
 
     /**
      * @brief The status of an action on a file.
      *
-     * An action on a file can have one of the following statuses:
-     *  - OK: the action completed successfully;
-     *  - NON_RETRIEVABLE_FILE: the action could not retrieve the contents of a file;
-     *  - NON_INSTANTIABLE_FILE: the action could not instantiate a file.
+     * The status of an action on a file, i.e. whether it was successful, unable to retrieve the contents of a file, or
+     * unable to instantiate a file.
      */
 
     enum class Status
     {
-        OK,
-        NON_RETRIEVABLE_FILE,
-        NON_INSTANTIABLE_FILE
+        OK, /**< The action completed successfully. */
+        NON_RETRIEVABLE_FILE, /**< The action could not retrieve the contents of a file. */
+        NON_INSTANTIABLE_FILE /**< The action could not instantiate a file. */
     };
 
     /**
