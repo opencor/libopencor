@@ -25,6 +25,7 @@ TEST(ResolveFileTest, resolveNonRetrievableFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::NON_RETRIEVABLE_FILE));
 
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
 }
 
 TEST(ResolveFileTest, resolveUnknownFile)

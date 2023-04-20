@@ -20,6 +20,7 @@ def test_resolve_non_retrievable_file():
     f = File(utils.resource_path(utils.NON_RETRIEVABLE_FILE))
 
     assert f.resolve() == File.Status.NonRetrievableFile
+    assert f.type == File.Type.Unresolved
 
 
 def test_resolve_unknown_file():
