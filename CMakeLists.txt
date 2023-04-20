@@ -38,14 +38,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# On macOS, deploy on macOS 10.15 and later and make sure that we target x86_64.
+# On macOS, deploy on macOS 10.15 and later.
 
-if(APPLE)
-    if("${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
-        set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
-    endif()
-
-    set(CMAKE_OSX_ARCHITECTURES x86_64)
+if(APPLE AND "${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 endif()
 
 # Some common CMake functions/macros.
