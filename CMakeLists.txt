@@ -438,9 +438,8 @@ if(LIBOPENCOR_PYTHON_UNIT_TESTING)
 endif()
 
 # Determine whether we are building in release mode.
-# Note: this only makes sense if we are not in a multi-configuration mode, i.e.
-#       IS_MULTI_CONFIG is equal to FALSE, which is likely to be the case when
-#       building a third-party library.
+# Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE, which
+#       is likely to be the case when building a third-party library.
 
 if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
     set(RELEASE_MODE FALSE)
@@ -461,12 +460,10 @@ if(WIN32)
 endif()
 
 # Enable Python bindings.
-# Note: we unset Python_FOUND so that pybind11 can look for Python on our behalf
-#       and thus allow our Windows Python CI test to work as expected using
-#       GitHub Actions. Indeed, on GHA Windows, Python 3.7.9 is the official
-#       version, yet CMake finds and uses Python 3.10.0, which causes problems
-#       when we then want to test our Python bindings since we use the official
-#       version of Python.
+# Note: we unset Python_FOUND so that pybind11 can look for Python on our behalf and thus allow our Windows Python CI
+#       test to work as expected using GitHub Actions. Indeed, on GHA Windows, Python 3.7.9 is the official version, yet
+#       CMake finds and uses Python 3.10.0, which causes problems when we then want to test our Python bindings since we
+#       use the official version of Python.
 
 if(LIBOPENCOR_PYTHON_BINDINGS)
     unset(Python_FOUND)

@@ -84,8 +84,8 @@ function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_
                     RESULT_VARIABLE RESULT
                     OUTPUT_QUIET)
 
-    # Calculate the SHA-1 value of our package, if it exists, and let people
-    # know how we should call the retrieve_package() function.
+    # Calculate the SHA-1 value of our package, if it exists, and let people know how we should call the
+    # retrieve_package() function.
 
     if(RESULT EQUAL 0 AND EXISTS ${PACKAGE_FILE})
         file(SHA1 ${PACKAGE_FILE} SHA1_VALUE)
@@ -124,8 +124,7 @@ function(add_package PACKAGE)
 endfunction()
 
 function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG SHA1_VALUE)
-    # Check whether the package has already been retrieved by simply checking
-    # whether its installation directory exists.
+    # Check whether the package has already been retrieved by simply checking whether its installation directory exists.
 
     set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -182,8 +181,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
     endif()
 
     # Create a dummy target for our package.
-    # Note: this is needed so that we can build a package that depends on other
-    #       packages that have been retrieved.
+    # Note: this is needed so that we can build a package that depends on other packages that have been retrieved.
 
     add_custom_target(${PACKAGE_NAME})
 endfunction()
@@ -213,9 +211,8 @@ else()
 endif()
 
 # Build our third-party libraries the same way that we build libOpenCOR.
-# Note: the build type on Linux/macOS is always Release since we don't need to
-#       debug third-party libraries and a debug library can use release
-#       libraries.
+# Note: the build type on Linux/macOS is always Release since we don't need to debug third-party libraries and a debug
+#       library can use release libraries.
 
 include(ExternalProject)
 

@@ -40,8 +40,7 @@ if(FORMAT_CODE_AVAILABLE)
                COMMENT "Formatting the code...")
 endif()
 
-# Add some custom targets to test the formatting of our Python code and to
-# format it.
+# Add some custom targets to test the formatting of our Python code and to format it.
 
 if(PYTHON_FORMATTING_AVAILABLE)
     add_target(python_check_code_formatting

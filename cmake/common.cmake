@@ -191,8 +191,8 @@ function(configure_target TARGET)
 
         if(    "${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR}" STREQUAL ""
            AND "${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}" STREQUAL "")
-            # There are no CMake configuration files, so manually configure the
-            # package using targets of the form <PACKAGE_NAME>::<LIBRARY_NAME>.
+            # There are no CMake configuration files, so manually configure the package using targets of the form
+            # <PACKAGE_NAME>::<LIBRARY_NAME>.
 
             foreach(AVAILABLE_PACKAGE_LIBRARY ${${AVAILABLE_PACKAGE_UC}_LIBRARY} ${${AVAILABLE_PACKAGE_UC}_LIBRARIES})
                 if(NOT TARGET ${AVAILABLE_PACKAGE_LIBRARY})
@@ -215,8 +215,7 @@ function(configure_target TARGET)
                 endif()
             endforeach()
         else()
-            # There are some CMake configuration files, so use them to configure the
-            # package.
+            # There are some CMake configuration files, so use them to configure the package.
 
             find_package(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME} REQUIRED
                          PATHS ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR}
@@ -327,8 +326,7 @@ function(prepare_test TARGET)
 endfunction()
 
 function(build_documentation DOCUMENTATION_NAME)
-    # Build the given documentation as an external project and have it copied to
-    # our final documentation directory.
+    # Build the given documentation as an external project and have it copied to our final documentation directory.
 
     set(DOCUMENTATION_BUILD ${DOCUMENTATION_NAME}_documentation)
 

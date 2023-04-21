@@ -57,9 +57,8 @@ else()
             set(PLATFORM debug-VC-WIN64A)
         endif()
 
-        # Patch the generated makefile since it contains non-escaped paths that
-        # result in our build to fail. (Not sure why this is the case, but
-        # that's the situation!)
+        # Patch the generated makefile since it contains non-escaped paths that result in our build to fail. (Not sure
+        # why this is the case, but that's the situation!)
 
         set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
 
@@ -113,10 +112,9 @@ else()
 endif()
 
 # Make our package accessible.
-# Note: the order in which we list the OpenSSL libraries in OPENSSL_LIBRARIES
-#       should not matter, but as it happens it does when building our Python
-#       bindings on Linux. Indeed, if libcrypto is listed before libssl then our
-#       Python module will report that SRP_Calc_A is undefined.
+# Note: the order in which we list the OpenSSL libraries in OPENSSL_LIBRARIES should not matter, but as it happens it
+#       does when building our Python bindings on Linux. Indeed, if libcrypto is listed before libssl then our Python
+#       module will report that SRP_Calc_A is undefined.
 
 set(OPENSSL_ROOT_DIR ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(OPENSSL_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")

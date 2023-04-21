@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build our Python bindings and make sure that they are linked against our
-# third-party libraries.
+# Build our Python bindings and make sure that they are linked against our third-party libraries.
 
 set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
 set(PYTHON_SOURCE_FILES
