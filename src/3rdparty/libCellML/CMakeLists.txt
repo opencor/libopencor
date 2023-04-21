@@ -43,9 +43,15 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
                              f3a8bb581eb00a4e06dd9a698511101b1b32a39d)
         endif()
     elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         d9f1bff8a4cbd4981d6197ea4ea398ad937e62ee)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             d9f1bff8a4cbd4981d6197ea4ea398ad937e62ee)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             43f33697b7a6ae946f7e30a5829b16986d88df21)
+        endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}

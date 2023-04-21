@@ -463,6 +463,18 @@ else()
     set(RELEASE_MODE TRUE)
 endif()
 
+# Determine whether we are building for an Intel processor.
+
+if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
+    set(INTEL_MODE TRUE)
+
+    set(CMAKE_OSX_ARCHITECTURES x86_64)
+else()
+    set(INTEL_MODE FALSE)
+
+    set(CMAKE_OSX_ARCHITECTURES arm64)
+endif()
+
 # Location of our prebuilt packages.
 
 set(PREBUILT_DIR ${CMAKE_SOURCE_DIR}/prebuilt)

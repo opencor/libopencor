@@ -33,9 +33,15 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
                              d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
         endif()
     elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b77f772559f5feac52fae65914efd0df841feb87)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             b77f772559f5feac52fae65914efd0df841feb87)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             7dbe9aae7a1affa1e0f921fd5fa0f4ea25131f04)
+        endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -43,6 +49,12 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
     endif()
 else()
     # Build our package.
+
+    if(INTEL_MODE)
+        set(LLVM_TARGETS_TO_BUILD X86)
+    else()
+        set(LLVM_TARGETS_TO_BUILD AArch64)
+    endif()
 
     build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
@@ -95,7 +107,7 @@ else()
             -DLLVM_INCLUDE_TESTS=OFF
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
-            -DLLVM_TARGETS_TO_BUILD=X86
+            -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
     )
 
     # Create our package.
@@ -116,6 +128,28 @@ endif()
 
 if(NOT WIN32)
     set(_STATIC "_static")
+endif()
+
+if(INTEL_MODE)
+    set(EXTRA_LLVMCLANG_LIBRARIES
+        LLVMExegesisX86
+        LLVMX86AsmParser
+        LLVMX86CodeGen
+        LLVMX86Desc
+        LLVMX86Disassembler
+        LLVMX86Info
+        LLVMX86TargetMCA
+    )
+else()
+    set(EXTRA_LLVMCLANG_LIBRARIES
+        LLVMAArch64AsmParser
+        LLVMAArch64CodeGen
+        LLVMAArch64Desc
+        LLVMAArch64Disassembler
+        LLVMAArch64Info
+        LLVMAArch64Utils
+        LLVMExegesisAArch64
+    )
 endif()
 
 set(LLVMCLANG_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
@@ -187,7 +221,6 @@ set(LLVMCLANG_LIBRARIES
     LLVMDWP
     LLVMExecutionEngine
     LLVMExegesis
-    LLVMExegesisX86
     LLVMExtensions
     LLVMFileCheck
     LLVMFrontendOpenACC
@@ -233,12 +266,7 @@ set(LLVMCLANG_LIBRARIES
     LLVMTransformUtils
     LLVMVectorize
     LLVMWindowsManifest
-    LLVMX86AsmParser
-    LLVMX86CodeGen
-    LLVMX86Desc
-    LLVMX86Disassembler
-    LLVMX86Info
-    LLVMX86TargetMCA
     LLVMXRay
+    ${EXTRA_LLVMCLANG_LIBRARIES}
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )

@@ -37,9 +37,15 @@ if(LIBOPENCOR_PREBUILT_LIBSEDML)
                              d2b1bb7ce728354f21de2a5b9161314212ff8d83)
         endif()
     elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         d4a3a3bcd0be4137967517b63167cb7d169dd353)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             d4a3a3bcd0be4137967517b63167cb7d169dd353)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             c0823de700727c4872da11e6bbed0ff9e005fb73)
+        endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}

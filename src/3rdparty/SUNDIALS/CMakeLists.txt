@@ -33,9 +33,15 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
                              d82fc0e2312ab6dda73cff32c12e456246fd441e)
         endif()
     elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ef844d27b82a63b7167f3165e45ce78d20c3a7cf)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             ef844d27b82a63b7167f3165e45ce78d20c3a7cf)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             a2399ef9cf50d64c1dad7d6e554700a47adde9b2)
+        endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}

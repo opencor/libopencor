@@ -33,9 +33,15 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
                              4f375a3dda98e703c25e24cb762e7651f79895ec)
         endif()
     elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         847b9b0e0c70bf4b458796c453d8c03c4b0d4252)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             847b9b0e0c70bf4b458796c453d8c03c4b0d4252)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             ae38760197be0715d0398cd88945ad74fe16ff45)
+        endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -70,7 +76,11 @@ else()
         )
     else()
         if(APPLE)
-            set(PLATFORM darwin64-x86_64-cc)
+            if(INTEL_MODE)
+                set(PLATFORM darwin64-x86_64-cc)
+            else()
+                set(PLATFORM darwin64-arm64-cc)
+            endif()
 
             list(APPEND CONFIG_OPTIONS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
         else()
