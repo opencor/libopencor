@@ -77,7 +77,7 @@ endfunction()
 function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG)
     # Create the package.
 
-    set(PACKAGE_FILE ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM}.tar.gz)
+    set(PACKAGE_FILE ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM}.${TARGET_ARCHITECTURE}.tar.gz)
 
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar -czf ${PACKAGE_FILE} ${ARGN}
                     WORKING_DIRECTORY ${PREBUILT_DIR}/${PACKAGE_NAME}
@@ -135,7 +135,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
     else()
         # Retrieve the package.
 
-        set(PACKAGE_FILE ${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM}.tar.gz)
+        set(PACKAGE_FILE ${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM}.${TARGET_ARCHITECTURE}.tar.gz)
         set(REAL_PACKAGE_FILE ${INSTALL_DIR}/${PACKAGE_FILE})
         set(PACKAGE_URL "https://github.com/opencor/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
 
@@ -208,6 +208,14 @@ elseif(APPLE)
     set(TARGET_PLATFORM macos)
 else()
     set(TARGET_PLATFORM linux)
+endif()
+
+# Determine the architecture on which we want to build.
+
+if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
+    set(TARGET_ARCHITECTURE intel)
+else()
+    set(TARGET_ARCHITECTURE arm)
 endif()
 
 # Build our third-party libraries the same way that we build libOpenCOR.

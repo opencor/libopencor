@@ -62,6 +62,32 @@ if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET VERSION_GREATER_EQUAL ${MACOS_DEPLO
     message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built for macOS ${MACOS_DEPLOYMENT_TARGET} and later.")
 endif()
 
+# Determine our default target architecture.
+
+if(WIN32)
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM64")
+        set(DEFAULT_TARGET_ARCHITECTURE ARM)
+    endif()
+elseif(APPLE)
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "arm64")
+        set(DEFAULT_TARGET_ARCHITECTURE ARM)
+    endif()
+else()
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+        set(DEFAULT_TARGET_ARCHITECTURE ARM)
+    endif()
+endif()
+
+if("${DEFAULT_TARGET_ARCHITECTURE}" STREQUAL "")
+    message(FATAL_ERROR "No supported target architecture could be determined for ${CMAKE_PROJECT_NAME}.")
+endif()
+
 # Check whether we are dealing with a single or multiple configuration.
 
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
