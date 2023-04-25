@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libssh2)
 set(PACKAGE_VERSION 1.10.0)
 set(PACKAGE_REPOSITORY libssh2)
-set(GIT_TAG libssh2-1.10.0)
 set(RELEASE_TAG libssh2-1.10.0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -51,11 +50,8 @@ else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBUILD_EXAMPLES=OFF
             -DBUILD_TESTING=OFF

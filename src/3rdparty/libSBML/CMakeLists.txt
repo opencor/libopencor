@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libSBML)
 set(PACKAGE_VERSION 5.19.6)
 set(PACKAGE_REPOSITORY libsbml)
-set(GIT_TAG v5.19.6-libopencor)
 set(RELEASE_TAG v5.19.6-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -55,11 +54,8 @@ else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}

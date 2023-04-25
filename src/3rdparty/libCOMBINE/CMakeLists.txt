@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libCOMBINE)
 set(PACKAGE_VERSION 0.2.18)
 set(PACKAGE_REPOSITORY libCombine)
-set(GIT_TAG v0.2.18)
 set(RELEASE_TAG v0.2.18)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -55,11 +54,8 @@ else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBUILD_TEST=OFF
             ${CMAKE_ARGS}

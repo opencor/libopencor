@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libcurl)
 set(PACKAGE_VERSION 7.83.1)
 set(PACKAGE_REPOSITORY curl)
-set(GIT_TAG curl-7_83_1)
 set(RELEASE_TAG curl-7_83_1)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -55,11 +54,8 @@ else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBUILD_CURL_EXE=OFF
             -DBUILD_SHARED_LIBS=OFF

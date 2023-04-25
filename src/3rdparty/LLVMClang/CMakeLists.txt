@@ -15,7 +15,6 @@
 set(PACKAGE_NAME LLVMClang)
 set(PACKAGE_VERSION 14.0.3)
 set(PACKAGE_REPOSITORY llvm-project)
-set(GIT_TAG release/14.0.3-libopencor)
 set(RELEASE_TAG llvmorg-14.0.3)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -57,11 +56,8 @@ else()
     endif()
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         SOURCE_SUBDIR
             llvm
         CMAKE_ARGS

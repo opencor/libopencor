@@ -15,7 +15,6 @@
 set(PACKAGE_NAME OpenSSL)
 set(PACKAGE_VERSION 3.0.3)
 set(PACKAGE_REPOSITORY openssl)
-set(GIT_TAG openssl-3.0.3-libopencor)
 set(RELEASE_TAG openssl-3.0.3-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -91,11 +90,8 @@ else()
     endif()
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CONFIGURE_COMMAND
             ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
         ${PATCH_COMMANDS}

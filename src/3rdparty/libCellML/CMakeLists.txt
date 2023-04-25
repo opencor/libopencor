@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libCellML)
 set(PACKAGE_VERSION 0.4.0)
 set(PACKAGE_REPOSITORY libcellml)
-set(GIT_TAG 2023-04-17)
 set(RELEASE_TAG 2023-04-17)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -61,11 +60,8 @@ else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF
             -DBUILD_SHARED=OFF

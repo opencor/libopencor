@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libxml2)
 set(PACKAGE_VERSION 2.9.14)
 set(PACKAGE_REPOSITORY libxml2)
-set(GIT_TAG v2.9.14)
 set(RELEASE_TAG v2.9.14)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -51,11 +50,8 @@ else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBUILD_SHARED_LIBS=OFF
             ${CMAKE_ARGS}

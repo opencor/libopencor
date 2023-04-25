@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libSEDML)
 set(PACKAGE_VERSION 2.0.32)
 set(PACKAGE_REPOSITORY libSEDML)
-set(GIT_TAG v2.0.32-libopencor)
 set(RELEASE_TAG v2.0.32-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -55,11 +54,8 @@ else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBUILD_TESTS=OFF
             ${CMAKE_ARGS}
