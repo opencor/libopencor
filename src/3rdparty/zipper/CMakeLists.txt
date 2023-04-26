@@ -15,6 +15,7 @@
 set(PACKAGE_NAME zipper)
 set(PACKAGE_VERSION 0.9.1)
 set(PACKAGE_REPOSITORY zipper)
+set(GIT_TAG 6f54c03)
 set(RELEASE_TAG 6f54c03)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -54,8 +55,11 @@ else()
     endif()
 
     build_package(${PACKAGE_NAME}
-        URL
-            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+        GIT_REPOSITORY
+            https://github.com/opencor/${PACKAGE_REPOSITORY}
+        GIT_TAG
+            ${GIT_TAG}
+        GIT_SHALLOW
         CMAKE_CACHE_ARGS
             -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         CMAKE_ARGS
