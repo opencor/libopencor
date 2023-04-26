@@ -22,6 +22,6 @@ namespace libOpenCOR {
 
 class File;
 
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @c File pointer. */
+using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
 
 } // namespace libcellml
