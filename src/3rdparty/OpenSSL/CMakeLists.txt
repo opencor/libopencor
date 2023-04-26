@@ -83,7 +83,11 @@ else()
 
             list(APPEND CONFIG_OPTIONS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
         else()
-            set(PLATFORM linux-x86_64)
+            if(INTEL_MODE)
+                set(PLATFORM linux-x86_64)
+            else()
+                set(PLATFORM linux-aarch64)
+            endif()
 
             list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
         endif()
@@ -101,9 +105,10 @@ else()
             ${MAKE_NMAKE_COMMAND} install_sw
     )
 
-    # On Linux, we need to rename the library folder from lib64 to lib.
+    # On Linux, we need to rename the library folder from lib64 to lib, but only when building for the Intel
+    # architecture.
 
-    if(NOT WIN32 AND NOT APPLE)
+    if(NOT WIN32 AND NOT APPLE AND INTEL_MODE)
         file(RENAME "${INSTALL_DIR}/lib64" "${INSTALL_DIR}/lib")
     endif()
 
