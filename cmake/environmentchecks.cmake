@@ -58,7 +58,7 @@ endif()
 
 # Make sure that we are building libOpenCOR for the version of macOS that we are after.
 
-if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET VERSION_GREATER_EQUAL ${MACOS_DEPLOYMENT_TARGET})
+if(APPLE AND NOT "${CMAKE_OSX_DEPLOYMENT_TARGET}" VERSION_GREATER_EQUAL "${MACOS_DEPLOYMENT_TARGET}")
     message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built for macOS ${MACOS_DEPLOYMENT_TARGET} and later.")
 endif()
 
