@@ -448,9 +448,15 @@ if(LIBOPENCOR_PYTHON_UNIT_TESTING)
     endif()
 endif()
 
-if(    NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel"
-   AND NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "ARM")
-    message(SEND_ERROR "Configuration error: unsupported target architecture (${LIBOPENCOR_TARGET_ARCHITECTURE}). Supported target architectures are Intel and ARM.")
+if(APPLE)
+    if(    NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel"
+       AND NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "ARM")
+        message(SEND_ERROR "Configuration error: unsupported target architecture (${LIBOPENCOR_TARGET_ARCHITECTURE}). Supported target architectures are Intel and ARM.")
+    endif()
+else()
+    if(NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "${DEFAULT_TARGET_ARCHITECTURE}")
+        message(SEND_ERROR "Configuration error: unsupported target architecture (${LIBOPENCOR_TARGET_ARCHITECTURE}). Supported target architecture is ${DEFAULT_TARGET_ARCHITECTURE}.")
+    endif()
 endif()
 
 # Determine whether we are building in release mode.

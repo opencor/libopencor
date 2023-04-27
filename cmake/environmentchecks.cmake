@@ -63,9 +63,15 @@ if(APPLE AND NOT "${CMAKE_OSX_DEPLOYMENT_TARGET}" VERSION_GREATER_EQUAL "${MACOS
 endif()
 
 # Determine our default target architecture.
+# Note: on Windows, we first check the VSCMD_ARG_TGT_ARCH environment variable since the default target architecture
+#       depends on how Visual Studio command line tools were started.
 
 if(WIN32)
-    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
+    if("$ENV{VSCMD_ARG_TGT_ARCH}" STREQUAL "x64")
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    elseif("$ENV{VSCMD_ARG_TGT_ARCH}" STREQUAL "arm64")
+        set(DEFAULT_TARGET_ARCHITECTURE ARM)
+    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
         set(DEFAULT_TARGET_ARCHITECTURE Intel)
     elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM64")
         set(DEFAULT_TARGET_ARCHITECTURE ARM)
