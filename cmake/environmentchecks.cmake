@@ -63,18 +63,20 @@ if(APPLE AND NOT "${CMAKE_OSX_DEPLOYMENT_TARGET}" VERSION_GREATER_EQUAL "${MACOS
 endif()
 
 # Determine our default target architecture.
-# Note: on Windows, we first check the VSCMD_ARG_TGT_ARCH environment variable since the default target architecture
-#       depends on how Visual Studio command line tools were started.
+# Note: on Windows, the target architecture depends on the version of MSVC we are using (i.e. x64 or arm64), so we look
+#       for /x64/ and /arm64/ in CMAKE_CXX_COMPILER rather than just rely on the value of CMAKE_SYSTEM_PROCESSOR.
 
 if(WIN32)
-    if("$ENV{VSCMD_ARG_TGT_ARCH}" STREQUAL "x64")
+    string(FIND "${CMAKE_CXX_COMPILER}" "/x64/" INDEX)
+
+    if(NOT INDEX EQUAL -1)
         set(DEFAULT_TARGET_ARCHITECTURE Intel)
-    elseif("$ENV{VSCMD_ARG_TGT_ARCH}" STREQUAL "arm64")
-        set(DEFAULT_TARGET_ARCHITECTURE ARM)
-    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "AMD64")
-        set(DEFAULT_TARGET_ARCHITECTURE Intel)
-    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "ARM64")
-        set(DEFAULT_TARGET_ARCHITECTURE ARM)
+    else()
+        string(FIND "${CMAKE_CXX_COMPILER}" "/arm64/" INDEX)
+
+        if(NOT INDEX EQUAL -1)
+            set(DEFAULT_TARGET_ARCHITECTURE ARM)
+        endif()
     endif()
 elseif(APPLE)
     if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
@@ -92,6 +94,12 @@ endif()
 
 if("${DEFAULT_TARGET_ARCHITECTURE}" STREQUAL "")
     message(FATAL_ERROR "No supported target architecture could be determined for ${CMAKE_PROJECT_NAME}.")
+endif()
+
+if(NOT APPLE)
+    # On Windows and Linux, our actual target architecture is always our default target architecture.
+
+    set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE})
 endif()
 
 # Check whether we are dealing with a single or multiple configuration.

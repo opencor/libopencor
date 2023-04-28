@@ -372,15 +372,20 @@ set(BUILD_SHARED_LIBS ${LIBOPENCOR_SHARED_LIBS} CACHE INTERNAL "Internalise BUIL
 unset(SHARED_LIBS CACHE)
 
 # TARGET_ARCHITECTURE ==> LIBOPENCOR_TARGET_ARCHITECTURE.
+# Note: this is only relevant on macOS since on Windows the target architecture is always going to be the same as that
+#       of the version of MSVC we are using (i.e. x64 or arm64) while on Linux we have no choice but to target the same
+#       architecture as that of the system.
 
-set(LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING "Specify the target architecture (Intel or ARM).")
-set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE} CACHE BOOL "${LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING}")
+if(APPLE)
+    set(LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING "Specify the target architecture (Intel or ARM).")
+    set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE} CACHE BOOL "${LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING}")
 
-if(DEFINED TARGET_ARCHITECTURE AND NOT "${TARGET_ARCHITECTURE}" STREQUAL "")
-    set(LIBOPENCOR_TARGET_ARCHITECTURE ${TARGET_ARCHITECTURE} CACHE BOOL "${LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING}" FORCE)
+    if(DEFINED TARGET_ARCHITECTURE AND NOT "${TARGET_ARCHITECTURE}" STREQUAL "")
+        set(LIBOPENCOR_TARGET_ARCHITECTURE ${TARGET_ARCHITECTURE} CACHE BOOL "${LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING}" FORCE)
+    endif()
+
+    unset(TARGET_ARCHITECTURE CACHE)
 endif()
-
-unset(TARGET_ARCHITECTURE CACHE)
 
 # UNIT_TESTING ==> LIBOPENCOR_UNIT_TESTING.
 
@@ -453,10 +458,6 @@ if(APPLE)
        AND NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "ARM")
         message(SEND_ERROR "Configuration error: unsupported target architecture (${LIBOPENCOR_TARGET_ARCHITECTURE}). Supported target architectures are Intel and ARM.")
     endif()
-else()
-    if(NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "${DEFAULT_TARGET_ARCHITECTURE}")
-        message(SEND_ERROR "Configuration error: unsupported target architecture (${LIBOPENCOR_TARGET_ARCHITECTURE}). Supported target architecture is ${DEFAULT_TARGET_ARCHITECTURE}.")
-    endif()
 endif()
 
 # Determine whether we are building in release mode.
@@ -470,6 +471,7 @@ else()
 endif()
 
 # Determine whether we are building for an Intel processor.
+# Note: it's fine to always set CMAKE_OSX_ARCHITECTURES since it gets ignored on Windows and Linux.
 
 if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
     set(INTEL_MODE TRUE)
