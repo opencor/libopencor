@@ -15,7 +15,6 @@
 set(PACKAGE_NAME SUNDIALS)
 set(PACKAGE_VERSION v6.2.0)
 set(PACKAGE_REPOSITORY sundials)
-set(GIT_TAG v6.2.0-libopencor)
 set(RELEASE_TAG v6.2.0-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -24,22 +23,46 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 if(LIBOPENCOR_PREBUILT_SUNDIALS)
     if(WIN32)
         if(RELEASE_MODE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 09f9d72512c03240420ce1eb33237628d4088fa2)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 cd1fb99c5662480b0a41111de2194b8025344ba0)
+            endif()
+        else()
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 79810672405ebf776c99b386d6d12fa77944897a)
+            endif()
+        endif()
+    elseif(APPLE)
+        if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             09f9d72512c03240420ce1eb33237628d4088fa2)
+                             ef844d27b82a63b7167f3165e45ce78d20c3a7cf)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d82fc0e2312ab6dda73cff32c12e456246fd441e)
+                             a2399ef9cf50d64c1dad7d6e554700a47adde9b2)
         endif()
-    elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ef844d27b82a63b7167f3165e45ce78d20c3a7cf)
     else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b0d953dffcab7be7440d148bf334cac7913914dd)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             b0d953dffcab7be7440d148bf334cac7913914dd)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             bcaaad18087d6e4a002b3eda5f5c49eca7e255cc)
+        endif()
     endif()
 else()
     # Build our package.
@@ -47,11 +70,8 @@ else()
     set(PACKAGE_C_FLAGS -DNO_FPRINTF_OUTPUT ${CMAKE_C_FLAGS})
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_CACHE_ARGS
             -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         CMAKE_ARGS

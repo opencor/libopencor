@@ -77,9 +77,9 @@ public:
     File &operator=(File &&) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Create a @c File object.
+     * @brief Create a @ref File object.
      *
-     * Factory method to create a @c File object:
+     * Factory method to create a @ref File object:
      *
      * ```
      * auto localFile = libOpenCOR::File::create("/some/path/file.txt");
@@ -88,7 +88,7 @@ public:
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
      *
-     * @return A smart pointer to a @c File object.
+     * @return A smart pointer to a @ref File object.
      */
 
     static FilePtr create(const std::string &pFileNameOrUrl);
@@ -98,7 +98,7 @@ public:
      *
      * Return the type of this file.
      *
-     * @return The type as a @c Type.
+     * @return The type as a @ref Type.
      */
 
     Type type() const;
@@ -124,27 +124,27 @@ public:
     std::string url() const;
 
     /**
-     * @brief Resolve this @c File.
+     * @brief Resolve this @ref File.
      *
-     * Retrieve the contents of this @c File and determine its @c Type, i.e. a CellML file, a SED-ML file, a COMBINE
+     * Retrieve the contents of this @ref File and determine its @ref Type, i.e. a CellML file, a SED-ML file, a COMBINE
      * archive, or an unknown file.
      *
      * @sa Status, type()
      *
-     * @return The status as a @c Status.
+     * @return The status as a @ref Status.
      */
 
     Status resolve();
 
     /**
-     * @brief Instantiate this @c File.
+     * @brief Instantiate this @ref File.
      *
-     * Instantiate this @c File and generate the runtime associated with the CellML file that is associated with this
-     * @c File, be it directly or indirectly.
+     * Instantiate this @ref File and generate the runtime associated with the CellML file that is associated with this
+     * @ref File, be it directly or indirectly.
      *
      * @sa Status, runtime()
      *
-     * @return The status as a @c Status.
+     * @return The status as a @ref Status.
      */
 
     Status instantiate();

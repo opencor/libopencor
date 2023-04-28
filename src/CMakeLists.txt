@@ -38,9 +38,8 @@ endif()
 # Replace some compiler flags when building using MSVC.
 
 if(BUILDING_USING_MSVC)
-    # Replace the /Zi option (i.e. enable debugging information), if present,
-    # with the /Z7 option (i.e. enable old-style debugging information)
-    # otherwise caching (be it with buildcache or clcache) won't work.
+    # Replace the /Zi option (i.e. enable debugging information), if present, with the /Z7 option (i.e. enable old-style
+    # debugging information) otherwise caching (be it with buildcache or clcache) won't work.
 
     if(BUILDCACHE_EXE OR CLCACHE_EXE)
         replace_compiler_flag("/Zi" "/Z7")
@@ -178,8 +177,7 @@ generate_export_header(${CMAKE_PROJECT_NAME}
                        BASE_NAME LIBOPENCOR)
 
 # Don't allow unresolved symbols.
-# Note: MSVC doesn't allow unresolved symbols, so we only need to look for them
-#       if we are building using GNU or Clang.
+# Note: MSVC doesn't allow unresolved symbols, so we only need to look for them if we are building using GNU or Clang.
 
 if(BUILDING_USING_GNU)
     SET(CMAKE_SHARED_LINKER_FLAGS -Wl,--no-undefined)

@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libSBML)
 set(PACKAGE_VERSION 5.19.6)
 set(PACKAGE_REPOSITORY libsbml)
-set(GIT_TAG v5.19.6-libopencor)
 set(RELEASE_TAG v5.19.6-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -28,32 +27,53 @@ endif()
 if(LIBOPENCOR_PREBUILT_LIBSBML)
     if(WIN32)
         if(RELEASE_MODE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 49889f70d18ead72d4718c5a6e7fec677f36a39d)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 a7138e1d007e7929913b36c462c5a2c4b3884b02)
+            endif()
+        else()
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 d02f61cce711cd74aef2b4dff28af9a9b8ce61a8)
+            endif()
+        endif()
+    elseif(APPLE)
+        if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             49889f70d18ead72d4718c5a6e7fec677f36a39d)
+                             f9d89084dd9bcb724e68beddcba924c6fb21147e)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             cfd76c888a66a803ae5182be39e382a76e90d3cc)
+                             694ad628772f8fd5009d6f048a4062079cafa5c8)
         endif()
-    elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         f9d89084dd9bcb724e68beddcba924c6fb21147e)
     else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b968f19fc3f91f6b639ba7df671025d0838780c8)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             b968f19fc3f91f6b639ba7df671025d0838780c8)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             f70f0b25a9f13fc1fbe398bf89cbfd03c31633b2)
+        endif()
     endif()
 else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}

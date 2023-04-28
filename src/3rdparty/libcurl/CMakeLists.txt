@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libcurl)
 set(PACKAGE_VERSION 7.83.1)
 set(PACKAGE_REPOSITORY curl)
-set(GIT_TAG curl-7_83_1)
 set(RELEASE_TAG curl-7_83_1)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -28,32 +27,53 @@ endif()
 if(LIBOPENCOR_PREBUILT_LIBCURL)
     if(WIN32)
         if(RELEASE_MODE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 7b6994f4dbf03e709acb1b3c5e7981aa12decbca)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 34941642c98855a7a34964c70f9bf396694cefb8)
+            endif()
+        else()
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 9ea6f74f7012f1217b3e9a5db86afa4292926dd7)
+            endif()
+        endif()
+    elseif(APPLE)
+        if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7b6994f4dbf03e709acb1b3c5e7981aa12decbca)
+                             8476306e95a657dc0a224b19797b9cdea5215c5f)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             50c8c43bc5bbcaf1ff3c349a2ec5c86b1ad58818)
+                             d7e55af2f4f71599680b5c6dd1c3953b729548d0)
         endif()
-    elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         8476306e95a657dc0a224b19797b9cdea5215c5f)
     else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         a1251435ea2228af7e87a9f6ed1d7bd89a7592a1)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             a1251435ea2228af7e87a9f6ed1d7bd89a7592a1)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             1d41aebf3040f0ae86845f4cac26b8f05e35abc1)
+        endif()
     endif()
 else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBUILD_CURL_EXE=OFF
             -DBUILD_SHARED_LIBS=OFF
@@ -74,8 +94,8 @@ else()
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
     string(REPLACE "${LIBSSH2_LIBRARY_FILE}" "${LIBSSH2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "OpenSSL::Crypto" "OpenSSL::libcrypto" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "OpenSSL::SSL" "OpenSSL::libssl" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "OpenSSL::Crypto" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "OpenSSL::SSL" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "ZLIB::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")

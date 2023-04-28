@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libCOMBINE)
 set(PACKAGE_VERSION 0.2.18)
 set(PACKAGE_REPOSITORY libCombine)
-set(GIT_TAG v0.2.18)
 set(RELEASE_TAG v0.2.18)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -28,32 +27,53 @@ endif()
 if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
     if(WIN32)
         if(RELEASE_MODE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 01169dc3d311eebcac4fac86950d8c3bd7a224e7)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 13619456697bc22f508b80f2b2ed809dedf15953)
+            endif()
+        else()
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 19146fb4e79347297fad86860ad9b198f9213f7b)
+            endif()
+        endif()
+    elseif(APPLE)
+        if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             01169dc3d311eebcac4fac86950d8c3bd7a224e7)
+                             1b7ec9932dd53f37e5bad7ae20f98a2c1f32f342)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c7f7141c7fcf9d9a22d786b103e9a2308d7e5d3c)
+                             a8657b4e8d3b36ece2dd1571a830184500f89ea4)
         endif()
-    elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         1b7ec9932dd53f37e5bad7ae20f98a2c1f32f342)
     else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         18ebd3acc651040f127f94284ed5241e2bb38380)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             18ebd3acc651040f127f94284ed5241e2bb38380)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             9bce82e9a99759bbc27ebf265c54f50033d51af8)
+        endif()
     endif()
 else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBUILD_TEST=OFF
             ${CMAKE_ARGS}

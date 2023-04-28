@@ -59,8 +59,7 @@ set(GIT_TESTS_HEADER_FILES ${GIT_TESTS_HEADER_FILES} PARENT_SCOPE)
 
 include(header_files/tests.cmake)
 
-# Add our prepared tests, after sorting them, as well as our unit testing
-# target.
+# Add our prepared tests, after sorting them, as well as our unit testing target.
 
 if(LIBOPENCOR_UNIT_TESTING)
     list(SORT TEST_TARGETS)

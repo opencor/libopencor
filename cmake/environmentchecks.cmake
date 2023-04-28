@@ -43,9 +43,8 @@ else()
 endif()
 
 # Make sure that we are building libOpenCOR in 64-bit mode.
-# Note: normally, we would check the value of CMAKE_SIZEOF_VOID_P, but in some
-#       cases it may not be set (e.g., when generating an Xcode project file),
-#       so we determine and retrieve that value ourselves.
+# Note: normally, we would check the value of CMAKE_SIZEOF_VOID_P, but in some cases it may not be set (e.g., when
+#       generating an Xcode project file), so we determine and retrieve that value ourselves.
 
 try_run(ARCHITECTURE_RUN ARCHITECTURE_COMPILE
         ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake/architecture.c
@@ -57,10 +56,50 @@ elseif(NOT ${ARCHITECTURE} EQUAL 64)
     message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built in 64-bit mode.")
 endif()
 
-# Make sure that we are building libOpenCOR for macOS 10.15 and later.
+# Make sure that we are building libOpenCOR for the version of macOS that we are after.
 
-if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET VERSION_GREATER_EQUAL 10.15)
-    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built for macOS 10.15 and later.")
+if(APPLE AND NOT "${CMAKE_OSX_DEPLOYMENT_TARGET}" VERSION_GREATER_EQUAL "${MACOS_DEPLOYMENT_TARGET}")
+    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built for macOS ${MACOS_DEPLOYMENT_TARGET} and later.")
+endif()
+
+# Determine our default target architecture.
+# Note: on Windows, the target architecture depends on the version of MSVC we are using (i.e. x64 or arm64), so we look
+#       for /x64/ and /arm64/ in CMAKE_CXX_COMPILER rather than just rely on the value of CMAKE_SYSTEM_PROCESSOR.
+
+if(WIN32)
+    string(FIND "${CMAKE_CXX_COMPILER}" "/x64/" INDEX)
+
+    if(NOT INDEX EQUAL -1)
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    else()
+        string(FIND "${CMAKE_CXX_COMPILER}" "/arm64/" INDEX)
+
+        if(NOT INDEX EQUAL -1)
+            set(DEFAULT_TARGET_ARCHITECTURE ARM)
+        endif()
+    endif()
+elseif(APPLE)
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "arm64")
+        set(DEFAULT_TARGET_ARCHITECTURE ARM)
+    endif()
+else()
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+        set(DEFAULT_TARGET_ARCHITECTURE ARM)
+    endif()
+endif()
+
+if("${DEFAULT_TARGET_ARCHITECTURE}" STREQUAL "")
+    message(FATAL_ERROR "No supported target architecture could be determined for ${CMAKE_PROJECT_NAME}.")
+endif()
+
+if(NOT APPLE)
+    # On Windows and Linux, our actual target architecture is always our default target architecture.
+
+    set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE})
 endif()
 
 # Check whether we are dealing with a single or multiple configuration.
@@ -68,10 +107,9 @@ endif()
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
 # Look for various packages and programs.
-# Note: when it comes to finding Python, we try to use the registry after the
-#       environment variables on Windows and to find frameworks after standard
-#       libraries or headers on macOS. (On GitHub Actions, it helps finding the
-#       correct version of Python on Windows.)
+# Note: when it comes to finding Python, we try to use the registry after the environment variables on Windows and to
+#       find frameworks after standard libraries or headers on macOS. (On GitHub Actions, it helps finding the correct
+#       version of Python on Windows.)
 
 if(NOT DEFINED Python_FIND_REGISTRY)
     set(Python_FIND_REGISTRY "LAST")
@@ -85,10 +123,9 @@ find_package(Doxygen)
 find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
 if(NOT WIN32 AND NOT APPLE)
-    # Some third-party libraries get built with threads support (and so do our
-    # tests, though this can be disabled by setting GTEST_DISABLE_PTHREADS to
-    # ON), so make sure that it's present since libOpenCOR will need to be
-    # linked against pthreads as a result.
+    # Some third-party libraries get built with threads support (and so do our tests, though this can be disabled by
+    # setting GTEST_DISABLE_PTHREADS to ON), so make sure that it's present since libOpenCOR will need to be linked
+    # against pthreads as a result.
 
     find_package(Threads REQUIRED)
 endif()

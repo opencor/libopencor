@@ -15,7 +15,6 @@
 set(PACKAGE_NAME libCellML)
 set(PACKAGE_VERSION 0.4.0)
 set(PACKAGE_REPOSITORY libcellml)
-set(GIT_TAG 2023-04-17)
 set(RELEASE_TAG 2023-04-17)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -34,32 +33,53 @@ endif()
 if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(WIN32)
         if(RELEASE_MODE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 38258a57e91ac842c26bb57e933f5add2cdfc75a)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 000fc3e009875bb090bacd12e5d4a61e8690de9c)
+            endif()
+        else()
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 0193b3d4797d926cdd856a915e4ce7c4bfa8c6be)
+            endif()
+        endif()
+    elseif(APPLE)
+        if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             38258a57e91ac842c26bb57e933f5add2cdfc75a)
+                             d9f1bff8a4cbd4981d6197ea4ea398ad937e62ee)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f3a8bb581eb00a4e06dd9a698511101b1b32a39d)
+                             43f33697b7a6ae946f7e30a5829b16986d88df21)
         endif()
-    elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         d9f1bff8a4cbd4981d6197ea4ea398ad937e62ee)
     else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b3357a159127ff3dbd55eb9f34ba1f0ae23f48b3)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             b3357a159127ff3dbd55eb9f34ba1f0ae23f48b3)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             0fe4938f95e2f71dff631c7720fcaabaaf57627e)
+        endif()
     endif()
 else()
     # Build our package.
 
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF
             -DBUILD_SHARED=OFF

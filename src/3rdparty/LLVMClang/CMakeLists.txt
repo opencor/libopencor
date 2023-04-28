@@ -15,7 +15,6 @@
 set(PACKAGE_NAME LLVMClang)
 set(PACKAGE_VERSION 14.0.3)
 set(PACKAGE_REPOSITORY llvm-project)
-set(GIT_TAG release/14.0.3-libopencor)
 set(RELEASE_TAG llvmorg-14.0.3)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
@@ -24,32 +23,59 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 if(LIBOPENCOR_PREBUILT_LLVMCLANG)
     if(WIN32)
         if(RELEASE_MODE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 63d1685ef2e1f33f59a159c045cbb7c235388dc6)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 def2f10ec77ad33ba5c344ad4106ae5385881b29)
+            endif()
+        else()
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 5be75cd7dd2df4dc972de1b7c4cb3d76c0e6cdf6)
+            endif()
+        endif()
+    elseif(APPLE)
+        if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             63d1685ef2e1f33f59a159c045cbb7c235388dc6)
+                             b77f772559f5feac52fae65914efd0df841feb87)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+                             7dbe9aae7a1affa1e0f921fd5fa0f4ea25131f04)
         endif()
-    elseif(APPLE)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         b77f772559f5feac52fae65914efd0df841feb87)
     else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         c6fa29ae4bf02a42249b74fbf21e28795ab057a6)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             c6fa29ae4bf02a42249b74fbf21e28795ab057a6)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             7a847ed5ca7069f428fe162d2caba2c8dcade4d7)
+        endif()
     endif()
 else()
     # Build our package.
 
+    if(INTEL_MODE)
+        set(LLVM_TARGETS_TO_BUILD X86)
+    else()
+        set(LLVM_TARGETS_TO_BUILD AArch64)
+    endif()
+
     build_package(${PACKAGE_NAME}
-        GIT_REPOSITORY
-            https://github.com/opencor/${PACKAGE_REPOSITORY}
-        GIT_TAG
-            ${GIT_TAG}
-        GIT_SHALLOW
+        URL
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         SOURCE_SUBDIR
             llvm
         CMAKE_ARGS
@@ -95,7 +121,7 @@ else()
             -DLLVM_INCLUDE_TESTS=OFF
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
-            -DLLVM_TARGETS_TO_BUILD=X86
+            -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
     )
 
     # Create our package.
@@ -116,6 +142,28 @@ endif()
 
 if(NOT WIN32)
     set(_STATIC "_static")
+endif()
+
+if(INTEL_MODE)
+    set(EXTRA_LLVMCLANG_LIBRARIES
+        LLVMExegesisX86
+        LLVMX86AsmParser
+        LLVMX86CodeGen
+        LLVMX86Desc
+        LLVMX86Disassembler
+        LLVMX86Info
+        LLVMX86TargetMCA
+    )
+else()
+    set(EXTRA_LLVMCLANG_LIBRARIES
+        LLVMAArch64AsmParser
+        LLVMAArch64CodeGen
+        LLVMAArch64Desc
+        LLVMAArch64Disassembler
+        LLVMAArch64Info
+        LLVMAArch64Utils
+        LLVMExegesisAArch64
+    )
 endif()
 
 set(LLVMCLANG_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
@@ -187,7 +235,6 @@ set(LLVMCLANG_LIBRARIES
     LLVMDWP
     LLVMExecutionEngine
     LLVMExegesis
-    LLVMExegesisX86
     LLVMExtensions
     LLVMFileCheck
     LLVMFrontendOpenACC
@@ -233,12 +280,7 @@ set(LLVMCLANG_LIBRARIES
     LLVMTransformUtils
     LLVMVectorize
     LLVMWindowsManifest
-    LLVMX86AsmParser
-    LLVMX86CodeGen
-    LLVMX86Desc
-    LLVMX86Disassembler
-    LLVMX86Info
-    LLVMX86TargetMCA
     LLVMXRay
+    ${EXTRA_LLVMCLANG_LIBRARIES}
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
