@@ -24,7 +24,7 @@ setup(
     license="Apache 2.0",
     packages=["libopencor"],
     package_dir={"": "src/bindings/python"},
-    cmake_args=["-DPYTHON_BINDINGS=ON", "-DSHARED_LIBS=OFF"],
+    cmake_args=["-DBUILD_TYPE=Release", "-DPYTHON_BINDINGS=ON", "-DSHARED_LIBS=OFF"],
     cmake_install_dir="src/bindings/python/libopencor",
     exclude_package_data={"": ["bin/*", "cmake/*", "include/*", "lib/*"]},
 )
