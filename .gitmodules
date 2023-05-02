@@ -1,7 +1,0 @@
-[submodule "extern/googletest"]
-	path = extern/googletest
-	url = ../../google/googletest
-[submodule "extern/pybind11"]
-	path = extern/pybind11
-	url = ../../pybind/pybind11
-	branch = stable
