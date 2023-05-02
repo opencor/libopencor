@@ -529,7 +529,14 @@ int AppropriateResolution(FloatType val) {
     } else if (val >= 0.0001) {
       mulfor6 = 1e9;
     }
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
+#endif
     if (static_cast<int32_t>(val * mulfor6 + 0.5) / mulfor6 == val) return 6;
+#ifdef __clang__
+# pragma clang diagnostic pop
+#endif
   } else if (val < 1e10) {
     FloatType divfor6 = 1.0;
     if (val >= 1e9) {  // 1,000,000,000 to 9,999,999,999
@@ -541,7 +548,14 @@ int AppropriateResolution(FloatType val) {
     } else if (val >= 1e6) {  // 1,000,000 to 9,999,999
       divfor6 = 10;
     }
+#ifdef __clang__
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
+#endif
     if (static_cast<int32_t>(val / divfor6 + 0.5) * divfor6 == val) return 6;
+#ifdef __clang__
+# pragma clang diagnostic pop
+#endif
   }
   return full;
 }
