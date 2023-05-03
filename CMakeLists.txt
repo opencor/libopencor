@@ -19,19 +19,6 @@ project(libOpenCOR
 
 string(TOLOWER "${CMAKE_PROJECT_NAME}" CMAKE_PROJECT_NAME_LC)
 
-# Initialise our submodules.
-
-find_package(Git REQUIRED)
-
-execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
-                RESULT_VARIABLE RESULT
-                WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                OUTPUT_QUIET ERROR_QUIET)
-
-if(NOT RESULT EQUAL 0)
-    message(FATAL_ERROR "Git submodules could not be retrieved.")
-endif()
-
 # Enable C++17.
 
 set(CMAKE_CXX_STANDARD 17)
