@@ -72,7 +72,7 @@ bool Compiler::compile(const std::string &pCode)
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
 
 #ifdef NLLVMCOV
-    if (!compilation) {
+    if (compilation == nullptr) {
         return false;
     }
 #endif
@@ -153,7 +153,7 @@ bool Compiler::compile(const std::string &pCode)
     auto module = codeGenAction->takeModule();
 
 #ifdef NLLVMCOV
-    if (!module) {
+    if (module == nullptr) {
         return false;
     }
 #endif
@@ -169,7 +169,7 @@ bool Compiler::compile(const std::string &pCode)
     auto lljit = llvm::orc::LLJITBuilder().create();
 
 #ifdef NLLVMCOV
-    if (!lljit) {
+    if (lljit == nullptr) {
         return false;
     }
 #endif
