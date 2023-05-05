@@ -122,6 +122,7 @@ else()
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+        DOWNLOAD_NO_PROGRESS ON
         CONFIGURE_COMMAND
             ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
         ${PATCH_COMMANDS}
