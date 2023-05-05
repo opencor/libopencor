@@ -39,21 +39,29 @@ function(build_package PACKAGE_NAME)
 
     configure_file(${CMAKE_SOURCE_DIR}/cmake/buildpackage.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt)
 
+    message(STATUS "Building ${PACKAGE_NAME}")
+
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S . -B build
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    RESULT_VARIABLE RESULT)
+                    RESULT_VARIABLE RESULT
+                    ERROR_VARIABLE ERROR
+                    OUTPUT_QUIET)
 
     if(NOT RESULT EQUAL 0)
-        message(FATAL_ERROR "The ${PACKAGE_NAME} package could not be configured.")
+        message(FATAL_ERROR "${ERROR}")
     endif()
 
     execute_process(COMMAND ${CMAKE_COMMAND} --build build
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                    RESULT_VARIABLE RESULT)
+                    RESULT_VARIABLE RESULT
+                    ERROR_VARIABLE ERROR
+                    OUTPUT_QUIET)
 
     if(NOT RESULT EQUAL 0)
-        message(FATAL_ERROR "The ${PACKAGE_NAME} package could not be built.")
+        message(FATAL_ERROR "${ERROR}")
     endif()
+
+    message(STATUS "Building ${PACKAGE_NAME} - Success")
 endfunction()
 
 function(fix_import_prefix CONFIG_FILE)
@@ -77,17 +85,22 @@ endfunction()
 function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_TAG)
     # Create the package.
 
+    message(STATUS "Creating ${PACKAGE_NAME} package")
+
     set(PACKAGE_FILE ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM}.${TARGET_ARCHITECTURE}.tar.gz)
 
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar -czf ${PACKAGE_FILE} ${ARGN}
                     WORKING_DIRECTORY ${PREBUILT_DIR}/${PACKAGE_NAME}
                     RESULT_VARIABLE RESULT
+                    ERROR_VARIABLE ERROR
                     OUTPUT_QUIET)
 
     # Calculate the SHA-1 value of our package, if it exists, and let people know how we should call the
     # retrieve_package() function.
 
     if(RESULT EQUAL 0 AND EXISTS ${PACKAGE_FILE})
+        message(STATUS "Creating ${PACKAGE_NAME} package - Success")
+
         file(SHA1 ${PACKAGE_FILE} SHA1_VALUE)
 
         message("To retrieve the ${PACKAGE_NAME} package, use:
