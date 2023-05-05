@@ -15,18 +15,20 @@
 if(LIBOPENCOR_DOCUMENTATION)
     # General documentation.
 
-    include(ExternalProject)
-
-    ExternalProject_Add(general_documentation
-                        URL https://github.com/opencor/general-documentation/archive/refs/heads/master.tar.gz
-                        CMAKE_ARGS -DMODE=${CMAKE_PROJECT_NAME}
-                        INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/doc/general_documentation-prefix/src/general_documentation-build/html
-                                                                           ${CMAKE_BINARY_DIR}/doc/html)
+    build_documentation(general_documentation
+                        general-documentation
+                        .
+                        -DMODE=${CMAKE_PROJECT_NAME})
 
     # User and developer documentations.
 
-    build_documentation(user ${BUILD_OPENCOR})
-    build_documentation(developer ${BUILD_OPENCOR})
+    foreach(DOCUMENTATION_TYPE user developer)
+        build_documentation(${DOCUMENTATION_TYPE}_documentation
+                            libopencor-${DOCUMENTATION_TYPE}-documentation
+                            ${DOCUMENTATION_TYPE}
+                            -DPYTHON_EXECUTABLE=${PYTHON_EXE}
+                            -DSPHINX_EXECUTABLE=${SPHINX_EXE})
+    endforeach()
 
     # API documentation.
 
