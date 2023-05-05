@@ -19,6 +19,14 @@ project(libOpenCOR
 
 string(TOLOWER "${CMAKE_PROJECT_NAME}" CMAKE_PROJECT_NAME_LC)
 
+# Set some policies.
+
+foreach(POLICY CMP0135)
+    if(POLICY ${POLICY})
+        cmake_policy(SET ${POLICY} NEW)
+    endif()
+endforeach()
+
 # Enable C++17.
 
 set(CMAKE_CXX_STANDARD 17)

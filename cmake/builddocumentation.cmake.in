@@ -14,7 +14,7 @@
 
 cmake_minimum_required(VERSION @CMAKE_MINIMUM_REQUIRED_VERSION@)
 
-project(@PACKAGE_NAME@)
+project(@DOCUMENTATION_NAME@)
 
 if(POLICY CMP0135)
     cmake_policy(SET CMP0135 NEW)
@@ -22,4 +22,9 @@ endif()
 
 include(ExternalProject)
 
-ExternalProject_Add(@PACKAGE_NAME@ @ARGN@)
+ExternalProject_Add(@DOCUMENTATION_NAME@
+                    URL https://github.com/opencor/@REPOSITORY_NAME@/archive/refs/heads/master.tar.gz
+                    DOWNLOAD_NO_PROGRESS ON
+                    CMAKE_ARGS @ARGN@
+                    INSTALL_COMMAND @CMAKE_COMMAND@ -E copy_directory @DOCUMENTATION_BUILD_DIR@/build/@DOCUMENTATION_NAME@-prefix/src/@DOCUMENTATION_NAME@-build/html
+                                                                      @CMAKE_BINARY_DIR@/doc/html/@DESTINATION_DIR@)
