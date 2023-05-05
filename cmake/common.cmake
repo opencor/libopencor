@@ -331,8 +331,7 @@ function(build_documentation DOCUMENTATION_NAME)
     set(DOCUMENTATION_BUILD ${DOCUMENTATION_NAME}_documentation)
 
     ExternalProject_Add(${DOCUMENTATION_BUILD}
-                        GIT_REPOSITORY https://github.com/opencor/libopencor-${DOCUMENTATION_NAME}-documentation
-                        GIT_SHALLOW
+                        URL https://github.com/opencor/libopencor-${DOCUMENTATION_NAME}-documentation/archive/refs/heads/master.tar.gz
                         CMAKE_ARGS -DPYTHON_EXECUTABLE=${PYTHON_EXE}
                                    -DSPHINX_EXECUTABLE=${SPHINX_EXE}
                         INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/doc/${DOCUMENTATION_BUILD}-prefix/src/${DOCUMENTATION_BUILD}-build/html

@@ -18,8 +18,7 @@ if(LIBOPENCOR_DOCUMENTATION)
     include(ExternalProject)
 
     ExternalProject_Add(general_documentation
-                        GIT_REPOSITORY https://github.com/opencor/general-documentation
-                        GIT_SHALLOW
+                        URL https://github.com/opencor/general-documentation/archive/refs/heads/master.tar.gz
                         CMAKE_ARGS -DMODE=${CMAKE_PROJECT_NAME}
                         INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/doc/general_documentation-prefix/src/general_documentation-build/html
                                                                            ${CMAKE_BINARY_DIR}/doc/html)
