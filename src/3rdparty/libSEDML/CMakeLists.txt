@@ -74,6 +74,7 @@ else()
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+        DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBUILD_TESTS=OFF
             ${CMAKE_ARGS}

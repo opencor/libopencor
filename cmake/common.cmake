@@ -325,16 +325,15 @@ function(prepare_test TARGET)
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)
 endfunction()
 
-function(build_documentation DOCUMENTATION_NAME)
+function(build_documentation DOCUMENTATION_NAME REPOSITORY_NAME DESTINATION_DIR)
     # Build the given documentation as an external project and have it copied to our final documentation directory.
 
-    set(DOCUMENTATION_BUILD ${DOCUMENTATION_NAME}_documentation)
+    set(DOCUMENTATION_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${DOCUMENTATION_NAME})
 
-    ExternalProject_Add(${DOCUMENTATION_BUILD}
-                        GIT_REPOSITORY https://github.com/opencor/libopencor-${DOCUMENTATION_NAME}-documentation
-                        GIT_SHALLOW
-                        CMAKE_ARGS -DPYTHON_EXECUTABLE=${PYTHON_EXE}
-                                   -DSPHINX_EXECUTABLE=${SPHINX_EXE}
-                        INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_BINARY_DIR}/doc/${DOCUMENTATION_BUILD}-prefix/src/${DOCUMENTATION_BUILD}-build/html
-                                                                           ${CMAKE_BINARY_DIR}/doc/html/${DOCUMENTATION_NAME})
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/builddocumentation.cmake.in ${DOCUMENTATION_BUILD_DIR}/CMakeLists.txt)
+
+    add_custom_target(${DOCUMENTATION_NAME}
+                      COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S . -B build
+                      COMMAND ${CMAKE_COMMAND} --build build
+                      WORKING_DIRECTORY ${DOCUMENTATION_BUILD_DIR})
 endfunction()
