@@ -19,14 +19,6 @@ project(libOpenCOR
 
 string(TOLOWER "${CMAKE_PROJECT_NAME}" CMAKE_PROJECT_NAME_LC)
 
-# Set some policies.
-
-foreach(POLICY CMP0135)
-    if(POLICY ${POLICY})
-        cmake_policy(SET ${POLICY} NEW)
-    endif()
-endforeach()
-
 # Enable C++17.
 
 set(CMAKE_CXX_STANDARD 17)
@@ -459,9 +451,7 @@ endif()
 # Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE, which
 #       is likely to be the case when building a third-party library.
 
-if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
-    set(RELEASE_MODE FALSE)
-else()
+if(NOT "${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
     set(RELEASE_MODE TRUE)
 endif()
 
@@ -473,8 +463,6 @@ if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
 
     set(CMAKE_OSX_ARCHITECTURES x86_64)
 else()
-    set(INTEL_MODE FALSE)
-
     set(CMAKE_OSX_ARCHITECTURES arm64)
 endif()
 

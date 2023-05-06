@@ -57,7 +57,7 @@ set(GIT_TESTS_HEADER_FILES ${GIT_TESTS_HEADER_FILES} PARENT_SCOPE)
 
 # Prepare the tests for our header files.
 
-include(header_files/tests.cmake)
+include(headerfiles/tests.cmake)
 
 # Add our prepared tests, after sorting them, as well as our unit testing target.
 
