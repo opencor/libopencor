@@ -12,12 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build our different bindings.
+if(BUILDING_JAVASCRIPT_BINDINGS)
+    # Copy our HTML test page over.
 
-if(BUILDING_JAVASCRIPT_BINDINGS OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
-    add_subdirectory(javascript)
-endif()
+    configure_file(res/index.html ${CMAKE_BINARY_DIR}/../../../../tests/bindings/javascript/index.html COPYONLY)
+else()
+    # Run our JavaScript tests.
 
-if(LIBOPENCOR_PYTHON_BINDINGS)
-    add_subdirectory(python)
+    add_target(javascript_unit_testing
+               COMMAND echo "JavaScript tests..."
+               DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
+               USES_TERMINAL
+               COMMENT "Running JavaScript unit testing...")
 endif()

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>libOpenCOR - JavaScript bindings</title>
+
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            border: 1px solid #aaaaaa;
+            text-align: left;
+            padding: 4px;
+        }
+
+        th {
+            background-color: #cccccc;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <tr>
+            <th>API</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>version()</td>
+            <td id="version"></td>
+        </tr>
+        <tr>
+            <td>versionString()</td>
+            <td id="versionString"></td>
+        </tr>
+    </table>
+
+    <script src="libOpenCOR.js"></script>
+
+    <script>
+        Module.onRuntimeInitialized = function () {
+            document.getElementById("version").innerHTML = Module.version();
+            document.getElementById("versionString").innerHTML = Module.versionString();
+        }
+    </script>
+</body>
+
+</html>
