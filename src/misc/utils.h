@@ -27,7 +27,8 @@ bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 std::string uniqueFileName();
 
-std::string downloadFile(const std::string &pUrl);
+//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
+// std::string downloadFile(const std::string &pUrl);
 
 std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFileName);
 

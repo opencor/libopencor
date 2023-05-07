@@ -18,7 +18,9 @@ configure_file(utils.py.in ${PYTHON_BINDINGS_DIR}/utils.py)
 
 # Copy our Python tests over.
 
-file(GLOB PYTHON_TESTS "*.py")
+#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
+# file(GLOB PYTHON_TESTS "*.py")
+file(GLOB PYTHON_TESTS "test_version.py")
 
 foreach(PYTHON_TEST ${PYTHON_TESTS})
     get_filename_component(PYTHON_TEST_FILE ${PYTHON_TEST} NAME)

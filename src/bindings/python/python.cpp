@@ -37,6 +37,7 @@ PYBIND11_MODULE(module, m)
 
     // File API.
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
 
     py::enum_<libOpenCOR::File::Type>(file, "Type")
@@ -71,11 +72,13 @@ PYBIND11_MODULE(module, m)
             return "Remote file: " + pFile.url();
         },
         "Get the string representation of this File object.");
+*/
 
     // Version API.
 
     m.def("version", &libOpenCOR::version, "Get the version number of libOpenCOR.");
     m.def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.");
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     m.def("clang_version", &libOpenCOR::clangVersion, "Get the version number of Clang.");
     m.def("clang_version_string", &libOpenCOR::clangVersionString, "Get the version string of Clang.");
     m.def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.");
@@ -90,4 +93,5 @@ PYBIND11_MODULE(module, m)
     m.def("llvm_version_string", &libOpenCOR::llvmVersionString, "Get the version string of LLVM.");
     m.def("sundials_version", &libOpenCOR::sundialsVersion, "Get the version number of SUNDIALS.");
     m.def("sundials_version_string", &libOpenCOR::sundialsVersionString, "Get the version string of SUNDIALS.");
+*/
 }

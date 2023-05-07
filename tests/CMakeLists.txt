@@ -14,8 +14,9 @@
 
 # Include our different tests.
 
-include(compiler/tests.cmake)
-include(file/tests.cmake)
+#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
+# include(compiler/tests.cmake)
+# include(file/tests.cmake)
 include(version/tests.cmake)
 
 # Prepare our different tests.

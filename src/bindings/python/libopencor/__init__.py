@@ -15,44 +15,48 @@
 from .module import __doc__, __version__
 from .module import (
     # File API.
-    File,
+    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
+    # File,
     # Version API.
     version,
     version_string,
-    clang_version,
-    clang_version_string,
-    libcellml_version,
-    libcellml_version_string,
-    libcombine_version,
-    libcombine_version_string,
-    libcurl_version,
-    libcurl_version_string,
-    libsedml_version,
-    libsedml_version_string,
-    llvm_version,
-    llvm_version_string,
-    sundials_version,
-    sundials_version_string,
+    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
+    # clang_version,
+    # clang_version_string,
+    # libcellml_version,
+    # libcellml_version_string,
+    # libcombine_version,
+    # libcombine_version_string,
+    # libcurl_version,
+    # libcurl_version_string,
+    # libsedml_version,
+    # libsedml_version_string,
+    # llvm_version,
+    # llvm_version_string,
+    # sundials_version,
+    # sundials_version_string,
 )
 
 __all__ = (
     # File API.
-    "File",
+    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
+    # "File",
     # Version API.
     "version",
     "version_string",
-    "clang_version",
-    "clang_version_string",
-    "libcellml_version",
-    "libcellml_version_string",
-    "libcombine_version",
-    "libcombine_version_string",
-    "libcurl_version",
-    "libcurl_version_string",
-    "libsedml_version",
-    "libsedml_version_string",
-    "llvm_version",
-    "llvm_version_string",
-    "sundials_version",
-    "sundials_version_string",
+    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
+    # "clang_version",
+    # "clang_version_string",
+    # "libcellml_version",
+    # "libcellml_version_string",
+    # "libcombine_version",
+    # "libcombine_version_string",
+    # "libcurl_version",
+    # "libcurl_version_string",
+    # "libsedml_version",
+    # "libsedml_version_string",
+    # "llvm_version",
+    # "llvm_version_string",
+    # "sundials_version",
+    # "sundials_version_string",
 )

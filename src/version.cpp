@@ -19,6 +19,7 @@ limitations under the License.
 #include <array>
 #include <cmath>
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 #include "clangbegin.h"
 #include "clang/Basic/Version.h"
 #include "clangend.h"
@@ -30,9 +31,11 @@ limitations under the License.
 #include "libcombinebegin.h"
 #include "omex/common/libcombine-version.h"
 #include "libcombineend.h"
+*/
 
 #include "libopencor/version.h"
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 #include "libsedmlbegin.h"
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
@@ -44,6 +47,7 @@ limitations under the License.
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
 #include "sundialsend.h"
+*/
 
 namespace libOpenCOR {
 
@@ -78,6 +82,7 @@ std::string versionString()
     return LIBOPENCOR_VERSION_STRING;
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 unsigned int clangVersion()
 {
     return static_cast<unsigned int>(MAJOR_10 * firstDigit(CLANG_VERSION_MAJOR) + MAJOR_01 * secondDigit(CLANG_VERSION_MAJOR)
@@ -172,5 +177,6 @@ std::string sundialsVersionString()
 
     return res;
 }
+*/
 
 } // namespace libOpenCOR

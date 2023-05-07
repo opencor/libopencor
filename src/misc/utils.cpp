@@ -26,7 +26,8 @@ limitations under the License.
 #    include <unistd.h>
 #endif
 
-#include <curl/curl.h>
+//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
+// #include <curl/curl.h>
 
 namespace libOpenCOR {
 
@@ -124,6 +125,7 @@ std::string uniqueFileName()
     return res;
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 static size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
     const auto realDataSize = pSize * pDataSize;
@@ -201,5 +203,6 @@ std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFil
 
     return std::make_tuple(contents, size);
 }
+*/
 
 } // namespace libOpenCOR

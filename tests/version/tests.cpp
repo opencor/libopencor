@@ -24,6 +24,7 @@ TEST(VersionTest, libOpenCOR)
     EXPECT_EQ("0.1.0", libOpenCOR::versionString());
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 TEST(VersionTest, Clang)
 {
     EXPECT_EQ(0x140003U, libOpenCOR::clangVersion());
@@ -65,3 +66,4 @@ TEST(VersionTest, SUNDIALS)
     EXPECT_EQ(0x060200U, libOpenCOR::sundialsVersion());
     EXPECT_EQ("6.2.0", libOpenCOR::sundialsVersionString());
 }
+*/
