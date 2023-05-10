@@ -459,22 +459,19 @@ endif()
 # Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE, which
 #       is likely to be the case when building a third-party library.
 
-if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
-    set(RELEASE_MODE FALSE)
-else()
+if(NOT "${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
     set(RELEASE_MODE TRUE)
 endif()
 
 # Determine whether we are building for an Intel processor.
-# Note: it's fine to always set CMAKE_OSX_ARCHITECTURES since it gets ignored on Windows and Linux.
 
 if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
     set(INTEL_MODE TRUE)
 
-    set(CMAKE_OSX_ARCHITECTURES x86_64)
-else()
-    set(INTEL_MODE FALSE)
-
+    if(APPLE)
+        set(CMAKE_OSX_ARCHITECTURES x86_64)
+    endif()
+elseif(APPLE)
     set(CMAKE_OSX_ARCHITECTURES arm64)
 endif()
 

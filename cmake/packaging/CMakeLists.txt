@@ -27,8 +27,6 @@ if(WIN32)
        OR EXISTS "C:/Program Files (x86)/NSIS/makensis.exe")
         set(NSIS_FOUND TRUE)
         set(NSIS_GENERATOR NSIS)
-    else()
-        set(NSIS_FOUND FALSE)
     endif()
 
     set(CPACK_GENERATOR ${NSIS_GENERATOR} ZIP)
