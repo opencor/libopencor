@@ -20,6 +20,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -34,6 +36,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -48,6 +52,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -62,6 +68,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -76,6 +84,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -90,6 +100,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -97,6 +109,21 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+          - name: 'JavaScript'
+            os: macos-latest
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            javascript_bindings: ON
+            javascript_unit_testing: ON
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            target: javascript_unit_testing
           - name: 'Windows Python'
             os: windows-latest
             build_type: Release
@@ -104,6 +131,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: ON
             python_unit_testing: ON
@@ -118,6 +147,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: ON
             python_unit_testing: ON
@@ -132,6 +163,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: ON
             python_unit_testing: ON
@@ -148,6 +181,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -162,6 +197,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -175,6 +212,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -188,6 +227,8 @@ jobs:
             code_coverage_gcov: ON
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -201,6 +242,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: ON
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -215,6 +258,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: ON
             python_bindings: OFF
             python_unit_testing: OFF
@@ -228,6 +273,8 @@ jobs:
             code_coverage_gcov: OFF
             code_coverage_llvm_cov: OFF
             documentation: ON
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
             memory_checks: OFF
             python_bindings: OFF
             python_unit_testing: OFF
@@ -249,7 +296,7 @@ jobs:
       - name: Install buildcache
         uses: mikehardy/buildcache-action@v2
         with:
-          cache_key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage_gcov }}-${{ matrix.code_coverage_llvm_cov }}-${{ matrix.documentation }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
+          cache_key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage_gcov }}-${{ matrix.code_coverage_llvm_cov }}-${{ matrix.documentation }}-${{ matrix.javascript_bindings }}-${{ matrix.javascript_unit_testing }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -274,6 +321,9 @@ jobs:
         run: |
           wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
+      - name: Install Emscripten
+        if: ${{ matrix.name == 'JavaScript' }}
+        run: brew install emscripten
       - name: Install Black
         if: ${{ matrix.target == 'python_check_code_formatting' }}
         run: pip3 install black
@@ -300,14 +350,19 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE_GCOV=${{ matrix.code_coverage_gcov }} -DCODE_COVERAGE_LLVM_COV=${{ matrix.code_coverage_llvm_cov }} -DDOCUMENTATION=${{ matrix.documentation }} -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_bindings }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_unit_testing }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
       - name: Build libOpenCOR
-        if: ${{ matrix.target == 'unit_testing' }}
+        if: ${{ matrix.target == 'unit_testing' || matrix.target == 'javascript_unit_testing' }}
         run: |
           cd build
           ninja
       - name: Unit testing
         if: ${{ matrix.target == 'unit_testing' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: JavaScript unit testing
+        if: ${{ matrix.target == 'javascript_unit_testing' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
