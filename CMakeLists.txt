@@ -36,14 +36,24 @@ include(common)
 if(DEFINED EMSCRIPTEN)
     set(BUILDING_JAVASCRIPT_BINDINGS TRUE)
 
-    # Build libOpenCOR.
+    # Build libOpenCOR's JavaScript bindings.
 
     add_subdirectory(src)
 
-    # Run our tests.
+    # Run our JavaScript-based tests.
 
     add_subdirectory(tests)
 else()
+    # On macOS, deploy on macOS 10.15 and later.
+
+    if(APPLE)
+        set(MACOS_DEPLOYMENT_TARGET 10.15)
+
+        if("${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
+            set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_DEPLOYMENT_TARGET})
+        endif()
+    endif()
+
     # Check the environment we are dealing with.
 
     include(environmentchecks)

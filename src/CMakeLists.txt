@@ -12,16 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# On macOS, deploy on macOS 10.15 and later.
-
-if(APPLE)
-    set(MACOS_DEPLOYMENT_TARGET 10.15)
-
-    if("${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
-        set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_DEPLOYMENT_TARGET})
-    endif()
-endif()
-
 # Enable compiler caching.
 
 if(LIBOPENCOR_COMPILER_CACHING)

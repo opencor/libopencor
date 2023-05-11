@@ -42,20 +42,18 @@ else()
     endif()
 endif()
 
-# Make sure that we are building libOpenCOR in 64-bit mode, but only if we are not building our JavaScript bindings.
+# Make sure that we are building libOpenCOR in 64-bit mode.
 # Note: normally, we would check the value of CMAKE_SIZEOF_VOID_P, but in some cases it may not be set (e.g., when
 #       generating an Xcode project file), so we determine and retrieve that value ourselves.
 
-if(NOT BUILDING_JAVASCRIPT_BINDINGS)
-    try_run(ARCHITECTURE_RUN ARCHITECTURE_COMPILE
-            ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake/architecture.c
-            RUN_OUTPUT_VARIABLE ARCHITECTURE)
+try_run(ARCHITECTURE_RUN ARCHITECTURE_COMPILE
+        ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake/architecture.c
+        RUN_OUTPUT_VARIABLE ARCHITECTURE)
 
-    if(NOT ARCHITECTURE_COMPILE)
-        message(FATAL_ERROR "We could not determine your architecture. Please clean your ${CMAKE_PROJECT_NAME} environment and try again.")
-    elseif(NOT ${ARCHITECTURE} EQUAL 64)
-        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built in 64-bit mode.")
-    endif()
+if(NOT ARCHITECTURE_COMPILE)
+    message(FATAL_ERROR "We could not determine your architecture. Please clean your ${CMAKE_PROJECT_NAME} environment and try again.")
+elseif(NOT ${ARCHITECTURE} EQUAL 64)
+    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built in 64-bit mode.")
 endif()
 
 # Make sure that we are building libOpenCOR for the version of macOS that we are after.
@@ -68,44 +66,39 @@ endif()
 # Note: on Windows, the target architecture depends on the version of MSVC we are using (i.e. x64 or arm64), so we look
 #       for /x64/ and /arm64/ in CMAKE_CXX_COMPILER rather than just rely on the value of CMAKE_SYSTEM_PROCESSOR.
 
-if(BUILDING_JAVASCRIPT_BINDINGS)
-    set(DEFAULT_TARGET_ARCHITECTURE WASM)
-else()
-    if(WIN32)
-        string(FIND "${CMAKE_CXX_COMPILER}" "/x64/" INDEX)
+if(WIN32)
+    string(FIND "${CMAKE_CXX_COMPILER}" "/x64/" INDEX)
+
+    if(NOT INDEX EQUAL -1)
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    else()
+        string(FIND "${CMAKE_CXX_COMPILER}" "/arm64/" INDEX)
 
         if(NOT INDEX EQUAL -1)
-            set(DEFAULT_TARGET_ARCHITECTURE Intel)
-        else()
-            string(FIND "${CMAKE_CXX_COMPILER}" "/arm64/" INDEX)
-
-            if(NOT INDEX EQUAL -1)
-                set(DEFAULT_TARGET_ARCHITECTURE ARM)
-            endif()
-        endif()
-    elseif(APPLE)
-        if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-            set(DEFAULT_TARGET_ARCHITECTURE Intel)
-        elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "arm64")
-            set(DEFAULT_TARGET_ARCHITECTURE ARM)
-        endif()
-    else()
-        if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-            set(DEFAULT_TARGET_ARCHITECTURE Intel)
-        elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
             set(DEFAULT_TARGET_ARCHITECTURE ARM)
         endif()
     endif()
-
-    if("${DEFAULT_TARGET_ARCHITECTURE}" STREQUAL "")
-        message(FATAL_ERROR "No supported target architecture could be determined for ${CMAKE_PROJECT_NAME}.")
+elseif(APPLE)
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "arm64")
+        set(DEFAULT_TARGET_ARCHITECTURE ARM)
+    endif()
+else()
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+        set(DEFAULT_TARGET_ARCHITECTURE ARM)
     endif()
 endif()
 
-# If we are building our JavaScript bindings or if we are on Windows and Linux, our actual target architecture is always
-# our default target architecture.
+if("${DEFAULT_TARGET_ARCHITECTURE}" STREQUAL "")
+    message(FATAL_ERROR "No supported target architecture could be determined for ${CMAKE_PROJECT_NAME}.")
+endif()
 
-if(BUILDING_JAVASCRIPT_BINDINGS OR NOT APPLE)
+# On Windows and Linux, our actual target architecture is always our default target architecture.
+
+if(NOT APPLE)
     set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE})
 endif()
 
