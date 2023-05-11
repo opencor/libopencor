@@ -96,9 +96,9 @@ if("${DEFAULT_TARGET_ARCHITECTURE}" STREQUAL "")
     message(FATAL_ERROR "No supported target architecture could be determined for ${CMAKE_PROJECT_NAME}.")
 endif()
 
-if(NOT APPLE)
-    # On Windows and Linux, our actual target architecture is always our default target architecture.
+# On Windows and Linux, our actual target architecture is always our default target architecture.
 
+if(NOT APPLE)
     set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE})
 endif()
 
@@ -143,6 +143,7 @@ endif()
 find_program(BLACK_EXE NAMES ${PREFERRED_BLACK_NAMES} black)
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
+find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
 find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
 find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
@@ -246,6 +247,14 @@ if(CLANG_TIDY_EXE)
     endif()
 else()
     set(CODE_ANALYSIS_ERROR_MESSAGE "Code analysis is requested but Clang-Tidy could not be found.")
+endif()
+
+if(EMCMAKE_EXE)
+    set(JAVASCRIPT_BINDINGS_AVAILABLE TRUE)
+    set(JAVASCRIPT_UNIT_TESTING_AVAILABLE TRUE)
+else()
+    set(JAVASCRIPT_BINDINGS_ERROR_MESSAGE "JavaScript bindings are requested but the emcmake tool could not be found.")
+    set(JAVASCRIPT_UNIT_TESTING_ERROR_MESSAGE "JavaScript unit testing is requested but the emcmake tool could not be found.")
 endif()
 
 if(FIND_EXE AND GCOV_EXE AND GCOVR_EXE AND CODE_COVERAGE_GCOV_COMPILER_FLAGS_OK)

@@ -138,17 +138,41 @@ include_directories(misc
                     support
                     ${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(${CMAKE_PROJECT_NAME}
-            ${API_HEADER_FILES}
-            ${SOURCE_FILES}
-            ${HEADER_FILES})
+if (BUILDING_JAVASCRIPT_BINDINGS)
+    add_executable(${CMAKE_PROJECT_NAME}
+                   ${API_HEADER_FILES}
+                   ${SOURCE_FILES}
+                   ${HEADER_FILES})
 
-set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-                      CXX_VISIBILITY_PRESET hidden
-                      DEBUG_POSTFIX d
-                      PREFIX ""
-                      VERSION ${PROJECT_VERSION}
-                      VISIBILITY_INLINES_HIDDEN ON)
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                          COMPILE_FLAGS "-O3"
+                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sINLINING_LIMIT --bind")
+
+    # Copy our generated .js and .wasm files over.
+
+    set(JAVASCRIPT_DIR tests/bindings/javascript)
+
+    foreach(FILE_EXTENSION js wasm)
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.${FILE_EXTENSION}
+                                                            ${CMAKE_BINARY_DIR}/../../../../${JAVASCRIPT_DIR}/${CMAKE_PROJECT_NAME}.${FILE_EXTENSION})
+    endforeach()
+
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript HTML test file has been copied to: ${JAVASCRIPT_DIR}/index.html")
+else()
+    add_library(${CMAKE_PROJECT_NAME}
+                ${API_HEADER_FILES}
+                ${SOURCE_FILES}
+                ${HEADER_FILES})
+
+    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                          CXX_VISIBILITY_PRESET hidden
+                          DEBUG_POSTFIX d
+                          PREFIX ""
+                          VERSION ${PROJECT_VERSION}
+                          VISIBILITY_INLINES_HIDDEN ON)
+endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/api>
@@ -168,13 +192,17 @@ set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
 configure_target(${CMAKE_PROJECT_NAME})
 
-# Generate the export header file.
+# Generate the export header file, or a fake one if we are building our JavaScript bindings.
 
-include(GenerateExportHeader)
+if(BUILDING_JAVASCRIPT_BINDINGS)
+    configure_file(noexports.h ${API_EXPORT_HEADER_FILE})
+else()
+    include(GenerateExportHeader)
 
-generate_export_header(${CMAKE_PROJECT_NAME}
-                       EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
-                       BASE_NAME LIBOPENCOR)
+    generate_export_header(${CMAKE_PROJECT_NAME}
+                           EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
+                           BASE_NAME LIBOPENCOR)
+endif()
 
 # Don't allow unresolved symbols.
 # Note: MSVC doesn't allow unresolved symbols, so we only need to look for them if we are building using GNU or Clang.
