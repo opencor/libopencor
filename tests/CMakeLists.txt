@@ -12,11 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(BUILDING_JAVASCRIPT_BINDINGS)
-    # Add our bindings tests.
-
-    add_subdirectory(bindings)
-else()
+if(NOT BUILDING_JAVASCRIPT_BINDINGS)
     # Include our different tests.
 
     #---GRY--- BUILDING_JAVASCRIPT_BINDINGS.

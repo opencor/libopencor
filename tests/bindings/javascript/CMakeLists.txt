@@ -12,16 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(BUILDING_JAVASCRIPT_BINDINGS)
-    # Copy our HTML test page over.
+# Copy some test-related files over.
 
-    configure_file(res/index.html ${CMAKE_BINARY_DIR}/../../../../tests/bindings/javascript/index.html COPYONLY)
-else()
-    # Run our JavaScript tests.
+foreach(RESOURCE_FILE index.html package.json)
+    configure_file(res/${RESOURCE_FILE} ${RESOURCE_FILE} COPYONLY)
+endforeach()
 
-    add_target(javascript_unit_testing
-               COMMAND echo "JavaScript tests..."
-               DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
-               USES_TERMINAL
-               COMMENT "Running JavaScript unit testing...")
-endif()
+# Copy our JavaScript tests over.
+
+file(GLOB JAVASCRIPT_TESTS "*.js")
+
+foreach(JAVASCRIPT_TEST ${JAVASCRIPT_TESTS})
+    get_filename_component(JAVASCRIPT_TEST_FILE ${JAVASCRIPT_TEST} NAME)
+
+    configure_file(${JAVASCRIPT_TEST_FILE} ${JAVASCRIPT_TEST_FILE} COPYONLY)
+endforeach()
+
+# Run our JavaScript tests.
+
+add_target(javascript_unit_testing
+            COMMAND npm install
+            COMMAND npm test
+            DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
+            USES_TERMINAL
+            COMMENT "Running JavaScript unit testing...")

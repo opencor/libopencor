@@ -36,6 +36,10 @@ include(common)
 if(DEFINED EMSCRIPTEN)
     set(BUILDING_JAVASCRIPT_BINDINGS TRUE)
 
+    # Use a lower-case version of our project name.
+
+    string(TOLOWER "${CMAKE_PROJECT_NAME}" CMAKE_PROJECT_NAME)
+
     # Build libOpenCOR's JavaScript bindings.
 
     add_subdirectory(src)

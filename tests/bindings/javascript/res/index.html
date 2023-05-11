@@ -40,13 +40,13 @@
         </tr>
     </table>
 
-    <script src="libOpenCOR.js"></script>
+    <script type="module">
+        import libOpenCOR from "./libopencor.js";
 
-    <script>
-        Module.onRuntimeInitialized = function () {
-            document.getElementById("version").innerHTML = Module.version();
-            document.getElementById("versionString").innerHTML = Module.versionString();
-        }
+        libOpenCOR().then(function (libopencor) {
+            document.getElementById("version").innerHTML = libopencor.version();
+            document.getElementById("versionString").innerHTML = libopencor.versionString();
+        });
     </script>
 </body>
 
