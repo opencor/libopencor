@@ -14,6 +14,10 @@
 
 # Build our different bindings.
 
+if(BUILDING_JAVASCRIPT_BINDINGS OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
+    add_subdirectory(javascript)
+endif()
+
 if(LIBOPENCOR_PYTHON_BINDINGS)
     add_subdirectory(python)
 endif()
