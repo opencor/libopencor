@@ -33,8 +33,8 @@ from .module import (
     # libsedml_version_string,
     # llvm_version,
     # llvm_version_string,
-    # sundials_version,
-    # sundials_version_string,
+    sundials_version,
+    sundials_version_string,
 )
 
 __all__ = (
@@ -57,6 +57,6 @@ __all__ = (
     # "libsedml_version_string",
     # "llvm_version",
     # "llvm_version_string",
-    # "sundials_version",
-    # "sundials_version_string",
+    "sundials_version",
+    "sundials_version_string",
 )

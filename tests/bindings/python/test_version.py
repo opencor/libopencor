@@ -86,11 +86,11 @@ def test_version_string():
 #     assert oc.llvm_version_string() == "14.0.3"
 
 
-# def test_sundials_version():
-#     assert isinstance(oc.sundials_version(), int)
-#     assert oc.sundials_version() == 0x060200
+def test_sundials_version():
+    assert isinstance(oc.sundials_version(), int)
+    assert oc.sundials_version() == 0x060200
 
 
-# def test_sundials_version_string():
-#     assert isinstance(oc.sundials_version_string(), str)
-#     assert oc.sundials_version_string() == "6.2.0"
+def test_sundials_version_string():
+    assert isinstance(oc.sundials_version_string(), str)
+    assert oc.sundials_version_string() == "6.2.0"

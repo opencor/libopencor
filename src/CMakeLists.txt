@@ -48,8 +48,7 @@ endif()
 
 # Build our different third-party libraries.
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-# add_subdirectory(3rdparty)
+add_subdirectory(3rdparty)
 
 # Configure the version file.
 

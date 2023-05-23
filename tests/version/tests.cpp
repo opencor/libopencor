@@ -60,10 +60,10 @@ TEST(VersionTest, LLVM)
     EXPECT_EQ(0x140003U, libOpenCOR::llvmVersion());
     EXPECT_EQ("14.0.3", libOpenCOR::llvmVersionString());
 }
+*/
 
 TEST(VersionTest, SUNDIALS)
 {
     EXPECT_EQ(0x060200U, libOpenCOR::sundialsVersion());
     EXPECT_EQ("6.2.0", libOpenCOR::sundialsVersionString());
 }
-*/

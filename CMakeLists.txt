@@ -518,18 +518,6 @@ else()
         set(CMAKE_OSX_ARCHITECTURES arm64)
     endif()
 
-    # Location of our prebuilt packages.
-
-    set(PREBUILT_DIR ${CMAKE_SOURCE_DIR}/prebuilt)
-
-    if(WIN32)
-        if(RELEASE_MODE)
-            set(PREBUILT_DIR ${PREBUILT_DIR}/release)
-        else()
-            set(PREBUILT_DIR ${PREBUILT_DIR}/debug)
-        endif()
-    endif()
-
     # Enable Python bindings.
     # Note: we unset Python_FOUND so that pybind11 can look for Python on our behalf and thus allow our Windows Python CI
     #       test to work as expected using GitHub Actions. Indeed, on GHA Windows, Python 3.7.9 is the official version, yet

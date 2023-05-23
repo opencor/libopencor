@@ -43,11 +43,11 @@ limitations under the License.
 #include "llvmbegin.h"
 #include "llvm/Config/llvm-config.h"
 #include "llvmend.h"
+*/
 
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
 #include "sundialsend.h"
-*/
 
 namespace libOpenCOR {
 
@@ -146,6 +146,7 @@ std::string llvmVersionString()
 {
     return LLVM_VERSION_STRING;
 }
+*/
 
 unsigned int sundialsVersion()
 {
@@ -177,6 +178,5 @@ std::string sundialsVersionString()
 
     return res;
 }
-*/
 
 } // namespace libOpenCOR

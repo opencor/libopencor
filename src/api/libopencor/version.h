@@ -170,8 +170,7 @@ std::string LIBOPENCOR_EXPORT versionString();
  * @return A number that represents the version of SUNDIALS.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// unsigned int LIBOPENCOR_EXPORT sundialsVersion();
+unsigned int LIBOPENCOR_EXPORT sundialsVersion();
 
 /**
  * Return the version of SUNDIALS as a string. The version string is in the format x.y.z, where the "."s are literal,
@@ -181,7 +180,6 @@ std::string LIBOPENCOR_EXPORT versionString();
  * @return A string that represents the version of SUNDIALS.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// std::string LIBOPENCOR_EXPORT sundialsVersionString();
+std::string LIBOPENCOR_EXPORT sundialsVersionString();
 
 } // namespace libOpenCOR

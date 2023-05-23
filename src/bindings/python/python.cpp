@@ -91,7 +91,7 @@ PYBIND11_MODULE(module, m)
     m.def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.");
     m.def("llvm_version", &libOpenCOR::llvmVersion, "Get the version number of LLVM.");
     m.def("llvm_version_string", &libOpenCOR::llvmVersionString, "Get the version string of LLVM.");
+*/
     m.def("sundials_version", &libOpenCOR::sundialsVersion, "Get the version number of SUNDIALS.");
     m.def("sundials_version_string", &libOpenCOR::sundialsVersionString, "Get the version string of SUNDIALS.");
-*/
 }

@@ -21,4 +21,6 @@ limitations under the License.
 EMSCRIPTEN_BINDINGS(libOpenCOR_version) {
     emscripten::function("version", &libOpenCOR::version);
     emscripten::function("versionString", &libOpenCOR::versionString);
+    emscripten::function("sundialsVersion", &libOpenCOR::sundialsVersion);
+    emscripten::function("sundialsVersionString", &libOpenCOR::sundialsVersionString);
 }

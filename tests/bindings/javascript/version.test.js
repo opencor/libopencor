@@ -19,8 +19,13 @@ import libOpenCOR from "./libopencor.js";
 const libopencor = await libOpenCOR();
 
 describe("Version tests", () => {
-    test("Checking version string", () => {
+    test("libOpenCOR", () => {
         expect(libopencor.version()).toBe(0x000100);
         expect(libopencor.versionString()).toBe("0.1.0");
+    });
+
+    test("SUNDIALS", () => {
+        expect(libopencor.sundialsVersion()).toBe(0x060200);
+        expect(libopencor.sundialsVersionString()).toBe("6.2.0");
     });
 });

@@ -38,6 +38,14 @@
             <td>versionString()</td>
             <td id="versionString"></td>
         </tr>
+        <tr>
+            <td>sundialsVersion()</td>
+            <td id="sundialsVersion"></td>
+        </tr>
+        <tr>
+            <td>sundialsVersionString()</td>
+            <td id="sundialsVersionString"></td>
+        </tr>
     </table>
 
     <script type="module">
@@ -46,6 +54,8 @@
         libOpenCOR().then(function (libopencor) {
             document.getElementById("version").innerHTML = libopencor.version();
             document.getElementById("versionString").innerHTML = libopencor.versionString();
+            document.getElementById("sundialsVersion").innerHTML = libopencor.sundialsVersion();
+            document.getElementById("sundialsVersionString").innerHTML = libopencor.sundialsVersionString();
         });
     </script>
 </body>
