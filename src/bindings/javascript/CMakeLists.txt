@@ -26,6 +26,7 @@ else()
        OR NOT LIBOPENCOR_PREBUILT_LIBSBML
        OR NOT LIBOPENCOR_PREBUILT_LIBXML2
        OR NOT LIBOPENCOR_PREBUILT_SUNDIALS
+       OR NOT LIBOPENCOR_PREBUILT_ZIPPER
        OR NOT LIBOPENCOR_PREBUILT_ZLIB)
         set(DEMCMAKE_EXE -DEMCMAKE_EXE=${EMCMAKE_EXE})
     endif()
@@ -37,6 +38,7 @@ else()
                                                               -DLIBOPENCOR_PREBUILT_LIBSBML=${LIBOPENCOR_PREBUILT_LIBSBML}
                                                               -DLIBOPENCOR_PREBUILT_LIBXML2=${LIBOPENCOR_PREBUILT_LIBXML2}
                                                               -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}
+                                                              -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
                                                               -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
                       COMMAND ${CMAKE_COMMAND} --build build
                       WORKING_DIRECTORY ${DOCUMENTATION_BUILD_DIR})
