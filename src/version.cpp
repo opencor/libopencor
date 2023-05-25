@@ -25,9 +25,11 @@ limitations under the License.
 #include "clangend.h"
 
 #include "curl/curlver.h"
+*/
 
 #include "libcellml/version.h"
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 #include "libcombinebegin.h"
 #include "omex/common/libcombine-version.h"
 #include "libcombineend.h"
@@ -94,6 +96,7 @@ std::string clangVersionString()
 {
     return CLANG_VERSION_STRING;
 }
+*/
 
 unsigned int libcellmlVersion()
 {
@@ -105,6 +108,7 @@ std::string libcellmlVersionString()
     return libcellml::versionString();
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 unsigned int libcombineVersion()
 {
     return static_cast<unsigned int>(libcombine::getLibCombineVersion());

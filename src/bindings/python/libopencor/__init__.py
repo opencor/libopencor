@@ -23,8 +23,8 @@ from .module import (
     # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     # clang_version,
     # clang_version_string,
-    # libcellml_version,
-    # libcellml_version_string,
+    libcellml_version,
+    libcellml_version_string,
     # libcombine_version,
     # libcombine_version_string,
     # libcurl_version,
@@ -47,8 +47,8 @@ __all__ = (
     # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     # "clang_version",
     # "clang_version_string",
-    # "libcellml_version",
-    # "libcellml_version_string",
+    "libcellml_version",
+    "libcellml_version_string",
     # "libcombine_version",
     # "libcombine_version_string",
     # "libcurl_version",

@@ -22,7 +22,8 @@ else()
 
     set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
 
-    if(   NOT LIBOPENCOR_PREBUILT_LIBSBML
+    if(   NOT LIBOPENCOR_PREBUILT_LIBCELLML
+       OR NOT LIBOPENCOR_PREBUILT_LIBSBML
        OR NOT LIBOPENCOR_PREBUILT_LIBXML2
        OR NOT LIBOPENCOR_PREBUILT_SUNDIALS
        OR NOT LIBOPENCOR_PREBUILT_ZLIB)
@@ -32,6 +33,7 @@ else()
     add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
                       COMMAND ${EMCMAKE_EXE} ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S ${CMAKE_SOURCE_DIR} -B build
                                                               ${DEMCMAKE_EXE}
+                                                              -DLIBOPENCOR_PREBUILT_LIBCELLML=${LIBOPENCOR_PREBUILT_LIBCELLML}
                                                               -DLIBOPENCOR_PREBUILT_LIBSBML=${LIBOPENCOR_PREBUILT_LIBSBML}
                                                               -DLIBOPENCOR_PREBUILT_LIBXML2=${LIBOPENCOR_PREBUILT_LIBXML2}
                                                               -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}

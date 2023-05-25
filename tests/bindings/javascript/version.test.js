@@ -24,6 +24,11 @@ describe("Version tests", () => {
         expect(libopencor.versionString()).toBe("0.1.0");
     });
 
+    test("libCellML", () => {
+        expect(libopencor.libcellmlVersion()).toBe(0x000400);
+        expect(libopencor.libcellmlVersionString()).toBe("0.4.0");
+    });
+
     test("SUNDIALS", () => {
         expect(libopencor.sundialsVersion()).toBe(0x060200);
         expect(libopencor.sundialsVersionString()).toBe("6.2.0");

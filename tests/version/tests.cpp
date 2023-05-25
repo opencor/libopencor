@@ -30,6 +30,7 @@ TEST(VersionTest, Clang)
     EXPECT_EQ(0x140003U, libOpenCOR::clangVersion());
     EXPECT_EQ("14.0.3", libOpenCOR::clangVersionString());
 }
+*/
 
 TEST(VersionTest, libCellML)
 {
@@ -37,6 +38,7 @@ TEST(VersionTest, libCellML)
     EXPECT_EQ("0.4.0", libOpenCOR::libcellmlVersionString());
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 TEST(VersionTest, libCOMBINE)
 {
     EXPECT_EQ(218U, libOpenCOR::libcombineVersion());

@@ -81,8 +81,10 @@ PYBIND11_MODULE(module, m)
 /*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     m.def("clang_version", &libOpenCOR::clangVersion, "Get the version number of Clang.");
     m.def("clang_version_string", &libOpenCOR::clangVersionString, "Get the version string of Clang.");
+*/
     m.def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.");
     m.def("libcellml_version_string", &libOpenCOR::libcellmlVersionString, "Get the version string of libCellML.");
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     m.def("libcombine_version", &libOpenCOR::libcombineVersion, "Get the version number of libCOMBINE.");
     m.def("libcombine_version_string", &libOpenCOR::libcombineVersionString, "Get the version string of libCOMBINE.");
     m.def("libcurl_version", &libOpenCOR::libcurlVersion, "Get the version number of libcurl.");
