@@ -82,7 +82,6 @@ add_package(zlib)
 #---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 # add_package(zipper) # Requires zlib.
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 # Required third-party libraries.
 
 #---GRY--- BUILDING_JAVASCRIPT_BINDINGS.

@@ -218,9 +218,7 @@ function(configure_target TARGET)
             # There are some CMake configuration files, so use them to configure the package.
 
             if(BUILDING_JAVASCRIPT_BINDINGS)
-                string(TOLOWER "${AVAILABLE_PACKAGE}" AVAILABLE_PACKAGE_LC)
-
-                set(${AVAILABLE_PACKAGE_UC}_DIR ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR}/${AVAILABLE_PACKAGE_LC})
+                set(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}_DIR ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR})
             endif()
 
             find_package(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME} REQUIRED
