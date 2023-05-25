@@ -22,7 +22,8 @@ else()
 
     set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
 
-    if(NOT LIBOPENCOR_PREBUILT_SUNDIALS)
+    if(   NOT LIBOPENCOR_PREBUILT_SUNDIALS
+       OR NOT LIBOPENCOR_PREBUILT_ZLIB)
         set(DEMCMAKE_EXE -DEMCMAKE_EXE=${EMCMAKE_EXE})
     endif()
 
@@ -30,6 +31,7 @@ else()
                       COMMAND ${EMCMAKE_EXE} ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S ${CMAKE_SOURCE_DIR} -B build
                                                               ${DEMCMAKE_EXE}
                                                               -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}
+                                                              -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
                       COMMAND ${CMAKE_COMMAND} --build build
                       WORKING_DIRECTORY ${DOCUMENTATION_BUILD_DIR})
 
