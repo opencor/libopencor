@@ -24,6 +24,7 @@ else()
 
     if(   NOT LIBOPENCOR_PREBUILT_LIBCELLML
        OR NOT LIBOPENCOR_PREBUILT_LIBSBML
+       OR NOT LIBOPENCOR_PREBUILT_LIBSSH2
        OR NOT LIBOPENCOR_PREBUILT_LIBXML2
        OR NOT LIBOPENCOR_PREBUILT_OPENSSL
        OR NOT LIBOPENCOR_PREBUILT_SUNDIALS
@@ -42,6 +43,7 @@ else()
                                                               ${DEMCONFIGURE_EXE}
                                                               -DLIBOPENCOR_PREBUILT_LIBCELLML=${LIBOPENCOR_PREBUILT_LIBCELLML}
                                                               -DLIBOPENCOR_PREBUILT_LIBSBML=${LIBOPENCOR_PREBUILT_LIBSBML}
+                                                              -DLIBOPENCOR_PREBUILT_LIBSSH2=${LIBOPENCOR_PREBUILT_LIBSSH2}
                                                               -DLIBOPENCOR_PREBUILT_LIBXML2=${LIBOPENCOR_PREBUILT_LIBXML2}
                                                               -DLIBOPENCOR_PREBUILT_OPENSSL=${LIBOPENCOR_PREBUILT_OPENSSL}
                                                               -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}

@@ -22,7 +22,7 @@ set(PACKAGES_TO_BUILD)
 
 #---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 # foreach(PACKAGE libCellML libCOMBINE libcurl libNuML libSBML libSEDML libssh2 libxml2 LLVMClang OpenSSL SUNDIALS zipper zlib)
-foreach(PACKAGE libCellML libSBML libxml2 OpenSSL SUNDIALS zipper zlib)
+foreach(PACKAGE libCellML libSBML libssh2 libxml2 OpenSSL SUNDIALS zipper zlib)
     string(TOUPPER "${PACKAGE}" PACKAGE_UC)
 
     if(NOT LIBOPENCOR_PREBUILT_${PACKAGE_UC})
@@ -65,7 +65,6 @@ set(THIRD_PARTY_HEADER_FILES "" CACHE INTERNAL "Third-party (special) header fil
 
 # Prerequisite third-party libraries, respecting their own prerequisites.
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 add_package(libxml2)
 add_package(OpenSSL)
 add_package(zlib)
@@ -75,8 +74,7 @@ add_package(libSBML) # Requires libxml2.
 #---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 # add_package(libNuML) # Requires libSBML.
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-# add_package(libssh2) # Requires OpenSSL.
+add_package(libssh2) # Requires OpenSSL.
 
 add_package(zipper) # Requires zlib.
 
