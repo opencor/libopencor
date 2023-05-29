@@ -35,11 +35,11 @@ limitations under the License.
 
 #include "libopencor/version.h"
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 #include "libsedmlbegin.h"
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 #include "llvmbegin.h"
 #include "llvm/Config/llvm-config.h"
 #include "llvmend.h"
@@ -126,6 +126,7 @@ std::string libcurlVersionString()
 {
     return LIBCURL_VERSION;
 }
+*/
 
 unsigned int libsedmlVersion()
 {
@@ -137,6 +138,7 @@ std::string libsedmlVersionString()
     return libsedml::getLibSEDMLDottedVersion();
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 unsigned int llvmVersion()
 {
     return static_cast<unsigned int>(MAJOR_10 * firstDigit(LLVM_VERSION_MAJOR) + MAJOR_01 * secondDigit(LLVM_VERSION_MAJOR)

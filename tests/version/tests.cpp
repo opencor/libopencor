@@ -50,6 +50,7 @@ TEST(VersionTest, libcurl)
     EXPECT_EQ(0x075301U, libOpenCOR::libcurlVersion());
     EXPECT_EQ("7.83.1-DEV", libOpenCOR::libcurlVersionString());
 }
+*/
 
 TEST(VersionTest, libSEDML)
 {
@@ -57,6 +58,7 @@ TEST(VersionTest, libSEDML)
     EXPECT_EQ("2.0.32", libOpenCOR::libsedmlVersionString());
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 TEST(VersionTest, LLVM)
 {
     EXPECT_EQ(0x140003U, libOpenCOR::llvmVersion());

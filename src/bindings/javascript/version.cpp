@@ -25,6 +25,8 @@ EMSCRIPTEN_BINDINGS(libOpenCOR_version) {
     emscripten::function("libcellmlVersionString", &libOpenCOR::libcellmlVersionString);
     emscripten::function("libcombineVersion", &libOpenCOR::libcombineVersion);
     emscripten::function("libcombineVersionString", &libOpenCOR::libcombineVersionString);
+    emscripten::function("libsedmlVersion", &libOpenCOR::libsedmlVersion);
+    emscripten::function("libsedmlVersionString", &libOpenCOR::libsedmlVersionString);
     emscripten::function("sundialsVersion", &libOpenCOR::sundialsVersion);
     emscripten::function("sundialsVersionString", &libOpenCOR::sundialsVersionString);
 }

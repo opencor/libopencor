@@ -26,6 +26,7 @@ else()
        OR NOT LIBOPENCOR_PREBUILT_LIBCOMBINE
        OR NOT LIBOPENCOR_PREBUILT_LIBNUML
        OR NOT LIBOPENCOR_PREBUILT_LIBSBML
+       OR NOT LIBOPENCOR_PREBUILT_LIBSEDML
        OR NOT LIBOPENCOR_PREBUILT_LIBSSH2
        OR NOT LIBOPENCOR_PREBUILT_LIBXML2
        OR NOT LIBOPENCOR_PREBUILT_OPENSSL
@@ -47,6 +48,7 @@ else()
                                                               -DLIBOPENCOR_PREBUILT_LIBCOMBINE=${LIBOPENCOR_PREBUILT_LIBCOMBINE}
                                                               -DLIBOPENCOR_PREBUILT_LIBNUML=${LIBOPENCOR_PREBUILT_LIBNUML}
                                                               -DLIBOPENCOR_PREBUILT_LIBSBML=${LIBOPENCOR_PREBUILT_LIBSBML}
+                                                              -DLIBOPENCOR_PREBUILT_LIBSEDML=${LIBOPENCOR_PREBUILT_LIBSEDML}
                                                               -DLIBOPENCOR_PREBUILT_LIBSSH2=${LIBOPENCOR_PREBUILT_LIBSSH2}
                                                               -DLIBOPENCOR_PREBUILT_LIBXML2=${LIBOPENCOR_PREBUILT_LIBXML2}
                                                               -DLIBOPENCOR_PREBUILT_OPENSSL=${LIBOPENCOR_PREBUILT_OPENSSL}

@@ -56,6 +56,7 @@ def test_libcombine_version_string():
     assert oc.libcombine_version_string() == "0.2.18"
 
 
+# ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 # def test_libcurl_version():
 #     assert isinstance(oc.libcurl_version(), int)
 #     assert oc.libcurl_version() == 0x075301
@@ -66,16 +67,17 @@ def test_libcombine_version_string():
 #     assert oc.libcurl_version_string() == "7.83.1-DEV"
 
 
-# def test_libsedml_version():
-#     assert isinstance(oc.libsedml_version(), int)
-#     assert oc.libsedml_version() == 20032
+def test_libsedml_version():
+    assert isinstance(oc.libsedml_version(), int)
+    assert oc.libsedml_version() == 20032
 
 
-# def test_libsedml_version_string():
-#     assert isinstance(oc.libsedml_version_string(), str)
-#     assert oc.libsedml_version_string() == "2.0.32"
+def test_libsedml_version_string():
+    assert isinstance(oc.libsedml_version_string(), str)
+    assert oc.libsedml_version_string() == "2.0.32"
 
 
+# ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 # def test_llvm_version():
 #     assert isinstance(oc.llvm_version(), int)
 #     assert oc.llvm_version() == 0x140003

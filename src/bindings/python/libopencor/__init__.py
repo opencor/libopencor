@@ -55,8 +55,9 @@ __all__ = (
     # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     # "libcurl_version",
     # "libcurl_version_string",
-    # "libsedml_version",
-    # "libsedml_version_string",
+    "libsedml_version",
+    "libsedml_version_string",
+    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     # "llvm_version",
     # "llvm_version_string",
     "sundials_version",

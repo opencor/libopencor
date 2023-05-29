@@ -126,8 +126,7 @@ std::string LIBOPENCOR_EXPORT libcombineVersionString();
  * @return A number that represents the version of libSEDML.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// unsigned int LIBOPENCOR_EXPORT libsedmlVersion();
+unsigned int LIBOPENCOR_EXPORT libsedmlVersion();
 
 /**
  * Return the version of libSEDML as a string. The version string is in the format x.y.z, where the "."s are literal,
@@ -137,8 +136,7 @@ std::string LIBOPENCOR_EXPORT libcombineVersionString();
  * @return A string that represents the version of libSEDML.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// std::string LIBOPENCOR_EXPORT libsedmlVersionString();
+std::string LIBOPENCOR_EXPORT libsedmlVersionString();
 
 /**
  * Return the version of LLVM as a number.

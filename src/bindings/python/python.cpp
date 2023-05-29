@@ -89,8 +89,10 @@ PYBIND11_MODULE(module, m)
 /*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     m.def("libcurl_version", &libOpenCOR::libcurlVersion, "Get the version number of libcurl.");
     m.def("libcurl_version_string", &libOpenCOR::libcurlVersionString, "Get the version string of libcurl.");
+*/
     m.def("libsedml_version", &libOpenCOR::libsedmlVersion, "Get the version number of libSEDML.");
     m.def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.");
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     m.def("llvm_version", &libOpenCOR::llvmVersion, "Get the version number of LLVM.");
     m.def("llvm_version_string", &libOpenCOR::llvmVersionString, "Get the version string of LLVM.");
 */
