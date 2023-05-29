@@ -23,6 +23,7 @@ else()
     set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
 
     if(   NOT LIBOPENCOR_PREBUILT_LIBCELLML
+       OR NOT LIBOPENCOR_PREBUILT_LIBNUML
        OR NOT LIBOPENCOR_PREBUILT_LIBSBML
        OR NOT LIBOPENCOR_PREBUILT_LIBSSH2
        OR NOT LIBOPENCOR_PREBUILT_LIBXML2
@@ -42,6 +43,7 @@ else()
                                                               ${DEMCMAKE_EXE}
                                                               ${DEMCONFIGURE_EXE}
                                                               -DLIBOPENCOR_PREBUILT_LIBCELLML=${LIBOPENCOR_PREBUILT_LIBCELLML}
+                                                              -DLIBOPENCOR_PREBUILT_LIBNUML=${LIBOPENCOR_PREBUILT_LIBNUML}
                                                               -DLIBOPENCOR_PREBUILT_LIBSBML=${LIBOPENCOR_PREBUILT_LIBSBML}
                                                               -DLIBOPENCOR_PREBUILT_LIBSSH2=${LIBOPENCOR_PREBUILT_LIBSSH2}
                                                               -DLIBOPENCOR_PREBUILT_LIBXML2=${LIBOPENCOR_PREBUILT_LIBXML2}
