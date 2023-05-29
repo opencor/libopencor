@@ -24,13 +24,11 @@ TEST(VersionTest, libOpenCOR)
     EXPECT_EQ("0.1.0", libOpenCOR::versionString());
 }
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 TEST(VersionTest, Clang)
 {
     EXPECT_EQ(0x140003U, libOpenCOR::clangVersion());
     EXPECT_EQ("14.0.3", libOpenCOR::clangVersionString());
 }
-*/
 
 TEST(VersionTest, libCellML)
 {
@@ -56,13 +54,11 @@ TEST(VersionTest, libSEDML)
     EXPECT_EQ("2.0.32", libOpenCOR::libsedmlVersionString());
 }
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 TEST(VersionTest, LLVM)
 {
     EXPECT_EQ(0x140003U, libOpenCOR::llvmVersion());
     EXPECT_EQ("14.0.3", libOpenCOR::llvmVersionString());
 }
-*/
 
 TEST(VersionTest, SUNDIALS)
 {

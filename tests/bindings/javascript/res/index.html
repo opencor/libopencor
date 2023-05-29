@@ -39,6 +39,14 @@
             <td id="versionString"></td>
         </tr>
         <tr>
+            <td>clangVersion()</td>
+            <td id="clangVersion"></td>
+        </tr>
+        <tr>
+            <td>clangVersionString()</td>
+            <td id="clangVersionString"></td>
+        </tr>
+        <tr>
             <td>libcellmlVersion()</td>
             <td id="libcellmlVersion"></td>
         </tr>
@@ -71,6 +79,14 @@
             <td id="libsedmlVersionString"></td>
         </tr>
         <tr>
+            <td>llvmVersion()</td>
+            <td id="llvmVersion"></td>
+        </tr>
+        <tr>
+            <td>llvmVersionString()</td>
+            <td id="llvmVersionString"></td>
+        </tr>
+        <tr>
             <td>sundialsVersion()</td>
             <td id="sundialsVersion"></td>
         </tr>
@@ -86,6 +102,8 @@
         libOpenCOR().then(function (libopencor) {
             document.getElementById("version").innerHTML = libopencor.version();
             document.getElementById("versionString").innerHTML = libopencor.versionString();
+            document.getElementById("clangVersion").innerHTML = libopencor.clangVersion();
+            document.getElementById("clangVersionString").innerHTML = libopencor.clangVersionString();
             document.getElementById("libcellmlVersion").innerHTML = libopencor.libcellmlVersion();
             document.getElementById("libcellmlVersionString").innerHTML = libopencor.libcellmlVersionString();
             document.getElementById("libcombineVersion").innerHTML = libopencor.libcombineVersion();
@@ -94,6 +112,8 @@
             document.getElementById("libcurlVersionString").innerHTML = libopencor.libcurlVersionString();
             document.getElementById("libsedmlVersion").innerHTML = libopencor.libsedmlVersion();
             document.getElementById("libsedmlVersionString").innerHTML = libopencor.libsedmlVersionString();
+            document.getElementById("llvmVersion").innerHTML = libopencor.llvmVersion();
+            document.getElementById("llvmVersionString").innerHTML = libopencor.llvmVersionString();
             document.getElementById("sundialsVersion").innerHTML = libopencor.sundialsVersion();
             document.getElementById("sundialsVersionString").innerHTML = libopencor.sundialsVersionString();
         });

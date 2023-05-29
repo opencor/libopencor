@@ -218,7 +218,20 @@ function(configure_target TARGET)
             # There are some CMake configuration files, so use them to configure the package.
 
             if(BUILDING_JAVASCRIPT_BINDINGS)
-                set(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}_DIR ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR})
+                if("${${AVAILABLE_PACKAGE_UC}_CMAKE_DIRS}" STREQUAL "")
+                    set(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}_DIR ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR})
+                else()
+                    list(LENGTH ${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAMES SUB_PACKAGES_COUNT)
+
+                    foreach(INDEX RANGE 1 ${SUB_PACKAGES_COUNT})
+                        math(EXPR REAL_INDEX "${INDEX}-1")
+
+                        list(GET ${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAMES ${REAL_INDEX} SUB_PACKAGE_NAME)
+                        list(GET ${AVAILABLE_PACKAGE_UC}_CMAKE_DIRS ${REAL_INDEX} SUB_PACKAGE_DIR)
+
+                        set(${SUB_PACKAGE_NAME}_DIR ${SUB_PACKAGE_DIR})
+                    endforeach()
+                endif()
             endif()
 
             find_package(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME} REQUIRED

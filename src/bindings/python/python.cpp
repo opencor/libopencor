@@ -78,10 +78,8 @@ PYBIND11_MODULE(module, m)
 
     m.def("version", &libOpenCOR::version, "Get the version number of libOpenCOR.");
     m.def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.");
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     m.def("clang_version", &libOpenCOR::clangVersion, "Get the version number of Clang.");
     m.def("clang_version_string", &libOpenCOR::clangVersionString, "Get the version string of Clang.");
-*/
     m.def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.");
     m.def("libcellml_version_string", &libOpenCOR::libcellmlVersionString, "Get the version string of libCellML.");
     m.def("libcombine_version", &libOpenCOR::libcombineVersion, "Get the version number of libCOMBINE.");
@@ -90,10 +88,8 @@ PYBIND11_MODULE(module, m)
     m.def("libcurl_version_string", &libOpenCOR::libcurlVersionString, "Get the version string of libcurl.");
     m.def("libsedml_version", &libOpenCOR::libsedmlVersion, "Get the version number of libSEDML.");
     m.def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.");
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     m.def("llvm_version", &libOpenCOR::llvmVersion, "Get the version number of LLVM.");
     m.def("llvm_version_string", &libOpenCOR::llvmVersionString, "Get the version string of LLVM.");
-*/
     m.def("sundials_version", &libOpenCOR::sundialsVersion, "Get the version number of SUNDIALS.");
     m.def("sundials_version_string", &libOpenCOR::sundialsVersionString, "Get the version string of SUNDIALS.");
 }

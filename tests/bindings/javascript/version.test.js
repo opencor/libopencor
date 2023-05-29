@@ -24,6 +24,11 @@ describe("Version tests", () => {
         expect(libopencor.versionString()).toBe("0.1.0");
     });
 
+    test("Clang", () => {
+        expect(libopencor.clangVersion()).toBe(0x140003);
+        expect(libopencor.clangVersionString()).toBe("14.0.3");
+    });
+
     test("libCellML", () => {
         expect(libopencor.libcellmlVersion()).toBe(0x000400);
         expect(libopencor.libcellmlVersionString()).toBe("0.4.0");
@@ -42,6 +47,11 @@ describe("Version tests", () => {
     test("libSEDML", () => {
         expect(libopencor.libsedmlVersion()).toBe(20032);
         expect(libopencor.libsedmlVersionString()).toBe("2.0.32");
+    });
+
+    test("LLVM", () => {
+        expect(libopencor.llvmVersion()).toBe(0x140003);
+        expect(libopencor.llvmVersionString()).toBe("14.0.3");
     });
 
     test("SUNDIALS", () => {

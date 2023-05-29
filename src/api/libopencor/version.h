@@ -50,8 +50,7 @@ std::string LIBOPENCOR_EXPORT versionString();
  * @return A number that represents the version of Clang.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// unsigned int LIBOPENCOR_EXPORT clangVersion();
+unsigned int LIBOPENCOR_EXPORT clangVersion();
 
 /**
  * Return the version of Clang as a string. The version string is in the format x.y.z, where the "."s are literal, and
@@ -61,8 +60,7 @@ std::string LIBOPENCOR_EXPORT versionString();
  * @return A string that represents the version of Clang.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// std::string LIBOPENCOR_EXPORT clangVersionString();
+std::string LIBOPENCOR_EXPORT clangVersionString();
 
 /**
  * Return the version of libCellML as a number.
@@ -142,8 +140,7 @@ std::string LIBOPENCOR_EXPORT libsedmlVersionString();
  * @return A number that represents the version of LLVM.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// unsigned int LIBOPENCOR_EXPORT llvmVersion();
+unsigned int LIBOPENCOR_EXPORT llvmVersion();
 
 /**
  * Return the version of LLVM as a string. The version string is in the format x.y.z, where the "."s are literal, and
@@ -153,8 +150,7 @@ std::string LIBOPENCOR_EXPORT libsedmlVersionString();
  * @return A string that represents the version of LLVM.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// std::string LIBOPENCOR_EXPORT llvmVersionString();
+std::string LIBOPENCOR_EXPORT llvmVersionString();
 
 /**
  * Return the version of SUNDIALS as a number.

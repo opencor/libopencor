@@ -19,11 +19,9 @@ limitations under the License.
 #include <array>
 #include <cmath>
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 #include "clangbegin.h"
 #include "clang/Basic/Version.h"
 #include "clangend.h"
-*/
 
 #include "curl/curlver.h"
 
@@ -39,11 +37,9 @@ limitations under the License.
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 #include "llvmbegin.h"
 #include "llvm/Config/llvm-config.h"
 #include "llvmend.h"
-*/
 
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
@@ -82,7 +78,6 @@ std::string versionString()
     return LIBOPENCOR_VERSION_STRING;
 }
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 unsigned int clangVersion()
 {
     return static_cast<unsigned int>(MAJOR_10 * firstDigit(CLANG_VERSION_MAJOR) + MAJOR_01 * secondDigit(CLANG_VERSION_MAJOR)
@@ -94,7 +89,6 @@ std::string clangVersionString()
 {
     return CLANG_VERSION_STRING;
 }
-*/
 
 unsigned int libcellmlVersion()
 {
@@ -136,7 +130,6 @@ std::string libsedmlVersionString()
     return libsedml::getLibSEDMLDottedVersion();
 }
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 unsigned int llvmVersion()
 {
     return static_cast<unsigned int>(MAJOR_10 * firstDigit(LLVM_VERSION_MAJOR) + MAJOR_01 * secondDigit(LLVM_VERSION_MAJOR)
@@ -148,7 +141,6 @@ std::string llvmVersionString()
 {
     return LLVM_VERSION_STRING;
 }
-*/
 
 unsigned int sundialsVersion()
 {
