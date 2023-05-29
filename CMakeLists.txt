@@ -40,6 +40,10 @@ if(DEFINED EMSCRIPTEN)
 
     string(TOLOWER "${CMAKE_PROJECT_NAME}" CMAKE_PROJECT_NAME)
 
+    # Check the environment we are dealing with.
+
+    include(environmentchecks)
+
     # Build libOpenCOR's JavaScript bindings.
 
     add_subdirectory(src)
