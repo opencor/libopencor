@@ -103,8 +103,7 @@ else()
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
     string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "find_dependency(LIBNUML)" "string(REPLACE \"libSEDML\" \"libNuML\" LIBNUML_CMAKE_DIR \"\${LIBSEDML_CMAKE_DIR}\")\nfind_dependency(\${LIBNUML_LIBRARY_NAME} PATHS \${LIBNUML_CMAKE_DIR})" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "find_dependency(LIBSBML)" "string(REPLACE \"libSEDML\" \"libSBML\" LIBSBML_CMAKE_DIR \"\${LIBSEDML_CMAKE_DIR}\")\nfind_dependency(\${LIBSBML_LIBRARY_NAME} PATHS \${LIBSBML_CMAKE_DIR})" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "find_dependency" "# find_dependency" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
