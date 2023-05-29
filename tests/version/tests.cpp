@@ -38,13 +38,13 @@ TEST(VersionTest, libCellML)
     EXPECT_EQ("0.4.0", libOpenCOR::libcellmlVersionString());
 }
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 TEST(VersionTest, libCOMBINE)
 {
     EXPECT_EQ(218U, libOpenCOR::libcombineVersion());
     EXPECT_EQ("0.2.18", libOpenCOR::libcombineVersionString());
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 TEST(VersionTest, libcurl)
 {
     EXPECT_EQ(0x075301U, libOpenCOR::libcurlVersion());

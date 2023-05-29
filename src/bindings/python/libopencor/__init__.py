@@ -25,8 +25,9 @@ from .module import (
     # clang_version_string,
     libcellml_version,
     libcellml_version_string,
-    # libcombine_version,
-    # libcombine_version_string,
+    libcombine_version,
+    libcombine_version_string,
+    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     # libcurl_version,
     # libcurl_version_string,
     # libsedml_version,
@@ -49,8 +50,9 @@ __all__ = (
     # "clang_version_string",
     "libcellml_version",
     "libcellml_version_string",
-    # "libcombine_version",
-    # "libcombine_version_string",
+    "libcombine_version",
+    "libcombine_version_string",
+    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     # "libcurl_version",
     # "libcurl_version_string",
     # "libsedml_version",

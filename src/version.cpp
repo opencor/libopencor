@@ -29,11 +29,9 @@ limitations under the License.
 
 #include "libcellml/version.h"
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 #include "libcombinebegin.h"
 #include "omex/common/libcombine-version.h"
 #include "libcombineend.h"
-*/
 
 #include "libopencor/version.h"
 
@@ -108,7 +106,6 @@ std::string libcellmlVersionString()
     return libcellml::versionString();
 }
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 unsigned int libcombineVersion()
 {
     return static_cast<unsigned int>(libcombine::getLibCombineVersion());
@@ -119,6 +116,7 @@ std::string libcombineVersionString()
     return libcombine::getLibCombineDottedVersion();
 }
 
+/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 unsigned int libcurlVersion()
 {
     return LIBCURL_VERSION_NUM;
