@@ -38,18 +38,17 @@ if(LIBOPENCOR_DOCUMENTATION)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/footer.html.in ${CMAKE_CURRENT_BINARY_DIR}/footer.html)
 
     add_custom_target(api_documentation
-                      COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/doc/html/api/
-                      COMMAND ${DOXYGEN_EXE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
-                      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doc/html/res/pics/twitter.png ${CMAKE_BINARY_DIR}/doc/html/api/twitter.png
-                      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/doc/html/res/pics/vpr.png ${CMAKE_BINARY_DIR}/doc/html/api/vpr.png
-                      COMMAND ${PATCH_EXE} ${CMAKE_BINARY_DIR}/doc/html/api/resize.js ${CMAKE_CURRENT_SOURCE_DIR}/resize.js.patch
-                      DEPENDS general_documentation
-                      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+                      COMMAND ${CMAKE_COMMAND} -E make_directory html/api
+                      COMMAND ${DOXYGEN_EXE} Doxyfile
+                      COMMAND ${CMAKE_COMMAND} -E copy html/res/pics/twitter.png html/api/twitter.png
+                      COMMAND ${CMAKE_COMMAND} -E copy html/res/pics/vpr.png html/api/vpr.png
+                      COMMAND ${PATCH_EXE} html/api/resize.js ${CMAKE_CURRENT_SOURCE_DIR}/resize.js.patch
+                      DEPENDS general_documentation)
 
     # Generate our documentation.
 
     add_target(documentation
-               COMMAND echo "The documentation can be found at ${CMAKE_BINARY_DIR}/doc/html/index.html."
+               COMMAND echo "The documentation can be found at ${CMAKE_CURRENT_BINARY_DIR}/html/index.html."
                DEPENDS general_documentation
                        api_documentation
                        user_documentation

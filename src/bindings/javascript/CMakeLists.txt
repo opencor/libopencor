@@ -57,8 +57,7 @@ else()
                                                               -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}
                                                               -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
                                                               -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
-                      COMMAND ${CMAKE_COMMAND} --build build
-                      WORKING_DIRECTORY ${DOCUMENTATION_BUILD_DIR})
+                      COMMAND ${CMAKE_COMMAND} --build build)
 
     add_dependencies(${CMAKE_PROJECT_NAME} ${JAVASCRIPT_BINDINGS_TARGET})
 endif()
