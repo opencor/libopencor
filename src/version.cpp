@@ -23,9 +23,9 @@ limitations under the License.
 #include "clangbegin.h"
 #include "clang/Basic/Version.h"
 #include "clangend.h"
+*/
 
 #include "curl/curlver.h"
-*/
 
 #include "libcellml/version.h"
 
@@ -116,7 +116,6 @@ std::string libcombineVersionString()
     return libcombine::getLibCombineDottedVersion();
 }
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 unsigned int libcurlVersion()
 {
     return LIBCURL_VERSION_NUM;
@@ -126,7 +125,6 @@ std::string libcurlVersionString()
 {
     return LIBCURL_VERSION;
 }
-*/
 
 unsigned int libsedmlVersion()
 {

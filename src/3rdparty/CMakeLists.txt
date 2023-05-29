@@ -22,7 +22,7 @@ set(PACKAGES_TO_BUILD)
 
 #---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 # foreach(PACKAGE libCellML libCOMBINE libcurl libNuML libSBML libSEDML libssh2 libxml2 LLVMClang OpenSSL SUNDIALS zipper zlib)
-foreach(PACKAGE libCellML libCOMBINE libNuML libSBML libSEDML libssh2 libxml2 OpenSSL SUNDIALS zipper zlib)
+foreach(PACKAGE libCellML libCOMBINE libcurl libNuML libSBML libSEDML libssh2 libxml2 OpenSSL SUNDIALS zipper zlib)
     string(TOUPPER "${PACKAGE}" PACKAGE_UC)
 
     if(NOT LIBOPENCOR_PREBUILT_${PACKAGE_UC})
@@ -82,7 +82,7 @@ add_package(zipper) # Requires zlib.
 #---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 add_package(libCellML) # Requires libxml2 and zlib.
 add_package(libCOMBINE) # Requires libSBML, zipper and zlib.
-# add_package(libcurl) # Requires libssh2, OpenSSL and zlib.
+add_package(libcurl) # Requires libssh2, OpenSSL and zlib.
 add_package(libSEDML) # Requires libNuML and libSBML.
 # add_package(LLVMClang)
 add_package(SUNDIALS)

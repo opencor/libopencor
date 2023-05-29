@@ -27,11 +27,11 @@ from .module import (
     libcellml_version_string,
     libcombine_version,
     libcombine_version_string,
+    libcurl_version,
+    libcurl_version_string,
+    libsedml_version,
+    libsedml_version_string,
     # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-    # libcurl_version,
-    # libcurl_version_string,
-    # libsedml_version,
-    # libsedml_version_string,
     # llvm_version,
     # llvm_version_string,
     sundials_version,
@@ -52,9 +52,8 @@ __all__ = (
     "libcellml_version_string",
     "libcombine_version",
     "libcombine_version_string",
-    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-    # "libcurl_version",
-    # "libcurl_version_string",
+    "libcurl_version",
+    "libcurl_version_string",
     "libsedml_version",
     "libsedml_version_string",
     # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.

@@ -44,13 +44,11 @@ TEST(VersionTest, libCOMBINE)
     EXPECT_EQ("0.2.18", libOpenCOR::libcombineVersionString());
 }
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 TEST(VersionTest, libcurl)
 {
     EXPECT_EQ(0x075301U, libOpenCOR::libcurlVersion());
     EXPECT_EQ("7.83.1-DEV", libOpenCOR::libcurlVersionString());
 }
-*/
 
 TEST(VersionTest, libSEDML)
 {

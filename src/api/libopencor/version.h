@@ -106,8 +106,7 @@ std::string LIBOPENCOR_EXPORT libcombineVersionString();
  * @return A number that represents the version of libcurl.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// unsigned int LIBOPENCOR_EXPORT libcurlVersion();
+unsigned int LIBOPENCOR_EXPORT libcurlVersion();
 
 /**
  * Return the version of libcurl as a string. The version string is in the format x.y.z, where the "."s are literal,
@@ -117,8 +116,7 @@ std::string LIBOPENCOR_EXPORT libcombineVersionString();
  * @return A string that represents the version of libcurl.
  */
 
-//---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-// std::string LIBOPENCOR_EXPORT libcurlVersionString();
+std::string LIBOPENCOR_EXPORT libcurlVersionString();
 
 /**
  * Return the version of libSEDML as a number.

@@ -56,15 +56,14 @@ def test_libcombine_version_string():
     assert oc.libcombine_version_string() == "0.2.18"
 
 
-# ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-# def test_libcurl_version():
-#     assert isinstance(oc.libcurl_version(), int)
-#     assert oc.libcurl_version() == 0x075301
+def test_libcurl_version():
+    assert isinstance(oc.libcurl_version(), int)
+    assert oc.libcurl_version() == 0x075301
 
 
-# def test_libcurl_version_string():
-#     assert isinstance(oc.libcurl_version_string(), str)
-#     assert oc.libcurl_version_string() == "7.83.1-DEV"
+def test_libcurl_version_string():
+    assert isinstance(oc.libcurl_version_string(), str)
+    assert oc.libcurl_version_string() == "7.83.1-DEV"
 
 
 def test_libsedml_version():
