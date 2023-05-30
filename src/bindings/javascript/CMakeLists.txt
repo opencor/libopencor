@@ -24,6 +24,7 @@ else()
 
     add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
                       COMMAND ${EMCMAKE_EXE} ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S ${CMAKE_SOURCE_DIR} -B build
+                                                              -DLIBOPENCOR_COMPILER_CACHING=${LIBOPENCOR_COMPILER_CACHING}
                                                               -DLIBOPENCOR_PREBUILT_LIBCELLML=${LIBOPENCOR_PREBUILT_LIBCELLML}
                                                               -DLIBOPENCOR_PREBUILT_LIBCOMBINE=${LIBOPENCOR_PREBUILT_LIBCOMBINE}
                                                               -DLIBOPENCOR_PREBUILT_LIBCURL=${LIBOPENCOR_PREBUILT_LIBCURL}

@@ -13,7 +13,17 @@
 # limitations under the License.
 
 if(BUILDING_JAVASCRIPT_BINDINGS)
-    # Look for emcmake and emconfigure, which are needed to build our third-party libraries.
+    # Look for various packages and programs.
+
+    find_program(BUILDCACHE_EXE buildcache)
+
+    if(NOT BUILDCACHE_EXE)
+        if(BUILDING_USING_MSVC)
+            find_program(CLCACHE_EXE clcache)
+        else()
+            find_program(CCACHE_EXE ccache)
+        endif()
+    endif()
 
     find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
     find_program(EMCONFIGURE_EXE NAMES ${PREFERRED_EMCONFIGURE_NAMES} emconfigure)
