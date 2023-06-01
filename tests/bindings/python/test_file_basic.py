@@ -21,45 +21,45 @@ UNIX_LOCAL_FILE = "/some/path/file.txt"
 
 
 def test_basic_windows_file():
-    f = File(WINDOWS_LOCAL_FILE)
+    file = File(WINDOWS_LOCAL_FILE)
 
-    assert f.type == File.Type.Unresolved
-    assert f.file_name == WINDOWS_LOCAL_FILE
-    assert f.url == ""
-    assert repr(f) == "Local file: " + WINDOWS_LOCAL_FILE
+    assert file.type == File.Type.Unresolved
+    assert file.file_name == WINDOWS_LOCAL_FILE
+    assert file.url == ""
+    assert repr(file) == "Local file: " + WINDOWS_LOCAL_FILE
 
 
 def test_basic_unix_file():
-    f = File(UNIX_LOCAL_FILE)
+    file = File(UNIX_LOCAL_FILE)
 
-    assert f.type == File.Type.Unresolved
-    assert f.file_name == UNIX_LOCAL_FILE
-    assert f.url == ""
-    assert repr(f) == "Local file: " + UNIX_LOCAL_FILE
+    assert file.type == File.Type.Unresolved
+    assert file.file_name == UNIX_LOCAL_FILE
+    assert file.url == ""
+    assert repr(file) == "Local file: " + UNIX_LOCAL_FILE
 
 
 def test_basic_url_based_windows_file():
-    f = File("file:///C:/some/path/file.txt")
+    file = File("file:///C:/some/path/file.txt")
 
-    assert f.type == File.Type.Unresolved
-    assert f.file_name == WINDOWS_LOCAL_FILE
-    assert f.url == ""
-    assert repr(f) == "Local file: " + WINDOWS_LOCAL_FILE
+    assert file.type == File.Type.Unresolved
+    assert file.file_name == WINDOWS_LOCAL_FILE
+    assert file.url == ""
+    assert repr(file) == "Local file: " + WINDOWS_LOCAL_FILE
 
 
 def test_basic_url_based_unix_file():
-    f = File("file:///some/path/file.txt")
+    file = File("file:///some/path/file.txt")
 
-    assert f.type == File.Type.Unresolved
-    assert f.file_name == UNIX_LOCAL_FILE
-    assert f.url == ""
-    assert repr(f) == "Local file: " + UNIX_LOCAL_FILE
+    assert file.type == File.Type.Unresolved
+    assert file.file_name == UNIX_LOCAL_FILE
+    assert file.url == ""
+    assert repr(file) == "Local file: " + UNIX_LOCAL_FILE
 
 
 def test_basic_remote_file():
-    f = File(utils.REMOTE_FILE)
+    file = File(utils.REMOTE_FILE)
 
-    assert f.type == File.Type.Unresolved
-    assert f.file_name == ""
-    assert f.url == utils.REMOTE_FILE
-    assert repr(f) == "Remote file: " + utils.REMOTE_FILE
+    assert file.type == File.Type.Unresolved
+    assert file.file_name == ""
+    assert file.url == utils.REMOTE_FILE
+    assert repr(file) == "Remote file: " + utils.REMOTE_FILE
