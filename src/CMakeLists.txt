@@ -173,7 +173,8 @@ if (BUILDING_JAVASCRIPT_BINDINGS)
     endforeach()
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript HTML test file has been copied to: ${JAVASCRIPT_SOURCE_DIR}/index.html")
+                       COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript HTML test file has been copied to: ${JAVASCRIPT_SOURCE_DIR}/index.html"
+                       COMMAND ${CMAKE_COMMAND} -E echo "                        and can be tested using: emrun --browser chrome ${JAVASCRIPT_SOURCE_DIR}/index.html")
 else()
     add_library(${CMAKE_PROJECT_NAME}
                 ${API_HEADER_FILES}
