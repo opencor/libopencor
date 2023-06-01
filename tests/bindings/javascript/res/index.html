@@ -6,95 +6,107 @@
     <title>libOpenCOR - JavaScript bindings</title>
 
     <style>
-        table {
+        body {
             font-family: arial, sans-serif;
+            background-color: #202124;
+            color: #bdc1c6;
+        }
+
+        div {
+            margin-top: 8px;
+        }
+
+        table {
+            background-color: #242729;
             border-collapse: collapse;
         }
 
         td,
         th {
-            border: 1px solid #aaaaaa;
+            border: 1px solid #3C4043;
             text-align: left;
             padding: 4px;
         }
 
         th {
-            background-color: #cccccc;
+            background-color: #181a1b;
         }
     </style>
 </head>
 
 <body>
-    <table>
-        <tr>
-            <th>API</th>
-            <th>Value</th>
-        </tr>
-        <tr>
-            <td>version()</td>
-            <td id="version"></td>
-        </tr>
-        <tr>
-            <td>versionString()</td>
-            <td id="versionString"></td>
-        </tr>
-        <tr>
-            <td>clangVersion()</td>
-            <td id="clangVersion"></td>
-        </tr>
-        <tr>
-            <td>clangVersionString()</td>
-            <td id="clangVersionString"></td>
-        </tr>
-        <tr>
-            <td>libcellmlVersion()</td>
-            <td id="libcellmlVersion"></td>
-        </tr>
-        <tr>
-            <td>libcellmlVersionString()</td>
-            <td id="libcellmlVersionString"></td>
-        </tr>
-        <tr>
-            <td>libcombineVersion()</td>
-            <td id="libcombineVersion"></td>
-        </tr>
-        <tr>
-            <td>libcombineVersionString()</td>
-            <td id="libcombineVersionString"></td>
-        </tr>
-        <tr>
-            <td>libcurlVersion()</td>
-            <td id="libcurlVersion"></td>
-        </tr>
-        <tr>
-            <td>libcurlVersionString()</td>
-            <td id="libcurlVersionString"></td>
-        </tr>
-        <tr>
-            <td>libsedmlVersion()</td>
-            <td id="libsedmlVersion"></td>
-        </tr>
-        <tr>
-            <td>libsedmlVersionString()</td>
-            <td id="libsedmlVersionString"></td>
-        </tr>
-        <tr>
-            <td>llvmVersion()</td>
-            <td id="llvmVersion"></td>
-        </tr>
-        <tr>
-            <td>llvmVersionString()</td>
-            <td id="llvmVersionString"></td>
-        </tr>
-        <tr>
-            <td>sundialsVersion()</td>
-            <td id="sundialsVersion"></td>
-        </tr>
-        <tr>
-            <td>sundialsVersionString()</td>
-            <td id="sundialsVersionString"></td>
-        </tr>
-    </table>
+    <div>
+        <table>
+            <tr>
+                <th>API</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>version()</td>
+                <td id="version"></td>
+            </tr>
+            <tr>
+                <td>versionString()</td>
+                <td id="versionString"></td>
+            </tr>
+            <tr>
+                <td>clangVersion()</td>
+                <td id="clangVersion"></td>
+            </tr>
+            <tr>
+                <td>clangVersionString()</td>
+                <td id="clangVersionString"></td>
+            </tr>
+            <tr>
+                <td>libcellmlVersion()</td>
+                <td id="libcellmlVersion"></td>
+            </tr>
+            <tr>
+                <td>libcellmlVersionString()</td>
+                <td id="libcellmlVersionString"></td>
+            </tr>
+            <tr>
+                <td>libcombineVersion()</td>
+                <td id="libcombineVersion"></td>
+            </tr>
+            <tr>
+                <td>libcombineVersionString()</td>
+                <td id="libcombineVersionString"></td>
+            </tr>
+            <tr>
+                <td>libcurlVersion()</td>
+                <td id="libcurlVersion"></td>
+            </tr>
+            <tr>
+                <td>libcurlVersionString()</td>
+                <td id="libcurlVersionString"></td>
+            </tr>
+            <tr>
+                <td>libsedmlVersion()</td>
+                <td id="libsedmlVersion"></td>
+            </tr>
+            <tr>
+                <td>libsedmlVersionString()</td>
+                <td id="libsedmlVersionString"></td>
+            </tr>
+            <tr>
+                <td>llvmVersion()</td>
+                <td id="llvmVersion"></td>
+            </tr>
+            <tr>
+                <td>llvmVersionString()</td>
+                <td id="llvmVersionString"></td>
+            </tr>
+            <tr>
+                <td>sundialsVersion()</td>
+                <td id="sundialsVersion"></td>
+            </tr>
+            <tr>
+                <td>sundialsVersionString()</td>
+                <td id="sundialsVersionString"></td>
+            </tr>
+        </table>
+    </div>
 
     <script type="module">
         import libOpenCOR from "./libopencor.js";

@@ -18,9 +18,16 @@ foreach(RESOURCE_FILE index.html package.json)
     configure_file(res/${RESOURCE_FILE} ${RESOURCE_FILE} COPYONLY)
 endforeach()
 
+# Configure our utilities.
+
+configure_file(utils.js.in ${JAVASCRIPT_BINDINGS_DIR}/utils.js)
+
 # Copy our JavaScript tests over.
 
-file(GLOB JAVASCRIPT_TESTS "*.js")
+#---GRY--- WE NEED TO ALLOW OUR File CLASS TO ACCEPT SOME CONTENTS (I.E. TO ALLOW FOR VIRTUAL FILES) BEFORE WE CAN
+#          ENABLE OUR OTHER TESTS.
+# file(GLOB JAVASCRIPT_TESTS "*.js")
+set(JAVASCRIPT_TESTS file.basic.test.js)
 
 foreach(JAVASCRIPT_TEST ${JAVASCRIPT_TESTS})
     get_filename_component(JAVASCRIPT_TEST_FILE ${JAVASCRIPT_TEST} NAME)

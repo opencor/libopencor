@@ -16,6 +16,7 @@ if(BUILDING_JAVASCRIPT_BINDINGS)
     # Add some sources to our WASM version of libOpenCOR so we can access its internals.
 
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+                   ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
                    ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp)
 
     # Use the variables that we passed to CMake but that may or may not end up being used.

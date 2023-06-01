@@ -17,5 +17,6 @@ limitations under the License.
 #pragma once
 
 #include <emscripten/bind.h>
+#include <emscripten/emscripten.h>
 
 #define LIBOPENCOR_EXPORT

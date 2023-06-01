@@ -16,9 +16,7 @@ limitations under the License.
 
 #include "libopencor/version.h"
 
-#include <emscripten/bind.h>
-
-EMSCRIPTEN_BINDINGS(libOpenCOR_version) {
+EMSCRIPTEN_BINDINGS(libOpenCOR_Version) {
     emscripten::function("version", &libOpenCOR::version);
     emscripten::function("versionString", &libOpenCOR::versionString);
     emscripten::function("clangVersion", &libOpenCOR::clangVersion);
