@@ -15,8 +15,7 @@
 from .module import __doc__, __version__
 from .module import (
     # File API.
-    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-    # File,
+    File,
     # Version API.
     version,
     version_string,
@@ -38,8 +37,7 @@ from .module import (
 
 __all__ = (
     # File API.
-    # ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-    # "File",
+    "File",
     # Version API.
     "version",
     "version_string",

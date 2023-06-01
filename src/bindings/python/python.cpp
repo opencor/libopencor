@@ -37,7 +37,6 @@ PYBIND11_MODULE(module, m)
 
     // File API.
 
-/*---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
     py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
 
     py::enum_<libOpenCOR::File::Type>(file, "Type")
@@ -72,7 +71,6 @@ PYBIND11_MODULE(module, m)
             return "Remote file: " + pFile.url();
         },
         "Get the string representation of this File object.");
-*/
 
     // Version API.
 

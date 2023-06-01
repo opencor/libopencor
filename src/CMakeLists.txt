@@ -72,9 +72,8 @@ if(NOT WIN32 AND NOT APPLE)
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 set(GIT_API_HEADER_FILES
-    # ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/file.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/file.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
 
@@ -88,25 +87,22 @@ set(API_HEADER_FILES
 set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/module/${CMAKE_PROJECT_NAME_LC})
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 set(INTERNAL_SOURCE_FILES
-    # ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.cpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/support/support.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.cpp
 )
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 set(GIT_API_SOURCE_FILES
-    # ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
 )
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 set(GIT_SOURCE_FILES
-    # ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
     ${GIT_API_SOURCE_FILES}
     ${INTERNAL_SOURCE_FILES}
     ${PYTHON_SOURCE_FILES}
@@ -117,15 +113,14 @@ set(SOURCE_FILES
     ${INTERNAL_SOURCE_FILES}
 )
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 set(INTERNAL_HEADER_FILES
-    # ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/unittestingexport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
-    # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
-    # ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
-    # ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.h
-    # ${CMAKE_CURRENT_SOURCE_DIR}/support/support.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.h
 )
 
 set(GIT_HEADER_FILES
@@ -139,9 +134,8 @@ set(HEADER_FILES
     ${VERSION_HEADER_FILE}
 )
 
-#---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
 include_directories(misc
-                    # support
+                    support
                     ${CMAKE_CURRENT_BINARY_DIR})
 
 set(JAVASCRIPT_SOURCE_DIR tests/bindings/javascript)

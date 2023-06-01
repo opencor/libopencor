@@ -15,9 +15,8 @@
 if(NOT BUILDING_JAVASCRIPT_BINDINGS)
     # Include our different tests.
 
-    #---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-    # include(compiler/tests.cmake)
-    # include(file/tests.cmake)
+    include(compiler/tests.cmake)
+    include(file/tests.cmake)
     include(version/tests.cmake)
 
     # Prepare our different tests.

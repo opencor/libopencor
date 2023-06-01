@@ -18,7 +18,7 @@ if(BUILDING_JAVASCRIPT_BINDINGS)
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
                    ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp)
 
-    # Use the variables that we passed to CMake but that may or not be used.
+    # Use the variables that we passed to CMake but that may or may not end up being used.
     # Note: this prevents us from getting a warning about unused variables.
 
     set(DUMMY
