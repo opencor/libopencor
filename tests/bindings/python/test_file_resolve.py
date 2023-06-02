@@ -17,70 +17,70 @@ import utils
 
 
 def test_resolve_non_retrievable_file():
-    f = File(utils.resource_path(utils.NON_RETRIEVABLE_FILE))
+    file = File(utils.resource_path(utils.NON_RETRIEVABLE_FILE))
 
-    assert f.resolve() == File.Status.NonRetrievableFile
-    assert f.type == File.Type.Unresolved
+    assert file.resolve() == File.Status.NonRetrievableFile
+    assert file.type == File.Type.Unresolved
 
 
 def test_resolve_unknown_file():
-    f = File(utils.resource_path(utils.UNKNOWN_FILE))
+    file = File(utils.resource_path(utils.UNKNOWN_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.UnknownFile
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.UnknownFile
 
 
 def test_resolve_sbml_file():
-    f = File(utils.resource_path(utils.SBML_FILE))
+    file = File(utils.resource_path(utils.SBML_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.UnknownFile
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.UnknownFile
 
 
 def test_resolve_error_sedml_file():
-    f = File(utils.resource_path(utils.ERROR_SEDML_FILE))
+    file = File(utils.resource_path(utils.ERROR_SEDML_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.SedmlFile
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.SedmlFile
 
 
 def test_resolve_cellml_1_x_file():
-    f = File(utils.resource_path(utils.CELLML_1_X_FILE))
+    file = File(utils.resource_path(utils.CELLML_1_X_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.CellmlFile
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.CellmlFile
 
 
 def test_resolve_sedml_1_x_file():
-    f = File(utils.resource_path(utils.SEDML_1_X_FILE))
+    file = File(utils.resource_path(utils.SEDML_1_X_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.SedmlFile
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.SedmlFile
 
 
 def test_resolve_combine_1_x_archive():
-    f = File(utils.resource_path(utils.COMBINE_1_X_ARCHIVE))
+    file = File(utils.resource_path(utils.COMBINE_1_X_ARCHIVE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.CombineArchive
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.CombineArchive
 
 
 def test_resolve_cellml_2_file():
-    f = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.CellmlFile
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.CellmlFile
 
 
 def test_resolve_sedml_2_file():
-    f = File(utils.resource_path(utils.SEDML_2_FILE))
+    file = File(utils.resource_path(utils.SEDML_2_FILE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.SedmlFile
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.SedmlFile
 
 
 def test_resolve_combine_2_archive():
-    f = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
+    file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.type == File.Type.CombineArchive
+    assert file.resolve() == File.Status.Ok
+    assert file.type == File.Type.CombineArchive

@@ -17,60 +17,60 @@ import utils
 
 
 def test_instantiate_non_retrievable_file():
-    f = File(utils.resource_path(utils.NON_RETRIEVABLE_FILE))
+    file = File(utils.resource_path(utils.NON_RETRIEVABLE_FILE))
 
-    assert f.instantiate() == File.Status.NonRetrievableFile
+    assert file.instantiate() == File.Status.NonRetrievableFile
 
 
 def test_instantiate_unknown_file():
-    f = File(utils.resource_path(utils.UNKNOWN_FILE))
+    file = File(utils.resource_path(utils.UNKNOWN_FILE))
 
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert file.instantiate() == File.Status.NonInstantiableFile
 
 
 def test_instantiate_sbml_file():
-    f = File(utils.resource_path(utils.SBML_FILE))
+    file = File(utils.resource_path(utils.SBML_FILE))
 
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert file.instantiate() == File.Status.NonInstantiableFile
 
 
 def test_instantiate_error_sedml_file():
-    f = File(utils.resource_path(utils.ERROR_SEDML_FILE))
+    file = File(utils.resource_path(utils.ERROR_SEDML_FILE))
 
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert file.instantiate() == File.Status.NonInstantiableFile
 
 
 def test_instantiate_cellml_1_x_file():
-    f = File(utils.resource_path(utils.CELLML_1_X_FILE))
+    file = File(utils.resource_path(utils.CELLML_1_X_FILE))
 
-    assert f.instantiate() == File.Status.Ok
+    assert file.instantiate() == File.Status.Ok
 
 
 def test_instantiate_sedml_1_x_file():
-    f = File(utils.resource_path(utils.SEDML_1_X_FILE))
+    file = File(utils.resource_path(utils.SEDML_1_X_FILE))
 
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert file.instantiate() == File.Status.NonInstantiableFile
 
 
 def test_instantiate_combine_1_x_archive():
-    f = File(utils.resource_path(utils.COMBINE_1_X_ARCHIVE))
+    file = File(utils.resource_path(utils.COMBINE_1_X_ARCHIVE))
 
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert file.instantiate() == File.Status.NonInstantiableFile
 
 
 def test_instantiate_cellml_2_file():
-    f = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
 
-    assert f.instantiate() == File.Status.Ok
+    assert file.instantiate() == File.Status.Ok
 
 
 def test_instantiate_sedml_2_file():
-    f = File(utils.resource_path(utils.SEDML_2_FILE))
+    file = File(utils.resource_path(utils.SEDML_2_FILE))
 
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert file.instantiate() == File.Status.NonInstantiableFile
 
 
 def test_instantiate_combine_2_file():
-    f = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
+    file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
 
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert file.instantiate() == File.Status.NonInstantiableFile

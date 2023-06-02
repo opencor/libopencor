@@ -20,57 +20,79 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
-if(LIBOPENCOR_PREBUILT_LLVMCLANG)
-    if(WIN32)
-        if(RELEASE_MODE)
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 63d1685ef2e1f33f59a159c045cbb7c235388dc6)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 def2f10ec77ad33ba5c344ad4106ae5385881b29)
-            endif()
-        else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5be75cd7dd2df4dc972de1b7c4cb3d76c0e6cdf6)
-            endif()
-        endif()
-    elseif(APPLE)
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b77f772559f5feac52fae65914efd0df841feb87)
-        else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7dbe9aae7a1affa1e0f921fd5fa0f4ea25131f04)
-        endif()
+if(LIBOPENCOR_PREBUILT_LLVMCLANG OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
+    if(BUILDING_JAVASCRIPT_BINDINGS)
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         5ef2875a7611e17e7c4b1f4b2fe8590b59ab2d10)
     else()
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c6fa29ae4bf02a42249b74fbf21e28795ab057a6)
+        if(WIN32)
+            if(RELEASE_MODE)
+                if(INTEL_MODE)
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     63d1685ef2e1f33f59a159c045cbb7c235388dc6)
+                else()
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     def2f10ec77ad33ba5c344ad4106ae5385881b29)
+                endif()
+            else()
+                if(INTEL_MODE)
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+                else()
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     5be75cd7dd2df4dc972de1b7c4cb3d76c0e6cdf6)
+                endif()
+            endif()
+        elseif(APPLE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 b77f772559f5feac52fae65914efd0df841feb87)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 403034d1a05b390eff66b23ff66ce52f648c45fb)
+            endif()
         else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7a847ed5ca7069f428fe162d2caba2c8dcade4d7)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 c6fa29ae4bf02a42249b74fbf21e28795ab057a6)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 7a847ed5ca7069f428fe162d2caba2c8dcade4d7)
+            endif()
         endif()
     endif()
 else()
     # Build our package.
 
-    if(INTEL_MODE)
-        set(LLVM_TARGETS_TO_BUILD X86)
+    if(BUILDING_JAVASCRIPT_BINDINGS)
+        list(APPEND CMAKE_ARGS
+            -DCMAKE_CXX_FLAGS=-Dwait4=__syscall_wait4
+        )
+
+        set(LIBCLANG_BUILD_STATIC OFF)
+        set(LLVM_TARGETS_TO_BUILD WebAssembly)
+
+        set(TABLEGENS
+            -DLLVM_TABLEGEN=${NATIVE_PREBUILT_DIR}/${PACKAGE_NAME}/bin/llvm-tblgen
+            -DCLANG_TABLEGEN=${NATIVE_PREBUILT_DIR}/${PACKAGE_NAME}/bin/clang-tblgen
+        )
     else()
-        set(LLVM_TARGETS_TO_BUILD AArch64)
+        set(LIBCLANG_BUILD_STATIC ON)
+
+        if(INTEL_MODE)
+            set(LLVM_TARGETS_TO_BUILD X86)
+        else()
+            set(LLVM_TARGETS_TO_BUILD AArch64)
+        endif()
     endif()
 
     build_package(${PACKAGE_NAME}
@@ -91,7 +113,7 @@ else()
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DLIBCLANG_BUILD_STATIC=ON
+            -DLIBCLANG_BUILD_STATIC=${LIBCLANG_BUILD_STATIC}
             -DLLVM_BUILD_RUNTIME=OFF
             -DLLVM_BUILD_RUNTIMES=OFF
             -DLLVM_BUILD_TOOLS=OFF
@@ -123,9 +145,23 @@ else()
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
             -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
+            ${TABLEGENS}
     )
 
     # Create our package.
+    # Note: we also package our native llvm-tblgen and clang-tblgen since we need them to build our JavaScript bindings.
+
+    if(NOT BUILDING_JAVASCRIPT_BINDINGS)
+        set(TABLEGEN_EXES_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/build/LLVMClang-prefix/src/LLVMClang-build)
+
+        file(GLOB TABLEGEN_EXES "${TABLEGEN_EXES_BUILD_DIR}/bin/*tblgen")
+
+        foreach(TABLEGEN_EXE ${TABLEGEN_EXES})
+            file(COPY ${TABLEGEN_EXE} DESTINATION ${INSTALL_DIR}/bin)
+        endforeach()
+
+        string(REPLACE "${TABLEGEN_EXES_BUILD_DIR}/" "" TABLEGEN_EXES "${TABLEGEN_EXES}")
+    endif()
 
     file(GLOB STATIC_AND_IMPORT_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
     string(REPLACE "${INSTALL_DIR}/" "" STATIC_AND_IMPORT_LIBRARIES "${STATIC_AND_IMPORT_LIBRARIES}")
@@ -136,40 +172,60 @@ else()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   include lib/cmake ${STATIC_AND_IMPORT_LIBRARIES} ${SHARED_LIBRARIES})
+                   include lib/cmake ${TABLEGEN_EXES} ${STATIC_AND_IMPORT_LIBRARIES} ${SHARED_LIBRARIES})
 endif()
 
 # Make our package accessible.
 
-if(NOT WIN32)
-    set(_STATIC "_static")
-endif()
+if(BUILDING_JAVASCRIPT_BINDINGS)
+    set(LIBCLANG libclang)
 
-if(INTEL_MODE)
     set(EXTRA_LLVMCLANG_LIBRARIES
-        LLVMExegesisX86
-        LLVMX86AsmParser
-        LLVMX86CodeGen
-        LLVMX86Desc
-        LLVMX86Disassembler
-        LLVMX86Info
-        LLVMX86TargetMCA
+        clang-cpp
+        LLVMWebAssemblyAsmParser
+        LLVMWebAssemblyCodeGen
+        LLVMWebAssemblyDesc
+        LLVMWebAssemblyDisassembler
+        LLVMWebAssemblyInfo
+        LLVMWebAssemblyUtils
+        LTO
+        Remarks
     )
 else()
-    set(EXTRA_LLVMCLANG_LIBRARIES
-        LLVMAArch64AsmParser
-        LLVMAArch64CodeGen
-        LLVMAArch64Desc
-        LLVMAArch64Disassembler
-        LLVMAArch64Info
-        LLVMAArch64Utils
-        LLVMExegesisAArch64
-    )
+    if(NOT WIN32)
+        set(LIBCLANG libclang_static)
+    else()
+        set(LIBCLANG libclang)
+    endif()
+
+    if(INTEL_MODE)
+        set(EXTRA_LLVMCLANG_LIBRARIES
+            LLVMExegesisX86
+            LLVMX86AsmParser
+            LLVMX86CodeGen
+            LLVMX86Desc
+            LLVMX86Disassembler
+            LLVMX86Info
+            LLVMX86TargetMCA
+        )
+    else()
+        set(EXTRA_LLVMCLANG_LIBRARIES
+            LLVMAArch64AsmParser
+            LLVMAArch64CodeGen
+            LLVMAArch64Desc
+            LLVMAArch64Disassembler
+            LLVMAArch64Info
+            LLVMAArch64Utils
+            LLVMExegesisAArch64
+        )
+    endif()
 endif()
 
 set(LLVMCLANG_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
-set(LLVMCLANG_CMAKE_DIR ${INSTALL_DIR}/lib/cmake CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
+set(LLVMCLANG_CMAKE_DIR ${INSTALL_DIR}/lib/cmake/clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
+set(LLVMCLANG_CMAKE_DIRS ${INSTALL_DIR}/lib/cmake/llvm ${INSTALL_DIR}/lib/cmake/clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake directories.")
 set(LLVMCLANG_CMAKE_PACKAGE_NAME Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
+set(LLVMCLANG_CMAKE_PACKAGE_NAMES LLVM Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake package names.")
 set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LLVMCLANG_LIBRARIES
     clangAnalysis
@@ -208,7 +264,7 @@ set(LLVMCLANG_LIBRARIES
     clangToolingRefactoring
     clangToolingSyntax
     clangTransformer
-    libclang${_STATIC}
+    ${LIBCLANG}
     LLVMAggressiveInstCombine
     LLVMAnalysis
     LLVMAsmParser

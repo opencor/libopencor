@@ -24,48 +24,54 @@ if(WIN32)
     set(LIBRARY_PREFIX lib)
 endif()
 
-if(LIBOPENCOR_PREBUILT_LIBNUML)
-    if(WIN32)
-        if(RELEASE_MODE)
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 f694750cb885e0ca0acdcff12ee7571f5e35b04e)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9cc9e397c8d512a0d630cbe238c4d4903a45ddd7)
-            endif()
-        else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 afd154cba12979e760ba7a0d8db34cd1e38dbb6e)
-            endif()
-        endif()
-    elseif(APPLE)
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b1aa08c1f2bb41298675165a1608bf6029743a5a)
-        else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             8424f3ee04bcaa973160f56c6807b2d9d21e1482)
-        endif()
+if(LIBOPENCOR_PREBUILT_LIBNUML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
+    if(BUILDING_JAVASCRIPT_BINDINGS)
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         b3e53917bc59f6b15c1f1958fd251d238208de46)
     else()
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             826470e27e446414a9d1269efa89d935c8a1eb55)
+        if(WIN32)
+            if(RELEASE_MODE)
+                if(INTEL_MODE)
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     f694750cb885e0ca0acdcff12ee7571f5e35b04e)
+                else()
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     9cc9e397c8d512a0d630cbe238c4d4903a45ddd7)
+                endif()
+            else()
+                if(INTEL_MODE)
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+                else()
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     afd154cba12979e760ba7a0d8db34cd1e38dbb6e)
+                endif()
+            endif()
+        elseif(APPLE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 b1aa08c1f2bb41298675165a1608bf6029743a5a)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 8424f3ee04bcaa973160f56c6807b2d9d21e1482)
+            endif()
         else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             4acdd314a5c90a1208fd725901b36918dea1add9)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 826470e27e446414a9d1269efa89d935c8a1eb55)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 4acdd314a5c90a1208fd725901b36918dea1add9)
+            endif()
         endif()
     endif()
 else()
@@ -82,7 +88,8 @@ else()
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DLIBNUML_SHARED_VERSION=OFF
             -DLIBNUML_SKIP_SHARED_LIBRARY=ON
-            -DLIBSBML_ROOT=${LIBSBML_CMAKE_DIR}
+            -DLIBSBML_INCLUDE_DIR=${LIBSBML_INCLUDE_DIR}
+            -DLIBSBML_LIBRARY=${LIBSBML_LIBRARY_FILE}
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
     )
@@ -95,7 +102,7 @@ else()
 
     string(REPLACE "LIBSBML_CMAKE_DIR" "LIBNUML_CMAKE_DIR" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "find_dependency(LIBSBML)" "string(REPLACE \"libNuML\" \"libSBML\" LIBSBML_CMAKE_DIR \"\${LIBNUML_CMAKE_DIR}\")\nfind_dependency(\${LIBSBML_LIBRARY_NAME} PATHS \${LIBSBML_CMAKE_DIR})" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "find_dependency" "# find_dependency" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 

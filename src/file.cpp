@@ -165,7 +165,7 @@ File::Status File::Impl::instantiate()
 }
 
 File::File(const std::string &pFileNameOrUrl)
-    : mPimpl(std::make_unique<Impl>())
+    : mPimpl(new Impl())
 {
     // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
     // with "file://".
@@ -209,6 +209,11 @@ File::File(const std::string &pFileNameOrUrl)
 
         curl_url_cleanup(url);
     }
+}
+
+File::~File()
+{
+    delete mPimpl;
 }
 
 FilePtr File::create(const std::string &pFileNameOrUrl)

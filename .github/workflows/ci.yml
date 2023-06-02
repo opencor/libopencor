@@ -109,22 +109,21 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-# ---GRY--- BUILDING_JAVASCRIPT_BINDINGS.
-          # - name: 'JavaScript'
-          #   os: macos-latest
-          #   build_type: Release
-          #   code_analysis: OFF
-          #   code_coverage_gcov: OFF
-          #   code_coverage_llvm_cov: OFF
-          #   documentation: OFF
-          #   javascript_bindings: ON
-          #   javascript_unit_testing: ON
-          #   memory_checks: OFF
-          #   python_bindings: OFF
-          #   python_unit_testing: OFF
-          #   shared_libs: OFF
-          #   unit_testing: OFF
-          #   target: javascript_unit_testing
+          - name: 'JavaScript'
+            os: macos-latest
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            javascript_bindings: ON
+            javascript_unit_testing: ON
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            target: javascript_unit_testing
           - name: 'Windows Python'
             os: windows-latest
             build_type: Release

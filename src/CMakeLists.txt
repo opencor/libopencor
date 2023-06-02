@@ -138,6 +138,18 @@ include_directories(misc
                     support
                     ${CMAKE_CURRENT_BINARY_DIR})
 
+set(JAVASCRIPT_SOURCE_DIR tests/bindings/javascript)
+
+if(BUILDING_JAVASCRIPT_BINDINGS)
+    set(JAVASCRIPT_BINDINGS_DIR ${CMAKE_BINARY_DIR}/../../../../${JAVASCRIPT_SOURCE_DIR})
+
+    get_filename_component(JAVASCRIPT_BINDINGS_DIR "${JAVASCRIPT_BINDINGS_DIR}" REALPATH)
+else()
+    set(JAVASCRIPT_BINDINGS_DIR ${CMAKE_BINARY_DIR}/${JAVASCRIPT_SOURCE_DIR})
+endif()
+
+set(JAVASCRIPT_BINDINGS_DIR ${JAVASCRIPT_BINDINGS_DIR} PARENT_SCOPE)
+
 if (BUILDING_JAVASCRIPT_BINDINGS)
     add_executable(${CMAKE_PROJECT_NAME}
                    ${API_HEADER_FILES}
@@ -146,20 +158,19 @@ if (BUILDING_JAVASCRIPT_BINDINGS)
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                           COMPILE_FLAGS "-O3"
-                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sINLINING_LIMIT --bind")
+                          LINK_FLAGS "-O3 -s ALLOW_MEMORY_GROWTH -s EXPORT_ES6=1 -s INLINING_LIMIT --bind")
 
     # Copy our generated .js and .wasm files over.
-
-    set(JAVASCRIPT_DIR tests/bindings/javascript)
 
     foreach(FILE_EXTENSION js wasm)
         add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.${FILE_EXTENSION}
-                                                            ${CMAKE_BINARY_DIR}/../../../../${JAVASCRIPT_DIR}/${CMAKE_PROJECT_NAME}.${FILE_EXTENSION})
+                                                            ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.${FILE_EXTENSION})
     endforeach()
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript HTML test file has been copied to: ${JAVASCRIPT_DIR}/index.html")
+                       COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript HTML test file has been copied to: ${JAVASCRIPT_BINDINGS_DIR}/index.html"
+                       COMMAND ${CMAKE_COMMAND} -E echo "                        and can be tested using: emrun --browser chrome ${JAVASCRIPT_BINDINGS_DIR}/index.html")
 else()
     add_library(${CMAKE_PROJECT_NAME}
                 ${API_HEADER_FILES}

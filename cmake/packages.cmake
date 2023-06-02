@@ -35,11 +35,17 @@ endfunction()
 function(build_package PACKAGE_NAME)
     # Configure and run a CMake script to build the package for us.
 
-    configure_file(${CMAKE_SOURCE_DIR}/cmake/buildpackage.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt)
-
     message(STATUS "Building ${PACKAGE_NAME}")
 
-    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S . -B build
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/buildpackage.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt)
+
+    if(BUILDING_JAVASCRIPT_BINDINGS)
+        set(CONFIGURE_COMMAND ${EMCMAKE_EXE} ${CMAKE_COMMAND})
+    else()
+        set(CONFIGURE_COMMAND ${CMAKE_COMMAND})
+    endif()
+
+    execute_process(COMMAND ${CONFIGURE_COMMAND} -G "${CMAKE_GENERATOR}" -S . -B build
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     RESULT_VARIABLE RESULT
                     ERROR_VARIABLE ERROR
@@ -85,7 +91,13 @@ function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_
 
     message(STATUS "Creating ${PACKAGE_NAME} package")
 
-    set(PACKAGE_FILE ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM}.${TARGET_ARCHITECTURE}.tar.gz)
+    set(PACKAGE_FILENAME ${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM_ARCHITECTURE}.tar.gz)
+
+    if(BUILDING_JAVASCRIPT_BINDINGS)
+        set(PACKAGE_FILE ${CMAKE_BINARY_DIR}/../../../../${PACKAGE_FILENAME})
+    else()
+        set(PACKAGE_FILE ${CMAKE_BINARY_DIR}/${PACKAGE_FILENAME})
+    endif()
 
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar -czf ${PACKAGE_FILE} ${ARGN}
                     WORKING_DIRECTORY ${PREBUILT_DIR}/${PACKAGE_NAME}
@@ -146,7 +158,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
     else()
         # Retrieve the package.
 
-        set(PACKAGE_FILE ${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM}.${TARGET_ARCHITECTURE}.tar.gz)
+        set(PACKAGE_FILE ${PACKAGE_NAME}.${PACKAGE_VERSION}.${TARGET_PLATFORM_ARCHITECTURE}.tar.gz)
         set(REAL_PACKAGE_FILE ${INSTALL_DIR}/${PACKAGE_FILE})
         set(PACKAGE_URL "https://github.com/opencor/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
 
@@ -157,8 +169,6 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         list(GET STATUS 0 STATUS_CODE)
 
         if(${STATUS_CODE} EQUAL 0)
-            set(REAL_PACKAGE_FILE ${PREBUILT_DIR}/${PACKAGE_NAME}/${PACKAGE_FILE})
-
             file(SHA1 ${REAL_PACKAGE_FILE} REAL_SHA1_VALUE)
 
             if(NOT "${REAL_SHA1_VALUE}" STREQUAL "${SHA1_VALUE}")
@@ -207,27 +217,43 @@ function(escape_path OLD_PATH NEW_PATH)
     set(${NEW_PATH} ${NEW_PATH_VALUE} PARENT_SCOPE)
 endfunction()
 
-# Determine the platform on which we are.
+# Determine the platform on which we are and the architecture on which we want to build.
+
+if(BUILDING_JAVASCRIPT_BINDINGS)
+    set(TARGET_PLATFORM_ARCHITECTURE wasm)
+else()
+    if(WIN32)
+        if(RELEASE_MODE)
+            set(TARGET_PLATFORM_ARCHITECTURE windows.release)
+        else()
+            set(TARGET_PLATFORM_ARCHITECTURE windows.debug)
+        endif()
+    elseif(APPLE)
+        set(TARGET_PLATFORM_ARCHITECTURE macos)
+    else()
+        set(TARGET_PLATFORM_ARCHITECTURE linux)
+    endif()
+
+    if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
+        set(TARGET_PLATFORM_ARCHITECTURE ${TARGET_PLATFORM_ARCHITECTURE}.intel)
+    else()
+        set(TARGET_PLATFORM_ARCHITECTURE ${TARGET_PLATFORM_ARCHITECTURE}.arm)
+    endif()
+endif()
+
+# Location of our prebuilt packages.
+
+set(PREBUILT_DIR ${CMAKE_SOURCE_DIR}/prebuilt/${TARGET_PLATFORM_ARCHITECTURE})
 
 if(WIN32)
     if(RELEASE_MODE)
-        set(TARGET_PLATFORM windows.release)
+        set(PREBUILT_DIR ${PREBUILT_DIR}/release)
     else()
-        set(TARGET_PLATFORM windows.debug)
+        set(PREBUILT_DIR ${PREBUILT_DIR}/debug)
     endif()
-elseif(APPLE)
-    set(TARGET_PLATFORM macos)
-else()
-    set(TARGET_PLATFORM linux)
 endif()
 
-# Determine the architecture on which we want to build.
-
-if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
-    set(TARGET_ARCHITECTURE intel)
-else()
-    set(TARGET_ARCHITECTURE arm)
-endif()
+set(PREBUILT_DIR "${PREBUILT_DIR}" CACHE INTERNAL "Prebuilt directory.")
 
 # Build our third-party libraries the same way that we build libOpenCOR.
 # Note: the build type on Linux/macOS is always Release since we don't need to debug third-party libraries and a debug
@@ -235,20 +261,15 @@ endif()
 
 include(ExternalProject)
 
-escape_path(${CMAKE_C_COMPILER} EP_CMAKE_C_COMPILER)
-escape_path(${CMAKE_CXX_COMPILER} EP_CMAKE_CXX_COMPILER)
-
-if(NOT WIN32 AND NOT APPLE)
-    set(CMAKE_C_FLAGS_ARG -DCMAKE_C_FLAGS=-fPIC)
-    set(CMAKE_CXX_FLAGS_ARG -DCMAKE_CXX_FLAGS=-fPIC)
+if(NOT WIN32 AND NOT APPLE AND NOT BUILDING_JAVASCRIPT_BINDINGS)
+    set(CMAKE_C_FLAGS_ARGS -DCMAKE_C_FLAGS=-fPIC)
+    set(CMAKE_CXX_FLAGS_ARGS -DCMAKE_CXX_FLAGS=-fPIC)
 endif()
 
 set(CMAKE_ARGS
-    -DCMAKE_C_COMPILER=${EP_CMAKE_C_COMPILER}
-    -DCMAKE_CXX_COMPILER=${EP_CMAKE_CXX_COMPILER}
     -DCMAKE_BUILD_TYPE=${LIBOPENCOR_BUILD_TYPE}
-    ${CMAKE_C_FLAGS_ARG}
-    ${CMAKE_CXX_FLAGS_ARG}
+    ${CMAKE_C_FLAGS_ARGS}
+    ${CMAKE_CXX_FLAGS_ARGS}
 )
 
 if(CMAKE_C_COMPILER_LAUNCHER AND CMAKE_CXX_COMPILER_LAUNCHER)
@@ -261,11 +282,26 @@ if(CMAKE_C_COMPILER_LAUNCHER AND CMAKE_CXX_COMPILER_LAUNCHER)
     )
 endif()
 
-if(APPLE)
+if(BUILDING_JAVASCRIPT_BINDINGS)
     list(APPEND CMAKE_ARGS
-        -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
-        -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+        -DCMAKE_CROSSCOMPILING_EMULATOR=${CMAKE_CROSSCOMPILING_EMULATOR}
     )
+else()
+    escape_path(${CMAKE_C_COMPILER} EP_CMAKE_C_COMPILER)
+    escape_path(${CMAKE_CXX_COMPILER} EP_CMAKE_CXX_COMPILER)
+
+    list(APPEND CMAKE_ARGS
+        -DCMAKE_C_COMPILER=${EP_CMAKE_C_COMPILER}
+        -DCMAKE_CXX_COMPILER=${EP_CMAKE_CXX_COMPILER}
+    )
+
+    if(APPLE)
+        list(APPEND CMAKE_ARGS
+            -DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}
+        )
+    endif()
 endif()
 
 # Get ready to use nmake/make for some third-party libraries (e.g., OpenSSL).

@@ -17,21 +17,21 @@ import utils
 
 
 def test_underconstrained_cellml_file():
-    f = File(utils.resource_path("underconstrained.cellml"))
+    file = File(utils.resource_path("underconstrained.cellml"))
 
-    assert f.resolve() == File.Status.Ok
-    assert f.instantiate() == File.Status.NonInstantiableFile
+    assert file.resolve() == File.Status.Ok
+    assert file.instantiate() == File.Status.NonInstantiableFile
 
 
 def test_remote_file():
-    f = File(utils.REMOTE_FILE)
+    file = File(utils.REMOTE_FILE)
 
-    assert f.resolve() == File.Status.Ok
-    assert f.instantiate() == File.Status.Ok
+    assert file.resolve() == File.Status.Ok
+    assert file.instantiate() == File.Status.Ok
 
 
-def test_note_remote_file():
-    f = File(utils.NOT_REMOTE_FILE)
+def test_not_remote_file():
+    file = File(utils.NOT_REMOTE_FILE)
 
-    assert f.resolve() == File.Status.NonRetrievableFile
-    assert f.instantiate() == File.Status.NonRetrievableFile
+    assert file.resolve() == File.Status.NonRetrievableFile
+    assert file.instantiate() == File.Status.NonRetrievableFile

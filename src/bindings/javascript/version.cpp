@@ -16,9 +16,21 @@ limitations under the License.
 
 #include "libopencor/version.h"
 
-#include <emscripten/bind.h>
-
-EMSCRIPTEN_BINDINGS(libOpenCOR_version) {
+EMSCRIPTEN_BINDINGS(libOpenCOR_Version) {
     emscripten::function("version", &libOpenCOR::version);
     emscripten::function("versionString", &libOpenCOR::versionString);
+    emscripten::function("clangVersion", &libOpenCOR::clangVersion);
+    emscripten::function("clangVersionString", &libOpenCOR::clangVersionString);
+    emscripten::function("libcellmlVersion", &libOpenCOR::libcellmlVersion);
+    emscripten::function("libcellmlVersionString", &libOpenCOR::libcellmlVersionString);
+    emscripten::function("libcombineVersion", &libOpenCOR::libcombineVersion);
+    emscripten::function("libcombineVersionString", &libOpenCOR::libcombineVersionString);
+    emscripten::function("libcurlVersion", &libOpenCOR::libcurlVersion);
+    emscripten::function("libcurlVersionString", &libOpenCOR::libcurlVersionString);
+    emscripten::function("libsedmlVersion", &libOpenCOR::libsedmlVersion);
+    emscripten::function("libsedmlVersionString", &libOpenCOR::libsedmlVersionString);
+    emscripten::function("llvmVersion", &libOpenCOR::llvmVersion);
+    emscripten::function("llvmVersionString", &libOpenCOR::llvmVersionString);
+    emscripten::function("sundialsVersion", &libOpenCOR::sundialsVersion);
+    emscripten::function("sundialsVersionString", &libOpenCOR::sundialsVersionString);
 }

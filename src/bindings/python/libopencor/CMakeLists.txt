@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Make it possible to unit test and code coverage our Python bindings.
+# Copy our Python module over.
 
-set(PYTHON_BINDINGS_DIR ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "Python bindings directory.")
-
-configure_file(__init__.py __init__.py COPYONLY)
+configure_file(__init__.py ${PYTHON_BINDINGS_DIR}/${CMAKE_PROJECT_NAME_LC}/__init__.py COPYONLY)

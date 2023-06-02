@@ -36,13 +36,13 @@ include(common)
 if(DEFINED EMSCRIPTEN)
     set(BUILDING_JAVASCRIPT_BINDINGS TRUE)
 
+    # Use a lower-case version of our project name.
+
+    string(TOLOWER "${CMAKE_PROJECT_NAME}" CMAKE_PROJECT_NAME)
+
     # Build libOpenCOR's JavaScript bindings.
 
     add_subdirectory(src)
-
-    # Run our JavaScript-based tests.
-
-    add_subdirectory(tests)
 else()
     # On macOS, deploy on macOS 10.15 and later.
 
@@ -69,6 +69,8 @@ else()
 
         if(DEFINED BUILD_TYPE AND NOT "${BUILD_TYPE}" STREQUAL "")
             set(LIBOPENCOR_BUILD_TYPE "${BUILD_TYPE}" CACHE STRING "${LIBOPENCOR_BUILD_TYPE_DOCSTRING}" FORCE)
+        elseif(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
+            set(LIBOPENCOR_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING "${LIBOPENCOR_BUILD_TYPE_DOCSTRING}")
         else()
             set(LIBOPENCOR_BUILD_TYPE "Debug" CACHE STRING "${LIBOPENCOR_BUILD_TYPE_DOCSTRING}")
         endif()
@@ -159,6 +161,8 @@ else()
 
     if(DEFINED INSTALL_PREFIX AND NOT "${INSTALL_PREFIX}" STREQUAL "")
         set(LIBOPENCOR_INSTALL_PREFIX "${INSTALL_PREFIX}" CACHE PATH "${LIBOPENCOR_INSTALL_PREFIX_DOCSTRING}" FORCE)
+    elseif(NOT "${CMAKE_INSTALL_PREFIX}" STREQUAL "")
+        set(LIBOPENCOR_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE STRING "${LIBOPENCOR_INSTALL_PREFIX_DOCSTRING}")
     else()
         set(LIBOPENCOR_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE PATH "${LIBOPENCOR_INSTALL_PREFIX_DOCSTRING}")
     endif()
@@ -508,18 +512,6 @@ else()
         endif()
     elseif(APPLE)
         set(CMAKE_OSX_ARCHITECTURES arm64)
-    endif()
-
-    # Location of our prebuilt packages.
-
-    set(PREBUILT_DIR ${CMAKE_SOURCE_DIR}/prebuilt)
-
-    if(WIN32)
-        if(RELEASE_MODE)
-            set(PREBUILT_DIR ${PREBUILT_DIR}/release)
-        else()
-            set(PREBUILT_DIR ${PREBUILT_DIR}/debug)
-        endif()
     endif()
 
     # Enable Python bindings.

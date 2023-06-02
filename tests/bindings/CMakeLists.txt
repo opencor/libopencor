@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if(BUILDING_JAVASCRIPT_BINDINGS OR LIBOPENCOR_JAVASCRIPT_UNIT_TESTING)
+    add_subdirectory(javascript)
+endif()
+
 if(LIBOPENCOR_PYTHON_UNIT_TESTING)
     add_subdirectory(python)
 endif()
