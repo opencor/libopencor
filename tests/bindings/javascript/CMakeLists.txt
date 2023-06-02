@@ -38,8 +38,8 @@ endforeach()
 # Run our JavaScript tests.
 
 add_target(javascript_unit_testing
-            COMMAND npm install
-            COMMAND npm test
-            DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
-            USES_TERMINAL
-            COMMENT "Running JavaScript unit testing...")
+           COMMAND npm install
+           COMMAND npm test
+           DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
+           USES_TERMINAL
+           COMMENT "Running JavaScript unit testing...")

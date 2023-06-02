@@ -43,10 +43,6 @@ if(DEFINED EMSCRIPTEN)
     # Build libOpenCOR's JavaScript bindings.
 
     add_subdirectory(src)
-
-    # Run our JavaScript-based tests.
-
-    add_subdirectory(tests)
 else()
     # On macOS, deploy on macOS 10.15 and later.
 
