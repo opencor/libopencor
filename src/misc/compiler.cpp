@@ -71,7 +71,7 @@ bool Compiler::compile(const std::string &pCode)
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
 
-#ifdef NLLVMCOV
+#ifdef NCOVERAGE
     if (compilation == nullptr) {
         return false;
     }
@@ -81,7 +81,7 @@ bool Compiler::compile(const std::string &pCode)
 
     clang::driver::JobList &jobs = compilation->getJobs();
 
-#ifdef NLLVMCOV
+#ifdef NCOVERAGE
     if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
         return false;
     }
@@ -91,7 +91,7 @@ bool Compiler::compile(const std::string &pCode)
 
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
 
-#ifdef NLLVMCOV
+#ifdef NCOVERAGE
     static constexpr auto CLANG = "clang";
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
@@ -103,7 +103,7 @@ bool Compiler::compile(const std::string &pCode)
     // arguments.
 
     auto commandArguments = command.getArguments();
-#ifdef NLLVMCOV
+#ifdef NCOVERAGE
     auto *commandArgument = find(commandArguments, llvm::StringRef("-disable-free"));
 
     if (commandArgument != commandArguments.end()) {
@@ -122,14 +122,14 @@ bool Compiler::compile(const std::string &pCode)
 
     // Create a compiler invocation object.
 
-#ifdef NLLVMCOV
+#ifdef NCOVERAGE
     bool res =
 #endif
         clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
                                                   commandArguments,
                                                   *diagnosticsEngine);
 
-#ifdef NLLVMCOV
+#ifdef NCOVERAGE
     if (!res) {
         return false;
     }
@@ -152,7 +152,7 @@ bool Compiler::compile(const std::string &pCode)
 
     auto module = codeGenAction->takeModule();
 
-#ifdef NLLVMCOV
+#ifdef NCOVERAGE
     if (module == nullptr) {
         return false;
     }
@@ -168,8 +168,8 @@ bool Compiler::compile(const std::string &pCode)
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 
-#ifdef NLLVMCOV
-    if (lljit == nullptr) {
+#ifdef NCOVERAGE
+    if (!lljit) {
         return false;
     }
 #endif
