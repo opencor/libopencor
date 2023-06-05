@@ -12,15 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Copy some test-related files over.
+# (Configure and) copy over some test-related files.
 
-foreach(RESOURCE_FILE index.html package.json)
+foreach(RESOURCE_FILE index.html)
     configure_file(res/${RESOURCE_FILE} ${RESOURCE_FILE} COPYONLY)
 endforeach()
 
-# Configure our utilities.
-
-configure_file(utils.js.in ${JAVASCRIPT_BINDINGS_DIR}/utils.js)
+configure_file(res/package.json.in package.json)
+configure_file(utils.js.in utils.js)
 
 # Copy our JavaScript tests over.
 
@@ -38,8 +37,8 @@ endforeach()
 # Run our JavaScript tests.
 
 add_target(javascript_unit_testing
-           COMMAND npm install
-           COMMAND npm test
+           COMMAND ${NPM_EXE} install
+           COMMAND ${NPM_EXE} test
            DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
            USES_TERMINAL
            COMMENT "Running JavaScript unit testing...")
