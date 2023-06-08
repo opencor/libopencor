@@ -99,7 +99,7 @@ bool Compiler::compile(const std::string &pCode)
     }
 #endif
 
-    // Prevent the Clang driver from asking CC1 to leak memory, this by removing -disable-free from the command
+    // Prevent the Clang driver from asking cc1 to leak memory, this by removing -disable-free from the command
     // arguments.
 
     auto commandArguments = command.getArguments();
