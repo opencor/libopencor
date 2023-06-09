@@ -21,7 +21,7 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_OPENSSL OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
-    if(BUILDING_JAVASCRIPT_BINDINGS)
+    if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
                          43f7b8d70e2661fe76965252afc89538c64d84d6)
@@ -77,7 +77,7 @@ else()
 
     set(CONFIG_OPTIONS no-shared no-tests no-threads --prefix=${INSTALL_DIR})
 
-    if(BUILDING_JAVASCRIPT_BINDINGS)
+    if(EMSCRIPTEN)
         set(EMCONFIGURE_PERL_EXECUTABLE ${EMCONFIGURE_EXE} ${PERL_EXECUTABLE})
 
         list(APPEND CONFIG_OPTIONS "-no-asm")

@@ -21,7 +21,7 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LLVMCLANG OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
-    if(BUILDING_JAVASCRIPT_BINDINGS)
+    if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
                          5ef2875a7611e17e7c4b1f4b2fe8590b59ab2d10)
@@ -73,7 +73,7 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
 else()
     # Build our package.
 
-    if(BUILDING_JAVASCRIPT_BINDINGS)
+    if(EMSCRIPTEN)
         list(APPEND CMAKE_ARGS
             -DCMAKE_CXX_FLAGS=-Dwait4=__syscall_wait4
         )
@@ -151,7 +151,7 @@ else()
     # Create our package.
     # Note: we also package our native llvm-tblgen and clang-tblgen since we need them to build our JavaScript bindings.
 
-    if(NOT BUILDING_JAVASCRIPT_BINDINGS)
+    if(NOT EMSCRIPTEN)
         set(TABLEGEN_EXES_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/build/LLVMClang-prefix/src/LLVMClang-build)
 
         file(GLOB TABLEGEN_EXES "${TABLEGEN_EXES_BUILD_DIR}/bin/*tblgen")
@@ -177,7 +177,7 @@ endif()
 
 # Make our package accessible.
 
-if(BUILDING_JAVASCRIPT_BINDINGS)
+if(EMSCRIPTEN)
     set(LIBCLANG libclang)
 
     set(EXTRA_LLVMCLANG_LIBRARIES

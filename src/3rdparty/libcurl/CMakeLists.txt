@@ -25,7 +25,7 @@ endif()
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LIBCURL OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
-    if(BUILDING_JAVASCRIPT_BINDINGS)
+    if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
                          ad049488bb00c7242e3fea549c7244f7a065c0d7)

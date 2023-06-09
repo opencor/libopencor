@@ -25,7 +25,7 @@ if(WIN32)
 endif()
 
 if(LIBOPENCOR_PREBUILT_LIBSBML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
-    if(BUILDING_JAVASCRIPT_BINDINGS)
+    if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
                          da5d9db8b53f0afebfc75fb4a6dbaa7fae17540e)

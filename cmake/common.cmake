@@ -184,6 +184,14 @@ function(configure_target TARGET)
         endif()
     endif()
 
+    # Let libOpenCOR know that we are not building with LLVM code coverage.
+
+    if(    NOT LIBOPENCOR_CODE_COVERAGE_GCOV
+       AND NOT LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   NCOVERAGE)
+    endif()
+
     # Statically link our packages to the target.
 
     foreach(AVAILABLE_PACKAGE ${AVAILABLE_PACKAGES})
@@ -217,7 +225,7 @@ function(configure_target TARGET)
         else()
             # There are some CMake configuration files, so use them to configure the package.
 
-            if(BUILDING_JAVASCRIPT_BINDINGS)
+            if(EMSCRIPTEN)
                 if("${${AVAILABLE_PACKAGE_UC}_CMAKE_DIRS}" STREQUAL "")
                     set(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}_DIR ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR})
                 else()
@@ -331,11 +339,6 @@ function(prepare_test TARGET)
                           ${CMAKE_PROJECT_NAME})
 
     configure_target(${TARGET})
-
-    if(NOT LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
-        target_compile_definitions(${TARGET} PRIVATE
-                                   NLLVMCOV)
-    endif()
 
     list(APPEND TEST_TARGETS "${TARGET}")
 

@@ -153,7 +153,7 @@ File::Status File::Impl::instantiate()
 
     auto compiler = std::make_unique<Compiler>();
 
-#ifdef NLLVMCOV
+#ifdef NCOVERAGE
     if (!compiler->compile(generator->implementationCode())) {
         return File::Status::NON_INSTANTIABLE_FILE;
     }
