@@ -14,7 +14,7 @@
 
 # Build our different bindings.
 
-if(BUILDING_JAVASCRIPT_BINDINGS OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
+if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
     add_subdirectory(javascript)
 endif()
 

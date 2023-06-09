@@ -225,7 +225,7 @@ function(configure_target TARGET)
         else()
             # There are some CMake configuration files, so use them to configure the package.
 
-            if(BUILDING_JAVASCRIPT_BINDINGS)
+            if(EMSCRIPTEN)
                 if("${${AVAILABLE_PACKAGE_UC}_CMAKE_DIRS}" STREQUAL "")
                     set(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}_DIR ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR})
                 else()

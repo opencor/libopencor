@@ -111,11 +111,11 @@ get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 #       find frameworks after standard libraries or headers on macOS. (On GitHub Actions, it helps finding the correct
 #       version of Python on Windows.)
 
-if(NOT DEFINED Python_FIND_REGISTRY)
+if("${Python_FIND_REGISTRY}" STREQUAL "")
     set(Python_FIND_REGISTRY "LAST")
 endif()
 
-if(NOT DEFINED Python_FIND_FRAMEWORK)
+if("${Python_FIND_FRAMEWORK}" STREQUAL "")
     set(Python_FIND_FRAMEWORK "LAST")
 endif()
 

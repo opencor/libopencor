@@ -21,7 +21,7 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_ZLIB OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
-    if(BUILDING_JAVASCRIPT_BINDINGS)
+    if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
                          544da662b566972b50f815197c89039fbb8088ff)

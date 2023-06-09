@@ -36,10 +36,8 @@ include_directories(${CMAKE_SOURCE_DIR}/src/misc
 
 foreach(TEST ${TESTS})
     if(LIBOPENCOR_UNIT_TESTING)
-        if(DEFINED ${TEST}_CATEGORY)
+        if(NOT "${${TEST}_CATEGORY}" STREQUAL "")
             set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
-        else()
-            set(TEST_CATEGORY)
         endif()
 
         prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES} ${UTILS_SOURCE_FILE})

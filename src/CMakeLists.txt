@@ -140,7 +140,7 @@ include_directories(misc
 
 set(JAVASCRIPT_SOURCE_DIR tests/bindings/javascript)
 
-if(BUILDING_JAVASCRIPT_BINDINGS)
+if(EMSCRIPTEN)
     set(JAVASCRIPT_BINDINGS_DIR ${CMAKE_BINARY_DIR}/../../../../${JAVASCRIPT_SOURCE_DIR})
 
     get_filename_component(JAVASCRIPT_BINDINGS_DIR "${JAVASCRIPT_BINDINGS_DIR}" REALPATH)
@@ -150,7 +150,7 @@ endif()
 
 set(JAVASCRIPT_BINDINGS_DIR ${JAVASCRIPT_BINDINGS_DIR} PARENT_SCOPE)
 
-if (BUILDING_JAVASCRIPT_BINDINGS)
+if (EMSCRIPTEN)
     add_executable(${CMAKE_PROJECT_NAME}
                    ${API_HEADER_FILES}
                    ${SOURCE_FILES}
@@ -205,7 +205,7 @@ configure_target(${CMAKE_PROJECT_NAME})
 
 # Generate the export header file, or a fake one if we are building our JavaScript bindings.
 
-if(BUILDING_JAVASCRIPT_BINDINGS)
+if(EMSCRIPTEN)
     configure_file(noexports.h ${API_EXPORT_HEADER_FILE})
 else()
     include(GenerateExportHeader)
