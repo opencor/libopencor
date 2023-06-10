@@ -18,7 +18,11 @@ limitations under the License.
 
 #include "cellmlfile.h"
 #include "combinearchive.h"
-#include "compiler.h"
+
+#ifndef __EMSCRIPTEN__
+#    include "compiler.h"
+#endif
+
 #include "file_p.h"
 #include "sedmlfile.h"
 #include "support.h"
@@ -27,7 +31,9 @@ limitations under the License.
 #include <filesystem>
 #include <regex>
 
-#include <curl/curl.h>
+#ifndef __EMSCRIPTEN__
+#    include <curl/curl.h>
+#endif
 
 #include <libcellml>
 
@@ -61,6 +67,7 @@ File::Status File::Impl::resolve()
 {
     reset();
 
+#ifndef __EMSCRIPTEN__
     // Download a local copy of the remote file, if needed.
 
     if (mFileName.empty()) {
@@ -84,6 +91,7 @@ File::Status File::Impl::resolve()
     } else {
         mType = Type::UNKNOWN_FILE;
     }
+#endif
 
     return File::Status::OK;
 }
@@ -106,6 +114,7 @@ File::Status File::Impl::instantiate()
         return File::Status::NON_INSTANTIABLE_FILE;
     }
 
+#ifndef __EMSCRIPTEN__
     // Generate and compile the C code associated with the CellML file.
 
     auto [contents, size] = fileContents(mFileName);
@@ -153,12 +162,13 @@ File::Status File::Impl::instantiate()
 
     auto compiler = std::make_unique<Compiler>();
 
-#ifdef NCOVERAGE
+#    ifdef NCOVERAGE
     if (!compiler->compile(generator->implementationCode())) {
         return File::Status::NON_INSTANTIABLE_FILE;
     }
-#else
+#    else
     compiler->compile(generator->implementationCode());
+#    endif
 #endif
 
     return File::Status::OK;
@@ -167,6 +177,9 @@ File::Status File::Impl::instantiate()
 File::File(const std::string &pFileNameOrUrl)
     : mPimpl(new Impl())
 {
+#ifdef __EMSCRIPTEN__
+    (void)pFileNameOrUrl;
+#else
     // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
     // with "file://".
 
@@ -209,6 +222,7 @@ File::File(const std::string &pFileNameOrUrl)
 
         curl_url_cleanup(url);
     }
+#endif
 }
 
 File::~File()

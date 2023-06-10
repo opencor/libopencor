@@ -19,11 +19,15 @@ limitations under the License.
 #include <array>
 #include <cmath>
 
-#include "clangbegin.h"
-#include "clang/Basic/Version.h"
-#include "clangend.h"
+#ifndef __EMSCRIPTEN__
+#    include "clangbegin.h"
+#    include "clang/Basic/Version.h"
+#    include "clangend.h"
+#endif
 
-#include "curl/curlver.h"
+#ifndef __EMSCRIPTEN__
+#    include "curl/curlver.h"
+#endif
 
 #include "libcellml/version.h"
 
@@ -37,9 +41,11 @@ limitations under the License.
 #include "sedml/common/libsedml-version.h"
 #include "libsedmlend.h"
 
-#include "llvmbegin.h"
-#include "llvm/Config/llvm-config.h"
-#include "llvmend.h"
+#ifndef __EMSCRIPTEN__
+#    include "llvmbegin.h"
+#    include "llvm/Config/llvm-config.h"
+#    include "llvmend.h"
+#endif
 
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
@@ -78,6 +84,7 @@ std::string versionString()
     return LIBOPENCOR_VERSION_STRING;
 }
 
+#ifndef __EMSCRIPTEN__
 unsigned int clangVersion()
 {
     return static_cast<unsigned int>(MAJOR_10 * firstDigit(CLANG_VERSION_MAJOR) + MAJOR_01 * secondDigit(CLANG_VERSION_MAJOR)
@@ -89,6 +96,7 @@ std::string clangVersionString()
 {
     return CLANG_VERSION_STRING;
 }
+#endif
 
 unsigned int libcellmlVersion()
 {
@@ -110,6 +118,7 @@ std::string libcombineVersionString()
     return libcombine::getLibCombineDottedVersion();
 }
 
+#ifndef __EMSCRIPTEN__
 unsigned int libcurlVersion()
 {
     return LIBCURL_VERSION_NUM;
@@ -119,6 +128,7 @@ std::string libcurlVersionString()
 {
     return LIBCURL_VERSION;
 }
+#endif
 
 unsigned int libsedmlVersion()
 {
@@ -130,6 +140,7 @@ std::string libsedmlVersionString()
     return libsedml::getLibSEDMLDottedVersion();
 }
 
+#ifndef __EMSCRIPTEN__
 unsigned int llvmVersion()
 {
     return static_cast<unsigned int>(MAJOR_10 * firstDigit(LLVM_VERSION_MAJOR) + MAJOR_01 * secondDigit(LLVM_VERSION_MAJOR)
@@ -141,6 +152,7 @@ std::string llvmVersionString()
 {
     return LLVM_VERSION_STRING;
 }
+#endif
 
 unsigned int sundialsVersion()
 {

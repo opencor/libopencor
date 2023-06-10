@@ -26,7 +26,9 @@ limitations under the License.
 #    include <unistd.h>
 #endif
 
-#include <curl/curl.h>
+#ifndef __EMSCRIPTEN__
+#    include <curl/curl.h>
+#endif
 
 namespace libOpenCOR {
 
@@ -37,6 +39,7 @@ bool fuzzyCompare(double pNb1, double pNb2)
     return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
 }
 
+#ifndef __EMSCRIPTEN__
 using TimeVal = struct
 {
     uint64_t seconds;
@@ -56,7 +59,7 @@ static int getTimeOfDay(TimeVal &pTimeVal)
     return 0;
 }
 
-std::string uniqueFileName()
+static std::string uniqueFileName()
 {
     // This is based off glibc's __gen_tempname() method, which used in std::tmpfile(). The only reason we don't use
     // std::tmpfile() is that it creates the file for us and as soon as we would be closing std::fclose(), the file
@@ -66,10 +69,10 @@ std::string uniqueFileName()
     // The number of times to attempt to generate a temporary file name.
     // Note: ATTEMPTS_MIN is equal to 62x62x62 where 62 is the number of characters in LETTERS.
 
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
     static constexpr uint64_t ATTEMPTS_MIN = 238328U;
     static constexpr uint64_t MAX_ATTEMPTS = (ATTEMPTS_MIN < TMP_MAX) ? TMP_MAX : ATTEMPTS_MIN;
-#endif
+#    endif
 
     // Get some more or less random data.
 
@@ -81,9 +84,9 @@ std::string uniqueFileName()
     static const size_t XXXXXX_POS = testFile.size() - 6 - 4;
     static constexpr uint64_t MICROSECONDS_SHIFT = 16U;
     static constexpr uint64_t PID_SHIFT = 32U;
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
     static constexpr uint64_t VALUE_SHIFT = 7777U;
-#endif
+#    endif
     static constexpr uint64_t XXXXXX_POS_SHIFT = 6U;
 
     TimeVal timeVal;
@@ -92,17 +95,17 @@ std::string uniqueFileName()
 
     auto value = (timeVal.microeconds << MICROSECONDS_SHIFT) ^ timeVal.seconds;
 
-#ifdef _MSC_VER
+#    ifdef _MSC_VER
     value ^= static_cast<uint64_t>(_getpid()) << PID_SHIFT;
-#else
+#    else
     value ^= static_cast<uint64_t>(getpid()) << PID_SHIFT;
-#endif
+#    endif
 
     std::string res;
 
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
     for (uint64_t attempt = 0; attempt < MAX_ATTEMPTS; value += VALUE_SHIFT, ++attempt) {
-#endif
+#    endif
         uint64_t val = value;
 
         for (uint64_t i = 0; i < XXXXXX_POS_SHIFT; ++i) {
@@ -110,16 +113,16 @@ std::string uniqueFileName()
             val /= LETTERS_SIZE;
         }
 
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
         if (!std::filesystem::exists(testFile)) {
-#endif
+#    endif
             res = testFile;
 
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
             break;
         }
     }
-#endif
+#    endif
 
     return res;
 }
@@ -138,11 +141,11 @@ std::string downloadFile(const std::string &pUrl)
     auto fileName = uniqueFileName();
     std::ofstream file(fileName, std::ios_base::binary);
 
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
     if (!file.is_open()) {
         return {};
     }
-#endif
+#    endif
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -154,11 +157,11 @@ std::string downloadFile(const std::string &pUrl)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void *>(&file)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
     if (curl_easy_perform(curl) == CURLE_OK) {
-#else
+#    else
     curl_easy_perform(curl);
-#endif
+#    endif
         static constexpr int64_t HTTP_OK = 200;
 
         int64_t responseCode = 0;
@@ -166,9 +169,9 @@ std::string downloadFile(const std::string &pUrl)
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
 
         res = responseCode == HTTP_OK;
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
     }
-#endif
+#    endif
 
     curl_easy_cleanup(curl);
     curl_global_cleanup();
@@ -181,16 +184,18 @@ std::string downloadFile(const std::string &pUrl)
 
     return {};
 }
+#endif
 
+#ifndef __EMSCRIPTEN__
 std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFileName) // NOLINT(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
 {
     std::ifstream file(pFileName, std::ios_base::binary);
 
-#ifndef COVERAGE_ENABLED
+#    ifndef COVERAGE_ENABLED
     if (!file.is_open()) {
         return {};
     }
-#endif
+#    endif
 
     const auto size = std::filesystem::file_size(pFileName);
     const std::shared_ptr<char[]> contents(new char[size + 1]); // NOLINT(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
@@ -201,5 +206,6 @@ std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFil
 
     return std::make_tuple(contents, size);
 }
+#endif
 
 } // namespace libOpenCOR
