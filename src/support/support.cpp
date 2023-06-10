@@ -30,6 +30,11 @@ namespace libOpenCOR::Support {
 
 bool isCellmlFile(const std::string &pFileName)
 {
+#ifdef __EMSCRIPTEN__
+    (void)pFileName;
+
+    return false;
+#else
     // Try to parse the file contents as a CellML 2.0 file.
 
     auto [contents, size] = fileContents(pFileName);
@@ -49,6 +54,7 @@ bool isCellmlFile(const std::string &pFileName)
     }
 
     return true;
+#endif
 }
 
 bool isCombineArchive(const std::string &pFileName)

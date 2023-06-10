@@ -88,13 +88,18 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/support.cpp
 )
+
+if(NOT EMSCRIPTEN)
+    list(APPEND INTERNAL_SOURCE_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    )
+endif()
 
 set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
@@ -114,7 +119,6 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/unittestingexport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
@@ -122,6 +126,12 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/support.h
 )
+
+if(NOT EMSCRIPTEN)
+    list(APPEND INTERNAL_HEADER_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    )
+endif()
 
 set(GIT_HEADER_FILES
     ${INTERNAL_HEADER_FILES}

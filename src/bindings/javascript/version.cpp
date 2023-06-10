@@ -19,18 +19,24 @@ limitations under the License.
 EMSCRIPTEN_BINDINGS(libOpenCOR_Version) {
     emscripten::function("version", &libOpenCOR::version);
     emscripten::function("versionString", &libOpenCOR::versionString);
+#ifndef __EMSCRIPTEN__
     emscripten::function("clangVersion", &libOpenCOR::clangVersion);
     emscripten::function("clangVersionString", &libOpenCOR::clangVersionString);
+#endif
     emscripten::function("libcellmlVersion", &libOpenCOR::libcellmlVersion);
     emscripten::function("libcellmlVersionString", &libOpenCOR::libcellmlVersionString);
     emscripten::function("libcombineVersion", &libOpenCOR::libcombineVersion);
     emscripten::function("libcombineVersionString", &libOpenCOR::libcombineVersionString);
+#ifndef __EMSCRIPTEN__
     emscripten::function("libcurlVersion", &libOpenCOR::libcurlVersion);
     emscripten::function("libcurlVersionString", &libOpenCOR::libcurlVersionString);
+#endif
     emscripten::function("libsedmlVersion", &libOpenCOR::libsedmlVersion);
     emscripten::function("libsedmlVersionString", &libOpenCOR::libsedmlVersionString);
+#ifndef __EMSCRIPTEN__
     emscripten::function("llvmVersion", &libOpenCOR::llvmVersion);
     emscripten::function("llvmVersionString", &libOpenCOR::llvmVersionString);
+#endif
     emscripten::function("sundialsVersion", &libOpenCOR::sundialsVersion);
     emscripten::function("sundialsVersionString", &libOpenCOR::sundialsVersionString);
 }

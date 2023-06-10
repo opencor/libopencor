@@ -21,53 +21,47 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_OPENSSL OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
-    if(EMSCRIPTEN)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         43f7b8d70e2661fe76965252afc89538c64d84d6)
-    else()
-        if(WIN32)
-            if(RELEASE_MODE)
-                if(INTEL_MODE)
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     a5ff6059a0376e2a5803afab6c00c22bdfb1ecfc)
-                else()
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     111bfb17debbe20a62941a25f597a35fa78aaa52)
-                endif()
-            else()
-                if(INTEL_MODE)
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
-                else()
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     30e0e7f822b99598ec9cc45f919bbe3bc6dd0870)
-                endif()
-            endif()
-        elseif(APPLE)
+    if(WIN32)
+        if(RELEASE_MODE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 847b9b0e0c70bf4b458796c453d8c03c4b0d4252)
+                                 a5ff6059a0376e2a5803afab6c00c22bdfb1ecfc)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ae38760197be0715d0398cd88945ad74fe16ff45)
+                                 111bfb17debbe20a62941a25f597a35fa78aaa52)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 f3f1619acc385df0165fbb932fdf23f5b6eb5179)
+                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 0411e8ce55a452ea6b72f031f4b07b9dba6b98df)
+                                 30e0e7f822b99598ec9cc45f919bbe3bc6dd0870)
             endif()
+        endif()
+    elseif(APPLE)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             847b9b0e0c70bf4b458796c453d8c03c4b0d4252)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             ae38760197be0715d0398cd88945ad74fe16ff45)
+        endif()
+    else()
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             f3f1619acc385df0165fbb932fdf23f5b6eb5179)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             0411e8ce55a452ea6b72f031f4b07b9dba6b98df)
         endif()
     endif()
 else()
@@ -77,69 +71,52 @@ else()
 
     set(CONFIG_OPTIONS no-shared no-tests no-threads --prefix=${INSTALL_DIR})
 
-    if(EMSCRIPTEN)
-        set(EMCONFIGURE_PERL_EXECUTABLE ${EMCONFIGURE_EXE} ${PERL_EXECUTABLE})
+    set(EMCONFIGURE_PERL_EXECUTABLE ${PERL_EXECUTABLE})
 
-        list(APPEND CONFIG_OPTIONS "-no-asm")
+    if(WIN32)
+        list(APPEND CONFIG_OPTIONS no-asm)
 
-        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/Makefile)
-
-        list(APPEND PATCH_COMMANDS
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/CROSS_COMPILE=[^\\\\n]*\\\\n/CROSS_COMPILE=\\\\n/" ${MAKEFILE}
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/CNF_CFLAGS=[^\\\\n]*\\\\n/CNF_CFLAGS=\\\\n/" ${MAKEFILE}
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/CNF_LDFLAGS=[^\\\\n]*\\\\n/CNF_LDFLAGS=\\\\n/" ${MAKEFILE}
-            )
-    else()
-        set(EMCONFIGURE_PERL_EXECUTABLE ${PERL_EXECUTABLE})
-
-        if(WIN32)
-            list(APPEND CONFIG_OPTIONS no-asm)
-
-            if(RELEASE_MODE)
-                if(INTEL_MODE)
-                    set(PLATFORM VC-WIN64A)
-                else()
-                    set(PLATFORM VC-WIN64-ARM)
-                endif()
-            else()
-                if(INTEL_MODE)
-                    set(PLATFORM debug-VC-WIN64A)
-                else()
-                    set(PLATFORM debug-VC-WIN64-ARM)
-                endif()
-            endif()
-
-            # Patch the generated makefile since it contains non-escaped paths that result in our build to fail. (Not
-            # sure why this is the case, but that's the situation!)
-
-            set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
-
-            set(PATCH_COMMANDS
-                COMMAND
-                    ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
-                COMMAND
-                    ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
-            )
-        elseif(APPLE)
+        if(RELEASE_MODE)
             if(INTEL_MODE)
-                set(PLATFORM darwin64-x86_64-cc)
+                set(PLATFORM VC-WIN64A)
             else()
-                set(PLATFORM darwin64-arm64-cc)
+                set(PLATFORM VC-WIN64-ARM)
             endif()
-
-            list(APPEND CONFIG_OPTIONS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
         else()
             if(INTEL_MODE)
-                set(PLATFORM linux-x86_64)
+                set(PLATFORM debug-VC-WIN64A)
             else()
-                set(PLATFORM linux-aarch64)
+                set(PLATFORM debug-VC-WIN64-ARM)
             endif()
-
-            list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
         endif()
+
+        # Patch the generated makefile since it contains non-escaped paths that result in our build to fail. (Not
+        # sure why this is the case, but that's the situation!)
+
+        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
+
+        set(PATCH_COMMANDS
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
+        )
+    elseif(APPLE)
+        if(INTEL_MODE)
+            set(PLATFORM darwin64-x86_64-cc)
+        else()
+            set(PLATFORM darwin64-arm64-cc)
+        endif()
+
+        list(APPEND CONFIG_OPTIONS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    else()
+        if(INTEL_MODE)
+            set(PLATFORM linux-x86_64)
+        else()
+            set(PLATFORM linux-aarch64)
+        endif()
+
+        list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
     endif()
 
     build_package(${PACKAGE_NAME}
