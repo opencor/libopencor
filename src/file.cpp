@@ -160,12 +160,12 @@ File::Status File::Impl::instantiate()
 
     auto compiler = std::make_unique<Compiler>();
 
-#    ifdef NCOVERAGE
+#    ifdef COVERAGE_ENABLED
+    compiler->compile(generator->implementationCode());
+#    else
     if (!compiler->compile(generator->implementationCode())) {
         return File::Status::NON_INSTANTIABLE_FILE;
     }
-#    else
-    compiler->compile(generator->implementationCode());
 #    endif
 #endif
 

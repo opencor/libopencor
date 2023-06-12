@@ -186,10 +186,9 @@ function(configure_target TARGET)
 
     # Let libOpenCOR know that we are not building with LLVM code coverage.
 
-    if(    NOT LIBOPENCOR_CODE_COVERAGE_GCOV
-       AND NOT LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+    if(LIBOPENCOR_CODE_COVERAGE_GCOV OR LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
         target_compile_definitions(${TARGET} PRIVATE
-                                   NCOVERAGE)
+                                   COVERAGE_ENABLED)
     endif()
 
     # Statically link our packages to the target.

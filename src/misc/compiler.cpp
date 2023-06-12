@@ -71,7 +71,7 @@ bool Compiler::compile(const std::string &pCode)
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
 
-#ifdef NCOVERAGE
+#ifndef COVERAGE_ENABLED
     if (compilation == nullptr) {
         return false;
     }
@@ -81,7 +81,7 @@ bool Compiler::compile(const std::string &pCode)
 
     clang::driver::JobList &jobs = compilation->getJobs();
 
-#ifdef NCOVERAGE
+#ifndef COVERAGE_ENABLED
     if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
         return false;
     }
@@ -91,7 +91,7 @@ bool Compiler::compile(const std::string &pCode)
 
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
 
-#ifdef NCOVERAGE
+#ifndef COVERAGE_ENABLED
     static constexpr auto CLANG = "clang";
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
@@ -103,14 +103,15 @@ bool Compiler::compile(const std::string &pCode)
     // arguments.
 
     auto commandArguments = command.getArguments();
-#ifdef NCOVERAGE
+
+#ifdef COVERAGE_ENABLED
+    commandArguments.erase(find(commandArguments, llvm::StringRef("-disable-free")));
+#else
     auto *commandArgument = find(commandArguments, llvm::StringRef("-disable-free"));
 
     if (commandArgument != commandArguments.end()) {
         commandArguments.erase(commandArgument);
     }
-#else
-    commandArguments.erase(find(commandArguments, llvm::StringRef("-disable-free")));
 #endif
 
     // Create a compiler instance.
@@ -122,14 +123,14 @@ bool Compiler::compile(const std::string &pCode)
 
     // Create a compiler invocation object.
 
-#ifdef NCOVERAGE
+#ifndef COVERAGE_ENABLED
     bool res =
 #endif
         clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
                                                   commandArguments,
                                                   *diagnosticsEngine);
 
-#ifdef NCOVERAGE
+#ifndef COVERAGE_ENABLED
     if (!res) {
         return false;
     }
@@ -152,7 +153,7 @@ bool Compiler::compile(const std::string &pCode)
 
     auto module = codeGenAction->takeModule();
 
-#ifdef NCOVERAGE
+#ifndef COVERAGE_ENABLED
     if (module == nullptr) {
         return false;
     }
@@ -168,7 +169,7 @@ bool Compiler::compile(const std::string &pCode)
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 
-#ifdef NCOVERAGE
+#ifndef COVERAGE_ENABLED
     if (!lljit) {
         return false;
     }
