@@ -27,10 +27,8 @@ EMSCRIPTEN_BINDINGS(libOpenCOR_Version) {
     emscripten::function("libcellmlVersionString", &libOpenCOR::libcellmlVersionString);
     emscripten::function("libcombineVersion", &libOpenCOR::libcombineVersion);
     emscripten::function("libcombineVersionString", &libOpenCOR::libcombineVersionString);
-#ifndef __EMSCRIPTEN__
     emscripten::function("libcurlVersion", &libOpenCOR::libcurlVersion);
     emscripten::function("libcurlVersionString", &libOpenCOR::libcurlVersionString);
-#endif
     emscripten::function("libsedmlVersion", &libOpenCOR::libsedmlVersion);
     emscripten::function("libsedmlVersionString", &libOpenCOR::libsedmlVersionString);
 #ifndef __EMSCRIPTEN__
