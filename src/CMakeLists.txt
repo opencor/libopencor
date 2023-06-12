@@ -165,7 +165,7 @@ if (EMSCRIPTEN)
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                           COMPILE_FLAGS "-O3"
-                          LINK_FLAGS "-O3 -s ALLOW_MEMORY_GROWTH -s EXPORT_ES6=1 -s INLINING_LIMIT --bind")
+                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sINLINING_LIMIT --bind")
 
     # Copy our generated .js and .wasm files over.
 

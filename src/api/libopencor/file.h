@@ -76,6 +76,7 @@ public:
     File &operator=(const File &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     File &operator=(File &&) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
+#ifndef __EMSCRIPTEN__
     /**
      * @brief Create a @ref File object.
      *
@@ -92,6 +93,36 @@ public:
      */
 
     static FilePtr create(const std::string &pFileNameOrUrl);
+#endif
+
+    /**
+     * @brief Create a @ref File object.
+     *
+     * Factory method to create a @ref File object for a virtual file:
+     *
+     * ```
+     * auto localVirtualFile = libOpenCOR::File::create("/some/path/file.txt", "Contents.");
+     * auto remoteVirtualFile = libOpenCOR::File::create("https://domain.com/file.txt", "Contents."");
+     * ```
+     *
+     * @param pFileNameOrUrl The @c std::string file name or URL.
+     * @param pContents The raw contents of the virtual file.
+     * @param pSize The size of the raw contents of the virtual file.
+     *
+     * @return A smart pointer to a @ref File object.
+     */
+
+    static FilePtr create(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize);
+
+    /**
+     * @brief Return whether this file is virtual.
+     *
+     * Return whether this file is virtual.
+     *
+     * @return @c true if the file is virtual, @c false otherwise.
+     */
+
+    bool isVirtual() const;
 
     /**
      * @brief Get the type of this file.
@@ -150,7 +181,7 @@ public:
     Status instantiate();
 
 private:
-    explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private*/
+    explicit File(const std::string &pFileNameOrUrl, const char *pContents = nullptr, size_t pSize = 0); /**< Constructor @private*/
 
     struct Impl; /**< Forward declaration of the implementation class, @private. */
 

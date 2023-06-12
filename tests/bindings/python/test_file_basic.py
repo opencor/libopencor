@@ -63,3 +63,21 @@ def test_remote_file():
     assert file.file_name == ""
     assert file.url == utils.REMOTE_FILE
     assert repr(file) == "Remote file: " + utils.REMOTE_FILE
+
+
+def test_local_virtual_file():
+    file = File(UNIX_LOCAL_FILE, utils.CONTENTS, len(utils.CONTENTS))
+
+    assert file.type == File.Type.Unresolved
+    assert file.file_name == UNIX_LOCAL_FILE
+    assert file.url == ""
+    assert file.is_virtual
+
+
+def test_remote_virtual_file():
+    file = File(utils.REMOTE_FILE, utils.CONTENTS, len(utils.CONTENTS))
+
+    assert file.type == File.Type.Unresolved
+    assert file.file_name == ""
+    assert file.url == utils.REMOTE_FILE
+    assert file.is_virtual

@@ -31,7 +31,10 @@ EMSCRIPTEN_BINDINGS(libOpenCOR_File)
         .value("NON_INSTANTIABLE_FILE", libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
 
     emscripten::class_<libOpenCOR::File>("File")
-        .smart_ptr_constructor("File", &libOpenCOR::File::create)
+        .smart_ptr_constructor("File", emscripten::optional_override([](const std::string &pFileNameOrUrl, uintptr_t pContents, size_t pSize) {
+                                   return libOpenCOR::File::create(pFileNameOrUrl, reinterpret_cast<char *>(pContents), pSize);
+                               }))
+        .function("isVirtual", &libOpenCOR::File::isVirtual)
         .function("type", &libOpenCOR::File::type)
         .function("fileName", &libOpenCOR::File::fileName)
         .function("url", &libOpenCOR::File::url)

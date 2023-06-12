@@ -35,3 +35,7 @@ def test_not_remote_file():
 
     assert file.resolve() == File.Status.NonRetrievableFile
     assert file.instantiate() == File.Status.NonRetrievableFile
+
+
+def test_not_virtual_file():
+    File(utils.REMOTE_FILE, utils.CONTENTS, 0)

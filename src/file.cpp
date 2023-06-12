@@ -52,6 +52,10 @@ void File::Impl::reset()
         mFileName = {};
     }
 
+    delete mContents;
+
+    mContents = nullptr;
+
     delete mCellmlFile;
     delete mSedmlFile;
     delete mCombineArchive;
@@ -172,7 +176,7 @@ File::Status File::Impl::instantiate()
     return File::Status::OK;
 }
 
-File::File(const std::string &pFileNameOrUrl)
+File::File(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
     : mPimpl(new Impl())
 {
     // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
@@ -217,6 +221,17 @@ File::File(const std::string &pFileNameOrUrl)
 
         curl_url_cleanup(url);
     }
+
+    // Check whether we have some contents and, if so, keep track of it and consider the file virtual.
+
+    if ((pContents != nullptr) && (pSize != 0)) {
+        mPimpl->mIsVirtual = true;
+
+        mPimpl->mContents = new char[pSize] {};
+        mPimpl->mSize = pSize;
+
+        std::copy_n(pContents, pSize, mPimpl->mContents);
+    }
 }
 
 File::~File()
@@ -224,9 +239,21 @@ File::~File()
     delete mPimpl;
 }
 
+#ifndef __EMSCRIPTEN__
 FilePtr File::create(const std::string &pFileNameOrUrl)
 {
     return std::shared_ptr<File> {new File {pFileNameOrUrl}};
+}
+#endif
+
+FilePtr File::create(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
+{
+    return std::shared_ptr<File> {new File {pFileNameOrUrl, pContents, pSize}};
+}
+
+bool File::isVirtual() const
+{
+    return mPimpl->mIsVirtual;
 }
 
 File::Type File::type() const

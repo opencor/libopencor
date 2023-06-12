@@ -43,3 +43,8 @@ TEST(CoverageTest, notRemoteFile)
     EXPECT_EQ(file->resolve(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
     EXPECT_EQ(file->instantiate(), libOpenCOR::File::Status::NON_RETRIEVABLE_FILE);
 }
+
+TEST(CoverageTest, notVirtualFile)
+{
+    libOpenCOR::File::create(libOpenCOR::REMOTE_FILE, libOpenCOR::CONTENTS, 0);
+}

@@ -67,3 +67,23 @@ TEST(BasicFileTest, remoteFile)
     EXPECT_EQ(file->fileName(), "");
     EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
 }
+
+TEST(BasicFileTest, localVirtualFile)
+{
+    auto file = libOpenCOR::File::create(UNIX_LOCAL_FILE, libOpenCOR::CONTENTS, strlen(libOpenCOR::CONTENTS));
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
+    EXPECT_EQ(file->fileName(), UNIX_LOCAL_FILE);
+    EXPECT_EQ(file->url(), "");
+    EXPECT_TRUE(file->isVirtual());
+}
+
+TEST(BasicFileTest, remoteVirtualFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE, libOpenCOR::CONTENTS, strlen(libOpenCOR::CONTENTS));
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
+    EXPECT_EQ(file->fileName(), "");
+    EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
+    EXPECT_TRUE(file->isVirtual());
+}

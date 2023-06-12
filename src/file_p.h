@@ -31,6 +31,11 @@ struct File::Impl
     std::string mFileName;
     std::string mUrl;
 
+    bool mIsVirtual = false;
+
+    char *mContents = nullptr;
+    size_t mSize = 0;
+
     Support::CellmlFile *mCellmlFile = nullptr;
     Support::SedmlFile *mSedmlFile = nullptr;
     Support::CombineArchive *mCombineArchive = nullptr;

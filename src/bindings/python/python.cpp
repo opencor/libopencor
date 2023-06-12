@@ -53,7 +53,9 @@ PYBIND11_MODULE(module, m)
         .value("NonInstantiableFile", libOpenCOR::File::Status::NON_INSTANTIABLE_FILE)
         .export_values();
 
-    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
+    file.def(py::init(py::overload_cast<const std::string &>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"))
+        .def(py::init(py::overload_cast<const std::string &, const char *, size_t>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"), py::arg("contents"), py::arg("size"))
+        .def_property_readonly("is_virtual", &libOpenCOR::File::isVirtual, "Return whether this File object is virtual.")
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")

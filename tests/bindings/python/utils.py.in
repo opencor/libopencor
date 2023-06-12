@@ -34,5 +34,8 @@ REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests
 NOT_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/not_cellml_2.cellml"
 
 
+CONTENTS = "Contents..."
+
+
 def resource_path(relative_path=""):
     return RESOURCE_LOCATION + "/" + relative_path
