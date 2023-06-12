@@ -31,9 +31,7 @@ limitations under the License.
 #include <filesystem>
 #include <regex>
 
-#ifndef __EMSCRIPTEN__
-#    include <curl/curl.h>
-#endif
+#include <curl/curl.h>
 
 #include <libcellml>
 
@@ -177,9 +175,6 @@ File::Status File::Impl::instantiate()
 File::File(const std::string &pFileNameOrUrl)
     : mPimpl(new Impl())
 {
-#ifdef __EMSCRIPTEN__
-    (void)pFileNameOrUrl;
-#else
     // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
     // with "file://".
 
@@ -222,7 +217,6 @@ File::File(const std::string &pFileNameOrUrl)
 
         curl_url_cleanup(url);
     }
-#endif
 }
 
 File::~File()
