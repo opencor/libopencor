@@ -20,7 +20,7 @@ WINDOWS_LOCAL_FILE = "C:\\some\\path\\file.txt"
 UNIX_LOCAL_FILE = "/some/path/file.txt"
 
 
-def test_basic_windows_file():
+def test_windows_local_file():
     file = File(WINDOWS_LOCAL_FILE)
 
     assert file.type == File.Type.Unresolved
@@ -29,7 +29,7 @@ def test_basic_windows_file():
     assert repr(file) == "Local file: " + WINDOWS_LOCAL_FILE
 
 
-def test_basic_unix_file():
+def test_unix_local_file():
     file = File(UNIX_LOCAL_FILE)
 
     assert file.type == File.Type.Unresolved
@@ -38,7 +38,7 @@ def test_basic_unix_file():
     assert repr(file) == "Local file: " + UNIX_LOCAL_FILE
 
 
-def test_basic_url_based_windows_file():
+def test_url_based_windows_local_file():
     file = File("file:///C:/some/path/file.txt")
 
     assert file.type == File.Type.Unresolved
@@ -47,7 +47,7 @@ def test_basic_url_based_windows_file():
     assert repr(file) == "Local file: " + WINDOWS_LOCAL_FILE
 
 
-def test_basic_url_based_unix_file():
+def test_url_based_unix_local_file():
     file = File("file:///some/path/file.txt")
 
     assert file.type == File.Type.Unresolved
@@ -56,7 +56,7 @@ def test_basic_url_based_unix_file():
     assert repr(file) == "Local file: " + UNIX_LOCAL_FILE
 
 
-def test_basic_remote_file():
+def test_remote_file():
     file = File(utils.REMOTE_FILE)
 
     assert file.type == File.Type.Unresolved
