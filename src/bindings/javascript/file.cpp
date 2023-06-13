@@ -16,7 +16,8 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
-EMSCRIPTEN_BINDINGS(libOpenCOR_File) {
+EMSCRIPTEN_BINDINGS(libOpenCOR_File)
+{
     emscripten::enum_<libOpenCOR::File::Type>("File.Type")
         .value("UNRESOLVED", libOpenCOR::File::Type::UNRESOLVED)
         .value("CELLML_FILE", libOpenCOR::File::Type::CELLML_FILE)
@@ -37,11 +38,11 @@ EMSCRIPTEN_BINDINGS(libOpenCOR_File) {
         .function("resolve", &libOpenCOR::File::resolve)
         .function("instantiate", &libOpenCOR::File::instantiate);
 
-    EM_ASM(
+    EM_ASM({
         Module['File']['Type'] = Module['File.Type'];
         delete Module['File.Type'];
 
         Module['File']['Status'] = Module['File.Status'];
         delete Module['File.Status'];
-    );
+    });
 }

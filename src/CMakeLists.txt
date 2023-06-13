@@ -110,7 +110,6 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
     ${GIT_API_SOURCE_FILES}
     ${INTERNAL_SOURCE_FILES}
-    ${PYTHON_SOURCE_FILES}
 )
 
 set(SOURCE_FILES
@@ -202,11 +201,6 @@ target_include_directories(${CMAKE_PROJECT_NAME} INTERFACE
                            $<INSTALL_INTERFACE:include/>
                            $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>)
 
-set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
-set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
-set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
-set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
-
 # Configure libOpenCOR.
 
 configure_target(${CMAKE_PROJECT_NAME})
@@ -256,6 +250,11 @@ endif()
 # Build our different bindings.
 
 add_subdirectory(bindings)
+
+list(APPEND GIT_SOURCE_FILES
+    ${JAVASCRIPT_SOURCE_FILES}
+    ${PYTHON_SOURCE_FILES}
+)
 
 # Install libOpenCOR itself.
 
@@ -309,3 +308,10 @@ configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/uninstall.cmake.in ${UNINST
 add_target(uninstall
            COMMAND ${CMAKE_COMMAND} -P ${UNINSTALL_CMAKE_FILE}
            COMMENT "Uninstall the project...")
+
+# Share some file information with the rest of our building system.
+
+set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
+set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
+set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
+set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
