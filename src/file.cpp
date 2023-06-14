@@ -37,6 +37,63 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+File::Impl::Impl(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
+{
+    // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
+    // with "file://".
+
+    if (pFileNameOrUrl.find("file://") == 0) {
+        // We are dealing with a URL representing a local file, so retrieve its actual path.
+
+        static constexpr size_t SCHEME_LENGTH = 7;
+
+        mFileName = pFileNameOrUrl;
+
+        mFileName.erase(0, SCHEME_LENGTH);
+
+        // On Windows, we also need to remove the leading "/" and replace all the other "/"s with "\"s.
+
+        static const auto WINDOWS_PATH_REGEX = std::regex("^/[A-Z]:/.*");
+
+        std::smatch match;
+
+        std::regex_search(mFileName, match, WINDOWS_PATH_REGEX);
+
+        if (!match.empty()) {
+            static constexpr size_t SLASH_LENGTH = 1;
+            static const auto FORWARD_SLASH_REGEX = std::regex("/");
+
+            mFileName.erase(0, SLASH_LENGTH);
+
+            mFileName = std::regex_replace(mFileName, FORWARD_SLASH_REGEX, "\\");
+        }
+    } else {
+        // If we can get a URL from pFileNameOrUrl then it means that we are dealing with a remote file otherwise we are
+        // dealing with a local file.
+
+        CURLU *url = curl_url();
+
+        if (curl_url_set(url, CURLUPART_URL, pFileNameOrUrl.c_str(), 0) == CURLUE_OK) {
+            mUrl = pFileNameOrUrl;
+        } else {
+            mFileName = pFileNameOrUrl;
+        }
+
+        curl_url_cleanup(url);
+    }
+
+    // Check whether we have some contents and, if so, keep track of it and consider the file virtual.
+
+    if ((pContents != nullptr) && (pSize != 0)) {
+        mIsVirtual = true;
+
+        mContents = new char[pSize] {};
+        mSize = pSize;
+
+        std::copy_n(pContents, pSize, mContents);
+    }
+}
+
 File::Impl::~Impl()
 {
     reset();
@@ -177,61 +234,8 @@ File::Status File::Impl::instantiate()
 }
 
 File::File(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
-    : mPimpl(new Impl())
+    : mPimpl(new Impl(pFileNameOrUrl, pContents, pSize))
 {
-    // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
-    // with "file://".
-
-    if (pFileNameOrUrl.find("file://") == 0) {
-        // We are dealing with a URL representing a local file, so retrieve its actual path.
-
-        static constexpr size_t SCHEME_LENGTH = 7;
-
-        mPimpl->mFileName = pFileNameOrUrl;
-
-        mPimpl->mFileName.erase(0, SCHEME_LENGTH);
-
-        // On Windows, we also need to remove the leading "/" and replace all the other "/"s with "\"s.
-
-        static const auto WINDOWS_PATH_REGEX = std::regex("^/[A-Z]:/.*");
-
-        std::smatch match;
-
-        std::regex_search(mPimpl->mFileName, match, WINDOWS_PATH_REGEX);
-
-        if (!match.empty()) {
-            static constexpr size_t SLASH_LENGTH = 1;
-            static const auto FORWARD_SLASH_REGEX = std::regex("/");
-
-            mPimpl->mFileName.erase(0, SLASH_LENGTH);
-
-            mPimpl->mFileName = std::regex_replace(mPimpl->mFileName, FORWARD_SLASH_REGEX, "\\");
-        }
-    } else {
-        // If we can get a URL from pFileNameOrUrl then it means that we are dealing with a remote file otherwise we are
-        // dealing with a local file.
-
-        CURLU *url = curl_url();
-
-        if (curl_url_set(url, CURLUPART_URL, pFileNameOrUrl.c_str(), 0) == CURLUE_OK) {
-            mPimpl->mUrl = pFileNameOrUrl;
-        } else {
-            mPimpl->mFileName = pFileNameOrUrl;
-        }
-
-        curl_url_cleanup(url);
-    }
-
-    // Check whether we have some contents and, if so, keep track of it and consider the file virtual.
-
-    if ((pContents != nullptr) && (pSize != 0)) {
-        mPimpl->mIsVirtual = true;
-
-        mPimpl->mContents = new char[pSize] {};
-        mPimpl->mSize = pSize;
-
-        std::copy_n(pContents, pSize, mPimpl->mContents);
-    }
 }
 
 File::~File()

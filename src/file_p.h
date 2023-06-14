@@ -40,6 +40,7 @@ struct File::Impl
     Support::SedmlFile *mSedmlFile = nullptr;
     Support::CombineArchive *mCombineArchive = nullptr;
 
+    Impl(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize);
     ~Impl();
 
     void reset();
