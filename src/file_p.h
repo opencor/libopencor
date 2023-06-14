@@ -26,6 +26,8 @@ class CombineArchive;
 
 struct File::Impl
 {
+    FilePtr mOwner;
+
     Type mType = Type::UNRESOLVED;
 
     std::string mFileName;
@@ -42,6 +44,8 @@ struct File::Impl
 
     Impl(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize);
     ~Impl();
+
+    void setOwner(const FilePtr &pOwner);
 
     void reset();
 

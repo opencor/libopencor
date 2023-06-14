@@ -99,6 +99,11 @@ File::Impl::~Impl()
     reset();
 }
 
+void File::Impl::setOwner(const FilePtr &pOwner)
+{
+    mOwner = pOwner;
+}
+
 void File::Impl::reset()
 {
     mType = Type::UNRESOLVED;
@@ -246,13 +251,21 @@ File::~File()
 #ifndef __EMSCRIPTEN__
 FilePtr File::create(const std::string &pFileNameOrUrl)
 {
-    return std::shared_ptr<File> {new File {pFileNameOrUrl}};
+    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl}};
+
+    res->mPimpl->setOwner(res);
+
+    return res;
 }
 #endif
 
 FilePtr File::create(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
 {
-    return std::shared_ptr<File> {new File {pFileNameOrUrl, pContents, pSize}};
+    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl, pContents, pSize}};
+
+    res->mPimpl->setOwner(res);
+
+    return res;
 }
 
 bool File::isVirtual() const
