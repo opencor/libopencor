@@ -146,11 +146,11 @@ File::Status File::Impl::resolve()
 
     // Check whether the local/remote file is a CellML file, a SED-ML file, a COMBINE archive, or an unknown file.
 
-    if (Support::isCellmlFile(mFileName)) {
+    if (Support::isCellmlFile(mOwner)) {
         mType = Type::CELLML_FILE;
-    } else if (Support::isSedmlFile(mFileName)) {
+    } else if (Support::isSedmlFile(mOwner)) {
         mType = Type::SEDML_FILE;
-    } else if (Support::isCombineArchive(mFileName)) {
+    } else if (Support::isCombineArchive(mOwner)) {
         mType = Type::COMBINE_ARCHIVE;
     } else {
         mType = Type::UNKNOWN_FILE;

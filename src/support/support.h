@@ -20,8 +20,8 @@ limitations under the License.
 
 namespace libOpenCOR::Support {
 
-bool isCellmlFile(const std::string &pFileName);
-bool isCombineArchive(const std::string &pFileName);
-bool isSedmlFile(const std::string &pFileName);
+bool isCellmlFile(const FilePtr &pFile);
+bool isCombineArchive(const FilePtr &pFile);
+bool isSedmlFile(const FilePtr &pFile);
 
 } // namespace libOpenCOR::Support

@@ -17,6 +17,8 @@ limitations under the License.
 #include "support.h"
 #include "utils.h"
 
+#include "libopencor/file.h"
+
 #include <combine/combinearchive.h>
 
 #include <libcellml>
@@ -28,16 +30,16 @@ limitations under the License.
 
 namespace libOpenCOR::Support {
 
-bool isCellmlFile(const std::string &pFileName)
+bool isCellmlFile(const FilePtr &pFile)
 {
 #ifdef __EMSCRIPTEN__
-    (void)pFileName;
+    (void)pFile;
 
     return false;
 #else
     // Try to parse the file contents as a CellML 2.0 file.
 
-    auto [contents, size] = fileContents(pFileName);
+    auto [contents, size] = fileContents(pFile->fileName());
     auto *rawContents = contents.get();
     auto parser = libcellml::Parser::create();
 
@@ -57,12 +59,12 @@ bool isCellmlFile(const std::string &pFileName)
 #endif
 }
 
-bool isCombineArchive(const std::string &pFileName)
+bool isCombineArchive(const FilePtr &pFile)
 {
     // Try to retrieve a COMBINE archive.
 
     auto combineArchive = libcombine::CombineArchive();
-    auto res = combineArchive.initializeFromArchive(pFileName);
+    auto res = combineArchive.initializeFromArchive(pFile->fileName());
 
     if (res) {
         combineArchive.cleanUp();
@@ -71,11 +73,11 @@ bool isCombineArchive(const std::string &pFileName)
     return res;
 }
 
-bool isSedmlFile(const std::string &pFileName)
+bool isSedmlFile(const FilePtr &pFile)
 {
     // Try to retrieve a SED-ML document.
 
-    auto *sedmlDocument = libsedml::readSedML(pFileName.c_str());
+    auto *sedmlDocument = libsedml::readSedML(pFile->fileName().c_str());
 
     // A non-SED-ML file results in our SED-ML document having at least one error, the first of which being of id
     // libsedml::SedNotSchemaConformant (e.g., a CellML file, i.e. an XML file, but not a SED-ML one) or XMLContentEmpty
