@@ -5,111 +5,127 @@
 <head>
     <title>libOpenCOR - JavaScript bindings</title>
 
-    <style>
-        body {
-            font-family: arial, sans-serif;
-            background-color: #202124;
-            color: #bdc1c6;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        div {
-            margin-top: 8px;
-        }
-
-        table {
-            background-color: #242729;
-            border-collapse: collapse;
-        }
-
-        td,
-        th {
-            border: 1px solid #3C4043;
-            text-align: left;
-            padding: 4px;
-        }
-
-        th {
-            background-color: #181a1b;
-        }
-    </style>
+    <link href="res/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <div>
-        <table>
-            <tr>
-                <th>API</th>
-                <th>Value</th>
-            </tr>
-            <tr>
-                <td>version()</td>
-                <td id="version"></td>
-            </tr>
-            <tr>
-                <td>versionString()</td>
-                <td id="versionString"></td>
-            </tr>
-            <tr>
-                <td>libcellmlVersion()</td>
-                <td id="libcellmlVersion"></td>
-            </tr>
-            <tr>
-                <td>libcellmlVersionString()</td>
-                <td id="libcellmlVersionString"></td>
-            </tr>
-            <tr>
-                <td>libcombineVersion()</td>
-                <td id="libcombineVersion"></td>
-            </tr>
-            <tr>
-                <td>libcombineVersionString()</td>
-                <td id="libcombineVersionString"></td>
-            </tr>
-            <tr>
-                <td>libcurlVersion()</td>
-                <td id="libcurlVersion"></td>
-            </tr>
-            <tr>
-                <td>libcurlVersionString()</td>
-                <td id="libcurlVersionString"></td>
-            </tr>
-            <tr>
-                <td>libsedmlVersion()</td>
-                <td id="libsedmlVersion"></td>
-            </tr>
-            <tr>
-                <td>libsedmlVersionString()</td>
-                <td id="libsedmlVersionString"></td>
-            </tr>
-            <tr>
-                <td>sundialsVersion()</td>
-                <td id="sundialsVersion"></td>
-            </tr>
-            <tr>
-                <td>sundialsVersionString()</td>
-                <td id="sundialsVersionString"></td>
-            </tr>
-        </table>
+    <nav class="navbar bg-dark border-bottom border-bottom-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+        <div class="container-fluid">
+            <div class="navbar-brand">libOpenCOR</div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-home">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-simulation">Simulation</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="nav-versions"">Versions</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="p-2">
+        <div class="page" id="home-page">
+            <p>
+                Welcome to this very simple JavaScript bindings test page for libOpenCOR.
+            </p>
+            <p>
+                Just click on the links above to navigate through the different pages.
+            </p>
+        </div>
+
+        <div class="page" id="simulation-page">
+            Simulation page...
+        </div>
+
+        <div class="page" id="versions-page">
+            <div class="row">
+                <div class="col-md-auto">
+                    <table class="table table-bordered table-sm table-secondary table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>API</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>version()</td>
+                                <td id="version"></td>
+                            </tr>
+                            <tr>
+                                <td>versionString()</td>
+                                <td id="versionString"></td>
+                            </tr>
+                            <tr>
+                                <td>libcellmlVersion()</td>
+                                <td id="libcellmlVersion"></td>
+                            </tr>
+                            <tr>
+                                <td>libcellmlVersionString()</td>
+                                <td id="libcellmlVersionString"></td>
+                            </tr>
+                            <tr>
+                                <td>libcombineVersion()</td>
+                                <td id="libcombineVersion"></td>
+                            </tr>
+                            <tr>
+                                <td>libcombineVersionString()</td>
+                                <td id="libcombineVersionString"></td>
+                            </tr>
+                            <tr>
+                                <td>libcurlVersion()</td>
+                                <td id="libcurlVersion"></td>
+                            </tr>
+                            <tr>
+                                <td>libcurlVersionString()</td>
+                                <td id="libcurlVersionString"></td>
+                            </tr>
+                            <tr>
+                                <td>libsedmlVersion()</td>
+                                <td id="libsedmlVersion"></td>
+                            </tr>
+                            <tr>
+                                <td>libsedmlVersionString()</td>
+                                <td id="libsedmlVersionString"></td>
+                            </tr>
+                            <tr>
+                                <td>sundialsVersion()</td>
+                                <td id="sundialsVersion"></td>
+                            </tr>
+                            <tr>
+                                <td>sundialsVersionString()</td>
+                                <td id="sundialsVersionString"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
-        import libOpenCOR from "./libopencor.js";
+        import { showPage } from './res/libopencor.js';
 
-        libOpenCOR().then(function (libopencor) {
-            document.getElementById("version").innerHTML = libopencor.version();
-            document.getElementById("versionString").innerHTML = libopencor.versionString();
-            document.getElementById("libcellmlVersion").innerHTML = libopencor.libcellmlVersion();
-            document.getElementById("libcellmlVersionString").innerHTML = libopencor.libcellmlVersionString();
-            document.getElementById("libcombineVersion").innerHTML = libopencor.libcombineVersion();
-            document.getElementById("libcombineVersionString").innerHTML = libopencor.libcombineVersionString();
-            document.getElementById("libcurlVersion").innerHTML = libopencor.libcurlVersion();
-            document.getElementById("libcurlVersionString").innerHTML = libopencor.libcurlVersionString();
-            document.getElementById("libsedmlVersion").innerHTML = libopencor.libsedmlVersion();
-            document.getElementById("libsedmlVersionString").innerHTML = libopencor.libsedmlVersionString();
-            document.getElementById("sundialsVersion").innerHTML = libopencor.sundialsVersion();
-            document.getElementById("sundialsVersionString").innerHTML = libopencor.sundialsVersionString();
-        });
+        document.querySelector('#nav-home').addEventListener('click', showPage.bind(null, 'home'));
+        document.querySelector('#nav-simulation').addEventListener('click', showPage.bind(null, 'simulation'));
+        document.querySelector('#nav-versions').addEventListener('click', showPage.bind(null, 'versions'));
+
+        showPage('home');
     </script>
+
+    <script src="res/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

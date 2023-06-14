@@ -14,12 +14,18 @@
 
 # (Configure and) copy over some test-related files.
 
-foreach(RESOURCE_FILE index.html)
-    configure_file(res/${RESOURCE_FILE} ${RESOURCE_FILE} COPYONLY)
-endforeach()
-
-configure_file(res/package.json.in package.json)
 configure_file(utils.js.in utils.js)
+configure_file(res/package.json.in package.json)
+
+configure_file(res/index.html index.html COPYONLY)
+
+file(GLOB RESOURCE_FILES "res/res/*")
+
+foreach(RESOURCE_FILE ${RESOURCE_FILES})
+    get_filename_component(RESOURCE_FILE_NAME ${RESOURCE_FILE} NAME)
+
+    configure_file(${RESOURCE_FILE} res/${RESOURCE_FILE_NAME} COPYONLY)
+endforeach()
 
 # Copy our JavaScript tests over.
 
