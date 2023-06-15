@@ -20,24 +20,11 @@ import * as utils from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("File coverage tests", () => {
-    test("Underconstrained CellML file", () => {
-        const file = new libopencor.File(utils.resourcePath("underconstrained.cellml"));
-
-        expect(file.resolve().value).toBe(libopencor.File.Status.OK.value);
-        expect(file.instantiate().value).toBe(libopencor.File.Status.NON_INSTANTIABLE_FILE.value);
+    test("Irretrievable remote file", () => {
+        new libopencor.File(utils.IRRETRIEVABLE_REMOTE_FILE, utils.SOME_UNKNOWN_CONTENTS, utils.SOME_UNKNOWN_CONTENTS.size);
     });
 
-    test("Remote file", () => {
-        const file = new libopencor.File(utils.REMOTE_FILE);
-
-        expect(file.resolve().value).toBe(libopencor.File.Status.OK.value);
-        expect(file.instantiate().value).toBe(libopencor.File.Status.OK.value);
-    });
-
-    test("Not remote file", () => {
-        const file = new libopencor.File(utils.NOT_REMOTE_FILE);
-
-        expect(file.resolve().value).toBe(libopencor.File.Status.NON_RETRIEVABLE_FILE.value);
-        expect(file.instantiate().value).toBe(libopencor.File.Status.NON_RETRIEVABLE_FILE.value);
+    test("Not virtual file", () => {
+        new libopencor.File(utils.REMOTE_FILE, utils.SOME_UNKNOWN_CONTENTS, 0);
     });
 });

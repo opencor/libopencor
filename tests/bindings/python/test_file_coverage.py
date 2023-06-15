@@ -16,26 +16,9 @@ from libopencor import File
 import utils
 
 
-def test_underconstrained_cellml_file():
-    file = File(utils.resource_path("underconstrained.cellml"))
-
-    assert file.resolve() == File.Status.Ok
-    assert file.instantiate() == File.Status.NonInstantiableFile
-
-
-def test_remote_file():
-    file = File(utils.REMOTE_FILE)
-
-    assert file.resolve() == File.Status.Ok
-    assert file.instantiate() == File.Status.Ok
-
-
-def test_not_remote_file():
-    file = File(utils.NOT_REMOTE_FILE)
-
-    assert file.resolve() == File.Status.NonRetrievableFile
-    assert file.instantiate() == File.Status.NonRetrievableFile
+def test_irretrievable_remote_file():
+    File(utils.IRRETRIEVABLE_REMOTE_FILE)
 
 
 def test_not_virtual_file():
-    File(utils.REMOTE_FILE, utils.CONTENTS, 0)
+    File(utils.REMOTE_FILE, utils.SOME_UNKNOWN_CONTENTS, 0)

@@ -19,42 +19,36 @@ import * as utils from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
-const UNIX_LOCAL_FILE = "/some/path/file.txt";
-
 describe("File basic tests", () => {
-    let contentsPtr;
-    let contentsLength;
+    let someUknownContents;
+    let someUknownContentsPtr;
 
     beforeAll(async () => {
-        const contents = await utils.CONTENTS.arrayBuffer();
-
-        contentsLength = contents.byteLength;
-        contentsPtr = libopencor._malloc(contentsLength);
-
-        const contentsMem = new Uint8Array(libopencor.HEAPU8.buffer, contentsPtr, contentsLength);
-
-        contentsMem.set(new Uint8Array(contents));
+        someUknownContents = await utils.blobToString(utils.SOME_UNKNOWN_CONTENTS);
+        someUknownContentsPtr = await utils.createBlobPtr(libopencor, utils.SOME_UNKNOWN_CONTENTS);
     });
 
     afterAll(() => {
-        libopencor._free(contentsPtr);
+        utils.deleteBlobPtr(libopencor, someUknownContentsPtr);
     });
 
-    test("Local virtual file", async () => {
-        const file = new libopencor.File(UNIX_LOCAL_FILE, contentsPtr, contentsLength);
+    test("Local virtual file", () => {
+        const file = new libopencor.File(utils.LOCAL_FILE, someUknownContentsPtr, utils.SOME_UNKNOWN_CONTENTS.size);
 
-        expect(file.type().value).toBe(libopencor.File.Type.UNRESOLVED.value);
-        expect(file.fileName()).toBe(UNIX_LOCAL_FILE);
+        expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+        expect(file.fileName()).toBe(utils.LOCAL_FILE);
         expect(file.url()).toBe("");
-        expect(file.isVirtual()).toBe(true);
+        expect(utils.arrayBufferToString(file.contents())).toBe(someUknownContents);
+        expect(file.size()).toBe(utils.SOME_UNKNOWN_CONTENTS.size);
     });
 
     test("Remote virtual file", () => {
-        const file = new libopencor.File(utils.REMOTE_FILE, contentsPtr, contentsLength);
+        const file = new libopencor.File(utils.REMOTE_FILE, someUknownContentsPtr, utils.SOME_UNKNOWN_CONTENTS.size);
 
-        expect(file.type().value).toBe(libopencor.File.Type.UNRESOLVED.value);
+        expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
         expect(file.fileName()).toBe("");
         expect(file.url()).toBe(utils.REMOTE_FILE);
-        expect(file.isVirtual()).toBe(true);
+        expect(utils.arrayBufferToString(file.contents())).toBe(someUknownContents);
+        expect(file.size()).toBe(utils.SOME_UNKNOWN_CONTENTS.size);
     });
 });

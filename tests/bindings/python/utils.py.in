@@ -30,11 +30,17 @@ SEDML_2_FILE = "cellml_2.sedml"
 COMBINE_2_ARCHIVE = "cellml_2.omex"
 
 
+WINDOWS_LOCAL_FILE = "C:\\some\\path\\file.txt"
+UNIX_LOCAL_FILE = "/some/path/file.txt"
+
+
 REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-NOT_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/not_cellml_2.cellml"
+IRRETRIEVABLE_REMOTE_FILE = "https://my.domain.com/irretrievable_file.txt"
 
 
-CONTENTS = "Contents..."
+SOME_UNKNOWN_CONTENTS = "Some unknown contents..."
+SOME_CELLML_CONTENTS = """@SOME_CELLML_CONTENTS@"""
+SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
 
 
 def resource_path(relative_path=""):

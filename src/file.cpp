@@ -83,159 +83,105 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const char *pContents, size_
     }
 
     // Check whether we have some contents and, if so, keep track of it and consider the file virtual.
+    // Note: we end the contents with a '\0' so that we can use it as a C string.
 
     if ((pContents != nullptr) && (pSize != 0)) {
-        mIsVirtual = true;
-
-        mContents = new char[pSize] {};
+        mContents = new char[pSize + 1] {};
         mSize = pSize;
 
         std::copy_n(pContents, pSize, mContents);
+
+        mContentsRetrieved = true;
     }
+#ifndef __EMSCRIPTEN__
+    // If we don't have any contents, then we get ready to retrieve it.
+
+    else {
+        // Download a local copy of the remote file, if needed.
+
+        if (mFileName.empty()) {
+            auto [res, fileName] = downloadFile(mUrl);
+
+            mFileName = fileName;
+        }
+
+        // Make sure that the (local) file exists.
+
+        if (mFileName.empty() || !std::filesystem::exists(mFileName.c_str())) {
+            mType = Type::IRRETRIEVABLE_FILE;
+
+            return;
+        }
+    }
+#endif
 }
 
 File::Impl::~Impl()
 {
-    reset();
-}
-
-void File::Impl::setOwner(const FilePtr &pOwner)
-{
-    mOwner = pOwner;
-}
-
-void File::Impl::reset()
-{
-    mType = Type::UNRESOLVED;
+    // Delete the local file associated with a remote file.
 
     if (!mUrl.empty() && !mFileName.empty()) {
         remove(mFileName.c_str()); // NOLINT(cert-err33-c)
-
-        mFileName = {};
     }
 
-    delete mContents;
+    // Delete some internal objects.
 
-    mContents = nullptr;
+    delete mContents;
 
     delete mCellmlFile;
     delete mSedmlFile;
     delete mCombineArchive;
-
-    mCellmlFile = nullptr;
-    mSedmlFile = nullptr;
-    mCombineArchive = nullptr;
 }
 
-File::Status File::Impl::resolve()
+void File::Impl::checkType(const FilePtr &pOwner)
 {
-    reset();
+    // Check whether the file is a CellML file, a SED-ML file, or a COMBINE archive.
 
-#ifndef __EMSCRIPTEN__
-    // Download a local copy of the remote file, if needed.
-
-    if (mFileName.empty()) {
-        mFileName = downloadFile(mUrl);
-    }
-
-    // Make sure that the (local) file exists.
-
-    if (mFileName.empty() || !std::filesystem::exists(mFileName.c_str())) {
-        return File::Status::NON_RETRIEVABLE_FILE;
-    }
-
-    // Check whether the local/remote file is a CellML file, a SED-ML file, a COMBINE archive, or an unknown file.
-
-    if (Support::isCellmlFile(mOwner)) {
+    if (Support::isCellmlFile(pOwner)) {
         mType = Type::CELLML_FILE;
-    } else if (Support::isSedmlFile(mOwner)) {
+    } else if (Support::isSedmlFile(pOwner)) {
         mType = Type::SEDML_FILE;
-    } else if (Support::isCombineArchive(mOwner)) {
+    } else if (Support::isCombineArchive(pOwner)) {
         mType = Type::COMBINE_ARCHIVE;
-    } else {
-        mType = Type::UNKNOWN_FILE;
     }
-#endif
-
-    return File::Status::OK;
 }
 
-File::Status File::Impl::instantiate()
-{
-    // Make sure that the file has been resolved.
-
-    if (mType == Type::UNRESOLVED) {
-        auto res = resolve();
-
-        if (res != File::Status::OK) {
-            return res;
-        }
-    }
-
-    // Make sure that we are dealing with a CellML file.
-
-    if (mType != Type::CELLML_FILE) {
-        return File::Status::NON_INSTANTIABLE_FILE;
-    }
-
 #ifndef __EMSCRIPTEN__
-    // Generate and compile the C code associated with the CellML file.
+void File::Impl::retrieveContents()
+{
+    // Retrieve the contents of the file, if needed.
 
-    auto [contents, size] = fileContents(mFileName);
-    auto *rawContents = contents.get();
-    auto parser = libcellml::Parser::create();
-    auto model = parser->parseModel(rawContents);
+    if (!mContentsRetrieved) {
+        auto [res, contents, size] = fileContents(mFileName);
 
-    if (parser->errorCount() != 0) {
-        // We couldn't parse the file contents as a CellML 2.0 file, so this means that we are dealing with a CellML 1.x
-        // file, hence we should use a non-strict parser instead.
-        // Note: we don't need to check whether the parsing was fine since it's a prequisite to a file being considered
-        //       a CellML file. We just didn't know whether it was a CellML 1.x file or a CellML 2.0 file. So, now that
-        //       we know that it's not a CellML 2.0 file, it means that it can only be a CellML 1.x file.
+        if (res) {
+            mContents = contents;
+            mSize = size;
+        } else {
+            mType = Type::IRRETRIEVABLE_FILE;
+        }
 
-        parser = libcellml::Parser::create(false);
-        model = parser->parseModel(rawContents);
+        mContentsRetrieved = true;
     }
-
-    auto analyser = libcellml::Analyser::create();
-
-    analyser->analyseModel(model);
-
-    if (analyser->errorCount() != 0) {
-        return File::Status::NON_INSTANTIABLE_FILE;
-    }
-
-    auto generator = libcellml::Generator::create();
-    auto generatorProfile = libcellml::GeneratorProfile::create();
-
-    generatorProfile->setOriginCommentString("");
-    generatorProfile->setImplementationHeaderString("");
-    generatorProfile->setImplementationVersionString("");
-    generatorProfile->setImplementationStateCountString("");
-    generatorProfile->setImplementationVariableCountString("");
-    generatorProfile->setImplementationLibcellmlVersionString("");
-    generatorProfile->setImplementationVoiInfoString("");
-    generatorProfile->setImplementationStateInfoString("");
-    generatorProfile->setImplementationVariableInfoString("");
-    generatorProfile->setImplementationCreateStatesArrayMethodString("");
-    generatorProfile->setImplementationCreateVariablesArrayMethodString("");
-    generatorProfile->setImplementationDeleteArrayMethodString("");
-
-    generator->setModel(analyser->model());
-    generator->setProfile(generatorProfile);
-
-    auto compiler = std::make_unique<Compiler>();
-
-#    ifdef COVERAGE_ENABLED
-    compiler->compile(generator->implementationCode());
-#    else
-    if (!compiler->compile(generator->implementationCode())) {
-        return File::Status::NON_INSTANTIABLE_FILE;
-    }
-#    endif
+}
 #endif
 
-    return File::Status::OK;
+const char *File::Impl::contents()
+{
+#ifndef __EMSCRIPTEN__
+    retrieveContents();
+#endif
+
+    return mContents;
+}
+
+size_t File::Impl::size()
+{
+#ifndef __EMSCRIPTEN__
+    retrieveContents();
+#endif
+
+    return mSize;
 }
 
 File::File(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
@@ -253,7 +199,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
 {
     auto res = std::shared_ptr<File> {new File {pFileNameOrUrl}};
 
-    res->mPimpl->setOwner(res);
+    res->mPimpl->checkType(res);
 
     return res;
 }
@@ -263,14 +209,9 @@ FilePtr File::create(const std::string &pFileNameOrUrl, const char *pContents, s
 {
     auto res = std::shared_ptr<File> {new File {pFileNameOrUrl, pContents, pSize}};
 
-    res->mPimpl->setOwner(res);
+    res->mPimpl->checkType(res);
 
     return res;
-}
-
-bool File::isVirtual() const
-{
-    return mPimpl->mIsVirtual;
 }
 
 File::Type File::type() const
@@ -288,14 +229,21 @@ std::string File::url() const
     return mPimpl->mUrl;
 }
 
-File::Status File::resolve()
+#ifdef __EMSCRIPTEN__
+emscripten::val File::jsContents() const
 {
-    return mPimpl->resolve();
+    return emscripten::val(emscripten::typed_memory_view(size(), contents()));
+}
+#endif
+
+const char *File::contents() const
+{
+    return mPimpl->contents();
 }
 
-File::Status File::instantiate()
+size_t File::size() const
 {
-    return mPimpl->instantiate();
+    return mPimpl->size();
 }
 
 } // namespace libOpenCOR

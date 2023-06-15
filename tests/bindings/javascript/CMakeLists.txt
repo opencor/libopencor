@@ -29,10 +29,7 @@ endforeach()
 
 # Copy our JavaScript tests over.
 
-#---GRY--- WE NEED TO ALLOW OUR File CLASS TO ACCEPT SOME CONTENTS (I.E. TO ALLOW FOR VIRTUAL FILES) BEFORE WE CAN
-#          ENABLE OUR OTHER TESTS.
-# file(GLOB JAVASCRIPT_TESTS "*.js")
-set(JAVASCRIPT_TESTS file.basic.test.js version.test.js)
+file(GLOB JAVASCRIPT_TESTS "*.js")
 
 foreach(JAVASCRIPT_TEST ${JAVASCRIPT_TESTS})
     get_filename_component(JAVASCRIPT_TEST_FILE ${JAVASCRIPT_TEST} NAME)

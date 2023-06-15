@@ -16,6 +16,8 @@ limitations under the License.
 
 #pragma once
 
+#include "libopencor/file.h"
+
 #include <string>
 
 namespace libOpenCOR::Support {

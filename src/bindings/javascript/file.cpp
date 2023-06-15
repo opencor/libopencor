@@ -19,33 +19,24 @@ limitations under the License.
 EMSCRIPTEN_BINDINGS(libOpenCOR_File)
 {
     emscripten::enum_<libOpenCOR::File::Type>("File.Type")
-        .value("UNRESOLVED", libOpenCOR::File::Type::UNRESOLVED)
+        .value("UNKNOWN_FILE", libOpenCOR::File::Type::UNKNOWN_FILE)
         .value("CELLML_FILE", libOpenCOR::File::Type::CELLML_FILE)
         .value("SEDML_FILE", libOpenCOR::File::Type::SEDML_FILE)
         .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE)
-        .value("UNKNOWN_FILE", libOpenCOR::File::Type::UNKNOWN_FILE);
-
-    emscripten::enum_<libOpenCOR::File::Status>("File.Status")
-        .value("OK", libOpenCOR::File::Status::OK)
-        .value("NON_RETRIEVABLE_FILE", libOpenCOR::File::Status::NON_RETRIEVABLE_FILE)
-        .value("NON_INSTANTIABLE_FILE", libOpenCOR::File::Status::NON_INSTANTIABLE_FILE);
+        .value("IRRETRIEVABLE_FILE", libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
 
     emscripten::class_<libOpenCOR::File>("File")
         .smart_ptr_constructor("File", emscripten::optional_override([](const std::string &pFileNameOrUrl, uintptr_t pContents, size_t pSize) {
                                    return libOpenCOR::File::create(pFileNameOrUrl, reinterpret_cast<char *>(pContents), pSize);
                                }))
-        .function("isVirtual", &libOpenCOR::File::isVirtual)
         .function("type", &libOpenCOR::File::type)
         .function("fileName", &libOpenCOR::File::fileName)
         .function("url", &libOpenCOR::File::url)
-        .function("resolve", &libOpenCOR::File::resolve)
-        .function("instantiate", &libOpenCOR::File::instantiate);
+        .function("contents", &libOpenCOR::File::jsContents)
+        .function("size", &libOpenCOR::File::size);
 
     EM_ASM({
         Module['File']['Type'] = Module['File.Type'];
         delete Module['File.Type'];
-
-        Module['File']['Status'] = Module['File.Status'];
-        delete Module['File.Status'];
     });
 }

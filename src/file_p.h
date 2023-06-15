@@ -26,15 +26,12 @@ class CombineArchive;
 
 struct File::Impl
 {
-    FilePtr mOwner;
-
-    Type mType = Type::UNRESOLVED;
+    Type mType = Type::UNKNOWN_FILE;
 
     std::string mFileName;
     std::string mUrl;
 
-    bool mIsVirtual = false;
-
+    bool mContentsRetrieved = false;
     char *mContents = nullptr;
     size_t mSize = 0;
 
@@ -45,12 +42,14 @@ struct File::Impl
     Impl(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize);
     ~Impl();
 
-    void setOwner(const FilePtr &pOwner);
+    void checkType(const FilePtr &pOwner);
 
-    void reset();
+#ifndef __EMSCRIPTEN__
+    void retrieveContents();
+#endif
 
-    File::Status resolve();
-    File::Status instantiate();
+    const char *contents();
+    size_t size();
 };
 
 } // namespace libOpenCOR

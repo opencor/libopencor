@@ -35,32 +35,17 @@ public:
     /**
      * @brief The type of a file.
      *
-     * The type of a file, i.e. whether it is unresolved, a CellML file, a SED-ML file, a COMBINE archive, or unknown.
-     *
-     * @sa resolve()
+     * The type of a file, i.e. whether it is unknown, a CellML file, a SED-ML file, a COMBINE archive, or
+     * irretrievable.
      */
 
     enum class Type
     {
-        UNRESOLVED, /**< The file has yet to be resolved. */
+        UNKNOWN_FILE, /**< The type of the file is unknown. */
         CELLML_FILE, /**< The file is a CellML file. */
         SEDML_FILE, /**< The file is a SED-ML file. */
         COMBINE_ARCHIVE, /**< The file is a COMBINE archive. */
-        UNKNOWN_FILE /**< The type of the file is unknown. */
-    };
-
-    /**
-     * @brief The status of an action on a file.
-     *
-     * The status of an action on a file, i.e. whether it was successful, unable to retrieve the contents of a file, or
-     * unable to instantiate a file.
-     */
-
-    enum class Status
-    {
-        OK, /**< The action completed successfully. */
-        NON_RETRIEVABLE_FILE, /**< The action could not retrieve the contents of a file. */
-        NON_INSTANTIABLE_FILE /**< The action could not instantiate a file. */
+        IRRETRIEVABLE_FILE /**< The file is irretrievable. */
     };
 
     /**
@@ -101,8 +86,8 @@ public:
      * Factory method to create a @ref File object for a virtual file:
      *
      * ```
-     * auto localVirtualFile = libOpenCOR::File::create("/some/path/file.txt", "Contents.");
-     * auto remoteVirtualFile = libOpenCOR::File::create("https://domain.com/file.txt", "Contents."");
+     * auto localVirtualFile = libOpenCOR::File::create("/some/path/file.txt", "Some contents...", 16);
+     * auto remoteVirtualFile = libOpenCOR::File::create("https://domain.com/file.txt", "Some contents...", 16);
      * ```
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
@@ -113,16 +98,6 @@ public:
      */
 
     static FilePtr create(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize);
-
-    /**
-     * @brief Return whether this file is virtual.
-     *
-     * Return whether this file is virtual.
-     *
-     * @return @c true if the file is virtual, @c false otherwise.
-     */
-
-    bool isVirtual() const;
 
     /**
      * @brief Get the type of this file.
@@ -155,30 +130,28 @@ public:
     std::string url() const;
 
     /**
-     * @brief Resolve this @ref File.
+     * @brief Get the contents of this file.
      *
-     * Retrieve the contents of this @ref File and determine its @ref Type, i.e. a CellML file, a SED-ML file, a COMBINE
-     * archive, or an unknown file.
+     * Return the contents of this file.
      *
-     * @sa Status, type()
-     *
-     * @return The status as a @ref Status.
+     * @return The contents, as an array of @c char, of this file.
      */
 
-    Status resolve();
+#ifdef __EMSCRIPTEN__
+    emscripten::val jsContents() const;
+#endif
+
+    const char *contents() const;
 
     /**
-     * @brief Instantiate this @ref File.
+     * @brief Return the size of this file.
      *
-     * Instantiate this @ref File and generate the runtime associated with the CellML file that is associated with this
-     * @ref File, be it directly or indirectly.
+     * Return the size of this file.
      *
-     * @sa Status, runtime()
-     *
-     * @return The status as a @ref Status.
+     * @return The size, as a @c size_t, of this file.
      */
 
-    Status instantiate();
+    size_t size() const;
 
 private:
     explicit File(const std::string &pFileNameOrUrl, const char *pContents = nullptr, size_t pSize = 0); /**< Constructor @private*/

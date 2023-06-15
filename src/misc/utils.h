@@ -26,9 +26,9 @@ namespace libOpenCOR {
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 #ifndef __EMSCRIPTEN__
-std::string downloadFile(const std::string &pUrl);
+std::tuple<bool, std::string> downloadFile(const std::string &pUrl);
 
-std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFileName);
+std::tuple<bool, char *, size_t> fileContents(const std::string &pFileName);
 #endif
 
 } // namespace libOpenCOR

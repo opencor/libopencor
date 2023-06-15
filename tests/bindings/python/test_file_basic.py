@@ -16,68 +16,77 @@ from libopencor import File
 import utils
 
 
-WINDOWS_LOCAL_FILE = "C:\\some\\path\\file.txt"
-UNIX_LOCAL_FILE = "/some/path/file.txt"
-
-
 def test_windows_local_file():
-    file = File(WINDOWS_LOCAL_FILE)
+    file = File(utils.WINDOWS_LOCAL_FILE)
 
-    assert file.type == File.Type.Unresolved
-    assert file.file_name == WINDOWS_LOCAL_FILE
+    assert file.type == File.Type.IrretrievableFile
+    assert file.file_name == utils.WINDOWS_LOCAL_FILE
     assert file.url == ""
-    assert repr(file) == "Local file: " + WINDOWS_LOCAL_FILE
+    assert file.contents == None
+    assert file.size == 0
 
 
 def test_unix_local_file():
-    file = File(UNIX_LOCAL_FILE)
+    file = File(utils.UNIX_LOCAL_FILE)
 
-    assert file.type == File.Type.Unresolved
-    assert file.file_name == UNIX_LOCAL_FILE
+    assert file.type == File.Type.IrretrievableFile
+    assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
-    assert repr(file) == "Local file: " + UNIX_LOCAL_FILE
+    assert file.contents == None
+    assert file.size == 0
 
 
 def test_url_based_windows_local_file():
     file = File("file:///C:/some/path/file.txt")
 
-    assert file.type == File.Type.Unresolved
-    assert file.file_name == WINDOWS_LOCAL_FILE
+    assert file.type == File.Type.IrretrievableFile
+    assert file.file_name == utils.WINDOWS_LOCAL_FILE
     assert file.url == ""
-    assert repr(file) == "Local file: " + WINDOWS_LOCAL_FILE
+    assert file.contents == None
+    assert file.size == 0
 
 
 def test_url_based_unix_local_file():
     file = File("file:///some/path/file.txt")
 
-    assert file.type == File.Type.Unresolved
-    assert file.file_name == UNIX_LOCAL_FILE
+    assert file.type == File.Type.IrretrievableFile
+    assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
-    assert repr(file) == "Local file: " + UNIX_LOCAL_FILE
+    assert file.contents == None
+    assert file.size == 0
 
 
 def test_remote_file():
     file = File(utils.REMOTE_FILE)
 
-    assert file.type == File.Type.Unresolved
-    assert file.file_name == ""
+    assert file.type == File.Type.CellmlFile
+    assert file.file_name != ""
     assert file.url == utils.REMOTE_FILE
-    assert repr(file) == "Remote file: " + utils.REMOTE_FILE
+    assert file.contents != None
+    assert file.size != 0
 
 
 def test_local_virtual_file():
-    file = File(UNIX_LOCAL_FILE, utils.CONTENTS, len(utils.CONTENTS))
+    file = File(
+        utils.UNIX_LOCAL_FILE,
+        utils.SOME_UNKNOWN_CONTENTS,
+        len(utils.SOME_UNKNOWN_CONTENTS),
+    )
 
-    assert file.type == File.Type.Unresolved
-    assert file.file_name == UNIX_LOCAL_FILE
+    assert file.type == File.Type.UnknownFile
+    assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
-    assert file.is_virtual
+    assert file.contents == utils.SOME_UNKNOWN_CONTENTS
+    assert file.size == len(utils.SOME_UNKNOWN_CONTENTS)
 
 
 def test_remote_virtual_file():
-    file = File(utils.REMOTE_FILE, utils.CONTENTS, len(utils.CONTENTS))
+    file = File(
+        utils.REMOTE_FILE, utils.SOME_UNKNOWN_CONTENTS, len(utils.SOME_UNKNOWN_CONTENTS)
+    )
 
-    assert file.type == File.Type.Unresolved
+    assert file.type == File.Type.UnknownFile
     assert file.file_name == ""
     assert file.url == utils.REMOTE_FILE
-    assert file.is_virtual
+    assert file.contents == utils.SOME_UNKNOWN_CONTENTS
+    assert file.size == len(utils.SOME_UNKNOWN_CONTENTS)
