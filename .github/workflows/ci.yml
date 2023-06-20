@@ -190,6 +190,21 @@ jobs:
             unit_testing: OFF
             context: PATH=$GITHUB_WORKSPACE:$PATH
             target: check_code_formatting
+          - name: 'JavaScript code formatting'
+            os: macos-latest
+            build_type: Release
+            code_analysis: OFF
+            code_coverage_gcov: OFF
+            code_coverage_llvm_cov: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: OFF
+            target: javascript_check_code_formatting
           - name: 'Python code formatting'
             os: ubuntu-latest
             build_type: Release
@@ -324,6 +339,9 @@ jobs:
       - name: Install Emscripten
         if: ${{ matrix.name == 'JavaScript' }}
         run: brew install emscripten
+      - name: Install Prettier
+        if: ${{ matrix.target == 'javascript_check_code_formatting' }}
+        run: brew install prettier
       - name: Install Black
         if: ${{ matrix.target == 'python_check_code_formatting' }}
         run: pip3 install black
@@ -378,6 +396,11 @@ jobs:
           ninja ${{ matrix.target }}_report
       - name: Code formatting
         if: ${{ matrix.target == 'check_code_formatting' }}
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+      - name: JavaScript code formatting
+        if: ${{ matrix.target == 'javascript_check_code_formatting' }}
         run: |
           cd build
           ninja ${{ matrix.target }}

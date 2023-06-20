@@ -29,41 +29,44 @@ export const COMBINE_2_ARCHIVE = "cellml_2.omex";
 
 export const LOCAL_FILE = "/some/path/file.txt";
 
-export const HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
-export const REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
-export const IRRETRIEVABLE_REMOTE_FILE = "https://my.domain.com/irretrievable_file.txt";
+export const HTTP_REMOTE_FILE =
+  "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+export const REMOTE_FILE =
+  "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+export const IRRETRIEVABLE_REMOTE_FILE =
+  "https://my.domain.com/irretrievable_file.txt";
 
-export const SOME_UNKNOWN_CONTENTS = new Blob(['Some unknown contents...']);
+export const SOME_UNKNOWN_CONTENTS = new Blob(["Some unknown contents..."]);
 export const SOME_CELLML_CONTENTS = new Blob([`@SOME_CELLML_CONTENTS@`]);
 export const SOME_SEDML_CONTENTS = new Blob([`@SOME_SEDML_CONTENTS@`]);
 
 export function resourcePath(relativePath = "") {
-    return RESOURCE_LOCATION + "/" + relativePath;
+  return RESOURCE_LOCATION + "/" + relativePath;
 }
 
 export async function createBlobPtr(module, blob) {
-    const blobArrayBuffer = await blob.arrayBuffer();
-    const blobPtr = module._malloc(blob.size);
-    const blobMem = new Uint8Array(module.HEAPU8.buffer, blobPtr, blob.size);
+  const blobArrayBuffer = await blob.arrayBuffer();
+  const blobPtr = module._malloc(blob.size);
+  const blobMem = new Uint8Array(module.HEAPU8.buffer, blobPtr, blob.size);
 
-    blobMem.set(new Uint8Array(blobArrayBuffer));
+  blobMem.set(new Uint8Array(blobArrayBuffer));
 
-    return blobPtr;
+  return blobPtr;
 }
 
 export async function deleteBlobPtr(module, blobPtr) {
-    module._free(blobPtr);
+  module._free(blobPtr);
 }
 
 export async function blobToString(blob) {
-    const blobArrayBuffer = await blob.arrayBuffer();
-    const decoder = new TextDecoder();
+  const blobArrayBuffer = await blob.arrayBuffer();
+  const decoder = new TextDecoder();
 
-    return decoder.decode(blobArrayBuffer);
+  return decoder.decode(blobArrayBuffer);
 }
 
 export function arrayBufferToString(arrayBuffer) {
-    const decoder = new TextDecoder();
+  const decoder = new TextDecoder();
 
-    return decoder.decode(arrayBuffer);
+  return decoder.decode(arrayBuffer);
 }
