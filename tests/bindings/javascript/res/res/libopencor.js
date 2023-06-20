@@ -1,3 +1,17 @@
+export function showPage(page) {
+  document.querySelectorAll(".nav-link").forEach((crtPage) => {
+    if (crtPage.id === "nav-" + page) {
+      crtPage.classList.add("active");
+    } else {
+      crtPage.classList.remove("active");
+    }
+  });
+
+  document.querySelectorAll(".page").forEach((crtPage) => {
+    crtPage.style.display = crtPage.id === page + "-page" ? "block" : "none";
+  });
+}
+
 import libOpenCOR from "../libopencor.js";
 
 libOpenCOR().then(function (libopencor) {
@@ -21,17 +35,3 @@ libOpenCOR().then(function (libopencor) {
   document.getElementById("sundialsVersionString").innerHTML =
     libopencor.sundialsVersionString();
 });
-
-export function showPage(page) {
-  document.querySelectorAll(".nav-link").forEach((crtPage) => {
-    if (crtPage.id === "nav-" + page) {
-      crtPage.classList.add("active");
-    } else {
-      crtPage.classList.remove("active");
-    }
-  });
-
-  document.querySelectorAll(".page").forEach((crtPage) => {
-    crtPage.style.display = crtPage.id === page + "-page" ? "block" : "none";
-  });
-}
