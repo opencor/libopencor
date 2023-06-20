@@ -26,21 +26,30 @@ class CombineArchive;
 
 struct File::Impl
 {
-    Type mType = Type::UNRESOLVED;
+    Type mType = Type::UNKNOWN_FILE;
 
     std::string mFileName;
     std::string mUrl;
+
+    bool mContentsRetrieved = false;
+    char *mContents = nullptr;
+    size_t mSize = 0;
 
     Support::CellmlFile *mCellmlFile = nullptr;
     Support::SedmlFile *mSedmlFile = nullptr;
     Support::CombineArchive *mCombineArchive = nullptr;
 
+    Impl(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize);
     ~Impl();
 
-    void reset();
+    void checkType(const FilePtr &pOwner);
 
-    File::Status resolve();
-    File::Status instantiate();
+#ifndef __EMSCRIPTEN__
+    void retrieveContents();
+#endif
+
+    const char *contents();
+    size_t size();
 };
 
 } // namespace libOpenCOR

@@ -40,37 +40,20 @@ PYBIND11_MODULE(module, m)
     py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
 
     py::enum_<libOpenCOR::File::Type>(file, "Type")
-        .value("Unresolved", libOpenCOR::File::Type::UNRESOLVED)
+        .value("UnknownFile", libOpenCOR::File::Type::UNKNOWN_FILE)
         .value("CellmlFile", libOpenCOR::File::Type::CELLML_FILE)
         .value("SedmlFile", libOpenCOR::File::Type::SEDML_FILE)
         .value("CombineArchive", libOpenCOR::File::Type::COMBINE_ARCHIVE)
-        .value("UnknownFile", libOpenCOR::File::Type::UNKNOWN_FILE)
+        .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE)
         .export_values();
 
-    py::enum_<libOpenCOR::File::Status>(file, "Status")
-        .value("Ok", libOpenCOR::File::Status::OK)
-        .value("NonRetrievableFile", libOpenCOR::File::Status::NON_RETRIEVABLE_FILE)
-        .value("NonInstantiableFile", libOpenCOR::File::Status::NON_INSTANTIABLE_FILE)
-        .export_values();
-
-    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
+    file.def(py::init(py::overload_cast<const std::string &>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"))
+        .def(py::init(py::overload_cast<const std::string &, const char *, size_t>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"), py::arg("contents"), py::arg("size"))
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
-        .def("resolve", &libOpenCOR::File::resolve, "Resolve this File object.")
-        .def("instantiate", &libOpenCOR::File::instantiate, "Instantiate this File object.");
-
-    file.def(
-        "__repr__", [](const libOpenCOR::File &pFile) {
-            auto fileName = pFile.fileName();
-
-            if (!fileName.empty()) {
-                return "Local file: " + fileName;
-            }
-
-            return "Remote file: " + pFile.url();
-        },
-        "Get the string representation of this File object.");
+        .def_property_readonly("contents", &libOpenCOR::File::contents, "Get the contents of this File object.")
+        .def_property_readonly("size", &libOpenCOR::File::size, "Get the size of this File object.");
 
     // Version API.
 

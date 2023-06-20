@@ -108,7 +108,6 @@ function(configure_target TARGET)
                 set(DISABLED_CPPCOREGUIDELINES_CHECKS
                     -cppcoreguidelines-avoid-non-const-global-variables
                     -cppcoreguidelines-non-private-member-variables-in-classes
-                    -cppcoreguidelines-owning-memory
                     -cppcoreguidelines-pro-type-reinterpret-cast
                 )
                 set(DISABLED_FUCHSIA_CHECKS
@@ -129,6 +128,7 @@ function(configure_target TARGET)
                 cert-*
                 ${DISABLED_CERT_CHECKS}
                 cppcoreguidelines-*
+                -cppcoreguidelines-owning-memory
                 ${DISABLED_CPPCOREGUIDELINES_CHECKS}
                 fuchsia-*
                 -fuchsia-default-arguments-calls
@@ -186,10 +186,9 @@ function(configure_target TARGET)
 
     # Let libOpenCOR know that we are not building with LLVM code coverage.
 
-    if(    NOT LIBOPENCOR_CODE_COVERAGE_GCOV
-       AND NOT LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+    if(LIBOPENCOR_CODE_COVERAGE_GCOV OR LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
         target_compile_definitions(${TARGET} PRIVATE
-                                   NCOVERAGE)
+                                   COVERAGE_ENABLED)
     endif()
 
     # Statically link our packages to the target.

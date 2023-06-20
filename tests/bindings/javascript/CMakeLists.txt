@@ -14,19 +14,22 @@
 
 # (Configure and) copy over some test-related files.
 
-foreach(RESOURCE_FILE index.html)
-    configure_file(res/${RESOURCE_FILE} ${RESOURCE_FILE} COPYONLY)
-endforeach()
-
-configure_file(res/package.json.in package.json)
 configure_file(utils.js.in utils.js)
+configure_file(res/package.json.in package.json)
+
+configure_file(res/index.html index.html COPYONLY)
+
+file(GLOB RESOURCE_FILES "res/res/*")
+
+foreach(RESOURCE_FILE ${RESOURCE_FILES})
+    get_filename_component(RESOURCE_FILE_NAME ${RESOURCE_FILE} NAME)
+
+    configure_file(${RESOURCE_FILE} res/${RESOURCE_FILE_NAME} COPYONLY)
+endforeach()
 
 # Copy our JavaScript tests over.
 
-#---GRY--- WE NEED TO ALLOW OUR File CLASS TO ACCEPT SOME CONTENTS (I.E. TO ALLOW FOR VIRTUAL FILES) BEFORE WE CAN
-#          ENABLE OUR OTHER TESTS.
-# file(GLOB JAVASCRIPT_TESTS "*.js")
-set(JAVASCRIPT_TESTS version.test.js)
+file(GLOB JAVASCRIPT_TESTS "*.js")
 
 foreach(JAVASCRIPT_TEST ${JAVASCRIPT_TESTS})
     get_filename_component(JAVASCRIPT_TEST_FILE ${JAVASCRIPT_TEST} NAME)

@@ -20,50 +20,79 @@ limitations under the License.
 
 #include <libopencor>
 
-inline constexpr auto WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
-inline constexpr auto UNIX_LOCAL_FILE = "/some/path/file.txt";
-
 TEST(BasicFileTest, windowsLocalFile)
 {
-    auto file = libOpenCOR::File::create(WINDOWS_LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::WINDOWS_LOCAL_FILE);
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
-    EXPECT_EQ(file->fileName(), WINDOWS_LOCAL_FILE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::WINDOWS_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->contents(), nullptr);
+    EXPECT_EQ(file->size(), 0);
 }
 
 TEST(BasicFileTest, unixLocalFile)
 {
-    auto file = libOpenCOR::File::create(UNIX_LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE);
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
-    EXPECT_EQ(file->fileName(), UNIX_LOCAL_FILE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->contents(), nullptr);
+    EXPECT_EQ(file->size(), 0);
 }
 
 TEST(BasicFileTest, urlBasedWindowsLocalFile)
 {
     auto file = libOpenCOR::File::create("file:///C:/some/path/file.txt");
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
-    EXPECT_EQ(file->fileName(), WINDOWS_LOCAL_FILE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::WINDOWS_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->contents(), nullptr);
+    EXPECT_EQ(file->size(), 0);
 }
 
 TEST(BasicFileTest, urlBasedUnixLocalFile)
 {
     auto file = libOpenCOR::File::create("file:///some/path/file.txt");
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
-    EXPECT_EQ(file->fileName(), UNIX_LOCAL_FILE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->contents(), nullptr);
+    EXPECT_EQ(file->size(), 0);
 }
 
 TEST(BasicFileTest, remoteFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNRESOLVED);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
+    EXPECT_NE(file->fileName(), "");
+    EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
+    EXPECT_NE(file->contents(), nullptr);
+    EXPECT_NE(file->size(), 0);
+}
+
+TEST(BasicFileTest, localVirtualFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE, libOpenCOR::SOME_UNKNOWN_CONTENTS, strlen(libOpenCOR::SOME_UNKNOWN_CONTENTS));
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
+    EXPECT_EQ(file->url(), "");
+    EXPECT_TRUE(!strcmp(file->contents(), libOpenCOR::SOME_UNKNOWN_CONTENTS));
+    EXPECT_EQ(file->size(), strlen(libOpenCOR::SOME_UNKNOWN_CONTENTS));
+}
+
+TEST(BasicFileTest, remoteVirtualFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE, libOpenCOR::SOME_UNKNOWN_CONTENTS, strlen(libOpenCOR::SOME_UNKNOWN_CONTENTS));
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->fileName(), "");
     EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
+    EXPECT_TRUE(!strcmp(file->contents(), libOpenCOR::SOME_UNKNOWN_CONTENTS));
+    EXPECT_EQ(file->size(), strlen(libOpenCOR::SOME_UNKNOWN_CONTENTS));
 }

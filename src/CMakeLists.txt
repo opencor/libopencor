@@ -110,7 +110,6 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
     ${GIT_API_SOURCE_FILES}
     ${INTERNAL_SOURCE_FILES}
-    ${PYTHON_SOURCE_FILES}
 )
 
 set(SOURCE_FILES
@@ -158,8 +157,6 @@ else()
     set(JAVASCRIPT_BINDINGS_DIR ${CMAKE_BINARY_DIR}/${JAVASCRIPT_SOURCE_DIR})
 endif()
 
-set(JAVASCRIPT_BINDINGS_DIR ${JAVASCRIPT_BINDINGS_DIR} PARENT_SCOPE)
-
 if (EMSCRIPTEN)
     add_executable(${CMAKE_PROJECT_NAME}
                    ${API_HEADER_FILES}
@@ -168,7 +165,7 @@ if (EMSCRIPTEN)
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                           COMPILE_FLAGS "-O3"
-                          LINK_FLAGS "-O3 -s ALLOW_MEMORY_GROWTH -s EXPORT_ES6=1 -s INLINING_LIMIT --bind")
+                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sINLINING_LIMIT --bind")
 
     # Copy our generated .js and .wasm files over.
 
@@ -203,11 +200,6 @@ target_include_directories(${CMAKE_PROJECT_NAME} INTERFACE
                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/module>
                            $<INSTALL_INTERFACE:include/>
                            $<INSTALL_INTERFACE:include/${CMAKE_PROJECT_NAME_LC}/module>)
-
-set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
-set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
-set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
-set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)
 
 # Configure libOpenCOR.
 
@@ -258,6 +250,11 @@ endif()
 # Build our different bindings.
 
 add_subdirectory(bindings)
+
+list(APPEND GIT_SOURCE_FILES
+    ${JAVASCRIPT_SOURCE_FILES}
+    ${PYTHON_SOURCE_FILES}
+)
 
 # Install libOpenCOR itself.
 
@@ -311,3 +308,10 @@ configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/uninstall.cmake.in ${UNINST
 add_target(uninstall
            COMMAND ${CMAKE_COMMAND} -P ${UNINSTALL_CMAKE_FILE}
            COMMENT "Uninstall the project...")
+
+# Share some file information with the rest of our building system.
+
+set(GIT_API_HEADER_FILES ${GIT_API_HEADER_FILES} PARENT_SCOPE)
+set(GIT_API_MODULE_FILE ${GIT_API_MODULE_FILE} PARENT_SCOPE)
+set(GIT_SOURCE_FILES ${GIT_SOURCE_FILES} PARENT_SCOPE)
+set(GIT_HEADER_FILES ${GIT_HEADER_FILES} PARENT_SCOPE)

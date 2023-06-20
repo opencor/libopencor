@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set(JAVASCRIPT_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
+    CACHE INTERNAL "JavaScript source files."
+)
+
 if(EMSCRIPTEN)
     # Add some sources to our WASM version of libOpenCOR so we can access its internals.
 
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-                   ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
-                   ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp)
+                   ${JAVASCRIPT_SOURCE_FILES})
 
     # Use the variables that we passed to CMake but that may or may not end up being used.
     # Note: this prevents us from getting a warning about unused variables.

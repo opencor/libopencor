@@ -136,7 +136,7 @@ static size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, voi
     return realDataSize;
 }
 
-std::string downloadFile(const std::string &pUrl)
+std::tuple<bool, std::string> downloadFile(const std::string &pUrl)
 {
     auto fileName = uniqueFileName();
     std::ofstream file(fileName, std::ios_base::binary);
@@ -177,7 +177,7 @@ std::string downloadFile(const std::string &pUrl)
     curl_global_cleanup();
 
     if (res) {
-        return fileName;
+        return std::make_tuple(true, fileName);
     }
 
     remove(fileName.c_str()); // NOLINT(cert-err33-c)
@@ -187,24 +187,21 @@ std::string downloadFile(const std::string &pUrl)
 #endif
 
 #ifndef __EMSCRIPTEN__
-std::tuple<std::shared_ptr<char[]>, size_t> fileContents(const std::string &pFileName) // NOLINT(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
+std::tuple<bool, char *, size_t> fileContents(const std::string &pFileName)
 {
     std::ifstream file(pFileName, std::ios_base::binary);
 
-#    ifndef COVERAGE_ENABLED
     if (!file.is_open()) {
         return {};
     }
-#    endif
 
     const auto size = std::filesystem::file_size(pFileName);
-    const std::shared_ptr<char[]> contents(new char[size + 1]); // NOLINT(cppcoreguidelines-avoid-c-arrays, hicpp-avoid-c-arrays, modernize-avoid-c-arrays)
+    auto * const contents = new char[size + 1] {};
+    // Note: we end the contents with a '\0' so that we can use it as a C string.
 
-    file.read(contents.get(), static_cast<std::streamsize>(size));
+    file.read(contents, static_cast<std::streamsize>(size));
 
-    contents[static_cast<ptrdiff_t>(size)] = 0;
-
-    return std::make_tuple(contents, size);
+    return std::make_tuple(true, contents, size);
 }
 #endif
 

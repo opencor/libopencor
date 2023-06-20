@@ -19,47 +19,36 @@ import * as utils from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
-const WINDOWS_LOCAL_FILE = "C:\\some\\path\\file.txt";
-const UNIX_LOCAL_FILE = "/some/path/file.txt";
-
 describe("File basic tests", () => {
-    test("Basic Windows file", () => {
-        const file = new libopencor.File(WINDOWS_LOCAL_FILE);
+    let someUknownContents;
+    let someUknownContentsPtr;
 
-        expect(file.type().value).toBe(libopencor.File.Type.UNRESOLVED.value);
-        expect(file.fileName()).toBe(WINDOWS_LOCAL_FILE);
-        expect(file.url()).toBe("");
+    beforeAll(async () => {
+        someUknownContents = await utils.blobToString(utils.SOME_UNKNOWN_CONTENTS);
+        someUknownContentsPtr = await utils.createBlobPtr(libopencor, utils.SOME_UNKNOWN_CONTENTS);
     });
 
-    test("Basic UNIX file", () => {
-        const file = new libopencor.File(UNIX_LOCAL_FILE);
-
-        expect(file.type().value).toBe(libopencor.File.Type.UNRESOLVED.value);
-        expect(file.fileName()).toBe(UNIX_LOCAL_FILE);
-        expect(file.url()).toBe("");
+    afterAll(() => {
+        utils.deleteBlobPtr(libopencor, someUknownContentsPtr);
     });
 
-    test("Basic URL-based Windows file", () => {
-        const file = new libopencor.File("file:///C:/some/path/file.txt");
+    test("Local virtual file", () => {
+        const file = new libopencor.File(utils.LOCAL_FILE, someUknownContentsPtr, utils.SOME_UNKNOWN_CONTENTS.size);
 
-        expect(file.type().value).toBe(libopencor.File.Type.UNRESOLVED.value);
-        expect(file.fileName()).toBe(WINDOWS_LOCAL_FILE);
+        expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+        expect(file.fileName()).toBe(utils.LOCAL_FILE);
         expect(file.url()).toBe("");
+        expect(utils.arrayBufferToString(file.contents())).toBe(someUknownContents);
+        expect(file.size()).toBe(utils.SOME_UNKNOWN_CONTENTS.size);
     });
 
-    test("Basic URL-based UNIX file", () => {
-        const file = new libopencor.File("file:///some/path/file.txt");
+    test("Remote virtual file", () => {
+        const file = new libopencor.File(utils.REMOTE_FILE, someUknownContentsPtr, utils.SOME_UNKNOWN_CONTENTS.size);
 
-        expect(file.type().value).toBe(libopencor.File.Type.UNRESOLVED.value);
-        expect(file.fileName()).toBe(UNIX_LOCAL_FILE);
-        expect(file.url()).toBe("");
-    });
-
-    test("Basic remote file", () => {
-        const file = new libopencor.File(utils.REMOTE_FILE);
-
-        expect(file.type().value).toBe(libopencor.File.Type.UNRESOLVED.value);
+        expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
         expect(file.fileName()).toBe("");
         expect(file.url()).toBe(utils.REMOTE_FILE);
+        expect(utils.arrayBufferToString(file.contents())).toBe(someUknownContents);
+        expect(file.size()).toBe(utils.SOME_UNKNOWN_CONTENTS.size);
     });
 });
