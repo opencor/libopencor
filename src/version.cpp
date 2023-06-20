@@ -25,7 +25,9 @@ limitations under the License.
 #    include "clangend.h"
 #endif
 
-#include "curl/curlver.h"
+#ifndef __EMSCRIPTEN__
+#    include "curl/curlver.h"
+#endif
 
 #include "libcellml/version.h"
 
@@ -116,6 +118,7 @@ std::string libcombineVersionString()
     return libcombine::getLibCombineDottedVersion();
 }
 
+#ifndef __EMSCRIPTEN__
 unsigned int libcurlVersion()
 {
     return LIBCURL_VERSION_NUM;
@@ -125,6 +128,7 @@ std::string libcurlVersionString()
 {
     return LIBCURL_VERSION;
 }
+#endif
 
 unsigned int libsedmlVersion()
 {

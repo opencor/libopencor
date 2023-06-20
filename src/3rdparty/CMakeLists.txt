@@ -18,10 +18,10 @@ include(packages)
 
 # Keep track of which packages are to be built.
 
-set(PACKAGES libCellML libCOMBINE libcurl libNuML libSBML libSEDML libssh2 libxml2 OpenSSL SUNDIALS zipper zlib)
+set(PACKAGES libCellML libCOMBINE libNuML libSBML libSEDML libxml2 SUNDIALS zipper zlib)
 
 if(NOT EMSCRIPTEN)
-    list(APPEND PACKAGES LLVMClang)
+    list(APPEND PACKAGES libcurl libssh2 LLVMClang OpenSSL)
 endif()
 
 set(PACKAGES_TO_BUILD)
@@ -47,11 +47,20 @@ endif()
 set(DEPENDENT_PACKAGES_TO_BUILD "" CACHE INTERNAL "Dependent packages to be built.")
 
 check_dependent_packages(libxml2 libCellML libSBML)
-check_dependent_packages(OpenSSL libcurl libssh2)
-check_dependent_packages(zlib libCellML libCOMBINE libcurl zipper)
+
+if(EMSCRIPTEN)
+    check_dependent_packages(zlib libCellML libCOMBINE zipper)
+else()
+    check_dependent_packages(OpenSSL libcurl libssh2)
+    check_dependent_packages(zlib libCellML libCOMBINE libcurl zipper)
+endif()
+
 check_dependent_packages(libSBML libCOMBINE libNuML libSEDML)
 check_dependent_packages(libNuML libSEDML)
-check_dependent_packages(libssh2 libcurl)
+
+if(NOT EMSCRIPTEN)
+    check_dependent_packages(libssh2 libcurl)
+endif()
 
 check_dependent_packages(zipper libCOMBINE)
 
@@ -71,19 +80,31 @@ set(THIRD_PARTY_HEADER_FILES "" CACHE INTERNAL "Third-party (special) header fil
 # Prerequisite third-party libraries, respecting their own prerequisites.
 
 add_package(libxml2)
-add_package(OpenSSL)
+
+if(NOT EMSCRIPTEN)
+    add_package(OpenSSL)
+endif()
+
 add_package(zlib)
 
 add_package(libSBML) # Requires libxml2.
 add_package(libNuML) # Requires libSBML.
-add_package(libssh2) # Requires OpenSSL.
+
+if(NOT EMSCRIPTEN)
+    add_package(libssh2) # Requires OpenSSL.
+endif()
+
 add_package(zipper) # Requires zlib.
 
 # Required third-party libraries.
 
 add_package(libCellML) # Requires libxml2 and zlib.
 add_package(libCOMBINE) # Requires libSBML, zipper and zlib.
-add_package(libcurl) # Requires libssh2, OpenSSL and zlib.
+
+if(NOT EMSCRIPTEN)
+    add_package(libcurl) # Requires libssh2, OpenSSL and zlib.
+endif()
+
 add_package(libSEDML) # Requires libNuML and libSBML.
 
 if(NOT EMSCRIPTEN)

@@ -7,8 +7,6 @@ libOpenCOR().then(function (libopencor) {
     document.getElementById("libcellmlVersionString").innerHTML = libopencor.libcellmlVersionString();
     document.getElementById("libcombineVersion").innerHTML = libopencor.libcombineVersion();
     document.getElementById("libcombineVersionString").innerHTML = libopencor.libcombineVersionString();
-    document.getElementById("libcurlVersion").innerHTML = libopencor.libcurlVersion();
-    document.getElementById("libcurlVersionString").innerHTML = libopencor.libcurlVersionString();
     document.getElementById("libsedmlVersion").innerHTML = libopencor.libsedmlVersion();
     document.getElementById("libsedmlVersionString").innerHTML = libopencor.libsedmlVersionString();
     document.getElementById("sundialsVersion").innerHTML = libopencor.sundialsVersion();

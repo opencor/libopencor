@@ -16,6 +16,10 @@ from libopencor import File
 import utils
 
 
+def test_http_remote_file():
+    File(utils.HTTP_REMOTE_FILE)
+
+
 def test_irretrievable_remote_file():
     File(utils.IRRETRIEVABLE_REMOTE_FILE)
 

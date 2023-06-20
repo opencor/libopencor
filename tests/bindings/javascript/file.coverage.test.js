@@ -20,8 +20,8 @@ import * as utils from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("File coverage tests", () => {
-    test("Irretrievable remote file", () => {
-        new libopencor.File(utils.IRRETRIEVABLE_REMOTE_FILE, utils.SOME_UNKNOWN_CONTENTS, utils.SOME_UNKNOWN_CONTENTS.size);
+    test("http remote file", () => {
+        new libopencor.File(utils.HTTP_REMOTE_FILE, utils.SOME_UNKNOWN_CONTENTS, utils.SOME_UNKNOWN_CONTENTS.size);
     });
 
     test("Not virtual file", () => {

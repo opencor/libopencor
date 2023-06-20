@@ -100,6 +100,7 @@ unsigned int LIBOPENCOR_EXPORT libcombineVersion();
 
 std::string LIBOPENCOR_EXPORT libcombineVersionString();
 
+#ifndef __EMSCRIPTEN__
 /**
  * Return the version of libcurl as a number.
  *
@@ -117,6 +118,7 @@ unsigned int LIBOPENCOR_EXPORT libcurlVersion();
  */
 
 std::string LIBOPENCOR_EXPORT libcurlVersionString();
+#endif
 
 /**
  * Return the version of libSEDML as a number.

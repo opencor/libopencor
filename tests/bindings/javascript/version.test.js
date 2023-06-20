@@ -34,11 +34,6 @@ describe("Version tests", () => {
         expect(libopencor.libcombineVersionString()).toBe("0.2.18");
     });
 
-    test("libcurl", () => {
-        expect(libopencor.libcurlVersion()).toBe(0x075301);
-        expect(libopencor.libcurlVersionString()).toBe("7.83.1-DEV");
-    });
-
     test("libSEDML", () => {
         expect(libopencor.libsedmlVersion()).toBe(20032);
         expect(libopencor.libsedmlVersionString()).toBe("2.0.32");
