@@ -340,12 +340,16 @@ mark_as_advanced(BLACK_EXE
                  BUILDCACHE_EXE
                  CLANG_FORMAT_EXE
                  CLANG_TIDY_EXE
+                 EMCMAKE_EXE
+                 EMCONFIGURE_EXE
                  FIND_EXE
                  GCOV_EXE
                  GCOVR_EXE
                  GIT_EXE
                  LLVM_COV_EXE
                  LLVM_PROFDATA_EXE
+                 NODE_EXE
+                 NPM_EXE
                  PATCH_EXE
                  PYTEST_EXE
                  SPHINX_EXE
