@@ -154,6 +154,7 @@ find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profd
 find_program(NODE_EXE NAMES ${PREFERRED_NODE_NAMES} node)
 find_program(NPM_EXE NAMES ${PREFERRED_NPM_NAMES} npm)
 find_program(PATCH_EXE NAMES ${PREFERRED_PATCH_NAMES} patch)
+find_program(PRETTIER_EXE NAMES ${PREFERRED_PRETTIER_NAMES} prettier)
 find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
 find_program(SPHINX_EXE NAMES ${PREFERRED_SPHINX_NAMES} sphinx-build sphinx-build2)
 find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
@@ -295,6 +296,10 @@ else()
     set(DOCUMENTATION_AVAILABLE_ERROR_MESSAGE "Documentation is requested but Doxygen, the patch tool, Python and/or Sphinx could not be found.")
 endif()
 
+if(PRETTIER_EXE)
+    set(JAVASCRIPT_FORMATTING_AVAILABLE TRUE)
+endif()
+
 if(PYTHON_LIBRARIES)
     set(PYTHON_BINDINGS_AVAILABLE TRUE)
 else()
@@ -340,13 +345,18 @@ mark_as_advanced(BLACK_EXE
                  BUILDCACHE_EXE
                  CLANG_FORMAT_EXE
                  CLANG_TIDY_EXE
+                 EMCMAKE_EXE
+                 EMCONFIGURE_EXE
                  FIND_EXE
                  GCOV_EXE
                  GCOVR_EXE
                  GIT_EXE
                  LLVM_COV_EXE
                  LLVM_PROFDATA_EXE
+                 NODE_EXE
+                 NPM_EXE
                  PATCH_EXE
+                 PRETTIER_EXE
                  PYTEST_EXE
                  SPHINX_EXE
                  VALGRIND_EXE)

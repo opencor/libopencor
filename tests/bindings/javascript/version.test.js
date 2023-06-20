@@ -19,28 +19,28 @@ import libOpenCOR from "./libopencor.js";
 const libopencor = await libOpenCOR();
 
 describe("Version tests", () => {
-    test("libOpenCOR", () => {
-        expect(libopencor.version()).toBe(0x000100);
-        expect(libopencor.versionString()).toBe("0.1.0");
-    });
+  test("libOpenCOR", () => {
+    expect(libopencor.version()).toBe(0x000100);
+    expect(libopencor.versionString()).toBe("0.1.0");
+  });
 
-    test("libCellML", () => {
-        expect(libopencor.libcellmlVersion()).toBe(0x000400);
-        expect(libopencor.libcellmlVersionString()).toBe("0.4.0");
-    });
+  test("libCellML", () => {
+    expect(libopencor.libcellmlVersion()).toBe(0x000400);
+    expect(libopencor.libcellmlVersionString()).toBe("0.4.0");
+  });
 
-    test("libCOMBINE", () => {
-        expect(libopencor.libcombineVersion()).toBe(218);
-        expect(libopencor.libcombineVersionString()).toBe("0.2.18");
-    });
+  test("libCOMBINE", () => {
+    expect(libopencor.libcombineVersion()).toBe(218);
+    expect(libopencor.libcombineVersionString()).toBe("0.2.18");
+  });
 
-    test("libSEDML", () => {
-        expect(libopencor.libsedmlVersion()).toBe(20032);
-        expect(libopencor.libsedmlVersionString()).toBe("2.0.32");
-    });
+  test("libSEDML", () => {
+    expect(libopencor.libsedmlVersion()).toBe(20032);
+    expect(libopencor.libsedmlVersionString()).toBe("2.0.32");
+  });
 
-    test("SUNDIALS", () => {
-        expect(libopencor.sundialsVersion()).toBe(0x060200);
-        expect(libopencor.sundialsVersionString()).toBe("6.2.0");
-    });
+  test("SUNDIALS", () => {
+    expect(libopencor.sundialsVersion()).toBe(0x060200);
+    expect(libopencor.sundialsVersionString()).toBe("6.2.0");
+  });
 });
