@@ -21,53 +21,47 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_OPENSSL OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
-    if(EMSCRIPTEN)
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         43f7b8d70e2661fe76965252afc89538c64d84d6)
-    else()
-        if(WIN32)
-            if(RELEASE_MODE)
-                if(INTEL_MODE)
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     a5ff6059a0376e2a5803afab6c00c22bdfb1ecfc)
-                else()
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     111bfb17debbe20a62941a25f597a35fa78aaa52)
-                endif()
-            else()
-                if(INTEL_MODE)
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
-                else()
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     30e0e7f822b99598ec9cc45f919bbe3bc6dd0870)
-                endif()
-            endif()
-        elseif(APPLE)
+    if(WIN32)
+        if(RELEASE_MODE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 847b9b0e0c70bf4b458796c453d8c03c4b0d4252)
+                                 a5ff6059a0376e2a5803afab6c00c22bdfb1ecfc)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ae38760197be0715d0398cd88945ad74fe16ff45)
+                                 111bfb17debbe20a62941a25f597a35fa78aaa52)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 f3f1619acc385df0165fbb932fdf23f5b6eb5179)
+                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 0411e8ce55a452ea6b72f031f4b07b9dba6b98df)
+                                 30e0e7f822b99598ec9cc45f919bbe3bc6dd0870)
             endif()
+        endif()
+    elseif(APPLE)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             847b9b0e0c70bf4b458796c453d8c03c4b0d4252)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             ae38760197be0715d0398cd88945ad74fe16ff45)
+        endif()
+    else()
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             f3f1619acc385df0165fbb932fdf23f5b6eb5179)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             0411e8ce55a452ea6b72f031f4b07b9dba6b98df)
         endif()
     endif()
 else()

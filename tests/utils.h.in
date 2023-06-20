@@ -36,6 +36,7 @@ inline constexpr auto IRRETRIEVABLE_FILE = "irretrievable_file.txt";
 inline constexpr auto WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
 inline constexpr auto UNIX_LOCAL_FILE = "/some/path/file.txt";
 
+inline constexpr auto HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 inline constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 inline constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://my.domain.com/irretrievable_file.txt";
 

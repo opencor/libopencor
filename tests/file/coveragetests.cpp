@@ -20,6 +20,11 @@ limitations under the License.
 
 #include <libopencor>
 
+TEST(CoverageTest, httpRemoteFile)
+{
+    libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_FILE);
+}
+
 TEST(CoverageTest, irretrievableRemoteFile)
 {
     libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);

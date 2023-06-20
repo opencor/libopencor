@@ -31,7 +31,9 @@ limitations under the License.
 #include <filesystem>
 #include <regex>
 
-#include <curl/curl.h>
+#ifndef __EMSCRIPTEN__
+#    include <curl/curl.h>
+#endif
 
 #include <libcellml>
 
@@ -67,19 +69,15 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const char *pContents, size_
 
             mFileName = std::regex_replace(mFileName, FORWARD_SLASH_REGEX, "\\");
         }
+    } else if ((pFileNameOrUrl.find("http://") == 0)
+               || (pFileNameOrUrl.find("https://") == 0)) {
+        // We are dealing with a URL representing a remote file.
+
+        mUrl = pFileNameOrUrl;
     } else {
-        // If we can get a URL from pFileNameOrUrl then it means that we are dealing with a remote file otherwise we are
-        // dealing with a local file.
+        // We are dealing with a local file.
 
-        CURLU *url = curl_url();
-
-        if (curl_url_set(url, CURLUPART_URL, pFileNameOrUrl.c_str(), 0) == CURLUE_OK) {
-            mUrl = pFileNameOrUrl;
-        } else {
-            mFileName = pFileNameOrUrl;
-        }
-
-        curl_url_cleanup(url);
+        mFileName = pFileNameOrUrl;
     }
 
     // Check whether we have some contents and, if so, keep track of it and consider the file virtual.

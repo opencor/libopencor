@@ -29,6 +29,7 @@ export const COMBINE_2_ARCHIVE = "cellml_2.omex";
 
 export const LOCAL_FILE = "/some/path/file.txt";
 
+export const HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 export const REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 export const IRRETRIEVABLE_REMOTE_FILE = "https://my.domain.com/irretrievable_file.txt";
 
