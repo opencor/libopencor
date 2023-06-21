@@ -35,3 +35,7 @@ libOpenCOR().then(function (libopencor) {
   document.getElementById("sundialsVersionString").innerHTML =
     libopencor.sundialsVersionString();
 });
+
+// Show our home page.
+
+showPage('home');
