@@ -175,9 +175,13 @@ if (EMSCRIPTEN)
                                                             ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.${FILE_EXTENSION})
     endforeach()
 
-    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript HTML test file has been copied to: ${JAVASCRIPT_BINDINGS_DIR}/index.html"
-                       COMMAND ${CMAKE_COMMAND} -E echo "                        and can be tested using: emrun --browser chrome ${JAVASCRIPT_BINDINGS_DIR}/index.html")
+    # Let people know how to run our test web page.
+
+    if(LIBOPENCOR_JAVASCRIPT_UNIT_TESTING)
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript test web page has been copied to: ${JAVASCRIPT_BINDINGS_DIR}/index.html"
+                           COMMAND ${CMAKE_COMMAND} -E echo "                          and can be run using: emrun --browser chrome ${JAVASCRIPT_BINDINGS_DIR}/index.html")
+    endif()
 else()
     add_library(${CMAKE_PROJECT_NAME}
                 ${API_HEADER_FILES}
