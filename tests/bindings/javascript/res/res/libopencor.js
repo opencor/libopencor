@@ -88,8 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             document.getElementById("fileName").innerHTML = file.name;
-            document.getElementById("fileType").innerHTML =
-              libopencorFileType + ".";
+            document.getElementById("fileType").innerHTML = libopencorFileType;
 
             updateFileUi("block", "none", "block");
           } catch (exception) {
