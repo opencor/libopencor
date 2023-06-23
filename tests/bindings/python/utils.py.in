@@ -36,7 +36,7 @@ UNIX_LOCAL_FILE = "/some/path/file.txt"
 
 HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
 REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-IRRETRIEVABLE_REMOTE_FILE = "https://my.domain.com/irretrievable_file.txt"
+IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt"
 
 
 SOME_UNKNOWN_CONTENTS = "Some unknown contents..."
@@ -46,3 +46,14 @@ SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
 
 def resource_path(relative_path=""):
     return RESOURCE_LOCATION + "/" + relative_path
+
+
+def string_to_list(string):
+    return [ord(x) for x in string]
+
+
+def list_to_string(list):
+    if (len(list) == 0) or (list[0] == 0):
+        return ""
+
+    return chr(list[0]) + list_to_string(list[1:])

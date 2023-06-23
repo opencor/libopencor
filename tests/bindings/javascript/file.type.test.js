@@ -24,32 +24,32 @@ describe("File type tests", () => {
   let someCellmlContentsPtr;
   let someSedmlContentsPtr;
 
-  beforeAll(async () => {
-    someUnknownContentsPtr = await utils.createBlobPtr(
+  beforeAll(() => {
+    someUnknownContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_UNKNOWN_CONTENTS
     );
-    someCellmlContentsPtr = await utils.createBlobPtr(
+    someCellmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_CELLML_CONTENTS
     );
-    someSedmlContentsPtr = await utils.createBlobPtr(
+    someSedmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_SEDML_CONTENTS
     );
   });
 
   afterAll(() => {
-    utils.deleteBlobPtr(libopencor, someUnknownContentsPtr);
-    utils.deleteBlobPtr(libopencor, someCellmlContentsPtr);
-    utils.deleteBlobPtr(libopencor, someSedmlContentsPtr);
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
+    utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someSedmlContentsPtr);
   });
 
   test("Unknown virtual file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.size
+      utils.SOME_UNKNOWN_CONTENTS.length
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
@@ -59,7 +59,7 @@ describe("File type tests", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
-      utils.SOME_CELLML_CONTENTS.size
+      utils.SOME_CELLML_CONTENTS.length
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.CELLML_FILE.value);
@@ -69,7 +69,7 @@ describe("File type tests", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someSedmlContentsPtr,
-      utils.SOME_SEDML_CONTENTS.size
+      utils.SOME_SEDML_CONTENTS.length
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.SEDML_FILE.value);

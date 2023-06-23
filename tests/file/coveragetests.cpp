@@ -29,8 +29,3 @@ TEST(CoverageTest, irretrievableRemoteFile)
 {
     libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
 }
-
-TEST(CoverageTest, notVirtualFile)
-{
-    libOpenCOR::File::create(libOpenCOR::REMOTE_FILE, libOpenCOR::SOME_UNKNOWN_CONTENTS, 0);
-}

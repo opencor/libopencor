@@ -19,6 +19,7 @@ limitations under the License.
 #include <libopencor>
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace py = pybind11;
 
@@ -48,12 +49,11 @@ PYBIND11_MODULE(module, m)
         .export_values();
 
     file.def(py::init(py::overload_cast<const std::string &>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"))
-        .def(py::init(py::overload_cast<const std::string &, const char *, size_t>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"), py::arg("contents"), py::arg("size"))
+        .def(py::init(py::overload_cast<const std::string &, const std::vector<unsigned char> &>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"), py::arg("contents"))
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
-        .def_property_readonly("contents", &libOpenCOR::File::contents, "Get the contents of this File object.")
-        .def_property_readonly("size", &libOpenCOR::File::size, "Get the size of this File object.");
+        .def_property_readonly("contents", &libOpenCOR::File::contents, "Get the contents of this File object.");
 
     // Version API.
 

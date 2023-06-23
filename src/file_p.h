@@ -32,14 +32,13 @@ struct File::Impl
     std::string mUrl;
 
     bool mContentsRetrieved = false;
-    char *mContents = nullptr;
-    size_t mSize = 0;
+    std::vector<unsigned char> mContents;
 
     Support::CellmlFile *mCellmlFile = nullptr;
     Support::SedmlFile *mSedmlFile = nullptr;
     Support::CombineArchive *mCombineArchive = nullptr;
 
-    Impl(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize);
+    Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents);
     ~Impl();
 
     void checkType(const FilePtr &pOwner);
@@ -48,7 +47,7 @@ struct File::Impl
     void retrieveContents();
 #endif
 
-    const char *contents();
+    std::vector<unsigned char> contents();
     size_t size();
 };
 

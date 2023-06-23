@@ -22,7 +22,3 @@ def test_http_remote_file():
 
 def test_irretrievable_remote_file():
     File(utils.IRRETRIEVABLE_REMOTE_FILE)
-
-
-def test_not_virtual_file():
-    File(utils.REMOTE_FILE, utils.SOME_UNKNOWN_CONTENTS, 0)

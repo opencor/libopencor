@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace libOpenCOR {
 
@@ -38,12 +39,14 @@ inline constexpr auto UNIX_LOCAL_FILE = "/some/path/file.txt";
 
 inline constexpr auto HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 inline constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
-inline constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://my.domain.com/irretrievable_file.txt";
+inline constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt";
 
 inline constexpr auto SOME_UNKNOWN_CONTENTS = "Some unknown contents...";
 inline constexpr auto SOME_CELLML_CONTENTS = "@SOME_CELLML_CONTENTS_C@";
 inline constexpr auto SOME_SEDML_CONTENTS = "@SOME_SEDML_CONTENTS_C@";
 
 std::string resourcePath(const std::string &resourceRelativePath);
+
+std::vector<unsigned char> charArrayToVector(const char *contents);
 
 } // namespace libOpenCOR
