@@ -8,10 +8,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="res/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="res/libopencor.css" rel="stylesheet">
 </head>
 
-<body>
+<body data-bs-theme="dark">
     <nav class="navbar bg-dark border-bottom border-bottom-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
         <div class="container-fluid">
             <div class="navbar-brand">libOpenCOR</div>
@@ -22,13 +24,13 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="nav-home">Home</a>
+                        <a class="nav-link" href="#" id="navHome">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="nav-simulation">Simulation</a>
+                        <a class="nav-link" href="#" id="navSimulation">Simulation</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="nav-versions">Versions</a>
+                        <a class="nav-link" href="#" id="navVersions">Versions</a>
                     </li>
                 </ul>
             </div>
@@ -36,7 +38,7 @@
     </nav>
 
     <div class="p-2">
-        <div class="page" id="home-page">
+        <div class="page" id="pageHome">
             <p>
                 Welcome to this very simple JavaScript bindings test page for libOpenCOR.
             </p>
@@ -45,12 +47,51 @@
             </p>
         </div>
 
-        <div class="page" id="simulation-page">
-            Simulation page...
+        <div class="page" id="pageSimulation">
+            <div class="drop-area">
+                <input class="drop-area-input" id="dropAreaInput" type="file">
+
+                <div class="drop-area-div"">
+                    <i class="far fa-images"></i>
+
+                    <span>
+                        Choose a CellML / SED-ML file or a COMBINE archive,
+                    </span>
+
+                    <span>
+                        or drag and drop such a file here.
+                    </span>
+
+                    <p class="note"><small>
+                        <span class="note">Note:</span> only CellML files with no imports can currently be processed.
+                    </small></p>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-secondary reset-button" id="resetFile"><i class="fa fa-refresh"></i></button>
+
+            <div class="file-info">
+                <table class="file-info-table">
+                    <tr>
+                        <td><span class="property">File name:</span></td>
+                        <td><span id="fileName"></span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="property">File type:</span></td>
+                        <td><span id="fileType"></span></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="file-error">
+                <p class="error">
+                    <span class="property">Error:</span> <span id="fileError"></span>
+                </p>
+            </div>
         </div>
 
-        <div class="page" id="versions-page">
-            <div class="row">
+        <div class="page" id="pageVersions">
+            <div class="row justify-content-center" style="width: 100%">
                 <div class="col-md-auto">
                     <table class="table table-bordered table-sm table-secondary table-striped">
                         <thead class="table-dark">
@@ -108,16 +149,16 @@
     </div>
 
     <script type="module">
-        import { showPage } from './res/libopencor.js';
+        import { resetFile, showPage } from "./res/libopencor.js";
 
-        document.querySelector('#nav-home').addEventListener('click', showPage.bind(null, 'home'));
-        document.querySelector('#nav-simulation').addEventListener('click', showPage.bind(null, 'simulation'));
-        document.querySelector('#nav-versions').addEventListener('click', showPage.bind(null, 'versions'));
+        document.querySelector("#navHome").addEventListener("click", showPage.bind(null, "Home"));
+        document.querySelector("#navSimulation").addEventListener("click", showPage.bind(null, "Simulation"));
+        document.querySelector("#navVersions").addEventListener("click", showPage.bind(null, "Versions"));
 
-        showPage('home');
+        document.querySelector("#resetFile").addEventListener("click", resetFile.bind(null));
     </script>
 
-    <script src="res/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

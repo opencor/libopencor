@@ -49,6 +49,7 @@ else()
                                                               -DEMCONFIGURE_EXE=${EMCONFIGURE_EXE}
                                                               -DLIBOPENCOR_BUILD_TYPE=${LIBOPENCOR_BUILD_TYPE}
                                                               -DLIBOPENCOR_COMPILER_CACHING=${LIBOPENCOR_COMPILER_CACHING}
+                                                              -DLIBOPENCOR_JAVASCRIPT_UNIT_TESTING=${LIBOPENCOR_JAVASCRIPT_UNIT_TESTING}
                                                               -DLIBOPENCOR_PREBUILT_LIBCELLML=${LIBOPENCOR_PREBUILT_LIBCELLML}
                                                               -DLIBOPENCOR_PREBUILT_LIBCOMBINE=${LIBOPENCOR_PREBUILT_LIBCOMBINE}
                                                               -DLIBOPENCOR_PREBUILT_LIBNUML=${LIBOPENCOR_PREBUILT_LIBNUML}

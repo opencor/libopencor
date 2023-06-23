@@ -1,0 +1,118 @@
+:root {
+    --offset: -45px;
+}
+
+.center {
+    text-align: center;
+}
+
+.drop-area,
+.file-error,
+.file-info,
+.reset-button {
+    position: relative;
+    margin: 1rem auto;
+    display: flex;
+    background-color: #2f3236;
+}
+
+.drop-area,
+.file-error,
+.file-info {
+    border-radius: 13px;
+}
+
+.drop-area {
+    width: 479px;
+}
+
+.drop-area {
+    border: 3px dashed #a5a5a5;
+}
+
+.drop-area i {
+    font-size: 3rem;
+    padding: 1rem 0 0.5rem 0;
+}
+
+.drop-area-valid-file,
+.drop-area-valid-file i {
+    border-color: #29aa29;
+    background-color: #002900;
+    color: #29aa29;
+}
+
+.drop-area-invalid-file-s,
+.drop-area-invalid-file-s i,
+.file-error {
+    border-color: #aa2929;
+    background-color: #290000;
+    color: #aa2929;
+}
+
+.drop-area-div,
+.drop-area-input {
+    width: 100%;
+    height: 100%;
+}
+
+.drop-area-div,
+.reset-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.drop-area-input {
+    position: absolute;
+    cursor: pointer;
+    opacity: 0;
+    z-index: 1;
+}
+
+.file-error,
+.file-info {
+    top: var(--offset);
+    display: flex;
+    flex-direction: column;
+}
+
+.file-info-table {
+    margin: 1rem;
+}
+
+.file-error {
+    border: 1px dashed #aa2929;
+}
+
+.file-info {
+    border: 1px dashed #a5a5a5;
+}
+
+.file-error,
+.file-info,
+.page,
+.reset-button {
+    display: none;
+}
+
+.reset-button {
+    top: var(--offset);
+    left: 269px;
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-font-size: 0.75rem;
+}
+
+p.error {
+    margin: 1rem;
+}
+
+p.note {
+    margin-top: 1rem;
+}
+
+span.note,
+span.property {
+    font-weight: bold;
+    text-decoration: underline;
+}
