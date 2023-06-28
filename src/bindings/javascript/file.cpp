@@ -27,8 +27,10 @@ EMSCRIPTEN_BINDINGS(libOpenCOR_File)
 
     emscripten::class_<libOpenCOR::File>("File")
         .smart_ptr_constructor("File", emscripten::optional_override([](const std::string &pFileNameOrUrl, uintptr_t pContents, size_t pSize) {
+                                   auto contents = reinterpret_cast<unsigned char *>(pContents);
+
                                    return libOpenCOR::File::create(pFileNameOrUrl,
-                                                                   std::vector<unsigned char>(reinterpret_cast<unsigned char *>(pContents), reinterpret_cast<unsigned char *>(pContents) + pSize));
+                                                                   std::vector<unsigned char>(contents, contents + pSize));
                                }))
         .function("type", &libOpenCOR::File::type)
         .function("fileName", &libOpenCOR::File::fileName)

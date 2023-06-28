@@ -23,19 +23,8 @@ limitations under the License.
 
 namespace py = pybind11;
 
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
-
-PYBIND11_MODULE(module, m)
+void fileApi(py::module_ &m)
 {
-    // Version.
-
-    m.attr("__version__") = MACRO_STRINGIFY(PROJECT_VERSION);
-
-    // Documentation.
-
-    m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";
-
     // File API.
 
     py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
@@ -54,23 +43,4 @@ PYBIND11_MODULE(module, m)
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
         .def_property_readonly("contents", &libOpenCOR::File::contents, "Get the contents of this File object.");
-
-    // Version API.
-
-    m.def("version", &libOpenCOR::version, "Get the version number of libOpenCOR.");
-    m.def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.");
-    m.def("clang_version", &libOpenCOR::clangVersion, "Get the version number of Clang.");
-    m.def("clang_version_string", &libOpenCOR::clangVersionString, "Get the version string of Clang.");
-    m.def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.");
-    m.def("libcellml_version_string", &libOpenCOR::libcellmlVersionString, "Get the version string of libCellML.");
-    m.def("libcombine_version", &libOpenCOR::libcombineVersion, "Get the version number of libCOMBINE.");
-    m.def("libcombine_version_string", &libOpenCOR::libcombineVersionString, "Get the version string of libCOMBINE.");
-    m.def("libcurl_version", &libOpenCOR::libcurlVersion, "Get the version number of libcurl.");
-    m.def("libcurl_version_string", &libOpenCOR::libcurlVersionString, "Get the version string of libcurl.");
-    m.def("libsedml_version", &libOpenCOR::libsedmlVersion, "Get the version number of libSEDML.");
-    m.def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.");
-    m.def("llvm_version", &libOpenCOR::llvmVersion, "Get the version number of LLVM.");
-    m.def("llvm_version_string", &libOpenCOR::llvmVersionString, "Get the version string of LLVM.");
-    m.def("sundials_version", &libOpenCOR::sundialsVersion, "Get the version number of SUNDIALS.");
-    m.def("sundials_version_string", &libOpenCOR::sundialsVersionString, "Get the version string of SUNDIALS.");
 }

@@ -50,10 +50,3 @@ def resource_path(relative_path=""):
 
 def string_to_list(string):
     return [ord(x) for x in string]
-
-
-def list_to_string(list):
-    if (len(list) == 0) or (list[0] == 0):
-        return ""
-
-    return chr(list[0]) + list_to_string(list[1:])

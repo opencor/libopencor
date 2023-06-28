@@ -72,22 +72,22 @@ TEST(BasicFileTest, remoteFile)
 
 TEST(BasicFileTest, localVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
-                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS));
+    auto someUnknownContentsVector = libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS);
+    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE, someUnknownContentsVector);
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
-    EXPECT_TRUE(!strcmp(reinterpret_cast<const char *>(file->contents().data()), libOpenCOR::SOME_UNKNOWN_CONTENTS));
+    EXPECT_EQ(file->contents(), someUnknownContentsVector);
 }
 
 TEST(BasicFileTest, remoteVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE,
-                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS));
+    auto someUnknownContentsVector = libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS);
+    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE, someUnknownContentsVector);
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->fileName(), "");
     EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
-    EXPECT_TRUE(!strcmp(reinterpret_cast<const char *>(file->contents().data()), libOpenCOR::SOME_UNKNOWN_CONTENTS));
+    EXPECT_EQ(file->contents(), someUnknownContentsVector);
 }

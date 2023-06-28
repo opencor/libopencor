@@ -62,20 +62,20 @@ def test_remote_file():
 
 
 def test_local_virtual_file():
-    file = File(
-        utils.UNIX_LOCAL_FILE, utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
-    )
+    some_unknown_contents_list = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
+    file = File(utils.UNIX_LOCAL_FILE, some_unknown_contents_list)
 
     assert file.type == File.Type.UnknownFile
     assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
-    assert utils.list_to_string(file.contents) == utils.SOME_UNKNOWN_CONTENTS
+    assert file.contents == some_unknown_contents_list
 
 
 def test_remote_virtual_file():
-    file = File(utils.REMOTE_FILE, utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS))
+    some_unknown_contents_list = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
+    file = File(utils.REMOTE_FILE, some_unknown_contents_list)
 
     assert file.type == File.Type.UnknownFile
     assert file.file_name == ""
     assert file.url == utils.REMOTE_FILE
-    assert utils.list_to_string(file.contents) == utils.SOME_UNKNOWN_CONTENTS
+    assert file.contents == some_unknown_contents_list

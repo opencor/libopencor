@@ -92,7 +92,7 @@ public:
      * ```
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
-     * @param pContents The raw contents of the virtual file as @c std::vector of unsigned @c char.
+     * @param pContents The raw contents of the virtual file as a @c std::vector of unsigned @c char.
      *
      * @return A smart pointer to a @ref File object.
      */

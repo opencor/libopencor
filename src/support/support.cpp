@@ -49,7 +49,7 @@ bool isCellmlFile(const FilePtr &pFile)
 
             parser = libcellml::Parser::create(false);
 
-            parser->parseModel(reinterpret_cast<const char *>(pFile->contents().data())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+            parser->parseModel(contents);
 
             return parser->errorCount() == 0;
         }
