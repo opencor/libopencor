@@ -14,9 +14,12 @@
 
 # Include our different tests.
 
+include(cellmlfile/tests.cmake)
+include(combinearchive/tests.cmake)
 include(compiler/tests.cmake)
 include(file/tests.cmake)
 include(runtime/tests.cmake)
+include(sedmlfile/tests.cmake)
 include(simulation/tests.cmake)
 include(solver/tests.cmake)
 include(version/tests.cmake)
