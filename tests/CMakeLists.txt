@@ -17,6 +17,7 @@
 include(compiler/tests.cmake)
 include(file/tests.cmake)
 include(runtime/tests.cmake)
+include(solver/tests.cmake)
 include(version/tests.cmake)
 
 # Prepare our different tests.
