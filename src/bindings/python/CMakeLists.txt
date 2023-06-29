@@ -36,8 +36,6 @@ target_compile_definitions(${PYTHON_BINDINGS_TARGET} PRIVATE
                            PROJECT_VERSION=${PROJECT_VERSION})
 
 target_include_directories(${PYTHON_BINDINGS_TARGET} PRIVATE
-                           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src/api>
-                           $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api>
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
 
 target_link_libraries(${PYTHON_BINDINGS_TARGET} PRIVATE
