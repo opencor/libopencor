@@ -14,13 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "gtest/gtest.h"
+
 #include "runtime.h"
 
-namespace libOpenCOR {
+#include "tests/utils.h"
 
-Runtime::Runtime(const FilePtr &pFile)
+#include <libopencor>
+
+TEST(RuntimeTest, cellmlFile)
 {
-    (void)pFile;
-}
+    // Get a CellML file.
 
-} // namespace libOpenCOR
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+
+    // Get a runtime for it.
+
+    auto *runtime = new libOpenCOR::Runtime(file);
+
+    delete runtime;
+}
