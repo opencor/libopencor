@@ -14,15 +14,17 @@
 
 # Include our different tests.
 
-include(cellmlfile/tests.cmake)
-include(combinearchive/tests.cmake)
-include(compiler/tests.cmake)
-include(file/tests.cmake)
-include(runtime/tests.cmake)
-include(sedmlfile/tests.cmake)
-include(simulation/tests.cmake)
-include(solver/tests.cmake)
-include(version/tests.cmake)
+include(api/file/tests.cmake)
+include(api/simulation/tests.cmake)
+include(api/version/tests.cmake)
+
+include(misc/compiler/tests.cmake)
+include(misc/runtime/tests.cmake)
+include(misc/solver/tests.cmake)
+
+include(support/cellmlfile/tests.cmake)
+include(support/combinearchive/tests.cmake)
+include(support/sedmlfile/tests.cmake)
 
 # Prepare our different tests.
 
