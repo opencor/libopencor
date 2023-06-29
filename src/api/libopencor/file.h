@@ -58,10 +58,10 @@ public:
     ~File(); /**< Destructor, @private. */
 
     File(const File &pOther) = delete; /**< No copy constructor allowed, @private. */
-    File(File &&) noexcept = delete; /**< No move constructor allowed, @private. */
+    File(File &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
     File &operator=(const File &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
-    File &operator=(File &&) noexcept = delete; /**< No move assignment operator allowed, @private. */
+    File &operator=(File &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
 #ifndef __EMSCRIPTEN__
     /**
