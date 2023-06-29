@@ -16,9 +16,11 @@ limitations under the License.
 
 #pragma once
 
+#include "unittestingexport.h"
+
 namespace libOpenCOR::Support {
 
-class CombineArchive
+class LIBOPENCOR_UNIT_TESTING_EXPORT CombineArchive
 {
 };
 
