@@ -20,26 +20,9 @@ limitations under the License.
 
 namespace py = pybind11;
 
-#define STRINGIFY(x) #x
-#define MACRO_STRINGIFY(x) STRINGIFY(x)
-
-void fileApi(py::module_ &m);
-void simulationApi(py::module_ &m);
-void versionApi(py::module_ &m);
-
-PYBIND11_MODULE(module, m)
+void simulationApi(py::module_ &m)
 {
-    // Version.
+    // Simulation API.
 
-    m.attr("__version__") = MACRO_STRINGIFY(PROJECT_VERSION);
-
-    // Documentation.
-
-    m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";
-
-    // APIs.
-
-    fileApi(m);
-    simulationApi(m);
-    versionApi(m);
+    py::class_<libOpenCOR::Simulation, std::shared_ptr<libOpenCOR::Simulation>> simulation(m, "Simulation");
 }
