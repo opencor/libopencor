@@ -14,8 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include "libopencor/file.h"
 #include "libopencor/simulation.h"
-#include "libopencor/version.h"
+
+namespace libOpenCOR {
+} // namespace libOpenCOR

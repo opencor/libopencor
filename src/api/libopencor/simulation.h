@@ -16,6 +16,12 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
-#include "libopencor/simulation.h"
-#include "libopencor/version.h"
+#include "libopencor/export.h"
+
+namespace libOpenCOR {
+
+class LIBOPENCOR_EXPORT Simulation
+{
+};
+
+} // namespace libOpenCOR

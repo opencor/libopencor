@@ -14,8 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include "gtest/gtest.h"
 
-#include "libopencor/file.h"
-#include "libopencor/simulation.h"
-#include "libopencor/version.h"
+TEST(SimulationTest, basic)
+{
+}
