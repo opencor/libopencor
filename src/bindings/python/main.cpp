@@ -14,18 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
-
-#include "tests/utils.h"
-
 #include <libopencor>
 
-TEST(CoverageTest, httpRemoteFile)
-{
-    libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_FILE);
-}
+#include <pybind11/pybind11.h>
 
-TEST(CoverageTest, irretrievableRemoteFile)
+namespace py = pybind11;
+
+#define STRINGIFY(x) #x
+#define MACRO_STRINGIFY(x) STRINGIFY(x)
+
+void fileApi(py::module_ &m);
+void versionApi(py::module_ &m);
+
+PYBIND11_MODULE(module, m)
 {
-    libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
+    // Version.
+
+    m.attr("__version__") = MACRO_STRINGIFY(PROJECT_VERSION);
+
+    // Documentation.
+
+    m.doc() = "libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.";
+
+    // APIs.
+
+    fileApi(m);
+    versionApi(m);
 }

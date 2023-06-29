@@ -20,6 +20,7 @@ limitations under the License.
 #include "libopencor/types.h"
 
 #include <string>
+#include <vector>
 
 namespace libOpenCOR {
 
@@ -69,7 +70,7 @@ public:
      *
      * ```
      * auto localFile = libOpenCOR::File::create("/some/path/file.txt");
-     * auto remoteFile = libOpenCOR::File::create("https://domain.com/file.txt");
+     * auto remoteFile = libOpenCOR::File::create("https://some.domain.com/file.txt");
      * ```
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
@@ -86,18 +87,17 @@ public:
      * Factory method to create a @ref File object for a virtual file:
      *
      * ```
-     * auto localVirtualFile = libOpenCOR::File::create("/some/path/file.txt", "Some contents...", 16);
-     * auto remoteVirtualFile = libOpenCOR::File::create("https://domain.com/file.txt", "Some contents...", 16);
+     * auto localVirtualFile = libOpenCOR::File::create("/some/path/file.txt", someContents);
+     * auto remoteVirtualFile = libOpenCOR::File::create("https://some.domain.com/file.txt", someContents);
      * ```
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
-     * @param pContents The raw contents of the virtual file.
-     * @param pSize The size of the raw contents of the virtual file.
+     * @param pContents The raw contents of the virtual file as a @c std::vector of unsigned @c char.
      *
      * @return A smart pointer to a @ref File object.
      */
 
-    static FilePtr create(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize);
+    static FilePtr create(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents);
 
     /**
      * @brief Get the type of this file.
@@ -141,20 +141,10 @@ public:
     emscripten::val jsContents() const;
 #endif
 
-    const char *contents() const;
-
-    /**
-     * @brief Return the size of this file.
-     *
-     * Return the size of this file.
-     *
-     * @return The size, as a @c size_t, of this file.
-     */
-
-    size_t size() const;
+    std::vector<unsigned char> contents() const;
 
 private:
-    explicit File(const std::string &pFileNameOrUrl, const char *pContents = nullptr, size_t pSize = 0); /**< Constructor @private*/
+    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private*/
 
     struct Impl; /**< Forward declaration of the implementation class, @private. */
 

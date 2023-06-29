@@ -34,35 +34,37 @@ export const HTTP_REMOTE_FILE =
 export const REMOTE_FILE =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 export const IRRETRIEVABLE_REMOTE_FILE =
-  "https://my.domain.com/irretrievable_file.txt";
+  "https://some.domain.com/irretrievable_file.txt";
 
-export const SOME_UNKNOWN_CONTENTS = new Blob(["Some unknown contents..."]);
-export const SOME_CELLML_CONTENTS = new Blob([`@SOME_CELLML_CONTENTS@`]);
-export const SOME_SEDML_CONTENTS = new Blob([`@SOME_SEDML_CONTENTS@`]);
+export const SOME_UNKNOWN_CONTENTS = stringToArrayBuffer(
+  "Some unknown contents..."
+);
+export const SOME_CELLML_CONTENTS = stringToArrayBuffer(
+  `@SOME_CELLML_CONTENTS@`
+);
+export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
 
 export function resourcePath(relativePath = "") {
   return RESOURCE_LOCATION + "/" + relativePath;
 }
 
-export async function createBlobPtr(module, blob) {
-  const blobArrayBuffer = await blob.arrayBuffer();
-  const blobPtr = module._malloc(blob.size);
-  const blobMem = new Uint8Array(module.HEAPU8.buffer, blobPtr, blob.size);
+export function allocateMemory(module, arrayBuffer) {
+  const memPtr = module._malloc(arrayBuffer.length);
+  const mem = new Uint8Array(module.HEAPU8.buffer, memPtr, arrayBuffer.length);
 
-  blobMem.set(new Uint8Array(blobArrayBuffer));
+  mem.set(arrayBuffer);
 
-  return blobPtr;
+  return memPtr;
 }
 
-export async function deleteBlobPtr(module, blobPtr) {
-  module._free(blobPtr);
+export function freeMemory(module, memPtr) {
+  module._free(memPtr);
 }
 
-export async function blobToString(blob) {
-  const blobArrayBuffer = await blob.arrayBuffer();
-  const decoder = new TextDecoder();
+function stringToArrayBuffer(string) {
+  const encoder = new TextEncoder();
 
-  return decoder.decode(blobArrayBuffer);
+  return encoder.encode(string);
 }
 
 export function arrayBufferToString(arrayBuffer) {

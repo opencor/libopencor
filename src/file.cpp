@@ -39,7 +39,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-File::Impl::Impl(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
+File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
 {
     // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
     // with "file://".
@@ -81,13 +81,9 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const char *pContents, size_
     }
 
     // Check whether we have some contents and, if so, keep track of it and consider the file virtual.
-    // Note: we end the contents with a '\0' so that we can use it as a C string.
 
-    if ((pContents != nullptr) && (pSize != 0)) {
-        mContents = new char[pSize + 1] {};
-        mSize = pSize;
-
-        std::copy_n(pContents, pSize, mContents);
+    if (!pContents.empty()) {
+        mContents = pContents;
 
         mContentsRetrieved = true;
     }
@@ -124,8 +120,6 @@ File::Impl::~Impl()
 
     // Delete some internal objects.
 
-    delete mContents;
-
     delete mCellmlFile;
     delete mSedmlFile;
     delete mCombineArchive;
@@ -150,11 +144,10 @@ void File::Impl::retrieveContents()
     // Retrieve the contents of the file, if needed.
 
     if (!mContentsRetrieved) {
-        auto [res, contents, size] = fileContents(mFileName);
+        auto [res, contents] = fileContents(mFileName);
 
         if (res) {
             mContents = contents;
-            mSize = size;
         } else {
             mType = Type::IRRETRIEVABLE_FILE;
         }
@@ -164,7 +157,7 @@ void File::Impl::retrieveContents()
 }
 #endif
 
-const char *File::Impl::contents()
+std::vector<unsigned char> File::Impl::contents()
 {
 #ifndef __EMSCRIPTEN__
     retrieveContents();
@@ -173,17 +166,8 @@ const char *File::Impl::contents()
     return mContents;
 }
 
-size_t File::Impl::size()
-{
-#ifndef __EMSCRIPTEN__
-    retrieveContents();
-#endif
-
-    return mSize;
-}
-
-File::File(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
-    : mPimpl(new Impl(pFileNameOrUrl, pContents, pSize))
+File::File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
+    : mPimpl(new Impl(pFileNameOrUrl, pContents))
 {
 }
 
@@ -203,9 +187,9 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
 }
 #endif
 
-FilePtr File::create(const std::string &pFileNameOrUrl, const char *pContents, size_t pSize)
+FilePtr File::create(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
 {
-    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl, pContents, pSize}};
+    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl, pContents}};
 
     res->mPimpl->checkType(res);
 
@@ -230,18 +214,13 @@ std::string File::url() const
 #ifdef __EMSCRIPTEN__
 emscripten::val File::jsContents() const
 {
-    return emscripten::val(emscripten::typed_memory_view(size(), contents()));
+    return emscripten::val(emscripten::typed_memory_view(contents().size(), contents().data()));
 }
 #endif
 
-const char *File::contents() const
+std::vector<unsigned char> File::contents() const
 {
     return mPimpl->contents();
-}
-
-size_t File::size() const
-{
-    return mPimpl->size();
 }
 
 } // namespace libOpenCOR

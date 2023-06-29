@@ -20,46 +20,42 @@ import * as utils from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("File basic tests", () => {
-  let someUknownContents;
   let someUknownContentsPtr;
 
-  beforeAll(async () => {
-    someUknownContents = await utils.blobToString(utils.SOME_UNKNOWN_CONTENTS);
-    someUknownContentsPtr = await utils.createBlobPtr(
+  beforeAll(() => {
+    someUknownContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_UNKNOWN_CONTENTS
     );
   });
 
   afterAll(() => {
-    utils.deleteBlobPtr(libopencor, someUknownContentsPtr);
+    utils.freeMemory(libopencor, someUknownContentsPtr);
   });
 
   test("Local virtual file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.size
+      utils.SOME_UNKNOWN_CONTENTS.length
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.fileName()).toBe(utils.LOCAL_FILE);
     expect(file.url()).toBe("");
-    expect(utils.arrayBufferToString(file.contents())).toBe(someUknownContents);
-    expect(file.size()).toBe(utils.SOME_UNKNOWN_CONTENTS.size);
+    expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
   });
 
   test("Remote virtual file", () => {
     const file = new libopencor.File(
       utils.REMOTE_FILE,
       someUknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.size
+      utils.SOME_UNKNOWN_CONTENTS.length
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.fileName()).toBe("");
     expect(file.url()).toBe(utils.REMOTE_FILE);
-    expect(utils.arrayBufferToString(file.contents())).toBe(someUknownContents);
-    expect(file.size()).toBe(utils.SOME_UNKNOWN_CONTENTS.size);
+    expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
   });
 });

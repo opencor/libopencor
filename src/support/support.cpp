@@ -27,22 +27,29 @@ limitations under the License.
 #include "libsedmlend.h"
 
 namespace libOpenCOR::Support {
+namespace {
+std::string contentsAsString(const std::vector<unsigned char> &pContents)
+{
+    return {reinterpret_cast<const char *>(pContents.data()), pContents.size()}; // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+}
+} // namespace
 
 bool isCellmlFile(const FilePtr &pFile)
 {
     // Try to parse the file contents as a CellML 2.0 file.
 
-    if (pFile->size() != 0) {
+    if (!pFile->contents().empty()) {
         auto parser = libcellml::Parser::create();
+        auto contents = contentsAsString(pFile->contents());
 
-        parser->parseModel(pFile->contents());
+        parser->parseModel(contents);
 
         if (parser->errorCount() != 0) {
             // We couldn't parse the file contents as a CellML 2.0 file, so maybe it is a CellML 1.x file?
 
             parser = libcellml::Parser::create(false);
 
-            parser->parseModel(pFile->contents());
+            parser->parseModel(contents);
 
             return parser->errorCount() == 0;
         }
@@ -77,8 +84,9 @@ bool isSedmlFile(const FilePtr &pFile)
 {
     // Try to retrieve a SED-ML document.
 
-    if (pFile->size() != 0) {
-        auto *sedmlDocument = libsedml::readSedMLFromString(pFile->contents());
+    if (!pFile->contents().empty()) {
+        auto contents = contentsAsString(pFile->contents());
+        auto *sedmlDocument = libsedml::readSedMLFromString(contents.c_str());
 
         // A non-SED-ML file results in our SED-ML document having at least one error, the first of which being of id
         // libsedml::SedNotSchemaConformant (e.g., a CellML file, i.e. an XML file, but not a SED-ML one) or

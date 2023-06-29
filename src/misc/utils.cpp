@@ -46,7 +46,8 @@ using TimeVal = struct
     uint64_t microeconds;
 };
 
-static int getTimeOfDay(TimeVal &pTimeVal)
+namespace {
+int getTimeOfDay(TimeVal &pTimeVal)
 {
     // Based off https://stackoverflow.com/a/58162122.
 
@@ -59,7 +60,7 @@ static int getTimeOfDay(TimeVal &pTimeVal)
     return 0;
 }
 
-static std::string uniqueFileName()
+std::string uniqueFileName()
 {
     // This is based off glibc's __gen_tempname() method, which used in std::tmpfile(). The only reason we don't use
     // std::tmpfile() is that it creates the file for us and as soon as we would be closing std::fclose(), the file
@@ -127,7 +128,7 @@ static std::string uniqueFileName()
     return res;
 }
 
-static size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUserData)
+size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
     const auto realDataSize = pSize * pDataSize;
 
@@ -135,6 +136,7 @@ static size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, voi
 
     return realDataSize;
 }
+} // namespace
 
 std::tuple<bool, std::string> downloadFile(const std::string &pUrl)
 {
@@ -187,21 +189,22 @@ std::tuple<bool, std::string> downloadFile(const std::string &pUrl)
 #endif
 
 #ifndef __EMSCRIPTEN__
-std::tuple<bool, char *, size_t> fileContents(const std::string &pFileName)
+std::tuple<bool, std::vector<unsigned char>> fileContents(const std::string &pFileName)
 {
+    // Retrieve and return the contents of the given file.
+
     std::ifstream file(pFileName, std::ios_base::binary);
 
     if (!file.is_open()) {
         return {};
     }
 
-    const auto size = std::filesystem::file_size(pFileName);
-    auto * const contents = new char[size + 1] {};
-    // Note: we end the contents with a '\0' so that we can use it as a C string.
+    const auto fileSize = std::filesystem::file_size(pFileName);
+    std::vector<unsigned char> contents(fileSize);
 
-    file.read(contents, static_cast<std::streamsize>(size));
+    file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT(bugprone-narrowing-conversions, cppcoreguidelines-pro-type-reinterpret-cast, readability-container-data-pointer)
 
-    return std::make_tuple(true, contents, size);
+    return std::make_tuple(true, contents);
 }
 #endif
 

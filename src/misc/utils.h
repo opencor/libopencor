@@ -18,8 +18,8 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
-#include <memory>
 #include <string>
+#include <vector>
 
 namespace libOpenCOR {
 
@@ -28,7 +28,7 @@ bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::string> downloadFile(const std::string &pUrl);
 
-std::tuple<bool, char *, size_t> fileContents(const std::string &pFileName);
+std::tuple<bool, std::vector<unsigned char>> fileContents(const std::string &pFileName);
 #endif
 
 } // namespace libOpenCOR

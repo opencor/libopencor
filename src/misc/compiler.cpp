@@ -124,7 +124,7 @@ bool Compiler::compile(const std::string &pCode)
     // Create a compiler invocation object.
 
 #ifndef COVERAGE_ENABLED
-    bool res =
+    const bool res =
 #endif
         clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
                                                   commandArguments,
