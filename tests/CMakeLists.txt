@@ -20,7 +20,8 @@ include(api/version/tests.cmake)
 
 include(misc/compiler/tests.cmake)
 include(misc/runtime/tests.cmake)
-include(misc/solver/tests.cmake)
+
+include(solver/tests.cmake)
 
 include(support/cellmlfile/tests.cmake)
 include(support/combinearchive/tests.cmake)

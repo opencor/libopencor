@@ -90,8 +90,8 @@ set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/runtime.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.cpp
@@ -123,13 +123,13 @@ set(SOURCE_FILES
 
 set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/runtime.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/solver.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/unittestingexport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/support.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/unittestingexport.h
 )
 
 if(NOT EMSCRIPTEN)
@@ -215,10 +215,10 @@ target_include_directories(${CMAKE_PROJECT_NAME} INTERFACE
 
 configure_target(${CMAKE_PROJECT_NAME})
 
-# Generate the export header file, or a fake one if we are building our JavaScript bindings.
+# Generate the export header file, or don't use any if we are building our JavaScript bindings.
 
 if(EMSCRIPTEN)
-    configure_file(noexports.h ${API_EXPORT_HEADER_FILE})
+    configure_file(noexports.h ${API_EXPORT_HEADER_FILE} COPYONLY)
 else()
     include(GenerateExportHeader)
 
@@ -226,6 +226,10 @@ else()
                            EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
                            BASE_NAME LIBOPENCOR)
 endif()
+
+# Copy over our export header file for unit testing.
+
+configure_file(unittestingexport.h unittestingexport.h COPYONLY)
 
 # Don't allow unresolved symbols.
 # Note: MSVC doesn't allow unresolved symbols, so we only need to look for them if we are building using GNU or Clang.

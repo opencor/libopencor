@@ -16,7 +16,7 @@ set(TEST solver)
 
 list(APPEND TESTS ${TEST})
 
-set(${TEST}_CATEGORY misc)
+set(${TEST}_CATEGORY solver)
 set(${TEST}_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/tests.cpp
 )
