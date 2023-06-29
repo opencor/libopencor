@@ -16,7 +16,16 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/version.h"
+namespace libOpenCOR {
+
+/**
+ * @brief The Logger class.
+ *
+ * The Logger class is used to log issues that have been generated as a result of using libOpenCOR.
+ */
+
+class LIBOPENCOR_EXPORT Logger
+{
+};
+
+} // namespace libOpenCOR

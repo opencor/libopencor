@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/export.h"
+#include "libopencor/logger.h"
 #include "libopencor/types.h"
 
 #include <string>
@@ -27,10 +28,10 @@ namespace libOpenCOR {
 /**
  * @brief The File class.
  *
- * The File class is for representing a local or a remote file.
+ * The File class is used to represent a local or a remote file, either on disk or in memory.
  */
 
-class LIBOPENCOR_EXPORT File
+class LIBOPENCOR_EXPORT File: public Logger
 {
 public:
     /**

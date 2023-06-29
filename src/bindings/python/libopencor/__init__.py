@@ -16,6 +16,10 @@ from .module import __doc__, __version__
 from .module import (
     # File API.
     File,
+    # Issue API.
+    Issue,
+    # Logger API.
+    Logger,
     # Version API.
     version,
     version_string,
@@ -38,6 +42,10 @@ from .module import (
 __all__ = (
     # File API.
     "File",
+    # Issue API.
+    "Issue",
+    # Logger API.
+    "Logger",
     # Version API.
     "version",
     "version_string",
