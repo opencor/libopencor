@@ -14,6 +14,7 @@
 
 set(JAVASCRIPT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/simulation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "JavaScript source files."
 )
