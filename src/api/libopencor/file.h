@@ -149,11 +149,11 @@ public:
     std::vector<unsigned char> contents() const;
 
 private:
-    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private*/
-
-    struct Impl; /**< Forward declaration of the implementation class, @private. */
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
     Impl *mPimpl;
+
+    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private*/
 };
 
 } // namespace libOpenCOR

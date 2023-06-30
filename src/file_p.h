@@ -24,8 +24,9 @@ class SedmlFile;
 class CombineArchive;
 } // namespace Support
 
-struct File::Impl
+class File::Impl
 {
+public:
     Type mType = Type::UNKNOWN_FILE;
 
     std::string mFileName;
