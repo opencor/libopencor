@@ -16,6 +16,8 @@ limitations under the License.
 
 #pragma once
 
+#include "libopencor/export.h"
+
 namespace libOpenCOR {
 
 /**
@@ -26,6 +28,30 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT Logger
 {
+public:
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
+
+    Logger() = delete; /**< No default constructor allowed, @private. */
+    ~Logger() = default; /**< Destructor, @private. */
+
+    Logger(const Logger &pOther) = delete; /**< No copy constructor allowed, @private. */
+    Logger(Logger &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    Logger &operator=(const Logger &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    Logger &operator=(Logger &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+
+protected:
+    class Impl; /**< Forward declaration of the implementation class, @private. */
+
+    explicit Logger(Impl *pPimpl); /**< Constructor @private. */
+
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+
+private:
+    Impl *mPimpl;
 };
 
 } // namespace libOpenCOR

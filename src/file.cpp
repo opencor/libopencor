@@ -167,13 +167,23 @@ std::vector<unsigned char> File::Impl::contents()
 }
 
 File::File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
-    : mPimpl(new Impl(pFileNameOrUrl, pContents))
+    : Logger(new Impl(pFileNameOrUrl, pContents))
 {
 }
 
 File::~File()
 {
-    delete mPimpl;
+    delete pimpl();
+}
+
+File::Impl *File::pimpl()
+{
+    return reinterpret_cast<Impl *>(Logger::pimpl()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+}
+
+const File::Impl *File::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(Logger::pimpl()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 }
 
 #ifndef __EMSCRIPTEN__
@@ -181,7 +191,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
 {
     auto res = std::shared_ptr<File> {new File {pFileNameOrUrl}};
 
-    res->mPimpl->checkType(res);
+    res->pimpl()->checkType(res);
 
     return res;
 }
@@ -191,36 +201,36 @@ FilePtr File::create(const std::string &pFileNameOrUrl, const std::vector<unsign
 {
     auto res = std::shared_ptr<File> {new File {pFileNameOrUrl, pContents}};
 
-    res->mPimpl->checkType(res);
+    res->pimpl()->checkType(res);
 
     return res;
 }
 
 File::Type File::type() const
 {
-    return mPimpl->mType;
+    return pimpl()->mType;
 }
 
 std::string File::fileName() const
 {
-    return mPimpl->mFileName;
+    return pimpl()->mFileName;
 }
 
 std::string File::url() const
 {
-    return mPimpl->mUrl;
+    return pimpl()->mUrl;
 }
 
 #ifdef __EMSCRIPTEN__
-emscripten::val File::jsContents() const
+emscripten::val File::jsContents()
 {
     return emscripten::val(emscripten::typed_memory_view(contents().size(), contents().data()));
 }
 #endif
 
-std::vector<unsigned char> File::contents() const
+std::vector<unsigned char> File::contents()
 {
-    return mPimpl->contents();
+    return pimpl()->contents();
 }
 
 } // namespace libOpenCOR

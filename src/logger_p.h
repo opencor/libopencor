@@ -16,23 +16,10 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
-#include "logger_p.h"
-
 namespace libOpenCOR {
-Logger::Logger(Impl *pPimpl)
-    : mPimpl(pPimpl)
-{
-    (void)mPimpl;
-}
 
-Logger::Impl *Logger::pimpl()
+class Logger::Impl
 {
-    return mPimpl;
-}
-
-const Logger::Impl *Logger::pimpl() const
-{
-    return mPimpl;
-}
+};
 
 } // namespace libOpenCOR

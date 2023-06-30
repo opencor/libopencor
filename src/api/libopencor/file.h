@@ -143,17 +143,18 @@ public:
      */
 
 #ifdef __EMSCRIPTEN__
-    emscripten::val jsContents() const;
+    emscripten::val jsContents();
 #endif
 
-    std::vector<unsigned char> contents() const;
+    std::vector<unsigned char> contents();
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *mPimpl;
-
     explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private. */
+
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 };
 
 } // namespace libOpenCOR

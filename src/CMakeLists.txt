@@ -74,6 +74,8 @@ endif()
 
 set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/file.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/issue.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
 
@@ -103,6 +105,8 @@ endif()
 
 set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
 )
 

@@ -16,6 +16,8 @@ limitations under the License.
 
 #pragma once
 
+#include "libopencor/export.h"
+
 namespace libOpenCOR {
 
 /**
