@@ -46,8 +46,12 @@ public:
         UNKNOWN_FILE, /**< The type of the file is unknown. */
         CELLML_FILE, /**< The file is a CellML file. */
         SEDML_FILE, /**< The file is a SED-ML file. */
+#ifdef __EMSCRIPTEN__
+        COMBINE_ARCHIVE /**< The file is a COMBINE archive. */
+#else
         COMBINE_ARCHIVE, /**< The file is a COMBINE archive. */
         IRRETRIEVABLE_FILE /**< The file is irretrievable. */
+#endif
     };
 
     /**
