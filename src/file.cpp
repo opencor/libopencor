@@ -178,12 +178,12 @@ File::~File()
 
 File::Impl *File::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
 const File::Impl *File::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
 #ifndef __EMSCRIPTEN__
