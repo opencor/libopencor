@@ -153,7 +153,7 @@ private:
 
     Impl *mPimpl;
 
-    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private*/
+    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private. */
 };
 
 } // namespace libOpenCOR
