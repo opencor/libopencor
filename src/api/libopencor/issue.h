@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/export.h"
 
+#include <string>
+
 namespace libOpenCOR {
 
 /**
@@ -29,6 +31,58 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT Issue
 {
+public:
+    /**
+     * @brief The type of an issue.
+     *
+     * The type of an issue, i.e. whether it is an error, a warning, or a message.
+     */
+
+    enum class Type
+    {
+        ERROR, /**< The issue is an error. */
+        WARNING, /**< The issue is a warning. */
+        MESSAGE /**< The issue is a message. */
+    };
+
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
+
+    ~Issue(); /**< Destructor, @private. */
+
+    Issue(const Issue &pOther) = delete; /**< No copy constructor allowed, @private. */
+    Issue(Issue &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    Issue &operator=(const Issue &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    Issue &operator=(Issue &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+
+    /**
+     * @brief Get the type of this issue.
+     *
+     * Return the type of this issue.
+     *
+     * @return The @ref Type of this issue.
+     */
+
+    Type type() const;
+
+    /**
+     * @brief Get the description of this issue.
+     *
+     * Return the @c std::string description of this issue.
+     *
+     * @return The @c std::string description of this issue.
+     */
+
+    std::string description() const;
+
+private:
+    class Impl; /**< Forward declaration of the implementation class, @private. */
+
+    explicit Issue(); /**< Constructor @private. */
+
+    Impl *mPimpl;
 };
 
 } // namespace libOpenCOR

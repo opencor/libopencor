@@ -14,16 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include "libopencor/logger.h"
 
-#include <memory>
+#include <vector>
 
 namespace libOpenCOR {
 
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
+class Issue::Impl
+{
+public:
+    Type mType = Type::ERROR;
+    std::string mDescription;
 
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
+    static IssuePtr create();
 
-} // namespace libcellml
+    void setType(Type pType);
+    void setDescription(const std::string &pDescription);
+};
+
+} // namespace libOpenCOR

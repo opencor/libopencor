@@ -16,10 +16,21 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
+#include <vector>
+
 namespace libOpenCOR {
 
 class Logger::Impl
 {
+public:
+    std::vector<IssuePtr> mIssues;
+
+    std::vector<size_t> mErrors;
+    std::vector<size_t> mWarnings;
+    std::vector<size_t> mMessages;
+
+    void addIssue(const IssuePtr &issue);
+    void removeAllIssues();
 };
 
 } // namespace libOpenCOR

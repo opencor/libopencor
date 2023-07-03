@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/export.h"
+#include "libopencor/types.h"
 
 namespace libOpenCOR {
 
@@ -41,6 +42,98 @@ public:
 
     Logger &operator=(const Logger &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     Logger &operator=(Logger &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+
+    /**
+     * @brief Get the number of issues.
+     *
+     * Return the number of issues.
+     *
+     * @return The number of issues.
+     */
+
+    size_t issueCount() const;
+
+    /**
+     * @brief Get the issue at the given @p pIndex.
+     *
+     * Return the issue at the given @p pIndex. If @p pIndex is not valid then @c nullptr is returned. The valid range
+     * for @p pIndex is [0, \#issues).
+     *
+     * @param pIndex The index of the issue to return.
+     *
+     * @return A reference to the issue at the given @p pIndex or @c nullptr if @p pIndex is not valid.
+     */
+
+    IssuePtr issue(size_t pIndex) const;
+
+    /**
+     * @brief Get the number of errors.
+     *
+     * Return the number of issues of error type.
+     *
+     * @return The number of errors.
+     */
+
+    size_t errorCount() const;
+
+    /**
+     * @brief Get the error at the given @p pIndex.
+     *
+     * Return the issue, of error type, at the given @p pIndex. If @p pIndex is not valid then @c nullptr is returned.
+     * The valid range for @p pIndex is [0, \#errors).
+     *
+     * @param pIndex The index of the error to return.
+     *
+     * @return A reference to the error at the given @p pIndex or @c nullptr if @p pIndex is not valid.
+     */
+
+    IssuePtr error(size_t pIndex) const;
+
+    /**
+     * @brief Get the number of warnings.
+     *
+     * Return the number of issues of warning type.
+     *
+     * @return The number of warnings.
+     */
+
+    size_t warningCount() const;
+
+    /**
+     * @brief Get the warning at the given @p pIndex.
+     *
+     * Return the issue, of warning type, at the given @p pIndex. If @p pIndex is not valid then @c nullptr is returned.
+     * The valid range for @p pIndex is [0, \#warnings).
+     *
+     * @param pIndex The index of the warning to return.
+     *
+     * @return A reference to the warning at the given @p pIndex or @c nullptr if @p pIndex is not valid.
+     */
+
+    IssuePtr warning(size_t pIndex) const;
+
+    /**
+     * @brief Get the number of messages.
+     *
+     * Return the number of issues of message type.
+     *
+     * @return The number of messages.
+     */
+
+    size_t messageCount() const;
+
+    /**
+     * @brief Get the message at the given @p pIndex.
+     *
+     * Return the issue, of message type, at the given @p pIndex. If @p pIndex is not valid then @c nullptr is returned.
+     * The valid range for @p pIndex is [0, \#messages).
+     *
+     * @param pIndex The index of the message to return.
+     *
+     * @return A reference to the message at the given @p pIndex or @c nullptr if @p pIndex is not valid.
+     */
+
+    IssuePtr message(size_t pIndex) const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
