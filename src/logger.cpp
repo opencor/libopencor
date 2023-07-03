@@ -19,6 +19,7 @@ limitations under the License.
 #include "logger_p.h"
 
 namespace libOpenCOR {
+
 Logger::Logger(Impl *pPimpl)
     : mPimpl(pPimpl)
 {
