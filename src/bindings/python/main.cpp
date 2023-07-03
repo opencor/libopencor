@@ -24,6 +24,8 @@ namespace py = pybind11;
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 void fileApi(py::module_ &m);
+void issueApi(py::module_ &m);
+void loggerApi(py::module_ &m);
 void simulationApi(py::module_ &m);
 void versionApi(py::module_ &m);
 
@@ -40,6 +42,8 @@ PYBIND11_MODULE(module, m)
     // APIs.
 
     fileApi(m);
+    issueApi(m);
+    loggerApi(m);
     simulationApi(m);
     versionApi(m);
 }

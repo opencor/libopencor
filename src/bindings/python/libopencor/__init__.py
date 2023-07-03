@@ -16,6 +16,10 @@ from .module import __doc__, __version__
 from .module import (
     # File API.
     File,
+    # Issue API.
+    Issue,
+    # Logger API.
+    Logger,
     # Simulation API.
     Simulation,
     # Version API.
@@ -40,6 +44,10 @@ from .module import (
 __all__ = (
     # File API.
     "File",
+    # Issue API.
+    "Issue",
+    # Logger API.
+    "Logger",
     # Simulation API.
     "Simulation",
     # Version API.

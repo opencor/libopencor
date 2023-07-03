@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
+#include "logger_p.h"
+
 namespace libOpenCOR {
 
 namespace Support {
@@ -24,8 +26,9 @@ class SedmlFile;
 class CombineArchive;
 } // namespace Support
 
-struct File::Impl
+class File::Impl: public Logger::Impl
 {
+public:
     Type mType = Type::UNKNOWN_FILE;
 
     std::string mFileName;

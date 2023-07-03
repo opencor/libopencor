@@ -14,16 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include <libopencor>
 
-#include <memory>
-
-namespace libOpenCOR {
-
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
-
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
-
-} // namespace libcellml
+EMSCRIPTEN_BINDINGS(libOpenCOR_Logger)
+{
+    emscripten::class_<libOpenCOR::Logger>("Logger");
+}

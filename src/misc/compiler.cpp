@@ -193,7 +193,7 @@ void *Compiler::function(const std::string &pName)
         auto symbol = mLljit->lookup(pName);
 
         if (symbol) {
-            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
+            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT(performance-no-int-to-ptr)
         }
     }
 

@@ -22,8 +22,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR_File)
         .value("UNKNOWN_FILE", libOpenCOR::File::Type::UNKNOWN_FILE)
         .value("CELLML_FILE", libOpenCOR::File::Type::CELLML_FILE)
         .value("SEDML_FILE", libOpenCOR::File::Type::SEDML_FILE)
-        .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE)
-        .value("IRRETRIEVABLE_FILE", libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+        .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE);
 
     emscripten::class_<libOpenCOR::File>("File")
         .smart_ptr_constructor("File", emscripten::optional_override([](const std::string &pFileNameOrUrl, uintptr_t pContents, size_t pSize) {

@@ -14,16 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include <libopencor>
 
-#include <memory>
+#include <pybind11/pybind11.h>
 
-namespace libOpenCOR {
+namespace py = pybind11;
 
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
+void loggerApi(py::module_ &m)
+{
+    // Logger API.
 
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
-
-} // namespace libcellml
+    py::class_<libOpenCOR::Logger, std::shared_ptr<libOpenCOR::Logger>> logger(m, "Logger");
+}

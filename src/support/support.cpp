@@ -30,7 +30,7 @@ namespace libOpenCOR::Support {
 namespace {
 std::string contentsAsString(const std::vector<unsigned char> &pContents)
 {
-    return {reinterpret_cast<const char *>(pContents.data()), pContents.size()}; // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+    return {reinterpret_cast<const char *>(pContents.data()), pContents.size()};
 }
 } // namespace
 

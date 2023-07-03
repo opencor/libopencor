@@ -14,16 +14,45 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include "libopencor/issue.h"
 
-#include <memory>
+#include "issue_p.h"
 
 namespace libOpenCOR {
 
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
+IssuePtr Issue::Impl::create()
+{
+    return std::shared_ptr<Issue> {new Issue {}};
+}
 
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
+void Issue::Impl::setType(Issue::Type pType)
+{
+    mType = pType;
+}
 
-} // namespace libcellml
+void Issue::Impl::setDescription(const std::string &pDescription)
+{
+    mDescription = pDescription;
+}
+
+Issue::Issue()
+    : mPimpl(new Impl())
+{
+}
+
+Issue::~Issue()
+{
+    delete mPimpl;
+}
+
+Issue::Type Issue::type() const
+{
+    return mPimpl->mType;
+}
+
+std::string Issue::description() const
+{
+    return mPimpl->mDescription;
+}
+
+} // namespace libOpenCOR
