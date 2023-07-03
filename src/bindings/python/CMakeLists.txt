@@ -21,6 +21,8 @@ set(PYTHON_BINDINGS_DIR ${CMAKE_BINARY_DIR}/tests/bindings/python CACHE INTERNAL
 set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
 set(PYTHON_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "Python source files."
@@ -36,8 +38,6 @@ target_compile_definitions(${PYTHON_BINDINGS_TARGET} PRIVATE
                            PROJECT_VERSION=${PROJECT_VERSION})
 
 target_include_directories(${PYTHON_BINDINGS_TARGET} PRIVATE
-                           $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src/api>
-                           $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api>
                            $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
 
 target_link_libraries(${PYTHON_BINDINGS_TARGET} PRIVATE

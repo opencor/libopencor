@@ -14,6 +14,8 @@
 
 set(JAVASCRIPT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "JavaScript source files."
 )
@@ -23,6 +25,9 @@ if(EMSCRIPTEN)
 
     target_sources(${CMAKE_PROJECT_NAME} PRIVATE
                    ${JAVASCRIPT_SOURCE_FILES})
+
+    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+                               $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
 
     # Use the variables that we passed to CMake but that may or may not end up being used.
     # Note: this prevents us from getting a warning about unused variables.

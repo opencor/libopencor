@@ -14,9 +14,14 @@
 
 # Include our different tests.
 
-include(compiler/tests.cmake)
-include(file/tests.cmake)
-include(version/tests.cmake)
+include(api/file/tests.cmake)
+include(api/version/tests.cmake)
+
+include(misc/compiler/tests.cmake)
+
+include(support/cellmlfile/tests.cmake)
+include(support/combinearchive/tests.cmake)
+include(support/sedmlfile/tests.cmake)
 
 # Prepare our different tests.
 

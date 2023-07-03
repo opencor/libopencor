@@ -108,7 +108,6 @@ function(configure_target TARGET)
                 set(DISABLED_CPPCOREGUIDELINES_CHECKS
                     -cppcoreguidelines-avoid-non-const-global-variables
                     -cppcoreguidelines-non-private-member-variables-in-classes
-                    -cppcoreguidelines-pro-type-reinterpret-cast
                 )
                 set(DISABLED_FUCHSIA_CHECKS
                     -fuchsia-statically-constructed-objects
@@ -129,6 +128,7 @@ function(configure_target TARGET)
                 ${DISABLED_CERT_CHECKS}
                 cppcoreguidelines-*
                 -cppcoreguidelines-owning-memory
+                -cppcoreguidelines-pro-type-reinterpret-cast
                 ${DISABLED_CPPCOREGUIDELINES_CHECKS}
                 fuchsia-*
                 -fuchsia-default-arguments-calls

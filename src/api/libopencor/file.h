@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/export.h"
+#include "libopencor/logger.h"
 #include "libopencor/types.h"
 
 #include <string>
@@ -27,10 +28,10 @@ namespace libOpenCOR {
 /**
  * @brief The File class.
  *
- * The File class is for representing a local or a remote file.
+ * The File class is used to represent a local or a remote file, either on disk or in memory.
  */
 
-class LIBOPENCOR_EXPORT File
+class LIBOPENCOR_EXPORT File: public Logger
 {
 public:
     /**
@@ -45,8 +46,12 @@ public:
         UNKNOWN_FILE, /**< The type of the file is unknown. */
         CELLML_FILE, /**< The file is a CellML file. */
         SEDML_FILE, /**< The file is a SED-ML file. */
+#ifdef __EMSCRIPTEN__
+        COMBINE_ARCHIVE /**< The file is a COMBINE archive. */
+#else
         COMBINE_ARCHIVE, /**< The file is a COMBINE archive. */
         IRRETRIEVABLE_FILE /**< The file is irretrievable. */
+#endif
     };
 
     /**
@@ -57,10 +62,10 @@ public:
     ~File(); /**< Destructor, @private. */
 
     File(const File &pOther) = delete; /**< No copy constructor allowed, @private. */
-    File(File &&) noexcept = delete; /**< No move constructor allowed, @private. */
+    File(File &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
     File &operator=(const File &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
-    File &operator=(File &&) noexcept = delete; /**< No move assignment operator allowed, @private. */
+    File &operator=(File &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
 #ifndef __EMSCRIPTEN__
     /**
@@ -138,17 +143,18 @@ public:
      */
 
 #ifdef __EMSCRIPTEN__
-    emscripten::val jsContents() const;
+    emscripten::val jsContents();
 #endif
 
-    std::vector<unsigned char> contents() const;
+    std::vector<unsigned char> contents();
 
 private:
-    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private*/
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    struct Impl; /**< Forward declaration of the implementation class, @private. */
+    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private. */
 
-    Impl *mPimpl;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 };
 
 } // namespace libOpenCOR

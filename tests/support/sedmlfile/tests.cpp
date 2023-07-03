@@ -14,16 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include "gtest/gtest.h"
 
-#include <memory>
-
-namespace libOpenCOR {
-
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
-
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
-
-} // namespace libcellml
+TEST(SedmlfileTest, basic)
+{
+}

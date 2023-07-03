@@ -14,18 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
-
-export const NON_RETRIEVABLE_FILE = "non_retrievable_file.txt";
 export const UNKNOWN_FILE = "unknown_file.txt";
-export const SBML_FILE = "sbml.sbml";
-export const ERROR_SEDML_FILE = "error.sedml";
-export const CELLML_1_X_FILE = "cellml_1_x.cellml";
-export const SEDML_1_X_FILE = "cellml_1_x.sedml";
-export const COMBINE_1_X_ARCHIVE = "cellml_1_x.omex";
-export const CELLML_2_FILE = "cellml_2.cellml";
-export const SEDML_2_FILE = "cellml_2.sedml";
-export const COMBINE_2_ARCHIVE = "cellml_2.omex";
 
 export const LOCAL_FILE = "/some/path/file.txt";
 
@@ -33,8 +22,6 @@ export const HTTP_REMOTE_FILE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 export const REMOTE_FILE =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
-export const IRRETRIEVABLE_REMOTE_FILE =
-  "https://some.domain.com/irretrievable_file.txt";
 
 export const SOME_UNKNOWN_CONTENTS = stringToArrayBuffer(
   "Some unknown contents..."
@@ -43,10 +30,6 @@ export const SOME_CELLML_CONTENTS = stringToArrayBuffer(
   `@SOME_CELLML_CONTENTS@`
 );
 export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
-
-export function resourcePath(relativePath = "") {
-  return RESOURCE_LOCATION + "/" + relativePath;
-}
 
 export function allocateMemory(module, arrayBuffer) {
   const memPtr = module._malloc(arrayBuffer.length);
@@ -65,10 +48,4 @@ function stringToArrayBuffer(string) {
   const encoder = new TextEncoder();
 
   return encoder.encode(string);
-}
-
-export function arrayBufferToString(arrayBuffer) {
-  const decoder = new TextDecoder();
-
-  return decoder.decode(arrayBuffer);
 }
