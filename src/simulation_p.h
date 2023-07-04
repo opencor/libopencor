@@ -25,6 +25,8 @@ public:
 
     Impl(const FilePtr &pFile);
     ~Impl() = default;
+
+    bool supportedFile() const;
 };
 
 } // namespace libOpenCOR

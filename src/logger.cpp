@@ -14,20 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/issue.h"
 #include "libopencor/logger.h"
 
+#include "issue_p.h"
 #include "logger_p.h"
 
 namespace libOpenCOR {
 
-void Logger::Impl::addIssue(const IssuePtr &pIssue)
+void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
 {
     auto index = mIssues.size();
 
-    mIssues.push_back(pIssue);
+    mIssues.push_back(std::shared_ptr<Issue> {new Issue {pDescription, pType}});
 
-    switch (pIssue->type()) {
+    switch (pType) {
     case libOpenCOR::Issue::Type::ERROR:
         mErrors.push_back(index);
 
@@ -42,6 +42,21 @@ void Logger::Impl::addIssue(const IssuePtr &pIssue)
 
         break;
     }
+}
+
+void Logger::Impl::addError(const std::string &pDescription)
+{
+    addIssue(pDescription, Issue::Type::ERROR);
+}
+
+void Logger::Impl::addWarning(const std::string &pDescription)
+{
+    addIssue(pDescription, Issue::Type::WARNING);
+}
+
+void Logger::Impl::addMessage(const std::string &pDescription)
+{
+    addIssue(pDescription, Issue::Type::MESSAGE);
 }
 
 void Logger::Impl::removeAllIssues()

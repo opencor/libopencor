@@ -18,12 +18,40 @@ limitations under the License.
 
 #include "simulation_p.h"
 
+#include "libopencor/file.h"
+
 namespace libOpenCOR {
 
 Simulation::Impl::Impl(const FilePtr &pFile)
     : mFile(pFile)
 {
-    (void)mFile;
+    switch (mFile->type()) {
+    case File::Type::UNKNOWN_FILE:
+        addError("A simulation cannot be created using an unknown file.");
+
+        break;
+    case File::Type::CELLML_FILE:
+        break;
+    case File::Type::SEDML_FILE:
+        addError("A simulation cannot currently be created using a SED-ML file.");
+
+        break;
+    case File::Type::COMBINE_ARCHIVE:
+        addError("A simulation cannot currently be created using a COMBINE archive.");
+
+        break;
+#ifndef __EMSCRIPTEN__
+    case File::Type::IRRETRIEVABLE_FILE:
+        addError("A simulation cannot be created using an irretrievable file.");
+
+        break;
+#endif
+    }
+}
+
+bool Simulation::Impl::supportedFile() const
+{
+    return mFile->type() == File::Type::CELLML_FILE;
 }
 
 Simulation::Simulation(const FilePtr &pFile)

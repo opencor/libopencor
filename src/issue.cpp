@@ -20,23 +20,14 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-IssuePtr Issue::Impl::create()
+Issue::Impl::Impl(const std::string &pDescription, Type pType)
+    : mType(pType)
+    , mDescription(pDescription)
 {
-    return std::shared_ptr<Issue> {new Issue {}};
 }
 
-void Issue::Impl::setType(Issue::Type pType)
-{
-    mType = pType;
-}
-
-void Issue::Impl::setDescription(const std::string &pDescription)
-{
-    mDescription = pDescription;
-}
-
-Issue::Issue()
-    : mPimpl(new Impl())
+Issue::Issue(const std::string &pDescription, Type pType)
+    : mPimpl(new Impl(pDescription, pType))
 {
 }
 

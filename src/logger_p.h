@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/logger.h"
+#include "libopencor/issue.h"
 
 #include <vector>
 
@@ -29,7 +29,12 @@ public:
     std::vector<size_t> mWarnings;
     std::vector<size_t> mMessages;
 
-    void addIssue(const IssuePtr &issue);
+    void addIssue(const std::string &pDescription, Issue::Type pType);
+
+    void addError(const std::string &pDescription);
+    void addWarning(const std::string &pDescription);
+    void addMessage(const std::string &pDescription);
+
     void removeAllIssues();
 };
 
