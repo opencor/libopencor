@@ -15,9 +15,30 @@ limitations under the License.
 */
 
 import libOpenCOR from "./libopencor.js";
+import * as utils from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
 describe("Simulation tests", () => {
-  test("Simulation", () => {});
+  let someCellmlContentsPtr;
+
+  beforeAll(() => {
+    someCellmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_CELLML_CONTENTS
+    );
+  });
+
+  afterAll(() => {
+    utils.freeMemory(libopencor, someCellmlContentsPtr);
+  });
+
+  test("Simulation", () => {
+    const file = new libopencor.File(
+      utils.LOCAL_FILE,
+      someCellmlContentsPtr,
+      utils.SOME_CELLML_CONTENTS.length
+    );
+    new libopencor.Simulation(file);
+  });
 });

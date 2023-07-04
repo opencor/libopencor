@@ -18,5 +18,6 @@ limitations under the License.
 
 EMSCRIPTEN_BINDINGS(libOpenCOR_Simulation)
 {
-    emscripten::class_<libOpenCOR::Simulation>("Simulation");
+    emscripten::class_<libOpenCOR::Simulation>("Simulation")
+        .smart_ptr_constructor("Simulation", &libOpenCOR::Simulation::create);
 }
