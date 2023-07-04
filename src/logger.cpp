@@ -23,7 +23,7 @@ namespace libOpenCOR {
 
 void Logger::Impl::addIssue(const IssuePtr &pIssue)
 {
-    size_t index = mIssues.size();
+    auto index = mIssues.size();
 
     mIssues.push_back(pIssue);
 
