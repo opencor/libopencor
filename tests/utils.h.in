@@ -45,8 +45,8 @@ inline constexpr auto SOME_UNKNOWN_CONTENTS = "Some unknown contents...";
 inline constexpr auto SOME_CELLML_CONTENTS = "@SOME_CELLML_CONTENTS_C@";
 inline constexpr auto SOME_SEDML_CONTENTS = "@SOME_SEDML_CONTENTS_C@";
 
-std::string resourcePath(const std::string &resourceRelativePath);
+std::string resourcePath(const std::string &pResourceRelativePath);
 
-std::vector<unsigned char> charArrayToVector(const char *contents);
+std::vector<unsigned char> charArrayToVector(const char *pContents);
 
 } // namespace libOpenCOR

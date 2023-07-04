@@ -19,7 +19,6 @@ import os
 RESOURCE_LOCATION = "@RESOURCE_LOCATION@"
 
 
-NON_RETRIEVABLE_FILE = "non_retrievable_file.txt"
 UNKNOWN_FILE = "unknown_file.txt"
 SBML_FILE = "sbml.sbml"
 ERROR_SEDML_FILE = "error.sedml"
@@ -29,6 +28,7 @@ COMBINE_1_X_ARCHIVE = "cellml_1_x.omex"
 CELLML_2_FILE = "cellml_2.cellml"
 SEDML_2_FILE = "cellml_2.sedml"
 COMBINE_2_ARCHIVE = "cellml_2.omex"
+IRRETRIEVABLE_FILE = "irretrievable_file.txt"
 
 
 WINDOWS_LOCAL_FILE = "C:\\some\\path\\file.txt"

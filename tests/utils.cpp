@@ -20,21 +20,21 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-std::string resourcePath(const std::string &resourceRelativePath)
+std::string resourcePath(const std::string &pResourceRelativePath)
 {
-    return std::string(RESOURCE_LOCATION) + "/" + resourceRelativePath;
+    return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;
 }
 
 #ifdef __clang__
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-std::vector<unsigned char> charArrayToVector(const char *contents)
+std::vector<unsigned char> charArrayToVector(const char *pContents)
 #ifdef __clang__
 #    pragma clang diagnostic pop
 #endif
 {
-    return {contents, contents + strlen(contents)}; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return {pContents, pContents + strlen(pContents)}; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 } // namespace libOpenCOR

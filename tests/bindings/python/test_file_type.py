@@ -18,7 +18,7 @@ import utils
 
 
 def test_type_irretrievable_file():
-    file = File(utils.resource_path(utils.NON_RETRIEVABLE_FILE))
+    file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
 
     assert file.type == File.Type.IrretrievableFile
 
