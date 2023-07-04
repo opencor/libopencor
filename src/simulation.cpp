@@ -23,6 +23,7 @@ namespace libOpenCOR {
 Simulation::Impl::Impl(const FilePtr &pFile)
     : mFile(pFile)
 {
+    (void)mFile;
 }
 
 Simulation::Simulation(const FilePtr &pFile)

@@ -21,11 +21,10 @@ namespace libOpenCOR {
 class Simulation::Impl: public Logger::Impl
 {
 public:
+    const FilePtr &mFile;
+
     Impl(const FilePtr &pFile);
     ~Impl() = default;
-
-private:
-    FilePtr mFile;
 };
 
 } // namespace libOpenCOR
