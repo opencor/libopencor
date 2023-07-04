@@ -25,4 +25,6 @@ void simulationApi(py::module_ &m)
     // Simulation API.
 
     py::class_<libOpenCOR::Simulation, std::shared_ptr<libOpenCOR::Simulation>> simulation(m, "Simulation");
+
+    simulation.def(py::init(&libOpenCOR::Simulation::create), "Create a Simulation object.", py::arg("file"));
 }

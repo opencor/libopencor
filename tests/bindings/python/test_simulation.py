@@ -13,5 +13,10 @@
 # limitations under the License.
 
 
+from libopencor import File, Simulation
+import utils
+
+
 def test_simulation():
-    pass
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    simulation = Simulation(file)
