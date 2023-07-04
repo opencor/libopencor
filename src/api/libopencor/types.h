@@ -26,4 +26,7 @@ using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref 
 class Issue;
 using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
 
+class Simulation;
+using SimulationPtr = std::shared_ptr<Simulation>; /**< Type definition for the shared @ref Simulation pointer. */
+
 } // namespace libcellml

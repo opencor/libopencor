@@ -16,6 +16,17 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
+#include "tests/utils.h"
+
+#include <libopencor>
+
 TEST(SimulationTest, basic)
 {
+    // Get a CellML file.
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+
+    // Get a simulation for it.
+
+    auto simulation = libOpenCOR::Simulation::create(file);
 }

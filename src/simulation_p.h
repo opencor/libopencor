@@ -14,40 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/simulation.h"
-
-#include "simulation_p.h"
+#include "logger_p.h"
 
 namespace libOpenCOR {
 
-Simulation::Impl::Impl(const FilePtr &pFile)
-    : mFile(pFile)
+class Simulation::Impl: public Logger::Impl
 {
-}
+public:
+    Impl(const FilePtr &pFile);
+    ~Impl() = default;
 
-Simulation::Simulation(const FilePtr &pFile)
-    : Logger(new Impl(pFile))
-{
-}
-
-Simulation::~Simulation()
-{
-    delete pimpl();
-}
-
-Simulation::Impl *Simulation::pimpl()
-{
-    return reinterpret_cast<Impl *>(Logger::pimpl());
-}
-
-const Simulation::Impl *Simulation::pimpl() const
-{
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
-}
-
-SimulationPtr Simulation::create(const FilePtr &pFile)
-{
-    return std::shared_ptr<Simulation> {new Simulation {pFile}};
-}
+private:
+    FilePtr mFile;
+};
 
 } // namespace libOpenCOR
