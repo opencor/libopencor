@@ -16,9 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/export.h"
 #include "libopencor/logger.h"
-#include "libopencor/types.h"
 
 #include <string>
 #include <vector>

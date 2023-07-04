@@ -18,11 +18,6 @@ limitations under the License.
 
 #include "cellmlfile.h"
 #include "combinearchive.h"
-
-#ifndef __EMSCRIPTEN__
-#    include "compiler.h"
-#endif
-
 #include "file_p.h"
 #include "sedmlfile.h"
 #include "support.h"
@@ -30,12 +25,6 @@ limitations under the License.
 
 #include <filesystem>
 #include <regex>
-
-#ifndef __EMSCRIPTEN__
-#    include <curl/curl.h>
-#endif
-
-#include <libcellml>
 
 namespace libOpenCOR {
 
