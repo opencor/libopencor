@@ -20,6 +20,13 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The Simulation class.
+ *
+ * The Simulation class is used to represent a simulation associated with a CellML file, a SED-ML file, or a COMBINE
+ * archive.
+ */
+
 class LIBOPENCOR_EXPORT Simulation: public Logger
 {
 public:
