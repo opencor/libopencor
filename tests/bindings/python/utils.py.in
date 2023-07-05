@@ -45,6 +45,14 @@ SOME_CELLML_CONTENTS = """@SOME_CELLML_CONTENTS@"""
 SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
 
 
+def assert_issues(expected_issues, logger):
+    assert len(expected_issues) == logger.issue_count
+
+    for i in range(len(expected_issues)):
+        assert expected_issues[i][0] == logger.issue(i).type
+        assert expected_issues[i][1] == logger.issue(i).description
+
+
 def resource_path(relative_path=""):
     return RESOURCE_LOCATION + "/" + relative_path
 
