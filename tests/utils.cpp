@@ -16,9 +16,23 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include "gtest/gtest.h"
+
+#include "libopencor/logger.h"
+
 #include <cstring>
 
 namespace libOpenCOR {
+
+void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger)
+{
+    EXPECT_EQ(pExpectedIssues.size(), pLogger->issueCount());
+
+    for (size_t i = 0; i < pExpectedIssues.size(); ++i) {
+        EXPECT_EQ(pExpectedIssues.at(i).type, pLogger->issue(i)->type());
+        EXPECT_EQ(pExpectedIssues.at(i).description, pLogger->issue(i)->description());
+    }
+}
 
 std::string resourcePath(const std::string &pResourceRelativePath)
 {

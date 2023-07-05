@@ -16,6 +16,9 @@ limitations under the License.
 
 #pragma once
 
+#include "libopencor/issue.h"
+#include "libopencor/types.h"
+
 #include <string>
 #include <vector>
 
@@ -44,6 +47,20 @@ inline constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irret
 inline constexpr auto SOME_UNKNOWN_CONTENTS = "Some unknown contents...";
 inline constexpr auto SOME_CELLML_CONTENTS = "@SOME_CELLML_CONTENTS_C@";
 inline constexpr auto SOME_SEDML_CONTENTS = "@SOME_SEDML_CONTENTS_C@";
+
+typedef struct
+{
+    Issue::Type type;
+    std::string description;
+} ExpectedIssue;
+
+using ExpectedIssues = std::vector<ExpectedIssue>;
+
+void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger);
+
+#define EXPECT_EQ_ISSUES(pIssues, pLogger) \
+    SCOPED_TRACE("Issue occurred here."); \
+    expectEqualIssues(pIssues, pLogger)
 
 std::string resourcePath(const std::string &pResourceRelativePath);
 

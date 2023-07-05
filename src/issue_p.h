@@ -24,9 +24,9 @@ class Issue::Impl
 {
 public:
     Type mType;
-    const std::string &mDescription;
+    std::string mDescription;
 
-    Impl(const std::string &pDescription, Type pType);
+    Impl(std::string pDescription, Type pType);
     ~Impl() = default;
 };
 
