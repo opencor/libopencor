@@ -24,20 +24,20 @@ void versionApi(py::module_ &m)
 {
     // Version API.
 
-    m.def("version", &libOpenCOR::version, "Get the version number of libOpenCOR.");
-    m.def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.");
-    m.def("clang_version", &libOpenCOR::clangVersion, "Get the version number of Clang.");
-    m.def("clang_version_string", &libOpenCOR::clangVersionString, "Get the version string of Clang.");
-    m.def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.");
-    m.def("libcellml_version_string", &libOpenCOR::libcellmlVersionString, "Get the version string of libCellML.");
-    m.def("libcombine_version", &libOpenCOR::libcombineVersion, "Get the version number of libCOMBINE.");
-    m.def("libcombine_version_string", &libOpenCOR::libcombineVersionString, "Get the version string of libCOMBINE.");
-    m.def("libcurl_version", &libOpenCOR::libcurlVersion, "Get the version number of libcurl.");
-    m.def("libcurl_version_string", &libOpenCOR::libcurlVersionString, "Get the version string of libcurl.");
-    m.def("libsedml_version", &libOpenCOR::libsedmlVersion, "Get the version number of libSEDML.");
-    m.def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.");
-    m.def("llvm_version", &libOpenCOR::llvmVersion, "Get the version number of LLVM.");
-    m.def("llvm_version_string", &libOpenCOR::llvmVersionString, "Get the version string of LLVM.");
-    m.def("sundials_version", &libOpenCOR::sundialsVersion, "Get the version number of SUNDIALS.");
-    m.def("sundials_version_string", &libOpenCOR::sundialsVersionString, "Get the version string of SUNDIALS.");
+    m.def("version", &libOpenCOR::version, "Get the version number of libOpenCOR.")
+        .def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.")
+        .def("clang_version", &libOpenCOR::clangVersion, "Get the version number of Clang.")
+        .def("clang_version_string", &libOpenCOR::clangVersionString, "Get the version string of Clang.")
+        .def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.")
+        .def("libcellml_version_string", &libOpenCOR::libcellmlVersionString, "Get the version string of libCellML.")
+        .def("libcombine_version", &libOpenCOR::libcombineVersion, "Get the version number of libCOMBINE.")
+        .def("libcombine_version_string", &libOpenCOR::libcombineVersionString, "Get the version string of libCOMBINE.")
+        .def("libcurl_version", &libOpenCOR::libcurlVersion, "Get the version number of libcurl.")
+        .def("libcurl_version_string", &libOpenCOR::libcurlVersionString, "Get the version string of libcurl.")
+        .def("libsedml_version", &libOpenCOR::libsedmlVersion, "Get the version number of libSEDML.")
+        .def("libsedml_version_string", &libOpenCOR::libsedmlVersionString, "Get the version string of libSEDML.")
+        .def("llvm_version", &libOpenCOR::llvmVersion, "Get the version number of LLVM.")
+        .def("llvm_version_string", &libOpenCOR::llvmVersionString, "Get the version string of LLVM.")
+        .def("sundials_version", &libOpenCOR::sundialsVersion, "Get the version number of SUNDIALS.")
+        .def("sundials_version_string", &libOpenCOR::sundialsVersionString, "Get the version string of SUNDIALS.");
 }
