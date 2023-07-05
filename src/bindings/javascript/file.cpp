@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <libopencor>
 
-EMSCRIPTEN_BINDINGS(libOpenCOR_File)
+void fileApi()
 {
     emscripten::enum_<libOpenCOR::File::Type>("File.Type")
         .value("UNKNOWN_FILE", libOpenCOR::File::Type::UNKNOWN_FILE)
@@ -24,7 +24,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR_File)
         .value("SEDML_FILE", libOpenCOR::File::Type::SEDML_FILE)
         .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE);
 
-    emscripten::class_<libOpenCOR::File>("File")
+    emscripten::class_<libOpenCOR::File, emscripten::base<libOpenCOR::Logger>>("File")
         .smart_ptr_constructor("File", emscripten::optional_override([](const std::string &pFileNameOrUrl, uintptr_t pContents, size_t pSize) {
                                    auto contents = reinterpret_cast<unsigned char *>(pContents);
 
@@ -38,6 +38,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR_File)
 
     EM_ASM({
         Module['File']['Type'] = Module['File.Type'];
+
         delete Module['File.Type'];
     });
 }

@@ -16,8 +16,8 @@ limitations under the License.
 
 #include <libopencor>
 
-EMSCRIPTEN_BINDINGS(libOpenCOR_Simulation)
+void simulationApi()
 {
-    emscripten::class_<libOpenCOR::Simulation>("Simulation")
+    emscripten::class_<libOpenCOR::Simulation, emscripten::base<libOpenCOR::Logger>>("Simulation")
         .smart_ptr_constructor("Simulation", &libOpenCOR::Simulation::create);
 }
