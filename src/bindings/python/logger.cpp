@@ -26,12 +26,12 @@ void loggerApi(py::module_ &m)
 
     py::class_<libOpenCOR::Logger, std::shared_ptr<libOpenCOR::Logger>> logger(m, "Logger");
 
-    logger.def_property_readonly("issue_count", &libOpenCOR::Logger::issueCount, "Get the number of issues in this Logger object.")
-        .def("issue", &libOpenCOR::Logger::issue, "Return the given issue in this Logger object.")
-        .def_property_readonly("error_count", &libOpenCOR::Logger::errorCount, "Get the number of errors in this Logger object.")
-        .def("error", &libOpenCOR::Logger::error, "Return the given error in this Logger object.")
-        .def_property_readonly("warning_count", &libOpenCOR::Logger::warningCount, "Get the number of warnings in this Logger object.")
-        .def("warning", &libOpenCOR::Logger::warning, "Return the given warning in this Logger object.")
-        .def_property_readonly("message_count", &libOpenCOR::Logger::messageCount, "Get the number of messages in this Logger object.")
-        .def("message", &libOpenCOR::Logger::message, "Return the given message in this Logger object.");
+    logger.def_property_readonly("issue_count", &libOpenCOR::Logger::issueCount, "Get the number of issues.")
+        .def("issue", &libOpenCOR::Logger::issue, "Return the given issue.")
+        .def_property_readonly("error_count", &libOpenCOR::Logger::errorCount, "Get the number of errors.")
+        .def("error", &libOpenCOR::Logger::error, "Return the given error.")
+        .def_property_readonly("warning_count", &libOpenCOR::Logger::warningCount, "Get the number of warnings.")
+        .def("warning", &libOpenCOR::Logger::warning, "Return the given warning.")
+        .def_property_readonly("message_count", &libOpenCOR::Logger::messageCount, "Get the number of messages.")
+        .def("message", &libOpenCOR::Logger::message, "Return the given message.");
 }
