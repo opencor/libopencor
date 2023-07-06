@@ -21,36 +21,15 @@ import { expectIssues } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("Simulation tests", () => {
-  let someUknownContentsPtr;
-  let someCellmlContentsPtr;
-  let someSedmlContentsPtr;
-
-  beforeAll(() => {
-    someUknownContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNKNOWN_CONTENTS
-    );
-    someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS
-    );
-    someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_CONTENTS
-    );
-  });
-
-  afterAll(() => {
-    utils.freeMemory(libopencor, someUknownContentsPtr);
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
-  });
-
   test("Unknown file", () => {
+    const someUnknownContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_UNKNOWN_CONTENTS,
+    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
-      someUknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length
+      someUnknownContentsPtr,
+      utils.SOME_UNKNOWN_CONTENTS.length,
     );
     const simulation = new libopencor.Simulation(file);
 
@@ -61,26 +40,38 @@ describe("Simulation tests", () => {
           "A simulation cannot be created using an unknown file.",
         ],
       ],
-      simulation
+      simulation,
     );
+
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
   test("CellML file", () => {
+    const someCellmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_CELLML_CONTENTS,
+    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
-      utils.SOME_CELLML_CONTENTS.length
+      utils.SOME_CELLML_CONTENTS.length,
     );
     const simulation = new libopencor.Simulation(file);
 
     expect(simulation.hasIssues()).toBe(false);
+
+    utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
   test("SED-ML file", () => {
+    const someSedmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SEDML_CONTENTS,
+    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
-      someCellmlContentsPtr,
-      utils.SOME_SEDML_CONTENTS.length
+      someSedmlContentsPtr,
+      utils.SOME_SEDML_CONTENTS.length,
     );
     const simulation = new libopencor.Simulation(file);
 
@@ -91,7 +82,9 @@ describe("Simulation tests", () => {
           "A simulation cannot currently be created using a SED-ML file.",
         ],
       ],
-      simulation
+      simulation,
     );
+
+    utils.freeMemory(libopencor, someSedmlContentsPtr);
   });
 });

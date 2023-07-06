@@ -69,7 +69,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
         mFileName = pFileNameOrUrl;
     }
 
-    // Check whether we have some contents and, if so, keep track of it and consider the file virtual.
+    // Check whether we have some contents and, if so, keep track of it otherwise retrieve it.
 
     if (!pContents.empty()) {
         mContents = pContents;
@@ -77,23 +77,23 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
         mContentsRetrieved = true;
     }
 #ifndef __EMSCRIPTEN__
-    // If we don't have any contents, then we get ready to retrieve it.
-
     else {
         // Download a local copy of the remote file, if needed.
 
         if (mFileName.empty()) {
             auto [res, fileName] = downloadFile(mUrl);
 
-            mFileName = fileName;
-        }
+            if (res) {
+                mFileName = fileName;
+            } else {
+                mType = Type::IRRETRIEVABLE_FILE;
 
-        // Make sure that the (local) file exists.
-
-        if (mFileName.empty() || !std::filesystem::exists(mFileName.c_str())) {
+                addError("The file could not be downloaded.");
+            }
+        } else if (!std::filesystem::exists(mFileName.c_str())) {
             mType = Type::IRRETRIEVABLE_FILE;
 
-            return;
+            addError("The file does not exist.");
         }
     }
 #endif
@@ -124,6 +124,8 @@ void File::Impl::checkType(const FilePtr &pOwner)
         mType = Type::SEDML_FILE;
     } else if (Support::isCombineArchive(pOwner)) {
         mType = Type::COMBINE_ARCHIVE;
+    } else if (mType == Type::UNKNOWN_FILE) {
+        addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
     }
 }
 
@@ -137,8 +139,6 @@ void File::Impl::retrieveContents()
 
         if (res) {
             mContents = contents;
-        } else {
-            mType = Type::IRRETRIEVABLE_FILE;
         }
 
         mContentsRetrieved = true;

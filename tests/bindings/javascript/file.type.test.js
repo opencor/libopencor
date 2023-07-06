@@ -16,62 +16,65 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
+import { expectIssues } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
 describe("File type tests", () => {
-  let someUnknownContentsPtr;
-  let someCellmlContentsPtr;
-  let someSedmlContentsPtr;
-
-  beforeAll(() => {
-    someUnknownContentsPtr = utils.allocateMemory(
+  test("Unknown file", () => {
+    const someUnknownContentsPtr = utils.allocateMemory(
       libopencor,
-      utils.SOME_UNKNOWN_CONTENTS
+      utils.SOME_UNKNOWN_CONTENTS,
     );
-    someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS
-    );
-    someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_CONTENTS
-    );
-  });
-
-  afterAll(() => {
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
-  });
-
-  test("Unknown virtual file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length
+      utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expectIssues(
+      [
+        [
+          libopencor.Issue.Type.ERROR,
+          "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
+        ],
+      ],
+      file,
+    );
+
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
-  test("CellML virtual file", () => {
+  test("CellML file", () => {
+    const someCellmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_CELLML_CONTENTS,
+    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
-      utils.SOME_CELLML_CONTENTS.length
+      utils.SOME_CELLML_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.CELLML_FILE.value);
+
+    utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
-  test("SED-ML virtual file", () => {
+  test("SED-ML file", () => {
+    const someSedmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SEDML_CONTENTS,
+    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someSedmlContentsPtr,
-      utils.SOME_SEDML_CONTENTS.length
+      utils.SOME_SEDML_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.SEDML_FILE.value);
+
+    utils.freeMemory(libopencor, someSedmlContentsPtr);
   });
 });

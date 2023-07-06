@@ -13,26 +13,42 @@
 # limitations under the License.
 
 
-from libopencor import File
+from libopencor import File, Issue
 import utils
+from utils import assert_issues
+
+
+expected_unknown_file_issues = [
+    [
+        Issue.Type.Error,
+        "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
+    ],
+]
 
 
 def test_type_irretrievable_file():
+    expected_non_existing_file_issues = [
+        [Issue.Type.Error, "The file does not exist."],
+    ]
+
     file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
 
     assert file.type == File.Type.IrretrievableFile
+    assert_issues(expected_non_existing_file_issues, file)
 
 
 def test_type_unknown_file():
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
 
     assert file.type == File.Type.UnknownFile
+    assert_issues(expected_unknown_file_issues, file)
 
 
 def test_type_sbml_file():
     file = File(utils.resource_path(utils.SBML_FILE))
 
     assert file.type == File.Type.UnknownFile
+    assert_issues(expected_unknown_file_issues, file)
 
 
 def test_type_error_sedml_file():
@@ -83,6 +99,7 @@ def test_type_unknown_virtual_file():
     )
 
     assert file.type == File.Type.UnknownFile
+    assert_issues(expected_unknown_file_issues, file)
 
 
 def test_type_cellml_virtual_file():

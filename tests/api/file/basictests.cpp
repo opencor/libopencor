@@ -20,6 +20,13 @@ limitations under the License.
 
 #include <libopencor>
 
+static const libOpenCOR::ExpectedIssues expectedNonExistingFileIssues = {
+    {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
+};
+static const libOpenCOR::ExpectedIssues expectedUnknownFileIssues = {
+    {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
+};
+
 TEST(BasicFileTest, windowsLocalFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::WINDOWS_LOCAL_FILE);
@@ -28,6 +35,7 @@ TEST(BasicFileTest, windowsLocalFile)
     EXPECT_EQ(file->fileName(), libOpenCOR::WINDOWS_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
     EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
 }
 
 TEST(BasicFileTest, unixLocalFile)
@@ -38,6 +46,7 @@ TEST(BasicFileTest, unixLocalFile)
     EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
     EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
 }
 
 TEST(BasicFileTest, urlBasedWindowsLocalFile)
@@ -48,6 +57,7 @@ TEST(BasicFileTest, urlBasedWindowsLocalFile)
     EXPECT_EQ(file->fileName(), libOpenCOR::WINDOWS_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
     EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
 }
 
 TEST(BasicFileTest, urlBasedUnixLocalFile)
@@ -58,6 +68,7 @@ TEST(BasicFileTest, urlBasedUnixLocalFile)
     EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
     EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
 }
 
 TEST(BasicFileTest, remoteFile)
@@ -79,6 +90,7 @@ TEST(BasicFileTest, localVirtualFile)
     EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->contents(), someUnknownContentsVector);
+    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
 }
 
 TEST(BasicFileTest, remoteVirtualFile)
@@ -90,4 +102,5 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->fileName(), "");
     EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
     EXPECT_EQ(file->contents(), someUnknownContentsVector);
+    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
 }

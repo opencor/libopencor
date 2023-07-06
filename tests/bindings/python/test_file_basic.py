@@ -13,8 +13,20 @@
 # limitations under the License.
 
 
-from libopencor import File
+from libopencor import File, Issue
 import utils
+from utils import assert_issues
+
+
+expected_non_existing_file_issues = [
+    [Issue.Type.Error, "The file does not exist."],
+]
+expected_unknown_file_issues = [
+    [
+        Issue.Type.Error,
+        "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
+    ],
+]
 
 
 def test_windows_local_file():
@@ -24,6 +36,7 @@ def test_windows_local_file():
     assert file.file_name == utils.WINDOWS_LOCAL_FILE
     assert file.url == ""
     assert file.contents == []
+    assert_issues(expected_non_existing_file_issues, file)
 
 
 def test_unix_local_file():
@@ -33,6 +46,7 @@ def test_unix_local_file():
     assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
     assert file.contents == []
+    assert_issues(expected_non_existing_file_issues, file)
 
 
 def test_url_based_windows_local_file():
@@ -42,6 +56,7 @@ def test_url_based_windows_local_file():
     assert file.file_name == utils.WINDOWS_LOCAL_FILE
     assert file.url == ""
     assert file.contents == []
+    assert_issues(expected_non_existing_file_issues, file)
 
 
 def test_url_based_unix_local_file():
@@ -51,6 +66,7 @@ def test_url_based_unix_local_file():
     assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
     assert file.contents == []
+    assert_issues(expected_non_existing_file_issues, file)
 
 
 def test_remote_file():
@@ -70,6 +86,7 @@ def test_local_virtual_file():
     assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
     assert file.contents == some_unknown_contents_list
+    assert_issues(expected_unknown_file_issues, file)
 
 
 def test_remote_virtual_file():
@@ -80,3 +97,4 @@ def test_remote_virtual_file():
     assert file.file_name == ""
     assert file.url == utils.REMOTE_FILE
     assert file.contents == some_unknown_contents_list
+    assert_issues(expected_unknown_file_issues, file)
