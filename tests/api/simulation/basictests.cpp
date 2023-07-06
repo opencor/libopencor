@@ -22,7 +22,7 @@ limitations under the License.
 
 TEST(BasicSimulationTest, unknownFile)
 {
-    const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation cannot be created using an unknown file."},
     };
 
@@ -42,7 +42,7 @@ TEST(BasicSimulationTest, cellmlFile)
 
 TEST(BasicSimulationTest, sedmlFile)
 {
-    const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation cannot currently be created using a SED-ML file."},
     };
 
@@ -54,7 +54,7 @@ TEST(BasicSimulationTest, sedmlFile)
 
 TEST(BasicSimulationTest, combineArchive)
 {
-    const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation cannot currently be created using a COMBINE archive."},
     };
 
@@ -66,7 +66,7 @@ TEST(BasicSimulationTest, combineArchive)
 
 TEST(BasicSimulationTest, irretrievableFile)
 {
-    const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation cannot be created using an irretrievable file."},
     };
 
