@@ -33,7 +33,7 @@ def test_cellml_file():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     simulation = Simulation(file)
 
-    assert 0 == simulation.issue_count
+    assert not simulation.has_issues
 
 
 def test_sedml_file():

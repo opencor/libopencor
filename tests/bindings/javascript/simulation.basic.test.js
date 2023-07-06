@@ -73,7 +73,7 @@ describe("Simulation tests", () => {
     );
     const simulation = new libopencor.Simulation(file);
 
-    expect(simulation.issueCount()).toBe(0);
+    expect(simulation.hasIssues()).toBe(false);
   });
 
   test("SED-ML file", () => {

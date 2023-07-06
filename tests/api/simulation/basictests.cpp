@@ -37,7 +37,7 @@ TEST(BasicSimulationTest, cellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto simulation = libOpenCOR::Simulation::create(file);
 
-    EXPECT_EQ(0, simulation->issueCount());
+    EXPECT_FALSE(simulation->hasIssues());
 }
 
 TEST(BasicSimulationTest, sedmlFile)

@@ -83,6 +83,11 @@ const Logger::Impl *Logger::pimpl() const
     return mPimpl;
 }
 
+bool Logger::hasIssues() const
+{
+    return issueCount() != 0;
+}
+
 size_t Logger::issueCount() const
 {
     return pimpl()->mIssues.size();
@@ -95,6 +100,11 @@ IssuePtr Logger::issue(size_t pIndex) const
     }
 
     return {};
+}
+
+bool Logger::hasErrors() const
+{
+    return errorCount() != 0;
 }
 
 size_t Logger::errorCount() const
@@ -111,6 +121,11 @@ IssuePtr Logger::error(size_t pIndex) const
     return {};
 }
 
+bool Logger::hasWarnings() const
+{
+    return warningCount() != 0;
+}
+
 size_t Logger::warningCount() const
 {
     return pimpl()->mWarnings.size();
@@ -123,6 +138,11 @@ IssuePtr Logger::warning(size_t pIndex) const
     }
 
     return {};
+}
+
+bool Logger::hasMessages() const
+{
+    return messageCount() != 0;
 }
 
 size_t Logger::messageCount() const

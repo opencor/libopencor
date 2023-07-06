@@ -44,6 +44,16 @@ public:
     Logger &operator=(Logger &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
+     * @brief Return whether there are issues.
+     *
+     * Return whether there are issues.
+     *
+     * @return @c true if there are issues, @c false otherwise.
+     */
+
+    bool hasIssues() const;
+
+    /**
      * @brief Get the number of issues.
      *
      * Return the number of issues.
@@ -65,6 +75,16 @@ public:
      */
 
     IssuePtr issue(size_t pIndex) const;
+
+    /**
+     * @brief Return whether there are errors.
+     *
+     * Return whether there are errors.
+     *
+     * @return @c true if there are errors, @c false otherwise.
+     */
+
+    bool hasErrors() const;
 
     /**
      * @brief Get the number of errors.
@@ -90,6 +110,16 @@ public:
     IssuePtr error(size_t pIndex) const;
 
     /**
+     * @brief Return whether there are warnings.
+     *
+     * Return whether there are warnings.
+     *
+     * @return @c true if there are warnings, @c false otherwise.
+     */
+
+    bool hasWarnings() const;
+
+    /**
      * @brief Get the number of warnings.
      *
      * Return the number of issues of warning type.
@@ -111,6 +141,16 @@ public:
      */
 
     IssuePtr warning(size_t pIndex) const;
+
+    /**
+     * @brief Return whether there are messages.
+     *
+     * Return whether there are messages.
+     *
+     * @return @c true if there are messages, @c false otherwise.
+     */
+
+    bool hasMessages() const;
 
     /**
      * @brief Get the number of messages.
