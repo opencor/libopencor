@@ -317,7 +317,9 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
       - name: Install LLVM
         if: ${{ matrix.target == 'code_coverage_llvm_cov' }}
-        run: brew install llvm
+        run: |
+          brew update
+          brew install llvm
       - name: Install Clang
         if: ${{ matrix.name == 'Code analysis' }}
         run: |
@@ -338,10 +340,14 @@ jobs:
           sudo mv clang-tidy /usr/local/bin
       - name: Install Emscripten
         if: ${{ matrix.name == 'JavaScript' }}
-        run: brew install emscripten
+        run: |
+          brew update
+          brew install emscripten
       - name: Install Prettier
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
-        run: brew install prettier
+        run: |
+          brew update
+          brew install prettier
       - name: Install Black
         if: ${{ matrix.target == 'python_check_code_formatting' }}
         run: pip3 install black
