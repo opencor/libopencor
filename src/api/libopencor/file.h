@@ -87,7 +87,7 @@ public:
     /**
      * @brief Create a @ref File object.
      *
-     * Factory method to create a @ref File object for a virtual file:
+     * Factory method to create a @ref File object with some contents:
      *
      * ```
      * auto localVirtualFile = libOpenCOR::File::create("/some/path/file.txt", someContents);
@@ -95,7 +95,7 @@ public:
      * ```
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
-     * @param pContents The raw contents of the virtual file as a @c std::vector of unsigned @c char.
+     * @param pContents The contents of the file as a @c std::vector of unsigned @c char.
      *
      * @return A smart pointer to a @ref File object.
      */
