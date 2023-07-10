@@ -25,34 +25,25 @@ namespace libOpenCOR {
 Simulation::Impl::Impl(const FilePtr &pFile)
     : mFile(pFile)
 {
-    switch (mFile->type()) {
-    case File::Type::UNKNOWN_FILE:
+    if (mFile->type() == File::Type::UNKNOWN_FILE) {
         addError("A simulation cannot be created using an unknown file.");
-
-        break;
-    case File::Type::CELLML_FILE:
-        break;
-    case File::Type::SEDML_FILE:
+    } else if (mFile->type() == File::Type::SEDML_FILE) {
         addError("A simulation cannot currently be created using a SED-ML file.");
-
-        break;
-    case File::Type::COMBINE_ARCHIVE:
+    } else if (mFile->type() == File::Type::COMBINE_ARCHIVE) {
         addError("A simulation cannot currently be created using a COMBINE archive.");
-
-        break;
 #ifndef __EMSCRIPTEN__
-    case File::Type::IRRETRIEVABLE_FILE:
+    } else if (mFile->type() == File::Type::IRRETRIEVABLE_FILE) {
         addError("A simulation cannot be created using an irretrievable file.");
-
-        break;
 #endif
     }
 }
 
+/*---GRY---
 bool Simulation::Impl::supportedFile() const
 {
     return mFile->type() == File::Type::CELLML_FILE;
 }
+*/
 
 Simulation::Simulation(const FilePtr &pFile)
     : Logger(new Impl(pFile))
@@ -69,10 +60,12 @@ Simulation::Impl *Simulation::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
+/*---GRY---
 const Simulation::Impl *Simulation::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
+*/
 
 SimulationPtr Simulation::create(const FilePtr &pFile)
 {

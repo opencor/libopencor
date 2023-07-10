@@ -79,6 +79,7 @@ function(configure_target TARGET)
                 -Wno-exit-time-destructors
                 -Wno-global-constructors
                 -Wno-padded
+                -Wno-switch-enum
             )
 
             if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")

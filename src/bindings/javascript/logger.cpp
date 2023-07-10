@@ -25,10 +25,13 @@ void loggerApi()
         .function("hasErrors", &libOpenCOR::Logger::hasErrors)
         .function("errorCount", &libOpenCOR::Logger::errorCount)
         .function("error", &libOpenCOR::Logger::error)
-        .function("hasWarnings", &libOpenCOR::Logger::hasWarnings)
-        .function("warningCount", &libOpenCOR::Logger::warningCount)
-        .function("warning", &libOpenCOR::Logger::warning)
-        .function("hasMessages", &libOpenCOR::Logger::hasMessages)
-        .function("messageCount", &libOpenCOR::Logger::messageCount)
-        .function("message", &libOpenCOR::Logger::message);
+        /*---GRY---
+                .function("hasWarnings", &libOpenCOR::Logger::hasWarnings)
+                .function("warningCount", &libOpenCOR::Logger::warningCount)
+                .function("warning", &libOpenCOR::Logger::warning)
+                .function("hasMessages", &libOpenCOR::Logger::hasMessages)
+                .function("messageCount", &libOpenCOR::Logger::messageCount)
+                .function("message", &libOpenCOR::Logger::message)
+        */
+        ;
 }

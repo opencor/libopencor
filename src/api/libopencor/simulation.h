@@ -66,7 +66,8 @@ private:
     explicit Simulation(const FilePtr &pFile); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
-    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+    //---GRY---
+    //     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 };
 
 } // namespace libOpenCOR

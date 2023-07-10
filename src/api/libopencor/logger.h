@@ -117,7 +117,9 @@ public:
      * @return @c true if there are warnings, @c false otherwise.
      */
 
-    bool hasWarnings() const;
+    /*---GRY---
+        bool hasWarnings() const;
+    */
 
     /**
      * @brief Get the number of warnings.
@@ -127,7 +129,9 @@ public:
      * @return The number of warnings.
      */
 
-    size_t warningCount() const;
+    /*---GRY---
+        size_t warningCount() const;
+    */
 
     /**
      * @brief Get the warning at the given @p pIndex.
@@ -140,7 +144,9 @@ public:
      * @return A reference to the warning at the given @p pIndex or @c nullptr if @p pIndex is not valid.
      */
 
-    IssuePtr warning(size_t pIndex) const;
+    /*---GRY---
+        IssuePtr warning(size_t pIndex) const;
+    */
 
     /**
      * @brief Return whether there are messages.
@@ -150,7 +156,9 @@ public:
      * @return @c true if there are messages, @c false otherwise.
      */
 
-    bool hasMessages() const;
+    /*---GRY---
+        bool hasMessages() const;
+    */
 
     /**
      * @brief Get the number of messages.
@@ -160,7 +168,9 @@ public:
      * @return The number of messages.
      */
 
-    size_t messageCount() const;
+    /*---GRY---
+        size_t messageCount() const;
+    */
 
     /**
      * @brief Get the message at the given @p pIndex.
@@ -173,7 +183,9 @@ public:
      * @return A reference to the message at the given @p pIndex or @c nullptr if @p pIndex is not valid.
      */
 
-    IssuePtr message(size_t pIndex) const;
+    /*---GRY---
+        IssuePtr message(size_t pIndex) const;
+    */
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
