@@ -145,6 +145,7 @@ function(configure_target TARGET)
                 -modernize-use-trailing-return-type
                 performance-*
                 readability-*
+                -readability-function-cognitive-complexity
                 ${READABILITY_CHECKS}
             )
 
