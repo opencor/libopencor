@@ -141,6 +141,7 @@ set(INTERNAL_HEADER_FILES
 
 if(NOT EMSCRIPTEN)
     list(APPEND INTERNAL_HEADER_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler_p.h
         ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     )
 endif()
@@ -156,7 +157,8 @@ set(HEADER_FILES
     ${VERSION_HEADER_FILE}
 )
 
-include_directories(misc
+include_directories(.
+                    misc
                     support
                     ${CMAKE_CURRENT_BINARY_DIR})
 

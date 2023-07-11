@@ -22,17 +22,12 @@ limitations under the License.
 class CompilerTest: public testing::Test
 {
 protected:
+    libOpenCOR::CompilerPtr mCompiler;
+
     void SetUp() override
     {
-        mCompiler = new libOpenCOR::Compiler();
+        mCompiler = libOpenCOR::Compiler::create();
     }
-
-    void TearDown() override
-    {
-        delete mCompiler;
-    }
-
-    libOpenCOR::Compiler *mCompiler = nullptr;
 };
 
 TEST_F(CompilerTest, basic)

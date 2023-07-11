@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "compiler.h"
 
+#include "compiler_p.h"
+
 #include <iostream>
 
 #include "clangbegin.h"
@@ -36,7 +38,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-bool Compiler::compile(const std::string &pCode)
+bool Compiler::Impl::compile(const std::string &pCode)
 {
     // Reset ourselves.
 
@@ -185,7 +187,7 @@ bool Compiler::compile(const std::string &pCode)
     return !mLljit->addIRModule(std::move(threadSafeModule));
 }
 
-void *Compiler::function(const std::string &pName)
+void *Compiler::Impl::function(const std::string &pName) const
 {
     // Return the address of the requested function.
 
@@ -197,7 +199,42 @@ void *Compiler::function(const std::string &pName)
         }
     }
 
-    return nullptr;
+    return {};
+}
+
+Compiler::Compiler()
+    : Logger(new Impl())
+{
+}
+
+Compiler::~Compiler()
+{
+    delete pimpl();
+}
+
+Compiler::Impl *Compiler::pimpl()
+{
+    return reinterpret_cast<Impl *>(Logger::pimpl());
+}
+
+const Compiler::Impl *Compiler::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(Logger::pimpl());
+}
+
+CompilerPtr Compiler::create()
+{
+    return std::shared_ptr<Compiler> {new Compiler {}};
+}
+
+bool Compiler::compile(const std::string &pCode)
+{
+    return pimpl()->compile(pCode);
+}
+
+void *Compiler::function(const std::string &pName) const
+{
+    return pimpl()->function(pName);
 }
 
 } // namespace libOpenCOR
