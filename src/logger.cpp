@@ -66,7 +66,6 @@ void Logger::Impl::addMessage(const std::string &pDescription)
 }
 */
 
-/*---GRY---
 void Logger::Impl::removeAllIssues()
 {
     mIssues.clear();
@@ -75,7 +74,6 @@ void Logger::Impl::removeAllIssues()
     mWarnings.clear();
     mMessages.clear();
 }
-*/
 
 Logger::Logger(Impl *pPimpl)
     : mPimpl(pPimpl)

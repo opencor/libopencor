@@ -19,6 +19,7 @@ limitations under the License.
 #include "compiler_p.h"
 
 #include <iostream>
+#include <sstream>
 
 #include "clangbegin.h"
 #include "clang/CodeGen/CodeGenAction.h"
@@ -44,12 +45,16 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     mLljit.reset(nullptr);
 
+    removeAllIssues();
+
     // Create a diagnostics engine.
 
     auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(new clang::DiagnosticOptions());
+    std::string diagnostics;
+    llvm::raw_string_ostream outputStream(diagnostics);
     auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(new clang::DiagnosticsEngine(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs()),
                                                                                                              &*diagnosticOptions,
-                                                                                                             new clang::TextDiagnosticPrinter(llvm::nulls(), &*diagnosticOptions)));
+                                                                                                             new clang::TextDiagnosticPrinter(outputStream, &*diagnosticOptions)));
 
     diagnosticsEngine->setWarningsAsErrors(true);
 
@@ -75,21 +80,25 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
 #ifndef COVERAGE_ENABLED
     if (compilation == nullptr) {
+        addError("A compilation object could not be created.");
+
         return false;
     }
 #endif
 
-    // The compilation object should have only one command, so if it doesn't then something went wrong.
+    // The compilation object should have one command, so if it doesn't then something went wrong.
 
     clang::driver::JobList &jobs = compilation->getJobs();
 
 #ifndef COVERAGE_ENABLED
     if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
+        addError("The compilation object must have one command.");
+
         return false;
     }
 #endif
 
-    // Retrieve the command name and make sure that it is "clang".
+    // Retrieve the command and make sure that its name is "clang".
 
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
 
@@ -97,6 +106,8 @@ bool Compiler::Impl::compile(const std::string &pCode)
     static constexpr auto CLANG = "clang";
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
+        addError(std::string("The command name must be 'clang' while it is '") + command.getCreator().getName() + "'.");
+
         return false;
     }
 #endif
@@ -126,7 +137,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
     // Create a compiler invocation object.
 
 #ifndef COVERAGE_ENABLED
-    const bool res =
+    bool res =
 #endif
         clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
                                                   commandArguments,
@@ -134,6 +145,8 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
 #ifndef COVERAGE_ENABLED
     if (!res) {
+        addError("A compiler invocation object could not be created.");
+
         return false;
     }
 #endif
@@ -148,6 +161,41 @@ bool Compiler::Impl::compile(const std::string &pCode)
     std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction(llvm::unwrap(LLVMGetGlobalContext())));
 
     if (!compilerInstance.ExecuteAction(*codeGenAction)) {
+        addError("The given code could not be compiled.");
+
+        static constexpr auto ERROR = ": error: ";
+
+        std::istringstream input(diagnostics);
+        std::string line;
+
+        std::getline(input, line);
+
+        while (!input.eof()) {
+            const bool isError = line.find(ERROR) != std::string::npos;
+            std::string error;
+
+            if (isError) {
+                error = line.substr(line.find_last_of(':') + 2) + ":";
+                error[0] = static_cast<char>(std::toupper(error[0]));
+            }
+
+            std::getline(input, line);
+
+            while (!input.eof()) {
+                if (line.find(DUMMY_FILE_NAME) != std::string::npos) {
+                    break;
+                }
+
+                error += "\n" + line;
+
+                std::getline(input, line);
+            }
+
+            if (isError) {
+                addError(error);
+            }
+        }
+
         return false;
     }
 
@@ -157,6 +205,8 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
 #ifndef COVERAGE_ENABLED
     if (module == nullptr) {
+        addError("The LLVM bitcode module could not be retrieved.");
+
         return false;
     }
 #endif
@@ -173,6 +223,8 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
 #ifndef COVERAGE_ENABLED
     if (!lljit) {
+        addError("An ORC-based JIT could not be created.");
+
         return false;
     }
 #endif
@@ -184,7 +236,20 @@ bool Compiler::Impl::compile(const std::string &pCode)
     auto llvmContext = std::make_unique<llvm::LLVMContext>();
     auto threadSafeModule = llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext));
 
-    return !mLljit->addIRModule(std::move(threadSafeModule));
+#ifdef COVERAGE_ENABLED
+    const bool res =
+#else
+    res =
+#endif
+        !mLljit->addIRModule(std::move(threadSafeModule));
+
+#ifndef COVERAGE_ENABLED
+    if (!res) {
+        addError("The LLVM bitcode module could not be added to the ORC-based JIT.");
+    }
+#endif
+
+    return res;
 }
 
 void *Compiler::Impl::function(const std::string &pName) const
@@ -224,7 +289,7 @@ const Compiler::Impl *Compiler::pimpl() const
 
 CompilerPtr Compiler::create()
 {
-    return std::shared_ptr<Compiler> {new Compiler {}};
+    return std::shared_ptr<Compiler> {new Compiler()};
 }
 
 bool Compiler::compile(const std::string &pCode)
