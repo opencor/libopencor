@@ -39,7 +39,7 @@ void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
             mWarnings.push_back(index);
 
             break;
-        default: // libOpenCOR::Issue::Type::MESSAGE:
+        default: // libOpenCOR::Issue::Type::MESSAGE.
             mMessages.push_back(index);
 
             break;
