@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include "libopencor/logger.h"
+
 #include <memory>
 
 namespace libOpenCOR {
@@ -25,8 +27,27 @@ namespace libOpenCOR {
 class CombineArchive;
 using CombineArchivePtr = std::shared_ptr<CombineArchive>;
 
-class LIBOPENCOR_UNIT_TESTING_EXPORT CombineArchive
+class LIBOPENCOR_UNIT_TESTING_EXPORT CombineArchive: public Logger
 {
+public:
+    CombineArchive() = delete;
+    ~CombineArchive();
+
+    CombineArchive(const CombineArchive &pOther) = delete;
+    CombineArchive(CombineArchive &&pOther) noexcept = delete;
+
+    CombineArchive &operator=(const CombineArchive &pRhs) = delete;
+    CombineArchive &operator=(CombineArchive &&pRhs) noexcept = delete;
+
+    static CombineArchivePtr create(const FilePtr &pFile);
+
+private:
+    class Impl;
+
+    explicit CombineArchive(const FilePtr &pFile);
+
+    Impl *pimpl();
+    const Impl *pimpl() const;
 };
 
 } // namespace libOpenCOR

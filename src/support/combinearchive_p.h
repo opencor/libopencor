@@ -14,27 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "cellmlfile.h"
-#include "combinearchive.h"
 #include "logger_p.h"
-#include "sedmlfile.h"
 
 namespace libOpenCOR {
 
-class Simulation::Impl: public Logger::Impl
+class CombineArchive::Impl: public Logger::Impl
 {
 public:
     const FilePtr &mFile;
 
-    CellmlFilePtr mCellmlFile;
-    SedmlFilePtr mSedmlFile;
-    CombineArchivePtr mCombineArchive;
-
     Impl(const FilePtr &pFile);
-    ~Impl() = default;
-
     /*---GRY---
-        bool supportedFile() const;
+        ~Impl() = default;
     */
 };
 

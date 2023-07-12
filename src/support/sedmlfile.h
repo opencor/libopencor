@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include "libopencor/logger.h"
+
 #include <memory>
 
 namespace libOpenCOR {
@@ -25,8 +27,27 @@ namespace libOpenCOR {
 class SedmlFile;
 using SedmlFilePtr = std::shared_ptr<SedmlFile>;
 
-class LIBOPENCOR_UNIT_TESTING_EXPORT SedmlFile
+class LIBOPENCOR_UNIT_TESTING_EXPORT SedmlFile: public Logger
 {
+public:
+    SedmlFile() = delete;
+    ~SedmlFile();
+
+    SedmlFile(const SedmlFile &pOther) = delete;
+    SedmlFile(SedmlFile &&pOther) noexcept = delete;
+
+    SedmlFile &operator=(const SedmlFile &pRhs) = delete;
+    SedmlFile &operator=(SedmlFile &&pRhs) noexcept = delete;
+
+    static SedmlFilePtr create(const FilePtr &pFile);
+
+private:
+    class Impl;
+
+    explicit SedmlFile(const FilePtr &pFile);
+
+    Impl *pimpl();
+    const Impl *pimpl() const;
 };
 
 } // namespace libOpenCOR

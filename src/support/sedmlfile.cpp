@@ -16,5 +16,50 @@ limitations under the License.
 
 #include "sedmlfile.h"
 
+#include "sedmlfile_p.h"
+
 namespace libOpenCOR {
+
+/*---GRY---
+SedmlFile::Impl::Impl(const FilePtr &pFile)
+    : mFile(pFile)
+{
+}
+*/
+
+/*---GRY---
+SedmlFile::SedmlFile(const FilePtr &pFile)
+    : Logger(new Impl(pFile))
+{
+}
+*/
+
+/*---GRY---
+SedmlFile::~SedmlFile()
+{
+    delete pimpl();
+}
+*/
+
+/*---GRY---
+SedmlFile::Impl *SedmlFile::pimpl()
+{
+    return reinterpret_cast<Impl *>(Logger::pimpl());
+}
+*/
+
+/*---GRY---
+const SedmlFile::Impl *SedmlFile::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(Logger::pimpl());
+}
+*/
+
+/*---GRY---
+SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
+{
+    return std::shared_ptr<SedmlFile> {new SedmlFile {pFile}};
+}
+*/
+
 } // namespace libOpenCOR

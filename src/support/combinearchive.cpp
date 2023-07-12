@@ -16,5 +16,50 @@ limitations under the License.
 
 #include "combinearchive.h"
 
+#include "combinearchive_p.h"
+
 namespace libOpenCOR {
+
+/*---GRY---
+CombineArchive::Impl::Impl(const FilePtr &pFile)
+    : mFile(pFile)
+{
+}
+*/
+
+/*---GRY---
+CombineArchive::CombineArchive(const FilePtr &pFile)
+    : Logger(new Impl(pFile))
+{
+}
+*/
+
+/*---GRY---
+CombineArchive::~CombineArchive()
+{
+    delete pimpl();
+}
+*/
+
+/*---GRY---
+CombineArchive::Impl *CombineArchive::pimpl()
+{
+    return reinterpret_cast<Impl *>(Logger::pimpl());
+}
+*/
+
+/*---GRY---
+const CombineArchive::Impl *CombineArchive::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(Logger::pimpl());
+}
+*/
+
+/*---GRY---
+CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
+{
+    return std::shared_ptr<CombineArchive> {new CombineArchive {pFile}};
+}
+*/
+
 } // namespace libOpenCOR
