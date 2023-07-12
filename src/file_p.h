@@ -18,11 +18,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-namespace Support {
 class CellmlFile;
-class SedmlFile;
 class CombineArchive;
-} // namespace Support
+class SedmlFile;
 
 class File::Impl: public Logger::Impl
 {
@@ -35,9 +33,9 @@ public:
     bool mContentsRetrieved = false;
     std::vector<unsigned char> mContents;
 
-    Support::CellmlFile *mCellmlFile = nullptr;
-    Support::SedmlFile *mSedmlFile = nullptr;
-    Support::CombineArchive *mCombineArchive = nullptr;
+    CellmlFile *mCellmlFile = nullptr;
+    SedmlFile *mSedmlFile = nullptr;
+    CombineArchive *mCombineArchive = nullptr;
 
     Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents);
     ~Impl();

@@ -16,5 +16,5 @@ limitations under the License.
 
 #include "combinearchive.h"
 
-namespace libOpenCOR::Support {
-} // namespace libOpenCOR::Support
+namespace libOpenCOR {
+} // namespace libOpenCOR

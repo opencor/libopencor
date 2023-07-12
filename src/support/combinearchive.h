@@ -18,10 +18,10 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
-namespace libOpenCOR::Support {
+namespace libOpenCOR {
 
 class LIBOPENCOR_UNIT_TESTING_EXPORT CombineArchive
 {
 };
 
-} // namespace libOpenCOR::Support
+} // namespace libOpenCOR

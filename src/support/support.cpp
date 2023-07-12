@@ -26,7 +26,7 @@ limitations under the License.
 #include <sedml/SedReader.h>
 #include "libsedmlend.h"
 
-namespace libOpenCOR::Support {
+namespace libOpenCOR {
 namespace {
 std::string contentsAsString(const std::vector<unsigned char> &pContents)
 {
@@ -105,4 +105,4 @@ bool isSedmlFile(const FilePtr &pFile)
     return false;
 }
 
-} // namespace libOpenCOR::Support
+} // namespace libOpenCOR

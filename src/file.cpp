@@ -118,11 +118,11 @@ void File::Impl::checkType(const FilePtr &pOwner)
 {
     // Check whether the file is a CellML file, a SED-ML file, or a COMBINE archive.
 
-    if (Support::isCellmlFile(pOwner)) {
+    if (isCellmlFile(pOwner)) {
         mType = Type::CELLML_FILE;
-    } else if (Support::isSedmlFile(pOwner)) {
+    } else if (isSedmlFile(pOwner)) {
         mType = Type::SEDML_FILE;
-    } else if (Support::isCombineArchive(pOwner)) {
+    } else if (isCombineArchive(pOwner)) {
         mType = Type::COMBINE_ARCHIVE;
     } else if (mType == Type::UNKNOWN_FILE) {
         addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
