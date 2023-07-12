@@ -18,7 +18,12 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include <memory>
+
 namespace libOpenCOR {
+
+class CellmlFile;
+using CellmlFilePtr = std::shared_ptr<CellmlFile>;
 
 class LIBOPENCOR_UNIT_TESTING_EXPORT CellmlFile
 {

@@ -18,7 +18,12 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include <memory>
+
 namespace libOpenCOR {
+
+class CombineArchive;
+using CombineArchivePtr = std::shared_ptr<CombineArchive>;
 
 class LIBOPENCOR_UNIT_TESTING_EXPORT CombineArchive
 {

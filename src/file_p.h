@@ -14,13 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "cellmlfile.h"
+#include "combinearchive.h"
 #include "logger_p.h"
+#include "sedmlfile.h"
 
 namespace libOpenCOR {
-
-class CellmlFile;
-class CombineArchive;
-class SedmlFile;
 
 class File::Impl: public Logger::Impl
 {
@@ -33,9 +32,9 @@ public:
     bool mContentsRetrieved = false;
     std::vector<unsigned char> mContents;
 
-    CellmlFile *mCellmlFile = nullptr;
-    SedmlFile *mSedmlFile = nullptr;
-    CombineArchive *mCombineArchive = nullptr;
+    CellmlFilePtr mCellmlFile;
+    SedmlFilePtr mSedmlFile;
+    CombineArchivePtr mCombineArchive;
 
     Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents);
     ~Impl();

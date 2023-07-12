@@ -106,12 +106,6 @@ File::Impl::~Impl()
     if (!mUrl.empty() && !mFileName.empty()) {
         remove(mFileName.c_str()); // NOLINT(cert-err33-c)
     }
-
-    // Delete some internal objects.
-
-    delete mCellmlFile;
-    delete mSedmlFile;
-    delete mCombineArchive;
 }
 
 void File::Impl::checkType(const FilePtr &pOwner)

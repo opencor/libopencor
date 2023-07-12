@@ -18,7 +18,12 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include <memory>
+
 namespace libOpenCOR {
+
+class SedmlFile;
+using SedmlFilePtr = std::shared_ptr<SedmlFile>;
 
 class LIBOPENCOR_UNIT_TESTING_EXPORT SedmlFile
 {
