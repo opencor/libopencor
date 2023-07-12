@@ -25,15 +25,35 @@ namespace libOpenCOR {
 Simulation::Impl::Impl(const FilePtr &pFile)
     : mFile(pFile)
 {
-    if (mFile->type() == File::Type::UNKNOWN_FILE) {
+    // Make sure that the given file is supported.
+
+    switch (mFile->type()) {
+    case File::Type::UNKNOWN_FILE:
         addError("A simulation cannot be created using an unknown file.");
-    } else if (mFile->type() == File::Type::SEDML_FILE) {
+
+        break;
+    case File::Type::CELLML_FILE:
+        mCellmlFile = CellmlFile::create(mFile);
+
+        break;
+    case File::Type::SEDML_FILE:
         addError("A simulation cannot currently be created using a SED-ML file.");
-    } else if (mFile->type() == File::Type::COMBINE_ARCHIVE) {
+
+        break;
+#ifdef __EMSCRIPTEN__
+    default: // File::Type::COMBINE_ARCHIVE.
         addError("A simulation cannot currently be created using a COMBINE archive.");
-#ifndef __EMSCRIPTEN__
-    } else if (mFile->type() == File::Type::IRRETRIEVABLE_FILE) {
+
+        break;
+#else
+    case File::Type::COMBINE_ARCHIVE:
+        addError("A simulation cannot currently be created using a COMBINE archive.");
+
+        break;
+    default: // File::Type::IRRETRIEVABLE_FILE.
         addError("A simulation cannot be created using an irretrievable file.");
+
+        break;
 #endif
     }
 }

@@ -132,6 +132,7 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/runtime.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.h

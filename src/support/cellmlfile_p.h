@@ -14,42 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "cellmlfile.h"
-
-#include "cellmlfile_p.h"
+#include "logger_p.h"
 
 namespace libOpenCOR {
 
-CellmlFile::Impl::Impl(const FilePtr &pFile)
-    : mFile(pFile)
+class CellmlFile::Impl: public Logger::Impl
 {
-}
+public:
+    const FilePtr &mFile;
 
-CellmlFile::CellmlFile(const FilePtr &pFile)
-    : Logger(new Impl(pFile))
-{
-}
-
-CellmlFile::~CellmlFile()
-{
-    delete pimpl();
-}
-
-CellmlFile::Impl *CellmlFile::pimpl()
-{
-    return reinterpret_cast<Impl *>(Logger::pimpl());
-}
-
-/*---GRY---
-const CellmlFile::Impl *CellmlFile::pimpl() const
-{
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
-}
-*/
-
-CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
-{
-    return std::shared_ptr<CellmlFile> {new CellmlFile {pFile}};
-}
+    Impl(const FilePtr &pFile);
+    ~Impl() = default;
+};
 
 } // namespace libOpenCOR

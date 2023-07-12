@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "cellmlfile.h"
 #include "logger_p.h"
 
 namespace libOpenCOR {
@@ -22,6 +23,8 @@ class Simulation::Impl: public Logger::Impl
 {
 public:
     const FilePtr &mFile;
+
+    CellmlFilePtr mCellmlFile;
 
     Impl(const FilePtr &pFile);
     ~Impl() = default;

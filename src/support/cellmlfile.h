@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include "libopencor/logger.h"
+
 #include <memory>
 
 namespace libOpenCOR {
@@ -25,8 +27,27 @@ namespace libOpenCOR {
 class CellmlFile;
 using CellmlFilePtr = std::shared_ptr<CellmlFile>;
 
-class LIBOPENCOR_UNIT_TESTING_EXPORT CellmlFile
+class LIBOPENCOR_UNIT_TESTING_EXPORT CellmlFile: public Logger
 {
+public:
+    CellmlFile() = delete;
+    ~CellmlFile();
+
+    CellmlFile(const CellmlFile &pOther) = delete;
+    CellmlFile(CellmlFile &&pOther) noexcept = delete;
+
+    CellmlFile &operator=(const CellmlFile &pRhs) = delete;
+    CellmlFile &operator=(CellmlFile &&pRhs) noexcept = delete;
+
+    static CellmlFilePtr create(const FilePtr &pFile);
+
+private:
+    class Impl;
+
+    explicit CellmlFile(const FilePtr &pFile);
+
+    Impl *pimpl();
+    const Impl *pimpl() const;
 };
 
 } // namespace libOpenCOR
