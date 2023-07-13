@@ -92,7 +92,7 @@ const Logger::Impl *Logger::pimpl() const
 
 bool Logger::hasIssues() const
 {
-    return issueCount() != 0;
+    return !pimpl()->mIssues.empty();
 }
 
 size_t Logger::issueCount() const
@@ -111,7 +111,7 @@ IssuePtr Logger::issue(size_t pIndex) const
 
 bool Logger::hasErrors() const
 {
-    return errorCount() != 0;
+    return !pimpl()->mErrors.empty();
 }
 
 size_t Logger::errorCount() const
@@ -131,7 +131,7 @@ IssuePtr Logger::error(size_t pIndex) const
 /*---GRY---
 bool Logger::hasWarnings() const
 {
-    return warningCount() != 0;
+    return !pimpl()->mWarnings.empty();
 }
 */
 
@@ -156,7 +156,7 @@ IssuePtr Logger::warning(size_t pIndex) const
 /*---GRY---
 bool Logger::hasMessages() const
 {
-    return messageCount() != 0;
+    return !pimpl()->mMessages.empty();
 }
 */
 
