@@ -21,6 +21,13 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/*---GRY---
+void Logger::Impl::addIssue(const IssuePtr &pIssue)
+{
+    addIssue(pIssue->description(), pIssue->type());
+}
+*/
+
 void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
 {
     auto index = mIssues.size();

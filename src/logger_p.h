@@ -29,6 +29,7 @@ public:
     std::vector<size_t> mWarnings;
     std::vector<size_t> mMessages;
 
+    void addIssue(const IssuePtr &pIssue);
     void addIssue(const std::string &pDescription, Issue::Type pType);
 
     void addError(const std::string &pDescription);

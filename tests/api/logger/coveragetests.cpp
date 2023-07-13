@@ -36,6 +36,14 @@ TEST(LoggerTest, hasErrors)
     EXPECT_FALSE(simulation->hasErrors());
 }
 
+TEST(LoggerTest, errorCount)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto simulation = libOpenCOR::Simulation::create(file);
+
+    EXPECT_EQ(0, simulation->errorCount());
+}
+
 TEST(LoggerTest, error)
 {
     // Has an error.
