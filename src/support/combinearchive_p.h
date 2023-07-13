@@ -21,12 +21,10 @@ namespace libOpenCOR {
 class CombineArchive::Impl: public Logger::Impl
 {
 public:
-    const FilePtr &mFile;
+    libcombine::CombineArchive *mArchive;
 
-    Impl(const FilePtr &pFile);
-    /*---GRY---
-        ~Impl() = default;
-    */
+    Impl(libcombine::CombineArchive *pArchive);
+    ~Impl();
 };
 
 } // namespace libOpenCOR

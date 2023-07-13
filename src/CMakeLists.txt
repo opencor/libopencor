@@ -97,7 +97,6 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.cpp
 )
 
 if(NOT EMSCRIPTEN)
@@ -138,7 +137,6 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.h
     ${CMAKE_CURRENT_SOURCE_DIR}/unittestingexport.h
 )
 

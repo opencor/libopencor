@@ -20,7 +20,6 @@ limitations under the License.
 #include "combinearchive.h"
 #include "file_p.h"
 #include "sedmlfile.h"
-#include "support.h"
 #include "utils.h"
 
 #include <filesystem>
@@ -110,16 +109,26 @@ File::Impl::~Impl()
 
 void File::Impl::checkType(const FilePtr &pOwner)
 {
-    // Check whether the file is a CellML file, a SED-ML file, or a COMBINE archive.
+    // Try to get a CellML file, a SED-ML file, or a COMBINE archive.
 
-    if (isCellmlFile(pOwner)) {
+    mCellmlFile = CellmlFile::create(pOwner);
+
+    if (mCellmlFile != nullptr) {
         mType = Type::CELLML_FILE;
-    } else if (isSedmlFile(pOwner)) {
-        mType = Type::SEDML_FILE;
-    } else if (isCombineArchive(pOwner)) {
-        mType = Type::COMBINE_ARCHIVE;
-    } else if (mType == Type::UNKNOWN_FILE) {
-        addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
+    } else {
+        mSedmlFile = SedmlFile::create(pOwner);
+
+        if (mSedmlFile != nullptr) {
+            mType = Type::SEDML_FILE;
+        } else {
+            mCombineArchive = CombineArchive::create(pOwner);
+
+            if (mCombineArchive != nullptr) {
+                mType = Type::COMBINE_ARCHIVE;
+            } else if (mType == Type::UNKNOWN_FILE) {
+                addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
+            }
+        }
     }
 }
 

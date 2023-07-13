@@ -22,6 +22,10 @@ limitations under the License.
 
 #include <memory>
 
+namespace libcombine {
+class CombineArchive;
+}
+
 namespace libOpenCOR {
 
 class CombineArchive;
@@ -44,7 +48,7 @@ public:
 private:
     class Impl;
 
-    explicit CombineArchive(const FilePtr &pFile);
+    explicit CombineArchive(libcombine::CombineArchive *pArchive);
 
     Impl *pimpl();
     const Impl *pimpl() const;

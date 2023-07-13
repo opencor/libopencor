@@ -46,7 +46,6 @@ public:
 #endif
 
     std::vector<unsigned char> contents();
-    size_t size();
 };
 
 } // namespace libOpenCOR

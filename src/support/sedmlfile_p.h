@@ -21,12 +21,10 @@ namespace libOpenCOR {
 class SedmlFile::Impl: public Logger::Impl
 {
 public:
-    const FilePtr &mFile;
+    libsedml::SedDocument *mDocument;
 
-    Impl(const FilePtr &pFile);
-    /*---GRY---
-        ~Impl() = default;
-    */
+    Impl(libsedml::SedDocument *pDocument);
+    ~Impl();
 };
 
 } // namespace libOpenCOR

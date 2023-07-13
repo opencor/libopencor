@@ -16,14 +16,16 @@ limitations under the License.
 
 #include "logger_p.h"
 
+#include <libcellml>
+
 namespace libOpenCOR {
 
 class CellmlFile::Impl: public Logger::Impl
 {
 public:
-    const FilePtr &mFile;
+    const libcellml::ModelPtr &mModel;
 
-    Impl(const FilePtr &pFile);
+    Impl(const libcellml::ModelPtr &pModel);
     ~Impl() = default;
 };
 

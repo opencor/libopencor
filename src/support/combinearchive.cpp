@@ -18,35 +18,36 @@ limitations under the License.
 
 #include "combinearchive_p.h"
 
+#include "libopencor/file.h"
+
+#include <combine/combinearchive.h>
+
 namespace libOpenCOR {
 
-/*---GRY---
-CombineArchive::Impl::Impl(const FilePtr &pFile)
-    : mFile(pFile)
+CombineArchive::Impl::Impl(libcombine::CombineArchive *pArchive)
+    : mArchive(pArchive)
 {
 }
-*/
 
-/*---GRY---
-CombineArchive::CombineArchive(const FilePtr &pFile)
-    : Logger(new Impl(pFile))
+CombineArchive::Impl::~Impl()
+{
+    delete mArchive;
+}
+
+CombineArchive::CombineArchive(libcombine::CombineArchive *pArchive)
+    : Logger(new Impl(pArchive))
 {
 }
-*/
 
-/*---GRY---
 CombineArchive::~CombineArchive()
 {
     delete pimpl();
 }
-*/
 
-/*---GRY---
 CombineArchive::Impl *CombineArchive::pimpl()
 {
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
-*/
 
 /*---GRY---
 const CombineArchive::Impl *CombineArchive::pimpl() const
@@ -55,11 +56,25 @@ const CombineArchive::Impl *CombineArchive::pimpl() const
 }
 */
 
-/*---GRY---
 CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 {
-    return std::shared_ptr<CombineArchive> {new CombineArchive {pFile}};
+#ifdef __EMSCRIPTEN__
+    (void)pFile;
+
+    return nullptr;
+#else
+    // Try to retrieve a COMBINE archive.
+
+    auto *archive = new libcombine::CombineArchive();
+
+    if (archive->initializeFromArchive(pFile->fileName())) {
+        return std::shared_ptr<CombineArchive> {new CombineArchive {archive}};
+    }
+
+    delete archive;
+
+    return nullptr;
+#endif
 }
-*/
 
 } // namespace libOpenCOR

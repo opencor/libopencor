@@ -31,4 +31,6 @@ std::tuple<bool, std::string> downloadFile(const std::string &pUrl);
 std::tuple<bool, std::vector<unsigned char>> fileContents(const std::string &pFileName);
 #endif
 
+std::string contentsAsString(const std::vector<unsigned char> &pContents);
+
 } // namespace libOpenCOR

@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
+#include <libcellml>
 #include <memory>
 
 namespace libOpenCOR {
@@ -44,7 +45,7 @@ public:
 private:
     class Impl;
 
-    explicit CellmlFile(const FilePtr &pFile);
+    explicit CellmlFile(const libcellml::ModelPtr &pModel);
 
     Impl *pimpl();
     const Impl *pimpl() const;

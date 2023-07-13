@@ -208,4 +208,9 @@ std::tuple<bool, std::vector<unsigned char>> fileContents(const std::string &pFi
 }
 #endif
 
+std::string contentsAsString(const std::vector<unsigned char> &pContents)
+{
+    return {reinterpret_cast<const char *>(pContents.data()), pContents.size()};
+}
+
 } // namespace libOpenCOR

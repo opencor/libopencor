@@ -22,6 +22,10 @@ limitations under the License.
 
 #include <memory>
 
+namespace libsedml {
+class SedDocument;
+} // namespace libsedml
+
 namespace libOpenCOR {
 
 class SedmlFile;
@@ -44,7 +48,7 @@ public:
 private:
     class Impl;
 
-    explicit SedmlFile(const FilePtr &pFile);
+    explicit SedmlFile(libsedml::SedDocument *pDocument);
 
     Impl *pimpl();
     const Impl *pimpl() const;
