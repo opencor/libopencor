@@ -513,14 +513,8 @@ else()
     endif()
 
     # Enable Python bindings.
-    # Note: we unset Python_FOUND so that pybind11 can look for Python on our behalf and thus allow our Windows Python CI
-    #       test to work as expected using GitHub Actions. Indeed, on GHA Windows, Python 3.7.9 is the official version, yet
-    #       CMake finds and uses Python 3.10.0, which causes problems when we then want to test our Python bindings since we
-    #       use the official version of Python.
 
     if(LIBOPENCOR_PYTHON_BINDINGS)
-        unset(Python_FOUND)
-
         add_subdirectory(extern/pybind11)
 
         mark_as_advanced(PYBIND11_FINDPYTHON
