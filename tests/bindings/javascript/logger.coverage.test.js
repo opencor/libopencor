@@ -20,11 +20,26 @@ import * as utils from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("Issue coverage tests", () => {
-  test("issue()", () => {
-    const someCellmlContentsPtr = utils.allocateMemory(
+  let someCellmlContentsPtr;
+  let someUnknownContentsPtr;
+
+  beforeAll(() => {
+    someCellmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_CELLML_CONTENTS,
     );
+    someUnknownContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_UNKNOWN_CONTENTS,
+    );
+  });
+
+  afterAll(() => {
+    utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
+  });
+
+  test("issue()", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
@@ -33,15 +48,9 @@ describe("Issue coverage tests", () => {
     const simulation = new libopencor.Simulation(file);
 
     expect(simulation.issue(0)).toBeNull();
-
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
   test("hasErrors()", () => {
-    const someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS,
-    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
@@ -50,20 +59,9 @@ describe("Issue coverage tests", () => {
     const simulation = new libopencor.Simulation(file);
 
     expect(simulation.hasErrors()).toBe(false);
-
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
   test("error()", () => {
-    const someUnknownContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNKNOWN_CONTENTS,
-    );
-    const someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS,
-    );
-
     // Has an error.
 
     let file = new libopencor.File(
@@ -85,8 +83,5 @@ describe("Issue coverage tests", () => {
     simulation = new libopencor.Simulation(file);
 
     expect(simulation.error(0)).toBeNull();
-
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 });

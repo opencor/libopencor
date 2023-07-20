@@ -28,11 +28,20 @@ const expectedUnknownFileIssues = [
 ];
 
 describe("File basic tests", () => {
-  test("Local file", () => {
-    const someUnknownContentsPtr = utils.allocateMemory(
+  let someUnknownContentsPtr;
+
+  beforeAll(() => {
+    someUnknownContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_UNKNOWN_CONTENTS,
     );
+  });
+
+  afterAll(() => {
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
+  });
+
+  test("Local file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUnknownContentsPtr,
@@ -44,15 +53,9 @@ describe("File basic tests", () => {
     expect(file.url()).toBe("");
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(expectedUnknownFileIssues, file);
-
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
   test("Remote file", () => {
-    const someUnknownContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNKNOWN_CONTENTS,
-    );
     const file = new libopencor.File(
       utils.REMOTE_FILE,
       someUnknownContentsPtr,
@@ -64,7 +67,5 @@ describe("File basic tests", () => {
     expect(file.url()).toBe(utils.REMOTE_FILE);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(expectedUnknownFileIssues, file);
-
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 });

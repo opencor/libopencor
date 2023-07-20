@@ -21,11 +21,32 @@ import { expectIssues } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("Simulation tests", () => {
-  test("Unknown file", () => {
-    const someUnknownContentsPtr = utils.allocateMemory(
+  let someCellmlContentsPtr;
+  let someSedmlContentsPtr;
+  let someUnknownContentsPtr;
+
+  beforeAll(() => {
+    someCellmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_CELLML_CONTENTS,
+    );
+    someSedmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SEDML_CONTENTS,
+    );
+    someUnknownContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_UNKNOWN_CONTENTS,
     );
+  });
+
+  afterAll(() => {
+    utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someSedmlContentsPtr);
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
+  });
+
+  test("Unknown file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUnknownContentsPtr,
@@ -42,15 +63,9 @@ describe("Simulation tests", () => {
       ],
       simulation,
     );
-
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
   test("CellML file", () => {
-    const someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS,
-    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
@@ -59,15 +74,9 @@ describe("Simulation tests", () => {
     const simulation = new libopencor.Simulation(file);
 
     expect(simulation.hasIssues()).toBe(false);
-
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
   test("SED-ML file", () => {
-    const someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_CONTENTS,
-    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someSedmlContentsPtr,
@@ -84,7 +93,5 @@ describe("Simulation tests", () => {
       ],
       simulation,
     );
-
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
   });
 });

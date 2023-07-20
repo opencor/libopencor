@@ -21,11 +21,32 @@ import { expectIssues } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("File type tests", () => {
-  test("Unknown file", () => {
-    const someUnknownContentsPtr = utils.allocateMemory(
+  let someUnknownContentsPtr;
+  let someCellmlContentsPtr;
+  let someSedmlContentsPtr;
+
+  beforeAll(() => {
+    someUnknownContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_UNKNOWN_CONTENTS,
     );
+    someCellmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_CELLML_CONTENTS,
+    );
+    someSedmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SEDML_CONTENTS,
+    );
+  });
+
+  afterAll(() => {
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
+    utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someSedmlContentsPtr);
+  });
+
+  test("Unknown file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUnknownContentsPtr,
@@ -42,15 +63,9 @@ describe("File type tests", () => {
       ],
       file,
     );
-
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
   test("CellML file", () => {
-    const someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS,
-    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
@@ -58,15 +73,9 @@ describe("File type tests", () => {
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.CELLML_FILE.value);
-
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
   test("SED-ML file", () => {
-    const someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_CONTENTS,
-    );
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someSedmlContentsPtr,
@@ -74,7 +83,5 @@ describe("File type tests", () => {
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.SEDML_FILE.value);
-
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
   });
 });
