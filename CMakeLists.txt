@@ -25,7 +25,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Some common CMake functions/macros.
+# Some common CMake policies, functions, and macros.
+
+foreach(POLICY CMP0144)
+    if(POLICY ${POLICY})
+        cmake_policy(SET ${POLICY} NEW)
+    endif()
+endforeach()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
@@ -513,14 +519,8 @@ else()
     endif()
 
     # Enable Python bindings.
-    # Note: we unset Python_FOUND so that pybind11 can look for Python on our behalf and thus allow our Windows Python CI
-    #       test to work as expected using GitHub Actions. Indeed, on GHA Windows, Python 3.7.9 is the official version, yet
-    #       CMake finds and uses Python 3.10.0, which causes problems when we then want to test our Python bindings since we
-    #       use the official version of Python.
 
     if(LIBOPENCOR_PYTHON_BINDINGS)
-        unset(Python_FOUND)
-
         add_subdirectory(extern/pybind11)
 
         mark_as_advanced(PYBIND11_FINDPYTHON
