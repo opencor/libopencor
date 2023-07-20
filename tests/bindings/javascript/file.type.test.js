@@ -27,15 +27,15 @@ describe("File type tests", () => {
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
       libopencor,
-      utils.SOME_UNKNOWN_CONTENTS
+      utils.SOME_UNKNOWN_CONTENTS,
     );
     someCellmlContentsPtr = utils.allocateMemory(
       libopencor,
-      utils.SOME_CELLML_CONTENTS
+      utils.SOME_CELLML_CONTENTS,
     );
     someSedmlContentsPtr = utils.allocateMemory(
       libopencor,
-      utils.SOME_SEDML_CONTENTS
+      utils.SOME_SEDML_CONTENTS,
     );
   });
 
@@ -49,7 +49,7 @@ describe("File type tests", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length
+      utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
@@ -59,7 +59,7 @@ describe("File type tests", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
-      utils.SOME_CELLML_CONTENTS.length
+      utils.SOME_CELLML_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.CELLML_FILE.value);
@@ -69,7 +69,7 @@ describe("File type tests", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someSedmlContentsPtr,
-      utils.SOME_SEDML_CONTENTS.length
+      utils.SOME_SEDML_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.SEDML_FILE.value);

@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const mem = new Uint8Array(
               libopencor.HEAPU8.buffer,
               memPtr,
-              file.size
+              file.size,
             );
 
             mem.set(new Uint8Array(fileArrayBuffer));
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const libopencorFile = new libopencor.File(
               file.name,
               memPtr,
-              file.size
+              file.size,
             );
             let libopencorFileType = "unknown file";
 
