@@ -25,7 +25,7 @@ describe("File basic tests", () => {
   beforeAll(() => {
     someUknownContentsPtr = utils.allocateMemory(
       libopencor,
-      utils.SOME_UNKNOWN_CONTENTS
+      utils.SOME_UNKNOWN_CONTENTS,
     );
   });
 
@@ -37,7 +37,7 @@ describe("File basic tests", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length
+      utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
@@ -50,7 +50,7 @@ describe("File basic tests", () => {
     const file = new libopencor.File(
       utils.REMOTE_FILE,
       someUknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length
+      utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);

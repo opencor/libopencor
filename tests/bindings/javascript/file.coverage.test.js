@@ -24,7 +24,7 @@ describe("File coverage tests", () => {
     new libopencor.File(
       utils.HTTP_REMOTE_FILE,
       utils.SOME_UNKNOWN_CONTENTS,
-      utils.SOME_UNKNOWN_CONTENTS.length
+      utils.SOME_UNKNOWN_CONTENTS.length,
     );
   });
 });

@@ -24,10 +24,10 @@ export const REMOTE_FILE =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 
 export const SOME_UNKNOWN_CONTENTS = stringToArrayBuffer(
-  "Some unknown contents..."
+  "Some unknown contents...",
 );
 export const SOME_CELLML_CONTENTS = stringToArrayBuffer(
-  `@SOME_CELLML_CONTENTS@`
+  `@SOME_CELLML_CONTENTS@`,
 );
 export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
 
