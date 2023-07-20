@@ -216,7 +216,13 @@ std::string File::url() const
 #ifdef __EMSCRIPTEN__
 emscripten::val File::jsContents()
 {
-    return emscripten::val(emscripten::typed_memory_view(contents().size(), contents().data()));
+    auto contents = this->contents();
+    auto view = emscripten::typed_memory_view(contents.size(), contents.data());
+    auto res = emscripten::val::global("Uint8Array").new_(contents.size());
+
+    res.call<void>("set", view);
+
+    return res;
 }
 #endif
 
