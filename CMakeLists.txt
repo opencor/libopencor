@@ -25,7 +25,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Some common CMake functions/macros.
+# Some common CMake policies, functions, and macros.
+
+foreach(POLICY CMP0144)
+    if(POLICY ${POLICY})
+        cmake_policy(SET ${POLICY} NEW)
+    endif()
+endforeach()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
