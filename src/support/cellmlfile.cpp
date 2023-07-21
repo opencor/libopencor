@@ -93,9 +93,7 @@ CellmlFile::Impl::Impl(const libcellml::ModelPtr &pModel)
         if (!compiler->compile(generator->implementationCode())) {
             // The compilation failed, so add the issues it generated.
 
-            for (size_t i = 0; i < compiler->issueCount(); ++i) {
-                addIssue(compiler->issue(i));
-            }
+            addIssues(compiler);
         }
     }
 */

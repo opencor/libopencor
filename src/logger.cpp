@@ -22,9 +22,13 @@ limitations under the License.
 namespace libOpenCOR {
 
 /*---GRY---
-void Logger::Impl::addIssue(const IssuePtr &pIssue)
+void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 {
-    addIssue(pIssue->description(), pIssue->type());
+    for (size_t i = 0; i < pLogger->issueCount(); ++i) {
+        auto issue = pLogger->issue(i);
+
+        addIssue(issue->description(), issue->type());
+    }
 }
 */
 
