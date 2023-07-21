@@ -115,16 +115,22 @@ void File::Impl::checkType(const FilePtr &pOwner)
 
     if (mCellmlFile != nullptr) {
         mType = Type::CELLML_FILE;
+
+        addIssues(mCellmlFile);
     } else {
         mSedmlFile = SedmlFile::create(pOwner);
 
         if (mSedmlFile != nullptr) {
             mType = Type::SEDML_FILE;
+
+            addIssues(mSedmlFile);
         } else {
             mCombineArchive = CombineArchive::create(pOwner);
 
             if (mCombineArchive != nullptr) {
                 mType = Type::COMBINE_ARCHIVE;
+
+                addIssues(mCombineArchive);
             } else if (mType == Type::UNKNOWN_FILE) {
                 addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
             }

@@ -18,9 +18,10 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/*---GRY---
 Runtime::Runtime(const FilePtr &pFile)
 {
-    (void)pFile;
 }
+*/
 
 } // namespace libOpenCOR
