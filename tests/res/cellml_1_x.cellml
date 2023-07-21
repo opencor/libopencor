@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
 <model name="Lorenz" xmlns="http://www.cellml.org/cellml/1.0#" xmlns:cellml="http://www.cellml.org/cellml/1.0#">
     <component name="main">
         <variable name="t" units="dimensionless"/>
