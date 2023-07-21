@@ -16,8 +16,6 @@ limitations under the License.
 
 #pragma once
 
-#include "unittestingexport.h"
-
 #include "libopencor/logger.h"
 
 #include <libcellml>
@@ -28,7 +26,7 @@ namespace libOpenCOR {
 class CellmlFile;
 using CellmlFilePtr = std::shared_ptr<CellmlFile>;
 
-class LIBOPENCOR_UNIT_TESTING_EXPORT CellmlFile: public Logger
+class CellmlFile: public Logger
 {
 public:
     CellmlFile() = delete;

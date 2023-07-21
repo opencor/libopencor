@@ -16,13 +16,11 @@ limitations under the License.
 
 #pragma once
 
-#include "unittestingexport.h"
-
 #include "libopencor/file.h"
 
 namespace libOpenCOR {
 
-class LIBOPENCOR_UNIT_TESTING_EXPORT Runtime
+class Runtime
 {
 public:
     explicit Runtime(const FilePtr &pFile);

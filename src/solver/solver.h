@@ -16,11 +16,9 @@ limitations under the License.
 
 #pragma once
 
-#include "unittestingexport.h"
-
 namespace libOpenCOR {
 
-class LIBOPENCOR_UNIT_TESTING_EXPORT Solver
+class Solver
 {
 };
 

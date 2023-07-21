@@ -20,13 +20,6 @@ include(api/simulation/tests.cmake)
 include(api/version/tests.cmake)
 
 include(misc/compiler/tests.cmake)
-include(misc/runtime/tests.cmake)
-
-include(solver/tests.cmake)
-
-include(support/cellmlfile/tests.cmake)
-include(support/combinearchive/tests.cmake)
-include(support/sedmlfile/tests.cmake)
 
 # Prepare our different tests.
 
