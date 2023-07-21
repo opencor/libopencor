@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(LoggerTest, issue)
+TEST(CoverageLoggerTest, issue)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto simulation = libOpenCOR::Simulation::create(file);
@@ -28,7 +28,7 @@ TEST(LoggerTest, issue)
     EXPECT_EQ(nullptr, simulation->issue(0));
 }
 
-TEST(LoggerTest, hasErrors)
+TEST(CoverageLoggerTest, hasErrors)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto simulation = libOpenCOR::Simulation::create(file);
@@ -36,7 +36,7 @@ TEST(LoggerTest, hasErrors)
     EXPECT_FALSE(simulation->hasErrors());
 }
 
-TEST(LoggerTest, errorCount)
+TEST(CoverageLoggerTest, errorCount)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto simulation = libOpenCOR::Simulation::create(file);
@@ -44,7 +44,7 @@ TEST(LoggerTest, errorCount)
     EXPECT_EQ(0, simulation->errorCount());
 }
 
-TEST(LoggerTest, error)
+TEST(CoverageLoggerTest, error)
 {
     // Has an error.
 
