@@ -186,9 +186,9 @@ function(configure_target TARGET)
         endif()
     endif()
 
-    # Let libOpenCOR know that we are not building with LLVM code coverage.
+    # Let libOpenCOR know that we are building with coverage enabled.
 
-    if(LIBOPENCOR_CODE_COVERAGE_GCOV OR LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+    if(LIBOPENCOR_CODE_COVERAGE)
         target_compile_definitions(${TARGET} PRIVATE
                                    COVERAGE_ENABLED)
     endif()

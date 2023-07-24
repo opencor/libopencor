@@ -111,55 +111,27 @@ endif()
 
 add_subdirectory(bindings)
 
-# Let libOpenCOR know if coverage is enabled.
+# Let libOpenCOR know that we are building with coverage enabled.
 
-if(LIBOPENCOR_CODE_COVERAGE_GCOV OR LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
+if(LIBOPENCOR_CODE_COVERAGE)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
                                COVERAGE_ENABLED)
 endif()
 
-# Run our code coverage tests using gcov.
+# Run our code coverage tests.
 
-if(LIBOPENCOR_CODE_COVERAGE_GCOV)
-    # Clean our old gcov-based code coverage data.
+if(LIBOPENCOR_CODE_COVERAGE)
+    # Clean our old code coverage data.
 
-    add_custom_target(clean_code_coverage_gcov_data
-                      COMMAND ${FIND_EXE} ${GCOV_ANALYSIS_PATH} -type f -name \"*.gcda\" -print | xargs /bin/rm -f
-                      COMMENT "Cleaning old gcov-based code coverage data...")
-
-    # Clean our old gcov-based code coverage data when building libOpenCOR.
-
-    add_dependencies(${CMAKE_PROJECT_NAME} clean_code_coverage_gcov_data)
-
-    # Prepare for gcov-based code coverage.
-
-    add_custom_target(prepare_code_coverage_gcov
-                      COMMAND ${CMAKE_CTEST_COMMAND} > /dev/null
-                      DEPENDS clean_code_coverage_gcov_data ${TEST_TARGETS}
-                      COMMENT "Preparing for gcov-based code coverage...")
-
-    # Run our code coverage tests using gcov.
-
-    add_target(code_coverage_gcov
-               COMMAND ${GCOVR_EXE} -r ${GCOV_PREFIX_PATH} --gcov-executable=${GCOV_EXE} ${GCOV_ANALYSIS_PATH}
-               DEPENDS prepare_code_coverage_gcov
-               COMMENT "Running code coverage tests using gcov...")
-endif()
-
-# Run our code coverage tests using llvm-cov.
-
-if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
-    # Clean our old llvm-cov-based code coverage data.
-
-    add_custom_target(clean_code_coverage_llvm_cov_data
+    add_custom_target(clean_code_coverage_data
                       COMMAND ${FIND_EXE} ${CMAKE_CURRENT_BINARY_DIR} -type f -name \"${CMAKE_PROJECT_NAME}*.prof*\" -print | xargs /bin/rm -f
-                      COMMENT "Cleaning old llvm-cov-based code coverage data...")
+                      COMMENT "Cleaning old coverage data...")
 
-    # Clean our old llvm-cov-based code coverage data when building libOpenCOR.
+    # Clean our old code coverage data when building libOpenCOR.
 
-    add_dependencies(${CMAKE_PROJECT_NAME} clean_code_coverage_llvm_cov_data)
+    add_dependencies(${CMAKE_PROJECT_NAME} clean_code_coverage_data)
 
-    # Prepare for llvm-cov-based code coverage.
+    # Prepare for code coverage.
 
     foreach(TEST_TARGET ${TEST_TARGETS})
         list(APPEND COMMANDS COMMAND LLVM_PROFILE_FILE=${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_${TEST_TARGET}.profraw ./${TEST_TARGET} > /dev/null 2> /dev/null)
@@ -167,30 +139,30 @@ if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
 
     set(PROFDATA_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.profdata)
 
-    add_custom_target(prepare_code_coverage_llvm_cov
+    add_custom_target(prepare_code_coverage
                       ${COMMANDS}
                       COMMAND ${LLVM_PROFDATA_EXE} merge -sparse ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}*.profraw -o ${PROFDATA_FILE}
-                      DEPENDS clean_code_coverage_llvm_cov_data ${TEST_TARGETS}
-                      COMMENT "Preparing for llvm-cov-based code coverage...")
+                      DEPENDS clean_code_coverage_data ${TEST_TARGETS}
+                      COMMENT "Preparing for code coverage...")
 
-    # Run our code coverage tests using llvm-cov.
+    # Run our code coverage tests.
 
     set(LLVM_COV_OPTIONS -ignore-filename-regex="prebuilt.*" -instr-profile=${PROFDATA_FILE})
 
-    add_target(code_coverage_llvm_cov
+    add_target(code_coverage
                COMMAND ${LLVM_COV_EXE} report $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -use-color
-               DEPENDS prepare_code_coverage_llvm_cov
-               COMMENT "Running code coverage tests using llvm-cov...")
+               DEPENDS prepare_code_coverage
+               COMMENT "Running code coverage tests...")
 
-    # Run our code coverage report using llvm-cov.
+    # Run our code coverage report.
 
-    set(COVERAGE_REPORT_DIR code_coverage_llvm_cov_report)
+    set(COVERAGE_REPORT_DIR code_coverage_report)
 
-    add_target(code_coverage_llvm_cov_report
+    add_target(code_coverage_report
                COMMAND ${LLVM_COV_EXE} show $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LLVM_COV_OPTIONS} -format=html -show-branches=count -show-line-counts-or-regions -o ${COVERAGE_REPORT_DIR}
                COMMAND echo "The coverage report can be found at ${CMAKE_CURRENT_BINARY_DIR}/${COVERAGE_REPORT_DIR}/index.html."
-               DEPENDS prepare_code_coverage_llvm_cov
-               COMMENT "Running code coverage report using llvm-cov...")
+               DEPENDS prepare_code_coverage
+               COMMENT "Running code coverage report...")
 endif()
 
 # Run our memory checks.
