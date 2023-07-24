@@ -34,7 +34,9 @@ def test_error_cellml_file():
         ],
     ]
 
-    file = File(utils.UNIX_LOCAL_FILE, utils.string_to_list(utils.SOME_ERROR_CELLML_CONTENTS))
+    file = File(
+        utils.UNIX_LOCAL_FILE, utils.string_to_list(utils.SOME_ERROR_CELLML_CONTENTS)
+    )
 
     assert_issues(expected_issues, file)
 
@@ -47,6 +49,8 @@ def test_warning_cellml_file():
         ],
     ]
 
-    file = File(utils.UNIX_LOCAL_FILE, utils.string_to_list(utils.SOME_WARNING_CELLML_CONTENTS))
+    file = File(
+        utils.UNIX_LOCAL_FILE, utils.string_to_list(utils.SOME_WARNING_CELLML_CONTENTS)
+    )
 
     assert_issues(expected_issues, file)
