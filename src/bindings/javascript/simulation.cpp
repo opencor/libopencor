@@ -19,5 +19,9 @@ limitations under the License.
 void simulationApi()
 {
     emscripten::class_<libOpenCOR::Simulation, emscripten::base<libOpenCOR::Logger>>("Simulation")
-        .smart_ptr_constructor("Simulation", &libOpenCOR::Simulation::create);
+        .smart_ptr_constructor("Simulation", &libOpenCOR::Simulation::create)
+        .function("run", &libOpenCOR::Simulation::run)
+        .function("pause", &libOpenCOR::Simulation::pause)
+        .function("resume", &libOpenCOR::Simulation::resume)
+        .function("stop", &libOpenCOR::Simulation::stop);
 }

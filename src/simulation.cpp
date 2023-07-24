@@ -65,6 +65,22 @@ bool Simulation::Impl::supportedFile() const
 }
 */
 
+void Simulation::Impl::run()
+{
+}
+
+void Simulation::Impl::pause()
+{
+}
+
+void Simulation::Impl::resume()
+{
+}
+
+void Simulation::Impl::stop()
+{
+}
+
 Simulation::Simulation(const FilePtr &pFile)
     : Logger(new Impl(pFile))
 {
@@ -90,6 +106,26 @@ const Simulation::Impl *Simulation::pimpl() const
 SimulationPtr Simulation::create(const FilePtr &pFile)
 {
     return std::shared_ptr<Simulation> {new Simulation {pFile}};
+}
+
+void Simulation::run()
+{
+    pimpl()->run();
+}
+
+void Simulation::pause()
+{
+    pimpl()->pause();
+}
+
+void Simulation::resume()
+{
+    pimpl()->resume();
+}
+
+void Simulation::stop()
+{
+    pimpl()->stop();
 }
 
 } // namespace libOpenCOR

@@ -60,6 +60,38 @@ public:
 
     static SimulationPtr create(const FilePtr &pFile);
 
+    /**
+     * @brief Run the simulation.
+     *
+     * Run the simulation.
+     */
+
+    void run();
+
+    /**
+     * @brief Pause the simulation.
+     *
+     * Pause the simulation.
+     */
+
+    void pause();
+
+    /**
+     * @brief Resume the simulation.
+     *
+     * Resume the simulation.
+     */
+
+    void resume();
+
+    /**
+     * @brief Stop the simulation.
+     *
+     * Stop the simulation.
+     */
+
+    void stop();
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

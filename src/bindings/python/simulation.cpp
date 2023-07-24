@@ -26,5 +26,9 @@ void simulationApi(py::module_ &m)
 
     py::class_<libOpenCOR::Simulation, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::Simulation>> simulation(m, "Simulation");
 
-    simulation.def(py::init(&libOpenCOR::Simulation::create), "Create a Simulation object.", py::arg("file"));
+    simulation.def(py::init(&libOpenCOR::Simulation::create), "Create a Simulation object.", py::arg("file"))
+        .def("run", &libOpenCOR::Simulation::run, "Run the simulation.")
+        .def("pause", &libOpenCOR::Simulation::run, "Pause the simulation.")
+        .def("resume", &libOpenCOR::Simulation::run, "Resume the simulation.")
+        .def("stop", &libOpenCOR::Simulation::run, "Stop the simulation.");
 }

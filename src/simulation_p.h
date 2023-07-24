@@ -36,6 +36,11 @@ public:
     /*---GRY---
         bool supportedFile() const;
     */
+
+    void run();
+    void pause();
+    void resume();
+    void stop();
 };
 
 } // namespace libOpenCOR
