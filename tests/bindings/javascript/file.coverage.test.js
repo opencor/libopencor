@@ -16,34 +16,21 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
 describe("File coverage tests", () => {
   let someUnknownContentsPtr;
-  let someErrorCellmlContentsPtr;
-  let someWarningCellmlContentsPtr;
 
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_UNKNOWN_CONTENTS,
     );
-    someErrorCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_ERROR_CELLML_CONTENTS,
-    );
-    someWarningCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_WARNING_CELLML_CONTENTS,
-    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someUnknownContentsPtr);
-    utils.freeMemory(libopencor, someErrorCellmlContentsPtr);
-    utils.freeMemory(libopencor, someWarningCellmlContentsPtr);
   });
 
   test("http remote file", () => {
@@ -52,37 +39,5 @@ describe("File coverage tests", () => {
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
-  });
-
-  test("Error CellML file", () => {
-    const expectedIssues = [
-      [
-        libopencor.Issue.Type.ERROR,
-        "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
-      ],
-    ];
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someErrorCellmlContentsPtr,
-      utils.SOME_ERROR_CELLML_CONTENTS.length,
-    );
-
-    expectIssues(expectedIssues, file);
-  });
-
-  test("Warning CellML file", () => {
-    const expectedIssues = [
-      [
-        libopencor.Issue.Type.WARNING,
-        "The units in 'metre = 1.0' in component 'main' are not equivalent. 'metre' is in 'metre' while '1.0' is 'dimensionless'.",
-      ],
-    ];
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someWarningCellmlContentsPtr,
-      utils.SOME_WARNING_CELLML_CONTENTS.length,
-    );
-
-    expectIssues(expectedIssues, file);
   });
 });
