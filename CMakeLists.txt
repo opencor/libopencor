@@ -99,35 +99,20 @@ else()
 
     unset(CODE_ANALYSIS CACHE)
 
-    # CODE_COVERAGE_GCOV ==> LIBOPENCOR_CODE_COVERAGE_GCOV.
+    # CODE_COVERAGE ==> LIBOPENCOR_CODE_COVERAGE.
 
-    if(CODE_COVERAGE_GCOV_AVAILABLE)
-        set(LIBOPENCOR_CODE_COVERAGE_GCOV_DOCSTRING "Enable code coverage testing using gcov.")
-        set(LIBOPENCOR_CODE_COVERAGE_GCOV OFF CACHE BOOL "${LIBOPENCOR_CODE_COVERAGE_GCOV_DOCSTRING}")
+    if(CODE_COVERAGE_AVAILABLE)
+        set(LIBOPENCOR_CODE_COVERAGE_DOCSTRING "Enable code coverage testing.")
+        set(LIBOPENCOR_CODE_COVERAGE OFF CACHE BOOL "${LIBOPENCOR_CODE_COVERAGE_DOCSTRING}")
     endif()
 
-    if(NOT "${CODE_COVERAGE_GCOV}" STREQUAL "" AND CODE_COVERAGE_GCOV_AVAILABLE)
-        set(LIBOPENCOR_CODE_COVERAGE_GCOV ${CODE_COVERAGE_GCOV} CACHE BOOL "${LIBOPENCOR_CODE_COVERAGE_GCOV_DOCSTRING}" FORCE)
-    elseif(CODE_COVERAGE_GCOV)
-        message(SEND_ERROR "${CODE_COVERAGE_GCOV_ERROR_MESSAGE}")
+    if(NOT "${CODE_COVERAGE}" STREQUAL "" AND CODE_COVERAGE_AVAILABLE)
+        set(LIBOPENCOR_CODE_COVERAGE ${CODE_COVERAGE} CACHE BOOL "${LIBOPENCOR_CODE_COVERAGE_DOCSTRING}" FORCE)
+    elseif(CODE_COVERAGE)
+        message(SEND_ERROR "${CODE_COVERAGE_ERROR_MESSAGE}")
     endif()
 
-    unset(CODE_COVERAGE_GCOV CACHE)
-
-    # CODE_COVERAGE_LLVM_COV ==> LIBOPENCOR_CODE_COVERAGE_LLVM_COV.
-
-    if(CODE_COVERAGE_LLVM_COV_AVAILABLE)
-        set(LIBOPENCOR_CODE_COVERAGE_LLVM_COV_DOCSTRING "Enable code coverage testing using llvm-cov.")
-        set(LIBOPENCOR_CODE_COVERAGE_LLVM_COV OFF CACHE BOOL "${LIBOPENCOR_CODE_COVERAGE_LLVM_COV_DOCSTRING}")
-    endif()
-
-    if(NOT "${CODE_COVERAGE_LLVM_COV}" STREQUAL "" AND CODE_COVERAGE_LLVM_COV_AVAILABLE)
-        set(LIBOPENCOR_CODE_COVERAGE_LLVM_COV ${CODE_COVERAGE_LLVM_COV} CACHE BOOL "${LIBOPENCOR_CODE_COVERAGE_LLVM_COV_DOCSTRING}" FORCE)
-    elseif(CODE_COVERAGE_LLVM_COV)
-        message(SEND_ERROR "${CODE_COVERAGE_LLVM_COV_ERROR_MESSAGE}")
-    endif()
-
-    unset(CODE_COVERAGE_LLVM_COV CACHE)
+    unset(CODE_COVERAGE CACHE)
 
     # COMPILER_CACHING ==> LIBOPENCOR_COMPILER_CACHING.
 
@@ -449,23 +434,13 @@ else()
 
     # Make sure that the configuration is sound.
 
-    if(LIBOPENCOR_CODE_COVERAGE_GCOV)
+    if(LIBOPENCOR_CODE_COVERAGE)
         if(NOT LIBOPENCOR_SHARED_LIBS)
-            message(SEND_ERROR "Configuration confusion: code coverage using gcov is requested which means that a static library cannot be requested.")
+            message(SEND_ERROR "Configuration confusion: code coverage is requested which means that a static library cannot be requested.")
         endif()
 
         if(NOT LIBOPENCOR_UNIT_TESTING)
-            message(SEND_ERROR "Configuration confusion: code coverage using gcov is requested which means that unit testing should also be requested.")
-        endif()
-    endif()
-
-    if(LIBOPENCOR_CODE_COVERAGE_LLVM_COV)
-        if(NOT LIBOPENCOR_SHARED_LIBS)
-            message(SEND_ERROR "Configuration confusion: code coverage using llvm-cov is requested which means that a static library cannot be requested.")
-        endif()
-
-        if(NOT LIBOPENCOR_UNIT_TESTING)
-            message(SEND_ERROR "Configuration confusion: code coverage using llvm-cov is requested which means that unit testing should also be requested.")
+            message(SEND_ERROR "Configuration confusion: code coverage is requested which means that unit testing should also be requested.")
         endif()
     endif()
 
@@ -576,12 +551,8 @@ else()
         message(STATUS " - LIBOPENCOR_CODE_ANALYSIS:           ${LIBOPENCOR_CODE_ANALYSIS}")
     endif()
 
-    if(NOT "${LIBOPENCOR_CODE_COVERAGE_GCOV}" STREQUAL "")
-        message(STATUS " - LIBOPENCOR_CODE_COVERAGE_GCOV:      ${LIBOPENCOR_CODE_COVERAGE_GCOV}")
-    endif()
-
-    if(NOT "${LIBOPENCOR_CODE_COVERAGE_LLVM_COV}" STREQUAL "")
-        message(STATUS " - LIBOPENCOR_CODE_COVERAGE_LLVM_COV:  ${LIBOPENCOR_CODE_COVERAGE_LLVM_COV}")
+    if(NOT "${LIBOPENCOR_CODE_COVERAGE}" STREQUAL "")
+        message(STATUS " - LIBOPENCOR_CODE_COVERAGE:           ${LIBOPENCOR_CODE_COVERAGE}")
     endif()
 
     if(NOT "${LIBOPENCOR_COMPILER_CACHING}" STREQUAL "")
