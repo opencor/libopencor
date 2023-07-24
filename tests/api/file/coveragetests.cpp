@@ -29,3 +29,27 @@ TEST(CoverageFileTest, irretrievableRemoteFile)
 {
     libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
 }
+
+TEST(CoverageFileTest, errorCellmlFile)
+{
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
+        {libOpenCOR::Issue::Type::ERROR, "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."},
+    };
+
+    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
+                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_ERROR_CELLML_CONTENTS));
+
+    EXPECT_EQ_ISSUES(expectedIssues, file);
+}
+
+TEST(CoverageFileTest, warningCellmlFile)
+{
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
+        {libOpenCOR::Issue::Type::WARNING, "The units in 'metre = 1.0' in component 'main' are not equivalent. 'metre' is in 'metre' while '1.0' is 'dimensionless'."},
+    };
+
+    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
+                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_WARNING_CELLML_CONTENTS));
+
+    EXPECT_EQ_ISSUES(expectedIssues, file);
+}

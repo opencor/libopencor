@@ -13,8 +13,9 @@
 # limitations under the License.
 
 
-from libopencor import File
+from libopencor import File, Issue
 import utils
+from utils import assert_issues
 
 
 def test_http_remote_file():
@@ -23,3 +24,29 @@ def test_http_remote_file():
 
 def test_irretrievable_remote_file():
     File(utils.IRRETRIEVABLE_REMOTE_FILE)
+
+
+def test_error_cellml_file():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
+        ],
+    ]
+
+    file = File(utils.UNIX_LOCAL_FILE, utils.string_to_list(utils.SOME_ERROR_CELLML_CONTENTS))
+
+    assert_issues(expected_issues, file)
+
+
+def test_warning_cellml_file():
+    expected_issues = [
+        [
+            Issue.Type.Warning,
+            "The units in 'metre = 1.0' in component 'main' are not equivalent. 'metre' is in 'metre' while '1.0' is 'dimensionless'.",
+        ],
+    ]
+
+    file = File(utils.UNIX_LOCAL_FILE, utils.string_to_list(utils.SOME_WARNING_CELLML_CONTENTS))
+
+    assert_issues(expected_issues, file)
