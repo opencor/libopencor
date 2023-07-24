@@ -146,8 +146,6 @@ find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
 find_program(EMCONFIGURE_EXE NAMES ${PREFERRED_EMCONFIGURE_NAMES} emconfigure)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
-find_program(GCOV_EXE NAMES ${PREFERRED_GCOV_NAMES} gcov)
-find_program(GCOVR_EXE NAMES ${PREFERRED_GCOVR_NAMES} gcovr)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
 find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov)
 find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata)
@@ -183,17 +181,11 @@ include(CheckCXXCompilerFlag)
 
 set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
 
-set(CODE_COVERAGE_GCOV_COMPILER_FLAGS "-fprofile-arcs -ftest-coverage")
-set(CODE_COVERAGE_GCOV_LINKER_FLAGS "${CODE_COVERAGE_GCOV_COMPILER_FLAGS}")
-set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_GCOV_COMPILER_FLAGS})
+set(CODE_COVERAGE_COMPILER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+set(CODE_COVERAGE_LINKER_FLAGS "-fprofile-instr-generate")
+set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_COMPILER_FLAGS})
 
-check_cxx_compiler_flag(${CODE_COVERAGE_GCOV_COMPILER_FLAGS} CODE_COVERAGE_GCOV_COMPILER_FLAGS_OK)
-
-set(CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
-set(CODE_COVERAGE_LLVM_COV_LINKER_FLAGS "-fprofile-instr-generate")
-set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS})
-
-check_cxx_compiler_flag(${CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS} CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
+check_cxx_compiler_flag(${CODE_COVERAGE_COMPILER_FLAGS} CODE_COVERAGE_COMPILER_FLAGS_OK)
 
 set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
 
@@ -265,16 +257,10 @@ else()
     set(JAVASCRIPT_UNIT_TESTING_ERROR_MESSAGE "JavaScript unit testing is requested but the emcmake, emconfigure, node, and/or npm tools could not be found.")
 endif()
 
-if(FIND_EXE AND GCOV_EXE AND GCOVR_EXE AND CODE_COVERAGE_GCOV_COMPILER_FLAGS_OK)
-    set(CODE_COVERAGE_GCOV_AVAILABLE TRUE)
+if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_COMPILER_FLAGS_OK)
+    set(CODE_COVERAGE_AVAILABLE TRUE)
 else()
-    set(CODE_COVERAGE_GCOV_ERROR_MESSAGE "Code coverage testing using gcov is requested but the find, gcov and/or gcovr tools could not be found, and/or the -fprofile-arcs and -ftest-coverage compiler/linker flags are not supported.")
-endif()
-
-if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_LLVM_COV_COMPILER_FLAGS_OK)
-    set(CODE_COVERAGE_LLVM_COV_AVAILABLE TRUE)
-else()
-    set(CODE_COVERAGE_LLVM_COV_ERROR_MESSAGE "Code coverage testing using llvm-cov is requested but the find, llvm-cov and/or llvm-profdata tools could not be found, and/or the -fprofile-instr-generate and -fcoverage-mapping compiler/linker flags are not supported.")
+    set(CODE_COVERAGE_ERROR_MESSAGE "Code coverage testing is requested but the find, llvm-cov and/or llvm-profdata tools could not be found, and/or the -fprofile-instr-generate and -fcoverage-mapping compiler/linker flags are not supported.")
 endif()
 
 if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
@@ -348,8 +334,6 @@ mark_as_advanced(BLACK_EXE
                  EMCMAKE_EXE
                  EMCONFIGURE_EXE
                  FIND_EXE
-                 GCOV_EXE
-                 GCOVR_EXE
                  GIT_EXE
                  LLVM_COV_EXE
                  LLVM_PROFDATA_EXE
