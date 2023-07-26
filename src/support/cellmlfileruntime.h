@@ -16,12 +16,9 @@ limitations under the License.
 
 #pragma once
 
-#include "cellmlfileruntime.h"
+#include "cellmlfile.h"
 
 #include "libopencor/logger.h"
-
-#include <libcellml>
-#include <memory>
 
 namespace libOpenCOR {
 
@@ -31,29 +28,24 @@ using CellmlFilePtr = std::shared_ptr<CellmlFile>;
 class CellmlFileRuntime;
 using CellmlFileRuntimePtr = std::shared_ptr<CellmlFileRuntime>;
 
-class CellmlFile: public Logger
-    , public std::enable_shared_from_this<CellmlFile>
+class CellmlFileRuntime: public Logger
 {
 public:
-    CellmlFile() = delete;
-    ~CellmlFile();
+    CellmlFileRuntime() = delete;
+    ~CellmlFileRuntime();
 
-    CellmlFile(const CellmlFile &pOther) = delete;
-    CellmlFile(CellmlFile &&pOther) noexcept = delete;
+    CellmlFileRuntime(const CellmlFileRuntime &pOther) = delete;
+    CellmlFileRuntime(CellmlFileRuntime &&pOther) noexcept = delete;
 
-    CellmlFile &operator=(const CellmlFile &pRhs) = delete;
-    CellmlFile &operator=(CellmlFile &&pRhs) noexcept = delete;
+    CellmlFileRuntime &operator=(const CellmlFileRuntime &pRhs) = delete;
+    CellmlFileRuntime &operator=(CellmlFileRuntime &&pRhs) noexcept = delete;
 
-    static CellmlFilePtr create(const FilePtr &pFile);
-
-    libcellml::ModelPtr model() const;
-
-    CellmlFileRuntimePtr runtime();
+    static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile);
 
 private:
     class Impl;
 
-    explicit CellmlFile(const libcellml::ModelPtr &pModel);
+    explicit CellmlFileRuntime(const CellmlFilePtr &pCellmlFile);
 
     Impl *pimpl();
     const Impl *pimpl() const;

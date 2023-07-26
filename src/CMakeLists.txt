@@ -91,10 +91,10 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/runtime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfileruntime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.cpp
 )
@@ -128,11 +128,12 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/runtime.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfileruntime_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfileruntime.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile_p.h

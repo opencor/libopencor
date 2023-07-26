@@ -31,6 +31,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT File: public Logger
 {
+    friend class Simulation;
+
 public:
     /**
      * @brief The type of a file.

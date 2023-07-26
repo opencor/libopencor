@@ -17,7 +17,7 @@ limitations under the License.
 #include "cellmlfile.h"
 
 #include "cellmlfile_p.h"
-#include "compiler.h"
+#include "cellmlfileruntime.h"
 #include "utils.h"
 
 #include "libopencor/file.h"
@@ -27,82 +27,6 @@ namespace libOpenCOR {
 CellmlFile::Impl::Impl(const libcellml::ModelPtr &pModel)
     : mModel(pModel)
 {
-    // Analyse the model.
-
-    auto analyser = libcellml::Analyser::create();
-
-    analyser->analyseModel(mModel);
-
-    if (analyser->issueCount() != 0) {
-        // The analyser reported some issues, so make them ours.
-
-        for (size_t i = 0; i < analyser->issueCount(); ++i) {
-            auto issue = analyser->issue(i);
-            Issue::Type type = Issue::Type::ERROR;
-
-#ifdef COVERAGE_ENABLED
-            if (issue->level() == libcellml::Issue::Level::ERROR) {
-                type = Issue::Type::ERROR;
-            } else {
-                type = Issue::Type::WARNING;
-            }
-#else
-            switch (issue->level()) {
-            case libcellml::Issue::Level::ERROR:
-                type = Issue::Type::ERROR;
-
-                break;
-            case libcellml::Issue::Level::WARNING:
-                type = Issue::Type::WARNING;
-
-                break;
-            default: // libcellml::Issue::Level::MESSAGE.
-                type = Issue::Type::MESSAGE;
-
-                break;
-            }
-#endif
-
-            addIssue(issue->description(), type);
-        }
-    }
-
-#ifndef __EMSCRIPTEN__
-    // Generate some code for the model and compile it, should the analysis have been fine.
-
-    if (mIssues.empty()) {
-        auto generator = libcellml::Generator::create();
-        auto generatorProfile = libcellml::GeneratorProfile::create();
-
-        generatorProfile->setOriginCommentString("");
-        generatorProfile->setImplementationHeaderString("");
-        generatorProfile->setImplementationVersionString("");
-        generatorProfile->setImplementationStateCountString("");
-        generatorProfile->setImplementationVariableCountString("");
-        generatorProfile->setImplementationLibcellmlVersionString("");
-        generatorProfile->setImplementationVoiInfoString("");
-        generatorProfile->setImplementationStateInfoString("");
-        generatorProfile->setImplementationVariableInfoString("");
-        generatorProfile->setImplementationCreateStatesArrayMethodString("");
-        generatorProfile->setImplementationCreateVariablesArrayMethodString("");
-        generatorProfile->setImplementationDeleteArrayMethodString("");
-
-        generator->setModel(analyser->model());
-        generator->setProfile(generatorProfile);
-
-        auto compiler = Compiler::create();
-
-#    ifdef COVERAGE_ENABLED
-        compiler->compile(generator->implementationCode());
-#    else
-        if (!compiler->compile(generator->implementationCode())) {
-            // The compilation failed, so add the issues it generated.
-
-            addIssues(compiler);
-        }
-#    endif
-    }
-#endif
 }
 
 CellmlFile::CellmlFile(const libcellml::ModelPtr &pModel)
@@ -120,12 +44,10 @@ CellmlFile::Impl *CellmlFile::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const CellmlFile::Impl *CellmlFile::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 {
@@ -155,6 +77,16 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     }
 
     return nullptr;
+}
+
+libcellml::ModelPtr CellmlFile::model() const
+{
+    return pimpl()->mModel;
+}
+
+CellmlFileRuntimePtr CellmlFile::runtime()
+{
+    return CellmlFileRuntime::create(shared_from_this());
 }
 
 } // namespace libOpenCOR

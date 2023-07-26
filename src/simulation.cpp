@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "libopencor/simulation.h"
 
+#include "file_p.h"
 #include "simulation_p.h"
 
 #include "libopencor/file.h"
@@ -33,7 +34,7 @@ Simulation::Impl::Impl(const FilePtr &pFile)
 
         break;
     case File::Type::CELLML_FILE:
-        mCellmlFile = CellmlFile::create(mFile);
+        mCellmlFile = mFile->pimpl()->mCellmlFile;
 
         break;
     case File::Type::SEDML_FILE:
@@ -58,15 +59,26 @@ Simulation::Impl::Impl(const FilePtr &pFile)
     }
 }
 
-/*---GRY---
 bool Simulation::Impl::supportedFile() const
 {
-    return mFile->type() == File::Type::CELLML_FILE;
+    return mCellmlFile != nullptr;
 }
-*/
 
 void Simulation::Impl::run()
 {
+    // Make sure that our file is supported.
+
+    if (!supportedFile()) {
+        return;
+    }
+
+    // Retrieve a runtime for the CellML file and propagate any issue it may have.
+
+    auto runtime = mCellmlFile->runtime();
+
+    if (runtime->hasIssues()) {
+        addIssues(runtime);
+    }
 }
 
 void Simulation::Impl::pause()

@@ -33,9 +33,7 @@ public:
     Impl(const FilePtr &pFile);
     ~Impl() = default;
 
-    /*---GRY---
-        bool supportedFile() const;
-    */
+    bool supportedFile() const;
 
     void run();
     void pause();

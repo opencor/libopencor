@@ -19,6 +19,8 @@ limitations under the License.
 #include "logger_p.h"
 #include "sedmlfile.h"
 
+#include "libopencor/file.h"
+
 namespace libOpenCOR {
 
 class File::Impl: public Logger::Impl
