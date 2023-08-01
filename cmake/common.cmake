@@ -142,6 +142,7 @@ function(configure_target TARGET)
                 misc-*
                 ${MISC_CHECKS}
                 modernize-*
+                -modernize-pass-by-value
                 -modernize-use-trailing-return-type
                 performance-*
                 readability-*

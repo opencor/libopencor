@@ -25,7 +25,7 @@ namespace libOpenCOR {
 class CellmlFile::Impl: public Logger::Impl
 {
 public:
-    const libcellml::ModelPtr &mModel;
+    libcellml::ModelPtr mModel;
 
     Impl(const libcellml::ModelPtr &pModel);
     ~Impl() = default;
