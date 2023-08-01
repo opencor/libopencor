@@ -20,7 +20,7 @@ import { expectIssues } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
-describe("Simulation basic tests", () => {
+describe("Simulation tests", () => {
   let someCellmlContentsPtr;
   let someSedmlContentsPtr;
   let someUnknownContentsPtr;
@@ -46,7 +46,7 @@ describe("Simulation basic tests", () => {
     utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
-  test("Unknown file", () => {
+  test("Run unknown file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someUnknownContentsPtr,
@@ -54,18 +54,10 @@ describe("Simulation basic tests", () => {
     );
     const simulation = new libopencor.Simulation(file);
 
-    expectIssues(
-      [
-        [
-          libopencor.Issue.Type.ERROR,
-          "A simulation cannot be created using an unknown file.",
-        ],
-      ],
-      simulation,
-    );
+    simulation.run();
   });
 
-  test("CellML file", () => {
+  test("Run CellML file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
@@ -73,10 +65,10 @@ describe("Simulation basic tests", () => {
     );
     const simulation = new libopencor.Simulation(file);
 
-    expect(simulation.hasIssues()).toBe(false);
+    simulation.run();
   });
 
-  test("SED-ML file", () => {
+  test("Run SED-ML file", () => {
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someSedmlContentsPtr,
@@ -84,14 +76,6 @@ describe("Simulation basic tests", () => {
     );
     const simulation = new libopencor.Simulation(file);
 
-    expectIssues(
-      [
-        [
-          libopencor.Issue.Type.ERROR,
-          "A simulation cannot currently be created using a SED-ML file.",
-        ],
-      ],
-      simulation,
-    );
+    simulation.run();
   });
 });

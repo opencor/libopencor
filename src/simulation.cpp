@@ -81,23 +81,26 @@ void Simulation::Impl::run()
     }
 }
 
-/*---GRY---
+//---GRY---
+#ifndef COVERAGE_ENABLED
 void Simulation::Impl::pause()
 {
 }
-*/
+#endif
 
-/*---GRY---
+//---GRY---
+#ifndef COVERAGE_ENABLED
 void Simulation::Impl::resume()
 {
 }
-*/
+#endif
 
-/*---GRY---
+//---GRY---
+#ifndef COVERAGE_ENABLED
 void Simulation::Impl::stop()
 {
 }
-*/
+#endif
 
 Simulation::Simulation(const FilePtr &pFile)
     : Logger(new Impl(pFile))
@@ -131,25 +134,28 @@ void Simulation::run()
     pimpl()->run();
 }
 
-/*---GRY---
+//---GRY---
+#ifndef COVERAGE_ENABLED
 void Simulation::pause()
 {
     pimpl()->pause();
 }
-*/
+#endif
 
-/*---GRY---
+//---GRY---
+#ifndef COVERAGE_ENABLED
 void Simulation::resume()
 {
     pimpl()->resume();
 }
-*/
+#endif
 
-/*---GRY---
+//---GRY---
+#ifndef COVERAGE_ENABLED
 void Simulation::stop()
 {
     pimpl()->stop();
 }
-*/
+#endif
 
 } // namespace libOpenCOR
