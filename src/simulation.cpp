@@ -81,17 +81,23 @@ void Simulation::Impl::run()
     }
 }
 
+/*---GRY---
 void Simulation::Impl::pause()
 {
 }
+*/
 
+/*---GRY---
 void Simulation::Impl::resume()
 {
 }
+*/
 
+/*---GRY---
 void Simulation::Impl::stop()
 {
 }
+*/
 
 Simulation::Simulation(const FilePtr &pFile)
     : Logger(new Impl(pFile))
@@ -125,19 +131,25 @@ void Simulation::run()
     pimpl()->run();
 }
 
+/*---GRY---
 void Simulation::pause()
 {
     pimpl()->pause();
 }
+*/
 
+/*---GRY---
 void Simulation::resume()
 {
     pimpl()->resume();
 }
+*/
 
+/*---GRY---
 void Simulation::stop()
 {
     pimpl()->stop();
 }
+*/
 
 } // namespace libOpenCOR
