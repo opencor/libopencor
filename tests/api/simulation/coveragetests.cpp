@@ -31,6 +31,7 @@ TEST(CoverageSimulationTest, errorCellmlFile)
     auto simulation = libOpenCOR::Simulation::create(file);
 
     simulation->run();
+    simulation->run();
 
     EXPECT_EQ_ISSUES(expectedIssues, simulation);
 }
@@ -45,6 +46,7 @@ TEST(CoverageSimulationTest, warningCellmlFile)
                                          libOpenCOR::charArrayToVector(libOpenCOR::SOME_WARNING_CELLML_CONTENTS));
     auto simulation = libOpenCOR::Simulation::create(file);
 
+    simulation->run();
     simulation->run();
 
     EXPECT_EQ_ISSUES(expectedIssues, simulation);

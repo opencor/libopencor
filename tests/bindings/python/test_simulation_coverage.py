@@ -32,6 +32,7 @@ def test_error_cellml_file():
     simulation = Simulation(file)
 
     simulation.run()
+    simulation.run()
 
     assert_issues(expected_issues, simulation)
 
@@ -49,6 +50,7 @@ def test_warning_cellml_file():
     )
     simulation = Simulation(file)
 
+    simulation.run()
     simulation.run()
 
     assert_issues(expected_issues, simulation)

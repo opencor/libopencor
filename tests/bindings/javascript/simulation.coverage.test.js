@@ -55,6 +55,7 @@ describe("Simulation coverage tests", () => {
     const simulation = new libopencor.Simulation(file);
 
     simulation.run();
+    simulation.run();
 
     expectIssues(expectedIssues, simulation);
   });
@@ -73,6 +74,7 @@ describe("Simulation coverage tests", () => {
     );
     const simulation = new libopencor.Simulation(file);
 
+    simulation.run();
     simulation.run();
 
     expectIssues(expectedIssues, simulation);

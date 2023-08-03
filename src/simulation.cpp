@@ -72,7 +72,11 @@ void Simulation::Impl::run()
         return;
     }
 
-    // Retrieve a runtime for the CellML file and propagate any issue it may have.
+    // Remove all our issues in case we had some from a previous run.
+
+    removeAllIssues();
+
+    // Retrieve a runtime for the CellML file and propagate any issues it may have.
 
     auto runtime = mCellmlFile->runtime();
 
