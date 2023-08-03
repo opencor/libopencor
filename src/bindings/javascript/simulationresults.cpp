@@ -14,12 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include <libopencor>
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/simulation.h"
-#include "libopencor/simulationdata.h"
-#include "libopencor/simulationresults.h"
-#include "libopencor/version.h"
+void simulationResultsApi()
+{
+    emscripten::class_<libOpenCOR::SimulationResults, emscripten::base<libOpenCOR::Logger>>("SimulationResults");
+}

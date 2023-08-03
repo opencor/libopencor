@@ -25,6 +25,8 @@ set(PYTHON_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/simulation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/simulationdata.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/simulationresults.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "Python source files."
 )

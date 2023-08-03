@@ -14,12 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include <libopencor>
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/simulation.h"
-#include "libopencor/simulationdata.h"
-#include "libopencor/simulationresults.h"
-#include "libopencor/version.h"
+#include <pybind11/pybind11.h>
+
+namespace py = pybind11;
+
+void simulationDataApi(py::module_ &m)
+{
+    // SimulationData API.
+
+    py::class_<libOpenCOR::SimulationData, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::SimulationData>> simulationData(m, "SimulationData");
+
+    simulationData.def("is_valid", &libOpenCOR::SimulationData::isValid, "Return whether the SimulationData object is valid.");
+}

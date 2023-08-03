@@ -16,40 +16,33 @@ limitations under the License.
 
 #pragma once
 
-#include "cellmlfile.h"
-#include "combinearchive.h"
-#include "logger_p.h"
-#include "sedmlfile.h"
-#include "simulationworker.h"
-
-#include "libopencor/simulationdata.h"
-#include "libopencor/simulationresults.h"
+#include "libopencor/logger.h"
 
 namespace libOpenCOR {
 
-class Simulation::Impl: public Logger::Impl
+class SimulationWorker;
+using SimulationWorkerPtr = std::shared_ptr<SimulationWorker>;
+
+class SimulationWorker: public Logger
 {
 public:
-    const FilePtr &mFile;
+    ~SimulationWorker();
 
-    CellmlFilePtr mCellmlFile;
-    SedmlFilePtr mSedmlFile;
-    CombineArchivePtr mCombineArchive;
+    SimulationWorker(const SimulationWorker &pOther) = delete;
+    SimulationWorker(SimulationWorker &&pOther) noexcept = delete;
 
-    SimulationWorkerPtr mWorker;
+    SimulationWorker &operator=(const SimulationWorker &pRhs) = delete;
+    SimulationWorker &operator=(SimulationWorker &&pRhs) noexcept = delete;
 
-    SimulationDataPtr mData;
-    SimulationResultsPtr mResults;
+    static SimulationWorkerPtr create();
 
-    Impl(const FilePtr &pFile);
-    ~Impl() = default;
+private:
+    class Impl;
 
-    bool supportedFile() const;
+    explicit SimulationWorker();
 
-    void run();
-    void pause();
-    void resume();
-    void stop();
+    Impl *pimpl();
+    const Impl *pimpl() const;
 };
 
 } // namespace libOpenCOR

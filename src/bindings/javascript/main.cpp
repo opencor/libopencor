@@ -20,6 +20,8 @@ void fileApi();
 void issueApi();
 void loggerApi();
 void simulationApi();
+void simulationDataApi();
+void simulationResultsApi();
 void versionApi();
 
 EMSCRIPTEN_BINDINGS(libOpenCOR)
@@ -29,5 +31,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     fileApi();
     issueApi();
     simulationApi();
+    simulationDataApi();
+    simulationResultsApi();
     versionApi();
 }

@@ -16,10 +16,12 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/simulation.h"
-#include "libopencor/simulationdata.h"
-#include "libopencor/simulationresults.h"
-#include "libopencor/version.h"
+#include "logger_p.h"
+
+namespace libOpenCOR {
+
+class SimulationWorker::Impl: public Logger::Impl
+{
+};
+
+} // namespace libOpenCOR

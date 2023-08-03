@@ -14,12 +14,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/simulation.h"
-#include "libopencor/simulationdata.h"
 #include "libopencor/simulationresults.h"
-#include "libopencor/version.h"
+
+#include "simulationresults_p.h"
+
+namespace libOpenCOR {
+
+SimulationResultsPtr SimulationResults::Impl::create()
+{
+    return std::shared_ptr<SimulationResults> {new SimulationResults()};
+}
+
+SimulationResults::SimulationResults()
+    : Logger(new Impl())
+{
+}
+
+SimulationResults::~SimulationResults()
+{
+    delete pimpl();
+}
+
+SimulationResults::Impl *SimulationResults::pimpl()
+{
+    return reinterpret_cast<Impl *>(Logger::pimpl());
+}
+
+/*---GRY---
+const SimulationResults::Impl *SimulationResults::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(Logger::pimpl());
+}
+*/
+
+} // namespace libOpenCOR

@@ -27,6 +27,8 @@ void fileApi(py::module_ &m);
 void issueApi(py::module_ &m);
 void loggerApi(py::module_ &m);
 void simulationApi(py::module_ &m);
+void simulationDataApi(py::module_ &m);
+void simulationResultsApi(py::module_ &m);
 void versionApi(py::module_ &m);
 
 PYBIND11_MODULE(module, m)
@@ -46,5 +48,7 @@ PYBIND11_MODULE(module, m)
     fileApi(m);
     issueApi(m);
     simulationApi(m);
+    simulationDataApi(m);
+    simulationResultsApi(m);
     versionApi(m);
 }

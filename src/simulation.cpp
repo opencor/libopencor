@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "file_p.h"
 #include "simulation_p.h"
+#include "simulationdata_p.h"
+#include "simulationresults_p.h"
 
 #include "libopencor/file.h"
 
@@ -26,6 +28,11 @@ namespace libOpenCOR {
 Simulation::Impl::Impl(const FilePtr &pFile)
     : mFile(pFile)
 {
+    // Create our simulation data and results objects.
+
+    mData = SimulationData::Impl::create();
+    mResults = SimulationResults::Impl::create();
+
     // Make sure that the given file is supported.
 
     switch (mFile->type()) {
@@ -85,6 +92,18 @@ void Simulation::Impl::run()
 
         return;
     }
+
+    // Initialise our worker, if we don't already have one and if our simulation data are valid.
+
+//---GRY---
+#ifndef COVERAGE_ENABLED
+    if ((mWorker == nullptr) && mData->isValid()) {
+#endif
+        mWorker = SimulationWorker::create();
+//---GRY---
+#ifndef COVERAGE_ENABLED
+    }
+#endif
 }
 
 //---GRY---
