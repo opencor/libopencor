@@ -78,6 +78,8 @@ void Simulation::Impl::run()
 
     if (runtime->hasIssues()) {
         addIssues(runtime);
+
+        return;
     }
 }
 
