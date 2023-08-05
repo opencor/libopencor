@@ -20,58 +20,58 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(BasicSimulationTest, unknownFile)
+TEST(BasicSedDocumentTest, unknownFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "A simulation cannot be created using an unknown file."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an unknown file."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(expectedIssues, simulation);
 }
 
-TEST(BasicSimulationTest, cellmlFile)
+TEST(BasicSedDocumentTest, cellmlFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_FALSE(simulation->hasIssues());
 }
 
-TEST(BasicSimulationTest, sedmlFile)
+TEST(BasicSedDocumentTest, sedmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "A simulation cannot currently be created using a SED-ML file."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot currently be created using a SED-ML file."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(expectedIssues, simulation);
 }
 
-TEST(BasicSimulationTest, combineArchive)
+TEST(BasicSedDocumentTest, combineArchive)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "A simulation cannot currently be created using a COMBINE archive."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot currently be created using a COMBINE archive."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(expectedIssues, simulation);
 }
 
-TEST(BasicSimulationTest, irretrievableFile)
+TEST(BasicSedDocumentTest, irretrievableFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "A simulation cannot be created using an irretrievable file."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an irretrievable file."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(expectedIssues, simulation);
 }

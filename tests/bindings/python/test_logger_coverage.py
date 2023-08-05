@@ -13,20 +13,20 @@
 # limitations under the License.
 
 
-from libopencor import File, Simulation
+from libopencor import File, SedDocument
 import utils
 
 
 def test_issue():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert simulation.issue(0) == None
 
 
 def test_has_errors():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert not simulation.has_errors
 
@@ -35,13 +35,13 @@ def test_error():
     # Has an error.
 
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert simulation.error(0) != None
 
     # Doesn't have an error.
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert simulation.error(0) == None

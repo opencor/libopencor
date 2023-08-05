@@ -23,7 +23,7 @@ limitations under the License.
 TEST(CoverageLoggerTest, issue)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(nullptr, simulation->issue(0));
 }
@@ -31,7 +31,7 @@ TEST(CoverageLoggerTest, issue)
 TEST(CoverageLoggerTest, hasErrors)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_FALSE(simulation->hasErrors());
 }
@@ -39,7 +39,7 @@ TEST(CoverageLoggerTest, hasErrors)
 TEST(CoverageLoggerTest, errorCount)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(0, simulation->errorCount());
 }
@@ -49,14 +49,14 @@ TEST(CoverageLoggerTest, error)
     // Has an error.
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
-    auto simulation = libOpenCOR::Simulation::create(file);
+    auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_NE(nullptr, simulation->error(0));
 
     // Doesn't have an error.
 
     file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    simulation = libOpenCOR::Simulation::create(file);
+    simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(nullptr, simulation->error(0));
 }

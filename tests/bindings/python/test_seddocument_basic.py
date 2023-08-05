@@ -13,25 +13,28 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue, Simulation
+from libopencor import File, Issue, SedDocument
 import utils
 from utils import assert_issues
 
 
 def test_unknown_file():
     expected_issues = [
-        [Issue.Type.Error, "A simulation cannot be created using an unknown file."],
+        [
+            Issue.Type.Error,
+            "A simulation experiment description cannot be created using an unknown file.",
+        ],
     ]
 
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert_issues(expected_issues, simulation)
 
 
 def test_cellml_file():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert not simulation.has_issues
 
@@ -40,12 +43,12 @@ def test_sedml_file():
     expected_issues = [
         [
             Issue.Type.Error,
-            "A simulation cannot currently be created using a SED-ML file.",
+            "A simulation experiment description cannot currently be created using a SED-ML file.",
         ],
     ]
 
     file = File(utils.resource_path(utils.SEDML_2_FILE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert_issues(expected_issues, simulation)
 
@@ -54,12 +57,12 @@ def test_combine_archive():
     expected_issues = [
         [
             Issue.Type.Error,
-            "A simulation cannot currently be created using a COMBINE archive.",
+            "A simulation experiment description cannot currently be created using a COMBINE archive.",
         ],
     ]
 
     file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert_issues(expected_issues, simulation)
 
@@ -68,11 +71,11 @@ def test_irretrievable_file():
     expected_issues = [
         [
             Issue.Type.Error,
-            "A simulation cannot be created using an irretrievable file.",
+            "A simulation experiment description cannot be created using an irretrievable file.",
         ],
     ]
 
     file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
-    simulation = Simulation(file)
+    simulation = SedDocument(file)
 
     assert_issues(expected_issues, simulation)

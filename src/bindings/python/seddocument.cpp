@@ -20,11 +20,11 @@ limitations under the License.
 
 namespace py = pybind11;
 
-void simulationDataApi(py::module_ &m)
+void sedDocumentApi(py::module_ &m)
 {
-    // SimulationData API.
+    // SedDocument API.
 
-    py::class_<libOpenCOR::SimulationData, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::SimulationData>> simulationData(m, "SimulationData");
+    py::class_<libOpenCOR::SedDocument, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::SedDocument>> sedDocument(m, "SedDocument");
 
-    simulationData.def("is_valid", &libOpenCOR::SimulationData::isValid, "Return whether the SimulationData object is valid.");
+    sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", py::arg("file"));
 }

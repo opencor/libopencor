@@ -16,40 +16,15 @@ limitations under the License.
 
 #pragma once
 
-#include "cellmlfile.h"
-#include "combinearchive.h"
 #include "logger_p.h"
-#include "sedmlfile.h"
-#include "simulationworker.h"
-
-#include "libopencor/simulationdata.h"
-#include "libopencor/simulationresults.h"
 
 namespace libOpenCOR {
 
-class Simulation::Impl: public Logger::Impl
+class SedDocument::Impl: public Logger::Impl
 {
 public:
-    const FilePtr &mFile;
-
-    CellmlFilePtr mCellmlFile;
-    SedmlFilePtr mSedmlFile;
-    CombineArchivePtr mCombineArchive;
-
-    SimulationWorkerPtr mWorker;
-
-    SimulationDataPtr mData;
-    SimulationResultsPtr mResults;
-
     Impl(const FilePtr &pFile);
     ~Impl() = default;
-
-    bool supportedFile() const;
-
-    void run();
-    void pause();
-    void resume();
-    void stop();
 };
 
 } // namespace libOpenCOR

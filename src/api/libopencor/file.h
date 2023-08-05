@@ -32,8 +32,6 @@ namespace libOpenCOR {
 class LIBOPENCOR_EXPORT File: public Logger
     , public std::enable_shared_from_this<File>
 {
-    friend class Simulation;
-
 public:
     /**
      * @brief The type of a file.

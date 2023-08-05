@@ -76,9 +76,7 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/file.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/issue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/logger.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/simulation.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/simulationdata.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/simulationresults.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddocument.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
 
@@ -100,7 +98,6 @@ set(INTERNAL_SOURCE_FILES
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/simulation/simulationworker.cpp
 )
 
 if(NOT EMSCRIPTEN)
@@ -113,9 +110,7 @@ set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulationdata.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulationresults.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
 )
 
@@ -123,9 +118,7 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/issue_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/logger_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulation_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulationdata_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/simulationresults_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/seddocument_p.h
     ${GIT_API_SOURCE_FILES}
     ${INTERNAL_SOURCE_FILES}
 )
@@ -147,8 +140,6 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/simulation/simulationworker_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/simulation/simulationworker.h
     ${CMAKE_CURRENT_SOURCE_DIR}/unittestingexport.h
 )
 
@@ -175,7 +166,6 @@ include_directories(.
                     support/cellml
                     support/combine
                     support/sedml
-                    support/simulation
                     ${CMAKE_CURRENT_BINARY_DIR})
 
 set(JAVASCRIPT_SOURCE_DIR tests/bindings/javascript)

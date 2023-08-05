@@ -45,7 +45,7 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const simulation = new libopencor.Simulation(file);
+    const simulation = new libopencor.SedDocument(file);
 
     expect(simulation.issue(0)).toBeNull();
   });
@@ -56,7 +56,7 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const simulation = new libopencor.Simulation(file);
+    const simulation = new libopencor.SedDocument(file);
 
     expect(simulation.hasErrors()).toBe(false);
   });
@@ -69,7 +69,7 @@ describe("Issue coverage tests", () => {
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
-    let simulation = new libopencor.Simulation(file);
+    let simulation = new libopencor.SedDocument(file);
 
     expect(simulation.error(0)).not.toBeNull();
 
@@ -80,7 +80,7 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    simulation = new libopencor.Simulation(file);
+    simulation = new libopencor.SedDocument(file);
 
     expect(simulation.error(0)).toBeNull();
   });

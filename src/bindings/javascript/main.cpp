@@ -19,9 +19,7 @@ limitations under the License.
 void fileApi();
 void issueApi();
 void loggerApi();
-void simulationApi();
-void simulationDataApi();
-void simulationResultsApi();
+void sedDocumentApi();
 void versionApi();
 
 EMSCRIPTEN_BINDINGS(libOpenCOR)
@@ -30,8 +28,6 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
 
     fileApi();
     issueApi();
-    simulationApi();
-    simulationDataApi();
-    simulationResultsApi();
+    sedDocumentApi();
     versionApi();
 }

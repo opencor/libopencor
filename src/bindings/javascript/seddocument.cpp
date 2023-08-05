@@ -16,7 +16,8 @@ limitations under the License.
 
 #include <libopencor>
 
-void simulationResultsApi()
+void sedDocumentApi()
 {
-    emscripten::class_<libOpenCOR::SimulationResults, emscripten::base<libOpenCOR::Logger>>("SimulationResults");
+    emscripten::class_<libOpenCOR::SedDocument, emscripten::base<libOpenCOR::Logger>>("SedDocument")
+        .smart_ptr_constructor("SedDocument", &libOpenCOR::SedDocument::create);
 }

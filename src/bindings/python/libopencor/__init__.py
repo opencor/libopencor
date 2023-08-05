@@ -20,8 +20,8 @@ from .module import (
     Issue,
     # Logger API.
     Logger,
-    # Simulation API.
-    Simulation,
+    # SedDocument API.
+    SedDocument,
     # Version API.
     version,
     version_string,
@@ -48,8 +48,8 @@ __all__ = (
     "Issue",
     # Logger API.
     "Logger",
-    # Simulation API.
-    "Simulation",
+    # SedDocument API.
+    "SedDocument",
     # Version API.
     "version",
     "version_string",

@@ -29,13 +29,7 @@ using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @re
 class Logger;
 using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
 
-class Simulation;
-using SimulationPtr = std::shared_ptr<Simulation>; /**< Type definition for the shared @ref Simulation pointer. */
-
-class SimulationData;
-using SimulationDataPtr = std::shared_ptr<SimulationData>; /**< Type definition for the shared @ref SimulationData pointer. */
-
-class SimulationResults;
-using SimulationResultsPtr = std::shared_ptr<SimulationResults>; /**< Type definition for the shared @ref SimulationResults pointer. */
+class SedDocument;
+using SedDocumentPtr = std::shared_ptr<SedDocument>; /**< Type definition for the shared @ref SedDocument pointer. */
 
 } // namespace libcellml
