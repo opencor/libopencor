@@ -44,10 +44,12 @@ CellmlFile::Impl *CellmlFile::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
+/*---GRY---
 const CellmlFile::Impl *CellmlFile::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
+*/
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 {
@@ -79,14 +81,18 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     return nullptr;
 }
 
+/*---GRY---
 libcellml::ModelPtr CellmlFile::model() const
 {
     return pimpl()->mModel;
 }
+*/
 
+/*---GRY---
 CellmlFileRuntimePtr CellmlFile::runtime()
 {
     return CellmlFileRuntime::create(shared_from_this());
 }
+*/
 
 } // namespace libOpenCOR

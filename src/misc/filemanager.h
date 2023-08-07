@@ -16,29 +16,24 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/issue.h"
+#include "libopencor/file.h"
 
 #include <vector>
 
 namespace libOpenCOR {
 
-class Logger::Impl
+class FileManager
 {
 public:
-    std::vector<IssuePtr> mIssues;
+    static FileManager *instance();
 
-    std::vector<size_t> mErrors;
-    std::vector<size_t> mWarnings;
-    std::vector<size_t> mMessages;
+    void manage(File *pFile);
+    void unmanage(File *pFile);
 
-    static void addIssues(const LoggerPtr &pLogger);
-    void addIssue(const std::string &pDescription, Issue::Type pType);
+    FilePtr file(const std::string &pFileNameOrUrl) const;
 
-    void addError(const std::string &pDescription);
-    void addWarning(const std::string &pDescription);
-    void addMessage(const std::string &pDescription);
-
-    void removeAllIssues();
+private:
+    std::vector<File *> mFiles;
 };
 
 } // namespace libOpenCOR

@@ -93,10 +93,11 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/simulation/simulationworker.cpp
@@ -135,12 +136,13 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.h
+    # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime_p.h
+    # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile_p.h

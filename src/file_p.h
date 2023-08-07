@@ -50,6 +50,7 @@ public:
 #endif
 
     std::vector<unsigned char> contents();
+    void setContents(const std::vector<unsigned char> &pContents);
 };
 
 } // namespace libOpenCOR

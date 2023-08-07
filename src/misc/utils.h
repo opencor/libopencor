@@ -30,7 +30,7 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::string> downloadFile(const std::string &pUrl);
 
-std::tuple<bool, std::vector<unsigned char>> fileContents(const std::string &pFileName);
+std::vector<unsigned char> fileContents(const std::string &pFileName);
 #endif
 
 std::string contentsAsString(const std::vector<unsigned char> &pContents);

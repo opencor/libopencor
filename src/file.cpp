@@ -19,6 +19,7 @@ limitations under the License.
 #include "cellmlfile.h"
 #include "combinearchive.h"
 #include "file_p.h"
+#include "filemanager.h"
 #include "sedmlfile.h"
 #include "utils.h"
 
@@ -41,9 +42,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
     // Check whether we have some contents and, if so, keep track of it otherwise retrieve it.
 
     if (!pContents.empty()) {
-        mContents = pContents;
-
-        mContentsRetrieved = true;
+        setContents(pContents);
     }
 #ifndef __EMSCRIPTEN__
     else {
@@ -79,6 +78,16 @@ File::Impl::~Impl()
 
 void File::Impl::checkType(const FilePtr &pOwner)
 {
+    // Reset the type of the file, if it isn't that of an irretrievable file.
+
+#ifndef __EMSCRIPTEN__
+    if (mType != Type::IRRETRIEVABLE_FILE) {
+#endif
+        mType = Type::UNKNOWN_FILE;
+#ifndef __EMSCRIPTEN__
+    }
+#endif
+
     // Try to get a CellML file, a SED-ML file, or a COMBINE archive.
 
     mCellmlFile = CellmlFile::create(pOwner);
@@ -114,16 +123,17 @@ void File::Impl::retrieveContents()
     // Retrieve the contents of the file, if needed.
 
     if (!mContentsRetrieved) {
-        auto [res, contents] = fileContents(mFileName);
-
-        if (res) {
-            mContents = contents;
-        }
-
-        mContentsRetrieved = true;
+        setContents(fileContents(mFileName));
     }
 }
 #endif
+
+void File::Impl::setContents(const std::vector<unsigned char> &pContents)
+{
+    mContents = pContents;
+
+    mContentsRetrieved = true;
+}
 
 std::vector<unsigned char> File::Impl::contents()
 {
@@ -141,6 +151,10 @@ File::File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &
 
 File::~File()
 {
+    // Have ourselves unmanaged.
+
+    FileManager::instance()->unmanage(this);
+
     delete pimpl();
 }
 
@@ -157,19 +171,29 @@ const File::Impl *File::pimpl() const
 #ifndef __EMSCRIPTEN__
 FilePtr File::create(const std::string &pFileNameOrUrl)
 {
-    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl}};
-
-    res->pimpl()->checkType(res);
-
-    return res;
+    return create(pFileNameOrUrl, {});
 }
 #endif
 
 FilePtr File::create(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
 {
+    // Check whether the given file name or URL is already managed and if so then return it (after having updated its
+    // contents and rechecked its type) otherwise create, manage, and return a new file object.
+
+    auto file = FileManager::instance()->file(pFileNameOrUrl);
+
+    if (file != nullptr) {
+        file->pimpl()->setContents(pContents);
+        file->pimpl()->checkType(file);
+
+        return file->shared_from_this();
+    }
+
     auto res = std::shared_ptr<File> {new File {pFileNameOrUrl, pContents}};
 
     res->pimpl()->checkType(res);
+
+    FileManager::instance()->manage(res.get());
 
     return res;
 }

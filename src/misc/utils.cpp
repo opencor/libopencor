@@ -292,7 +292,7 @@ std::tuple<bool, std::string> downloadFile(const std::string &pUrl)
 #endif
 
 #ifndef __EMSCRIPTEN__
-std::tuple<bool, std::vector<unsigned char>> fileContents(const std::string &pFileName)
+std::vector<unsigned char> fileContents(const std::string &pFileName)
 {
     // Retrieve and return the contents of the given file.
 
@@ -307,7 +307,7 @@ std::tuple<bool, std::vector<unsigned char>> fileContents(const std::string &pFi
 
     file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT(bugprone-narrowing-conversions, readability-container-data-pointer)
 
-    return std::make_tuple(true, contents);
+    return contents;
 }
 #endif
 

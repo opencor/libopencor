@@ -40,4 +40,34 @@ describe("File coverage tests", () => {
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
   });
+
+  test("Same local file", () => {
+    const file1 = new libopencor.File(
+      utils.LOCAL_FILE,
+      someUnknownContentsPtr,
+      utils.SOME_UNKNOWN_CONTENTS.length,
+    );
+    const file2 = new libopencor.File(
+      utils.LOCAL_FILE,
+      someUnknownContentsPtr,
+      utils.SOME_UNKNOWN_CONTENTS.length,
+    );
+
+    expect(file1).toStrictEqual(file2);
+  });
+
+  test("Same remote file", () => {
+    const file1 = new libopencor.File(
+      utils.REMOTE_FILE,
+      someUnknownContentsPtr,
+      utils.SOME_UNKNOWN_CONTENTS.length,
+    );
+    const file2 = new libopencor.File(
+      utils.REMOTE_FILE,
+      someUnknownContentsPtr,
+      utils.SOME_UNKNOWN_CONTENTS.length,
+    );
+
+    expect(file1).toStrictEqual(file2);
+  });
 });

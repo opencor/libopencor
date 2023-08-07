@@ -23,11 +23,14 @@ namespace libOpenCOR {
 
 void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 {
-    for (size_t i = 0; i < pLogger->issueCount(); ++i) {
-        auto issue = pLogger->issue(i);
+    (void)pLogger;
+    /*---GRY---
+        for (size_t i = 0; i < pLogger->issueCount(); ++i) {
+            auto issue = pLogger->issue(i);
 
-        addIssue(issue->description(), issue->type());
-    }
+            addIssue(issue->description(), issue->type());
+        }
+    */
 }
 
 void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
