@@ -38,12 +38,34 @@ TEST(BasicFileTest, windowsLocalFile)
     EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
 }
 
+TEST(BasicFileTest, windowsRelativeLocalFile)
+{
+    auto file = libOpenCOR::File::create(R"(some\.\relative\..\..\path\.\..\dir\file.txt)");
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), R"(dir\file.txt)");
+    EXPECT_EQ(file->url(), "");
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
+}
+
 TEST(BasicFileTest, unixLocalFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE);
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
     EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
+    EXPECT_EQ(file->url(), "");
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
+}
+
+TEST(BasicFileTest, unixRelativeLocalFile)
+{
+    auto file = libOpenCOR::File::create("some/relative/../../path/../dir/file.txt");
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), "dir/file.txt");
     EXPECT_EQ(file->url(), "");
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);

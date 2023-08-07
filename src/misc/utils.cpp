@@ -19,6 +19,7 @@ limitations under the License.
 #include <cmath>
 #include <filesystem>
 #include <fstream>
+#include <regex>
 
 #ifdef _MSC_VER
 #    include <process.h>
@@ -37,6 +38,108 @@ bool fuzzyCompare(double pNb1, double pNb2)
     static constexpr double ONE_TRILLION = 1000000000000.0;
 
     return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
+}
+
+namespace {
+std::string canonicalFileName(const std::string &pFileName, bool pIsFromUrl)
+{
+    // Check whether we are dealing with a Windows file.
+
+    static const auto WINDOWS_PATH_REGEX = std::regex(R"(^([A-Za-z]:\\)?.*[\\].*)");
+    static const auto WINDOWS_URL_PATH_REGEX = std::regex("^/[A-Za-z]:/.*");
+
+    std::smatch match;
+
+    std::regex_search(pFileName, match, pIsFromUrl ? WINDOWS_URL_PATH_REGEX : WINDOWS_PATH_REGEX);
+
+    auto isWindowsFile = !match.empty();
+
+    // Replace any "\"s with "/"s, if needed.
+
+    static constexpr auto FORWARD_SLASH = "/";
+
+    auto res = pFileName;
+
+    if (isWindowsFile && !pIsFromUrl) {
+        static constexpr auto BACKSLASH = "\\\\";
+        static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
+
+        res = std::regex_replace(pFileName, BACKSLASH_REGEX, FORWARD_SLASH);
+    }
+
+    // Check whether we are dealing with a file that starts with a forward slash.
+
+    auto startsWithForwardSlash = res.find(FORWARD_SLASH) == 0;
+
+    // Determine the canonical version of a Windows local file or a remote file.
+
+    static auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
+
+    auto currentPath = std::filesystem::current_path();
+
+    std::filesystem::current_path(FORWARD_SLASH);
+
+    res = std::filesystem::weakly_canonical(res).string();
+
+    std::filesystem::current_path(currentPath);
+
+    // Remove the leading "/", if needed.
+
+    if (!startsWithForwardSlash || (startsWithForwardSlash && isWindowsFile)) {
+        res.erase(0, FORWARD_SLASH_LENGTH);
+    }
+
+    // Replace any "/"s with "\"s, if needed.
+
+    if (isWindowsFile) {
+        static constexpr auto BACKSLASH = "\\";
+        static const auto FORWARD_SLASH_REGEX = std::regex(FORWARD_SLASH);
+
+        res = std::regex_replace(res, FORWARD_SLASH_REGEX, BACKSLASH);
+    }
+
+    // Return the canonical version of a Windows local file or a remote file.
+
+    return res;
+}
+} // namespace
+
+std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl)
+{
+    // Check whether the given file name or URL is a local file name or a URL.
+    // Note: a URL represents a local file when used with the "file" scheme.
+
+    static constexpr auto FILE_SCHEME = "file://";
+    static auto FILE_SCHEME_LENGTH = strlen(FILE_SCHEME);
+    static constexpr auto HTTP_SCHEME = "http://";
+    static auto HTTP_SCHEME_LENGTH = strlen(HTTP_SCHEME);
+    static constexpr auto HTTPS_SCHEME = "https://";
+    static auto HTTPS_SCHEME_LENGTH = strlen(HTTPS_SCHEME);
+
+    auto res = pFileNameOrUrl;
+    size_t schemeLength = 0;
+    auto requiresHttpScheme = false;
+    auto requiresHttpsScheme = false;
+
+    if (pFileNameOrUrl.find(FILE_SCHEME) == 0) {
+        schemeLength = FILE_SCHEME_LENGTH;
+    } else if (pFileNameOrUrl.find(HTTP_SCHEME) == 0) {
+        schemeLength = HTTP_SCHEME_LENGTH;
+        requiresHttpScheme = true;
+    } else if (pFileNameOrUrl.find(HTTPS_SCHEME) == 0) {
+        schemeLength = HTTPS_SCHEME_LENGTH;
+        requiresHttpsScheme = true;
+    }
+
+    res.erase(0, schemeLength);
+
+    return {!requiresHttpScheme && !requiresHttpsScheme,
+            (requiresHttpScheme ?
+                 HTTP_SCHEME :
+             requiresHttpsScheme ?
+                 HTTPS_SCHEME :
+                 "")
+                + canonicalFileName(res, schemeLength != 0)};
 }
 
 #ifndef __EMSCRIPTEN__

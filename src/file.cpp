@@ -23,49 +23,19 @@ limitations under the License.
 #include "utils.h"
 
 #include <filesystem>
-#include <regex>
 
 namespace libOpenCOR {
 
 File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
 {
-    // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
-    // with "file://".
+    // Check whether we are dealing with a local file file or a URL.
 
-    if (pFileNameOrUrl.find("file://") == 0) {
-        // We are dealing with a URL representing a local file, so retrieve its actual path.
+    auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
 
-        static constexpr size_t SCHEME_LENGTH = 7;
-
-        mFileName = pFileNameOrUrl;
-
-        mFileName.erase(0, SCHEME_LENGTH);
-
-        // On Windows, we also need to remove the leading "/" and replace all the other "/"s with "\"s.
-
-        static const auto WINDOWS_PATH_REGEX = std::regex("^/[A-Z]:/.*");
-
-        std::smatch match;
-
-        std::regex_search(mFileName, match, WINDOWS_PATH_REGEX);
-
-        if (!match.empty()) {
-            static constexpr size_t SLASH_LENGTH = 1;
-            static const auto FORWARD_SLASH_REGEX = std::regex("/");
-
-            mFileName.erase(0, SLASH_LENGTH);
-
-            mFileName = std::regex_replace(mFileName, FORWARD_SLASH_REGEX, "\\");
-        }
-    } else if ((pFileNameOrUrl.find("http://") == 0)
-               || (pFileNameOrUrl.find("https://") == 0)) {
-        // We are dealing with a URL representing a remote file.
-
-        mUrl = pFileNameOrUrl;
+    if (isLocalFile) {
+        mFileName = fileNameOrUrl;
     } else {
-        // We are dealing with a local file.
-
-        mFileName = pFileNameOrUrl;
+        mUrl = fileNameOrUrl;
     }
 
     // Check whether we have some contents and, if so, keep track of it otherwise retrieve it.

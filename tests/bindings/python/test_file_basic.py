@@ -39,11 +39,31 @@ def test_windows_local_file():
     assert_issues(expected_non_existing_file_issues, file)
 
 
+def test_windows_relative_local_file():
+    file = File("some\\.\\relative\\..\\..\\path\\.\\..\\dir\\file.txt")
+
+    assert file.type == File.Type.IrretrievableFile
+    assert file.file_name == "dir\\file.txt"
+    assert file.url == ""
+    assert file.contents == []
+    assert_issues(expected_non_existing_file_issues, file)
+
+
 def test_unix_local_file():
     file = File(utils.UNIX_LOCAL_FILE)
 
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == utils.UNIX_LOCAL_FILE
+    assert file.url == ""
+    assert file.contents == []
+    assert_issues(expected_non_existing_file_issues, file)
+
+
+def test_unix_relative_local_file():
+    file = File("some/relative/../../path/../dir/file.txt")
+
+    assert file.type == File.Type.IrretrievableFile
+    assert file.file_name == "dir/file.txt"
     assert file.url == ""
     assert file.contents == []
     assert_issues(expected_non_existing_file_issues, file)
