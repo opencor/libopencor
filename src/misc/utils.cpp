@@ -62,9 +62,9 @@ int getTimeOfDay(TimeVal &pTimeVal)
 
 std::string uniqueFileName()
 {
-    // This is based off glibc's __gen_tempname() method, which used in std::tmpfile(). The only reason we don't use
-    // std::tmpfile() is that it creates the file for us and as soon as we would be closing std::fclose(), the file
-    // would get automatically deleted, which is not what we want. See
+    // This is based off glibc's __gen_tempname() method, which is used in std::tmpfile(). The only reason we don't use
+    // std::tmpfile() is that it creates the file for us and as soon as we would be closing (though an automatic call
+    // to std::fclose()), the file would get automatically deleted, which is not what we want. See
     // https://code.woboq.org/userspace/glibc/sysdeps/posix/tempname.c.html#__gen_tempname.
 
     // The number of times to attempt to generate a temporary file name.
