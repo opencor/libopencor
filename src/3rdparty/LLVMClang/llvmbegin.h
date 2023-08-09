@@ -29,6 +29,7 @@ limitations under the License.
 #    pragma warning(disable: 4459)
 #    pragma warning(disable: 4624)
 #    pragma warning(disable: 4996)
+#    pragma warning(disable: 5054)
 #elif defined(__GNUC__) && !defined(__clang__)
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wredundant-move"
