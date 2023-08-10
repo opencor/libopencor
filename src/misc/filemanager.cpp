@@ -41,7 +41,13 @@ void FileManager::unmanage(File *pFile)
 
 FilePtr FileManager::file(const std::string &pFileNameOrUrl) const
 {
+#if __clang_major__ < 16
+    auto [tIsLocalFile, tFileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
+    auto isLocalFile = tIsLocalFile;
+    auto fileNameOrUrl = tFileNameOrUrl;
+#else
     auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
+#endif
     auto res = std::find_if(mFiles.cbegin(), mFiles.cend(), [&](const auto &file) {
         return isLocalFile ?
                    file->fileName() == fileNameOrUrl :
