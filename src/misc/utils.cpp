@@ -17,6 +17,7 @@ limitations under the License.
 #include "utils.h"
 
 #include <cmath>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <regex>

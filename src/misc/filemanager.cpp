@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include <algorithm>
+
 namespace libOpenCOR {
 
 FileManager *FileManager::instance()
