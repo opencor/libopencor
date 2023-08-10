@@ -70,7 +70,7 @@ def test_unix_relative_local_file():
 
 
 def test_url_based_windows_local_file():
-    file = File("file:///C:/some/path/file.txt")
+    file = File("file:///P:/some/path/file.txt")
 
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == utils.WINDOWS_LOCAL_FILE

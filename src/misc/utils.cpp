@@ -55,11 +55,18 @@ std::string canonicalFileName(const std::string &pFileName, bool pIsFromUrl)
 
     auto isWindowsFile = !match.empty();
 
-    // Replace any "\"s with "/"s, if needed.
+    // Remove the leading forward slash, if any and if needed.
 
     static constexpr auto FORWARD_SLASH = "/";
+    static const auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
 
     auto res = pFileName;
+
+    if (isWindowsFile && pIsFromUrl) {
+        res.erase(0, FORWARD_SLASH_LENGTH);
+    }
+
+    // Replace "\"s with "/"s, if needed.
 
     if (isWindowsFile && !pIsFromUrl) {
         static constexpr auto BACKSLASH = "\\\\";
@@ -68,38 +75,68 @@ std::string canonicalFileName(const std::string &pFileName, bool pIsFromUrl)
         res = std::regex_replace(pFileName, BACKSLASH_REGEX, FORWARD_SLASH);
     }
 
-    // Check whether we are dealing with a file that starts with a forward slash.
+    // Determine the root path of the file, if any, and (temporarily) remove it.
 
-    auto startsWithForwardSlash = res.find(FORWARD_SLASH) == 0;
+    static const auto WINDOWS_URL_PATH_ROOT_NAME_REGEX = std::regex("^/[A-Za-z]:/");
+    static const auto WINDOWS_PATH_ROOT_NAME_REGEX = std::regex("^[A-Za-z]:/");
+    static const auto UNIX_PATH_ROOT_NAME_REGEX = std::regex("^/");
 
-    // Determine the canonical version of a Windows local file or a remote file.
+    std::regex_search(res, match, isWindowsFile ? pIsFromUrl ? WINDOWS_URL_PATH_ROOT_NAME_REGEX : WINDOWS_PATH_ROOT_NAME_REGEX : UNIX_PATH_ROOT_NAME_REGEX);
 
-    static auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
+    std::string rootPath;
+
+    if (!match.empty()) {
+        rootPath = match.str();
+
+        res.erase(0, rootPath.length());
+    }
+
+    // Determine the canonical version of the relative path, keeping in mind that a default root path may have been
+    // prepended in the process (depending on the case and the implementation of std::filesystem).
 
     auto currentPath = std::filesystem::current_path();
 
     std::filesystem::current_path(FORWARD_SLASH);
 
+    auto tempRootPath = std::filesystem::current_path().string();
+
     res = std::filesystem::weakly_canonical(res).string();
+
+#if defined(__GNUC__) || defined(__clang__)
+#    ifndef __clang__
+    if (res.find(tempRootPath) == 0) {
+#    endif
+        res.erase(0, tempRootPath.size());
+#    ifndef __clang__
+    }
+#    endif
+#endif
 
     std::filesystem::current_path(currentPath);
 
-    // Remove the leading "/", if needed.
+    // Re-add the root path, if needed.
 
-    if (!startsWithForwardSlash || (startsWithForwardSlash && isWindowsFile)) {
-        res.erase(0, FORWARD_SLASH_LENGTH);
+    if (!rootPath.empty()) {
+        res = rootPath + res;
     }
 
-    // Replace any "/"s with "\"s, if needed.
+    // Replace any "/"s with "\"s or any "\"s with "/"s, as needed.
 
     if (isWindowsFile) {
         static constexpr auto BACKSLASH = "\\";
         static const auto FORWARD_SLASH_REGEX = std::regex(FORWARD_SLASH);
 
         res = std::regex_replace(res, FORWARD_SLASH_REGEX, BACKSLASH);
+#ifdef _MSC_VER
+    } else {
+        static constexpr auto BACKSLASH = "\\\\";
+        static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
+
+        res = std::regex_replace(res, BACKSLASH_REGEX, FORWARD_SLASH);
+#endif
     }
 
-    // Return the canonical version of a Windows local file or a remote file.
+    // Return the canonical version of the file name.
 
     return res;
 }

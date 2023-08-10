@@ -73,7 +73,7 @@ TEST(BasicFileTest, unixRelativeLocalFile)
 
 TEST(BasicFileTest, urlBasedWindowsLocalFile)
 {
-    auto file = libOpenCOR::File::create("file:///C:/some/path/file.txt");
+    auto file = libOpenCOR::File::create("file:///P:/some/path/file.txt");
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
     EXPECT_EQ(file->fileName(), libOpenCOR::WINDOWS_LOCAL_FILE);
