@@ -80,12 +80,12 @@ function(configure_target TARGET)
                 -Wno-global-constructors
                 -Wno-padded
                 -Wno-switch-enum
+                -Wno-weak-vtables
             )
 
             if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
                 list(APPEND COMPILE_OPTIONS
                     -Wno-c++98-compat-pedantic
-                    -Wno-weak-vtables
                 )
             endif()
 

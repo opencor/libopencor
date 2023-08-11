@@ -14,17 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include "libopencor/sedbase.h"
 
 #include "sedbase_p.h"
 
 namespace libOpenCOR {
 
-class SedDocument::Impl: public SedBase::Impl
+SedBase::SedBase(Impl *pPimpl)
+    : Logger(pPimpl)
 {
-public:
-    Impl(const FilePtr &pFile);
-    ~Impl() = default;
-};
+}
+
+SedBase::Impl *SedBase::pimpl()
+{
+    return reinterpret_cast<Impl *>(Logger::pimpl());
+}
+
+/*---GRY---
+const SedBase::Impl *SedBase::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(Logger::pimpl());
+}
+*/
 
 } // namespace libOpenCOR

@@ -16,15 +16,12 @@ limitations under the License.
 
 #pragma once
 
-#include "sedbase_p.h"
+#include "logger_p.h"
 
 namespace libOpenCOR {
 
-class SedDocument::Impl: public SedBase::Impl
+class SedBase::Impl: public Logger::Impl
 {
-public:
-    Impl(const FilePtr &pFile);
-    ~Impl() = default;
 };
 
 } // namespace libOpenCOR

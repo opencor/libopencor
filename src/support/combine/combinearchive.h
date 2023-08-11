@@ -33,7 +33,7 @@ class CombineArchive: public Logger
 {
 public:
     CombineArchive() = delete;
-    ~CombineArchive();
+    ~CombineArchive() override;
 
     CombineArchive(const CombineArchive &pOther) = delete;
     CombineArchive(CombineArchive &&pOther) noexcept = delete;

@@ -16,18 +16,17 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/logger.h"
+#include "libopencor/sedbase.h"
 
 namespace libOpenCOR {
 
 /**
  * @brief The SedDocument class.
  *
- * The SedDocument class is used to describe a simulation experiment that adheres to the SED-ML L1V4 specification (see
- * https://sed-ml.org/documents/sed-ml-L1V4.pdf).
+ * The SedDocument class is used to describe a simulation experiment that adheres to the SED-ML specification.
  */
 
-class LIBOPENCOR_EXPORT SedDocument: public Logger
+class LIBOPENCOR_EXPORT SedDocument: public SedBase
 {
 public:
     /**
@@ -35,7 +34,7 @@ public:
      */
 
     SedDocument() = delete; /**< No default constructor allowed, @private. */
-    ~SedDocument(); /**< Destructor, @private. */
+    ~SedDocument() override; /**< Destructor, @private. */
 
     SedDocument(const SedDocument &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedDocument(SedDocument &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */

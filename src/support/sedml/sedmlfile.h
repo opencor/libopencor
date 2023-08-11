@@ -33,7 +33,7 @@ class SedmlFile: public Logger
 {
 public:
     SedmlFile() = delete;
-    ~SedmlFile();
+    ~SedmlFile() override;
 
     SedmlFile(const SedmlFile &pOther) = delete;
     SedmlFile(SedmlFile &&pOther) noexcept = delete;

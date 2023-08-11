@@ -26,6 +26,7 @@ namespace py = pybind11;
 void fileApi(py::module_ &m);
 void issueApi(py::module_ &m);
 void loggerApi(py::module_ &m);
+void sedBaseApi(py::module_ &m);
 void sedDocumentApi(py::module_ &m);
 void versionApi(py::module_ &m);
 
@@ -42,6 +43,7 @@ PYBIND11_MODULE(module, m)
     // APIs.
 
     loggerApi(m); // Note: it needs to be first since it is used by some other APIs.
+    sedBaseApi(m); // Note: it needs to be second since it is used by some other APIs.
 
     fileApi(m);
     issueApi(m);

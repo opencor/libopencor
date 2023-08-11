@@ -14,17 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include <libopencor>
 
-#include "sedbase_p.h"
+#include <pybind11/pybind11.h>
 
-namespace libOpenCOR {
+namespace py = pybind11;
 
-class SedDocument::Impl: public SedBase::Impl
+void sedBaseApi(py::module_ &m)
 {
-public:
-    Impl(const FilePtr &pFile);
-    ~Impl() = default;
-};
+    // SedBase API.
 
-} // namespace libOpenCOR
+    py::class_<libOpenCOR::SedBase, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::SedBase>> sedBase(m, "SedBase");
+}

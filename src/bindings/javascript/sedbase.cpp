@@ -14,17 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include <libopencor>
 
-#include "sedbase_p.h"
-
-namespace libOpenCOR {
-
-class SedDocument::Impl: public SedBase::Impl
+void sedBaseApi()
 {
-public:
-    Impl(const FilePtr &pFile);
-    ~Impl() = default;
-};
-
-} // namespace libOpenCOR
+    emscripten::class_<libOpenCOR::SedBase, emscripten::base<libOpenCOR::Logger>>("SedBase");
+}

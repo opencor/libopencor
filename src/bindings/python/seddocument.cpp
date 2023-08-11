@@ -24,7 +24,7 @@ void sedDocumentApi(py::module_ &m)
 {
     // SedDocument API.
 
-    py::class_<libOpenCOR::SedDocument, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::SedDocument>> sedDocument(m, "SedDocument");
+    py::class_<libOpenCOR::SedDocument, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedDocument>> sedDocument(m, "SedDocument");
 
     sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", py::arg("file"));
 }

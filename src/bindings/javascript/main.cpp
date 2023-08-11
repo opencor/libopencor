@@ -19,12 +19,14 @@ limitations under the License.
 void fileApi();
 void issueApi();
 void loggerApi();
+void sedBaseApi();
 void sedDocumentApi();
 void versionApi();
 
 EMSCRIPTEN_BINDINGS(libOpenCOR)
 {
     loggerApi(); // Note: it needs to be first since it is used by some other APIs.
+    sedBaseApi(); // Note: it needs to be second since it is used by some other APIs.
 
     fileApi();
     issueApi();

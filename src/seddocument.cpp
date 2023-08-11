@@ -59,7 +59,7 @@ SedDocument::Impl::Impl(const FilePtr &pFile)
 }
 
 SedDocument::SedDocument(const FilePtr &pFile)
-    : Logger(new Impl(pFile))
+    : SedBase(new Impl(pFile))
 {
 }
 
@@ -70,13 +70,13 @@ SedDocument::~SedDocument()
 
 SedDocument::Impl *SedDocument::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
 
 /*---GRY---
 const SedDocument::Impl *SedDocument::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
 */
 

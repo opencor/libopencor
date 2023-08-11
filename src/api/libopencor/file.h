@@ -58,7 +58,7 @@ public:
      */
 
     File() = delete; /**< No default constructor allowed, @private. */
-    ~File(); /**< Destructor, @private. */
+    ~File() override; /**< Destructor, @private. */
 
     File(const File &pOther) = delete; /**< No copy constructor allowed, @private. */
     File(File &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */

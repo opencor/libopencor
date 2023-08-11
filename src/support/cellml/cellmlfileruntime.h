@@ -32,7 +32,7 @@ class CellmlFileRuntime: public Logger
 {
 public:
     CellmlFileRuntime() = delete;
-    ~CellmlFileRuntime();
+    ~CellmlFileRuntime() override;
 
     CellmlFileRuntime(const CellmlFileRuntime &pOther) = delete;
     CellmlFileRuntime(CellmlFileRuntime &&pOther) noexcept = delete;

@@ -30,7 +30,7 @@ using CompilerPtr = std::shared_ptr<Compiler>;
 class LIBOPENCOR_UNIT_TESTING_EXPORT Compiler: public Logger
 {
 public:
-    ~Compiler();
+    ~Compiler() override;
 
     Compiler(const Compiler &pOther) = delete;
     Compiler(Compiler &&pOther) noexcept = delete;

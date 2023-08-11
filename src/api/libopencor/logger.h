@@ -35,7 +35,7 @@ public:
      */
 
     Logger() = delete; /**< No default constructor allowed, @private. */
-    ~Logger() = default; /**< Destructor, @private. */
+    virtual ~Logger() = default; /**< Destructor, @private. */
 
     Logger(const Logger &pOther) = delete; /**< No copy constructor allowed, @private. */
     Logger(Logger &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
