@@ -22,6 +22,10 @@ namespace libOpenCOR {
 
 class SedBase::Impl: public Logger::Impl
 {
+public:
+    std::string mId;
+    std::string mName;
+    std::string mMetaId;
 };
 
 } // namespace libOpenCOR
