@@ -23,8 +23,10 @@ namespace libOpenCOR {
 class SedModel::Impl: public SedBase::Impl
 {
 public:
-    Impl() = default;
+    Impl(const FilePtr &pFile);
     ~Impl() = default;
+
+    FilePtr mFile;
 };
 
 } // namespace libOpenCOR

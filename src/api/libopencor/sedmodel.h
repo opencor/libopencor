@@ -34,6 +34,7 @@ public:
      */
 
     //---GRY---
+    // SedModel() = delete; /**< No default constructor allowed, @private. */
     // ~SedModel() override; /**< Destructor, @private. */
 
     SedModel(const SedModel &pOther) = delete; /**< No copy constructor allowed, @private. */
@@ -46,7 +47,7 @@ private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     //---GRY---
-    // explicit SedModel(); /**< Constructor @private. */
+    // explicit SedModel(const FilePtr &pFile); /**< Constructor @private. */
 
     // Impl *pimpl(); /**< Private implementation pointer, @private. */
     // const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
