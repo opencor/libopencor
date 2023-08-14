@@ -14,28 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <libopencor>
+#include "libopencor/sedsimulation.h"
 
-void fileApi();
-void issueApi();
-void loggerApi();
-void sedBaseApi();
-void sedDataDescriptionApi();
-void sedDocumentApi();
-void sedModelApi();
-void sedSimulationApi();
-void versionApi();
+#include "sedsimulation_p.h"
 
-EMSCRIPTEN_BINDINGS(libOpenCOR)
+namespace libOpenCOR {
+
+SedSimulation::SedSimulation()
+    : SedBase(new Impl())
 {
-    loggerApi(); // Note: it needs to be first since it is used by some other APIs.
-    sedBaseApi(); // Note: it needs to be second since it is used by some other APIs.
-
-    fileApi();
-    issueApi();
-    sedDataDescriptionApi();
-    sedDocumentApi();
-    sedModelApi();
-    sedSimulationApi();
-    versionApi();
 }
+
+SedSimulation::~SedSimulation()
+{
+    delete pimpl();
+}
+
+SedSimulation::Impl *SedSimulation::pimpl()
+{
+    return reinterpret_cast<Impl *>(SedBase::pimpl());
+}
+
+const SedSimulation::Impl *SedSimulation::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+}
+
+} // namespace libOpenCOR

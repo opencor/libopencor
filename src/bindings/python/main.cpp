@@ -30,6 +30,7 @@ void sedBaseApi(py::module_ &m);
 void sedDataDescriptionApi(py::module_ &m);
 void sedDocumentApi(py::module_ &m);
 void sedModelApi(py::module_ &m);
+void sedSimulationApi(py::module_ &m);
 void versionApi(py::module_ &m);
 
 PYBIND11_MODULE(module, m)
@@ -52,5 +53,6 @@ PYBIND11_MODULE(module, m)
     sedDataDescriptionApi(m);
     sedDocumentApi(m);
     sedModelApi(m);
+    sedSimulationApi(m);
     versionApi(m);
 }

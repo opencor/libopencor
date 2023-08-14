@@ -25,6 +25,7 @@ from .module import (
     SedDataDescription,
     SedDocument,
     SedModel,
+    SedSimulation,
     # Version API.
     version,
     version_string,
@@ -56,6 +57,7 @@ __all__ = (
     "SedDataDescription",
     "SedDocument",
     "SedModel",
+    "SedSimulation",
     # Version API.
     "version",
     "version_string",

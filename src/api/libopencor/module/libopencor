@@ -22,4 +22,5 @@ limitations under the License.
 #include "libopencor/seddatadescription.h"
 #include "libopencor/seddocument.h"
 #include "libopencor/sedmodel.h"
+#include "libopencor/sedsimulation.h"
 #include "libopencor/version.h"

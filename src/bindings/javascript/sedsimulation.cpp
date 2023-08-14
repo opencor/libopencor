@@ -16,26 +16,7 @@ limitations under the License.
 
 #include <libopencor>
 
-void fileApi();
-void issueApi();
-void loggerApi();
-void sedBaseApi();
-void sedDataDescriptionApi();
-void sedDocumentApi();
-void sedModelApi();
-void sedSimulationApi();
-void versionApi();
-
-EMSCRIPTEN_BINDINGS(libOpenCOR)
+void sedSimulationApi()
 {
-    loggerApi(); // Note: it needs to be first since it is used by some other APIs.
-    sedBaseApi(); // Note: it needs to be second since it is used by some other APIs.
-
-    fileApi();
-    issueApi();
-    sedDataDescriptionApi();
-    sedDocumentApi();
-    sedModelApi();
-    sedSimulationApi();
-    versionApi();
+    emscripten::class_<libOpenCOR::SedSimulation, emscripten::base<libOpenCOR::SedBase>>("SedSimulation");
 }

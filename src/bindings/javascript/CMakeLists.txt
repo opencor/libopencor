@@ -21,6 +21,7 @@ set(JAVASCRIPT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "JavaScript source files."
 )
