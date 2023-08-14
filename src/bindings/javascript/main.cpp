@@ -20,6 +20,7 @@ void fileApi();
 void issueApi();
 void loggerApi();
 void sedAbstractTaskApi();
+void sedAlgorithmParameterApi();
 void sedBaseApi();
 void sedDataDescriptionApi();
 void sedDataGeneratorApi();
@@ -38,6 +39,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     fileApi();
     issueApi();
     sedAbstractTaskApi();
+    sedAlgorithmParameterApi();
     sedDataDescriptionApi();
     sedDataGeneratorApi();
     sedDocumentApi();

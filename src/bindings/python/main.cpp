@@ -27,6 +27,7 @@ void fileApi(py::module_ &m);
 void issueApi(py::module_ &m);
 void loggerApi(py::module_ &m);
 void sedAbstractTaskApi(py::module_ &m);
+void sedAlgorithmParameterApi(py::module_ &m);
 void sedBaseApi(py::module_ &m);
 void sedDataDescriptionApi(py::module_ &m);
 void sedDataGeneratorApi(py::module_ &m);
@@ -55,6 +56,7 @@ PYBIND11_MODULE(module, m)
     fileApi(m);
     issueApi(m);
     sedAbstractTaskApi(m);
+    sedAlgorithmParameterApi(m);
     sedDataDescriptionApi(m);
     sedDataGeneratorApi(m);
     sedDocumentApi(m);

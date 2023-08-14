@@ -14,19 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/sedabstracttask.h"
 #include "libopencor/sedalgorithmparameter.h"
-#include "libopencor/sedbase.h"
-#include "libopencor/seddatadescription.h"
-#include "libopencor/seddatagenerator.h"
-#include "libopencor/seddocument.h"
-#include "libopencor/sedmodel.h"
-#include "libopencor/sedoutput.h"
-#include "libopencor/sedsimulation.h"
-#include "libopencor/sedstyle.h"
-#include "libopencor/version.h"
+
+#include "sedalgorithmparameter_p.h"
+
+namespace libOpenCOR {
+
+SedAlgorithmParameter::SedAlgorithmParameter()
+    : SedBase(new Impl())
+{
+}
+
+SedAlgorithmParameter::~SedAlgorithmParameter()
+{
+    delete pimpl();
+}
+
+SedAlgorithmParameter::Impl *SedAlgorithmParameter::pimpl()
+{
+    return reinterpret_cast<Impl *>(SedBase::pimpl());
+}
+
+const SedAlgorithmParameter::Impl *SedAlgorithmParameter::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+}
+
+} // namespace libOpenCOR
