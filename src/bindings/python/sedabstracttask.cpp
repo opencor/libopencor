@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include <libopencor>
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/sedbase.h"
-#include "libopencor/sedabstracttask.h"
-#include "libopencor/seddatadescription.h"
-#include "libopencor/seddocument.h"
-#include "libopencor/sedmodel.h"
-#include "libopencor/sedsimulation.h"
-#include "libopencor/version.h"
+#include <pybind11/pybind11.h>
+
+namespace py = pybind11;
+
+void sedAbstractTaskApi(py::module_ &m)
+{
+    // SedAbstractTask API.
+
+    py::class_<libOpenCOR::SedAbstractTask, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedAbstractTask>> sedAbstractTask(m, "SedAbstractTask");
+}

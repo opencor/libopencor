@@ -26,6 +26,7 @@ namespace py = pybind11;
 void fileApi(py::module_ &m);
 void issueApi(py::module_ &m);
 void loggerApi(py::module_ &m);
+void sedAbstractTaskApi(py::module_ &m);
 void sedBaseApi(py::module_ &m);
 void sedDataDescriptionApi(py::module_ &m);
 void sedDocumentApi(py::module_ &m);
@@ -50,6 +51,7 @@ PYBIND11_MODULE(module, m)
 
     fileApi(m);
     issueApi(m);
+    sedAbstractTaskApi(m);
     sedDataDescriptionApi(m);
     sedDocumentApi(m);
     sedModelApi(m);

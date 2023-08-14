@@ -19,6 +19,7 @@ limitations under the License.
 void fileApi();
 void issueApi();
 void loggerApi();
+void sedAbstractTaskApi();
 void sedBaseApi();
 void sedDataDescriptionApi();
 void sedDocumentApi();
@@ -33,6 +34,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
 
     fileApi();
     issueApi();
+    sedAbstractTaskApi();
     sedDataDescriptionApi();
     sedDocumentApi();
     sedModelApi();

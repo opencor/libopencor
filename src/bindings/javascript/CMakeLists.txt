@@ -17,6 +17,7 @@ set(JAVASCRIPT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp

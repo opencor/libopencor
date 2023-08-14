@@ -76,6 +76,7 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/file.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/issue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/logger.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedabstracttask.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatadescription.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddocument.h
@@ -114,6 +115,7 @@ set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
@@ -126,6 +128,7 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/issue_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/logger_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument_p.h

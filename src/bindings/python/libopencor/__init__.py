@@ -21,6 +21,7 @@ from .module import (
     # Logger API.
     Logger,
     # Sed API.
+    SedAbstractTask,
     SedBase,
     SedDataDescription,
     SedDocument,
@@ -53,6 +54,7 @@ __all__ = (
     # Logger API.
     "Logger",
     # Sed API.
+    "SedAbstractTask",
     "SedBase",
     "SedDataDescription",
     "SedDocument",
