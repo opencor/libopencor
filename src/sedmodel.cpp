@@ -14,11 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/seddocument.h"
 #include "libopencor/sedmodel.h"
-#include "libopencor/version.h"
+
+#include "sedmodel_p.h"
+
+namespace libOpenCOR {
+
+SedModel::SedModel()
+    : SedBase(new Impl())
+{
+}
+
+SedModel::~SedModel()
+{
+    delete pimpl();
+}
+
+SedModel::Impl *SedModel::pimpl()
+{
+    return reinterpret_cast<Impl *>(SedBase::pimpl());
+}
+
+const SedModel::Impl *SedModel::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+}
+
+} // namespace libOpenCOR

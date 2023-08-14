@@ -23,6 +23,7 @@ from .module import (
     # Sed API.
     SedBase,
     SedDocument,
+    SedModel,
     # Version API.
     version,
     version_string,
@@ -52,6 +53,7 @@ __all__ = (
     # Sed API.
     "SedBase",
     "SedDocument",
+    "SedModel",
     # Version API.
     "version",
     "version_string",

@@ -26,6 +26,7 @@ set(PYTHON_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "Python source files."
 )

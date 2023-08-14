@@ -16,9 +16,15 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/seddocument.h"
-#include "libopencor/sedmodel.h"
-#include "libopencor/version.h"
+#include "sedbase_p.h"
+
+namespace libOpenCOR {
+
+class SedModel::Impl: public SedBase::Impl
+{
+public:
+    Impl() = default;
+    ~Impl() = default;
+};
+
+} // namespace libOpenCOR
