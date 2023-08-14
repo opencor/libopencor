@@ -27,6 +27,7 @@ set(PYTHON_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/seddatagenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation.cpp

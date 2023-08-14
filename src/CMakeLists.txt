@@ -79,6 +79,7 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedabstracttask.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatadescription.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatagenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddocument.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedmodel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedsimulation.h
@@ -118,6 +119,7 @@ set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/seddatagenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation.cpp
@@ -131,6 +133,7 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/seddatagenerator_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation_p.h

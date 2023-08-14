@@ -14,16 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/sedbase.h"
-#include "libopencor/sedabstracttask.h"
-#include "libopencor/seddatadescription.h"
 #include "libopencor/seddatagenerator.h"
-#include "libopencor/seddocument.h"
-#include "libopencor/sedmodel.h"
-#include "libopencor/sedsimulation.h"
-#include "libopencor/version.h"
+
+#include "seddatagenerator_p.h"
+
+namespace libOpenCOR {
+
+SedDataGenerator::SedDataGenerator()
+    : SedBase(new Impl())
+{
+}
+
+SedDataGenerator::~SedDataGenerator()
+{
+    delete pimpl();
+}
+
+SedDataGenerator::Impl *SedDataGenerator::pimpl()
+{
+    return reinterpret_cast<Impl *>(SedBase::pimpl());
+}
+
+const SedDataGenerator::Impl *SedDataGenerator::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+}
+
+} // namespace libOpenCOR
