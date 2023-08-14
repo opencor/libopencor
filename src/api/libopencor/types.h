@@ -29,7 +29,31 @@ using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @re
 class Logger;
 using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
 
+class SedAbstractTask;
+using SedAbstractTaskPtr = std::shared_ptr<SedAbstractTask>; /**< Type definition for the shared @ref SedAbstractTask pointer. */
+
+class SedAlgorithmParameter;
+using SedAlgorithmParameterPtr = std::shared_ptr<SedAlgorithmParameter>; /**< Type definition for the shared @ref SedAlgorithmParameter pointer. */
+
+class SedDataDescription;
+using SedDataDescriptionPtr = std::shared_ptr<SedDataDescription>; /**< Type definition for the shared @ref SedDataDescription pointer. */
+
+class SedDataGenerator;
+using SedDataGeneratorPtr = std::shared_ptr<SedDataGenerator>; /**< Type definition for the shared @ref SedDataGenerator pointer. */
+
 class SedDocument;
 using SedDocumentPtr = std::shared_ptr<SedDocument>; /**< Type definition for the shared @ref SedDocument pointer. */
+
+class SedModel;
+using SedModelPtr = std::shared_ptr<SedModel>; /**< Type definition for the shared @ref SedModel pointer. */
+
+class SedOutput;
+using SedOutputPtr = std::shared_ptr<SedOutput>; /**< Type definition for the shared @ref SedOutput pointer. */
+
+class SedSimulation;
+using SedSimulationPtr = std::shared_ptr<SedSimulation>; /**< Type definition for the shared @ref SedSimulation pointer. */
+
+class SedStyle;
+using SedStylePtr = std::shared_ptr<SedStyle>; /**< Type definition for the shared @ref SedStyle pointer. */
 
 } // namespace libcellml
