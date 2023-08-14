@@ -82,6 +82,7 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatagenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddocument.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedmodel.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedoutput.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedsimulation.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
@@ -122,6 +123,7 @@ set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatagenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sedoutput.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
 )
@@ -136,6 +138,7 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/seddatagenerator_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/seddocument_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sedoutput_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation_p.h
     ${GIT_API_SOURCE_FILES}
     ${INTERNAL_SOURCE_FILES}
