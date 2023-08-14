@@ -22,6 +22,7 @@ from .module import (
     Logger,
     # Sed API.
     SedBase,
+    SedDataDescription,
     SedDocument,
     SedModel,
     # Version API.
@@ -52,6 +53,7 @@ __all__ = (
     "Logger",
     # Sed API.
     "SedBase",
+    "SedDataDescription",
     "SedDocument",
     "SedModel",
     # Version API.
