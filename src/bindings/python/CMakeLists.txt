@@ -32,6 +32,7 @@ set(PYTHON_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedoutput.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sedstyle.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "Python source files."
 )

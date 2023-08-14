@@ -27,6 +27,7 @@ void sedDocumentApi();
 void sedModelApi();
 void sedOutputApi();
 void sedSimulationApi();
+void sedStyleApi();
 void versionApi();
 
 EMSCRIPTEN_BINDINGS(libOpenCOR)
@@ -43,5 +44,6 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     sedModelApi();
     sedOutputApi();
     sedSimulationApi();
+    sedStyleApi();
     versionApi();
 }
