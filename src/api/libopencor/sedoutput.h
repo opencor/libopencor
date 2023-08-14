@@ -33,7 +33,8 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SedOutput() override; /**< Destructor, @private. */
+    //---GRY---
+    // ~SedOutput() override; /**< Destructor, @private. */
 
     SedOutput(const SedOutput &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedOutput(SedOutput &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -44,10 +45,11 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedOutput(); /**< Constructor @private. */
+    //---GRY---
+    // explicit SedOutput(); /**< Constructor @private. */
 
-    Impl *pimpl(); /**< Private implementation pointer, @private. */
-    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+    // Impl *pimpl(); /**< Private implementation pointer, @private. */
+    // const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 };
 
 } // namespace libOpenCOR

@@ -20,24 +20,32 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/*---GRY---
 SedAlgorithmParameter::SedAlgorithmParameter()
     : SedBase(new Impl())
 {
 }
+*/
 
+/*---GRY---
 SedAlgorithmParameter::~SedAlgorithmParameter()
 {
     delete pimpl();
 }
+*/
 
+/*---GRY---
 SedAlgorithmParameter::Impl *SedAlgorithmParameter::pimpl()
 {
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
+*/
 
+/*---GRY---
 const SedAlgorithmParameter::Impl *SedAlgorithmParameter::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
+*/
 
 } // namespace libOpenCOR
