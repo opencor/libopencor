@@ -33,10 +33,12 @@ def test_unknown_file():
 
 
 def test_cellml_file():
+    expected_serialisation = ""
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     simulation = SedDocument(file)
 
     assert not simulation.has_issues
+    assert simulation.serialise == expected_serialisation
 
 
 def test_sedml_file():

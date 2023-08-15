@@ -66,6 +66,8 @@ describe("SedDocument basic tests", () => {
   });
 
   test("CellML file", () => {
+    const expectedSerialisation = "";
+
     const file = new libopencor.File(
       utils.LOCAL_FILE,
       someCellmlContentsPtr,
@@ -74,6 +76,7 @@ describe("SedDocument basic tests", () => {
     const simulation = new libopencor.SedDocument(file);
 
     expect(simulation.hasIssues()).toBe(false);
+    expect(simulation.serialise()).toBe(expectedSerialisation);
   });
 
   test("SED-ML file", () => {

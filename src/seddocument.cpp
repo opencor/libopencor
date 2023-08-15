@@ -94,6 +94,11 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
     mModels.push_back(std::shared_ptr<SedModel> {new SedModel {pFile, pOwner}});
 }
 
+std::string SedDocument::Impl::serialise()
+{
+    return {};
+}
+
 SedDocument::SedDocument()
     : SedBase(new Impl())
 {
@@ -109,12 +114,10 @@ SedDocument::Impl *SedDocument::pimpl()
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
 
-/*---GRY---
 const SedDocument::Impl *SedDocument::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
-*/
 
 SedDocumentPtr SedDocument::create(const FilePtr &pFile)
 {
@@ -123,6 +126,11 @@ SedDocumentPtr SedDocument::create(const FilePtr &pFile)
     res->pimpl()->initialise(pFile, res->shared_from_this());
 
     return res;
+}
+
+std::string SedDocument::serialise() const
+{
+    return pimpl()->serialise();
 }
 
 } // namespace libOpenCOR

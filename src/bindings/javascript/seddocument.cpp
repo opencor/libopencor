@@ -19,5 +19,6 @@ limitations under the License.
 void sedDocumentApi()
 {
     emscripten::class_<libOpenCOR::SedDocument, emscripten::base<libOpenCOR::SedBase>>("SedDocument")
-        .smart_ptr_constructor("SedDocument", &libOpenCOR::SedDocument::create);
+        .smart_ptr_constructor("SedDocument", &libOpenCOR::SedDocument::create)
+        .function("serialise", &libOpenCOR::SedDocument::serialise);
 }

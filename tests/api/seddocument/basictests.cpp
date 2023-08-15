@@ -34,10 +34,13 @@ TEST(BasicSedDocumentTest, unknownFile)
 
 TEST(BasicSedDocumentTest, cellmlFile)
 {
+    static const std::string expectedSerialisation;
+
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto simulation = libOpenCOR::SedDocument::create(file);
 
     EXPECT_FALSE(simulation->hasIssues());
+    EXPECT_EQ(expectedSerialisation, simulation->serialise());
 }
 
 TEST(BasicSedDocumentTest, sedmlFile)

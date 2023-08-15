@@ -61,6 +61,16 @@ public:
 
     static SedDocumentPtr create(const FilePtr &pFile);
 
+    /**
+     * @brief Get the serialised version of this simulation experiment description.
+     *
+     * Return the @c std::string serialised version of this simulation experiment description.
+     *
+     * @return The @c std::string serialised version of this simulation experiment description.
+     */
+
+    std::string serialise() const;
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
