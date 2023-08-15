@@ -20,6 +20,7 @@ limitations under the License.
 #include "seddocument_p.h"
 
 #include "libopencor/file.h"
+#include "libopencor/sedmodel.h"
 
 namespace libOpenCOR {
 
@@ -33,7 +34,7 @@ SedDocument::Impl::Impl(const FilePtr &pFile)
 
         break;
     case File::Type::CELLML_FILE:
-        // All good.
+        initialiseWithCellmlFile(pFile);
 
         break;
     case File::Type::SEDML_FILE:
@@ -56,6 +57,13 @@ SedDocument::Impl::Impl(const FilePtr &pFile)
         break;
 #endif
     }
+}
+
+void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile)
+{
+    // Add a model for the given CellML file.
+
+    mModels.push_back(std::shared_ptr<SedModel> {new SedModel {pFile}});
 }
 
 SedDocument::SedDocument(const FilePtr &pFile)

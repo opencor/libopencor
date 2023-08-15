@@ -20,33 +20,25 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-/*---GRY---
 SedModel::Impl::Impl(const FilePtr &pFile)
     : mFile(pFile)
 {
 }
-*/
 
-/*---GRY---
 SedModel::SedModel(const FilePtr &pFile)
     : SedBase(new Impl(pFile))
 {
 }
-*/
 
-/*---GRY---
 SedModel::~SedModel()
 {
     delete pimpl();
 }
-*/
 
-/*---GRY---
 SedModel::Impl *SedModel::pimpl()
 {
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
-*/
 
 /*---GRY---
 const SedModel::Impl *SedModel::pimpl() const

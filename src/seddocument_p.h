@@ -38,6 +38,8 @@ public:
 
     Impl(const FilePtr &pFile);
     ~Impl() = default;
+
+    void initialiseWithCellmlFile(const FilePtr &pFile);
 };
 
 } // namespace libOpenCOR
