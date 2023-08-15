@@ -20,10 +20,39 @@ limitations under the License.
 #include "seddocument_p.h"
 
 #include "libopencor/file.h"
+#include "libopencor/sedmodel.h"
+
+#include <iomanip>
+#include <sstream>
 
 namespace libOpenCOR {
 
-SedDocument::Impl::Impl(const FilePtr &pFile)
+std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
+{
+    static const auto WIDTH = 9;
+    static const auto FILL = '0';
+
+    size_t counter = 0;
+    std::stringstream stream;
+
+    stream << pPrefix << std::setw(WIDTH) << std::setfill(FILL) << ++counter;
+
+    auto res = stream.str();
+
+    while (mIds.contains(res)) {
+        stream.str({});
+
+        stream << pPrefix << std::setw(WIDTH) << std::setfill(FILL) << ++counter;
+
+        res = stream.str();
+    }
+
+    mIds.insert(res);
+
+    return res;
+}
+
+void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner)
 {
     // Make sure that the given file is supported.
 
@@ -33,7 +62,7 @@ SedDocument::Impl::Impl(const FilePtr &pFile)
 
         break;
     case File::Type::CELLML_FILE:
-        // All good.
+        initialiseWithCellmlFile(pFile, pOwner);
 
         break;
     case File::Type::SEDML_FILE:
@@ -58,8 +87,15 @@ SedDocument::Impl::Impl(const FilePtr &pFile)
     }
 }
 
-SedDocument::SedDocument(const FilePtr &pFile)
-    : SedBase(new Impl(pFile))
+void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner)
+{
+    // Add a model for the given CellML file.
+
+    mModels.push_back(std::shared_ptr<SedModel> {new SedModel {pFile, pOwner}});
+}
+
+SedDocument::SedDocument()
+    : SedBase(new Impl())
 {
 }
 
@@ -82,7 +118,11 @@ const SedDocument::Impl *SedDocument::pimpl() const
 
 SedDocumentPtr SedDocument::create(const FilePtr &pFile)
 {
-    return std::shared_ptr<SedDocument> {new SedDocument {pFile}};
+    auto res = std::shared_ptr<SedDocument> {new SedDocument {}};
+
+    res->pimpl()->initialise(pFile, res->shared_from_this());
+
+    return res;
 }
 
 } // namespace libOpenCOR

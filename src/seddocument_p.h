@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "sedbase_p.h"
 
+#include <unordered_set>
+
 namespace libOpenCOR {
 
 class SedDocument::Impl: public SedBase::Impl
@@ -26,6 +28,8 @@ public:
     std::string mXmlns = "http://sed-ml.org/sed-ml/level1/version4";
     size_t mLevel = 1;
     size_t mVersion = 4;
+
+    std::unordered_set<std::string> mIds;
 
     std::vector<SedDataDescriptionPtr> mDataDescriptions;
     std::vector<SedModelPtr> mModels;
@@ -36,8 +40,13 @@ public:
     std::vector<SedStylePtr> mStyles;
     std::vector<SedAlgorithmParameterPtr> mAlgorithmParameters;
 
-    Impl(const FilePtr &pFile);
+    Impl() = default;
     ~Impl() = default;
+
+    std::string uniqueId(const std::string &pPrefix);
+
+    void initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner);
+    void initialiseWithCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner);
 };
 
 } // namespace libOpenCOR

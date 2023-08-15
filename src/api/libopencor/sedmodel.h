@@ -28,14 +28,15 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedModel: public SedBase
 {
+    friend class SedDocument;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.
      */
 
-    //---GRY---
-    // SedModel() = delete; /**< No default constructor allowed, @private. */
-    // ~SedModel() override; /**< Destructor, @private. */
+    SedModel() = delete; /**< No default constructor allowed, @private. */
+    ~SedModel() override; /**< Destructor, @private. */
 
     SedModel(const SedModel &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedModel(SedModel &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -46,11 +47,10 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    //---GRY---
-    // explicit SedModel(const FilePtr &pFile); /**< Constructor @private. */
+    explicit SedModel(const FilePtr &pFile, const SedDocumentPtr &pDocument); /**< Constructor @private. */
 
-    // Impl *pimpl(); /**< Private implementation pointer, @private. */
-    // const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 };
 
 } // namespace libOpenCOR

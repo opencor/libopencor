@@ -16,37 +16,37 @@ limitations under the License.
 
 #include "libopencor/sedmodel.h"
 
+#include "libopencor/seddocument.h"
+
+#include "seddocument_p.h"
 #include "sedmodel_p.h"
 
 namespace libOpenCOR {
 
-/*---GRY---
-SedModel::Impl::Impl(const FilePtr &pFile)
+static constexpr auto ID_PREFIX = "model";
+static constexpr auto CELLML_LANGUAGE = "urn:sedml:language:cellml";
+
+SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
     : mFile(pFile)
+    , mLanguage(CELLML_LANGUAGE)
+{
+    mId = pDocument->pimpl()->uniqueId(ID_PREFIX);
+}
+
+SedModel::SedModel(const FilePtr &pFile, const SedDocumentPtr &pDocument)
+    : SedBase(new Impl(pFile, pDocument))
 {
 }
-*/
 
-/*---GRY---
-SedModel::SedModel(const FilePtr &pFile)
-    : SedBase(new Impl(pFile))
-{
-}
-*/
-
-/*---GRY---
 SedModel::~SedModel()
 {
     delete pimpl();
 }
-*/
 
-/*---GRY---
 SedModel::Impl *SedModel::pimpl()
 {
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
-*/
 
 /*---GRY---
 const SedModel::Impl *SedModel::pimpl() const
