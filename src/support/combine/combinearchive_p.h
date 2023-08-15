@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "logger_p.h"
 
+#include "combinearchive.h"
+
 namespace libOpenCOR {
 
 class CombineArchive::Impl: public Logger::Impl

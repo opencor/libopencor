@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "cellmlfile.h"
-
 #include "cellmlfile_p.h"
+
 #include "cellmlfileruntime.h"
 #include "utils.h"
 

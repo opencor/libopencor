@@ -16,8 +16,10 @@ limitations under the License.
 
 #pragma once
 
-#include "cellmlfile.h"
 #include "logger_p.h"
+
+#include "cellmlfile.h"
+#include "cellmlfileruntime.h"
 
 namespace libOpenCOR {
 

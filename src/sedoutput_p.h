@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "sedbase_p.h"
 
+#include "libopencor/sedoutput.h"
+
 namespace libOpenCOR {
 
 class SedOutput::Impl: public SedBase::Impl

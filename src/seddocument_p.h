@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "sedbase_p.h"
 
+#include "libopencor/seddocument.h"
+
 #include <unordered_set>
 
 namespace libOpenCOR {

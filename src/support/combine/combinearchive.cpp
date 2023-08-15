@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "combinearchive.h"
-
 #include "combinearchive_p.h"
 
 #include "libopencor/file.h"

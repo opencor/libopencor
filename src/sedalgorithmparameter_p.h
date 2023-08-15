@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "sedbase_p.h"
 
+#include "libopencor/sedalgorithmparameter.h"
+
 namespace libOpenCOR {
 
 class SedAlgorithmParameter::Impl: public SedBase::Impl

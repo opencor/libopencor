@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "logger_p.h"
 
+#include "compiler.h"
+
 #include "llvmbegin.h"
 #include "llvm/ExecutionEngine/Orc/LLJIT.h"
 #include "llvmend.h"

@@ -14,10 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/sedmodel.h"
-
-#include "libopencor/seddocument.h"
-
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 

@@ -18,8 +18,6 @@ limitations under the License.
 
 #include "libopencor/issue.h"
 
-#include <vector>
-
 namespace libOpenCOR {
 
 class Issue::Impl

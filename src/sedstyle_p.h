@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "sedbase_p.h"
 
+#include "libopencor/sedstyle.h"
+
 namespace libOpenCOR {
 
 class SedStyle::Impl: public SedBase::Impl

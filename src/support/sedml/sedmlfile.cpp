@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedmlfile.h"
-
 #include "sedmlfile_p.h"
+
 #include "utils.h"
 
 #include "libopencor/file.h"

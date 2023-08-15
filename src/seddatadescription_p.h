@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "sedbase_p.h"
 
+#include "libopencor/seddatadescription.h"
+
 namespace libOpenCOR {
 
 class SedDataDescription::Impl: public SedBase::Impl

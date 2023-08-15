@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "filemanager.h"
-
 #include "utils.h"
 
 #include <algorithm>

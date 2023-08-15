@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "logger_p.h"
 
+#include "cellmlfile.h"
+
 #include <libcellml>
 
 namespace libOpenCOR {

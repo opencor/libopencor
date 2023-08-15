@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "logger_p.h"
 
+#include "libopencor/sedbase.h"
+
 namespace libOpenCOR {
 
 class SedBase::Impl: public Logger::Impl

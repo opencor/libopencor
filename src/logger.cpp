@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/logger.h"
-
 #include "issue_p.h"
 #include "logger_p.h"
 

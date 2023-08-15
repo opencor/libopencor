@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/issue.h"
+#include "libopencor/logger.h"
 
 #include <vector>
 

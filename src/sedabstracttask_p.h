@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "sedbase_p.h"
 
+#include "libopencor/sedabstracttask.h"
+
 namespace libOpenCOR {
 
 class SedAbstractTask::Impl: public SedBase::Impl
