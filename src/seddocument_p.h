@@ -23,9 +23,6 @@ namespace libOpenCOR {
 class SedDocument::Impl: public SedBase::Impl
 {
 public:
-    Impl(const FilePtr &pFile);
-    ~Impl() = default;
-
     std::string mXmlns = "http://sed-ml.org/sed-ml/level1/version4";
     size_t mLevel = 1;
     size_t mVersion = 4;
@@ -38,6 +35,9 @@ public:
     std::vector<SedOutputPtr> mOutputs;
     std::vector<SedStylePtr> mStyles;
     std::vector<SedAlgorithmParameterPtr> mAlgorithmParameters;
+
+    Impl(const FilePtr &pFile);
+    ~Impl() = default;
 };
 
 } // namespace libOpenCOR
