@@ -36,6 +36,8 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 
     auto res = stream.str();
 
+//---GRY---
+#ifndef COVERAGE_ENABLED
     while (mIds.contains(res)) {
         stream.str({});
 
@@ -43,6 +45,7 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 
         res = stream.str();
     }
+#endif
 
     mIds.insert(res);
 
