@@ -29,6 +29,15 @@ public:
     std::string mXmlns = "http://sed-ml.org/sed-ml/level1/version4";
     size_t mLevel = 1;
     size_t mVersion = 4;
+
+    std::vector<SedDataDescriptionPtr> mDataDescriptions;
+    std::vector<SedModelPtr> mModels;
+    std::vector<SedSimulationPtr> mSimulations;
+    std::vector<SedAbstractTaskPtr> mTasks;
+    std::vector<SedDataGeneratorPtr> mDataGenerators;
+    std::vector<SedOutputPtr> mOutputs;
+    std::vector<SedStylePtr> mStyles;
+    std::vector<SedAlgorithmParameterPtr> mAlgorithmParameters;
 };
 
 } // namespace libOpenCOR
