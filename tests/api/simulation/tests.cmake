@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(TEST simulation)
+set(TEST seddocument)
 
 list(APPEND TESTS ${TEST})
 
