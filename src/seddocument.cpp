@@ -109,6 +109,120 @@ std::string SedDocument::Impl::serialise() const
 
     xmlDocSetRootElement(doc, sedNode);
 
+    // Add the data descriptions, if any, to our SED-ML document.
+
+    /*---GRY---
+    if (!mDataDescriptions.empty()) {
+        auto *sedListOfDataDescriptions = xmlNewNode(nullptr, constXmlCharPtr("listOfDataDescriptions"));
+
+        for (const auto &dataDescription : mDataDescriptions) {
+            (void)dataDescription;
+        }
+
+        xmlAddChild(sedNode, sedListOfDataDescriptions);
+    }
+    */
+
+    // Add the models, if any, to our SED-ML document.
+
+#ifndef COVERAGE_ENABLED
+    if (!mModels.empty()) {
+#endif
+        auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
+
+        for (const auto &model : mModels) {
+            (void)model;
+        }
+
+        xmlAddChild(sedNode, sedListOfModels);
+#ifndef COVERAGE_ENABLED
+    }
+#endif
+
+    // Add the simulations, if any, to our SED-ML document.
+
+    /*---GRY---
+    if (!mSimulations.empty()) {
+        auto *sedListOfSimulations = xmlNewNode(nullptr, constXmlCharPtr("listOfSimulations"));
+
+        for (const auto &simulation : mSimulations) {
+            (void)simulation;
+        }
+
+        xmlAddChild(sedNode, sedListOfSimulations);
+    }
+    */
+
+    // Add the tasks, if any, to our SED-ML document.
+
+    /*---GRY---
+    if (!mTasks.empty()) {
+        auto *sedListOfTasks = xmlNewNode(nullptr, constXmlCharPtr("listOfTasks"));
+
+        for (const auto &task : mTasks) {
+            (void)task;
+        }
+
+        xmlAddChild(sedNode, sedListOfTasks);
+    }
+    */
+
+    // Add the data generators, if any, to our SED-ML document.
+
+    /*---GRY---
+    if (!mDataGenerators.empty()) {
+        auto *sedListOfDataGenerators = xmlNewNode(nullptr, constXmlCharPtr("listOfDataGenerators"));
+
+        for (const auto &dataGenerator : mDataGenerators) {
+            (void)dataGenerator;
+        }
+
+        xmlAddChild(sedNode, sedListOfDataGenerators);
+    }
+    */
+
+    // Add the outputs, if any, to our SED-ML document.
+
+    /*---GRY---
+    if (!mOutputs.empty()) {
+        auto *sedListOfOutputs = xmlNewNode(nullptr, constXmlCharPtr("listOfOutputs"));
+
+        for (const auto &output : mOutputs) {
+            (void)output;
+        }
+
+        xmlAddChild(sedNode, sedListOfOutputs);
+    }
+    */
+
+    // Add the styles, if any, to our SED-ML document.
+
+    /*---GRY---
+    if (!mStyles.empty()) {
+        auto *sedListOfStyles = xmlNewNode(nullptr, constXmlCharPtr("listOfStyles"));
+
+        for (const auto &style : mStyles) {
+            (void)style;
+        }
+
+        xmlAddChild(sedNode, sedListOfStyles);
+    }
+    */
+
+    // Add the algorithm parameters, if any, to our SED-ML document.
+
+    /*---GRY---
+    if (!mAlgorithmParameters.empty()) {
+        auto *sedListOfAlgorithmParameters = xmlNewNode(nullptr, constXmlCharPtr("listOfAlgorithmParameters"));
+
+        for (const auto &algorithmParameter : mAlgorithmParameters) {
+            (void)algorithmParameter;
+        }
+
+        xmlAddChild(sedNode, sedListOfAlgorithmParameters);
+    }
+    */
+
     // Convert our SED-ML document to a string and return it.
 
     xmlChar *buffer = nullptr;

@@ -67,7 +67,9 @@ describe("SedDocument basic tests", () => {
 
   test("CellML file", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels/>
+</sed>
 `;
     const file = new libopencor.File(
       utils.LOCAL_FILE,
