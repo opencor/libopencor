@@ -29,6 +29,17 @@ SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
     mId = pDocument->pimpl()->uniqueId(ID_PREFIX);
 }
 
+void SedModel::Impl::populate(xmlNodePtr pNode) const
+{
+    auto *node = xmlNewNode(nullptr, constXmlCharPtr("model"));
+
+    xmlNewProp(node, constXmlCharPtr("id"), constXmlCharPtr(mId));
+    xmlNewProp(node, constXmlCharPtr("language"), constXmlCharPtr(mLanguage));
+    xmlNewProp(node, constXmlCharPtr("source"), constXmlCharPtr("..."));
+
+    xmlAddChild(pNode, node);
+}
+
 SedModel::SedModel(const FilePtr &pFile, const SedDocumentPtr &pDocument)
     : SedBase(new Impl(pFile, pDocument))
 {

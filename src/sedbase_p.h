@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "libopencor/sedbase.h"
 
-#include <libxml/xmlstring.h>
+#include <libxml/tree.h>
 
 namespace libOpenCOR {
 
@@ -32,6 +32,8 @@ public:
     std::string mMetaId;
 
     static const xmlChar *constXmlCharPtr(const std::string &pString);
+
+    void populate(xmlNodePtr pNode) const;
 };
 
 } // namespace libOpenCOR

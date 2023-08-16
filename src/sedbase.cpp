@@ -23,6 +23,15 @@ const xmlChar *SedBase::Impl::constXmlCharPtr(const std::string &pString)
     return reinterpret_cast<const xmlChar *>(pString.c_str());
 }
 
+/*
+void SedBase::Impl::populate(xmlNodePtr pNode) const // NOLINT(readability-convert-member-functions-to-static)
+{
+    // Do nothing by default.
+
+    (void)pNode;
+}
+*/
+
 SedBase::SedBase(Impl *pPimpl)
     : Logger(pPimpl)
 {

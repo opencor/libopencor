@@ -25,11 +25,13 @@ namespace libOpenCOR {
 class SedModel::Impl: public SedBase::Impl
 {
 public:
+    FilePtr mFile;
+    std::string mLanguage;
+
     Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument);
     ~Impl() = default;
 
-    FilePtr mFile;
-    std::string mLanguage;
+    void populate(xmlNodePtr pNode) const;
 };
 
 } // namespace libOpenCOR

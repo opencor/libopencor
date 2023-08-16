@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "seddocument_p.h"
+#include "sedmodel_p.h"
 
 #include "libopencor/file.h"
 #include "libopencor/sedmodel.h"
@@ -131,7 +132,7 @@ std::string SedDocument::Impl::serialise() const
         auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
 
         for (const auto &model : mModels) {
-            (void)model;
+            model->pimpl()->populate(sedListOfModels);
         }
 
         xmlAddChild(sedNode, sedListOfModels);
