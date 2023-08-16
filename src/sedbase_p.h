@@ -20,6 +20,8 @@ limitations under the License.
 
 #include "libopencor/sedbase.h"
 
+#include <libxml/xmlstring.h>
+
 namespace libOpenCOR {
 
 class SedBase::Impl: public Logger::Impl
@@ -28,6 +30,8 @@ public:
     std::string mId;
     std::string mName;
     std::string mMetaId;
+
+    static const xmlChar *constXmlCharPtr(const std::string &pString);
 };
 
 } // namespace libOpenCOR

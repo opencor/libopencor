@@ -22,6 +22,8 @@ limitations under the License.
 #include <iomanip>
 #include <sstream>
 
+#include <libxml/tree.h>
+
 namespace libOpenCOR {
 
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
@@ -94,9 +96,34 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
     mModels.push_back(std::shared_ptr<SedModel> {new SedModel {pFile, pOwner}});
 }
 
-std::string SedDocument::Impl::serialise()
+std::string SedDocument::Impl::serialise() const
 {
-    return {};
+    // Serialise our SED-ML document using libxml2.
+
+    auto *doc = xmlNewDoc(constXmlCharPtr("1.0"));
+    auto *sedNode = xmlNewNode(nullptr, constXmlCharPtr("sed"));
+
+    xmlNewProp(sedNode, constXmlCharPtr("xmlns"), constXmlCharPtr(mXmlns));
+    xmlNewProp(sedNode, constXmlCharPtr("level"), constXmlCharPtr(std::to_string(mLevel)));
+    xmlNewProp(sedNode, constXmlCharPtr("version"), constXmlCharPtr(std::to_string(mVersion)));
+
+    xmlDocSetRootElement(doc, sedNode);
+
+    // Convert our SED-ML document to a string and return it.
+
+    xmlChar *buffer = nullptr;
+    int size = 0;
+
+    xmlDocDumpFormatMemoryEnc(doc, &buffer, &size, "UTF-8", 1);
+
+    std::stringstream res;
+
+    res << buffer;
+
+    xmlFree(buffer);
+    xmlFreeDoc(doc);
+
+    return res.str();
 }
 
 SedDocument::SedDocument()

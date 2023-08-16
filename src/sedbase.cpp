@@ -18,6 +18,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+const xmlChar *SedBase::Impl::constXmlCharPtr(const std::string &pString)
+{
+    return reinterpret_cast<const xmlChar *>(pString.c_str());
+}
+
 SedBase::SedBase(Impl *pPimpl)
     : Logger(pPimpl)
 {

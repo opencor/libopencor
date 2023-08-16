@@ -33,7 +33,9 @@ def test_unknown_file():
 
 
 def test_cellml_file():
-    expected_serialisation = ""
+    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
+"""
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     simulation = SedDocument(file)
 

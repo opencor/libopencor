@@ -50,7 +50,7 @@ public:
     void initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner);
     void initialiseWithCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner);
 
-    static std::string serialise();
+    std::string serialise() const;
 };
 
 } // namespace libOpenCOR
