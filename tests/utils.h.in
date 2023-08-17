@@ -64,7 +64,7 @@ void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &p
     SCOPED_TRACE("Issue occurred here."); \
     expectEqualIssues(pIssues, pLogger)
 
-std::string resourcePath(const std::string &pResourceRelativePath);
+std::string resourcePath(const std::string &pResourceRelativePath = {});
 
 std::vector<unsigned char> charArrayToVector(const char *pContents);
 
