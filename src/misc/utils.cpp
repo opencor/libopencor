@@ -180,6 +180,13 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
                 + canonicalFileName(res, schemeLength != 0)};
 }
 
+std::string canonicalPath(const std::string &pPath)
+{
+    auto [isLocalPath, path] = retrieveFileInfo(pPath);
+
+    return path;
+}
+
 #ifndef __EMSCRIPTEN__
 using TimeVal = struct
 {

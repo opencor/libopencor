@@ -27,6 +27,8 @@ bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl);
 
+std::string canonicalPath(const std::string &pPath);
+
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::string> downloadFile(const std::string &pUrl);
 
