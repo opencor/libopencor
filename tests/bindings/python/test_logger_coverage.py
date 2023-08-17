@@ -19,29 +19,29 @@ import utils
 
 def test_issue():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert simulation.issue(0) == None
+    assert sed.issue(0) == None
 
 
 def test_has_errors():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert not simulation.has_errors
+    assert not sed.has_errors
 
 
 def test_error():
     # Has an error.
 
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert simulation.error(0) != None
+    assert sed.error(0) != None
 
     # Doesn't have an error.
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert simulation.error(0) == None
+    assert sed.error(0) == None

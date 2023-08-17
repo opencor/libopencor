@@ -52,7 +52,7 @@ describe("SedDocument basic tests", () => {
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
-    const simulation = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument(file);
 
     expectIssues(
       [
@@ -61,7 +61,7 @@ describe("SedDocument basic tests", () => {
           "A simulation experiment description cannot be created using an unknown file.",
         ],
       ],
-      simulation,
+      sed,
     );
   });
 
@@ -78,10 +78,10 @@ describe("SedDocument basic tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const simulation = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument(file);
 
-    expect(simulation.hasIssues()).toBe(false);
-    expect(simulation.serialise()).toBe(expectedSerialisation);
+    expect(sed.hasIssues()).toBe(false);
+    expect(sed.serialise()).toBe(expectedSerialisation);
   });
 
   test("SED-ML file", () => {
@@ -90,7 +90,7 @@ describe("SedDocument basic tests", () => {
       someSedmlContentsPtr,
       utils.SOME_SEDML_CONTENTS.length,
     );
-    const simulation = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument(file);
 
     expectIssues(
       [
@@ -99,7 +99,7 @@ describe("SedDocument basic tests", () => {
           "A simulation experiment description cannot currently be created using a SED-ML file.",
         ],
       ],
-      simulation,
+      sed,
     );
   });
 });

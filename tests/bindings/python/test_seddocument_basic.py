@@ -27,9 +27,9 @@ def test_unknown_file():
     ]
 
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert_issues(expected_issues, simulation)
+    assert_issues(expected_issues, sed)
 
 
 def test_cellml_file():
@@ -41,10 +41,10 @@ def test_cellml_file():
 </sed>
 """
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert not simulation.has_issues
-    assert simulation.serialise == expected_serialisation
+    assert not sed.has_issues
+    assert sed.serialise == expected_serialisation
 
 
 def test_sedml_file():
@@ -56,9 +56,9 @@ def test_sedml_file():
     ]
 
     file = File(utils.resource_path(utils.SEDML_2_FILE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert_issues(expected_issues, simulation)
+    assert_issues(expected_issues, sed)
 
 
 def test_combine_archive():
@@ -70,9 +70,9 @@ def test_combine_archive():
     ]
 
     file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert_issues(expected_issues, simulation)
+    assert_issues(expected_issues, sed)
 
 
 def test_irretrievable_file():
@@ -84,6 +84,6 @@ def test_irretrievable_file():
     ]
 
     file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
-    simulation = SedDocument(file)
+    sed = SedDocument(file)
 
-    assert_issues(expected_issues, simulation)
+    assert_issues(expected_issues, sed)

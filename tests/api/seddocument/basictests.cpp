@@ -27,9 +27,9 @@ TEST(BasicSedDocumentTest, unknownFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
-    auto simulation = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(expectedIssues, simulation);
+    EXPECT_EQ_ISSUES(expectedIssues, sed);
 }
 
 TEST(BasicSedDocumentTest, cellmlFile)
@@ -42,10 +42,10 @@ TEST(BasicSedDocumentTest, cellmlFile)
                                                      "</sed>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto simulation = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(simulation->hasIssues());
-    EXPECT_EQ(expectedSerialisation, simulation->serialise());
+    EXPECT_FALSE(sed->hasIssues());
+    EXPECT_EQ(expectedSerialisation, sed->serialise());
 }
 
 TEST(BasicSedDocumentTest, sedmlFile)
@@ -55,9 +55,9 @@ TEST(BasicSedDocumentTest, sedmlFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
-    auto simulation = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(expectedIssues, simulation);
+    EXPECT_EQ_ISSUES(expectedIssues, sed);
 }
 
 TEST(BasicSedDocumentTest, combineArchive)
@@ -67,9 +67,9 @@ TEST(BasicSedDocumentTest, combineArchive)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
-    auto simulation = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(expectedIssues, simulation);
+    EXPECT_EQ_ISSUES(expectedIssues, sed);
 }
 
 TEST(BasicSedDocumentTest, irretrievableFile)
@@ -79,7 +79,7 @@ TEST(BasicSedDocumentTest, irretrievableFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE));
-    auto simulation = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(expectedIssues, simulation);
+    EXPECT_EQ_ISSUES(expectedIssues, sed);
 }

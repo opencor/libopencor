@@ -45,9 +45,9 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const simulation = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument(file);
 
-    expect(simulation.issue(0)).toBeNull();
+    expect(sed.issue(0)).toBeNull();
   });
 
   test("hasErrors()", () => {
@@ -56,9 +56,9 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const simulation = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument(file);
 
-    expect(simulation.hasErrors()).toBe(false);
+    expect(sed.hasErrors()).toBe(false);
   });
 
   test("error()", () => {
@@ -69,9 +69,9 @@ describe("Issue coverage tests", () => {
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
-    let simulation = new libopencor.SedDocument(file);
+    let sed = new libopencor.SedDocument(file);
 
-    expect(simulation.error(0)).not.toBeNull();
+    expect(sed.error(0)).not.toBeNull();
 
     // Doesn't have an error.
 
@@ -80,8 +80,8 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    simulation = new libopencor.SedDocument(file);
+    sed = new libopencor.SedDocument(file);
 
-    expect(simulation.error(0)).toBeNull();
+    expect(sed.error(0)).toBeNull();
   });
 });
