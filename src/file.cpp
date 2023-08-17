@@ -116,6 +116,11 @@ void File::Impl::checkType(const FilePtr &pOwner)
     }
 }
 
+std::string File::Impl::path() const
+{
+    return mUrl.empty() ? mFileName : mUrl;
+}
+
 #ifndef __EMSCRIPTEN__
 void File::Impl::retrieveContents()
 {
@@ -210,6 +215,11 @@ std::string File::fileName() const
 std::string File::url() const
 {
     return pimpl()->mUrl;
+}
+
+std::string File::path() const
+{
+    return pimpl()->path();
 }
 
 #ifdef __EMSCRIPTEN__

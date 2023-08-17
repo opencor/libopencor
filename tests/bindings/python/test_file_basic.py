@@ -35,6 +35,7 @@ def test_windows_local_file():
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == utils.WINDOWS_LOCAL_FILE
     assert file.url == ""
+    assert file.path == utils.WINDOWS_LOCAL_FILE
     assert file.contents == []
     assert_issues(expected_non_existing_file_issues, file)
 
@@ -45,6 +46,7 @@ def test_windows_relative_local_file():
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == "dir\\file.txt"
     assert file.url == ""
+    assert file.path == "dir\\file.txt"
     assert file.contents == []
     assert_issues(expected_non_existing_file_issues, file)
 
@@ -55,6 +57,7 @@ def test_unix_local_file():
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
+    assert file.path == utils.UNIX_LOCAL_FILE
     assert file.contents == []
     assert_issues(expected_non_existing_file_issues, file)
 
@@ -65,6 +68,7 @@ def test_unix_relative_local_file():
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == "dir/file.txt"
     assert file.url == ""
+    assert file.path == "dir/file.txt"
     assert file.contents == []
     assert_issues(expected_non_existing_file_issues, file)
 
@@ -75,6 +79,7 @@ def test_url_based_windows_local_file():
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == utils.WINDOWS_LOCAL_FILE
     assert file.url == ""
+    assert file.path == utils.WINDOWS_LOCAL_FILE
     assert file.contents == []
     assert_issues(expected_non_existing_file_issues, file)
 
@@ -85,6 +90,7 @@ def test_url_based_unix_local_file():
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
+    assert file.path == utils.UNIX_LOCAL_FILE
     assert file.contents == []
     assert_issues(expected_non_existing_file_issues, file)
 
@@ -95,6 +101,7 @@ def test_remote_file():
     assert file.type == File.Type.CellmlFile
     assert file.file_name != ""
     assert file.url == utils.REMOTE_FILE
+    assert file.path == utils.REMOTE_FILE
     assert file.contents != []
 
 
@@ -105,6 +112,7 @@ def test_local_virtual_file():
     assert file.type == File.Type.UnknownFile
     assert file.file_name == utils.UNIX_LOCAL_FILE
     assert file.url == ""
+    assert file.path == utils.UNIX_LOCAL_FILE
     assert file.contents == some_unknown_contents_list
     assert_issues(expected_unknown_file_issues, file)
 
@@ -116,5 +124,6 @@ def test_remote_virtual_file():
     assert file.type == File.Type.UnknownFile
     assert file.file_name == ""
     assert file.url == utils.REMOTE_FILE
+    assert file.path == utils.REMOTE_FILE
     assert file.contents == some_unknown_contents_list
     assert_issues(expected_unknown_file_issues, file)

@@ -45,6 +45,8 @@ public:
 
     void checkType(const FilePtr &pOwner);
 
+    std::string path() const;
+
 #ifndef __EMSCRIPTEN__
     void retrieveContents();
 #endif

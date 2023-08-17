@@ -51,6 +51,7 @@ describe("File basic tests", () => {
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.fileName()).toBe(utils.LOCAL_FILE);
     expect(file.url()).toBe("");
+    expect(file.path()).toBe(utils.LOCAL_FILE);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(expectedUnknownFileIssues, file);
   });
@@ -65,6 +66,7 @@ describe("File basic tests", () => {
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.fileName()).toBe("");
     expect(file.url()).toBe(utils.REMOTE_FILE);
+    expect(file.path()).toBe(utils.REMOTE_FILE);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(expectedUnknownFileIssues, file);
   });

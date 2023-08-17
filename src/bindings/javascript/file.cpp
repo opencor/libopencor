@@ -34,6 +34,7 @@ void fileApi()
         .function("type", &libOpenCOR::File::type)
         .function("fileName", &libOpenCOR::File::fileName)
         .function("url", &libOpenCOR::File::url)
+        .function("path", &libOpenCOR::File::path)
         .function("contents", &libOpenCOR::File::jsContents);
 
     EM_ASM({
