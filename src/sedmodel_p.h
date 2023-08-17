@@ -31,7 +31,7 @@ public:
     Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument);
     ~Impl() = default;
 
-    void populate(xmlNodePtr pNode) const;
+    void populate(xmlNodePtr pNode, const std::string &pBasePath) const;
 };
 
 } // namespace libOpenCOR

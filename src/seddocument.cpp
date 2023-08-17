@@ -17,6 +17,8 @@ limitations under the License.
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 
+#include "utils.h"
+
 #include "libopencor/file.h"
 #include "libopencor/sedmodel.h"
 
@@ -97,7 +99,7 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
     mModels.push_back(std::shared_ptr<SedModel> {new SedModel {pFile, pOwner}});
 }
 
-std::string SedDocument::Impl::serialise() const
+std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 {
     // Serialise our SED-ML document using libxml2.
 
@@ -132,7 +134,7 @@ std::string SedDocument::Impl::serialise() const
         auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
 
         for (const auto &model : mModels) {
-            model->pimpl()->populate(sedListOfModels);
+            model->pimpl()->populate(sedListOfModels, canonicalPath(pBasePath));
         }
 
         xmlAddChild(sedNode, sedListOfModels);
@@ -270,9 +272,9 @@ SedDocumentPtr SedDocument::create(const FilePtr &pFile)
     return res;
 }
 
-std::string SedDocument::serialise() const
+std::string SedDocument::serialise(const std::string &pBasePath) const
 {
-    return pimpl()->serialise();
+    return pimpl()->serialise(pBasePath);
 }
 
 } // namespace libOpenCOR

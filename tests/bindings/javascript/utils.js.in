@@ -16,6 +16,7 @@ limitations under the License.
 
 export const UNKNOWN_FILE = "unknown_file.txt";
 
+export const LOCAL_BASE_PATH = "/some/path";
 export const LOCAL_FILE = "/some/path/file.txt";
 
 export const HTTP_REMOTE_FILE =

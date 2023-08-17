@@ -17,6 +17,10 @@ limitations under the License.
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 
+#include "libopencor/file.h"
+
+#include <filesystem>
+
 namespace libOpenCOR {
 
 static constexpr auto ID_PREFIX = "model";
@@ -29,13 +33,13 @@ SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
     mId = pDocument->pimpl()->uniqueId(ID_PREFIX);
 }
 
-void SedModel::Impl::populate(xmlNodePtr pNode) const
+void SedModel::Impl::populate(xmlNodePtr pNode, const std::string &pBasePath) const
 {
     auto *node = xmlNewNode(nullptr, constXmlCharPtr("model"));
 
     xmlNewProp(node, constXmlCharPtr("id"), constXmlCharPtr(mId));
     xmlNewProp(node, constXmlCharPtr("language"), constXmlCharPtr(mLanguage));
-    xmlNewProp(node, constXmlCharPtr("source"), constXmlCharPtr("..."));
+    xmlNewProp(node, constXmlCharPtr("source"), constXmlCharPtr(std::filesystem::relative(mFile->path(), pBasePath)));
 
     xmlAddChild(pNode, node);
 }

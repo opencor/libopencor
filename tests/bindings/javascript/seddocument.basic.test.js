@@ -69,7 +69,7 @@ describe("SedDocument basic tests", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="..."/>
+    <model id="model000000001" language="urn:sedml:language:cellml" source="file.txt"/>
   </listOfModels>
 </sed>
 `;
@@ -81,7 +81,7 @@ describe("SedDocument basic tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.hasIssues()).toBe(false);
-    expect(sed.serialise()).toBe(expectedSerialisation);
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
   });
 
   test("SED-ML file", () => {

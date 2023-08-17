@@ -36,7 +36,7 @@ def test_cellml_file():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="..."/>
+    <model id="model000000001" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
 </sed>
 """
@@ -44,7 +44,7 @@ def test_cellml_file():
     sed = SedDocument(file)
 
     assert not sed.has_issues
-    assert sed.serialise == expected_serialisation
+    assert sed.serialise(utils.resource_path()) == expected_serialisation
 
 
 def test_sedml_file():
