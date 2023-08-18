@@ -39,7 +39,7 @@ void SedModel::Impl::populate(xmlNodePtr pNode, const std::string &pBasePath) co
 
     xmlNewProp(node, constXmlCharPtr("id"), constXmlCharPtr(mId));
     xmlNewProp(node, constXmlCharPtr("language"), constXmlCharPtr(mLanguage));
-    xmlNewProp(node, constXmlCharPtr("source"), constXmlCharPtr(std::filesystem::relative(mFile->path(), pBasePath)));
+    xmlNewProp(node, constXmlCharPtr("source"), constXmlCharPtr(std::filesystem::relative(mFile->path(), pBasePath).string()));
 
     xmlAddChild(pNode, node);
 }

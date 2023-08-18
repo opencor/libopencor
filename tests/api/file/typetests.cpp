@@ -103,7 +103,7 @@ TEST(TypeFileTest, combine2Archive)
 
 TEST(TypeFileTest, unknownVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE,
                                          libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
@@ -112,7 +112,7 @@ TEST(TypeFileTest, unknownVirtualFile)
 
 TEST(TypeFileTest, cellmlVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE,
                                          libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
@@ -120,7 +120,7 @@ TEST(TypeFileTest, cellmlVirtualFile)
 
 TEST(TypeFileTest, sedmlVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE,
                                          libOpenCOR::charArrayToVector(libOpenCOR::SOME_SEDML_CONTENTS));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);

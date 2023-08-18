@@ -187,11 +187,34 @@ function(configure_target TARGET)
         endif()
     endif()
 
-    # Let libOpenCOR know that we are building with coverage enabled.
+    # Let the target know which compiler we are using.
+
+    if(BUILDING_USING_MSVC)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_USING_MSVC)
+    elseif(BUILDING_USING_GNU)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_USING_GNU)
+    elseif(BUILDING_USING_CLANG)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_USING_CLANG)
+    endif()
+
+    # Let the target know that we are building with coverage enabled.
 
     if(LIBOPENCOR_CODE_COVERAGE)
         target_compile_definitions(${TARGET} PRIVATE
                                    COVERAGE_ENABLED)
+    endif()
+
+    # Let the target know that we are fine with using std::codecvt_utf8() even though it has been deprecated in C++17
+    # (but no replacement has been provided yet).
+    # Note: this is so that we can convert a std::wstring to a std::string on Windows (see wideStringToString()), hence
+    #       the WIN32 check.
+
+    if(WIN32)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
     endif()
 
     # Statically link our packages to the target.

@@ -32,8 +32,8 @@ TEST(CoverageFileTest, irretrievableRemoteFile)
 
 TEST(CoverageFileTest, sameLocalFile)
 {
-    auto file1 = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE);
-    auto file2 = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE);
+    auto file1 = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file2 = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
 
     EXPECT_EQ(file1, file2);
 }

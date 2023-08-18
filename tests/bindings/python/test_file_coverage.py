@@ -26,8 +26,8 @@ def test_irretrievable_remote_file():
 
 
 def test_same_local_file():
-    file1 = File(utils.UNIX_LOCAL_FILE)
-    file2 = File(utils.UNIX_LOCAL_FILE)
+    file1 = File(utils.LOCAL_FILE)
+    file2 = File(utils.LOCAL_FILE)
 
     assert file1.__subclasshook__ == file2.__subclasshook__
 

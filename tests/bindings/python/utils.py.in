@@ -14,6 +14,7 @@
 
 
 import os
+import platform
 
 
 RESOURCE_LOCATION = "@RESOURCE_LOCATION@"
@@ -31,8 +32,10 @@ COMBINE_2_ARCHIVE = "cellml_2.omex"
 IRRETRIEVABLE_FILE = "irretrievable_file.txt"
 
 
-WINDOWS_LOCAL_FILE = "P:\\some\\path\\file.txt"
-UNIX_LOCAL_FILE = "/some/path/file.txt"
+if platform.system() == "Windows":
+    LOCAL_FILE = "P:\\some\\path\\file.txt"
+else:
+    LOCAL_FILE = "/some/path/file.txt"
 
 
 HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"

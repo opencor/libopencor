@@ -22,7 +22,7 @@ limitations under the License.
 #include <fstream>
 #include <regex>
 
-#ifdef _MSC_VER
+#ifdef BUILDING_USING_MSVC
 #    include <process.h>
 #else
 #    include <unistd.h>
@@ -30,6 +30,10 @@ limitations under the License.
 
 #ifndef __EMSCRIPTEN__
 #    include <curl/curl.h>
+#endif
+
+#ifdef BUILDING_USING_MSVC
+#    include <codecvt>
 #endif
 
 namespace libOpenCOR {
@@ -41,100 +45,55 @@ bool fuzzyCompare(double pNb1, double pNb2)
     return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
 }
 
-namespace {
-std::string canonicalFileName(const std::string &pFileName, bool pIsFromUrl)
+#ifdef BUILDING_USING_MSVC
+std::string wideStringToString(const std::wstring &pString)
 {
-    // Check whether we are dealing with a Windows file.
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pString);
+}
+#endif
 
-    static const auto WINDOWS_PATH_REGEX = std::regex(R"(^([A-Za-z]:\\)?.*[\\].*)");
-    static const auto WINDOWS_URL_PATH_REGEX = std::regex("^/[A-Za-z]:/.*");
-
-    std::smatch match;
-
-    std::regex_search(pFileName, match, pIsFromUrl ? WINDOWS_URL_PATH_REGEX : WINDOWS_PATH_REGEX);
-
-    auto isWindowsFile = !match.empty();
-
-    // Remove the leading forward slash, if any and if needed.
+namespace {
+#ifdef BUILDING_USING_MSVC
+std::string canonicalFileName(const std::string &pFileName, bool pIsRemoteFile)
+#else
+std::string canonicalFileName(const std::string &pFileName)
+#endif
+{
+    // Determine the canonical version of the file name.
 
     static constexpr auto FORWARD_SLASH = "/";
-    static const auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
-
-    auto res = pFileName;
-
-    if (isWindowsFile && pIsFromUrl) {
-        res.erase(0, FORWARD_SLASH_LENGTH);
-    }
-
-    // Replace "\"s with "/"s, if needed.
-
-    if (isWindowsFile && !pIsFromUrl) {
-        static constexpr auto BACKSLASH = "\\\\";
-        static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
-
-        res = std::regex_replace(pFileName, BACKSLASH_REGEX, FORWARD_SLASH);
-    }
-
-    // Determine the root path of the file, if any, and (temporarily) remove it.
-
-    static const auto WINDOWS_URL_PATH_ROOT_NAME_REGEX = std::regex("^/[A-Za-z]:/");
-    static const auto WINDOWS_PATH_ROOT_NAME_REGEX = std::regex("^[A-Za-z]:/");
-    static const auto UNIX_PATH_ROOT_NAME_REGEX = std::regex("^/");
-
-    std::regex_search(res, match, isWindowsFile ? pIsFromUrl ? WINDOWS_URL_PATH_ROOT_NAME_REGEX : WINDOWS_PATH_ROOT_NAME_REGEX : UNIX_PATH_ROOT_NAME_REGEX);
-
-    std::string rootPath;
-
-    if (!match.empty()) {
-        rootPath = match.str();
-
-        res.erase(0, rootPath.length());
-    }
-
-    // Determine the canonical version of the relative path, keeping in mind that a default root path may have been
-    // prepended in the process (depending on the case and the implementation of std::filesystem).
 
     auto currentPath = std::filesystem::current_path();
 
     std::filesystem::current_path(FORWARD_SLASH);
 
-    auto tempRootPath = std::filesystem::current_path().string();
-
-    res = std::filesystem::weakly_canonical(res).string();
-
-#if defined(__GNUC__) || defined(__clang__)
-#    ifndef __clang__
-    if (res.find(tempRootPath) == 0) {
-#    endif
-        res.erase(0, tempRootPath.size());
-#    ifndef __clang__
-    }
-#    endif
+#ifdef BUILDING_USING_MSVC
+    auto res = wideStringToString(std::filesystem::weakly_canonical(pFileName).native());
+#else
+    auto res = std::filesystem::weakly_canonical(pFileName).native();
 #endif
 
     std::filesystem::current_path(currentPath);
 
-    // Re-add the root path, if needed.
+#if defined(BUILDING_USING_MSVC)
+    // Replace "\"s with "/"s, if needed.
 
-    if (!rootPath.empty()) {
-        res = rootPath + res;
-    }
-
-    // Replace any "/"s with "\"s or any "\"s with "/"s, as needed.
-
-    if (isWindowsFile) {
-        static constexpr auto BACKSLASH = "\\";
-        static const auto FORWARD_SLASH_REGEX = std::regex(FORWARD_SLASH);
-
-        res = std::regex_replace(res, FORWARD_SLASH_REGEX, BACKSLASH);
-#ifdef _MSC_VER
-    } else {
+    if (pIsRemoteFile) {
         static constexpr auto BACKSLASH = "\\\\";
         static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
 
-        res = std::regex_replace(res, BACKSLASH_REGEX, FORWARD_SLASH);
-#endif
+        res = std::regex_replace(pFileName, BACKSLASH_REGEX, FORWARD_SLASH);
     }
+#elif defined(BUILDING_USING_CLANG) || defined(__EMSCRIPTEN__)
+    // The file name may be relative rather than absolute, in which case we need to remove the forward slash that got
+    // added (at the beginning of the file name) by std::filesystem::weakly_canonical().
+
+    if (pFileName.find(FORWARD_SLASH) != 0) {
+        static const auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
+
+        res.erase(0, FORWARD_SLASH_LENGTH);
+    }
+#endif
 
     // Return the canonical version of the file name.
 
@@ -147,7 +106,11 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
     // Check whether the given file name or URL is a local file name or a URL.
     // Note: a URL represents a local file when used with the "file" scheme.
 
+#ifdef _WIN32
+    static constexpr auto FILE_SCHEME = "file:///";
+#else
     static constexpr auto FILE_SCHEME = "file://";
+#endif
     static auto FILE_SCHEME_LENGTH = strlen(FILE_SCHEME);
     static constexpr auto HTTP_SCHEME = "http://";
     static auto HTTP_SCHEME_LENGTH = strlen(HTTP_SCHEME);
@@ -177,7 +140,11 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
              requiresHttpsScheme ?
                  HTTPS_SCHEME :
                  "")
-                + canonicalFileName(res, schemeLength != 0)};
+#ifdef BUILDING_USING_MSVC
+                + canonicalFileName(res, requiresHttpScheme || requiresHttpsScheme)};
+#else
+                + canonicalFileName(res)};
+#endif
 }
 
 std::string canonicalPath(const std::string &pPath)
@@ -244,7 +211,7 @@ std::string uniqueFileName()
 
     auto value = (timeVal.microeconds << MICROSECONDS_SHIFT) ^ timeVal.seconds;
 
-#    ifdef _MSC_VER
+#    ifdef BUILDING_USING_MSVC
     value ^= static_cast<uint64_t>(_getpid()) << PID_SHIFT;
 #    else
     value ^= static_cast<uint64_t>(getpid()) << PID_SHIFT;
