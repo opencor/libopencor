@@ -21,6 +21,8 @@ export const LOCAL_FILE = "/some/path/file.txt";
 
 export const HTTP_REMOTE_FILE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+export const REMOTE_BASE_PATH =
+  "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
 export const REMOTE_FILE =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 

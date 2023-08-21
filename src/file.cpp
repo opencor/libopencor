@@ -28,7 +28,7 @@ namespace libOpenCOR {
 
 File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
 {
-    // Check whether we are dealing with a local file file or a URL.
+    // Check whether we are dealing with a local file or a URL.
 
     auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
 

@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
+#include "utils.h"
 
 #include "libopencor/file.h"
 
@@ -39,7 +40,16 @@ void SedModel::Impl::populate(xmlNodePtr pNode, const std::string &pBasePath) co
 
     xmlNewProp(node, constXmlCharPtr("id"), constXmlCharPtr(mId));
     xmlNewProp(node, constXmlCharPtr("language"), constXmlCharPtr(mLanguage));
-    xmlNewProp(node, constXmlCharPtr("source"), constXmlCharPtr(std::filesystem::relative(mFile->path(), pBasePath).string()));
+
+    auto source = pBasePath.empty() ?
+                      urlPath(mFile->path()) :
+#ifdef BUILDING_USING_MSVC
+                      forwardSlashPath(relativePath(mFile->path(), pBasePath));
+#else
+                      relativePath(mFile->path(), pBasePath);
+#endif
+
+    xmlNewProp(node, constXmlCharPtr("source"), constXmlCharPtr(source));
 
     xmlAddChild(pNode, node);
 }

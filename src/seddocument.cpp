@@ -134,7 +134,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
         auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
 
         for (const auto &model : mModels) {
-            model->pimpl()->populate(sedListOfModels, canonicalPath(pBasePath));
+            model->pimpl()->populate(sedListOfModels, pBasePath);
         }
 
         xmlAddChild(sedNode, sedListOfModels);
@@ -271,6 +271,13 @@ SedDocumentPtr SedDocument::create(const FilePtr &pFile)
 
     return res;
 }
+
+#ifdef __EMSCRIPTEN__
+std::string SedDocument::jsSerialise()
+{
+    return pimpl()->serialise();
+}
+#endif
 
 std::string SedDocument::serialise(const std::string &pBasePath) const
 {

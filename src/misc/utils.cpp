@@ -50,6 +50,15 @@ std::string wideStringToString(const std::wstring &pString)
 {
     return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pString);
 }
+
+std::string forwardSlashPath(const std::string &pPath)
+{
+    static constexpr auto FORWARD_SLASH = "/";
+    static constexpr auto BACKSLASH = "\\\\";
+    static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
+
+    return std::regex_replace(pPath, BACKSLASH_REGEX, FORWARD_SLASH);
+}
 #endif
 
 namespace {
@@ -60,6 +69,10 @@ std::string canonicalFileName(const std::string &pFileName)
 #endif
 {
     // Determine the canonical version of the file name.
+    // Note: when building using Emscripten, std::filesystem::weakly_canonical() doesn't work as expected. For instance,
+    //       if pFileName is equal to "/some/path/../.." then the call to std::filesystem::weakly_canonical() will
+    //       generate an exception rather than return "/". So, we prepend a dummy folder to pFileName and then remove it
+    //       from the result of std::filesystem::weakly_canonical().
 
     static constexpr auto FORWARD_SLASH = "/";
 
@@ -67,10 +80,19 @@ std::string canonicalFileName(const std::string &pFileName)
 
     std::filesystem::current_path(FORWARD_SLASH);
 
-#ifdef BUILDING_USING_MSVC
-    auto res = wideStringToString(std::filesystem::weakly_canonical(pFileName).native());
+#if defined(BUILDING_USING_MSVC)
+    auto res = wideStringToString(std::filesystem::weakly_canonical(pFileName).wstring());
+#elif defined(BUILDING_USING_GNU) || defined(BUILDING_USING_CLANG)
+    auto res = std::filesystem::weakly_canonical(pFileName).string();
 #else
-    auto res = std::filesystem::weakly_canonical(pFileName).native();
+    static constexpr auto DUMMY_FOLDER = "/dummy";
+
+    auto res = std::filesystem::path(pFileName).string();
+
+    res = DUMMY_FOLDER + std::string((res.find(FORWARD_SLASH) != 0) ? FORWARD_SLASH : "") + res;
+    res = std::filesystem::weakly_canonical(res).string();
+
+    res.erase(0, strlen(DUMMY_FOLDER));
 #endif
 
     std::filesystem::current_path(currentPath);
@@ -79,10 +101,7 @@ std::string canonicalFileName(const std::string &pFileName)
     // Replace "\"s with "/"s, if needed.
 
     if (pIsRemoteFile) {
-        static constexpr auto BACKSLASH = "\\\\";
-        static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
-
-        res = std::regex_replace(pFileName, BACKSLASH_REGEX, FORWARD_SLASH);
+        res = forwardSlashPath(pFileName);
     }
 #elif defined(BUILDING_USING_CLANG) || defined(__EMSCRIPTEN__)
     // The file name may be relative rather than absolute, in which case we need to remove the forward slash that got
@@ -150,6 +169,29 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 std::string canonicalPath(const std::string &pPath)
 {
     auto [isLocalPath, path] = retrieveFileInfo(pPath);
+
+    return path;
+}
+
+std::string relativePath(const std::string &pPath, const std::string &pBasePath)
+{
+    return std::filesystem::relative(canonicalPath(pPath), canonicalPath(pBasePath)).string();
+}
+
+std::string urlPath(const std::string &pPath)
+{
+    auto [isLocalPath, path] = retrieveFileInfo(pPath);
+
+    if (isLocalPath && std::filesystem::path(path).is_absolute()) {
+        static const std::string FILE_SCHEME = "file://";
+#ifdef BUILDING_USING_MSVC
+        static constexpr auto FORWARD_SLASH = "/";
+
+        return FILE_SCHEME + FORWARD_SLASH + forwardSlashPath(path);
+#else
+        return FILE_SCHEME + path;
+#endif
+    }
 
     return path;
 }

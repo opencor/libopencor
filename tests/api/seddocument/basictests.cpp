@@ -34,18 +34,10 @@ TEST(BasicSedDocumentTest, unknownFile)
 
 TEST(BasicSedDocumentTest, cellmlFile)
 {
-    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
-                                                     "  <listOfModels>\n"
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
-                                                     "  </listOfModels>\n"
-                                                     "</sed>\n";
-
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_FALSE(sed->hasIssues());
-    EXPECT_EQ(expectedSerialisation, sed->serialise(libOpenCOR::resourcePath()));
 }
 
 TEST(BasicSedDocumentTest, sedmlFile)

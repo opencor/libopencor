@@ -39,6 +39,9 @@ else:
 
 
 HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+REMOTE_BASE_PATH = (
+    "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
+)
 REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
 IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt"
 

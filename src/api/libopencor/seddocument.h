@@ -72,7 +72,10 @@ public:
      * @return The @c std::string serialised version of this simulation experiment description.
      */
 
-    std::string serialise(const std::string &pBasePath) const;
+#ifdef __EMSCRIPTEN__
+    std::string jsSerialise();
+#endif
+    std::string serialise(const std::string &pBasePath = {}) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
