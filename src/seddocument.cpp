@@ -275,7 +275,7 @@ SedDocumentPtr SedDocument::create(const FilePtr &pFile)
 #ifdef __EMSCRIPTEN__
 std::string SedDocument::jsSerialise()
 {
-    return pimpl()->serialise();
+    return serialise();
 }
 #endif
 
