@@ -18,6 +18,12 @@ import utils
 from utils import assert_issues
 
 
+def test_no_file():
+    sed = SedDocument()
+
+    assert not sed.has_issues
+
+
 def test_unknown_file():
     expected_issues = [
         [
@@ -27,14 +33,18 @@ def test_unknown_file():
     ]
 
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert_issues(expected_issues, sed)
 
 
 def test_cellml_file():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert not sed.has_issues
 
@@ -48,7 +58,9 @@ def test_sedml_file():
     ]
 
     file = File(utils.resource_path(utils.SEDML_2_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert_issues(expected_issues, sed)
 
@@ -62,7 +74,9 @@ def test_combine_archive():
     ]
 
     file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert_issues(expected_issues, sed)
 
@@ -76,6 +90,8 @@ def test_irretrievable_file():
     ]
 
     file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert_issues(expected_issues, sed)

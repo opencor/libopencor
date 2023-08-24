@@ -45,7 +45,9 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.issue(0)).toBeNull();
   });
@@ -56,7 +58,9 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.hasErrors()).toBe(false);
   });
@@ -69,7 +73,9 @@ describe("Issue coverage tests", () => {
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
-    let sed = new libopencor.SedDocument(file);
+    let sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.error(0)).not.toBeNull();
 
@@ -80,7 +86,9 @@ describe("Issue coverage tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    sed = new libopencor.SedDocument(file);
+    sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.error(0)).toBeNull();
   });

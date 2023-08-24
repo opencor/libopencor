@@ -28,7 +28,9 @@ def test_local_cellml_file_with_base_path():
 </sed>
 """
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.serialise(utils.resource_path()) == expected_serialisation
 
@@ -52,7 +54,9 @@ def test_local_cellml_file_without_base_path():
 """
 
     file = File(utils.LOCAL_FILE, utils.string_to_list(utils.SOME_CELLML_CONTENTS))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.serialise() == expected_serialisation
 
@@ -66,7 +70,9 @@ def test_relative_local_cellml_file_with_base_path():
 </sed>
 """
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.serialise(utils.resource_path() + "../..") == expected_serialisation
 
@@ -80,7 +86,9 @@ def test_relative_local_cellml_file_without_base_path():
 </sed>
 """
     file = File(utils.CELLML_2_FILE, utils.string_to_list(utils.SOME_CELLML_CONTENTS))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.serialise() == expected_serialisation
 
@@ -94,7 +102,9 @@ def test_remote_cellml_file_with_base_path():
 </sed>
 """
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.serialise(utils.REMOTE_BASE_PATH) == expected_serialisation
 
@@ -108,7 +118,9 @@ def test_remote_cellml_file_without_base_path():
 </sed>
 """
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.serialise() == expected_serialisation
 
@@ -122,6 +134,8 @@ def test_relative_remote_cellml_file_with_base_path():
 </sed>
 """
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.serialise(utils.REMOTE_BASE_PATH + "/../..") == expected_serialisation

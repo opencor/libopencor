@@ -50,16 +50,23 @@ public:
      * Factory method to create a @ref SedDocument object:
      *
      * ```
-     * auto file = libOpenCOR::File::create(...);
-     * auto sedDocument = libOpenCOR::SedDocument::create(file);
+     * auto sedDocument = libOpenCOR::SedDocument::create();
      * ```
-     *
-     * @param pFile The @ref File for which a simulation experiment description is to be created.
      *
      * @return A smart pointer to a @ref SedDocument object.
      */
 
-    static SedDocumentPtr create(const FilePtr &pFile);
+    static SedDocumentPtr create();
+
+    /**
+     * @brief Initialise this simulation experiment description using the given @ref File.
+     *
+     * Initialise this simulation experiment description using the given @ref File.
+     *
+     * @param pFile The @ref File used to initialise this simulation experiment description.
+     */
+
+    void initialise(const FilePtr &pFile);
 
     /**
      * @brief Get the serialised version of this simulation experiment description.
@@ -69,7 +76,7 @@ public:
      * @return The @c std::string serialised version of this simulation experiment description.
      */
 
-    std::string serialise() const ;
+    std::string serialise() const;
 
     /**
      * @brief Get the serialised version of this simulation experiment description.
@@ -82,7 +89,7 @@ public:
      * @return The @c std::string serialised version of this simulation experiment description.
      */
 
-    std::string serialise(const std::string &pBasePath) const ;
+    std::string serialise(const std::string &pBasePath) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

@@ -20,6 +20,13 @@ limitations under the License.
 
 #include <libopencor>
 
+TEST(BasicSedDocumentTest, noFile)
+{
+    auto sed = libOpenCOR::SedDocument::create();
+
+    EXPECT_FALSE(sed->hasIssues());
+}
+
 TEST(BasicSedDocumentTest, unknownFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
@@ -27,7 +34,9 @@ TEST(BasicSedDocumentTest, unknownFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create();
+
+    sed->initialise(file);
 
     EXPECT_EQ_ISSUES(expectedIssues, sed);
 }
@@ -35,7 +44,9 @@ TEST(BasicSedDocumentTest, unknownFile)
 TEST(BasicSedDocumentTest, cellmlFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create();
+
+    sed->initialise(file);
 
     EXPECT_FALSE(sed->hasIssues());
 }
@@ -47,7 +58,9 @@ TEST(BasicSedDocumentTest, sedmlFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create();
+
+    sed->initialise(file);
 
     EXPECT_EQ_ISSUES(expectedIssues, sed);
 }
@@ -59,7 +72,9 @@ TEST(BasicSedDocumentTest, combineArchive)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create();
+
+    sed->initialise(file);
 
     EXPECT_EQ_ISSUES(expectedIssues, sed);
 }
@@ -71,7 +86,9 @@ TEST(BasicSedDocumentTest, irretrievableFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto sed = libOpenCOR::SedDocument::create();
+
+    sed->initialise(file);
 
     EXPECT_EQ_ISSUES(expectedIssues, sed);
 }

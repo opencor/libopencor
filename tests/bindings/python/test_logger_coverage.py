@@ -19,14 +19,18 @@ import utils
 
 def test_issue():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.issue(0) == None
 
 
 def test_has_errors():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert not sed.has_errors
 
@@ -35,13 +39,17 @@ def test_error():
     # Has an error.
 
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.error(0) != None
 
     # Doesn't have an error.
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    sed = SedDocument()
+
+    sed.initialise(file)
 
     assert sed.error(0) == None

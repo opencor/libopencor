@@ -59,6 +59,12 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 
 void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner)
 {
+    // Check whether we were given a file.
+
+    if (pFile == nullptr) {
+        return;
+    }
+
     // Make sure that the given file is supported.
 
     switch (pFile->type()) {
@@ -263,13 +269,14 @@ const SedDocument::Impl *SedDocument::pimpl() const
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
 
-SedDocumentPtr SedDocument::create(const FilePtr &pFile)
+SedDocumentPtr SedDocument::create()
 {
-    auto res = std::shared_ptr<SedDocument> {new SedDocument {}};
+    return std::shared_ptr<SedDocument> {new SedDocument {}};
+}
 
-    res->pimpl()->initialise(pFile, res->shared_from_this());
-
-    return res;
+void SedDocument::initialise(const FilePtr &pFile)
+{
+    pimpl()->initialise(pFile, shared_from_this());
 }
 
 std::string SedDocument::serialise() const

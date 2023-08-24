@@ -47,7 +47,9 @@ describe("SedDocument serialise tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
   });
@@ -65,7 +67,9 @@ describe("SedDocument serialise tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.serialise()).toBe(expectedSerialisation);
   });
@@ -83,7 +87,9 @@ describe("SedDocument serialise tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
       expectedSerialisation,
@@ -103,7 +109,9 @@ describe("SedDocument serialise tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.serialise()).toBe(expectedSerialisation);
   });
@@ -121,7 +129,9 @@ describe("SedDocument serialise tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(expectedSerialisation);
   });
@@ -139,7 +149,9 @@ describe("SedDocument serialise tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.serialise()).toBe(expectedSerialisation);
   });
@@ -157,7 +169,9 @@ describe("SedDocument serialise tests", () => {
       someCellmlContentsPtr,
       utils.SOME_CELLML_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument(file);
+    const sed = new libopencor.SedDocument();
+
+    sed.initialise(file);
 
     expect(sed.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
       expectedSerialisation,
