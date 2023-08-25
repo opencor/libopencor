@@ -26,6 +26,7 @@ void sedDocumentApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedDocument, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedDocument>> sedDocument(m, "SedDocument");
 
-    sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", py::arg("file"))
-        .def("serialise", &libOpenCOR::SedDocument::serialise, "Get the serialised version of this SedDocument object.", py::arg("base_path") = "");
+    sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", py::arg("file") = nullptr)
+        .def("serialise", py::overload_cast<>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.")
+        .def("serialise", py::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.", py::arg("base_path"));
 }

@@ -66,16 +66,23 @@ public:
      *
      * Return the @c std::string serialised version of this simulation experiment description.
      *
+     * @return The @c std::string serialised version of this simulation experiment description.
+     */
+
+    std::string serialise() const ;
+
+    /**
+     * @brief Get the serialised version of this simulation experiment description.
+     *
+     * Return the @c std::string serialised version of this simulation experiment description.
+     *
      * @param pBasePath The @c std::string base path to use to determine the relative path, if possible, of a model
      * source.
      *
      * @return The @c std::string serialised version of this simulation experiment description.
      */
 
-#ifdef __EMSCRIPTEN__
-    std::string jsSerialise();
-#endif
-    std::string serialise(const std::string &pBasePath = {}) const;
+    std::string serialise(const std::string &pBasePath) const ;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

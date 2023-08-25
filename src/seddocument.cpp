@@ -272,12 +272,10 @@ SedDocumentPtr SedDocument::create(const FilePtr &pFile)
     return res;
 }
 
-#ifdef __EMSCRIPTEN__
-std::string SedDocument::jsSerialise()
+std::string SedDocument::serialise() const
 {
-    return serialise();
+    return serialise({});
 }
-#endif
 
 std::string SedDocument::serialise(const std::string &pBasePath) const
 {
