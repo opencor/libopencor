@@ -37,7 +37,7 @@ function(configure_target TARGET)
 
     if(BUILDING_USING_MSVC)
         target_compile_options(${TARGET} PRIVATE
-                                /wd4251)
+                               /wd4251)
     endif()
 
     # Treat warnings as errors.
