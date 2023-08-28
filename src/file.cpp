@@ -49,9 +49,9 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
 
         static constexpr size_t SCHEME_LENGTH = 7;
 
-        mFileName = pFileNameOrUrl;
+        auto fileName = pFileNameOrUrl;
 
-        mFileName.erase(0, SCHEME_LENGTH);
+        fileName.erase(0, SCHEME_LENGTH);
 
         // On Windows, we also need to remove the leading "/" and replace all the other "/"s with "\"s.
 
@@ -59,16 +59,18 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
 
         std::smatch match;
 
-        std::regex_search(mFileName, match, WINDOWS_PATH_REGEX);
+        std::regex_search(fileName, match, WINDOWS_PATH_REGEX);
 
         if (!match.empty()) {
             static constexpr size_t SLASH_LENGTH = 1;
             static const auto FORWARD_SLASH_REGEX = std::regex("/");
 
-            mFileName.erase(0, SLASH_LENGTH);
+            fileName.erase(0, SLASH_LENGTH);
 
-            mFileName = std::regex_replace(mFileName, FORWARD_SLASH_REGEX, "\\");
+            fileName = std::regex_replace(fileName, FORWARD_SLASH_REGEX, "\\");
         }
+
+        mFilePath = std::filesystem::u8path(fileName);
     } else if ((pFileNameOrUrl.find("http://") == 0)
                || (pFileNameOrUrl.find("https://") == 0)) {
         // We are dealing with a URL representing a remote file.
@@ -77,7 +79,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
     } else {
         // We are dealing with a local file.
 
-        mFileName = pFileNameOrUrl;
+        mFilePath = std::filesystem::u8path(pFileNameOrUrl);
     }
 
     // Check whether we have some contents and, if so, keep track of it and consider the file virtual.
@@ -93,15 +95,15 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
     else {
         // Download a local copy of the remote file, if needed.
 
-        if (mFileName.empty()) {
-            auto [res, fileName] = downloadFile(mUrl);
+        if (mFilePath.empty()) {
+            auto [res, filePath] = downloadFile(mUrl);
 
-            mFileName = fileName;
+            mFilePath = filePath;
         }
 
         // Make sure that the (local) file exists.
 
-        if (mFileName.empty() || !std::filesystem::exists(mFileName.c_str())) {
+        if (mFilePath.empty() || !std::filesystem::exists(mFilePath)) {
             mType = Type::IRRETRIEVABLE_FILE;
 
             return;
@@ -114,8 +116,8 @@ File::Impl::~Impl()
 {
     // Delete the local file associated with a remote file.
 
-    if (!mUrl.empty() && !mFileName.empty()) {
-        remove(mFileName.c_str()); // NOLINT(cert-err33-c)
+    if (!mUrl.empty() && !mFilePath.empty()) {
+        std::filesystem::remove(mFilePath);
     }
 
     // Delete some internal objects.
@@ -144,7 +146,7 @@ void File::Impl::retrieveContents()
     // Retrieve the contents of the file, if needed.
 
     if (!mContentsRetrieved) {
-        auto [res, contents] = fileContents(mFileName);
+        auto [res, contents] = fileContents(mFilePath);
 
         if (res) {
             mContents = contents;
@@ -213,7 +215,7 @@ File::Type File::type() const
 
 std::string File::fileName() const
 {
-    return pimpl()->mFileName;
+    return pimpl()->mFilePath.string();
 }
 
 std::string File::url() const
