@@ -12,13 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(TEST seddocument)
 
-list(APPEND TESTS ${TEST})
+from libopencor import File, SedDocument
+import utils
 
-set(${TEST}_CATEGORY api)
-set(${TEST}_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/coveragetests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/serialisetests.cpp
-)
+
+def test_initialise():
+    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\"/>
+"""
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument()
+
+    sed.initialise(None)
+
+    assert sed.serialise() == expected_serialisation
