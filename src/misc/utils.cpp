@@ -61,6 +61,11 @@ std::string forwardSlashPath(const std::string &pPath)
 }
 #endif
 
+std::filesystem::path stringToPath(const std::string &pString)
+{
+    return std::u8string {pString.begin(), pString.end()};
+}
+
 namespace {
 #ifdef BUILDING_USING_MSVC
 std::string canonicalFileName(const std::string &pFileName, bool pIsRemoteFile)
@@ -81,16 +86,16 @@ std::string canonicalFileName(const std::string &pFileName)
     std::filesystem::current_path(FORWARD_SLASH);
 
 #if defined(BUILDING_USING_MSVC)
-    auto res = wideStringToString(std::filesystem::weakly_canonical(pFileName).wstring());
+    auto res = wideStringToString(std::filesystem::weakly_canonical(stringToPath(pFileName)).wstring());
 #elif defined(BUILDING_USING_GNU) || defined(BUILDING_USING_CLANG)
-    auto res = std::filesystem::weakly_canonical(pFileName).string();
+    auto res = std::filesystem::weakly_canonical(stringToPath(pFileName)).string();
 #else
     static constexpr auto DUMMY_FOLDER = "/dummy";
 
-    auto res = std::filesystem::path(pFileName).string();
+    auto res = pFileName;
 
     res = DUMMY_FOLDER + std::string((res.find(FORWARD_SLASH) != 0) ? FORWARD_SLASH : "") + res;
-    res = std::filesystem::weakly_canonical(res).string();
+    res = std::filesystem::weakly_canonical(stringToPath(res)).string();
 
     res.erase(0, strlen(DUMMY_FOLDER));
 #endif
@@ -166,12 +171,14 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 #endif
 }
 
-std::string canonicalPath(const std::string &pPath)
+namespace {
+std::filesystem::path canonicalPath(const std::string &pPath)
 {
     auto [isLocalPath, path] = retrieveFileInfo(pPath);
 
-    return path;
+    return stringToPath(path);
 }
+} // namespace
 
 std::string relativePath(const std::string &pPath, const std::string &pBasePath)
 {
@@ -182,7 +189,7 @@ std::string urlPath(const std::string &pPath)
 {
     auto [isLocalPath, path] = retrieveFileInfo(pPath);
 
-    if (isLocalPath && std::filesystem::path(path).is_absolute()) {
+    if (isLocalPath && stringToPath(path).is_absolute()) {
         static const std::string FILE_SCHEME = "file://";
 #ifdef BUILDING_USING_MSVC
         static constexpr auto FORWARD_SLASH = "/";

@@ -33,7 +33,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
     auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
 
     if (isLocalFile) {
-        mFilePath = std::filesystem::u8path(fileNameOrUrl);
+        mFilePath = stringToPath(fileNameOrUrl);
     } else {
         mUrl = fileNameOrUrl;
     }
@@ -51,13 +51,13 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
             auto [res, filePath] = downloadFile(mUrl);
 
             if (res) {
-                mFilePath = std::filesystem::u8path(fileName);
+                mFilePath = filePath;
             } else {
                 mType = Type::IRRETRIEVABLE_FILE;
 
                 addError("The file could not be downloaded.");
             }
-        } else if (!std::filesystem::exists(mFileName.c_str())) {
+        } else if (!std::filesystem::exists(mFilePath)) {
             mType = Type::IRRETRIEVABLE_FILE;
 
             addError("The file does not exist.");
@@ -118,7 +118,7 @@ void File::Impl::checkType(const FilePtr &pOwner)
 
 std::string File::Impl::path() const
 {
-    return mUrl.empty() ? mFileName : mUrl;
+    return mUrl.empty() ? mFilePath.string() : mUrl;
 }
 
 #ifndef __EMSCRIPTEN__

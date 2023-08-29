@@ -44,7 +44,7 @@ TEST(I18nFileTest, hindiFiles)
     // EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/फोल्डर/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
 
-#if !defined(__GNUC__) && defined(__clang__)
+#ifdef BUILDING_ON_MACOS
 TEST(I18nFileTest, japaneseFiles)
 {
     // Note: the フォルダ folder was created on macOS and although it can be accessed on Windows, Linux, and macOS using

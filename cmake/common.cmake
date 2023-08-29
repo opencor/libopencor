@@ -187,6 +187,19 @@ function(configure_target TARGET)
         endif()
     endif()
 
+    # Let the target know which operating system we are using.
+
+    if(WIN32)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_WINDOWS)
+    elseif(APPLE)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_MACOS)
+    else()
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_LINUX)
+    endif()
+
     # Let the target know which compiler we are using.
 
     if(BUILDING_USING_MSVC)

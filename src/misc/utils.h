@@ -32,8 +32,9 @@ std::string wideStringToString(const std::wstring &pString);
 std::string forwardSlashPath(const std::string &pPath);
 #endif
 
+std::filesystem::path stringToPath(const std::string &pString);
+
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl);
-std::string canonicalPath(const std::string &pPath);
 std::string relativePath(const std::string &pPath, const std::string &pBasePath);
 std::string urlPath(const std::string &pPath);
 

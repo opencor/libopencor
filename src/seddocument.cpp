@@ -134,9 +134,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     // Add the models, if any, to our SED-ML document.
 
-#ifndef COVERAGE_ENABLED
     if (!mModels.empty()) {
-#endif
         auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
 
         for (const auto &model : mModels) {
@@ -144,9 +142,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
         }
 
         xmlAddChild(sedNode, sedListOfModels);
-#ifndef COVERAGE_ENABLED
     }
-#endif
 
     // Add the simulations, if any, to our SED-ML document.
 
