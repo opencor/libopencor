@@ -33,7 +33,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
     auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
 
     if (isLocalFile) {
-        mFileName = fileNameOrUrl;
+        mFilePath = std::filesystem::u8path(fileNameOrUrl);
     } else {
         mUrl = fileNameOrUrl;
     }
@@ -47,11 +47,11 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
     else {
         // Download a local copy of the remote file, if needed.
 
-        if (mFileName.empty()) {
-            auto [res, fileName] = downloadFile(mUrl);
+        if (mFilePath.empty()) {
+            auto [res, filePath] = downloadFile(mUrl);
 
             if (res) {
-                mFileName = fileName;
+                mFilePath = std::filesystem::u8path(fileName);
             } else {
                 mType = Type::IRRETRIEVABLE_FILE;
 
@@ -70,8 +70,8 @@ File::Impl::~Impl()
 {
     // Delete the local file associated with a remote file.
 
-    if (!mUrl.empty() && !mFileName.empty()) {
-        remove(mFileName.c_str()); // NOLINT(cert-err33-c)
+    if (!mUrl.empty() && !mFilePath.empty()) {
+        std::filesystem::remove(mFilePath);
     }
 }
 
@@ -127,7 +127,7 @@ void File::Impl::retrieveContents()
     // Retrieve the contents of the file, if needed.
 
     if (!mContentsRetrieved) {
-        setContents(fileContents(mFileName));
+        setContents(fileContents(mFilePath));
     }
 }
 #endif
@@ -209,7 +209,7 @@ File::Type File::type() const
 
 std::string File::fileName() const
 {
-    return pimpl()->mFileName;
+    return pimpl()->mFilePath.string();
 }
 
 std::string File::url() const

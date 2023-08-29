@@ -217,7 +217,7 @@ int getTimeOfDay(TimeVal &pTimeVal)
     return 0;
 }
 
-std::string uniqueFileName()
+std::filesystem::path uniqueFilePath()
 {
     // This is based off glibc's __gen_tempname() method, which is used in std::tmpfile(). The only reason we don't use
     // std::tmpfile() is that it creates the file for us and as soon as we would be closing (though an automatic call
@@ -295,10 +295,10 @@ size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUse
 }
 } // namespace
 
-std::tuple<bool, std::string> downloadFile(const std::string &pUrl)
+std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 {
-    auto fileName = uniqueFileName();
-    std::ofstream file(fileName, std::ios_base::binary);
+    auto filePath = uniqueFilePath();
+    std::ofstream file(filePath, std::ios_base::binary);
 
 #    ifndef COVERAGE_ENABLED
     if (!file.is_open()) {
@@ -335,28 +335,30 @@ std::tuple<bool, std::string> downloadFile(const std::string &pUrl)
     curl_easy_cleanup(curl);
     curl_global_cleanup();
 
+    file.close();
+
     if (res) {
-        return std::make_tuple(true, fileName);
+        return std::make_tuple(true, filePath);
     }
 
-    remove(fileName.c_str()); // NOLINT(cert-err33-c)
+    std::filesystem::remove(filePath);
 
     return {};
 }
 #endif
 
 #ifndef __EMSCRIPTEN__
-std::vector<unsigned char> fileContents(const std::string &pFileName)
+std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
 {
     // Retrieve and return the contents of the given file.
 
-    std::ifstream file(pFileName, std::ios_base::binary);
+    std::ifstream file(pFilePath, std::ios_base::binary);
 
     if (!file.is_open()) {
         return {};
     }
 
-    const auto fileSize = std::filesystem::file_size(pFileName);
+    const auto fileSize = std::filesystem::file_size(pFilePath);
     std::vector<unsigned char> contents(fileSize);
 
     file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT(bugprone-narrowing-conversions, readability-container-data-pointer)

@@ -18,6 +18,7 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -37,9 +38,9 @@ std::string relativePath(const std::string &pPath, const std::string &pBasePath)
 std::string urlPath(const std::string &pPath);
 
 #ifndef __EMSCRIPTEN__
-std::tuple<bool, std::string> downloadFile(const std::string &pUrl);
+std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 
-std::vector<unsigned char> fileContents(const std::string &pFileName);
+std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath);
 #endif
 
 std::string contentsAsString(const std::vector<unsigned char> &pContents);

@@ -23,6 +23,8 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
+#include <filesystem>
+
 namespace libOpenCOR {
 
 class File::Impl: public Logger::Impl
@@ -30,7 +32,7 @@ class File::Impl: public Logger::Impl
 public:
     Type mType = Type::UNKNOWN_FILE;
 
-    std::string mFileName;
+    std::filesystem::path mFilePath;
     std::string mUrl;
 
     bool mContentsRetrieved = false;
