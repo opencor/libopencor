@@ -166,10 +166,6 @@ public:
      * @return The contents, as an array of @c char, of this file.
      */
 
-#ifdef __EMSCRIPTEN__
-    emscripten::val jsContents();
-#endif
-
     std::vector<unsigned char> contents();
 
 private:

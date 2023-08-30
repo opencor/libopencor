@@ -222,19 +222,6 @@ std::string File::path() const
     return pimpl()->path();
 }
 
-#ifdef __EMSCRIPTEN__
-emscripten::val File::jsContents()
-{
-    auto contents = this->contents();
-    auto view = emscripten::typed_memory_view(contents.size(), contents.data());
-    auto res = emscripten::val::global("Uint8Array").new_(contents.size());
-
-    res.call<void>("set", view);
-
-    return res;
-}
-#endif
-
 std::vector<unsigned char> File::contents()
 {
     return pimpl()->contents();

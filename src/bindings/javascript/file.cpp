@@ -35,7 +35,15 @@ void fileApi()
         .function("fileName", &libOpenCOR::File::fileName)
         .function("url", &libOpenCOR::File::url)
         .function("path", &libOpenCOR::File::path)
-        .function("contents", &libOpenCOR::File::jsContents);
+        .function("contents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis) {
+                      auto contents = pThis->contents();
+                      auto view = emscripten::typed_memory_view(contents.size(), contents.data());
+                      auto res = emscripten::val::global("Uint8Array").new_(contents.size());
+
+                      res.call<void>("set", view);
+
+                      return res;
+                  }));
 
     EM_ASM({
         Module['File']['Type'] = Module['File.Type'];
