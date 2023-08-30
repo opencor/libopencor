@@ -309,9 +309,7 @@ jobs:
         run: brew install emscripten
       - name: Install Prettier
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
-        run: |
-          brew update
-          brew install prettier
+        run: brew install prettier
       - name: Install Black
         if: ${{ matrix.target == 'python_check_code_formatting' }}
         run: pip3 install black
