@@ -40,26 +40,20 @@ describe("Issue coverage tests", () => {
   });
 
   test("issue()", () => {
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someCellmlContentsPtr,
-      utils.SOME_CELLML_CONTENTS.length,
-    );
+    const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument();
 
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
     expect(sed.issue(0)).toBeNull();
   });
 
   test("hasErrors()", () => {
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someCellmlContentsPtr,
-      utils.SOME_CELLML_CONTENTS.length,
-    );
+    const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument();
 
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
     expect(sed.hasErrors()).toBe(false);
@@ -68,26 +62,23 @@ describe("Issue coverage tests", () => {
   test("error()", () => {
     // Has an error.
 
-    let file = new libopencor.File(
-      utils.LOCAL_FILE,
+    let file = new libopencor.File(utils.LOCAL_FILE);
+    let sed = new libopencor.SedDocument();
+
+    file.setContents(
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
-    let sed = new libopencor.SedDocument();
-
     sed.initialise(file);
 
     expect(sed.error(0)).not.toBeNull();
 
     // Doesn't have an error.
 
-    file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someCellmlContentsPtr,
-      utils.SOME_CELLML_CONTENTS.length,
-    );
+    file = new libopencor.File(utils.LOCAL_FILE);
     sed = new libopencor.SedDocument();
 
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
     expect(sed.error(0)).toBeNull();

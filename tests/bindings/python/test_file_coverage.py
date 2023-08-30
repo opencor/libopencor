@@ -17,6 +17,14 @@ from libopencor import File
 import utils
 
 
+def test_empty_file():
+    file = File(utils.LOCAL_FILE)
+
+    file.set_contents(utils.string_to_list(utils.NO_CONTENTS))
+
+    assert file.type == File.Type.UnknownFile
+
+
 def test_http_remote_file():
     File(utils.HTTP_REMOTE_FILE)
 

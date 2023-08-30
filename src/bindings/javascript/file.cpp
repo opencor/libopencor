@@ -25,12 +25,7 @@ void fileApi()
         .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE);
 
     emscripten::class_<libOpenCOR::File, emscripten::base<libOpenCOR::Logger>>("File")
-        .smart_ptr_constructor("File", emscripten::optional_override([](const std::string &pFileNameOrUrl, uintptr_t pContents, size_t pSize) {
-                                   auto contents = reinterpret_cast<unsigned char *>(pContents);
-
-                                   return libOpenCOR::File::create(pFileNameOrUrl,
-                                                                   std::vector<unsigned char>(contents, contents + pSize));
-                               }))
+        .smart_ptr_constructor("File", &libOpenCOR::File::create)
         .function("type", &libOpenCOR::File::type)
         .function("fileName", &libOpenCOR::File::fileName)
         .function("url", &libOpenCOR::File::url)
@@ -43,6 +38,11 @@ void fileApi()
                       res.call<void>("set", view);
 
                       return res;
+                  }))
+        .function("setContents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis, uintptr_t pContents, size_t pSize) {
+                      auto contents = reinterpret_cast<unsigned char *>(pContents);
+
+                      pThis->setContents(std::vector<unsigned char>(contents, contents + pSize));
                   }));
 
     EM_ASM({

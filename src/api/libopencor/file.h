@@ -66,7 +66,6 @@ public:
     File &operator=(const File &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     File &operator=(File &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-#ifndef __EMSCRIPTEN__
     /**
      * @brief Create a @ref File object.
      *
@@ -86,28 +85,6 @@ public:
      */
 
     static FilePtr create(const std::string &pFileNameOrUrl);
-#endif
-
-    /**
-     * @brief Create a @ref File object.
-     *
-     * Factory method to create a @ref File object with some contents:
-     *
-     * ```
-     * auto localVirtualFile = libOpenCOR::File::create("/some/path/file.txt", someContents);
-     * auto remoteVirtualFile = libOpenCOR::File::create("https://some.domain.com/file.txt", someContents);
-     * ```
-     *
-     * Note: if there is already a @ref File object for the given file name or URL then we return it after having
-     *       updated its contents and type.
-     *
-     * @param pFileNameOrUrl The @c std::string file name or URL.
-     * @param pContents The contents of the file as a @c std::vector of unsigned @c char.
-     *
-     * @return A smart pointer to a @ref File object.
-     */
-
-    static FilePtr create(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents);
 
     /**
      * @brief Get the type of this file.
@@ -168,10 +145,20 @@ public:
 
     std::vector<unsigned char> contents();
 
+    /**
+     * @brief Set the contents of this file.
+     *
+     * Set the contents of this file.
+     *
+     * @param pContents The contents of the file as a @c std::vector of unsigned @c char.
+     */
+
+    void setContents(const std::vector<unsigned char> &pContents);
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents); /**< Constructor @private. */
+    explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

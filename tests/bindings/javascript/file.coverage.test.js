@@ -20,53 +20,28 @@ import * as utils from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("File coverage tests", () => {
-  let someUnknownContentsPtr;
+  test("Empty file", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
 
-  beforeAll(() => {
-    someUnknownContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNKNOWN_CONTENTS,
-    );
-  });
+    file.setContents(null, 0);
 
-  afterAll(() => {
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
+    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
   });
 
   test("http remote file", () => {
-    new libopencor.File(
-      utils.HTTP_REMOTE_FILE,
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    new libopencor.File(utils.HTTP_REMOTE_FILE);
   });
 
   test("Same local file", () => {
-    const file1 = new libopencor.File(
-      utils.LOCAL_FILE,
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
-    const file2 = new libopencor.File(
-      utils.LOCAL_FILE,
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    const file1 = new libopencor.File(utils.LOCAL_FILE);
+    const file2 = new libopencor.File(utils.LOCAL_FILE);
 
     expect(file1).toStrictEqual(file2);
   });
 
   test("Same remote file", () => {
-    const file1 = new libopencor.File(
-      utils.REMOTE_FILE,
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
-    const file2 = new libopencor.File(
-      utils.REMOTE_FILE,
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    const file1 = new libopencor.File(utils.REMOTE_FILE);
+    const file2 = new libopencor.File(utils.REMOTE_FILE);
 
     expect(file1).toStrictEqual(file2);
   });

@@ -42,31 +42,41 @@ describe("File basic tests", () => {
   });
 
   test("Local file", () => {
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    const file = new libopencor.File(utils.LOCAL_FILE);
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.fileName()).toBe(utils.LOCAL_FILE);
     expect(file.url()).toBe("");
     expect(file.path()).toBe(utils.LOCAL_FILE);
-    expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
+    expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
     expectIssues(expectedUnknownFileIssues, file);
-  });
 
-  test("Remote file", () => {
-    const file = new libopencor.File(
-      utils.REMOTE_FILE,
+    file.setContents(
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
+    expectIssues(expectedUnknownFileIssues, file);
+  });
+
+  test("Remote file", () => {
+    const file = new libopencor.File(utils.REMOTE_FILE);
+
+    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.fileName()).toBe("");
     expect(file.url()).toBe(utils.REMOTE_FILE);
     expect(file.path()).toBe(utils.REMOTE_FILE);
+    expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
+    expectIssues(expectedUnknownFileIssues, file);
+
+    file.setContents(
+      someUnknownContentsPtr,
+      utils.SOME_UNKNOWN_CONTENTS.length,
+    );
+
+    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(expectedUnknownFileIssues, file);
   });

@@ -50,10 +50,10 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithoutBasePath)
                                                      "  </listOfModels>\n"
                                                      "</sed>\n";
 
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE,
-                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
     auto sed = libOpenCOR::SedDocument::create();
 
+    file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
     sed->initialise(file);
 
     EXPECT_EQ(expectedSerialisation, sed->serialise());
@@ -85,10 +85,10 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithoutBasePath)
                                                      "  </listOfModels>\n"
                                                      "</sed>\n";
 
-    auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE,
-                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
+    auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
     auto sed = libOpenCOR::SedDocument::create();
 
+    file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
     sed->initialise(file);
 
     EXPECT_EQ(expectedSerialisation, sed->serialise());

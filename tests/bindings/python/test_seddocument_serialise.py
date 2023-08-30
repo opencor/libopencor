@@ -53,9 +53,10 @@ def test_local_cellml_file_without_base_path():
 </sed>
 """
 
-    file = File(utils.LOCAL_FILE, utils.string_to_list(utils.SOME_CELLML_CONTENTS))
+    file = File(utils.LOCAL_FILE)
     sed = SedDocument()
 
+    file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
     sed.initialise(file)
 
     assert sed.serialise() == expected_serialisation
@@ -85,9 +86,10 @@ def test_relative_local_cellml_file_without_base_path():
   </listOfModels>
 </sed>
 """
-    file = File(utils.CELLML_2_FILE, utils.string_to_list(utils.SOME_CELLML_CONTENTS))
+    file = File(utils.CELLML_2_FILE)
     sed = SedDocument()
 
+    file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
     sed.initialise(file)
 
     assert sed.serialise() == expected_serialisation

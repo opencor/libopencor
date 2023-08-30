@@ -26,7 +26,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
+File::Impl::Impl(const std::string &pFileNameOrUrl)
 {
     // Check whether we are dealing with a local file or a URL.
 
@@ -38,30 +38,23 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned c
         mUrl = fileNameOrUrl;
     }
 
-    // Check whether we have some contents and, if so, keep track of it otherwise retrieve it.
-
-    if (!pContents.empty()) {
-        setContents(pContents);
-    }
 #ifndef __EMSCRIPTEN__
-    else {
-        // Download a local copy of the remote file, if needed.
+    // Download a local copy of the remote file, if needed.
 
-        if (mFilePath.empty()) {
-            auto [res, filePath] = downloadFile(mUrl);
+    if (mFilePath.empty()) {
+        auto [res, filePath] = downloadFile(mUrl);
 
-            if (res) {
-                mFilePath = filePath;
-            } else {
-                mType = Type::IRRETRIEVABLE_FILE;
-
-                addError("The file could not be downloaded.");
-            }
-        } else if (!std::filesystem::exists(mFilePath)) {
+        if (res) {
+            mFilePath = filePath;
+        } else {
             mType = Type::IRRETRIEVABLE_FILE;
 
-            addError("The file does not exist.");
+            addError("The file could not be downloaded.");
         }
+    } else if (!std::filesystem::exists(mFilePath)) {
+        mType = Type::IRRETRIEVABLE_FILE;
+
+        addError("The file does not exist.");
     }
 #endif
 }
@@ -75,17 +68,19 @@ File::Impl::~Impl()
     }
 }
 
-void File::Impl::checkType(const FilePtr &pOwner)
+void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
 {
-    // Reset the type of the file, if it isn't that of an irretrievable file.
+    // Reset he type of the file, if needed.
 
-#ifndef __EMSCRIPTEN__
-    if (mType != Type::IRRETRIEVABLE_FILE) {
-#endif
+    if (pResetType) {
+        removeAllIssues();
+
         mType = Type::UNKNOWN_FILE;
 #ifndef __EMSCRIPTEN__
-    }
+    } else if (mType == Type::IRRETRIEVABLE_FILE) {
+        return;
 #endif
+    }
 
     // Try to get a CellML file, a SED-ML file, or a COMBINE archive.
 
@@ -109,7 +104,7 @@ void File::Impl::checkType(const FilePtr &pOwner)
                 mType = Type::COMBINE_ARCHIVE;
 
                 addIssues(mCombineArchive);
-            } else if (mType == Type::UNKNOWN_FILE) {
+            } else {
                 addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
             }
         }
@@ -148,8 +143,8 @@ std::vector<unsigned char> File::Impl::contents()
     return mContents;
 }
 
-File::File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
-    : Logger(new Impl(pFileNameOrUrl, pContents))
+File::File(const std::string &pFileNameOrUrl)
+    : Logger(new Impl(pFileNameOrUrl))
 {
 }
 
@@ -172,28 +167,18 @@ const File::Impl *File::pimpl() const
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
-#ifndef __EMSCRIPTEN__
 FilePtr File::create(const std::string &pFileNameOrUrl)
 {
-    return create(pFileNameOrUrl, {});
-}
-#endif
-
-FilePtr File::create(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
-{
-    // Check whether the given file name or URL is already managed and if so then return it (after having updated its
-    // contents and rechecked its type) otherwise create, manage, and return a new file object.
+    // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage,
+    // and return a new file object.
 
     auto file = FileManager::instance()->file(pFileNameOrUrl);
 
     if (file != nullptr) {
-        file->pimpl()->setContents(pContents);
-        file->pimpl()->checkType(file);
-
         return file->shared_from_this();
     }
 
-    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl, pContents}};
+    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl}};
 
     res->pimpl()->checkType(res);
 
@@ -225,6 +210,13 @@ std::string File::path() const
 std::vector<unsigned char> File::contents()
 {
     return pimpl()->contents();
+}
+
+void File::setContents(const std::vector<unsigned char> &pContents)
+{
+    pimpl()->setContents(pContents);
+
+    pimpl()->checkType(shared_from_this(), true);
 }
 
 } // namespace libOpenCOR

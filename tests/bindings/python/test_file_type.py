@@ -94,19 +94,25 @@ def test_type_combine_2_archive():
 
 
 def test_type_unknown_virtual_file():
-    file = File(utils.LOCAL_FILE, utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS))
+    file = File(utils.LOCAL_FILE)
+
+    file.set_contents(utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS))
 
     assert file.type == File.Type.UnknownFile
     assert_issues(expected_unknown_file_issues, file)
 
 
 def test_type_cellml_virtual_file():
-    file = File(utils.LOCAL_FILE, utils.string_to_list(utils.SOME_CELLML_CONTENTS))
+    file = File(utils.LOCAL_FILE)
+
+    file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
 
     assert file.type == File.Type.CellmlFile
 
 
 def test_type_sedml_virtual_file():
-    file = File(utils.LOCAL_FILE, utils.string_to_list(utils.SOME_SEDML_CONTENTS))
+    file = File(utils.LOCAL_FILE)
+
+    file.set_contents(utils.string_to_list(utils.SOME_SEDML_CONTENTS))
 
     assert file.type == File.Type.SedmlFile

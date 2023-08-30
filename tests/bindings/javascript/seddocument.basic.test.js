@@ -53,13 +53,13 @@ describe("SedDocument basic tests", () => {
   });
 
   test("Unknown file", () => {
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument();
+
+    file.setContents(
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
-    const sed = new libopencor.SedDocument();
-
     sed.initialise(file);
 
     expectIssues(
@@ -74,26 +74,20 @@ describe("SedDocument basic tests", () => {
   });
 
   test("CellML file", () => {
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someCellmlContentsPtr,
-      utils.SOME_CELLML_CONTENTS.length,
-    );
+    const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument();
 
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
     expect(sed.hasIssues()).toBe(false);
   });
 
   test("SED-ML file", () => {
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someSedmlContentsPtr,
-      utils.SOME_SEDML_CONTENTS.length,
-    );
+    const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument();
 
+    file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
     sed.initialise(file);
 
     expectIssues(

@@ -46,6 +46,7 @@ REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests
 IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt"
 
 
+NO_CONTENTS = ""
 SOME_UNKNOWN_CONTENTS = "Some unknown contents..."
 SOME_CELLML_CONTENTS = """@SOME_CELLML_CONTENTS@"""
 SOME_ERROR_CELLML_CONTENTS = """@SOME_ERROR_CELLML_CONTENTS@"""
