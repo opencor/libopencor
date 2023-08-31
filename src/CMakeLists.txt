@@ -219,10 +219,10 @@ target_include_directories(${CMAKE_PROJECT_NAME} INTERFACE
 
 configure_target(${CMAKE_PROJECT_NAME})
 
-# Generate the export header file, or a fake one if we are building our JavaScript bindings.
+# Generate the export header file, or don't use any if we are building our JavaScript bindings.
 
 if(EMSCRIPTEN)
-    configure_file(noexports.h ${API_EXPORT_HEADER_FILE})
+    configure_file(noexports.h ${API_EXPORT_HEADER_FILE} COPYONLY)
 else()
     include(GenerateExportHeader)
 
