@@ -381,11 +381,10 @@ jobs:
           ninja
       - name: Coverage
         if: ${{ matrix.target == 'code_coverage' }}
-        # run: |
-        #   cd build
-        #   ninja ${{ matrix.target }}
-        #   if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
-        run: echo "Coverage is currently disabled..."
+        run: |
+          cd build
+          ninja ${{ matrix.target }}
+          if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
       - name: Coverage report
         if: ${{ matrix.target == 'code_coverage' }}
         run: |
