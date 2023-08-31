@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#if defined(_MSC_VER)
+#if defined(BUILDING_USING_MSVC)
 #    pragma warning(push)
 #    pragma warning(disable: 4100)
 #    pragma warning(disable: 4127)
@@ -30,12 +30,12 @@ limitations under the License.
 #    pragma warning(disable: 4624)
 #    pragma warning(disable: 4996)
 #    pragma warning(disable: 5054)
-#elif defined(__GNUC__) && !defined(__clang__)
+#elif defined(BUILDING_USING_GNU)
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wdeprecated-enum-enum-conversion"
 #    pragma GCC diagnostic ignored "-Wredundant-move"
 #    pragma GCC diagnostic ignored "-Wunused-parameter"
-#elif defined(__clang__)
+#else
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wbitfield-enum-conversion"
 #    pragma clang diagnostic ignored "-Wc++98-compat-pedantic"

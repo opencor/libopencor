@@ -184,7 +184,33 @@ function(configure_target TARGET)
         endif()
     endif()
 
-    # Let libOpenCOR know that we are building with coverage enabled.
+    # Let the target know which operating system we are using.
+
+    if(WIN32)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_WINDOWS)
+    elseif(APPLE)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_MACOS)
+    else()
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_LINUX)
+    endif()
+
+    # Let the target know which compiler we are using.
+
+    if(BUILDING_USING_MSVC)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_USING_MSVC)
+    elseif(BUILDING_USING_GNU)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_USING_GNU)
+    elseif(BUILDING_USING_CLANG)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_USING_CLANG)
+    endif()
+
+    # Let the target know that we are building with coverage enabled.
 
     if(LIBOPENCOR_CODE_COVERAGE)
         target_compile_definitions(${TARGET} PRIVATE

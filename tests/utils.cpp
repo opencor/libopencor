@@ -25,12 +25,12 @@ std::string resourcePath(const std::string &resourceRelativePath)
     return std::string(RESOURCE_LOCATION) + "/" + resourceRelativePath;
 }
 
-#ifdef __clang__
+#ifdef BUILDING_USING_CLANG
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
 std::vector<unsigned char> charArrayToVector(const char *contents)
-#ifdef __clang__
+#ifdef BUILDING_USING_CLANG
 #    pragma clang diagnostic pop
 #endif
 {

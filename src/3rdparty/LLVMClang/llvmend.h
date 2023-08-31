@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#if defined(_MSC_VER)
+#if defined(BUILDING_USING_MSVC)
 #    pragma warning(pop)
-#elif defined(__GNUC__) && !defined(__clang__)
+#elif defined(BUILDING_USING_GNU)
 #    pragma GCC diagnostic pop
-#elif defined(__clang__)
+#else
 #    pragma clang diagnostic pop
 #endif
