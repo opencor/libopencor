@@ -24,20 +24,30 @@ void fileApi()
         .value("SEDML_FILE", libOpenCOR::File::Type::SEDML_FILE)
         .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE);
 
-    emscripten::class_<libOpenCOR::File>("File")
-        .smart_ptr_constructor("File", emscripten::optional_override([](const std::string &pFileNameOrUrl, uintptr_t pContents, size_t pSize) {
-                                   auto contents = reinterpret_cast<unsigned char *>(pContents);
-
-                                   return libOpenCOR::File::create(pFileNameOrUrl,
-                                                                   std::vector<unsigned char>(contents, contents + pSize));
-                               }))
+    emscripten::class_<libOpenCOR::File, emscripten::base<libOpenCOR::Logger>>("File")
+        .smart_ptr_constructor("File", &libOpenCOR::File::create)
         .function("type", &libOpenCOR::File::type)
         .function("fileName", &libOpenCOR::File::fileName)
         .function("url", &libOpenCOR::File::url)
-        .function("contents", &libOpenCOR::File::jsContents);
+        .function("path", &libOpenCOR::File::path)
+        .function("contents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis) {
+                      auto contents = pThis->contents();
+                      auto view = emscripten::typed_memory_view(contents.size(), contents.data());
+                      auto res = emscripten::val::global("Uint8Array").new_(contents.size());
+
+                      res.call<void>("set", view);
+
+                      return res;
+                  }))
+        .function("setContents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis, uintptr_t pContents, size_t pSize) {
+                      auto contents = reinterpret_cast<unsigned char *>(pContents);
+
+                      pThis->setContents(std::vector<unsigned char>(contents, contents + pSize));
+                  }));
 
     EM_ASM({
         Module['File']['Type'] = Module['File.Type'];
+
         delete Module['File.Type'];
     });
 }

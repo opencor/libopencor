@@ -16,46 +16,68 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
+import { expectIssues } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
+const expectedUnknownFileIssues = [
+  [
+    libopencor.Issue.Type.ERROR,
+    "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
+  ],
+];
+
 describe("File basic tests", () => {
-  let someUknownContentsPtr;
+  let someUnknownContentsPtr;
 
   beforeAll(() => {
-    someUknownContentsPtr = utils.allocateMemory(
+    someUnknownContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_UNKNOWN_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someUknownContentsPtr);
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
-  test("Local virtual file", () => {
-    const file = new libopencor.File(
-      utils.LOCAL_FILE,
-      someUknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+  test("Local file", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.fileName()).toBe(utils.LOCAL_FILE);
     expect(file.url()).toBe("");
-    expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
-  });
+    expect(file.path()).toBe(utils.LOCAL_FILE);
+    expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
+    expectIssues(expectedUnknownFileIssues, file);
 
-  test("Remote virtual file", () => {
-    const file = new libopencor.File(
-      utils.REMOTE_FILE,
-      someUknownContentsPtr,
+    file.setContents(
+      someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
+    expectIssues(expectedUnknownFileIssues, file);
+  });
+
+  test("Remote file", () => {
+    const file = new libopencor.File(utils.REMOTE_FILE);
+
+    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.fileName()).toBe("");
     expect(file.url()).toBe(utils.REMOTE_FILE);
+    expect(file.path()).toBe(utils.REMOTE_FILE);
+    expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
+    expectIssues(expectedUnknownFileIssues, file);
+
+    file.setContents(
+      someUnknownContentsPtr,
+      utils.SOME_UNKNOWN_CONTENTS.length,
+    );
+
+    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
+    expectIssues(expectedUnknownFileIssues, file);
   });
 });

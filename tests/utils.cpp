@@ -16,25 +16,39 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include "gtest/gtest.h"
+
+#include "libopencor/logger.h"
+
 #include <cstring>
 
 namespace libOpenCOR {
 
-std::string resourcePath(const std::string &resourceRelativePath)
+void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger)
 {
-    return std::string(RESOURCE_LOCATION) + "/" + resourceRelativePath;
+    EXPECT_EQ(pExpectedIssues.size(), pLogger->issueCount());
+
+    for (size_t i = 0; i < pExpectedIssues.size(); ++i) {
+        EXPECT_EQ(pExpectedIssues.at(i).type, pLogger->issue(i)->type());
+        EXPECT_EQ(pExpectedIssues.at(i).description, pLogger->issue(i)->description());
+    }
+}
+
+std::string resourcePath(const std::string &pResourceRelativePath)
+{
+    return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;
 }
 
 #ifdef BUILDING_USING_CLANG
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-std::vector<unsigned char> charArrayToVector(const char *contents)
+std::vector<unsigned char> charArrayToVector(const char *pContents)
 #ifdef BUILDING_USING_CLANG
 #    pragma clang diagnostic pop
 #endif
 {
-    return {contents, contents + strlen(contents)}; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return {pContents, pContents + strlen(pContents)}; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 }
 
 } // namespace libOpenCOR

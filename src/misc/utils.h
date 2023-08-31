@@ -26,10 +26,22 @@ namespace libOpenCOR {
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
+#ifdef BUILDING_USING_MSVC
+std::string wideStringToString(const std::wstring &pString);
+
+std::string forwardSlashPath(const std::string &pPath);
+#endif
+
+std::filesystem::path stringToPath(const std::string &pString);
+
+std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl);
+
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 
-std::tuple<bool, std::vector<unsigned char>> fileContents(const std::filesystem::path &pFilePath);
+std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath);
 #endif
+
+std::string contentsAsString(const std::vector<unsigned char> &pContents);
 
 } // namespace libOpenCOR

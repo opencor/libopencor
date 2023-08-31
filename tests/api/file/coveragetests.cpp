@@ -20,12 +20,37 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(CoverageTest, httpRemoteFile)
+TEST(CoverageFileTest, emptyFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    file->setContents({});
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+}
+
+TEST(CoverageFileTest, httpRemoteFile)
 {
     libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_FILE);
 }
 
-TEST(CoverageTest, irretrievableRemoteFile)
+TEST(CoverageFileTest, irretrievableRemoteFile)
 {
     libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
+}
+
+TEST(CoverageFileTest, sameLocalFile)
+{
+    auto file1 = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file2 = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    EXPECT_EQ(file1, file2);
+}
+
+TEST(CoverageFileTest, sameRemoteFile)
+{
+    auto file1 = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
+    auto file2 = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
+
+    EXPECT_EQ(file1, file2);
 }

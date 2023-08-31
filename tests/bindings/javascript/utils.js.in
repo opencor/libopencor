@@ -16,20 +16,39 @@ limitations under the License.
 
 export const UNKNOWN_FILE = "unknown_file.txt";
 
+export const LOCAL_BASE_PATH = "/some/path";
 export const LOCAL_FILE = "/some/path/file.txt";
 
 export const HTTP_REMOTE_FILE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+export const REMOTE_BASE_PATH =
+  "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
 export const REMOTE_FILE =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 
+export const NO_CONTENTS = stringToArrayBuffer("");
 export const SOME_UNKNOWN_CONTENTS = stringToArrayBuffer(
   "Some unknown contents...",
 );
 export const SOME_CELLML_CONTENTS = stringToArrayBuffer(
   `@SOME_CELLML_CONTENTS@`,
 );
+export const SOME_ERROR_CELLML_CONTENTS = stringToArrayBuffer(
+  `@SOME_ERROR_CELLML_CONTENTS@`,
+);
+export const SOME_WARNING_CELLML_CONTENTS = stringToArrayBuffer(
+  `@SOME_WARNING_CELLML_CONTENTS@`,
+);
 export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
+
+export function expectIssues(expectedIssues, logger) {
+  expect(logger.issueCount()).toBe(expectedIssues.length);
+
+  for (let i = 0; i < expectedIssues.length; ++i) {
+    expect(logger.issue(i).type().value).toBe(expectedIssues[i][0].value);
+    expect(logger.issue(i).description()).toBe(expectedIssues[i][1]);
+  }
+}
 
 export function allocateMemory(module, arrayBuffer) {
   const memPtr = module._malloc(arrayBuffer.length);

@@ -16,9 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/export.h"
 #include "libopencor/logger.h"
-#include "libopencor/types.h"
 
 #include <string>
 #include <vector>
@@ -32,6 +30,7 @@ namespace libOpenCOR {
  */
 
 class LIBOPENCOR_EXPORT File: public Logger
+    , public std::enable_shared_from_this<File>
 {
 public:
     /**
@@ -59,7 +58,7 @@ public:
      */
 
     File() = delete; /**< No default constructor allowed, @private. */
-    ~File(); /**< Destructor, @private. */
+    ~File() override; /**< Destructor, @private. */
 
     File(const File &pOther) = delete; /**< No copy constructor allowed, @private. */
     File(File &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -67,7 +66,6 @@ public:
     File &operator=(const File &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     File &operator=(File &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-#ifndef __EMSCRIPTEN__
     /**
      * @brief Create a @ref File object.
      *
@@ -78,31 +76,15 @@ public:
      * auto remoteFile = libOpenCOR::File::create("https://some.domain.com/file.txt");
      * ```
      *
+     * Note: if there is already a @ref File object for the given file name or URL then we return it after having reset
+     *       its contents and type.
+     *
      * @param pFileNameOrUrl The @c std::string file name or URL.
      *
      * @return A smart pointer to a @ref File object.
      */
 
     static FilePtr create(const std::string &pFileNameOrUrl);
-#endif
-
-    /**
-     * @brief Create a @ref File object.
-     *
-     * Factory method to create a @ref File object for a virtual file:
-     *
-     * ```
-     * auto localVirtualFile = libOpenCOR::File::create("/some/path/file.txt", someContents);
-     * auto remoteVirtualFile = libOpenCOR::File::create("https://some.domain.com/file.txt", someContents);
-     * ```
-     *
-     * @param pFileNameOrUrl The @c std::string file name or URL.
-     * @param pContents The raw contents of the virtual file as a @c std::vector of unsigned @c char.
-     *
-     * @return A smart pointer to a @ref File object.
-     */
-
-    static FilePtr create(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents);
 
     /**
      * @brief Get the type of this file.
@@ -119,6 +101,9 @@ public:
      *
      * Return the file name of this file. If the file is remote then we return the file name of its local copy.
      *
+     * @sa url
+     * @sa path
+     *
      * @return The file name, as a @c std::string, of this file.
      */
 
@@ -129,10 +114,26 @@ public:
      *
      * Return the URL of this file. If the file is local then we return an empty string.
      *
+     * @sa fileName
+     * @sa path
+     *
      * @return The URL, as a @c std::string, of this file.
      */
 
     std::string url() const;
+
+    /**
+     * @brief Get the path of this file.
+     *
+     * Return the path of this file. If the file is local then we return its file name otherwise its URL.
+     *
+     * @sa fileName
+     * @sa url
+     *
+     * @return The path, as a @c std::string, of this file.
+     */
+
+    std::string path() const;
 
     /**
      * @brief Get the contents of this file.
@@ -142,16 +143,22 @@ public:
      * @return The contents, as an array of @c char, of this file.
      */
 
-#ifdef __EMSCRIPTEN__
-    emscripten::val jsContents();
-#endif
-
     std::vector<unsigned char> contents();
+
+    /**
+     * @brief Set the contents of this file.
+     *
+     * Set the contents of this file.
+     *
+     * @param pContents The contents of the file as a @c std::vector of unsigned @c char.
+     */
+
+    void setContents(const std::vector<unsigned char> &pContents);
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents = {}); /**< Constructor @private. */
+    explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

@@ -16,6 +16,9 @@ limitations under the License.
 
 #pragma once
 
+#include "libopencor/issue.h"
+#include "libopencor/types.h"
+
 #include <string>
 #include <vector>
 
@@ -34,19 +37,39 @@ inline constexpr auto SEDML_2_FILE = "cellml_2.sedml";
 inline constexpr auto COMBINE_2_ARCHIVE = "cellml_2.omex";
 inline constexpr auto IRRETRIEVABLE_FILE = "irretrievable_file.txt";
 
-inline constexpr auto WINDOWS_LOCAL_FILE = R"(C:\some\path\file.txt)";
-inline constexpr auto UNIX_LOCAL_FILE = "/some/path/file.txt";
+#ifdef _WIN32
+inline constexpr auto LOCAL_FILE = R"(P:\some\path\file.txt)";
+#else
+inline constexpr auto LOCAL_FILE = "/some/path/file.txt";
+#endif
 
 inline constexpr auto HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+inline constexpr auto REMOTE_BASE_PATH = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
 inline constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 inline constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt";
 
 inline constexpr auto SOME_UNKNOWN_CONTENTS = "Some unknown contents...";
 inline constexpr auto SOME_CELLML_CONTENTS = "@SOME_CELLML_CONTENTS_C@";
+inline constexpr auto SOME_ERROR_CELLML_CONTENTS = "@SOME_ERROR_CELLML_CONTENTS_C@";
+inline constexpr auto SOME_WARNING_CELLML_CONTENTS = "@SOME_WARNING_CELLML_CONTENTS_C@";
 inline constexpr auto SOME_SEDML_CONTENTS = "@SOME_SEDML_CONTENTS_C@";
 
-std::string resourcePath(const std::string &resourceRelativePath);
+typedef struct
+{
+    Issue::Type type;
+    std::string description;
+} ExpectedIssue;
 
-std::vector<unsigned char> charArrayToVector(const char *contents);
+using ExpectedIssues = std::vector<ExpectedIssue>;
+
+void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger);
+
+#define EXPECT_EQ_ISSUES(pIssues, pLogger) \
+    SCOPED_TRACE("Issue occurred here."); \
+    expectEqualIssues(pIssues, pLogger)
+
+std::string resourcePath(const std::string &pResourceRelativePath = {});
+
+std::vector<unsigned char> charArrayToVector(const char *pContents);
 
 } // namespace libOpenCOR
