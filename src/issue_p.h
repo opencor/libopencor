@@ -14,22 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/logger.h"
+#pragma once
 
-#include <vector>
+#include "libopencor/issue.h"
 
 namespace libOpenCOR {
 
 class Issue::Impl
 {
 public:
-    Type mType = Type::ERROR;
+    Type mType;
     std::string mDescription;
 
-    static IssuePtr create();
-
-    void setType(Type pType);
-    void setDescription(const std::string &pDescription);
+    Impl(std::string pDescription, Type pType);
+    ~Impl() = default;
 };
 
 } // namespace libOpenCOR

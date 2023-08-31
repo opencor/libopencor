@@ -17,10 +17,12 @@ limitations under the License.
 #include "utils.h"
 
 #include <cmath>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <regex>
 
-#ifdef _MSC_VER
+#ifdef BUILDING_USING_MSVC
 #    include <process.h>
 #else
 #    include <unistd.h>
@@ -30,6 +32,10 @@ limitations under the License.
 #    include <curl/curl.h>
 #endif
 
+#ifdef BUILDING_USING_MSVC
+#    include <codecvt>
+#endif
+
 namespace libOpenCOR {
 
 bool fuzzyCompare(double pNb1, double pNb2)
@@ -37,6 +43,132 @@ bool fuzzyCompare(double pNb1, double pNb2)
     static constexpr double ONE_TRILLION = 1000000000000.0;
 
     return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
+}
+
+#ifdef BUILDING_USING_MSVC
+std::string wideStringToString(const std::wstring &pString)
+{
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pString);
+}
+
+std::string forwardSlashPath(const std::string &pPath)
+{
+    static constexpr auto FORWARD_SLASH = "/";
+    static constexpr auto BACKSLASH = "\\\\";
+    static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
+
+    return std::regex_replace(pPath, BACKSLASH_REGEX, FORWARD_SLASH);
+}
+#endif
+
+std::filesystem::path stringToPath(const std::string &pString)
+{
+    return std::u8string {pString.begin(), pString.end()};
+}
+
+namespace {
+#ifdef BUILDING_USING_MSVC
+std::string canonicalFileName(const std::string &pFileName, bool pIsRemoteFile)
+#else
+std::string canonicalFileName(const std::string &pFileName)
+#endif
+{
+    // Determine the canonical version of the file name.
+    // Note: when building using Emscripten, std::filesystem::weakly_canonical() doesn't work as expected. For instance,
+    //       if pFileName is equal to "/some/path/../.." then the call to std::filesystem::weakly_canonical() will
+    //       generate an exception rather than return "/". So, we prepend a dummy folder to pFileName and then remove it
+    //       from the result of std::filesystem::weakly_canonical().
+
+    static constexpr auto FORWARD_SLASH = "/";
+
+    auto currentPath = std::filesystem::current_path();
+
+    std::filesystem::current_path(FORWARD_SLASH);
+
+#if defined(BUILDING_USING_MSVC)
+    auto res = wideStringToString(std::filesystem::weakly_canonical(stringToPath(pFileName)).wstring());
+#elif defined(BUILDING_USING_GNU) || defined(BUILDING_USING_CLANG)
+    auto res = std::filesystem::weakly_canonical(stringToPath(pFileName)).string();
+#else
+    static constexpr auto DUMMY_FOLDER = "/dummy";
+
+    auto res = pFileName;
+
+    res = DUMMY_FOLDER + std::string((res.find(FORWARD_SLASH) != 0) ? FORWARD_SLASH : "") + res;
+    res = std::filesystem::weakly_canonical(stringToPath(res)).string();
+
+    res.erase(0, strlen(DUMMY_FOLDER));
+#endif
+
+    std::filesystem::current_path(currentPath);
+
+#if defined(BUILDING_USING_MSVC)
+    // Replace "\"s with "/"s, if needed.
+
+    if (pIsRemoteFile) {
+        res = forwardSlashPath(pFileName);
+    }
+#elif defined(BUILDING_USING_CLANG) || defined(__EMSCRIPTEN__)
+    // The file name may be relative rather than absolute, in which case we need to remove the forward slash that got
+    // added (at the beginning of the file name) by std::filesystem::weakly_canonical().
+
+    if (pFileName.find(FORWARD_SLASH) != 0) {
+        static const auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
+
+        res.erase(0, FORWARD_SLASH_LENGTH);
+    }
+#endif
+
+    // Return the canonical version of the file name.
+
+    return res;
+}
+} // namespace
+
+std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl)
+{
+    // Check whether the given file name or URL is a local file name or a URL.
+    // Note: a URL represents a local file when used with the "file" scheme.
+
+#ifdef _WIN32
+    static constexpr auto FILE_SCHEME = "file:///";
+#else
+    static constexpr auto FILE_SCHEME = "file://";
+#endif
+    static auto FILE_SCHEME_LENGTH = strlen(FILE_SCHEME);
+    static constexpr auto HTTP_SCHEME = "http://";
+    static auto HTTP_SCHEME_LENGTH = strlen(HTTP_SCHEME);
+    static constexpr auto HTTPS_SCHEME = "https://";
+    static auto HTTPS_SCHEME_LENGTH = strlen(HTTPS_SCHEME);
+
+    auto res = pFileNameOrUrl;
+    size_t schemeLength = 0;
+    auto requiresHttpScheme = false;
+    auto requiresHttpsScheme = false;
+
+    if (pFileNameOrUrl.find(FILE_SCHEME) == 0) {
+        schemeLength = FILE_SCHEME_LENGTH;
+    } else if (pFileNameOrUrl.find(HTTP_SCHEME) == 0) {
+        schemeLength = HTTP_SCHEME_LENGTH;
+        requiresHttpScheme = true;
+    } else if (pFileNameOrUrl.find(HTTPS_SCHEME) == 0) {
+        schemeLength = HTTPS_SCHEME_LENGTH;
+        requiresHttpsScheme = true;
+    }
+
+    res.erase(0, schemeLength);
+
+    return {!requiresHttpScheme && !requiresHttpsScheme,
+            (requiresHttpScheme ?
+                 HTTP_SCHEME :
+             requiresHttpsScheme ?
+                 HTTPS_SCHEME :
+                 "")
+#ifdef BUILDING_USING_MSVC
+                + canonicalFileName(res, requiresHttpScheme || requiresHttpsScheme)};
+#else
+                + canonicalFileName(res)};
+#endif
 }
 
 #ifndef __EMSCRIPTEN__
@@ -62,9 +194,9 @@ int getTimeOfDay(TimeVal &pTimeVal)
 
 std::filesystem::path uniqueFilePath()
 {
-    // This is based off glibc's __gen_tempname() method, which used in std::tmpfile(). The only reason we don't use
-    // std::tmpfile() is that it creates the file for us and as soon as we would be closing std::fclose(), the file
-    // would get automatically deleted, which is not what we want. See
+    // This is based off glibc's __gen_tempname() method, which is used in std::tmpfile(). The only reason we don't use
+    // std::tmpfile() is that it creates the file for us and as soon as we would be closing (though an automatic call
+    // to std::fclose()), the file would get automatically deleted, which is not what we want. See
     // https://code.woboq.org/userspace/glibc/sysdeps/posix/tempname.c.html#__gen_tempname.
 
     // The number of times to attempt to generate a temporary file name.
@@ -96,7 +228,7 @@ std::filesystem::path uniqueFilePath()
 
     auto value = (timeVal.microeconds << MICROSECONDS_SHIFT) ^ timeVal.seconds;
 
-#    ifdef _MSC_VER
+#    ifdef BUILDING_USING_MSVC
     value ^= static_cast<uint64_t>(_getpid()) << PID_SHIFT;
 #    else
     value ^= static_cast<uint64_t>(getpid()) << PID_SHIFT;
@@ -191,7 +323,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 #endif
 
 #ifndef __EMSCRIPTEN__
-std::tuple<bool, std::vector<unsigned char>> fileContents(const std::filesystem::path &pFilePath)
+std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
 {
     // Retrieve and return the contents of the given file.
 
@@ -206,8 +338,13 @@ std::tuple<bool, std::vector<unsigned char>> fileContents(const std::filesystem:
 
     file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT(bugprone-narrowing-conversions, readability-container-data-pointer)
 
-    return std::make_tuple(true, contents);
+    return contents;
 }
 #endif
+
+std::string contentsAsString(const std::vector<unsigned char> &pContents)
+{
+    return {reinterpret_cast<const char *>(pContents.data()), pContents.size()};
+}
 
 } // namespace libOpenCOR

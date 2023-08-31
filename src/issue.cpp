@@ -14,29 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/issue.h"
-
 #include "issue_p.h"
 
 namespace libOpenCOR {
 
-IssuePtr Issue::Impl::create()
+Issue::Impl::Impl(std::string pDescription, Type pType)
+    : mType(pType)
+    , mDescription(std::move(pDescription))
 {
-    return std::shared_ptr<Issue> {new Issue {}};
 }
 
-void Issue::Impl::setType(Issue::Type pType)
-{
-    mType = pType;
-}
-
-void Issue::Impl::setDescription(const std::string &pDescription)
-{
-    mDescription = pDescription;
-}
-
-Issue::Issue()
-    : mPimpl(new Impl())
+Issue::Issue(const std::string &pDescription, Type pType)
+    : mPimpl(new Impl(pDescription, pType))
 {
 }
 

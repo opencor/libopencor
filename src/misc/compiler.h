@@ -18,23 +18,39 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
-#include <string>
+#include "libopencor/logger.h"
 
-#include "llvmbegin.h"
-#include "llvm/ExecutionEngine/Orc/LLJIT.h"
-#include "llvmend.h"
+#include <string>
 
 namespace libOpenCOR {
 
-class LIBOPENCOR_UNIT_TESTING_EXPORT Compiler
+class Compiler;
+using CompilerPtr = std::shared_ptr<Compiler>;
+
+class LIBOPENCOR_UNIT_TESTING_EXPORT Compiler: public Logger
 {
 public:
+    ~Compiler() override;
+
+    Compiler(const Compiler &pOther) = delete;
+    Compiler(Compiler &&pOther) noexcept = delete;
+
+    Compiler &operator=(const Compiler &pRhs) = delete;
+    Compiler &operator=(Compiler &&pRhs) noexcept = delete;
+
+    static CompilerPtr create();
+
     bool compile(const std::string &pCode);
 
-    void *function(const std::string &pName);
+    void *function(const std::string &pName) const;
 
 private:
-    std::unique_ptr<llvm::orc::LLJIT> mLljit;
+    class Impl;
+
+    explicit Compiler();
+
+    Impl *pimpl();
+    const Impl *pimpl() const;
 };
 
 } // namespace libOpenCOR

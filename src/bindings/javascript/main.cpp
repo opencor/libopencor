@@ -14,7 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "combinearchive.h"
+#include <libopencor>
 
-namespace libOpenCOR::Support {
-} // namespace libOpenCOR::Support
+void fileApi();
+void issueApi();
+void loggerApi();
+void versionApi();
+
+EMSCRIPTEN_BINDINGS(libOpenCOR)
+{
+    loggerApi(); // Note: it needs to be first since it is used by some other APIs.
+
+    fileApi();
+    issueApi();
+    versionApi();
+}

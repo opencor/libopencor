@@ -14,100 +14,47 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "libopencor/file.h"
+#include "file_p.h"
 
 #include "cellmlfile.h"
 #include "combinearchive.h"
-
-#ifndef __EMSCRIPTEN__
-#    include "compiler.h"
-#endif
-
-#include "file_p.h"
+#include "filemanager.h"
 #include "sedmlfile.h"
-#include "support.h"
 #include "utils.h"
 
 #include <filesystem>
-#include <regex>
-
-#ifndef __EMSCRIPTEN__
-#    include <curl/curl.h>
-#endif
-
-#include <libcellml>
 
 namespace libOpenCOR {
 
-File::Impl::Impl(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
+File::Impl::Impl(const std::string &pFileNameOrUrl)
 {
-    // By default, we assume that we are dealing with a local file, but it may be in the form of a URL, i.e. starting
-    // with "file://".
+    // Check whether we are dealing with a local file or a URL.
 
-    if (pFileNameOrUrl.find("file://") == 0) {
-        // We are dealing with a URL representing a local file, so retrieve its actual path.
+    auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
 
-        static constexpr size_t SCHEME_LENGTH = 7;
-
-        auto fileName = pFileNameOrUrl;
-
-        fileName.erase(0, SCHEME_LENGTH);
-
-        // On Windows, we also need to remove the leading "/" and replace all the other "/"s with "\"s.
-
-        static const auto WINDOWS_PATH_REGEX = std::regex("^/[A-Z]:/.*");
-
-        std::smatch match;
-
-        std::regex_search(fileName, match, WINDOWS_PATH_REGEX);
-
-        if (!match.empty()) {
-            static constexpr size_t SLASH_LENGTH = 1;
-            static const auto FORWARD_SLASH_REGEX = std::regex("/");
-
-            fileName.erase(0, SLASH_LENGTH);
-
-            fileName = std::regex_replace(fileName, FORWARD_SLASH_REGEX, "\\");
-        }
-
-        mFilePath = std::filesystem::u8path(fileName);
-    } else if ((pFileNameOrUrl.find("http://") == 0)
-               || (pFileNameOrUrl.find("https://") == 0)) {
-        // We are dealing with a URL representing a remote file.
-
-        mUrl = pFileNameOrUrl;
+    if (isLocalFile) {
+        mFilePath = stringToPath(fileNameOrUrl);
     } else {
-        // We are dealing with a local file.
-
-        mFilePath = std::filesystem::u8path(pFileNameOrUrl);
+        mUrl = fileNameOrUrl;
     }
 
-    // Check whether we have some contents and, if so, keep track of it and consider the file virtual.
-
-    if (!pContents.empty()) {
-        mContents = pContents;
-
-        mContentsRetrieved = true;
-    }
 #ifndef __EMSCRIPTEN__
-    // If we don't have any contents, then we get ready to retrieve it.
+    // Download a local copy of the remote file, if needed.
 
-    else {
-        // Download a local copy of the remote file, if needed.
+    if (mFilePath.empty()) {
+        auto [res, filePath] = downloadFile(mUrl);
 
-        if (mFilePath.empty()) {
-            auto [res, filePath] = downloadFile(mUrl);
-
+        if (res) {
             mFilePath = filePath;
-        }
-
-        // Make sure that the (local) file exists.
-
-        if (mFilePath.empty() || !std::filesystem::exists(mFilePath)) {
+        } else {
             mType = Type::IRRETRIEVABLE_FILE;
 
-            return;
+            addError("The file could not be downloaded.");
         }
+    } else if (!std::filesystem::exists(mFilePath)) {
+        mType = Type::IRRETRIEVABLE_FILE;
+
+        addError("The file does not exist.");
     }
 #endif
 }
@@ -119,25 +66,54 @@ File::Impl::~Impl()
     if (!mUrl.empty() && !mFilePath.empty()) {
         std::filesystem::remove(mFilePath);
     }
-
-    // Delete some internal objects.
-
-    delete mCellmlFile;
-    delete mSedmlFile;
-    delete mCombineArchive;
 }
 
-void File::Impl::checkType(const FilePtr &pOwner)
+void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
 {
-    // Check whether the file is a CellML file, a SED-ML file, or a COMBINE archive.
+    // Reset he type of the file, if needed.
 
-    if (Support::isCellmlFile(pOwner)) {
-        mType = Type::CELLML_FILE;
-    } else if (Support::isSedmlFile(pOwner)) {
-        mType = Type::SEDML_FILE;
-    } else if (Support::isCombineArchive(pOwner)) {
-        mType = Type::COMBINE_ARCHIVE;
+    if (pResetType) {
+        removeAllIssues();
+
+        mType = Type::UNKNOWN_FILE;
+#ifndef __EMSCRIPTEN__
+    } else if (mType == Type::IRRETRIEVABLE_FILE) {
+        return;
+#endif
     }
+
+    // Try to get a CellML file, a SED-ML file, or a COMBINE archive.
+
+    mCellmlFile = CellmlFile::create(pOwner);
+
+    if (mCellmlFile != nullptr) {
+        mType = Type::CELLML_FILE;
+
+        addIssues(mCellmlFile);
+    } else {
+        mSedmlFile = SedmlFile::create(pOwner);
+
+        if (mSedmlFile != nullptr) {
+            mType = Type::SEDML_FILE;
+
+            addIssues(mSedmlFile);
+        } else {
+            mCombineArchive = CombineArchive::create(pOwner);
+
+            if (mCombineArchive != nullptr) {
+                mType = Type::COMBINE_ARCHIVE;
+
+                addIssues(mCombineArchive);
+            } else {
+                addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
+            }
+        }
+    }
+}
+
+std::string File::Impl::path() const
+{
+    return mUrl.empty() ? mFilePath.string() : mUrl;
 }
 
 #ifndef __EMSCRIPTEN__
@@ -146,18 +122,17 @@ void File::Impl::retrieveContents()
     // Retrieve the contents of the file, if needed.
 
     if (!mContentsRetrieved) {
-        auto [res, contents] = fileContents(mFilePath);
-
-        if (res) {
-            mContents = contents;
-        } else {
-            mType = Type::IRRETRIEVABLE_FILE;
-        }
-
-        mContentsRetrieved = true;
+        setContents(fileContents(mFilePath));
     }
 }
 #endif
+
+void File::Impl::setContents(const std::vector<unsigned char> &pContents)
+{
+    mContents = pContents;
+
+    mContentsRetrieved = true;
+}
 
 std::vector<unsigned char> File::Impl::contents()
 {
@@ -168,13 +143,17 @@ std::vector<unsigned char> File::Impl::contents()
     return mContents;
 }
 
-File::File(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
-    : Logger(new Impl(pFileNameOrUrl, pContents))
+File::File(const std::string &pFileNameOrUrl)
+    : Logger(new Impl(pFileNameOrUrl))
 {
 }
 
 File::~File()
 {
+    // Have ourselves unmanaged.
+
+    FileManager::instance()->unmanage(this);
+
     delete pimpl();
 }
 
@@ -188,22 +167,22 @@ const File::Impl *File::pimpl() const
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
-#ifndef __EMSCRIPTEN__
 FilePtr File::create(const std::string &pFileNameOrUrl)
 {
+    // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage,
+    // and return a new file object.
+
+    auto file = FileManager::instance()->file(pFileNameOrUrl);
+
+    if (file != nullptr) {
+        return file->shared_from_this();
+    }
+
     auto res = std::shared_ptr<File> {new File {pFileNameOrUrl}};
 
     res->pimpl()->checkType(res);
 
-    return res;
-}
-#endif
-
-FilePtr File::create(const std::string &pFileNameOrUrl, const std::vector<unsigned char> &pContents)
-{
-    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl, pContents}};
-
-    res->pimpl()->checkType(res);
+    FileManager::instance()->manage(res.get());
 
     return res;
 }
@@ -223,16 +202,21 @@ std::string File::url() const
     return pimpl()->mUrl;
 }
 
-#ifdef __EMSCRIPTEN__
-emscripten::val File::jsContents()
+std::string File::path() const
 {
-    return emscripten::val(emscripten::typed_memory_view(contents().size(), contents().data()));
+    return pimpl()->path();
 }
-#endif
 
 std::vector<unsigned char> File::contents()
 {
     return pimpl()->contents();
+}
+
+void File::setContents(const std::vector<unsigned char> &pContents)
+{
+    pimpl()->setContents(pContents);
+
+    pimpl()->checkType(shared_from_this(), true);
 }
 
 } // namespace libOpenCOR

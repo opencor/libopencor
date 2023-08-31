@@ -25,7 +25,7 @@ void fileApi(py::module_ &m)
 {
     // File API.
 
-    py::class_<libOpenCOR::File, std::shared_ptr<libOpenCOR::File>> file(m, "File");
+    py::class_<libOpenCOR::File, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::File>> file(m, "File");
 
     py::enum_<libOpenCOR::File::Type>(file, "Type")
         .value("UnknownFile", libOpenCOR::File::Type::UNKNOWN_FILE)
@@ -36,9 +36,10 @@ void fileApi(py::module_ &m)
         .export_values();
 
     file.def(py::init(py::overload_cast<const std::string &>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"))
-        .def(py::init(py::overload_cast<const std::string &, const std::vector<unsigned char> &>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"), py::arg("contents"))
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
-        .def_property_readonly("contents", &libOpenCOR::File::contents, "Get the contents of this File object.");
+        .def_property_readonly("path", &libOpenCOR::File::path, "Get the path for this File object.")
+        .def_property_readonly("contents", &libOpenCOR::File::contents, "Get the contents of this File object.")
+        .def("set_contents", &libOpenCOR::File::setContents, "Set the contents of this File object.");
 }

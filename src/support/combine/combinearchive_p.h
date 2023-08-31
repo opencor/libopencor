@@ -14,8 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
+#pragma once
 
-TEST(SedmlfileTest, basic)
+#include "logger_p.h"
+
+#include "combinearchive.h"
+
+namespace libOpenCOR {
+
+class CombineArchive::Impl: public Logger::Impl
 {
-}
+public:
+    libcombine::CombineArchive *mArchive;
+
+    Impl(libcombine::CombineArchive *pArchive);
+    ~Impl();
+};
+
+} // namespace libOpenCOR

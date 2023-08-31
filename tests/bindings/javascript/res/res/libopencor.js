@@ -67,11 +67,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             mem.set(new Uint8Array(fileArrayBuffer));
 
-            const libopencorFile = new libopencor.File(
-              file.name,
-              memPtr,
-              file.size,
-            );
+            const libopencorFile = new libopencor.File(file.name);
+
+            libopencorFile.setContents(memPtr, file.size);
+
             let libopencorFileType = "unknown file";
 
             switch (libopencorFile.type()) {

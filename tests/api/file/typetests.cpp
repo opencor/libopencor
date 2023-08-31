@@ -20,11 +20,20 @@ limitations under the License.
 
 #include <libopencor>
 
+static const libOpenCOR::ExpectedIssues expectedUnknownFileIssues = {
+    {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
+};
+
 TEST(TypeFileTest, irretrievableFile)
 {
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
+        {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
+    };
+
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ_ISSUES(expectedIssues, file);
 }
 
 TEST(TypeFileTest, unknownFile)
@@ -32,6 +41,7 @@ TEST(TypeFileTest, unknownFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
 }
 
 TEST(TypeFileTest, sbmlFile)
@@ -39,6 +49,7 @@ TEST(TypeFileTest, sbmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SBML_FILE));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
 }
 
 TEST(TypeFileTest, errorSedmlFile)
@@ -92,24 +103,28 @@ TEST(TypeFileTest, combine2Archive)
 
 TEST(TypeFileTest, unknownVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
-                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS));
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
 }
 
 TEST(TypeFileTest, cellmlVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
-                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
 
 TEST(TypeFileTest, sedmlVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE,
-                                         libOpenCOR::charArrayToVector(libOpenCOR::SOME_SEDML_CONTENTS));
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_SEDML_CONTENTS));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }

@@ -12,8 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from libopencor import File
 import utils
+
+
+def test_empty_file():
+    file = File(utils.LOCAL_FILE)
+
+    file.set_contents(utils.string_to_list(utils.NO_CONTENTS))
+
+    assert file.type == File.Type.UnknownFile
 
 
 def test_http_remote_file():
@@ -22,3 +31,17 @@ def test_http_remote_file():
 
 def test_irretrievable_remote_file():
     File(utils.IRRETRIEVABLE_REMOTE_FILE)
+
+
+def test_same_local_file():
+    file1 = File(utils.LOCAL_FILE)
+    file2 = File(utils.LOCAL_FILE)
+
+    assert file1.__subclasshook__ == file2.__subclasshook__
+
+
+def test_same_remote_file():
+    file1 = File(utils.REMOTE_FILE)
+    file2 = File(utils.REMOTE_FILE)
+
+    assert file1.__subclasshook__ == file2.__subclasshook__

@@ -16,10 +16,24 @@ limitations under the License.
 
 #pragma once
 
-namespace libOpenCOR::Support {
+#include "logger_p.h"
 
-class CellmlFile
+#include "compiler.h"
+
+#include "llvmbegin.h"
+#include "llvm/ExecutionEngine/Orc/LLJIT.h"
+#include "llvmend.h"
+
+namespace libOpenCOR {
+
+class Compiler::Impl: public Logger::Impl
 {
+public:
+    std::unique_ptr<llvm::orc::LLJIT> mLljit;
+
+    bool compile(const std::string &pCode);
+
+    void *function(const std::string &pName) const;
 };
 
-} // namespace libOpenCOR::Support
+} // namespace libOpenCOR

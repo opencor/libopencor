@@ -14,7 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "cellmlfile.h"
+#pragma once
 
-namespace libOpenCOR::Support {
-} // namespace libOpenCOR::Support
+#include "logger_p.h"
+
+#include "cellmlfile.h"
+#include "cellmlfileruntime.h"
+
+namespace libOpenCOR {
+
+class CellmlFileRuntime::Impl: public Logger::Impl
+{
+public:
+    Impl(const CellmlFilePtr &pCellmlFile);
+    ~Impl() = default;
+};
+
+} // namespace libOpenCOR

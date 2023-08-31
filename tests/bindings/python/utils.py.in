@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 import os
+import platform
 
 
 RESOURCE_LOCATION = "@RESOURCE_LOCATION@"
 
 
-NON_RETRIEVABLE_FILE = "non_retrievable_file.txt"
 UNKNOWN_FILE = "unknown_file.txt"
 SBML_FILE = "sbml.sbml"
 ERROR_SEDML_FILE = "error.sedml"
@@ -28,20 +29,37 @@ COMBINE_1_X_ARCHIVE = "cellml_1_x.omex"
 CELLML_2_FILE = "cellml_2.cellml"
 SEDML_2_FILE = "cellml_2.sedml"
 COMBINE_2_ARCHIVE = "cellml_2.omex"
+IRRETRIEVABLE_FILE = "irretrievable_file.txt"
 
 
-WINDOWS_LOCAL_FILE = "C:\\some\\path\\file.txt"
-UNIX_LOCAL_FILE = "/some/path/file.txt"
+if platform.system() == "Windows":
+    LOCAL_FILE = "P:\\some\\path\\file.txt"
+else:
+    LOCAL_FILE = "/some/path/file.txt"
 
 
 HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+REMOTE_BASE_PATH = (
+    "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
+)
 REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
 IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt"
 
 
+NO_CONTENTS = ""
 SOME_UNKNOWN_CONTENTS = "Some unknown contents..."
 SOME_CELLML_CONTENTS = """@SOME_CELLML_CONTENTS@"""
+SOME_ERROR_CELLML_CONTENTS = """@SOME_ERROR_CELLML_CONTENTS@"""
+SOME_WARNING_CELLML_CONTENTS = """@SOME_WARNING_CELLML_CONTENTS@"""
 SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
+
+
+def assert_issues(expected_issues, logger):
+    assert len(expected_issues) == logger.issue_count
+
+    for i in range(len(expected_issues)):
+        assert expected_issues[i][0] == logger.issue(i).type
+        assert expected_issues[i][1] == logger.issue(i).description
 
 
 def resource_path(relative_path=""):

@@ -14,8 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
+#pragma once
 
-TEST(CellmlfileTest, basic)
+#include "logger_p.h"
+
+#include "cellmlfile.h"
+
+#include <libcellml>
+
+namespace libOpenCOR {
+
+class CellmlFile::Impl: public Logger::Impl
 {
-}
+public:
+    libcellml::ModelPtr mModel;
+
+    Impl(const libcellml::ModelPtr &pModel);
+    ~Impl() = default;
+};
+
+} // namespace libOpenCOR

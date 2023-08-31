@@ -20,44 +20,66 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(BasicFileTest, windowsLocalFile)
+static const libOpenCOR::ExpectedIssues expectedNonExistingFileIssues = {
+    {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
+};
+static const libOpenCOR::ExpectedIssues expectedNonDownloadableFileIssues = {
+    {libOpenCOR::Issue::Type::ERROR, "The file could not be downloaded."},
+};
+static const libOpenCOR::ExpectedIssues expectedUnknownFileIssues = {
+    {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
+};
+
+TEST(BasicFileTest, localFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::WINDOWS_LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::WINDOWS_LOCAL_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
     EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
 }
 
-TEST(BasicFileTest, unixLocalFile)
+TEST(BasicFileTest, relativeLocalFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE);
+#ifdef _WIN32
+    auto file = libOpenCOR::File::create(R"(some\.\relative\..\..\path\.\..\dir\file.txt)");
+#else
+    auto file = libOpenCOR::File::create("some/relative/../../path/../dir/file.txt");
+#endif
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
+#ifdef _WIN32
+    EXPECT_EQ(file->fileName(), R"(dir\file.txt)");
+#else
+    EXPECT_EQ(file->fileName(), "dir/file.txt");
+#endif
     EXPECT_EQ(file->url(), "");
+#ifdef _WIN32
+    EXPECT_EQ(file->path(), R"(dir\file.txt)");
+#else
+    EXPECT_EQ(file->path(), "dir/file.txt");
+#endif
     EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
 }
 
-TEST(BasicFileTest, urlBasedWindowsLocalFile)
+TEST(BasicFileTest, urlBasedLocalFile)
 {
-    auto file = libOpenCOR::File::create("file:///C:/some/path/file.txt");
-
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::WINDOWS_LOCAL_FILE);
-    EXPECT_EQ(file->url(), "");
-    EXPECT_TRUE(file->contents().empty());
-}
-
-TEST(BasicFileTest, urlBasedUnixLocalFile)
-{
+#ifdef _WIN32
+    auto file = libOpenCOR::File::create("file:///P:/some/path/file.txt");
+#else
     auto file = libOpenCOR::File::create("file:///some/path/file.txt");
+#endif
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::LOCAL_FILE);
     EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
     EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
 }
 
 TEST(BasicFileTest, remoteFile)
@@ -67,27 +89,46 @@ TEST(BasicFileTest, remoteFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
     EXPECT_NE(file->fileName(), "");
     EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
+    EXPECT_EQ(file->path(), libOpenCOR::REMOTE_FILE);
     EXPECT_FALSE(file->contents().empty());
 }
 
 TEST(BasicFileTest, localVirtualFile)
 {
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::LOCAL_FILE);
+    EXPECT_EQ(file->url(), "");
+    EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
+
     auto someUnknownContentsVector = libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS);
-    auto file = libOpenCOR::File::create(libOpenCOR::UNIX_LOCAL_FILE, someUnknownContentsVector);
+
+    file->setContents(someUnknownContentsVector);
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::UNIX_LOCAL_FILE);
-    EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->contents(), someUnknownContentsVector);
+    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
 }
 
 TEST(BasicFileTest, remoteVirtualFile)
 {
+    auto file = libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_EQ(file->fileName(), "");
+    EXPECT_EQ(file->url(), libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
+    EXPECT_EQ(file->path(), libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(expectedNonDownloadableFileIssues, file);
+
     auto someUnknownContentsVector = libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS);
-    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE, someUnknownContentsVector);
+
+    file->setContents(someUnknownContentsVector);
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ(file->fileName(), "");
-    EXPECT_EQ(file->url(), libOpenCOR::REMOTE_FILE);
     EXPECT_EQ(file->contents(), someUnknownContentsVector);
+    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
 }

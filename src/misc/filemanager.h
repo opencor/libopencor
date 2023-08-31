@@ -14,7 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedmlfile.h"
+#pragma once
 
-namespace libOpenCOR::Support {
-} // namespace libOpenCOR::Support
+#include "libopencor/file.h"
+
+#include <vector>
+
+namespace libOpenCOR {
+
+class FileManager
+{
+public:
+    static FileManager *instance();
+
+    void manage(File *pFile);
+    void unmanage(File *pFile);
+
+    FilePtr file(const std::string &pFileNameOrUrl) const;
+
+private:
+    std::vector<File *> mFiles;
+};
+
+} // namespace libOpenCOR
