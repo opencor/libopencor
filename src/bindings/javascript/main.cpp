@@ -16,7 +16,16 @@ limitations under the License.
 
 #include <libopencor>
 
-void loggerApi()
+void fileApi();
+void issueApi();
+void loggerApi();
+void versionApi();
+
+EMSCRIPTEN_BINDINGS(libOpenCOR)
 {
-    emscripten::class_<libOpenCOR::Logger>("Logger");
+    loggerApi(); // Note: it needs to be first since it is used by some other APIs.
+
+    fileApi();
+    issueApi();
+    versionApi();
 }

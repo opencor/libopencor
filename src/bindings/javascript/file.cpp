@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <libopencor>
 
-EMSCRIPTEN_BINDINGS(libOpenCOR_File)
+void fileApi()
 {
     emscripten::enum_<libOpenCOR::File::Type>("File.Type")
         .value("UNKNOWN_FILE", libOpenCOR::File::Type::UNKNOWN_FILE)

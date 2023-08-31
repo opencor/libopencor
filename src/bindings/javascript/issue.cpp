@@ -16,7 +16,7 @@ limitations under the License.
 
 #include <libopencor>
 
-EMSCRIPTEN_BINDINGS(libOpenCOR_Issue)
+void issueApi()
 {
     emscripten::class_<libOpenCOR::Issue>("Issue");
 }
