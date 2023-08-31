@@ -13,43 +13,43 @@
 # limitations under the License.
 
 
-from libopencor import File, SedDocument
+from libopencor import File
 import utils
 
 
 def test_issue():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument()
 
-    sed.initialise(file)
+    assert file.issue(0) == None
 
-    assert sed.issue(0) == None
+
+def test_has_issues():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+
+    assert not file.has_issues
 
 
 def test_has_errors():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument()
 
-    sed.initialise(file)
+    assert not file.has_errors
 
-    assert not sed.has_errors
+
+def test_error_count():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+
+    assert file.error_count == 0
 
 
 def test_error():
     # Has an error.
 
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    sed = SedDocument()
 
-    sed.initialise(file)
-
-    assert sed.error(0) != None
+    assert file.error(0) != None
 
     # Doesn't have an error.
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument()
 
-    sed.initialise(file)
-
-    assert sed.error(0) == None
+    assert file.error(0) == None

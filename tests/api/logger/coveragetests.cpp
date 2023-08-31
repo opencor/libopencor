@@ -23,31 +23,29 @@ limitations under the License.
 TEST(CoverageLoggerTest, issue)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
 
-    sed->initialise(file);
+    EXPECT_EQ(nullptr, file->issue(0));
+}
 
-    EXPECT_EQ(nullptr, sed->issue(0));
+TEST(CoverageLoggerTest, hasIssues)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+
+    EXPECT_FALSE(file->hasIssues());
 }
 
 TEST(CoverageLoggerTest, hasErrors)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
 
-    sed->initialise(file);
-
-    EXPECT_FALSE(sed->hasErrors());
+    EXPECT_FALSE(file->hasErrors());
 }
 
 TEST(CoverageLoggerTest, errorCount)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
 
-    sed->initialise(file);
-
-    EXPECT_EQ(0, sed->errorCount());
+    EXPECT_EQ(0, file->errorCount());
 }
 
 TEST(CoverageLoggerTest, error)
@@ -55,18 +53,12 @@ TEST(CoverageLoggerTest, error)
     // Has an error.
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
 
-    sed->initialise(file);
-
-    EXPECT_NE(nullptr, sed->error(0));
+    EXPECT_NE(nullptr, file->error(0));
 
     // Doesn't have an error.
 
     file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    sed = libOpenCOR::SedDocument::create();
 
-    sed->initialise(file);
-
-    EXPECT_EQ(nullptr, sed->error(0));
+    EXPECT_EQ(nullptr, file->error(0));
 }

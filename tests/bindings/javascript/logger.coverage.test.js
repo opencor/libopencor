@@ -41,46 +41,54 @@ describe("Issue coverage tests", () => {
 
   test("issue()", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
 
-    expect(sed.issue(0)).toBeNull();
+    expect(file.issue(0)).toBeNull();
+  });
+
+  test("hasIssues()", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.hasIssues()).toBe(false);
   });
 
   test("hasErrors()", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
 
-    expect(sed.hasErrors()).toBe(false);
+    expect(file.hasErrors()).toBe(false);
+  });
+
+  test("errorCount()", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.errorCount()).toBe(0);
   });
 
   test("error()", () => {
     // Has an error.
 
     let file = new libopencor.File(utils.LOCAL_FILE);
-    let sed = new libopencor.SedDocument();
 
     file.setContents(
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
-    sed.initialise(file);
 
-    expect(sed.error(0)).not.toBeNull();
+    expect(file.error(0)).not.toBeNull();
 
     // Doesn't have an error.
 
     file = new libopencor.File(utils.LOCAL_FILE);
-    sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
 
-    expect(sed.error(0)).toBeNull();
+    expect(file.error(0)).toBeNull();
   });
 });
