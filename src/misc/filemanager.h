@@ -25,7 +25,7 @@ namespace libOpenCOR {
 class FileManager
 {
 public:
-    static FileManager *instance();
+    static FileManager &instance();
 
     void manage(File *pFile);
     void unmanage(File *pFile);
