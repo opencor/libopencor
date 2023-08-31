@@ -124,7 +124,6 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/unittestingexport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
@@ -134,10 +133,12 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/unittestingexport.h
 )
 
 if(NOT EMSCRIPTEN)
     list(APPEND INTERNAL_HEADER_FILES
+        ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler_p.h
         ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     )
 endif()
@@ -154,6 +155,7 @@ set(HEADER_FILES
 )
 
 include_directories(.
+                    misc
                     support/cellml
                     support/combine
                     support/sedml
@@ -232,6 +234,10 @@ else()
                            EXPORT_FILE_NAME ${API_EXPORT_HEADER_FILE}
                            BASE_NAME LIBOPENCOR)
 endif()
+
+# Copy over our export header file for unit testing.
+
+configure_file(unittestingexport.h unittestingexport.h COPYONLY)
 
 # Don't allow unresolved symbols.
 # Note: MSVC doesn't allow unresolved symbols, so we only need to look for them if we are building using GNU or Clang.
