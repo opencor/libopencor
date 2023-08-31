@@ -19,10 +19,6 @@ include(api/version/tests.cmake)
 
 include(misc/compiler/tests.cmake)
 
-include(support/cellmlfile/tests.cmake)
-include(support/combinearchive/tests.cmake)
-include(support/sedmlfile/tests.cmake)
-
 # Prepare our different tests.
 
 set(GIT_TESTS_SOURCE_FILES)

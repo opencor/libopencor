@@ -16,14 +16,19 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
+#include "logger_p.h"
 
-#include <string>
+#include "sedmlfile.h"
 
-namespace libOpenCOR::Support {
+namespace libOpenCOR {
 
-bool isCellmlFile(const FilePtr &pFile);
-bool isCombineArchive(const FilePtr &pFile);
-bool isSedmlFile(const FilePtr &pFile);
+class SedmlFile::Impl: public Logger::Impl
+{
+public:
+    libsedml::SedDocument *mDocument;
 
-} // namespace libOpenCOR::Support
+    Impl(libsedml::SedDocument *pDocument);
+    ~Impl();
+};
+
+} // namespace libOpenCOR

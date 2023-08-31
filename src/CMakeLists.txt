@@ -91,10 +91,10 @@ set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.cpp
 )
 
 if(NOT EMSCRIPTEN)
@@ -124,10 +124,14 @@ set(SOURCE_FILES
 set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/unittestingexport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellmlfile.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/combinearchive.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedmlfile.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/support/support.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
+    # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime_p.h
+    # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.h
 )
 
 if(NOT EMSCRIPTEN)
@@ -147,8 +151,10 @@ set(HEADER_FILES
     ${VERSION_HEADER_FILE}
 )
 
-include_directories(misc
-                    support
+include_directories(.
+                    support/cellml
+                    support/combine
+                    support/sedml
                     ${CMAKE_CURRENT_BINARY_DIR})
 
 set(JAVASCRIPT_SOURCE_DIR tests/bindings/javascript)
