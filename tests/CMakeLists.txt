@@ -15,6 +15,7 @@
 # Include our different tests.
 
 include(api/file/tests.cmake)
+include(api/logger/tests.cmake)
 include(api/version/tests.cmake)
 
 include(misc/compiler/tests.cmake)

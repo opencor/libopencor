@@ -31,6 +31,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT Issue
 {
+    friend class Logger;
+
 public:
     /**
      * @brief The type of an issue.
@@ -80,7 +82,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit Issue(); /**< Constructor @private. */
+    explicit Issue(const std::string &pDescription, Type pType); /**< Constructor @private. */
 
     Impl *mPimpl;
 };

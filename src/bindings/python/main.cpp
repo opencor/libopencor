@@ -40,8 +40,9 @@ PYBIND11_MODULE(module, m)
 
     // APIs.
 
+    loggerApi(m); // Note: it needs to be first since it is used by some other APIs.
+
     fileApi(m);
     issueApi(m);
-    loggerApi(m);
     versionApi(m);
 }

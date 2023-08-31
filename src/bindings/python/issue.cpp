@@ -25,4 +25,13 @@ void issueApi(py::module_ &m)
     // Issue API.
 
     py::class_<libOpenCOR::Issue, std::shared_ptr<libOpenCOR::Issue>> issue(m, "Issue");
+
+    py::enum_<libOpenCOR::Issue::Type>(issue, "Type")
+        .value("Error", libOpenCOR::Issue::Type::ERROR)
+        .value("Warning", libOpenCOR::Issue::Type::WARNING)
+        .value("Message", libOpenCOR::Issue::Type::MESSAGE)
+        .export_values();
+
+    issue.def_property_readonly("type", &libOpenCOR::Issue::type, "Get the type of this Issue object.")
+        .def_property_readonly("description", &libOpenCOR::Issue::description, "Get the description for this Issue object.");
 }

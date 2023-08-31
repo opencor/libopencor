@@ -35,13 +35,23 @@ public:
      */
 
     Logger() = delete; /**< No default constructor allowed, @private. */
-    ~Logger() = default; /**< Destructor, @private. */
+    virtual ~Logger() = default; /**< Destructor, @private. */
 
     Logger(const Logger &pOther) = delete; /**< No copy constructor allowed, @private. */
     Logger(Logger &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
     Logger &operator=(const Logger &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     Logger &operator=(Logger &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+
+    /**
+     * @brief Return whether there are issues.
+     *
+     * Return whether there are issues.
+     *
+     * @return @c true if there are issues, @c false otherwise.
+     */
+
+    bool hasIssues() const;
 
     /**
      * @brief Get the number of issues.
@@ -67,6 +77,16 @@ public:
     IssuePtr issue(size_t pIndex) const;
 
     /**
+     * @brief Return whether there are errors.
+     *
+     * Return whether there are errors.
+     *
+     * @return @c true if there are errors, @c false otherwise.
+     */
+
+    bool hasErrors() const;
+
+    /**
      * @brief Get the number of errors.
      *
      * Return the number of issues of error type.
@@ -90,6 +110,18 @@ public:
     IssuePtr error(size_t pIndex) const;
 
     /**
+     * @brief Return whether there are warnings.
+     *
+     * Return whether there are warnings.
+     *
+     * @return @c true if there are warnings, @c false otherwise.
+     */
+
+    /*---GRY---
+        bool hasWarnings() const;
+    */
+
+    /**
      * @brief Get the number of warnings.
      *
      * Return the number of issues of warning type.
@@ -97,7 +129,9 @@ public:
      * @return The number of warnings.
      */
 
-    size_t warningCount() const;
+    /*---GRY---
+        size_t warningCount() const;
+    */
 
     /**
      * @brief Get the warning at the given @p pIndex.
@@ -110,7 +144,21 @@ public:
      * @return A reference to the warning at the given @p pIndex or @c nullptr if @p pIndex is not valid.
      */
 
-    IssuePtr warning(size_t pIndex) const;
+    /*---GRY---
+        IssuePtr warning(size_t pIndex) const;
+    */
+
+    /**
+     * @brief Return whether there are messages.
+     *
+     * Return whether there are messages.
+     *
+     * @return @c true if there are messages, @c false otherwise.
+     */
+
+    /*---GRY---
+        bool hasMessages() const;
+    */
 
     /**
      * @brief Get the number of messages.
@@ -120,7 +168,9 @@ public:
      * @return The number of messages.
      */
 
-    size_t messageCount() const;
+    /*---GRY---
+        size_t messageCount() const;
+    */
 
     /**
      * @brief Get the message at the given @p pIndex.
@@ -133,7 +183,9 @@ public:
      * @return A reference to the message at the given @p pIndex or @c nullptr if @p pIndex is not valid.
      */
 
-    IssuePtr message(size_t pIndex) const;
+    /*---GRY---
+        IssuePtr message(size_t pIndex) const;
+    */
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
