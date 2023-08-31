@@ -21,11 +21,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-FileManager *FileManager::instance()
+FileManager &FileManager::instance()
 {
     static FileManager instance;
 
-    return &instance;
+    return instance;
 }
 
 void FileManager::manage(File *pFile)
