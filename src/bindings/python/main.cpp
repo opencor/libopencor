@@ -26,6 +26,7 @@ namespace py = pybind11;
 void fileApi(py::module_ &m);
 void issueApi(py::module_ &m);
 void loggerApi(py::module_ &m);
+void solverApi(py::module_ &m);
 void versionApi(py::module_ &m);
 
 PYBIND11_MODULE(module, m)
@@ -44,5 +45,6 @@ PYBIND11_MODULE(module, m)
 
     fileApi(m);
     issueApi(m);
+    solverApi(m);
     versionApi(m);
 }

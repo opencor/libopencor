@@ -14,22 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+import libOpenCOR from "./libopencor.js";
 
-#include <memory>
+const libopencor = await libOpenCOR();
 
-namespace libOpenCOR {
+describe("Solver basic tests", () => {
+  test("Forward Euler method", () => {
+    const solver = new libopencor.Solver(
+      libopencor.Solver.Method.FORWARD_EULER,
+    );
 
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
-
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
-
-class Logger;
-using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
-
-class Solver;
-using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
-
-} // namespace libcellml
+    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solver.method().value).toBe(
+      libopencor.Solver.Method.FORWARD_EULER.value,
+    );
+    expect(solver.name()).toBe("Forward Euler");
+  });
+});

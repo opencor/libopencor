@@ -14,22 +14,35 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include <memory>
+#include "solverforwardeuler_p.h"
 
 namespace libOpenCOR {
 
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
+SolverForwardEuler::Impl::Impl()
+    : Solver::Impl(Type::ODE, Method::FORWARD_EULER, "Forward Euler")
+{
+}
 
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
+SolverForwardEuler::SolverForwardEuler()
+    : Solver(new Impl())
+{
+}
 
-class Logger;
-using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
+SolverForwardEuler::~SolverForwardEuler()
+{
+    delete pimpl();
+}
 
-class Solver;
-using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
+SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
+{
+    return reinterpret_cast<Impl *>(Solver::pimpl());
+}
 
-} // namespace libcellml
+/*---GRY---
+const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(Solver::pimpl());
+}
+*/
+
+} // namespace libOpenCOR

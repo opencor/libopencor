@@ -16,20 +16,20 @@ limitations under the License.
 
 #pragma once
 
-#include <memory>
+#include "logger_p.h"
+
+#include "libopencor/solver.h"
 
 namespace libOpenCOR {
 
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
+class Solver::Impl: public Logger::Impl
+{
+public:
+    Type mType = Type::ODE;
+    Method mMethod = Method::CVODE;
+    std::string mName;
 
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
+    explicit Impl(Type pType = Type::ODE, Method pMethod = Method::CVODE, const std::string &pName = {});
+};
 
-class Logger;
-using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
-
-class Solver;
-using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
-
-} // namespace libcellml
+} // namespace libOpenCOR

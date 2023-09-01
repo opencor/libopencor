@@ -16,6 +16,7 @@
 
 include(api/file/tests.cmake)
 include(api/logger/tests.cmake)
+include(api/solver/tests.cmake)
 include(api/version/tests.cmake)
 
 include(misc/compiler/tests.cmake)

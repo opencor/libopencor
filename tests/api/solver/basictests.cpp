@@ -14,22 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+#include "gtest/gtest.h"
 
-#include <memory>
+#include "tests/utils.h"
 
-namespace libOpenCOR {
+#include <libopencor>
 
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
+TEST(BasicSolverTest, ForwardEulerMethod)
+{
+    auto solver = libOpenCOR::Solver::create(libOpenCOR::Solver::Method::FORWARD_EULER);
 
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
-
-class Logger;
-using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
-
-class Solver;
-using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
-
-} // namespace libcellml
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->method(), libOpenCOR::Solver::Method::FORWARD_EULER);
+    EXPECT_EQ(solver->name(), "Forward Euler");
+}

@@ -20,6 +20,9 @@ from .module import (
     Issue,
     # Logger API.
     Logger,
+    # Solver API.
+    Solver,
+    SolverForwardEuler,
     # Version API.
     version,
     version_string,
@@ -46,6 +49,9 @@ __all__ = (
     "Issue",
     # Logger API.
     "Logger",
+    # Solver API.
+    "Solver",
+    "SolverForwardEuler",
     # Version API.
     "version",
     "version_string",

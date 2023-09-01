@@ -16,20 +16,16 @@ limitations under the License.
 
 #pragma once
 
-#include <memory>
+#include "solver_p.h"
+
+#include "libopencor/solverforwardeuler.h"
 
 namespace libOpenCOR {
 
-class File;
-using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
+class SolverForwardEuler::Impl: public Solver::Impl
+{
+public:
+    explicit Impl();
+};
 
-class Issue;
-using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @ref Issue pointer. */
-
-class Logger;
-using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
-
-class Solver;
-using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
-
-} // namespace libcellml
+} // namespace libOpenCOR
