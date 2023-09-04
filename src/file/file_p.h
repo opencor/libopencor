@@ -42,7 +42,7 @@ public:
     SedmlFilePtr mSedmlFile;
     CombineArchivePtr mCombineArchive;
 
-    Impl(const std::string &pFileNameOrUrl);
+    explicit Impl(const std::string &pFileNameOrUrl);
     ~Impl();
 
     void checkType(const FilePtr &pOwner, bool pResetType = false);

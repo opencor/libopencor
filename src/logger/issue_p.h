@@ -26,7 +26,7 @@ public:
     Type mType;
     std::string mDescription;
 
-    Impl(std::string pDescription, Type pType);
+    explicit Impl(std::string pDescription, Type pType);
     ~Impl() = default;
 };
 
