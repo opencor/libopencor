@@ -91,7 +91,7 @@ public:
      *
      * Return the type of this file.
      *
-     * @return The type as a @ref Type.
+     * @return The type, as a @ref Type, of this file.
      */
 
     Type type() const;
@@ -104,7 +104,7 @@ public:
      * @sa url
      * @sa path
      *
-     * @return The file name, as a @c std::string, of this file.
+     * @return The file name as a @c std::string.
      */
 
     std::string fileName() const;
@@ -140,7 +140,7 @@ public:
      *
      * Return the contents of this file.
      *
-     * @return The contents, as an array of @c char, of this file.
+     * @return The contents, as a @c std::vector of unsigned @c char, of this file.
      */
 
     std::vector<unsigned char> contents();
@@ -150,7 +150,7 @@ public:
      *
      * Set the contents of this file.
      *
-     * @param pContents The contents of the file as a @c std::vector of unsigned @c char.
+     * @param pContents The contents, as a @c std::vector of unsigned @c char, of this file.
      */
 
     void setContents(const std::vector<unsigned char> &pContents);
