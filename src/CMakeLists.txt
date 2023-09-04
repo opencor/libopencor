@@ -90,7 +90,7 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/filemanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
@@ -105,16 +105,16 @@ if(NOT EMSCRIPTEN)
 endif()
 
 set(GIT_API_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
 )
 
 set(GIT_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/issue_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/logger_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/file_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger_p.h
     ${GIT_API_SOURCE_FILES}
     ${INTERNAL_SOURCE_FILES}
 )
@@ -125,7 +125,7 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/filemanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
@@ -157,6 +157,8 @@ set(HEADER_FILES
 )
 
 include_directories(.
+                    file
+                    logger
                     misc
                     support/cellml
                     support/combine
