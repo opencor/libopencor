@@ -35,7 +35,7 @@ void fileApi(py::module_ &m)
         .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE)
         .export_values();
 
-    file.def(py::init(py::overload_cast<const std::string &>(&libOpenCOR::File::create)), "Create a File object.", py::arg("file_name_or_url"))
+    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
