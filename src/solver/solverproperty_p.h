@@ -17,21 +17,23 @@ limitations under the License.
 #pragma once
 
 #include "logger_p.h"
-#include "solverproperty.h"
 
-#include "libopencor/solver.h"
+#include "solverproperty.h"
 
 namespace libOpenCOR {
 
-class Solver::Impl: public Logger::Impl
+class SolverProperty::Impl: public Logger::Impl
 {
 public:
-    Type mType = Type::ODE;
-    Method mMethod = Method::CVODE;
+    Type mType = Type::Double;
     std::string mName;
-    SolverProperties mProperties;
+    SolverPropertyValue mValue = 0.0;
+    std::vector<std::string> mListValues;
+    SolverPropertyValue mDefaultValue = 0.0;
+    bool mHasVoiUnit = false;
 
-    explicit Impl(Type pType, Method pMethod, const std::string &pName, const SolverProperties &pProperties);
+    explicit Impl(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
+                  const SolverPropertyValue &pDefaultValue, bool pHasVoiValue);
 };
 
 } // namespace libOpenCOR

@@ -19,7 +19,8 @@ limitations under the License.
 namespace libOpenCOR {
 
 SolverForwardEuler::Impl::Impl()
-    : Solver::Impl(Type::ODE, Method::FORWARD_EULER, "Forward Euler")
+    : Solver::Impl(Type::ODE, Method::FORWARD_EULER, "Forward Euler",
+                   {SolverProperty::create(SolverProperty::Type::DoubleGt0, "Step", {}, 1.0, true)})
 {
 }
 

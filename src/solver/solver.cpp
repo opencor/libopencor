@@ -20,11 +20,13 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-Solver::Impl::Impl(Solver::Type pType, Solver::Method pMethod, const std::string &pName)
+Solver::Impl::Impl(Solver::Type pType, Solver::Method pMethod, const std::string &pName,
+                   const SolverProperties &pProperties)
     : Logger::Impl()
     , mType(pType)
     , mMethod(pMethod)
     , mName(pName)
+    , mProperties(pProperties)
 {
 }
 
