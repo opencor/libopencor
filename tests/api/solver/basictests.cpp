@@ -27,4 +27,5 @@ TEST(BasicSolverTest, ForwardEulerMethod)
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solver->method(), libOpenCOR::Solver::Method::FORWARD_EULER);
     EXPECT_EQ(solver->name(), "Forward Euler");
+    EXPECT_EQ_STRINGS(solver->properties(), {"Step"});
 }

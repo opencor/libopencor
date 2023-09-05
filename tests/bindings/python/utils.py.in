@@ -62,6 +62,13 @@ def assert_issues(expected_issues, logger):
         assert expected_issues[i][1] == logger.issue(i).description
 
 
+def assert_strings(strings, expected_strings):
+    assert len(strings) == len(expected_strings)
+
+    for i in range(len(strings)):
+        assert strings[i] == expected_strings[i]
+
+
 def resource_path(relative_path=""):
     return RESOURCE_LOCATION + "/" + relative_path
 

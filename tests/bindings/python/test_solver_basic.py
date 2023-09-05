@@ -14,6 +14,7 @@
 
 
 from libopencor import Solver
+from utils import assert_strings
 
 
 def test_forward_euler_method():
@@ -22,3 +23,4 @@ def test_forward_euler_method():
     assert solver.type == Solver.Type.Ode
     assert solver.method == Solver.Method.ForwardEuler
     assert solver.name == "Forward Euler"
+    assert_strings(solver.properties, ["Step"])

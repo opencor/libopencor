@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 import libOpenCOR from "./libopencor.js";
+import { expectStrings } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
@@ -29,5 +30,6 @@ describe("Solver basic tests", () => {
       libopencor.Solver.Method.FORWARD_EULER.value,
     );
     expect(solver.name()).toBe("Forward Euler");
+    expectStrings(solver.properties(), ["Step"]);
   });
 });

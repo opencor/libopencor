@@ -114,6 +114,16 @@ public:
 
     std::string name() const;
 
+    /**
+     * @brief Get the properties of this solver.
+     *
+     * Return the properties of this solver.
+     *
+     * @return The properties, as a @c std::vector of a @c std::string, of this solver.
+     */
+
+    std::vector<std::string> properties() const;
+
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

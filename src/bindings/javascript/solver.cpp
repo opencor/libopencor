@@ -34,7 +34,8 @@ void solverApi()
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
         .function("type", &libOpenCOR::Solver::type)
         .function("method", &libOpenCOR::Solver::method)
-        .function("name", &libOpenCOR::Solver::name);
+        .function("name", &libOpenCOR::Solver::name)
+        .function("properties", &libOpenCOR::Solver::properties);
 
     emscripten::class_<libOpenCOR::SolverForwardEuler, emscripten::base<libOpenCOR::Solver>>("SolverForwardEuler");
 

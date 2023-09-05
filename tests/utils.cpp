@@ -34,6 +34,15 @@ void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &p
     }
 }
 
+void expectEqualStrings(const std::vector<std::string> &pStrings, const std::vector<std::string> &pExpectedStrings)
+{
+    EXPECT_EQ(pStrings.size(), pExpectedStrings.size());
+
+    for (size_t i = 0; i < pStrings.size(); ++i) {
+        EXPECT_EQ(pStrings[i], pExpectedStrings[i]);
+    }
+}
+
 std::string resourcePath(const std::string &pResourceRelativePath)
 {
     return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;

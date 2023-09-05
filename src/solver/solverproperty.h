@@ -69,6 +69,4 @@ private:
     const Impl *pimpl() const;
 };
 
-using SolverProperties = std::vector<SolverPropertyPtr>;
-
 } // namespace libOpenCOR

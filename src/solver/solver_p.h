@@ -29,9 +29,12 @@ public:
     Type mType = Type::ODE;
     Method mMethod = Method::CVODE;
     std::string mName;
-    SolverProperties mProperties;
+    std::vector<SolverPropertyPtr> mProperties;
 
-    explicit Impl(Type pType, Method pMethod, const std::string &pName, const SolverProperties &pProperties);
+    explicit Impl(Type pType, Method pMethod, const std::string &pName,
+                  const std::vector<SolverPropertyPtr> &pProperties);
+
+    std::vector<std::string> properties() const;
 };
 
 } // namespace libOpenCOR

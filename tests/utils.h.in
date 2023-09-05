@@ -64,9 +64,15 @@ using ExpectedIssues = std::vector<ExpectedIssue>;
 
 void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger);
 
-#define EXPECT_EQ_ISSUES(pIssues, pLogger) \
+#define EXPECT_EQ_ISSUES(pExpectedIssues, pLogger) \
     SCOPED_TRACE("Issue occurred here."); \
-    libOpenCOR::expectEqualIssues(pIssues, pLogger)
+    libOpenCOR::expectEqualIssues(pExpectedIssues, pLogger)
+
+void expectEqualStrings(const std::vector<std::string> &pStrings, const std::vector<std::string> &pExpectedStrings);
+
+#define EXPECT_EQ_STRINGS(pStrings, pExpectedStrings) \
+    SCOPED_TRACE("Issue occurred here."); \
+    libOpenCOR::expectEqualStrings(pStrings, pExpectedStrings)
 
 std::string resourcePath(const std::string &pResourceRelativePath = {});
 
