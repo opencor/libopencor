@@ -113,7 +113,7 @@ size_t Logger::issueCount() const
 IssuePtr Logger::issue(size_t pIndex) const
 {
     if (pIndex < pimpl()->mIssues.size()) {
-        return pimpl()->mIssues.at(pIndex);
+        return pimpl()->mIssues[pIndex];
     }
 
     return {};
@@ -132,7 +132,7 @@ size_t Logger::errorCount() const
 IssuePtr Logger::error(size_t pIndex) const
 {
     if (pIndex < pimpl()->mErrors.size()) {
-        return pimpl()->mIssues.at(pimpl()->mErrors.at(pIndex));
+        return pimpl()->mIssues[pimpl()->mErrors[pIndex]];
     }
 
     return {};
@@ -156,7 +156,7 @@ size_t Logger::warningCount() const
 IssuePtr Logger::warning(size_t pIndex) const
 {
     if (pIndex < pimpl()->mWarnings.size()) {
-        return pimpl()->mIssues.at(pimpl()->mWarnings.at(pIndex));
+        return pimpl()->mIssues[pimpl()->mWarnings[pIndex]];
     }
 
     return {};
@@ -181,7 +181,7 @@ size_t Logger::messageCount() const
 IssuePtr Logger::message(size_t pIndex) const
 {
     if (pIndex < pimpl()->mMessages.size()) {
-        return pimpl()->mIssues.at(pimpl()->mMessages.at(pIndex));
+        return pimpl()->mIssues[pimpl()->mMessages[pIndex]];
     }
 
     return {};

@@ -29,8 +29,8 @@ void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &p
     EXPECT_EQ(pExpectedIssues.size(), pLogger->issueCount());
 
     for (size_t i = 0; i < pExpectedIssues.size(); ++i) {
-        EXPECT_EQ(pExpectedIssues.at(i).type, pLogger->issue(i)->type());
-        EXPECT_EQ(pExpectedIssues.at(i).description, pLogger->issue(i)->description());
+        EXPECT_EQ(pExpectedIssues[i].type, pLogger->issue(i)->type());
+        EXPECT_EQ(pExpectedIssues[i].description, pLogger->issue(i)->description());
     }
 }
 
