@@ -39,7 +39,7 @@ TEST(BasicFileTest, localFile)
     EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues);
 }
 
 TEST(BasicFileTest, relativeLocalFile)
@@ -63,7 +63,7 @@ TEST(BasicFileTest, relativeLocalFile)
     EXPECT_EQ(file->path(), "dir/file.txt");
 #endif
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues);
 }
 
 TEST(BasicFileTest, urlBasedLocalFile)
@@ -79,7 +79,7 @@ TEST(BasicFileTest, urlBasedLocalFile)
     EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues);
 }
 
 TEST(BasicFileTest, remoteFile)
@@ -102,7 +102,7 @@ TEST(BasicFileTest, localVirtualFile)
     EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(expectedNonExistingFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues);
 
     auto someUnknownContentsVector = libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS);
 
@@ -110,7 +110,7 @@ TEST(BasicFileTest, localVirtualFile)
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), someUnknownContentsVector);
-    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues);
 }
 
 TEST(BasicFileTest, remoteVirtualFile)
@@ -122,7 +122,7 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->url(), libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
     EXPECT_EQ(file->path(), libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(expectedNonDownloadableFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedNonDownloadableFileIssues);
 
     auto someUnknownContentsVector = libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS);
 
@@ -130,5 +130,5 @@ TEST(BasicFileTest, remoteVirtualFile)
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), someUnknownContentsVector);
-    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues);
 }

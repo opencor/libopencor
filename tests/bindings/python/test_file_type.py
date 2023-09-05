@@ -34,21 +34,21 @@ def test_type_irretrievable_file():
     file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
 
     assert file.type == File.Type.IrretrievableFile
-    assert_issues(expected_non_existing_file_issues, file)
+    assert_issues(file, expected_non_existing_file_issues)
 
 
 def test_type_unknown_file():
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
 
     assert file.type == File.Type.UnknownFile
-    assert_issues(expected_unknown_file_issues, file)
+    assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_sbml_file():
     file = File(utils.resource_path(utils.SBML_FILE))
 
     assert file.type == File.Type.UnknownFile
-    assert_issues(expected_unknown_file_issues, file)
+    assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_error_sedml_file():
@@ -99,7 +99,7 @@ def test_type_unknown_virtual_file():
     file.set_contents(utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS))
 
     assert file.type == File.Type.UnknownFile
-    assert_issues(expected_unknown_file_issues, file)
+    assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_cellml_virtual_file():

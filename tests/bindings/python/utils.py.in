@@ -54,12 +54,12 @@ SOME_WARNING_CELLML_CONTENTS = """@SOME_WARNING_CELLML_CONTENTS@"""
 SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
 
 
-def assert_issues(expected_issues, logger):
-    assert len(expected_issues) == logger.issue_count
+def assert_issues(logger, expected_issues):
+    assert logger.issue_count == len(expected_issues)
 
-    for i in range(len(expected_issues)):
-        assert expected_issues[i][0] == logger.issue(i).type
-        assert expected_issues[i][1] == logger.issue(i).description
+    for i in range(logger.issue_count):
+        assert logger.issue(i).type == expected_issues[i][0]
+        assert logger.issue(i).description == expected_issues[i][1]
 
 
 def assert_strings(strings, expected_strings):

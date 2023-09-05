@@ -24,13 +24,13 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger)
+void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues)
 {
-    EXPECT_EQ(pExpectedIssues.size(), pLogger->issueCount());
+    EXPECT_EQ(pLogger->issueCount(), pExpectedIssues.size());
 
-    for (size_t i = 0; i < pExpectedIssues.size(); ++i) {
-        EXPECT_EQ(pExpectedIssues[i].type, pLogger->issue(i)->type());
-        EXPECT_EQ(pExpectedIssues[i].description, pLogger->issue(i)->description());
+    for (size_t i = 0; i < pLogger->issueCount(); ++i) {
+        EXPECT_EQ(pLogger->issue(i)->type(), pExpectedIssues[i].type);
+        EXPECT_EQ(pLogger->issue(i)->description(), pExpectedIssues[i].description);
     }
 }
 

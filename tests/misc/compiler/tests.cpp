@@ -51,7 +51,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("void"));
-    EXPECT_EQ_ISSUES(expectedIssues01, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues01);
 
     // Add an identifier to our string.
 
@@ -62,7 +62,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("void function"));
-    EXPECT_EQ_ISSUES(expectedIssues02, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues02);
 
     // Add a "(" to our string.
 
@@ -74,7 +74,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("void function("));
-    EXPECT_EQ_ISSUES(expectedIssues03, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues03);
 
     // Add a ")" to our string.
 
@@ -84,7 +84,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("void function()"));
-    EXPECT_EQ_ISSUES(expectedIssues04, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues04);
 
     // Add a "{" to our string.
 
@@ -94,7 +94,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("void function() {"));
-    EXPECT_EQ_ISSUES(expectedIssues05, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues05);
 
     // Add a "}" to our string, making it a valid void function.
 
@@ -113,7 +113,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() {}"));
-    EXPECT_EQ_ISSUES(expectedIssues06, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues06);
 
     // Add "return" to our string.
 
@@ -124,7 +124,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() { return"));
-    EXPECT_EQ_ISSUES(expectedIssues07, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues07);
 
     // Add "3.0" to our string.
 
@@ -135,7 +135,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0"));
-    EXPECT_EQ_ISSUES(expectedIssues08, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues08);
 
     // Add ";" to our string.
 
@@ -145,7 +145,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0;"));
-    EXPECT_EQ_ISSUES(expectedIssues09, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues09);
 
     // Add a "}" to our string, making it a valid double function.
 
@@ -161,7 +161,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("double .function() { return 3.0; }"));
-    EXPECT_EQ_ISSUES(expectedIssues10, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues10);
 
     // Return an invalid statement.
 
@@ -172,7 +172,7 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0+*-/a; }"));
-    EXPECT_EQ_ISSUES(expectedIssues11, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues11);
 }
 
 TEST_F(CompilerTest, severalFunctions)

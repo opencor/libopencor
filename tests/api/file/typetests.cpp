@@ -33,7 +33,7 @@ TEST(TypeFileTest, irretrievableFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ_ISSUES(expectedIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedIssues);
 }
 
 TEST(TypeFileTest, unknownFile)
@@ -41,7 +41,7 @@ TEST(TypeFileTest, unknownFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues);
 }
 
 TEST(TypeFileTest, sbmlFile)
@@ -49,7 +49,7 @@ TEST(TypeFileTest, sbmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SBML_FILE));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues);
 }
 
 TEST(TypeFileTest, errorSedmlFile)
@@ -108,7 +108,7 @@ TEST(TypeFileTest, unknownVirtualFile)
     file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_UNKNOWN_CONTENTS));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ_ISSUES(expectedUnknownFileIssues, file);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues);
 }
 
 TEST(TypeFileTest, cellmlVirtualFile)

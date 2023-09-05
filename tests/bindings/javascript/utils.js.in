@@ -41,7 +41,7 @@ export const SOME_WARNING_CELLML_CONTENTS = stringToArrayBuffer(
 );
 export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
 
-export function expectIssues(expectedIssues, logger) {
+export function expectIssues(logger, expectedIssues) {
   expect(logger.issueCount()).toBe(expectedIssues.length);
 
   for (let i = 0; i < logger.issueCount(); ++i) {

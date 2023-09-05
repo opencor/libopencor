@@ -62,11 +62,11 @@ typedef struct
 
 using ExpectedIssues = std::vector<ExpectedIssue>;
 
-void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger);
+void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues);
 
-#define EXPECT_EQ_ISSUES(pExpectedIssues, pLogger) \
+#define EXPECT_EQ_ISSUES(pLogger, pExpectedIssues) \
     SCOPED_TRACE("Issue occurred here."); \
-    libOpenCOR::expectEqualIssues(pExpectedIssues, pLogger)
+    libOpenCOR::expectEqualIssues(pLogger, pExpectedIssues)
 
 void expectEqualStrings(const std::vector<std::string> &pStrings, const std::vector<std::string> &pExpectedStrings);
 
