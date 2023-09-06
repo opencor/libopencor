@@ -27,7 +27,6 @@ class SolverProperty::Impl
 public:
     Type mType = Type::Double;
     std::string mName;
-    SolverPropertyValue mValue = 0.0;
     std::vector<std::string> mListValues;
     SolverPropertyValue mDefaultValue = 0.0;
     bool mHasVoiUnit = false;

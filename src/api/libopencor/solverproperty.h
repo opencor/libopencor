@@ -54,7 +54,6 @@ public:
 
     Type type() const;
     std::string name() const;
-    SolverPropertyValue value() const;
     std::vector<std::string> listValues() const;
     SolverPropertyValue defaultValue() const;
     bool hasVoiUnit() const;

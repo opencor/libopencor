@@ -22,7 +22,6 @@ SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::vect
                            const SolverPropertyValue &pDefaultValue, bool pHasVoiValue)
     : mType(pType)
     , mName(pName)
-    , mValue(pDefaultValue)
     , mListValues(pListValues)
     , mDefaultValue(pDefaultValue)
     , mHasVoiUnit(pHasVoiValue)
@@ -55,11 +54,6 @@ SolverProperty::Type SolverProperty::type() const
 std::string SolverProperty::name() const
 {
     return mPimpl->mName;
-}
-
-SolverPropertyValue SolverProperty::value() const
-{
-    return mPimpl->mValue;
 }
 
 std::vector<std::string> SolverProperty::listValues() const
