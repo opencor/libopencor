@@ -51,6 +51,7 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
+    Issue() = delete; /**< No default constructor allowed, @private. */
     ~Issue(); /**< Destructor, @private. */
 
     Issue(const Issue &pOther) = delete; /**< No copy constructor allowed, @private. */

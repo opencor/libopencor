@@ -269,7 +269,7 @@ void *Compiler::Impl::function(const std::string &pName) const
         auto symbol = mLljit->lookup(pName);
 
         if (symbol) {
-            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT(performance-no-int-to-ptr)
+            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
         }
     }
 

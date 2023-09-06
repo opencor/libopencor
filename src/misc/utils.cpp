@@ -336,7 +336,7 @@ std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
     const auto fileSize = std::filesystem::file_size(pFilePath);
     std::vector<unsigned char> contents(fileSize);
 
-    file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT(bugprone-narrowing-conversions, readability-container-data-pointer)
+    file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT
 
     return contents;
 }
