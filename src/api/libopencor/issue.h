@@ -82,9 +82,9 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit Issue(const std::string &pDescription, Type pType); /**< Constructor @private. */
-
     Impl *mPimpl;
+
+    explicit Issue(const std::string &pDescription, Type pType); /**< Constructor @private. */
 };
 
 } // namespace libOpenCOR
