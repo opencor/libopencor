@@ -23,7 +23,7 @@ namespace libOpenCOR {
 /**
  * @brief The Solver class.
  *
- * The Solver class is used to access various solvers.
+ * The Solver class is used to access various information about available solvers, as well as to create a solver.
  */
 
 class LIBOPENCOR_EXPORT Solver: public Logger
