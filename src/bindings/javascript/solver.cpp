@@ -35,7 +35,6 @@ void solverApi()
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
         .function("type", &libOpenCOR::Solver::type)
-        .function("method", &libOpenCOR::Solver::method)
         .function("name", &libOpenCOR::Solver::name)
         .function("properties", &libOpenCOR::Solver::properties);
 

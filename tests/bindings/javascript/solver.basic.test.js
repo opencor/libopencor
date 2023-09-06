@@ -26,9 +26,6 @@ describe("Solver basic tests", () => {
     );
 
     expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.method().value).toBe(
-      libopencor.Solver.Method.FORWARD_EULER.value,
-    );
     expect(solver.name()).toBe("Forward Euler");
     expectStrings(solver.properties(), ["Step"]);
   });

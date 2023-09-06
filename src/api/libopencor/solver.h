@@ -98,16 +98,6 @@ public:
     Type type() const;
 
     /**
-     * @brief Get the method used by this solver.
-     *
-     * Return the method used by this solver.
-     *
-     * @return The method, as a @ref Method, used by this solver.
-     */
-
-    Method method() const;
-
-    /**
      * @brief Get the name of this solver.
      *
      * Return the name of this solver.

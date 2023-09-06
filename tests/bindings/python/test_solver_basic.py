@@ -21,6 +21,5 @@ def test_forward_euler_method():
     solver = Solver(Solver.Method.ForwardEuler)
 
     assert solver.type == Solver.Type.Ode
-    assert solver.method == Solver.Method.ForwardEuler
     assert solver.name == "Forward Euler"
     assert_strings(solver.properties, ["Step"])

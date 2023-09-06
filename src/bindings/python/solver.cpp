@@ -43,7 +43,6 @@ void solverApi(py::module_ &m)
 
     solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
         .def_property_readonly("type", &libOpenCOR::Solver::type, "Get the type of this Solver object.")
-        .def_property_readonly("method", &libOpenCOR::Solver::method, "Get the method used by this Solver object.")
         .def_property_readonly("name", &libOpenCOR::Solver::name, "Get the name of this Solver object.")
         .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of this Solver object.");
 

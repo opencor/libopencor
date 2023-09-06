@@ -20,11 +20,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-Solver::Impl::Impl(Solver::Type pType, Solver::Method pMethod, const std::string &pName,
-                   const std::vector<SolverPropertyPtr> &pProperties)
+Solver::Impl::Impl(Solver::Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties)
     : Logger::Impl()
     , mType(pType)
-    , mMethod(pMethod)
     , mName(pName)
     , mProperties(pProperties)
 {
@@ -68,11 +66,6 @@ SolverPtr Solver::create(Method pMethod)
 Solver::Type Solver::type() const
 {
     return pimpl()->mType;
-}
-
-Solver::Method Solver::method() const
-{
-    return pimpl()->mMethod;
 }
 
 std::string Solver::name() const

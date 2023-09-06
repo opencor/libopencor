@@ -27,12 +27,10 @@ class Solver::Impl: public Logger::Impl
 {
 public:
     Type mType = Type::ODE;
-    Method mMethod = Method::CVODE;
     std::string mName;
     std::vector<SolverPropertyPtr> mProperties;
 
-    explicit Impl(Type pType, Method pMethod, const std::string &pName,
-                  const std::vector<SolverPropertyPtr> &pProperties);
+    explicit Impl(Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
 
     std::vector<std::string> properties() const;
 };
