@@ -18,6 +18,8 @@ limitations under the License.
 
 void loggerApi()
 {
+    // Logger API.
+
     emscripten::class_<libOpenCOR::Logger>("Logger")
         .function("hasIssues", &libOpenCOR::Logger::hasIssues)
         .function("issueCount", &libOpenCOR::Logger::issueCount)

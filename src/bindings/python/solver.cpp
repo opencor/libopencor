@@ -26,7 +26,6 @@ void solverApi(py::module_ &m)
     // Solver API.
 
     py::class_<libOpenCOR::Solver, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::Solver>> solver(m, "Solver");
-    py::class_<libOpenCOR::SolverForwardEuler, libOpenCOR::Solver, std::shared_ptr<libOpenCOR::SolverForwardEuler>> solverForwardEuler(m, "SolverForwardEuler");
 
     py::enum_<libOpenCOR::Solver::Type>(solver, "Type")
         .value("Ode", libOpenCOR::Solver::Type::ODE)
@@ -47,4 +46,8 @@ void solverApi(py::module_ &m)
         .def_property_readonly("method", &libOpenCOR::Solver::method, "Get the method used by this Solver object.")
         .def_property_readonly("name", &libOpenCOR::Solver::name, "Get the name of this Solver object.")
         .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of this Solver object.");
+
+    // SolverForwardEuler API.
+
+    py::class_<libOpenCOR::SolverForwardEuler, libOpenCOR::Solver, std::shared_ptr<libOpenCOR::SolverForwardEuler>> solverForwardEuler(m, "SolverForwardEuler");
 }

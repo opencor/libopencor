@@ -18,6 +18,8 @@ limitations under the License.
 
 void solverApi()
 {
+    // Solver API.
+
     emscripten::enum_<libOpenCOR::Solver::Type>("Solver.Type")
         .value("ODE", libOpenCOR::Solver::Type::ODE)
         .value("NLA", libOpenCOR::Solver::Type::NLA);
@@ -37,8 +39,6 @@ void solverApi()
         .function("name", &libOpenCOR::Solver::name)
         .function("properties", &libOpenCOR::Solver::properties);
 
-    emscripten::class_<libOpenCOR::SolverForwardEuler, emscripten::base<libOpenCOR::Solver>>("SolverForwardEuler");
-
     EM_ASM({
         Module['Solver']['Type'] = Module['Solver.Type'];
         Module['Solver']['Method'] = Module['Solver.Method'];
@@ -46,4 +46,8 @@ void solverApi()
         delete Module['Solver.Type'];
         delete Module['Solver.Method'];
     });
+
+    // SolverForwardEuler API.
+
+    emscripten::class_<libOpenCOR::SolverForwardEuler, emscripten::base<libOpenCOR::Solver>>("SolverForwardEuler");
 }

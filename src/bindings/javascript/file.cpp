@@ -18,6 +18,8 @@ limitations under the License.
 
 void fileApi()
 {
+    // File API.
+
     emscripten::enum_<libOpenCOR::File::Type>("File.Type")
         .value("UNKNOWN_FILE", libOpenCOR::File::Type::UNKNOWN_FILE)
         .value("CELLML_FILE", libOpenCOR::File::Type::CELLML_FILE)

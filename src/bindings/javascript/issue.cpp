@@ -18,6 +18,8 @@ limitations under the License.
 
 void issueApi()
 {
+    // Issue API.
+
     emscripten::enum_<libOpenCOR::Issue::Type>("Issue.Type")
         .value("ERROR", libOpenCOR::Issue::Type::ERROR)
         .value("WARNING", libOpenCOR::Issue::Type::WARNING)
