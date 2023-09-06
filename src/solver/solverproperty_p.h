@@ -18,11 +18,11 @@ limitations under the License.
 
 #include "logger_p.h"
 
-#include "solverproperty.h"
+#include "libopencor/solverproperty.h"
 
 namespace libOpenCOR {
 
-class SolverProperty::Impl: public Logger::Impl
+class SolverProperty::Impl
 {
 public:
     Type mType = Type::Double;

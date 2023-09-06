@@ -20,8 +20,7 @@ namespace libOpenCOR {
 
 SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
                            const SolverPropertyValue &pDefaultValue, bool pHasVoiValue)
-    : Logger::Impl()
-    , mType(pType)
+    : mType(pType)
     , mName(pName)
     , mValue(pDefaultValue)
     , mListValues(pListValues)
@@ -32,23 +31,13 @@ SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::vect
 
 SolverProperty::SolverProperty(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
                                const SolverPropertyValue &pDefaultValue, bool pHasVoiValue)
-    : Logger(new Impl(pType, pName, pListValues, pDefaultValue, pHasVoiValue))
+    : mPimpl(new Impl(pType, pName, pListValues, pDefaultValue, pHasVoiValue))
 {
 }
 
 SolverProperty::~SolverProperty()
 {
-    delete pimpl();
-}
-
-SolverProperty::Impl *SolverProperty::pimpl()
-{
-    return reinterpret_cast<Impl *>(Logger::pimpl());
-}
-
-const SolverProperty::Impl *SolverProperty::pimpl() const
-{
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    delete mPimpl;
 }
 
 SolverPropertyPtr SolverProperty::create(Type pType, const std::string &pName,
@@ -60,32 +49,32 @@ SolverPropertyPtr SolverProperty::create(Type pType, const std::string &pName,
 
 SolverProperty::Type SolverProperty::type() const
 {
-    return pimpl()->mType;
+    return mPimpl->mType;
 }
 
 std::string SolverProperty::name() const
 {
-    return pimpl()->mName;
+    return mPimpl->mName;
 }
 
 SolverPropertyValue SolverProperty::value() const
 {
-    return pimpl()->mValue;
+    return mPimpl->mValue;
 }
 
 std::vector<std::string> SolverProperty::listValues() const
 {
-    return pimpl()->mListValues;
+    return mPimpl->mListValues;
 }
 
 SolverPropertyValue SolverProperty::defaultValue() const
 {
-    return pimpl()->mDefaultValue;
+    return mPimpl->mDefaultValue;
 }
 
 bool SolverProperty::hasVoiUnit() const
 {
-    return pimpl()->mHasVoiUnit;
+    return mPimpl->mHasVoiUnit;
 }
 
 } // namespace libOpenCOR

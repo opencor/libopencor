@@ -17,9 +17,9 @@ limitations under the License.
 #pragma once
 
 #include "logger_p.h"
-#include "solverproperty.h"
 
 #include "libopencor/solver.h"
+#include "libopencor/solverproperty.h"
 
 namespace libOpenCOR {
 

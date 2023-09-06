@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/logger.h"
+#include "libopencor/export.h"
 
 namespace libOpenCOR {
 
@@ -25,7 +25,7 @@ using SolverPropertyPtr = std::shared_ptr<SolverProperty>;
 
 using SolverPropertyValue = std::variant<bool, int, double, std::string>;
 
-class SolverProperty: public Logger
+class SolverProperty
 {
 public:
     enum class Type
@@ -41,7 +41,7 @@ public:
     };
 
     SolverProperty() = delete;
-    ~SolverProperty() override;
+    ~SolverProperty();
 
     SolverProperty(const SolverProperty &pOther) = delete;
     SolverProperty(SolverProperty &&pOther) noexcept = delete;
@@ -62,11 +62,10 @@ public:
 private:
     class Impl;
 
+    Impl *mPimpl;
+
     explicit SolverProperty(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
                             const SolverPropertyValue &pDefaultValue, bool pHasVoiValue);
-
-    Impl *pimpl();
-    const Impl *pimpl() const;
 };
 
 } // namespace libOpenCOR
