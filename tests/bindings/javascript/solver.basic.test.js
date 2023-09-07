@@ -20,12 +20,11 @@ import { expectStrings } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("Solver basic tests", () => {
-  test("Forward Euler method", () => {
-    const solver = new libopencor.Solver("Forward Euler");
+  test("Unknown solver", () => {
+    expect(new libopencor.Solver("Unknown solver")).toBe(null);
+  });
 
-    //---GRY---
-    // expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    // expect(solver.name()).toBe("Forward Euler");
-    // expectStrings(solver.properties(), ["Step"]);
+  test("Forward Euler", () => {
+    expect(new libopencor.Solver("Forward Euler")).toNotBe(null);
   });
 });

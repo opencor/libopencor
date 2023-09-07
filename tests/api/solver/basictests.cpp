@@ -20,16 +20,12 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(BasicSolverTest, solversInfo)
+TEST(BasicSolverTest, unknownSolver)
 {
+    EXPECT_EQ(libOpenCOR::Solver::create("Uknown solver"), nullptr);
 }
 
-TEST(BasicSolverTest, ForwardEulerMethod)
+TEST(BasicSolverTest, ForwardEuler)
 {
-    auto solver = libOpenCOR::Solver::create("Forward Euler");
-
-    //---GRY---
-    // EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
-    // EXPECT_EQ(solver->name(), "Forward Euler");
-    // EXPECT_EQ_STRINGS(solver->properties(), {"Step"});
+    EXPECT_NE(libOpenCOR::Solver::create("Forward Euler"), nullptr);
 }

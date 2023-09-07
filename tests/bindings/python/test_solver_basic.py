@@ -17,10 +17,9 @@ from libopencor import Solver
 from utils import assert_strings
 
 
-def test_forward_euler_method():
-    solver = Solver("Forward Euler")
+def test_unknown_solver():
+    assert Solver("Unknown solver") == None
 
-    # ---GRY---
-    # assert solver.type == Solver.Type.Ode
-    # assert solver.name == "Forward Euler"
-    # assert_strings(solver.properties, ["Step"])
+
+def test_forward_euler():
+    assert Solver("Forward Euler") != None
