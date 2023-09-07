@@ -29,7 +29,6 @@ class Solver::Impl: public Logger::Impl
 public:
     static bool registerSolver(Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
 
-private:
     static std::map<std::string, SolverInfoPtr> sSolversInfo;
 };
 
