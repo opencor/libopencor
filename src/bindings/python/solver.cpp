@@ -41,12 +41,21 @@ void solverApi(py::module_ &m)
         .value("SecondOrderRungeKutta", libOpenCOR::Solver::Method::SECOND_ORDER_RUNGE_KUTTA)
         .export_values();
 
-    solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
-        .def_property_readonly("type", &libOpenCOR::Solver::type, "Get the type of this Solver object.")
-        .def_property_readonly("name", &libOpenCOR::Solver::name, "Get the name of this Solver object.")
-        .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of this Solver object.");
+    solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.");
 
     // SolverForwardEuler API.
 
     py::class_<libOpenCOR::SolverForwardEuler, libOpenCOR::Solver, std::shared_ptr<libOpenCOR::SolverForwardEuler>> solverForwardEuler(m, "SolverForwardEuler");
+
+    // SolverInfo API.
+
+    py::class_<libOpenCOR::SolverInfo, std::shared_ptr<libOpenCOR::SolverInfo>> solverInfo(m, "SolverInfo");
+
+    solverInfo.def_property_readonly("type", &libOpenCOR::SolverInfo::type, "Get the type of the Solver object.")
+        .def_property_readonly("name", &libOpenCOR::SolverInfo::name, "Get the name of the Solver object.")
+        .def_property_readonly("properties", &libOpenCOR::SolverInfo::properties, "Get the properties of the Solver object.");
+
+    // SolverProperty API.
+
+    py::class_<libOpenCOR::SolverProperty, std::shared_ptr<libOpenCOR::SolverProperty>> solverProperty(m, "SolverProperty");
 }

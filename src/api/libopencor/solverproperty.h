@@ -17,15 +17,11 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/export.h"
+#include "libopencor/types.h"
 
 namespace libOpenCOR {
 
-class SolverProperty;
-using SolverPropertyPtr = std::shared_ptr<SolverProperty>;
-
-using SolverPropertyValue = std::variant<bool, int, double, std::string>;
-
-class SolverProperty
+class LIBOPENCOR_EXPORT SolverProperty
 {
 public:
     enum class Type

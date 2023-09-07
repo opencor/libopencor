@@ -33,10 +33,7 @@ void solverApi()
         .value("SECOND_ORDER_RUNGE_KUTTA", libOpenCOR::Solver::Method::SECOND_ORDER_RUNGE_KUTTA);
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
-        .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
-        .function("type", &libOpenCOR::Solver::type)
-        .function("name", &libOpenCOR::Solver::name)
-        .function("properties", &libOpenCOR::Solver::properties);
+        .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create);
 
     EM_ASM({
         Module['Solver']['Type'] = Module['Solver.Type'];
@@ -49,4 +46,16 @@ void solverApi()
     // SolverForwardEuler API.
 
     emscripten::class_<libOpenCOR::SolverForwardEuler, emscripten::base<libOpenCOR::Solver>>("SolverForwardEuler");
+
+    // SolverInfo API.
+
+    emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
+        .smart_ptr<std::shared_ptr<libOpenCOR::SolverInfo>>("SolverInfo")
+        .function("type", &libOpenCOR::SolverInfo::type)
+        .function("name", &libOpenCOR::SolverInfo::name)
+        .function("properties", &libOpenCOR::SolverInfo::properties);
+
+    // SolverProperty API.
+
+    emscripten::class_<libOpenCOR::SolverProperty>("SolverProperty");
 }

@@ -18,10 +18,18 @@ limitations under the License.
 
 #include "libopencor/solverinfo.h"
 
+#include <string>
+
 namespace libOpenCOR {
 
 class SolverInfo::Impl
 {
+public:
+    Solver::Type mType = Solver::Type::ODE;
+    std::string mName;
+    std::vector<SolverPropertyPtr> mProperties;
+
+    explicit Impl(Solver::Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
 };
 
 } // namespace libOpenCOR

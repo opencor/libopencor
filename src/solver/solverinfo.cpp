@@ -18,14 +18,38 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverInfo::SolverInfo()
-    : mPimpl(new Impl())
+SolverInfo::Impl::Impl(Solver::Type pType, const std::string &pName,
+                       const std::vector<SolverPropertyPtr> &pProperties)
+    : mType(pType)
+    , mName(pName)
+    , mProperties(pProperties)
+{
+}
+
+SolverInfo::SolverInfo(Solver::Type pType, const std::string &pName,
+                       const std::vector<SolverPropertyPtr> &pProperties)
+    : mPimpl(new Impl(pType, pName, pProperties))
 {
 }
 
 SolverInfo::~SolverInfo()
 {
     delete mPimpl;
+}
+
+Solver::Type SolverInfo::type() const
+{
+    return mPimpl->mType;
+}
+
+std::string SolverInfo::name() const
+{
+    return mPimpl->mName;
+}
+
+std::vector<SolverPropertyPtr> SolverInfo::properties() const
+{
+    return mPimpl->mProperties;
 }
 
 } // namespace libOpenCOR

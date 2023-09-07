@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/export.h"
+#include "libopencor/solver.h"
 
 namespace libOpenCOR {
 
@@ -41,12 +41,43 @@ public:
     SolverInfo &operator=(const SolverInfo &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverInfo &operator=(SolverInfo &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
+    /**
+     * @brief Get the type of the solver.
+     *
+     * Return the type of the solver.
+     *
+     * @return The type, as a @ref Type, of the solver.
+     */
+
+    Solver::Type type() const;
+
+    /**
+     * @brief Get the name of the solver.
+     *
+     * Return the name of the solver.
+     *
+     * @return The name, as a @c std::string, of the solver.
+     */
+
+    std::string name() const;
+
+    /**
+     * @brief Get the properties of the solver.
+     *
+     * Return the properties of the solver.
+     *
+     * @return The properties, as a @c std::vector of @ref SolverProperty, of the solver.
+     */
+
+    std::vector<SolverPropertyPtr> properties() const;
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     Impl *mPimpl;
 
-    explicit SolverInfo(); /**< Constructor @private. */
+    explicit SolverInfo(Solver::Type pType, const std::string &pName,
+                        const std::vector<SolverPropertyPtr> &pProperties); /**< Constructor @private. */
 };
 
 } // namespace libOpenCOR

@@ -19,20 +19,11 @@ limitations under the License.
 #include "logger_p.h"
 
 #include "libopencor/solver.h"
-#include "libopencor/solverproperty.h"
 
 namespace libOpenCOR {
 
 class Solver::Impl: public Logger::Impl
 {
-public:
-    Type mType = Type::ODE;
-    std::string mName;
-    std::vector<SolverPropertyPtr> mProperties;
-
-    explicit Impl(Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
-
-    std::vector<std::string> properties() const;
 };
 
 } // namespace libOpenCOR

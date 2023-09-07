@@ -30,9 +30,9 @@ class LIBOPENCOR_EXPORT Solver: public Logger
 {
 public:
     /**
-     * @brief The type of a Solver.
+     * @brief The type of the Solver.
      *
-     * The type of a solver, i.e. whether it is an ODE or an NLA solver.
+     * The type of the solver, i.e. whether it is an ODE or an NLA solver.
      */
 
     enum class Type
@@ -42,9 +42,9 @@ public:
     };
 
     /**
-     * @brief The method used by a Solver.
+     * @brief The method used by the Solver.
      *
-     * The method used by a solver, i.e. whether it uses the CVODE, forward Euler, fourth-order Runge-Kutta, Heun,
+     * The method used by the solver, i.e. whether it uses the CVODE, forward Euler, fourth-order Runge-Kutta, Heun,
      * KINSOL, or second-order Runge-Kutta method.
      */
 
@@ -86,36 +86,6 @@ public:
      */
 
     static SolverPtr create(Method pMethod);
-
-    /**
-     * @brief Get the type of this solver.
-     *
-     * Return the type of this solver.
-     *
-     * @return The type, as a @ref Type, of this solver.
-     */
-
-    Type type() const;
-
-    /**
-     * @brief Get the name of this solver.
-     *
-     * Return the name of this solver.
-     *
-     * @return The name, as a @c std::string, of this solver.
-     */
-
-    std::string name() const;
-
-    /**
-     * @brief Get the properties of this solver.
-     *
-     * Return the properties of this solver.
-     *
-     * @return The properties, as a @c std::vector of a @c std::string, of this solver.
-     */
-
-    std::vector<std::string> properties() const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

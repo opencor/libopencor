@@ -24,8 +24,6 @@ namespace libOpenCOR {
 
 class SolverForwardEuler::Impl: public Solver::Impl
 {
-public:
-    explicit Impl();
 };
 
 } // namespace libOpenCOR
