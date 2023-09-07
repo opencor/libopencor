@@ -39,13 +39,6 @@ SolverProperty::~SolverProperty()
     delete mPimpl;
 }
 
-SolverPropertyPtr SolverProperty::create(Type pType, const std::string &pName,
-                                         const std::vector<std::string> &pListValues,
-                                         const SolverPropertyValue &pDefaultValue, bool pHasVoiValue)
-{
-    return std::shared_ptr<SolverProperty> {new SolverProperty(pType, pName, pListValues, pDefaultValue, pHasVoiValue)};
-}
-
 SolverProperty::Type SolverProperty::type() const
 {
     return mPimpl->mType;

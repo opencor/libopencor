@@ -21,20 +21,40 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverInfo class.
+ *
+ * The SolverInfo class is used to access various information about a solver.
+ */
+
 class LIBOPENCOR_EXPORT SolverProperty
 {
+    friend class Solver;
+
 public:
+    /**
+     * @brief The type of the @ref SolverProperty.
+     *
+     * The type of the solver property, i.e. whether it is a boolean, an integer, an integer greater than zero, an
+     * interger greater or equal to zero, a double, a double greater than zero, a double greater or equal to zero, or a
+     * list.
+     */
+
     enum class Type
     {
-        Boolean,
-        Integer,
-        IntegerGt0,
-        IntegerGe0,
-        Double,
-        DoubleGe0,
-        DoubleGt0,
-        List
+        Boolean, /**< The solver property is a boolean. */
+        Integer, /**< The solver property is an integer. */
+        IntegerGt0, /**< The solver property is an integer greater than zero. */
+        IntegerGe0, /**< The solver property is an integer greater or equal to zero. */
+        Double, /**< The solver property is a double. */
+        DoubleGt0, /**< The solver property is a double greater than zero. */
+        DoubleGe0, /**< The solver property is a double greater or equal to zero. */
+        List /**< The solver property is a list. */
     };
+
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
     SolverProperty() = delete;
     ~SolverProperty();
@@ -45,13 +65,54 @@ public:
     SolverProperty &operator=(const SolverProperty &pRhs) = delete;
     SolverProperty &operator=(SolverProperty &&pRhs) noexcept = delete;
 
-    static SolverPropertyPtr create(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
-                                    const SolverPropertyValue &pDefaultValue, bool pHasVoiValue);
+    /**
+     * @brief Get the type of the property.
+     *
+     * Return the type of the property.
+     *
+     * @return The type, as a @ref Type, of the property.
+     */
 
     Type type() const;
+
+    /**
+     * @brief Get the name of the property.
+     *
+     * Return the name of the property.
+     *
+     * @return The name, as a @c std::string, of the property.
+     */
+
     std::string name() const;
+
+    /**
+     * @brief Get the list of values the property can take.
+     *
+     * Return the name of the list of values the property can take.
+     *
+     * @return The list of values, as a @c std::vector of @c std::string, the property can take.
+     */
+
     std::vector<std::string> listValues() const;
+
+    /**
+     * @brief Get the default value of the property.
+     *
+     * Return the default value of the property.
+     *
+     * @return The default value, as a @c std::variant, of the property.
+     */
+
     SolverPropertyValue defaultValue() const;
+
+    /**
+     * @brief Get whether the property has VOI unit.
+     *
+     * Return whether the property has VOI unit.
+     *
+     * @return Where, as a @c bool, the property has VOI unit.
+     */
+
     bool hasVoiUnit() const;
 
 private:

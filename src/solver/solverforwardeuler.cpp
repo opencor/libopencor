@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "solverforwardeuler_p.h"
+#include "solverproperty_p.h"
 
 #include "libopencor/solverproperty.h"
 
@@ -22,7 +23,7 @@ namespace libOpenCOR {
 
 const bool SolverForwardEuler::Impl::sRegistered = // NOLINT
     Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler",
-                                 {SolverProperty::create(SolverProperty::Type::DoubleGt0, "Step", {}, 1.0, true)});
+                                 {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", {}, 1.0, true)});
 
 SolverForwardEuler::SolverForwardEuler()
     : Solver(new Impl())

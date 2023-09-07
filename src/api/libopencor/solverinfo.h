@@ -50,7 +50,7 @@ public:
      *
      * Return the type of the solver.
      *
-     * @return The type, as a @ref Type, of the solver.
+     * @return The type, as a @ref Solver::Type, of the solver.
      */
 
     Solver::Type type() const;

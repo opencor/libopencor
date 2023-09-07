@@ -30,7 +30,7 @@ class LIBOPENCOR_EXPORT Solver: public Logger
 {
 public:
     /**
-     * @brief The type of the Solver.
+     * @brief The type of the @ref Solver.
      *
      * The type of the solver, i.e. whether it is an ODE or an NLA solver.
      */
@@ -42,7 +42,7 @@ public:
     };
 
     /**
-     * @brief The method used by the Solver.
+     * @brief The method used by the @ref Solver.
      *
      * The method used by the solver, i.e. whether it uses the CVODE, forward Euler, fourth-order Runge-Kutta, Heun,
      * KINSOL, or second-order Runge-Kutta method.

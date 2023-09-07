@@ -19,6 +19,7 @@ limitations under the License.
 #include "logger_p.h"
 
 #include "libopencor/solver.h"
+#include "libopencor/solverproperty.h"
 
 #include <map>
 
@@ -28,6 +29,9 @@ class Solver::Impl: public Logger::Impl
 {
 public:
     static bool registerSolver(Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
+    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
+                                            const std::vector<std::string> &pListValues,
+                                            const SolverPropertyValue &pDefaultValue, bool pHasVoiValue);
 
     static std::map<std::string, SolverInfoPtr> sSolversInfo;
 };
