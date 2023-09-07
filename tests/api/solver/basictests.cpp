@@ -26,7 +26,7 @@ TEST(BasicSolverTest, solversInfo)
 
 TEST(BasicSolverTest, ForwardEulerMethod)
 {
-    auto solver = libOpenCOR::Solver::create(libOpenCOR::Solver::Method::FORWARD_EULER);
+    auto solver = libOpenCOR::Solver::create("Forward Euler");
 
     //---GRY---
     // EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);

@@ -24,23 +24,13 @@ void solverApi()
         .value("ODE", libOpenCOR::Solver::Type::ODE)
         .value("NLA", libOpenCOR::Solver::Type::NLA);
 
-    emscripten::enum_<libOpenCOR::Solver::Method>("Solver.Method")
-        .value("CVODE", libOpenCOR::Solver::Method::CVODE)
-        .value("FORWARD_EULER", libOpenCOR::Solver::Method::FORWARD_EULER)
-        .value("FOURTH_ORDER_RUNGE_KUTTA", libOpenCOR::Solver::Method::FOURTH_ORDER_RUNGE_KUTTA)
-        .value("HEUN", libOpenCOR::Solver::Method::HEUN)
-        .value("KINSOL", libOpenCOR::Solver::Method::KINSOL)
-        .value("SECOND_ORDER_RUNGE_KUTTA", libOpenCOR::Solver::Method::SECOND_ORDER_RUNGE_KUTTA);
-
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create);
 
     EM_ASM({
         Module['Solver']['Type'] = Module['Solver.Type'];
-        Module['Solver']['Method'] = Module['Solver.Method'];
 
         delete Module['Solver.Type'];
-        delete Module['Solver.Method'];
     });
 
     // SolverForwardEuler API.

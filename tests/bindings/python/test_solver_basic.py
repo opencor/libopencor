@@ -18,7 +18,7 @@ from utils import assert_strings
 
 
 def test_forward_euler_method():
-    solver = Solver(Solver.Method.ForwardEuler)
+    solver = Solver("Forward Euler")
 
     # ---GRY---
     # assert solver.type == Solver.Type.Ode

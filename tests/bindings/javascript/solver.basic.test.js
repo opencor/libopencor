@@ -21,9 +21,7 @@ const libopencor = await libOpenCOR();
 
 describe("Solver basic tests", () => {
   test("Forward Euler method", () => {
-    const solver = new libopencor.Solver(
-      libopencor.Solver.Method.FORWARD_EULER,
-    );
+    const solver = new libopencor.Solver("Forward Euler");
 
     //---GRY---
     // expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);

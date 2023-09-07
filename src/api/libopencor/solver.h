@@ -42,23 +42,6 @@ public:
     };
 
     /**
-     * @brief The method used by the @ref Solver.
-     *
-     * The method used by the solver, i.e. whether it uses the CVODE, forward Euler, fourth-order Runge-Kutta, Heun,
-     * KINSOL, or second-order Runge-Kutta method.
-     */
-
-    enum class Method
-    {
-        CVODE, /**< The solver uses the CVODE method. */
-        FORWARD_EULER, /**< The solver uses the forward Euler method. */
-        FOURTH_ORDER_RUNGE_KUTTA, /**< The solver uses the fourth-order Runge-Kutta method. */
-        HEUN, /**< The solver uses the Heun method. */
-        KINSOL, /**< The solver uses the KINSOL method. */
-        SECOND_ORDER_RUNGE_KUTTA /**< The solver uses the second-order Runge-Kutta method. */
-    };
-
-    /**
      * Constructors, destructor, and assignment operators.
      */
 
@@ -74,18 +57,19 @@ public:
     /**
      * @brief Create a @ref Solver object.
      *
-     * Factory method to create a @ref Solver object that uses the given @ref Method "":
+     * Factory method to create a @ref Solver object which name or KiSAO id is given:
      *
      * ```
-     * auto cvodeSolver = libOpenCOR::Solver::create(libOpenCOR::Solver::CVODE);
+     * auto cvodeSolver = libOpenCOR::Solver::create("CVODE");
+     * auto anotherCvodeSolver = libOpenCOR::Solver::create("KISAO:0000019");
      * ```
      *
-     * @param pMethod The @ref Method used by the solver.
+     * @param pNameOrKisaoId The name of the solver or its KiSAO id.
      *
      * @return A smart pointer to a @ref Solver object.
      */
 
-    static SolverPtr create(Method pMethod);
+    static SolverPtr create(const std::string &pNameOrKisaoId);
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

@@ -32,15 +32,6 @@ void solverApi(py::module_ &m)
         .value("Nla", libOpenCOR::Solver::Type::NLA)
         .export_values();
 
-    py::enum_<libOpenCOR::Solver::Method>(solver, "Method")
-        .value("Cvode", libOpenCOR::Solver::Method::CVODE)
-        .value("ForwardEuler", libOpenCOR::Solver::Method::FORWARD_EULER)
-        .value("FourthOrderRungeKutta", libOpenCOR::Solver::Method::FOURTH_ORDER_RUNGE_KUTTA)
-        .value("Heun", libOpenCOR::Solver::Method::HEUN)
-        .value("Kinsol", libOpenCOR::Solver::Method::KINSOL)
-        .value("SecondOrderRungeKutta", libOpenCOR::Solver::Method::SECOND_ORDER_RUNGE_KUTTA)
-        .export_values();
-
     solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.");
 
     // SolverForwardEuler API.

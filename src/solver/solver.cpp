@@ -24,15 +24,17 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-std::map<std::string, SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
+static std::map<std::string, SolverInfoPtr> sSolversInfo; // NOLINT
+static std::map<std::string, SolverCreate> sSolversCreate; // NOLINT
 
-bool Solver::Impl::registerSolver(Type pType, const std::string &pName,
+bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
                                   const std::vector<SolverPropertyPtr> &pProperties)
 {
     auto res = true;
 
     if (auto iter = sSolversInfo.find(pName); iter == sSolversInfo.end()) {
         sSolversInfo[pName] = SolverInfo::Impl::create(pType, pName, pProperties);
+        sSolversCreate[pName] = pCreate;
     } else {
         res = false;
     }
@@ -64,11 +66,13 @@ const Solver::Impl *Solver::pimpl() const
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
-SolverPtr Solver::create(Method pMethod)
+SolverPtr Solver::create(const std::string &pNameOrKisaoId)
 {
-    //---GRY---
-    (void)pMethod;
-    return std::shared_ptr<Solver> {new SolverForwardEuler {}};
+    if (auto iter = sSolversCreate.find(pNameOrKisaoId); iter != sSolversCreate.end()) {
+        return iter->second();
+    }
+
+    return {};
 }
 
 } // namespace libOpenCOR
