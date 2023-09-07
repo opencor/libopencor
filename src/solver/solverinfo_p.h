@@ -19,6 +19,7 @@ limitations under the License.
 #include "libopencor/solverinfo.h"
 
 #include <string>
+#include <vector>
 
 namespace libOpenCOR {
 
