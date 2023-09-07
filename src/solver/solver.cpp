@@ -15,10 +15,30 @@ limitations under the License.
 */
 
 #include "solver_p.h"
+#include "solverinfo_p.h"
 
 #include "libopencor/solverforwardeuler.h"
 
+#include <cassert>
+
 namespace libOpenCOR {
+
+std::map<std::string, SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
+
+bool Solver::Impl::registerSolver(Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties)
+{
+    auto res = true;
+
+    if (auto iter = sSolversInfo.find(pName); iter == sSolversInfo.end()) {
+        sSolversInfo[pName] = SolverInfo::Impl::create(pType, pName, pProperties);
+    } else {
+        res = false;
+    }
+
+    assert(res == true);
+
+    return res;
+}
 
 Solver::Solver(Impl *pPimpl)
     : Logger(pPimpl)

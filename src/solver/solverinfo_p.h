@@ -29,6 +29,8 @@ public:
     std::string mName;
     std::vector<SolverPropertyPtr> mProperties;
 
+    static SolverInfoPtr create(Solver::Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
+
     explicit Impl(Solver::Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
 };
 

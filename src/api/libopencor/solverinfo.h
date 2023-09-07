@@ -28,6 +28,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverInfo
 {
+    friend class Solver;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.

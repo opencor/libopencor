@@ -57,7 +57,7 @@ std::vector<unsigned char> charArrayToVector(const char *pContents)
 #    pragma clang diagnostic pop
 #endif
 {
-    return {pContents, pContents + strlen(pContents)}; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return {pContents, pContents + strlen(pContents)}; // NOLINT
 }
 
 } // namespace libOpenCOR
