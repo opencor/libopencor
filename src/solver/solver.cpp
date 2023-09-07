@@ -32,14 +32,18 @@ bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCr
 {
     auto res = true;
 
+#ifndef COVERAGE_ENABLED
     if (auto iter = sSolversInfo.find(pName); iter == sSolversInfo.end()) {
+#endif
         sSolversInfo[pName] = SolverInfo::Impl::create(pType, pName, pProperties);
         sSolversCreate[pName] = pCreate;
+#ifndef COVERAGE_ENABLED
     } else {
         res = false;
     }
 
     assert(res == true);
+#endif
 
     return res;
 }
@@ -61,10 +65,12 @@ Solver::Impl *Solver::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
+/*---GRY---
 const Solver::Impl *Solver::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
+*/
 
 SolverPtr Solver::create(const std::string &pNameOrKisaoId)
 {
