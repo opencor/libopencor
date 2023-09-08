@@ -32,7 +32,8 @@ void solverApi(py::module_ &m)
         .value("Nla", libOpenCOR::Solver::Type::NLA)
         .export_values();
 
-    solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.");
+    solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
+        .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.");
 
     // SolverInfo API.
 

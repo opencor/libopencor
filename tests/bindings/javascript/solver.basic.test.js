@@ -15,11 +15,16 @@ limitations under the License.
 */
 
 import libOpenCOR from "./libopencor.js";
-import { expectStrings } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
 describe("Solver basic tests", () => {
+  test("Solvers info", () => {
+    const solversInfo = libopencor.Solver.solversInfo();
+
+    expect(solversInfo.length).toBe(1);
+  });
+
   test("Unknown solver", () => {
     expect(new libopencor.Solver("Unknown solver")).toBe(null);
   });

@@ -23,7 +23,8 @@ namespace libOpenCOR {
 /**
  * @brief The Solver class.
  *
- * The Solver class is used to access various information about available solvers, as well as to create a solver.
+ * The Solver class is used to get various information about the solvers that are available, as well as to create a
+ * solver.
  */
 
 class LIBOPENCOR_EXPORT Solver: public Logger
@@ -70,6 +71,16 @@ public:
      */
 
     static SolverPtr create(const std::string &pNameOrKisaoId);
+
+    /**
+     * @brief Get get various information about the solvers that are available.
+     *
+     * Return various information about the solvers that are available.
+     *
+     * @return The information, as a @c std::vector of @ref SolverInfo, about the solvers that are available.
+     */
+
+    static std::vector<SolverInfoPtr> solversInfo();
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

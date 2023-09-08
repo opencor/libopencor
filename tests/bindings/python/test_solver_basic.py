@@ -14,7 +14,12 @@
 
 
 from libopencor import Solver
-from utils import assert_strings
+
+
+def test_solvers_info():
+    solvers_info = Solver.solvers_info()
+
+    assert len(solvers_info) == 1
 
 
 def test_unknown_solver():

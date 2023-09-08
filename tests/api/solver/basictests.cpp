@@ -16,9 +16,14 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
-#include "tests/utils.h"
-
 #include <libopencor>
+
+TEST(BasicSolverTest, solversInfo)
+{
+    auto solversInfo = libOpenCOR::Solver::solversInfo();
+
+    EXPECT_EQ(solversInfo.size(), 1);
+}
 
 TEST(BasicSolverTest, unknownSolver)
 {

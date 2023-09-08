@@ -81,4 +81,17 @@ SolverPtr Solver::create(const std::string &pNameOrKisaoId)
     return {};
 }
 
+std::vector<SolverInfoPtr> Solver::solversInfo()
+{
+    std::vector<SolverInfoPtr> res;
+
+    res.reserve(sSolversInfo.size());
+
+    for (const auto &solverInfo : sSolversInfo) {
+        res.push_back(solverInfo.second);
+    }
+
+    return res;
+}
+
 } // namespace libOpenCOR
