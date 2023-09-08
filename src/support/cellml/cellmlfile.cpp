@@ -73,7 +73,7 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
         }
 
         if (isCellmlFile) {
-            return std::shared_ptr<CellmlFile> {new CellmlFile {model}};
+            return CellmlFilePtr {new CellmlFile {model}};
         }
     }
 

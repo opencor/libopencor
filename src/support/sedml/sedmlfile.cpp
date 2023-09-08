@@ -74,7 +74,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
         if ((document->getNumErrors() == 0)
             || ((document->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
                 && (document->getError(0)->getErrorId() != libsbml::XMLContentEmpty))) {
-            return std::shared_ptr<SedmlFile> {new SedmlFile {document}};
+            return SedmlFilePtr {new SedmlFile {document}};
         }
 
         delete document;

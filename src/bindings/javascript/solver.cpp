@@ -37,7 +37,7 @@ void solverApi()
     // SolverInfo API.
 
     emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
-        .smart_ptr<std::shared_ptr<libOpenCOR::SolverInfo>>("SolverInfo")
+        .smart_ptr<libOpenCOR::SolverInfoPtr>("SolverInfo")
         .function("type", &libOpenCOR::SolverInfo::type)
         .function("name", &libOpenCOR::SolverInfo::name)
         .function("properties", &libOpenCOR::SolverInfo::properties);

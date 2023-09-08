@@ -52,7 +52,7 @@ SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const
                                                const std::vector<std::string> &pListValues,
                                                const SolverPropertyValue &pDefaultValue, bool pHasVoiValue)
 {
-    return std::shared_ptr<SolverProperty> {new SolverProperty(pType, pName, pListValues, pDefaultValue, pHasVoiValue)};
+    return SolverPropertyPtr {new SolverProperty(pType, pName, pListValues, pDefaultValue, pHasVoiValue)};
 }
 
 Solver::Solver(Impl *pPimpl)

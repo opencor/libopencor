@@ -25,7 +25,7 @@ void solverApi(py::module_ &m)
 {
     // Solver API.
 
-    py::class_<libOpenCOR::Solver, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::Solver>> solver(m, "Solver");
+    py::class_<libOpenCOR::Solver, libOpenCOR::Logger, libOpenCOR::SolverPtr> solver(m, "Solver");
 
     py::enum_<libOpenCOR::Solver::Type>(solver, "Type")
         .value("Ode", libOpenCOR::Solver::Type::ODE)
@@ -37,7 +37,7 @@ void solverApi(py::module_ &m)
 
     // SolverInfo API.
 
-    py::class_<libOpenCOR::SolverInfo, std::shared_ptr<libOpenCOR::SolverInfo>> solverInfo(m, "SolverInfo");
+    py::class_<libOpenCOR::SolverInfo, libOpenCOR::SolverInfoPtr> solverInfo(m, "SolverInfo");
 
     solverInfo.def_property_readonly("type", &libOpenCOR::SolverInfo::type, "Get the type of the Solver object.")
         .def_property_readonly("name", &libOpenCOR::SolverInfo::name, "Get the name of the Solver object.")
@@ -45,5 +45,5 @@ void solverApi(py::module_ &m)
 
     // SolverProperty API.
 
-    py::class_<libOpenCOR::SolverProperty, std::shared_ptr<libOpenCOR::SolverProperty>> solverProperty(m, "SolverProperty");
+    py::class_<libOpenCOR::SolverProperty, libOpenCOR::SolverPropertyPtr> solverProperty(m, "SolverProperty");
 }

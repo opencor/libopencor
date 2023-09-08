@@ -298,7 +298,7 @@ const Compiler::Impl *Compiler::pimpl() const
 
 CompilerPtr Compiler::create()
 {
-    return std::shared_ptr<Compiler> {new Compiler()};
+    return CompilerPtr {new Compiler()};
 }
 
 bool Compiler::compile(const std::string &pCode)

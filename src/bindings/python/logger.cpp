@@ -24,7 +24,7 @@ void loggerApi(py::module_ &m)
 {
     // Logger API.
 
-    py::class_<libOpenCOR::Logger, std::shared_ptr<libOpenCOR::Logger>> logger(m, "Logger");
+    py::class_<libOpenCOR::Logger, libOpenCOR::LoggerPtr> logger(m, "Logger");
 
     logger.def_property_readonly("has_issues", &libOpenCOR::Logger::hasIssues, "Return whether there are issues.")
         .def_property_readonly("issue_count", &libOpenCOR::Logger::issueCount, "Get the number of issues.")

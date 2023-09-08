@@ -66,7 +66,7 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
     auto *archive = new libcombine::CombineArchive();
 
     if (archive->initializeFromArchive(pFile->fileName())) {
-        return std::shared_ptr<CombineArchive> {new CombineArchive {archive}};
+        return CombineArchivePtr {new CombineArchive {archive}};
     }
 
     delete archive;

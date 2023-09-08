@@ -35,7 +35,7 @@ void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
 {
     auto index = mIssues.size();
 
-    mIssues.push_back(std::shared_ptr<Issue> {new Issue {pDescription, pType}});
+    mIssues.push_back(IssuePtr {new Issue {pDescription, pType}});
 
     mErrors.push_back(index);
     /*---GRY---

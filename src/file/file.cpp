@@ -178,7 +178,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
         return file->shared_from_this();
     }
 
-    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl}};
+    auto res = FilePtr {new File {pFileNameOrUrl}};
 
     res->pimpl()->checkType(res);
 

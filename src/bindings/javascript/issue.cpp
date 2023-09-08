@@ -26,7 +26,7 @@ void issueApi()
         .value("MESSAGE", libOpenCOR::Issue::Type::MESSAGE);
 
     emscripten::class_<libOpenCOR::Issue>("Issue")
-        .smart_ptr<std::shared_ptr<libOpenCOR::Issue>>("Issue")
+        .smart_ptr<libOpenCOR::IssuePtr>("Issue")
         .function("type", &libOpenCOR::Issue::type)
         .function("description", &libOpenCOR::Issue::description);
 

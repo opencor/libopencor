@@ -125,7 +125,7 @@ const CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl() const
 
 CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile)
 {
-    return std::shared_ptr<CellmlFileRuntime> {new CellmlFileRuntime {pCellmlFile}};
+    return CellmlFileRuntimePtr {new CellmlFileRuntime {pCellmlFile}};
 }
 
 } // namespace libOpenCOR
