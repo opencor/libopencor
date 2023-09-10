@@ -46,8 +46,29 @@ void solverApi()
 
     // SolverProperty API.
 
+    emscripten::enum_<libOpenCOR::SolverProperty::Type>("SolverProperty.Type")
+        .value("Boolean", libOpenCOR::SolverProperty::Type::Boolean)
+        .value("Integer", libOpenCOR::SolverProperty::Type::Integer)
+        .value("IntegerGt0", libOpenCOR::SolverProperty::Type::IntegerGt0)
+        .value("IntegerGe0", libOpenCOR::SolverProperty::Type::IntegerGe0)
+        .value("Double", libOpenCOR::SolverProperty::Type::Double)
+        .value("DoubleGt0", libOpenCOR::SolverProperty::Type::DoubleGt0)
+        .value("DoubleGe0", libOpenCOR::SolverProperty::Type::DoubleGe0)
+        .value("List", libOpenCOR::SolverProperty::Type::List);
+
     emscripten::class_<libOpenCOR::SolverProperty>("SolverProperty")
-        .smart_ptr<libOpenCOR::SolverPropertyPtr>("SolverProperty");
+        .smart_ptr<libOpenCOR::SolverPropertyPtr>("SolverProperty")
+        .function("type", &libOpenCOR::SolverProperty::type)
+        .function("name", &libOpenCOR::SolverProperty::name)
+        .function("listValues", &libOpenCOR::SolverProperty::listValues)
+        .function("defaultValue", &libOpenCOR::SolverProperty::defaultValue)
+        .function("hasVoiUnit", &libOpenCOR::SolverProperty::hasVoiUnit);
 
     emscripten::register_vector<libOpenCOR::SolverPropertyPtr>("SolverProperties");
+
+    EM_ASM({
+        Module['SolverProperty']['Type'] = Module['SolverProperty.Type'];
+
+        delete Module['SolverProperty.Type'];
+    });
 }
