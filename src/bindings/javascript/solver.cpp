@@ -26,7 +26,7 @@ void solverApi()
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
-        .function("solversInfo", &libOpenCOR::Solver::solversInfo);
+        .class_function("solversInfo", &libOpenCOR::Solver::solversInfo);
 
     EM_ASM({
         Module['Solver']['Type'] = Module['Solver.Type'];
@@ -42,7 +42,12 @@ void solverApi()
         .function("name", &libOpenCOR::SolverInfo::name)
         .function("properties", &libOpenCOR::SolverInfo::properties);
 
+    emscripten::register_vector<libOpenCOR::SolverInfoPtr>("SolversInfo");
+
     // SolverProperty API.
 
-    emscripten::class_<libOpenCOR::SolverProperty>("SolverProperty");
+    emscripten::class_<libOpenCOR::SolverProperty>("SolverProperty")
+        .smart_ptr<libOpenCOR::SolverPropertyPtr>("SolverProperty");
+
+    emscripten::register_vector<libOpenCOR::SolverPropertyPtr>("SolverProperties");
 }
