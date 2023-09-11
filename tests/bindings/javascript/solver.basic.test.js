@@ -22,7 +22,28 @@ describe("Solver basic tests", () => {
   test("Solvers info", () => {
     const solversInfo = libopencor.Solver.solversInfo();
 
-    expect(solversInfo.length).toBe(1);
+    expect(solversInfo.size()).toBe(1);
+
+    const solverInfo = solversInfo.get(0);
+
+    expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solverInfo.name()).toBe("Forward Euler");
+
+    const properties = solverInfo.properties();
+
+    expect(properties.size()).toBe(1);
+
+    const property = properties.get(0);
+
+    expect(property.type().value).toBe(
+      libopencor.SolverProperty.Type.DoubleGt0.value,
+    );
+    expect(property.name()).toBe("Step");
+    expect(property.hasVoiUnit()).toBe(true);
+
+    const listValues = property.listValues();
+
+    expect(listValues.size()).toBe(0);
   });
 
   test("Unknown", () => {

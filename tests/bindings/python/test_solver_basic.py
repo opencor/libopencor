@@ -13,13 +13,32 @@
 # limitations under the License.
 
 
-from libopencor import Solver
+from libopencor import Solver, SolverProperty
 
 
 def test_solvers_info():
     solvers_info = Solver.solvers_info()
 
     assert len(solvers_info) == 1
+
+    solver_info = solvers_info[0]
+
+    assert solver_info.type == Solver.Type.Ode
+    assert solver_info.name == "Forward Euler"
+
+    properties = solver_info.properties
+
+    assert len(properties) == 1
+
+    property = properties[0]
+
+    assert property.type == SolverProperty.Type.DoubleGt0
+    assert property.name == "Step"
+    assert property.hasVoiUnit == True
+
+    list_values = property.list_values
+
+    assert len(list_values) == 0
 
 
 def test_unknown():
