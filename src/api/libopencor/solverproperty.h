@@ -56,14 +56,14 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    SolverProperty() = delete;
-    ~SolverProperty() = default;
+    SolverProperty() = delete; /**< Constructor, @private. */
+    ~SolverProperty() = default; /**< Destructor, @private. */
 
-    SolverProperty(const SolverProperty &pOther) = delete;
-    SolverProperty(SolverProperty &&pOther) noexcept = delete;
+    SolverProperty(const SolverProperty &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverProperty(SolverProperty &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
-    SolverProperty &operator=(const SolverProperty &pRhs) = delete;
-    SolverProperty &operator=(SolverProperty &&pRhs) noexcept = delete;
+    SolverProperty &operator=(const SolverProperty &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverProperty &operator=(SolverProperty &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
      * @brief Get the type of the property.
