@@ -26,7 +26,7 @@ namespace libOpenCOR {
 class SolverInfo::Impl
 {
 public:
-    Solver::Type mType = Solver::Type::ODE;
+    Solver::Type mType;
     std::string mName;
     std::vector<SolverPropertyPtr> mProperties;
 

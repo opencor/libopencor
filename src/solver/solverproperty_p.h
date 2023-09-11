@@ -25,11 +25,11 @@ namespace libOpenCOR {
 class SolverProperty::Impl
 {
 public:
-    Type mType = Type::Double;
+    Type mType;
     std::string mName;
     std::vector<std::string> mListValues;
     std::string mDefaultValue;
-    bool mHasVoiUnit = false;
+    bool mHasVoiUnit;
 
     explicit Impl(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
                   const std::string &pDefaultValue, bool pHasVoiValue);
