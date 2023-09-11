@@ -19,8 +19,6 @@ limitations under the License.
 #include "solverinfo_p.h"
 #include "solverunknown_p.h"
 
-#include "libopencor/solverproperty.h"
-
 #include <cassert>
 
 namespace libOpenCOR {
