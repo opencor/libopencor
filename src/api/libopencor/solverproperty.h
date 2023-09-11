@@ -57,7 +57,7 @@ public:
      */
 
     SolverProperty() = delete;
-    ~SolverProperty();
+    ~SolverProperty() = default;
 
     SolverProperty(const SolverProperty &pOther) = delete;
     SolverProperty(SolverProperty &&pOther) noexcept = delete;

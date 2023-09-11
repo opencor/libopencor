@@ -12,12 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(TEST solver)
 
-list(APPEND TESTS ${TEST})
+from libopencor import Solver
 
-set(${TEST}_CATEGORY api)
-set(${TEST}_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/coveragetests.cpp
-)
+
+def test_solvers_info():
+    Solver.solvers_info()

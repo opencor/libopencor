@@ -37,6 +37,7 @@ TEST(BasicSolverTest, solversInfo)
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
     EXPECT_EQ(property->name(), "Step");
+    EXPECT_EQ(std::get<double>(property->defaultValue()), 1.0);
     EXPECT_TRUE(property->hasVoiUnit());
 
     auto listValues = property->listValues();
