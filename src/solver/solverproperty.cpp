@@ -34,6 +34,11 @@ SolverProperty::SolverProperty(Type pType, const std::string &pName, const std::
 {
 }
 
+SolverProperty::~SolverProperty()
+{
+    delete mPimpl;
+}
+
 SolverProperty::Type SolverProperty::type() const
 {
     return mPimpl->mType;

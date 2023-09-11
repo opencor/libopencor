@@ -37,6 +37,11 @@ SolverInfo::SolverInfo(Solver::Type pType, const std::string &pName,
 {
 }
 
+SolverInfo::~SolverInfo()
+{
+    delete mPimpl;
+}
+
 Solver::Type SolverInfo::type() const
 {
     return mPimpl->mType;

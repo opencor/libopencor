@@ -57,7 +57,7 @@ public:
      */
 
     SolverProperty() = delete; /**< Constructor, @private. */
-    ~SolverProperty() = default; /**< Destructor, @private. */
+    ~SolverProperty(); /**< Destructor, @private. */
 
     SolverProperty(const SolverProperty &pOther) = delete; /**< No copy constructor allowed, @private. */
     SolverProperty(SolverProperty &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */

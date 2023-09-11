@@ -37,7 +37,7 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SolverInfo() = default; /**< Destructor, @private. */
+    ~SolverInfo(); /**< Destructor, @private. */
 
     SolverInfo(const SolverInfo &pOther) = delete; /**< No copy constructor allowed, @private. */
     SolverInfo(SolverInfo &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
