@@ -35,6 +35,10 @@ void solverApi(py::module_ &m)
     solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
         .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.");
 
+    // SolverForwardEuler API.
+
+    py::class_<libOpenCOR::SolverForwardEuler, libOpenCOR::Solver, libOpenCOR::SolverForwardEulerPtr> solverForwardEuler(m, "SolverForwardEuler");
+
     // SolverInfo API.
 
     py::class_<libOpenCOR::SolverInfo, libOpenCOR::SolverInfoPtr> solverInfo(m, "SolverInfo");

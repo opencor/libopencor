@@ -34,6 +34,11 @@ void solverApi()
         delete Module['Solver.Type'];
     });
 
+    // SolverForwardEuler API.
+
+    emscripten::class_<libOpenCOR::SolverForwardEuler, emscripten::base<libOpenCOR::Solver>>("SolverForwardEuler")
+        .smart_ptr<libOpenCOR::SolverForwardEulerPtr>("SolverForwardEuler");
+
     // SolverInfo API.
 
     emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
