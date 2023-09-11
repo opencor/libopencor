@@ -29,7 +29,7 @@ std::vector<SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
 bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
                                   const std::vector<SolverPropertyPtr> &pProperties)
 {
-//---GRY--- ALSO HAVE A KISAO ID BASED ENTRY IN sSolversCreate...
+    //---GRY--- ALSO HAVE A KISAO ID BASED ENTRY IN sSolversCreate...
     auto res = true;
 
 #ifndef COVERAGE_ENABLED
