@@ -39,7 +39,7 @@ public:
                                const std::vector<SolverPropertyPtr> &pProperties);
     static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
                                             const std::vector<std::string> &pListValues,
-                                            const SolverPropertyValue &pDefaultValue, bool pHasVoiValue);
+                                            const std::string &pDefaultValue, bool pHasVoiValue);
 };
 
 } // namespace libOpenCOR

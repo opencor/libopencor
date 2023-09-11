@@ -28,11 +28,11 @@ public:
     Type mType = Type::Double;
     std::string mName;
     std::vector<std::string> mListValues;
-    SolverPropertyValue mDefaultValue = 0.0;
+    std::string mDefaultValue;
     bool mHasVoiUnit = false;
 
     explicit Impl(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
-                  const SolverPropertyValue &pDefaultValue, bool pHasVoiValue);
+                  const std::string &pDefaultValue, bool pHasVoiValue);
 };
 
 } // namespace libOpenCOR

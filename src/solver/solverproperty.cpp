@@ -19,7 +19,7 @@ limitations under the License.
 namespace libOpenCOR {
 
 SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
-                           const SolverPropertyValue &pDefaultValue, bool pHasVoiValue)
+                           const std::string &pDefaultValue, bool pHasVoiValue)
     : mType(pType)
     , mName(pName)
     , mListValues(pListValues)
@@ -29,7 +29,7 @@ SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::vect
 }
 
 SolverProperty::SolverProperty(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
-                               const SolverPropertyValue &pDefaultValue, bool pHasVoiValue)
+                               const std::string &pDefaultValue, bool pHasVoiValue)
     : mPimpl(new Impl(pType, pName, pListValues, pDefaultValue, pHasVoiValue))
 {
 }
@@ -49,7 +49,7 @@ std::vector<std::string> SolverProperty::listValues() const
     return mPimpl->mListValues;
 }
 
-SolverPropertyValue SolverProperty::defaultValue() const
+std::string SolverProperty::defaultValue() const
 {
     return mPimpl->mDefaultValue;
 }

@@ -50,7 +50,7 @@ bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCr
 
 SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pName,
                                                const std::vector<std::string> &pListValues,
-                                               const SolverPropertyValue &pDefaultValue, bool pHasVoiValue)
+                                               const std::string &pDefaultValue, bool pHasVoiValue)
 {
     return SolverPropertyPtr {new SolverProperty(pType, pName, pListValues, pDefaultValue, pHasVoiValue)};
 }
@@ -87,7 +87,7 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
         initialised = true;
 
         Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", SolverForwardEuler::Impl::create,
-                                     {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", {}, 1.0, true)});
+                                     {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", {}, "1.0", true)});
     }
 
     return Solver::Impl::sSolversInfo;

@@ -43,8 +43,6 @@ using SolverInfoPtr = std::shared_ptr<SolverInfo>; /**< Type definition for the 
 class SolverProperty;
 using SolverPropertyPtr = std::shared_ptr<SolverProperty>; /**< Type definition for the shared @ref SolverProperty pointer. */
 
-using SolverPropertyValue = std::variant<bool, int, double, std::string>; /**< Type definition for a @ref SolverProperty value. */
-
 class SolverUnknown;
 using SolverUnknownPtr = std::shared_ptr<SolverUnknown>; /**< Type definition for the shared @ref SolverUnknown pointer. */
 

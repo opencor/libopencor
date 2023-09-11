@@ -100,10 +100,10 @@ public:
      *
      * Return the default value of the property.
      *
-     * @return The default value, as a @c std::variant, of the property.
+     * @return The default value, as a @c std::string, of the property.
      */
 
-    SolverPropertyValue defaultValue() const;
+    std::string defaultValue() const;
 
     /**
      * @brief Get whether the property has VOI unit.
@@ -121,7 +121,7 @@ private:
     Impl *mPimpl;
 
     explicit SolverProperty(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
-                            const SolverPropertyValue &pDefaultValue, bool pHasVoiValue);
+                            const std::string &pDefaultValue, bool pHasVoiValue);
 };
 
 } // namespace libOpenCOR
