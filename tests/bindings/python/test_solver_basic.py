@@ -22,8 +22,8 @@ def test_solvers_info():
     assert len(solvers_info) == 1
 
 
-def test_unknown_solver():
-    assert Solver("Unknown solver") == None
+def test_unknown():
+    assert Solver("Unknown") == None
 
 
 def test_forward_euler():

@@ -25,12 +25,12 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(solversInfo.size(), 1);
 }
 
-TEST(BasicSolverTest, unknownSolver)
+TEST(BasicSolverTest, unknown)
 {
-    EXPECT_EQ(libOpenCOR::Solver::create("Uknown solver"), nullptr);
+    EXPECT_EQ(libOpenCOR::Solver::create("Uknown"), nullptr);
 }
 
-TEST(BasicSolverTest, ForwardEuler)
+TEST(BasicSolverTest, forwardEuler)
 {
     EXPECT_NE(libOpenCOR::Solver::create("Forward Euler"), nullptr);
 }

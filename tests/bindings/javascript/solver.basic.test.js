@@ -25,11 +25,11 @@ describe("Solver basic tests", () => {
     expect(solversInfo.length).toBe(1);
   });
 
-  test("Unknown solver", () => {
-    expect(new libopencor.Solver("Unknown solver")).toBe(null);
+  test("Unknown", () => {
+    expect(new libopencor.Solver("Unknown")).toBeNull();
   });
 
   test("Forward Euler", () => {
-    expect(new libopencor.Solver("Forward Euler")).toNotBe(null);
+    expect(new libopencor.Solver("Forward Euler")).not.toBeNull();
   });
 });
