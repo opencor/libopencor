@@ -100,7 +100,7 @@ protected:
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit Solver(Impl *pPimpl); /**< Constructor @private. */
+    explicit Solver(Impl *pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

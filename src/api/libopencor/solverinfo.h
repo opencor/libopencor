@@ -81,7 +81,7 @@ private:
     Impl *mPimpl;
 
     explicit SolverInfo(Solver::Type pType, const std::string &pName,
-                        const std::vector<SolverPropertyPtr> &pProperties); /**< Constructor @private. */
+                        const std::vector<SolverPropertyPtr> &pProperties); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

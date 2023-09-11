@@ -85,7 +85,7 @@ private:
 
     Impl *mPimpl;
 
-    explicit Issue(const std::string &pDescription, Type pType); /**< Constructor @private. */
+    explicit Issue(const std::string &pDescription, Type pType); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR
