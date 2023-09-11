@@ -15,9 +15,9 @@ limitations under the License.
 */
 
 #include "solver_p.h"
-#include "solverforwardeuler.h"
 #include "solverinfo_p.h"
 
+#include "libopencor/solverforwardeuler.h"
 #include "libopencor/solverproperty.h"
 
 #include <cassert>

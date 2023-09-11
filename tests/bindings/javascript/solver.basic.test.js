@@ -47,10 +47,14 @@ describe("Solver basic tests", () => {
   });
 
   test("Unknown", () => {
-    expect(new libopencor.Solver("Unknown")).toBeNull();
+    const solver = new libopencor.Solver("Unknown");
+
+    expect(solver.constructor.name).toBe("Solver");
   });
 
   test("Forward Euler", () => {
-    expect(new libopencor.Solver("Forward Euler")).not.toBeNull();
+    const solver = new libopencor.Solver("Forward Euler");
+
+    expect(solver.constructor.name).toBe("SolverForwardEuler");
   });
 });
