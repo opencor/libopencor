@@ -21,10 +21,6 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-const bool SolverForwardEuler::Impl::sRegistered = // NOLINT
-    Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", SolverForwardEuler::Impl::create,
-                                 {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", {}, 1.0, true)});
-
 SolverPtr SolverForwardEuler::Impl::create()
 {
     return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};

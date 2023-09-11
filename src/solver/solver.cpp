@@ -15,17 +15,17 @@ limitations under the License.
 */
 
 #include "solver_p.h"
+#include "solverforwardeuler_p.h"
 #include "solverinfo_p.h"
 
-#include "libopencor/solverforwardeuler.h"
 #include "libopencor/solverproperty.h"
 
 #include <cassert>
 
 namespace libOpenCOR {
 
-std::map<std::string, SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
 std::map<std::string, SolverCreate> Solver::Impl::sSolversCreate; // NOLINT
+std::vector<SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
 
 bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
                                   const std::vector<SolverPropertyPtr> &pProperties)
@@ -33,10 +33,10 @@ bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCr
     auto res = true;
 
 #ifndef COVERAGE_ENABLED
-    if (auto iter = Solver::Impl::sSolversInfo.find(pName); iter == Solver::Impl::sSolversInfo.end()) {
+    if (auto iter = Solver::Impl::sSolversCreate.find(pName); iter == Solver::Impl::sSolversCreate.end()) {
 #endif
-        Solver::Impl::sSolversInfo[pName] = SolverInfo::Impl::create(pType, pName, pProperties);
         Solver::Impl::sSolversCreate[pName] = pCreate;
+        Solver::Impl::sSolversInfo.push_back(SolverInfo::Impl::create(pType, pName, pProperties));
 #ifndef COVERAGE_ENABLED
     } else {
         res = false;
@@ -83,15 +83,16 @@ SolverPtr Solver::create(const std::string &pNameOrKisaoId)
 
 std::vector<SolverInfoPtr> Solver::solversInfo()
 {
-    std::vector<SolverInfoPtr> res;
+    static auto initialised = false;
 
-    res.reserve(Solver::Impl::sSolversInfo.size());
+    if (!initialised) {
+        initialised = true;
 
-    for (const auto &solverInfo : Solver::Impl::sSolversInfo) {
-        res.push_back(solverInfo.second);
+        Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", SolverForwardEuler::Impl::create,
+                                     {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", {}, 1.0, true)});
     }
 
-    return res;
+    return Solver::Impl::sSolversInfo;
 }
 
 } // namespace libOpenCOR

@@ -25,8 +25,6 @@ namespace libOpenCOR {
 class SolverForwardEuler::Impl: public Solver::Impl
 {
 public:
-    static const bool sRegistered;
-
     static SolverPtr create();
 };
 
