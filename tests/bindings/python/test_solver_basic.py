@@ -42,8 +42,12 @@ def test_solvers_info():
 
 
 def test_unknown():
-    assert Solver("Unknown") == None
+    solver = Solver("Unknown")
+
+    assert solver.is_valid == False
 
 
 def test_forward_euler():
-    assert Solver("Forward Euler") != None
+    solver = Solver("Forward Euler")
+
+    assert solver.is_valid == True

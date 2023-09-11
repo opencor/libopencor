@@ -33,6 +33,8 @@ public:
     static std::map<std::string, SolverCreate> sSolversCreate;
     static std::vector<SolverInfoPtr> sSolversInfo;
 
+    bool mIsValid = false;
+
     static bool registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
                                const std::vector<SolverPropertyPtr> &pProperties);
     static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,

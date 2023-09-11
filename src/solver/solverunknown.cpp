@@ -14,33 +14,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solverforwardeuler_p.h"
+#include "solverunknown_p.h"
 
 namespace libOpenCOR {
 
-SolverPtr SolverForwardEuler::Impl::create()
+SolverPtr SolverUnknown::Impl::create()
 {
-    return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};
+    return std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
 }
 
-SolverForwardEuler::SolverForwardEuler()
+SolverUnknown::SolverUnknown()
     : Solver(new Impl())
 {
-    pimpl()->mIsValid = true;
 }
 
-SolverForwardEuler::~SolverForwardEuler()
+SolverUnknown::~SolverUnknown()
 {
     delete pimpl();
 }
 
-SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
+SolverUnknown::Impl *SolverUnknown::pimpl()
 {
     return reinterpret_cast<Impl *>(Solver::pimpl());
 }
 
 /*---GRY---
-const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
+const SolverUnknown::Impl *SolverUnknown::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Solver::pimpl());
 }

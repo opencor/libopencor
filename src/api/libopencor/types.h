@@ -45,4 +45,7 @@ using SolverPropertyPtr = std::shared_ptr<SolverProperty>; /**< Type definition 
 
 using SolverPropertyValue = std::variant<bool, int, double, std::string>; /**< Type definition for a @ref SolverProperty value. */
 
+class SolverUnknown;
+using SolverUnknownPtr = std::shared_ptr<SolverUnknown>; /**< Type definition for the shared @ref SolverUnknown pointer. */
+
 } // namespace libcellml

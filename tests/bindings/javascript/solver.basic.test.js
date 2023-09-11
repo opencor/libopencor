@@ -49,12 +49,12 @@ describe("Solver basic tests", () => {
   test("Unknown", () => {
     const solver = new libopencor.Solver("Unknown");
 
-    expect(solver.constructor.name).toBe("Solver");
+    expect(solver.isValid()).toBe(false);
   });
 
   test("Forward Euler", () => {
     const solver = new libopencor.Solver("Forward Euler");
 
-    expect(solver.constructor.name).toBe("SolverForwardEuler");
+    expect(solver.isValid()).toBe(true);
   });
 });

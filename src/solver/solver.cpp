@@ -17,6 +17,7 @@ limitations under the License.
 #include "solver_p.h"
 #include "solverforwardeuler_p.h"
 #include "solverinfo_p.h"
+#include "solverunknown_p.h"
 
 #include "libopencor/solverproperty.h"
 
@@ -30,6 +31,7 @@ std::vector<SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
 bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
                                   const std::vector<SolverPropertyPtr> &pProperties)
 {
+//---GRY--- ALSO HAVE A KISAO ID BASED ENTRY IN sSolversCreate...
     auto res = true;
 
 #ifndef COVERAGE_ENABLED
@@ -65,12 +67,10 @@ Solver::Impl *Solver::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const Solver::Impl *Solver::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
 SolverPtr Solver::create(const std::string &pNameOrKisaoId)
 {
@@ -78,7 +78,7 @@ SolverPtr Solver::create(const std::string &pNameOrKisaoId)
         return iter->second();
     }
 
-    return {};
+    return SolverUnknown::Impl::create();
 }
 
 std::vector<SolverInfoPtr> Solver::solversInfo()
@@ -93,6 +93,11 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
     }
 
     return Solver::Impl::sSolversInfo;
+}
+
+bool Solver::isValid() const
+{
+    return pimpl()->mIsValid;
 }
 
 } // namespace libOpenCOR

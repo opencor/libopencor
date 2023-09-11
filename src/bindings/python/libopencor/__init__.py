@@ -25,6 +25,7 @@ from .module import (
     SolverInfo,
     SolverForwardEuler,
     SolverProperty,
+    SolverUnknown,
     # Version API.
     version,
     version_string,
@@ -56,6 +57,7 @@ __all__ = (
     "SolverInfo",
     "SolverForwardEuler",
     "SolverProperty",
+    "SolverUnknown",
     # Version API.
     "version",
     "version_string",

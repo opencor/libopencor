@@ -33,7 +33,8 @@ void solverApi(py::module_ &m)
         .export_values();
 
     solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
-        .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.");
+        .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.")
+        .def_property_readonly("is_valid", &libOpenCOR::Solver::isValid, "Get whether the Solver object is valid.");
 
     // SolverForwardEuler API.
 
@@ -67,4 +68,8 @@ void solverApi(py::module_ &m)
         .def_property_readonly("list_values", &libOpenCOR::SolverProperty::listValues, "Get the list of values of the SolverProperty object.")
         .def_property_readonly("default_value", &libOpenCOR::SolverProperty::defaultValue, "Get the default value of the SolverProperty object.")
         .def_property_readonly("has_voi_unit", &libOpenCOR::SolverProperty::hasVoiUnit, "Get whether the SolverProperty object has VOI unit.");
+
+    // SolverUnknown API.
+
+    py::class_<libOpenCOR::SolverUnknown, libOpenCOR::Solver, libOpenCOR::SolverUnknownPtr> solverUnknown(m, "SolverUnknown");
 }

@@ -73,7 +73,7 @@ public:
     static SolverPtr create(const std::string &pNameOrKisaoId);
 
     /**
-     * @brief Get get various information about the solvers that are available.
+     * @brief Return various information about the solvers that are available.
      *
      * Return various information about the solvers that are available.
      *
@@ -81,6 +81,16 @@ public:
      */
 
     static std::vector<SolverInfoPtr> solversInfo();
+
+    /**
+     * @brief Return whether the solver is valid.
+     *
+     * Return whether the solver is valid.
+     *
+     * @return @c true if the solver is valid, @c false otherwise.
+     */
+
+    bool isValid() const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

@@ -16,12 +16,16 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/solver.h"
-#include "libopencor/solverforwardeuler.h"
-#include "libopencor/solverinfo.h"
-#include "libopencor/solverproperty.h"
+#include "solver_p.h"
+
 #include "libopencor/solverunknown.h"
-#include "libopencor/version.h"
+
+namespace libOpenCOR {
+
+class SolverUnknown::Impl: public Solver::Impl
+{
+public:
+    static SolverPtr create();
+};
+
+} // namespace libOpenCOR

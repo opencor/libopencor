@@ -46,10 +46,14 @@ TEST(BasicSolverTest, solversInfo)
 
 TEST(BasicSolverTest, unknown)
 {
-    EXPECT_EQ(libOpenCOR::Solver::create("Uknown"), nullptr);
+    auto solver = libOpenCOR::Solver::create("Unknown");
+
+    EXPECT_FALSE(solver->isValid());
 }
 
 TEST(BasicSolverTest, forwardEuler)
 {
-    EXPECT_NE(libOpenCOR::Solver::create("Forward Euler"), nullptr);
+    auto solver = libOpenCOR::Solver::create("Forward Euler");
+
+    EXPECT_TRUE(solver->isValid());
 }

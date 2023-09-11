@@ -26,7 +26,8 @@ void solverApi()
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
-        .class_function("solversInfo", &libOpenCOR::Solver::solversInfo);
+        .class_function("solversInfo", &libOpenCOR::Solver::solversInfo)
+        .function("isValid", &libOpenCOR::Solver::isValid);
 
     EM_ASM({
         Module['Solver']['Type'] = Module['Solver.Type'];
