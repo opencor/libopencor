@@ -23,6 +23,25 @@ TEST(BasicSolverTest, solversInfo)
     auto solversInfo = libOpenCOR::Solver::solversInfo();
 
     EXPECT_EQ(solversInfo.size(), 1);
+
+    auto solverInfo = solversInfo[0];
+
+    EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solverInfo->name(), "Forward Euler");
+
+    auto properties = solverInfo->properties();
+
+    EXPECT_EQ(properties.size(), 1);
+
+    auto property = properties[0];
+
+    EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
+    EXPECT_EQ(property->name(), "Step");
+    EXPECT_TRUE(property->hasVoiUnit());
+
+    auto listValues = property->listValues();
+
+    EXPECT_EQ(listValues.size(), 0);
 }
 
 TEST(BasicSolverTest, unknown)
