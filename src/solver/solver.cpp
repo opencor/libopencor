@@ -24,8 +24,8 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-static std::map<std::string, SolverInfoPtr> sSolversInfo; // NOLINT
-static std::map<std::string, SolverCreate> sSolversCreate; // NOLINT
+std::map<std::string, SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
+std::map<std::string, SolverCreate> Solver::Impl::sSolversCreate; // NOLINT
 
 bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
                                   const std::vector<SolverPropertyPtr> &pProperties)
@@ -33,10 +33,10 @@ bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCr
     auto res = true;
 
 #ifndef COVERAGE_ENABLED
-    if (auto iter = sSolversInfo.find(pName); iter == sSolversInfo.end()) {
+    if (auto iter = Solver::Impl::sSolversInfo.find(pName); iter == Solver::Impl::sSolversInfo.end()) {
 #endif
-        sSolversInfo[pName] = SolverInfo::Impl::create(pType, pName, pProperties);
-        sSolversCreate[pName] = pCreate;
+        Solver::Impl::sSolversInfo[pName] = SolverInfo::Impl::create(pType, pName, pProperties);
+        Solver::Impl::sSolversCreate[pName] = pCreate;
 #ifndef COVERAGE_ENABLED
     } else {
         res = false;
@@ -74,7 +74,7 @@ const Solver::Impl *Solver::pimpl() const
 
 SolverPtr Solver::create(const std::string &pNameOrKisaoId)
 {
-    if (auto iter = sSolversCreate.find(pNameOrKisaoId); iter != sSolversCreate.end()) {
+    if (auto iter = Solver::Impl::sSolversCreate.find(pNameOrKisaoId); iter != Solver::Impl::sSolversCreate.end()) {
         return iter->second();
     }
 
@@ -85,9 +85,9 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
 {
     std::vector<SolverInfoPtr> res;
 
-    res.reserve(sSolversInfo.size());
+    res.reserve(Solver::Impl::sSolversInfo.size());
 
-    for (const auto &solverInfo : sSolversInfo) {
+    for (const auto &solverInfo : Solver::Impl::sSolversInfo) {
         res.push_back(solverInfo.second);
     }
 

@@ -30,6 +30,9 @@ using SolverCreate = SolverPtr (*)();
 class Solver::Impl: public Logger::Impl
 {
 public:
+    static std::map<std::string, SolverInfoPtr> sSolversInfo;
+    static std::map<std::string, SolverCreate> sSolversCreate;
+
     static bool registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
                                const std::vector<SolverPropertyPtr> &pProperties);
     static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
