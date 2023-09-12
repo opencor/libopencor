@@ -58,3 +58,30 @@ def test_forward_euler_by_kisao_id():
     solver = Solver("KISAO:0000030")
 
     assert solver.is_valid == True
+
+
+def test_properties():
+    solver = Solver("Forward Euler")
+
+    assert len(solver.properties) == 0
+
+    solver.set_property("Property #1", "1.0")
+    solver.set_property("Property #2", "2.0")
+    solver.set_property("Property #3", "3.0")
+
+    assert len(solver.properties) == 3
+
+    properties = solver.properties
+
+    solver.set_property("Property #4", "4.0")
+    solver.set_property("Property #5", "5.0")
+
+    assert len(solver.properties) == 5
+
+    solver.set_properties(properties)
+
+    assert len(solver.properties) == 3
+
+    assert solver.property("Property #1") == "1.0"
+    assert solver.property("Property #2") == "2.0"
+    assert solver.property("Property #3") == "3.0"

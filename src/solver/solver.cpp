@@ -45,6 +45,26 @@ SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const
     return SolverPropertyPtr {new SolverProperty(pType, pName, pListValues, pDefaultValue, pHasVoiValue)};
 }
 
+std::string Solver::Impl::property(const std::string &pName)
+{
+    return mProperties[pName];
+}
+
+void Solver::Impl::setProperty(const std::string &pName, const std::string &pValue)
+{
+    mProperties[pName] = pValue;
+}
+
+std::map<std::string, std::string> Solver::Impl::properties() const
+{
+    return mProperties;
+}
+
+void Solver::Impl::setProperties(const std::map<std::string, std::string> &pProperties)
+{
+    mProperties = pProperties;
+}
+
 Solver::Solver(Impl *pPimpl)
     : Logger(pPimpl)
 {
@@ -90,6 +110,26 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
 bool Solver::isValid() const
 {
     return pimpl()->mIsValid;
+}
+
+std::string Solver::property(const std::string &pName)
+{
+    return pimpl()->property(pName);
+}
+
+void Solver::setProperty(const std::string &pName, const std::string &pValue)
+{
+    pimpl()->setProperty(pName, pValue);
+}
+
+std::map<std::string, std::string> Solver::properties() const
+{
+    return pimpl()->properties();
+}
+
+void Solver::setProperties(const std::map<std::string, std::string> &pProperties)
+{
+    pimpl()->setProperties(pProperties);
 }
 
 } // namespace libOpenCOR

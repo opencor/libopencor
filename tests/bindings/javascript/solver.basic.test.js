@@ -64,4 +64,31 @@ describe("Solver basic tests", () => {
 
     expect(solver.isValid()).toBe(true);
   });
+
+  test("Properties", () => {
+    const solver = new libopencor.Solver("Forward Euler");
+
+    expect(solver.properties().size()).toBe(0);
+
+    solver.setProperty("Property #1", "1.0");
+    solver.setProperty("Property #2", "2.0");
+    solver.setProperty("Property #3", "3.0");
+
+    expect(solver.properties().size()).toBe(3);
+
+    const properties = solver.properties();
+
+    solver.setProperty("Property #4", "4.0");
+    solver.setProperty("Property #5", "5.0");
+
+    expect(solver.properties().size()).toBe(5);
+
+    solver.setProperties(properties);
+
+    expect(solver.properties().size()).toBe(3);
+
+    expect(solver.property("Property #1")).toBe("1.0");
+    expect(solver.property("Property #2")).toBe("2.0");
+    expect(solver.property("Property #3")).toBe("3.0");
+  });
 });

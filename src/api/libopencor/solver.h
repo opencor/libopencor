@@ -18,6 +18,7 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -76,9 +77,9 @@ public:
     static SolverPtr create(const std::string &pNameOrKisaoId);
 
     /**
-     * @brief Return various information about the solvers that are available.
+     * @brief Get various information about the solvers that are available.
      *
-     * Return various information about the solvers that are available.
+     * Get various information about the solvers that are available.
      *
      * @return The information, as a @c std::vector of @ref SolverInfo, about the solvers that are available.
      */
@@ -94,6 +95,49 @@ public:
      */
 
     bool isValid() const;
+
+    /**
+     * @brief Get the value of a property of this solver.
+     *
+     * Get the value of a property of this solver.
+     *
+     * @param pName The name, as a @c std::string, of a property.
+     *
+     * @return The value, as a @c std::string, of the property.
+     */
+
+    std::string property(const std::string &pName);
+
+    /**
+     * @brief Set the value of a property of this solver.
+     *
+     * Set the value of a property of this solver.
+     *
+     * @param pName The name, as a @c std::string, of a property.
+     * @param pValue The value, as a @c std::string, of a property.
+     */
+
+    void setProperty(const std::string &pName, const std::string &pValue);
+
+    /**
+     * @brief Get the properties of this solver.
+     *
+     * Get the properties of this solver.
+     *
+     * @return The properties, as a @c std::map of @c std::string, of this solver.
+     */
+
+    std::map<std::string, std::string> properties() const;
+
+    /**
+     * @brief Set the properties of this solver.
+     *
+     * Set the properties of this solver, replacing all the previous properties, if any.
+     *
+     * @param pProperties The properties, as a @c std::map of @c std::string, of this solver.
+     */
+
+    void setProperties(const std::map<std::string, std::string> &pProperties);
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

@@ -65,3 +65,31 @@ TEST(BasicSolverTest, forwardEulerByKisaoId)
 
     EXPECT_TRUE(solver->isValid());
 }
+
+TEST(BasicSolverTest, properties)
+{
+    auto solver = libOpenCOR::Solver::create("Forward Euler");
+
+    EXPECT_EQ(solver->properties().size(), 0);
+
+    solver->setProperty("Property #1", "1.0");
+    solver->setProperty("Property #2", "2.0");
+    solver->setProperty("Property #3", "3.0");
+
+    EXPECT_EQ(solver->properties().size(), 3);
+
+    auto properties = solver->properties();
+
+    solver->setProperty("Property #4", "4.0");
+    solver->setProperty("Property #5", "5.0");
+
+    EXPECT_EQ(solver->properties().size(), 5);
+
+    solver->setProperties(properties);
+
+    EXPECT_EQ(solver->properties().size(), 3);
+
+    EXPECT_EQ(solver->property("Property #1"), "1.0");
+    EXPECT_EQ(solver->property("Property #2"), "2.0");
+    EXPECT_EQ(solver->property("Property #3"), "3.0");
+}

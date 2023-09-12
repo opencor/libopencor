@@ -34,7 +34,11 @@ void solverApi(py::module_ &m)
 
     solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
         .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.")
-        .def_property_readonly("is_valid", &libOpenCOR::Solver::isValid, "Get whether the Solver object is valid.");
+        .def_property_readonly("is_valid", &libOpenCOR::Solver::isValid, "Get whether the Solver object is valid.")
+        .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of the Solver object.")
+        .def("set_properties", &libOpenCOR::Solver::setProperties, "Set the properties of the Solver object.")
+        .def("property", &libOpenCOR::Solver::property, "Get the property of the Solver object.")
+        .def("set_property", &libOpenCOR::Solver::setProperty, "Set the property of the Solver object.");
 
     // SolverInfo API.
 
