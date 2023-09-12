@@ -19,7 +19,7 @@ import libOpenCOR from "./libopencor.js";
 const libopencor = await libOpenCOR();
 
 describe("Coverage basic tests", () => {
-  test("Solvers info", () => {
+  test("Solvers info already initialised", () => {
     libopencor.Solver.solversInfo();
   });
 });

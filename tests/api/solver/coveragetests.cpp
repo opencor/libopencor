@@ -18,7 +18,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(CoverageSolverTest, solversInfo)
+TEST(CoverageSolverTest, solversInfoAlreadyInitialised)
 {
     libOpenCOR::Solver::solversInfo();
 }

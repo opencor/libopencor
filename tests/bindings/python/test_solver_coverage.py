@@ -16,5 +16,5 @@
 from libopencor import Solver
 
 
-def test_solvers_info():
+def test_solvers_info_already_initialised():
     Solver.solvers_info()

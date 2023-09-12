@@ -171,9 +171,7 @@ set(HEADER_FILES
     ${VERSION_HEADER_FILE}
 )
 
-include_directories(.
-                    file
-                    logger
+include_directories(logger
                     misc
                     support/cellml
                     support/combine
