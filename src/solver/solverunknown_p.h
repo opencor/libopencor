@@ -17,8 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "solver_p.h"
-
-#include "libopencor/solverunknown.h"
+#include "solverunknown.h"
 
 namespace libOpenCOR {
 

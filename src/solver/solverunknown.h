@@ -16,10 +16,30 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
 #include "libopencor/solver.h"
-#include "libopencor/solverinfo.h"
-#include "libopencor/solverproperty.h"
-#include "libopencor/version.h"
+
+namespace libOpenCOR {
+
+class LIBOPENCOR_EXPORT SolverUnknown: public Solver
+{
+    friend class Solver;
+
+public:
+    ~SolverUnknown() override;
+
+    SolverUnknown(const SolverUnknown &pOther) = delete;
+    SolverUnknown(SolverUnknown &&pOther) noexcept = delete;
+
+    SolverUnknown &operator=(const SolverUnknown &pRhs) = delete;
+    SolverUnknown &operator=(SolverUnknown &&pRhs) noexcept = delete;
+
+private:
+    class Impl;
+
+    explicit SolverUnknown();
+
+    Impl *pimpl();
+    const Impl *pimpl() const;
+};
+
+} // namespace libOpenCOR
