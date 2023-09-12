@@ -19,33 +19,23 @@ limitations under the License.
 #include "solverinfo_p.h"
 #include "solverunknown_p.h"
 
-#include <cassert>
-
 namespace libOpenCOR {
 
 std::map<std::string, SolverCreate> Solver::Impl::sSolversCreate; // NOLINT
 std::vector<SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
 
-bool Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
+void Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
                                   const std::vector<SolverPropertyPtr> &pProperties)
 {
     //---GRY--- ALSO HAVE A KISAO ID BASED ENTRY IN sSolversCreate...
-    auto res = true;
-
 #ifndef COVERAGE_ENABLED
     if (auto iter = Solver::Impl::sSolversCreate.find(pName); iter == Solver::Impl::sSolversCreate.end()) {
 #endif
         Solver::Impl::sSolversCreate[pName] = pCreate;
         Solver::Impl::sSolversInfo.push_back(SolverInfo::Impl::create(pType, pName, pProperties));
 #ifndef COVERAGE_ENABLED
-    } else {
-        res = false;
     }
-
-    assert(res == true);
 #endif
-
-    return res;
 }
 
 SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pName,
