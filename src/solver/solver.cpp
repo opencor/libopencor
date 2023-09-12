@@ -77,7 +77,11 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
         initialised = true;
 
         Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", "KISAO:0000030", SolverForwardEuler::Impl::create,
-                                     {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", {}, "1.0", true)});
+                                     {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0,
+                                                                   SolverForwardEuler::StepId,
+                                                                   {},
+                                                                   std::to_string(SolverForwardEuler::StepDefaultValue),
+                                                                   true)});
     }
 
     return Solver::Impl::sSolversInfo;

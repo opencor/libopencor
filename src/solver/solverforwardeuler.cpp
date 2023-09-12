@@ -18,6 +18,8 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+const std::string SolverForwardEuler::StepId = "Step"; // NOLINT
+
 SolverPtr SolverForwardEuler::Impl::create()
 {
     return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};

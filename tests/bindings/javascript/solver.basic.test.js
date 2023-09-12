@@ -39,7 +39,7 @@ describe("Solver basic tests", () => {
       libopencor.SolverProperty.Type.DoubleGt0.value,
     );
     expect(property.name()).toBe("Step");
-    expect(property.defaultValue()).toBe("1.0");
+    expect(property.defaultValue()).toBe("1.000000");
     expect(property.hasVoiUnit()).toBe(true);
 
     const listValues = property.listValues();

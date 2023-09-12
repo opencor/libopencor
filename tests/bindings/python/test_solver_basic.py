@@ -34,7 +34,7 @@ def test_solvers_info():
 
     assert property.type == SolverProperty.Type.DoubleGt0
     assert property.name == "Step"
-    assert property.default_value == "1.0"
+    assert property.default_value == "1.000000"
     assert property.has_voi_unit == True
 
     list_values = property.list_values
