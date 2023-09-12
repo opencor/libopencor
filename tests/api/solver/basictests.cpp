@@ -52,9 +52,16 @@ TEST(BasicSolverTest, unknown)
     EXPECT_FALSE(solver->isValid());
 }
 
-TEST(BasicSolverTest, forwardEuler)
+TEST(BasicSolverTest, forwardEulerByName)
 {
     auto solver = libOpenCOR::Solver::create("Forward Euler");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, forwardEulerByKisaoId)
+{
+    auto solver = libOpenCOR::Solver::create("KISAO:0000030");
 
     EXPECT_TRUE(solver->isValid());
 }

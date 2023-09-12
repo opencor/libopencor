@@ -24,14 +24,14 @@ namespace libOpenCOR {
 std::map<std::string, SolverCreate> Solver::Impl::sSolversCreate; // NOLINT
 std::vector<SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
 
-void Solver::Impl::registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
-                                  const std::vector<SolverPropertyPtr> &pProperties)
+void Solver::Impl::registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId,
+                                  SolverCreate pCreate, const std::vector<SolverPropertyPtr> &pProperties)
 {
-    //---GRY--- ALSO HAVE A KISAO ID BASED ENTRY IN sSolversCreate...
 #ifndef COVERAGE_ENABLED
     if (auto iter = Solver::Impl::sSolversCreate.find(pName); iter == Solver::Impl::sSolversCreate.end()) {
 #endif
         Solver::Impl::sSolversCreate[pName] = pCreate;
+        Solver::Impl::sSolversCreate[pKisaoId] = pCreate;
         Solver::Impl::sSolversInfo.push_back(SolverInfo::Impl::create(pType, pName, pProperties));
 #ifndef COVERAGE_ENABLED
     }
@@ -76,7 +76,7 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
     if (!initialised) {
         initialised = true;
 
-        Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", SolverForwardEuler::Impl::create,
+        Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", "KISAO:0000030", SolverForwardEuler::Impl::create,
                                      {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", {}, "1.0", true)});
     }
 

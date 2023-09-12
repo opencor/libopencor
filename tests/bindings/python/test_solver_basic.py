@@ -48,7 +48,13 @@ def test_unknown():
     assert solver.is_valid == False
 
 
-def test_forward_euler():
+def test_forward_euler_by_name():
     solver = Solver("Forward Euler")
+
+    assert solver.is_valid == True
+
+
+def test_forward_euler_by_kisao_id():
+    solver = Solver("KISAO:0000030")
 
     assert solver.is_valid == True

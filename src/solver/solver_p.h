@@ -35,7 +35,7 @@ public:
 
     bool mIsValid = false;
 
-    static void registerSolver(Type pType, const std::string &pName, SolverCreate pCreate,
+    static void registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId, SolverCreate pCreate,
                                const std::vector<SolverPropertyPtr> &pProperties);
     static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
                                             const std::vector<std::string> &pListValues,

@@ -53,8 +53,14 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(false);
   });
 
-  test("Forward Euler", () => {
+  test("Forward Euler by name", () => {
     const solver = new libopencor.Solver("Forward Euler");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("Forward Euler by KiSAO id", () => {
+    const solver = new libopencor.Solver("KISAO:0000030");
 
     expect(solver.isValid()).toBe(true);
   });
