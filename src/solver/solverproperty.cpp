@@ -34,10 +34,12 @@ SolverProperty::SolverProperty(Type pType, const std::string &pName, const std::
 {
 }
 
+#ifndef COVERAGE_ENABLED
 SolverProperty::~SolverProperty()
 {
     delete mPimpl;
 }
+#endif
 
 SolverProperty::Type SolverProperty::type() const
 {

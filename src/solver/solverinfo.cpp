@@ -37,10 +37,12 @@ SolverInfo::SolverInfo(Solver::Type pType, const std::string &pName,
 {
 }
 
+#ifndef COVERAGE_ENABLED
 SolverInfo::~SolverInfo()
 {
     delete mPimpl;
 }
+#endif
 
 Solver::Type SolverInfo::type() const
 {

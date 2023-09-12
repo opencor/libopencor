@@ -57,7 +57,11 @@ public:
      */
 
     SolverProperty() = delete; /**< Constructor, @private. */
+#ifdef COVERAGE_ENABLED
+    ~SolverProperty() = default; /**< Destructor, @private. */
+#else
     ~SolverProperty(); /**< Destructor, @private. */
+#endif
 
     SolverProperty(const SolverProperty &pOther) = delete; /**< No copy constructor allowed, @private. */
     SolverProperty(SolverProperty &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */

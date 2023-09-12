@@ -37,7 +37,11 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
+#ifdef COVERAGE_ENABLED
+    ~SolverInfo() = default; /**< Destructor, @private. */
+#else
     ~SolverInfo(); /**< Destructor, @private. */
+#endif
 
     SolverInfo(const SolverInfo &pOther) = delete; /**< No copy constructor allowed, @private. */
     SolverInfo(SolverInfo &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
