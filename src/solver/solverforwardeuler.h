@@ -25,7 +25,6 @@ class LIBOPENCOR_EXPORT SolverForwardEuler: public Solver
     friend class Solver;
 
 public:
-    static const std::string StepId;
     static constexpr double StepDefaultValue = 1.0;
 
     ~SolverForwardEuler() override;

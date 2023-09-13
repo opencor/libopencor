@@ -18,12 +18,13 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverInfoPtr SolverInfo::Impl::create(Solver::Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties)
+SolverInfoPtr SolverInfo::Impl::create(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
+                                       const std::vector<SolverPropertyPtr> &pProperties)
 {
     return SolverInfoPtr {new SolverInfo {pType, pName, pProperties}};
 }
 
-SolverInfo::Impl::Impl(Solver::Type pType, const std::string &pName,
+SolverInfo::Impl::Impl(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
                        const std::vector<SolverPropertyPtr> &pProperties)
     : mType(pType)
     , mName(pName)
@@ -31,7 +32,7 @@ SolverInfo::Impl::Impl(Solver::Type pType, const std::string &pName,
 {
 }
 
-SolverInfo::SolverInfo(Solver::Type pType, const std::string &pName,
+SolverInfo::SolverInfo(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
                        const std::vector<SolverPropertyPtr> &pProperties)
     : mPimpl(new Impl(pType, pName, pProperties))
 {
@@ -49,7 +50,7 @@ Solver::Type SolverInfo::type() const
     return mPimpl->mType;
 }
 
-std::string SolverInfo::name() const
+std::tuple<std::string, std::string> SolverInfo::name() const
 {
     return mPimpl->mName;
 }

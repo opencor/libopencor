@@ -18,8 +18,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
-                           const std::string &pDefaultValue, bool pHasVoiValue)
+SolverProperty::Impl::Impl(Type pType, const std::tuple<std::string, std::string> &pName,
+                           const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
+                           bool pHasVoiValue)
     : mType(pType)
     , mName(pName)
     , mListValues(pListValues)
@@ -28,8 +29,9 @@ SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::vect
 {
 }
 
-SolverProperty::SolverProperty(Type pType, const std::string &pName, const std::vector<std::string> &pListValues,
-                               const std::string &pDefaultValue, bool pHasVoiValue)
+SolverProperty::SolverProperty(Type pType, const std::tuple<std::string, std::string> &pName,
+                               const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
+                               bool pHasVoiValue)
     : mPimpl(new Impl(pType, pName, pListValues, pDefaultValue, pHasVoiValue))
 {
 }
@@ -46,7 +48,7 @@ SolverProperty::Type SolverProperty::type() const
     return mPimpl->mType;
 }
 
-std::string SolverProperty::name() const
+std::tuple<std::string, std::string> SolverProperty::name() const
 {
     return mPimpl->mName;
 }

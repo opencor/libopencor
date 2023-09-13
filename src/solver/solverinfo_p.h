@@ -27,12 +27,14 @@ class SolverInfo::Impl
 {
 public:
     Solver::Type mType;
-    std::string mName;
+    std::tuple<std::string, std::string> mName;
     std::vector<SolverPropertyPtr> mProperties;
 
-    static SolverInfoPtr create(Solver::Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
+    static SolverInfoPtr create(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
+                                const std::vector<SolverPropertyPtr> &pProperties);
 
-    explicit Impl(Solver::Type pType, const std::string &pName, const std::vector<SolverPropertyPtr> &pProperties);
+    explicit Impl(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
+                  const std::vector<SolverPropertyPtr> &pProperties);
 };
 
 } // namespace libOpenCOR

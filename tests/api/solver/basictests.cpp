@@ -27,7 +27,11 @@ TEST(BasicSolverTest, solversInfo)
     auto solverInfo = solversInfo[0];
 
     EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solverInfo->name(), "Forward Euler");
+
+    auto [nameId, nameKisaoId] = solverInfo->name();
+
+    EXPECT_EQ(nameId, "Forward Euler");
+    EXPECT_EQ(nameKisaoId, "KISAO:0000030");
 
     auto properties = solverInfo->properties();
 
@@ -36,7 +40,11 @@ TEST(BasicSolverTest, solversInfo)
     auto property = properties[0];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
-    EXPECT_EQ(property->name(), "Step");
+
+    std::tie(nameId, nameKisaoId) = property->name();
+
+    EXPECT_EQ(nameId, "Step");
+    EXPECT_EQ(nameKisaoId, "KISAO:0000483");
     EXPECT_EQ(property->defaultValue(), "1.000000");
     EXPECT_TRUE(property->hasVoiUnit());
 

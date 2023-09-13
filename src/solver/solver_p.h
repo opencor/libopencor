@@ -28,15 +28,17 @@ using SolverCreate = SolverPtr (*)();
 class Solver::Impl: public Logger::Impl
 {
 public:
+    static std::map<std::string, std::string> sSolversKisaoId;
     static std::map<std::string, SolverCreate> sSolversCreate;
     static std::vector<SolverInfoPtr> sSolversInfo;
 
     bool mIsValid = false;
     std::map<std::string, std::string> mProperties;
 
-    static void registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId, SolverCreate pCreate,
+    static void registerSolver(Type pType, const std::tuple<std::string, std::string> &pName, SolverCreate pCreate,
                                const std::vector<SolverPropertyPtr> &pProperties);
-    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
+    static SolverPropertyPtr createProperty(SolverProperty::Type pType,
+                                            const std::tuple<std::string, std::string> &pName,
                                             const std::vector<std::string> &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiValue);
 

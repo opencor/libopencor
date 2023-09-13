@@ -24,7 +24,7 @@ def test_solvers_info():
     solver_info = solvers_info[0]
 
     assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Forward Euler"
+    assert solver_info.name == ("Forward Euler", "KISAO:0000030")
 
     properties = solver_info.properties
 
@@ -33,7 +33,7 @@ def test_solvers_info():
     property = properties[0]
 
     assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
+    assert property.name == ("Step", "KISAO:0000483")
     assert property.default_value == "1.000000"
     assert property.has_voi_unit == True
 

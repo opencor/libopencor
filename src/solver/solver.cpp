@@ -21,24 +21,26 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+std::map<std::string, std::string> Solver::Impl::sSolversKisaoId; // NOLINT
 std::map<std::string, SolverCreate> Solver::Impl::sSolversCreate; // NOLINT
 std::vector<SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
 
-void Solver::Impl::registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId,
+void Solver::Impl::registerSolver(Type pType, const std::tuple<std::string, std::string> &pName,
                                   SolverCreate pCreate, const std::vector<SolverPropertyPtr> &pProperties)
 {
 #ifndef COVERAGE_ENABLED
-    if (auto iter = Solver::Impl::sSolversCreate.find(pName); iter == Solver::Impl::sSolversCreate.end()) {
+    if (auto iter = Solver::Impl::sSolversCreate.find(std::get<1>(pName)); iter == Solver::Impl::sSolversCreate.end()) {
 #endif
-        Solver::Impl::sSolversCreate[pName] = pCreate;
-        Solver::Impl::sSolversCreate[pKisaoId] = pCreate;
+        Solver::Impl::sSolversKisaoId[std::get<0>(pName)] = std::get<1>(pName);
+        Solver::Impl::sSolversCreate[std::get<1>(pName)] = pCreate;
         Solver::Impl::sSolversInfo.push_back(SolverInfo::Impl::create(pType, pName, pProperties));
 #ifndef COVERAGE_ENABLED
     }
 #endif
 }
 
-SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pName,
+SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType,
+                                               const std::tuple<std::string, std::string> &pName,
                                                const std::vector<std::string> &pListValues,
                                                const std::string &pDefaultValue, bool pHasVoiValue)
 {
@@ -82,7 +84,10 @@ const Solver::Impl *Solver::pimpl() const
 
 SolverPtr Solver::create(const std::string &pNameOrKisaoId)
 {
-    if (auto iter = Solver::Impl::sSolversCreate.find(pNameOrKisaoId); iter != Solver::Impl::sSolversCreate.end()) {
+    auto kisaoIdIter = Solver::Impl::sSolversKisaoId.find(pNameOrKisaoId);
+    auto kisaoId = (kisaoIdIter != Solver::Impl::sSolversKisaoId.end()) ? kisaoIdIter->second : pNameOrKisaoId;
+
+    if (auto iter = Solver::Impl::sSolversCreate.find(kisaoId); iter != Solver::Impl::sSolversCreate.end()) {
         return iter->second();
     }
 
@@ -96,9 +101,11 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
     if (!initialised) {
         initialised = true;
 
-        Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", "KISAO:0000030", SolverForwardEuler::Impl::create,
+        Solver::Impl::registerSolver(Solver::Type::ODE,
+                                     std::make_tuple("Forward Euler", "KISAO:0000030"),
+                                     SolverForwardEuler::Impl::create,
                                      {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0,
-                                                                   SolverForwardEuler::StepId,
+                                                                   std::make_tuple("Step", "KISAO:0000483"),
                                                                    {},
                                                                    std::to_string(SolverForwardEuler::StepDefaultValue),
                                                                    true)});
