@@ -25,26 +25,25 @@ std::map<std::string, std::string> Solver::Impl::sSolversKisaoId; // NOLINT
 std::map<std::string, SolverCreate> Solver::Impl::sSolversCreate; // NOLINT
 std::vector<SolverInfoPtr> Solver::Impl::sSolversInfo; // NOLINT
 
-void Solver::Impl::registerSolver(Type pType, const std::tuple<std::string, std::string> &pName,
+void Solver::Impl::registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId,
                                   SolverCreate pCreate, const std::vector<SolverPropertyPtr> &pProperties)
 {
 #ifndef COVERAGE_ENABLED
-    if (auto iter = Solver::Impl::sSolversCreate.find(std::get<1>(pName)); iter == Solver::Impl::sSolversCreate.end()) {
+    if (auto iter = Solver::Impl::sSolversCreate.find(pKisaoId); iter == Solver::Impl::sSolversCreate.end()) {
 #endif
-        Solver::Impl::sSolversKisaoId[std::get<0>(pName)] = std::get<1>(pName);
-        Solver::Impl::sSolversCreate[std::get<1>(pName)] = pCreate;
-        Solver::Impl::sSolversInfo.push_back(SolverInfo::Impl::create(pType, pName, pProperties));
+        Solver::Impl::sSolversKisaoId[pName] = pKisaoId;
+        Solver::Impl::sSolversCreate[pKisaoId] = pCreate;
+        Solver::Impl::sSolversInfo.push_back(SolverInfo::Impl::create(pType, pName, pKisaoId, pProperties));
 #ifndef COVERAGE_ENABLED
     }
 #endif
 }
 
-SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType,
-                                               const std::tuple<std::string, std::string> &pName,
-                                               const std::vector<std::string> &pListValues,
+SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pName,
+                                               const std::string &pKisaoId, const std::vector<std::string> &pListValues,
                                                const std::string &pDefaultValue, bool pHasVoiValue)
 {
-    return SolverPropertyPtr {new SolverProperty(pType, pName, pListValues, pDefaultValue, pHasVoiValue)};
+    return SolverPropertyPtr {new SolverProperty(pType, pName, pKisaoId, pListValues, pDefaultValue, pHasVoiValue)};
 }
 
 std::string Solver::Impl::property(const std::string &pName)
@@ -101,11 +100,9 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
     if (!initialised) {
         initialised = true;
 
-        Solver::Impl::registerSolver(Solver::Type::ODE,
-                                     std::make_tuple("Forward Euler", "KISAO:0000030"),
+        Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", "KISAO:0000030",
                                      SolverForwardEuler::Impl::create,
-                                     {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0,
-                                                                   std::make_tuple("Step", "KISAO:0000483"),
+                                     {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", "KISAO:0000483",
                                                                    {},
                                                                    std::to_string(SolverForwardEuler::StepDefaultValue),
                                                                    true)});

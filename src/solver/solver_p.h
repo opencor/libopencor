@@ -35,11 +35,10 @@ public:
     bool mIsValid = false;
     std::map<std::string, std::string> mProperties;
 
-    static void registerSolver(Type pType, const std::tuple<std::string, std::string> &pName, SolverCreate pCreate,
+    static void registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId, SolverCreate pCreate,
                                const std::vector<SolverPropertyPtr> &pProperties);
-    static SolverPropertyPtr createProperty(SolverProperty::Type pType,
-                                            const std::tuple<std::string, std::string> &pName,
-                                            const std::vector<std::string> &pListValues,
+    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
+                                            const std::string &pKisaoId, const std::vector<std::string> &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiValue);
 
     std::string property(const std::string &pName);

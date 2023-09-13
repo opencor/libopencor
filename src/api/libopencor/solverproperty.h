@@ -81,12 +81,22 @@ public:
     /**
      * @brief Get the name of the property.
      *
-     * Return the name of the property, both as a normal name and as a KiSAO id.
+     * Return the name of the property.
      *
-     * @return The name, as a @c std::tuple of two @c std::string, of the property.
+     * @return The name, as a @c std::string, of the property.
      */
 
-    std::tuple<std::string, std::string> name() const;
+    std::string name() const;
+
+    /**
+     * @brief Get the KiSAO id of the property.
+     *
+     * Return the KiSAO id of the property.
+     *
+     * @return The KiSAO id, as a @c std::string, of the property.
+     */
+
+    std::string kisaoId() const;
 
     /**
      * @brief Get the list of values the property can take.
@@ -123,7 +133,7 @@ private:
 
     Impl *mPimpl;
 
-    explicit SolverProperty(Type pType, const std::tuple<std::string, std::string> &pName,
+    explicit SolverProperty(Type pType, const std::string &pName, const std::string &pKisaoId,
                             const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
                             bool pHasVoiValue);
 };

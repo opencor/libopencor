@@ -18,23 +18,24 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverInfoPtr SolverInfo::Impl::create(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
+SolverInfoPtr SolverInfo::Impl::create(Solver::Type pType, const std::string &pName, const std::string &pKisaoId,
                                        const std::vector<SolverPropertyPtr> &pProperties)
 {
-    return SolverInfoPtr {new SolverInfo {pType, pName, pProperties}};
+    return SolverInfoPtr {new SolverInfo {pType, pName, pKisaoId, pProperties}};
 }
 
-SolverInfo::Impl::Impl(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
+SolverInfo::Impl::Impl(Solver::Type pType, const std::string &pName, const std::string &pKisaoId,
                        const std::vector<SolverPropertyPtr> &pProperties)
     : mType(pType)
     , mName(pName)
+    , mKisaoId(pKisaoId)
     , mProperties(pProperties)
 {
 }
 
-SolverInfo::SolverInfo(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
+SolverInfo::SolverInfo(Solver::Type pType, const std::string &pName, const std::string &pKisaoId,
                        const std::vector<SolverPropertyPtr> &pProperties)
-    : mPimpl(new Impl(pType, pName, pProperties))
+    : mPimpl(new Impl(pType, pName, pKisaoId, pProperties))
 {
 }
 
@@ -50,9 +51,14 @@ Solver::Type SolverInfo::type() const
     return mPimpl->mType;
 }
 
-std::tuple<std::string, std::string> SolverInfo::name() const
+std::string SolverInfo::name() const
 {
     return mPimpl->mName;
+}
+
+std::string SolverInfo::kisaoId() const
+{
+    return mPimpl->mKisaoId;
 }
 
 std::vector<SolverPropertyPtr> SolverInfo::properties() const

@@ -26,12 +26,13 @@ class SolverProperty::Impl
 {
 public:
     Type mType;
-    std::tuple<std::string, std::string> mName;
+    std::string mName;
+    std::string mKisaoId;
     std::vector<std::string> mListValues;
     std::string mDefaultValue;
     bool mHasVoiUnit;
 
-    explicit Impl(Type pType, const std::tuple<std::string, std::string> &pName,
+    explicit Impl(Type pType, const std::string &pName, const std::string &pKisaoId,
                   const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
                   bool pHasVoiValue);
 };

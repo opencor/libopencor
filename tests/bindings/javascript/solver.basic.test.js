@@ -28,6 +28,7 @@ describe("Solver basic tests", () => {
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solverInfo.name()).toBe("Forward Euler");
+    expect(solverInfo.kisaoId()).toBe("KISAO:0000030");
 
     const properties = solverInfo.properties();
 
@@ -39,6 +40,7 @@ describe("Solver basic tests", () => {
       libopencor.SolverProperty.Type.DoubleGt0.value,
     );
     expect(property.name()).toBe("Step");
+    expect(property.kisaoId()).toBe("KISAO:0000483");
     expect(property.defaultValue()).toBe("1.000000");
     expect(property.hasVoiUnit()).toBe(true);
 

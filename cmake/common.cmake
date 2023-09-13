@@ -123,6 +123,7 @@ function(configure_target TARGET)
             set(CLANG_TIDY_CHECKS
                 -*
                 bugprone-*
+                -bugprone-easily-swappable-parameters
                 ${DISABLED_BUGPRONE_CHECKS}
                 cert-*
                 ${DISABLED_CERT_CHECKS}

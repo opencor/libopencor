@@ -62,12 +62,22 @@ public:
     /**
      * @brief Get the name of the solver.
      *
-     * Return the name of the solver, both as a normal name and as a KiSAO id.
+     * Return the name of the solver.
      *
-     * @return The name, as a @c std::tuple of two @c std::string, of the solver.
+     * @return The name, as a @c std::string, of the solver.
      */
 
-    std::tuple<std::string, std::string> name() const;
+    std::string name() const;
+
+    /**
+     * @brief Get the KiSAO id of the solver.
+     *
+     * Return the KiSAO id of the solver.
+     *
+     * @return The KiSAO id, as a @c std::string, of the solver.
+     */
+
+    std::string kisaoId() const;
 
     /**
      * @brief Get the properties of the solver.
@@ -84,7 +94,7 @@ private:
 
     Impl *mPimpl;
 
-    explicit SolverInfo(Solver::Type pType, const std::tuple<std::string, std::string> &pName,
+    explicit SolverInfo(Solver::Type pType, const std::string &pName, const std::string &pKisaoId,
                         const std::vector<SolverPropertyPtr> &pProperties); /**< Constructor, @private. */
 };
 
