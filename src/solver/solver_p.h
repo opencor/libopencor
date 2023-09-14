@@ -28,9 +28,9 @@ using SolverCreate = SolverPtr (*)();
 class Solver::Impl: public Logger::Impl
 {
 public:
-    static std::map<std::string, std::string> sSolversKisaoId;
-    static std::map<std::string, SolverCreate> sSolversCreate;
-    static std::vector<SolverInfoPtr> sSolversInfo;
+    static std::map<std::string, std::string> SolversKisaoId;
+    static std::map<std::string, SolverCreate> SolversCreate;
+    static std::vector<SolverInfoPtr> SolversInfo;
 
     bool mIsValid = false;
     std::map<std::string, std::string> mProperties;
