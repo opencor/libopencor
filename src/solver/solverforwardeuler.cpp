@@ -18,15 +18,47 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+const std::string SolverForwardEuler::Impl::Name = "Forward Euler"; // NOLINT
+const std::string SolverForwardEuler::Impl::KisaoId = "KISAO:0000030"; // NOLINT
+
+const std::string SolverForwardEuler::Impl::StepName = "Step"; // NOLINT
+const std::string SolverForwardEuler::Impl::StepKisaoId = "KISAO:0000483"; // NOLINT
+
 SolverPtr SolverForwardEuler::Impl::create()
 {
     return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};
 }
 
+std::vector<SolverPropertyPtr> SolverForwardEuler::Impl::propertiesInfo()
+{
+    return {
+        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, StepName, StepKisaoId,
+                                     {},
+                                     std::to_string(StepDefaultValue),
+                                     true),
+    };
+}
+
+SolverForwardEuler::Impl::Impl()
+    : Solver::Impl()
+{
+    mIsValid = true;
+
+    mProperties[StepKisaoId] = std::to_string(StepDefaultValue);
+}
+
+std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesKisaoId() const
+{
+    static const std::map<std::string, std::string> PropertiesKisaoId = {
+        {StepName, StepKisaoId},
+    };
+
+    return PropertiesKisaoId;
+}
+
 SolverForwardEuler::SolverForwardEuler()
     : Solver(new Impl())
 {
-    pimpl()->mIsValid = true;
 }
 
 SolverForwardEuler::~SolverForwardEuler()

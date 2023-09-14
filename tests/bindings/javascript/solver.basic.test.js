@@ -69,28 +69,31 @@ describe("Solver basic tests", () => {
 
   test("Properties", () => {
     const solver = new libopencor.Solver("Forward Euler");
-
-    expect(solver.properties().size()).toBe(0);
-
-    solver.setProperty("Property #1", "1.0");
-    solver.setProperty("Property #2", "2.0");
-    solver.setProperty("Property #3", "3.0");
-
-    expect(solver.properties().size()).toBe(3);
-
     const properties = solver.properties();
 
-    solver.setProperty("Property #4", "4.0");
-    solver.setProperty("Property #5", "5.0");
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1.000000");
+    expect(solver.property("KISAO:0000483")).toBe("1.000000");
 
-    expect(solver.properties().size()).toBe(5);
+    solver.setProperty("Step", "1.2345");
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("KISAO:0000483")).toBe("1.2345");
+
+    solver.setProperty("KISAO:0000483", "7.89");
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("7.89");
+
+    solver.setProperty("Unknown property", "1.23");
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("7.89");
+    expect(solver.property("Unknown property")).toBe("");
 
     solver.setProperties(properties);
 
-    expect(solver.properties().size()).toBe(3);
-
-    expect(solver.property("Property #1")).toBe("1.0");
-    expect(solver.property("Property #2")).toBe("2.0");
-    expect(solver.property("Property #3")).toBe("3.0");
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1.000000");
   });
 });

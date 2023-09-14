@@ -46,14 +46,26 @@ SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const
     return SolverPropertyPtr {new SolverProperty(pType, pName, pKisaoId, pListValues, pDefaultValue, pHasVoiValue)};
 }
 
-std::string Solver::Impl::property(const std::string &pName)
+std::string Solver::Impl::kisaoId(const std::string &pNameOrKisaoId) const
 {
-    return mProperties[pName];
+    auto kisaoIds = propertiesKisaoId();
+    auto kisaoIdIter = kisaoIds.find(pNameOrKisaoId);
+
+    return (kisaoIdIter != kisaoIds.end()) ? kisaoIdIter->second : pNameOrKisaoId;
 }
 
-void Solver::Impl::setProperty(const std::string &pName, const std::string &pValue)
+std::string Solver::Impl::property(const std::string &pNameOrKisaoId)
 {
-    mProperties[pName] = pValue;
+    return mProperties[kisaoId(pNameOrKisaoId)];
+}
+
+void Solver::Impl::setProperty(const std::string &pNameOrKisaoId, const std::string &pValue)
+{
+    auto kisaoId = this->kisaoId(pNameOrKisaoId);
+
+    if (mProperties.find(kisaoId) != mProperties.end()) {
+        mProperties[kisaoId] = pValue;
+    }
 }
 
 std::map<std::string, std::string> Solver::Impl::properties() const
@@ -73,12 +85,12 @@ Solver::Solver(Impl *pPimpl)
 
 Solver::Impl *Solver::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 const Solver::Impl *Solver::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 
 SolverPtr Solver::create(const std::string &pNameOrKisaoId)
@@ -100,12 +112,11 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
     if (!initialised) {
         initialised = true;
 
-        Solver::Impl::registerSolver(Solver::Type::ODE, "Forward Euler", "KISAO:0000030",
+        Solver::Impl::registerSolver(SolverForwardEuler::Impl::Type,
+                                     SolverForwardEuler::Impl::Name,
+                                     SolverForwardEuler::Impl::KisaoId,
                                      SolverForwardEuler::Impl::create,
-                                     {Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, "Step", "KISAO:0000483",
-                                                                   {},
-                                                                   std::to_string(SolverForwardEuler::StepDefaultValue),
-                                                                   true)});
+                                     SolverForwardEuler::Impl::propertiesInfo());
     }
 
     return Solver::Impl::sSolversInfo;
@@ -116,14 +127,14 @@ bool Solver::isValid() const
     return pimpl()->mIsValid;
 }
 
-std::string Solver::property(const std::string &pName)
+std::string Solver::property(const std::string &pNameOrKisaoId)
 {
-    return pimpl()->property(pName);
+    return pimpl()->property(pNameOrKisaoId);
 }
 
-void Solver::setProperty(const std::string &pName, const std::string &pValue)
+void Solver::setProperty(const std::string &pNameOrKisaoId, const std::string &pValue)
 {
-    pimpl()->setProperty(pName, pValue);
+    pimpl()->setProperty(pNameOrKisaoId, pValue);
 }
 
 std::map<std::string, std::string> Solver::properties() const

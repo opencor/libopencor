@@ -41,11 +41,17 @@ public:
                                             const std::string &pKisaoId, const std::vector<std::string> &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiValue);
 
-    std::string property(const std::string &pName);
-    void setProperty(const std::string &pName, const std::string &pValue);
+    virtual ~Impl() = default;
+
+    std::string kisaoId(const std::string &pNameOrKisaoId) const;
+
+    std::string property(const std::string &pNameOrKisaoId);
+    void setProperty(const std::string &pNameOrKisaoId, const std::string &pValue);
 
     std::map<std::string, std::string> properties() const;
     void setProperties(const std::map<std::string, std::string> &pProperties);
+
+    virtual std::map<std::string, std::string> propertiesKisaoId() const = 0;
 };
 
 } // namespace libOpenCOR

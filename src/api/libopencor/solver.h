@@ -99,25 +99,26 @@ public:
     /**
      * @brief Get the value of a property of this solver.
      *
-     * Get the value of a property of this solver.
+     * Get the value of a property, which name or KiSAO id is given, of this solver.
      *
-     * @param pName The name, as a @c std::string, of a property.
+     * @param pNameOrKisaoId The name or KiSAO id, as a @c std::string, of a property.
      *
      * @return The value, as a @c std::string, of the property.
      */
 
-    std::string property(const std::string &pName);
+    std::string property(const std::string &pNameOrKisaoId);
 
     /**
      * @brief Set the value of a property of this solver.
      *
-     * Set the value of a property of this solver.
+     * Set the value of a property, which name or KiSAO ID is given, of this solver. If the name or KiSAO ID is not
+     * supported by the solver then nothing is done.
      *
-     * @param pName The name, as a @c std::string, of a property.
+     * @param pNameOrKisaoId The name or KiSAO id, as a @c std::string, of a property.
      * @param pValue The value, as a @c std::string, of a property.
      */
 
-    void setProperty(const std::string &pName, const std::string &pValue);
+    void setProperty(const std::string &pNameOrKisaoId, const std::string &pValue);
 
     /**
      * @brief Get the properties of this solver.
@@ -132,7 +133,8 @@ public:
     /**
      * @brief Set the properties of this solver.
      *
-     * Set the properties of this solver, replacing all the previous properties, if any.
+     * Set the properties of this solver. If the name or KiSAO ID of a property is not supported by the solver then
+     * nothing is done for that property.
      *
      * @param pProperties The properties, as a @c std::map of @c std::string, of this solver.
      */

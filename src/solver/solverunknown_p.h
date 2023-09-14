@@ -25,6 +25,8 @@ class SolverUnknown::Impl: public Solver::Impl
 {
 public:
     static SolverPtr create();
+
+    std::map<std::string, std::string> propertiesKisaoId() const override;
 };
 
 } // namespace libOpenCOR

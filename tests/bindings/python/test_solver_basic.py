@@ -64,26 +64,29 @@ def test_forward_euler_by_kisao_id():
 
 def test_properties():
     solver = Solver("Forward Euler")
-
-    assert len(solver.properties) == 0
-
-    solver.set_property("Property #1", "1.0")
-    solver.set_property("Property #2", "2.0")
-    solver.set_property("Property #3", "3.0")
-
-    assert len(solver.properties) == 3
-
     properties = solver.properties
 
-    solver.set_property("Property #4", "4.0")
-    solver.set_property("Property #5", "5.0")
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1.000000"
+    assert solver.property("KISAO:0000483") == "1.000000"
 
-    assert len(solver.properties) == 5
+    solver.set_property("Step", "1.2345")
+
+    assert len(solver.properties) == 1
+    assert solver.property("KISAO:0000483") == "1.2345"
+
+    solver.set_property("KISAO:0000483", "7.89")
+
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "7.89"
+
+    solver.set_property("Unknown property", "1.23")
+
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "7.89"
+    assert solver.property("Unknown property") == ""
 
     solver.set_properties(properties)
 
-    assert len(solver.properties) == 3
-
-    assert solver.property("Property #1") == "1.0"
-    assert solver.property("Property #2") == "2.0"
-    assert solver.property("Property #3") == "3.0"
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1.000000"

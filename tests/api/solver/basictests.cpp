@@ -71,27 +71,30 @@ TEST(BasicSolverTest, forwardEulerByKisaoId)
 TEST(BasicSolverTest, properties)
 {
     auto solver = libOpenCOR::Solver::create("Forward Euler");
-
-    EXPECT_EQ(solver->properties().size(), 0);
-
-    solver->setProperty("Property #1", "1.0");
-    solver->setProperty("Property #2", "2.0");
-    solver->setProperty("Property #3", "3.0");
-
-    EXPECT_EQ(solver->properties().size(), 3);
-
     auto properties = solver->properties();
 
-    solver->setProperty("Property #4", "4.0");
-    solver->setProperty("Property #5", "5.0");
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "1.000000");
+    EXPECT_EQ(solver->property("KISAO:0000483"), "1.000000");
 
-    EXPECT_EQ(solver->properties().size(), 5);
+    solver->setProperty("Step", "1.2345");
+
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("KISAO:0000483"), "1.2345");
+
+    solver->setProperty("KISAO:0000483", "7.89");
+
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "7.89");
+
+    solver->setProperty("Unknown property", "1.23");
+
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "7.89");
+    EXPECT_EQ(solver->property("Unknown property"), "");
 
     solver->setProperties(properties);
 
-    EXPECT_EQ(solver->properties().size(), 3);
-
-    EXPECT_EQ(solver->property("Property #1"), "1.0");
-    EXPECT_EQ(solver->property("Property #2"), "2.0");
-    EXPECT_EQ(solver->property("Property #3"), "3.0");
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "1.000000");
 }
