@@ -130,6 +130,7 @@ function(configure_target TARGET)
                 cppcoreguidelines-*
                 -cppcoreguidelines-owning-memory
                 -cppcoreguidelines-pro-type-reinterpret-cast
+                -cppcoreguidelines-pro-type-static-cast-downcast
                 ${DISABLED_CPPCOREGUIDELINES_CHECKS}
                 fuchsia-*
                 -fuchsia-default-arguments-calls

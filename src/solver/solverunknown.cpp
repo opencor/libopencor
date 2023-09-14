@@ -35,13 +35,13 @@ SolverUnknown::~SolverUnknown()
 
 SolverUnknown::Impl *SolverUnknown::pimpl()
 {
-    return reinterpret_cast<Impl *>(Solver::pimpl());
+    return static_cast<Impl *>(Solver::pimpl());
 }
 
 /*---GRY---
 const SolverUnknown::Impl *SolverUnknown::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Solver::pimpl());
+    return static_cast<const Impl *>(Solver::pimpl());
 }
 */
 

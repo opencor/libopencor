@@ -264,7 +264,7 @@ size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUse
 {
     const auto realDataSize = pSize * pDataSize;
 
-    reinterpret_cast<std::ofstream *>(pUserData)->write(reinterpret_cast<char *>(pData), static_cast<std::streamsize>(realDataSize));
+    static_cast<std::ofstream *>(pUserData)->write(static_cast<char *>(pData), static_cast<std::streamsize>(realDataSize));
 
     return realDataSize;
 }
@@ -288,7 +288,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_URL, pUrl.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void *>(&file));
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void *>(&file));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 
 #    ifndef COVERAGE_ENABLED

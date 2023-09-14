@@ -36,13 +36,13 @@ SolverForwardEuler::~SolverForwardEuler()
 
 SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
 {
-    return reinterpret_cast<Impl *>(Solver::pimpl());
+    return static_cast<Impl *>(Solver::pimpl());
 }
 
 /*---GRY---
 const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Solver::pimpl());
+    return static_cast<const Impl *>(Solver::pimpl());
 }
 */
 

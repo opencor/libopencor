@@ -288,12 +288,12 @@ Compiler::~Compiler()
 
 Compiler::Impl *Compiler::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 const Compiler::Impl *Compiler::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 
 CompilerPtr Compiler::create()

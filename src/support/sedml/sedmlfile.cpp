@@ -49,13 +49,13 @@ SedmlFile::~SedmlFile()
 
 SedmlFile::Impl *SedmlFile::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 /*---GRY---
 const SedmlFile::Impl *SedmlFile::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 */
 
