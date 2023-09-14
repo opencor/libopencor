@@ -14,32 +14,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
-
-#include "solverode.h"
+#include "solverode_p.h"
 
 namespace libOpenCOR {
 
-class LIBOPENCOR_EXPORT SolverForwardEuler: public SolverOde
+SolverOde::SolverOde(Impl *pPimpl)
+    : Solver(pPimpl)
 {
-    friend class Solver;
+}
 
-public:
-    ~SolverForwardEuler() override;
+SolverOde::Impl *SolverOde::pimpl()
+{
+    return static_cast<Impl *>(Solver::pimpl());
+}
 
-    SolverForwardEuler(const SolverForwardEuler &pOther) = delete;
-    SolverForwardEuler(SolverForwardEuler &&pOther) noexcept = delete;
-
-    SolverForwardEuler &operator=(const SolverForwardEuler &pRhs) = delete;
-    SolverForwardEuler &operator=(SolverForwardEuler &&pRhs) noexcept = delete;
-
-private:
-    class Impl;
-
-    explicit SolverForwardEuler();
-
-    Impl *pimpl();
-    const Impl *pimpl() const;
-};
+/*---GRY---
+const SolverOde::Impl *SolverOde::pimpl() const
+{
+    return static_cast<const Impl *>(Solver::pimpl());
+}
+*/
 
 } // namespace libOpenCOR

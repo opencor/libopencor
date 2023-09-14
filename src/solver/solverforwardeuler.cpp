@@ -40,7 +40,7 @@ std::vector<SolverPropertyPtr> SolverForwardEuler::Impl::propertiesInfo()
 }
 
 SolverForwardEuler::Impl::Impl()
-    : Solver::Impl()
+    : SolverOde::Impl()
 {
     mIsValid = true;
 
@@ -57,7 +57,7 @@ std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesKisaoId()
 }
 
 SolverForwardEuler::SolverForwardEuler()
-    : Solver(new Impl())
+    : SolverOde(new Impl())
 {
 }
 
@@ -68,13 +68,13 @@ SolverForwardEuler::~SolverForwardEuler()
 
 SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
 {
-    return static_cast<Impl *>(Solver::pimpl());
+    return static_cast<Impl *>(SolverOde::pimpl());
 }
 
 /*---GRY---
 const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 {
-    return static_cast<const Impl *>(Solver::pimpl());
+    return static_cast<const Impl *>(SolverOde::pimpl());
 }
 */
 

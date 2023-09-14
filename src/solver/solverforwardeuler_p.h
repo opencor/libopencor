@@ -16,12 +16,12 @@ limitations under the License.
 
 #pragma once
 
-#include "solver_p.h"
+#include "solverode_p.h"
 #include "solverforwardeuler.h"
 
 namespace libOpenCOR {
 
-class SolverForwardEuler::Impl: public Solver::Impl
+class SolverForwardEuler::Impl: public SolverOde::Impl
 {
 public:
     static const Solver::Type Type = Solver::Type::ODE;
