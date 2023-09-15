@@ -20,26 +20,37 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverForwardEuler class.
+ *
+ * The SolverForwardEuler class implements the Foward Euler method, a first-order numerical technique for solving a
+ * system of ODEs.
+ */
+
 class LIBOPENCOR_EXPORT SolverForwardEuler: public SolverOde
 {
     friend class Solver;
 
 public:
-    ~SolverForwardEuler() override;
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
-    SolverForwardEuler(const SolverForwardEuler &pOther) = delete;
-    SolverForwardEuler(SolverForwardEuler &&pOther) noexcept = delete;
+    ~SolverForwardEuler() override; /**< Destructor, @private. */
 
-    SolverForwardEuler &operator=(const SolverForwardEuler &pRhs) = delete;
-    SolverForwardEuler &operator=(SolverForwardEuler &&pRhs) noexcept = delete;
+    SolverForwardEuler(const SolverForwardEuler &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverForwardEuler(SolverForwardEuler &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    SolverForwardEuler &operator=(const SolverForwardEuler &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverForwardEuler &operator=(SolverForwardEuler &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
 private:
-    class Impl;
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverForwardEuler();
+    explicit SolverForwardEuler(); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

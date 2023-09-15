@@ -20,27 +20,37 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverOde class.
+ *
+ * The SolverOde class is used as an abstract class for ODE solvers.
+ */
+
 class LIBOPENCOR_EXPORT SolverOde: public Solver
 {
     friend class Solver;
 
 public:
-    SolverOde() = delete;
-    ~SolverOde() override = default;
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
-    SolverOde(const SolverOde &pOther) = delete;
-    SolverOde(SolverOde &&pOther) noexcept = delete;
+    SolverOde() = delete; /**< No default constructor allowed, @private. */
+    ~SolverOde() override = default; /**< Destructor, @private. */
 
-    SolverOde &operator=(const SolverOde &pRhs) = delete;
-    SolverOde &operator=(SolverOde &&pRhs) noexcept = delete;
+    SolverOde(const SolverOde &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverOde(SolverOde &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    SolverOde &operator=(const SolverOde &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverOde &operator=(SolverOde &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
 protected:
-    class Impl;
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverOde(Impl *pPimpl);
+    explicit SolverOde(Impl *pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR
