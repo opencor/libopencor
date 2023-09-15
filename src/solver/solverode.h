@@ -37,10 +37,10 @@ public:
 protected:
     class Impl;
 
+    explicit SolverOde(Impl *pPimpl);
+
     Impl *pimpl();
     const Impl *pimpl() const;
-
-    explicit SolverOde(Impl *pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR
