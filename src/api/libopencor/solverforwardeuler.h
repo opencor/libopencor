@@ -36,10 +36,10 @@ public:
 private:
     class Impl;
 
-    explicit SolverForwardEuler();
-
     Impl *pimpl();
     const Impl *pimpl() const;
+
+    explicit SolverForwardEuler();
 };
 
 } // namespace libOpenCOR
