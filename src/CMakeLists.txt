@@ -77,7 +77,9 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/issue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverforwardeuler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverinfo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
@@ -138,10 +140,8 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown.h
