@@ -54,7 +54,7 @@ SOME_WARNING_CELLML_CONTENTS = """@SOME_WARNING_CELLML_CONTENTS@"""
 SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
 
 
-def assert_issues(expected_issues, logger):
+def assert_issues(logger, expected_issues):
     issues = logger.issues
 
     assert len(issues) == len(expected_issues)
