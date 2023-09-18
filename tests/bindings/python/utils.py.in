@@ -55,11 +55,13 @@ SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
 
 
 def assert_issues(expected_issues, logger):
-    assert len(expected_issues) == logger.issue_count
+    issues = logger.issues
 
-    for i in range(len(expected_issues)):
-        assert expected_issues[i][0] == logger.issue(i).type
-        assert expected_issues[i][1] == logger.issue(i).description
+    assert len(issues) == len(expected_issues)
+
+    for i in range(len(issues)):
+        assert issues[i].type == expected_issues[i][0]
+        assert issues[i].description == expected_issues[i][1]
 
 
 def resource_path(relative_path=""):

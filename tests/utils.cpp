@@ -26,11 +26,13 @@ namespace libOpenCOR {
 
 void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger)
 {
-    EXPECT_EQ(pExpectedIssues.size(), pLogger->issueCount());
+    auto issues = pLogger->issues();
 
-    for (size_t i = 0; i < pExpectedIssues.size(); ++i) {
-        EXPECT_EQ(pExpectedIssues.at(i).type, pLogger->issue(i)->type());
-        EXPECT_EQ(pExpectedIssues.at(i).description, pLogger->issue(i)->description());
+    EXPECT_EQ(issues.size(), pExpectedIssues.size());
+
+    for (size_t i = 0; i < issues.size(); ++i) {
+        EXPECT_EQ(issues[i]->type(), pExpectedIssues[i].type);
+        EXPECT_EQ(issues[i]->description(), pExpectedIssues[i].description);
     }
 }
 

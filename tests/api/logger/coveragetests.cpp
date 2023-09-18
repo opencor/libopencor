@@ -20,45 +20,23 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(CoverageLoggerTest, issue)
+TEST(CoverageLoggerTest, errors)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
 
-    EXPECT_EQ(nullptr, file->issue(0));
+    EXPECT_EQ(file->errors().size(), 0);
 }
 
-TEST(CoverageLoggerTest, hasIssues)
+TEST(CoverageLoggerTest, warnings)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
 
-    EXPECT_FALSE(file->hasIssues());
+    EXPECT_EQ(file->warnings().size(), 0);
 }
 
-TEST(CoverageLoggerTest, hasErrors)
+TEST(CoverageLoggerTest, messages)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
 
-    EXPECT_FALSE(file->hasErrors());
-}
-
-TEST(CoverageLoggerTest, errorCount)
-{
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-
-    EXPECT_EQ(0, file->errorCount());
-}
-
-TEST(CoverageLoggerTest, error)
-{
-    // Has an error.
-
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
-
-    EXPECT_NE(nullptr, file->error(0));
-
-    // Doesn't have an error.
-
-    file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-
-    EXPECT_EQ(nullptr, file->error(0));
+    EXPECT_EQ(file->messages().size(), 0);
 }

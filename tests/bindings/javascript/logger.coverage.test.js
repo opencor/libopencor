@@ -21,74 +21,39 @@ const libopencor = await libOpenCOR();
 
 describe("Issue coverage tests", () => {
   let someCellmlContentsPtr;
-  let someUnknownContentsPtr;
 
   beforeAll(() => {
     someCellmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_CELLML_CONTENTS,
     );
-    someUnknownContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNKNOWN_CONTENTS,
-    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
-  test("issue()", () => {
+  test("errors()", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    expect(file.issue(0)).toBeNull();
+    expect(file.errors().size()).toBe(0);
   });
 
-  test("hasIssues()", () => {
+  test("warnings()", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    expect(file.hasIssues()).toBe(false);
+    expect(file.warnings().size()).toBe(0);
   });
 
-  test("hasErrors()", () => {
+  test("messages()", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    expect(file.hasErrors()).toBe(false);
-  });
-
-  test("errorCount()", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
-
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-
-    expect(file.errorCount()).toBe(0);
-  });
-
-  test("error()", () => {
-    // Has an error.
-
-    let file = new libopencor.File(utils.LOCAL_FILE);
-
-    file.setContents(
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
-
-    expect(file.error(0)).not.toBeNull();
-
-    // Doesn't have an error.
-
-    file = new libopencor.File(utils.LOCAL_FILE);
-
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-
-    expect(file.error(0)).toBeNull();
+    expect(file.messages().size()).toBe(0);
   });
 });
