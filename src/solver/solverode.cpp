@@ -46,9 +46,4 @@ const SolverOde::Impl *SolverOde::pimpl() const
 }
 */
 
-bool SolverOde::initialise(double *pStates, double *pRates, double *pVariables, ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pStates, pRates, pVariables, pComputeRates);
-}
-
 } // namespace libOpenCOR

@@ -58,7 +58,7 @@ public:
      * @return @c true if the solver is initialised, @c false otherwise.
      */
 
-    virtual bool initialise(double *pStates, double *pRates, double *pVariables, ComputeRates pComputeRates);
+    virtual bool initialise(double *pStates, double *pRates, double *pVariables, ComputeRates pComputeRates) = 0;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

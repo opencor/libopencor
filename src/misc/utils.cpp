@@ -354,16 +354,24 @@ double stringToDouble(const std::string &pString, bool *pOk)
     try {
         res = std::stod(pString);
     } catch (...) {
-        if (pOk != nullptr) {
-            *pOk = false;
-        }
+        /*---GRY--- TO BE UNCOMMENTED ONCE WE CALL stringToDouble() WITH A NULL pOk.
+                if (pOk != nullptr) {
+        */
+        *pOk = false;
+        /*---GRY--- TO BE UNCOMMENTED ONCE WE CALL stringToDouble() WITH A NULL pOk.
+                }
+        */
 
         return 0.0;
     }
 
-    if (pOk != nullptr) {
-        *pOk = true;
-    }
+    /*---GRY--- TO BE UNCOMMENTED ONCE WE CALL stringToDouble() WITH A NULL pOk.
+        if (pOk != nullptr) {
+    */
+    *pOk = true;
+    /*---GRY--- TO BE UNCOMMENTED ONCE WE CALL stringToDouble() WITH A NULL pOk.
+        }
+    */
 
     return res;
 }
