@@ -81,7 +81,7 @@ TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
     // Customise, and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "The 'Step' property has an invalid value ('abc'). It must be a floating point number greater than zero."},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("abc"). It must be a floating point number greater than zero.)"},
     };
 
     solver->setProperty("Step", "abc");
@@ -103,7 +103,7 @@ TEST(ForwardEulerSolverTest, invalidStepValue)
     // Customise, and initialise our solver using an invalid step value.
 
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "The 'Step' property has an invalid value ('0.0'). It must be a floating point number greater than zero."},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("0.0"). It must be a floating point number greater than zero.)"},
     };
 
     solver->setProperty("Step", "0.0");

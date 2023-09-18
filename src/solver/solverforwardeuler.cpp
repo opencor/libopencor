@@ -68,7 +68,7 @@ bool SolverForwardEuler::Impl::initialise(double *pStates, double *pRates, doubl
     if (ok && (step > 0.0)) {
         mStep = step;
     } else {
-        addError("The 'Step' property has an invalid value ('" + mProperties[StepKisaoId] + "'). It must be a floating point number greater than zero.");
+        addError(R"(The "Step" property has an invalid value (")" + mProperties[StepKisaoId] + R"("). It must be a floating point number greater than zero.)");
 
         return false;
     }
