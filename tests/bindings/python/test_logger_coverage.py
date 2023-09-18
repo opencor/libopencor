@@ -17,39 +17,19 @@ from libopencor import File
 import utils
 
 
-def test_issue():
+def test_errors():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
 
-    assert file.issue(0) == None
+    assert len(file.errors) == 0
 
 
-def test_has_issues():
+def test_warnings():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
 
-    assert not file.has_issues
+    assert len(file.warnings) == 0
 
 
-def test_has_errors():
+def test_messages():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
 
-    assert not file.has_errors
-
-
-def test_error_count():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
-
-    assert file.error_count == 0
-
-
-def test_error():
-    # Has an error.
-
-    file = File(utils.resource_path(utils.UNKNOWN_FILE))
-
-    assert file.error(0) != None
-
-    # Doesn't have an error.
-
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
-
-    assert file.error(0) == None
+    assert len(file.messages) == 0

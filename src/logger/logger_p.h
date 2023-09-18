@@ -28,9 +28,9 @@ class Logger::Impl
 public:
     std::vector<IssuePtr> mIssues;
 
-    std::vector<size_t> mErrors;
-    std::vector<size_t> mWarnings;
-    std::vector<size_t> mMessages;
+    std::vector<IssuePtr> mErrors;
+    std::vector<IssuePtr> mWarnings;
+    std::vector<IssuePtr> mMessages;
 
     static void addIssues(const LoggerPtr &pLogger);
     void addIssue(const std::string &pDescription, Issue::Type pType);

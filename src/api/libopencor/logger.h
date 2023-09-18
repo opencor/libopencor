@@ -19,6 +19,8 @@ limitations under the License.
 #include "libopencor/export.h"
 #include "libopencor/types.h"
 
+#include <vector>
+
 namespace libOpenCOR {
 
 /**
@@ -44,148 +46,44 @@ public:
     Logger &operator=(Logger &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Return whether there are issues.
+     * @brief Return the issues.
      *
-     * Return whether there are issues.
+     * Return the issues.
      *
-     * @return @c true if there are issues, @c false otherwise.
+     * @return The issues as a @c std::vector of references to @ref Issue objects.
      */
 
-    bool hasIssues() const;
+    std::vector<IssuePtr> issues() const;
 
     /**
-     * @brief Get the number of issues.
+     * @brief Return the errors.
      *
-     * Return the number of issues.
+     * Return the errors.
      *
-     * @return The number of issues.
+     * @return The errors as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::ERROR.
      */
 
-    size_t issueCount() const;
+    std::vector<IssuePtr> errors() const;
 
     /**
-     * @brief Get the issue at the given @p pIndex.
+     * @brief Return the warnings.
      *
-     * Return the issue at the given @p pIndex. If @p pIndex is not valid then @c nullptr is returned. The valid range
-     * for @p pIndex is [0, \#issues).
+     * Return the warnings.
      *
-     * @param pIndex The index of the issue to return.
-     *
-     * @return A reference to the issue at the given @p pIndex or @c nullptr if @p pIndex is not valid.
+     * @return The warnings as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::WARNING.
      */
 
-    IssuePtr issue(size_t pIndex) const;
+    std::vector<IssuePtr> warnings() const;
 
     /**
-     * @brief Return whether there are errors.
+     * @brief Return the messages.
      *
-     * Return whether there are errors.
+     * Return the messages.
      *
-     * @return @c true if there are errors, @c false otherwise.
+     * @return The messages as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::MESSAGE.
      */
 
-    bool hasErrors() const;
-
-    /**
-     * @brief Get the number of errors.
-     *
-     * Return the number of issues of error type.
-     *
-     * @return The number of errors.
-     */
-
-    size_t errorCount() const;
-
-    /**
-     * @brief Get the error at the given @p pIndex.
-     *
-     * Return the issue, of error type, at the given @p pIndex. If @p pIndex is not valid then @c nullptr is returned.
-     * The valid range for @p pIndex is [0, \#errors).
-     *
-     * @param pIndex The index of the error to return.
-     *
-     * @return A reference to the error at the given @p pIndex or @c nullptr if @p pIndex is not valid.
-     */
-
-    IssuePtr error(size_t pIndex) const;
-
-    /**
-     * @brief Return whether there are warnings.
-     *
-     * Return whether there are warnings.
-     *
-     * @return @c true if there are warnings, @c false otherwise.
-     */
-
-    /*---GRY---
-        bool hasWarnings() const;
-    */
-
-    /**
-     * @brief Get the number of warnings.
-     *
-     * Return the number of issues of warning type.
-     *
-     * @return The number of warnings.
-     */
-
-    /*---GRY---
-        size_t warningCount() const;
-    */
-
-    /**
-     * @brief Get the warning at the given @p pIndex.
-     *
-     * Return the issue, of warning type, at the given @p pIndex. If @p pIndex is not valid then @c nullptr is returned.
-     * The valid range for @p pIndex is [0, \#warnings).
-     *
-     * @param pIndex The index of the warning to return.
-     *
-     * @return A reference to the warning at the given @p pIndex or @c nullptr if @p pIndex is not valid.
-     */
-
-    /*---GRY---
-        IssuePtr warning(size_t pIndex) const;
-    */
-
-    /**
-     * @brief Return whether there are messages.
-     *
-     * Return whether there are messages.
-     *
-     * @return @c true if there are messages, @c false otherwise.
-     */
-
-    /*---GRY---
-        bool hasMessages() const;
-    */
-
-    /**
-     * @brief Get the number of messages.
-     *
-     * Return the number of issues of message type.
-     *
-     * @return The number of messages.
-     */
-
-    /*---GRY---
-        size_t messageCount() const;
-    */
-
-    /**
-     * @brief Get the message at the given @p pIndex.
-     *
-     * Return the issue, of message type, at the given @p pIndex. If @p pIndex is not valid then @c nullptr is returned.
-     * The valid range for @p pIndex is [0, \#messages).
-     *
-     * @param pIndex The index of the message to return.
-     *
-     * @return A reference to the message at the given @p pIndex or @c nullptr if @p pIndex is not valid.
-     */
-
-    /*---GRY---
-        IssuePtr message(size_t pIndex) const;
-    */
+    std::vector<IssuePtr> messages() const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

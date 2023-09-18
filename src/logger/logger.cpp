@@ -23,9 +23,7 @@ void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 {
     (void)pLogger;
     /*---GRY---
-        for (size_t i = 0; i < pLogger->issueCount(); ++i) {
-            auto issue = pLogger->issue(i);
-
+        for (const auto &issue : pLogger->issues()) {
             addIssue(issue->description(), issue->type());
         }
     */
@@ -33,24 +31,23 @@ void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 
 void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
 {
-    auto index = mIssues.size();
+    auto issue = std::shared_ptr<Issue> {new Issue {pDescription, pType}};
+    mIssues.push_back(issue);
 
-    mIssues.push_back(IssuePtr {new Issue {pDescription, pType}});
-
-    mErrors.push_back(index);
+    mErrors.push_back(issue);
     /*---GRY---
         switch (pType) {
         case libOpenCOR::Issue::Type::ERROR:
-            mErrors.push_back(index);
+            mErrors.push_back(issue);
 
             break;
 
         case libOpenCOR::Issue::Type::WARNING:
-            mWarnings.push_back(index);
+            mWarnings.push_back(issue);
 
             break;
-        default: // libOpenCOR::Issue::Type::MESSAGE.
-            mMessages.push_back(index);
+        case libOpenCOR::Issue::Type::MESSAGE:
+            mMessages.push_back(issue);
 
             break;
         }
@@ -100,92 +97,24 @@ const Logger::Impl *Logger::pimpl() const
     return mPimpl;
 }
 
-bool Logger::hasIssues() const
+std::vector<IssuePtr> Logger::issues() const
 {
-    return !pimpl()->mIssues.empty();
+    return pimpl()->mIssues;
 }
 
-size_t Logger::issueCount() const
+std::vector<IssuePtr> Logger::errors() const
 {
-    return pimpl()->mIssues.size();
+    return pimpl()->mErrors;
 }
 
-IssuePtr Logger::issue(size_t pIndex) const
+std::vector<IssuePtr> Logger::warnings() const
 {
-    if (pIndex < pimpl()->mIssues.size()) {
-        return pimpl()->mIssues[pIndex];
-    }
-
-    return {};
+    return pimpl()->mWarnings;
 }
 
-bool Logger::hasErrors() const
+std::vector<IssuePtr> Logger::messages() const
 {
-    return !pimpl()->mErrors.empty();
+    return pimpl()->mMessages;
 }
-
-size_t Logger::errorCount() const
-{
-    return pimpl()->mErrors.size();
-}
-
-IssuePtr Logger::error(size_t pIndex) const
-{
-    if (pIndex < pimpl()->mErrors.size()) {
-        return pimpl()->mIssues[pimpl()->mErrors[pIndex]];
-    }
-
-    return {};
-}
-
-/*---GRY---
-bool Logger::hasWarnings() const
-{
-    return !pimpl()->mWarnings.empty();
-}
-*/
-
-/*---GRY---
-size_t Logger::warningCount() const
-{
-    return pimpl()->mWarnings.size();
-}
-*/
-
-/*---GRY---
-IssuePtr Logger::warning(size_t pIndex) const
-{
-    if (pIndex < pimpl()->mWarnings.size()) {
-        return pimpl()->mIssues[pimpl()->mWarnings[pIndex]];
-    }
-
-    return {};
-}
-*/
-
-/*---GRY---
-bool Logger::hasMessages() const
-{
-    return !pimpl()->mMessages.empty();
-}
-*/
-
-/*---GRY---
-size_t Logger::messageCount() const
-{
-    return pimpl()->mMessages.size();
-}
-*/
-
-/*---GRY---
-IssuePtr Logger::message(size_t pIndex) const
-{
-    if (pIndex < pimpl()->mMessages.size()) {
-        return pimpl()->mIssues[pimpl()->mMessages[pIndex]];
-    }
-
-    return {};
-}
-*/
 
 } // namespace libOpenCOR

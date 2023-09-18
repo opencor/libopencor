@@ -20,20 +20,11 @@ void loggerApi()
 {
     // Logger API.
 
+    emscripten::register_vector<libOpenCOR::IssuePtr>("Issues");
+
     emscripten::class_<libOpenCOR::Logger>("Logger")
-        .function("hasIssues", &libOpenCOR::Logger::hasIssues)
-        .function("issueCount", &libOpenCOR::Logger::issueCount)
-        .function("issue", &libOpenCOR::Logger::issue)
-        .function("hasErrors", &libOpenCOR::Logger::hasErrors)
-        .function("errorCount", &libOpenCOR::Logger::errorCount)
-        .function("error", &libOpenCOR::Logger::error)
-        /*---GRY---
-                .function("hasWarnings", &libOpenCOR::Logger::hasWarnings)
-                .function("warningCount", &libOpenCOR::Logger::warningCount)
-                .function("warning", &libOpenCOR::Logger::warning)
-                .function("hasMessages", &libOpenCOR::Logger::hasMessages)
-                .function("messageCount", &libOpenCOR::Logger::messageCount)
-                .function("message", &libOpenCOR::Logger::message)
-        */
-        ;
+        .function("issues", &libOpenCOR::Logger::issues)
+        .function("errors", &libOpenCOR::Logger::errors)
+        .function("warnings", &libOpenCOR::Logger::warnings)
+        .function("messages", &libOpenCOR::Logger::messages);
 }
