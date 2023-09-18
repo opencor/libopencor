@@ -29,6 +29,17 @@ namespace libOpenCOR {
 class LIBOPENCOR_EXPORT SolverOde: public Solver
 {
 public:
+    /**
+     * @brief Signature of the compute rates method.
+     *
+     * Signature of the method used to compute the rates of a system of ODEs.
+     *
+     * @param pVoi The variable of integration, as a @c double.
+     * @param pStates The states, as an array of @c double.
+     * @param pRates The rates, as an array of @c double.
+     * @param pVariables The other variables, as an array of @c double.
+     */
+
     using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
 
     /**
@@ -50,10 +61,10 @@ public:
      * Initialise the solver, which means keeping track of the various arrays and of the compute rates method, as well
      * as checking its properties to initialise the solver itself.
      *
-     * @param pStates The array of states.
-     * @param pRates The array of rates.
-     * @param pVariables The array of variables.
-     * @param pComputeRates The compute rates method.
+     * @param pStates The states, as an array of @c double.
+     * @param pRates The rates, as an array of @c double.
+     * @param pVariables The other variables, as an array of @c double.
+     * @param pComputeRates The compute rates method, as a @ref ComputeRates.
      *
      * @return @c true if the solver is initialised, @c false otherwise.
      */
