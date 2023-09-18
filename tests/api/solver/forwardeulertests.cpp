@@ -20,7 +20,13 @@ limitations under the License.
 
 #include <libopencor>
 
-#ifdef BUILDING_USING_CLANG
+#if defined(BUILDING_USING_MSVC)
+#    pragma warning(push)
+#    pragma warning(disable: 4100)
+#elif defined(BUILDING_USING_GNU)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wunused-parameter"
+#else
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wdouble-promotion"
 #    pragma clang diagnostic ignored "-Wmissing-prototypes"
@@ -33,7 +39,11 @@ limitations under the License.
 #include "../../res/hh52/c/model.h" // NOLINT
 #include "../../res/hh52/c/model.c" // NOLINT
 
-#ifdef BUILDING_USING_CLANG
+#if defined(BUILDING_USING_MSVC)
+#    pragma warning(pop)
+#elif defined(BUILDING_USING_GNU)
+#    pragma GCC diagnostic pop
+#else
 #    pragma clang diagnostic pop
 #endif
 
