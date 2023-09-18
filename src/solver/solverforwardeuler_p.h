@@ -36,9 +36,14 @@ public:
     static SolverPtr create();
     static std::vector<SolverPropertyPtr> propertiesInfo();
 
+    double mStep = StepDefaultValue;
+
     explicit Impl();
 
     std::map<std::string, std::string> propertiesKisaoId() const override;
+
+    bool initialise(double *pStates, double *pRates, double *pVariables,
+                    SolverOde::ComputeRates pComputeRates) override;
 };
 
 } // namespace libOpenCOR

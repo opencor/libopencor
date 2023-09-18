@@ -44,6 +44,22 @@ public:
     SolverForwardEuler &operator=(const SolverForwardEuler &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverForwardEuler &operator=(SolverForwardEuler &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
+    /**
+     * @brief Initialise the solver.
+     *
+     * Initialise the solver, which means keeping track of the various arrays and of the compute rates method, as well
+     * as checking its properties to initialise the solver itself.
+     *
+     * @param pStates The array of states.
+     * @param pRates The array of rates.
+     * @param pVariables The array of variables.
+     * @param pComputeRates The compute rates method.
+     *
+     * @return @c true if the solver is initialised, @c false otherwise.
+     */
+
+    bool initialise(double *pStates, double *pRates, double *pVariables, ComputeRates pComputeRates) override;
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

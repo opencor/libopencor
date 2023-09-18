@@ -20,6 +20,8 @@ limitations under the License.
 #include "libopencor/issue.h"
 #include "libopencor/logger.h"
 #include "libopencor/solver.h"
+#include "libopencor/solverforwardeuler.h"
 #include "libopencor/solverinfo.h"
+#include "libopencor/solverode.h"
 #include "libopencor/solverproperty.h"
 #include "libopencor/version.h"

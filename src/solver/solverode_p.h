@@ -24,6 +24,14 @@ namespace libOpenCOR {
 
 class SolverOde::Impl: public Solver::Impl
 {
+public:
+    double *mStates = nullptr;
+    double *mRates = nullptr;
+    double *mVariables = nullptr;
+
+    SolverOde::ComputeRates mComputeRates = nullptr;
+
+    virtual bool initialise(double *pStates, double *pRates, double *pVariables, SolverOde::ComputeRates pComputeRates);
 };
 
 } // namespace libOpenCOR

@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "solverforwardeuler_p.h"
+#include "utils.h"
 
 namespace libOpenCOR {
 
@@ -56,6 +57,25 @@ std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesKisaoId()
     return PropertiesKisaoId;
 }
 
+bool SolverForwardEuler::Impl::initialise(double *pStates, double *pRates, double *pVariables,
+                                          ComputeRates pComputeRates)
+{
+    removeAllIssues();
+
+    bool ok = true;
+    auto step = stringToDouble(mProperties[StepKisaoId], &ok);
+
+    if (ok && (step > 0.0)) {
+        mStep = step;
+    } else {
+        addError("The 'Step' property has an invalid value ('" + mProperties[StepKisaoId] + "'). It must be a floating point number greater than zero.");
+
+        return false;
+    }
+
+    return SolverOde::Impl::initialise(pStates, pRates, pVariables, pComputeRates);
+}
+
 SolverForwardEuler::SolverForwardEuler()
     : SolverOde(new Impl())
 {
@@ -77,5 +97,10 @@ const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 */
+
+bool SolverForwardEuler::initialise(double *pStates, double *pRates, double *pVariables, ComputeRates pComputeRates)
+{
+    return pimpl()->initialise(pStates, pRates, pVariables, pComputeRates);
+}
 
 } // namespace libOpenCOR

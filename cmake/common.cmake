@@ -148,6 +148,7 @@ function(configure_target TARGET)
                 performance-*
                 readability-*
                 -readability-function-cognitive-complexity
+                -readability-identifier-length
                 ${READABILITY_CHECKS}
             )
 

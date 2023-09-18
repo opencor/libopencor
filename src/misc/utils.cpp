@@ -347,4 +347,25 @@ std::string contentsAsString(const std::vector<unsigned char> &pContents)
     return {reinterpret_cast<const char *>(pContents.data()), pContents.size()};
 }
 
+double stringToDouble(const std::string &pString, bool *pOk)
+{
+    auto res = 0.0;
+
+    try {
+        res = std::stod(pString);
+    } catch (...) {
+        if (pOk != nullptr) {
+            *pOk = false;
+        }
+
+        return 0.0;
+    }
+
+    if (pOk != nullptr) {
+        *pOk = true;
+    }
+
+    return res;
+}
+
 } // namespace libOpenCOR

@@ -44,4 +44,6 @@ std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath);
 
 std::string contentsAsString(const std::vector<unsigned char> &pContents);
 
+double stringToDouble(const std::string &pString, bool *pOk = nullptr);
+
 } // namespace libOpenCOR
