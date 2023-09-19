@@ -18,29 +18,6 @@ limitations under the License.
 
 void solverApi()
 {
-    // Solver API.
-
-    emscripten::enum_<libOpenCOR::Solver::Type>("Solver.Type")
-        .value("ODE", libOpenCOR::Solver::Type::ODE)
-        .value("NLA", libOpenCOR::Solver::Type::NLA);
-
-    emscripten::register_map<std::string, std::string>("Properties");
-
-    emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
-        .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
-        .class_function("solversInfo", &libOpenCOR::Solver::solversInfo)
-        .function("isValid", &libOpenCOR::Solver::isValid)
-        .function("properties", &libOpenCOR::Solver::properties)
-        .function("setProperties", &libOpenCOR::Solver::setProperties)
-        .function("property", &libOpenCOR::Solver::property)
-        .function("setProperty", &libOpenCOR::Solver::setProperty);
-
-    EM_ASM({
-        Module['Solver']['Type'] = Module['Solver.Type'];
-
-        delete Module['Solver.Type'];
-    });
-
     // SolverInfo API.
 
     emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
@@ -79,5 +56,28 @@ void solverApi()
         Module['SolverProperty']['Type'] = Module['SolverProperty.Type'];
 
         delete Module['SolverProperty.Type'];
+    });
+
+    // Solver API.
+
+    emscripten::enum_<libOpenCOR::Solver::Type>("Solver.Type")
+        .value("ODE", libOpenCOR::Solver::Type::ODE)
+        .value("NLA", libOpenCOR::Solver::Type::NLA);
+
+    emscripten::register_map<std::string, std::string>("Properties");
+
+    emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
+        .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
+        .class_function("solversInfo", &libOpenCOR::Solver::solversInfo)
+        .function("isValid", &libOpenCOR::Solver::isValid)
+        .function("properties", &libOpenCOR::Solver::properties)
+        .function("setProperties", &libOpenCOR::Solver::setProperties)
+        .function("property", &libOpenCOR::Solver::property)
+        .function("setProperty", &libOpenCOR::Solver::setProperty);
+
+    EM_ASM({
+        Module['Solver']['Type'] = Module['Solver.Type'];
+
+        delete Module['Solver.Type'];
     });
 }

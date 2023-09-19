@@ -23,23 +23,6 @@ namespace py = pybind11;
 
 void solverApi(py::module_ &m)
 {
-    // Solver API.
-
-    py::class_<libOpenCOR::Solver, libOpenCOR::Logger, libOpenCOR::SolverPtr> solver(m, "Solver");
-
-    py::enum_<libOpenCOR::Solver::Type>(solver, "Type")
-        .value("Ode", libOpenCOR::Solver::Type::ODE)
-        .value("Nla", libOpenCOR::Solver::Type::NLA)
-        .export_values();
-
-    solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
-        .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.")
-        .def_property_readonly("is_valid", &libOpenCOR::Solver::isValid, "Get whether the Solver object is valid.")
-        .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of the Solver object.")
-        .def("set_properties", &libOpenCOR::Solver::setProperties, "Set the properties of the Solver object.")
-        .def("property", &libOpenCOR::Solver::property, "Get the property of the Solver object.")
-        .def("set_property", &libOpenCOR::Solver::setProperty, "Set the property of the Solver object.");
-
     // SolverInfo API.
 
     py::class_<libOpenCOR::SolverInfo, libOpenCOR::SolverInfoPtr> solverInfo(m, "SolverInfo");
@@ -70,4 +53,21 @@ void solverApi(py::module_ &m)
         .def_property_readonly("list_values", &libOpenCOR::SolverProperty::listValues, "Get the list of values of the SolverProperty object.")
         .def_property_readonly("default_value", &libOpenCOR::SolverProperty::defaultValue, "Get the default value of the SolverProperty object.")
         .def_property_readonly("has_voi_unit", &libOpenCOR::SolverProperty::hasVoiUnit, "Get whether the SolverProperty object has VOI unit.");
+
+    // Solver API.
+
+    py::class_<libOpenCOR::Solver, libOpenCOR::Logger, libOpenCOR::SolverPtr> solver(m, "Solver");
+
+    py::enum_<libOpenCOR::Solver::Type>(solver, "Type")
+        .value("Ode", libOpenCOR::Solver::Type::ODE)
+        .value("Nla", libOpenCOR::Solver::Type::NLA)
+        .export_values();
+
+    solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
+        .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.")
+        .def_property_readonly("is_valid", &libOpenCOR::Solver::isValid, "Get whether the Solver object is valid.")
+        .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of the Solver object.")
+        .def("set_properties", &libOpenCOR::Solver::setProperties, "Set the properties of the Solver object.")
+        .def("property", &libOpenCOR::Solver::property, "Get the property of the Solver object.")
+        .def("set_property", &libOpenCOR::Solver::setProperty, "Set the property of the Solver object.");
 }
