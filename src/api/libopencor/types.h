@@ -32,6 +32,9 @@ using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @
 class Solver;
 using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
 
+class SolverForwardEuler;
+using SolverForwardEulerPtr = std::shared_ptr<SolverForwardEuler>; /**< Type definition for the shared @ref SolverForwardEuler pointer. */
+
 class SolverInfo;
 using SolverInfoPtr = std::shared_ptr<SolverInfo>; /**< Type definition for the shared @ref SolverInfo pointer. */
 

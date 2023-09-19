@@ -22,7 +22,9 @@ from .module import (
     Logger,
     # Solver API.
     Solver,
+    SolverForwardEuler,
     SolverInfo,
+    SolverOde,
     SolverProperty,
     # Version API.
     version,
@@ -52,7 +54,9 @@ __all__ = (
     "Logger",
     # Solver API.
     "Solver",
+    "SolverForwardEuler",
     "SolverInfo",
+    "SolverOde",
     "SolverProperty",
     # Version API.
     "version",

@@ -70,4 +70,18 @@ void solverApi(py::module_ &m)
         .def("set_properties", &libOpenCOR::Solver::setProperties, "Set the properties of the Solver object.")
         .def("property", &libOpenCOR::Solver::property, "Get the property of the Solver object.")
         .def("set_property", &libOpenCOR::Solver::setProperty, "Set the property of the Solver object.");
+
+    // SolverOde API.
+
+    py::class_<libOpenCOR::SolverOde, libOpenCOR::Solver, libOpenCOR::SolverOdePtr> solverOde(m, "SolverOde");
+
+    solverOde.def("initialise", &libOpenCOR::SolverOde::initialise, "Initialise the SolverOde object.")
+        .def("solve", &libOpenCOR::SolverOde::solve, "Solve using the SolverOde object.");
+
+    // SolverForwardEuler API.
+
+    py::class_<libOpenCOR::SolverForwardEuler, libOpenCOR::SolverOde, libOpenCOR::SolverForwardEulerPtr> solverForwardEuler(m, "SolverForwardEuler");
+
+    solverForwardEuler.def("initialise", &libOpenCOR::SolverForwardEuler::initialise, "Initialise the SolverForwardEuler object.")
+        .def("solve", &libOpenCOR::SolverForwardEuler::solve, "Solve using the SolverForwardEuler object.");
 }
