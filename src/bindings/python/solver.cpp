@@ -63,8 +63,7 @@ void solverApi(py::module_ &m)
         .value("Nla", libOpenCOR::Solver::Type::NLA)
         .export_values();
 
-    solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
-        .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.")
+    solver.def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.")
         .def_property_readonly("is_valid", &libOpenCOR::Solver::isValid, "Get whether the Solver object is valid.")
         .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of the Solver object.")
         .def("set_properties", &libOpenCOR::Solver::setProperties, "Set the properties of the Solver object.")
@@ -75,13 +74,7 @@ void solverApi(py::module_ &m)
 
     py::class_<libOpenCOR::SolverOde, libOpenCOR::Solver, libOpenCOR::SolverOdePtr> solverOde(m, "SolverOde");
 
-    solverOde.def("initialise", &libOpenCOR::SolverOde::initialise, "Initialise the SolverOde object.")
+    solverOde.def(py::init(&libOpenCOR::SolverOde::create), "Create a SolverOde object.")
+        .def("initialise", &libOpenCOR::SolverOde::initialise, "Initialise the SolverOde object.")
         .def("solve", &libOpenCOR::SolverOde::solve, "Solve using the SolverOde object.");
-
-    // SolverForwardEuler API.
-
-    py::class_<libOpenCOR::SolverForwardEuler, libOpenCOR::SolverOde, libOpenCOR::SolverForwardEulerPtr> solverForwardEuler(m, "SolverForwardEuler");
-
-    solverForwardEuler.def("initialise", &libOpenCOR::SolverForwardEuler::initialise, "Initialise the SolverForwardEuler object.")
-        .def("solve", &libOpenCOR::SolverForwardEuler::solve, "Solve using the SolverForwardEuler object.");
 }

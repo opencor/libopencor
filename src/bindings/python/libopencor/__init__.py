@@ -22,7 +22,6 @@ from .module import (
     Logger,
     # Solver API.
     Solver,
-    SolverForwardEuler,
     SolverInfo,
     SolverOde,
     SolverProperty,
@@ -54,7 +53,6 @@ __all__ = (
     "Logger",
     # Solver API.
     "Solver",
-    "SolverForwardEuler",
     "SolverInfo",
     "SolverOde",
     "SolverProperty",

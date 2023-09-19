@@ -13,10 +13,10 @@
 # limitations under the License.
 
 
-from libopencor import Solver
+from libopencor import SolverOde
 
 
 def test_main():
-    solver = Solver("Forward Euler")
+    ode_solver = SolverOde("Forward Euler")
 
-    solver.set_property("Step", "0.01")
+    ode_solver.set_property("Step", "0.01")
