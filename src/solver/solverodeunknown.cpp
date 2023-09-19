@@ -14,30 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solverunknown_p.h"
+#include "solverodeunknown_p.h"
 
 namespace libOpenCOR {
 
-SolverOdePtr SolverUnknown::Impl::create()
+SolverOdePtr SolverOdeUnknown::Impl::create()
 {
 #ifdef COVERAGE_ENABLED
-    auto res = std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
+    auto res = std::shared_ptr<SolverOdeUnknown> {new SolverOdeUnknown {}};
 
     res->pimpl()->propertiesKisaoId(); // Just for code coverage.
 
     return res;
 #else
-    return std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
+    return std::shared_ptr<SolverOdeUnknown> {new SolverOdeUnknown {}};
 #endif
 }
 
-std::map<std::string, std::string> SolverUnknown::Impl::propertiesKisaoId() const
+std::map<std::string, std::string> SolverOdeUnknown::Impl::propertiesKisaoId() const
 {
     return {};
 }
 
-bool SolverUnknown::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                     ComputeRates pComputeRates)
+bool SolverOdeUnknown::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                        ComputeRates pComputeRates)
 {
     (void)pSize;
     (void)pStates;
@@ -48,39 +48,39 @@ bool SolverUnknown::Impl::initialise(size_t pSize, double *pStates, double *pRat
     return false;
 }
 
-void SolverUnknown::Impl::solve(double &pVoi, double pVoiEnd) const
+void SolverOdeUnknown::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     (void)pVoi;
     (void)pVoiEnd;
 }
 
-SolverUnknown::SolverUnknown()
+SolverOdeUnknown::SolverOdeUnknown()
     : SolverOde(new Impl())
 {
 }
 
-SolverUnknown::~SolverUnknown()
+SolverOdeUnknown::~SolverOdeUnknown()
 {
     delete pimpl();
 }
 
-SolverUnknown::Impl *SolverUnknown::pimpl()
+SolverOdeUnknown::Impl *SolverOdeUnknown::pimpl()
 {
     return static_cast<Impl *>(SolverOde::pimpl());
 }
 
-const SolverUnknown::Impl *SolverUnknown::pimpl() const
+const SolverOdeUnknown::Impl *SolverOdeUnknown::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-bool SolverUnknown::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                               ComputeRates pComputeRates)
+bool SolverOdeUnknown::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                  ComputeRates pComputeRates)
 {
     return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-void SolverUnknown::solve(double &pVoi, double pVoiEnd) const
+void SolverOdeUnknown::solve(double &pVoi, double pVoiEnd) const
 {
     pimpl()->solve(pVoi, pVoiEnd);
 }

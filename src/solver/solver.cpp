@@ -17,7 +17,7 @@ limitations under the License.
 #include "solver_p.h"
 #include "solverforwardeuler_p.h"
 #include "solverinfo_p.h"
-#include "solverunknown_p.h"
+#include "solverodeunknown_p.h"
 
 namespace libOpenCOR {
 
@@ -102,7 +102,7 @@ SolverOdePtr Solver::createOde(const std::string &pNameOrKisaoId)
         return iter->second();
     }
 
-    return SolverUnknown::Impl::create();
+    return SolverOdeUnknown::Impl::create();
 }
 
 std::vector<SolverInfoPtr> Solver::solversInfo()

@@ -102,7 +102,7 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverodeunknown.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
@@ -143,8 +143,8 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverodeunknown_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverodeunknown.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime_p.h
