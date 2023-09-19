@@ -33,7 +33,7 @@ public:
     static const std::string StepKisaoId;
     static constexpr double StepDefaultValue = 1.0;
 
-    static SolverPtr create();
+    static SolverOdePtr create();
     static std::vector<SolverPropertyPtr> propertiesInfo();
 
     double mStep = StepDefaultValue;

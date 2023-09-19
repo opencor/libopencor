@@ -60,21 +60,21 @@ public:
     Solver &operator=(Solver &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Create a @ref Solver object.
+     * @brief Create a @ref SolverOde object.
      *
-     * Factory method to create a @ref Solver object which name or KiSAO id is given:
+     * Factory method to create a @ref SolverOde object which name or KiSAO id is given:
      *
      * ```
-     * auto cvodeSolver = libOpenCOR::Solver::create("CVODE");
-     * auto anotherCvodeSolver = libOpenCOR::Solver::create("KISAO:0000019");
+     * auto cvodeSolver = libOpenCOR::Solver::createOde("CVODE");
+     * auto anotherCvodeSolver = libOpenCOR::Solver::createOde("KISAO:0000019");
      * ```
      *
-     * @param pNameOrKisaoId The name of the solver or its KiSAO id.
+     * @param pNameOrKisaoId The name of the ODE solver or its KiSAO id.
      *
-     * @return A smart pointer to a @ref Solver object.
+     * @return A smart pointer to a @ref SolverOde object.
      */
 
-    static SolverPtr create(const std::string &pNameOrKisaoId);
+    static SolverOdePtr createOde(const std::string &pNameOrKisaoId);
 
     /**
      * @brief Get various information about the solvers that are available.

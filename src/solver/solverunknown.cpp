@@ -18,7 +18,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverPtr SolverUnknown::Impl::create()
+SolverOdePtr SolverUnknown::Impl::create()
 {
 #ifdef COVERAGE_ENABLED
     auto res = std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
@@ -36,8 +36,26 @@ std::map<std::string, std::string> SolverUnknown::Impl::propertiesKisaoId() cons
     return {};
 }
 
+bool SolverUnknown::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                     ComputeRates pComputeRates)
+{
+    (void)pSize;
+    (void)pStates;
+    (void)pRates;
+    (void)pVariables;
+    (void)pComputeRates;
+
+    return false;
+}
+
+void SolverUnknown::Impl::solve(double &pVoi, double pVoiEnd) const
+{
+    (void)pVoi;
+    (void)pVoiEnd;
+}
+
 SolverUnknown::SolverUnknown()
-    : Solver(new Impl())
+    : SolverOde(new Impl())
 {
 }
 
@@ -48,14 +66,23 @@ SolverUnknown::~SolverUnknown()
 
 SolverUnknown::Impl *SolverUnknown::pimpl()
 {
-    return static_cast<Impl *>(Solver::pimpl());
+    return static_cast<Impl *>(SolverOde::pimpl());
 }
 
-/*---GRY---
 const SolverUnknown::Impl *SolverUnknown::pimpl() const
 {
-    return static_cast<const Impl *>(Solver::pimpl());
+    return static_cast<const Impl *>(SolverOde::pimpl());
 }
-*/
+
+bool SolverUnknown::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                               ComputeRates pComputeRates)
+{
+    return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+}
+
+void SolverUnknown::solve(double &pVoi, double pVoiEnd) const
+{
+    pimpl()->solve(pVoi, pVoiEnd);
+}
 
 } // namespace libOpenCOR

@@ -25,7 +25,7 @@ const std::string SolverForwardEuler::Impl::KisaoId = "KISAO:0000030"; // NOLINT
 const std::string SolverForwardEuler::Impl::StepName = "Step"; // NOLINT
 const std::string SolverForwardEuler::Impl::StepKisaoId = "KISAO:0000483"; // NOLINT
 
-SolverPtr SolverForwardEuler::Impl::create()
+SolverOdePtr SolverForwardEuler::Impl::create()
 {
     return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};
 }

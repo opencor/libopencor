@@ -22,17 +22,17 @@ limitations under the License.
 namespace libOpenCOR {
 
 std::map<std::string, std::string> Solver::Impl::SolversKisaoId; // NOLINT
-std::map<std::string, SolverCreate> Solver::Impl::SolversCreate; // NOLINT
+std::map<std::string, SolverOdeCreate> Solver::Impl::SolversCreateOde; // NOLINT
 std::vector<SolverInfoPtr> Solver::Impl::SolversInfo; // NOLINT
 
-void Solver::Impl::registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId,
-                                  SolverCreate pCreate, const std::vector<SolverPropertyPtr> &pProperties)
+void Solver::Impl::registerSolverOde(Type pType, const std::string &pName, const std::string &pKisaoId,
+                                     SolverOdeCreate pCreateOde, const std::vector<SolverPropertyPtr> &pProperties)
 {
 #ifndef COVERAGE_ENABLED
-    if (auto iter = Solver::Impl::SolversCreate.find(pKisaoId); iter == Solver::Impl::SolversCreate.end()) {
+    if (auto iter = Solver::Impl::SolversCreateOde.find(pKisaoId); iter == Solver::Impl::SolversCreateOde.end()) {
 #endif
         Solver::Impl::SolversKisaoId[pName] = pKisaoId;
-        Solver::Impl::SolversCreate[pKisaoId] = pCreate;
+        Solver::Impl::SolversCreateOde[pKisaoId] = pCreateOde;
         Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pName, pKisaoId, pProperties));
 #ifndef COVERAGE_ENABLED
     }
@@ -93,12 +93,12 @@ const Solver::Impl *Solver::pimpl() const
     return static_cast<const Impl *>(Logger::pimpl());
 }
 
-SolverPtr Solver::create(const std::string &pNameOrKisaoId)
+SolverOdePtr Solver::createOde(const std::string &pNameOrKisaoId)
 {
     auto kisaoIdIter = Solver::Impl::SolversKisaoId.find(pNameOrKisaoId);
     auto kisaoId = (kisaoIdIter != Solver::Impl::SolversKisaoId.end()) ? kisaoIdIter->second : pNameOrKisaoId;
 
-    if (auto iter = Solver::Impl::SolversCreate.find(kisaoId); iter != Solver::Impl::SolversCreate.end()) {
+    if (auto iter = Solver::Impl::SolversCreateOde.find(kisaoId); iter != Solver::Impl::SolversCreateOde.end()) {
         return iter->second();
     }
 
@@ -112,11 +112,11 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
     if (!initialised) {
         initialised = true;
 
-        Solver::Impl::registerSolver(SolverForwardEuler::Impl::Type,
-                                     SolverForwardEuler::Impl::Name,
-                                     SolverForwardEuler::Impl::KisaoId,
-                                     SolverForwardEuler::Impl::create,
-                                     SolverForwardEuler::Impl::propertiesInfo());
+        Solver::Impl::registerSolverOde(SolverForwardEuler::Impl::Type,
+                                        SolverForwardEuler::Impl::Name,
+                                        SolverForwardEuler::Impl::KisaoId,
+                                        SolverForwardEuler::Impl::create,
+                                        SolverForwardEuler::Impl::propertiesInfo());
     }
 
     return Solver::Impl::SolversInfo;

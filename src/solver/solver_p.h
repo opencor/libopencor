@@ -23,20 +23,20 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-using SolverCreate = SolverPtr (*)();
+using SolverOdeCreate = SolverOdePtr (*)();
 
 class Solver::Impl: public Logger::Impl
 {
 public:
     static std::map<std::string, std::string> SolversKisaoId;
-    static std::map<std::string, SolverCreate> SolversCreate;
+    static std::map<std::string, SolverOdeCreate> SolversCreateOde;
     static std::vector<SolverInfoPtr> SolversInfo;
 
     bool mIsValid = false;
     std::map<std::string, std::string> mProperties;
 
-    static void registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId, SolverCreate pCreate,
-                               const std::vector<SolverPropertyPtr> &pProperties);
+    static void registerSolverOde(Type pType, const std::string &pName, const std::string &pKisaoId, SolverOdeCreate pCreateOde,
+                                  const std::vector<SolverPropertyPtr> &pProperties);
     static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
                                             const std::string &pKisaoId, const std::vector<std::string> &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiValue);

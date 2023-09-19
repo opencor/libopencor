@@ -16,11 +16,11 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solver.h"
+#include "libopencor/solverode.h"
 
 namespace libOpenCOR {
 
-class LIBOPENCOR_EXPORT SolverUnknown: public Solver
+class LIBOPENCOR_EXPORT SolverUnknown: public SolverOde
 {
     friend class Solver;
 
@@ -32,6 +32,10 @@ public:
 
     SolverUnknown &operator=(const SolverUnknown &pRhs) = delete;
     SolverUnknown &operator=(SolverUnknown &&pRhs) noexcept = delete;
+
+    bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                    ComputeRates pComputeRates) override;
+    void solve(double &pVoi, double pVoiEnd) const override;
 
 private:
     class Impl;

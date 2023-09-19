@@ -60,9 +60,9 @@ std::tuple<double *, double *, double *, libOpenCOR::SolverOdePtr> createAndInit
     computeRates(0.0, states, rates, variables);
     computeVariables(0.0, states, rates, variables);
 
-    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Forward Euler"));
+    auto odeSolver = libOpenCOR::Solver::createOde("Forward Euler");
 
-    return std::make_tuple(states, rates, variables, solver);
+    return std::make_tuple(states, rates, variables, odeSolver);
 }
 
 void deleteArrays(double *pStates, double *pRates, double *pVariables)
@@ -75,20 +75,20 @@ void deleteArrays(double *pStates, double *pRates, double *pVariables)
 
 TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
 {
-    // Create and initialise our various arrays.
+    // Create and initialise our various arrays and create our ODE solver.
 
-    const auto [states, rates, variables, solver] = createAndInitialiseArraysAndCreateSolver();
+    const auto [states, rates, variables, odeSolver] = createAndInitialiseArraysAndCreateSolver();
 
-    // Customise, and initialise our solver using a step value that is not a floating point number.
+    // Customise, and initialise our ODE solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("abc"). It must be a floating point number greater than zero.)"},
     };
 
-    solver->setProperty("Step", "abc");
+    odeSolver->setProperty("Step", "abc");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
-    EXPECT_EQ_ISSUES(solver, expectedIssues);
+    EXPECT_FALSE(odeSolver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_EQ_ISSUES(odeSolver, expectedIssues);
 
     // Clean up after ourselves.
 
@@ -97,20 +97,20 @@ TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
 
 TEST(ForwardEulerSolverTest, invalidStepValue)
 {
-    // Create and initialise our various arrays.
+    // Create and initialise our various arrays and create our ODE solver.
 
-    const auto [states, rates, variables, solver] = createAndInitialiseArraysAndCreateSolver();
+    const auto [states, rates, variables, odeSolver] = createAndInitialiseArraysAndCreateSolver();
 
-    // Customise, and initialise our solver using an invalid step value.
+    // Customise, and initialise our ODE solver using an invalid step value.
 
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("0.0"). It must be a floating point number greater than zero.)"},
     };
 
-    solver->setProperty("Step", "0.0");
+    odeSolver->setProperty("Step", "0.0");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
-    EXPECT_EQ_ISSUES(solver, expectedIssues);
+    EXPECT_FALSE(odeSolver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_EQ_ISSUES(odeSolver, expectedIssues);
 
     // Clean up after ourselves.
 
@@ -119,18 +119,18 @@ TEST(ForwardEulerSolverTest, invalidStepValue)
 
 TEST(ForwardEulerSolverTest, main)
 {
-    // Create and initialise our various arrays.
+    // Create and initialise our various arrays and create our ODE solver.
 
-    const auto [states, rates, variables, solver] = createAndInitialiseArraysAndCreateSolver();
+    const auto [states, rates, variables, odeSolver] = createAndInitialiseArraysAndCreateSolver();
 
-    // Customise, and initialise our solver.
+    // Customise, and initialise our ODE solver.
 
     static const libOpenCOR::Doubles initialStates = {0.0, 0.6, 0.05, 0.325};
     static const libOpenCOR::Doubles finalStates = {-0.015329449762310435, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
 
-    solver->setProperty("Step", "0.0123");
+    odeSolver->setProperty("Step", "0.0123");
 
-    EXPECT_TRUE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_TRUE(odeSolver->initialise(STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_DOUBLES(states, initialStates);
 
     // Solve our model.
@@ -143,7 +143,7 @@ TEST(ForwardEulerSolverTest, main)
     size_t voiCounter = 0;
 
     while (!libOpenCOR::fuzzyCompare(voi, voiEnd)) {
-        solver->solve(voi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd));
+        odeSolver->solve(voi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd));
 
         computeVariables(voi, states, rates, variables);
     }
