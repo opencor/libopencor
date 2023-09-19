@@ -33,7 +33,6 @@ limitations under the License.
 #    pragma clang diagnostic ignored "-Wdouble-promotion"
 #    pragma clang diagnostic ignored "-Wmissing-prototypes"
 #    pragma clang diagnostic ignored "-Wold-style-cast"
-#    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #    pragma clang diagnostic ignored "-Wunused-parameter"
 #    pragma clang diagnostic ignored "-Wunused-variable"
 #endif

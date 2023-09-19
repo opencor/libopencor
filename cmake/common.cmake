@@ -79,6 +79,7 @@ function(configure_target TARGET)
                 -Wno-exit-time-destructors
                 -Wno-global-constructors
                 -Wno-padded
+                -Wno-unsafe-buffer-usage
                 -Wno-weak-vtables
             )
 

@@ -98,14 +98,7 @@ void SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
         // Compute Y_n+1.
 
         for (size_t i = 0; i < mSize; ++i) {
-#ifdef BUILDING_USING_CLANG
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#endif
             mStates[i] += realStep * mRates[i]; // NOLINT
-#ifdef BUILDING_USING_CLANG
-#    pragma clang diagnostic pop
-#endif
         }
 
         // Update the variable of integration.

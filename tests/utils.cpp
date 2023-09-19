@@ -36,14 +36,7 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
     }
 }
 
-#ifdef BUILDING_USING_CLANG
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#endif
-void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles) // NOLINT
-#ifdef BUILDING_USING_CLANG
-#    pragma clang diagnostic pop
-#endif
+void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles)
 {
     for (size_t i = 0; i < pExpectedDoubles.size(); ++i) {
         EXPECT_DOUBLE_EQ(pDoubles[i], pExpectedDoubles[i]); // NOLINT
@@ -55,14 +48,7 @@ std::string resourcePath(const std::string &pResourceRelativePath)
     return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;
 }
 
-#ifdef BUILDING_USING_CLANG
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#endif
 std::vector<unsigned char> charArrayToVector(const char *pContents)
-#ifdef BUILDING_USING_CLANG
-#    pragma clang diagnostic pop
-#endif
 {
     return {pContents, pContents + strlen(pContents)}; // NOLINT
 }
