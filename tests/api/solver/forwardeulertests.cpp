@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
+
 #include "gtest/gtest.h"
 
 #include "tests/utils.h"
@@ -86,7 +88,7 @@ TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
 
     solver->setProperty("Step", "abc");
 
-    EXPECT_FALSE(solver->initialise(states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, expectedIssues);
 
     // Clean up after ourselves.
@@ -108,7 +110,7 @@ TEST(ForwardEulerSolverTest, invalidStepValue)
 
     solver->setProperty("Step", "0.0");
 
-    EXPECT_FALSE(solver->initialise(states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, expectedIssues);
 
     // Clean up after ourselves.
@@ -124,9 +126,30 @@ TEST(ForwardEulerSolverTest, main)
 
     // Customise, and initialise our solver.
 
-    solver->setProperty("Step", "0.01");
+    static const libOpenCOR::Doubles initialStates = {0.0, 0.6, 0.05, 0.325};
+    static const libOpenCOR::Doubles finalStates = {-0.015329449762310435, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
 
-    EXPECT_TRUE(solver->initialise(states, rates, variables, computeRates));
+    solver->setProperty("Step", "0.0123");
+
+    EXPECT_TRUE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_EQ_DOUBLES(states, initialStates);
+
+    // Solve our model.
+
+    static const double voiStart = 0.0;
+    static const double voiEnd = 50.0;
+    static const double voiInterval = 0.1;
+
+    double voi = 0.0;
+    size_t voiCounter = 0;
+
+    while (!libOpenCOR::fuzzyCompare(voi, voiEnd)) {
+        solver->solve(voi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd));
+
+        computeVariables(voi, states, rates, variables);
+    }
+
+    EXPECT_EQ_DOUBLES(states, finalStates);
 
     // Clean up after ourselves.
 

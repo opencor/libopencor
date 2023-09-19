@@ -25,13 +25,17 @@ namespace libOpenCOR {
 class SolverOde::Impl: public Solver::Impl
 {
 public:
+    size_t mSize = 0;
+
     double *mStates = nullptr;
     double *mRates = nullptr;
     double *mVariables = nullptr;
 
     SolverOde::ComputeRates mComputeRates = nullptr;
 
-    virtual bool initialise(double *pStates, double *pRates, double *pVariables, SolverOde::ComputeRates pComputeRates);
+    virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                            SolverOde::ComputeRates pComputeRates) = 0;
+    virtual void solve(double &pVoi, double pVoiEnd) const = 0;
 };
 
 } // namespace libOpenCOR

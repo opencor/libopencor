@@ -57,7 +57,7 @@ std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesKisaoId()
     return PropertiesKisaoId;
 }
 
-bool SolverForwardEuler::Impl::initialise(double *pStates, double *pRates, double *pVariables,
+bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
                                           ComputeRates pComputeRates)
 {
     removeAllIssues();
@@ -73,7 +73,47 @@ bool SolverForwardEuler::Impl::initialise(double *pStates, double *pRates, doubl
         return false;
     }
 
-    return SolverOde::Impl::initialise(pStates, pRates, pVariables, pComputeRates);
+    return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+}
+
+void SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
+{
+    // Y_n+1 = Y_n + h * f(t_n, Y_n).
+
+    const double voiStart = pVoi;
+    size_t voiCounter = 0;
+    double realStep = mStep;
+
+    while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
+        // Check that the step is correct.
+
+        if (pVoi + realStep > pVoiEnd) {
+            realStep = pVoiEnd - pVoi;
+        }
+
+        // Compute f(t_n, Y_n).
+
+        mComputeRates(pVoi, mStates, mRates, mVariables);
+
+        // Compute Y_n+1.
+
+        for (size_t i = 0; i < mSize; ++i) {
+#ifdef BUILDING_USING_CLANG
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
+            mStates[i] += realStep * mRates[i]; // NOLINT
+#ifdef BUILDING_USING_CLANG
+#    pragma clang diagnostic pop
+#endif
+        }
+
+        // Update the variable of integration.
+
+        pVoi = libOpenCOR::fuzzyCompare(realStep, mStep) ?
+                   voiStart + static_cast<double>(++voiCounter) *realStep :
+                   pVoi = pVoiEnd;
+    }
 }
 
 SolverForwardEuler::SolverForwardEuler()
@@ -91,16 +131,20 @@ SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
     return static_cast<Impl *>(SolverOde::pimpl());
 }
 
-/*---GRY---
 const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
-*/
 
-bool SolverForwardEuler::initialise(double *pStates, double *pRates, double *pVariables, ComputeRates pComputeRates)
+bool SolverForwardEuler::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                    ComputeRates pComputeRates)
 {
-    return pimpl()->initialise(pStates, pRates, pVariables, pComputeRates);
+    return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+}
+
+void SolverForwardEuler::solve(double &pVoi, double pVoiEnd) const
+{
+    pimpl()->solve(pVoi, pVoiEnd);
 }
 
 } // namespace libOpenCOR

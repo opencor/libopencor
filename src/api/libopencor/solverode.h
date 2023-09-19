@@ -61,6 +61,7 @@ public:
      * Initialise the solver, which means keeping track of the various arrays and of the compute rates method, as well
      * as checking its properties to initialise the solver itself.
      *
+     * @param pSize The size, as a @c size_t, of the system of ODEs.
      * @param pStates The states, as an array of @c double.
      * @param pRates The rates, as an array of @c double.
      * @param pVariables The other variables, as an array of @c double.
@@ -69,7 +70,19 @@ public:
      * @return @c true if the solver is initialised, @c false otherwise.
      */
 
-    virtual bool initialise(double *pStates, double *pRates, double *pVariables, ComputeRates pComputeRates) = 0;
+    virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                            ComputeRates pComputeRates) = 0;
+
+    /**
+     * @brief Solve the system of ODEs.
+     *
+     * Solve the system of ODEs between @p pVoi and @p pVoiEnd.
+     *
+     * @param pVoi The variable of integration, as a @c double.
+     * @param pVoiEnd The end value of the variable of integration, as a @c double.
+     */
+
+    virtual void solve(double &pVoi, double pVoiEnd) const = 0;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

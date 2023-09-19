@@ -42,8 +42,9 @@ public:
 
     std::map<std::string, std::string> propertiesKisaoId() const override;
 
-    bool initialise(double *pStates, double *pRates, double *pVariables,
+    bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
                     SolverOde::ComputeRates pComputeRates) override;
+    void solve(double &pVoi, double pVoiEnd) const override;
 };
 
 } // namespace libOpenCOR
