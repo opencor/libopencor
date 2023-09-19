@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "tests/utils.h"
+#include "utils.h"
 
 #include "gtest/gtest.h"
 
-#include "libopencor/logger.h"
+#include "tests/utils.h"
 
-#include <cstring>
+#include <libopencor>
 
 namespace libOpenCOR {
 
@@ -33,15 +33,6 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
     for (size_t i = 0; i < issues.size(); ++i) {
         EXPECT_EQ(issues[i]->type(), pExpectedIssues[i].type);
         EXPECT_EQ(issues[i]->description(), pExpectedIssues[i].description);
-    }
-}
-
-void expectEqualStrings(const std::vector<std::string> &pStrings, const std::vector<std::string> &pExpectedStrings)
-{
-    EXPECT_EQ(pStrings.size(), pExpectedStrings.size());
-
-    for (size_t i = 0; i < pStrings.size(); ++i) {
-        EXPECT_EQ(pStrings[i], pExpectedStrings[i]);
     }
 }
 
