@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "solverforwardeuler_p.h"
 #include "solverode_p.h"
+#include "solverodeunknown_p.h"
 
 namespace libOpenCOR {
 
@@ -45,6 +47,18 @@ SolverOde::Impl *SolverOde::pimpl()
 const SolverOde::Impl *SolverOde::pimpl() const
 {
     return static_cast<const Impl *>(Solver::pimpl());
+}
+
+SolverOdePtr SolverOde::create(const std::string &pNameOrKisaoId)
+{
+    auto kisaoIdIter = Solver::Impl::SolversKisaoId.find(pNameOrKisaoId);
+    auto kisaoId = (kisaoIdIter != Solver::Impl::SolversKisaoId.end()) ? kisaoIdIter->second : pNameOrKisaoId;
+
+    if (auto iter = Solver::Impl::SolversCreateOde.find(kisaoId); iter != Solver::Impl::SolversCreateOde.end()) {
+        return iter->second();
+    }
+
+    return SolverOdeUnknown::Impl::create();
 }
 
 } // namespace libOpenCOR

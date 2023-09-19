@@ -22,7 +22,7 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverOdeUnknown: public SolverOde
 {
-    friend class Solver;
+    friend class SolverOde;
 
 public:
     ~SolverOdeUnknown() override;

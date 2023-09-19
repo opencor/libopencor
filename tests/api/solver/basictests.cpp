@@ -49,28 +49,28 @@ TEST(BasicSolverTest, solversInfo)
 
 TEST(BasicSolverTest, unknownOdeSolver)
 {
-    auto odeSolver = libOpenCOR::Solver::createOde("Unknown");
+    auto odeSolver = libOpenCOR::SolverOde::create("Unknown");
 
     EXPECT_FALSE(odeSolver->isValid());
 }
 
 TEST(BasicSolverTest, forwardEulerByName)
 {
-    auto odeSolver = libOpenCOR::Solver::createOde("Forward Euler");
+    auto odeSolver = libOpenCOR::SolverOde::create("Forward Euler");
 
     EXPECT_TRUE(odeSolver->isValid());
 }
 
 TEST(BasicSolverTest, forwardEulerByKisaoId)
 {
-    auto odeSolver = libOpenCOR::Solver::createOde("KISAO:0000030");
+    auto odeSolver = libOpenCOR::SolverOde::create("KISAO:0000030");
 
     EXPECT_TRUE(odeSolver->isValid());
 }
 
 TEST(BasicSolverTest, properties)
 {
-    auto odeSolver = libOpenCOR::Solver::createOde("Forward Euler");
+    auto odeSolver = libOpenCOR::SolverOde::create("Forward Euler");
     auto properties = odeSolver->properties();
 
     EXPECT_EQ(odeSolver->properties().size(), 1);

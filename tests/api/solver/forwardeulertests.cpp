@@ -60,7 +60,7 @@ std::tuple<double *, double *, double *, libOpenCOR::SolverOdePtr> createAndInit
     computeRates(0.0, states, rates, variables);
     computeVariables(0.0, states, rates, variables);
 
-    auto odeSolver = libOpenCOR::Solver::createOde("Forward Euler");
+    auto odeSolver = libOpenCOR::SolverOde::create("Forward Euler");
 
     return std::make_tuple(states, rates, variables, odeSolver);
 }

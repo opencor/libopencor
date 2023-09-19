@@ -56,6 +56,23 @@ public:
     SolverOde &operator=(SolverOde &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
+     * @brief Create a @ref SolverOde object.
+     *
+     * Factory method to create a @ref SolverOde object which name or KiSAO id is given:
+     *
+     * ```
+     * auto odeSolver = libOpenCOR::SolverOde::create("CVODE");
+     * auto anotherOdeSolver = libOpenCOR::SolverOde::create("KISAO:0000019");
+     * ```
+     *
+     * @param pNameOrKisaoId The name of the ODE solver or its KiSAO id.
+     *
+     * @return A smart pointer to a @ref SolverOde object.
+     */
+
+    static SolverOdePtr create(const std::string &pNameOrKisaoId);
+
+    /**
      * @brief Initialise the solver.
      *
      * Initialise the solver, which means keeping track of the various arrays and of the compute rates method, as well
