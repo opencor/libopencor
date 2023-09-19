@@ -16,9 +16,8 @@ limitations under the License.
 
 #pragma once
 
+#include "solverforwardeuler.h"
 #include "solverode_p.h"
-
-#include "libopencor/solverforwardeuler.h"
 
 namespace libOpenCOR {
 
