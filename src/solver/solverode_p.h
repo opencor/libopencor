@@ -35,7 +35,7 @@ public:
 
     virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
                             SolverOde::ComputeRates pComputeRates) = 0;
-    virtual void solve(double &pVoi, double pVoiEnd) const = 0;
+    virtual bool solve(double pVoiFrom, double pVoiTo) const = 0;
 };
 
 } // namespace libOpenCOR

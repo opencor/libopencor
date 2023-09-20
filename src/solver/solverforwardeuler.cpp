@@ -76,24 +76,25 @@ bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double 
     return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-void SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverForwardEuler::Impl::solve(double pVoiFrom, double pVoiTo) const
 {
     // Y_n+1 = Y_n + h * f(t_n, Y_n).
 
-    const double voiStart = pVoi;
+    const double voiFrom = pVoiFrom;
+    double voi = pVoiFrom;
     size_t voiCounter = 0;
     double realStep = mStep;
 
-    while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
+    while (!libOpenCOR::fuzzyCompare(voi, pVoiTo)) {
         // Check that the step is correct.
 
-        if (pVoi + realStep > pVoiEnd) {
-            realStep = pVoiEnd - pVoi;
+        if (voi + realStep > pVoiTo) {
+            realStep = pVoiTo - voi;
         }
 
         // Compute f(t_n, Y_n).
 
-        mComputeRates(pVoi, mStates, mRates, mVariables);
+        mComputeRates(voi, mStates, mRates, mVariables);
 
         // Compute Y_n+1.
 
@@ -103,10 +104,12 @@ void SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
 
         // Update the variable of integration.
 
-        pVoi = libOpenCOR::fuzzyCompare(realStep, mStep) ?
-                   voiStart + static_cast<double>(++voiCounter) *realStep :
-                   pVoi = pVoiEnd;
+        voi = libOpenCOR::fuzzyCompare(realStep, mStep) ?
+                  voiFrom + static_cast<double>(++voiCounter) * realStep :
+                  pVoiTo;
     }
+
+    return true;
 }
 
 SolverForwardEuler::SolverForwardEuler()
@@ -135,9 +138,9 @@ bool SolverForwardEuler::initialise(size_t pSize, double *pStates, double *pRate
     return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-void SolverForwardEuler::solve(double &pVoi, double pVoiEnd) const
+bool SolverForwardEuler::solve(double pVoiFrom, double pVoiTo) const
 {
-    pimpl()->solve(pVoi, pVoiEnd);
+    return pimpl()->solve(pVoiFrom, pVoiTo);
 }
 
 } // namespace libOpenCOR

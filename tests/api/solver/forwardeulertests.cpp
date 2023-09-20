@@ -139,11 +139,15 @@ TEST(ForwardEulerSolverTest, main)
     static const double voiEnd = 50.0;
     static const double voiInterval = 0.1;
 
-    double voi = 0.0;
+    double voi = voiStart;
     size_t voiCounter = 0;
 
     while (!libOpenCOR::fuzzyCompare(voi, voiEnd)) {
-        odeSolver->solve(voi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd));
+        double voiTo = std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd);
+
+        EXPECT_TRUE(odeSolver->solve(voi, voiTo));
+
+        voi = voiTo;
 
         computeVariables(voi, states, rates, variables);
     }

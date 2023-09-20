@@ -48,10 +48,12 @@ bool SolverOdeUnknown::Impl::initialise(size_t pSize, double *pStates, double *p
     return false;
 }
 
-void SolverOdeUnknown::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverOdeUnknown::Impl::solve(double pVoiFrom, double pVoiTo) const
 {
-    (void)pVoi;
-    (void)pVoiEnd;
+    (void)pVoiFrom;
+    (void)pVoiTo;
+
+    return false;
 }
 
 SolverOdeUnknown::SolverOdeUnknown()
@@ -80,9 +82,9 @@ bool SolverOdeUnknown::initialise(size_t pSize, double *pStates, double *pRates,
     return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-void SolverOdeUnknown::solve(double &pVoi, double pVoiEnd) const
+bool SolverOdeUnknown::solve(double pVoiFrom, double pVoiTo) const
 {
-    pimpl()->solve(pVoi, pVoiEnd);
+    return pimpl()->solve(pVoiFrom, pVoiTo);
 }
 
 } // namespace libOpenCOR

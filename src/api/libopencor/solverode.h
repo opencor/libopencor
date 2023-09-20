@@ -95,11 +95,13 @@ public:
      *
      * Solve the system of ODEs between @p pVoi and @p pVoiEnd.
      *
-     * @param pVoi The variable of integration, as a @c double.
-     * @param pVoiEnd The end value of the variable of integration, as a @c double.
+     * @param pVoiFrom The value of the variable of integration, as a @c double, from which to solve the system of ODEs.
+     * @param pVoiTo The value of the variable of integration, as a @c double, to which to solve the system of ODEs.
+     *
+     * @return @c true if the solve is successful, @c false otherwise.
      */
 
-    virtual void solve(double &pVoi, double pVoiEnd) const = 0;
+    virtual bool solve(double pVoiFrom, double pVoiTo) const = 0;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
