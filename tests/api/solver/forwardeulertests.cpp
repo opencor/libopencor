@@ -79,7 +79,7 @@ TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
 
     const auto [states, rates, variables, odeSolver] = createAndInitialiseArraysAndCreateSolver();
 
-    // Customise, and initialise our ODE solver using a step value that is not a floating point number.
+    // Customise and initialise our ODE solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("abc"). It must be a floating point number greater than zero.)"},
@@ -101,7 +101,7 @@ TEST(ForwardEulerSolverTest, invalidStepValue)
 
     const auto [states, rates, variables, odeSolver] = createAndInitialiseArraysAndCreateSolver();
 
-    // Customise, and initialise our ODE solver using an invalid step value.
+    // Customise and initialise our ODE solver using an invalid step value.
 
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("0.0"). It must be a floating point number greater than zero.)"},
@@ -123,7 +123,7 @@ TEST(ForwardEulerSolverTest, main)
 
     const auto [states, rates, variables, odeSolver] = createAndInitialiseArraysAndCreateSolver();
 
-    // Customise, and initialise our ODE solver.
+    // Customise and initialise our ODE solver.
 
     static const libOpenCOR::Doubles initialStates = {0.0, 0.6, 0.05, 0.325};
     static const libOpenCOR::Doubles finalStates = {-0.015329449762310435, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
