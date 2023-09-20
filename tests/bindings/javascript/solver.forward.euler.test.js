@@ -20,8 +20,8 @@ const libopencor = await libOpenCOR();
 
 describe("Solver Forward Euler tests", () => {
   test("Main", () => {
-    const solver = new libopencor.Solver("Forward Euler");
+    const odeSolver = new libopencor.SolverOde("Forward Euler");
 
-    solver.setProperty("Step", "0.01");
+    odeSolver.setProperty("Step", "0.01");
   });
 });
