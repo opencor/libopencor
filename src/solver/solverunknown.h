@@ -16,31 +16,27 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solverode.h"
+#include "libopencor/solver.h"
 
 namespace libOpenCOR {
 
-class SolverOdeUnknown: public SolverOde
+class SolverUnknown: public Solver
 {
-    friend class SolverOde;
+    friend class Solver;
 
 public:
-    ~SolverOdeUnknown() override;
+    ~SolverUnknown() override;
 
-    SolverOdeUnknown(const SolverOdeUnknown &pOther) = delete;
-    SolverOdeUnknown(SolverOdeUnknown &&pOther) noexcept = delete;
+    SolverUnknown(const SolverUnknown &pOther) = delete;
+    SolverUnknown(SolverUnknown &&pOther) noexcept = delete;
 
-    SolverOdeUnknown &operator=(const SolverOdeUnknown &pRhs) = delete;
-    SolverOdeUnknown &operator=(SolverOdeUnknown &&pRhs) noexcept = delete;
-
-    bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
-    bool solve(double pVoiFrom, double pVoiTo) const override;
+    SolverUnknown &operator=(const SolverUnknown &pRhs) = delete;
+    SolverUnknown &operator=(SolverUnknown &&pRhs) noexcept = delete;
 
 private:
     class Impl;
 
-    explicit SolverOdeUnknown();
+    explicit SolverUnknown();
 
     Impl *pimpl();
     const Impl *pimpl() const;

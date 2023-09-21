@@ -35,7 +35,7 @@ public:
      * @brief The type of the @ref SolverProperty.
      *
      * The type of the solver property, i.e. whether it is a boolean, an integer, an integer greater than zero, an
-     * interger greater or equal to zero, a double, a double greater than zero, a double greater or equal to zero, or a
+     * integer greater or equal to zero, a double, a double greater than zero, a double greater or equal to zero, or a
      * list.
      */
 
@@ -119,11 +119,11 @@ public:
     std::string defaultValue() const;
 
     /**
-     * @brief Get whether the property has VOI unit.
+     * @brief Get whether the property has the same unit as the variable of integration.
      *
-     * Return whether the property has VOI unit.
+     * Return whether the property has the same unit as the variable of integration.
      *
-     * @return Where, as a @c bool, the property has VOI unit.
+     * @return Whether, as a @c bool, the property has the same unit as the variable of integration.
      */
 
     bool hasVoiUnit() const;
@@ -135,7 +135,7 @@ private:
 
     explicit SolverProperty(Type pType, const std::string &pName, const std::string &pKisaoId,
                             const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
-                            bool pHasVoiValue);
+                            bool pHasVoiUnit);
 };
 
 } // namespace libOpenCOR

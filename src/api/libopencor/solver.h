@@ -60,6 +60,23 @@ public:
     Solver &operator=(Solver &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
+     * @brief Create a @ref Solver object.
+     *
+     * Factory method to create a @ref Solver object which name or KiSAO id is given:
+     *
+     * ```
+     * auto cvodeSolver = libOpenCOR::Solver::create("CVODE");
+     * auto anotherCvodeSolver = libOpenCOR::Solver::create("KISAO:0000019");
+     * ```
+     *
+     * @param pNameOrKisaoId The name of the solver or its KiSAO id.
+     *
+     * @return A smart pointer to a @ref Solver object.
+     */
+
+    static SolverPtr create(const std::string &pNameOrKisaoId);
+
+    /**
      * @brief Get various information about the solvers that are available.
      *
      * Get various information about the solvers that are available.
@@ -86,7 +103,7 @@ public:
      *
      * @param pNameOrKisaoId The name or KiSAO id, as a @c std::string, of a property.
      *
-     * @return The value, as a @c std::string, of the property.
+     * @return The value, as a @c std::string, of the property of this solver.
      */
 
     std::string property(const std::string &pNameOrKisaoId);
@@ -97,8 +114,8 @@ public:
      * Set the value of a property, which name or KiSAO ID is given, of this solver. If the name or KiSAO ID is not
      * supported by the solver then nothing is done.
      *
-     * @param pNameOrKisaoId The name or KiSAO id, as a @c std::string, of a property.
-     * @param pValue The value, as a @c std::string, of a property.
+     * @param pNameOrKisaoId The name or KiSAO id, as a @c std::string, of a property of this solver.
+     * @param pValue The value, as a @c std::string, of a property of this solver.
      */
 
     void setProperty(const std::string &pNameOrKisaoId, const std::string &pValue);
@@ -117,7 +134,7 @@ public:
      * @brief Set the properties of this solver.
      *
      * Set the properties of this solver. If the name or KiSAO ID of a property is not supported by the solver then
-     * nothing is done for that property.
+     * nothing is done.
      *
      * @param pProperties The properties, as a @c std::map of @c std::string, of this solver.
      */

@@ -23,7 +23,6 @@ from .module import (
     # Solver API.
     Solver,
     SolverInfo,
-    SolverOde,
     SolverProperty,
     # Version API.
     version,
@@ -54,7 +53,6 @@ __all__ = (
     # Solver API.
     "Solver",
     "SolverInfo",
-    "SolverOde",
     "SolverProperty",
     # Version API.
     "version",

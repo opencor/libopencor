@@ -16,24 +16,34 @@ limitations under the License.
 
 #pragma once
 
-#include "solver_p.h"
-#include "solverode.h"
+#include "libopencor/solver.h"
 
 namespace libOpenCOR {
 
-class SolverOde::Impl: public Solver::Impl
+class LIBOPENCOR_EXPORT SolverOde: public Solver
 {
 public:
-    size_t mSize = 0;
+    using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
 
-    double *mStates = nullptr;
-    double *mRates = nullptr;
-    double *mVariables = nullptr;
+    SolverOde() = delete;
+    ~SolverOde() override = default;
 
-    SolverOde::ComputeRates mComputeRates = nullptr;
+    SolverOde(const SolverOde &pOther) = delete;
+    SolverOde(SolverOde &&pOther) noexcept = delete;
+
+    SolverOde &operator=(const SolverOde &pRhs) = delete;
+    SolverOde &operator=(SolverOde &&pRhs) noexcept = delete;
+
+protected:
+    class Impl;
+
+    Impl *pimpl();
+    const Impl *pimpl() const;
+
+    explicit SolverOde(Impl *pPimpl);
 
     virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                            SolverOde::ComputeRates pComputeRates) = 0;
+                            ComputeRates pComputeRates) = 0;
     virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
 };
 

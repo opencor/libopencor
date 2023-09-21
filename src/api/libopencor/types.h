@@ -35,9 +35,6 @@ using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @
 class SolverInfo;
 using SolverInfoPtr = std::shared_ptr<SolverInfo>; /**< Type definition for the shared @ref SolverInfo pointer. */
 
-class SolverOde;
-using SolverOdePtr = std::shared_ptr<SolverOde>; /**< Type definition for the shared @ref SolverOde pointer. */
-
 class SolverProperty;
 using SolverPropertyPtr = std::shared_ptr<SolverProperty>; /**< Type definition for the shared @ref SolverProperty pointer. */
 

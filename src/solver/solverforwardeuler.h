@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solverode.h"
+#include "solverode.h"
 
 namespace libOpenCOR {
 
@@ -35,7 +35,7 @@ public:
 
     bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
-    bool solve(double pVoiFrom, double pVoiTo) const override;
+    bool solve(double &pVoi, double pVoiEnd) const override;
 
 private:
     class Impl;

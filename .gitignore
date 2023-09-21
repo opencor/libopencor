@@ -4,5 +4,4 @@ _skbuild/
 *.egg-info/
 
 .DS_Store
-*.pyc
 CMakeLists.txt.user

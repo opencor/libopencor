@@ -14,37 +14,43 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solverode_p.h"
+#include "solverunknown_p.h"
 
 namespace libOpenCOR {
 
-bool SolverOde::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                 ComputeRates pComputeRates)
+SolverPtr SolverUnknown::Impl::create()
 {
-    mSize = pSize;
+#ifdef COVERAGE_ENABLED
+    auto res = std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
 
-    mStates = pStates;
-    mRates = pRates;
-    mVariables = pVariables;
+    res->pimpl()->propertiesKisaoId(); // Just for code coverage.
 
-    mComputeRates = pComputeRates;
-
-    return true;
+    return res;
+#else
+    return std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
+#endif
 }
 
-SolverOde::SolverOde(Impl *pPimpl)
-    : Solver(pPimpl)
+SolverUnknown::SolverUnknown()
+    : Solver(new Impl())
 {
 }
 
-SolverOde::Impl *SolverOde::pimpl()
+SolverUnknown::~SolverUnknown()
+{
+    delete pimpl();
+}
+
+SolverUnknown::Impl *SolverUnknown::pimpl()
 {
     return static_cast<Impl *>(Solver::pimpl());
 }
 
-const SolverOde::Impl *SolverOde::pimpl() const
+/*---GRY---
+const SolverUnknown::Impl *SolverUnknown::pimpl() const
 {
     return static_cast<const Impl *>(Solver::pimpl());
 }
+*/
 
 } // namespace libOpenCOR

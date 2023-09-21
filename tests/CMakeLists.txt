@@ -52,6 +52,7 @@ string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_CONTENTS_C "${SOME_SEDML_CONTENT
 configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/misc
+                    ${CMAKE_SOURCE_DIR}/src/solver
                     ${CMAKE_BINARY_DIR})
 
 foreach(TEST ${TESTS})

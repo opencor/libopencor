@@ -104,7 +104,7 @@ public:
      * @sa url
      * @sa path
      *
-     * @return The file name, as a @c std::string.
+     * @return The file name, as a @c std::string, of this file.
      */
 
     std::string fileName() const;

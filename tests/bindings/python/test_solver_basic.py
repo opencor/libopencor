@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import Solver, SolverOde, SolverProperty
+from libopencor import Solver, SolverProperty
 
 
 def test_solvers_info():
@@ -44,49 +44,49 @@ def test_solvers_info():
     assert len(list_values) == 0
 
 
-def test_unknown_ode_solver():
-    ode_solver = SolverOde("Unknown")
+def test_unknown_solver():
+    solver = Solver("Unknown")
 
-    assert ode_solver.is_valid == False
+    assert solver.is_valid == False
 
 
 def test_forward_euler_by_name():
-    ode_solver = SolverOde("Forward Euler")
+    solver = Solver("Forward Euler")
 
-    assert ode_solver.is_valid == True
+    assert solver.is_valid == True
 
 
 def test_forward_euler_by_kisao_id():
-    ode_solver = SolverOde("KISAO:0000030")
+    solver = Solver("KISAO:0000030")
 
-    assert ode_solver.is_valid == True
+    assert solver.is_valid == True
 
 
 def test_properties():
-    ode_solver = SolverOde("Forward Euler")
-    properties = ode_solver.properties
+    solver = Solver("Forward Euler")
+    properties = solver.properties
 
-    assert len(ode_solver.properties) == 1
-    assert ode_solver.property("Step") == "1.000000"
-    assert ode_solver.property("KISAO:0000483") == "1.000000"
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1.000000"
+    assert solver.property("KISAO:0000483") == "1.000000"
 
-    ode_solver.set_property("Step", "1.2345")
+    solver.set_property("Step", "1.2345")
 
-    assert len(ode_solver.properties) == 1
-    assert ode_solver.property("KISAO:0000483") == "1.2345"
+    assert len(solver.properties) == 1
+    assert solver.property("KISAO:0000483") == "1.2345"
 
-    ode_solver.set_property("KISAO:0000483", "7.89")
+    solver.set_property("KISAO:0000483", "7.89")
 
-    assert len(ode_solver.properties) == 1
-    assert ode_solver.property("Step") == "7.89"
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "7.89"
 
-    ode_solver.set_property("Unknown property", "1.23")
+    solver.set_property("Unknown property", "1.23")
 
-    assert len(ode_solver.properties) == 1
-    assert ode_solver.property("Step") == "7.89"
-    assert ode_solver.property("Unknown property") == ""
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "7.89"
+    assert solver.property("Unknown property") == ""
 
-    ode_solver.set_properties(properties)
+    solver.set_properties(properties)
 
-    assert len(ode_solver.properties) == 1
-    assert ode_solver.property("Step") == "1.000000"
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1.000000"

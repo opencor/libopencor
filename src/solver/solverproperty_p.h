@@ -33,8 +33,7 @@ public:
     bool mHasVoiUnit;
 
     explicit Impl(Type pType, const std::string &pName, const std::string &pKisaoId,
-                  const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
-                  bool pHasVoiValue);
+                  const std::vector<std::string> &pListValues, const std::string &pDefaultValue, bool pHasVoiUnit);
 };
 
 } // namespace libOpenCOR

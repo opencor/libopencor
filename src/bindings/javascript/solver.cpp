@@ -67,7 +67,7 @@ void solverApi()
     emscripten::register_map<std::string, std::string>("Properties");
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
-        .smart_ptr<libOpenCOR::SolverPtr>("Solver")
+        .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
         .class_function("solversInfo", &libOpenCOR::Solver::solversInfo)
         .function("isValid", &libOpenCOR::Solver::isValid)
         .function("properties", &libOpenCOR::Solver::properties)
@@ -80,11 +80,4 @@ void solverApi()
 
         delete Module['Solver.Type'];
     });
-
-    // SolverOde API.
-
-    emscripten::class_<libOpenCOR::SolverOde, emscripten::base<libOpenCOR::Solver>>("SolverOde")
-        .smart_ptr_constructor("SolverOde", &libOpenCOR::SolverOde::create)
-        .function("initialise", &libOpenCOR::SolverOde::initialise, emscripten::allow_raw_pointers())
-        .function("solve", &libOpenCOR::SolverOde::solve);
 }

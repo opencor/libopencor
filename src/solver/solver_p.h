@@ -23,25 +23,27 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-using SolverOdeCreate = SolverOdePtr (*)();
+using SolverCreate = SolverPtr (*)();
 
 class Solver::Impl: public Logger::Impl
 {
 public:
     static std::map<std::string, std::string> SolversKisaoId;
-    static std::map<std::string, SolverOdeCreate> SolversCreateOde;
+    static std::map<std::string, SolverCreate> SolversCreate;
     static std::vector<SolverInfoPtr> SolversInfo;
 
     bool mIsValid = false;
     std::map<std::string, std::string> mProperties;
 
-    static void registerSolverOde(Type pType, const std::string &pName, const std::string &pKisaoId, SolverOdeCreate pCreateOde,
-                                  const std::vector<SolverPropertyPtr> &pProperties);
+    static void registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId, SolverCreate pCreate,
+                               const std::vector<SolverPropertyPtr> &pProperties);
     static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
                                             const std::string &pKisaoId, const std::vector<std::string> &pListValues,
-                                            const std::string &pDefaultValue, bool pHasVoiValue);
+                                            const std::string &pDefaultValue, bool pHasVoiUnit);
 
     virtual ~Impl() = default;
+
+    virtual std::map<std::string, std::string> propertiesKisaoId() const;
 
     std::string kisaoId(const std::string &pNameOrKisaoId) const;
 
@@ -50,8 +52,6 @@ public:
 
     std::map<std::string, std::string> properties() const;
     void setProperties(const std::map<std::string, std::string> &pProperties);
-
-    virtual std::map<std::string, std::string> propertiesKisaoId() const = 0;
 };
 
 } // namespace libOpenCOR

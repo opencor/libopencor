@@ -47,10 +47,10 @@ public:
 private:
     class Impl;
 
-    explicit Compiler();
-
     Impl *pimpl();
     const Impl *pimpl() const;
+
+    explicit Compiler();
 };
 
 } // namespace libOpenCOR

@@ -20,20 +20,20 @@ namespace libOpenCOR {
 
 SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::string &pKisaoId,
                            const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
-                           bool pHasVoiValue)
+                           bool pHasVoiUnit)
     : mType(pType)
     , mName(pName)
     , mKisaoId(pKisaoId)
     , mListValues(pListValues)
     , mDefaultValue(pDefaultValue)
-    , mHasVoiUnit(pHasVoiValue)
+    , mHasVoiUnit(pHasVoiUnit)
 {
 }
 
 SolverProperty::SolverProperty(Type pType, const std::string &pName, const std::string &pKisaoId,
                                const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
-                               bool pHasVoiValue)
-    : mPimpl(new Impl(pType, pName, pKisaoId, pListValues, pDefaultValue, pHasVoiValue))
+                               bool pHasVoiUnit)
+    : mPimpl(new Impl(pType, pName, pKisaoId, pListValues, pDefaultValue, pHasVoiUnit))
 {
 }
 

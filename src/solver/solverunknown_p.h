@@ -14,14 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import libOpenCOR from "./libopencor.js";
+#pragma once
 
-const libopencor = await libOpenCOR();
+#include "solver_p.h"
+#include "solverunknown.h"
 
-describe("Solver Forward Euler tests", () => {
-  test("Main", () => {
-    const odeSolver = new libopencor.SolverOde("Forward Euler");
+namespace libOpenCOR {
 
-    odeSolver.setProperty("Step", "0.01");
-  });
-});
+class SolverUnknown::Impl: public Solver::Impl
+{
+public:
+    static SolverPtr create();
+};
+
+} // namespace libOpenCOR

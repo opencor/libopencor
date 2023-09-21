@@ -216,6 +216,16 @@ function(configure_target TARGET)
                                    BUILDING_USING_CLANG)
     endif()
 
+    # Let the target know which processor we are using.
+
+    if(INTEL_MODE)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_INTEL)
+    else()
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_ARM)
+    endif()
+
     # Let the target know that we are building with coverage enabled.
 
     if(LIBOPENCOR_CODE_COVERAGE)

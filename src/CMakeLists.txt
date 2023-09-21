@@ -78,7 +78,6 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverinfo.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
@@ -101,7 +100,7 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverodeunknown.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
@@ -142,9 +141,10 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverodeunknown_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverodeunknown.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime_p.h

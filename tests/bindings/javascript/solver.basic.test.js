@@ -49,51 +49,51 @@ describe("Solver basic tests", () => {
     expect(listValues.size()).toBe(0);
   });
 
-  test("Unknown", () => {
-    const odeSolver = new libopencor.SolverOde("Unknown");
+  test("Unknown solver", () => {
+    const solver = new libopencor.Solver("Unknown");
 
-    expect(odeSolver.isValid()).toBe(false);
+    expect(solver.isValid()).toBe(false);
   });
 
   test("Forward Euler by name", () => {
-    const odeSolver = new libopencor.SolverOde("Forward Euler");
+    const solver = new libopencor.Solver("Forward Euler");
 
-    expect(odeSolver.isValid()).toBe(true);
+    expect(solver.isValid()).toBe(true);
   });
 
   test("Forward Euler by KiSAO id", () => {
-    const odeSolver = new libopencor.SolverOde("KISAO:0000030");
+    const solver = new libopencor.Solver("KISAO:0000030");
 
-    expect(odeSolver.isValid()).toBe(true);
+    expect(solver.isValid()).toBe(true);
   });
 
   test("Properties", () => {
-    const odeSolver = new libopencor.SolverOde("Forward Euler");
-    const properties = odeSolver.properties();
+    const solver = new libopencor.Solver("Forward Euler");
+    const properties = solver.properties();
 
-    expect(odeSolver.properties().size()).toBe(1);
-    expect(odeSolver.property("Step")).toBe("1.000000");
-    expect(odeSolver.property("KISAO:0000483")).toBe("1.000000");
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1.000000");
+    expect(solver.property("KISAO:0000483")).toBe("1.000000");
 
-    odeSolver.setProperty("Step", "1.2345");
+    solver.setProperty("Step", "1.2345");
 
-    expect(odeSolver.properties().size()).toBe(1);
-    expect(odeSolver.property("KISAO:0000483")).toBe("1.2345");
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("KISAO:0000483")).toBe("1.2345");
 
-    odeSolver.setProperty("KISAO:0000483", "7.89");
+    solver.setProperty("KISAO:0000483", "7.89");
 
-    expect(odeSolver.properties().size()).toBe(1);
-    expect(odeSolver.property("Step")).toBe("7.89");
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("7.89");
 
-    odeSolver.setProperty("Unknown property", "1.23");
+    solver.setProperty("Unknown property", "1.23");
 
-    expect(odeSolver.properties().size()).toBe(1);
-    expect(odeSolver.property("Step")).toBe("7.89");
-    expect(odeSolver.property("Unknown property")).toBe("");
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("7.89");
+    expect(solver.property("Unknown property")).toBe("");
 
-    odeSolver.setProperties(properties);
+    solver.setProperties(properties);
 
-    expect(odeSolver.properties().size()).toBe(1);
-    expect(odeSolver.property("Step")).toBe("1.000000");
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1.000000");
   });
 });

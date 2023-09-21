@@ -47,54 +47,54 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(listValues.size(), 0);
 }
 
-TEST(BasicSolverTest, unknownOdeSolver)
+TEST(BasicSolverTest, unknownSolver)
 {
-    auto odeSolver = libOpenCOR::SolverOde::create("Unknown");
+    auto solver = libOpenCOR::Solver::create("Unknown");
 
-    EXPECT_FALSE(odeSolver->isValid());
+    EXPECT_FALSE(solver->isValid());
 }
 
 TEST(BasicSolverTest, forwardEulerByName)
 {
-    auto odeSolver = libOpenCOR::SolverOde::create("Forward Euler");
+    auto solver = libOpenCOR::Solver::create("Forward Euler");
 
-    EXPECT_TRUE(odeSolver->isValid());
+    EXPECT_TRUE(solver->isValid());
 }
 
 TEST(BasicSolverTest, forwardEulerByKisaoId)
 {
-    auto odeSolver = libOpenCOR::SolverOde::create("KISAO:0000030");
+    auto solver = libOpenCOR::Solver::create("KISAO:0000030");
 
-    EXPECT_TRUE(odeSolver->isValid());
+    EXPECT_TRUE(solver->isValid());
 }
 
 TEST(BasicSolverTest, properties)
 {
-    auto odeSolver = libOpenCOR::SolverOde::create("Forward Euler");
-    auto properties = odeSolver->properties();
+    auto solver = libOpenCOR::Solver::create("Forward Euler");
+    auto properties = solver->properties();
 
-    EXPECT_EQ(odeSolver->properties().size(), 1);
-    EXPECT_EQ(odeSolver->property("Step"), "1.000000");
-    EXPECT_EQ(odeSolver->property("KISAO:0000483"), "1.000000");
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "1.000000");
+    EXPECT_EQ(solver->property("KISAO:0000483"), "1.000000");
 
-    odeSolver->setProperty("Step", "1.2345");
+    solver->setProperty("Step", "1.2345");
 
-    EXPECT_EQ(odeSolver->properties().size(), 1);
-    EXPECT_EQ(odeSolver->property("KISAO:0000483"), "1.2345");
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("KISAO:0000483"), "1.2345");
 
-    odeSolver->setProperty("KISAO:0000483", "7.89");
+    solver->setProperty("KISAO:0000483", "7.89");
 
-    EXPECT_EQ(odeSolver->properties().size(), 1);
-    EXPECT_EQ(odeSolver->property("Step"), "7.89");
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "7.89");
 
-    odeSolver->setProperty("Unknown property", "1.23");
+    solver->setProperty("Unknown property", "1.23");
 
-    EXPECT_EQ(odeSolver->properties().size(), 1);
-    EXPECT_EQ(odeSolver->property("Step"), "7.89");
-    EXPECT_EQ(odeSolver->property("Unknown property"), "");
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "7.89");
+    EXPECT_EQ(solver->property("Unknown property"), "");
 
-    odeSolver->setProperties(properties);
+    solver->setProperties(properties);
 
-    EXPECT_EQ(odeSolver->properties().size(), 1);
-    EXPECT_EQ(odeSolver->property("Step"), "1.000000");
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "1.000000");
 }

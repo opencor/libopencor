@@ -347,31 +347,19 @@ std::string contentsAsString(const std::vector<unsigned char> &pContents)
     return {reinterpret_cast<const char *>(pContents.data()), pContents.size()};
 }
 
-double stringToDouble(const std::string &pString, bool *pOk)
+double stringToDouble(const std::string &pString, bool &pOk)
 {
     auto res = 0.0;
 
     try {
         res = std::stod(pString);
     } catch (...) {
-        /*---GRY--- TO BE UNCOMMENTED ONCE WE CALL stringToDouble() WITH A NULL pOk.
-                if (pOk != nullptr) {
-        */
-        *pOk = false;
-        /*---GRY--- TO BE UNCOMMENTED ONCE WE CALL stringToDouble() WITH A NULL pOk.
-                }
-        */
+        pOk = false;
 
         return 0.0;
     }
 
-    /*---GRY--- TO BE UNCOMMENTED ONCE WE CALL stringToDouble() WITH A NULL pOk.
-        if (pOk != nullptr) {
-    */
-    *pOk = true;
-    /*---GRY--- TO BE UNCOMMENTED ONCE WE CALL stringToDouble() WITH A NULL pOk.
-        }
-    */
+    pOk = true;
 
     return res;
 }
