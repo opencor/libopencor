@@ -20,7 +20,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class LIBOPENCOR_EXPORT SolverOdeUnknown: public SolverOde
+class SolverOdeUnknown: public SolverOde
 {
     friend class SolverOde;
 

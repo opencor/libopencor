@@ -23,7 +23,7 @@ limitations under the License.
 
 class CompilerTest: public testing::Test
 {
-protected:
+public:
     libOpenCOR::CompilerPtr mCompiler;
 
     void SetUp() override
