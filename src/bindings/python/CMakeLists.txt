@@ -21,19 +21,9 @@ set(PYTHON_BINDINGS_DIR ${CMAKE_BINARY_DIR}/tests/bindings/python CACHE INTERNAL
 set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
 set(PYTHON_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedalgorithmparameter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedbase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddatagenerator.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedoutput.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedstyle.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
     CACHE INTERNAL "Python source files."

@@ -17,18 +17,8 @@ limitations under the License.
 #include <libopencor>
 
 void fileApi();
-void issueApi();
 void loggerApi();
-void sedAbstractTaskApi();
-void sedAlgorithmParameterApi();
-void sedBaseApi();
-void sedDataDescriptionApi();
-void sedDataGeneratorApi();
-void sedDocumentApi();
-void sedModelApi();
-void sedOutputApi();
-void sedSimulationApi();
-void sedStyleApi();
+void sedApi();
 void solverApi();
 void versionApi();
 
@@ -37,19 +27,9 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     emscripten::register_vector<std::string>("Strings");
 
     loggerApi(); // Note: it needs to be first since it is used by some other APIs.
-    sedBaseApi(); // Note: it needs to be second since it is used by some other APIs.
 
     fileApi();
-    issueApi();
-    sedAbstractTaskApi();
-    sedAlgorithmParameterApi();
-    sedDataDescriptionApi();
-    sedDataGeneratorApi();
-    sedDocumentApi();
-    sedModelApi();
-    sedOutputApi();
-    sedSimulationApi();
-    sedStyleApi();
+    sedApi();
     solverApi();
     versionApi();
 }

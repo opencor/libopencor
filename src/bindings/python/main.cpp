@@ -24,18 +24,8 @@ namespace py = pybind11;
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 void fileApi(py::module_ &m);
-void issueApi(py::module_ &m);
 void loggerApi(py::module_ &m);
-void sedAbstractTaskApi(py::module_ &m);
-void sedAlgorithmParameterApi(py::module_ &m);
-void sedBaseApi(py::module_ &m);
-void sedDataDescriptionApi(py::module_ &m);
-void sedDataGeneratorApi(py::module_ &m);
-void sedDocumentApi(py::module_ &m);
-void sedModelApi(py::module_ &m);
-void sedOutputApi(py::module_ &m);
-void sedSimulationApi(py::module_ &m);
-void sedStyleApi(py::module_ &m);
+void sedApi(py::module_ &m);
 void solverApi(py::module_ &m);
 void versionApi(py::module_ &m);
 
@@ -52,19 +42,9 @@ PYBIND11_MODULE(module, m)
     // APIs.
 
     loggerApi(m); // Note: it needs to be first since it is used by some other APIs.
-    sedBaseApi(m); // Note: it needs to be second since it is used by some other APIs.
 
     fileApi(m);
-    issueApi(m);
-    sedAbstractTaskApi(m);
-    sedAlgorithmParameterApi(m);
-    sedDataDescriptionApi(m);
-    sedDataGeneratorApi(m);
-    sedDocumentApi(m);
-    sedModelApi(m);
-    sedOutputApi(m);
-    sedSimulationApi(m);
-    sedStyleApi(m);
+    sedApi(m);
     solverApi(m);
     versionApi(m);
 }
