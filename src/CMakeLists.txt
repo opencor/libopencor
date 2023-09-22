@@ -127,16 +127,16 @@ set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/file.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedalgorithmparameter.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedbase.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddatagenerator.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddocument.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedoutput.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedstyle.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedabstracttask.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedalgorithmparameter.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedbase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatadescription.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatagenerator.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddocument.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedmodel.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedoutput.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedsimulation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedstyle.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
 )
 
@@ -144,16 +144,16 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/file_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedalgorithmparameter_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedbase_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddatadescription_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddatagenerator_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/seddocument_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedmodel_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedoutput_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedsimulation_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/sedstyle_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedabstracttask_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedalgorithmparameter_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedbase_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatadescription_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatagenerator_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddocument_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedmodel_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedoutput_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedsimulation_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedstyle_p.h
     ${GIT_API_SOURCE_FILES}
     ${INTERNAL_SOURCE_FILES}
 )
