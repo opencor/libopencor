@@ -24,7 +24,7 @@ TEST(BasicSedDocumentTest, noFile)
 {
     auto sed = libOpenCOR::SedDocument::create();
 
-    EXPECT_FALSE(sed->hasIssues());
+    EXPECT_TRUE(sed->issues().empty());
 }
 
 TEST(BasicSedDocumentTest, unknownFile)
@@ -38,7 +38,7 @@ TEST(BasicSedDocumentTest, unknownFile)
 
     sed->initialise(file);
 
-    EXPECT_EQ_ISSUES(expectedIssues, sed);
+    EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
 TEST(BasicSedDocumentTest, cellmlFile)
@@ -48,7 +48,7 @@ TEST(BasicSedDocumentTest, cellmlFile)
 
     sed->initialise(file);
 
-    EXPECT_FALSE(sed->hasIssues());
+    EXPECT_TRUE(sed->issues().empty());
 }
 
 TEST(BasicSedDocumentTest, sedmlFile)
@@ -62,7 +62,7 @@ TEST(BasicSedDocumentTest, sedmlFile)
 
     sed->initialise(file);
 
-    EXPECT_EQ_ISSUES(expectedIssues, sed);
+    EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
 TEST(BasicSedDocumentTest, combineArchive)
@@ -76,7 +76,7 @@ TEST(BasicSedDocumentTest, combineArchive)
 
     sed->initialise(file);
 
-    EXPECT_EQ_ISSUES(expectedIssues, sed);
+    EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
 TEST(BasicSedDocumentTest, irretrievableFile)
@@ -90,5 +90,5 @@ TEST(BasicSedDocumentTest, irretrievableFile)
 
     sed->initialise(file);
 
-    EXPECT_EQ_ISSUES(expectedIssues, sed);
+    EXPECT_EQ_ISSUES(sed, expectedIssues);
 }

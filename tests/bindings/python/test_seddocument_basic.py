@@ -21,7 +21,7 @@ from utils import assert_issues
 def test_no_file():
     sed = SedDocument()
 
-    assert not sed.has_issues
+    assert len(sed.issues) == 0
 
 
 def test_unknown_file():
@@ -37,7 +37,7 @@ def test_unknown_file():
 
     sed.initialise(file)
 
-    assert_issues(expected_issues, sed)
+    assert_issues(sed, expected_issues)
 
 
 def test_cellml_file():
@@ -46,7 +46,7 @@ def test_cellml_file():
 
     sed.initialise(file)
 
-    assert not sed.has_issues
+    assert len(sed.issues) == 0
 
 
 def test_sedml_file():
@@ -62,7 +62,7 @@ def test_sedml_file():
 
     sed.initialise(file)
 
-    assert_issues(expected_issues, sed)
+    assert_issues(sed, expected_issues)
 
 
 def test_combine_archive():
@@ -78,7 +78,7 @@ def test_combine_archive():
 
     sed.initialise(file)
 
-    assert_issues(expected_issues, sed)
+    assert_issues(sed, expected_issues)
 
 
 def test_irretrievable_file():
@@ -94,4 +94,4 @@ def test_irretrievable_file():
 
     sed.initialise(file)
 
-    assert_issues(expected_issues, sed)
+    assert_issues(sed, expected_issues)
