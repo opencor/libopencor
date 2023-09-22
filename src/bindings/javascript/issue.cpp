@@ -18,13 +18,15 @@ limitations under the License.
 
 void issueApi()
 {
+    // Issue API.
+
     emscripten::enum_<libOpenCOR::Issue::Type>("Issue.Type")
         .value("ERROR", libOpenCOR::Issue::Type::ERROR)
         .value("WARNING", libOpenCOR::Issue::Type::WARNING)
         .value("MESSAGE", libOpenCOR::Issue::Type::MESSAGE);
 
     emscripten::class_<libOpenCOR::Issue>("Issue")
-        .smart_ptr<std::shared_ptr<libOpenCOR::Issue>>("Issue")
+        .smart_ptr<libOpenCOR::IssuePtr>("Issue")
         .function("type", &libOpenCOR::Issue::type)
         .function("description", &libOpenCOR::Issue::description);
 

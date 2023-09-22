@@ -29,10 +29,13 @@ void sedModelApi();
 void sedOutputApi();
 void sedSimulationApi();
 void sedStyleApi();
+void solverApi();
 void versionApi();
 
 EMSCRIPTEN_BINDINGS(libOpenCOR)
 {
+    emscripten::register_vector<std::string>("Strings");
+
     loggerApi(); // Note: it needs to be first since it is used by some other APIs.
     sedBaseApi(); // Note: it needs to be second since it is used by some other APIs.
 
@@ -47,5 +50,6 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     sedOutputApi();
     sedSimulationApi();
     sedStyleApi();
+    solverApi();
     versionApi();
 }

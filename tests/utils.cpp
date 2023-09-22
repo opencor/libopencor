@@ -14,23 +14,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "tests/utils.h"
+#include "utils.h"
 
 #include "gtest/gtest.h"
 
-#include "libopencor/logger.h"
+#include "tests/utils.h"
 
-#include <cstring>
+#include <libopencor>
 
 namespace libOpenCOR {
 
-void expectEqualIssues(const ExpectedIssues &pExpectedIssues, const LoggerPtr &pLogger)
+void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues)
 {
-    EXPECT_EQ(pExpectedIssues.size(), pLogger->issueCount());
+    auto issues = pLogger->issues();
 
-    for (size_t i = 0; i < pExpectedIssues.size(); ++i) {
-        EXPECT_EQ(pExpectedIssues.at(i).type, pLogger->issue(i)->type());
-        EXPECT_EQ(pExpectedIssues.at(i).description, pLogger->issue(i)->description());
+    EXPECT_EQ(issues.size(), pExpectedIssues.size());
+
+    for (size_t i = 0; i < issues.size(); ++i) {
+        EXPECT_EQ(issues[i]->type(), pExpectedIssues[i].type);
+        EXPECT_EQ(issues[i]->description(), pExpectedIssues[i].description);
+    }
+}
+
+void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles)
+{
+    for (size_t i = 0; i < pExpectedDoubles.size(); ++i) {
+        EXPECT_DOUBLE_EQ(pDoubles[i], pExpectedDoubles[i]); // NOLINT
     }
 }
 
@@ -39,16 +48,9 @@ std::string resourcePath(const std::string &pResourceRelativePath)
     return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;
 }
 
-#ifdef BUILDING_USING_CLANG
-#    pragma clang diagnostic push
-#    pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
-#endif
 std::vector<unsigned char> charArrayToVector(const char *pContents)
-#ifdef BUILDING_USING_CLANG
-#    pragma clang diagnostic pop
-#endif
 {
-    return {pContents, pContents + strlen(pContents)}; // NOLINT(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    return {pContents, pContents + strlen(pContents)}; // NOLINT
 }
 
 } // namespace libOpenCOR

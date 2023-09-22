@@ -31,6 +31,10 @@ from .module import (
     SedOutput,
     SedSimulation,
     SedStyle,
+    # Solver API.
+    Solver,
+    SolverInfo,
+    SolverProperty,
     # Version API.
     version,
     version_string,
@@ -68,6 +72,10 @@ __all__ = (
     "SedOutput",
     "SedSimulation",
     "SedStyle",
+    # Solver API.
+    "Solver",
+    "SolverInfo",
+    "SolverProperty",
     # Version API.
     "version",
     "version_string",

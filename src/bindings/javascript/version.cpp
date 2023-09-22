@@ -18,6 +18,8 @@ limitations under the License.
 
 void versionApi()
 {
+    // Version API.
+
     emscripten::function("version", &libOpenCOR::version);
     emscripten::function("versionString", &libOpenCOR::versionString);
 #ifndef __EMSCRIPTEN__

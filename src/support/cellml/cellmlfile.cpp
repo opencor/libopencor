@@ -40,13 +40,13 @@ CellmlFile::~CellmlFile()
 
 CellmlFile::Impl *CellmlFile::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 /*---GRY---
 const CellmlFile::Impl *CellmlFile::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 */
 
@@ -73,7 +73,7 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
         }
 
         if (isCellmlFile) {
-            return std::shared_ptr<CellmlFile> {new CellmlFile {model}};
+            return CellmlFilePtr {new CellmlFile {model}};
         }
     }
 

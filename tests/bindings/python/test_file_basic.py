@@ -41,7 +41,7 @@ def test_local_file():
     assert file.url == ""
     assert file.path == utils.LOCAL_FILE
     assert file.contents == []
-    assert_issues(expected_non_existing_file_issues, file)
+    assert_issues(file, expected_non_existing_file_issues)
 
 
 def test_relative_local_file():
@@ -65,7 +65,7 @@ def test_relative_local_file():
         assert file.path == "dir/file.txt"
 
     assert file.contents == []
-    assert_issues(expected_non_existing_file_issues, file)
+    assert_issues(file, expected_non_existing_file_issues)
 
 
 def test_url_based_local_file():
@@ -79,7 +79,7 @@ def test_url_based_local_file():
     assert file.url == ""
     assert file.path == utils.LOCAL_FILE
     assert file.contents == []
-    assert_issues(expected_non_existing_file_issues, file)
+    assert_issues(file, expected_non_existing_file_issues)
 
 
 def test_remote_file():
@@ -100,7 +100,7 @@ def test_local_virtual_file():
     assert file.url == ""
     assert file.path == utils.LOCAL_FILE
     assert file.contents == []
-    assert_issues(expected_non_existing_file_issues, file)
+    assert_issues(file, expected_non_existing_file_issues)
 
     some_unknown_contents_list = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
 
@@ -108,7 +108,7 @@ def test_local_virtual_file():
 
     assert file.type == File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
-    assert_issues(expected_unknown_file_issues, file)
+    assert_issues(file, expected_unknown_file_issues)
 
 
 def test_remote_virtual_file():
@@ -119,7 +119,7 @@ def test_remote_virtual_file():
     assert file.url == utils.IRRETRIEVABLE_REMOTE_FILE
     assert file.path == utils.IRRETRIEVABLE_REMOTE_FILE
     assert file.contents == []
-    assert_issues(expected_non_downloadable_file_issues, file)
+    assert_issues(file, expected_non_downloadable_file_issues)
 
     some_unknown_contents_list = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
 
@@ -127,4 +127,4 @@ def test_remote_virtual_file():
 
     assert file.type == File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
-    assert_issues(expected_unknown_file_issues, file)
+    assert_issues(file, expected_unknown_file_issues)

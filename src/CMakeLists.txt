@@ -86,6 +86,9 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedoutput.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedsimulation.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedstyle.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverinfo.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverproperty.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
 
@@ -100,9 +103,14 @@ set(GIT_API_MODULE_FILE ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}
 set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/filemanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
@@ -116,9 +124,9 @@ if(NOT EMSCRIPTEN)
 endif()
 
 set(GIT_API_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/issue.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedalgorithmparameter.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase.cpp
@@ -133,9 +141,9 @@ set(GIT_API_SOURCE_FILES
 )
 
 set(GIT_SOURCE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/file_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/issue_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/logger_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/file_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedabstracttask_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedalgorithmparameter_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sedbase_p.h
@@ -156,9 +164,17 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/misc/filemanager.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverunknown.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime_p.h
@@ -188,7 +204,7 @@ set(HEADER_FILES
     ${VERSION_HEADER_FILE}
 )
 
-include_directories(.
+include_directories(logger
                     misc
                     support/cellml
                     support/combine

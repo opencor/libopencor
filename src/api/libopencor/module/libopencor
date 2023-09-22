@@ -29,4 +29,7 @@ limitations under the License.
 #include "libopencor/sedoutput.h"
 #include "libopencor/sedsimulation.h"
 #include "libopencor/sedstyle.h"
+#include "libopencor/solver.h"
+#include "libopencor/solverinfo.h"
+#include "libopencor/solverproperty.h"
 #include "libopencor/version.h"

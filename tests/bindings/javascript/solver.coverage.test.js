@@ -14,20 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+import libOpenCOR from "./libopencor.js";
 
-#include "libopencor/issue.h"
+const libopencor = await libOpenCOR();
 
-namespace libOpenCOR {
-
-class Issue::Impl
-{
-public:
-    Type mType;
-    std::string mDescription;
-
-    Impl(std::string pDescription, Type pType);
-    ~Impl() = default;
-};
-
-} // namespace libOpenCOR
+describe("Coverage basic tests", () => {
+  test("Solvers info already initialised", () => {
+    libopencor.Solver.solversInfo();
+  });
+});

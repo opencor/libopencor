@@ -56,4 +56,13 @@ using SedSimulationPtr = std::shared_ptr<SedSimulation>; /**< Type definition fo
 class SedStyle;
 using SedStylePtr = std::shared_ptr<SedStyle>; /**< Type definition for the shared @ref SedStyle pointer. */
 
+class Solver;
+using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
+
+class SolverInfo;
+using SolverInfoPtr = std::shared_ptr<SolverInfo>; /**< Type definition for the shared @ref SolverInfo pointer. */
+
+class SolverProperty;
+using SolverPropertyPtr = std::shared_ptr<SolverProperty>; /**< Type definition for the shared @ref SolverProperty pointer. */
+
 } // namespace libcellml

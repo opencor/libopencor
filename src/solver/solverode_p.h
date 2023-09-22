@@ -16,30 +16,25 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-
-#include <vector>
+#include "solver_p.h"
+#include "solverode.h"
 
 namespace libOpenCOR {
 
-class Logger::Impl
+class SolverOde::Impl: public Solver::Impl
 {
 public:
-    std::vector<IssuePtr> mIssues;
+    size_t mSize = 0;
 
-    std::vector<size_t> mErrors;
-    std::vector<size_t> mWarnings;
-    std::vector<size_t> mMessages;
+    double *mStates = nullptr;
+    double *mRates = nullptr;
+    double *mVariables = nullptr;
 
-    static void addIssues(const LoggerPtr &pLogger);
-    void addIssue(const std::string &pDescription, Issue::Type pType);
+    SolverOde::ComputeRates mComputeRates = nullptr;
 
-    void addError(const std::string &pDescription);
-    void addWarning(const std::string &pDescription);
-    void addMessage(const std::string &pDescription);
-
-    void removeAllIssues();
+    virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                            SolverOde::ComputeRates pComputeRates) = 0;
+    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
 };
 
 } // namespace libOpenCOR

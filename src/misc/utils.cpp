@@ -296,7 +296,7 @@ size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUse
 {
     const auto realDataSize = pSize * pDataSize;
 
-    reinterpret_cast<std::ofstream *>(pUserData)->write(reinterpret_cast<char *>(pData), static_cast<std::streamsize>(realDataSize));
+    static_cast<std::ofstream *>(pUserData)->write(static_cast<char *>(pData), static_cast<std::streamsize>(realDataSize));
 
     return realDataSize;
 }
@@ -320,7 +320,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_URL, pUrl.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, reinterpret_cast<void *>(&file));
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void *>(&file));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 
 #    ifndef COVERAGE_ENABLED
@@ -368,7 +368,7 @@ std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
     const auto fileSize = std::filesystem::file_size(pFilePath);
     std::vector<unsigned char> contents(fileSize);
 
-    file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT(bugprone-narrowing-conversions, readability-container-data-pointer)
+    file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT
 
     return contents;
 }
@@ -377,6 +377,23 @@ std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
 std::string contentsAsString(const std::vector<unsigned char> &pContents)
 {
     return {reinterpret_cast<const char *>(pContents.data()), pContents.size()};
+}
+
+double stringToDouble(const std::string &pString, bool &pOk)
+{
+    auto res = 0.0;
+
+    try {
+        res = std::stod(pString);
+    } catch (...) {
+        pOk = false;
+
+        return 0.0;
+    }
+
+    pOk = true;
+
+    return res;
 }
 
 } // namespace libOpenCOR

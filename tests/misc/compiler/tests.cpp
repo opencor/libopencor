@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
-
 #include "compiler.h"
 #include "utils.h"
+
+#include "gtest/gtest.h"
 
 #include "tests/utils.h"
 
 class CompilerTest: public testing::Test
 {
-protected:
+public:
     libOpenCOR::CompilerPtr mCompiler;
 
     void SetUp() override
@@ -45,28 +45,28 @@ TEST_F(CompilerTest, basic)
 
     // Add "void" to our string.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues01 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_01 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected identifier or '(':\nvoid\n    ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("void"));
-    EXPECT_EQ_ISSUES(expectedIssues01, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_01);
 
     // Add an identifier to our string.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues02 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_02 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Variable has incomplete type 'void':\nvoid function\n     ^"},
         {libOpenCOR::Issue::Type::ERROR, "Expected ';' after top level declarator:\nvoid function\n             ^\n             ;"},
     };
 
     EXPECT_FALSE(mCompiler->compile("void function"));
-    EXPECT_EQ_ISSUES(expectedIssues02, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_02);
 
     // Add a "(" to our string.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues03 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_03 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected parameter declarator:\nvoid function(\n              ^"},
         {libOpenCOR::Issue::Type::ERROR, "Expected ')' to match this '(':\nvoid function(\n             ^"},
@@ -74,27 +74,27 @@ TEST_F(CompilerTest, basic)
     };
 
     EXPECT_FALSE(mCompiler->compile("void function("));
-    EXPECT_EQ_ISSUES(expectedIssues03, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_03);
 
     // Add a ")" to our string.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues04 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_04 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected function body after function declarator:\nvoid function()\n               ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("void function()"));
-    EXPECT_EQ_ISSUES(expectedIssues04, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_04);
 
     // Add a "{" to our string.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues05 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_05 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected '}':\nvoid function() {\n                 ^\nto match this '{':\nvoid function() {\n                ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("void function() {"));
-    EXPECT_EQ_ISSUES(expectedIssues05, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_05);
 
     // Add a "}" to our string, making it a valid void function.
 
@@ -107,45 +107,45 @@ TEST_F(CompilerTest, basic)
 
     // Make the function a double function.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues06 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_06 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Non-void function does not return a value:\ndouble function() {}\n                   ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() {}"));
-    EXPECT_EQ_ISSUES(expectedIssues06, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_06);
 
     // Add "return" to our string.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues07 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_07 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected expression:\ndouble function() { return\n                          ^"},
         {libOpenCOR::Issue::Type::ERROR, "Expected '}' to match this '{':\ndouble function() { return\n                  ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() { return"));
-    EXPECT_EQ_ISSUES(expectedIssues07, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_07);
 
     // Add "3.0" to our string.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues08 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_08 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected ';' after return statement:\ndouble function() { return 3.0\n                              ^\n                              ;"},
         {libOpenCOR::Issue::Type::ERROR, "Expected '}' to match this '{':\ndouble function() { return 3.0\n                  ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0"));
-    EXPECT_EQ_ISSUES(expectedIssues08, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_08);
 
     // Add ";" to our string.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues09 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_09 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected '}':\ndouble function() { return 3.0;\n                               ^\nto match this '{':\ndouble function() { return 3.0;\n                  ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0;"));
-    EXPECT_EQ_ISSUES(expectedIssues09, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_09);
 
     // Add a "}" to our string, making it a valid double function.
 
@@ -155,24 +155,24 @@ TEST_F(CompilerTest, basic)
 
     // Use an invalid function name.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues10 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_10 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected identifier or '(':\ndouble .function() { return 3.0; }\n       ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("double .function() { return 3.0; }"));
-    EXPECT_EQ_ISSUES(expectedIssues10, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_10);
 
     // Return an invalid statement.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues11 = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_11 = {
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
         {libOpenCOR::Issue::Type::ERROR, "Expected expression:\ndouble function() { return 3.0+*-/a; }\n                                 ^"},
         {libOpenCOR::Issue::Type::ERROR, "Use of undeclared identifier 'a':\ndouble function() { return 3.0+*-/a; }\n                                  ^"},
     };
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0+*-/a; }"));
-    EXPECT_EQ_ISSUES(expectedIssues11, mCompiler);
+    EXPECT_EQ_ISSUES(mCompiler, EXPECTED_ISSUES_11);
 }
 
 TEST_F(CompilerTest, severalFunctions)

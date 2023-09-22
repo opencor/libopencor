@@ -24,7 +24,7 @@ void issueApi(py::module_ &m)
 {
     // Issue API.
 
-    py::class_<libOpenCOR::Issue, std::shared_ptr<libOpenCOR::Issue>> issue(m, "Issue");
+    py::class_<libOpenCOR::Issue, libOpenCOR::IssuePtr> issue(m, "Issue");
 
     py::enum_<libOpenCOR::Issue::Type>(issue, "Type")
         .value("Error", libOpenCOR::Issue::Type::ERROR)

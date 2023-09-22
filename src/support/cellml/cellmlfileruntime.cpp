@@ -113,19 +113,19 @@ CellmlFileRuntime::~CellmlFileRuntime()
 
 CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 /*---GRY---
 const CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 */
 
 CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile)
 {
-    return std::shared_ptr<CellmlFileRuntime> {new CellmlFileRuntime {pCellmlFile}};
+    return CellmlFileRuntimePtr {new CellmlFileRuntime {pCellmlFile}};
 }
 
 } // namespace libOpenCOR

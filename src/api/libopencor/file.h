@@ -91,7 +91,7 @@ public:
      *
      * Return the type of this file.
      *
-     * @return The type as a @ref Type.
+     * @return The type, as a @ref Type, of this file.
      */
 
     Type type() const;
@@ -140,7 +140,7 @@ public:
      *
      * Return the contents of this file.
      *
-     * @return The contents, as an array of @c char, of this file.
+     * @return The contents, as a @c std::vector of unsigned @c char, of this file.
      */
 
     std::vector<unsigned char> contents();
@@ -150,7 +150,7 @@ public:
      *
      * Set the contents of this file.
      *
-     * @param pContents The contents of the file as a @c std::vector of unsigned @c char.
+     * @param pContents The contents, as a @c std::vector of unsigned @c char, of this file.
      */
 
     void setContents(const std::vector<unsigned char> &pContents);
@@ -158,10 +158,10 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit File(const std::string &pFileNameOrUrl); /**< Constructor @private. */
-
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+
+    explicit File(const std::string &pFileNameOrUrl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR
