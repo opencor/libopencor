@@ -19,13 +19,17 @@ limitations under the License.
 void fileApi();
 void issueApi();
 void loggerApi();
+void solverApi();
 void versionApi();
 
 EMSCRIPTEN_BINDINGS(libOpenCOR)
 {
+    emscripten::register_vector<std::string>("Strings");
+
     loggerApi(); // Note: it needs to be first since it is used by some other APIs.
 
     fileApi();
     issueApi();
+    solverApi();
     versionApi();
 }

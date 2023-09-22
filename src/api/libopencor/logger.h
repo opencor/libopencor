@@ -50,7 +50,7 @@ public:
      *
      * Return the issues.
      *
-     * @return The issues as a @c std::vector of references to @ref Issue objects.
+     * @return The issues, as a @c std::vector of references to @ref Issue objects.
      */
 
     std::vector<IssuePtr> issues() const;
@@ -60,7 +60,7 @@ public:
      *
      * Return the errors.
      *
-     * @return The errors as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::ERROR.
+     * @return The errors, as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::ERROR.
      */
 
     std::vector<IssuePtr> errors() const;
@@ -70,7 +70,7 @@ public:
      *
      * Return the warnings.
      *
-     * @return The warnings as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::WARNING.
+     * @return The warnings, as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::WARNING.
      */
 
     std::vector<IssuePtr> warnings() const;
@@ -80,7 +80,7 @@ public:
      *
      * Return the messages.
      *
-     * @return The messages as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::MESSAGE.
+     * @return The messages, as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::MESSAGE.
      */
 
     std::vector<IssuePtr> messages() const;
@@ -88,10 +88,10 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit Logger(Impl *pPimpl); /**< Constructor @private. */
-
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+
+    explicit Logger(Impl *pPimpl); /**< Constructor, @private. */
 
 private:
     Impl *mPimpl;

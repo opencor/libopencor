@@ -269,7 +269,7 @@ void *Compiler::Impl::function(const std::string &pName) const
         auto symbol = mLljit->lookup(pName);
 
         if (symbol) {
-            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT(performance-no-int-to-ptr)
+            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
         }
     }
 
@@ -288,17 +288,17 @@ Compiler::~Compiler()
 
 Compiler::Impl *Compiler::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 const Compiler::Impl *Compiler::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 
 CompilerPtr Compiler::create()
 {
-    return std::shared_ptr<Compiler> {new Compiler()};
+    return CompilerPtr {new Compiler()};
 }
 
 bool Compiler::compile(const std::string &pCode)

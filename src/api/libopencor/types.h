@@ -29,4 +29,13 @@ using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @re
 class Logger;
 using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
 
+class Solver;
+using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
+
+class SolverInfo;
+using SolverInfoPtr = std::shared_ptr<SolverInfo>; /**< Type definition for the shared @ref SolverInfo pointer. */
+
+class SolverProperty;
+using SolverPropertyPtr = std::shared_ptr<SolverProperty>; /**< Type definition for the shared @ref SolverProperty pointer. */
+
 } // namespace libcellml

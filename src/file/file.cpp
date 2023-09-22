@@ -27,6 +27,7 @@ limitations under the License.
 namespace libOpenCOR {
 
 File::Impl::Impl(const std::string &pFileNameOrUrl)
+    : Logger::Impl()
 {
     // Check whether we are dealing with a local file or a URL.
 
@@ -159,12 +160,12 @@ File::~File()
 
 File::Impl *File::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 const File::Impl *File::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 
 FilePtr File::create(const std::string &pFileNameOrUrl)
@@ -178,7 +179,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
         return file->shared_from_this();
     }
 
-    auto res = std::shared_ptr<File> {new File {pFileNameOrUrl}};
+    auto res = FilePtr {new File {pFileNameOrUrl}};
 
     res->pimpl()->checkType(res);
 

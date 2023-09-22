@@ -49,13 +49,13 @@ SedmlFile::~SedmlFile()
 
 SedmlFile::Impl *SedmlFile::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 /*---GRY---
 const SedmlFile::Impl *SedmlFile::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 */
 
@@ -74,7 +74,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
         if ((document->getNumErrors() == 0)
             || ((document->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
                 && (document->getError(0)->getErrorId() != libsbml::XMLContentEmpty))) {
-            return std::shared_ptr<SedmlFile> {new SedmlFile {document}};
+            return SedmlFilePtr {new SedmlFile {document}};
         }
 
         delete document;

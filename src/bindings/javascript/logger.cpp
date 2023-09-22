@@ -18,6 +18,8 @@ limitations under the License.
 
 void loggerApi()
 {
+    // Logger API.
+
     emscripten::register_vector<libOpenCOR::IssuePtr>("Issues");
 
     emscripten::class_<libOpenCOR::Logger>("Logger")

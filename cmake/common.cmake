@@ -79,6 +79,7 @@ function(configure_target TARGET)
                 -Wno-exit-time-destructors
                 -Wno-global-constructors
                 -Wno-padded
+                -Wno-unsafe-buffer-usage
                 -Wno-weak-vtables
             )
 
@@ -123,12 +124,14 @@ function(configure_target TARGET)
             set(CLANG_TIDY_CHECKS
                 -*
                 bugprone-*
+                -bugprone-easily-swappable-parameters
                 ${DISABLED_BUGPRONE_CHECKS}
                 cert-*
                 ${DISABLED_CERT_CHECKS}
                 cppcoreguidelines-*
                 -cppcoreguidelines-owning-memory
                 -cppcoreguidelines-pro-type-reinterpret-cast
+                -cppcoreguidelines-pro-type-static-cast-downcast
                 ${DISABLED_CPPCOREGUIDELINES_CHECKS}
                 fuchsia-*
                 -fuchsia-default-arguments-calls
@@ -146,6 +149,7 @@ function(configure_target TARGET)
                 performance-*
                 readability-*
                 -readability-function-cognitive-complexity
+                -readability-identifier-length
                 ${READABILITY_CHECKS}
             )
 
@@ -210,6 +214,16 @@ function(configure_target TARGET)
     elseif(BUILDING_USING_CLANG)
         target_compile_definitions(${TARGET} PRIVATE
                                    BUILDING_USING_CLANG)
+    endif()
+
+    # Let the target know which processor we are using.
+
+    if(INTEL_MODE)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_INTEL)
+    else()
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_ARM)
     endif()
 
     # Let the target know that we are building with coverage enabled.

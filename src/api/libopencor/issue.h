@@ -51,6 +51,7 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
+    Issue() = delete; /**< No default constructor allowed, @private. */
     ~Issue(); /**< Destructor, @private. */
 
     Issue(const Issue &pOther) = delete; /**< No copy constructor allowed, @private. */
@@ -82,9 +83,9 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit Issue(const std::string &pDescription, Type pType); /**< Constructor @private. */
-
     Impl *mPimpl;
+
+    explicit Issue(const std::string &pDescription, Type pType); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

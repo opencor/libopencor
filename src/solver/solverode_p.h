@@ -16,18 +16,25 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/issue.h"
+#include "solver_p.h"
+#include "solverode.h"
 
 namespace libOpenCOR {
 
-class Issue::Impl
+class SolverOde::Impl: public Solver::Impl
 {
 public:
-    Type mType;
-    std::string mDescription;
+    size_t mSize = 0;
 
-    Impl(std::string pDescription, Type pType);
-    ~Impl() = default;
+    double *mStates = nullptr;
+    double *mRates = nullptr;
+    double *mVariables = nullptr;
+
+    SolverOde::ComputeRates mComputeRates = nullptr;
+
+    virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                            SolverOde::ComputeRates pComputeRates) = 0;
+    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
 };
 
 } // namespace libOpenCOR
