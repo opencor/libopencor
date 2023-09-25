@@ -21,4 +21,9 @@ set(${TEST}_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/coveragetests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/forwardeulertests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/heuntests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/model.cpp
+)
+set(${TEST}_HEADER_FILES
+    ${CMAKE_CURRENT_LIST_DIR}/model.h
 )
