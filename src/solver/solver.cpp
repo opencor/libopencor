@@ -18,6 +18,7 @@ limitations under the License.
 #include "solverforwardeuler_p.h"
 #include "solverheun_p.h"
 #include "solverinfo_p.h"
+#include "solversecondorderrungekutta_p.h"
 #include "solverunknown_p.h"
 
 namespace libOpenCOR {
@@ -129,6 +130,12 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
                                      SolverHeun::Impl::KISAO_ID,
                                      SolverHeun::Impl::create,
                                      SolverHeun::Impl::propertiesInfo());
+
+        Solver::Impl::registerSolver(SolverSecondOrderRungeKutta::Impl::TYPE,
+                                     SolverSecondOrderRungeKutta::Impl::NAME,
+                                     SolverSecondOrderRungeKutta::Impl::KISAO_ID,
+                                     SolverSecondOrderRungeKutta::Impl::create,
+                                     SolverSecondOrderRungeKutta::Impl::propertiesInfo());
     }
 
     return Solver::Impl::SolversInfo;

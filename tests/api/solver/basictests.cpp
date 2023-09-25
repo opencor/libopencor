@@ -22,7 +22,7 @@ TEST(BasicSolverTest, solversInfo)
 {
     auto solversInfo = libOpenCOR::Solver::solversInfo();
 
-    EXPECT_EQ(solversInfo.size(), 2);
+    EXPECT_EQ(solversInfo.size(), 3);
 
     // Forward Euler.
 
@@ -55,6 +55,30 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solverInfo->name(), "Heun");
     EXPECT_EQ(solverInfo->kisaoId(), "KISAO:0000301");
+
+    properties = solverInfo->properties();
+
+    EXPECT_EQ(properties.size(), 1);
+
+    property = properties[0];
+
+    EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
+    EXPECT_EQ(property->name(), "Step");
+    EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
+    EXPECT_EQ(property->defaultValue(), "1.000000");
+    EXPECT_TRUE(property->hasVoiUnit());
+
+    listValues = property->listValues();
+
+    EXPECT_EQ(listValues.size(), 0);
+
+    // Second-order Runge-Kutta.
+
+    solverInfo = solversInfo[2];
+
+    EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solverInfo->name(), "Second-order Runge-Kutta");
+    EXPECT_EQ(solverInfo->kisaoId(), "KISAO:0000381");
 
     properties = solverInfo->properties();
 
@@ -104,6 +128,20 @@ TEST(BasicSolverTest, heunByName)
 TEST(BasicSolverTest, heunByKisaoId)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000301");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, secondOrderRungeKuttaByName)
+{
+    auto solver = libOpenCOR::Solver::create("Second-order Runge-Kutta");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, secondOrderRungeKuttaByKisaoId)
+{
+    auto solver = libOpenCOR::Solver::create("KISAO:0000381");
 
     EXPECT_TRUE(solver->isValid());
 }
