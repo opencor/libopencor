@@ -16,7 +16,7 @@
 
 include(api/file/tests.cmake)
 include(api/logger/tests.cmake)
-include(api/seddocument/tests.cmake)
+include(api/sed/tests.cmake)
 include(api/solver/tests.cmake)
 include(api/version/tests.cmake)
 
