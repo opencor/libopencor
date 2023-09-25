@@ -62,6 +62,8 @@ bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double 
 {
     removeAllIssues();
 
+    // Retrieve the solver's properties.
+
     bool ok = true;
     auto step = stringToDouble(mProperties[STEP_KISAO_ID], ok);
 
@@ -72,6 +74,8 @@ bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double 
 
         return false;
     }
+
+    // Initialise the ODE solver itself.
 
     return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
@@ -104,7 +108,7 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
         // Update the variable of integration.
 
         pVoi = libOpenCOR::fuzzyCompare(realStep, mStep) ?
-                   voiStart + static_cast<double>(++voiCounter) * realStep :
+                   voiStart + static_cast<double>(++voiCounter) * mStep :
                    pVoiEnd;
     }
 
