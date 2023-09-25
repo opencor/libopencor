@@ -27,4 +27,22 @@ void loggerApi()
         .function("errors", &libOpenCOR::Logger::errors)
         .function("warnings", &libOpenCOR::Logger::warnings)
         .function("messages", &libOpenCOR::Logger::messages);
+
+    // Issue API.
+
+    emscripten::enum_<libOpenCOR::Issue::Type>("Issue.Type")
+        .value("ERROR", libOpenCOR::Issue::Type::ERROR)
+        .value("WARNING", libOpenCOR::Issue::Type::WARNING)
+        .value("MESSAGE", libOpenCOR::Issue::Type::MESSAGE);
+
+    emscripten::class_<libOpenCOR::Issue>("Issue")
+        .smart_ptr<libOpenCOR::IssuePtr>("Issue")
+        .function("type", &libOpenCOR::Issue::type)
+        .function("description", &libOpenCOR::Issue::description);
+
+    EM_ASM({
+        Module['Issue']['Type'] = Module['Issue.Type'];
+
+        delete Module['Issue.Type'];
+    });
 }
