@@ -143,6 +143,7 @@ function(configure_target TARGET)
                 -llvm-header-guard
                 -llvm-include-order
                 misc-*
+                -misc-include-cleaner
                 ${MISC_CHECKS}
                 modernize-*
                 -modernize-pass-by-value
