@@ -34,6 +34,10 @@ public:
     SolverOde &operator=(const SolverOde &pRhs) = delete;
     SolverOde &operator=(SolverOde &&pRhs) noexcept = delete;
 
+    virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                            ComputeRates pComputeRates) = 0;
+    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
+
 protected:
     class Impl;
 
@@ -41,10 +45,6 @@ protected:
     const Impl *pimpl() const;
 
     explicit SolverOde(Impl *pPimpl);
-
-    virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                            ComputeRates pComputeRates) = 0;
-    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
 };
 
 } // namespace libOpenCOR

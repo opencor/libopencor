@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 #include "model.h"
-#include "solverforwardeuler.h"
+#include "solverheun.h"
 #include "utils.h"
 
 #include "gtest/gtest.h"
@@ -24,11 +24,11 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
+TEST(HeunSolverTest, nonFloatingPointStepValue)
 {
     // Create and initialise our various arrays and create our solver.
 
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Forward Euler");
+    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Heun");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -46,11 +46,11 @@ TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(ForwardEulerSolverTest, invalidStepValue)
+TEST(HeunSolverTest, invalidStepValue)
 {
     // Create and initialise our various arrays and create our solver.
 
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Forward Euler");
+    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Heun");
 
     // Customise and initialise our solver using an invalid step value.
 
@@ -68,23 +68,23 @@ TEST(ForwardEulerSolverTest, invalidStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(ForwardEulerSolverTest, main)
+TEST(HeunSolverTest, main)
 {
     // Create and initialise our various arrays and create our solver.
 
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Forward Euler");
+    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Heun");
 
     // Customise and initialise our solver and compute it.
 
     static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
 #if defined(BUILDING_ON_WINDOWS)
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762314604, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179346003, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
 #elif defined(BUILDING_ON_LINUX)
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762310383, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179346, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
 #elif defined(BUILDING_ON_INTEL)
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762310383, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179345996, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
 #else
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762310435, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179346029, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
 #endif
 
     solver->setProperty("Step", "0.0123");

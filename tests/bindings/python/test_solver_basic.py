@@ -19,13 +19,39 @@ from libopencor import Solver, SolverProperty
 def test_solvers_info():
     solvers_info = Solver.solvers_info()
 
-    assert len(solvers_info) == 1
+    assert len(solvers_info) == 2
+
+    # Forward Euler.
 
     solver_info = solvers_info[0]
 
     assert solver_info.type == Solver.Type.Ode
     assert solver_info.name == "Forward Euler"
     assert solver_info.kisao_id == "KISAO:0000030"
+
+    properties = solver_info.properties
+
+    assert len(properties) == 1
+
+    property = properties[0]
+
+    assert property.type == SolverProperty.Type.DoubleGt0
+    assert property.name == "Step"
+    assert property.kisao_id == "KISAO:0000483"
+    assert property.default_value == "1.000000"
+    assert property.has_voi_unit == True
+
+    list_values = property.list_values
+
+    assert len(list_values) == 0
+
+    # Heun.
+
+    solver_info = solvers_info[1]
+
+    assert solver_info.type == Solver.Type.Ode
+    assert solver_info.name == "Heun"
+    assert solver_info.kisao_id == "KISAO:0000301"
 
     properties = solver_info.properties
 
@@ -58,6 +84,18 @@ def test_forward_euler_by_name():
 
 def test_forward_euler_by_kisao_id():
     solver = Solver("KISAO:0000030")
+
+    assert solver.is_valid == True
+
+
+def test_heun_by_name():
+    solver = Solver("Heun")
+
+    assert solver.is_valid == True
+
+
+def test_heun_by_kisao_id():
+    solver = Solver("KISAO:0000301")
 
     assert solver.is_valid == True
 

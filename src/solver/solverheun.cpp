@@ -14,23 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solverforwardeuler_p.h"
+#include "solverheun_p.h"
 #include "utils.h"
 
 namespace libOpenCOR {
 
-const std::string SolverForwardEuler::Impl::NAME = "Forward Euler"; // NOLINT
-const std::string SolverForwardEuler::Impl::KISAO_ID = "KISAO:0000030"; // NOLINT
+const std::string SolverHeun::Impl::NAME = "Heun"; // NOLINT
+const std::string SolverHeun::Impl::KISAO_ID = "KISAO:0000301"; // NOLINT
 
-const std::string SolverForwardEuler::Impl::STEP_NAME = "Step"; // NOLINT
-const std::string SolverForwardEuler::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
+const std::string SolverHeun::Impl::STEP_NAME = "Step"; // NOLINT
+const std::string SolverHeun::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
 
-SolverPtr SolverForwardEuler::Impl::create()
+SolverPtr SolverHeun::Impl::create()
 {
-    return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};
+    return std::shared_ptr<SolverHeun> {new SolverHeun {}};
 }
 
-std::vector<SolverPropertyPtr> SolverForwardEuler::Impl::propertiesInfo()
+std::vector<SolverPropertyPtr> SolverHeun::Impl::propertiesInfo()
 {
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_NAME, STEP_KISAO_ID,
@@ -40,7 +40,7 @@ std::vector<SolverPropertyPtr> SolverForwardEuler::Impl::propertiesInfo()
     };
 }
 
-SolverForwardEuler::Impl::Impl()
+SolverHeun::Impl::Impl()
     : SolverOde::Impl()
 {
     mIsValid = true;
@@ -48,7 +48,13 @@ SolverForwardEuler::Impl::Impl()
     mProperties[STEP_KISAO_ID] = std::to_string(STEP_DEFAULT_VALUE);
 }
 
-std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesKisaoId() const
+SolverHeun::Impl::~Impl()
+{
+    delete[] mK;
+    delete[] mYk;
+}
+
+std::map<std::string, std::string> SolverHeun::Impl::propertiesKisaoId() const
 {
     static const std::map<std::string, std::string> PROPERTIES_KISAO_ID = {
         {STEP_NAME, STEP_KISAO_ID},
@@ -57,8 +63,8 @@ std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesKisaoId()
     return PROPERTIES_KISAO_ID;
 }
 
-bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                          ComputeRates pComputeRates)
+bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                  ComputeRates pComputeRates)
 {
     removeAllIssues();
 
@@ -75,34 +81,55 @@ bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double 
         return false;
     }
 
+    // Create our various arrays.
+
+    mK = new double[pSize] {};
+    mYk = new double[pSize] {};
+
     // Initialise the ODE solver itself.
 
     return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 {
-    // Y_n+1 = Y_n + h * f(t_n, Y_n).
+    // k = h * f(t_n, Y_n).
+    // Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + k) ).
+
+    static const double HALF = 0.5;
 
     const double voiStart = pVoi;
     size_t voiCounter = 0;
     double realStep = mStep;
+    double realHalfStep = HALF * realStep;
 
     while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
 
         if (pVoi + realStep > pVoiEnd) {
             realStep = pVoiEnd - pVoi;
+            realHalfStep = HALF * realStep;
         }
 
         // Compute f(t_n, Y_n).
 
         mComputeRates(pVoi, mStates, mRates, mVariables);
 
+        // Compute k and Yk.
+
+        for (size_t i = 0; i < mSize; ++i) {
+            mK[i] = mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + realStep * mRates[i]; // NOLINT
+        }
+
+        // Compute f(t_n + h, Y_n + k).
+
+        mComputeRates(pVoi + realStep, mYk, mRates, mVariables);
+
         // Compute Y_n+1.
 
         for (size_t i = 0; i < mSize; ++i) {
-            mStates[i] += realStep * mRates[i]; // NOLINT
+            mStates[i] += realHalfStep * (mK[i] + mRates[i]); // NOLINT
         }
 
         // Update the variable of integration.
@@ -115,33 +142,33 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
     return true;
 }
 
-SolverForwardEuler::SolverForwardEuler()
+SolverHeun::SolverHeun()
     : SolverOde(new Impl())
 {
 }
 
-SolverForwardEuler::~SolverForwardEuler()
+SolverHeun::~SolverHeun()
 {
     delete pimpl();
 }
 
-SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
+SolverHeun::Impl *SolverHeun::pimpl()
 {
     return static_cast<Impl *>(SolverOde::pimpl());
 }
 
-const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
+const SolverHeun::Impl *SolverHeun::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-bool SolverForwardEuler::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                    ComputeRates pComputeRates)
+bool SolverHeun::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                            ComputeRates pComputeRates)
 {
     return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverForwardEuler::solve(double &pVoi, double pVoiEnd) const
+bool SolverHeun::solve(double &pVoi, double pVoiEnd) const
 {
     return pimpl()->solve(pVoi, pVoiEnd);
 }
