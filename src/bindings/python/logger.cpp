@@ -31,4 +31,17 @@ void loggerApi(py::module_ &m)
         .def_property_readonly("errors", &libOpenCOR::Logger::errors, "Return the errors.")
         .def_property_readonly("warnings", &libOpenCOR::Logger::warnings, "Return the warnings.")
         .def_property_readonly("messages", &libOpenCOR::Logger::messages, "Return the messages.");
+
+    // Issue API.
+
+    py::class_<libOpenCOR::Issue, libOpenCOR::IssuePtr> issue(m, "Issue");
+
+    py::enum_<libOpenCOR::Issue::Type>(issue, "Type")
+        .value("Error", libOpenCOR::Issue::Type::ERROR)
+        .value("Warning", libOpenCOR::Issue::Type::WARNING)
+        .value("Message", libOpenCOR::Issue::Type::MESSAGE)
+        .export_values();
+
+    issue.def_property_readonly("type", &libOpenCOR::Issue::type, "Get the type of this Issue object.")
+        .def_property_readonly("description", &libOpenCOR::Issue::description, "Get the description for this Issue object.");
 }
