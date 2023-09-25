@@ -22,19 +22,21 @@ describe("Solver basic tests", () => {
   test("Solvers info", () => {
     const solversInfo = libopencor.Solver.solversInfo();
 
-    expect(solversInfo.size()).toBe(1);
+    expect(solversInfo.size()).toBe(2);
 
-    const solverInfo = solversInfo.get(0);
+    // Forward Euler.
+
+    let solverInfo = solversInfo.get(0);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solverInfo.name()).toBe("Forward Euler");
     expect(solverInfo.kisaoId()).toBe("KISAO:0000030");
 
-    const properties = solverInfo.properties();
+    let properties = solverInfo.properties();
 
     expect(properties.size()).toBe(1);
 
-    const property = properties.get(0);
+    let property = properties.get(0);
 
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.DoubleGt0.value,
@@ -44,7 +46,33 @@ describe("Solver basic tests", () => {
     expect(property.defaultValue()).toBe("1.000000");
     expect(property.hasVoiUnit()).toBe(true);
 
-    const listValues = property.listValues();
+    let listValues = property.listValues();
+
+    expect(listValues.size()).toBe(0);
+
+    // Heun.
+
+    solverInfo = solversInfo.get(1);
+
+    expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solverInfo.name()).toBe("Heun");
+    expect(solverInfo.kisaoId()).toBe("KISAO:0000301");
+
+    properties = solverInfo.properties();
+
+    expect(properties.size()).toBe(1);
+
+    property = properties.get(0);
+
+    expect(property.type().value).toBe(
+      libopencor.SolverProperty.Type.DoubleGt0.value,
+    );
+    expect(property.name()).toBe("Step");
+    expect(property.kisaoId()).toBe("KISAO:0000483");
+    expect(property.defaultValue()).toBe("1.000000");
+    expect(property.hasVoiUnit()).toBe(true);
+
+    listValues = property.listValues();
 
     expect(listValues.size()).toBe(0);
   });
@@ -63,6 +91,18 @@ describe("Solver basic tests", () => {
 
   test("Forward Euler by KiSAO id", () => {
     const solver = new libopencor.Solver("KISAO:0000030");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("Heun by name", () => {
+    const solver = new libopencor.Solver("Heun");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("Heun by KiSAO id", () => {
+    const solver = new libopencor.Solver("KISAO:0000301");
 
     expect(solver.isValid()).toBe(true);
   });

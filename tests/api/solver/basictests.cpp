@@ -22,7 +22,9 @@ TEST(BasicSolverTest, solversInfo)
 {
     auto solversInfo = libOpenCOR::Solver::solversInfo();
 
-    EXPECT_EQ(solversInfo.size(), 1);
+    EXPECT_EQ(solversInfo.size(), 2);
+
+    // Forward Euler.
 
     auto solverInfo = solversInfo[0];
 
@@ -45,6 +47,30 @@ TEST(BasicSolverTest, solversInfo)
     auto listValues = property->listValues();
 
     EXPECT_EQ(listValues.size(), 0);
+
+    // Heun.
+
+    solverInfo = solversInfo[1];
+
+    EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solverInfo->name(), "Heun");
+    EXPECT_EQ(solverInfo->kisaoId(), "KISAO:0000301");
+
+    properties = solverInfo->properties();
+
+    EXPECT_EQ(properties.size(), 1);
+
+    property = properties[0];
+
+    EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
+    EXPECT_EQ(property->name(), "Step");
+    EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
+    EXPECT_EQ(property->defaultValue(), "1.000000");
+    EXPECT_TRUE(property->hasVoiUnit());
+
+    listValues = property->listValues();
+
+    EXPECT_EQ(listValues.size(), 0);
 }
 
 TEST(BasicSolverTest, unknownSolver)
@@ -64,6 +90,20 @@ TEST(BasicSolverTest, forwardEulerByName)
 TEST(BasicSolverTest, forwardEulerByKisaoId)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000030");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, heunByName)
+{
+    auto solver = libOpenCOR::Solver::create("Heun");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, heunByKisaoId)
+{
+    auto solver = libOpenCOR::Solver::create("KISAO:0000301");
 
     EXPECT_TRUE(solver->isValid());
 }
