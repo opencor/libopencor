@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "solver_p.h"
 #include "solverforwardeuler_p.h"
+#include "solverfourthorderrungekutta_p.h"
 #include "solverheun_p.h"
 #include "solverinfo_p.h"
 #include "solversecondorderrungekutta_p.h"
@@ -124,6 +125,12 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
                                      SolverForwardEuler::Impl::KISAO_ID,
                                      SolverForwardEuler::Impl::create,
                                      SolverForwardEuler::Impl::propertiesInfo());
+
+        Solver::Impl::registerSolver(SolverFourthOrderRungeKutta::Impl::TYPE,
+                                     SolverFourthOrderRungeKutta::Impl::NAME,
+                                     SolverFourthOrderRungeKutta::Impl::KISAO_ID,
+                                     SolverFourthOrderRungeKutta::Impl::create,
+                                     SolverFourthOrderRungeKutta::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverHeun::Impl::TYPE,
                                      SolverHeun::Impl::NAME,

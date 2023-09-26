@@ -1,0 +1,209 @@
+/*
+Copyright libOpenCOR contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+#include "solverfourthorderrungekutta_p.h"
+#include "utils.h"
+
+namespace libOpenCOR {
+
+const std::string SolverFourthOrderRungeKutta::Impl::NAME = "Fourth-order Runge-Kutta"; // NOLINT
+const std::string SolverFourthOrderRungeKutta::Impl::KISAO_ID = "KISAO:0000032"; // NOLINT
+
+const std::string SolverFourthOrderRungeKutta::Impl::STEP_NAME = "Step"; // NOLINT
+const std::string SolverFourthOrderRungeKutta::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
+
+SolverPtr SolverFourthOrderRungeKutta::Impl::create()
+{
+    return std::shared_ptr<SolverFourthOrderRungeKutta> {new SolverFourthOrderRungeKutta {}};
+}
+
+std::vector<SolverPropertyPtr> SolverFourthOrderRungeKutta::Impl::propertiesInfo()
+{
+    return {
+        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_NAME, STEP_KISAO_ID,
+                                     {},
+                                     std::to_string(STEP_DEFAULT_VALUE),
+                                     true),
+    };
+}
+
+SolverFourthOrderRungeKutta::Impl::Impl()
+    : SolverOde::Impl()
+{
+    mIsValid = true;
+
+    mProperties[STEP_KISAO_ID] = std::to_string(STEP_DEFAULT_VALUE);
+}
+
+SolverFourthOrderRungeKutta::Impl::~Impl()
+{
+    delete[] mK1;
+    delete[] mK2;
+    delete[] mK3;
+    delete[] mYk;
+}
+
+std::map<std::string, std::string> SolverFourthOrderRungeKutta::Impl::propertiesKisaoId() const
+{
+    static const std::map<std::string, std::string> PROPERTIES_KISAO_ID = {
+        {STEP_NAME, STEP_KISAO_ID},
+    };
+
+    return PROPERTIES_KISAO_ID;
+}
+
+bool SolverFourthOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                                   ComputeRates pComputeRates)
+{
+    removeAllIssues();
+
+    // Retrieve the solver's properties.
+
+    bool ok = true;
+    auto step = stringToDouble(mProperties[STEP_KISAO_ID], ok);
+
+    if (ok && (step > 0.0)) {
+        mStep = step;
+    } else {
+        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_KISAO_ID] + R"("). It must be a floating point number greater than zero.)");
+
+        return false;
+    }
+
+    // Create our various arrays.
+
+    mK1 = new double[pSize] {};
+    mK2 = new double[pSize] {};
+    mK3 = new double[pSize] {};
+    mYk = new double[pSize] {};
+
+    // Initialise the ODE solver itself.
+
+    return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+}
+
+bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
+{
+    // We compute the following:
+    //   k1 = h * f(t_n, Y_n)
+    //   k2 = h * f(t_n + h / 2, Y_n + k1 / 2)
+    //   k3 = h * f(t_n + h / 2, Y_n + k2 / 2)
+    //   k4 = h * f(t_n + h, Y_n + k3)
+    //   Y_n+1 = Y_n + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+    // Note that k4 doesn't need to be tracked since it is used only once.
+
+    static const auto HALF = 0.5;
+    static const auto ONE_THIRD = 1.0 / 3.0;
+    static const auto ONE_SIXTH = 1.0 / 6.0;
+
+    const auto voiStart = pVoi;
+    size_t voiCounter = 0;
+    auto realStep = mStep;
+    auto realHalfStep = HALF * realStep;
+
+    while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
+        // Check that the step is correct.
+
+        if (pVoi + realStep > pVoiEnd) {
+            realStep = pVoiEnd - pVoi;
+            realHalfStep = HALF * realStep;
+        }
+
+        // Compute f(t_n, Y_n).
+
+        mComputeRates(pVoi, mStates, mRates, mVariables);
+
+        // Compute k1 and Y_n + k1 / 2.
+
+        for (size_t i = 0; i < mSize; ++i) {
+            mK1[i] = realStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + HALF * mK1[i]; // NOLINT
+        }
+
+        // Compute f(t_n + h / 2, Y_n + k1 / 2).
+
+        mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
+
+        // Compute k2 and Y_n + k2 / 2.
+
+        for (size_t i = 0; i < mSize; ++i) {
+            mK2[i] = realStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + HALF * mK2[i]; // NOLINT
+        }
+
+        // Compute f(t_n + h / 2, Y_n + k2 / 2).
+
+        mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
+
+        // Compute k3 and Y_n + k3.
+
+        for (size_t i = 0; i < mSize; ++i) {
+            mK3[i] = realStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + mK3[i]; // NOLINT
+        }
+
+        // Compute f(t_n + h, Y_n + k3).
+
+        mComputeRates(pVoi + realStep, mYk, mRates, mVariables);
+
+        // Compute Y_n+1.
+
+        for (size_t i = 0; i < mSize; ++i) {
+            mStates[i] += ONE_SIXTH * mK1[i] + ONE_THIRD * mK2[i] + ONE_THIRD * mK3[i] + ONE_SIXTH * realStep * mRates[i]; // NOLINT
+        }
+
+        // Update the variable of integration.
+
+        pVoi = libOpenCOR::fuzzyCompare(realStep, mStep) ?
+                   voiStart + static_cast<double>(++voiCounter) * mStep :
+                   pVoiEnd;
+    }
+
+    return true;
+}
+
+SolverFourthOrderRungeKutta::SolverFourthOrderRungeKutta()
+    : SolverOde(new Impl())
+{
+}
+
+SolverFourthOrderRungeKutta::~SolverFourthOrderRungeKutta()
+{
+    delete pimpl();
+}
+
+SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl()
+{
+    return static_cast<Impl *>(SolverOde::pimpl());
+}
+
+const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() const
+{
+    return static_cast<const Impl *>(SolverOde::pimpl());
+}
+
+bool SolverFourthOrderRungeKutta::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                             ComputeRates pComputeRates)
+{
+    return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+}
+
+bool SolverFourthOrderRungeKutta::solve(double &pVoi, double pVoiEnd) const
+{
+    return pimpl()->solve(pVoi, pVoiEnd);
+}
+
+} // namespace libOpenCOR
