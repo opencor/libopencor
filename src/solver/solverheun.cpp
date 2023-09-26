@@ -97,12 +97,12 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
     //   k = h * f(t_n, Y_n)
     //   Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + k) )
 
-    static const double HALF = 0.5;
+    static const auto HALF = 0.5;
 
-    const double voiStart = pVoi;
+    const auto voiStart = pVoi;
     size_t voiCounter = 0;
-    double realStep = mStep;
-    double realHalfStep = HALF * realStep;
+    auto realStep = mStep;
+    auto realHalfStep = HALF * realStep;
 
     while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
