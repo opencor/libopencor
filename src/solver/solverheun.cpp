@@ -93,8 +93,9 @@ bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates,
 
 bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 {
-    // k = h * f(t_n, Y_n).
-    // Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + k) ).
+    // We compute the following:
+    //   k = h * f(t_n, Y_n)
+    //   Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + k) )
 
     static const double HALF = 0.5;
 

@@ -23,6 +23,7 @@ set(${TEST}_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/forwardeulertests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/heuntests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/model.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/secondorderrungekuttatests.cpp
 )
 set(${TEST}_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/model.h
