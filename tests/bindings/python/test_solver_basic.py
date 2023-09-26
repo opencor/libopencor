@@ -19,7 +19,7 @@ from libopencor import Solver, SolverProperty
 def test_solvers_info():
     solvers_info = Solver.solvers_info()
 
-    assert len(solvers_info) == 3
+    assert len(solvers_info) == 4
 
     # Forward Euler.
 
@@ -45,9 +45,33 @@ def test_solvers_info():
 
     assert len(list_values) == 0
 
-    # Heun.
+    # Fourth-order Runge-Kutta.
 
     solver_info = solvers_info[1]
+
+    assert solver_info.type == Solver.Type.Ode
+    assert solver_info.name == "Fourth-order Runge-Kutta"
+    assert solver_info.kisao_id == "KISAO:0000032"
+
+    properties = solver_info.properties
+
+    assert len(properties) == 1
+
+    property = properties[0]
+
+    assert property.type == SolverProperty.Type.DoubleGt0
+    assert property.name == "Step"
+    assert property.kisao_id == "KISAO:0000483"
+    assert property.default_value == "1.000000"
+    assert property.has_voi_unit == True
+
+    list_values = property.list_values
+
+    assert len(list_values) == 0
+
+    # Heun.
+
+    solver_info = solvers_info[2]
 
     assert solver_info.type == Solver.Type.Ode
     assert solver_info.name == "Heun"
@@ -71,7 +95,7 @@ def test_solvers_info():
 
     # Second-order Runge-Kutta.
 
-    solver_info = solvers_info[2]
+    solver_info = solvers_info[3]
 
     assert solver_info.type == Solver.Type.Ode
     assert solver_info.name == "Second-order Runge-Kutta"
@@ -108,6 +132,18 @@ def test_forward_euler_by_name():
 
 def test_forward_euler_by_kisao_id():
     solver = Solver("KISAO:0000030")
+
+    assert solver.is_valid == True
+
+
+def test_fourth_order_runge_kutta_by_name():
+    solver = Solver("Fourth-order Runge-Kutta")
+
+    assert solver.is_valid == True
+
+
+def test_fourth_order_runge_kutta_by_kisao_id():
+    solver = Solver("KISAO:0000032")
 
     assert solver.is_valid == True
 

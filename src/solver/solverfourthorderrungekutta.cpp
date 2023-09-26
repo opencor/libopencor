@@ -14,23 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solversecondorderrungekutta_p.h"
+#include "solverfourthorderrungekutta_p.h"
 #include "utils.h"
 
 namespace libOpenCOR {
 
-const std::string SolverSecondOrderRungeKutta::Impl::NAME = "Second-order Runge-Kutta"; // NOLINT
-const std::string SolverSecondOrderRungeKutta::Impl::KISAO_ID = "KISAO:0000381"; // NOLINT
+const std::string SolverFourthOrderRungeKutta::Impl::NAME = "Fourth-order Runge-Kutta"; // NOLINT
+const std::string SolverFourthOrderRungeKutta::Impl::KISAO_ID = "KISAO:0000032"; // NOLINT
 
-const std::string SolverSecondOrderRungeKutta::Impl::STEP_NAME = "Step"; // NOLINT
-const std::string SolverSecondOrderRungeKutta::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
+const std::string SolverFourthOrderRungeKutta::Impl::STEP_NAME = "Step"; // NOLINT
+const std::string SolverFourthOrderRungeKutta::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
 
-SolverPtr SolverSecondOrderRungeKutta::Impl::create()
+SolverPtr SolverFourthOrderRungeKutta::Impl::create()
 {
-    return std::shared_ptr<SolverSecondOrderRungeKutta> {new SolverSecondOrderRungeKutta {}};
+    return std::shared_ptr<SolverFourthOrderRungeKutta> {new SolverFourthOrderRungeKutta {}};
 }
 
-std::vector<SolverPropertyPtr> SolverSecondOrderRungeKutta::Impl::propertiesInfo()
+std::vector<SolverPropertyPtr> SolverFourthOrderRungeKutta::Impl::propertiesInfo()
 {
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_NAME, STEP_KISAO_ID,
@@ -40,7 +40,7 @@ std::vector<SolverPropertyPtr> SolverSecondOrderRungeKutta::Impl::propertiesInfo
     };
 }
 
-SolverSecondOrderRungeKutta::Impl::Impl()
+SolverFourthOrderRungeKutta::Impl::Impl()
     : SolverOde::Impl()
 {
     mIsValid = true;
@@ -48,12 +48,15 @@ SolverSecondOrderRungeKutta::Impl::Impl()
     mProperties[STEP_KISAO_ID] = std::to_string(STEP_DEFAULT_VALUE);
 }
 
-SolverSecondOrderRungeKutta::Impl::~Impl()
+SolverFourthOrderRungeKutta::Impl::~Impl()
 {
+    delete[] mK1;
+    delete[] mK2;
+    delete[] mK3;
     delete[] mYk;
 }
 
-std::map<std::string, std::string> SolverSecondOrderRungeKutta::Impl::propertiesKisaoId() const
+std::map<std::string, std::string> SolverFourthOrderRungeKutta::Impl::propertiesKisaoId() const
 {
     static const std::map<std::string, std::string> PROPERTIES_KISAO_ID = {
         {STEP_NAME, STEP_KISAO_ID},
@@ -62,7 +65,7 @@ std::map<std::string, std::string> SolverSecondOrderRungeKutta::Impl::properties
     return PROPERTIES_KISAO_ID;
 }
 
-bool SolverSecondOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverFourthOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
                                                    ComputeRates pComputeRates)
 {
     removeAllIssues();
@@ -82,6 +85,9 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates
 
     // Create our various arrays.
 
+    mK1 = new double[pSize] {};
+    mK2 = new double[pSize] {};
+    mK3 = new double[pSize] {};
     mYk = new double[pSize] {};
 
     // Initialise the ODE solver itself.
@@ -89,15 +95,19 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates
     return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     // We compute the following:
     //   k1 = h * f(t_n, Y_n)
     //   k2 = h * f(t_n + h / 2, Y_n + k1 / 2)
-    //   Y_n+1 = Y_n + k2
-    // Note that k1 and k2 don't need to be tracked since they are used only once.
+    //   k3 = h * f(t_n + h / 2, Y_n + k2 / 2)
+    //   k4 = h * f(t_n + h, Y_n + k3)
+    //   Y_n+1 = Y_n + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+    // Note that k4 doesn't need to be tracked since it is used only once.
 
     static const auto HALF = 0.5;
+    static const auto ONE_THIRD = 1.0 / 3.0;
+    static const auto ONE_SIXTH = 1.0 / 6.0;
 
     const auto voiStart = pVoi;
     size_t voiCounter = 0;
@@ -116,20 +126,43 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
 
         mComputeRates(pVoi, mStates, mRates, mVariables);
 
-        // Compute Y_n + k1 / 2.
+        // Compute k1 and Y_n + k1 / 2.
 
         for (size_t i = 0; i < mSize; ++i) {
-            mYk[i] = mStates[i] + realHalfStep * mRates[i]; // NOLINT
+            mK1[i] = realStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + HALF * mK1[i]; // NOLINT
         }
 
         // Compute f(t_n + h / 2, Y_n + k1 / 2).
 
         mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
 
+        // Compute k2 and Y_n + k2 / 2.
+
+        for (size_t i = 0; i < mSize; ++i) {
+            mK2[i] = realStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + HALF * mK2[i]; // NOLINT
+        }
+
+        // Compute f(t_n + h / 2, Y_n + k2 / 2).
+
+        mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
+
+        // Compute k3 and Y_n + k3.
+
+        for (size_t i = 0; i < mSize; ++i) {
+            mK3[i] = realStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + mK3[i]; // NOLINT
+        }
+
+        // Compute f(t_n + h, Y_n + k3).
+
+        mComputeRates(pVoi + realStep, mYk, mRates, mVariables);
+
         // Compute Y_n+1.
 
         for (size_t i = 0; i < mSize; ++i) {
-            mStates[i] += realStep * mRates[i]; // NOLINT
+            mStates[i] += ONE_SIXTH * mK1[i] + ONE_THIRD * mK2[i] + ONE_THIRD * mK3[i] + ONE_SIXTH * realStep * mRates[i]; // NOLINT
         }
 
         // Update the variable of integration.
@@ -142,33 +175,33 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
     return true;
 }
 
-SolverSecondOrderRungeKutta::SolverSecondOrderRungeKutta()
+SolverFourthOrderRungeKutta::SolverFourthOrderRungeKutta()
     : SolverOde(new Impl())
 {
 }
 
-SolverSecondOrderRungeKutta::~SolverSecondOrderRungeKutta()
+SolverFourthOrderRungeKutta::~SolverFourthOrderRungeKutta()
 {
     delete pimpl();
 }
 
-SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl()
+SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl()
 {
     return static_cast<Impl *>(SolverOde::pimpl());
 }
 
-const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() const
+const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-bool SolverSecondOrderRungeKutta::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverFourthOrderRungeKutta::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
                                              ComputeRates pComputeRates)
 {
     return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverSecondOrderRungeKutta::solve(double &pVoi, double pVoiEnd) const
+bool SolverFourthOrderRungeKutta::solve(double &pVoi, double pVoiEnd) const
 {
     return pimpl()->solve(pVoi, pVoiEnd);
 }

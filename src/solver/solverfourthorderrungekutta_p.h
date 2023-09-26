@@ -17,11 +17,11 @@ limitations under the License.
 #pragma once
 
 #include "solverode_p.h"
-#include "solversecondorderrungekutta.h"
+#include "solverfourthorderrungekutta.h"
 
 namespace libOpenCOR {
 
-class SolverSecondOrderRungeKutta::Impl: public SolverOde::Impl
+class SolverFourthOrderRungeKutta::Impl: public SolverOde::Impl
 {
 public:
     static const Solver::Type TYPE = Solver::Type::ODE;
@@ -37,6 +37,9 @@ public:
 
     double mStep = STEP_DEFAULT_VALUE;
 
+    double *mK1 = nullptr;
+    double *mK2 = nullptr;
+    double *mK3 = nullptr;
     double *mYk = nullptr;
 
     explicit Impl();

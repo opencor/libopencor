@@ -22,7 +22,7 @@ describe("Solver basic tests", () => {
   test("Solvers info", () => {
     const solversInfo = libopencor.Solver.solversInfo();
 
-    expect(solversInfo.size()).toBe(3);
+    expect(solversInfo.size()).toBe(4);
 
     // Forward Euler.
 
@@ -50,9 +50,35 @@ describe("Solver basic tests", () => {
 
     expect(listValues.size()).toBe(0);
 
-    // Heun.
+    // Fourth-order Runge-Kutta.
 
     solverInfo = solversInfo.get(1);
+
+    expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solverInfo.name()).toBe("Fourth-order Runge-Kutta");
+    expect(solverInfo.kisaoId()).toBe("KISAO:0000032");
+
+    properties = solverInfo.properties();
+
+    expect(properties.size()).toBe(1);
+
+    property = properties.get(0);
+
+    expect(property.type().value).toBe(
+      libopencor.SolverProperty.Type.DoubleGt0.value,
+    );
+    expect(property.name()).toBe("Step");
+    expect(property.kisaoId()).toBe("KISAO:0000483");
+    expect(property.defaultValue()).toBe("1.000000");
+    expect(property.hasVoiUnit()).toBe(true);
+
+    listValues = property.listValues();
+
+    expect(listValues.size()).toBe(0);
+
+    // Heun.
+
+    solverInfo = solversInfo.get(2);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solverInfo.name()).toBe("Heun");
@@ -78,7 +104,7 @@ describe("Solver basic tests", () => {
 
     // Second-order Runge-Kutta.
 
-    solverInfo = solversInfo.get(2);
+    solverInfo = solversInfo.get(3);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solverInfo.name()).toBe("Second-order Runge-Kutta");
@@ -117,6 +143,18 @@ describe("Solver basic tests", () => {
 
   test("Forward Euler by KiSAO id", () => {
     const solver = new libopencor.Solver("KISAO:0000030");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("Fourth-order Runge-Kutta by name", () => {
+    const solver = new libopencor.Solver("Fourth-order Runge-Kutta");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("Fourth-order Runge-Kutta by KiSAO id", () => {
+    const solver = new libopencor.Solver("KISAO:0000032");
 
     expect(solver.isValid()).toBe(true);
   });
