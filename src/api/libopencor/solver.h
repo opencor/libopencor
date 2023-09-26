@@ -27,7 +27,7 @@ namespace libOpenCOR {
 /**
  * @brief The Solver class.
  *
- * The Solver class is used to get various information about the solvers that are available, as well as to create a
+ * The Solver class is used to get various information about the solvers that are available, as well as to @ref create a
  * solver.
  */
 
@@ -68,6 +68,13 @@ public:
      * auto cvodeSolver = libOpenCOR::Solver::create("CVODE");
      * auto anotherCvodeSolver = libOpenCOR::Solver::create("KISAO:0000019");
      * ```
+     *
+     * The following <a href="https://en.wikipedia.org/wiki/Ordinary_differential_equation">ODE</a> solvers can be created:
+     *  - <a href="https://computing.llnl.gov/projects/sundials/cvode">`CVODE`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000019">`KISAO:0000019`</a>;
+     *  - <a href="https://en.wikipedia.org/wiki/Euler_method">`Forward Euler`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000030">`KISAO:0000030`</a>;
+     *  - <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Fourth-order Runge-Kutta`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000032">`KISAO:0000032`</a>;
+     *  - <a href="https://en.wikipedia.org/wiki/Heun's_method">`Heun`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000301">`KISAO:0000301`</a>; and
+     *  - <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Second-order Runge-Kutta`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000381">`KISAO:0000381`</a>.
      *
      * @param pNameOrKisaoId The name of the solver or its KiSAO id.
      *
