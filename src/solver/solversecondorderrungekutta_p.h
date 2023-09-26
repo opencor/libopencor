@@ -37,7 +37,7 @@ public:
 
     double mStep = STEP_DEFAULT_VALUE;
 
-    double *mYk1_2 = nullptr;
+    double *mYk = nullptr;
 
     explicit Impl();
     ~Impl() override;

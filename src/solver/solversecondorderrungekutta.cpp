@@ -50,7 +50,7 @@ SolverSecondOrderRungeKutta::Impl::Impl()
 
 SolverSecondOrderRungeKutta::Impl::~Impl()
 {
-    delete[] mYk1_2;
+    delete[] mYk;
 }
 
 std::map<std::string, std::string> SolverSecondOrderRungeKutta::Impl::propertiesKisaoId() const
@@ -82,7 +82,7 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates
 
     // Create our various arrays.
 
-    mYk1_2 = new double[pSize] {};
+    mYk = new double[pSize] {};
 
     // Initialise the ODE solver itself.
 
@@ -95,7 +95,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
     //   k1 = h * f(t_n, Y_n)
     //   k2 = h * f(t_n + h / 2, Y_n + k1 / 2)
     //   Y_n+1 = Y_n + k2
-    // Although, for performance reasons, we don't compute k1 and k2 as such.
+    // Note that k1 and k2 don't need to be tracked since they are used only once.
 
     static const auto HALF = 0.5;
 
@@ -116,15 +116,15 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
 
         mComputeRates(pVoi, mStates, mRates, mVariables);
 
-        // Compute k1 and therefore Y_n + k1 / 2.
+        // Compute Y_n + k1 / 2.
 
         for (size_t i = 0; i < mSize; ++i) {
-            mYk1_2[i] = mStates[i] + realHalfStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + realHalfStep * mRates[i]; // NOLINT
         }
 
         // Compute f(t_n + h / 2, Y_n + k1 / 2).
 
-        mComputeRates(pVoi + realHalfStep, mYk1_2, mRates, mVariables);
+        mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
 
         // Compute Y_n+1.
 
