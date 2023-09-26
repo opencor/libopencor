@@ -76,7 +76,6 @@ TEST(ForwardEulerSolverTest, main)
 
     // Customise and initialise our solver and compute it.
 
-    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
 #if defined(BUILDING_ON_WINDOWS)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762314604, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
 #elif defined(BUILDING_ON_LINUX)
@@ -88,9 +87,6 @@ TEST(ForwardEulerSolverTest, main)
 #endif
 
     solver->setProperty("Step", "0.0123");
-
-    EXPECT_TRUE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
-    EXPECT_EQ_DOUBLES(states, INITIAL_STATES);
 
     computeModel(solver, states, rates, variables, FINAL_STATES);
 

@@ -63,6 +63,11 @@ void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
                   double *pStates, double *pRates, double *pVariables,
                   const libOpenCOR::Doubles &pFinalStates)
 {
+    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
+
+    EXPECT_TRUE(pSolver->initialise(STATE_COUNT, pStates, pRates, pVariables, computeRates));
+    EXPECT_EQ_DOUBLES(pStates, INITIAL_STATES);
+
     static constexpr double VOI_START = 0.0;
     static constexpr double VOI_END = 50.0;
     static constexpr double VOI_INTERVAL = 0.1;

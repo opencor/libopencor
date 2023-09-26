@@ -76,7 +76,6 @@ TEST(SecondOrderRungeKuttaSolverTest, main)
 
     // Customise and initialise our solver and compute it.
 
-    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
 #if defined(BUILDING_ON_WINDOWS)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628843987, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
 #elif defined(BUILDING_ON_LINUX)
@@ -88,9 +87,6 @@ TEST(SecondOrderRungeKuttaSolverTest, main)
 #endif
 
     solver->setProperty("Step", "0.0123");
-
-    EXPECT_TRUE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
-    EXPECT_EQ_DOUBLES(states, INITIAL_STATES);
 
     computeModel(solver, states, rates, variables, FINAL_STATES);
 
