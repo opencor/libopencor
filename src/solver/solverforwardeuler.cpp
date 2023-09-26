@@ -85,9 +85,9 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
     // We compute the following:
     //   Y_n+1 = Y_n + h * f(t_n, Y_n)
 
-    const double voiStart = pVoi;
+    const auto voiStart = pVoi;
     size_t voiCounter = 0;
-    double realStep = mStep;
+    auto realStep = mStep;
 
     while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.

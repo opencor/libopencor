@@ -97,12 +97,12 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
     //   Y_n+1 = Y_n + k2
     // Although, for performance reasons, we don't compute k1 and k2 as such.
 
-    static const double HALF = 0.5;
+    static const auto HALF = 0.5;
 
-    const double voiStart = pVoi;
+    const auto voiStart = pVoi;
     size_t voiCounter = 0;
-    double realStep = mStep;
-    double realHalfStep = HALF * realStep;
+    auto realStep = mStep;
+    auto realHalfStep = HALF * realStep;
 
     while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
