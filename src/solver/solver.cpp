@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "solver_p.h"
+#include "solvercvode_p.h"
 #include "solverforwardeuler_p.h"
 #include "solverfourthorderrungekutta_p.h"
 #include "solverheun_p.h"
@@ -119,6 +120,12 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
 
     if (!initialised) {
         initialised = true;
+
+        Solver::Impl::registerSolver(SolverCvode::Impl::TYPE,
+                                     SolverCvode::Impl::NAME,
+                                     SolverCvode::Impl::KISAO_ID,
+                                     SolverCvode::Impl::create,
+                                     SolverCvode::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverForwardEuler::Impl::TYPE,
                                      SolverForwardEuler::Impl::NAME,

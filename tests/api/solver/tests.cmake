@@ -20,6 +20,7 @@ set(${TEST}_CATEGORY api)
 set(${TEST}_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/coveragetests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/cvodetests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/forwardeulertests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fourthorderrungekuttatests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/heuntests.cpp

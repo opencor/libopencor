@@ -96,6 +96,7 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverfourthorderrungekutta.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverheun.cpp
@@ -140,6 +141,8 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverfourthorderrungekutta_p.h

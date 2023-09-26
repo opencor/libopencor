@@ -22,15 +22,15 @@ describe("Solver basic tests", () => {
   test("Solvers info", () => {
     const solversInfo = libopencor.Solver.solversInfo();
 
-    expect(solversInfo.size()).toBe(4);
+    expect(solversInfo.size()).toBe(5);
 
-    // Forward Euler.
+    // CVODE.
 
     let solverInfo = solversInfo.get(0);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.name()).toBe("Forward Euler");
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000030");
+    expect(solverInfo.name()).toBe("CVODE");
+    expect(solverInfo.kisaoId()).toBe("KISAO:0000019");
 
     let properties = solverInfo.properties();
 
@@ -50,9 +50,35 @@ describe("Solver basic tests", () => {
 
     expect(listValues.size()).toBe(0);
 
-    // Fourth-order Runge-Kutta.
+    // Forward Euler.
 
     solverInfo = solversInfo.get(1);
+
+    expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solverInfo.name()).toBe("Forward Euler");
+    expect(solverInfo.kisaoId()).toBe("KISAO:0000030");
+
+    properties = solverInfo.properties();
+
+    expect(properties.size()).toBe(1);
+
+    property = properties.get(0);
+
+    expect(property.type().value).toBe(
+      libopencor.SolverProperty.Type.DoubleGt0.value,
+    );
+    expect(property.name()).toBe("Step");
+    expect(property.kisaoId()).toBe("KISAO:0000483");
+    expect(property.defaultValue()).toBe("1.000000");
+    expect(property.hasVoiUnit()).toBe(true);
+
+    listValues = property.listValues();
+
+    expect(listValues.size()).toBe(0);
+
+    // Fourth-order Runge-Kutta.
+
+    solverInfo = solversInfo.get(2);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solverInfo.name()).toBe("Fourth-order Runge-Kutta");
@@ -78,7 +104,7 @@ describe("Solver basic tests", () => {
 
     // Heun.
 
-    solverInfo = solversInfo.get(2);
+    solverInfo = solversInfo.get(3);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solverInfo.name()).toBe("Heun");
@@ -104,7 +130,7 @@ describe("Solver basic tests", () => {
 
     // Second-order Runge-Kutta.
 
-    solverInfo = solversInfo.get(3);
+    solverInfo = solversInfo.get(4);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solverInfo.name()).toBe("Second-order Runge-Kutta");
@@ -133,6 +159,18 @@ describe("Solver basic tests", () => {
     const solver = new libopencor.Solver("Unknown");
 
     expect(solver.isValid()).toBe(false);
+  });
+
+  test("CVODE by name", () => {
+    const solver = new libopencor.Solver("CVODE");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("CVODE by KiSAO id", () => {
+    const solver = new libopencor.Solver("KISAO:0000019");
+
+    expect(solver.isValid()).toBe(true);
   });
 
   test("Forward Euler by name", () => {
