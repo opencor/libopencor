@@ -74,7 +74,7 @@ TEST(HeunSolverTest, main)
 
     const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Heun");
 
-    // Customise and initialise our solver and compute it.
+    // Customise our solver and compute our model.
 
 #if defined(BUILDING_ON_WINDOWS)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179346003, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};

@@ -74,7 +74,7 @@ TEST(SecondOrderRungeKuttaSolverTest, main)
 
     const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Second-order Runge-Kutta");
 
-    // Customise and initialise our solver and compute it.
+    // Customise our solver and compute our model.
 
 #if defined(BUILDING_ON_WINDOWS)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628843987, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};

@@ -74,7 +74,7 @@ TEST(ForwardEulerSolverTest, main)
 
     const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Forward Euler");
 
-    // Customise and initialise our solver and compute it.
+    // Customise our solver and compute our model.
 
 #if defined(BUILDING_ON_WINDOWS)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762314604, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
