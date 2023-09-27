@@ -26,8 +26,8 @@ def test_solvers_info():
     solver_info = solvers_info[0]
 
     assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "CVODE"
     assert solver_info.kisao_id == "KISAO:0000019"
+    assert solver_info.name == "CVODE"
 
     properties = solver_info.properties
 
@@ -36,8 +36,8 @@ def test_solvers_info():
     property = properties[0]
 
     assert property.type == SolverProperty.Type.DoubleGe0
-    assert property.name == "Maximum step"
     assert property.kisao_id == "KISAO:0000467"
+    assert property.name == "Maximum step"
     assert property.default_value == "0"
     assert property.has_voi_unit == True
 
@@ -48,8 +48,8 @@ def test_solvers_info():
     property = properties[1]
 
     assert property.type == SolverProperty.Type.IntegerGt0
-    assert property.name == "Maximum number of steps"
     assert property.kisao_id == "KISAO:0000415"
+    assert property.name == "Maximum number of steps"
     assert property.default_value == "500"
     assert property.has_voi_unit == False
 
@@ -60,8 +60,8 @@ def test_solvers_info():
     property = properties[2]
 
     assert property.type == SolverProperty.Type.List
-    assert property.name == "Integration method"
     assert property.kisao_id == "KISAO:0000475"
+    assert property.name == "Integration method"
     assert property.default_value == "BDF"
     assert property.has_voi_unit == False
 
@@ -74,8 +74,8 @@ def test_solvers_info():
     property = properties[3]
 
     assert property.type == SolverProperty.Type.List
-    assert property.name == "Iteration type"
     assert property.kisao_id == "KISAO:0000476"
+    assert property.name == "Iteration type"
     assert property.default_value == "Newton"
     assert property.has_voi_unit == False
 
@@ -88,8 +88,8 @@ def test_solvers_info():
     property = properties[4]
 
     assert property.type == SolverProperty.Type.List
-    assert property.name == "Linear solver"
     assert property.kisao_id == "KISAO:0000477"
+    assert property.name == "Linear solver"
     assert property.default_value == "Dense"
     assert property.has_voi_unit == False
 
@@ -106,8 +106,8 @@ def test_solvers_info():
     property = properties[5]
 
     assert property.type == SolverProperty.Type.List
-    assert property.name == "Preconditioner"
     assert property.kisao_id == "KISAO:0000478"
+    assert property.name == "Preconditioner"
     assert property.default_value == "Banded"
     assert property.has_voi_unit == False
 
@@ -120,8 +120,8 @@ def test_solvers_info():
     property = properties[6]
 
     assert property.type == SolverProperty.Type.IntegerGe0
-    assert property.name == "Upper half-bandwidth"
     assert property.kisao_id == "KISAO:0000479"
+    assert property.name == "Upper half-bandwidth"
     assert property.default_value == "0"
     assert property.has_voi_unit == False
 
@@ -132,8 +132,8 @@ def test_solvers_info():
     property = properties[7]
 
     assert property.type == SolverProperty.Type.IntegerGe0
-    assert property.name == "Lower half-bandwidth"
     assert property.kisao_id == "KISAO:0000480"
+    assert property.name == "Lower half-bandwidth"
     assert property.default_value == "0"
     assert property.has_voi_unit == False
 
@@ -144,8 +144,8 @@ def test_solvers_info():
     property = properties[8]
 
     assert property.type == SolverProperty.Type.DoubleGe0
-    assert property.name == "Relative tolerance"
     assert property.kisao_id == "KISAO:0000209"
+    assert property.name == "Relative tolerance"
     assert property.default_value == "1e-07"
     assert property.has_voi_unit == False
 
@@ -156,8 +156,8 @@ def test_solvers_info():
     property = properties[9]
 
     assert property.type == SolverProperty.Type.DoubleGe0
-    assert property.name == "Absolute tolerance"
     assert property.kisao_id == "KISAO:0000211"
+    assert property.name == "Absolute tolerance"
     assert property.default_value == "1e-07"
     assert property.has_voi_unit == False
 
@@ -168,8 +168,8 @@ def test_solvers_info():
     property = properties[10]
 
     assert property.type == SolverProperty.Type.Boolean
-    assert property.name == "Interpolate solution"
     assert property.kisao_id == "KISAO:0000481"
+    assert property.name == "Interpolate solution"
     assert property.default_value == "True"
     assert property.has_voi_unit == False
 
@@ -182,8 +182,8 @@ def test_solvers_info():
     solver_info = solvers_info[1]
 
     assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Forward Euler"
     assert solver_info.kisao_id == "KISAO:0000030"
+    assert solver_info.name == "Forward Euler"
 
     properties = solver_info.properties
 
@@ -192,8 +192,8 @@ def test_solvers_info():
     property = properties[0]
 
     assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
     assert property.kisao_id == "KISAO:0000483"
+    assert property.name == "Step"
     assert property.default_value == "1"
     assert property.has_voi_unit == True
 
@@ -206,8 +206,8 @@ def test_solvers_info():
     solver_info = solvers_info[2]
 
     assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Fourth-order Runge-Kutta"
     assert solver_info.kisao_id == "KISAO:0000032"
+    assert solver_info.name == "Fourth-order Runge-Kutta"
 
     properties = solver_info.properties
 
@@ -216,8 +216,8 @@ def test_solvers_info():
     property = properties[0]
 
     assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
     assert property.kisao_id == "KISAO:0000483"
+    assert property.name == "Step"
     assert property.default_value == "1"
     assert property.has_voi_unit == True
 
@@ -230,8 +230,8 @@ def test_solvers_info():
     solver_info = solvers_info[3]
 
     assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Heun"
     assert solver_info.kisao_id == "KISAO:0000301"
+    assert solver_info.name == "Heun"
 
     properties = solver_info.properties
 
@@ -240,8 +240,8 @@ def test_solvers_info():
     property = properties[0]
 
     assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
     assert property.kisao_id == "KISAO:0000483"
+    assert property.name == "Step"
     assert property.default_value == "1"
     assert property.has_voi_unit == True
 
@@ -254,8 +254,8 @@ def test_solvers_info():
     solver_info = solvers_info[4]
 
     assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Second-order Runge-Kutta"
     assert solver_info.kisao_id == "KISAO:0000381"
+    assert solver_info.name == "Second-order Runge-Kutta"
 
     properties = solver_info.properties
 
@@ -264,8 +264,8 @@ def test_solvers_info():
     property = properties[0]
 
     assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
     assert property.kisao_id == "KISAO:0000483"
+    assert property.name == "Step"
     assert property.default_value == "1"
     assert property.has_voi_unit == True
 
@@ -280,20 +280,14 @@ def test_unknown_solver():
     assert solver.is_valid == False
 
 
-def test_cvode_by_name():
-    solver = Solver("CVODE")
-
-    assert solver.is_valid == True
-
-
 def test_cvode_by_kisao_id():
     solver = Solver("KISAO:0000019")
 
     assert solver.is_valid == True
 
 
-def test_forward_euler_by_name():
-    solver = Solver("Forward Euler")
+def test_cvode_by_name():
+    solver = Solver("CVODE")
 
     assert solver.is_valid == True
 
@@ -304,8 +298,8 @@ def test_forward_euler_by_kisao_id():
     assert solver.is_valid == True
 
 
-def test_fourth_order_runge_kutta_by_name():
-    solver = Solver("Fourth-order Runge-Kutta")
+def test_forward_euler_by_name():
+    solver = Solver("Forward Euler")
 
     assert solver.is_valid == True
 
@@ -316,8 +310,8 @@ def test_fourth_order_runge_kutta_by_kisao_id():
     assert solver.is_valid == True
 
 
-def test_heun_by_name():
-    solver = Solver("Heun")
+def test_fourth_order_runge_kutta_by_name():
+    solver = Solver("Fourth-order Runge-Kutta")
 
     assert solver.is_valid == True
 
@@ -328,14 +322,20 @@ def test_heun_by_kisao_id():
     assert solver.is_valid == True
 
 
-def test_second_order_runge_kutta_by_name():
-    solver = Solver("Second-order Runge-Kutta")
+def test_heun_by_name():
+    solver = Solver("Heun")
 
     assert solver.is_valid == True
 
 
 def test_second_order_runge_kutta_by_kisao_id():
     solver = Solver("KISAO:0000381")
+
+    assert solver.is_valid == True
+
+
+def test_second_order_runge_kutta_by_name():
+    solver = Solver("Second-order Runge-Kutta")
 
     assert solver.is_valid == True
 

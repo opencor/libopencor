@@ -76,12 +76,12 @@ public:
      *  - <a href="https://en.wikipedia.org/wiki/Heun's_method">`Heun`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000301">`KISAO:0000301`</a>; and
      *  - <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Second-order Runge-Kutta`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000381">`KISAO:0000381`</a>.
      *
-     * @param pNameOrKisaoId The name of the solver or its KiSAO id.
+     * @param pKisaoIdOrName The KiSAO id or name of the solver.
      *
      * @return A smart pointer to a @ref Solver object.
      */
 
-    static SolverPtr create(const std::string &pNameOrKisaoId);
+    static SolverPtr create(const std::string &pKisaoIdOrName);
 
     /**
      * @brief Get various information about the solvers that are available.
@@ -108,12 +108,12 @@ public:
      *
      * Get the value of a property, which name or KiSAO id is given, of this solver.
      *
-     * @param pNameOrKisaoId The name or KiSAO id, as a @c std::string, of a property.
+     * @param pKisaoIdOrName The KiSAO id or name, as a @c std::string, of a property.
      *
      * @return The value, as a @c std::string, of the property of this solver.
      */
 
-    std::string property(const std::string &pNameOrKisaoId);
+    std::string property(const std::string &pKisaoIdOrName);
 
     /**
      * @brief Set the value of a property of this solver.
@@ -121,11 +121,11 @@ public:
      * Set the value of a property, which name or KiSAO ID is given, of this solver. If the name or KiSAO ID is not
      * supported by the solver then nothing is done.
      *
-     * @param pNameOrKisaoId The name or KiSAO id, as a @c std::string, of a property of this solver.
+     * @param pKisaoIdOrName The KiSAO id or name, as a @c std::string, of a property of this solver.
      * @param pValue The value, as a @c std::string, of a property of this solver.
      */
 
-    void setProperty(const std::string &pNameOrKisaoId, const std::string &pValue);
+    void setProperty(const std::string &pKisaoIdOrName, const std::string &pValue);
 
     /**
      * @brief Get the properties of this solver.

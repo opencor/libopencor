@@ -35,20 +35,20 @@ public:
     bool mIsValid = false;
     std::map<std::string, std::string> mProperties;
 
-    static void registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId, SolverCreate pCreate,
+    static void registerSolver(Type pType, const std::string &pKisaoId, const std::string &pName, SolverCreate pCreate,
                                const std::vector<SolverPropertyPtr> &pProperties);
-    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
-                                            const std::string &pKisaoId, const std::vector<std::string> &pListValues,
+    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pKisaoId,
+                                            const std::string &pName, const std::vector<std::string> &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiUnit);
 
     virtual ~Impl() = default;
 
     virtual std::map<std::string, std::string> propertiesKisaoId() const;
 
-    std::string kisaoId(const std::string &pNameOrKisaoId) const;
+    std::string kisaoId(const std::string &pKisaoIdOrName) const;
 
-    std::string property(const std::string &pNameOrKisaoId);
-    void setProperty(const std::string &pNameOrKisaoId, const std::string &pValue);
+    std::string property(const std::string &pKisaoIdOrName);
+    void setProperty(const std::string &pKisaoIdOrName, const std::string &pValue);
 
     std::map<std::string, std::string> properties() const;
     void setProperties(const std::map<std::string, std::string> &pProperties);

@@ -79,16 +79,6 @@ public:
     Type type() const;
 
     /**
-     * @brief Get the name of the property.
-     *
-     * Return the name of the property.
-     *
-     * @return The name, as a @c std::string, of the property.
-     */
-
-    std::string name() const;
-
-    /**
      * @brief Get the KiSAO id of the property.
      *
      * Return the KiSAO id of the property.
@@ -97,6 +87,16 @@ public:
      */
 
     std::string kisaoId() const;
+
+    /**
+     * @brief Get the name of the property.
+     *
+     * Return the name of the property.
+     *
+     * @return The name, as a @c std::string, of the property.
+     */
+
+    std::string name() const;
 
     /**
      * @brief Get the list of values the property can take.
@@ -133,7 +133,7 @@ private:
 
     Impl *mPimpl;
 
-    explicit SolverProperty(Type pType, const std::string &pName, const std::string &pKisaoId,
+    explicit SolverProperty(Type pType, const std::string &pKisaoId, const std::string &pName,
                             const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
                             bool pHasVoiUnit);
 };

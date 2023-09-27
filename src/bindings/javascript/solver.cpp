@@ -23,8 +23,8 @@ void solverApi()
     emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
         .smart_ptr<libOpenCOR::SolverInfoPtr>("SolverInfo")
         .function("type", &libOpenCOR::SolverInfo::type)
-        .function("name", &libOpenCOR::SolverInfo::name)
         .function("kisaoId", &libOpenCOR::SolverInfo::kisaoId)
+        .function("name", &libOpenCOR::SolverInfo::name)
         .function("properties", &libOpenCOR::SolverInfo::properties);
 
     emscripten::register_vector<libOpenCOR::SolverInfoPtr>("SolversInfo");
@@ -44,8 +44,8 @@ void solverApi()
     emscripten::class_<libOpenCOR::SolverProperty>("SolverProperty")
         .smart_ptr<libOpenCOR::SolverPropertyPtr>("SolverProperty")
         .function("type", &libOpenCOR::SolverProperty::type)
-        .function("name", &libOpenCOR::SolverProperty::name)
         .function("kisaoId", &libOpenCOR::SolverProperty::kisaoId)
+        .function("name", &libOpenCOR::SolverProperty::name)
         .function("listValues", &libOpenCOR::SolverProperty::listValues)
         .function("defaultValue", &libOpenCOR::SolverProperty::defaultValue)
         .function("hasVoiUnit", &libOpenCOR::SolverProperty::hasVoiUnit);

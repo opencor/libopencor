@@ -29,7 +29,7 @@ std::map<std::string, std::string> Solver::Impl::SolversKisaoId; // NOLINT
 std::map<std::string, SolverCreate> Solver::Impl::SolversCreate; // NOLINT
 std::vector<SolverInfoPtr> Solver::Impl::SolversInfo; // NOLINT
 
-void Solver::Impl::registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId,
+void Solver::Impl::registerSolver(Type pType, const std::string &pKisaoId, const std::string &pName,
                                   SolverCreate pCreate, const std::vector<SolverPropertyPtr> &pProperties)
 {
 #ifndef COVERAGE_ENABLED
@@ -37,17 +37,17 @@ void Solver::Impl::registerSolver(Type pType, const std::string &pName, const st
 #endif
         Solver::Impl::SolversKisaoId[pName] = pKisaoId;
         Solver::Impl::SolversCreate[pKisaoId] = pCreate;
-        Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pName, pKisaoId, pProperties));
+        Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pKisaoId, pName, pProperties));
 #ifndef COVERAGE_ENABLED
     }
 #endif
 }
 
-SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pName,
-                                               const std::string &pKisaoId, const std::vector<std::string> &pListValues,
+SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pKisaoId,
+                                               const std::string &pName, const std::vector<std::string> &pListValues,
                                                const std::string &pDefaultValue, bool pHasVoiUnit)
 {
-    return SolverPropertyPtr {new SolverProperty(pType, pName, pKisaoId, pListValues, pDefaultValue, pHasVoiUnit)};
+    return SolverPropertyPtr {new SolverProperty(pType, pKisaoId, pName, pListValues, pDefaultValue, pHasVoiUnit)};
 }
 
 std::map<std::string, std::string> Solver::Impl::propertiesKisaoId() const
@@ -55,22 +55,22 @@ std::map<std::string, std::string> Solver::Impl::propertiesKisaoId() const
     return {};
 }
 
-std::string Solver::Impl::kisaoId(const std::string &pNameOrKisaoId) const
+std::string Solver::Impl::kisaoId(const std::string &pKisaoIdOrName) const
 {
     auto kisaoIds = propertiesKisaoId();
-    auto kisaoIdIter = kisaoIds.find(pNameOrKisaoId);
+    auto kisaoIdIter = kisaoIds.find(pKisaoIdOrName);
 
-    return (kisaoIdIter != kisaoIds.end()) ? kisaoIdIter->second : pNameOrKisaoId;
+    return (kisaoIdIter != kisaoIds.end()) ? kisaoIdIter->second : pKisaoIdOrName;
 }
 
-std::string Solver::Impl::property(const std::string &pNameOrKisaoId)
+std::string Solver::Impl::property(const std::string &pKisaoIdOrName)
 {
-    return mProperties[kisaoId(pNameOrKisaoId)];
+    return mProperties[kisaoId(pKisaoIdOrName)];
 }
 
-void Solver::Impl::setProperty(const std::string &pNameOrKisaoId, const std::string &pValue)
+void Solver::Impl::setProperty(const std::string &pKisaoIdOrName, const std::string &pValue)
 {
-    auto kisaoId = this->kisaoId(pNameOrKisaoId);
+    auto kisaoId = this->kisaoId(pKisaoIdOrName);
 
     if (mProperties.find(kisaoId) != mProperties.end()) {
         mProperties[kisaoId] = pValue;
@@ -102,10 +102,10 @@ const Solver::Impl *Solver::pimpl() const
     return static_cast<const Impl *>(Logger::pimpl());
 }
 
-SolverPtr Solver::create(const std::string &pNameOrKisaoId)
+SolverPtr Solver::create(const std::string &pKisaoIdOrName)
 {
-    auto kisaoIdIter = Solver::Impl::SolversKisaoId.find(pNameOrKisaoId);
-    auto kisaoId = (kisaoIdIter != Solver::Impl::SolversKisaoId.end()) ? kisaoIdIter->second : pNameOrKisaoId;
+    auto kisaoIdIter = Solver::Impl::SolversKisaoId.find(pKisaoIdOrName);
+    auto kisaoId = (kisaoIdIter != Solver::Impl::SolversKisaoId.end()) ? kisaoIdIter->second : pKisaoIdOrName;
 
     if (auto iter = Solver::Impl::SolversCreate.find(kisaoId); iter != Solver::Impl::SolversCreate.end()) {
         return iter->second();
@@ -122,32 +122,32 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
         initialised = true;
 
         Solver::Impl::registerSolver(SolverCvode::Impl::TYPE,
-                                     SolverCvode::Impl::NAME,
                                      SolverCvode::Impl::KISAO_ID,
+                                     SolverCvode::Impl::NAME,
                                      SolverCvode::Impl::create,
                                      SolverCvode::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverForwardEuler::Impl::TYPE,
-                                     SolverForwardEuler::Impl::NAME,
                                      SolverForwardEuler::Impl::KISAO_ID,
+                                     SolverForwardEuler::Impl::NAME,
                                      SolverForwardEuler::Impl::create,
                                      SolverForwardEuler::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverFourthOrderRungeKutta::Impl::TYPE,
-                                     SolverFourthOrderRungeKutta::Impl::NAME,
                                      SolverFourthOrderRungeKutta::Impl::KISAO_ID,
+                                     SolverFourthOrderRungeKutta::Impl::NAME,
                                      SolverFourthOrderRungeKutta::Impl::create,
                                      SolverFourthOrderRungeKutta::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverHeun::Impl::TYPE,
-                                     SolverHeun::Impl::NAME,
                                      SolverHeun::Impl::KISAO_ID,
+                                     SolverHeun::Impl::NAME,
                                      SolverHeun::Impl::create,
                                      SolverHeun::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverSecondOrderRungeKutta::Impl::TYPE,
-                                     SolverSecondOrderRungeKutta::Impl::NAME,
                                      SolverSecondOrderRungeKutta::Impl::KISAO_ID,
+                                     SolverSecondOrderRungeKutta::Impl::NAME,
                                      SolverSecondOrderRungeKutta::Impl::create,
                                      SolverSecondOrderRungeKutta::Impl::propertiesInfo());
     }
@@ -160,14 +160,14 @@ bool Solver::isValid() const
     return pimpl()->mIsValid;
 }
 
-std::string Solver::property(const std::string &pNameOrKisaoId)
+std::string Solver::property(const std::string &pKisaoIdOrName)
 {
-    return pimpl()->property(pNameOrKisaoId);
+    return pimpl()->property(pKisaoIdOrName);
 }
 
-void Solver::setProperty(const std::string &pNameOrKisaoId, const std::string &pValue)
+void Solver::setProperty(const std::string &pKisaoIdOrName, const std::string &pValue)
 {
-    pimpl()->setProperty(pNameOrKisaoId, pValue);
+    pimpl()->setProperty(pKisaoIdOrName, pValue);
 }
 
 std::map<std::string, std::string> Solver::properties() const
