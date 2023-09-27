@@ -48,6 +48,9 @@ std::string toString(size_t pNumber);
 std::string toString(double pNumber);
 std::string toString(const std::vector<unsigned char> &pBytes);
 
+bool toBool(const std::string &pString, bool &pOk);
+int toInt(const std::string &pString, bool &pOk);
+size_t toSizeT(const std::string &pString, bool &pOk);
 double toDouble(const std::string &pString, bool &pOk);
 
 } // namespace libOpenCOR

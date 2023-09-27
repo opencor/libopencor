@@ -24,7 +24,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(SecondOrderRungeKuttaSolverTest, nonFloatingPointStepValue)
+TEST(SecondOrderRungeKuttaSolverTest, stepValueWithString)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -46,7 +46,7 @@ TEST(SecondOrderRungeKuttaSolverTest, nonFloatingPointStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(SecondOrderRungeKuttaSolverTest, invalidStepValue)
+TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -59,6 +59,28 @@ TEST(SecondOrderRungeKuttaSolverTest, invalidStepValue)
     };
 
     solver->setProperty("Step", "0.0");
+
+    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+
+    // Clean up after ourselves.
+
+    deleteArrays(states, rates, variables);
+}
+
+TEST(SecondOrderRungeKuttaSolverTest, stepValueWithTwoNumbers)
+{
+    // Create and initialise our various arrays and create our solver.
+
+    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Second-order Runge-Kutta");
+
+    // Customise and initialise our solver using an invalid step value.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("0.123 0.456"). It must be a floating point number greater than zero.)"},
+    };
+
+    solver->setProperty("Step", "0.123 0.456");
 
     EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);

@@ -380,19 +380,57 @@ std::string toString(const std::vector<unsigned char> &pBytes)
     return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
 }
 
+bool toBool(const std::string &pString, bool &pOk)
+{
+    if (pString == "True") {
+        pOk = true;
+
+        return true;
+    }
+
+    if (pString == "False") {
+        pOk = true;
+
+        return false;
+    }
+
+    pOk = false;
+
+    return false;
+}
+
+int toInt(const std::string &pString, bool &pOk)
+{
+    auto res = 0;
+    std::stringstream stream(pString);
+
+    stream >> res;
+
+    pOk = !stream.fail() && stream.eof();
+
+    return res;
+}
+
+size_t toSizeT(const std::string &pString, bool &pOk)
+{
+    size_t res = 0;
+    std::stringstream stream(pString);
+
+    stream >> res;
+
+    pOk = !stream.fail() && stream.eof();
+
+    return res;
+}
+
 double toDouble(const std::string &pString, bool &pOk)
 {
     auto res = 0.0;
+    std::stringstream stream(pString);
 
-    try {
-        res = std::stod(pString);
-    } catch (...) {
-        pOk = false;
+    stream >> res;
 
-        return 0.0;
-    }
-
-    pOk = true;
+    pOk = !stream.fail() && stream.eof();
 
     return res;
 }
