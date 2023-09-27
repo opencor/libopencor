@@ -98,21 +98,22 @@ bool SolverFourthOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates
 bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     // We compute the following:
-    //   k1 = h * f(t_n, Y_n)
-    //   k2 = h * f(t_n + h / 2, Y_n + k1 / 2)
-    //   k3 = h * f(t_n + h / 2, Y_n + k2 / 2)
-    //   k4 = h * f(t_n + h, Y_n + k3)
-    //   Y_n+1 = Y_n + k1 / 6 + k2 / 3 + k3 / 3 + k4 / 6
+    //   k1 = f(t_n, Y_n)
+    //   k2 = f(t_n + h / 2, Y_n + h / 2 * k1)
+    //   k3 = f(t_n + h / 2, Y_n + h / 2 * k2)
+    //   k4 = f(t_n + h, Y_n + h * k3)
+    //   Y_n+1 = Y_n + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
     // Note that k4 doesn't need to be tracked since it is used only once.
 
+    static const auto TWO = 2.0;
     static const auto HALF = 0.5;
-    static const auto ONE_THIRD = 1.0 / 3.0;
     static const auto ONE_SIXTH = 1.0 / 6.0;
 
     const auto voiStart = pVoi;
     size_t voiCounter = 0;
     auto realStep = mStep;
     auto realHalfStep = HALF * realStep;
+    auto realOneSixthStep = ONE_SIXTH * realStep;
 
     while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
@@ -120,49 +121,50 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
         if (pVoi + realStep > pVoiEnd) {
             realStep = pVoiEnd - pVoi;
             realHalfStep = HALF * realStep;
+            realOneSixthStep = ONE_SIXTH * realStep;
         }
 
         // Compute f(t_n, Y_n).
 
         mComputeRates(pVoi, mStates, mRates, mVariables);
 
-        // Compute k1 and Y_n + k1 / 2.
+        // Compute k1 and Y_n + h / 2 * k1.
 
         for (size_t i = 0; i < mSize; ++i) {
-            mK1[i] = realStep * mRates[i]; // NOLINT
-            mYk[i] = mStates[i] + HALF * mK1[i]; // NOLINT
+            mK1[i] = mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + realHalfStep * mK1[i]; // NOLINT
         }
 
-        // Compute f(t_n + h / 2, Y_n + k1 / 2).
+        // Compute f(t_n + h / 2, Y_n + h / 2 * k1).
 
         mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
 
-        // Compute k2 and Y_n + k2 / 2.
+        // Compute k2 and Y_n + h / 2 * k2.
 
         for (size_t i = 0; i < mSize; ++i) {
-            mK2[i] = realStep * mRates[i]; // NOLINT
-            mYk[i] = mStates[i] + HALF * mK2[i]; // NOLINT
+            mK2[i] = mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + realHalfStep * mK2[i]; // NOLINT
         }
 
-        // Compute f(t_n + h / 2, Y_n + k2 / 2).
+        // Compute f(t_n + h / 2, Y_n + h / 2 * k2).
 
         mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
 
-        // Compute k3 and Y_n + k3.
+        // Compute k3 and Y_n + h * k3.
 
         for (size_t i = 0; i < mSize; ++i) {
-            mK3[i] = realStep * mRates[i]; // NOLINT
-            mYk[i] = mStates[i] + mK3[i]; // NOLINT
+            mK3[i] = mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + realStep * mK3[i]; // NOLINT
         }
 
-        // Compute f(t_n + h, Y_n + k3).
+        // Compute f(t_n + h, Y_n + h * k3).
 
         mComputeRates(pVoi + realStep, mYk, mRates, mVariables);
 
         // Compute Y_n+1.
 
         for (size_t i = 0; i < mSize; ++i) {
-            mStates[i] += ONE_SIXTH * mK1[i] + ONE_THIRD * mK2[i] + ONE_THIRD * mK3[i] + ONE_SIXTH * realStep * mRates[i]; // NOLINT
+            mStates[i] += realOneSixthStep * (mK1[i] + TWO * mK2[i] + TWO * mK3[i] + mRates[i]); // NOLINT
         }
 
         // Update the variable of integration.
