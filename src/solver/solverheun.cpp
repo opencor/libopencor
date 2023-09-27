@@ -94,8 +94,8 @@ bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates,
 bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     // We compute the following:
-    //   k = h * f(t_n, Y_n)
-    //   Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + k) )
+    //   k = f(t_n, Y_n)
+    //   Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + h * k) )
 
     static const auto HALF = 0.5;
 
@@ -116,14 +116,14 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 
         mComputeRates(pVoi, mStates, mRates, mVariables);
 
-        // Compute k and Yk.
+        // Compute k and Y_n + h * k.
 
         for (size_t i = 0; i < mSize; ++i) {
             mK[i] = mRates[i]; // NOLINT
-            mYk[i] = mStates[i] + realStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + realStep * mK[i]; // NOLINT
         }
 
-        // Compute f(t_n + h, Y_n + k).
+        // Compute f(t_n + h, Y_n + h * k).
 
         mComputeRates(pVoi + realStep, mYk, mRates, mVariables);
 
