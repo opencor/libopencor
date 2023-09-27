@@ -19,11 +19,15 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+// Properties information.
+
 const std::string SolverSecondOrderRungeKutta::Impl::NAME = "Second-order Runge-Kutta"; // NOLINT
 const std::string SolverSecondOrderRungeKutta::Impl::KISAO_ID = "KISAO:0000381"; // NOLINT
 
 const std::string SolverSecondOrderRungeKutta::Impl::STEP_NAME = "Step"; // NOLINT
 const std::string SolverSecondOrderRungeKutta::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
+
+// Solver.
 
 SolverPtr SolverSecondOrderRungeKutta::Impl::create()
 {

@@ -19,11 +19,15 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+// Properties information.
+
 const std::string SolverHeun::Impl::NAME = "Heun"; // NOLINT
 const std::string SolverHeun::Impl::KISAO_ID = "KISAO:0000301"; // NOLINT
 
 const std::string SolverHeun::Impl::STEP_NAME = "Step"; // NOLINT
 const std::string SolverHeun::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
+
+// Solver.
 
 SolverPtr SolverHeun::Impl::create()
 {

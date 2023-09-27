@@ -24,6 +24,8 @@ namespace libOpenCOR {
 class SolverForwardEuler::Impl: public SolverOde::Impl
 {
 public:
+    // Properties information.
+
     static const Solver::Type TYPE = Solver::Type::ODE;
     static const std::string NAME;
     static const std::string KISAO_ID;
@@ -31,6 +33,8 @@ public:
     static const std::string STEP_NAME;
     static const std::string STEP_KISAO_ID;
     static constexpr double STEP_DEFAULT_VALUE = 1.0;
+
+    // Solver.
 
     static SolverPtr create();
     static std::vector<SolverPropertyPtr> propertiesInfo();

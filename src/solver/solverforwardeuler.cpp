@@ -19,11 +19,15 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+// Properties information.
+
 const std::string SolverForwardEuler::Impl::NAME = "Forward Euler"; // NOLINT
 const std::string SolverForwardEuler::Impl::KISAO_ID = "KISAO:0000030"; // NOLINT
 
 const std::string SolverForwardEuler::Impl::STEP_NAME = "Step"; // NOLINT
 const std::string SolverForwardEuler::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
+
+// Solver.
 
 SolverPtr SolverForwardEuler::Impl::create()
 {
