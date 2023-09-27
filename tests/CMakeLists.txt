@@ -20,6 +20,7 @@ include(api/solver/tests.cmake)
 include(api/version/tests.cmake)
 
 include(misc/compiler/tests.cmake)
+include(misc/utils/tests.cmake)
 
 # Prepare our different tests.
 

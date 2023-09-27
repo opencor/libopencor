@@ -51,6 +51,6 @@ std::string toString(const std::vector<unsigned char> &pBytes);
 bool toBool(const std::string &pString, bool &pOk);
 int toInt(const std::string &pString, bool &pOk);
 size_t toSizeT(const std::string &pString, bool &pOk);
-double toDouble(const std::string &pString, bool &pOk);
+double LIBOPENCOR_UNIT_TESTING_EXPORT toDouble(const std::string &pString, bool &pOk);
 
 } // namespace libOpenCOR
