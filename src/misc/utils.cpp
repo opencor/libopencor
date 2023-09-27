@@ -21,6 +21,7 @@ limitations under the License.
 #include <filesystem>
 #include <fstream>
 #include <regex>
+#include <sstream>
 
 #ifdef BUILDING_USING_MSVC
 #    include <process.h>
@@ -341,6 +342,38 @@ std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
     return contents;
 }
 #endif
+
+std::string toString(bool pBoolean)
+{
+    return pBoolean ? "True" : "False";
+}
+
+std::string toString(int pNumber)
+{
+    std::ostringstream res;
+
+    res << pNumber;
+
+    return res.str();
+}
+
+std::string toString(size_t pNumber)
+{
+    std::ostringstream res;
+
+    res << pNumber;
+
+    return res.str();
+}
+
+std::string toString(double pNumber)
+{
+    std::ostringstream res;
+
+    res << std::setprecision(std::numeric_limits<double>::digits10) << pNumber;
+
+    return res.str();
+}
 
 std::string toString(const std::vector<unsigned char> &pBytes)
 {

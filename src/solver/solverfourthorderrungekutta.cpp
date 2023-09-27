@@ -39,7 +39,7 @@ std::vector<SolverPropertyPtr> SolverFourthOrderRungeKutta::Impl::propertiesInfo
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_NAME, STEP_KISAO_ID,
                                      {},
-                                     std::to_string(STEP_DEFAULT_VALUE),
+                                     toString(STEP_DEFAULT_VALUE),
                                      true),
     };
 }
@@ -49,7 +49,7 @@ SolverFourthOrderRungeKutta::Impl::Impl()
 {
     mIsValid = true;
 
-    mProperties[STEP_KISAO_ID] = std::to_string(STEP_DEFAULT_VALUE);
+    mProperties[STEP_KISAO_ID] = toString(STEP_DEFAULT_VALUE);
 }
 
 SolverFourthOrderRungeKutta::Impl::~Impl()

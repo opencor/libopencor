@@ -41,7 +41,7 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGe0);
     EXPECT_EQ(property->name(), "Maximum step");
     EXPECT_EQ(property->kisaoId(), "KISAO:0000467");
-    EXPECT_EQ(property->defaultValue(), "0.000000");
+    EXPECT_EQ(property->defaultValue(), "0");
     EXPECT_TRUE(property->hasVoiUnit());
 
     auto listValues = property->listValues();
@@ -149,7 +149,7 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGe0);
     EXPECT_EQ(property->name(), "Relative tolerance");
     EXPECT_EQ(property->kisaoId(), "KISAO:0000209");
-    EXPECT_EQ(property->defaultValue(), "1.000000");
+    EXPECT_EQ(property->defaultValue(), "1e-07");
     EXPECT_FALSE(property->hasVoiUnit());
 
     listValues = property->listValues();
@@ -161,7 +161,7 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGe0);
     EXPECT_EQ(property->name(), "Absolute tolerance");
     EXPECT_EQ(property->kisaoId(), "KISAO:0000211");
-    EXPECT_EQ(property->defaultValue(), "1.000000");
+    EXPECT_EQ(property->defaultValue(), "1e-07");
     EXPECT_FALSE(property->hasVoiUnit());
 
     listValues = property->listValues();
@@ -173,7 +173,7 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::Boolean);
     EXPECT_EQ(property->name(), "Interpolate solution");
     EXPECT_EQ(property->kisaoId(), "KISAO:0000481");
-    EXPECT_EQ(property->defaultValue(), "1");
+    EXPECT_EQ(property->defaultValue(), "True");
     EXPECT_FALSE(property->hasVoiUnit());
 
     listValues = property->listValues();
@@ -197,7 +197,7 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
     EXPECT_EQ(property->name(), "Step");
     EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
-    EXPECT_EQ(property->defaultValue(), "1.000000");
+    EXPECT_EQ(property->defaultValue(), "1");
     EXPECT_TRUE(property->hasVoiUnit());
 
     listValues = property->listValues();
@@ -221,7 +221,7 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
     EXPECT_EQ(property->name(), "Step");
     EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
-    EXPECT_EQ(property->defaultValue(), "1.000000");
+    EXPECT_EQ(property->defaultValue(), "1");
     EXPECT_TRUE(property->hasVoiUnit());
 
     listValues = property->listValues();
@@ -245,7 +245,7 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
     EXPECT_EQ(property->name(), "Step");
     EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
-    EXPECT_EQ(property->defaultValue(), "1.000000");
+    EXPECT_EQ(property->defaultValue(), "1");
     EXPECT_TRUE(property->hasVoiUnit());
 
     listValues = property->listValues();
@@ -269,7 +269,7 @@ TEST(BasicSolverTest, solversInfo)
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
     EXPECT_EQ(property->name(), "Step");
     EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
-    EXPECT_EQ(property->defaultValue(), "1.000000");
+    EXPECT_EQ(property->defaultValue(), "1");
     EXPECT_TRUE(property->hasVoiUnit());
 
     listValues = property->listValues();
@@ -360,8 +360,8 @@ TEST(BasicSolverTest, properties)
     auto properties = solver->properties();
 
     EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "1.000000");
-    EXPECT_EQ(solver->property("KISAO:0000483"), "1.000000");
+    EXPECT_EQ(solver->property("Step"), "1");
+    EXPECT_EQ(solver->property("KISAO:0000483"), "1");
 
     solver->setProperty("Step", "1.2345");
 
@@ -382,5 +382,5 @@ TEST(BasicSolverTest, properties)
     solver->setProperties(properties);
 
     EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "1.000000");
+    EXPECT_EQ(solver->property("Step"), "1");
 }

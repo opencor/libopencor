@@ -97,11 +97,11 @@ std::vector<SolverPropertyPtr> SolverCvode::Impl::propertiesInfo()
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGe0, MAXIMUM_STEP_NAME, MAXIMUM_STEP_KISAO_ID,
                                      {},
-                                     std::to_string(MAXIMUM_STEP_DEFAULT_VALUE),
+                                     toString(MAXIMUM_STEP_DEFAULT_VALUE),
                                      true),
         Solver::Impl::createProperty(SolverProperty::Type::IntegerGt0, MAXIMUM_NUMBER_OF_STEPS_NAME, MAXIMUM_NUMBER_OF_STEPS_KISAO_ID,
                                      {},
-                                     std::to_string(MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE),
+                                     toString(MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE),
                                      false),
         Solver::Impl::createProperty(SolverProperty::Type::List, INTEGRATION_METHOD_NAME, INTEGRATION_METHOD_KISAO_ID,
                                      {ADAMS_MOULTON_METHOD,
@@ -129,23 +129,23 @@ std::vector<SolverPropertyPtr> SolverCvode::Impl::propertiesInfo()
                                      false),
         Solver::Impl::createProperty(SolverProperty::Type::IntegerGe0, UPPER_HALF_BANDWIDTH_NAME, UPPER_HALF_BANDWIDTH_KISAO_ID,
                                      {},
-                                     std::to_string(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE),
+                                     toString(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE),
                                      false),
         Solver::Impl::createProperty(SolverProperty::Type::IntegerGe0, LOWER_HALF_BANDWIDTH_NAME, LOWER_HALF_BANDWIDTH_KISAO_ID,
                                      {},
-                                     std::to_string(LOWER_HALF_BANDWIDTH_DEFAULT_VALUE),
+                                     toString(LOWER_HALF_BANDWIDTH_DEFAULT_VALUE),
                                      false),
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGe0, RELATIVE_TOLERANCE_NAME, RELATIVE_TOLERANCE_KISAO_ID,
                                      {},
-                                     std::to_string(RELATIVE_TOLERANCE_DEFAULT_VALUE),
+                                     toString(RELATIVE_TOLERANCE_DEFAULT_VALUE),
                                      false),
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGe0, ABSOLUTE_TOLERANCE_NAME, ABSOLUTE_TOLERANCE_KISAO_ID,
                                      {},
-                                     std::to_string(ABSOLUTE_TOLERANCE_DEFAULT_VALUE),
+                                     toString(ABSOLUTE_TOLERANCE_DEFAULT_VALUE),
                                      false),
         Solver::Impl::createProperty(SolverProperty::Type::Boolean, INTERPOLATE_SOLUTION_NAME, INTERPOLATE_SOLUTION_KISAO_ID,
                                      {},
-                                     std::to_string(static_cast<int>(INTERPOLATE_SOLUTION_DEFAULT_VALUE)),
+                                     toString(INTERPOLATE_SOLUTION_DEFAULT_VALUE),
                                      false),
     };
 }
@@ -155,17 +155,17 @@ SolverCvode::Impl::Impl()
 {
     mIsValid = true;
 
-    mProperties[MAXIMUM_STEP_KISAO_ID] = std::to_string(MAXIMUM_STEP_DEFAULT_VALUE);
-    mProperties[MAXIMUM_NUMBER_OF_STEPS_KISAO_ID] = std::to_string(MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE);
+    mProperties[MAXIMUM_STEP_KISAO_ID] = toString(MAXIMUM_STEP_DEFAULT_VALUE);
+    mProperties[MAXIMUM_NUMBER_OF_STEPS_KISAO_ID] = toString(MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE);
     mProperties[INTEGRATION_METHOD_KISAO_ID] = INTEGRATION_METHOD_DEFAULT_VALUE;
     mProperties[ITERATION_TYPE_KISAO_ID] = ITERATION_TYPE_DEFAULT_VALUE;
     mProperties[LINEAR_SOLVER_KISAO_ID] = LINEAR_SOLVER_DEFAULT_VALUE;
     mProperties[PRECONDITIONER_KISAO_ID] = PRECONDITIONER_DEFAULT_VALUE;
-    mProperties[UPPER_HALF_BANDWIDTH_KISAO_ID] = std::to_string(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE);
-    mProperties[LOWER_HALF_BANDWIDTH_KISAO_ID] = std::to_string(LOWER_HALF_BANDWIDTH_DEFAULT_VALUE);
-    mProperties[RELATIVE_TOLERANCE_KISAO_ID] = std::to_string(RELATIVE_TOLERANCE_DEFAULT_VALUE);
-    mProperties[ABSOLUTE_TOLERANCE_KISAO_ID] = std::to_string(ABSOLUTE_TOLERANCE_DEFAULT_VALUE);
-    mProperties[INTERPOLATE_SOLUTION_KISAO_ID] = std::to_string(static_cast<int>(INTERPOLATE_SOLUTION_DEFAULT_VALUE));
+    mProperties[UPPER_HALF_BANDWIDTH_KISAO_ID] = toString(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE);
+    mProperties[LOWER_HALF_BANDWIDTH_KISAO_ID] = toString(LOWER_HALF_BANDWIDTH_DEFAULT_VALUE);
+    mProperties[RELATIVE_TOLERANCE_KISAO_ID] = toString(RELATIVE_TOLERANCE_DEFAULT_VALUE);
+    mProperties[ABSOLUTE_TOLERANCE_KISAO_ID] = toString(ABSOLUTE_TOLERANCE_DEFAULT_VALUE);
+    mProperties[INTERPOLATE_SOLUTION_KISAO_ID] = toString(INTERPOLATE_SOLUTION_DEFAULT_VALUE);
 }
 
 std::map<std::string, std::string> SolverCvode::Impl::propertiesKisaoId() const
