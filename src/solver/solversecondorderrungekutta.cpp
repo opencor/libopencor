@@ -92,9 +92,9 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates
 bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     // We compute the following:
-    //   k1 = h * f(t_n, Y_n)
-    //   k2 = h * f(t_n + h / 2, Y_n + k1 / 2)
-    //   Y_n+1 = Y_n + k2
+    //   k1 = f(t_n, Y_n)
+    //   k2 = f(t_n + h / 2, Y_n + h / 2 * k1)
+    //   Y_n+1 = Y_n + h * k2
     // Note that k1 and k2 don't need to be tracked since they are used only once.
 
     static const auto HALF = 0.5;
@@ -116,13 +116,13 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
 
         mComputeRates(pVoi, mStates, mRates, mVariables);
 
-        // Compute Y_n + k1 / 2.
+        // Compute Y_n + h / 2 * k1.
 
         for (size_t i = 0; i < mSize; ++i) {
             mYk[i] = mStates[i] + realHalfStep * mRates[i]; // NOLINT
         }
 
-        // Compute f(t_n + h / 2, Y_n + k1 / 2).
+        // Compute f(t_n + h / 2, Y_n + h / 2 * k1).
 
         mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
 
