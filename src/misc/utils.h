@@ -42,8 +42,8 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath);
 #endif
 
-std::string contentsAsString(const std::vector<unsigned char> &pContents);
+std::string toString(const std::vector<unsigned char> &pBytes);
 
-double stringToDouble(const std::string &pString, bool &pOk);
+double toDouble(const std::string &pString, bool &pOk);
 
 } // namespace libOpenCOR

@@ -75,7 +75,7 @@ bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates,
     // Retrieve the solver's properties.
 
     bool ok = true;
-    auto step = stringToDouble(mProperties[STEP_KISAO_ID], ok);
+    auto step = toDouble(mProperties[STEP_KISAO_ID], ok);
 
     if (ok && (step > 0.0)) {
         mStep = step;

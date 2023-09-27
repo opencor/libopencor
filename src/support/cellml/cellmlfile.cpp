@@ -58,7 +58,7 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 
     if (!pFile->contents().empty()) {
         auto parser = libcellml::Parser::create();
-        auto contents = contentsAsString(pFile->contents());
+        auto contents = toString(pFile->contents());
         auto model = parser->parseModel(contents);
 
         if (parser->errorCount() != 0) {

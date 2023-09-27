@@ -342,12 +342,12 @@ std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
 }
 #endif
 
-std::string contentsAsString(const std::vector<unsigned char> &pContents)
+std::string toString(const std::vector<unsigned char> &pBytes)
 {
-    return {reinterpret_cast<const char *>(pContents.data()), pContents.size()};
+    return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
 }
 
-double stringToDouble(const std::string &pString, bool &pOk)
+double toDouble(const std::string &pString, bool &pOk)
 {
     auto res = 0.0;
 

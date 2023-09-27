@@ -196,7 +196,7 @@ bool SolverCvode::Impl::initialise(size_t pSize, double *pStates, double *pRates
 
     /*---GRY---
         bool ok = true;
-        auto step = stringToDouble(mProperties[STEP_KISAO_ID], ok);
+        auto step = toDouble(mProperties[STEP_KISAO_ID], ok);
 
         if (ok && (step > 0.0)) {
             mStep = step;
