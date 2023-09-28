@@ -75,11 +75,10 @@ bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates,
     // Retrieve the solver's properties.
 
     bool ok = true;
-    auto step = toDouble(mProperties[STEP_ID], ok);
 
-    if (ok && (step > 0.0)) {
-        mStep = step;
-    } else {
+    mStep = toDouble(mProperties[STEP_ID], ok);
+
+    if (!ok || (mStep <= 0.0)) {
         addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_ID] + R"("). It must be a floating point number greater than zero.)");
 
         return false;
