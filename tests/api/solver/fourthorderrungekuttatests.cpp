@@ -24,7 +24,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(FourthOrderRungeKuttaSolverTest, stepValueWithString)
+TEST(FourthOrderRungeKuttaSolverTest, stepValueWithNonNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -68,7 +68,7 @@ TEST(FourthOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
     deleteArrays(states, rates, variables);
 }
 
-TEST(FourthOrderRungeKuttaSolverTest, main)
+TEST(FourthOrderRungeKuttaSolverTest, solve)
 {
     // Create and initialise our various arrays and create our solver.
 

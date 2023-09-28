@@ -24,7 +24,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(ForwardEulerSolverTest, stepValueWithString)
+TEST(ForwardEulerSolverTest, stepValueWithNonNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -68,7 +68,7 @@ TEST(ForwardEulerSolverTest, stepValueWithInvalidNumber)
     deleteArrays(states, rates, variables);
 }
 
-TEST(ForwardEulerSolverTest, main)
+TEST(ForwardEulerSolverTest, solve)
 {
     // Create and initialise our various arrays and create our solver.
 

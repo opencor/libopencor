@@ -25,7 +25,7 @@ limitations under the License.
 #include <libopencor>
 
 /*---GRY---
-TEST(CvodeSolverTest, stepValueWithString)
+TEST(CvodeSolverTest, stepValueWithNonNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -72,7 +72,7 @@ TEST(CvodeSolverTest, stepValueWithInvalidNumber)
 }
 */
 
-TEST(CvodeSolverTest, main)
+TEST(CvodeSolverTest, solve)
 {
     // Create and initialise our various arrays and create our solver.
 

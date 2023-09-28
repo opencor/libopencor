@@ -24,7 +24,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(HeunSolverTest, stepValueWithString)
+TEST(HeunSolverTest, stepValueWithNonNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -68,7 +68,7 @@ TEST(HeunSolverTest, stepValueWithInvalidNumber)
     deleteArrays(states, rates, variables);
 }
 
-TEST(HeunSolverTest, main)
+TEST(HeunSolverTest, solve)
 {
     // Create and initialise our various arrays and create our solver.
 
