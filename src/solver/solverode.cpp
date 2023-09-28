@@ -18,9 +18,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-bool SolverOde::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                  ComputeRates pComputeRates)
 {
+    (void)pVoi;
+
     mSize = pSize;
 
     mStates = pStates;

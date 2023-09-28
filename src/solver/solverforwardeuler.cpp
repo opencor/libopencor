@@ -61,8 +61,8 @@ std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesId() cons
     return PROPERTIES_ID;
 }
 
-bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                          ComputeRates pComputeRates)
+bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                          double *pVariables, ComputeRates pComputeRates)
 {
     removeAllIssues();
 
@@ -80,7 +80,7 @@ bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double 
 
     // Initialise the ODE solver itself.
 
-    return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
@@ -139,10 +139,10 @@ const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-bool SolverForwardEuler::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                     ComputeRates pComputeRates)
 {
-    return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverForwardEuler::solve(double &pVoi, double pVoiEnd) const

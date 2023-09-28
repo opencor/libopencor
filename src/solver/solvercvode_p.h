@@ -19,7 +19,26 @@ limitations under the License.
 #include "solverode_p.h"
 #include "solvercvode.h"
 
+#include "sundialsbegin.h"
+#include "sundials/sundials_linearsolver.h"
+#include "sundials/sundials_matrix.h"
+#include "sundials/sundials_nonlinearsolver.h"
+#include "sundialsend.h"
+
 namespace libOpenCOR {
+
+class SolverCvodeUserData
+{
+public:
+    explicit SolverCvodeUserData(double *pVariables, SolverOde::ComputeRates pComputeRates);
+
+    double *variables() const;
+    SolverOde::ComputeRates computeRates() const;
+
+private:
+    double *mVariables = nullptr;
+    SolverOde::ComputeRates mComputeRates = nullptr;
+};
 
 class SolverCvode::Impl: public SolverOde::Impl
 {
@@ -60,31 +79,35 @@ public:
 
     static const std::string MAXIMUM_NUMBER_OF_STEPS_ID;
     static const std::string MAXIMUM_NUMBER_OF_STEPS_NAME;
-    static constexpr size_t MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE = 500;
+    static constexpr int MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE = 500;
 
     static const std::string INTEGRATION_METHOD_ID;
     static const std::string INTEGRATION_METHOD_NAME;
+    static const std::vector<std::string> INTEGRATION_METHOD_LIST;
     static const std::string INTEGRATION_METHOD_DEFAULT_VALUE;
 
     static const std::string ITERATION_TYPE_ID;
     static const std::string ITERATION_TYPE_NAME;
+    static const std::vector<std::string> ITERATION_TYPE_LIST;
     static const std::string ITERATION_TYPE_DEFAULT_VALUE;
 
     static const std::string LINEAR_SOLVER_ID;
     static const std::string LINEAR_SOLVER_NAME;
+    static const std::vector<std::string> LINEAR_SOLVER_LIST;
     static const std::string LINEAR_SOLVER_DEFAULT_VALUE;
 
     static const std::string PRECONDITIONER_ID;
     static const std::string PRECONDITIONER_NAME;
+    static const std::vector<std::string> PRECONDITIONER_LIST;
     static const std::string PRECONDITIONER_DEFAULT_VALUE;
 
     static const std::string UPPER_HALF_BANDWIDTH_ID;
     static const std::string UPPER_HALF_BANDWIDTH_NAME;
-    static constexpr size_t UPPER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
+    static constexpr int UPPER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
 
     static const std::string LOWER_HALF_BANDWIDTH_ID;
     static const std::string LOWER_HALF_BANDWIDTH_NAME;
-    static constexpr size_t LOWER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
+    static constexpr int LOWER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
 
     static const std::string RELATIVE_TOLERANCE_ID;
     static const std::string RELATIVE_TOLERANCE_NAME;
@@ -103,12 +126,27 @@ public:
     static SolverPtr create();
     static std::vector<SolverPropertyPtr> propertiesInfo();
 
+    SUNContext mContext = nullptr;
+
+    void *mSolver = nullptr;
+
+    N_Vector mStatesVector = nullptr;
+
+    SUNMatrix mMatrix = nullptr;
+    SUNLinearSolver mLinearSolver = nullptr;
+    SUNNonlinearSolver mNonLinearSolver = nullptr;
+
+    SolverCvodeUserData *mUserData = nullptr;
+
+    bool mInterpolateSolution = INTERPOLATE_SOLUTION_DEFAULT_VALUE;
+
     explicit Impl();
+    ~Impl() override;
 
     std::map<std::string, std::string> propertiesId() const override;
 
-    bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    SolverOde::ComputeRates pComputeRates) override;
+    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+                    ComputeRates pComputeRates) override;
     bool solve(double &pVoi, double pVoiEnd) const override;
 };
 

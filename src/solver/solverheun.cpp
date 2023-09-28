@@ -67,7 +67,7 @@ std::map<std::string, std::string> SolverHeun::Impl::propertiesId() const
     return PROPERTIES_ID;
 }
 
-bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                   ComputeRates pComputeRates)
 {
     removeAllIssues();
@@ -91,7 +91,7 @@ bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates,
 
     // Initialise the ODE solver itself.
 
-    return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
@@ -166,10 +166,10 @@ const SolverHeun::Impl *SolverHeun::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-bool SolverHeun::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             ComputeRates pComputeRates)
 {
-    return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverHeun::solve(double &pVoi, double pVoiEnd) const

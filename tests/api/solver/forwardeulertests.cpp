@@ -38,7 +38,7 @@ TEST(ForwardEulerSolverTest, stepValueWithString)
 
     solver->setProperty("Step", "abc");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     // Clean up after ourselves.
@@ -60,7 +60,7 @@ TEST(ForwardEulerSolverTest, stepValueWithInvalidNumber)
 
     solver->setProperty("Step", "0.0");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     // Clean up after ourselves.

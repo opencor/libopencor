@@ -33,7 +33,7 @@ public:
     SolverFourthOrderRungeKutta &operator=(const SolverFourthOrderRungeKutta &pRhs) = delete;
     SolverFourthOrderRungeKutta &operator=(SolverFourthOrderRungeKutta &&pRhs) noexcept = delete;
 
-    bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
     bool solve(double &pVoi, double pVoiEnd) const override;
 

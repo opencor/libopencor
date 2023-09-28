@@ -66,8 +66,8 @@ std::map<std::string, std::string> SolverSecondOrderRungeKutta::Impl::properties
     return PROPERTIES_ID;
 }
 
-bool SolverSecondOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                                   ComputeRates pComputeRates)
+bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                                   double *pVariables, ComputeRates pComputeRates)
 {
     removeAllIssues();
 
@@ -89,7 +89,7 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates
 
     // Initialise the ODE solver itself.
 
-    return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
@@ -165,10 +165,10 @@ const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() co
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-bool SolverSecondOrderRungeKutta::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                             ComputeRates pComputeRates)
+bool SolverSecondOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                             double *pVariables, ComputeRates pComputeRates)
 {
-    return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverSecondOrderRungeKutta::solve(double &pVoi, double pVoiEnd) const
