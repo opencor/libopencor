@@ -76,7 +76,7 @@ public:
      *  - <a href="https://en.wikipedia.org/wiki/Heun's_method">`Heun`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000301">`KISAO:0000301`</a>; and
      *  - <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Second-order Runge-Kutta`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000381">`KISAO:0000381`</a>.
      *
-     * @param pKisaoIdOrName The KiSAO id or name of the solver.
+     * @param pKisaoIdOrName The KiSAO id or name, as a @c std::string, of the solver.
      *
      * @return A smart pointer to a @ref Solver object.
      */
