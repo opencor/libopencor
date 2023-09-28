@@ -21,11 +21,11 @@ namespace libOpenCOR {
 
 // Properties information.
 
+const std::string SolverHeun::Impl::ID = "KISAO:0000301"; // NOLINT
 const std::string SolverHeun::Impl::NAME = "Heun"; // NOLINT
-const std::string SolverHeun::Impl::KISAO_ID = "KISAO:0000301"; // NOLINT
 
+const std::string SolverHeun::Impl::STEP_ID = "KISAO:0000483"; // NOLINT
 const std::string SolverHeun::Impl::STEP_NAME = "Step"; // NOLINT
-const std::string SolverHeun::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
 
 // Solver.
 
@@ -37,7 +37,7 @@ SolverPtr SolverHeun::Impl::create()
 std::vector<SolverPropertyPtr> SolverHeun::Impl::propertiesInfo()
 {
     return {
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_NAME, STEP_KISAO_ID,
+        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
                                      {},
                                      toString(STEP_DEFAULT_VALUE),
                                      true),
@@ -49,7 +49,7 @@ SolverHeun::Impl::Impl()
 {
     mIsValid = true;
 
-    mProperties[STEP_KISAO_ID] = toString(STEP_DEFAULT_VALUE);
+    mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
 }
 
 SolverHeun::Impl::~Impl()
@@ -58,13 +58,13 @@ SolverHeun::Impl::~Impl()
     delete[] mYk;
 }
 
-std::map<std::string, std::string> SolverHeun::Impl::propertiesKisaoId() const
+std::map<std::string, std::string> SolverHeun::Impl::propertiesId() const
 {
-    static const std::map<std::string, std::string> PROPERTIES_KISAO_ID = {
-        {STEP_NAME, STEP_KISAO_ID},
+    static const std::map<std::string, std::string> PROPERTIES_ID = {
+        {STEP_NAME, STEP_ID},
     };
 
-    return PROPERTIES_KISAO_ID;
+    return PROPERTIES_ID;
 }
 
 bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
@@ -75,12 +75,12 @@ bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates,
     // Retrieve the solver's properties.
 
     bool ok = true;
-    auto step = toDouble(mProperties[STEP_KISAO_ID], ok);
+    auto step = toDouble(mProperties[STEP_ID], ok);
 
     if (ok && (step > 0.0)) {
         mStep = step;
     } else {
-        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_KISAO_ID] + R"("). It must be a floating point number greater than zero.)");
+        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_ID] + R"("). It must be a floating point number greater than zero.)");
 
         return false;
     }

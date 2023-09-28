@@ -27,14 +27,14 @@ class SolverInfo::Impl
 {
 public:
     Solver::Type mType;
-    std::string mKisaoId;
+    std::string mId;
     std::string mName;
     std::vector<SolverPropertyPtr> mProperties;
 
-    static SolverInfoPtr create(Solver::Type pType, const std::string &pKisaoId, const std::string &pName,
+    static SolverInfoPtr create(Solver::Type pType, const std::string &pId, const std::string &pName,
                                 const std::vector<SolverPropertyPtr> &pProperties);
 
-    explicit Impl(Solver::Type pType, const std::string &pKisaoId, const std::string &pName,
+    explicit Impl(Solver::Type pType, const std::string &pId, const std::string &pName,
                   const std::vector<SolverPropertyPtr> &pProperties);
 };
 

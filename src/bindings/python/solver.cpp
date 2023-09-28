@@ -28,7 +28,7 @@ void solverApi(py::module_ &m)
     py::class_<libOpenCOR::SolverInfo, libOpenCOR::SolverInfoPtr> solverInfo(m, "SolverInfo");
 
     solverInfo.def_property_readonly("type", &libOpenCOR::SolverInfo::type, "Get the type of the Solver object.")
-        .def_property_readonly("kisao_id", &libOpenCOR::SolverInfo::kisaoId, "Get the KiSAO id of the Solver object.")
+        .def_property_readonly("id", &libOpenCOR::SolverInfo::id, "Get the (KiSAO) id of the Solver object.")
         .def_property_readonly("name", &libOpenCOR::SolverInfo::name, "Get the name of the Solver object.")
         .def_property_readonly("properties", &libOpenCOR::SolverInfo::properties, "Get the properties of the Solver object.");
 
@@ -48,7 +48,7 @@ void solverApi(py::module_ &m)
         .export_values();
 
     solverProperty.def_property_readonly("type", &libOpenCOR::SolverProperty::type, "Get the type of the SolverProperty object.")
-        .def_property_readonly("kisao_id", &libOpenCOR::SolverProperty::kisaoId, "Get the KiSAO id of the SolverProperty object.")
+        .def_property_readonly("id", &libOpenCOR::SolverProperty::id, "Get the (KiSAO) id of the SolverProperty object.")
         .def_property_readonly("name", &libOpenCOR::SolverProperty::name, "Get the name of the SolverProperty object.")
         .def_property_readonly("list_values", &libOpenCOR::SolverProperty::listValues, "Get the list of values of the SolverProperty object.")
         .def_property_readonly("default_value", &libOpenCOR::SolverProperty::defaultValue, "Get the default value of the SolverProperty object.")

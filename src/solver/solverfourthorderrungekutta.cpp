@@ -21,11 +21,11 @@ namespace libOpenCOR {
 
 // Properties information.
 
+const std::string SolverFourthOrderRungeKutta::Impl::ID = "KISAO:0000032"; // NOLINT
 const std::string SolverFourthOrderRungeKutta::Impl::NAME = "Fourth-order Runge-Kutta"; // NOLINT
-const std::string SolverFourthOrderRungeKutta::Impl::KISAO_ID = "KISAO:0000032"; // NOLINT
 
+const std::string SolverFourthOrderRungeKutta::Impl::STEP_ID = "KISAO:0000483"; // NOLINT
 const std::string SolverFourthOrderRungeKutta::Impl::STEP_NAME = "Step"; // NOLINT
-const std::string SolverFourthOrderRungeKutta::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
 
 // Solver.
 
@@ -37,7 +37,7 @@ SolverPtr SolverFourthOrderRungeKutta::Impl::create()
 std::vector<SolverPropertyPtr> SolverFourthOrderRungeKutta::Impl::propertiesInfo()
 {
     return {
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_NAME, STEP_KISAO_ID,
+        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
                                      {},
                                      toString(STEP_DEFAULT_VALUE),
                                      true),
@@ -49,7 +49,7 @@ SolverFourthOrderRungeKutta::Impl::Impl()
 {
     mIsValid = true;
 
-    mProperties[STEP_KISAO_ID] = toString(STEP_DEFAULT_VALUE);
+    mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
 }
 
 SolverFourthOrderRungeKutta::Impl::~Impl()
@@ -60,13 +60,13 @@ SolverFourthOrderRungeKutta::Impl::~Impl()
     delete[] mYk;
 }
 
-std::map<std::string, std::string> SolverFourthOrderRungeKutta::Impl::propertiesKisaoId() const
+std::map<std::string, std::string> SolverFourthOrderRungeKutta::Impl::propertiesId() const
 {
-    static const std::map<std::string, std::string> PROPERTIES_KISAO_ID = {
-        {STEP_NAME, STEP_KISAO_ID},
+    static const std::map<std::string, std::string> PROPERTIES_ID = {
+        {STEP_NAME, STEP_ID},
     };
 
-    return PROPERTIES_KISAO_ID;
+    return PROPERTIES_ID;
 }
 
 bool SolverFourthOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
@@ -77,12 +77,12 @@ bool SolverFourthOrderRungeKutta::Impl::initialise(size_t pSize, double *pStates
     // Retrieve the solver's properties.
 
     bool ok = true;
-    auto step = toDouble(mProperties[STEP_KISAO_ID], ok);
+    auto step = toDouble(mProperties[STEP_ID], ok);
 
     if (ok && (step > 0.0)) {
         mStep = step;
     } else {
-        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_KISAO_ID] + R"("). It must be a floating point number greater than zero.)");
+        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_ID] + R"("). It must be a floating point number greater than zero.)");
 
         return false;
     }

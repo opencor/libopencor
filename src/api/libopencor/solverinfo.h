@@ -60,14 +60,14 @@ public:
     Solver::Type type() const;
 
     /**
-     * @brief Get the KiSAO id of the solver.
+     * @brief Get the (KiSAO) id of the solver.
      *
-     * Return the KiSAO id of the solver.
+     * Return the (KiSAO) id of the solver.
      *
-     * @return The KiSAO id, as a @c std::string, of the solver.
+     * @return The (KiSAO) id, as a @c std::string, of the solver.
      */
 
-    std::string kisaoId() const;
+    std::string id() const;
 
     /**
      * @brief Get the name of the solver.
@@ -94,7 +94,7 @@ private:
 
     Impl *mPimpl;
 
-    explicit SolverInfo(Solver::Type pType, const std::string &pKisaoId, const std::string &pName,
+    explicit SolverInfo(Solver::Type pType, const std::string &pId, const std::string &pName,
                         const std::vector<SolverPropertyPtr> &pProperties); /**< Constructor, @private. */
 };
 

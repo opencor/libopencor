@@ -28,27 +28,27 @@ using SolverCreate = SolverPtr (*)();
 class Solver::Impl: public Logger::Impl
 {
 public:
-    static std::map<std::string, std::string> SolversKisaoId;
+    static std::map<std::string, std::string> SolversId;
     static std::map<std::string, SolverCreate> SolversCreate;
     static std::vector<SolverInfoPtr> SolversInfo;
 
     bool mIsValid = false;
     std::map<std::string, std::string> mProperties;
 
-    static void registerSolver(Type pType, const std::string &pKisaoId, const std::string &pName, SolverCreate pCreate,
+    static void registerSolver(Type pType, const std::string &pId, const std::string &pName, SolverCreate pCreate,
                                const std::vector<SolverPropertyPtr> &pProperties);
-    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pKisaoId,
+    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pId,
                                             const std::string &pName, const std::vector<std::string> &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiUnit);
 
     virtual ~Impl() = default;
 
-    virtual std::map<std::string, std::string> propertiesKisaoId() const;
+    virtual std::map<std::string, std::string> propertiesId() const;
 
-    std::string kisaoId(const std::string &pKisaoIdOrName) const;
+    std::string id(const std::string &pIdOrName) const;
 
-    std::string property(const std::string &pKisaoIdOrName);
-    void setProperty(const std::string &pKisaoIdOrName, const std::string &pValue);
+    std::string property(const std::string &pIdOrName);
+    void setProperty(const std::string &pIdOrName, const std::string &pValue);
 
     std::map<std::string, std::string> properties() const;
     void setProperties(const std::map<std::string, std::string> &pProperties);

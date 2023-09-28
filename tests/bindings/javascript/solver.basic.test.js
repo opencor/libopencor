@@ -29,7 +29,7 @@ describe("Solver basic tests", () => {
     let solverInfo = solversInfo.get(0);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000019");
+    expect(solverInfo.id()).toBe("KISAO:0000019");
     expect(solverInfo.name()).toBe("CVODE");
 
     let properties = solverInfo.properties();
@@ -41,7 +41,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.DoubleGe0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000467");
+    expect(property.id()).toBe("KISAO:0000467");
     expect(property.name()).toBe("Maximum step");
     expect(property.defaultValue()).toBe("0");
     expect(property.hasVoiUnit()).toBe(true);
@@ -55,7 +55,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.IntegerGt0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000415");
+    expect(property.id()).toBe("KISAO:0000415");
     expect(property.name()).toBe("Maximum number of steps");
     expect(property.defaultValue()).toBe("500");
     expect(property.hasVoiUnit()).toBe(false);
@@ -69,7 +69,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.List.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000475");
+    expect(property.id()).toBe("KISAO:0000475");
     expect(property.name()).toBe("Integration method");
     expect(property.defaultValue()).toBe("BDF");
     expect(property.hasVoiUnit()).toBe(false);
@@ -85,7 +85,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.List.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000476");
+    expect(property.id()).toBe("KISAO:0000476");
     expect(property.name()).toBe("Iteration type");
     expect(property.defaultValue()).toBe("Newton");
     expect(property.hasVoiUnit()).toBe(false);
@@ -101,7 +101,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.List.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000477");
+    expect(property.id()).toBe("KISAO:0000477");
     expect(property.name()).toBe("Linear solver");
     expect(property.defaultValue()).toBe("Dense");
     expect(property.hasVoiUnit()).toBe(false);
@@ -121,7 +121,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.List.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000478");
+    expect(property.id()).toBe("KISAO:0000478");
     expect(property.name()).toBe("Preconditioner");
     expect(property.defaultValue()).toBe("Banded");
     expect(property.hasVoiUnit()).toBe(false);
@@ -137,7 +137,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.IntegerGe0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000479");
+    expect(property.id()).toBe("KISAO:0000479");
     expect(property.name()).toBe("Upper half-bandwidth");
     expect(property.defaultValue()).toBe("0");
     expect(property.hasVoiUnit()).toBe(false);
@@ -151,7 +151,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.IntegerGe0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000480");
+    expect(property.id()).toBe("KISAO:0000480");
     expect(property.name()).toBe("Lower half-bandwidth");
     expect(property.defaultValue()).toBe("0");
     expect(property.hasVoiUnit()).toBe(false);
@@ -165,7 +165,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.DoubleGe0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000209");
+    expect(property.id()).toBe("KISAO:0000209");
     expect(property.name()).toBe("Relative tolerance");
     expect(property.defaultValue()).toBe("1e-07");
     expect(property.hasVoiUnit()).toBe(false);
@@ -179,7 +179,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.DoubleGe0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000211");
+    expect(property.id()).toBe("KISAO:0000211");
     expect(property.name()).toBe("Absolute tolerance");
     expect(property.defaultValue()).toBe("1e-07");
     expect(property.hasVoiUnit()).toBe(false);
@@ -193,7 +193,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.Boolean.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000481");
+    expect(property.id()).toBe("KISAO:0000481");
     expect(property.name()).toBe("Interpolate solution");
     expect(property.defaultValue()).toBe("True");
     expect(property.hasVoiUnit()).toBe(false);
@@ -207,7 +207,7 @@ describe("Solver basic tests", () => {
     solverInfo = solversInfo.get(1);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000030");
+    expect(solverInfo.id()).toBe("KISAO:0000030");
     expect(solverInfo.name()).toBe("Forward Euler");
 
     properties = solverInfo.properties();
@@ -219,7 +219,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.DoubleGt0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000483");
+    expect(property.id()).toBe("KISAO:0000483");
     expect(property.name()).toBe("Step");
     expect(property.defaultValue()).toBe("1");
     expect(property.hasVoiUnit()).toBe(true);
@@ -233,7 +233,7 @@ describe("Solver basic tests", () => {
     solverInfo = solversInfo.get(2);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000032");
+    expect(solverInfo.id()).toBe("KISAO:0000032");
     expect(solverInfo.name()).toBe("Fourth-order Runge-Kutta");
 
     properties = solverInfo.properties();
@@ -245,7 +245,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.DoubleGt0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000483");
+    expect(property.id()).toBe("KISAO:0000483");
     expect(property.name()).toBe("Step");
     expect(property.defaultValue()).toBe("1");
     expect(property.hasVoiUnit()).toBe(true);
@@ -259,7 +259,7 @@ describe("Solver basic tests", () => {
     solverInfo = solversInfo.get(3);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000301");
+    expect(solverInfo.id()).toBe("KISAO:0000301");
     expect(solverInfo.name()).toBe("Heun");
 
     properties = solverInfo.properties();
@@ -271,7 +271,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.DoubleGt0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000483");
+    expect(property.id()).toBe("KISAO:0000483");
     expect(property.name()).toBe("Step");
     expect(property.defaultValue()).toBe("1");
     expect(property.hasVoiUnit()).toBe(true);
@@ -285,7 +285,7 @@ describe("Solver basic tests", () => {
     solverInfo = solversInfo.get(4);
 
     expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000381");
+    expect(solverInfo.id()).toBe("KISAO:0000381");
     expect(solverInfo.name()).toBe("Second-order Runge-Kutta");
 
     properties = solverInfo.properties();
@@ -297,7 +297,7 @@ describe("Solver basic tests", () => {
     expect(property.type().value).toBe(
       libopencor.SolverProperty.Type.DoubleGt0.value,
     );
-    expect(property.kisaoId()).toBe("KISAO:0000483");
+    expect(property.id()).toBe("KISAO:0000483");
     expect(property.name()).toBe("Step");
     expect(property.defaultValue()).toBe("1");
     expect(property.hasVoiUnit()).toBe(true);
@@ -313,7 +313,7 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(false);
   });
 
-  test("CVODE by KiSAO id", () => {
+  test("CVODE by (KiSAO) id", () => {
     const solver = new libopencor.Solver("KISAO:0000019");
 
     expect(solver.isValid()).toBe(true);
@@ -325,7 +325,7 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(true);
   });
 
-  test("Forward Euler by KiSAO id", () => {
+  test("Forward Euler by (KiSAO) id", () => {
     const solver = new libopencor.Solver("KISAO:0000030");
 
     expect(solver.isValid()).toBe(true);
@@ -337,7 +337,7 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(true);
   });
 
-  test("Fourth-order Runge-Kutta by KiSAO id", () => {
+  test("Fourth-order Runge-Kutta by (KiSAO) id", () => {
     const solver = new libopencor.Solver("KISAO:0000032");
 
     expect(solver.isValid()).toBe(true);
@@ -349,7 +349,7 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(true);
   });
 
-  test("Heun by KiSAO id", () => {
+  test("Heun by (KiSAO) id", () => {
     const solver = new libopencor.Solver("KISAO:0000301");
 
     expect(solver.isValid()).toBe(true);
@@ -361,7 +361,7 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(true);
   });
 
-  test("Second-order Runge-Kutta by KiSAO id", () => {
+  test("Second-order Runge-Kutta by (KiSAO) id", () => {
     const solver = new libopencor.Solver("KISAO:0000381");
 
     expect(solver.isValid()).toBe(true);

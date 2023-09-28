@@ -51,51 +51,51 @@ public:
     // Properties information.
 
     static const Solver::Type TYPE = Solver::Type::ODE;
+    static const std::string ID;
     static const std::string NAME;
-    static const std::string KISAO_ID;
 
+    static const std::string MAXIMUM_STEP_ID;
     static const std::string MAXIMUM_STEP_NAME;
-    static const std::string MAXIMUM_STEP_KISAO_ID;
     static constexpr double MAXIMUM_STEP_DEFAULT_VALUE = 0.0;
 
+    static const std::string MAXIMUM_NUMBER_OF_STEPS_ID;
     static const std::string MAXIMUM_NUMBER_OF_STEPS_NAME;
-    static const std::string MAXIMUM_NUMBER_OF_STEPS_KISAO_ID;
     static constexpr size_t MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE = 500;
 
+    static const std::string INTEGRATION_METHOD_ID;
     static const std::string INTEGRATION_METHOD_NAME;
-    static const std::string INTEGRATION_METHOD_KISAO_ID;
     static const std::string INTEGRATION_METHOD_DEFAULT_VALUE;
 
+    static const std::string ITERATION_TYPE_ID;
     static const std::string ITERATION_TYPE_NAME;
-    static const std::string ITERATION_TYPE_KISAO_ID;
     static const std::string ITERATION_TYPE_DEFAULT_VALUE;
 
+    static const std::string LINEAR_SOLVER_ID;
     static const std::string LINEAR_SOLVER_NAME;
-    static const std::string LINEAR_SOLVER_KISAO_ID;
     static const std::string LINEAR_SOLVER_DEFAULT_VALUE;
 
+    static const std::string PRECONDITIONER_ID;
     static const std::string PRECONDITIONER_NAME;
-    static const std::string PRECONDITIONER_KISAO_ID;
     static const std::string PRECONDITIONER_DEFAULT_VALUE;
 
+    static const std::string UPPER_HALF_BANDWIDTH_ID;
     static const std::string UPPER_HALF_BANDWIDTH_NAME;
-    static const std::string UPPER_HALF_BANDWIDTH_KISAO_ID;
     static constexpr size_t UPPER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
 
+    static const std::string LOWER_HALF_BANDWIDTH_ID;
     static const std::string LOWER_HALF_BANDWIDTH_NAME;
-    static const std::string LOWER_HALF_BANDWIDTH_KISAO_ID;
     static constexpr size_t LOWER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
 
+    static const std::string RELATIVE_TOLERANCE_ID;
     static const std::string RELATIVE_TOLERANCE_NAME;
-    static const std::string RELATIVE_TOLERANCE_KISAO_ID;
     static constexpr double RELATIVE_TOLERANCE_DEFAULT_VALUE = 1.0e-7;
 
+    static const std::string ABSOLUTE_TOLERANCE_ID;
     static const std::string ABSOLUTE_TOLERANCE_NAME;
-    static const std::string ABSOLUTE_TOLERANCE_KISAO_ID;
     static constexpr double ABSOLUTE_TOLERANCE_DEFAULT_VALUE = 1.0e-7;
 
+    static const std::string INTERPOLATE_SOLUTION_ID;
     static const std::string INTERPOLATE_SOLUTION_NAME;
-    static const std::string INTERPOLATE_SOLUTION_KISAO_ID;
     static constexpr bool INTERPOLATE_SOLUTION_DEFAULT_VALUE = true;
 
     // Solver.
@@ -105,7 +105,7 @@ public:
 
     explicit Impl();
 
-    std::map<std::string, std::string> propertiesKisaoId() const override;
+    std::map<std::string, std::string> propertiesId() const override;
 
     bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
                     SolverOde::ComputeRates pComputeRates) override;

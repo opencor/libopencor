@@ -29,7 +29,7 @@ TEST(BasicSolverTest, solversInfo)
     auto solverInfo = solversInfo[0];
 
     EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solverInfo->kisaoId(), "KISAO:0000019");
+    EXPECT_EQ(solverInfo->id(), "KISAO:0000019");
     EXPECT_EQ(solverInfo->name(), "CVODE");
 
     auto properties = solverInfo->properties();
@@ -39,7 +39,7 @@ TEST(BasicSolverTest, solversInfo)
     auto property = properties[0];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGe0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000467");
+    EXPECT_EQ(property->id(), "KISAO:0000467");
     EXPECT_EQ(property->name(), "Maximum step");
     EXPECT_EQ(property->defaultValue(), "0");
     EXPECT_TRUE(property->hasVoiUnit());
@@ -51,7 +51,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[1];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::IntegerGt0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000415");
+    EXPECT_EQ(property->id(), "KISAO:0000415");
     EXPECT_EQ(property->name(), "Maximum number of steps");
     EXPECT_EQ(property->defaultValue(), "500");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -63,7 +63,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[2];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::List);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000475");
+    EXPECT_EQ(property->id(), "KISAO:0000475");
     EXPECT_EQ(property->name(), "Integration method");
     EXPECT_EQ(property->defaultValue(), "BDF");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -77,7 +77,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[3];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::List);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000476");
+    EXPECT_EQ(property->id(), "KISAO:0000476");
     EXPECT_EQ(property->name(), "Iteration type");
     EXPECT_EQ(property->defaultValue(), "Newton");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -91,7 +91,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[4];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::List);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000477");
+    EXPECT_EQ(property->id(), "KISAO:0000477");
     EXPECT_EQ(property->name(), "Linear solver");
     EXPECT_EQ(property->defaultValue(), "Dense");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -109,7 +109,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[5]; // NOLINT
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::List);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000478");
+    EXPECT_EQ(property->id(), "KISAO:0000478");
     EXPECT_EQ(property->name(), "Preconditioner");
     EXPECT_EQ(property->defaultValue(), "Banded");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -123,7 +123,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[6]; // NOLINT
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::IntegerGe0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000479");
+    EXPECT_EQ(property->id(), "KISAO:0000479");
     EXPECT_EQ(property->name(), "Upper half-bandwidth");
     EXPECT_EQ(property->defaultValue(), "0");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -135,7 +135,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[7]; // NOLINT
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::IntegerGe0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000480");
+    EXPECT_EQ(property->id(), "KISAO:0000480");
     EXPECT_EQ(property->name(), "Lower half-bandwidth");
     EXPECT_EQ(property->defaultValue(), "0");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -147,7 +147,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[8]; // NOLINT
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGe0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000209");
+    EXPECT_EQ(property->id(), "KISAO:0000209");
     EXPECT_EQ(property->name(), "Relative tolerance");
     EXPECT_EQ(property->defaultValue(), "1e-07");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -159,7 +159,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[9]; // NOLINT
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGe0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000211");
+    EXPECT_EQ(property->id(), "KISAO:0000211");
     EXPECT_EQ(property->name(), "Absolute tolerance");
     EXPECT_EQ(property->defaultValue(), "1e-07");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -171,7 +171,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[10]; // NOLINT
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::Boolean);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000481");
+    EXPECT_EQ(property->id(), "KISAO:0000481");
     EXPECT_EQ(property->name(), "Interpolate solution");
     EXPECT_EQ(property->defaultValue(), "True");
     EXPECT_FALSE(property->hasVoiUnit());
@@ -185,7 +185,7 @@ TEST(BasicSolverTest, solversInfo)
     solverInfo = solversInfo[1];
 
     EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solverInfo->kisaoId(), "KISAO:0000030");
+    EXPECT_EQ(solverInfo->id(), "KISAO:0000030");
     EXPECT_EQ(solverInfo->name(), "Forward Euler");
 
     properties = solverInfo->properties();
@@ -195,7 +195,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[0];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
+    EXPECT_EQ(property->id(), "KISAO:0000483");
     EXPECT_EQ(property->name(), "Step");
     EXPECT_EQ(property->defaultValue(), "1");
     EXPECT_TRUE(property->hasVoiUnit());
@@ -209,7 +209,7 @@ TEST(BasicSolverTest, solversInfo)
     solverInfo = solversInfo[2];
 
     EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solverInfo->kisaoId(), "KISAO:0000032");
+    EXPECT_EQ(solverInfo->id(), "KISAO:0000032");
     EXPECT_EQ(solverInfo->name(), "Fourth-order Runge-Kutta");
 
     properties = solverInfo->properties();
@@ -219,7 +219,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[0];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
+    EXPECT_EQ(property->id(), "KISAO:0000483");
     EXPECT_EQ(property->name(), "Step");
     EXPECT_EQ(property->defaultValue(), "1");
     EXPECT_TRUE(property->hasVoiUnit());
@@ -233,7 +233,7 @@ TEST(BasicSolverTest, solversInfo)
     solverInfo = solversInfo[3];
 
     EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solverInfo->kisaoId(), "KISAO:0000301");
+    EXPECT_EQ(solverInfo->id(), "KISAO:0000301");
     EXPECT_EQ(solverInfo->name(), "Heun");
 
     properties = solverInfo->properties();
@@ -243,7 +243,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[0];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
+    EXPECT_EQ(property->id(), "KISAO:0000483");
     EXPECT_EQ(property->name(), "Step");
     EXPECT_EQ(property->defaultValue(), "1");
     EXPECT_TRUE(property->hasVoiUnit());
@@ -257,7 +257,7 @@ TEST(BasicSolverTest, solversInfo)
     solverInfo = solversInfo[4];
 
     EXPECT_EQ(solverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solverInfo->kisaoId(), "KISAO:0000381");
+    EXPECT_EQ(solverInfo->id(), "KISAO:0000381");
     EXPECT_EQ(solverInfo->name(), "Second-order Runge-Kutta");
 
     properties = solverInfo->properties();
@@ -267,7 +267,7 @@ TEST(BasicSolverTest, solversInfo)
     property = properties[0];
 
     EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::DoubleGt0);
-    EXPECT_EQ(property->kisaoId(), "KISAO:0000483");
+    EXPECT_EQ(property->id(), "KISAO:0000483");
     EXPECT_EQ(property->name(), "Step");
     EXPECT_EQ(property->defaultValue(), "1");
     EXPECT_TRUE(property->hasVoiUnit());
@@ -284,7 +284,7 @@ TEST(BasicSolverTest, unknownSolver)
     EXPECT_FALSE(solver->isValid());
 }
 
-TEST(BasicSolverTest, cvodeByKisaoId)
+TEST(BasicSolverTest, cvodeById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000019");
 
@@ -298,7 +298,7 @@ TEST(BasicSolverTest, cvodeByName)
     EXPECT_TRUE(solver->isValid());
 }
 
-TEST(BasicSolverTest, forwardEulerByKisaoId)
+TEST(BasicSolverTest, forwardEulerById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000030");
 
@@ -312,7 +312,7 @@ TEST(BasicSolverTest, forwardEulerByName)
     EXPECT_TRUE(solver->isValid());
 }
 
-TEST(BasicSolverTest, fourthOrderRungeKuttaByKisaoId)
+TEST(BasicSolverTest, fourthOrderRungeKuttaById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000032");
 
@@ -326,7 +326,7 @@ TEST(BasicSolverTest, fourthOrderRungeKuttaByName)
     EXPECT_TRUE(solver->isValid());
 }
 
-TEST(BasicSolverTest, heunByKisaoId)
+TEST(BasicSolverTest, heunById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000301");
 
@@ -340,7 +340,7 @@ TEST(BasicSolverTest, heunByName)
     EXPECT_TRUE(solver->isValid());
 }
 
-TEST(BasicSolverTest, secondOrderRungeKuttaByKisaoId)
+TEST(BasicSolverTest, secondOrderRungeKuttaById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000381");
 

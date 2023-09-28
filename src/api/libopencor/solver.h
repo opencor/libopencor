@@ -62,26 +62,26 @@ public:
     /**
      * @brief Create a @ref Solver object.
      *
-     * Factory method to create a @ref Solver object which name or KiSAO id is given:
+     * Factory method to create a @ref Solver object which (KiSAO) id or name is given:
      *
      * ```
-     * auto cvodeSolver = libOpenCOR::Solver::create("CVODE");
      * auto anotherCvodeSolver = libOpenCOR::Solver::create("KISAO:0000019");
+     * auto cvodeSolver = libOpenCOR::Solver::create("CVODE");
      * ```
      *
      * The following <a href="https://en.wikipedia.org/wiki/Ordinary_differential_equation">ODE</a> solvers can be created:
-     *  - <a href="https://computing.llnl.gov/projects/sundials/cvode">`CVODE`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000019">`KISAO:0000019`</a>;
-     *  - <a href="https://en.wikipedia.org/wiki/Euler_method">`Forward Euler`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000030">`KISAO:0000030`</a>;
-     *  - <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Fourth-order Runge-Kutta`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000032">`KISAO:0000032`</a>;
-     *  - <a href="https://en.wikipedia.org/wiki/Heun's_method">`Heun`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000301">`KISAO:0000301`</a>; and
-     *  - <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Second-order Runge-Kutta`</a> | <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000381">`KISAO:0000381`</a>.
+     *  - <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000019">`KISAO:0000019`</a> | <a href="https://computing.llnl.gov/projects/sundials/cvode">`CVODE`</a>;
+     *  - <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000030">`KISAO:0000030`</a> | <a href="https://en.wikipedia.org/wiki/Euler_method">`Forward Euler`</a>;
+     *  - <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000032">`KISAO:0000032`</a> | <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Fourth-order Runge-Kutta`</a>;
+     *  - <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000301">`KISAO:0000301`</a> | <a href="https://en.wikipedia.org/wiki/Heun's_method">`Heun`</a>; and
+     *  - <a href="http://www.biomodels.net/kisao/KISAO#KISAO_0000381">`KISAO:0000381`</a> | <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Second-order Runge-Kutta`</a>.
      *
-     * @param pKisaoIdOrName The KiSAO id or name, as a @c std::string, of the solver.
+     * @param pIdOrName The (KiSAO) id or name, as a @c std::string, of the solver.
      *
      * @return A smart pointer to a @ref Solver object.
      */
 
-    static SolverPtr create(const std::string &pKisaoIdOrName);
+    static SolverPtr create(const std::string &pIdOrName);
 
     /**
      * @brief Get various information about the solvers that are available.
@@ -106,26 +106,26 @@ public:
     /**
      * @brief Get the value of a property of this solver.
      *
-     * Get the value of a property, which name or KiSAO id is given, of this solver.
+     * Get the value of a property, which (KiSAO) id or name is given, of this solver.
      *
-     * @param pKisaoIdOrName The KiSAO id or name, as a @c std::string, of a property.
+     * @param pIdOrName The (KiSAO) id or name, as a @c std::string, of a property.
      *
      * @return The value, as a @c std::string, of the property of this solver.
      */
 
-    std::string property(const std::string &pKisaoIdOrName);
+    std::string property(const std::string &pIdOrName);
 
     /**
      * @brief Set the value of a property of this solver.
      *
-     * Set the value of a property, which name or KiSAO ID is given, of this solver. If the name or KiSAO ID is not
+     * Set the value of a property, which (KiSAO) ID or name is given, of this solver. If the name or KiSAO ID is not
      * supported by the solver then nothing is done.
      *
-     * @param pKisaoIdOrName The KiSAO id or name, as a @c std::string, of a property of this solver.
+     * @param pIdOrName The (KiSAO) id or name, as a @c std::string, of a property of this solver.
      * @param pValue The value, as a @c std::string, of a property of this solver.
      */
 
-    void setProperty(const std::string &pKisaoIdOrName, const std::string &pValue);
+    void setProperty(const std::string &pIdOrName, const std::string &pValue);
 
     /**
      * @brief Get the properties of this solver.
@@ -140,7 +140,7 @@ public:
     /**
      * @brief Set the properties of this solver.
      *
-     * Set the properties of this solver. If the name or KiSAO ID of a property is not supported by the solver then
+     * Set the properties of this solver. If the (KiSAO) ID or name of a property is not supported by the solver then
      * nothing is done.
      *
      * @param pProperties The properties, as a @c std::map of @c std::string, of this solver.

@@ -27,11 +27,11 @@ public:
     // Properties information.
 
     static const Solver::Type TYPE = Solver::Type::ODE;
+    static const std::string ID;
     static const std::string NAME;
-    static const std::string KISAO_ID;
 
+    static const std::string STEP_ID;
     static const std::string STEP_NAME;
-    static const std::string STEP_KISAO_ID;
     static constexpr double STEP_DEFAULT_VALUE = 1.0;
 
     // Solver.
@@ -47,7 +47,7 @@ public:
     explicit Impl();
     ~Impl() override;
 
-    std::map<std::string, std::string> propertiesKisaoId() const override;
+    std::map<std::string, std::string> propertiesId() const override;
 
     bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
                     SolverOde::ComputeRates pComputeRates) override;

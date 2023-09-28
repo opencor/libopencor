@@ -25,55 +25,55 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-std::map<std::string, std::string> Solver::Impl::SolversKisaoId; // NOLINT
+std::map<std::string, std::string> Solver::Impl::SolversId; // NOLINT
 std::map<std::string, SolverCreate> Solver::Impl::SolversCreate; // NOLINT
 std::vector<SolverInfoPtr> Solver::Impl::SolversInfo; // NOLINT
 
-void Solver::Impl::registerSolver(Type pType, const std::string &pKisaoId, const std::string &pName,
+void Solver::Impl::registerSolver(Type pType, const std::string &pId, const std::string &pName,
                                   SolverCreate pCreate, const std::vector<SolverPropertyPtr> &pProperties)
 {
 #ifndef COVERAGE_ENABLED
-    if (auto iter = Solver::Impl::SolversCreate.find(pKisaoId); iter == Solver::Impl::SolversCreate.end()) {
+    if (auto iter = Solver::Impl::SolversCreate.find(pId); iter == Solver::Impl::SolversCreate.end()) {
 #endif
-        Solver::Impl::SolversKisaoId[pName] = pKisaoId;
-        Solver::Impl::SolversCreate[pKisaoId] = pCreate;
-        Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pKisaoId, pName, pProperties));
+        Solver::Impl::SolversId[pName] = pId;
+        Solver::Impl::SolversCreate[pId] = pCreate;
+        Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pId, pName, pProperties));
 #ifndef COVERAGE_ENABLED
     }
 #endif
 }
 
-SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pKisaoId,
+SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pId,
                                                const std::string &pName, const std::vector<std::string> &pListValues,
                                                const std::string &pDefaultValue, bool pHasVoiUnit)
 {
-    return SolverPropertyPtr {new SolverProperty(pType, pKisaoId, pName, pListValues, pDefaultValue, pHasVoiUnit)};
+    return SolverPropertyPtr {new SolverProperty(pType, pId, pName, pListValues, pDefaultValue, pHasVoiUnit)};
 }
 
-std::map<std::string, std::string> Solver::Impl::propertiesKisaoId() const
+std::map<std::string, std::string> Solver::Impl::propertiesId() const
 {
     return {};
 }
 
-std::string Solver::Impl::kisaoId(const std::string &pKisaoIdOrName) const
+std::string Solver::Impl::id(const std::string &pIdOrName) const
 {
-    auto kisaoIds = propertiesKisaoId();
-    auto kisaoIdIter = kisaoIds.find(pKisaoIdOrName);
+    auto ids = propertiesId();
+    auto idIter = ids.find(pIdOrName);
 
-    return (kisaoIdIter != kisaoIds.end()) ? kisaoIdIter->second : pKisaoIdOrName;
+    return (idIter != ids.end()) ? idIter->second : pIdOrName;
 }
 
-std::string Solver::Impl::property(const std::string &pKisaoIdOrName)
+std::string Solver::Impl::property(const std::string &pIdOrName)
 {
-    return mProperties[kisaoId(pKisaoIdOrName)];
+    return mProperties[id(pIdOrName)];
 }
 
-void Solver::Impl::setProperty(const std::string &pKisaoIdOrName, const std::string &pValue)
+void Solver::Impl::setProperty(const std::string &pIdOrName, const std::string &pValue)
 {
-    auto kisaoId = this->kisaoId(pKisaoIdOrName);
+    auto id = this->id(pIdOrName);
 
-    if (mProperties.find(kisaoId) != mProperties.end()) {
-        mProperties[kisaoId] = pValue;
+    if (mProperties.find(id) != mProperties.end()) {
+        mProperties[id] = pValue;
     }
 }
 
@@ -102,12 +102,12 @@ const Solver::Impl *Solver::pimpl() const
     return static_cast<const Impl *>(Logger::pimpl());
 }
 
-SolverPtr Solver::create(const std::string &pKisaoIdOrName)
+SolverPtr Solver::create(const std::string &pIdOrName)
 {
-    auto kisaoIdIter = Solver::Impl::SolversKisaoId.find(pKisaoIdOrName);
-    auto kisaoId = (kisaoIdIter != Solver::Impl::SolversKisaoId.end()) ? kisaoIdIter->second : pKisaoIdOrName;
+    auto idIter = Solver::Impl::SolversId.find(pIdOrName);
+    auto id = (idIter != Solver::Impl::SolversId.end()) ? idIter->second : pIdOrName;
 
-    if (auto iter = Solver::Impl::SolversCreate.find(kisaoId); iter != Solver::Impl::SolversCreate.end()) {
+    if (auto iter = Solver::Impl::SolversCreate.find(id); iter != Solver::Impl::SolversCreate.end()) {
         return iter->second();
     }
 
@@ -122,31 +122,31 @@ std::vector<SolverInfoPtr> Solver::solversInfo()
         initialised = true;
 
         Solver::Impl::registerSolver(SolverCvode::Impl::TYPE,
-                                     SolverCvode::Impl::KISAO_ID,
+                                     SolverCvode::Impl::ID,
                                      SolverCvode::Impl::NAME,
                                      SolverCvode::Impl::create,
                                      SolverCvode::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverForwardEuler::Impl::TYPE,
-                                     SolverForwardEuler::Impl::KISAO_ID,
+                                     SolverForwardEuler::Impl::ID,
                                      SolverForwardEuler::Impl::NAME,
                                      SolverForwardEuler::Impl::create,
                                      SolverForwardEuler::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverFourthOrderRungeKutta::Impl::TYPE,
-                                     SolverFourthOrderRungeKutta::Impl::KISAO_ID,
+                                     SolverFourthOrderRungeKutta::Impl::ID,
                                      SolverFourthOrderRungeKutta::Impl::NAME,
                                      SolverFourthOrderRungeKutta::Impl::create,
                                      SolverFourthOrderRungeKutta::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverHeun::Impl::TYPE,
-                                     SolverHeun::Impl::KISAO_ID,
+                                     SolverHeun::Impl::ID,
                                      SolverHeun::Impl::NAME,
                                      SolverHeun::Impl::create,
                                      SolverHeun::Impl::propertiesInfo());
 
         Solver::Impl::registerSolver(SolverSecondOrderRungeKutta::Impl::TYPE,
-                                     SolverSecondOrderRungeKutta::Impl::KISAO_ID,
+                                     SolverSecondOrderRungeKutta::Impl::ID,
                                      SolverSecondOrderRungeKutta::Impl::NAME,
                                      SolverSecondOrderRungeKutta::Impl::create,
                                      SolverSecondOrderRungeKutta::Impl::propertiesInfo());
@@ -160,14 +160,14 @@ bool Solver::isValid() const
     return pimpl()->mIsValid;
 }
 
-std::string Solver::property(const std::string &pKisaoIdOrName)
+std::string Solver::property(const std::string &pIdOrName)
 {
-    return pimpl()->property(pKisaoIdOrName);
+    return pimpl()->property(pIdOrName);
 }
 
-void Solver::setProperty(const std::string &pKisaoIdOrName, const std::string &pValue)
+void Solver::setProperty(const std::string &pIdOrName, const std::string &pValue)
 {
-    pimpl()->setProperty(pKisaoIdOrName, pValue);
+    pimpl()->setProperty(pIdOrName, pValue);
 }
 
 std::map<std::string, std::string> Solver::properties() const

@@ -23,7 +23,7 @@ SolverPtr SolverUnknown::Impl::create()
 #ifdef COVERAGE_ENABLED
     auto res = std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
 
-    res->pimpl()->propertiesKisaoId(); // Just for code coverage.
+    res->pimpl()->propertiesId(); // Just for code coverage.
 
     return res;
 #else

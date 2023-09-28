@@ -18,11 +18,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverProperty::Impl::Impl(Type pType, const std::string &pKisaoId, const std::string &pName,
+SolverProperty::Impl::Impl(Type pType, const std::string &pId, const std::string &pName,
                            const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
                            bool pHasVoiUnit)
     : mType(pType)
-    , mKisaoId(pKisaoId)
+    , mId(pId)
     , mName(pName)
     , mListValues(pListValues)
     , mDefaultValue(pDefaultValue)
@@ -30,10 +30,10 @@ SolverProperty::Impl::Impl(Type pType, const std::string &pKisaoId, const std::s
 {
 }
 
-SolverProperty::SolverProperty(Type pType, const std::string &pKisaoId, const std::string &pName,
+SolverProperty::SolverProperty(Type pType, const std::string &pId, const std::string &pName,
                                const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
                                bool pHasVoiUnit)
-    : mPimpl(new Impl(pType, pKisaoId, pName, pListValues, pDefaultValue, pHasVoiUnit))
+    : mPimpl(new Impl(pType, pId, pName, pListValues, pDefaultValue, pHasVoiUnit))
 {
 }
 
@@ -49,9 +49,9 @@ SolverProperty::Type SolverProperty::type() const
     return mPimpl->mType;
 }
 
-std::string SolverProperty::kisaoId() const
+std::string SolverProperty::id() const
 {
-    return mPimpl->mKisaoId;
+    return mPimpl->mId;
 }
 
 std::string SolverProperty::name() const
