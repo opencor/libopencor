@@ -452,9 +452,13 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
 bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
 {
-    //---GRY--- TO BE DONE.
+    // Solve the model using interpolation, if needed.
 
-    pVoi = pVoiEnd;
+    if (!mInterpolateSolution) {
+        CVodeSetStopTime(mSolver, pVoiEnd);
+    }
+
+    CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL);
 
     return true;
 }
