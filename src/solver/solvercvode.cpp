@@ -335,19 +335,19 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     relativeTolerance = toDouble(mProperties[RELATIVE_TOLERANCE_ID], ok);
 
     if (!ok || (relativeTolerance < 0.0)) {
-        addError(R"(The ")" + RELATIVE_TOLERANCE_NAME + R"(" property has an invalid value (")" + mProperties[RELATIVE_TOLERANCE_ID] + R"("). It must be a floating point number greater than zero.)");
+        addError(R"(The ")" + RELATIVE_TOLERANCE_NAME + R"(" property has an invalid value (")" + mProperties[RELATIVE_TOLERANCE_ID] + R"("). It must be a floating point number greater or equal to zero.)");
     }
 
     absoluteTolerance = toDouble(mProperties[ABSOLUTE_TOLERANCE_ID], ok);
 
     if (!ok || (absoluteTolerance < 0.0)) {
-        addError(R"(The ")" + ABSOLUTE_TOLERANCE_NAME + R"(" property has an invalid value (")" + mProperties[ABSOLUTE_TOLERANCE_ID] + R"("). It must be a floating point number greater than zero.)");
+        addError(R"(The ")" + ABSOLUTE_TOLERANCE_NAME + R"(" property has an invalid value (")" + mProperties[ABSOLUTE_TOLERANCE_ID] + R"("). It must be a floating point number greater or equal to zero.)");
     }
 
     mInterpolateSolution = toBool(mProperties[INTERPOLATE_SOLUTION_ID], ok);
 
     if (!ok) {
-        addError(R"(The ")" + INTERPOLATE_SOLUTION_NAME + R"(" property has an invalid value (")" + mProperties[INTERPOLATE_SOLUTION_ID] + R"("). It must be equal to either "Yes" or "No".)");
+        addError(R"(The ")" + INTERPOLATE_SOLUTION_NAME + R"(" property has an invalid value (")" + mProperties[INTERPOLATE_SOLUTION_ID] + R"("). It must be equal to either "True" or "False".)");
     }
 
     // Check whether we have had issues and, if so, then leave.
