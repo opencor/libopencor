@@ -20,11 +20,42 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+TEST(CoverageUtilsTest, toString)
+{
+    EXPECT_EQ(libOpenCOR::toString(false), "False");
+}
+
 TEST(CoverageUtilsTest, toDouble)
 {
     bool ok = true;
 
     libOpenCOR::toDouble("0.123 0.456", ok);
+
+    EXPECT_FALSE(ok);
+}
+
+TEST(CoverageUtilsTest, toInt)
+{
+    bool ok = true;
+
+    libOpenCOR::toInt("123 456", ok);
+
+    EXPECT_FALSE(ok);
+}
+
+TEST(CoverageUtilsTest, toSizeT)
+{
+    bool ok = true;
+
+    libOpenCOR::toSizeT("abc", ok);
+
+    EXPECT_FALSE(ok);
+
+    libOpenCOR::toSizeT("123", ok);
+
+    EXPECT_TRUE(ok);
+
+    libOpenCOR::toSizeT("123 456", ok);
 
     EXPECT_FALSE(ok);
 }
