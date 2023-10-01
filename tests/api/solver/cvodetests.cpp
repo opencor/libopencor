@@ -478,6 +478,33 @@ TEST(CvodeSolverTest, solve)
     deleteArrays(states, rates, variables);
 }
 
+TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
+{
+    // Create and initialise our various arrays and create our solver.
+
+    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+
+    // Compute our model.
+
+#if defined(BUILDING_ON_WINDOWS)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015422246861901662, 0.59605559394022689, 0.053035160895529773, 0.31777058539774627};
+#elif defined(BUILDING_ON_LINUX)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.01542143979535311, 0.59605559223195803, 0.053035155728368123, 0.31777058661072155};
+#elif defined(BUILDING_ON_INTEL)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015423275579583704, 0.5960556037980016, 0.053035167225244692, 0.31777058077104786};
+#else
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015419508480756496, 0.59605557817998434, 0.053035143433755365, 0.31777059031732957};
+#endif
+
+    solver->setProperty("Interpolate solution", "False");
+
+    computeModel(solver, states, rates, variables, FINAL_STATES);
+
+    // Clean up after ourselves.
+
+    deleteArrays(states, rates, variables);
+}
+
 TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 {
     // Create and initialise our various arrays and create our solver.
@@ -667,7 +694,7 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
     deleteArrays(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, solveWithNoPreconditioner)
+TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -686,6 +713,62 @@ TEST(CvodeSolverTest, solveWithNoPreconditioner)
 #endif
 
     solver->setProperty("Linear solver", "GMRES");
+    solver->setProperty("Preconditioner", "None");
+
+    computeModel(solver, states, rates, variables, FINAL_STATES);
+
+    // Clean up after ourselves.
+
+    deleteArrays(states, rates, variables);
+}
+
+TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
+{
+    // Create and initialise our various arrays and create our solver.
+
+    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+
+    // Compute our model.
+
+#if defined(BUILDING_ON_WINDOWS)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015420241462898464, 0.5960556173818069, 0.053035147575641185, 0.31777058072809794};
+#elif defined(BUILDING_ON_LINUX)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015418551780382105, 0.59605558999793573, 0.053035139566581964, 0.31777057984596135};
+#elif defined(BUILDING_ON_INTEL)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015421120988824191, 0.59605561310286714, 0.053035154765445257, 0.31777056515715035};
+#else
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015427314383742497, 0.59605566758093353, 0.053035189395094454, 0.31777054276865774};
+#endif
+
+    solver->setProperty("Linear solver", "BiCGStab");
+    solver->setProperty("Preconditioner", "None");
+
+    computeModel(solver, states, rates, variables, FINAL_STATES);
+
+    // Clean up after ourselves.
+
+    deleteArrays(states, rates, variables);
+}
+
+TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
+{
+    // Create and initialise our various arrays and create our solver.
+
+    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+
+    // Compute our model.
+
+#if defined(BUILDING_ON_WINDOWS)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015420241462898464, 0.5960556173818069, 0.053035147575641185, 0.31777058072809794};
+#elif defined(BUILDING_ON_LINUX)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015418551780382105, 0.59605558999793573, 0.053035139566581964, 0.31777057984596135};
+#elif defined(BUILDING_ON_INTEL)
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015421120988824191, 0.59605561310286714, 0.053035154765445257, 0.31777056515715035};
+#else
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015420448454150297, 0.59605559894084548, 0.05303514861517649, 0.31777057679851456};
+#endif
+
+    solver->setProperty("Linear solver", "TFQMR");
     solver->setProperty("Preconditioner", "None");
 
     computeModel(solver, states, rates, variables, FINAL_STATES);
