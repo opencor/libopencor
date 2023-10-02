@@ -368,11 +368,6 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     mSolver = CVodeCreate((integrationMethod == BDF_METHOD) ? CV_BDF : CV_ADAMS, mContext);
 
-    // Use our own error handler.
-
-    //---GRY---
-    // CVodeSetErrHandlerFn(mSolver, errorHandler, this);
-
     // Initialise our CVODES solver.
 
     CVodeInit(mSolver, rhsFunction, pVoi, mStatesVector);
