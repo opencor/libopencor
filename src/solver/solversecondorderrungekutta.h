@@ -35,6 +35,7 @@ public:
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
+
     bool solve(double &pVoi, double pVoiEnd) const override;
 
 private:
