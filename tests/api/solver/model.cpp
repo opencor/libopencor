@@ -63,11 +63,15 @@ void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
                   double *pStates, double *pRates, double *pVariables,
                   const libOpenCOR::Doubles &pFinalStates)
 {
+    // Initialise the model.
+
     static constexpr auto VOI_START = 0.0;
     static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
 
     EXPECT_TRUE(pSolver->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates));
     EXPECT_EQ_DOUBLES(pStates, INITIAL_STATES);
+
+    // Compute the model.
 
     static constexpr auto VOI_END = 50.0;
     static constexpr auto VOI_INTERVAL = 0.1;
@@ -82,6 +86,10 @@ void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
     }
 
     EXPECT_EQ_DOUBLES(pStates, pFinalStates);
+
+    // Reinitialise the model (for coverage reasons).
+
+    EXPECT_TRUE(pSolver->reinitialise(VOI_START));
 }
 
 void deleteArrays(double *pStates, double *pRates, double *pVariables)
