@@ -34,6 +34,13 @@ bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     return true;
 }
 
+bool SolverOde::Impl::reinitialise(double pVoi)
+{
+    (void)pVoi;
+
+    return true;
+}
+
 SolverOde::SolverOde(Impl *pPimpl)
     : Solver(pPimpl)
 {
@@ -47,6 +54,11 @@ SolverOde::Impl *SolverOde::pimpl()
 const SolverOde::Impl *SolverOde::pimpl() const
 {
     return static_cast<const Impl *>(Solver::pimpl());
+}
+
+bool SolverOde::reinitialise(double pVoi)
+{
+    return pimpl()->reinitialise(pVoi);
 }
 
 } // namespace libOpenCOR
