@@ -450,6 +450,17 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
+bool SolverCvode::Impl::reinitialise(double pVoi)
+{
+    // Reinitialise our CVODES solver.
+
+    CVodeReInit(mSolver, pVoi, mStatesVector);
+
+    // Reinitialise the ODE solver itself.
+
+    return SolverOde::Impl::reinitialise(pVoi);
+}
+
 bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     // Solve the model using interpolation, if needed.
@@ -487,6 +498,11 @@ bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double 
                              ComputeRates pComputeRates)
 {
     return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
+}
+
+bool SolverCvode::reinitialise(double pVoi)
+{
+    return pimpl()->reinitialise(pVoi);
 }
 
 bool SolverCvode::solve(double &pVoi, double pVoiEnd) const
