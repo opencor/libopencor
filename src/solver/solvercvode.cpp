@@ -358,7 +358,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Create our SUNDIALS context.
 
-    SUNContext_Create(nullptr, &mContext);
+    ASSERT_EQ(SUNContext_Create(nullptr, &mContext), 0);
 
     // Create our states vector.
 
@@ -368,41 +368,53 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     mSolver = CVodeCreate((integrationMethod == BDF_METHOD) ? CV_BDF : CV_ADAMS, mContext);
 
+    ASSERT_NE(mSolver, nullptr);
+
     // Initialise our CVODES solver.
 
-    CVodeInit(mSolver, rhsFunction, pVoi, mStatesVector);
+    ASSERT_EQ(CVodeInit(mSolver, rhsFunction, pVoi, mStatesVector), CV_SUCCESS);
 
     // Set our user data.
 
     mUserData = new SolverCvodeUserData(pVariables, pComputeRates);
 
-    CVodeSetUserData(mSolver, mUserData);
+    ASSERT_EQ(CVodeSetUserData(mSolver, mUserData), CV_SUCCESS);
 
     // Set our maximum step.
 
-    CVodeSetMaxStep(mSolver, maximumStep);
+    ASSERT_EQ(CVodeSetMaxStep(mSolver, maximumStep), CV_SUCCESS);
 
     // Set our maximum number of steps.
 
-    CVodeSetMaxNumSteps(mSolver, maximumNumberOfSteps);
+    ASSERT_EQ(CVodeSetMaxNumSteps(mSolver, maximumNumberOfSteps), CV_SUCCESS);
 
     // Set our linear solver, if needed.
 
     if (iterationType == NEWTON_ITERATION_TYPE) {
         if (linearSolver == DENSE_LINEAR_SOLVER) {
             mMatrix = SUNDenseMatrix(static_cast<int64_t>(pSize), static_cast<int64_t>(pSize), mContext);
+
+            ASSERT_NE(mMatrix, nullptr);
+
             mLinearSolver = SUNLinSol_Dense(mStatesVector, mMatrix, mContext);
 
-            CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix);
+            ASSERT_NE(mLinearSolver, nullptr);
+
+            ASSERT_EQ(CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix), CVLS_SUCCESS);
         } else if (linearSolver == BANDED_LINEAR_SOLVER) {
             mMatrix = SUNBandMatrix(static_cast<int64_t>(pSize),
                                     static_cast<int64_t>(upperHalfBandwidth), static_cast<int64_t>(lowerHalfBandwidth),
                                     mContext);
+
+            ASSERT_NE(mMatrix, nullptr);
+
             mLinearSolver = SUNLinSol_Band(mStatesVector, mMatrix, mContext);
 
-            CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix);
+            ASSERT_NE(mLinearSolver, nullptr);
+
+            ASSERT_EQ(CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix), CVLS_SUCCESS);
         } else if (linearSolver == DIAGONAL_LINEAR_SOLVER) {
-            CVDiag(mSolver);
+            ASSERT_EQ(CVDiag(mSolver), CVDIAG_SUCCESS);
         } else {
             // We are dealing with a GMRES/Bi-CGStab/TFQMR linear solver, so we may need a preconditioner.
 
@@ -415,9 +427,13 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
                     mLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, PREC_LEFT, 0, mContext);
                 }
 
-                CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix);
-                CVBandPrecInit(mSolver, static_cast<int64_t>(pSize),
-                               static_cast<int64_t>(upperHalfBandwidth), static_cast<int64_t>(lowerHalfBandwidth));
+                ASSERT_NE(mLinearSolver, nullptr);
+
+                ASSERT_EQ(CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix), CVLS_SUCCESS);
+                ASSERT_EQ(CVBandPrecInit(mSolver, static_cast<int64_t>(pSize),
+                                         static_cast<int64_t>(upperHalfBandwidth),
+                                         static_cast<int64_t>(lowerHalfBandwidth)),
+                          CVLS_SUCCESS);
             } else {
                 if (linearSolver == GMRES_LINEAR_SOLVER) {
                     mLinearSolver = SUNLinSol_SPGMR(mStatesVector, PREC_NONE, 0, mContext);
@@ -427,18 +443,22 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
                     mLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, PREC_NONE, 0, mContext);
                 }
 
-                CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix);
+                ASSERT_NE(mLinearSolver, nullptr);
+
+                ASSERT_EQ(CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix), CVLS_SUCCESS);
             }
         }
     } else {
         mNonLinearSolver = SUNNonlinSol_FixedPoint(mStatesVector, 0, mContext);
+
+        ASSERT_NE(mNonLinearSolver, nullptr);
 
         CVodeSetNonlinearSolver(mSolver, mNonLinearSolver);
     }
 
     // Set our relative and absolute tolerances.
 
-    CVodeSStolerances(mSolver, relativeTolerance, absoluteTolerance);
+    ASSERT_EQ(CVodeSStolerances(mSolver, relativeTolerance, absoluteTolerance), CV_SUCCESS);
 
     // Initialise the ODE solver itself.
 
@@ -449,7 +469,7 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 {
     // Reinitialise our CVODES solver.
 
-    CVodeReInit(mSolver, pVoi, mStatesVector);
+    ASSERT_EQ(CVodeReInit(mSolver, pVoi, mStatesVector), CV_SUCCESS);
 
     // Reinitialise the ODE solver itself.
 
@@ -461,10 +481,10 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
     // Solve the model using interpolation, if needed.
 
     if (!mInterpolateSolution) {
-        CVodeSetStopTime(mSolver, pVoiEnd);
+        ASSERT_EQ(CVodeSetStopTime(mSolver, pVoiEnd), CV_SUCCESS);
     }
 
-    CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL);
+    ASSERT_EQ(CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL), CV_SUCCESS);
 
     return true;
 }

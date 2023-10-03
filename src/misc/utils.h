@@ -18,11 +18,26 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#ifndef NDEBUG
+#    include <cassert>
+#endif
 #include <filesystem>
 #include <string>
 #include <vector>
 
 namespace libOpenCOR {
+
+#ifdef NDEBUG
+#    define ASSERT_EQ(x, y) \
+        (void)x; \
+        (void)y
+#    define ASSERT_NE(x, y) \
+        (void)x; \
+        (void)y
+#else
+#    define ASSERT_EQ(x, y) assert(x == y)
+#    define ASSERT_NE(x, y) assert(x != y)
+#endif
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
