@@ -364,6 +364,10 @@ def test_properties():
     assert solver.property("Step") == "7.89"
     assert solver.property("Unknown property") == ""
 
+    properties["Unknown property"] = "1.23"
+
+    assert len(properties) == 2
+
     solver.set_properties(properties)
 
     assert len(solver.properties) == 1

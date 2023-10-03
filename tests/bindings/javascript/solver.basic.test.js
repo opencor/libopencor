@@ -397,6 +397,10 @@ describe("Solver basic tests", () => {
     expect(solver.property("Step")).toBe("7.89");
     expect(solver.property("Unknown property")).toBe("");
 
+    properties.set("Unknown property", "1.23");
+
+    expect(properties.size()).toBe(2);
+
     solver.setProperties(properties);
 
     expect(solver.properties().size()).toBe(1);

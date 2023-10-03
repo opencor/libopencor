@@ -65,7 +65,13 @@ std::string Solver::Impl::id(const std::string &pIdOrName) const
 
 std::string Solver::Impl::property(const std::string &pIdOrName)
 {
-    return mProperties[id(pIdOrName)];
+    auto id = this->id(pIdOrName);
+
+    if (mProperties.find(id) != mProperties.end()) {
+        return mProperties[id];
+    }
+
+    return {};
 }
 
 void Solver::Impl::setProperty(const std::string &pIdOrName, const std::string &pValue)
@@ -84,7 +90,9 @@ std::map<std::string, std::string> Solver::Impl::properties() const
 
 void Solver::Impl::setProperties(const std::map<std::string, std::string> &pProperties)
 {
-    mProperties = pProperties;
+    for (const auto &property : pProperties) {
+        setProperty(property.first, property.second);
+    }
 }
 
 Solver::Solver(Impl *pPimpl)
