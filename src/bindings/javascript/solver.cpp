@@ -70,10 +70,10 @@ void solverApi()
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
         .class_function("solversInfo", &libOpenCOR::Solver::solversInfo)
         .function("isValid", &libOpenCOR::Solver::isValid)
-        .function("properties", &libOpenCOR::Solver::properties)
-        .function("setProperties", &libOpenCOR::Solver::setProperties)
         .function("property", &libOpenCOR::Solver::property)
-        .function("setProperty", &libOpenCOR::Solver::setProperty);
+        .function("setProperty", &libOpenCOR::Solver::setProperty)
+        .function("properties", &libOpenCOR::Solver::properties)
+        .function("setProperties", &libOpenCOR::Solver::setProperties);
 
     EM_ASM({
         Module['Solver']['Type'] = Module['Solver.Type'];
