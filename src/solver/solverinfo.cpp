@@ -19,23 +19,25 @@ limitations under the License.
 namespace libOpenCOR {
 
 SolverInfoPtr SolverInfo::Impl::create(Solver::Type pType, const std::string &pId, const std::string &pName,
-                                       const std::vector<SolverPropertyPtr> &pProperties)
+                                       const std::vector<SolverPropertyPtr> &pProperties,
+                                       HiddenPropertiesFunction pHiddenProperties)
 {
-    return SolverInfoPtr {new SolverInfo {pType, pId, pName, pProperties}};
+    return SolverInfoPtr {new SolverInfo {pType, pId, pName, pProperties, pHiddenProperties}};
 }
 
 SolverInfo::Impl::Impl(Solver::Type pType, const std::string &pId, const std::string &pName,
-                       const std::vector<SolverPropertyPtr> &pProperties)
+                       const std::vector<SolverPropertyPtr> &pProperties, HiddenPropertiesFunction pHiddenProperties)
     : mType(pType)
     , mId(pId)
     , mName(pName)
     , mProperties(pProperties)
+    , mHiddenProperties(pHiddenProperties)
 {
 }
 
 SolverInfo::SolverInfo(Solver::Type pType, const std::string &pId, const std::string &pName,
-                       const std::vector<SolverPropertyPtr> &pProperties)
-    : mPimpl(new Impl(pType, pId, pName, pProperties))
+                       const std::vector<SolverPropertyPtr> &pProperties, HiddenPropertiesFunction pHiddenProperties)
+    : mPimpl(new Impl(pType, pId, pName, pProperties, pHiddenProperties))
 {
 }
 
@@ -64,6 +66,11 @@ std::string SolverInfo::name() const
 std::vector<SolverPropertyPtr> SolverInfo::properties() const
 {
     return mPimpl->mProperties;
+}
+
+std::vector<std::string> SolverInfo::hiddenProperties(const std::map<std::string, std::string> &pProperties) const
+{
+    return mPimpl->mHiddenProperties(pProperties);
 }
 
 } // namespace libOpenCOR

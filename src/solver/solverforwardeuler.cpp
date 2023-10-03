@@ -44,6 +44,13 @@ std::vector<SolverPropertyPtr> SolverForwardEuler::Impl::propertiesInfo()
     };
 }
 
+std::vector<std::string> SolverForwardEuler::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
+{
+    (void)pProperties;
+
+    return {};
+}
+
 SolverForwardEuler::Impl::Impl()
     : SolverOde::Impl()
 {

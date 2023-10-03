@@ -44,6 +44,13 @@ std::vector<SolverPropertyPtr> SolverHeun::Impl::propertiesInfo()
     };
 }
 
+std::vector<std::string> SolverHeun::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
+{
+    (void)pProperties;
+
+    return {};
+}
+
 SolverHeun::Impl::Impl()
     : SolverOde::Impl()
 {

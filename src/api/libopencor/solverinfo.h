@@ -33,6 +33,8 @@ class LIBOPENCOR_EXPORT SolverInfo
     friend class Solver;
 
 public:
+    using HiddenPropertiesFunction = std::vector<std::string> (*)(const std::map<std::string, std::string> &pProperties);
+
     /**
      * Constructors, destructor, and assignment operators.
      */
@@ -89,13 +91,29 @@ public:
 
     std::vector<SolverPropertyPtr> properties() const;
 
+    /**
+     * @brief Get the properties of this solver that should be hidden.
+     *
+     * Get, for the given properties, the properties of this solver that should be hidden. Either the (KiSAO) ID or name
+     * of a property can be used. If @p pProperties has an entry for both the (KiSAO) ID and name of a property then the
+     * second entry is used.
+     *
+     * @param pProperties The properties, as a @c std::map of @c std::string, against which to determine the properties
+     * of this solver that should be hidden.
+     *
+     * @return The properties, as a @c std::vector of @c std::string, of this solver that should be hidden.
+     */
+
+    std::vector<std::string> hiddenProperties(const std::map<std::string, std::string> &pProperties) const;
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     Impl *mPimpl;
 
     explicit SolverInfo(Solver::Type pType, const std::string &pId, const std::string &pName,
-                        const std::vector<SolverPropertyPtr> &pProperties); /**< Constructor, @private. */
+                        const std::vector<SolverPropertyPtr> &pProperties,
+                        HiddenPropertiesFunction pHiddenProperties); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

@@ -192,6 +192,42 @@ std::vector<SolverPropertyPtr> SolverCvode::Impl::propertiesInfo()
     };
 }
 
+std::vector<std::string> SolverCvode::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
+{
+    std::vector<std::string> res;
+
+    if (auto iterationTypeIter = pProperties.find(ITERATION_TYPE_ID); iterationTypeIter != pProperties.end()) {
+        if (iterationTypeIter->second == NEWTON_ITERATION_TYPE) {
+            if (auto linearSolverIter = pProperties.find(LINEAR_SOLVER_ID); linearSolverIter != pProperties.end()) {
+                if ((linearSolverIter->second == DENSE_LINEAR_SOLVER)
+                    || (linearSolverIter->second == DIAGONAL_LINEAR_SOLVER)) {
+                    res.push_back(PRECONDITIONER_ID);
+                    res.push_back(UPPER_HALF_BANDWIDTH_ID);
+                    res.push_back(LOWER_HALF_BANDWIDTH_ID);
+                } else if (linearSolverIter->second == BANDED_LINEAR_SOLVER) {
+                    res.push_back(PRECONDITIONER_ID);
+                } else if ((linearSolverIter->second == GMRES_LINEAR_SOLVER)
+                           || (linearSolverIter->second == BICGSTAB_LINEAR_SOLVER)
+                           || (linearSolverIter->second == TFQMR_LINEAR_SOLVER)) {
+                    if (auto preconditionerIter = pProperties.find(PRECONDITIONER_ID); preconditionerIter != pProperties.end()) {
+                        if (preconditionerIter->second == NO_PRECONDITIONER) {
+                            res.push_back(UPPER_HALF_BANDWIDTH_ID);
+                            res.push_back(LOWER_HALF_BANDWIDTH_ID);
+                        }
+                    }
+                }
+            }
+        } else if (iterationTypeIter->second == FUNCTIONAL_ITERATION_TYPE) {
+            res.push_back(LINEAR_SOLVER_ID);
+            res.push_back(PRECONDITIONER_ID);
+            res.push_back(UPPER_HALF_BANDWIDTH_ID);
+            res.push_back(LOWER_HALF_BANDWIDTH_ID);
+        }
+    }
+
+    return res;
+}
+
 SolverCvode::Impl::Impl()
     : SolverOde::Impl()
 {

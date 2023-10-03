@@ -44,6 +44,13 @@ std::vector<SolverPropertyPtr> SolverSecondOrderRungeKutta::Impl::propertiesInfo
     };
 }
 
+std::vector<std::string> SolverSecondOrderRungeKutta::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
+{
+    (void)pProperties;
+
+    return {};
+}
+
 SolverSecondOrderRungeKutta::Impl::Impl()
     : SolverOde::Impl()
 {

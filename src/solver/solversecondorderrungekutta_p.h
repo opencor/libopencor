@@ -38,6 +38,7 @@ public:
 
     static SolverPtr create();
     static std::vector<SolverPropertyPtr> propertiesInfo();
+    static std::vector<std::string> hiddenProperties(const std::map<std::string, std::string> &pProperties);
 
     double mStep = STEP_DEFAULT_VALUE;
 
