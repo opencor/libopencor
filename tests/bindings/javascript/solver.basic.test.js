@@ -381,23 +381,23 @@ describe("Solver basic tests", () => {
     expect(solver.property("Step")).toBe("1");
     expect(solver.property("KISAO:0000483")).toBe("1");
 
-    solver.setProperty("Step", "1.2345");
+    solver.setProperty("Step", "1.23");
 
     expect(solver.properties().size()).toBe(1);
-    expect(solver.property("KISAO:0000483")).toBe("1.2345");
+    expect(solver.property("KISAO:0000483")).toBe("1.23");
 
     solver.setProperty("KISAO:0000483", "7.89");
 
     expect(solver.properties().size()).toBe(1);
     expect(solver.property("Step")).toBe("7.89");
 
-    solver.setProperty("Unknown property", "1.23");
+    solver.setProperty("Unknown", "1.23");
 
     expect(solver.properties().size()).toBe(1);
     expect(solver.property("Step")).toBe("7.89");
-    expect(solver.property("Unknown property")).toBe("");
+    expect(solver.property("Unknown")).toBe("");
 
-    properties.set("Unknown property", "1.23");
+    properties.set("Unknown", "1.23");
 
     expect(properties.size()).toBe(2);
 
