@@ -365,10 +365,11 @@ def test_properties():
     assert solver.property("Unknown") == ""
 
     properties["Unknown"] = "1.23"
+    properties["Step"] = "0.123"
 
-    assert len(properties) == 2
+    assert len(properties) == 3
 
     solver.set_properties(properties)
 
     assert len(solver.properties) == 1
-    assert solver.property("Step") == "1"
+    assert solver.property("Step") == "0.123"

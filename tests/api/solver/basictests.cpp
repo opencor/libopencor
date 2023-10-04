@@ -136,11 +136,12 @@ TEST(BasicSolverTest, properties)
     EXPECT_EQ(solver->property("Unknown"), "");
 
     properties["Unknown"] = "1.23";
+    properties["Step"] = "0.123";
 
-    EXPECT_EQ(properties.size(), 2);
+    EXPECT_EQ(properties.size(), 3);
 
     solver->setProperties(properties);
 
     EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "1");
+    EXPECT_EQ(solver->property("Step"), "0.123");
 }

@@ -398,12 +398,13 @@ describe("Solver basic tests", () => {
     expect(solver.property("Unknown")).toBe("");
 
     properties.set("Unknown", "1.23");
+    properties.set("Step", "0.123");
 
-    expect(properties.size()).toBe(2);
+    expect(properties.size()).toBe(3);
 
     solver.setProperties(properties);
 
     expect(solver.properties().size()).toBe(1);
-    expect(solver.property("Step")).toBe("1");
+    expect(solver.property("Step")).toBe("0.123");
   });
 });
