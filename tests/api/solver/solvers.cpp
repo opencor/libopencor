@@ -38,7 +38,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     auto listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 
     property = properties[1];
 
@@ -50,7 +50,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 
     property = properties[2];
 
@@ -122,7 +122,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 
     property = properties[7]; // NOLINT
 
@@ -134,7 +134,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 
     property = properties[8]; // NOLINT
 
@@ -146,7 +146,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 
     property = properties[9]; // NOLINT
 
@@ -158,7 +158,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 
     property = properties[10]; // NOLINT
 
@@ -170,7 +170,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 }
 
 void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
@@ -193,7 +193,7 @@ void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     auto listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 }
 
 void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
@@ -216,7 +216,7 @@ void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverIn
 
     auto listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 }
 
 void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
@@ -239,7 +239,7 @@ void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     auto listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 }
 
 void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
@@ -262,5 +262,5 @@ void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverIn
 
     auto listValues = property->listValues();
 
-    EXPECT_EQ(listValues.size(), 0);
+    EXPECT_TRUE(listValues.empty());
 }
