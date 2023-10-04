@@ -165,6 +165,11 @@ const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() co
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
+SolverInfoPtr SolverSecondOrderRungeKutta::info() const
+{
+    return Solver::solversInfo()[4];
+}
+
 bool SolverSecondOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                              double *pVariables, ComputeRates pComputeRates)
 {

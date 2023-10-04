@@ -53,4 +53,9 @@ const SolverUnknown::Impl *SolverUnknown::pimpl() const
 }
 */
 
+SolverInfoPtr SolverUnknown::info() const
+{
+    return nullptr;
+}
+
 } // namespace libOpenCOR

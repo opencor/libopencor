@@ -14,16 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
+#pragma once
 
 #include <libopencor>
 
-TEST(CoverageSolverTest, solversInfoAlreadyInitialised)
-{
-    libOpenCOR::Solver::solversInfo();
-}
-
-TEST(CoverageSolverTest, unknownSolverInfo)
-{
-    EXPECT_EQ(libOpenCOR::Solver::create("Unknown")->info(), nullptr);
-}
+void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);

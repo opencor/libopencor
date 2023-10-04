@@ -33,6 +33,8 @@ public:
     SolverHeun &operator=(const SolverHeun &pRhs) = delete;
     SolverHeun &operator=(SolverHeun &&pRhs) noexcept = delete;
 
+    SolverInfoPtr info() const override;
+
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
 

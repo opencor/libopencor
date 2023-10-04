@@ -200,6 +200,11 @@ const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() co
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
+SolverInfoPtr SolverFourthOrderRungeKutta::info() const
+{
+    return Solver::solversInfo()[2];
+}
+
 bool SolverFourthOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                              double *pVariables, ComputeRates pComputeRates)
 {

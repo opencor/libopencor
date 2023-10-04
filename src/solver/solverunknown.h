@@ -33,6 +33,8 @@ public:
     SolverUnknown &operator=(const SolverUnknown &pRhs) = delete;
     SolverUnknown &operator=(SolverUnknown &&pRhs) noexcept = delete;
 
+    SolverInfoPtr info() const override;
+
 private:
     class Impl;
 

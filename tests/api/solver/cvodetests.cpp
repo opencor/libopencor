@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "model.h"
 #include "solvercvode.h"
+#include "solvers.h"
 #include "utils.h"
 
 #include "gtest/gtest.h"
@@ -23,6 +24,13 @@ limitations under the License.
 #include "tests/utils.h"
 
 #include <libopencor>
+
+TEST(CvodeSolverTest, basic)
+{
+    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("CVODE"));
+
+    checkCvodeSolver(solver->info());
+}
 
 TEST(CvodeSolverTest, maximumStepValueWithNonNumber)
 {

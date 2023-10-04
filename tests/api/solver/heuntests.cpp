@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "model.h"
 #include "solverheun.h"
+#include "solvers.h"
 #include "utils.h"
 
 #include "gtest/gtest.h"
@@ -23,6 +24,13 @@ limitations under the License.
 #include "tests/utils.h"
 
 #include <libopencor>
+
+TEST(HeunSolverTest, basic)
+{
+    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Heun"));
+
+    checkHeunSolver(solver->info());
+}
 
 TEST(HeunSolverTest, stepValueWithNonNumber)
 {

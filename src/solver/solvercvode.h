@@ -33,6 +33,8 @@ public:
     SolverCvode &operator=(const SolverCvode &pRhs) = delete;
     SolverCvode &operator=(SolverCvode &&pRhs) noexcept = delete;
 
+    SolverInfoPtr info() const override;
+
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
     bool reinitialise(double pVoi) override;

@@ -166,6 +166,11 @@ const SolverHeun::Impl *SolverHeun::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
+SolverInfoPtr SolverHeun::info() const
+{
+    return Solver::solversInfo()[3];
+}
+
 bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             ComputeRates pComputeRates)
 {

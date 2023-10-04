@@ -139,6 +139,11 @@ const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
+SolverInfoPtr SolverForwardEuler::info() const
+{
+    return Solver::solversInfo()[1];
+}
+
 bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                     ComputeRates pComputeRates)
 {

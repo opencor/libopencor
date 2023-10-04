@@ -509,6 +509,11 @@ const SolverCvode::Impl *SolverCvode::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
+SolverInfoPtr SolverCvode::info() const
+{
+    return Solver::solversInfo()[0];
+}
+
 bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                              ComputeRates pComputeRates)
 {

@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "model.h"
+#include "solvers.h"
 #include "solversecondorderrungekutta.h"
 #include "utils.h"
 
@@ -23,6 +24,13 @@ limitations under the License.
 #include "tests/utils.h"
 
 #include <libopencor>
+
+TEST(SecondOrderRungeKuttaSolverTest, basic)
+{
+    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Second-order Runge-Kutta"));
+
+    checkSecondOrderRungeKuttaSolver(solver->info());
+}
 
 TEST(SecondOrderRungeKuttaSolverTest, stepValueWithNonNumber)
 {

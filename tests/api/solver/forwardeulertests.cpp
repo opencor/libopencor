@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "model.h"
 #include "solverforwardeuler.h"
+#include "solvers.h"
 #include "utils.h"
 
 #include "gtest/gtest.h"
@@ -23,6 +24,13 @@ limitations under the License.
 #include "tests/utils.h"
 
 #include <libopencor>
+
+TEST(ForwardEulerSolverTest, basic)
+{
+    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Forward Euler"));
+
+    checkForwardEulerSolver(solver->info());
+}
 
 TEST(ForwardEulerSolverTest, stepValueWithNonNumber)
 {
