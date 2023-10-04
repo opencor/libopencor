@@ -16,8 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "solverforwardeuler.h"
-#include "solverheun.h"
+#include "solverode.h"
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(push)

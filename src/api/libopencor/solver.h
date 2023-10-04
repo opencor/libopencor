@@ -94,11 +94,11 @@ public:
     static std::vector<SolverInfoPtr> solversInfo();
 
     /**
-     * @brief Return whether the solver is valid.
+     * @brief Return whether this solver is valid.
      *
-     * Return whether the solver is valid.
+     * Return whether this solver is valid.
      *
-     * @return @c true if the solver is valid, @c false otherwise.
+     * @return @c true if this solver is valid, @c false otherwise.
      */
 
     bool isValid() const;
@@ -119,7 +119,7 @@ public:
      * @brief Set the value of a property of this solver.
      *
      * Set the value of a property, which (KiSAO) ID or name is given, of this solver. If the name or KiSAO ID is not
-     * supported by the solver then nothing is done.
+     * supported by this solver then nothing is done.
      *
      * @param pIdOrName The (KiSAO) id or name, as a @c std::string, of a property of this solver.
      * @param pValue The value, as a @c std::string, of a property of this solver.
@@ -140,7 +140,7 @@ public:
     /**
      * @brief Set the properties of this solver.
      *
-     * Set the properties of this solver. If the (KiSAO) ID or name of a property is not supported by the solver then
+     * Set the properties of this solver. If the (KiSAO) ID or name of a property is not supported by this solver then
      * nothing is done.
      *
      * @param pProperties The properties, as a @c std::map of @c std::string, of this solver.
