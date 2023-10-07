@@ -96,7 +96,7 @@ public:
      *
      * Get, for the given properties, the properties of this solver that should be hidden. Either the (KiSAO) ID or name
      * of a property can be used. If @p pProperties has an entry for both the (KiSAO) ID and name of a property then the
-     * second entry is used.
+     * (KiSAO) ID entry is used.
      *
      * @param pProperties The properties, as a @c std::map of @c std::string, against which to determine the properties
      * of this solver that should be hidden.

@@ -195,34 +195,33 @@ std::vector<SolverPropertyPtr> SolverCvode::Impl::propertiesInfo()
 std::vector<std::string> SolverCvode::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
 {
     std::vector<std::string> res;
+    auto iterationType = valueFromProperties(ITERATION_TYPE_ID, ITERATION_TYPE_NAME, pProperties);
 
-    if (auto iterationTypeIter = pProperties.find(ITERATION_TYPE_ID); iterationTypeIter != pProperties.end()) {
-        if (iterationTypeIter->second == NEWTON_ITERATION_TYPE) {
-            if (auto linearSolverIter = pProperties.find(LINEAR_SOLVER_ID); linearSolverIter != pProperties.end()) {
-                if ((linearSolverIter->second == DENSE_LINEAR_SOLVER)
-                    || (linearSolverIter->second == DIAGONAL_LINEAR_SOLVER)) {
-                    res.push_back(PRECONDITIONER_ID);
-                    res.push_back(UPPER_HALF_BANDWIDTH_ID);
-                    res.push_back(LOWER_HALF_BANDWIDTH_ID);
-                } else if (linearSolverIter->second == BANDED_LINEAR_SOLVER) {
-                    res.push_back(PRECONDITIONER_ID);
-                } else if ((linearSolverIter->second == GMRES_LINEAR_SOLVER)
-                           || (linearSolverIter->second == BICGSTAB_LINEAR_SOLVER)
-                           || (linearSolverIter->second == TFQMR_LINEAR_SOLVER)) {
-                    if (auto preconditionerIter = pProperties.find(PRECONDITIONER_ID); preconditionerIter != pProperties.end()) {
-                        if (preconditionerIter->second == NO_PRECONDITIONER) {
-                            res.push_back(UPPER_HALF_BANDWIDTH_ID);
-                            res.push_back(LOWER_HALF_BANDWIDTH_ID);
-                        }
-                    }
-                }
-            }
-        } else if (iterationTypeIter->second == FUNCTIONAL_ITERATION_TYPE) {
-            res.push_back(LINEAR_SOLVER_ID);
+    if (iterationType == NEWTON_ITERATION_TYPE) {
+        auto linearSolver = valueFromProperties(LINEAR_SOLVER_ID, LINEAR_SOLVER_NAME, pProperties);
+
+        if ((linearSolver == DENSE_LINEAR_SOLVER)
+            || (linearSolver == DIAGONAL_LINEAR_SOLVER)) {
             res.push_back(PRECONDITIONER_ID);
             res.push_back(UPPER_HALF_BANDWIDTH_ID);
             res.push_back(LOWER_HALF_BANDWIDTH_ID);
+        } else if (linearSolver == BANDED_LINEAR_SOLVER) {
+            res.push_back(PRECONDITIONER_ID);
+        } else if ((linearSolver == GMRES_LINEAR_SOLVER)
+                   || (linearSolver == BICGSTAB_LINEAR_SOLVER)
+                   || (linearSolver == TFQMR_LINEAR_SOLVER)) {
+            auto preconditioner = valueFromProperties(PRECONDITIONER_ID, PRECONDITIONER_NAME, pProperties);
+
+            if (preconditioner == NO_PRECONDITIONER) {
+                res.push_back(UPPER_HALF_BANDWIDTH_ID);
+                res.push_back(LOWER_HALF_BANDWIDTH_ID);
+            }
         }
+    } else if (iterationType == FUNCTIONAL_ITERATION_TYPE) {
+        res.push_back(LINEAR_SOLVER_ID);
+        res.push_back(PRECONDITIONER_ID);
+        res.push_back(UPPER_HALF_BANDWIDTH_ID);
+        res.push_back(LOWER_HALF_BANDWIDTH_ID);
     }
 
     return res;

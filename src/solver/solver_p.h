@@ -42,6 +42,8 @@ public:
     static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pId,
                                             const std::string &pName, const std::vector<std::string> &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiUnit);
+    static std::string valueFromProperties(const std::string &pId, const std::string &pName,
+                                           const std::map<std::string, std::string> &pProperties);
 
     virtual ~Impl() = default;
 

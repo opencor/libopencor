@@ -51,6 +51,26 @@ SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const
     return SolverPropertyPtr {new SolverProperty(pType, pId, pName, pListValues, pDefaultValue, pHasVoiUnit)};
 }
 
+std::string Solver::Impl::valueFromProperties(const std::string &pId, const std::string &pName,
+                                              const std::map<std::string, std::string> &pProperties)
+{
+    std::string res;
+
+    for (const auto &property : pProperties) {
+        if (property.first == pName) {
+            res = property.second;
+        }
+    }
+
+    for (const auto &property : pProperties) {
+        if (property.first == pId) {
+            res = property.second;
+        }
+    }
+
+    return res;
+}
+
 std::map<std::string, std::string> Solver::Impl::propertiesId() const
 {
     return {};
