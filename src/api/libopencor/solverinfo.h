@@ -33,7 +33,7 @@ class LIBOPENCOR_EXPORT SolverInfo
     friend class Solver;
 
 public:
-    using HiddenPropertiesFunction = std::vector<std::string> (*)(const std::map<std::string, std::string> &pProperties);
+    using HiddenPropertiesFunction = std::vector<std::string> (*)(const std::map<std::string, std::string> &pProperties); /**< Signature of the method that returns the properties of the solver that should be hidden. */
 
     /**
      * Constructors, destructor, and assignment operators.
@@ -92,16 +92,16 @@ public:
     std::vector<SolverPropertyPtr> properties() const;
 
     /**
-     * @brief Get the properties of this solver that should be hidden.
+     * @brief Get the properties of the solver that should be hidden.
      *
-     * Get, for the given properties, the properties of this solver that should be hidden. Either the (KiSAO) ID or name
+     * Get, for the given properties, the properties of the solver that should be hidden. Either the (KiSAO) ID or name
      * of a property can be used. If @p pProperties has an entry for both the (KiSAO) ID and name of a property then the
      * (KiSAO) ID entry is used.
      *
      * @param pProperties The properties, as a @c std::map of @c std::string, against which to determine the properties
-     * of this solver that should be hidden.
+     * of the solver that should be hidden.
      *
-     * @return The properties, as a @c std::vector of @c std::string, of this solver that should be hidden.
+     * @return The properties, as a @c std::vector of @c std::string, of the solver that should be hidden.
      */
 
     std::vector<std::string> hiddenProperties(const std::map<std::string, std::string> &pProperties) const;
