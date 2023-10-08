@@ -283,8 +283,8 @@ elseif(BUILDING_USING_CLANG)
     if(APPLE)
         # Get the Xcode version.
         # Note: CMake has XCODE_VERSION, but it's only available when using the Xcode generator. So, we need to get the
-        #       Xcode version ourselves. Then, depending on how Xcode was installed, we may need to get the Xcode
-        #       version using softwareupdate.
+        #       Xcode version ourselves. And, depending on how Xcode was installed, we may need to get the Xcode version
+        #       using softwareupdate.
 
         execute_process(COMMAND xcodebuild -version
                         OUTPUT_VARIABLE XCODE_VERSION
