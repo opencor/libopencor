@@ -364,12 +364,38 @@ def test_properties():
     assert solver.property("Step") == "7.89"
     assert solver.property("Unknown") == ""
 
+    properties["Step"] = "1.23"
+
+    assert len(properties) == 2
+
+    solver.set_properties(properties)
+
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1"
+
     properties["Unknown"] = "1.23"
-    properties["Step"] = "0.123"
 
     assert len(properties) == 3
 
     solver.set_properties(properties)
 
     assert len(solver.properties) == 1
-    assert solver.property("Step") == "0.123"
+    assert solver.property("Step") == "1"
+
+    properties["KISAO:0000483"] = "1.23"
+
+    assert len(properties) == 3
+
+    solver.set_properties(properties)
+
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1.23"
+
+    properties.pop("KISAO:0000483")
+
+    assert len(properties) == 2
+
+    solver.set_properties(properties)
+
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1.23"

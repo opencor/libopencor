@@ -375,7 +375,7 @@ describe("Solver basic tests", () => {
 
   test("Properties", () => {
     const solver = new libopencor.Solver("Forward Euler");
-    const properties = solver.properties();
+    let properties = solver.properties();
 
     expect(solver.properties().size()).toBe(1);
     expect(solver.property("Step")).toBe("1");
@@ -397,14 +397,46 @@ describe("Solver basic tests", () => {
     expect(solver.property("Step")).toBe("7.89");
     expect(solver.property("Unknown")).toBe("");
 
+    properties.set("Step", "1.23");
+
+    expect(properties.size()).toBe(2);
+
+    solver.setProperties(properties);
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1");
+
     properties.set("Unknown", "1.23");
-    properties.set("Step", "0.123");
 
     expect(properties.size()).toBe(3);
 
     solver.setProperties(properties);
 
     expect(solver.properties().size()).toBe(1);
-    expect(solver.property("Step")).toBe("0.123");
+    expect(solver.property("Step")).toBe("1");
+
+    properties.set("KISAO:0000483", "1.23");
+
+    expect(properties.size()).toBe(3);
+
+    solver.setProperties(properties);
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1.23");
+
+    // Note: here, we want to remove "KISAO:0000483" entry from properties, but it cannot be done using the JavaScript
+    // bindings, so we create a new Properties object instead and add the "Unknonwn" and "Step" entries to it.
+
+    properties = new libopencor.Properties();
+
+    properties.set("Unknown", "1.23");
+    properties.set("Step", "1.23");
+
+    expect(properties.size()).toBe(2);
+
+    solver.setProperties(properties);
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1.23");
   });
 });

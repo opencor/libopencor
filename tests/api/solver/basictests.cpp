@@ -135,13 +135,39 @@ TEST(BasicSolverTest, properties)
     EXPECT_EQ(solver->property("Step"), "7.89");
     EXPECT_EQ(solver->property("Unknown"), "");
 
+    properties["Step"] = "1.23";
+
+    EXPECT_EQ(properties.size(), 2);
+
+    solver->setProperties(properties);
+
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "1");
+
     properties["Unknown"] = "1.23";
-    properties["Step"] = "0.123";
 
     EXPECT_EQ(properties.size(), 3);
 
     solver->setProperties(properties);
 
     EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "0.123");
+    EXPECT_EQ(solver->property("Step"), "1");
+
+    properties["KISAO:0000483"] = "1.23";
+
+    EXPECT_EQ(properties.size(), 3);
+
+    solver->setProperties(properties);
+
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "1.23");
+
+    properties.erase("KISAO:0000483");
+
+    EXPECT_EQ(properties.size(), 2);
+
+    solver->setProperties(properties);
+
+    EXPECT_EQ(solver->properties().size(), 1);
+    EXPECT_EQ(solver->property("Step"), "1.23");
 }

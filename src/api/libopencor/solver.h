@@ -151,8 +151,8 @@ public:
      * @brief Set the properties of this solver.
      *
      * Set the properties of this solver. If the (KiSAO) ID or name of a property is not supported by this solver then
-     * nothing is done. If @p pProperties has an entry for both the (KiSAO) ID and name of a property then the second
-     * entry is used.
+     * nothing is done. If @p pProperties has an entry for both the (KiSAO) ID and name of a property then the (KiSAO)
+     * ID entry is used.
      *
      * @param pProperties The properties, as a @c std::map of @c std::string, of this solver.
      */

@@ -112,7 +112,12 @@ std::map<std::string, std::string> Solver::Impl::properties() const
 void Solver::Impl::setProperties(const std::map<std::string, std::string> &pProperties)
 {
     for (const auto &property : pProperties) {
-        setProperty(property.first, property.second);
+        auto id = this->id(property.first);
+        auto idIter = pProperties.find(id);
+
+        if (idIter != pProperties.end()) {
+            setProperty(id, idIter->second);
+        }
     }
 }
 
