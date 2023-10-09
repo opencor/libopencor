@@ -16,13 +16,11 @@ limitations under the License.
 
 #pragma once
 
-#include "unittestingexport.h"
-
 #include "libopencor/solver.h"
 
 namespace libOpenCOR {
 
-class LIBOPENCOR_UNIT_TESTING_EXPORT SolverOde: public Solver
+class SolverOde: public Solver
 {
 public:
     using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
