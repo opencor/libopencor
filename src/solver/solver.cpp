@@ -54,21 +54,19 @@ SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const
 std::string Solver::Impl::valueFromProperties(const std::string &pId, const std::string &pName,
                                               const std::map<std::string, std::string> &pProperties)
 {
-    std::string res;
+    auto valueIter = pProperties.find(pId);
 
-    for (const auto &property : pProperties) {
-        if (property.first == pName) {
-            res = property.second;
-        }
+    if (valueIter != pProperties.end()) {
+        return valueIter->second;
     }
 
-    for (const auto &property : pProperties) {
-        if (property.first == pId) {
-            res = property.second;
-        }
+    valueIter = pProperties.find(pName);
+
+    if (valueIter != pProperties.end()) {
+        return valueIter->second;
     }
 
-    return res;
+    return {};
 }
 
 std::map<std::string, std::string> Solver::Impl::propertiesId() const

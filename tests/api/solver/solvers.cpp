@@ -203,7 +203,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
         std::map<std::string, std::string> properties;
 
-        properties["KISAO:0000476"] = "Newton";
+        properties["Iteration type"] = "Newton";
 
         EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForNewton);
 
@@ -236,7 +236,7 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
         EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForNewtonTfqmr);
 
         properties["KISAO:0000477"] = "GMRES";
-        properties["KISAO:0000478"] = "None";
+        properties["Preconditioner"] = "None";
 
         EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForNewtonGmresNone);
 
