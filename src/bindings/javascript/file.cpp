@@ -48,8 +48,8 @@ void fileApi()
                   }));
 
     EM_ASM({
-        Module['File']['Type'] = Module['File.Type'];
+        Module["File"]["Type"] = Module["File.Type"];
 
-        delete Module['File.Type'];
+        delete Module["File.Type"];
     });
 }

@@ -15,19 +15,25 @@ limitations under the License.
 */
 
 import libOpenCOR from "./libopencor.js";
+import { expectHiddenProperties } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
+const noProperties = new libopencor.Properties();
+const noHiddenProperties = new libopencor.HiddenProperties();
+
 export function checkCvodeSolver(solverInfo) {
+  // Properties.
+
   expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
   expect(solverInfo.id()).toBe("KISAO:0000019");
   expect(solverInfo.name()).toBe("CVODE");
 
-  const properties = solverInfo.properties();
+  const solverInfoProperties = solverInfo.properties();
 
-  expect(properties.size()).toBe(11);
+  expect(solverInfoProperties.size()).toBe(11);
 
-  let property = properties.get(0);
+  let property = solverInfoProperties.get(0);
 
   expect(property.type().value).toBe(
     libopencor.SolverProperty.Type.DoubleGe0.value,
@@ -41,7 +47,7 @@ export function checkCvodeSolver(solverInfo) {
 
   expect(listValues.size()).toBe(0);
 
-  property = properties.get(1);
+  property = solverInfoProperties.get(1);
 
   expect(property.type().value).toBe(
     libopencor.SolverProperty.Type.IntegerGt0.value,
@@ -55,9 +61,11 @@ export function checkCvodeSolver(solverInfo) {
 
   expect(listValues.size()).toBe(0);
 
-  property = properties.get(2);
+  property = solverInfoProperties.get(2);
 
-  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
+  expect(property.type().value).toBe(
+    libopencor.SolverProperty.Type.List.value,
+  );
   expect(property.id()).toBe("KISAO:0000475");
   expect(property.name()).toBe("Integration method");
   expect(property.defaultValue()).toBe("BDF");
@@ -69,9 +77,11 @@ export function checkCvodeSolver(solverInfo) {
   expect(listValues.get(0)).toBe("Adams-Moulton");
   expect(listValues.get(1)).toBe("BDF");
 
-  property = properties.get(3);
+  property = solverInfoProperties.get(3);
 
-  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
+  expect(property.type().value).toBe(
+    libopencor.SolverProperty.Type.List.value,
+  );
   expect(property.id()).toBe("KISAO:0000476");
   expect(property.name()).toBe("Iteration type");
   expect(property.defaultValue()).toBe("Newton");
@@ -83,9 +93,11 @@ export function checkCvodeSolver(solverInfo) {
   expect(listValues.get(0)).toBe("Functional");
   expect(listValues.get(1)).toBe("Newton");
 
-  property = properties.get(4);
+  property = solverInfoProperties.get(4);
 
-  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
+  expect(property.type().value).toBe(
+    libopencor.SolverProperty.Type.List.value,
+  );
   expect(property.id()).toBe("KISAO:0000477");
   expect(property.name()).toBe("Linear solver");
   expect(property.defaultValue()).toBe("Dense");
@@ -101,9 +113,11 @@ export function checkCvodeSolver(solverInfo) {
   expect(listValues.get(4)).toBe("BiCGStab");
   expect(listValues.get(5)).toBe("TFQMR");
 
-  property = properties.get(5);
+  property = solverInfoProperties.get(5);
 
-  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
+  expect(property.type().value).toBe(
+    libopencor.SolverProperty.Type.List.value,
+  );
   expect(property.id()).toBe("KISAO:0000478");
   expect(property.name()).toBe("Preconditioner");
   expect(property.defaultValue()).toBe("Banded");
@@ -115,7 +129,7 @@ export function checkCvodeSolver(solverInfo) {
   expect(listValues.get(0)).toBe("None");
   expect(listValues.get(1)).toBe("Banded");
 
-  property = properties.get(6);
+  property = solverInfoProperties.get(6);
 
   expect(property.type().value).toBe(
     libopencor.SolverProperty.Type.IntegerGe0.value,
@@ -129,7 +143,7 @@ export function checkCvodeSolver(solverInfo) {
 
   expect(listValues.size()).toBe(0);
 
-  property = properties.get(7);
+  property = solverInfoProperties.get(7);
 
   expect(property.type().value).toBe(
     libopencor.SolverProperty.Type.IntegerGe0.value,
@@ -143,7 +157,7 @@ export function checkCvodeSolver(solverInfo) {
 
   expect(listValues.size()).toBe(0);
 
-  property = properties.get(8);
+  property = solverInfoProperties.get(8);
 
   expect(property.type().value).toBe(
     libopencor.SolverProperty.Type.DoubleGe0.value,
@@ -157,7 +171,7 @@ export function checkCvodeSolver(solverInfo) {
 
   expect(listValues.size()).toBe(0);
 
-  property = properties.get(9);
+  property = solverInfoProperties.get(9);
 
   expect(property.type().value).toBe(
     libopencor.SolverProperty.Type.DoubleGe0.value,
@@ -171,7 +185,7 @@ export function checkCvodeSolver(solverInfo) {
 
   expect(listValues.size()).toBe(0);
 
-  property = properties.get(10);
+  property = solverInfoProperties.get(10);
 
   expect(property.type().value).toBe(
     libopencor.SolverProperty.Type.Boolean.value,
@@ -184,9 +198,163 @@ export function checkCvodeSolver(solverInfo) {
   listValues = property.listValues();
 
   expect(listValues.size()).toBe(0);
+
+  // Hidden properties.
+
+  const hiddenPropertiesForNewton = noHiddenProperties;
+  const hiddenPropertiesForNewtonDense = [
+    "KISAO:0000478",
+    "KISAO:0000479",
+    "KISAO:0000480",
+  ];
+  const hiddenPropertiesForNewtonBanded = ["KISAO:0000478"];
+  const hiddenPropertiesForNewtonGmres = noHiddenProperties;
+  const hiddenPropertiesForNewtonGmresNone = [
+    "KISAO:0000479",
+    "KISAO:0000480",
+  ];
+  const hiddenPropertiesForNewtonGmresBanded = noHiddenProperties;
+  const hiddenPropertiesForNewtonBicgstab = noHiddenProperties;
+  const hiddenPropertiesForNewtonBicgstabNone =
+    hiddenPropertiesForNewtonGmresNone;
+  const hiddenPropertiesForNewtonBicgstabBanded = noHiddenProperties;
+  const hiddenPropertiesForNewtonTfqmr = noHiddenProperties;
+  const hiddenPropertiesForNewtonTfqmrNone =
+    hiddenPropertiesForNewtonGmresNone;
+  const hiddenPropertiesForNewtonTfqmrBanded = noHiddenProperties;
+  const hiddenPropertiesForNewtonDiagonal = hiddenPropertiesForNewtonDense;
+  const hiddenPropertiesForFunctional = [
+    "KISAO:0000477",
+    "KISAO:0000478",
+    "KISAO:0000479",
+    "KISAO:0000480",
+  ];
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(noProperties),
+    noHiddenProperties,
+  );
+
+  let properties = new libopencor.Properties();
+
+  properties.set("Iteration type", "Newton");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewton,
+  );
+
+  properties.set("KISAO:0000477", "Dense");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonDense,
+  );
+
+  properties.set("Linear solver", "Banded");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonDense,
+  );
+
+  properties.set("KISAO:0000477", "Banded");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonBanded,
+  );
+
+  properties.set("KISAO:0000477", "Diagonal");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonDiagonal,
+  );
+
+  properties.set("KISAO:0000477", "GMRES");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonGmres,
+  );
+
+  properties.set("KISAO:0000477", "BiCGStab");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonBicgstab,
+  );
+
+  properties.set("KISAO:0000477", "TFQMR");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonTfqmr,
+  );
+
+  properties.set("KISAO:0000477", "GMRES");
+  properties.set("Preconditioner", "None");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonGmresNone,
+  );
+
+  properties.set("KISAO:0000477", "BiCGStab");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonBicgstabNone,
+  );
+
+  properties.set("KISAO:0000477", "TFQMR");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonTfqmrNone,
+  );
+
+  properties.set("KISAO:0000477", "GMRES");
+  properties.set("KISAO:0000478", "Banded");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonGmresBanded,
+  );
+
+  properties.set("KISAO:0000477", "BiCGStab");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonBicgstabBanded,
+  );
+
+  properties.set("KISAO:0000477", "TFQMR");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForNewtonTfqmrBanded,
+  );
+
+  properties.set("KISAO:0000476", "Functional");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForFunctional,
+  );
+
+  properties.set("Iteration type", "Newton");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForFunctional,
+  );
 }
 
 export function checkForwardEulerSolver(solverInfo) {
+  // Properties.
+
   expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
   expect(solverInfo.id()).toBe("KISAO:0000030");
   expect(solverInfo.name()).toBe("Forward Euler");
@@ -208,9 +376,18 @@ export function checkForwardEulerSolver(solverInfo) {
   const listValues = property.listValues();
 
   expect(listValues.size()).toBe(0);
+
+  // Hidden properties.
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(noProperties),
+    noHiddenProperties,
+  );
 }
 
 export function checkFourthOrderRungeKuttaSolver(solverInfo) {
+  // Properties.
+
   expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
   expect(solverInfo.id()).toBe("KISAO:0000032");
   expect(solverInfo.name()).toBe("Fourth-order Runge-Kutta");
@@ -232,9 +409,18 @@ export function checkFourthOrderRungeKuttaSolver(solverInfo) {
   const listValues = property.listValues();
 
   expect(listValues.size()).toBe(0);
+
+  // Hidden properties.
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(noProperties),
+    noHiddenProperties,
+  );
 }
 
 export function checkHeunSolver(solverInfo) {
+  // Properties.
+
   expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
   expect(solverInfo.id()).toBe("KISAO:0000301");
   expect(solverInfo.name()).toBe("Heun");
@@ -256,9 +442,18 @@ export function checkHeunSolver(solverInfo) {
   const listValues = property.listValues();
 
   expect(listValues.size()).toBe(0);
+
+  // Hidden properties.
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(noProperties),
+    noHiddenProperties,
+  );
 }
 
 export function checkSecondOrderRungeKuttaSolver(solverInfo) {
+  // Properties.
+
   expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
   expect(solverInfo.id()).toBe("KISAO:0000381");
   expect(solverInfo.name()).toBe("Second-order Runge-Kutta");
@@ -280,4 +475,11 @@ export function checkSecondOrderRungeKuttaSolver(solverInfo) {
   const listValues = property.listValues();
 
   expect(listValues.size()).toBe(0);
+
+  // Hidden properties.
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(noProperties),
+    noHiddenProperties,
+  );
 }

@@ -20,12 +20,19 @@ void solverApi()
 {
     // SolverInfo API.
 
+    EM_ASM({
+        Module["HiddenProperties"] = Module["Strings"];
+    });
+
+    emscripten::register_map<std::string, std::string>("Properties");
+
     emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
         .smart_ptr<libOpenCOR::SolverInfoPtr>("SolverInfo")
         .function("type", &libOpenCOR::SolverInfo::type)
         .function("id", &libOpenCOR::SolverInfo::id)
         .function("name", &libOpenCOR::SolverInfo::name)
-        .function("properties", &libOpenCOR::SolverInfo::properties);
+        .function("properties", &libOpenCOR::SolverInfo::properties)
+        .function("hiddenProperties", &libOpenCOR::SolverInfo::hiddenProperties);
 
     emscripten::register_vector<libOpenCOR::SolverInfoPtr>("SolversInfo");
 
@@ -53,9 +60,9 @@ void solverApi()
     emscripten::register_vector<libOpenCOR::SolverPropertyPtr>("SolverProperties");
 
     EM_ASM({
-        Module['SolverProperty']['Type'] = Module['SolverProperty.Type'];
+        Module["SolverProperty"]["Type"] = Module["SolverProperty.Type"];
 
-        delete Module['SolverProperty.Type'];
+        delete Module["SolverProperty.Type"];
     });
 
     // Solver API.
@@ -63,8 +70,6 @@ void solverApi()
     emscripten::enum_<libOpenCOR::Solver::Type>("Solver.Type")
         .value("ODE", libOpenCOR::Solver::Type::ODE)
         .value("NLA", libOpenCOR::Solver::Type::NLA);
-
-    emscripten::register_map<std::string, std::string>("Properties");
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
@@ -76,8 +81,8 @@ void solverApi()
         .function("setProperties", &libOpenCOR::Solver::setProperties);
 
     EM_ASM({
-        Module['Solver']['Type'] = Module['Solver.Type'];
+        Module["Solver"]["Type"] = Module["Solver.Type"];
 
-        delete Module['Solver.Type'];
+        delete Module["Solver.Type"];
     });
 }

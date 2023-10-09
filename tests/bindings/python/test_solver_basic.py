@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import Solver, SolverProperty
+from libopencor import Solver
 from solvers import (
     check_cvode_solver,
     check_forward_euler_solver,
