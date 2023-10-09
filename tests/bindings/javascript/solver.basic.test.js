@@ -378,8 +378,8 @@ describe("Solver basic tests", () => {
     let properties = solver.properties();
 
     expect(solver.properties().size()).toBe(1);
-    expect(solver.property("Step")).toBe("1");
     expect(solver.property("KISAO:0000483")).toBe("1");
+    expect(solver.property("Step")).toBe("1");
 
     solver.setProperty("Step", "1.23");
 

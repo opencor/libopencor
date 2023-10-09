@@ -345,8 +345,8 @@ def test_properties():
     properties = solver.properties
 
     assert len(solver.properties) == 1
-    assert solver.property("Step") == "1"
     assert solver.property("KISAO:0000483") == "1"
+    assert solver.property("Step") == "1"
 
     solver.set_property("Step", "1.23")
 

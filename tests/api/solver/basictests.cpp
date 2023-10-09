@@ -116,8 +116,8 @@ TEST(BasicSolverTest, properties)
     auto properties = solver->properties();
 
     EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "1");
     EXPECT_EQ(solver->property("KISAO:0000483"), "1");
+    EXPECT_EQ(solver->property("Step"), "1");
 
     solver->setProperty("Step", "1.23");
 
