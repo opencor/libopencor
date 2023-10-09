@@ -65,8 +65,8 @@ public:
      * Factory method to create a @ref Solver object which (KiSAO) id or name is given:
      *
      * ```
-     * auto anotherCvodeSolver = libOpenCOR::Solver::create("KISAO:0000019");
-     * auto cvodeSolver = libOpenCOR::Solver::create("CVODE");
+     * auto cvodeSolver = libOpenCOR::Solver::create("KISAO:0000019");
+     * auto anotherCvodeSolver = libOpenCOR::Solver::create("CVODE");
      * ```
      *
      * The following <a href="https://en.wikipedia.org/wiki/Ordinary_differential_equation">ODE</a> solvers can be created:
@@ -128,7 +128,7 @@ public:
     /**
      * @brief Set the value of a property of this solver.
      *
-     * Set the value of a property, which (KiSAO) ID or name is given, of this solver. If the name or KiSAO ID is not
+     * Set the value of a property, which (KiSAO) id or name is given, of this solver. If the (KiSAO) id or name is not
      * supported by this solver then nothing is done.
      *
      * @param pIdOrName The (KiSAO) id or name, as a @c std::string, of a property of this solver.
@@ -150,9 +150,9 @@ public:
     /**
      * @brief Set the properties of this solver.
      *
-     * Set the properties of this solver. If the (KiSAO) ID or name of a property is not supported by this solver then
-     * nothing is done. If @p pProperties has an entry for both the (KiSAO) ID and name of a property then the (KiSAO)
-     * ID entry is used.
+     * Set the properties of this solver. If the (KiSAO) id or name of a property is not supported by this solver then
+     * nothing is done. If @p pProperties has an entry for both the (KiSAO) id and name of a property then the (KiSAO)
+     * id entry is used.
      *
      * @param pProperties The properties, as a @c std::map of @c std::string, of this solver.
      */
