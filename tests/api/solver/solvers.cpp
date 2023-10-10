@@ -297,7 +297,7 @@ void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     // Hidden properties.
 
-    EXPECT_TRUE(pSolverInfo->hiddenProperties(NoProperties).empty());
+    EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(NoProperties), NoHiddenProperties);
 }
 
 void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
