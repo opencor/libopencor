@@ -21,7 +21,7 @@ if(LIBOPENCOR_COMPILER_CACHING)
     elseif(CLCACHE_EXE)
         set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
 
-        execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/clcachewrapper.c
+        execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_SOURCE_DIR}/cmake/clcachewrapper.c
                         RESULT_VARIABLE RESULT
                         OUTPUT_QUIET ERROR_QUIET)
 
