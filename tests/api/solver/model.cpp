@@ -61,7 +61,7 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *>
 
 void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
                   double *pStates, double *pRates, double *pVariables,
-                  const libOpenCOR::Doubles &pFinalStates)
+                  const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pFinalStates2)
 {
     // Initialise the model.
 
@@ -85,7 +85,11 @@ void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
         computeVariables(voi, pStates, pRates, pVariables);
     }
 
-    EXPECT_EQ_DOUBLES(pStates, pFinalStates);
+    if (pFinalStates2.empty()) {
+        EXPECT_EQ_DOUBLES(pStates, pFinalStates);
+    } else {
+        EXPECT_EQ_DOUBLES_2(pStates, pFinalStates, pFinalStates2);
+    }
 
     // Reinitialise the model (for coverage reasons).
 

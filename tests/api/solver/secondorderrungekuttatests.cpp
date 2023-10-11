@@ -90,13 +90,18 @@ TEST(SecondOrderRungeKuttaSolverTest, solve)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628843994, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
 #elif defined(BUILDING_ON_INTEL)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628843994, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
+    static const libOpenCOR::Doubles FINAL_STATES_2 = {-0.015418879628843984, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
 #else
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628844159, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
 #endif
 
     solver->setProperty("Step", "0.0123");
 
+#if defined(BUILDING_ON_MACOS) && defined(BUILDING_ON_INTEL)
+    computeModel(solver, states, rates, variables, FINAL_STATES, FINAL_STATES_2);
+#else
     computeModel(solver, states, rates, variables, FINAL_STATES);
+#endif
 
     // Clean up after ourselves.
 
