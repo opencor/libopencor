@@ -23,7 +23,7 @@ SolverPtr SolverUnknown::Impl::create()
 #ifdef COVERAGE_ENABLED
     auto res = std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
 
-    res->pimpl()->propertiesKisaoId(); // Just for code coverage.
+    res->pimpl()->propertiesId(); // Just for code coverage.
 
     return res;
 #else
@@ -52,5 +52,10 @@ const SolverUnknown::Impl *SolverUnknown::pimpl() const
     return static_cast<const Impl *>(Solver::pimpl());
 }
 */
+
+SolverInfoPtr SolverUnknown::info() const
+{
+    return nullptr;
+}
 
 } // namespace libOpenCOR

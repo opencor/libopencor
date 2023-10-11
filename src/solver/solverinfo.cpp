@@ -18,24 +18,26 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverInfoPtr SolverInfo::Impl::create(Solver::Type pType, const std::string &pName, const std::string &pKisaoId,
-                                       const std::vector<SolverPropertyPtr> &pProperties)
+SolverInfoPtr SolverInfo::Impl::create(Solver::Type pType, const std::string &pId, const std::string &pName,
+                                       const SolverPropertyPtrVector &pProperties,
+                                       HiddenPropertiesFunction pHiddenProperties)
 {
-    return SolverInfoPtr {new SolverInfo {pType, pName, pKisaoId, pProperties}};
+    return SolverInfoPtr {new SolverInfo {pType, pId, pName, pProperties, pHiddenProperties}};
 }
 
-SolverInfo::Impl::Impl(Solver::Type pType, const std::string &pName, const std::string &pKisaoId,
-                       const std::vector<SolverPropertyPtr> &pProperties)
+SolverInfo::Impl::Impl(Solver::Type pType, const std::string &pId, const std::string &pName,
+                       const SolverPropertyPtrVector &pProperties, HiddenPropertiesFunction pHiddenProperties)
     : mType(pType)
+    , mId(pId)
     , mName(pName)
-    , mKisaoId(pKisaoId)
     , mProperties(pProperties)
+    , mHiddenProperties(pHiddenProperties)
 {
 }
 
-SolverInfo::SolverInfo(Solver::Type pType, const std::string &pName, const std::string &pKisaoId,
-                       const std::vector<SolverPropertyPtr> &pProperties)
-    : mPimpl(new Impl(pType, pName, pKisaoId, pProperties))
+SolverInfo::SolverInfo(Solver::Type pType, const std::string &pId, const std::string &pName,
+                       const SolverPropertyPtrVector &pProperties, HiddenPropertiesFunction pHiddenProperties)
+    : mPimpl(new Impl(pType, pId, pName, pProperties, pHiddenProperties))
 {
 }
 
@@ -51,19 +53,24 @@ Solver::Type SolverInfo::type() const
     return mPimpl->mType;
 }
 
+std::string SolverInfo::id() const
+{
+    return mPimpl->mId;
+}
+
 std::string SolverInfo::name() const
 {
     return mPimpl->mName;
 }
 
-std::string SolverInfo::kisaoId() const
-{
-    return mPimpl->mKisaoId;
-}
-
-std::vector<SolverPropertyPtr> SolverInfo::properties() const
+SolverPropertyPtrVector SolverInfo::properties() const
 {
     return mPimpl->mProperties;
+}
+
+StringVector SolverInfo::hiddenProperties(const StringStringMap &pProperties) const
+{
+    return mPimpl->mHiddenProperties(pProperties);
 }
 
 } // namespace libOpenCOR

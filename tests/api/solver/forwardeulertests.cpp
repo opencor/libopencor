@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "model.h"
 #include "solverforwardeuler.h"
+#include "solvers.h"
 #include "utils.h"
 
 #include "gtest/gtest.h"
@@ -24,7 +25,14 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
+TEST(ForwardEulerSolverTest, basic)
+{
+    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Forward Euler"));
+
+    checkForwardEulerSolver(solver->info());
+}
+
+TEST(ForwardEulerSolverTest, stepValueWithNonNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -38,7 +46,7 @@ TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
 
     solver->setProperty("Step", "abc");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     // Clean up after ourselves.
@@ -46,7 +54,7 @@ TEST(ForwardEulerSolverTest, nonFloatingPointStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(ForwardEulerSolverTest, invalidStepValue)
+TEST(ForwardEulerSolverTest, stepValueWithInvalidNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -60,7 +68,7 @@ TEST(ForwardEulerSolverTest, invalidStepValue)
 
     solver->setProperty("Step", "0.0");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     // Clean up after ourselves.
@@ -68,15 +76,14 @@ TEST(ForwardEulerSolverTest, invalidStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(ForwardEulerSolverTest, main)
+TEST(ForwardEulerSolverTest, solve)
 {
     // Create and initialise our various arrays and create our solver.
 
     const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Forward Euler");
 
-    // Customise and initialise our solver and compute it.
+    // Customise our solver and compute our model.
 
-    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
 #if defined(BUILDING_ON_WINDOWS)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762314604, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
 #elif defined(BUILDING_ON_LINUX)
@@ -88,9 +95,6 @@ TEST(ForwardEulerSolverTest, main)
 #endif
 
     solver->setProperty("Step", "0.0123");
-
-    EXPECT_TRUE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
-    EXPECT_EQ_DOUBLES(states, INITIAL_STATES);
 
     computeModel(solver, states, rates, variables, FINAL_STATES);
 

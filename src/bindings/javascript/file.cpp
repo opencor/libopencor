@@ -44,12 +44,12 @@ void fileApi()
         .function("setContents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis, uintptr_t pContents, size_t pSize) {
                       auto contents = reinterpret_cast<unsigned char *>(pContents);
 
-                      pThis->setContents(std::vector<unsigned char>(contents, contents + pSize));
+                      pThis->setContents(libOpenCOR::UnsignedCharVector(contents, contents + pSize));
                   }));
 
     EM_ASM({
-        Module['File']['Type'] = Module['File.Type'];
+        Module["File"]["Type"] = Module["File.Type"];
 
-        delete Module['File.Type'];
+        delete Module["File.Type"];
     });
 }

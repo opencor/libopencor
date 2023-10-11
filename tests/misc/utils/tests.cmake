@@ -12,23 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(TEST solver)
+set(TEST utils)
 
 list(APPEND TESTS ${TEST})
 
-set(${TEST}_CATEGORY api)
+set(${TEST}_CATEGORY misc)
 set(${TEST}_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/coveragetests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/cvodetests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/forwardeulertests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/fourthorderrungekuttatests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/heuntests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/model.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/secondorderrungekuttatests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/solvers.cpp
-)
-set(${TEST}_HEADER_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/model.h
-    ${CMAKE_CURRENT_LIST_DIR}/solvers.h
 )

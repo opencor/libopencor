@@ -18,22 +18,20 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverProperty::Impl::Impl(Type pType, const std::string &pName, const std::string &pKisaoId,
-                           const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
-                           bool pHasVoiUnit)
+SolverProperty::Impl::Impl(Type pType, const std::string &pId, const std::string &pName,
+                           const StringVector &pListValues, const std::string &pDefaultValue, bool pHasVoiUnit)
     : mType(pType)
+    , mId(pId)
     , mName(pName)
-    , mKisaoId(pKisaoId)
     , mListValues(pListValues)
     , mDefaultValue(pDefaultValue)
     , mHasVoiUnit(pHasVoiUnit)
 {
 }
 
-SolverProperty::SolverProperty(Type pType, const std::string &pName, const std::string &pKisaoId,
-                               const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
-                               bool pHasVoiUnit)
-    : mPimpl(new Impl(pType, pName, pKisaoId, pListValues, pDefaultValue, pHasVoiUnit))
+SolverProperty::SolverProperty(Type pType, const std::string &pId, const std::string &pName,
+                               const StringVector &pListValues, const std::string &pDefaultValue, bool pHasVoiUnit)
+    : mPimpl(new Impl(pType, pId, pName, pListValues, pDefaultValue, pHasVoiUnit))
 {
 }
 
@@ -49,17 +47,17 @@ SolverProperty::Type SolverProperty::type() const
     return mPimpl->mType;
 }
 
+std::string SolverProperty::id() const
+{
+    return mPimpl->mId;
+}
+
 std::string SolverProperty::name() const
 {
     return mPimpl->mName;
 }
 
-std::string SolverProperty::kisaoId() const
-{
-    return mPimpl->mKisaoId;
-}
-
-std::vector<std::string> SolverProperty::listValues() const
+StringVector SolverProperty::listValues() const
 {
     return mPimpl->mListValues;
 }

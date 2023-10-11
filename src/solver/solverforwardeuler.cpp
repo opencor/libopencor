@@ -19,25 +19,36 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-const std::string SolverForwardEuler::Impl::NAME = "Forward Euler"; // NOLINT
-const std::string SolverForwardEuler::Impl::KISAO_ID = "KISAO:0000030"; // NOLINT
+// Properties information.
 
+const std::string SolverForwardEuler::Impl::ID = "KISAO:0000030"; // NOLINT
+const std::string SolverForwardEuler::Impl::NAME = "Forward Euler"; // NOLINT
+
+const std::string SolverForwardEuler::Impl::STEP_ID = "KISAO:0000483"; // NOLINT
 const std::string SolverForwardEuler::Impl::STEP_NAME = "Step"; // NOLINT
-const std::string SolverForwardEuler::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
+
+// Solver.
 
 SolverPtr SolverForwardEuler::Impl::create()
 {
     return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};
 }
 
-std::vector<SolverPropertyPtr> SolverForwardEuler::Impl::propertiesInfo()
+SolverPropertyPtrVector SolverForwardEuler::Impl::propertiesInfo()
 {
     return {
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_NAME, STEP_KISAO_ID,
+        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
                                      {},
-                                     std::to_string(STEP_DEFAULT_VALUE),
+                                     toString(STEP_DEFAULT_VALUE),
                                      true),
     };
+}
+
+StringVector SolverForwardEuler::Impl::hiddenProperties(const StringStringMap &pProperties)
+{
+    (void)pProperties;
+
+    return {};
 }
 
 SolverForwardEuler::Impl::Impl()
@@ -45,39 +56,38 @@ SolverForwardEuler::Impl::Impl()
 {
     mIsValid = true;
 
-    mProperties[STEP_KISAO_ID] = std::to_string(STEP_DEFAULT_VALUE);
+    mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
 }
 
-std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesKisaoId() const
+StringStringMap SolverForwardEuler::Impl::propertiesId() const
 {
-    static const std::map<std::string, std::string> PROPERTIES_KISAO_ID = {
-        {STEP_NAME, STEP_KISAO_ID},
+    static const StringStringMap PROPERTIES_ID = {
+        {STEP_NAME, STEP_ID},
     };
 
-    return PROPERTIES_KISAO_ID;
+    return PROPERTIES_ID;
 }
 
-bool SolverForwardEuler::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                          ComputeRates pComputeRates)
+bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                          double *pVariables, ComputeRates pComputeRates)
 {
     removeAllIssues();
 
     // Retrieve the solver's properties.
 
     bool ok = true;
-    auto step = stringToDouble(mProperties[STEP_KISAO_ID], ok);
 
-    if (ok && (step > 0.0)) {
-        mStep = step;
-    } else {
-        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_KISAO_ID] + R"("). It must be a floating point number greater than zero.)");
+    mStep = toDouble(mProperties[STEP_ID], ok);
+
+    if (!ok || (mStep <= 0.0)) {
+        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_ID] + R"("). It must be a floating point number greater than zero.)");
 
         return false;
     }
 
     // Initialise the ODE solver itself.
 
-    return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
@@ -136,10 +146,15 @@ const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-bool SolverForwardEuler::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+SolverInfoPtr SolverForwardEuler::info() const
+{
+    return Solver::solversInfo()[1];
+}
+
+bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                     ComputeRates pComputeRates)
 {
-    return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverForwardEuler::solve(double &pVoi, double pVoiEnd) const

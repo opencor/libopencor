@@ -24,16 +24,21 @@ namespace libOpenCOR {
 class SolverFourthOrderRungeKutta::Impl: public SolverOde::Impl
 {
 public:
-    static const Solver::Type TYPE = Solver::Type::ODE;
-    static const std::string NAME;
-    static const std::string KISAO_ID;
+    // Properties information.
 
+    static const Solver::Type TYPE = Solver::Type::ODE;
+    static const std::string ID;
+    static const std::string NAME;
+
+    static const std::string STEP_ID;
     static const std::string STEP_NAME;
-    static const std::string STEP_KISAO_ID;
     static constexpr double STEP_DEFAULT_VALUE = 1.0;
 
+    // Solver.
+
     static SolverPtr create();
-    static std::vector<SolverPropertyPtr> propertiesInfo();
+    static SolverPropertyPtrVector propertiesInfo();
+    static StringVector hiddenProperties(const StringStringMap &pProperties);
 
     double mStep = STEP_DEFAULT_VALUE;
 
@@ -45,10 +50,11 @@ public:
     explicit Impl();
     ~Impl() override;
 
-    std::map<std::string, std::string> propertiesKisaoId() const override;
+    StringStringMap propertiesId() const override;
 
-    bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    SolverOde::ComputeRates pComputeRates) override;
+    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+                    ComputeRates pComputeRates) override;
+
     bool solve(double &pVoi, double pVoiEnd) const override;
 };
 

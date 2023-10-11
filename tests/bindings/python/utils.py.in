@@ -64,6 +64,13 @@ def assert_issues(logger, expected_issues):
         assert issues[i].description == expected_issues[i][1]
 
 
+def assert_hidden_properties(hidden_properties, expected_hidden_properties):
+    assert len(hidden_properties) == len(expected_hidden_properties)
+
+    for i in range(len(hidden_properties)):
+        assert hidden_properties[i] == expected_hidden_properties[i]
+
+
 def resource_path(relative_path=""):
     return RESOURCE_LOCATION + "/" + relative_path
 

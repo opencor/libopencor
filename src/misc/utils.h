@@ -18,11 +18,36 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
+#include "libopencor/types.h"
+
+#ifndef NDEBUG
+#    include <cassert>
+#endif
 #include <filesystem>
+#include <map>
 #include <string>
 #include <vector>
 
 namespace libOpenCOR {
+
+using ConstCharPtrVector = std::vector<const char *>;
+using FileVector = std::vector<File *>;
+
+using SolverCreate = SolverPtr (*)();
+
+using StringSolverCreateMap = std::map<std::string, SolverCreate>;
+
+#ifdef NDEBUG
+#    define ASSERT_EQ(x, y) \
+        (void)x; \
+        (void)y
+#    define ASSERT_NE(x, y) \
+        (void)x; \
+        (void)y
+#else
+#    define ASSERT_EQ(x, y) assert(x == y)
+#    define ASSERT_NE(x, y) assert(x != y)
+#endif
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
@@ -39,11 +64,18 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 
-std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath);
+UnsignedCharVector fileContents(const std::filesystem::path &pFilePath);
 #endif
 
-std::string contentsAsString(const std::vector<unsigned char> &pContents);
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(bool pBoolean);
+std::string toString(int pNumber);
+std::string toString(size_t pNumber);
+std::string toString(double pNumber);
+std::string toString(const UnsignedCharVector &pBytes);
 
-double stringToDouble(const std::string &pString, bool &pOk);
+bool toBool(const std::string &pString, bool &pOk);
+int LIBOPENCOR_UNIT_TESTING_EXPORT toInt(const std::string &pString, bool &pOk);
+size_t LIBOPENCOR_UNIT_TESTING_EXPORT toSizeT(const std::string &pString, bool &pOk);
+double LIBOPENCOR_UNIT_TESTING_EXPORT toDouble(const std::string &pString, bool &pOk);
 
 } // namespace libOpenCOR

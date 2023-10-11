@@ -18,9 +18,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-bool SolverOde::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                  ComputeRates pComputeRates)
 {
+    (void)pVoi;
+
     mSize = pSize;
 
     mStates = pStates;
@@ -28,6 +30,13 @@ bool SolverOde::Impl::initialise(size_t pSize, double *pStates, double *pRates, 
     mVariables = pVariables;
 
     mComputeRates = pComputeRates;
+
+    return true;
+}
+
+bool SolverOde::Impl::reinitialise(double pVoi)
+{
+    (void)pVoi;
 
     return true;
 }
@@ -45,6 +54,11 @@ SolverOde::Impl *SolverOde::pimpl()
 const SolverOde::Impl *SolverOde::pimpl() const
 {
     return static_cast<const Impl *>(Solver::pimpl());
+}
+
+bool SolverOde::reinitialise(double pVoi)
+{
+    return pimpl()->reinitialise(pVoi);
 }
 
 } // namespace libOpenCOR
