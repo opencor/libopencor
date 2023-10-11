@@ -15,118 +15,26 @@ limitations under the License.
 */
 
 import libOpenCOR from "./libopencor.js";
-
-const libopencor = await libOpenCOR();
+import {
+  libopencor,
+  checkCvodeSolver,
+  checkForwardEulerSolver,
+  checkFourthOrderRungeKuttaSolver,
+  checkHeunSolver,
+  checkSecondOrderRungeKuttaSolver,
+} from "./solvers.js";
 
 describe("Solver basic tests", () => {
   test("Solvers info", () => {
     const solversInfo = libopencor.Solver.solversInfo();
 
-    expect(solversInfo.size()).toBe(4);
+    expect(solversInfo.size()).toBe(5);
 
-    // Forward Euler.
-
-    let solverInfo = solversInfo.get(0);
-
-    expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.name()).toBe("Forward Euler");
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000030");
-
-    let properties = solverInfo.properties();
-
-    expect(properties.size()).toBe(1);
-
-    let property = properties.get(0);
-
-    expect(property.type().value).toBe(
-      libopencor.SolverProperty.Type.DoubleGt0.value,
-    );
-    expect(property.name()).toBe("Step");
-    expect(property.kisaoId()).toBe("KISAO:0000483");
-    expect(property.defaultValue()).toBe("1.000000");
-    expect(property.hasVoiUnit()).toBe(true);
-
-    let listValues = property.listValues();
-
-    expect(listValues.size()).toBe(0);
-
-    // Fourth-order Runge-Kutta.
-
-    solverInfo = solversInfo.get(1);
-
-    expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.name()).toBe("Fourth-order Runge-Kutta");
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000032");
-
-    properties = solverInfo.properties();
-
-    expect(properties.size()).toBe(1);
-
-    property = properties.get(0);
-
-    expect(property.type().value).toBe(
-      libopencor.SolverProperty.Type.DoubleGt0.value,
-    );
-    expect(property.name()).toBe("Step");
-    expect(property.kisaoId()).toBe("KISAO:0000483");
-    expect(property.defaultValue()).toBe("1.000000");
-    expect(property.hasVoiUnit()).toBe(true);
-
-    listValues = property.listValues();
-
-    expect(listValues.size()).toBe(0);
-
-    // Heun.
-
-    solverInfo = solversInfo.get(2);
-
-    expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.name()).toBe("Heun");
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000301");
-
-    properties = solverInfo.properties();
-
-    expect(properties.size()).toBe(1);
-
-    property = properties.get(0);
-
-    expect(property.type().value).toBe(
-      libopencor.SolverProperty.Type.DoubleGt0.value,
-    );
-    expect(property.name()).toBe("Step");
-    expect(property.kisaoId()).toBe("KISAO:0000483");
-    expect(property.defaultValue()).toBe("1.000000");
-    expect(property.hasVoiUnit()).toBe(true);
-
-    listValues = property.listValues();
-
-    expect(listValues.size()).toBe(0);
-
-    // Second-order Runge-Kutta.
-
-    solverInfo = solversInfo.get(3);
-
-    expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solverInfo.name()).toBe("Second-order Runge-Kutta");
-    expect(solverInfo.kisaoId()).toBe("KISAO:0000381");
-
-    properties = solverInfo.properties();
-
-    expect(properties.size()).toBe(1);
-
-    property = properties.get(0);
-
-    expect(property.type().value).toBe(
-      libopencor.SolverProperty.Type.DoubleGt0.value,
-    );
-    expect(property.name()).toBe("Step");
-    expect(property.kisaoId()).toBe("KISAO:0000483");
-    expect(property.defaultValue()).toBe("1.000000");
-    expect(property.hasVoiUnit()).toBe(true);
-
-    listValues = property.listValues();
-
-    expect(listValues.size()).toBe(0);
+    checkCvodeSolver(solversInfo.get(0));
+    checkForwardEulerSolver(solversInfo.get(1));
+    checkFourthOrderRungeKuttaSolver(solversInfo.get(2));
+    checkHeunSolver(solversInfo.get(3));
+    checkSecondOrderRungeKuttaSolver(solversInfo.get(4));
   });
 
   test("Unknown solver", () => {
@@ -135,14 +43,32 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(false);
   });
 
+  test("CVODE by (KiSAO) id", () => {
+    const solver = new libopencor.Solver("KISAO:0000019");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("CVODE by name", () => {
+    const solver = new libopencor.Solver("CVODE");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("Forward Euler by (KiSAO) id", () => {
+    const solver = new libopencor.Solver("KISAO:0000030");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
   test("Forward Euler by name", () => {
     const solver = new libopencor.Solver("Forward Euler");
 
     expect(solver.isValid()).toBe(true);
   });
 
-  test("Forward Euler by KiSAO id", () => {
-    const solver = new libopencor.Solver("KISAO:0000030");
+  test("Fourth-order Runge-Kutta by (KiSAO) id", () => {
+    const solver = new libopencor.Solver("KISAO:0000032");
 
     expect(solver.isValid()).toBe(true);
   });
@@ -153,8 +79,8 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(true);
   });
 
-  test("Fourth-order Runge-Kutta by KiSAO id", () => {
-    const solver = new libopencor.Solver("KISAO:0000032");
+  test("Heun by (KiSAO) id", () => {
+    const solver = new libopencor.Solver("KISAO:0000301");
 
     expect(solver.isValid()).toBe(true);
   });
@@ -165,8 +91,8 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(true);
   });
 
-  test("Heun by KiSAO id", () => {
-    const solver = new libopencor.Solver("KISAO:0000301");
+  test("Second-order Runge-Kutta by (KiSAO) id", () => {
+    const solver = new libopencor.Solver("KISAO:0000381");
 
     expect(solver.isValid()).toBe(true);
   });
@@ -177,39 +103,70 @@ describe("Solver basic tests", () => {
     expect(solver.isValid()).toBe(true);
   });
 
-  test("Second-order Runge-Kutta by KiSAO id", () => {
-    const solver = new libopencor.Solver("KISAO:0000381");
-
-    expect(solver.isValid()).toBe(true);
-  });
-
   test("Properties", () => {
     const solver = new libopencor.Solver("Forward Euler");
-    const properties = solver.properties();
+    let properties = solver.properties();
 
     expect(solver.properties().size()).toBe(1);
-    expect(solver.property("Step")).toBe("1.000000");
-    expect(solver.property("KISAO:0000483")).toBe("1.000000");
+    expect(solver.property("KISAO:0000483")).toBe("1");
+    expect(solver.property("Step")).toBe("1");
 
-    solver.setProperty("Step", "1.2345");
+    solver.setProperty("Step", "1.23");
 
     expect(solver.properties().size()).toBe(1);
-    expect(solver.property("KISAO:0000483")).toBe("1.2345");
+    expect(solver.property("KISAO:0000483")).toBe("1.23");
 
     solver.setProperty("KISAO:0000483", "7.89");
 
     expect(solver.properties().size()).toBe(1);
     expect(solver.property("Step")).toBe("7.89");
 
-    solver.setProperty("Unknown property", "1.23");
+    solver.setProperty("Unknown", "1.23");
 
     expect(solver.properties().size()).toBe(1);
     expect(solver.property("Step")).toBe("7.89");
-    expect(solver.property("Unknown property")).toBe("");
+    expect(solver.property("Unknown")).toBe("");
+
+    properties.set("Step", "1.23");
+
+    expect(properties.size()).toBe(2);
 
     solver.setProperties(properties);
 
     expect(solver.properties().size()).toBe(1);
-    expect(solver.property("Step")).toBe("1.000000");
+    expect(solver.property("Step")).toBe("1");
+
+    properties.set("Unknown", "1.23");
+
+    expect(properties.size()).toBe(3);
+
+    solver.setProperties(properties);
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1");
+
+    properties.set("KISAO:0000483", "1.23");
+
+    expect(properties.size()).toBe(3);
+
+    solver.setProperties(properties);
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1.23");
+
+    // Note: here, we want to remove "KISAO:0000483" entry from properties, but it cannot be done using the JavaScript
+    // bindings, so we create a new Properties object instead and add the "Unknonwn" and "Step" entries to it.
+
+    properties = new libopencor.StringStringMap();
+
+    properties.set("Unknown", "1.23");
+    properties.set("Step", "1.23");
+
+    expect(properties.size()).toBe(2);
+
+    solver.setProperties(properties);
+
+    expect(solver.properties().size()).toBe(1);
+    expect(solver.property("Step")).toBe("1.23");
   });
 });

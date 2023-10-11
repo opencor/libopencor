@@ -23,11 +23,10 @@ void solverApi()
     emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
         .smart_ptr<libOpenCOR::SolverInfoPtr>("SolverInfo")
         .function("type", &libOpenCOR::SolverInfo::type)
+        .function("id", &libOpenCOR::SolverInfo::id)
         .function("name", &libOpenCOR::SolverInfo::name)
-        .function("kisaoId", &libOpenCOR::SolverInfo::kisaoId)
-        .function("properties", &libOpenCOR::SolverInfo::properties);
-
-    emscripten::register_vector<libOpenCOR::SolverInfoPtr>("SolversInfo");
+        .function("properties", &libOpenCOR::SolverInfo::properties)
+        .function("hiddenProperties", &libOpenCOR::SolverInfo::hiddenProperties);
 
     // SolverProperty API.
 
@@ -44,18 +43,16 @@ void solverApi()
     emscripten::class_<libOpenCOR::SolverProperty>("SolverProperty")
         .smart_ptr<libOpenCOR::SolverPropertyPtr>("SolverProperty")
         .function("type", &libOpenCOR::SolverProperty::type)
+        .function("id", &libOpenCOR::SolverProperty::id)
         .function("name", &libOpenCOR::SolverProperty::name)
-        .function("kisaoId", &libOpenCOR::SolverProperty::kisaoId)
         .function("listValues", &libOpenCOR::SolverProperty::listValues)
         .function("defaultValue", &libOpenCOR::SolverProperty::defaultValue)
         .function("hasVoiUnit", &libOpenCOR::SolverProperty::hasVoiUnit);
 
-    emscripten::register_vector<libOpenCOR::SolverPropertyPtr>("SolverProperties");
-
     EM_ASM({
-        Module['SolverProperty']['Type'] = Module['SolverProperty.Type'];
+        Module["SolverProperty"]["Type"] = Module["SolverProperty.Type"];
 
-        delete Module['SolverProperty.Type'];
+        delete Module["SolverProperty.Type"];
     });
 
     // Solver API.
@@ -64,20 +61,18 @@ void solverApi()
         .value("ODE", libOpenCOR::Solver::Type::ODE)
         .value("NLA", libOpenCOR::Solver::Type::NLA);
 
-    emscripten::register_map<std::string, std::string>("Properties");
-
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
         .class_function("solversInfo", &libOpenCOR::Solver::solversInfo)
         .function("isValid", &libOpenCOR::Solver::isValid)
-        .function("properties", &libOpenCOR::Solver::properties)
-        .function("setProperties", &libOpenCOR::Solver::setProperties)
         .function("property", &libOpenCOR::Solver::property)
-        .function("setProperty", &libOpenCOR::Solver::setProperty);
+        .function("setProperty", &libOpenCOR::Solver::setProperty)
+        .function("properties", &libOpenCOR::Solver::properties)
+        .function("setProperties", &libOpenCOR::Solver::setProperties);
 
     EM_ASM({
-        Module['Solver']['Type'] = Module['Solver.Type'];
+        Module["Solver"]["Type"] = Module["Solver.Type"];
 
-        delete Module['Solver.Type'];
+        delete Module["Solver.Type"];
     });
 }

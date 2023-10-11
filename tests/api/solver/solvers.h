@@ -16,26 +16,10 @@ limitations under the License.
 
 #pragma once
 
-#include "utils.h"
+#include <libopencor>
 
-#include "libopencor/file.h"
-
-#include <vector>
-
-namespace libOpenCOR {
-
-class FileManager
-{
-public:
-    static FileManager &instance();
-
-    void manage(File *pFile);
-    void unmanage(File *pFile);
-
-    FilePtr file(const std::string &pFileNameOrUrl) const;
-
-private:
-    FileVector mFiles;
-};
-
-} // namespace libOpenCOR
+void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);

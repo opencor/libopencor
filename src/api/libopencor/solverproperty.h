@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/export.h"
+#include "libopencor/types.h"
 
 namespace libOpenCOR {
 
@@ -69,61 +70,61 @@ public:
     SolverProperty &operator=(SolverProperty &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the type of the property.
+     * @brief Get the type of this property.
      *
-     * Return the type of the property.
+     * Return the type of this property.
      *
-     * @return The type, as a @ref Type, of the property.
+     * @return The type, as a @ref Type, of this property.
      */
 
     Type type() const;
 
     /**
-     * @brief Get the name of the property.
+     * @brief Get the (KiSAO) id of this property.
      *
-     * Return the name of the property.
+     * Return the (KiSAO) id of this property.
      *
-     * @return The name, as a @c std::string, of the property.
+     * @return The (KiSAO) id, as a @c std::string, of this property.
+     */
+
+    std::string id() const;
+
+    /**
+     * @brief Get the name of this property.
+     *
+     * Return the name of this property.
+     *
+     * @return The name, as a @c std::string, of this property.
      */
 
     std::string name() const;
 
     /**
-     * @brief Get the KiSAO id of the property.
+     * @brief Get the list of values this property can take.
      *
-     * Return the KiSAO id of the property.
+     * Return the name of the list of values this property can take.
      *
-     * @return The KiSAO id, as a @c std::string, of the property.
+     * @return The list of values, as a @ref StringVector, this property can take.
      */
 
-    std::string kisaoId() const;
+    StringVector listValues() const;
 
     /**
-     * @brief Get the list of values the property can take.
+     * @brief Get the default value of this property.
      *
-     * Return the name of the list of values the property can take.
+     * Return the default value of this property.
      *
-     * @return The list of values, as a @c std::vector of @c std::string, the property can take.
-     */
-
-    std::vector<std::string> listValues() const;
-
-    /**
-     * @brief Get the default value of the property.
-     *
-     * Return the default value of the property.
-     *
-     * @return The default value, as a @c std::string, of the property.
+     * @return The default value, as a @c std::string, of this property.
      */
 
     std::string defaultValue() const;
 
     /**
-     * @brief Get whether the property has the same unit as the variable of integration.
+     * @brief Get whether this property has the same unit as the variable of integration.
      *
-     * Return whether the property has the same unit as the variable of integration.
+     * Return whether this property has the same unit as the variable of integration.
      *
-     * @return Whether, as a @c bool, the property has the same unit as the variable of integration.
+     * @return Whether, as a @c bool, this property has the same unit as the variable of integration.
      */
 
     bool hasVoiUnit() const;
@@ -133,9 +134,8 @@ private:
 
     Impl *mPimpl;
 
-    explicit SolverProperty(Type pType, const std::string &pName, const std::string &pKisaoId,
-                            const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
-                            bool pHasVoiUnit);
+    explicit SolverProperty(Type pType, const std::string &pId, const std::string &pName,
+                            const StringVector &pListValues, const std::string &pDefaultValue, bool pHasVoiUnit);
 };
 
 } // namespace libOpenCOR

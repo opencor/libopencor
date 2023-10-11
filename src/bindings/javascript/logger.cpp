@@ -20,8 +20,6 @@ void loggerApi()
 {
     // Logger API.
 
-    emscripten::register_vector<libOpenCOR::IssuePtr>("Issues");
-
     emscripten::class_<libOpenCOR::Logger>("Logger")
         .function("issues", &libOpenCOR::Logger::issues)
         .function("errors", &libOpenCOR::Logger::errors)
@@ -41,8 +39,8 @@ void loggerApi()
         .function("description", &libOpenCOR::Issue::description);
 
     EM_ASM({
-        Module['Issue']['Type'] = Module['Issue.Type'];
+        Module["Issue"]["Type"] = Module["Issue.Type"];
 
-        delete Module['Issue.Type'];
+        delete Module["Issue.Type"];
     });
 }

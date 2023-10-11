@@ -20,7 +20,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class LIBOPENCOR_EXPORT SolverOde: public Solver
+class SolverOde: public Solver
 {
 public:
     using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
@@ -34,8 +34,10 @@ public:
     SolverOde &operator=(const SolverOde &pRhs) = delete;
     SolverOde &operator=(SolverOde &&pRhs) noexcept = delete;
 
-    virtual bool initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+    virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             ComputeRates pComputeRates) = 0;
+    virtual bool reinitialise(double pVoi);
+
     virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
 
 protected:

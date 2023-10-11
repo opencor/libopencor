@@ -21,6 +21,7 @@ limitations under the License.
 #include <filesystem>
 #include <fstream>
 #include <regex>
+#include <sstream>
 
 #ifdef BUILDING_USING_MSVC
 #    include <process.h>
@@ -355,7 +356,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 #endif
 
 #ifndef __EMSCRIPTEN__
-std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
+UnsignedCharVector fileContents(const std::filesystem::path &pFilePath)
 {
     // Retrieve and return the contents of the given file.
 
@@ -366,7 +367,7 @@ std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
     }
 
     const auto fileSize = std::filesystem::file_size(pFilePath);
-    std::vector<unsigned char> contents(fileSize);
+    UnsignedCharVector contents(fileSize);
 
     file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT
 
@@ -374,24 +375,94 @@ std::vector<unsigned char> fileContents(const std::filesystem::path &pFilePath)
 }
 #endif
 
-std::string contentsAsString(const std::vector<unsigned char> &pContents)
+std::string toString(bool pBoolean)
 {
-    return {reinterpret_cast<const char *>(pContents.data()), pContents.size()};
+    return pBoolean ? "True" : "False";
 }
 
-double stringToDouble(const std::string &pString, bool &pOk)
+std::string toString(int pNumber)
 {
-    auto res = 0.0;
+    std::ostringstream res;
 
-    try {
-        res = std::stod(pString);
-    } catch (...) {
-        pOk = false;
+    res << pNumber;
 
-        return 0.0;
+    return res.str();
+}
+
+std::string toString(size_t pNumber)
+{
+    std::ostringstream res;
+
+    res << pNumber;
+
+    return res.str();
+}
+
+std::string toString(double pNumber)
+{
+    std::ostringstream res;
+
+    res << std::setprecision(std::numeric_limits<double>::digits10) << pNumber;
+
+    return res.str();
+}
+
+std::string toString(const UnsignedCharVector &pBytes)
+{
+    return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
+}
+
+bool toBool(const std::string &pString, bool &pOk)
+{
+    if (pString == "True") {
+        pOk = true;
+
+        return true;
     }
 
-    pOk = true;
+    if (pString == "False") {
+        pOk = true;
+
+        return false;
+    }
+
+    pOk = false;
+
+    return false;
+}
+
+int toInt(const std::string &pString, bool &pOk)
+{
+    auto res = 0;
+    std::stringstream stream(pString);
+
+    stream >> res;
+
+    pOk = !stream.fail() && stream.eof();
+
+    return res;
+}
+
+size_t toSizeT(const std::string &pString, bool &pOk)
+{
+    size_t res = 0;
+    std::stringstream stream(pString);
+
+    stream >> res;
+
+    pOk = !stream.fail() && stream.eof();
+
+    return res;
+}
+
+double toDouble(const std::string &pString, bool &pOk)
+{
+    auto res = 0.0;
+    std::stringstream stream(pString);
+
+    stream >> res;
+
+    pOk = !stream.fail() && stream.eof();
 
     return res;
 }

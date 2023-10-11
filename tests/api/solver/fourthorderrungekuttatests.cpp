@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "model.h"
 #include "solverfourthorderrungekutta.h"
+#include "solvers.h"
 #include "utils.h"
 
 #include "gtest/gtest.h"
@@ -24,7 +25,14 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(FourthOrderRungeKuttaSolverTest, nonFloatingPointStepValue)
+TEST(FourthOrderRungeKuttaSolverTest, basic)
+{
+    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Fourth-order Runge-Kutta"));
+
+    checkFourthOrderRungeKuttaSolver(solver->info());
+}
+
+TEST(FourthOrderRungeKuttaSolverTest, stepValueWithNonNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -38,7 +46,7 @@ TEST(FourthOrderRungeKuttaSolverTest, nonFloatingPointStepValue)
 
     solver->setProperty("Step", "abc");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     // Clean up after ourselves.
@@ -46,7 +54,7 @@ TEST(FourthOrderRungeKuttaSolverTest, nonFloatingPointStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(FourthOrderRungeKuttaSolverTest, invalidStepValue)
+TEST(FourthOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -60,7 +68,7 @@ TEST(FourthOrderRungeKuttaSolverTest, invalidStepValue)
 
     solver->setProperty("Step", "0.0");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     // Clean up after ourselves.
@@ -68,15 +76,14 @@ TEST(FourthOrderRungeKuttaSolverTest, invalidStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(FourthOrderRungeKuttaSolverTest, main)
+TEST(FourthOrderRungeKuttaSolverTest, solve)
 {
     // Create and initialise our various arrays and create our solver.
 
     const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Fourth-order Runge-Kutta");
 
-    // Customise and initialise our solver and compute it.
+    // Customise our solver and compute our model.
 
-    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
 #if defined(BUILDING_ON_WINDOWS)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015384702698352787, 0.59605552631467773, 0.05303493396859079, 0.31777081396617829};
 #elif defined(BUILDING_ON_LINUX)
@@ -88,9 +95,6 @@ TEST(FourthOrderRungeKuttaSolverTest, main)
 #endif
 
     solver->setProperty("Step", "0.0123");
-
-    EXPECT_TRUE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
-    EXPECT_EQ_DOUBLES(states, INITIAL_STATES);
 
     computeModel(solver, states, rates, variables, FINAL_STATES);
 

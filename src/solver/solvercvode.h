@@ -16,44 +16,38 @@ limitations under the License.
 
 #pragma once
 
-#include "solverheun.h"
-#include "solverode_p.h"
+#include "solverode.h"
 
 namespace libOpenCOR {
 
-class SolverHeun::Impl: public SolverOde::Impl
+class SolverCvode: public SolverOde
 {
+    friend class Solver;
+
 public:
-    // Properties information.
+    ~SolverCvode() override;
 
-    static const Solver::Type TYPE = Solver::Type::ODE;
-    static const std::string ID;
-    static const std::string NAME;
+    SolverCvode(const SolverCvode &pOther) = delete;
+    SolverCvode(SolverCvode &&pOther) noexcept = delete;
 
-    static const std::string STEP_ID;
-    static const std::string STEP_NAME;
-    static constexpr double STEP_DEFAULT_VALUE = 1.0;
+    SolverCvode &operator=(const SolverCvode &pRhs) = delete;
+    SolverCvode &operator=(SolverCvode &&pRhs) noexcept = delete;
 
-    // Solver.
-
-    static SolverPtr create();
-    static SolverPropertyPtrVector propertiesInfo();
-    static StringVector hiddenProperties(const StringStringMap &pProperties);
-
-    double mStep = STEP_DEFAULT_VALUE;
-
-    double *mK = nullptr;
-    double *mYk = nullptr;
-
-    explicit Impl();
-    ~Impl() override;
-
-    StringStringMap propertiesId() const override;
+    SolverInfoPtr info() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
+    bool reinitialise(double pVoi) override;
 
     bool solve(double &pVoi, double pVoiEnd) const override;
+
+private:
+    class Impl;
+
+    Impl *pimpl();
+    const Impl *pimpl() const;
+
+    explicit SolverCvode();
 };
 
 } // namespace libOpenCOR

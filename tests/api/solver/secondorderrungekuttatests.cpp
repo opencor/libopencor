@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "model.h"
+#include "solvers.h"
 #include "solversecondorderrungekutta.h"
 #include "utils.h"
 
@@ -24,7 +25,14 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(SecondOrderRungeKuttaSolverTest, nonFloatingPointStepValue)
+TEST(SecondOrderRungeKuttaSolverTest, basic)
+{
+    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Second-order Runge-Kutta"));
+
+    checkSecondOrderRungeKuttaSolver(solver->info());
+}
+
+TEST(SecondOrderRungeKuttaSolverTest, stepValueWithNonNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -38,7 +46,7 @@ TEST(SecondOrderRungeKuttaSolverTest, nonFloatingPointStepValue)
 
     solver->setProperty("Step", "abc");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     // Clean up after ourselves.
@@ -46,7 +54,7 @@ TEST(SecondOrderRungeKuttaSolverTest, nonFloatingPointStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(SecondOrderRungeKuttaSolverTest, invalidStepValue)
+TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
     // Create and initialise our various arrays and create our solver.
 
@@ -60,7 +68,7 @@ TEST(SecondOrderRungeKuttaSolverTest, invalidStepValue)
 
     solver->setProperty("Step", "0.0");
 
-    EXPECT_FALSE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     // Clean up after ourselves.
@@ -68,15 +76,14 @@ TEST(SecondOrderRungeKuttaSolverTest, invalidStepValue)
     deleteArrays(states, rates, variables);
 }
 
-TEST(SecondOrderRungeKuttaSolverTest, main)
+TEST(SecondOrderRungeKuttaSolverTest, solve)
 {
     // Create and initialise our various arrays and create our solver.
 
     const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Second-order Runge-Kutta");
 
-    // Customise and initialise our solver and compute it.
+    // Customise our solver and compute our model.
 
-    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
 #if defined(BUILDING_ON_WINDOWS)
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628843987, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
 #elif defined(BUILDING_ON_LINUX)
@@ -88,9 +95,6 @@ TEST(SecondOrderRungeKuttaSolverTest, main)
 #endif
 
     solver->setProperty("Step", "0.0123");
-
-    EXPECT_TRUE(solver->initialise(STATE_COUNT, states, rates, variables, computeRates));
-    EXPECT_EQ_DOUBLES(states, INITIAL_STATES);
 
     computeModel(solver, states, rates, variables, FINAL_STATES);
 

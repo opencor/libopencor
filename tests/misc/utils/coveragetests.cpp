@@ -14,29 +14,48 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
+
 #include "gtest/gtest.h"
 
 #include "tests/utils.h"
 
-#include <libopencor>
-
-TEST(CoverageLoggerTest, errors)
+TEST(CoverageUtilsTest, toString)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-
-    EXPECT_TRUE(file->errors().empty());
+    EXPECT_EQ(libOpenCOR::toString(false), "False");
 }
 
-TEST(CoverageLoggerTest, warnings)
+TEST(CoverageUtilsTest, toDouble)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    bool ok = true;
 
-    EXPECT_TRUE(file->warnings().empty());
+    libOpenCOR::toDouble("0.123 0.456", ok);
+
+    EXPECT_FALSE(ok);
 }
 
-TEST(CoverageLoggerTest, messages)
+TEST(CoverageUtilsTest, toInt)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    bool ok = true;
 
-    EXPECT_TRUE(file->messages().empty());
+    libOpenCOR::toInt("123 456", ok);
+
+    EXPECT_FALSE(ok);
+}
+
+TEST(CoverageUtilsTest, toSizeT)
+{
+    bool ok = true;
+
+    libOpenCOR::toSizeT("abc", ok);
+
+    EXPECT_FALSE(ok);
+
+    libOpenCOR::toSizeT("123", ok);
+
+    EXPECT_TRUE(ok);
+
+    libOpenCOR::toSizeT("123 456", ok);
+
+    EXPECT_FALSE(ok);
 }

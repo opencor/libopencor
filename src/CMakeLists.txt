@@ -21,7 +21,7 @@ if(LIBOPENCOR_COMPILER_CACHING)
     elseif(CLCACHE_EXE)
         set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
 
-        execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/clcachewrapper.c
+        execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_SOURCE_DIR}/cmake/clcachewrapper.c
                         RESULT_VARIABLE RESULT
                         OUTPUT_QUIET ERROR_QUIET)
 
@@ -106,6 +106,7 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverfourthorderrungekutta.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverheun.cpp
@@ -170,6 +171,8 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverfourthorderrungekutta_p.h
@@ -304,7 +307,36 @@ configure_file(unittestingexport.h unittestingexport.h COPYONLY)
 if(BUILDING_USING_GNU)
     SET(CMAKE_SHARED_LINKER_FLAGS -Wl,--no-undefined)
 elseif(BUILDING_USING_CLANG)
-    SET(CMAKE_SHARED_LINKER_FLAGS -Wl,-undefined,error)
+    # On macOS, only use the -Wl,--no-undefined option if we are not using Xcode 15.0 or later since otherwise the
+    # linker is going to generate some warnings about -undefined error being deprecated.
+
+    if(APPLE)
+        # Get the Xcode version.
+        # Note: CMake has XCODE_VERSION, but it's only available when using the Xcode generator. So, we need to get the
+        #       Xcode version ourselves. And, depending on how Xcode was installed, we may need to get the Xcode version
+        #       using softwareupdate.
+
+        execute_process(COMMAND xcodebuild -version
+                        OUTPUT_VARIABLE XCODE_VERSION
+                        OUTPUT_STRIP_TRAILING_WHITESPACE
+                        RESULT_VARIABLE RESULT
+                        ERROR_QUIET)
+
+        if(NOT RESULT EQUAL 0)
+            execute_process(COMMAND softwareupdate --history
+                            COMMAND awk "/Command Line Tools for Xcode/ {print \$6}"
+                            COMMAND tail -1
+                            OUTPUT_VARIABLE XCODE_VERSION
+                            OUTPUT_STRIP_TRAILING_WHITESPACE
+                            ERROR_QUIET)
+        endif()
+    else()
+        set(XCODE_VERSION 0)
+    endif()
+
+    if(XCODE_VERSION VERSION_LESS 15.0)
+        SET(CMAKE_SHARED_LINKER_FLAGS -Wl,-undefined,error)
+    endif()
 endif()
 
 # Get ready for code coverage.

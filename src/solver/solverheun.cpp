@@ -19,25 +19,36 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-const std::string SolverHeun::Impl::NAME = "Heun"; // NOLINT
-const std::string SolverHeun::Impl::KISAO_ID = "KISAO:0000301"; // NOLINT
+// Properties information.
 
+const std::string SolverHeun::Impl::ID = "KISAO:0000301"; // NOLINT
+const std::string SolverHeun::Impl::NAME = "Heun"; // NOLINT
+
+const std::string SolverHeun::Impl::STEP_ID = "KISAO:0000483"; // NOLINT
 const std::string SolverHeun::Impl::STEP_NAME = "Step"; // NOLINT
-const std::string SolverHeun::Impl::STEP_KISAO_ID = "KISAO:0000483"; // NOLINT
+
+// Solver.
 
 SolverPtr SolverHeun::Impl::create()
 {
     return std::shared_ptr<SolverHeun> {new SolverHeun {}};
 }
 
-std::vector<SolverPropertyPtr> SolverHeun::Impl::propertiesInfo()
+SolverPropertyPtrVector SolverHeun::Impl::propertiesInfo()
 {
     return {
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_NAME, STEP_KISAO_ID,
+        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
                                      {},
-                                     std::to_string(STEP_DEFAULT_VALUE),
+                                     toString(STEP_DEFAULT_VALUE),
                                      true),
     };
+}
+
+StringVector SolverHeun::Impl::hiddenProperties(const StringStringMap &pProperties)
+{
+    (void)pProperties;
+
+    return {};
 }
 
 SolverHeun::Impl::Impl()
@@ -45,7 +56,7 @@ SolverHeun::Impl::Impl()
 {
     mIsValid = true;
 
-    mProperties[STEP_KISAO_ID] = std::to_string(STEP_DEFAULT_VALUE);
+    mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
 }
 
 SolverHeun::Impl::~Impl()
@@ -54,16 +65,16 @@ SolverHeun::Impl::~Impl()
     delete[] mYk;
 }
 
-std::map<std::string, std::string> SolverHeun::Impl::propertiesKisaoId() const
+StringStringMap SolverHeun::Impl::propertiesId() const
 {
-    static const std::map<std::string, std::string> PROPERTIES_KISAO_ID = {
-        {STEP_NAME, STEP_KISAO_ID},
+    static const StringStringMap PROPERTIES_ID = {
+        {STEP_NAME, STEP_ID},
     };
 
-    return PROPERTIES_KISAO_ID;
+    return PROPERTIES_ID;
 }
 
-bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                   ComputeRates pComputeRates)
 {
     removeAllIssues();
@@ -71,12 +82,11 @@ bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates,
     // Retrieve the solver's properties.
 
     bool ok = true;
-    auto step = stringToDouble(mProperties[STEP_KISAO_ID], ok);
 
-    if (ok && (step > 0.0)) {
-        mStep = step;
-    } else {
-        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_KISAO_ID] + R"("). It must be a floating point number greater than zero.)");
+    mStep = toDouble(mProperties[STEP_ID], ok);
+
+    if (!ok || (mStep <= 0.0)) {
+        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_ID] + R"("). It must be a floating point number greater than zero.)");
 
         return false;
     }
@@ -88,14 +98,14 @@ bool SolverHeun::Impl::initialise(size_t pSize, double *pStates, double *pRates,
 
     // Initialise the ODE solver itself.
 
-    return SolverOde::Impl::initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     // We compute the following:
-    //   k = h * f(t_n, Y_n)
-    //   Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + k) )
+    //   k = f(t_n, Y_n)
+    //   Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + h * k) )
 
     static const auto HALF = 0.5;
 
@@ -116,14 +126,14 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 
         mComputeRates(pVoi, mStates, mRates, mVariables);
 
-        // Compute k and Yk.
+        // Compute k and Y_n + h * k.
 
         for (size_t i = 0; i < mSize; ++i) {
             mK[i] = mRates[i]; // NOLINT
-            mYk[i] = mStates[i] + realStep * mRates[i]; // NOLINT
+            mYk[i] = mStates[i] + realStep * mK[i]; // NOLINT
         }
 
-        // Compute f(t_n + h, Y_n + k).
+        // Compute f(t_n + h, Y_n + h * k).
 
         mComputeRates(pVoi + realStep, mYk, mRates, mVariables);
 
@@ -163,10 +173,15 @@ const SolverHeun::Impl *SolverHeun::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-bool SolverHeun::initialise(size_t pSize, double *pStates, double *pRates, double *pVariables,
+SolverInfoPtr SolverHeun::info() const
+{
+    return Solver::solversInfo()[3];
+}
+
+bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             ComputeRates pComputeRates)
 {
-    return pimpl()->initialise(pSize, pStates, pRates, pVariables, pComputeRates);
+    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverHeun::solve(double &pVoi, double pVoiEnd) const

@@ -13,109 +13,26 @@
 # limitations under the License.
 
 
-from libopencor import Solver, SolverProperty
+from libopencor import Solver
+from solvers import (
+    check_cvode_solver,
+    check_forward_euler_solver,
+    check_fourth_order_runge_kutta_solver,
+    check_heun_solver,
+    check_second_order_runge_kutta_solver,
+)
 
 
 def test_solvers_info():
     solvers_info = Solver.solvers_info()
 
-    assert len(solvers_info) == 4
+    assert len(solvers_info) == 5
 
-    # Forward Euler.
-
-    solver_info = solvers_info[0]
-
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Forward Euler"
-    assert solver_info.kisao_id == "KISAO:0000030"
-
-    properties = solver_info.properties
-
-    assert len(properties) == 1
-
-    property = properties[0]
-
-    assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
-    assert property.kisao_id == "KISAO:0000483"
-    assert property.default_value == "1.000000"
-    assert property.has_voi_unit == True
-
-    list_values = property.list_values
-
-    assert len(list_values) == 0
-
-    # Fourth-order Runge-Kutta.
-
-    solver_info = solvers_info[1]
-
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Fourth-order Runge-Kutta"
-    assert solver_info.kisao_id == "KISAO:0000032"
-
-    properties = solver_info.properties
-
-    assert len(properties) == 1
-
-    property = properties[0]
-
-    assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
-    assert property.kisao_id == "KISAO:0000483"
-    assert property.default_value == "1.000000"
-    assert property.has_voi_unit == True
-
-    list_values = property.list_values
-
-    assert len(list_values) == 0
-
-    # Heun.
-
-    solver_info = solvers_info[2]
-
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Heun"
-    assert solver_info.kisao_id == "KISAO:0000301"
-
-    properties = solver_info.properties
-
-    assert len(properties) == 1
-
-    property = properties[0]
-
-    assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
-    assert property.kisao_id == "KISAO:0000483"
-    assert property.default_value == "1.000000"
-    assert property.has_voi_unit == True
-
-    list_values = property.list_values
-
-    assert len(list_values) == 0
-
-    # Second-order Runge-Kutta.
-
-    solver_info = solvers_info[3]
-
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.name == "Second-order Runge-Kutta"
-    assert solver_info.kisao_id == "KISAO:0000381"
-
-    properties = solver_info.properties
-
-    assert len(properties) == 1
-
-    property = properties[0]
-
-    assert property.type == SolverProperty.Type.DoubleGt0
-    assert property.name == "Step"
-    assert property.kisao_id == "KISAO:0000483"
-    assert property.default_value == "1.000000"
-    assert property.has_voi_unit == True
-
-    list_values = property.list_values
-
-    assert len(list_values) == 0
+    check_cvode_solver(solvers_info[0])
+    check_forward_euler_solver(solvers_info[1])
+    check_fourth_order_runge_kutta_solver(solvers_info[2])
+    check_heun_solver(solvers_info[3])
+    check_second_order_runge_kutta_solver(solvers_info[4])
 
 
 def test_unknown_solver():
@@ -124,14 +41,32 @@ def test_unknown_solver():
     assert solver.is_valid == False
 
 
+def test_cvode_by_id():
+    solver = Solver("KISAO:0000019")
+
+    assert solver.is_valid == True
+
+
+def test_cvode_by_name():
+    solver = Solver("CVODE")
+
+    assert solver.is_valid == True
+
+
+def test_forward_euler_by_id():
+    solver = Solver("KISAO:0000030")
+
+    assert solver.is_valid == True
+
+
 def test_forward_euler_by_name():
     solver = Solver("Forward Euler")
 
     assert solver.is_valid == True
 
 
-def test_forward_euler_by_kisao_id():
-    solver = Solver("KISAO:0000030")
+def test_fourth_order_runge_kutta_by_id():
+    solver = Solver("KISAO:0000032")
 
     assert solver.is_valid == True
 
@@ -142,8 +77,8 @@ def test_fourth_order_runge_kutta_by_name():
     assert solver.is_valid == True
 
 
-def test_fourth_order_runge_kutta_by_kisao_id():
-    solver = Solver("KISAO:0000032")
+def test_heun_by_id():
+    solver = Solver("KISAO:0000301")
 
     assert solver.is_valid == True
 
@@ -154,8 +89,8 @@ def test_heun_by_name():
     assert solver.is_valid == True
 
 
-def test_heun_by_kisao_id():
-    solver = Solver("KISAO:0000301")
+def test_second_order_runge_kutta_by_id():
+    solver = Solver("KISAO:0000381")
 
     assert solver.is_valid == True
 
@@ -166,37 +101,62 @@ def test_second_order_runge_kutta_by_name():
     assert solver.is_valid == True
 
 
-def test_second_order_runge_kutta_by_kisao_id():
-    solver = Solver("KISAO:0000381")
-
-    assert solver.is_valid == True
-
-
 def test_properties():
     solver = Solver("Forward Euler")
     properties = solver.properties
 
     assert len(solver.properties) == 1
-    assert solver.property("Step") == "1.000000"
-    assert solver.property("KISAO:0000483") == "1.000000"
+    assert solver.property("KISAO:0000483") == "1"
+    assert solver.property("Step") == "1"
 
-    solver.set_property("Step", "1.2345")
+    solver.set_property("Step", "1.23")
 
     assert len(solver.properties) == 1
-    assert solver.property("KISAO:0000483") == "1.2345"
+    assert solver.property("KISAO:0000483") == "1.23"
 
     solver.set_property("KISAO:0000483", "7.89")
 
     assert len(solver.properties) == 1
     assert solver.property("Step") == "7.89"
 
-    solver.set_property("Unknown property", "1.23")
+    solver.set_property("Unknown", "1.23")
 
     assert len(solver.properties) == 1
     assert solver.property("Step") == "7.89"
-    assert solver.property("Unknown property") == ""
+    assert solver.property("Unknown") == ""
+
+    properties["Step"] = "1.23"
+
+    assert len(properties) == 2
 
     solver.set_properties(properties)
 
     assert len(solver.properties) == 1
-    assert solver.property("Step") == "1.000000"
+    assert solver.property("Step") == "1"
+
+    properties["Unknown"] = "1.23"
+
+    assert len(properties) == 3
+
+    solver.set_properties(properties)
+
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1"
+
+    properties["KISAO:0000483"] = "1.23"
+
+    assert len(properties) == 3
+
+    solver.set_properties(properties)
+
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1.23"
+
+    properties.pop("KISAO:0000483")
+
+    assert len(properties) == 2
+
+    solver.set_properties(properties)
+
+    assert len(solver.properties) == 1
+    assert solver.property("Step") == "1.23"

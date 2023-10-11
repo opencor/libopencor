@@ -128,14 +128,14 @@ void File::Impl::retrieveContents()
 }
 #endif
 
-void File::Impl::setContents(const std::vector<unsigned char> &pContents)
+void File::Impl::setContents(const UnsignedCharVector &pContents)
 {
     mContents = pContents;
 
     mContentsRetrieved = true;
 }
 
-std::vector<unsigned char> File::Impl::contents()
+UnsignedCharVector File::Impl::contents()
 {
 #ifndef __EMSCRIPTEN__
     retrieveContents();
@@ -208,12 +208,12 @@ std::string File::path() const
     return pimpl()->path();
 }
 
-std::vector<unsigned char> File::contents()
+UnsignedCharVector File::contents()
 {
     return pimpl()->contents();
 }
 
-void File::setContents(const std::vector<unsigned char> &pContents)
+void File::setContents(const UnsignedCharVector &pContents)
 {
     pimpl()->setContents(pContents);
 

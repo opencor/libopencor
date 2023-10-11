@@ -17,41 +17,44 @@ limitations under the License.
 #pragma once
 
 #include "logger_p.h"
+#include "utils.h"
 
 #include "libopencor/solver.h"
+#include "libopencor/solverinfo.h"
 #include "libopencor/solverproperty.h"
 
 namespace libOpenCOR {
 
-using SolverCreate = SolverPtr (*)();
-
 class Solver::Impl: public Logger::Impl
 {
 public:
-    static std::map<std::string, std::string> SolversKisaoId;
-    static std::map<std::string, SolverCreate> SolversCreate;
-    static std::vector<SolverInfoPtr> SolversInfo;
+    static StringStringMap SolversId;
+    static StringSolverCreateMap SolversCreate;
+    static SolverInfoPtrVector SolversInfo;
 
     bool mIsValid = false;
-    std::map<std::string, std::string> mProperties;
+    StringStringMap mProperties;
 
-    static void registerSolver(Type pType, const std::string &pName, const std::string &pKisaoId, SolverCreate pCreate,
-                               const std::vector<SolverPropertyPtr> &pProperties);
-    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pName,
-                                            const std::string &pKisaoId, const std::vector<std::string> &pListValues,
+    static void registerSolver(Type pType, const std::string &pId, const std::string &pName, SolverCreate pCreate,
+                               const SolverPropertyPtrVector &pProperties,
+                               SolverInfo::HiddenPropertiesFunction pHiddenProperties);
+    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pId,
+                                            const std::string &pName, const StringVector &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiUnit);
+    static std::string valueFromProperties(const std::string &pId, const std::string &pName,
+                                           const StringStringMap &pProperties);
 
     virtual ~Impl() = default;
 
-    virtual std::map<std::string, std::string> propertiesKisaoId() const;
+    virtual StringStringMap propertiesId() const;
 
-    std::string kisaoId(const std::string &pNameOrKisaoId) const;
+    std::string id(const std::string &pIdOrName) const;
 
-    std::string property(const std::string &pNameOrKisaoId);
-    void setProperty(const std::string &pNameOrKisaoId, const std::string &pValue);
+    std::string property(const std::string &pIdOrName);
+    void setProperty(const std::string &pIdOrName, const std::string &pValue);
 
-    std::map<std::string, std::string> properties() const;
-    void setProperties(const std::map<std::string, std::string> &pProperties);
+    StringStringMap properties() const;
+    void setProperties(const StringStringMap &pProperties);
 };
 
 } // namespace libOpenCOR
