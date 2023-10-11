@@ -56,10 +56,10 @@ export function expectHiddenProperties(
   hiddenProperties,
   expectedHiddenProperties,
 ) {
-  expect(hiddenProperties.size()).toBe(expectedHiddenProperties.size());
+  expect(hiddenProperties.size()).toBe(expectedHiddenProperties.length);
 
   for (let i = 0; i < hiddenProperties.size(); ++i) {
-    expect(hiddenProperties.get(i)).toBe(expectedHiddenProperties.get(i));
+    expect(hiddenProperties.get(i)).toBe(expectedHiddenProperties[i]);
   }
 }
 

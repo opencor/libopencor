@@ -16,14 +16,13 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 import {
+  libopencor,
   checkCvodeSolver,
   checkForwardEulerSolver,
   checkFourthOrderRungeKuttaSolver,
   checkHeunSolver,
   checkSecondOrderRungeKuttaSolver,
 } from "./solvers.js";
-
-const libopencor = await libOpenCOR();
 
 describe("Solver basic tests", () => {
   test("Solvers info", () => {

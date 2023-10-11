@@ -17,10 +17,10 @@ limitations under the License.
 import libOpenCOR from "./libopencor.js";
 import { expectHiddenProperties } from "./utils.js";
 
-const libopencor = await libOpenCOR();
+export const libopencor = await libOpenCOR();
 
 const noProperties = new libopencor.StringStringMap();
-const noHiddenProperties = new libopencor.StringVector();
+const noHiddenProperties = [];
 
 export function checkCvodeSolver(solverInfo) {
   // Properties.
