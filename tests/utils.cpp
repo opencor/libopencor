@@ -43,6 +43,21 @@ void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles)
     }
 }
 
+void expectEqualDoubles2(double *pDoubles, const Doubles &pExpectedDoubles, const Doubles &pExpectedDoubles2)
+{
+    for (size_t i = 0; i < pExpectedDoubles.size(); ++i) {
+        EXPECT_TRUE(fuzzyCompare(pDoubles[i], pExpectedDoubles[i]) // NOLINT
+                    || (!pExpectedDoubles2.empty() && fuzzyCompare(pDoubles[i], pExpectedDoubles2[i]))) // NOLINT
+            << "Expected equality of these values:\n"
+            << "  pDoubles[i]\n"
+            << "    Which is: " << pDoubles[i] << "\n" // NOLINT
+            << "  pExpectedDoubles[i]\n"
+            << "    Which is: " << pExpectedDoubles[i] << "\n" // NOLINT
+            << "  pExpectedDoubles2[i]\n"
+            << "    Which is: " << pExpectedDoubles2[i]; // NOLINT
+    }
+}
+
 void expectEqualHiddenProperties(const StringVector &pHiddenProperties, const StringVector &pExpectedHiddenProperties)
 {
     EXPECT_EQ(pHiddenProperties.size(), pExpectedHiddenProperties.size());

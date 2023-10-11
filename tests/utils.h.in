@@ -76,6 +76,12 @@ void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles);
     SCOPED_TRACE("Issue occurred here."); \
     libOpenCOR::expectEqualDoubles(pDoubles, pExpectedDoubles)
 
+void expectEqualDoubles2(double *pDoubles, const Doubles &pExpectedDoubles, const Doubles &pExpectedDoubles2);
+
+#define EXPECT_EQ_DOUBLES_2(pDoubles, pExpectedDoubles, pExpectedDoubles2) \
+    SCOPED_TRACE("Issue occurred here."); \
+    libOpenCOR::expectEqualDoubles2(pDoubles, pExpectedDoubles, pExpectedDoubles2)
+
 void expectEqualHiddenProperties(const StringVector &pHiddenProperties, const StringVector &pExpectedHiddenProperties);
 
 #define EXPECT_EQ_HIDDEN_PROPERTIES(pHiddenProperties, pExpectedHiddenProperties) \
