@@ -48,10 +48,10 @@ if(EMSCRIPTEN)
 
     add_subdirectory(src)
 else()
-    # On macOS, deploy on macOS 10.15 and later.
+    # On macOS, deploy on macOS 11 and later.
 
     if(APPLE)
-        set(MACOS_DEPLOYMENT_TARGET 10.15)
+        set(MACOS_DEPLOYMENT_TARGET 11)
 
         if("${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
             set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_DEPLOYMENT_TARGET})
