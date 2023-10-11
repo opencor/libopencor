@@ -26,6 +26,7 @@ limitations under the License.
 #include <filesystem>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace libOpenCOR {
 
