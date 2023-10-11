@@ -83,22 +83,22 @@ public:
 
     static const std::string INTEGRATION_METHOD_ID;
     static const std::string INTEGRATION_METHOD_NAME;
-    static const std::vector<std::string> INTEGRATION_METHOD_LIST;
+    static const StringVector INTEGRATION_METHOD_LIST;
     static const std::string INTEGRATION_METHOD_DEFAULT_VALUE;
 
     static const std::string ITERATION_TYPE_ID;
     static const std::string ITERATION_TYPE_NAME;
-    static const std::vector<std::string> ITERATION_TYPE_LIST;
+    static const StringVector ITERATION_TYPE_LIST;
     static const std::string ITERATION_TYPE_DEFAULT_VALUE;
 
     static const std::string LINEAR_SOLVER_ID;
     static const std::string LINEAR_SOLVER_NAME;
-    static const std::vector<std::string> LINEAR_SOLVER_LIST;
+    static const StringVector LINEAR_SOLVER_LIST;
     static const std::string LINEAR_SOLVER_DEFAULT_VALUE;
 
     static const std::string PRECONDITIONER_ID;
     static const std::string PRECONDITIONER_NAME;
-    static const std::vector<std::string> PRECONDITIONER_LIST;
+    static const StringVector PRECONDITIONER_LIST;
     static const std::string PRECONDITIONER_DEFAULT_VALUE;
 
     static const std::string UPPER_HALF_BANDWIDTH_ID;
@@ -124,8 +124,8 @@ public:
     // Solver.
 
     static SolverPtr create();
-    static std::vector<SolverPropertyPtr> propertiesInfo();
-    static std::vector<std::string> hiddenProperties(const std::map<std::string, std::string> &pProperties);
+    static SolverPropertyPtrVector propertiesInfo();
+    static StringVector hiddenProperties(const StringStringMap &pProperties);
 
     SUNContext mContext = nullptr;
 
@@ -144,7 +144,7 @@ public:
     explicit Impl();
     ~Impl() override;
 
-    std::map<std::string, std::string> propertiesId() const override;
+    StringStringMap propertiesId() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;

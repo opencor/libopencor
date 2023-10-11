@@ -33,7 +33,7 @@ class LIBOPENCOR_EXPORT SolverInfo
     friend class Solver;
 
 public:
-    using HiddenPropertiesFunction = std::vector<std::string> (*)(const std::map<std::string, std::string> &pProperties); /**< Signature of the method that returns the properties of the solver that should be hidden. */
+    using HiddenPropertiesFunction = StringVector (*)(const StringStringMap &pProperties); /**< Signature of the method that returns the properties of the solver that should be hidden. */
 
     /**
      * Constructors, destructor, and assignment operators.
@@ -86,10 +86,10 @@ public:
      *
      * Return the properties of the solver.
      *
-     * @return The properties, as a @c std::vector of @ref SolverProperty, of the solver.
+     * @return The properties, as a @ref SolverPropertyPtrVector, of the solver.
      */
 
-    std::vector<SolverPropertyPtr> properties() const;
+    SolverPropertyPtrVector properties() const;
 
     /**
      * @brief Get the properties of the solver that should be hidden.
@@ -98,13 +98,13 @@ public:
      * @p pProperties can be either a (KiSAO) id or a name. If @p pProperties has an entry for both the (KiSAO) id and
      * name of a property then the (KiSAO) id entry is used.
      *
-     * @param pProperties The properties, as a @c std::map of @c std::string, against which to determine the properties
-     * of the solver that should be hidden.
+     * @param pProperties The properties, as a @ref StringStringMap, against which to determine the properties of the
+     * solver that should be hidden.
      *
-     * @return The properties, as a @c std::vector of @c std::string, of the solver that should be hidden.
+     * @return The properties, as a @ref StringVector, of the solver that should be hidden.
      */
 
-    std::vector<std::string> hiddenProperties(const std::map<std::string, std::string> &pProperties) const;
+    StringVector hiddenProperties(const StringStringMap &pProperties) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
@@ -112,8 +112,7 @@ private:
     Impl *mPimpl;
 
     explicit SolverInfo(Solver::Type pType, const std::string &pId, const std::string &pName,
-                        const std::vector<SolverPropertyPtr> &pProperties,
-                        HiddenPropertiesFunction pHiddenProperties); /**< Constructor, @private. */
+                        const SolverPropertyPtrVector &pProperties, HiddenPropertiesFunction pHiddenProperties); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

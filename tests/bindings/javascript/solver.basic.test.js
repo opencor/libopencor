@@ -158,7 +158,7 @@ describe("Solver basic tests", () => {
     // Note: here, we want to remove "KISAO:0000483" entry from properties, but it cannot be done using the JavaScript
     // bindings, so we create a new Properties object instead and add the "Unknonwn" and "Step" entries to it.
 
-    properties = new libopencor.Properties();
+    properties = new libopencor.StringStringMap();
 
     properties.set("Unknown", "1.23");
     properties.set("Step", "1.23");

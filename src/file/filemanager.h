@@ -16,6 +16,8 @@ limitations under the License.
 
 #pragma once
 
+#include "utils.h"
+
 #include "libopencor/file.h"
 
 #include <vector>
@@ -33,7 +35,7 @@ public:
     FilePtr file(const std::string &pFileNameOrUrl) const;
 
 private:
-    std::vector<File *> mFiles;
+    FileVector mFiles;
 };
 
 } // namespace libOpenCOR

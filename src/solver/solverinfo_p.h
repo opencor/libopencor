@@ -29,16 +29,14 @@ public:
     Solver::Type mType;
     std::string mId;
     std::string mName;
-    std::vector<SolverPropertyPtr> mProperties;
+    SolverPropertyPtrVector mProperties;
     HiddenPropertiesFunction mHiddenProperties = nullptr;
 
     static SolverInfoPtr create(Solver::Type pType, const std::string &pId, const std::string &pName,
-                                const std::vector<SolverPropertyPtr> &pProperties,
-                                HiddenPropertiesFunction pHiddenProperties);
+                                const SolverPropertyPtrVector &pProperties, HiddenPropertiesFunction pHiddenProperties);
 
     explicit Impl(Solver::Type pType, const std::string &pId, const std::string &pName,
-                  const std::vector<SolverPropertyPtr> &pProperties,
-                  HiddenPropertiesFunction pHiddenProperties);
+                  const SolverPropertyPtrVector &pProperties, HiddenPropertiesFunction pHiddenProperties);
 };
 
 } // namespace libOpenCOR

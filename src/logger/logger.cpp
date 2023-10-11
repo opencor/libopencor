@@ -97,22 +97,22 @@ const Logger::Impl *Logger::pimpl() const
     return mPimpl;
 }
 
-std::vector<IssuePtr> Logger::issues() const
+IssuePtrVector Logger::issues() const
 {
     return pimpl()->mIssues;
 }
 
-std::vector<IssuePtr> Logger::errors() const
+IssuePtrVector Logger::errors() const
 {
     return pimpl()->mErrors;
 }
 
-std::vector<IssuePtr> Logger::warnings() const
+IssuePtrVector Logger::warnings() const
 {
     return pimpl()->mWarnings;
 }
 
-std::vector<IssuePtr> Logger::messages() const
+IssuePtrVector Logger::messages() const
 {
     return pimpl()->mMessages;
 }

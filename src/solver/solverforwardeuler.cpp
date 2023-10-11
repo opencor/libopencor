@@ -34,7 +34,7 @@ SolverPtr SolverForwardEuler::Impl::create()
     return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};
 }
 
-std::vector<SolverPropertyPtr> SolverForwardEuler::Impl::propertiesInfo()
+SolverPropertyPtrVector SolverForwardEuler::Impl::propertiesInfo()
 {
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
@@ -44,7 +44,7 @@ std::vector<SolverPropertyPtr> SolverForwardEuler::Impl::propertiesInfo()
     };
 }
 
-std::vector<std::string> SolverForwardEuler::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
+StringVector SolverForwardEuler::Impl::hiddenProperties(const StringStringMap &pProperties)
 {
     (void)pProperties;
 
@@ -59,9 +59,9 @@ SolverForwardEuler::Impl::Impl()
     mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
 }
 
-std::map<std::string, std::string> SolverForwardEuler::Impl::propertiesId() const
+StringStringMap SolverForwardEuler::Impl::propertiesId() const
 {
-    static const std::map<std::string, std::string> PROPERTIES_ID = {
+    static const StringStringMap PROPERTIES_ID = {
         {STEP_NAME, STEP_ID},
     };
 

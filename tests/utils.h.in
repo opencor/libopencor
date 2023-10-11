@@ -76,10 +76,7 @@ void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles);
     SCOPED_TRACE("Issue occurred here."); \
     libOpenCOR::expectEqualDoubles(pDoubles, pExpectedDoubles)
 
-using HiddenProperties = std::vector<std::string>;
-
-void expectEqualHiddenProperties(const HiddenProperties &pHiddenProperties,
-                                 const HiddenProperties &pExpectedHiddenProperties);
+void expectEqualHiddenProperties(const StringVector &pHiddenProperties, const StringVector &pExpectedHiddenProperties);
 
 #define EXPECT_EQ_HIDDEN_PROPERTIES(pHiddenProperties, pExpectedHiddenProperties) \
     SCOPED_TRACE("Issue occurred here."); \
@@ -87,6 +84,6 @@ void expectEqualHiddenProperties(const HiddenProperties &pHiddenProperties,
 
 std::string resourcePath(const std::string &pResourceRelativePath = {});
 
-std::vector<unsigned char> charArrayToVector(const char *pContents);
+UnsignedCharVector charArrayToVector(const char *pContents);
 
 } // namespace libOpenCOR

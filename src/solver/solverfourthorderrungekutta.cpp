@@ -34,7 +34,7 @@ SolverPtr SolverFourthOrderRungeKutta::Impl::create()
     return std::shared_ptr<SolverFourthOrderRungeKutta> {new SolverFourthOrderRungeKutta {}};
 }
 
-std::vector<SolverPropertyPtr> SolverFourthOrderRungeKutta::Impl::propertiesInfo()
+SolverPropertyPtrVector SolverFourthOrderRungeKutta::Impl::propertiesInfo()
 {
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
@@ -44,7 +44,7 @@ std::vector<SolverPropertyPtr> SolverFourthOrderRungeKutta::Impl::propertiesInfo
     };
 }
 
-std::vector<std::string> SolverFourthOrderRungeKutta::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
+StringVector SolverFourthOrderRungeKutta::Impl::hiddenProperties(const StringStringMap &pProperties)
 {
     (void)pProperties;
 
@@ -67,9 +67,9 @@ SolverFourthOrderRungeKutta::Impl::~Impl()
     delete[] mYk;
 }
 
-std::map<std::string, std::string> SolverFourthOrderRungeKutta::Impl::propertiesId() const
+StringStringMap SolverFourthOrderRungeKutta::Impl::propertiesId() const
 {
-    static const std::map<std::string, std::string> PROPERTIES_ID = {
+    static const StringStringMap PROPERTIES_ID = {
         {STEP_NAME, STEP_ID},
     };
 

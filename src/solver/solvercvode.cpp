@@ -71,22 +71,22 @@ const std::string SolverCvode::Impl::MAXIMUM_NUMBER_OF_STEPS_NAME = "Maximum num
 
 const std::string SolverCvode::Impl::INTEGRATION_METHOD_ID = "KISAO:0000475"; // NOLINT
 const std::string SolverCvode::Impl::INTEGRATION_METHOD_NAME = "Integration method"; // NOLINT
-const std::vector<std::string> SolverCvode::Impl::INTEGRATION_METHOD_LIST = {ADAMS_MOULTON_METHOD, BDF_METHOD}; // NOLINT
+const StringVector SolverCvode::Impl::INTEGRATION_METHOD_LIST = {ADAMS_MOULTON_METHOD, BDF_METHOD}; // NOLINT
 const std::string SolverCvode::Impl::INTEGRATION_METHOD_DEFAULT_VALUE = BDF_METHOD; // NOLINT
 
 const std::string SolverCvode::Impl::ITERATION_TYPE_ID = "KISAO:0000476"; // NOLINT
 const std::string SolverCvode::Impl::ITERATION_TYPE_NAME = "Iteration type"; // NOLINT
-const std::vector<std::string> SolverCvode::Impl::ITERATION_TYPE_LIST = {FUNCTIONAL_ITERATION_TYPE, NEWTON_ITERATION_TYPE}; // NOLINT
+const StringVector SolverCvode::Impl::ITERATION_TYPE_LIST = {FUNCTIONAL_ITERATION_TYPE, NEWTON_ITERATION_TYPE}; // NOLINT
 const std::string SolverCvode::Impl::ITERATION_TYPE_DEFAULT_VALUE = NEWTON_ITERATION_TYPE; // NOLINT
 
 const std::string SolverCvode::Impl::LINEAR_SOLVER_ID = "KISAO:0000477"; // NOLINT
 const std::string SolverCvode::Impl::LINEAR_SOLVER_NAME = "Linear solver"; // NOLINT
-const std::vector<std::string> SolverCvode::Impl::LINEAR_SOLVER_LIST = {DENSE_LINEAR_SOLVER, BANDED_LINEAR_SOLVER, DIAGONAL_LINEAR_SOLVER, GMRES_LINEAR_SOLVER, BICGSTAB_LINEAR_SOLVER, TFQMR_LINEAR_SOLVER}; // NOLINT
+const StringVector SolverCvode::Impl::LINEAR_SOLVER_LIST = {DENSE_LINEAR_SOLVER, BANDED_LINEAR_SOLVER, DIAGONAL_LINEAR_SOLVER, GMRES_LINEAR_SOLVER, BICGSTAB_LINEAR_SOLVER, TFQMR_LINEAR_SOLVER}; // NOLINT
 const std::string SolverCvode::Impl::LINEAR_SOLVER_DEFAULT_VALUE = DENSE_LINEAR_SOLVER; // NOLINT
 
 const std::string SolverCvode::Impl::PRECONDITIONER_ID = "KISAO:0000478"; // NOLINT
 const std::string SolverCvode::Impl::PRECONDITIONER_NAME = "Preconditioner"; // NOLINT
-const std::vector<std::string> SolverCvode::Impl::PRECONDITIONER_LIST = {NO_PRECONDITIONER, BANDED_PRECONDITIONER}; // NOLINT
+const StringVector SolverCvode::Impl::PRECONDITIONER_LIST = {NO_PRECONDITIONER, BANDED_PRECONDITIONER}; // NOLINT
 const std::string SolverCvode::Impl::PRECONDITIONER_DEFAULT_VALUE = BANDED_PRECONDITIONER; // NOLINT
 
 const std::string SolverCvode::Impl::UPPER_HALF_BANDWIDTH_ID = "KISAO:0000479"; // NOLINT
@@ -142,7 +142,7 @@ SolverPtr SolverCvode::Impl::create()
     return std::shared_ptr<SolverCvode> {new SolverCvode {}};
 }
 
-std::vector<SolverPropertyPtr> SolverCvode::Impl::propertiesInfo()
+SolverPropertyPtrVector SolverCvode::Impl::propertiesInfo()
 {
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGe0, MAXIMUM_STEP_ID, MAXIMUM_STEP_NAME,
@@ -192,9 +192,9 @@ std::vector<SolverPropertyPtr> SolverCvode::Impl::propertiesInfo()
     };
 }
 
-std::vector<std::string> SolverCvode::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
+StringVector SolverCvode::Impl::hiddenProperties(const StringStringMap &pProperties)
 {
-    std::vector<std::string> res;
+    StringVector res;
     auto iterationType = valueFromProperties(ITERATION_TYPE_ID, ITERATION_TYPE_NAME, pProperties);
 
     if (iterationType == NEWTON_ITERATION_TYPE) {
@@ -261,9 +261,9 @@ SolverCvode::Impl::~Impl()
     }
 }
 
-std::map<std::string, std::string> SolverCvode::Impl::propertiesId() const
+StringStringMap SolverCvode::Impl::propertiesId() const
 {
-    static const std::map<std::string, std::string> PROPERTIES_ID = {
+    static const StringStringMap PROPERTIES_ID = {
         {MAXIMUM_STEP_NAME, MAXIMUM_STEP_ID},
         {MAXIMUM_NUMBER_OF_STEPS_NAME, MAXIMUM_NUMBER_OF_STEPS_ID},
         {INTEGRATION_METHOD_NAME, INTEGRATION_METHOD_ID},

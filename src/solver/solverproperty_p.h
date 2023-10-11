@@ -28,12 +28,12 @@ public:
     Type mType;
     std::string mId;
     std::string mName;
-    std::vector<std::string> mListValues;
+    StringVector mListValues;
     std::string mDefaultValue;
     bool mHasVoiUnit;
 
-    explicit Impl(Type pType, const std::string &pId, const std::string &pName,
-                  const std::vector<std::string> &pListValues, const std::string &pDefaultValue, bool pHasVoiUnit);
+    explicit Impl(Type pType, const std::string &pId, const std::string &pName, const StringVector &pListValues,
+                  const std::string &pDefaultValue, bool pHasVoiUnit);
 };
 
 } // namespace libOpenCOR

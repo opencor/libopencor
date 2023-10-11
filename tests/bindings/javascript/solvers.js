@@ -19,8 +19,8 @@ import { expectHiddenProperties } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
-const noProperties = new libopencor.Properties();
-const noHiddenProperties = new libopencor.HiddenProperties();
+const noProperties = new libopencor.StringStringMap();
+const noHiddenProperties = new libopencor.StringVector();
 
 export function checkCvodeSolver(solverInfo) {
   // Properties.
@@ -63,9 +63,7 @@ export function checkCvodeSolver(solverInfo) {
 
   property = solverInfoProperties.get(2);
 
-  expect(property.type().value).toBe(
-    libopencor.SolverProperty.Type.List.value,
-  );
+  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
   expect(property.id()).toBe("KISAO:0000475");
   expect(property.name()).toBe("Integration method");
   expect(property.defaultValue()).toBe("BDF");
@@ -79,9 +77,7 @@ export function checkCvodeSolver(solverInfo) {
 
   property = solverInfoProperties.get(3);
 
-  expect(property.type().value).toBe(
-    libopencor.SolverProperty.Type.List.value,
-  );
+  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
   expect(property.id()).toBe("KISAO:0000476");
   expect(property.name()).toBe("Iteration type");
   expect(property.defaultValue()).toBe("Newton");
@@ -95,9 +91,7 @@ export function checkCvodeSolver(solverInfo) {
 
   property = solverInfoProperties.get(4);
 
-  expect(property.type().value).toBe(
-    libopencor.SolverProperty.Type.List.value,
-  );
+  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
   expect(property.id()).toBe("KISAO:0000477");
   expect(property.name()).toBe("Linear solver");
   expect(property.defaultValue()).toBe("Dense");
@@ -115,9 +109,7 @@ export function checkCvodeSolver(solverInfo) {
 
   property = solverInfoProperties.get(5);
 
-  expect(property.type().value).toBe(
-    libopencor.SolverProperty.Type.List.value,
-  );
+  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
   expect(property.id()).toBe("KISAO:0000478");
   expect(property.name()).toBe("Preconditioner");
   expect(property.defaultValue()).toBe("Banded");
@@ -209,18 +201,14 @@ export function checkCvodeSolver(solverInfo) {
   ];
   const hiddenPropertiesForNewtonBanded = ["KISAO:0000478"];
   const hiddenPropertiesForNewtonGmres = noHiddenProperties;
-  const hiddenPropertiesForNewtonGmresNone = [
-    "KISAO:0000479",
-    "KISAO:0000480",
-  ];
+  const hiddenPropertiesForNewtonGmresNone = ["KISAO:0000479", "KISAO:0000480"];
   const hiddenPropertiesForNewtonGmresBanded = noHiddenProperties;
   const hiddenPropertiesForNewtonBicgstab = noHiddenProperties;
   const hiddenPropertiesForNewtonBicgstabNone =
     hiddenPropertiesForNewtonGmresNone;
   const hiddenPropertiesForNewtonBicgstabBanded = noHiddenProperties;
   const hiddenPropertiesForNewtonTfqmr = noHiddenProperties;
-  const hiddenPropertiesForNewtonTfqmrNone =
-    hiddenPropertiesForNewtonGmresNone;
+  const hiddenPropertiesForNewtonTfqmrNone = hiddenPropertiesForNewtonGmresNone;
   const hiddenPropertiesForNewtonTfqmrBanded = noHiddenProperties;
   const hiddenPropertiesForNewtonDiagonal = hiddenPropertiesForNewtonDense;
   const hiddenPropertiesForFunctional = [
@@ -235,7 +223,7 @@ export function checkCvodeSolver(solverInfo) {
     noHiddenProperties,
   );
 
-  let properties = new libopencor.Properties();
+  let properties = new libopencor.StringStringMap();
 
   properties.set("Iteration type", "Newton");
 

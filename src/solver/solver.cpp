@@ -25,12 +25,12 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-std::map<std::string, std::string> Solver::Impl::SolversId; // NOLINT
-std::map<std::string, SolverCreate> Solver::Impl::SolversCreate; // NOLINT
-std::vector<SolverInfoPtr> Solver::Impl::SolversInfo; // NOLINT
+StringStringMap Solver::Impl::SolversId; // NOLINT
+StringSolverCreateMap Solver::Impl::SolversCreate; // NOLINT
+SolverInfoPtrVector Solver::Impl::SolversInfo; // NOLINT
 
 void Solver::Impl::registerSolver(Type pType, const std::string &pId, const std::string &pName,
-                                  SolverCreate pCreate, const std::vector<SolverPropertyPtr> &pProperties,
+                                  SolverCreate pCreate, const SolverPropertyPtrVector &pProperties,
                                   SolverInfo::HiddenPropertiesFunction pHiddenProperties)
 {
 #ifndef COVERAGE_ENABLED
@@ -45,14 +45,14 @@ void Solver::Impl::registerSolver(Type pType, const std::string &pId, const std:
 }
 
 SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pId,
-                                               const std::string &pName, const std::vector<std::string> &pListValues,
+                                               const std::string &pName, const StringVector &pListValues,
                                                const std::string &pDefaultValue, bool pHasVoiUnit)
 {
     return SolverPropertyPtr {new SolverProperty(pType, pId, pName, pListValues, pDefaultValue, pHasVoiUnit)};
 }
 
 std::string Solver::Impl::valueFromProperties(const std::string &pId, const std::string &pName,
-                                              const std::map<std::string, std::string> &pProperties)
+                                              const StringStringMap &pProperties)
 {
     auto valueIter = pProperties.find(pId);
 
@@ -69,7 +69,7 @@ std::string Solver::Impl::valueFromProperties(const std::string &pId, const std:
     return {};
 }
 
-std::map<std::string, std::string> Solver::Impl::propertiesId() const
+StringStringMap Solver::Impl::propertiesId() const
 {
     return {};
 }
@@ -102,12 +102,12 @@ void Solver::Impl::setProperty(const std::string &pIdOrName, const std::string &
     }
 }
 
-std::map<std::string, std::string> Solver::Impl::properties() const
+StringStringMap Solver::Impl::properties() const
 {
     return mProperties;
 }
 
-void Solver::Impl::setProperties(const std::map<std::string, std::string> &pProperties)
+void Solver::Impl::setProperties(const StringStringMap &pProperties)
 {
     for (const auto &property : pProperties) {
         auto id = this->id(property.first);
@@ -146,7 +146,7 @@ SolverPtr Solver::create(const std::string &pIdOrName)
     return SolverUnknown::Impl::create();
 }
 
-std::vector<SolverInfoPtr> Solver::solversInfo()
+SolverInfoPtrVector Solver::solversInfo()
 {
     static auto initialised = false;
 
@@ -207,12 +207,12 @@ void Solver::setProperty(const std::string &pIdOrName, const std::string &pValue
     pimpl()->setProperty(pIdOrName, pValue);
 }
 
-std::map<std::string, std::string> Solver::properties() const
+StringStringMap Solver::properties() const
 {
     return pimpl()->properties();
 }
 
-void Solver::setProperties(const std::map<std::string, std::string> &pProperties)
+void Solver::setProperties(const StringStringMap &pProperties)
 {
     pimpl()->setProperties(pProperties);
 }

@@ -50,40 +50,40 @@ public:
      *
      * Return the issues.
      *
-     * @return The issues, as a @c std::vector of references to @ref Issue objects.
+     * @return The issues, as an @ref IssuePtrVector.
      */
 
-    std::vector<IssuePtr> issues() const;
+    IssuePtrVector issues() const;
 
     /**
      * @brief Return the errors.
      *
      * Return the errors.
      *
-     * @return The errors, as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::ERROR.
+     * @return The errors, as a @ref IssuePtrVector of type @ref Issue::Type::ERROR.
      */
 
-    std::vector<IssuePtr> errors() const;
+    IssuePtrVector errors() const;
 
     /**
      * @brief Return the warnings.
      *
      * Return the warnings.
      *
-     * @return The warnings, as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::WARNING.
+     * @return The warnings, as a @ref IssuePtrVector of type @ref Issue::Type::WARNING.
      */
 
-    std::vector<IssuePtr> warnings() const;
+    IssuePtrVector warnings() const;
 
     /**
      * @brief Return the messages.
      *
      * Return the messages.
      *
-     * @return The messages, as a @c std::vector of references to @ref Issue objects of type @ref Issue::Type::MESSAGE.
+     * @return The messages, as a @ref IssuePtrVector of type @ref Issue::Type::MESSAGE.
      */
 
-    std::vector<IssuePtr> messages() const;
+    IssuePtrVector messages() const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

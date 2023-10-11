@@ -20,8 +20,6 @@ void loggerApi()
 {
     // Logger API.
 
-    emscripten::register_vector<libOpenCOR::IssuePtr>("Issues");
-
     emscripten::class_<libOpenCOR::Logger>("Logger")
         .function("issues", &libOpenCOR::Logger::issues)
         .function("errors", &libOpenCOR::Logger::errors)

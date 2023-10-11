@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/export.h"
+#include "libopencor/types.h"
 
 namespace libOpenCOR {
 
@@ -103,10 +104,10 @@ public:
      *
      * Return the name of the list of values this property can take.
      *
-     * @return The list of values, as a @c std::vector of @c std::string, this property can take.
+     * @return The list of values, as a @ref StringVector, this property can take.
      */
 
-    std::vector<std::string> listValues() const;
+    StringVector listValues() const;
 
     /**
      * @brief Get the default value of this property.
@@ -134,8 +135,7 @@ private:
     Impl *mPimpl;
 
     explicit SolverProperty(Type pType, const std::string &pId, const std::string &pName,
-                            const std::vector<std::string> &pListValues, const std::string &pDefaultValue,
-                            bool pHasVoiUnit);
+                            const StringVector &pListValues, const std::string &pDefaultValue, bool pHasVoiUnit);
 };
 
 } // namespace libOpenCOR

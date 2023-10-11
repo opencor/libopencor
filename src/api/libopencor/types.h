@@ -16,9 +16,12 @@ limitations under the License.
 
 #pragma once
 
+#include <map>
 #include <memory>
 
 namespace libOpenCOR {
+
+// Shared pointers.
 
 class File;
 using FilePtr = std::shared_ptr<File>; /**< Type definition for the shared @ref File pointer. */
@@ -37,5 +40,17 @@ using SolverInfoPtr = std::shared_ptr<SolverInfo>; /**< Type definition for the 
 
 class SolverProperty;
 using SolverPropertyPtr = std::shared_ptr<SolverProperty>; /**< Type definition for the shared @ref SolverProperty pointer. */
+
+// Vectors.
+
+using IssuePtrVector = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
+using SolverInfoPtrVector = std::vector<SolverInfoPtr>; /**< Type definition for a vector of @ref SolverInfo pointers. */
+using SolverPropertyPtrVector = std::vector<SolverPropertyPtr>; /**< Type definition for a vector of @ref SolverProperty pointers. */
+using StringVector = std::vector<std::string>; /**< Type definition for a vector of strings. */
+using UnsignedCharVector = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
+
+// Maps.
+
+using StringStringMap = std::map<std::string, std::string>; /**< Type definition for a map of strings. */
 
 } // namespace libcellml

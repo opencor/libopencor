@@ -88,10 +88,10 @@ public:
      *
      * Get various information about the solvers that are available.
      *
-     * @return The information, as a @c std::vector of @ref SolverInfo, about the solvers that are available.
+     * @return The information, as a @ref SolverInfoPtrVector, about the solvers that are available.
      */
 
-    static std::vector<SolverInfoPtr> solversInfo();
+    static SolverInfoPtrVector solversInfo();
 
     /**
      * @brief Return whether this solver is valid.
@@ -142,10 +142,10 @@ public:
      *
      * Get the properties of this solver.
      *
-     * @return The properties, as a @c std::map of @c std::string, of this solver.
+     * @return The properties, as a @ref StringStringMap, of this solver.
      */
 
-    std::map<std::string, std::string> properties() const;
+    StringStringMap properties() const;
 
     /**
      * @brief Set the properties of this solver.
@@ -154,10 +154,10 @@ public:
      * nothing is done. If @p pProperties has an entry for both the (KiSAO) id and name of a property then the (KiSAO)
      * id entry is used.
      *
-     * @param pProperties The properties, as a @c std::map of @c std::string, of this solver.
+     * @param pProperties The properties, as a @ref StringStringMap, of this solver.
      */
 
-    void setProperties(const std::map<std::string, std::string> &pProperties);
+    void setProperties(const StringStringMap &pProperties);
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

@@ -140,20 +140,20 @@ public:
      *
      * Return the contents of this file.
      *
-     * @return The contents, as a @c std::vector of unsigned @c char, of this file.
+     * @return The contents, as an @ref UnsignedCharVector, of this file.
      */
 
-    std::vector<unsigned char> contents();
+    UnsignedCharVector contents();
 
     /**
      * @brief Set the contents of this file.
      *
      * Set the contents of this file.
      *
-     * @param pContents The contents, as a @c std::vector of unsigned @c char, of this file.
+     * @param pContents The contents, as an @ref UnsignedCharVector, of this file.
      */
 
-    void setContents(const std::vector<unsigned char> &pContents);
+    void setContents(const UnsignedCharVector &pContents);
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

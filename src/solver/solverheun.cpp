@@ -34,7 +34,7 @@ SolverPtr SolverHeun::Impl::create()
     return std::shared_ptr<SolverHeun> {new SolverHeun {}};
 }
 
-std::vector<SolverPropertyPtr> SolverHeun::Impl::propertiesInfo()
+SolverPropertyPtrVector SolverHeun::Impl::propertiesInfo()
 {
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
@@ -44,7 +44,7 @@ std::vector<SolverPropertyPtr> SolverHeun::Impl::propertiesInfo()
     };
 }
 
-std::vector<std::string> SolverHeun::Impl::hiddenProperties(const std::map<std::string, std::string> &pProperties)
+StringVector SolverHeun::Impl::hiddenProperties(const StringStringMap &pProperties)
 {
     (void)pProperties;
 
@@ -65,9 +65,9 @@ SolverHeun::Impl::~Impl()
     delete[] mYk;
 }
 
-std::map<std::string, std::string> SolverHeun::Impl::propertiesId() const
+StringStringMap SolverHeun::Impl::propertiesId() const
 {
-    static const std::map<std::string, std::string> PROPERTIES_ID = {
+    static const StringStringMap PROPERTIES_ID = {
         {STEP_NAME, STEP_ID},
     };
 

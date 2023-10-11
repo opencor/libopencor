@@ -20,12 +20,6 @@ void solverApi()
 {
     // SolverInfo API.
 
-    EM_ASM({
-        Module["HiddenProperties"] = Module["Strings"];
-    });
-
-    emscripten::register_map<std::string, std::string>("Properties");
-
     emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
         .smart_ptr<libOpenCOR::SolverInfoPtr>("SolverInfo")
         .function("type", &libOpenCOR::SolverInfo::type)
@@ -33,8 +27,6 @@ void solverApi()
         .function("name", &libOpenCOR::SolverInfo::name)
         .function("properties", &libOpenCOR::SolverInfo::properties)
         .function("hiddenProperties", &libOpenCOR::SolverInfo::hiddenProperties);
-
-    emscripten::register_vector<libOpenCOR::SolverInfoPtr>("SolversInfo");
 
     // SolverProperty API.
 
@@ -56,8 +48,6 @@ void solverApi()
         .function("listValues", &libOpenCOR::SolverProperty::listValues)
         .function("defaultValue", &libOpenCOR::SolverProperty::defaultValue)
         .function("hasVoiUnit", &libOpenCOR::SolverProperty::hasVoiUnit);
-
-    emscripten::register_vector<libOpenCOR::SolverPropertyPtr>("SolverProperties");
 
     EM_ASM({
         Module["SolverProperty"]["Type"] = Module["SolverProperty.Type"];

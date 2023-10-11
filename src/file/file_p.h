@@ -36,7 +36,7 @@ public:
     std::string mUrl;
 
     bool mContentsRetrieved = false;
-    std::vector<unsigned char> mContents;
+    UnsignedCharVector mContents;
 
     CellmlFilePtr mCellmlFile;
     SedmlFilePtr mSedmlFile;
@@ -53,8 +53,8 @@ public:
     void retrieveContents();
 #endif
 
-    std::vector<unsigned char> contents();
-    void setContents(const std::vector<unsigned char> &pContents);
+    UnsignedCharVector contents();
+    void setContents(const UnsignedCharVector &pContents);
 };
 
 } // namespace libOpenCOR

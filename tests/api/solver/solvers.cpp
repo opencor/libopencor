@@ -18,10 +18,12 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
+#include "libopencor/types.h"
+
 #include "tests/utils.h"
 
-static const std::map<std::string, std::string> NoProperties;
-static const std::vector<std::string> NoHiddenProperties;
+static const libOpenCOR::StringStringMap NoProperties;
+static const libOpenCOR::StringVector NoHiddenProperties;
 
 void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 {
@@ -181,24 +183,24 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 
     // Hidden properties.
 
-    static const std::vector<std::string> HiddenPropertiesForNewton = NoHiddenProperties;
-    static const std::vector<std::string> HiddenPropertiesForNewtonDense = {"KISAO:0000478", "KISAO:0000479", "KISAO:0000480"};
-    static const std::vector<std::string> HiddenPropertiesForNewtonBanded = {"KISAO:0000478"};
-    static const std::vector<std::string> HiddenPropertiesForNewtonGmres = NoHiddenProperties;
-    static const std::vector<std::string> HiddenPropertiesForNewtonGmresNone = {"KISAO:0000479", "KISAO:0000480"};
-    static const std::vector<std::string> HiddenPropertiesForNewtonGmresBanded = NoHiddenProperties;
-    static const std::vector<std::string> HiddenPropertiesForNewtonBicgstab = NoHiddenProperties;
-    static const std::vector<std::string> HiddenPropertiesForNewtonBicgstabNone = HiddenPropertiesForNewtonGmresNone;
-    static const std::vector<std::string> HiddenPropertiesForNewtonBicgstabBanded = NoHiddenProperties;
-    static const std::vector<std::string> HiddenPropertiesForNewtonTfqmr = NoHiddenProperties;
-    static const std::vector<std::string> HiddenPropertiesForNewtonTfqmrNone = HiddenPropertiesForNewtonGmresNone;
-    static const std::vector<std::string> HiddenPropertiesForNewtonTfqmrBanded = NoHiddenProperties;
-    static const std::vector<std::string> HiddenPropertiesForNewtonDiagonal = HiddenPropertiesForNewtonDense;
-    static const std::vector<std::string> HiddenPropertiesForFunctional = {"KISAO:0000477", "KISAO:0000478", "KISAO:0000479", "KISAO:0000480"};
+    static const libOpenCOR::StringVector HiddenPropertiesForNewton = NoHiddenProperties;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonDense = {"KISAO:0000478", "KISAO:0000479", "KISAO:0000480"};
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonBanded = {"KISAO:0000478"};
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonGmres = NoHiddenProperties;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonGmresNone = {"KISAO:0000479", "KISAO:0000480"};
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonGmresBanded = NoHiddenProperties;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonBicgstab = NoHiddenProperties;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonBicgstabNone = HiddenPropertiesForNewtonGmresNone;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonBicgstabBanded = NoHiddenProperties;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonTfqmr = NoHiddenProperties;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonTfqmrNone = HiddenPropertiesForNewtonGmresNone;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonTfqmrBanded = NoHiddenProperties;
+    static const libOpenCOR::StringVector HiddenPropertiesForNewtonDiagonal = HiddenPropertiesForNewtonDense;
+    static const libOpenCOR::StringVector HiddenPropertiesForFunctional = {"KISAO:0000477", "KISAO:0000478", "KISAO:0000479", "KISAO:0000480"};
 
     EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(NoProperties), NoHiddenProperties);
 
-    std::map<std::string, std::string> properties;
+    libOpenCOR::StringStringMap properties;
 
     properties["Iteration type"] = "Newton";
 

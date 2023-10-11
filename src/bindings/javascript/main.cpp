@@ -23,7 +23,18 @@ void versionApi();
 
 EMSCRIPTEN_BINDINGS(libOpenCOR)
 {
-    emscripten::register_vector<std::string>("Strings");
+    // Vectors.
+
+    emscripten::register_vector<libOpenCOR::IssuePtr>("IssuePtrVector");
+    emscripten::register_vector<libOpenCOR::SolverInfoPtr>("SolverInfoPtrVector");
+    emscripten::register_vector<libOpenCOR::SolverPropertyPtr>("SolverPropertyPtrVector");
+    emscripten::register_vector<std::string>("StringVector");
+
+    // Maps.
+
+    emscripten::register_map<std::string, std::string>("StringStringMap");
+
+    // APIs.
 
     loggerApi(); // Note: it needs to be first since it is used by some other APIs.
 

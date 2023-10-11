@@ -37,8 +37,8 @@ public:
     // Solver.
 
     static SolverPtr create();
-    static std::vector<SolverPropertyPtr> propertiesInfo();
-    static std::vector<std::string> hiddenProperties(const std::map<std::string, std::string> &pProperties);
+    static SolverPropertyPtrVector propertiesInfo();
+    static StringVector hiddenProperties(const StringStringMap &pProperties);
 
     double mStep = STEP_DEFAULT_VALUE;
 
@@ -47,7 +47,7 @@ public:
     explicit Impl();
     ~Impl() override;
 
-    std::map<std::string, std::string> propertiesId() const override;
+    StringStringMap propertiesId() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
