@@ -20,11 +20,13 @@ limitations under the License.
 #include "solverfourthorderrungekutta_p.h"
 #include "solverheun_p.h"
 #include "solverinfo_p.h"
+#include "solverkinsol_p.h"
 #include "solversecondorderrungekutta_p.h"
 #include "solverunknown_p.h"
 
 namespace libOpenCOR {
 
+StringSizetMap Solver::Impl::SolversIndex; // NOLINT
 StringStringMap Solver::Impl::SolversId; // NOLINT
 StringSolverCreateMap Solver::Impl::SolversCreate; // NOLINT
 SolverInfoPtrVector Solver::Impl::SolversInfo; // NOLINT
@@ -33,15 +35,10 @@ void Solver::Impl::registerSolver(Type pType, const std::string &pId, const std:
                                   SolverCreate pCreate, const SolverPropertyPtrVector &pProperties,
                                   SolverInfo::HiddenPropertiesFunction pHiddenProperties)
 {
-#ifndef COVERAGE_ENABLED
-    if (auto iter = Solver::Impl::SolversCreate.find(pId); iter == Solver::Impl::SolversCreate.end()) {
-#endif
-        Solver::Impl::SolversId[pName] = pId;
-        Solver::Impl::SolversCreate[pId] = pCreate;
-        Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pId, pName, pProperties, pHiddenProperties));
-#ifndef COVERAGE_ENABLED
-    }
-#endif
+    Solver::Impl::SolversIndex[pId] = SolversInfo.size();
+    Solver::Impl::SolversId[pName] = pId;
+    Solver::Impl::SolversCreate[pId] = pCreate;
+    Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pId, pName, pProperties, pHiddenProperties));
 }
 
 SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pId,
@@ -180,6 +177,13 @@ SolverInfoPtrVector Solver::solversInfo()
                                      SolverHeun::Impl::create,
                                      SolverHeun::Impl::propertiesInfo(),
                                      SolverHeun::Impl::hiddenProperties);
+
+        Solver::Impl::registerSolver(SolverKinsol::Impl::TYPE,
+                                     SolverKinsol::Impl::ID,
+                                     SolverKinsol::Impl::NAME,
+                                     SolverKinsol::Impl::create,
+                                     SolverKinsol::Impl::propertiesInfo(),
+                                     SolverKinsol::Impl::hiddenProperties);
 
         Solver::Impl::registerSolver(SolverSecondOrderRungeKutta::Impl::TYPE,
                                      SolverSecondOrderRungeKutta::Impl::ID,

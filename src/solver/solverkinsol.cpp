@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solvercvode_p.h"
+#include "solverkinsol_p.h"
 #include "utils.h"
 
 #include <algorithm>
@@ -36,80 +36,80 @@ namespace libOpenCOR {
 
 // Integration methods.
 
-const std::string SolverCvode::Impl::ADAMS_MOULTON_METHOD = "Adams-Moulton"; // NOLINT
-const std::string SolverCvode::Impl::BDF_METHOD = "BDF"; // NOLINT
+const std::string SolverKinsol::Impl::ADAMS_MOULTON_METHOD = "Adams-Moulton"; // NOLINT
+const std::string SolverKinsol::Impl::BDF_METHOD = "BDF"; // NOLINT
 
 // Iteration types.
 
-const std::string SolverCvode::Impl::FUNCTIONAL_ITERATION_TYPE = "Functional"; // NOLINT
-const std::string SolverCvode::Impl::NEWTON_ITERATION_TYPE = "Newton"; // NOLINT
+const std::string SolverKinsol::Impl::FUNCTIONAL_ITERATION_TYPE = "Functional"; // NOLINT
+const std::string SolverKinsol::Impl::NEWTON_ITERATION_TYPE = "Newton"; // NOLINT
 
 // Linear solvers.
 
-const std::string SolverCvode::Impl::DENSE_LINEAR_SOLVER = "Dense"; // NOLINT
-const std::string SolverCvode::Impl::BANDED_LINEAR_SOLVER = "Banded"; // NOLINT
-const std::string SolverCvode::Impl::DIAGONAL_LINEAR_SOLVER = "Diagonal"; // NOLINT
-const std::string SolverCvode::Impl::GMRES_LINEAR_SOLVER = "GMRES"; // NOLINT
-const std::string SolverCvode::Impl::BICGSTAB_LINEAR_SOLVER = "BiCGStab"; // NOLINT
-const std::string SolverCvode::Impl::TFQMR_LINEAR_SOLVER = "TFQMR"; // NOLINT
+const std::string SolverKinsol::Impl::DENSE_LINEAR_SOLVER = "Dense"; // NOLINT
+const std::string SolverKinsol::Impl::BANDED_LINEAR_SOLVER = "Banded"; // NOLINT
+const std::string SolverKinsol::Impl::DIAGONAL_LINEAR_SOLVER = "Diagonal"; // NOLINT
+const std::string SolverKinsol::Impl::GMRES_LINEAR_SOLVER = "GMRES"; // NOLINT
+const std::string SolverKinsol::Impl::BICGSTAB_LINEAR_SOLVER = "BiCGStab"; // NOLINT
+const std::string SolverKinsol::Impl::TFQMR_LINEAR_SOLVER = "TFQMR"; // NOLINT
 
 // Preconditioners.
 
-const std::string SolverCvode::Impl::NO_PRECONDITIONER = "None"; // NOLINT
-const std::string SolverCvode::Impl::BANDED_PRECONDITIONER = "Banded"; // NOLINT
+const std::string SolverKinsol::Impl::NO_PRECONDITIONER = "None"; // NOLINT
+const std::string SolverKinsol::Impl::BANDED_PRECONDITIONER = "Banded"; // NOLINT
 
 // Properties information.
 
-const std::string SolverCvode::Impl::ID = "KISAO:0000019"; // NOLINT
-const std::string SolverCvode::Impl::NAME = "CVODE"; // NOLINT
+const std::string SolverKinsol::Impl::ID = "KISAO:0000282"; // NOLINT
+const std::string SolverKinsol::Impl::NAME = "KINSOL"; // NOLINT
 
-const std::string SolverCvode::Impl::MAXIMUM_STEP_ID = "KISAO:0000467"; // NOLINT
-const std::string SolverCvode::Impl::MAXIMUM_STEP_NAME = "Maximum step"; // NOLINT
+const std::string SolverKinsol::Impl::MAXIMUM_STEP_ID = "KISAO:0000467"; // NOLINT
+const std::string SolverKinsol::Impl::MAXIMUM_STEP_NAME = "Maximum step"; // NOLINT
 
-const std::string SolverCvode::Impl::MAXIMUM_NUMBER_OF_STEPS_ID = "KISAO:0000415"; // NOLINT
-const std::string SolverCvode::Impl::MAXIMUM_NUMBER_OF_STEPS_NAME = "Maximum number of steps"; // NOLINT
+const std::string SolverKinsol::Impl::MAXIMUM_NUMBER_OF_STEPS_ID = "KISAO:0000415"; // NOLINT
+const std::string SolverKinsol::Impl::MAXIMUM_NUMBER_OF_STEPS_NAME = "Maximum number of steps"; // NOLINT
 
-const std::string SolverCvode::Impl::INTEGRATION_METHOD_ID = "KISAO:0000475"; // NOLINT
-const std::string SolverCvode::Impl::INTEGRATION_METHOD_NAME = "Integration method"; // NOLINT
-const StringVector SolverCvode::Impl::INTEGRATION_METHOD_LIST = {ADAMS_MOULTON_METHOD, BDF_METHOD}; // NOLINT
-const std::string SolverCvode::Impl::INTEGRATION_METHOD_DEFAULT_VALUE = BDF_METHOD; // NOLINT
+const std::string SolverKinsol::Impl::INTEGRATION_METHOD_ID = "KISAO:0000475"; // NOLINT
+const std::string SolverKinsol::Impl::INTEGRATION_METHOD_NAME = "Integration method"; // NOLINT
+const StringVector SolverKinsol::Impl::INTEGRATION_METHOD_LIST = {ADAMS_MOULTON_METHOD, BDF_METHOD}; // NOLINT
+const std::string SolverKinsol::Impl::INTEGRATION_METHOD_DEFAULT_VALUE = BDF_METHOD; // NOLINT
 
-const std::string SolverCvode::Impl::ITERATION_TYPE_ID = "KISAO:0000476"; // NOLINT
-const std::string SolverCvode::Impl::ITERATION_TYPE_NAME = "Iteration type"; // NOLINT
-const StringVector SolverCvode::Impl::ITERATION_TYPE_LIST = {FUNCTIONAL_ITERATION_TYPE, NEWTON_ITERATION_TYPE}; // NOLINT
-const std::string SolverCvode::Impl::ITERATION_TYPE_DEFAULT_VALUE = NEWTON_ITERATION_TYPE; // NOLINT
+const std::string SolverKinsol::Impl::ITERATION_TYPE_ID = "KISAO:0000476"; // NOLINT
+const std::string SolverKinsol::Impl::ITERATION_TYPE_NAME = "Iteration type"; // NOLINT
+const StringVector SolverKinsol::Impl::ITERATION_TYPE_LIST = {FUNCTIONAL_ITERATION_TYPE, NEWTON_ITERATION_TYPE}; // NOLINT
+const std::string SolverKinsol::Impl::ITERATION_TYPE_DEFAULT_VALUE = NEWTON_ITERATION_TYPE; // NOLINT
 
-const std::string SolverCvode::Impl::LINEAR_SOLVER_ID = "KISAO:0000477"; // NOLINT
-const std::string SolverCvode::Impl::LINEAR_SOLVER_NAME = "Linear solver"; // NOLINT
-const StringVector SolverCvode::Impl::LINEAR_SOLVER_LIST = {DENSE_LINEAR_SOLVER, BANDED_LINEAR_SOLVER, DIAGONAL_LINEAR_SOLVER, GMRES_LINEAR_SOLVER, BICGSTAB_LINEAR_SOLVER, TFQMR_LINEAR_SOLVER}; // NOLINT
-const std::string SolverCvode::Impl::LINEAR_SOLVER_DEFAULT_VALUE = DENSE_LINEAR_SOLVER; // NOLINT
+const std::string SolverKinsol::Impl::LINEAR_SOLVER_ID = "KISAO:0000477"; // NOLINT
+const std::string SolverKinsol::Impl::LINEAR_SOLVER_NAME = "Linear solver"; // NOLINT
+const StringVector SolverKinsol::Impl::LINEAR_SOLVER_LIST = {DENSE_LINEAR_SOLVER, BANDED_LINEAR_SOLVER, DIAGONAL_LINEAR_SOLVER, GMRES_LINEAR_SOLVER, BICGSTAB_LINEAR_SOLVER, TFQMR_LINEAR_SOLVER}; // NOLINT
+const std::string SolverKinsol::Impl::LINEAR_SOLVER_DEFAULT_VALUE = DENSE_LINEAR_SOLVER; // NOLINT
 
-const std::string SolverCvode::Impl::PRECONDITIONER_ID = "KISAO:0000478"; // NOLINT
-const std::string SolverCvode::Impl::PRECONDITIONER_NAME = "Preconditioner"; // NOLINT
-const StringVector SolverCvode::Impl::PRECONDITIONER_LIST = {NO_PRECONDITIONER, BANDED_PRECONDITIONER}; // NOLINT
-const std::string SolverCvode::Impl::PRECONDITIONER_DEFAULT_VALUE = BANDED_PRECONDITIONER; // NOLINT
+const std::string SolverKinsol::Impl::PRECONDITIONER_ID = "KISAO:0000478"; // NOLINT
+const std::string SolverKinsol::Impl::PRECONDITIONER_NAME = "Preconditioner"; // NOLINT
+const StringVector SolverKinsol::Impl::PRECONDITIONER_LIST = {NO_PRECONDITIONER, BANDED_PRECONDITIONER}; // NOLINT
+const std::string SolverKinsol::Impl::PRECONDITIONER_DEFAULT_VALUE = BANDED_PRECONDITIONER; // NOLINT
 
-const std::string SolverCvode::Impl::UPPER_HALF_BANDWIDTH_ID = "KISAO:0000479"; // NOLINT
-const std::string SolverCvode::Impl::UPPER_HALF_BANDWIDTH_NAME = "Upper half-bandwidth"; // NOLINT
+const std::string SolverKinsol::Impl::UPPER_HALF_BANDWIDTH_ID = "KISAO:0000479"; // NOLINT
+const std::string SolverKinsol::Impl::UPPER_HALF_BANDWIDTH_NAME = "Upper half-bandwidth"; // NOLINT
 
-const std::string SolverCvode::Impl::LOWER_HALF_BANDWIDTH_ID = "KISAO:0000480"; // NOLINT
-const std::string SolverCvode::Impl::LOWER_HALF_BANDWIDTH_NAME = "Lower half-bandwidth"; // NOLINT
+const std::string SolverKinsol::Impl::LOWER_HALF_BANDWIDTH_ID = "KISAO:0000480"; // NOLINT
+const std::string SolverKinsol::Impl::LOWER_HALF_BANDWIDTH_NAME = "Lower half-bandwidth"; // NOLINT
 
-const std::string SolverCvode::Impl::RELATIVE_TOLERANCE_ID = "KISAO:0000209"; // NOLINT
-const std::string SolverCvode::Impl::RELATIVE_TOLERANCE_NAME = "Relative tolerance"; // NOLINT
+const std::string SolverKinsol::Impl::RELATIVE_TOLERANCE_ID = "KISAO:0000209"; // NOLINT
+const std::string SolverKinsol::Impl::RELATIVE_TOLERANCE_NAME = "Relative tolerance"; // NOLINT
 
-const std::string SolverCvode::Impl::ABSOLUTE_TOLERANCE_ID = "KISAO:0000211"; // NOLINT
-const std::string SolverCvode::Impl::ABSOLUTE_TOLERANCE_NAME = "Absolute tolerance"; // NOLINT
+const std::string SolverKinsol::Impl::ABSOLUTE_TOLERANCE_ID = "KISAO:0000211"; // NOLINT
+const std::string SolverKinsol::Impl::ABSOLUTE_TOLERANCE_NAME = "Absolute tolerance"; // NOLINT
 
-const std::string SolverCvode::Impl::INTERPOLATE_SOLUTION_ID = "KISAO:0000481"; // NOLINT
-const std::string SolverCvode::Impl::INTERPOLATE_SOLUTION_NAME = "Interpolate solution"; // NOLINT
+const std::string SolverKinsol::Impl::INTERPOLATE_SOLUTION_ID = "KISAO:0000481"; // NOLINT
+const std::string SolverKinsol::Impl::INTERPOLATE_SOLUTION_NAME = "Interpolate solution"; // NOLINT
 
 // Right-hand side function.
 
 namespace {
 int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
-    auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
+    auto *userData = static_cast<SolverKinsolUserData *>(pUserData);
 
     userData->computeRates()(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables());
 
@@ -119,30 +119,30 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 
 // Solver user data.
 
-SolverCvodeUserData::SolverCvodeUserData(double *pVariables, SolverOde::ComputeRates pComputeRates)
+SolverKinsolUserData::SolverKinsolUserData(double *pVariables, SolverNla::ComputeRates pComputeRates)
     : mVariables(pVariables)
     , mComputeRates(pComputeRates)
 {
 }
 
-double *SolverCvodeUserData::variables() const
+double *SolverKinsolUserData::variables() const
 {
     return mVariables;
 }
 
-SolverOde::ComputeRates SolverCvodeUserData::computeRates() const
+SolverNla::ComputeRates SolverKinsolUserData::computeRates() const
 {
     return mComputeRates;
 }
 
 // Solver.
 
-SolverPtr SolverCvode::Impl::create()
+SolverPtr SolverKinsol::Impl::create()
 {
-    return std::shared_ptr<SolverCvode> {new SolverCvode {}};
+    return std::shared_ptr<SolverKinsol> {new SolverKinsol {}};
 }
 
-SolverPropertyPtrVector SolverCvode::Impl::propertiesInfo()
+SolverPropertyPtrVector SolverKinsol::Impl::propertiesInfo()
 {
     return {
         Solver::Impl::createProperty(SolverProperty::Type::DoubleGe0, MAXIMUM_STEP_ID, MAXIMUM_STEP_NAME,
@@ -192,7 +192,7 @@ SolverPropertyPtrVector SolverCvode::Impl::propertiesInfo()
     };
 }
 
-StringVector SolverCvode::Impl::hiddenProperties(const StringStringMap &pProperties)
+StringVector SolverKinsol::Impl::hiddenProperties(const StringStringMap &pProperties)
 {
     StringVector res;
     auto iterationType = valueFromProperties(ITERATION_TYPE_ID, ITERATION_TYPE_NAME, pProperties);
@@ -227,8 +227,8 @@ StringVector SolverCvode::Impl::hiddenProperties(const StringStringMap &pPropert
     return res;
 }
 
-SolverCvode::Impl::Impl()
-    : SolverOde::Impl()
+SolverKinsol::Impl::Impl()
+    : SolverNla::Impl()
 {
     mIsValid = true;
 
@@ -245,7 +245,7 @@ SolverCvode::Impl::Impl()
     mProperties[INTERPOLATE_SOLUTION_ID] = toString(INTERPOLATE_SOLUTION_DEFAULT_VALUE);
 }
 
-SolverCvode::Impl::~Impl()
+SolverKinsol::Impl::~Impl()
 {
     if (mContext != nullptr) {
         N_VDestroy_Serial(mStatesVector);
@@ -261,7 +261,7 @@ SolverCvode::Impl::~Impl()
     }
 }
 
-StringStringMap SolverCvode::Impl::propertiesId() const
+StringStringMap SolverKinsol::Impl::propertiesId() const
 {
     static const StringStringMap PROPERTIES_ID = {
         {MAXIMUM_STEP_NAME, MAXIMUM_STEP_ID},
@@ -280,8 +280,8 @@ StringStringMap SolverCvode::Impl::propertiesId() const
     return PROPERTIES_ID;
 }
 
-bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                   ComputeRates pComputeRates)
+bool SolverKinsol::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                    ComputeRates pComputeRates)
 {
     removeAllIssues();
 
@@ -395,6 +395,10 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     ASSERT_EQ(SUNContext_Create(nullptr, &mContext), 0);
 
+    // Create our states vector.
+
+    mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mContext);
+
     // Create our CVODES solver.
 
     mSolver = CVodeCreate((integrationMethod == BDF_METHOD) ? CV_BDF : CV_ADAMS, mContext);
@@ -403,13 +407,11 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Initialise our CVODES solver.
 
-    mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mContext);
-
     ASSERT_EQ(CVodeInit(mSolver, rhsFunction, pVoi, mStatesVector), CV_SUCCESS);
 
     // Set our user data.
 
-    mUserData = new SolverCvodeUserData(pVariables, pComputeRates);
+    mUserData = new SolverKinsolUserData(pVariables, pComputeRates);
 
     ASSERT_EQ(CVodeSetUserData(mSolver, mUserData), CV_SUCCESS);
 
@@ -495,10 +497,10 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Initialise the ODE solver itself.
 
-    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
+    return SolverNla::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverCvode::Impl::reinitialise(double pVoi)
+bool SolverKinsol::Impl::reinitialise(double pVoi)
 {
     // Reinitialise our CVODES solver.
 
@@ -506,10 +508,10 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 
     // Reinitialise the ODE solver itself.
 
-    return SolverOde::Impl::reinitialise(pVoi);
+    return SolverNla::Impl::reinitialise(pVoi);
 }
 
-bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverKinsol::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     // Solve the model using interpolation, if needed.
 
@@ -522,43 +524,43 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
     return true;
 }
 
-SolverCvode::SolverCvode()
-    : SolverOde(new Impl())
+SolverKinsol::SolverKinsol()
+    : SolverNla(new Impl())
 {
 }
 
-SolverCvode::~SolverCvode()
+SolverKinsol::~SolverKinsol()
 {
     delete pimpl();
 }
 
-SolverCvode::Impl *SolverCvode::pimpl()
+SolverKinsol::Impl *SolverKinsol::pimpl()
 {
-    return static_cast<Impl *>(SolverOde::pimpl());
+    return static_cast<Impl *>(SolverNla::pimpl());
 }
 
-const SolverCvode::Impl *SolverCvode::pimpl() const
+const SolverKinsol::Impl *SolverKinsol::pimpl() const
 {
-    return static_cast<const Impl *>(SolverOde::pimpl());
+    return static_cast<const Impl *>(SolverNla::pimpl());
 }
 
-SolverInfoPtr SolverCvode::info() const
+SolverInfoPtr SolverKinsol::info() const
 {
     return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]];
 }
 
-bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                             ComputeRates pComputeRates)
+bool SolverKinsol::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+                              ComputeRates pComputeRates)
 {
     return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverCvode::reinitialise(double pVoi)
+bool SolverKinsol::reinitialise(double pVoi)
 {
     return pimpl()->reinitialise(pVoi);
 }
 
-bool SolverCvode::solve(double &pVoi, double pVoiEnd) const
+bool SolverKinsol::solve(double &pVoi, double pVoiEnd) const
 {
     return pimpl()->solve(pVoi, pVoiEnd);
 }

@@ -28,13 +28,14 @@ describe("Solver basic tests", () => {
   test("Solvers info", () => {
     const solversInfo = libopencor.Solver.solversInfo();
 
-    expect(solversInfo.size()).toBe(5);
+    expect(solversInfo.size()).toBe(6);
 
     checkCvodeSolver(solversInfo.get(0));
     checkForwardEulerSolver(solversInfo.get(1));
     checkFourthOrderRungeKuttaSolver(solversInfo.get(2));
     checkHeunSolver(solversInfo.get(3));
-    checkSecondOrderRungeKuttaSolver(solversInfo.get(4));
+    checkKinsolSolver(solversInfo.get(4));
+    checkSecondOrderRungeKuttaSolver(solversInfo.get(5));
   });
 
   test("Unknown solver", () => {
@@ -87,6 +88,18 @@ describe("Solver basic tests", () => {
 
   test("Heun by name", () => {
     const solver = new libopencor.Solver("Heun");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("KINSOL by (KiSAO) id", () => {
+    const solver = new libopencor.Solver("KISAO:0000282");
+
+    expect(solver.isValid()).toBe(true);
+  });
+
+  test("KINSOL by name", () => {
+    const solver = new libopencor.Solver("KINSOL");
 
     expect(solver.isValid()).toBe(true);
   });

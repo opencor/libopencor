@@ -101,6 +101,8 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverfourthorderrungekutta.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverheun.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverkinsol.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvernla.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solversecondorderrungekutta.cpp
@@ -150,6 +152,10 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverheun_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverheun.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverkinsol_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverkinsol.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvernla_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvernla.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty_p.h

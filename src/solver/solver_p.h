@@ -28,6 +28,7 @@ namespace libOpenCOR {
 class Solver::Impl: public Logger::Impl
 {
 public:
+    static StringSizetMap SolversIndex;
     static StringStringMap SolversId;
     static StringSolverCreateMap SolversCreate;
     static SolverInfoPtrVector SolversInfo;

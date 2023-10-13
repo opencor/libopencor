@@ -26,13 +26,14 @@ from solvers import (
 def test_solvers_info():
     solvers_info = Solver.solvers_info()
 
-    assert len(solvers_info) == 5
+    assert len(solvers_info) == 6
 
     check_cvode_solver(solvers_info[0])
     check_forward_euler_solver(solvers_info[1])
     check_fourth_order_runge_kutta_solver(solvers_info[2])
     check_heun_solver(solvers_info[3])
-    check_second_order_runge_kutta_solver(solvers_info[4])
+    check_kinsol_solver(solvers_info[4])
+    check_second_order_runge_kutta_solver(solvers_info[5])
 
 
 def test_unknown_solver():
@@ -85,6 +86,18 @@ def test_heun_by_id():
 
 def test_heun_by_name():
     solver = Solver("Heun")
+
+    assert solver.is_valid == True
+
+
+def test_kinsol_by_id():
+    solver = Solver("KISAO:0000282")
+
+    assert solver.is_valid == True
+
+
+def test_kinsol_by_name():
+    solver = Solver("KINSOL")
 
     assert solver.is_valid == True
 

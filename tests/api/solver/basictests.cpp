@@ -24,13 +24,14 @@ TEST(BasicSolverTest, solversInfo)
 {
     auto solversInfo = libOpenCOR::Solver::solversInfo();
 
-    EXPECT_EQ(solversInfo.size(), 5);
+    EXPECT_EQ(solversInfo.size(), 6);
 
     checkCvodeSolver(solversInfo[0]);
     checkForwardEulerSolver(solversInfo[1]);
     checkFourthOrderRungeKuttaSolver(solversInfo[2]);
     checkHeunSolver(solversInfo[3]);
-    checkSecondOrderRungeKuttaSolver(solversInfo[4]);
+    checkKinsolSolver(solversInfo[4]);
+    checkSecondOrderRungeKuttaSolver(solversInfo[5]);
 }
 
 TEST(BasicSolverTest, unknownSolver)
@@ -92,6 +93,20 @@ TEST(BasicSolverTest, heunById)
 TEST(BasicSolverTest, heunByName)
 {
     auto solver = libOpenCOR::Solver::create("Heun");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, kinsolById)
+{
+    auto solver = libOpenCOR::Solver::create("KISAO:0000282");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, kinsolByName)
+{
+    auto solver = libOpenCOR::Solver::create("KINSOL");
 
     EXPECT_TRUE(solver->isValid());
 }

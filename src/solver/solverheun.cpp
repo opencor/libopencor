@@ -175,7 +175,7 @@ const SolverHeun::Impl *SolverHeun::pimpl() const
 
 SolverInfoPtr SolverHeun::info() const
 {
-    return Solver::solversInfo()[3];
+    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]];
 }
 
 bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
