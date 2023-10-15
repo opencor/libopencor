@@ -500,17 +500,6 @@ bool SolverKinsol::Impl::initialise(double pVoi, size_t pSize, double *pStates, 
     return SolverNla::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverKinsol::Impl::reinitialise(double pVoi)
-{
-    // Reinitialise our CVODES solver.
-
-    ASSERT_EQ(CVodeReInit(mSolver, pVoi, mStatesVector), CV_SUCCESS);
-
-    // Reinitialise the ODE solver itself.
-
-    return SolverNla::Impl::reinitialise(pVoi);
-}
-
 bool SolverKinsol::Impl::solve(double &pVoi, double pVoiEnd) const
 {
     // Solve the model using interpolation, if needed.
@@ -553,11 +542,6 @@ bool SolverKinsol::initialise(double pVoi, size_t pSize, double *pStates, double
                               ComputeRates pComputeRates)
 {
     return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverKinsol::reinitialise(double pVoi)
-{
-    return pimpl()->reinitialise(pVoi);
 }
 
 bool SolverKinsol::solve(double &pVoi, double pVoiEnd) const

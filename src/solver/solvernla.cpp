@@ -34,13 +34,6 @@ bool SolverNla::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     return true;
 }
 
-bool SolverNla::Impl::reinitialise(double pVoi)
-{
-    (void)pVoi;
-
-    return true;
-}
-
 SolverNla::SolverNla(Impl *pPimpl)
     : Solver(pPimpl)
 {
@@ -54,11 +47,6 @@ SolverNla::Impl *SolverNla::pimpl()
 const SolverNla::Impl *SolverNla::pimpl() const
 {
     return static_cast<const Impl *>(Solver::pimpl());
-}
-
-bool SolverNla::reinitialise(double pVoi)
-{
-    return pimpl()->reinitialise(pVoi);
 }
 
 } // namespace libOpenCOR

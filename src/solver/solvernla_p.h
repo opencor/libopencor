@@ -34,7 +34,6 @@ public:
 
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             ComputeRates pComputeRates) = 0;
-    virtual bool reinitialise(double pVoi);
 
     virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
 };
