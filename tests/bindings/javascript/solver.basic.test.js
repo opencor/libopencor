@@ -21,6 +21,7 @@ import {
   checkForwardEulerSolver,
   checkFourthOrderRungeKuttaSolver,
   checkHeunSolver,
+  checkKinsolSolver,
   checkSecondOrderRungeKuttaSolver,
 } from "./solvers.js";
 

@@ -19,6 +19,7 @@ from solvers import (
     check_forward_euler_solver,
     check_fourth_order_runge_kutta_solver,
     check_heun_solver,
+    check_kinsol_solver,
     check_second_order_runge_kutta_solver,
 )
 
