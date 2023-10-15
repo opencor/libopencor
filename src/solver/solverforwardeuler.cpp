@@ -148,7 +148,7 @@ const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 
 SolverInfoPtr SolverForwardEuler::info() const
 {
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]];
+    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]]; // NOLINT
 }
 
 bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

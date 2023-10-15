@@ -22,16 +22,24 @@ limitations under the License.
 
 TEST(BasicSolverTest, solversInfo)
 {
+    static const auto ZERO = 0;
+    static const auto ONE = 1;
+    static const auto TWO = 2;
+    static const auto THREE = 3;
+    static const auto FOUR = 4;
+    static const auto FIVE = 5;
+    static const auto SIX = 6;
+
     auto solversInfo = libOpenCOR::Solver::solversInfo();
 
-    EXPECT_EQ(solversInfo.size(), 6);
+    EXPECT_EQ(solversInfo.size(), SIX);
 
-    checkCvodeSolver(solversInfo[0]);
-    checkForwardEulerSolver(solversInfo[1]);
-    checkFourthOrderRungeKuttaSolver(solversInfo[2]);
-    checkHeunSolver(solversInfo[3]);
-    checkKinsolSolver(solversInfo[4]);
-    checkSecondOrderRungeKuttaSolver(solversInfo[5]);
+    checkCvodeSolver(solversInfo[ZERO]);
+    checkForwardEulerSolver(solversInfo[ONE]);
+    checkFourthOrderRungeKuttaSolver(solversInfo[TWO]);
+    checkHeunSolver(solversInfo[THREE]);
+    checkKinsolSolver(solversInfo[FOUR]);
+    checkSecondOrderRungeKuttaSolver(solversInfo[FIVE]);
 }
 
 TEST(BasicSolverTest, unknownSolver)

@@ -174,7 +174,7 @@ const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() co
 
 SolverInfoPtr SolverSecondOrderRungeKutta::info() const
 {
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]];
+    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]]; // NOLINT
 }
 
 bool SolverSecondOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,

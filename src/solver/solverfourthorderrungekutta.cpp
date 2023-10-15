@@ -209,7 +209,7 @@ const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() co
 
 SolverInfoPtr SolverFourthOrderRungeKutta::info() const
 {
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]];
+    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]]; // NOLINT
 }
 
 bool SolverFourthOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,

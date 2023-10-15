@@ -546,7 +546,7 @@ const SolverKinsol::Impl *SolverKinsol::pimpl() const
 
 SolverInfoPtr SolverKinsol::info() const
 {
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]];
+    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]]; // NOLINT
 }
 
 bool SolverKinsol::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
