@@ -19,6 +19,9 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
+#include <cmath>
+#include <cstdlib>
+
 namespace OdeModel {
 
 #if defined(BUILDING_USING_MSVC)

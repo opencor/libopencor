@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <stddef.h>
-
 extern const char VERSION[];
 extern const char LIBCELLML_VERSION[];
 
