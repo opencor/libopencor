@@ -23,17 +23,15 @@ namespace OdeModel {
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(push)
-#    pragma warning(disable: 4100)
+// #    pragma warning(disable: 4100)
 #elif defined(BUILDING_USING_GNU)
 #    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wunused-parameter"
+// #    pragma GCC diagnostic ignored "-Wunused-parameter"
 #else
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wdouble-promotion"
-#    pragma clang diagnostic ignored "-Wmissing-prototypes"
 #    pragma clang diagnostic ignored "-Wold-style-cast"
 #    pragma clang diagnostic ignored "-Wunused-parameter"
-#    pragma clang diagnostic ignored "-Wunused-variable"
 #endif
 
 #include "res/odemodel.c" // NOLINT
