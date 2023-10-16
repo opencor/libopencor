@@ -24,18 +24,7 @@ namespace libOpenCOR {
 class SolverNla::Impl: public Solver::Impl
 {
 public:
-    size_t mSize = 0;
-
-    double *mStates = nullptr;
-    double *mRates = nullptr;
-    double *mVariables = nullptr;
-
-    ComputeRates mComputeRates = nullptr;
-
-    virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                            ComputeRates pComputeRates) = 0;
-
-    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
+    virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) = 0;
 };
 
 } // namespace libOpenCOR

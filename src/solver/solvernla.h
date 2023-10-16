@@ -23,7 +23,7 @@ namespace libOpenCOR {
 class SolverNla: public Solver
 {
 public:
-    using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
+    using ComputeSystem = void (*)(double *pU, double *pF, void *pUserData);
 
     SolverNla() = delete;
     ~SolverNla() override = default;
@@ -34,10 +34,7 @@ public:
     SolverNla &operator=(const SolverNla &pRhs) = delete;
     SolverNla &operator=(SolverNla &&pRhs) noexcept = delete;
 
-    virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                            ComputeRates pComputeRates) = 0;
-
-    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
+    virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData = nullptr) = 0;
 
 protected:
     class Impl;

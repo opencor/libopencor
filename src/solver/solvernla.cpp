@@ -18,22 +18,6 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-bool SolverNla::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                 ComputeRates pComputeRates)
-{
-    (void)pVoi;
-
-    mSize = pSize;
-
-    mStates = pStates;
-    mRates = pRates;
-    mVariables = pVariables;
-
-    mComputeRates = pComputeRates;
-
-    return true;
-}
-
 SolverNla::SolverNla(Impl *pPimpl)
     : Solver(pPimpl)
 {
