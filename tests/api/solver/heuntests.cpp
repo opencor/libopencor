@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "model.h"
+#include "odemodel.h"
 #include "solverheun.h"
 #include "solvers.h"
 #include "utils.h"
@@ -34,9 +34,7 @@ TEST(HeunSolverTest, basic)
 
 TEST(HeunSolverTest, stepValueWithNonNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Heun");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("Heun");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -46,21 +44,15 @@ TEST(HeunSolverTest, stepValueWithNonNumber)
 
     solver->setProperty("Step", "abc");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(HeunSolverTest, stepValueWithInvalidNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Heun");
-
-    // Customise and initialise our solver using an invalid step value.
+    const auto [solver, states, rates, variables] = OdeModel::initialise("Heun");
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("0.0"). It must be a floating point number greater than zero.)"},
@@ -68,19 +60,15 @@ TEST(HeunSolverTest, stepValueWithInvalidNumber)
 
     solver->setProperty("Step", "0.0");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(HeunSolverTest, solve)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Heun");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("Heun");
 
     // Customise our solver and compute our model.
 
@@ -96,9 +84,7 @@ TEST(HeunSolverTest, solve)
 
     solver->setProperty("Step", "0.0123");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }

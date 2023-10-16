@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "model.h"
+#include "odemodel.h"
 #include "solvers.h"
 #include "solversecondorderrungekutta.h"
 #include "utils.h"
@@ -34,9 +34,7 @@ TEST(SecondOrderRungeKuttaSolverTest, basic)
 
 TEST(SecondOrderRungeKuttaSolverTest, stepValueWithNonNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Second-order Runge-Kutta");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("Second-order Runge-Kutta");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -46,21 +44,15 @@ TEST(SecondOrderRungeKuttaSolverTest, stepValueWithNonNumber)
 
     solver->setProperty("Step", "abc");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Second-order Runge-Kutta");
-
-    // Customise and initialise our solver using an invalid step value.
+    const auto [solver, states, rates, variables] = OdeModel::initialise("Second-order Runge-Kutta");
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, R"(The "Step" property has an invalid value ("0.0"). It must be a floating point number greater than zero.)"},
@@ -68,19 +60,15 @@ TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 
     solver->setProperty("Step", "0.0");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(SecondOrderRungeKuttaSolverTest, solve)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("Second-order Runge-Kutta");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("Second-order Runge-Kutta");
 
     // Customise our solver and compute our model.
 
@@ -98,12 +86,10 @@ TEST(SecondOrderRungeKuttaSolverTest, solve)
     solver->setProperty("Step", "0.0123");
 
 #if defined(BUILDING_ON_MACOS) && defined(BUILDING_ON_INTEL)
-    computeModel(solver, states, rates, variables, FINAL_STATES, FINAL_STATES_2);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, FINAL_STATES_2);
 #else
-    computeModel(solver, states, rates, variables, FINAL_STATES);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES);
 #endif
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }

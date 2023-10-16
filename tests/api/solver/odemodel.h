@@ -18,6 +18,13 @@ limitations under the License.
 
 #include "solverode.h"
 
+#include "tests/utils.h"
+
+#include <memory>
+#include <tuple>
+
+namespace OdeModel {
+
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(push)
 #    pragma warning(disable: 4100)
@@ -33,7 +40,7 @@ limitations under the License.
 #    pragma clang diagnostic ignored "-Wunused-variable"
 #endif
 
-#include "res/model.h" // NOLINT
+#include "res/odemodel.h" // NOLINT
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(pop)
@@ -43,13 +50,10 @@ limitations under the License.
 #    pragma clang diagnostic pop
 #endif
 
-#include "tests/utils.h"
+std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> initialise(const std::string &pSolverName);
+void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
+             double *pStates, double *pRates, double *pVariables,
+             const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pFinalStates2 = {});
+void finalise(double *pStates, double *pRates, double *pVariables);
 
-#include <memory>
-#include <tuple>
-
-std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> createAndInitialiseArraysAndCreateSolver(const std::string &pSolverName);
-void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
-                  double *pStates, double *pRates, double *pVariables,
-                  const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pFinalStates2 = {});
-void deleteArrays(double *pStates, double *pRates, double *pVariables);
+} // namespace OdeModel
