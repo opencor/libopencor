@@ -405,6 +405,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mContext);
 
+    ASSERT_NE(mStatesVector, nullptr);
     ASSERT_EQ(CVodeInit(mSolver, rhsFunction, pVoi, mStatesVector), CV_SUCCESS);
 
     // Set our user data.

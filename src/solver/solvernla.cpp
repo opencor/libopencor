@@ -18,6 +18,18 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+bool SolverNla::Impl::initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
+{
+    mComputeSystem = pComputeSystem;
+
+    mU = pU;
+    mN = pN;
+
+    mUserData = pUserData;
+
+    return true;
+}
+
 SolverNla::SolverNla(Impl *pPimpl)
     : Solver(pPimpl)
 {

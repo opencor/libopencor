@@ -22,7 +22,6 @@ limitations under the License.
 #include "sundialsbegin.h"
 #include "sundials/sundials_linearsolver.h"
 #include "sundials/sundials_matrix.h"
-#include "sundials/sundials_nonlinearsolver.h"
 #include "sundialsend.h"
 
 namespace libOpenCOR {
@@ -30,42 +29,26 @@ namespace libOpenCOR {
 class SolverKinsolUserData
 {
 public:
-    explicit SolverKinsolUserData(double *pVariables, SolverNla::ComputeRates pComputeRates);
+    explicit SolverKinsolUserData(SolverNla::ComputeSystem pComputeSystem, void *pUserData);
 
-    double *variables() const;
-    SolverNla::ComputeRates computeRates() const;
+    SolverNla::ComputeSystem computeSystem() const;
+    void *userData() const;
 
 private:
-    double *mVariables = nullptr;
-    SolverNla::ComputeRates mComputeRates = nullptr;
+    SolverNla::ComputeSystem mComputeSystem = nullptr;
+    void *mUserData = nullptr;
 };
 
 class SolverKinsol::Impl: public SolverNla::Impl
 {
 public:
-    // Integration methods.
-
-    static const std::string ADAMS_MOULTON_METHOD;
-    static const std::string BDF_METHOD;
-
-    // Iteration types.
-
-    static const std::string FUNCTIONAL_ITERATION_TYPE;
-    static const std::string NEWTON_ITERATION_TYPE;
-
     // Linear solvers.
 
     static const std::string DENSE_LINEAR_SOLVER;
     static const std::string BANDED_LINEAR_SOLVER;
-    static const std::string DIAGONAL_LINEAR_SOLVER;
     static const std::string GMRES_LINEAR_SOLVER;
     static const std::string BICGSTAB_LINEAR_SOLVER;
     static const std::string TFQMR_LINEAR_SOLVER;
-
-    // Preconditioners.
-
-    static const std::string NO_PRECONDITIONER;
-    static const std::string BANDED_PRECONDITIONER;
 
     // Properties information.
 
@@ -73,33 +56,14 @@ public:
     static const std::string ID;
     static const std::string NAME;
 
-    static const std::string MAXIMUM_STEP_ID;
-    static const std::string MAXIMUM_STEP_NAME;
-    static constexpr double MAXIMUM_STEP_DEFAULT_VALUE = 0.0;
-
-    static const std::string MAXIMUM_NUMBER_OF_STEPS_ID;
-    static const std::string MAXIMUM_NUMBER_OF_STEPS_NAME;
-    static constexpr int MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE = 500;
-
-    static const std::string INTEGRATION_METHOD_ID;
-    static const std::string INTEGRATION_METHOD_NAME;
-    static const StringVector INTEGRATION_METHOD_LIST;
-    static const std::string INTEGRATION_METHOD_DEFAULT_VALUE;
-
-    static const std::string ITERATION_TYPE_ID;
-    static const std::string ITERATION_TYPE_NAME;
-    static const StringVector ITERATION_TYPE_LIST;
-    static const std::string ITERATION_TYPE_DEFAULT_VALUE;
+    static const std::string MAXIMUM_NUMBER_OF_ITERATIONS_ID;
+    static const std::string MAXIMUM_NUMBER_OF_ITERATIONS_NAME;
+    static constexpr int MAXIMUM_NUMBER_OF_ITERATIONS_DEFAULT_VALUE = 200;
 
     static const std::string LINEAR_SOLVER_ID;
     static const std::string LINEAR_SOLVER_NAME;
     static const StringVector LINEAR_SOLVER_LIST;
     static const std::string LINEAR_SOLVER_DEFAULT_VALUE;
-
-    static const std::string PRECONDITIONER_ID;
-    static const std::string PRECONDITIONER_NAME;
-    static const StringVector PRECONDITIONER_LIST;
-    static const std::string PRECONDITIONER_DEFAULT_VALUE;
 
     static const std::string UPPER_HALF_BANDWIDTH_ID;
     static const std::string UPPER_HALF_BANDWIDTH_NAME;
@@ -108,18 +72,6 @@ public:
     static const std::string LOWER_HALF_BANDWIDTH_ID;
     static const std::string LOWER_HALF_BANDWIDTH_NAME;
     static constexpr int LOWER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
-
-    static const std::string RELATIVE_TOLERANCE_ID;
-    static const std::string RELATIVE_TOLERANCE_NAME;
-    static constexpr double RELATIVE_TOLERANCE_DEFAULT_VALUE = 1.0e-7;
-
-    static const std::string ABSOLUTE_TOLERANCE_ID;
-    static const std::string ABSOLUTE_TOLERANCE_NAME;
-    static constexpr double ABSOLUTE_TOLERANCE_DEFAULT_VALUE = 1.0e-7;
-
-    static const std::string INTERPOLATE_SOLUTION_ID;
-    static const std::string INTERPOLATE_SOLUTION_NAME;
-    static constexpr bool INTERPOLATE_SOLUTION_DEFAULT_VALUE = true;
 
     // Solver.
 
@@ -131,25 +83,22 @@ public:
 
     void *mSolver = nullptr;
 
-    N_Vector mStatesVector = nullptr;
+    N_Vector mUVector = nullptr;
+    N_Vector mOnesVector = nullptr;
 
     SUNMatrix mMatrix = nullptr;
     SUNLinearSolver mLinearSolver = nullptr;
-    SUNNonlinearSolver mNonLinearSolver = nullptr;
 
-    SolverKinsolUserData *mUserData = nullptr;
-
-    bool mInterpolateSolution = INTERPOLATE_SOLUTION_DEFAULT_VALUE;
+    SolverKinsolUserData *mKinsolUserData = nullptr;
 
     explicit Impl();
     ~Impl() override;
 
     StringStringMap propertiesId() const override;
 
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
+    bool initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 
-    bool solve(double &pVoi, double pVoiEnd) const override;
+    bool solve() override;
 };
 
 } // namespace libOpenCOR

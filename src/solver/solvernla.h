@@ -34,7 +34,9 @@ public:
     SolverNla &operator=(const SolverNla &pRhs) = delete;
     SolverNla &operator=(SolverNla &&pRhs) noexcept = delete;
 
-    virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData = nullptr) = 0;
+    virtual bool initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData = nullptr) = 0;
+
+    virtual bool solve() = 0;
 
 protected:
     class Impl;

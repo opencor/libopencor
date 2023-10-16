@@ -35,10 +35,9 @@ public:
 
     SolverInfoPtr info() const override;
 
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
+    bool initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 
-    bool solve(double &pVoi, double pVoiEnd) const override;
+    bool solve() override;
 
 private:
     class Impl;
