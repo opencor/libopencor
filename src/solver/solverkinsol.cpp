@@ -325,7 +325,7 @@ const SolverKinsol::Impl *SolverKinsol::pimpl() const
 
 SolverInfoPtr SolverKinsol::info() const
 {
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]]; // NOLINT
+    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverKinsol::Impl::ID]];
 }
 
 bool SolverKinsol::initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
