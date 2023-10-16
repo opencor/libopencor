@@ -22,6 +22,9 @@ limitations under the License.
 #include <cmath>
 #include <cstdlib>
 
+#include <cmath>
+#include <cstdlib>
+
 namespace OdeModel {
 
 #if defined(BUILDING_USING_MSVC)
