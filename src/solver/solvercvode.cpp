@@ -395,10 +395,6 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     ASSERT_EQ(SUNContext_Create(nullptr, &mContext), 0);
 
-    // Create our states vector.
-
-    mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mContext);
-
     // Create our CVODES solver.
 
     mSolver = CVodeCreate((integrationMethod == BDF_METHOD) ? CV_BDF : CV_ADAMS, mContext);
@@ -406,6 +402,8 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     ASSERT_NE(mSolver, nullptr);
 
     // Initialise our CVODES solver.
+
+    mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mContext);
 
     ASSERT_EQ(CVodeInit(mSolver, rhsFunction, pVoi, mStatesVector), CV_SUCCESS);
 
