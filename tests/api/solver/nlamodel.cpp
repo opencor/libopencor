@@ -20,7 +20,6 @@ limitations under the License.
 #include "gtest/gtest.h"
 
 #include <cmath>
-#include <cstdlib>
 
 namespace NlaModel {
 

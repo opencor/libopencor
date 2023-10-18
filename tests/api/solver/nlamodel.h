@@ -20,36 +20,9 @@ limitations under the License.
 
 #include "tests/utils.h"
 
-#include <cstddef>
-#include <memory>
-#include <tuple>
-
 namespace NlaModel {
 
-// #if defined(BUILDING_USING_MSVC)
-// #    pragma warning(push)
-// #    pragma warning(disable: 4100)
-// #elif defined(BUILDING_USING_GNU)
-// #    pragma GCC diagnostic push
-// #    pragma GCC diagnostic ignored "-Wunused-parameter"
-// #else
-// #    pragma clang diagnostic push
-// #    pragma clang diagnostic ignored "-Wdouble-promotion"
-// #    pragma clang diagnostic ignored "-Wmissing-prototypes"
-// #    pragma clang diagnostic ignored "-Wold-style-cast"
-// #    pragma clang diagnostic ignored "-Wunused-parameter"
-// #    pragma clang diagnostic ignored "-Wunused-variable"
-// #endif
-
-#include "res/nlamodel.h" // NOLINT
-
-// #if defined(BUILDING_USING_MSVC)
-// #    pragma warning(pop)
-// #elif defined(BUILDING_USING_GNU)
-// #    pragma GCC diagnostic pop
-// #else
-// #    pragma clang diagnostic pop
-// #endif
+#include "res/nlamodel.h"
 
 extern void nlaSolve(void (*pObjectiveFunction)(double *, double *, void *), double *pU, int pN, void *pUserData);
 

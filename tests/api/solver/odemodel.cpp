@@ -20,7 +20,6 @@ limitations under the License.
 #include "tests/utils.h"
 
 #include <cmath>
-#include <cstdlib>
 
 namespace OdeModel {
 
