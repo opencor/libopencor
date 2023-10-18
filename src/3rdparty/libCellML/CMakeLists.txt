@@ -34,7 +34,7 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         caacda455c3bb10428ecc59dea31b9d2eb61c826)
+                         67b8aeda04b896c59a2144e9922fd8bda6e52452)
     else()
         if(WIN32)
             if(RELEASE_MODE)
@@ -66,13 +66,13 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 43f33697b7a6ae946f7e30a5829b16986d88df21)
+                                 cc33300cb65f19d20a05772f625cf7377ad67e14)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b3357a159127ff3dbd55eb9f34ba1f0ae23f48b3)
+                                 eb486f76b6d274b0695c2ac7a817754f01560a48)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
