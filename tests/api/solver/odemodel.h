@@ -54,7 +54,7 @@ namespace OdeModel {
 std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> initialise(const std::string &pSolverName);
 void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
              double *pStates, double *pRates, double *pVariables,
-             const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pFinalStates2 = {});
+             const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors);
 void finalise(double *pStates, double *pRates, double *pVariables);
 
 } // namespace OdeModel
