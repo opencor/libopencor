@@ -61,15 +61,16 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *>
 
 void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
                   double *pStates, double *pRates, double *pVariables,
-                  const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pFinalStates2)
+                  const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors)
 {
     // Initialise the model.
 
     static constexpr auto VOI_START = 0.0;
     static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0, 0.0};
 
     EXPECT_TRUE(pSolver->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates));
-    EXPECT_EQ_DOUBLES(pStates, INITIAL_STATES);
+    EXPECT_EQ_DOUBLES(pStates, INITIAL_STATES, ABSOLUTE_ERRORS);
 
     // Compute the model.
 
@@ -85,11 +86,7 @@ void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
         computeVariables(voi, pStates, pRates, pVariables);
     }
 
-    if (pFinalStates2.empty()) {
-        EXPECT_EQ_DOUBLES(pStates, pFinalStates);
-    } else {
-        EXPECT_EQ_DOUBLES_2(pStates, pFinalStates, pFinalStates2);
-    }
+    EXPECT_EQ_DOUBLES(pStates, pFinalStates, pAbsoluteErrors);
 
     // Reinitialise the model (for coverage reasons).
 

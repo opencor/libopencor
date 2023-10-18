@@ -82,25 +82,12 @@ TEST(ForwardEulerSolverTest, solve)
 
     // Customise our solver and compute our model.
 
-#if defined(BUILDING_ON_WINDOWS)
-#    ifdef BUILDING_ON_INTEL
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762314604, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
-#    else
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762310383, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
-#    endif
-#elif defined(BUILDING_ON_LINUX)
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762310383, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
-#else
-#    ifdef BUILDING_ON_INTEL
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762310383, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
-#    else
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015329449762310435, 0.59604909855484645, 0.053034873006546725, 0.31777429461290835};
-#    endif
-#endif
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.01532944976231, 0.59604909855484645, 0.0530348730065467, 0.31777429461290835};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00000000000001, 0.00000000000000001, 0.0000000000000001, 0.00000000000000001};
 
     solver->setProperty("Step", "0.0123");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES);
+    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
     // Clean up after ourselves.
 

@@ -82,26 +82,12 @@ TEST(SecondOrderRungeKuttaSolverTest, solve)
 
     // Customise our solver and compute our model.
 
-#if defined(BUILDING_ON_WINDOWS)
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628843987, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
-#elif defined(BUILDING_ON_LINUX)
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628843994, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
-#else
-#    ifdef BUILDING_ON_INTEL
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628843994, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
-    static const libOpenCOR::Doubles FINAL_STATES_2 = {-0.015418879628843984, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
-#    else
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015418879628844159, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
-#    endif
-#endif
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.01541887962884, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00000000000001, 0.00000000000000001, 0.000000000000000001, 0.00000000000000001};
 
     solver->setProperty("Step", "0.0123");
 
-#if defined(BUILDING_ON_MACOS) && defined(BUILDING_ON_INTEL)
-    computeModel(solver, states, rates, variables, FINAL_STATES, FINAL_STATES_2);
-#else
-    computeModel(solver, states, rates, variables, FINAL_STATES);
-#endif
+    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
     // Clean up after ourselves.
 

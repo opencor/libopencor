@@ -82,21 +82,12 @@ TEST(HeunSolverTest, solve)
 
     // Customise our solver and compute our model.
 
-#if defined(BUILDING_ON_WINDOWS)
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179346003, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
-#elif defined(BUILDING_ON_LINUX)
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179346, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
-#else
-#    ifdef BUILDING_ON_INTEL
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179345996, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
-#    else
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015316926179346029, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
-#    endif
-#endif
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.01531692617934, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00000000000001, 0.00000000000000001, 0.000000000000000001, 0.00000000000000001};
 
     solver->setProperty("Step", "0.0123");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES);
+    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
     // Clean up after ourselves.
 
