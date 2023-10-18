@@ -25,8 +25,8 @@ describe("Version tests", () => {
   });
 
   test("libCellML", () => {
-    expect(libopencor.libcellmlVersion()).toBe(0x000400);
-    expect(libopencor.libcellmlVersionString()).toBe("0.4.0");
+    expect(libopencor.libcellmlVersion()).toBe(0x000500);
+    expect(libopencor.libcellmlVersionString()).toBe("0.5.0");
   });
 
   test("libCOMBINE", () => {
