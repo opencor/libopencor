@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <cstddef>
 #include <memory>
 #include <tuple>
 

@@ -19,6 +19,9 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
+#include <cmath>
+#include <cstdlib>
+
 namespace NlaModel {
 
 #if defined(BUILDING_USING_MSVC)
@@ -33,7 +36,6 @@ namespace NlaModel {
 #    pragma clang diagnostic ignored "-Wmissing-prototypes"
 #    pragma clang diagnostic ignored "-Wold-style-cast"
 #    pragma clang diagnostic ignored "-Wunused-parameter"
-#    pragma clang diagnostic ignored "-Wunused-variable"
 #endif
 
 #include "res/nlamodel.c" // NOLINT

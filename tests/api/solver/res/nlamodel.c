@@ -2,9 +2,6 @@
 
 #include "nlamodel.h"
 
-#include <math.h>
-#include <stdlib.h>
-
 const char VERSION[] = "0.4.0";
 const char LIBCELLML_VERSION[] = "0.5.0";
 

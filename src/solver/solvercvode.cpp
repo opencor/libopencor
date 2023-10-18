@@ -545,7 +545,7 @@ const SolverCvode::Impl *SolverCvode::pimpl() const
 
 SolverInfoPtr SolverCvode::info() const
 {
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[pimpl()->ID]]; // NOLINT
+    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverCvode::Impl::ID]];
 }
 
 bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

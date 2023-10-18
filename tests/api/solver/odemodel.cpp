@@ -19,6 +19,9 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <cmath>
+#include <cstdlib>
+
 namespace OdeModel {
 
 #if defined(BUILDING_USING_MSVC)
@@ -30,10 +33,8 @@ namespace OdeModel {
 #else
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wdouble-promotion"
-#    pragma clang diagnostic ignored "-Wmissing-prototypes"
 #    pragma clang diagnostic ignored "-Wold-style-cast"
 #    pragma clang diagnostic ignored "-Wunused-parameter"
-#    pragma clang diagnostic ignored "-Wunused-variable"
 #endif
 
 #include "res/odemodel.c" // NOLINT
