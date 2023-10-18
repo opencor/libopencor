@@ -17,7 +17,7 @@ limitations under the License.
 #include "model.h"
 #include "utils.h"
 
-#include "gtest/gtest.h"
+#include "tests/utils.h"
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(push)

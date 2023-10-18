@@ -19,8 +19,6 @@ limitations under the License.
 #include "solversecondorderrungekutta.h"
 #include "utils.h"
 
-#include "gtest/gtest.h"
-
 #include "tests/utils.h"
 
 #include <libopencor>

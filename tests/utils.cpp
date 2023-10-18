@@ -16,8 +16,6 @@ limitations under the License.
 
 #include "utils.h"
 
-#include "gtest/gtest.h"
-
 #include "tests/utils.h"
 
 #include <libopencor>
