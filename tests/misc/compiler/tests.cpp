@@ -17,8 +17,6 @@ limitations under the License.
 #include "compiler.h"
 #include "utils.h"
 
-#include "gtest/gtest.h"
-
 #include "tests/utils.h"
 
 class CompilerTest: public testing::Test

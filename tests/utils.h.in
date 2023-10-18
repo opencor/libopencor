@@ -16,6 +16,11 @@ limitations under the License.
 
 #pragma once
 
+#define GTEST_DONT_DEFINE_ASSERT_EQ 1
+#define GTEST_DONT_DEFINE_ASSERT_NE 1
+
+#include "gtest/gtest.h"
+
 #include "libopencor/issue.h"
 #include "libopencor/types.h"
 
@@ -70,17 +75,11 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
 
 using Doubles = std::vector<double>;
 
-void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles);
+void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles, const Doubles &pAbsoluteErrors);
 
-#define EXPECT_EQ_DOUBLES(pDoubles, pExpectedDoubles) \
+#define EXPECT_EQ_DOUBLES(pDoubles, pExpectedDoubles, pAbsoluteErrors) \
     SCOPED_TRACE("Issue occurred here."); \
-    libOpenCOR::expectEqualDoubles(pDoubles, pExpectedDoubles)
-
-void expectEqualDoubles2(double *pDoubles, const Doubles &pExpectedDoubles, const Doubles &pExpectedDoubles2);
-
-#define EXPECT_EQ_DOUBLES_2(pDoubles, pExpectedDoubles, pExpectedDoubles2) \
-    SCOPED_TRACE("Issue occurred here."); \
-    libOpenCOR::expectEqualDoubles2(pDoubles, pExpectedDoubles, pExpectedDoubles2)
+    libOpenCOR::expectEqualDoubles(pDoubles, pExpectedDoubles, pAbsoluteErrors)
 
 void expectEqualHiddenProperties(const StringVector &pHiddenProperties, const StringVector &pExpectedHiddenProperties);
 

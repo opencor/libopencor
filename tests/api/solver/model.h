@@ -51,5 +51,5 @@ limitations under the License.
 std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> createAndInitialiseArraysAndCreateSolver(const std::string &pSolverName);
 void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
                   double *pStates, double *pRates, double *pVariables,
-                  const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pFinalStates2 = {});
+                  const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors);
 void deleteArrays(double *pStates, double *pRates, double *pVariables);

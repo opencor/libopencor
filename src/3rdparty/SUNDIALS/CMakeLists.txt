@@ -41,7 +41,7 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+                                     d82fc0e2312ab6dda73cff32c12e456246fd441e)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}

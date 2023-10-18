@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
+#include "tests/utils.h"
 
 #include <libopencor>
 
@@ -32,8 +32,8 @@ TEST(VersionTest, Clang)
 
 TEST(VersionTest, libCellML)
 {
-    EXPECT_EQ(0x000400U, libOpenCOR::libcellmlVersion());
-    EXPECT_EQ("0.4.0", libOpenCOR::libcellmlVersionString());
+    EXPECT_EQ(0x000500U, libOpenCOR::libcellmlVersion());
+    EXPECT_EQ("0.5.0", libOpenCOR::libcellmlVersionString());
 }
 
 TEST(VersionTest, libCOMBINE)

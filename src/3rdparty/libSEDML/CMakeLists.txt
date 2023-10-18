@@ -45,7 +45,7 @@ if(LIBOPENCOR_PREBUILT_LIBSEDML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+                                     d2b1bb7ce728354f21de2a5b9161314212ff8d83)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
