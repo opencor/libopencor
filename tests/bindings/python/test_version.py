@@ -38,12 +38,12 @@ def test_clang_version_string():
 
 def test_libcellml_version():
     assert isinstance(oc.libcellml_version(), int)
-    assert oc.libcellml_version() == 0x000400
+    assert oc.libcellml_version() == 0x000500
 
 
 def test_libcellml_version_string():
     assert isinstance(oc.libcellml_version_string(), str)
-    assert oc.libcellml_version_string() == "0.4.0"
+    assert oc.libcellml_version_string() == "0.5.0"
 
 
 def test_libcombine_version():

@@ -16,7 +16,7 @@ limitations under the License.
 
 #include "solvers.h"
 
-#include "gtest/gtest.h"
+#include "tests/utils.h"
 
 #include <libopencor>
 
