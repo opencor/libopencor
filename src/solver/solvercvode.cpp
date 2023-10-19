@@ -107,6 +107,7 @@ const std::string SolverCvode::Impl::INTERPOLATE_SOLUTION_NAME = "Interpolate so
 // Right-hand side function.
 
 namespace {
+
 int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
@@ -115,6 +116,7 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 
     return 0;
 }
+
 } // namespace
 
 // Solver user data.

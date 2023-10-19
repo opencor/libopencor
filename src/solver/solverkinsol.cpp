@@ -61,6 +61,7 @@ const std::string SolverKinsol::Impl::LOWER_HALF_BANDWIDTH_NAME = "Lower half-ba
 // Compute system.
 
 namespace {
+
 int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
 {
     auto *userData = static_cast<SolverKinsolUserData *>(pUserData);
@@ -69,6 +70,7 @@ int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
 
     return 0;
 }
+
 } // namespace
 
 // Solver user data.

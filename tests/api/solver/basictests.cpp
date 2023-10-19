@@ -22,6 +22,7 @@ limitations under the License.
 #include <libopencor>
 
 namespace {
+
 void checkModel(const std::string &pModelType)
 {
     auto parser = libcellml::Parser::create();
@@ -48,6 +49,7 @@ void checkModel(const std::string &pModelType)
     EXPECT_EQ(generator->interfaceCode(), libOpenCOR::resourceContents("api/solver/" + pModelType + "/model.h"));
     EXPECT_EQ(generator->implementationCode(), libOpenCOR::resourceContents("api/solver/" + pModelType + "/model.c"));
 }
+
 } // namespace
 
 TEST(BasicSolverTest, checkOdeModel)

@@ -68,6 +68,7 @@ std::filesystem::path stringToPath(const std::string &pString)
 }
 
 namespace {
+
 #ifdef BUILDING_USING_MSVC
 std::string canonicalFileName(const std::string &pFileName, bool pIsRemoteFile)
 #else
@@ -124,6 +125,7 @@ std::string canonicalFileName(const std::string &pFileName)
 
     return res;
 }
+
 } // namespace
 
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl)
@@ -180,6 +182,7 @@ using TimeVal = struct
 };
 
 namespace {
+
 int getTimeOfDay(TimeVal &pTimeVal)
 {
     // Based off https://stackoverflow.com/a/58162122.
@@ -269,6 +272,7 @@ size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUse
 
     return realDataSize;
 }
+
 } // namespace
 
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
