@@ -12,12 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pkg_resources
+import pkgutil
 import sys
 
-installed_packages = {pkg.key for pkg in pkg_resources.working_set}
+package = sys.argv[1].replace("-", "_")
 
-if sys.argv[1] not in installed_packages:
-    sys.exit(1)
+for module in pkgutil.iter_modules():
+    if module[1] == package:
+        sys.exit(0)
 
-sys.exit(0)
+sys.exit(1)
