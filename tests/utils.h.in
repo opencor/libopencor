@@ -88,6 +88,7 @@ void expectEqualHiddenProperties(const StringVector &pHiddenProperties, const St
     libOpenCOR::expectEqualHiddenProperties(pHiddenProperties, pExpectedHiddenProperties)
 
 std::string resourcePath(const std::string &pResourceRelativePath = {});
+std::string resourceContents(const std::string &pFileName);
 
 UnsignedCharVector charArrayToVector(const char *pContents);
 
