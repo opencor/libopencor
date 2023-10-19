@@ -55,6 +55,11 @@ std::string resourcePath(const std::string &pResourceRelativePath)
     return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;
 }
 
+std::string resourceContents(const std::string &pFileName)
+{
+    return libOpenCOR::toString(libOpenCOR::fileContents(libOpenCOR::resourcePath(pFileName)));
+}
+
 UnsignedCharVector charArrayToVector(const char *pContents)
 {
     return {pContents, pContents + strlen(pContents)}; // NOLINT

@@ -64,14 +64,14 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 
-UnsignedCharVector fileContents(const std::filesystem::path &pFilePath);
+UnsignedCharVector LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem::path &pFilePath);
 #endif
 
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(bool pBoolean);
 std::string toString(int pNumber);
 std::string toString(size_t pNumber);
 std::string toString(double pNumber);
-std::string toString(const UnsignedCharVector &pBytes);
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedCharVector &pBytes);
 
 bool toBool(const std::string &pString, bool &pOk);
 int LIBOPENCOR_UNIT_TESTING_EXPORT toInt(const std::string &pString, bool &pOk);

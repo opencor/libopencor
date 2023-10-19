@@ -18,7 +18,47 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <libcellml>
 #include <libopencor>
+
+namespace {
+void checkModel(const std::string &pModelType)
+{
+    auto parser = libcellml::Parser::create();
+    auto model = parser->parseModel(libOpenCOR::resourceContents("api/solver/" + pModelType + "/model.cellml"));
+
+    EXPECT_EQ(parser->issueCount(), size_t(0));
+
+    auto analyser = libcellml::Analyser::create();
+
+    analyser->analyseModel(model);
+
+    EXPECT_EQ(analyser->issueCount(), size_t(0));
+
+    auto analyserModel = analyser->model();
+    auto generator = libcellml::Generator::create();
+
+    generator->setModel(analyserModel);
+
+    auto profile = generator->profile();
+
+    profile->setInterfaceHeaderString("#pragma once\n");
+    profile->setImplementationHeaderString("#include \"[INTERFACE_FILE_NAME]\"\n");
+
+    EXPECT_EQ(generator->interfaceCode(), libOpenCOR::resourceContents("api/solver/" + pModelType + "/model.h"));
+    EXPECT_EQ(generator->implementationCode(), libOpenCOR::resourceContents("api/solver/" + pModelType + "/model.c"));
+}
+} // namespace
+
+TEST(BasicSolverTest, checkOdeModel)
+{
+    checkModel("ode");
+}
+
+TEST(BasicSolverTest, checkNlaModel)
+{
+    checkModel("nla");
+}
 
 TEST(BasicSolverTest, solversInfo)
 {
