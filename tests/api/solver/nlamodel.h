@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace NlaModel {
 
-#include "res/nlamodel.h"
+#include "../../res/api/solver/nla/model.h"
 
 extern void nlaSolve(void (*pObjectiveFunction)(double *, double *, void *), double *pU, int pN, void *pUserData);
 

@@ -37,7 +37,7 @@ namespace NlaModel {
 #    pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
 
-#include "res/nlamodel.c" // NOLINT
+#include "../../res/api/solver/nla/model.c" // NOLINT
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(pop)

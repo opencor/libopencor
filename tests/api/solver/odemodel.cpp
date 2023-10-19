@@ -36,7 +36,7 @@ namespace OdeModel {
 #    pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
 
-#include "res/odemodel.c" // NOLINT
+#include "../../res/api/solver/ode/model.c" // NOLINT
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(pop)

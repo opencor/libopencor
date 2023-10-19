@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace OdeModel {
 
-#include "res/odemodel.h"
+#include "../../res/api/solver/ode/model.h"
 
 std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> initialise(const std::string &pSolverName);
 void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,

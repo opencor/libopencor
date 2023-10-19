@@ -1,6 +1,6 @@
 /* The content of this file was generated using the C profile of libCellML 0.5.0. */
 
-#include "nlamodel.h"
+#include "model.h"
 
 const char VERSION[] = "0.4.0";
 const char LIBCELLML_VERSION[] = "0.5.0";
