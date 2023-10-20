@@ -30,7 +30,7 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 467f84667ba3cabbb0b496f6b4cbdbe286779917)
+                                 a036e09966b8fe4fb51799b6027ef751d2d853bf)
             endif()
         else()
             if(INTEL_MODE)

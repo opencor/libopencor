@@ -35,7 +35,7 @@ if(LIBOPENCOR_PREBUILT_LIBXML2 OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     b9e207da18ca724bcc589388104b2d281db2c4b2)
+                                     f8a368bd57a99809427b8a8b091b69ee1c1a3fba)
                 endif()
             else()
                 if(INTEL_MODE)

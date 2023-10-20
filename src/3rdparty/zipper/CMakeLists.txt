@@ -35,7 +35,7 @@ if(LIBOPENCOR_PREBUILT_ZIPPER OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     508833a10dda749e9b143b87fbeddae3aa844c74)
+                                     9bf375fbce91eb4df163992a8a3d5c2b24efc204)
                 endif()
             else()
                 if(INTEL_MODE)

@@ -30,7 +30,7 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 def2f10ec77ad33ba5c344ad4106ae5385881b29)
+                                 97e10af9392a3d3ecde08f3acb96a40bfb2598e1)
             endif()
         else()
             if(INTEL_MODE)
