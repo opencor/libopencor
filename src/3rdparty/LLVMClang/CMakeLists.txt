@@ -26,21 +26,21 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 63d1685ef2e1f33f59a159c045cbb7c235388dc6)
+                                 97e10af9392a3d3ecde08f3acb96a40bfb2598e1)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 def2f10ec77ad33ba5c344ad4106ae5385881b29)
+                                 d8bd960a3eeeb772d18dfa6268ab4682ca5da78d)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 d7d0639a87c7cab2c140d197e8a469786b6b0b6d)
+                                 ebf689b4c30dcc10f9ea96671a7c4aff24690639)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5be75cd7dd2df4dc972de1b7c4cb3d76c0e6cdf6)
+                                 8b8bce24f2cf43c61160e0a1ecfcae1358c7748c)
             endif()
         endif()
     elseif(APPLE)
