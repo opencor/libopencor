@@ -16,10 +16,11 @@
 
 if(WIN32)
     if(    "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"
-       AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+       AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"
+       AND MSVC_TOOLSET_VERSION EQUAL 143)
         set(BUILDING_USING_MSVC TRUE)
     else()
-        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using MSVC on Windows.")
+        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using MSVC 2022 on Windows.")
     endif()
 elseif(APPLE)
     if(   (    "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"

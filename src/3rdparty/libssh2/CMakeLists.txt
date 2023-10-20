@@ -26,21 +26,21 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 66a45d6d04addac8c38cceb46abf1ec236235f04)
+                                 a036e09966b8fe4fb51799b6027ef751d2d853bf)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 467f84667ba3cabbb0b496f6b4cbdbe286779917)
+                                 d074e0a4ac949c7cfc4d74c56e7040fe25ee6332)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 107eb3f53756808c1aa5358d36198c00437a8836)
+                                 61ad26586df1fbf494c43e12548898a285a84d4b)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9448c2d7345bed06dffd5d8c78e17158eca417e6)
+                                 6532912f33cf074616d3d9e18888643061449fab)
             endif()
         endif()
     elseif(APPLE)
