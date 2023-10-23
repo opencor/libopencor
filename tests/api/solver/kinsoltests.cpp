@@ -114,11 +114,14 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNonNumber
     NlaModel::finalise(variables);
 }
 
+static const libOpenCOR::Doubles SOLUTIONS = {3.0, -2.0, 1.0};
+static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
+
 TEST(KinsolSolverTest, solve)
 {
     const auto [solver, variables] = NlaModel::initialise("KINSOL");
 
-    //---GRY--- SOLVE...
+    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
@@ -129,7 +132,7 @@ TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 
     solver->setProperty("Linear solver", "Banded");
 
-    //---GRY--- SOLVE...
+    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
@@ -140,7 +143,7 @@ TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 
     solver->setProperty("Linear solver", "GMRES");
 
-    //---GRY--- SOLVE...
+    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
@@ -151,7 +154,7 @@ TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 
     solver->setProperty("Linear solver", "BiCGStab");
 
-    //---GRY--- SOLVE...
+    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
@@ -162,7 +165,7 @@ TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
 
     solver->setProperty("Linear solver", "TFQMR");
 
-    //---GRY--- SOLVE...
+    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
