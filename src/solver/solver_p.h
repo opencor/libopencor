@@ -36,6 +36,7 @@ public:
     bool mIsValid = false;
     StringStringMap mProperties;
 
+    static void registerSolvers();
     static void registerSolver(Type pType, const std::string &pId, const std::string &pName, SolverCreate pCreate,
                                const SolverPropertyPtrVector &pProperties,
                                SolverInfo::HiddenPropertiesFunction pHiddenProperties);
