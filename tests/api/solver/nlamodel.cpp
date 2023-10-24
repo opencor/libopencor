@@ -75,19 +75,22 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const st
     Model1::initialiseVariables(variables);
     Model1::computeComputedConstants(variables);
 
-    static const libOpenCOR::Doubles GUESSES = {1.0, 1.0, 1.0};
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
+    static const libOpenCOR::Doubles GUESSES = {1.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0};
 
     EXPECT_EQ_DOUBLES(variables, GUESSES, ABSOLUTE_ERRORS);
 
     return std::make_tuple(solver, variables);
 }
 
-void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors)
+void compute(double *pVariables)
 {
     Model1::computeVariables(pVariables);
 
-    EXPECT_EQ_DOUBLES(pVariables, pSolutions, pAbsoluteErrors);
+    static const libOpenCOR::Doubles SOLUTIONS = {3.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0};
+
+    EXPECT_EQ_DOUBLES(pVariables, SOLUTIONS, ABSOLUTE_ERRORS);
 }
 
 void finalise(double *pVariables)
@@ -117,11 +120,14 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const st
     return std::make_tuple(solver, variables);
 }
 
-void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors)
+void compute(double *pVariables)
 {
     Model2::computeVariables(pVariables);
 
-    EXPECT_EQ_DOUBLES(pVariables, pSolutions, pAbsoluteErrors);
+    static const libOpenCOR::Doubles SOLUTIONS = {3.0, 7.0, -5.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
+
+    EXPECT_EQ_DOUBLES(pVariables, SOLUTIONS, ABSOLUTE_ERRORS);
 }
 
 void finalise(double *pVariables)
