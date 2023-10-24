@@ -121,7 +121,7 @@ TEST(KinsolSolverTest, solve)
 {
     const auto [solver, variables] = NlaModel::initialise("KINSOL");
 
-    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
+    NlaModel::compute(variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
@@ -132,7 +132,7 @@ TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 
     solver->setProperty("Linear solver", "Banded");
 
-    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
+    NlaModel::compute(variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
@@ -143,7 +143,7 @@ TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 
     solver->setProperty("Linear solver", "GMRES");
 
-    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
+    NlaModel::compute(variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
@@ -154,7 +154,7 @@ TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 
     solver->setProperty("Linear solver", "BiCGStab");
 
-    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
+    NlaModel::compute(variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }
@@ -165,7 +165,7 @@ TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
 
     solver->setProperty("Linear solver", "TFQMR");
 
-    NlaModel::compute(solver, variables, SOLUTIONS, ABSOLUTE_ERRORS);
+    NlaModel::compute(variables, SOLUTIONS, ABSOLUTE_ERRORS);
 
     NlaModel::finalise(variables);
 }

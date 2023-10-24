@@ -72,11 +72,8 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const st
     return std::make_tuple(solver, variables);
 }
 
-void compute(const std::shared_ptr<libOpenCOR::SolverNla> &pSolver, double *pVariables,
-             const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors)
+void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors)
 {
-    (void)pSolver;
-
     pVariables[0] = pSolutions[0]; // NOLINT
     pVariables[1] = pSolutions[1]; // NOLINT
     pVariables[2] = pSolutions[2]; // NOLINT
