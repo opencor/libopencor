@@ -29,13 +29,9 @@ void nlaSolve(SolverNla *pSolver, void (*pObjectiveFunction)(double *, double *,
     (void)pN;
     (void)pData;
 
-    printf(">>> pSolver: %p\n", static_cast<void *>(pSolver)); // NOLINT
+    ASSERT_NE(pSolver, nullptr);
 
-    // OpenCOR::Solver::NlaSolver *nlaSolver = OpenCOR::Solver::nlaSolver(pRuntime);
-
-    // ASSERT_NE(nlaSolver, nullptr);
-
-    // nlaSolver->solve(pFunction, pParameters, pSize, pUserData);
+    pSolver->solve();
 }
 
 bool SolverNla::Impl::initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)

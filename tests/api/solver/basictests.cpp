@@ -23,10 +23,10 @@ limitations under the License.
 
 namespace {
 
-void checkModel(const std::string &pModelType)
+void checkModel(const std::string &pModelType, const std::string &pFileName = "model") // NOLINT
 {
     auto parser = libcellml::Parser::create();
-    auto model = parser->parseModel(libOpenCOR::textFileContents("api/solver/" + pModelType + "/model.cellml"));
+    auto model = parser->parseModel(libOpenCOR::textFileContents("api/solver/" + pModelType + "/" + pFileName + ".cellml"));
 
     EXPECT_EQ(parser->issueCount(), size_t(0));
 
@@ -35,6 +35,9 @@ void checkModel(const std::string &pModelType)
     analyser->analyseModel(model);
 
     EXPECT_EQ(analyser->issueCount(), size_t(0));
+    for (size_t i = 0; i < analyser->issueCount(); ++i) {
+        printf(">>> %s\n", analyser->issue(i)->description().c_str()); // NOLINT
+    }
 
     auto analyserModel = analyser->model();
     auto generator = libcellml::Generator::create();
@@ -47,12 +50,13 @@ void checkModel(const std::string &pModelType)
     profile->setImplementationHeaderString("#include \"[INTERFACE_FILE_NAME]\"\n");
 
     if (pModelType == "nla") {
+        profile->setInterfaceFileNameString(pFileName + ".h");
         profile->setExternNlaSolveMethodString("");
         profile->setNlaSolveCallString(false, "libOpenCOR::nlaSolve(KINSOL_NLA_SOLVER, objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
     }
 
-    EXPECT_EQ(generator->interfaceCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/model.h"));
-    EXPECT_EQ(generator->implementationCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/model.c"));
+    EXPECT_EQ(generator->interfaceCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/" + pFileName + ".h"));
+    EXPECT_EQ(generator->implementationCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/" + pFileName + ".c"));
 }
 
 } // namespace
@@ -62,9 +66,14 @@ TEST(BasicSolverTest, checkOdeModel)
     checkModel("ode");
 }
 
-TEST(BasicSolverTest, checkNlaModel)
+TEST(BasicSolverTest, checkNlaModel1)
 {
-    checkModel("nla");
+    checkModel("nla", "model1");
+}
+
+TEST(BasicSolverTest, checkNlaModel2)
+{
+    checkModel("nla", "model2");
 }
 
 TEST(BasicSolverTest, solversInfo)

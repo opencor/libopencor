@@ -1,6 +1,6 @@
 /* The content of this file was generated using a modified C profile of libCellML 0.5.0. */
 
-#include "model.h"
+#include "model2.h"
 
 const char VERSION[] = "0.4.0.post0";
 const char LIBCELLML_VERSION[] = "0.5.0";
@@ -41,9 +41,9 @@ void objectiveFunction0(double *u, double *f, void *data)
     variables[1] = u[1];
     variables[2] = u[2];
 
-    f[0] = variables[0]+variables[2]+variables[1]-2.0;
-    f[1] = 6.0*variables[0]-4.0*variables[2]+5.0*variables[1]-31.0;
-    f[2] = 5.0*variables[0]+2.0*variables[2]+2.0*variables[1]-13.0;
+    f[0] = variables[0]+variables[2]+variables[1]-5.0;
+    f[1] = 6.0*variables[0]-4.0*variables[2]+5.0*variables[1]-73.0;
+    f[2] = 5.0*variables[0]+2.0*variables[2]+2.0*variables[1]-19.0;
 }
 
 void findRoot0(double *variables)

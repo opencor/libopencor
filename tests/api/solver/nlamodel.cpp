@@ -43,7 +43,17 @@ libOpenCOR::SolverNla *KINSOL_NLA_SOLVER = nullptr;
 #    pragma clang diagnostic ignored "-Wunused-parameter"
 #endif
 
-#include "../../res/api/solver/nla/model.c" // NOLINT
+namespace Model1 {
+
+#include "../../res/api/solver/nla/model1.c" // NOLINT
+
+} // namespace Model1
+
+namespace Model2 {
+
+#include "../../res/api/solver/nla/model2.c" // NOLINT
+
+} // namespace Model2
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(pop)
@@ -53,15 +63,17 @@ libOpenCOR::SolverNla *KINSOL_NLA_SOLVER = nullptr;
 #    pragma clang diagnostic pop
 #endif
 
+namespace Model1 {
+
 std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverNla>(libOpenCOR::Solver::create(pSolverName));
-    auto *variables = createVariablesArray();
+    auto *variables = Model1::createVariablesArray();
 
     KINSOL_NLA_SOLVER = solver.get();
 
-    initialiseVariables(variables);
-    computeComputedConstants(variables);
+    Model1::initialiseVariables(variables);
+    Model1::computeComputedConstants(variables);
 
     static const libOpenCOR::Doubles GUESSES = {1.0, 1.0, 1.0};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
@@ -73,14 +85,50 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const st
 
 void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors)
 {
-    computeVariables(pVariables);
+    Model1::computeVariables(pVariables);
 
     EXPECT_EQ_DOUBLES(pVariables, pSolutions, pAbsoluteErrors);
 }
 
 void finalise(double *pVariables)
 {
-    deleteArray(pVariables);
+    Model1::deleteArray(pVariables);
 }
+
+} // namespace Model1
+
+namespace Model2 {
+
+std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName)
+{
+    auto solver = std::static_pointer_cast<libOpenCOR::SolverNla>(libOpenCOR::Solver::create(pSolverName));
+    auto *variables = Model2::createVariablesArray();
+
+    KINSOL_NLA_SOLVER = solver.get();
+
+    Model2::initialiseVariables(variables);
+    Model2::computeComputedConstants(variables);
+
+    static const libOpenCOR::Doubles GUESSES = {1.0, 1.0, 1.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
+
+    EXPECT_EQ_DOUBLES(variables, GUESSES, ABSOLUTE_ERRORS);
+
+    return std::make_tuple(solver, variables);
+}
+
+void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors)
+{
+    Model2::computeVariables(pVariables);
+
+    EXPECT_EQ_DOUBLES(pVariables, pSolutions, pAbsoluteErrors);
+}
+
+void finalise(double *pVariables)
+{
+    Model2::deleteArray(pVariables);
+}
+
+} // namespace Model2
 
 } // namespace NlaModel

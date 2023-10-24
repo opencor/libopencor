@@ -22,10 +22,24 @@ limitations under the License.
 
 namespace NlaModel {
 
-#include "../../res/api/solver/nla/model.h"
+namespace Model1 {
+
+#include "../../res/api/solver/nla/model1.h"
 
 std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName);
 void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors);
 void finalise(double *pVariables);
+
+} // namespace Model1
+
+namespace Model2 {
+
+#include "../../res/api/solver/nla/model2.h"
+
+std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName);
+void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors);
+void finalise(double *pVariables);
+
+} // namespace Model2
 
 } // namespace NlaModel
