@@ -33,9 +33,6 @@ typedef struct {
     double *variables;
 } RootFindingInfo;
 
-extern void nlaSolve(void (*objectiveFunction)(double *, double *, void *),
-                     double *u, int n, void *data);
-
 void objectiveFunction0(double *u, double *f, void *data)
 {
     double *variables = ((RootFindingInfo *) data)->variables;
@@ -58,7 +55,7 @@ void findRoot0(double *variables)
     u[1] = variables[1];
     u[2] = variables[2];
 
-    nlaSolve(objectiveFunction0, u, 3, &rfi);
+    libOpenCOR::nlaSolve(KINSOL_NLA_SOLVER, objectiveFunction0, u, 3, &rfi);
 
     variables[0] = u[0];
     variables[1] = u[1];

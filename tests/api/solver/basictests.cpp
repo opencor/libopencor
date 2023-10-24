@@ -46,6 +46,11 @@ void checkModel(const std::string &pModelType)
     profile->setInterfaceHeaderString("#pragma once\n");
     profile->setImplementationHeaderString("#include \"[INTERFACE_FILE_NAME]\"\n");
 
+    if (pModelType == "nla") {
+        profile->setExternNlaSolveMethodString("");
+        profile->setNlaSolveCallString(false, "libOpenCOR::nlaSolve(KINSOL_NLA_SOLVER, objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
+    }
+
     EXPECT_EQ(generator->interfaceCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/model.h"));
     EXPECT_EQ(generator->implementationCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/model.c"));
 }

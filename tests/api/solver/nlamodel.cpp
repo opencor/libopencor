@@ -23,6 +23,12 @@ limitations under the License.
 
 namespace NlaModel {
 
+namespace {
+
+libOpenCOR::SolverNla *KINSOL_NLA_SOLVER = nullptr;
+
+} // namespace
+
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(push)
 #    pragma warning(disable: 4100)
@@ -47,19 +53,12 @@ namespace NlaModel {
 #    pragma clang diagnostic pop
 #endif
 
-//---GRY--- REMOVE THE NOLINT ONCE WE ARE DONE...
-void nlaSolve(void (*pObjectiveFunction)(double *, double *, void *), double *pU, int pN, void *pUserData) // NOLINT
-{
-    (void)pObjectiveFunction;
-    (void)pU;
-    (void)pN;
-    (void)pUserData;
-}
-
 std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverNla>(libOpenCOR::Solver::create(pSolverName));
     auto *variables = createVariablesArray();
+
+    KINSOL_NLA_SOLVER = solver.get();
 
     initialiseVariables(variables);
     computeComputedConstants(variables);
@@ -74,9 +73,7 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const st
 
 void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors)
 {
-    pVariables[0] = pSolutions[0]; // NOLINT
-    pVariables[1] = pSolutions[1]; // NOLINT
-    pVariables[2] = pSolutions[2]; // NOLINT
+    computeVariables(pVariables);
 
     EXPECT_EQ_DOUBLES(pVariables, pSolutions, pAbsoluteErrors);
 }

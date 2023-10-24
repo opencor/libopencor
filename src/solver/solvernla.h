@@ -47,4 +47,7 @@ protected:
     explicit SolverNla(Impl *pPimpl);
 };
 
+extern "C" void nlaSolve(SolverNla *pSolver, void (*pObjectiveFunction)(double *, double *, void *),
+                         double *pU, int pN, void *pData);
+
 } // namespace libOpenCOR

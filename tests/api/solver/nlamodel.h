@@ -24,8 +24,6 @@ namespace NlaModel {
 
 #include "../../res/api/solver/nla/model.h"
 
-extern void nlaSolve(void (*pObjectiveFunction)(double *, double *, void *), double *pU, int pN, void *pUserData);
-
 std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName);
 void compute(double *pVariables, const libOpenCOR::Doubles &pSolutions, const libOpenCOR::Doubles &pAbsoluteErrors);
 void finalise(double *pVariables);
