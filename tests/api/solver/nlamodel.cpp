@@ -63,7 +63,11 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const st
 
     initialiseVariables(variables);
     computeComputedConstants(variables);
-    computeVariables(variables);
+
+    static const libOpenCOR::Doubles GUESSES = {1.0, 1.0, 1.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
+
+    EXPECT_EQ_DOUBLES(variables, GUESSES, ABSOLUTE_ERRORS);
 
     return std::make_tuple(solver, variables);
 }
