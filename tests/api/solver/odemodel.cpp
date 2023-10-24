@@ -58,6 +58,11 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *>
     computeRates(0.0, states, rates, variables);
     computeVariables(0.0, states, rates, variables);
 
+    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0, 0.0};
+
+    EXPECT_EQ_DOUBLES(states, INITIAL_STATES, ABSOLUTE_ERRORS);
+
     return std::make_tuple(solver, states, rates, variables);
 }
 
@@ -68,11 +73,8 @@ void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
     // Initialise the ODE solver.
 
     static constexpr auto VOI_START = 0.0;
-    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0, 0.0};
 
     EXPECT_TRUE(pSolver->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates));
-    EXPECT_EQ_DOUBLES(pStates, INITIAL_STATES, ABSOLUTE_ERRORS);
 
     // Compute the ODE model.
 
