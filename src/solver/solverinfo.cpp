@@ -41,7 +41,7 @@ SolverInfo::SolverInfo(Solver::Type pType, const std::string &pId, const std::st
 {
 }
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
 SolverInfo::~SolverInfo()
 {
     delete mPimpl;

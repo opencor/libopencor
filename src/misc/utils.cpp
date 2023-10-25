@@ -206,7 +206,7 @@ std::filesystem::path uniqueFilePath()
     // The number of times to attempt to generate a temporary file name.
     // Note: ATTEMPTS_MIN is equal to 62x62x62 where 62 is the number of characters in LETTERS.
 
-#    ifndef COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     static constexpr uint64_t ATTEMPTS_MIN = 238328U;
     static constexpr uint64_t MAX_ATTEMPTS = (ATTEMPTS_MIN < TMP_MAX) ? TMP_MAX : ATTEMPTS_MIN;
 #    endif
@@ -221,7 +221,7 @@ std::filesystem::path uniqueFilePath()
     static const size_t XXXXXX_POS = testFile.size() - 6 - 4;
     static constexpr uint64_t MICROSECONDS_SHIFT = 16U;
     static constexpr uint64_t PID_SHIFT = 32U;
-#    ifndef COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     static constexpr uint64_t VALUE_SHIFT = 7777U;
 #    endif
     static constexpr uint64_t XXXXXX_POS_SHIFT = 6U;
@@ -240,7 +240,7 @@ std::filesystem::path uniqueFilePath()
 
     std::string res;
 
-#    ifndef COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     for (uint64_t attempt = 0; attempt < MAX_ATTEMPTS; value += VALUE_SHIFT, ++attempt) {
 #    endif
         uint64_t val = value;
@@ -250,12 +250,12 @@ std::filesystem::path uniqueFilePath()
             val /= LETTERS_SIZE;
         }
 
-#    ifndef COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
         if (!std::filesystem::exists(testFile)) {
 #    endif
             res = testFile;
 
-#    ifndef COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
             break;
         }
     }
@@ -280,7 +280,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     auto filePath = uniqueFilePath();
     std::ofstream file(filePath, std::ios_base::binary);
 
-#    ifndef COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     if (!file.is_open()) {
         return {};
     }
@@ -296,7 +296,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void *>(&file));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 
-#    ifndef COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     if (curl_easy_perform(curl) == CURLE_OK) {
 #    else
     curl_easy_perform(curl);
@@ -308,7 +308,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
 
         res = responseCode == HTTP_OK;
-#    ifndef COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     }
 #    endif
 

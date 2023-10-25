@@ -77,7 +77,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (compilation == nullptr) {
         addError("A compilation object could not be created.");
 
@@ -89,7 +89,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     clang::driver::JobList &jobs = compilation->getJobs();
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
         addError("The compilation object must have one command.");
 
@@ -101,7 +101,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     static constexpr auto CLANG = "clang";
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
@@ -116,7 +116,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     auto commandArguments = command.getArguments();
 
-#ifdef COVERAGE_ENABLED
+#ifdef CODE_COVERAGE_ENABLED
     commandArguments.erase(find(commandArguments, llvm::StringRef("-disable-free")));
 #else
     auto *commandArgument = find(commandArguments, llvm::StringRef("-disable-free"));
@@ -135,14 +135,14 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a compiler invocation object.
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     bool res =
 #endif
         clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
                                                   commandArguments,
                                                   *diagnosticsEngine);
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (!res) {
         addError("A compiler invocation object could not be created.");
 
@@ -213,7 +213,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     auto module = codeGenAction->takeModule();
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (module == nullptr) {
         addError("The LLVM bitcode module could not be retrieved.");
 
@@ -231,7 +231,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (!lljit) {
         addError("An ORC-based JIT could not be created.");
 
@@ -246,14 +246,14 @@ bool Compiler::Impl::compile(const std::string &pCode)
     auto llvmContext = std::make_unique<llvm::LLVMContext>();
     auto threadSafeModule = llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext));
 
-#ifdef COVERAGE_ENABLED
+#ifdef CODE_COVERAGE_ENABLED
     const bool res =
 #else
     res =
 #endif
         !mLljit->addIRModule(std::move(threadSafeModule));
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (!res) {
         addError("The LLVM bitcode module could not be added to the ORC-based JIT.");
     }
