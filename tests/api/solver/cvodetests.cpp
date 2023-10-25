@@ -180,7 +180,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNonNumber)
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 3.)"},
     };
 
     solver->setProperty("Linear solver", "Banded");
@@ -192,18 +192,17 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNonNumber)
     OdeModel::finalise(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndUpperHalfBandwidthValueWithNumberTooSmall)
+TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooSmall)
 {
     const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 3.)"},
     };
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Banded");
+    solver->setProperty("Linear solver", "Banded");
     solver->setProperty("Upper half-bandwidth", "-1");
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
@@ -212,19 +211,18 @@ TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndUpperHalfBandwidth
     OdeModel::finalise(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndUpperHalfBandwidthValueWithNumberTooBig)
+TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooBig)
 {
     const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("5"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("4"). It must be an integer number between 0 and 3.)"},
     };
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Banded");
-    solver->setProperty("Upper half-bandwidth", "5");
+    solver->setProperty("Linear solver", "Banded");
+    solver->setProperty("Upper half-bandwidth", "4");
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -239,7 +237,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNonNumber)
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 3.)"},
     };
 
     solver->setProperty("Linear solver", "Banded");
@@ -251,18 +249,17 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNonNumber)
     OdeModel::finalise(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndLowerHalfBandwidthValueWithNumberTooSmall)
+TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooSmall)
 {
     const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 3.)"},
     };
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Banded");
+    solver->setProperty("Linear solver", "Banded");
     solver->setProperty("Lower half-bandwidth", "-1");
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
@@ -271,19 +268,18 @@ TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndLowerHalfBandwidth
     OdeModel::finalise(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndLowerHalfBandwidthValueWithNumberTooBig)
+TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooBig)
 {
     const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("5"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("4"). It must be an integer number between 0 and 3.)"},
     };
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Banded");
-    solver->setProperty("Lower half-bandwidth", "5");
+    solver->setProperty("Linear solver", "Banded");
+    solver->setProperty("Lower half-bandwidth", "4");
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);

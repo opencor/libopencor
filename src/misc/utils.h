@@ -44,9 +44,25 @@ using StringSolverCreateMap = std::map<std::string, SolverCreate>;
 #    define ASSERT_NE(x, y) \
         (void)x; \
         (void)y
+#    define ASSERT_GT(x, y) \
+        (void)x; \
+        (void)y
+#    define ASSERT_GE(x, y) \
+        (void)x; \
+        (void)y
+#    define ASSERT_LT(x, y) \
+        (void)x; \
+        (void)y
+#    define ASSERT_LE(x, y) \
+        (void)x; \
+        (void)y
 #else
 #    define ASSERT_EQ(x, y) assert(x == y)
 #    define ASSERT_NE(x, y) assert(x != y)
+#    define ASSERT_GT(x, y) assert(x > y)
+#    define ASSERT_GE(x, y) assert(x >= y)
+#    define ASSERT_LT(x, y) assert(x < y)
+#    define ASSERT_LE(x, y) assert(x <= y)
 #endif
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);

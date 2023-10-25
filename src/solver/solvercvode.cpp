@@ -357,13 +357,13 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
                 upperHalfBandwidth = toInt(mProperties[UPPER_HALF_BANDWIDTH_ID], ok);
 
                 if (!ok || (upperHalfBandwidth < 0) || (upperHalfBandwidth >= static_cast<int>(pSize))) {
-                    addError(R"(The ")" + UPPER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[UPPER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize) + R"(.)");
+                    addError(R"(The ")" + UPPER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[UPPER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize - 1) + R"(.)");
                 }
 
                 lowerHalfBandwidth = toInt(mProperties[LOWER_HALF_BANDWIDTH_ID], ok);
 
                 if (!ok || (lowerHalfBandwidth < 0) || (lowerHalfBandwidth >= static_cast<int>(pSize))) {
-                    addError(R"(The ")" + LOWER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[LOWER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize) + R"(.)");
+                    addError(R"(The ")" + LOWER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[LOWER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize - 1) + R"(.)");
                 }
             }
         }

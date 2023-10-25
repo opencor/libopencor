@@ -18,32 +18,12 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-//---GRY--- REMOVE NOLINT ONCE nlaSolver() IS FULLY IMPLEMENTED.
 void nlaSolve(SolverNla *pSolver, void (*pObjectiveFunction)(double *, double *, void *),
-              double *pU, int pN, void *pData) // NOLINT
+              double *pU, size_t pN, void *pData)
 {
-    // Retrieve the NLA solver with which we should solve our NLA system.
-
-    (void)pObjectiveFunction;
-    (void)pU;
-    (void)pN;
-    (void)pData;
-
     ASSERT_NE(pSolver, nullptr);
 
-    pSolver->solve();
-}
-
-bool SolverNla::Impl::initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
-{
-    mComputeSystem = pComputeSystem;
-
-    mU = pU;
-    mN = pN;
-
-    mUserData = pUserData;
-
-    return true;
+    pSolver->solve(pObjectiveFunction, pU, pN, pData);
 }
 
 SolverNla::SolverNla(Impl *pPimpl)
@@ -56,9 +36,11 @@ SolverNla::Impl *SolverNla::pimpl()
     return static_cast<Impl *>(Solver::pimpl());
 }
 
+/*---GRY---
 const SolverNla::Impl *SolverNla::pimpl() const
 {
     return static_cast<const Impl *>(Solver::pimpl());
 }
+*/
 
 } // namespace libOpenCOR

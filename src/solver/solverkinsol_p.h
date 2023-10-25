@@ -26,17 +26,26 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class SolverKinsolUserData
+struct SolverKinsolUserData
 {
-public:
-    explicit SolverKinsolUserData(SolverNla::ComputeSystem pComputeSystem, void *pUserData);
+    SolverNla::ComputeSystem computeSystem = nullptr;
 
-    SolverNla::ComputeSystem computeSystem() const;
-    void *userData() const;
+    void *userData = nullptr;
+};
 
-private:
-    SolverNla::ComputeSystem mComputeSystem = nullptr;
-    void *mUserData = nullptr;
+struct SolverKinsolData
+{
+    SUNContext context = nullptr;
+
+    void *solver = nullptr;
+
+    N_Vector uVector = nullptr;
+    N_Vector onesVector = nullptr;
+
+    SUNMatrix matrix = nullptr;
+    SUNLinearSolver linearSolver = nullptr;
+
+    SolverKinsolUserData *userData = nullptr;
 };
 
 class SolverKinsol::Impl: public SolverNla::Impl
@@ -79,26 +88,14 @@ public:
     static SolverPropertyPtrVector propertiesInfo();
     static StringVector hiddenProperties(const StringStringMap &pProperties);
 
-    SUNContext mContext = nullptr;
-
-    void *mSolver = nullptr;
-
-    N_Vector mUVector = nullptr;
-    N_Vector mOnesVector = nullptr;
-
-    SUNMatrix mMatrix = nullptr;
-    SUNLinearSolver mLinearSolver = nullptr;
-
-    SolverKinsolUserData *mKinsolUserData = nullptr;
+    std::map<ComputeSystem, SolverKinsolData> mData;
 
     explicit Impl();
     ~Impl() override;
 
     StringStringMap propertiesId() const override;
 
-    bool initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
-
-    bool solve() override;
+    bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 };
 
 } // namespace libOpenCOR

@@ -35,9 +35,7 @@ public:
 
     SolverInfoPtr info() const override;
 
-    bool initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
-
-    bool solve() override;
+    bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 
 private:
     class Impl;

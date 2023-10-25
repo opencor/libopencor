@@ -5,7 +5,7 @@
 const char VERSION[] = "0.4.0.post0";
 const char LIBCELLML_VERSION[] = "0.5.0";
 
-const size_t VARIABLE_COUNT = 3;
+const size_t VARIABLE_COUNT_2 = 3;
 
 const VariableInfo VARIABLE_INFO[] = {
     {"x", "dimensionless", "my_algebraic_system", ALGEBRAIC},
@@ -15,9 +15,9 @@ const VariableInfo VARIABLE_INFO[] = {
 
 double * createVariablesArray()
 {
-    double *res = (double *) malloc(VARIABLE_COUNT*sizeof(double));
+    double *res = (double *) malloc(VARIABLE_COUNT_2*sizeof(double));
 
-    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
+    for (size_t i = 0; i < VARIABLE_COUNT_2; ++i) {
         res[i] = NAN;
     }
 

@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "nlamodel.h"
-#include "utils.h"
 
 #include "gtest/gtest.h"
 
@@ -85,10 +84,18 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const st
 
 void compute(double *pVariables)
 {
+    // Solve the model using KINSOL, initialising everything first.
+
     Model1::computeVariables(pVariables);
 
     static const libOpenCOR::Doubles SOLUTIONS = {3.0};
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00001};
+
+    EXPECT_EQ_DOUBLES(pVariables, SOLUTIONS, ABSOLUTE_ERRORS);
+
+    // Solve the model using KINSOL, but this time reusing the pre-existing settings.
+
+    Model1::computeVariables(pVariables);
 
     EXPECT_EQ_DOUBLES(pVariables, SOLUTIONS, ABSOLUTE_ERRORS);
 }
@@ -122,10 +129,18 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const st
 
 void compute(double *pVariables)
 {
+    // Solve the model using KINSOL, initialising everything first.
+
     Model2::computeVariables(pVariables);
 
     static const libOpenCOR::Doubles SOLUTIONS = {3.0, 7.0, -5.0};
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00001, 0.00001, 0.00001};
+
+    EXPECT_EQ_DOUBLES(pVariables, SOLUTIONS, ABSOLUTE_ERRORS);
+
+    // Solve the model using KINSOL, but this time reusing the pre-existing settings.
+
+    Model2::computeVariables(pVariables);
 
     EXPECT_EQ_DOUBLES(pVariables, SOLUTIONS, ABSOLUTE_ERRORS);
 }

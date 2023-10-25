@@ -5,7 +5,7 @@
 extern const char VERSION[];
 extern const char LIBCELLML_VERSION[];
 
-extern const size_t VARIABLE_COUNT;
+extern const size_t VARIABLE_COUNT_2;
 
 typedef enum {
     CONSTANT,

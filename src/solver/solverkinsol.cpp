@@ -66,30 +66,12 @@ int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
 {
     auto *userData = static_cast<SolverKinsolUserData *>(pUserData);
 
-    userData->computeSystem()(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData());
+    userData->computeSystem(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
 
     return 0;
 }
 
 } // namespace
-
-// Solver user data.
-
-SolverKinsolUserData::SolverKinsolUserData(SolverNla::ComputeSystem pComputeSystem, void *pUserData)
-    : mComputeSystem(pComputeSystem)
-    , mUserData(pUserData)
-{
-}
-
-SolverNla::ComputeSystem SolverKinsolUserData::computeSystem() const
-{
-    return mComputeSystem;
-}
-
-void *SolverKinsolUserData::userData() const
-{
-    return mUserData;
-}
 
 // Solver.
 
@@ -149,17 +131,17 @@ SolverKinsol::Impl::Impl()
 
 SolverKinsol::Impl::~Impl()
 {
-    if (mContext != nullptr) {
-        N_VDestroy_Serial(mUVector);
-        N_VDestroy_Serial(mOnesVector);
-        SUNLinSolFree(mLinearSolver);
-        SUNMatDestroy(mMatrix);
+    for (auto &data : mData) {
+        N_VDestroy_Serial(data.second.uVector);
+        N_VDestroy_Serial(data.second.onesVector);
+        SUNMatDestroy(data.second.matrix);
+        SUNLinSolFree(data.second.linearSolver);
 
-        KINFree(&mSolver);
+        KINFree(&data.second.solver);
 
-        SUNContext_Free(&mContext);
+        SUNContext_Free(&data.second.context);
 
-        delete mKinsolUserData;
+        delete data.second.userData;
     }
 }
 
@@ -175,132 +157,142 @@ StringStringMap SolverKinsol::Impl::propertiesId() const
     return PROPERTIES_ID;
 }
 
-bool SolverKinsol::Impl::initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
+bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
 {
     removeAllIssues();
 
-    // Retrieve the solver's properties.
+    // Check whether we need to initialise our data or whether we can just reuse it.
 
-    bool ok = true;
-    auto maximumNumberOfIterations = MAXIMUM_NUMBER_OF_ITERATIONS_DEFAULT_VALUE;
-    auto linearSolver = LINEAR_SOLVER_DEFAULT_VALUE;
-    auto upperHalfBandwidth = UPPER_HALF_BANDWIDTH_DEFAULT_VALUE;
-    auto lowerHalfBandwidth = LOWER_HALF_BANDWIDTH_DEFAULT_VALUE;
+    SolverKinsolData data;
 
-    maximumNumberOfIterations = toInt(mProperties[MAXIMUM_NUMBER_OF_ITERATIONS_ID], ok);
+    if (auto iter = mData.find(pComputeSystem); iter == mData.end()) {
+        // We don't have any data associated with the given pComputeSystem, so get some by first making sure that the
+        // solver's properties are all valid.
 
-    if (!ok || (maximumNumberOfIterations <= 0)) {
-        addError(R"(The ")" + MAXIMUM_NUMBER_OF_ITERATIONS_NAME + R"(" property has an invalid value (")" + mProperties[MAXIMUM_NUMBER_OF_ITERATIONS_ID] + R"("). It must be a floating point number greater than zero.)");
-    }
+        bool ok = true;
+        auto maximumNumberOfIterations = MAXIMUM_NUMBER_OF_ITERATIONS_DEFAULT_VALUE;
+        auto linearSolver = LINEAR_SOLVER_DEFAULT_VALUE;
+        auto upperHalfBandwidth = UPPER_HALF_BANDWIDTH_DEFAULT_VALUE;
+        auto lowerHalfBandwidth = LOWER_HALF_BANDWIDTH_DEFAULT_VALUE;
 
-    linearSolver = mProperties[LINEAR_SOLVER_ID];
+        maximumNumberOfIterations = toInt(mProperties[MAXIMUM_NUMBER_OF_ITERATIONS_ID], ok);
 
-    if (std::find(LINEAR_SOLVER_LIST.begin(), LINEAR_SOLVER_LIST.end(), linearSolver) == LINEAR_SOLVER_LIST.end()) {
-        addError(R"(The ")" + LINEAR_SOLVER_NAME + R"(" property has an invalid value (")" + mProperties[LINEAR_SOLVER_ID] + R"("). It must be equal to either ")" + DENSE_LINEAR_SOLVER + R"(", ")" + BANDED_LINEAR_SOLVER + R"(", ")" + GMRES_LINEAR_SOLVER + R"(", ")" + BICGSTAB_LINEAR_SOLVER + R"(", or ")" + TFQMR_LINEAR_SOLVER + R"(".)");
-    } else {
-        bool needUpperAndLowerHalfBandwidths = false;
-
-        if (linearSolver == BANDED_LINEAR_SOLVER) {
-            // We are dealing with a banded linear solver, so we need both an upper and a lower half bandwidth.
-
-            needUpperAndLowerHalfBandwidths = true;
+        if (!ok || (maximumNumberOfIterations <= 0)) {
+            addError(R"(The ")" + MAXIMUM_NUMBER_OF_ITERATIONS_NAME + R"(" property has an invalid value (")" + mProperties[MAXIMUM_NUMBER_OF_ITERATIONS_ID] + R"("). It must be a floating point number greater than zero.)");
         }
 
-        if (needUpperAndLowerHalfBandwidths) {
-            upperHalfBandwidth = toInt(mProperties[UPPER_HALF_BANDWIDTH_ID], ok);
+        linearSolver = mProperties[LINEAR_SOLVER_ID];
 
-            if (!ok || (upperHalfBandwidth < 0) || (upperHalfBandwidth >= static_cast<int>(pN))) {
-                addError(R"(The ")" + UPPER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[UPPER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pN) + R"(.)");
-            }
-
-            lowerHalfBandwidth = toInt(mProperties[LOWER_HALF_BANDWIDTH_ID], ok);
-
-            if (!ok || (lowerHalfBandwidth < 0) || (lowerHalfBandwidth >= static_cast<int>(pN))) {
-                addError(R"(The ")" + LOWER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[LOWER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pN) + R"(.)");
-            }
-        }
-    }
-
-    // Check whether we have had issues and, if so, then leave.
-
-    if (!mIssues.empty()) {
-        return false;
-    }
-
-    // Create our SUNDIALS context.
-
-    ASSERT_EQ(SUNContext_Create(nullptr, &mContext), 0);
-
-    // Create our KINSOL solver.
-
-    mSolver = KINCreate(mContext);
-
-    ASSERT_NE(mSolver, nullptr);
-
-    // Initialise our CVODES solver.
-
-    mUVector = N_VMake_Serial(static_cast<int64_t>(pN), pU, mContext);
-    mOnesVector = N_VNew_Serial(static_cast<int64_t>(pN), mContext);
-
-    ASSERT_NE(mUVector, nullptr);
-    ASSERT_NE(mOnesVector, nullptr);
-
-    N_VConst(1.0, mOnesVector);
-
-    ASSERT_EQ(KINInit(mSolver, computeSystem, mUVector), KIN_SUCCESS);
-
-    // Set our user data.
-
-    mKinsolUserData = new SolverKinsolUserData(pComputeSystem, pUserData);
-
-    ASSERT_EQ(KINSetUserData(mSolver, mKinsolUserData), KIN_SUCCESS);
-
-    // Set our maximum number of iterations
-
-    ASSERT_EQ(KINSetNumMaxIters(mSolver, maximumNumberOfIterations), KIN_SUCCESS);
-
-    // Set our linear solver.
-
-    if (linearSolver == DENSE_LINEAR_SOLVER) {
-        mMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), mContext);
-
-        ASSERT_NE(mMatrix, nullptr);
-
-        mLinearSolver = SUNLinSol_Dense(mUVector, mMatrix, mContext);
-    } else if (linearSolver == BANDED_LINEAR_SOLVER) {
-        mMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
-                                static_cast<int64_t>(upperHalfBandwidth), static_cast<int64_t>(lowerHalfBandwidth),
-                                mContext);
-
-        ASSERT_NE(mMatrix, nullptr);
-
-        mLinearSolver = SUNLinSol_Band(mUVector, mMatrix, mContext);
-    } else {
-        mMatrix = nullptr;
-
-        if (linearSolver == GMRES_LINEAR_SOLVER) {
-            mLinearSolver = SUNLinSol_SPGMR(mUVector, PREC_NONE, 0, mContext);
-        } else if (linearSolver == BICGSTAB_LINEAR_SOLVER) {
-            mLinearSolver = SUNLinSol_SPBCGS(mUVector, PREC_NONE, 0, mContext);
+        if (std::find(LINEAR_SOLVER_LIST.begin(), LINEAR_SOLVER_LIST.end(), linearSolver) == LINEAR_SOLVER_LIST.end()) {
+            addError(R"(The ")" + LINEAR_SOLVER_NAME + R"(" property has an invalid value (")" + mProperties[LINEAR_SOLVER_ID] + R"("). It must be equal to either ")" + DENSE_LINEAR_SOLVER + R"(", ")" + BANDED_LINEAR_SOLVER + R"(", ")" + GMRES_LINEAR_SOLVER + R"(", ")" + BICGSTAB_LINEAR_SOLVER + R"(", or ")" + TFQMR_LINEAR_SOLVER + R"(".)");
         } else {
-            mLinearSolver = SUNLinSol_SPTFQMR(mUVector, PREC_NONE, 0, mContext);
+            bool needUpperAndLowerHalfBandwidths = false;
+
+            if (linearSolver == BANDED_LINEAR_SOLVER) {
+                // We are dealing with a banded linear solver, so we need both an upper and a lower half bandwidth.
+
+                needUpperAndLowerHalfBandwidths = true;
+            }
+
+            if (needUpperAndLowerHalfBandwidths) {
+                upperHalfBandwidth = toInt(mProperties[UPPER_HALF_BANDWIDTH_ID], ok);
+
+                if (!ok || (upperHalfBandwidth < 0) || (upperHalfBandwidth >= static_cast<int>(pN))) {
+                    addError(R"(The ")" + UPPER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[UPPER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pN - 1) + R"(.)");
+                }
+
+                lowerHalfBandwidth = toInt(mProperties[LOWER_HALF_BANDWIDTH_ID], ok);
+
+                if (!ok || (lowerHalfBandwidth < 0) || (lowerHalfBandwidth >= static_cast<int>(pN))) {
+                    addError(R"(The ")" + LOWER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[LOWER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pN - 1) + R"(.)");
+                }
+            }
         }
+
+        // Check whether we had issues and, if so, then leave.
+
+        if (!mIssues.empty()) {
+            return false;
+        }
+
+        // Create our SUNDIALS context.
+
+        ASSERT_EQ(SUNContext_Create(nullptr, &data.context), 0);
+
+        // Create our KINSOL solver.
+
+        data.solver = KINCreate(data.context);
+
+        ASSERT_NE(data.solver, nullptr);
+
+        // Initialise our KINSOL solver.
+
+        data.uVector = N_VMake_Serial(static_cast<int64_t>(pN), pU, data.context);
+        data.onesVector = N_VNew_Serial(static_cast<int64_t>(pN), data.context);
+
+        ASSERT_NE(data.uVector, nullptr);
+        ASSERT_NE(data.onesVector, nullptr);
+
+        N_VConst(1.0, data.onesVector);
+
+        ASSERT_EQ(KINInit(data.solver, computeSystem, data.uVector), KIN_SUCCESS);
+
+        // Set our linear solver.
+
+        if (linearSolver == DENSE_LINEAR_SOLVER) {
+            data.matrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), data.context);
+
+            ASSERT_NE(data.matrix, nullptr);
+
+            data.linearSolver = SUNLinSol_Dense(data.uVector, data.matrix, data.context);
+        } else if (linearSolver == BANDED_LINEAR_SOLVER) {
+            data.matrix = SUNBandMatrix(static_cast<int64_t>(pN),
+                                        static_cast<int64_t>(upperHalfBandwidth), static_cast<int64_t>(lowerHalfBandwidth),
+                                        data.context);
+
+            ASSERT_NE(data.matrix, nullptr);
+
+            data.linearSolver = SUNLinSol_Band(data.uVector, data.matrix, data.context);
+        } else {
+            data.matrix = nullptr;
+
+            if (linearSolver == GMRES_LINEAR_SOLVER) {
+                data.linearSolver = SUNLinSol_SPGMR(data.uVector, PREC_NONE, 0, data.context);
+            } else if (linearSolver == BICGSTAB_LINEAR_SOLVER) {
+                data.linearSolver = SUNLinSol_SPBCGS(data.uVector, PREC_NONE, 0, data.context);
+            } else {
+                data.linearSolver = SUNLinSol_SPTFQMR(data.uVector, PREC_NONE, 0, data.context);
+            }
+        }
+
+        ASSERT_NE(data.linearSolver, nullptr);
+
+        ASSERT_EQ(KINSetLinearSolver(data.solver, data.linearSolver, data.matrix), KINLS_SUCCESS);
+
+        // Set our user data.
+
+        data.userData = new SolverKinsolUserData {pComputeSystem, pUserData};
+
+        ASSERT_EQ(KINSetUserData(data.solver, data.userData), KIN_SUCCESS);
+
+        // Set our maximum number of iterations.
+
+        ASSERT_EQ(KINSetNumMaxIters(data.solver, maximumNumberOfIterations), KIN_SUCCESS);
+
+        // Keep track of our data.
+
+        mData[pComputeSystem] = data;
+    } else {
+        // We are already initialised, so just reuse our previous data.
+
+        data = iter->second;
     }
 
-    ASSERT_NE(mLinearSolver, nullptr);
-
-    ASSERT_EQ(KINSetLinearSolver(mSolver, mLinearSolver, mMatrix), KINLS_SUCCESS);
-
-    // Initialise the NLA solver itself.
-
-    return SolverNla::Impl::initialise(pComputeSystem, pU, pN, pUserData);
-}
-
-bool SolverKinsol::Impl::solve()
-{
     // Solve the model.
+    // Note: we use ASSERT_GE() since upon success KINSol() will return either KIN_SUCCESS, KIN_INITIAL_GUESS_OK, or
+    //       KIN_STEP_LT_STPTOL.
 
-    ASSERT_EQ(KINSol(mSolver, mUVector, KIN_LINESEARCH, mOnesVector, mOnesVector), KIN_SUCCESS);
+    ASSERT_GE(KINSol(data.solver, data.uVector, KIN_LINESEARCH, data.onesVector, data.onesVector), KIN_SUCCESS);
 
     return true;
 }
@@ -320,24 +312,21 @@ SolverKinsol::Impl *SolverKinsol::pimpl()
     return static_cast<Impl *>(SolverNla::pimpl());
 }
 
+/*---GRY---
 const SolverKinsol::Impl *SolverKinsol::pimpl() const
 {
     return static_cast<const Impl *>(SolverNla::pimpl());
 }
+*/
 
 SolverInfoPtr SolverKinsol::info() const
 {
     return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverKinsol::Impl::ID]];
 }
 
-bool SolverKinsol::initialise(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
+bool SolverKinsol::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
 {
-    return pimpl()->initialise(pComputeSystem, pU, pN, pUserData);
-}
-
-bool SolverKinsol::solve()
-{
-    return pimpl()->solve();
+    return pimpl()->solve(pComputeSystem, pU, pN, pUserData);
 }
 
 } // namespace libOpenCOR

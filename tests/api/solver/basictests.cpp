@@ -23,10 +23,10 @@ limitations under the License.
 
 namespace {
 
-void checkModel(const std::string &pModelType, const std::string &pFileName = "model") // NOLINT
+void checkModel(const std::string &pModelType, const std::string &pVersion = {}) // NOLINT
 {
     auto parser = libcellml::Parser::create();
-    auto model = parser->parseModel(libOpenCOR::textFileContents("api/solver/" + pModelType + "/" + pFileName + ".cellml"));
+    auto model = parser->parseModel(libOpenCOR::textFileContents("api/solver/" + pModelType + "/model" + pVersion + ".cellml"));
 
     EXPECT_EQ(parser->issueCount(), size_t(0));
 
@@ -50,13 +50,27 @@ void checkModel(const std::string &pModelType, const std::string &pFileName = "m
     profile->setImplementationHeaderString("#include \"[INTERFACE_FILE_NAME]\"\n");
 
     if (pModelType == "nla") {
-        profile->setInterfaceFileNameString(pFileName + ".h");
+        profile->setInterfaceFileNameString("model" + pVersion + ".h");
+        profile->setInterfaceVariableCountString("extern const size_t VARIABLE_COUNT_" + pVersion + ";\n");
+        profile->setImplementationVariableCountString("const size_t VARIABLE_COUNT_" + pVersion + " = [VARIABLE_COUNT];\n");
+        profile->setImplementationCreateVariablesArrayMethodString("double * createVariablesArray()\n"
+                                                                   "{\n"
+                                                                   "    double *res = (double *) malloc(VARIABLE_COUNT_"
+                                                                   + pVersion + "*sizeof(double));\n"
+                                                                                "\n"
+                                                                                "    for (size_t i = 0; i < VARIABLE_COUNT_"
+                                                                   + pVersion + "; ++i) {\n"
+                                                                                "        res[i] = NAN;\n"
+                                                                                "    }\n"
+                                                                                "\n"
+                                                                                "    return res;\n"
+                                                                                "}\n");
         profile->setExternNlaSolveMethodString("");
         profile->setNlaSolveCallString(false, "libOpenCOR::nlaSolve(KINSOL_NLA_SOLVER, objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
     }
 
-    EXPECT_EQ(generator->interfaceCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/" + pFileName + ".h"));
-    EXPECT_EQ(generator->implementationCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/" + pFileName + ".c"));
+    EXPECT_EQ(generator->interfaceCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/model" + pVersion + ".h"));
+    EXPECT_EQ(generator->implementationCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/model" + pVersion + ".c"));
 }
 
 } // namespace
@@ -68,12 +82,12 @@ TEST(BasicSolverTest, checkOdeModel)
 
 TEST(BasicSolverTest, checkNlaModel1)
 {
-    checkModel("nla", "model1");
+    checkModel("nla", "1");
 }
 
 TEST(BasicSolverTest, checkNlaModel2)
 {
-    checkModel("nla", "model2");
+    checkModel("nla", "2");
 }
 
 TEST(BasicSolverTest, solversInfo)
