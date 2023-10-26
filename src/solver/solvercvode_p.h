@@ -27,17 +27,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class SolverCvodeUserData
+struct SolverCvodeUserData
 {
-public:
-    explicit SolverCvodeUserData(double *pVariables, SolverOde::ComputeRates pComputeRates);
+    double *variables = nullptr;
 
-    double *variables() const;
-    SolverOde::ComputeRates computeRates() const;
-
-private:
-    double *mVariables = nullptr;
-    SolverOde::ComputeRates mComputeRates = nullptr;
+    SolverOde::ComputeRates computeRates = nullptr;
 };
 
 class SolverCvode::Impl: public SolverOde::Impl

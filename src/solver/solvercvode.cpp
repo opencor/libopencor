@@ -112,30 +112,12 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
 
-    userData->computeRates()(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables());
+    userData->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
 
     return 0;
 }
 
 } // namespace
-
-// Solver user data.
-
-SolverCvodeUserData::SolverCvodeUserData(double *pVariables, SolverOde::ComputeRates pComputeRates)
-    : mVariables(pVariables)
-    , mComputeRates(pComputeRates)
-{
-}
-
-double *SolverCvodeUserData::variables() const
-{
-    return mVariables;
-}
-
-SolverOde::ComputeRates SolverCvodeUserData::computeRates() const
-{
-    return mComputeRates;
-}
 
 // Solver.
 
@@ -412,7 +394,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Set our user data.
 
-    mUserData = new SolverCvodeUserData(pVariables, pComputeRates);
+    mUserData = new SolverCvodeUserData {pVariables, pComputeRates};
 
     ASSERT_EQ(CVodeSetUserData(mSolver, mUserData), CV_SUCCESS);
 
