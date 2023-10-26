@@ -42,7 +42,7 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
     auto res = stream.str();
 
 //---GRY---
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     while (mIds.contains(res)) {
         stream.str({});
 
