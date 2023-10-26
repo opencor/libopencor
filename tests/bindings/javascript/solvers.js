@@ -439,6 +439,134 @@ export function checkHeunSolver(solverInfo) {
   );
 }
 
+export function checkKinsolSolver(solverInfo) {
+  // Properties.
+
+  expect(solverInfo.type().value).toBe(libopencor.Solver.Type.NLA.value);
+  expect(solverInfo.id()).toBe("KISAO:0000282");
+  expect(solverInfo.name()).toBe("KINSOL");
+
+  const solverInfoProperties = solverInfo.properties();
+
+  expect(solverInfoProperties.size()).toBe(4);
+
+  let property = solverInfoProperties.get(0);
+
+  expect(property.type().value).toBe(
+    libopencor.SolverProperty.Type.IntegerGt0.value,
+  );
+  expect(property.id()).toBe("KISAO:0000486");
+  expect(property.name()).toBe("Maximum number of iterations");
+  expect(property.defaultValue()).toBe("200");
+  expect(property.hasVoiUnit()).toBe(false);
+
+  let listValues = property.listValues();
+
+  expect(listValues.size()).toBe(0);
+
+  property = solverInfoProperties.get(1);
+
+  expect(property.type().value).toBe(libopencor.SolverProperty.Type.List.value);
+  expect(property.id()).toBe("KISAO:0000477");
+  expect(property.name()).toBe("Linear solver");
+  expect(property.defaultValue()).toBe("Dense");
+  expect(property.hasVoiUnit()).toBe(false);
+
+  listValues = property.listValues();
+
+  expect(listValues.size()).toBe(5);
+  expect(listValues.get(0)).toBe("Dense");
+  expect(listValues.get(1)).toBe("Banded");
+  expect(listValues.get(2)).toBe("GMRES");
+  expect(listValues.get(3)).toBe("BiCGStab");
+  expect(listValues.get(4)).toBe("TFQMR");
+
+  property = solverInfoProperties.get(2);
+
+  expect(property.type().value).toBe(
+    libopencor.SolverProperty.Type.IntegerGe0.value,
+  );
+  expect(property.id()).toBe("KISAO:0000479");
+  expect(property.name()).toBe("Upper half-bandwidth");
+  expect(property.defaultValue()).toBe("0");
+  expect(property.hasVoiUnit()).toBe(false);
+
+  listValues = property.listValues();
+
+  expect(listValues.size()).toBe(0);
+
+  property = solverInfoProperties.get(3);
+
+  expect(property.type().value).toBe(
+    libopencor.SolverProperty.Type.IntegerGe0.value,
+  );
+  expect(property.id()).toBe("KISAO:0000480");
+  expect(property.name()).toBe("Lower half-bandwidth");
+  expect(property.defaultValue()).toBe("0");
+  expect(property.hasVoiUnit()).toBe(false);
+
+  listValues = property.listValues();
+
+  expect(listValues.size()).toBe(0);
+
+  // Hidden properties.
+
+  const hiddenPropertiesForDense = ["KISAO:0000479", "KISAO:0000480"];
+  const hiddenPropertiesForBanded = noHiddenProperties;
+  const hiddenPropertiesForGmres = hiddenPropertiesForDense;
+  const hiddenPropertiesForBicgstab = hiddenPropertiesForDense;
+  const hiddenPropertiesForTfqmr = hiddenPropertiesForDense;
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(noProperties),
+    noHiddenProperties,
+  );
+
+  let properties = new libopencor.StringStringMap();
+
+  properties.set("KISAO:0000477", "Dense");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForDense,
+  );
+
+  properties.set("Linear solver", "Banded");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForDense,
+  );
+
+  properties.set("KISAO:0000477", "Banded");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForBanded,
+  );
+
+  properties.set("KISAO:0000477", "GMRES");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForGmres,
+  );
+
+  properties.set("KISAO:0000477", "BiCGStab");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForBicgstab,
+  );
+
+  properties.set("KISAO:0000477", "TFQMR");
+
+  expectHiddenProperties(
+    solverInfo.hiddenProperties(properties),
+    hiddenPropertiesForTfqmr,
+  );
+}
+
 export function checkSecondOrderRungeKuttaSolver(solverInfo) {
   // Properties.
 

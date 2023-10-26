@@ -19,6 +19,7 @@ limitations under the License.
 #include "tests/utils.h"
 
 #include <libopencor>
+#include <regex>
 
 namespace libOpenCOR {
 
@@ -53,6 +54,18 @@ void expectEqualHiddenProperties(const StringVector &pHiddenProperties, const St
 std::string resourcePath(const std::string &pResourceRelativePath)
 {
     return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;
+}
+
+std::string textFileContents(const std::string &pFileName)
+{
+    static const std::regex CR_LF("\\r\\n");
+
+    auto res = libOpenCOR::toString(libOpenCOR::fileContents(libOpenCOR::resourcePath(pFileName)));
+
+    // To retrieve a file contents as bytes will, on Windows, result in LF characters being converted to CR+LF, so
+    // convert back since we expect LF.
+
+    return regex_replace(res, CR_LF, "\n");
 }
 
 UnsignedCharVector charArrayToVector(const char *pContents)

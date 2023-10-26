@@ -16,11 +16,18 @@ limitations under the License.
 
 #pragma once
 
-#include <libopencor>
+#include "solverode.h"
 
-void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkKinsolSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+#include "tests/utils.h"
+
+namespace OdeModel {
+
+#include "../../res/api/solver/ode/model.h"
+
+std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> initialise(const std::string &pSolverName);
+void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
+             double *pStates, double *pRates, double *pVariables,
+             const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors);
+void finalise(double *pStates, double *pRates, double *pVariables);
+
+} // namespace OdeModel

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "model.h"
+#include "odemodel.h"
 #include "solvercvode.h"
 #include "solvers.h"
 #include "utils.h"
@@ -32,11 +32,7 @@ TEST(CvodeSolverTest, basic)
 
 TEST(CvodeSolverTest, maximumStepValueWithNonNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, R"(The "Maximum step" property has an invalid value ("abc"). It must be a floating point number greater or equal to zero.)"},
@@ -44,19 +40,15 @@ TEST(CvodeSolverTest, maximumStepValueWithNonNumber)
 
     solver->setProperty("Maximum step", "abc");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -66,19 +58,15 @@ TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 
     solver->setProperty("Maximum step", "-1.234");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, maximumNumberOfStepsValueWithNonNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -88,19 +76,15 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithNonNumber)
 
     solver->setProperty("Maximum number of steps", "abc");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -110,19 +94,15 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
 
     solver->setProperty("Maximum number of steps", "0");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, integrationMethodValueWithUnknownValue)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -132,19 +112,15 @@ TEST(CvodeSolverTest, integrationMethodValueWithUnknownValue)
 
     solver->setProperty("Integration method", "Unknown integration method");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, iterationTypeValueWithUnknownValue)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -154,19 +130,15 @@ TEST(CvodeSolverTest, iterationTypeValueWithUnknownValue)
 
     solver->setProperty("Iteration type", "Unknown iteration type");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, linearSolverValueWithUnknownValue)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -176,19 +148,15 @@ TEST(CvodeSolverTest, linearSolverValueWithUnknownValue)
 
     solver->setProperty("Linear solver", "Unknown linear solver");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, preconditionerValueWithUnknownValue)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -199,161 +167,129 @@ TEST(CvodeSolverTest, preconditionerValueWithUnknownValue)
     solver->setProperty("Linear solver", "GMRES");
     solver->setProperty("Preconditioner", "Unknown preconditioner");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNonNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 3.)"},
     };
 
     solver->setProperty("Linear solver", "Banded");
     solver->setProperty("Upper half-bandwidth", "abc");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndUpperHalfBandwidthValueWithNumberTooSmall)
+TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooSmall)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 3.)"},
     };
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Banded");
+    solver->setProperty("Linear solver", "Banded");
     solver->setProperty("Upper half-bandwidth", "-1");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndUpperHalfBandwidthValueWithNumberTooBig)
+TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooBig)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("5"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("4"). It must be an integer number between 0 and 3.)"},
     };
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Banded");
-    solver->setProperty("Upper half-bandwidth", "5");
+    solver->setProperty("Linear solver", "Banded");
+    solver->setProperty("Upper half-bandwidth", "4");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNonNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 3.)"},
     };
 
     solver->setProperty("Linear solver", "Banded");
     solver->setProperty("Lower half-bandwidth", "abc");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndLowerHalfBandwidthValueWithNumberTooSmall)
+TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooSmall)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 3.)"},
     };
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Banded");
+    solver->setProperty("Linear solver", "Banded");
     solver->setProperty("Lower half-bandwidth", "-1");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
-TEST(CvodeSolverTest, gmresLinearSolverBandedPreconditionerAndLowerHalfBandwidthValueWithNumberTooBig)
+TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooBig)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("5"). It must be an integer number between 0 and 4.)"},
+        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("4"). It must be an integer number between 0 and 3.)"},
     };
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Banded");
-    solver->setProperty("Lower half-bandwidth", "5");
+    solver->setProperty("Linear solver", "Banded");
+    solver->setProperty("Lower half-bandwidth", "4");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, relativeToleranceValueWithNonNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -363,19 +299,15 @@ TEST(CvodeSolverTest, relativeToleranceValueWithNonNumber)
 
     solver->setProperty("Relative tolerance", "abc");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -385,19 +317,15 @@ TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
 
     solver->setProperty("Relative tolerance", "-1.234");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, absoluteToleranceValueWithNonNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -407,19 +335,15 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithNonNumber)
 
     solver->setProperty("Absolute tolerance", "abc");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -429,19 +353,15 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 
     solver->setProperty("Absolute tolerance", "-1.234");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, interpolateSolutionValueWithNonBoolean)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Customise and initialise our solver using a step value that is not a floating point number.
 
@@ -451,37 +371,29 @@ TEST(CvodeSolverTest, interpolateSolutionValueWithNonBoolean)
 
     solver->setProperty("Interpolate solution", "Non boolean");
 
-    EXPECT_FALSE(solver->initialise(0.0, STATE_COUNT, states, rates, variables, computeRates));
+    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solve)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -490,18 +402,14 @@ TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 
     solver->setProperty("Interpolate solution", "False");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -510,18 +418,14 @@ TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 
     solver->setProperty("Integration method", "Adams-Moulton");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithFunctionalIterationType)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -530,18 +434,14 @@ TEST(CvodeSolverTest, solveWithFunctionalIterationType)
 
     solver->setProperty("Iteration type", "Functional");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -550,18 +450,14 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 
     solver->setProperty("Linear solver", "Banded");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -570,18 +466,14 @@ TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 
     solver->setProperty("Linear solver", "Diagonal");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolver)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -590,18 +482,14 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolver)
 
     solver->setProperty("Linear solver", "GMRES");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -610,18 +498,14 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
 
     solver->setProperty("Linear solver", "BiCGStab");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -630,18 +514,14 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
 
     solver->setProperty("Linear solver", "TFQMR");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -651,18 +531,14 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
     solver->setProperty("Linear solver", "GMRES");
     solver->setProperty("Preconditioner", "None");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -672,18 +548,14 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
     solver->setProperty("Linear solver", "BiCGStab");
     solver->setProperty("Preconditioner", "None");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
 {
-    // Create and initialise our various arrays and create our solver.
-
-    const auto [solver, states, rates, variables] = createAndInitialiseArraysAndCreateSolver("CVODE");
+    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
 
     // Compute our model.
 
@@ -693,9 +565,7 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
     solver->setProperty("Linear solver", "TFQMR");
     solver->setProperty("Preconditioner", "None");
 
-    computeModel(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
-    // Clean up after ourselves.
-
-    deleteArrays(states, rates, variables);
+    OdeModel::finalise(states, rates, variables);
 }

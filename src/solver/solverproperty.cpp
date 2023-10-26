@@ -35,7 +35,7 @@ SolverProperty::SolverProperty(Type pType, const std::string &pId, const std::st
 {
 }
 
-#ifndef COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
 SolverProperty::~SolverProperty()
 {
     delete mPimpl;

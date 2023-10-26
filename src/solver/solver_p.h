@@ -28,6 +28,7 @@ namespace libOpenCOR {
 class Solver::Impl: public Logger::Impl
 {
 public:
+    static StringSizetMap SolversIndex;
     static StringStringMap SolversId;
     static StringSolverCreateMap SolversCreate;
     static SolverInfoPtrVector SolversInfo;
@@ -35,6 +36,7 @@ public:
     bool mIsValid = false;
     StringStringMap mProperties;
 
+    static void registerSolvers();
     static void registerSolver(Type pType, const std::string &pId, const std::string &pName, SolverCreate pCreate,
                                const SolverPropertyPtrVector &pProperties,
                                SolverInfo::HiddenPropertiesFunction pHiddenProperties);

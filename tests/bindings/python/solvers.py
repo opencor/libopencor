@@ -403,6 +403,121 @@ def check_heun_solver(solver_info):
     )
 
 
+def check_kinsol_solver(solver_info):
+    # Properties.
+
+    assert solver_info.type == Solver.Type.Nla
+    assert solver_info.id == "KISAO:0000282"
+    assert solver_info.name == "KINSOL"
+
+    solver_info_properties = solver_info.properties
+
+    assert len(solver_info_properties) == 4
+
+    property = solver_info_properties[0]
+
+    assert property.type == SolverProperty.Type.IntegerGt0
+    assert property.id == "KISAO:0000486"
+    assert property.name == "Maximum number of iterations"
+    assert property.default_value == "200"
+    assert property.has_voi_unit == False
+
+    list_values = property.list_values
+
+    assert len(list_values) == 0
+
+    property = solver_info_properties[1]
+
+    assert property.type == SolverProperty.Type.List
+    assert property.id == "KISAO:0000477"
+    assert property.name == "Linear solver"
+    assert property.default_value == "Dense"
+    assert property.has_voi_unit == False
+
+    list_values = property.list_values
+
+    assert len(list_values) == 5
+    assert list_values[0] == "Dense"
+    assert list_values[1] == "Banded"
+    assert list_values[2] == "GMRES"
+    assert list_values[3] == "BiCGStab"
+    assert list_values[4] == "TFQMR"
+
+    property = solver_info_properties[2]
+
+    assert property.type == SolverProperty.Type.IntegerGe0
+    assert property.id == "KISAO:0000479"
+    assert property.name == "Upper half-bandwidth"
+    assert property.default_value == "0"
+    assert property.has_voi_unit == False
+
+    list_values = property.list_values
+
+    assert len(list_values) == 0
+
+    property = solver_info_properties[3]
+
+    assert property.type == SolverProperty.Type.IntegerGe0
+    assert property.id == "KISAO:0000480"
+    assert property.name == "Lower half-bandwidth"
+    assert property.default_value == "0"
+    assert property.has_voi_unit == False
+
+    list_values = property.list_values
+
+    assert len(list_values) == 0
+
+    # Hidden properties.
+
+    hidden_properties_for_dense = ["KISAO:0000479", "KISAO:0000480"]
+    hidden_properties_for_banded = no_hidden_properties
+    hidden_properties_for_gmres = hidden_properties_for_dense
+    hidden_properties_for_bicgstab = hidden_properties_for_dense
+    hidden_properties_for_tfqmr = hidden_properties_for_dense
+
+    assert_hidden_properties(
+        solver_info.hidden_properties(no_properties), no_hidden_properties
+    )
+
+    properties = {}
+
+    properties["KISAO:0000477"] = "Dense"
+
+    assert_hidden_properties(
+        solver_info.hidden_properties(properties), hidden_properties_for_dense
+    )
+
+    properties["Linear solver"] = "Banded"
+
+    assert_hidden_properties(
+        solver_info.hidden_properties(properties), hidden_properties_for_dense
+    )
+
+    properties["KISAO:0000477"] = "Banded"
+
+    assert_hidden_properties(
+        solver_info.hidden_properties(properties), hidden_properties_for_banded
+    )
+
+    properties["KISAO:0000477"] = "GMRES"
+
+    assert_hidden_properties(
+        solver_info.hidden_properties(properties), hidden_properties_for_gmres
+    )
+
+    properties["KISAO:0000477"] = "BiCGStab"
+
+    assert_hidden_properties(
+        solver_info.hidden_properties(properties), hidden_properties_for_bicgstab
+    )
+
+    properties["KISAO:0000477"] = "TFQMR"
+
+    assert_hidden_properties(
+        solver_info.hidden_properties(properties), hidden_properties_for_tfqmr
+    )
+
+
 def check_second_order_runge_kutta_solver(solver_info):
     # Properties.
 

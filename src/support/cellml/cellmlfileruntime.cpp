@@ -36,7 +36,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
             auto issue = analyser->issue(i);
             Issue::Type type = Issue::Type::ERROR;
 
-#ifdef COVERAGE_ENABLED
+#ifdef CODE_COVERAGE_ENABLED
             if (issue->level() == libcellml::Issue::Level::ERROR) {
                 type = Issue::Type::ERROR;
             } else {
@@ -88,7 +88,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
 
         auto compiler = Compiler::create();
 
-#    ifdef COVERAGE_ENABLED
+#    ifdef CODE_COVERAGE_ENABLED
         compiler->compile(generator->implementationCode());
 #    else
         if (!compiler->compile(generator->implementationCode())) {

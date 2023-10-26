@@ -16,11 +16,15 @@ limitations under the License.
 
 #pragma once
 
-#include <libopencor>
+#include "solver_p.h"
+#include "solvernla.h"
 
-void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkKinsolSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
-void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+namespace libOpenCOR {
+
+class SolverNla::Impl: public Solver::Impl
+{
+public:
+    virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) = 0;
+};
+
+} // namespace libOpenCOR

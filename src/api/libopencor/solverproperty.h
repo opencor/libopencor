@@ -57,7 +57,7 @@ public:
      */
 
     SolverProperty() = delete; /**< Constructor, @private. */
-#ifdef COVERAGE_ENABLED
+#ifdef CODE_COVERAGE_ENABLED
     ~SolverProperty() = default; /**< Destructor, @private. */
 #else
     ~SolverProperty(); /**< Destructor, @private. */

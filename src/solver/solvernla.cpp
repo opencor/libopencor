@@ -14,48 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solverunknown_p.h"
+#include "solvernla_p.h"
 
 namespace libOpenCOR {
 
-SolverPtr SolverUnknown::Impl::create()
+void nlaSolve(SolverNla *pSolver, void (*pObjectiveFunction)(double *, double *, void *),
+              double *pU, size_t pN, void *pData)
 {
-#ifdef CODE_COVERAGE_ENABLED
-    auto res = std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
+    ASSERT_NE(pSolver, nullptr);
 
-    res->pimpl()->propertiesId(); // Just for code coverage.
-
-    return res;
-#else
-    return std::shared_ptr<SolverUnknown> {new SolverUnknown {}};
-#endif
+    pSolver->solve(pObjectiveFunction, pU, pN, pData);
 }
 
-SolverUnknown::SolverUnknown()
-    : Solver(new Impl())
+SolverNla::SolverNla(Impl *pPimpl)
+    : Solver(pPimpl)
 {
 }
 
-SolverUnknown::~SolverUnknown()
-{
-    delete pimpl();
-}
-
-SolverUnknown::Impl *SolverUnknown::pimpl()
+SolverNla::Impl *SolverNla::pimpl()
 {
     return static_cast<Impl *>(Solver::pimpl());
 }
 
 /*---GRY---
-const SolverUnknown::Impl *SolverUnknown::pimpl() const
+const SolverNla::Impl *SolverNla::pimpl() const
 {
     return static_cast<const Impl *>(Solver::pimpl());
 }
 */
-
-SolverInfoPtr SolverUnknown::info() const
-{
-    return nullptr;
-}
 
 } // namespace libOpenCOR

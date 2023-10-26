@@ -107,33 +107,17 @@ const std::string SolverCvode::Impl::INTERPOLATE_SOLUTION_NAME = "Interpolate so
 // Right-hand side function.
 
 namespace {
+
 int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
 
-    userData->computeRates()(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables());
+    userData->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
 
     return 0;
 }
+
 } // namespace
-
-// Solver user data.
-
-SolverCvodeUserData::SolverCvodeUserData(double *pVariables, SolverOde::ComputeRates pComputeRates)
-    : mVariables(pVariables)
-    , mComputeRates(pComputeRates)
-{
-}
-
-double *SolverCvodeUserData::variables() const
-{
-    return mVariables;
-}
-
-SolverOde::ComputeRates SolverCvodeUserData::computeRates() const
-{
-    return mComputeRates;
-}
 
 // Solver.
 
@@ -355,13 +339,13 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
                 upperHalfBandwidth = toInt(mProperties[UPPER_HALF_BANDWIDTH_ID], ok);
 
                 if (!ok || (upperHalfBandwidth < 0) || (upperHalfBandwidth >= static_cast<int>(pSize))) {
-                    addError(R"(The ")" + UPPER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[UPPER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize) + R"(.)");
+                    addError(R"(The ")" + UPPER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[UPPER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize - 1) + R"(.)");
                 }
 
                 lowerHalfBandwidth = toInt(mProperties[LOWER_HALF_BANDWIDTH_ID], ok);
 
                 if (!ok || (lowerHalfBandwidth < 0) || (lowerHalfBandwidth >= static_cast<int>(pSize))) {
-                    addError(R"(The ")" + LOWER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[LOWER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize) + R"(.)");
+                    addError(R"(The ")" + LOWER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[LOWER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize - 1) + R"(.)");
                 }
             }
         }
@@ -395,10 +379,6 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     ASSERT_EQ(SUNContext_Create(nullptr, &mContext), 0);
 
-    // Create our states vector.
-
-    mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mContext);
-
     // Create our CVODES solver.
 
     mSolver = CVodeCreate((integrationMethod == BDF_METHOD) ? CV_BDF : CV_ADAMS, mContext);
@@ -407,11 +387,14 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Initialise our CVODES solver.
 
+    mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mContext);
+
+    ASSERT_NE(mStatesVector, nullptr);
     ASSERT_EQ(CVodeInit(mSolver, rhsFunction, pVoi, mStatesVector), CV_SUCCESS);
 
     // Set our user data.
 
-    mUserData = new SolverCvodeUserData(pVariables, pComputeRates);
+    mUserData = new SolverCvodeUserData {pVariables, pComputeRates};
 
     ASSERT_EQ(CVodeSetUserData(mSolver, mUserData), CV_SUCCESS);
 
@@ -546,7 +529,7 @@ const SolverCvode::Impl *SolverCvode::pimpl() const
 
 SolverInfoPtr SolverCvode::info() const
 {
-    return Solver::solversInfo()[0];
+    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverCvode::Impl::ID]];
 }
 
 bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

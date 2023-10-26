@@ -221,7 +221,7 @@ function(configure_target TARGET)
 
     if(LIBOPENCOR_CODE_COVERAGE)
         target_compile_definitions(${TARGET} PRIVATE
-                                   COVERAGE_ENABLED)
+                                   CODE_COVERAGE_ENABLED)
     endif()
 
     # Let the target know that we are fine with using std::codecvt_utf8() even though it has been deprecated in C++17
