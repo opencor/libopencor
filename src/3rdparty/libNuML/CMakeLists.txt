@@ -35,21 +35,21 @@ if(LIBOPENCOR_PREBUILT_LIBNUML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     f694750cb885e0ca0acdcff12ee7571f5e35b04e)
+                                     849756984debf9a74601a31ccd72f434724f655e)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     9cc9e397c8d512a0d630cbe238c4d4903a45ddd7)
+                                     e2c1e4b73bfb6a67c0a84a9295e7bbbe9ef05e77)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     0abbdf5216c660ce6f19953d9cd80c9954f6f5c6)
+                                     6b4214108546a24fab6c5dc77af9655d7484c2c6)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     afd154cba12979e760ba7a0d8db34cd1e38dbb6e)
+                                     eee56d12b1dcd31a8ba77da05263aac7aa9bf661)
                 endif()
             endif()
         elseif(APPLE)

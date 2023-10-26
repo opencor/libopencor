@@ -44,9 +44,25 @@ using StringSolverCreateMap = std::map<std::string, SolverCreate>;
 #    define ASSERT_NE(x, y) \
         (void)x; \
         (void)y
+#    define ASSERT_GT(x, y) \
+        (void)x; \
+        (void)y
+#    define ASSERT_GE(x, y) \
+        (void)x; \
+        (void)y
+#    define ASSERT_LT(x, y) \
+        (void)x; \
+        (void)y
+#    define ASSERT_LE(x, y) \
+        (void)x; \
+        (void)y
 #else
 #    define ASSERT_EQ(x, y) assert(x == y)
 #    define ASSERT_NE(x, y) assert(x != y)
+#    define ASSERT_GT(x, y) assert(x > y)
+#    define ASSERT_GE(x, y) assert(x >= y)
+#    define ASSERT_LT(x, y) assert(x < y)
+#    define ASSERT_LE(x, y) assert(x <= y)
 #endif
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
@@ -66,14 +82,14 @@ std::string urlPath(const std::string &pPath);
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 
-UnsignedCharVector fileContents(const std::filesystem::path &pFilePath);
+UnsignedCharVector LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem::path &pFilePath);
 #endif
 
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(bool pBoolean);
 std::string toString(int pNumber);
 std::string toString(size_t pNumber);
 std::string toString(double pNumber);
-std::string toString(const UnsignedCharVector &pBytes);
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedCharVector &pBytes);
 
 bool toBool(const std::string &pString, bool &pOk);
 int LIBOPENCOR_UNIT_TESTING_EXPORT toInt(const std::string &pString, bool &pOk);

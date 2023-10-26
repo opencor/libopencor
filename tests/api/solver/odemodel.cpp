@@ -14,10 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "model.h"
+#include "odemodel.h"
 #include "utils.h"
 
 #include "tests/utils.h"
+
+#include <cmath>
+
+namespace OdeModel {
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(push)
@@ -28,13 +32,11 @@ limitations under the License.
 #else
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wdouble-promotion"
-#    pragma clang diagnostic ignored "-Wmissing-prototypes"
 #    pragma clang diagnostic ignored "-Wold-style-cast"
 #    pragma clang diagnostic ignored "-Wunused-parameter"
-#    pragma clang diagnostic ignored "-Wunused-variable"
 #endif
 
-#include "res/model.c" // NOLINT
+#include "../../res/api/solver/ode/model.c" // NOLINT
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(pop)
@@ -44,7 +46,7 @@ limitations under the License.
 #    pragma clang diagnostic pop
 #endif
 
-std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> createAndInitialiseArraysAndCreateSolver(const std::string &pSolverName)
+std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> initialise(const std::string &pSolverName)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create(pSolverName));
     auto *states = createStatesArray();
@@ -56,23 +58,25 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *>
     computeRates(0.0, states, rates, variables);
     computeVariables(0.0, states, rates, variables);
 
-    return std::make_tuple(solver, states, rates, variables);
-}
-
-void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
-                  double *pStates, double *pRates, double *pVariables,
-                  const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors)
-{
-    // Initialise the model.
-
-    static constexpr auto VOI_START = 0.0;
     static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0, 0.0};
 
-    EXPECT_TRUE(pSolver->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates));
-    EXPECT_EQ_DOUBLES(pStates, INITIAL_STATES, ABSOLUTE_ERRORS);
+    EXPECT_EQ_DOUBLES(states, INITIAL_STATES, ABSOLUTE_ERRORS);
 
-    // Compute the model.
+    return std::make_tuple(solver, states, rates, variables);
+}
+
+void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
+             double *pStates, double *pRates, double *pVariables,
+             const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors)
+{
+    // Initialise the ODE solver.
+
+    static constexpr auto VOI_START = 0.0;
+
+    EXPECT_TRUE(pSolver->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates));
+
+    // Compute the ODE model.
 
     static constexpr auto VOI_END = 50.0;
     static constexpr auto VOI_INTERVAL = 0.1;
@@ -88,14 +92,16 @@ void computeModel(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
 
     EXPECT_EQ_DOUBLES(pStates, pFinalStates, pAbsoluteErrors);
 
-    // Reinitialise the model (for coverage reasons).
+    // Reinitialise the ODE model (for coverage reasons).
 
     EXPECT_TRUE(pSolver->reinitialise(VOI_START));
 }
 
-void deleteArrays(double *pStates, double *pRates, double *pVariables)
+void finalise(double *pStates, double *pRates, double *pVariables)
 {
     deleteArray(pStates);
     deleteArray(pRates);
     deleteArray(pVariables);
 }
+
+} // namespace OdeModel

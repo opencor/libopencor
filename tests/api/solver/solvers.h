@@ -22,4 +22,5 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
 void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
 void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
 void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
+void checkKinsolSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);
 void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo);

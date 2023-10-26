@@ -354,6 +354,108 @@ void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
     EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(NoProperties), NoHiddenProperties);
 }
 
+void checkKinsolSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
+{
+    // Properties.
+
+    EXPECT_EQ(pSolverInfo->type(), libOpenCOR::Solver::Type::NLA);
+    EXPECT_EQ(pSolverInfo->id(), "KISAO:0000282");
+    EXPECT_EQ(pSolverInfo->name(), "KINSOL");
+
+    auto solverInfoProperties = pSolverInfo->properties();
+
+    EXPECT_EQ(solverInfoProperties.size(), 4);
+
+    auto property = solverInfoProperties[0];
+
+    EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::IntegerGt0);
+    EXPECT_EQ(property->id(), "KISAO:0000486");
+    EXPECT_EQ(property->name(), "Maximum number of iterations");
+    EXPECT_EQ(property->defaultValue(), "200");
+    EXPECT_FALSE(property->hasVoiUnit());
+
+    auto listValues = property->listValues();
+
+    EXPECT_TRUE(listValues.empty());
+
+    property = solverInfoProperties[1];
+
+    EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::List);
+    EXPECT_EQ(property->id(), "KISAO:0000477");
+    EXPECT_EQ(property->name(), "Linear solver");
+    EXPECT_EQ(property->defaultValue(), "Dense");
+    EXPECT_FALSE(property->hasVoiUnit());
+
+    listValues = property->listValues();
+
+    EXPECT_EQ(listValues.size(), 5);
+    EXPECT_EQ(listValues[0], "Dense");
+    EXPECT_EQ(listValues[1], "Banded");
+    EXPECT_EQ(listValues[2], "GMRES");
+    EXPECT_EQ(listValues[3], "BiCGStab");
+    EXPECT_EQ(listValues[4], "TFQMR");
+
+    property = solverInfoProperties[2];
+
+    EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::IntegerGe0);
+    EXPECT_EQ(property->id(), "KISAO:0000479");
+    EXPECT_EQ(property->name(), "Upper half-bandwidth");
+    EXPECT_EQ(property->defaultValue(), "0");
+    EXPECT_FALSE(property->hasVoiUnit());
+
+    listValues = property->listValues();
+
+    EXPECT_TRUE(listValues.empty());
+
+    property = solverInfoProperties[3];
+
+    EXPECT_EQ(property->type(), libOpenCOR::SolverProperty::Type::IntegerGe0);
+    EXPECT_EQ(property->id(), "KISAO:0000480");
+    EXPECT_EQ(property->name(), "Lower half-bandwidth");
+    EXPECT_EQ(property->defaultValue(), "0");
+    EXPECT_FALSE(property->hasVoiUnit());
+
+    listValues = property->listValues();
+
+    EXPECT_TRUE(listValues.empty());
+
+    // Hidden properties.
+
+    static const libOpenCOR::StringVector HiddenPropertiesForDense = {"KISAO:0000479", "KISAO:0000480"};
+    static const libOpenCOR::StringVector HiddenPropertiesForBanded = NoHiddenProperties;
+    static const libOpenCOR::StringVector HiddenPropertiesForGmres = HiddenPropertiesForDense;
+    static const libOpenCOR::StringVector HiddenPropertiesForBicgstab = HiddenPropertiesForDense;
+    static const libOpenCOR::StringVector HiddenPropertiesForTfqmr = HiddenPropertiesForDense;
+
+    EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(NoProperties), NoHiddenProperties);
+
+    libOpenCOR::StringStringMap properties;
+
+    properties["KISAO:0000477"] = "Dense";
+
+    EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForDense);
+
+    properties["Linear solver"] = "Banded";
+
+    EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForDense);
+
+    properties["KISAO:0000477"] = "Banded";
+
+    EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForBanded);
+
+    properties["KISAO:0000477"] = "GMRES";
+
+    EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForGmres);
+
+    properties["KISAO:0000477"] = "BiCGStab";
+
+    EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForBicgstab);
+
+    properties["KISAO:0000477"] = "TFQMR";
+
+    EXPECT_EQ_HIDDEN_PROPERTIES(pSolverInfo->hiddenProperties(properties), HiddenPropertiesForTfqmr);
+}
+
 void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 {
     // Properties.

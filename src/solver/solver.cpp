@@ -20,28 +20,76 @@ limitations under the License.
 #include "solverfourthorderrungekutta_p.h"
 #include "solverheun_p.h"
 #include "solverinfo_p.h"
+#include "solverkinsol_p.h"
 #include "solversecondorderrungekutta_p.h"
 #include "solverunknown_p.h"
 
 namespace libOpenCOR {
 
+StringSizetMap Solver::Impl::SolversIndex; // NOLINT
 StringStringMap Solver::Impl::SolversId; // NOLINT
 StringSolverCreateMap Solver::Impl::SolversCreate; // NOLINT
 SolverInfoPtrVector Solver::Impl::SolversInfo; // NOLINT
+
+void Solver::Impl::registerSolvers()
+{
+    static auto initialised = false;
+
+    if (!initialised) {
+        initialised = true;
+
+        Solver::Impl::registerSolver(SolverCvode::Impl::TYPE,
+                                     SolverCvode::Impl::ID,
+                                     SolverCvode::Impl::NAME,
+                                     SolverCvode::Impl::create,
+                                     SolverCvode::Impl::propertiesInfo(),
+                                     SolverCvode::Impl::hiddenProperties);
+
+        Solver::Impl::registerSolver(SolverForwardEuler::Impl::TYPE,
+                                     SolverForwardEuler::Impl::ID,
+                                     SolverForwardEuler::Impl::NAME,
+                                     SolverForwardEuler::Impl::create,
+                                     SolverForwardEuler::Impl::propertiesInfo(),
+                                     SolverForwardEuler::Impl::hiddenProperties);
+
+        Solver::Impl::registerSolver(SolverFourthOrderRungeKutta::Impl::TYPE,
+                                     SolverFourthOrderRungeKutta::Impl::ID,
+                                     SolverFourthOrderRungeKutta::Impl::NAME,
+                                     SolverFourthOrderRungeKutta::Impl::create,
+                                     SolverFourthOrderRungeKutta::Impl::propertiesInfo(),
+                                     SolverFourthOrderRungeKutta::Impl::hiddenProperties);
+
+        Solver::Impl::registerSolver(SolverHeun::Impl::TYPE,
+                                     SolverHeun::Impl::ID,
+                                     SolverHeun::Impl::NAME,
+                                     SolverHeun::Impl::create,
+                                     SolverHeun::Impl::propertiesInfo(),
+                                     SolverHeun::Impl::hiddenProperties);
+
+        Solver::Impl::registerSolver(SolverKinsol::Impl::TYPE,
+                                     SolverKinsol::Impl::ID,
+                                     SolverKinsol::Impl::NAME,
+                                     SolverKinsol::Impl::create,
+                                     SolverKinsol::Impl::propertiesInfo(),
+                                     SolverKinsol::Impl::hiddenProperties);
+
+        Solver::Impl::registerSolver(SolverSecondOrderRungeKutta::Impl::TYPE,
+                                     SolverSecondOrderRungeKutta::Impl::ID,
+                                     SolverSecondOrderRungeKutta::Impl::NAME,
+                                     SolverSecondOrderRungeKutta::Impl::create,
+                                     SolverSecondOrderRungeKutta::Impl::propertiesInfo(),
+                                     SolverSecondOrderRungeKutta::Impl::hiddenProperties);
+    }
+}
 
 void Solver::Impl::registerSolver(Type pType, const std::string &pId, const std::string &pName,
                                   SolverCreate pCreate, const SolverPropertyPtrVector &pProperties,
                                   SolverInfo::HiddenPropertiesFunction pHiddenProperties)
 {
-#ifndef COVERAGE_ENABLED
-    if (auto iter = Solver::Impl::SolversCreate.find(pId); iter == Solver::Impl::SolversCreate.end()) {
-#endif
-        Solver::Impl::SolversId[pName] = pId;
-        Solver::Impl::SolversCreate[pId] = pCreate;
-        Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pId, pName, pProperties, pHiddenProperties));
-#ifndef COVERAGE_ENABLED
-    }
-#endif
+    Solver::Impl::SolversIndex[pId] = SolversInfo.size();
+    Solver::Impl::SolversId[pName] = pId;
+    Solver::Impl::SolversCreate[pId] = pCreate;
+    Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pId, pName, pProperties, pHiddenProperties));
 }
 
 SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pId,
@@ -136,6 +184,12 @@ const Solver::Impl *Solver::pimpl() const
 
 SolverPtr Solver::create(const std::string &pIdOrName)
 {
+    // Make sure that our solvers have been registered.
+
+    Solver::Impl::registerSolvers();
+
+    // Return the requested solver.
+
     auto idIter = Solver::Impl::SolversId.find(pIdOrName);
     auto id = (idIter != Solver::Impl::SolversId.end()) ? idIter->second : pIdOrName;
 
@@ -148,46 +202,11 @@ SolverPtr Solver::create(const std::string &pIdOrName)
 
 SolverInfoPtrVector Solver::solversInfo()
 {
-    static auto initialised = false;
+    // Make sure that our solvers have been registered.
 
-    if (!initialised) {
-        initialised = true;
+    Solver::Impl::registerSolvers();
 
-        Solver::Impl::registerSolver(SolverCvode::Impl::TYPE,
-                                     SolverCvode::Impl::ID,
-                                     SolverCvode::Impl::NAME,
-                                     SolverCvode::Impl::create,
-                                     SolverCvode::Impl::propertiesInfo(),
-                                     SolverCvode::Impl::hiddenProperties);
-
-        Solver::Impl::registerSolver(SolverForwardEuler::Impl::TYPE,
-                                     SolverForwardEuler::Impl::ID,
-                                     SolverForwardEuler::Impl::NAME,
-                                     SolverForwardEuler::Impl::create,
-                                     SolverForwardEuler::Impl::propertiesInfo(),
-                                     SolverForwardEuler::Impl::hiddenProperties);
-
-        Solver::Impl::registerSolver(SolverFourthOrderRungeKutta::Impl::TYPE,
-                                     SolverFourthOrderRungeKutta::Impl::ID,
-                                     SolverFourthOrderRungeKutta::Impl::NAME,
-                                     SolverFourthOrderRungeKutta::Impl::create,
-                                     SolverFourthOrderRungeKutta::Impl::propertiesInfo(),
-                                     SolverFourthOrderRungeKutta::Impl::hiddenProperties);
-
-        Solver::Impl::registerSolver(SolverHeun::Impl::TYPE,
-                                     SolverHeun::Impl::ID,
-                                     SolverHeun::Impl::NAME,
-                                     SolverHeun::Impl::create,
-                                     SolverHeun::Impl::propertiesInfo(),
-                                     SolverHeun::Impl::hiddenProperties);
-
-        Solver::Impl::registerSolver(SolverSecondOrderRungeKutta::Impl::TYPE,
-                                     SolverSecondOrderRungeKutta::Impl::ID,
-                                     SolverSecondOrderRungeKutta::Impl::NAME,
-                                     SolverSecondOrderRungeKutta::Impl::create,
-                                     SolverSecondOrderRungeKutta::Impl::propertiesInfo(),
-                                     SolverSecondOrderRungeKutta::Impl::hiddenProperties);
-    }
+    // Return our solvers' information.
 
     return Solver::Impl::SolversInfo;
 }

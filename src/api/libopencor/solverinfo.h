@@ -39,7 +39,7 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-#ifdef COVERAGE_ENABLED
+#ifdef CODE_COVERAGE_ENABLED
     ~SolverInfo() = default; /**< Destructor, @private. */
 #else
     ~SolverInfo(); /**< Destructor, @private. */

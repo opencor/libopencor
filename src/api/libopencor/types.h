@@ -80,6 +80,7 @@ using UnsignedCharVector = std::vector<unsigned char>; /**< Type definition for 
 
 // Maps.
 
+using StringSizetMap = std::map<std::string, size_t>; /**< Type definition for a map of sizes. */
 using StringStringMap = std::map<std::string, std::string>; /**< Type definition for a map of strings. */
 
 } // namespace libcellml

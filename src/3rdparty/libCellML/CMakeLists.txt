@@ -41,21 +41,21 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     f413112755042604a37164deab816606ae3cdabc)
+                                     a2d2555c60de750dfcf42bf3040ffa903919b5e4)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     2ff94fc3ffb147dd7f274888ae74a729315e41e7)
+                                     f00d15f699dcf253e8d85e91d0965d6ae248323c)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     e4daed2a891840391e900923ca4cbf0f6d48ac29)
+                                     883cafe9b6e993db2f7ebce5d04a02566e77d0b6)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     af3ee3ca6bc5d0bec1a4e4aadcbed7d2cd465023)
+                                     32b0f6ed51eb5863fb1f409a1f045ced4fb36f07)
                 endif()
             endif()
         elseif(APPLE)
@@ -95,6 +95,7 @@ else()
             -DINSTALL_PREFIX=${INSTALL_DIR}
             -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
             -DLIBXML2_LIBRARY=${LIBXML2_LIBRARY_FILE}
+            -DLIBXML2_DEFINITIONS=${LIBXML2_DEFINITIONS}
             -DLLVM_COVERAGE=OFF
             -DMEMCHECK=OFF
             -DPYTHON_COVERAGE=OFF

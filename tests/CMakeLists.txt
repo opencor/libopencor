@@ -114,13 +114,6 @@ endif()
 
 add_subdirectory(bindings)
 
-# Let libOpenCOR know that we are building with coverage enabled.
-
-if(LIBOPENCOR_CODE_COVERAGE)
-    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
-                               COVERAGE_ENABLED)
-endif()
-
 # Run our code coverage tests.
 
 if(LIBOPENCOR_CODE_COVERAGE)

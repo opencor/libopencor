@@ -18,19 +18,98 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <libcellml>
 #include <libopencor>
+
+namespace {
+
+void checkModel(const std::string &pModelType, const std::string &pVersion = {}) // NOLINT
+{
+    auto parser = libcellml::Parser::create();
+    auto model = parser->parseModel(libOpenCOR::textFileContents("api/solver/" + pModelType + "/model" + pVersion + ".cellml"));
+
+    EXPECT_EQ(parser->issueCount(), size_t(0));
+
+    auto analyser = libcellml::Analyser::create();
+
+    analyser->analyseModel(model);
+
+    EXPECT_EQ(analyser->issueCount(), size_t(0));
+    for (size_t i = 0; i < analyser->issueCount(); ++i) {
+        printf(">>> %s\n", analyser->issue(i)->description().c_str()); // NOLINT
+    }
+
+    auto analyserModel = analyser->model();
+    auto generator = libcellml::Generator::create();
+
+    generator->setModel(analyserModel);
+
+    auto profile = generator->profile();
+
+    profile->setInterfaceHeaderString("#pragma once\n");
+    profile->setImplementationHeaderString("#include \"[INTERFACE_FILE_NAME]\"\n");
+
+    if (pModelType == "nla") {
+        profile->setInterfaceFileNameString("model" + pVersion + ".h");
+        profile->setInterfaceVariableCountString("extern const size_t VARIABLE_COUNT_" + pVersion + ";\n");
+        profile->setImplementationVariableCountString("const size_t VARIABLE_COUNT_" + pVersion + " = [VARIABLE_COUNT];\n");
+        profile->setImplementationCreateVariablesArrayMethodString("double * createVariablesArray()\n"
+                                                                   "{\n"
+                                                                   "    double *res = (double *) malloc(VARIABLE_COUNT_"
+                                                                   + pVersion + "*sizeof(double));\n"
+                                                                                "\n"
+                                                                                "    for (size_t i = 0; i < VARIABLE_COUNT_"
+                                                                   + pVersion + "; ++i) {\n"
+                                                                                "        res[i] = NAN;\n"
+                                                                                "    }\n"
+                                                                                "\n"
+                                                                                "    return res;\n"
+                                                                                "}\n");
+        profile->setExternNlaSolveMethodString("");
+        profile->setNlaSolveCallString(false, "libOpenCOR::nlaSolve(KINSOL_NLA_SOLVER, objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
+    }
+
+    EXPECT_EQ(generator->interfaceCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/model" + pVersion + ".h"));
+    EXPECT_EQ(generator->implementationCode(), libOpenCOR::textFileContents("api/solver/" + pModelType + "/model" + pVersion + ".c"));
+}
+
+} // namespace
+
+TEST(BasicSolverTest, checkOdeModel)
+{
+    checkModel("ode");
+}
+
+TEST(BasicSolverTest, checkNlaModel1)
+{
+    checkModel("nla", "1");
+}
+
+TEST(BasicSolverTest, checkNlaModel2)
+{
+    checkModel("nla", "2");
+}
 
 TEST(BasicSolverTest, solversInfo)
 {
+    static const auto ZERO = 0;
+    static const auto ONE = 1;
+    static const auto TWO = 2;
+    static const auto THREE = 3;
+    static const auto FOUR = 4;
+    static const auto FIVE = 5;
+    static const auto SIX = 6;
+
     auto solversInfo = libOpenCOR::Solver::solversInfo();
 
-    EXPECT_EQ(solversInfo.size(), 5);
+    EXPECT_EQ(solversInfo.size(), SIX);
 
-    checkCvodeSolver(solversInfo[0]);
-    checkForwardEulerSolver(solversInfo[1]);
-    checkFourthOrderRungeKuttaSolver(solversInfo[2]);
-    checkHeunSolver(solversInfo[3]);
-    checkSecondOrderRungeKuttaSolver(solversInfo[4]);
+    checkCvodeSolver(solversInfo[ZERO]);
+    checkForwardEulerSolver(solversInfo[ONE]);
+    checkFourthOrderRungeKuttaSolver(solversInfo[TWO]);
+    checkHeunSolver(solversInfo[THREE]);
+    checkKinsolSolver(solversInfo[FOUR]);
+    checkSecondOrderRungeKuttaSolver(solversInfo[FIVE]);
 }
 
 TEST(BasicSolverTest, unknownSolver)
@@ -92,6 +171,20 @@ TEST(BasicSolverTest, heunById)
 TEST(BasicSolverTest, heunByName)
 {
     auto solver = libOpenCOR::Solver::create("Heun");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, kinsolById)
+{
+    auto solver = libOpenCOR::Solver::create("KISAO:0000282");
+
+    EXPECT_TRUE(solver->isValid());
+}
+
+TEST(BasicSolverTest, kinsolByName)
+{
+    auto solver = libOpenCOR::Solver::create("KINSOL");
 
     EXPECT_TRUE(solver->isValid());
 }
