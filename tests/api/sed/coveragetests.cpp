@@ -30,5 +30,5 @@ TEST(CoverageSedDocumentTest, initialise)
 
     sed->initialise({});
 
-    EXPECT_EQ(expectedSerialisation, sed->serialise());
+    EXPECT_EQ(sed->serialise(), expectedSerialisation);
 }

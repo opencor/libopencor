@@ -54,9 +54,9 @@ std::string wideStringToString(const std::wstring &pString)
 
 std::string forwardSlashPath(const std::string &pPath)
 {
-    static constexpr auto FORWARD_SLASH = "/";
     static constexpr auto BACKSLASH = "\\\\";
     static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
+    static constexpr auto FORWARD_SLASH = "/";
 
     return std::regex_replace(pPath, BACKSLASH_REGEX, FORWARD_SLASH);
 }

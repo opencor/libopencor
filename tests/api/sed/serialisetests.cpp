@@ -34,7 +34,7 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithBasePath)
 
     sed->initialise(file);
 
-    EXPECT_EQ(expectedSerialisation, sed->serialise(libOpenCOR::resourcePath()));
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
 }
 
 TEST(SerialiseSedDocumentTest, localCellmlFileWithoutBasePath)
@@ -56,7 +56,7 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithoutBasePath)
     file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
     sed->initialise(file);
 
-    EXPECT_EQ(expectedSerialisation, sed->serialise());
+    EXPECT_EQ(sed->serialise(), expectedSerialisation);
 }
 
 TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithBasePath)
@@ -73,7 +73,7 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithBasePath)
 
     sed->initialise(file);
 
-    EXPECT_EQ(expectedSerialisation, sed->serialise(libOpenCOR::resourcePath().append("../..")));
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath().append("../..")), expectedSerialisation);
 }
 
 TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithoutBasePath)
@@ -91,7 +91,7 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithoutBasePath)
     file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
     sed->initialise(file);
 
-    EXPECT_EQ(expectedSerialisation, sed->serialise());
+    EXPECT_EQ(sed->serialise(), expectedSerialisation);
 }
 
 TEST(SerialiseSedDocumentTest, remoteCellmlFileWithBasePath)
@@ -108,7 +108,7 @@ TEST(SerialiseSedDocumentTest, remoteCellmlFileWithBasePath)
 
     sed->initialise(file);
 
-    EXPECT_EQ(expectedSerialisation, sed->serialise(libOpenCOR::REMOTE_BASE_PATH));
+    EXPECT_EQ(sed->serialise(libOpenCOR::REMOTE_BASE_PATH), expectedSerialisation);
 }
 
 TEST(SerialiseSedDocumentTest, remoteCellmlFileWithoutBasePath)
@@ -125,7 +125,7 @@ TEST(SerialiseSedDocumentTest, remoteCellmlFileWithoutBasePath)
 
     sed->initialise(file);
 
-    EXPECT_EQ(expectedSerialisation, sed->serialise());
+    EXPECT_EQ(sed->serialise(), expectedSerialisation);
 }
 
 TEST(SerialiseSedDocumentTest, relativeRemoteCellmlFileWithBasePath)
@@ -142,5 +142,5 @@ TEST(SerialiseSedDocumentTest, relativeRemoteCellmlFileWithBasePath)
 
     sed->initialise(file);
 
-    EXPECT_EQ(expectedSerialisation, sed->serialise(std::string(libOpenCOR::REMOTE_BASE_PATH).append("/../..")));
+    EXPECT_EQ(sed->serialise(std::string(libOpenCOR::REMOTE_BASE_PATH).append("/../..")), expectedSerialisation);
 }
