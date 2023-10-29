@@ -94,4 +94,21 @@ describe("SedDocument basic tests", () => {
       ],
     ]);
   });
+
+  /*---GRY---
+  test("COMBINE archive", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument();
+
+    file.setContents(someCombineContentsPtr, utils.SOME_COMBINE_CONTENTS.length);
+    sed.initialise(file);
+
+    expectIssues(sed, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "A simulation experiment description cannot currently be created using a COMBINE archive.",
+      ],
+    ]);
+  });
+  */
 });
