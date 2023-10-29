@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
 
 const libopencor = await libOpenCOR();
 

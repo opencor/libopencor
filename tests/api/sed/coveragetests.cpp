@@ -16,8 +16,6 @@ limitations under the License.
 
 #include "gtest/gtest.h"
 
-#include "tests/utils.h"
-
 #include <libopencor>
 
 TEST(CoverageSedDocumentTest, initialise)
@@ -25,7 +23,6 @@ TEST(CoverageSedDocumentTest, initialise)
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\"/>\n";
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create();
 
     sed->initialise({});

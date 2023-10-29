@@ -13,15 +13,13 @@
 # limitations under the License.
 
 
-from libopencor import File, SedDocument
-import utils
+from libopencor import SedDocument
 
 
 def test_initialise():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\"/>
 """
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
     sed = SedDocument()
 
     sed.initialise(None)
