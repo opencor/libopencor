@@ -14,30 +14,54 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "seddocument_p.h"
 #include "seduniformtimecourse_p.h"
+#include "utils.h"
 
 namespace libOpenCOR {
 
-/*---GRY---
-SedUniformTimeCourse::SedUniformTimeCourse()
-    : SedSimulation(new Impl())
+static constexpr auto ID_PREFIX = "simulation";
+
+SedUniformTimeCourse::Impl::Impl(double pInitialTime, double pOutputStartTime, double pOutputEndTime,
+                                 int pNumberOfSteps, const SedDocumentPtr &pDocument)
+    : mInitialTime(pInitialTime)
+    , mOutputStartTime(pOutputStartTime)
+    , mOutputEndTime(pOutputEndTime)
+    , mNumberOfSteps(pNumberOfSteps)
+{
+    mId = pDocument->pimpl()->uniqueId(ID_PREFIX); //---GRY--- THIS SHOULD PROBABLY BE DONE ONLY WHEN SERIALISING...?
+}
+
+void SedUniformTimeCourse::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
+{
+    (void)pBasePath;
+
+    auto *node = xmlNewNode(nullptr, constXmlCharPtr("uniformTimeCourse"));
+
+    xmlNewProp(node, constXmlCharPtr("id"), constXmlCharPtr(mId));
+    xmlNewProp(node, constXmlCharPtr("initialTime"), constXmlCharPtr(toString(mInitialTime)));
+    xmlNewProp(node, constXmlCharPtr("outputStartTime"), constXmlCharPtr(toString(mOutputStartTime)));
+    xmlNewProp(node, constXmlCharPtr("outputEndTime"), constXmlCharPtr(toString(mOutputEndTime)));
+    xmlNewProp(node, constXmlCharPtr("numberOfSteps"), constXmlCharPtr(toString(mNumberOfSteps)));
+
+    xmlAddChild(pNode, node);
+}
+
+SedUniformTimeCourse::SedUniformTimeCourse(double pInitialTime, double pOutputStartTime, double pOutputEndTime,
+                                           int pNumberOfSteps, const SedDocumentPtr &pDocument)
+    : SedSimulation(new Impl(pInitialTime, pOutputStartTime, pOutputEndTime, pNumberOfSteps, pDocument))
 {
 }
-*/
 
-/*---GRY---
 SedUniformTimeCourse::~SedUniformTimeCourse()
 {
     delete pimpl();
 }
-*/
 
-/*---GRY---
 SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl()
 {
-    return reinterpret_cast<Impl *>(SedSimulation::pimpl());
+    return reinterpret_cast<SedUniformTimeCourse::Impl *>(SedSimulation::pimpl());
 }
-*/
 
 /*---GRY---
 const SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl() const

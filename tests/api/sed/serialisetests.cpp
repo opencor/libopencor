@@ -25,8 +25,11 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithBasePath)
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\"/>\n"
+                                                     "  </listOfSimulations>\n"
                                                      "</sed>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
@@ -43,11 +46,14 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithoutBasePath)
                                                      "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
 #ifdef BUILDING_USING_MSVC
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"file:///P:/some/path/file.txt\"/>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"file:///P:/some/path/file.txt\"/>\n"
 #else
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"file:///some/path/file.txt\"/>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"file:///some/path/file.txt\"/>\n"
 #endif
                                                      "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\"/>\n"
+                                                     "  </listOfSimulations>\n"
                                                      "</sed>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
@@ -64,8 +70,11 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithBasePath)
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"tests/res/cellml_2.cellml\"/>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"tests/res/cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\"/>\n"
+                                                     "  </listOfSimulations>\n"
                                                      "</sed>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
@@ -81,8 +90,11 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithoutBasePath)
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\"/>\n"
+                                                     "  </listOfSimulations>\n"
                                                      "</sed>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
@@ -99,8 +111,11 @@ TEST(SerialiseSedDocumentTest, remoteCellmlFileWithBasePath)
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\"/>\n"
+                                                     "  </listOfSimulations>\n"
                                                      "</sed>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
@@ -116,8 +131,11 @@ TEST(SerialiseSedDocumentTest, remoteCellmlFileWithoutBasePath)
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml\"/>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\"/>\n"
+                                                     "  </listOfSimulations>\n"
                                                      "</sed>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
@@ -133,8 +151,11 @@ TEST(SerialiseSedDocumentTest, relativeRemoteCellmlFileWithBasePath)
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
-                                                     "    <model id=\"model000000001\" language=\"urn:sedml:language:cellml\" source=\"tests/res/cellml_2.cellml\"/>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"tests/res/cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\"/>\n"
+                                                     "  </listOfSimulations>\n"
                                                      "</sed>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);

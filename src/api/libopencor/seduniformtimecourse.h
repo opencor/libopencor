@@ -29,13 +29,14 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedUniformTimeCourse: public SedSimulation
 {
+    friend class SedDocument;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.
      */
 
-    //---GRY---
-    // ~SedUniformTimeCourse() override; /**< Destructor, @private. */
+    ~SedUniformTimeCourse() override; /**< Destructor, @private. */
 
     SedUniformTimeCourse(const SedUniformTimeCourse &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedUniformTimeCourse(SedUniformTimeCourse &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -46,11 +47,10 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    //---GRY---
-    // explicit SedUniformTimeCourse(); /**< Constructor @private. */
+    explicit SedUniformTimeCourse(double pInitialTime, double pOutputStartTime, double pOutputEndTime, int pNumberOfSteps, const SedDocumentPtr &pDocument); /**< Constructor @private. */
 
-    // Impl *pimpl(); /**< Private implementation pointer, @private. */
-    // const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 };
 
 } // namespace libOpenCOR

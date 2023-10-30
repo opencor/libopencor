@@ -31,7 +31,7 @@ SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
     : mFile(pFile)
     , mLanguage(CELLML_LANGUAGE)
 {
-    mId = pDocument->pimpl()->uniqueId(ID_PREFIX);
+    mId = pDocument->pimpl()->uniqueId(ID_PREFIX); //---GRY--- THIS SHOULD PROBABLY BE DONE ONLY WHEN SERIALISING...?
 }
 
 void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const

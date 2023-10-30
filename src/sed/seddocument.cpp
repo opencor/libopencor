@@ -16,13 +16,14 @@ limitations under the License.
 
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
+#include "seduniformtimecourse_p.h"
 
 #include "utils.h"
 
 #include "libopencor/file.h"
 #include "libopencor/sedmodel.h"
+#include "libopencor/seduniformtimecourse.h"
 
-#include <iomanip>
 #include <sstream>
 
 #include <libxml/tree.h>
@@ -31,13 +32,10 @@ namespace libOpenCOR {
 
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 {
-    static const auto WIDTH = 9;
-    static const auto FILL = '0';
-
     size_t counter = 0;
     std::stringstream stream;
 
-    stream << pPrefix << std::setw(WIDTH) << std::setfill(FILL) << ++counter;
+    stream << pPrefix << ++counter;
 
     auto res = stream.str();
 
@@ -46,7 +44,7 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
     while (mIds.contains(res)) {
         stream.str({});
 
-        stream << pPrefix << std::setw(WIDTH) << std::setfill(FILL) << ++counter;
+        stream << pPrefix << ++counter;
 
         res = stream.str();
     }
@@ -103,6 +101,20 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
     // Add a model for the given CellML file.
 
     mModels.push_back(std::shared_ptr<SedModel> {new SedModel {pFile, pOwner}});
+
+    // Add a simulation: a uniform time course with an initial "time" and output start "time" of 0, an output end
+    // "time" of 1,000, and a number of steps of 1,000.
+
+    static const double INITIAL_TIME_DEFAULT_VALUE = 0.0;
+    static const double OUTPUT_START_TIME_DEFAULT_VALUE = 0.0;
+    static const double OUTPUT_END_TIME_DEFAULT_VALUE = 1000.0;
+    static const int NUMBER_OF_STEPS_DEFAULT_VALUE = 1000;
+
+    mSimulations.push_back(std::shared_ptr<SedUniformTimeCourse> {new SedUniformTimeCourse {INITIAL_TIME_DEFAULT_VALUE,
+                                                                                            OUTPUT_START_TIME_DEFAULT_VALUE,
+                                                                                            OUTPUT_END_TIME_DEFAULT_VALUE,
+                                                                                            NUMBER_OF_STEPS_DEFAULT_VALUE,
+                                                                                            pOwner}});
 }
 
 void SedDocument::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
@@ -153,17 +165,15 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     // Add the simulations, if any, to our SED-ML document.
 
-    /*---GRY---
     if (!mSimulations.empty()) {
         auto *sedListOfSimulations = xmlNewNode(nullptr, constXmlCharPtr("listOfSimulations"));
 
         for (const auto &simulation : mSimulations) {
-            (void)simulation;
+            simulation->pimpl()->serialise(sedListOfSimulations, pBasePath);
         }
 
         xmlAddChild(sedNode, sedListOfSimulations);
     }
-    */
 
     // Add the tasks, if any, to our SED-ML document.
 

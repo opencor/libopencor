@@ -28,13 +28,14 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedSimulation: public SedBase
 {
+    friend class SedDocument;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.
      */
 
-    //---GRY---
-    // ~SedSimulation() override; /**< Destructor, @private. */
+    ~SedSimulation() override = default; /**< Destructor, @private. */
 
     SedSimulation(const SedSimulation &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedSimulation(SedSimulation &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -45,11 +46,10 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    //---GRY---
-    // explicit SedSimulation(); /**< Constructor @private. */
+    explicit SedSimulation(Impl *pPimpl); /**< Constructor @private. */
 
-    // Impl *pimpl(); /**< Private implementation pointer, @private. */
-    // const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 };
 
 } // namespace libOpenCOR

@@ -18,26 +18,15 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-/*---GRY---
-SedSimulation::SedSimulation()
-    : SedBase(new Impl())
+SedSimulation::SedSimulation(Impl *pPimpl)
+    : SedBase(pPimpl)
 {
 }
-*/
 
-/*---GRY---
-SedSimulation::~SedSimulation()
-{
-    delete pimpl();
-}
-*/
-
-/*---GRY---
 SedSimulation::Impl *SedSimulation::pimpl()
 {
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
-*/
 
 /*---GRY---
 const SedSimulation::Impl *SedSimulation::pimpl() const

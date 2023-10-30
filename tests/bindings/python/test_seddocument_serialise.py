@@ -23,8 +23,11 @@ def test_local_cellml_file_with_base_path():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+  </listOfSimulations>
 </sed>
 """
     file = File(utils.resource_path(utils.CELLML_2_FILE))
@@ -40,16 +43,22 @@ def test_local_cellml_file_without_base_path():
         expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="file:///P:/some/path/file.txt"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="file:///P:/some/path/file.txt"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+  </listOfSimulations>
 </sed>
 """
     else:
         expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="file:///some/path/file.txt"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="file:///some/path/file.txt"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+  </listOfSimulations>
 </sed>
 """
 
@@ -66,8 +75,11 @@ def test_relative_local_cellml_file_with_base_path():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="tests/res/cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="tests/res/cellml_2.cellml"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+  </listOfSimulations>
 </sed>
 """
     file = File(utils.resource_path(utils.CELLML_2_FILE))
@@ -82,8 +94,11 @@ def test_relative_local_cellml_file_without_base_path():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+  </listOfSimulations>
 </sed>
 """
     file = File(utils.CELLML_2_FILE)
@@ -99,8 +114,11 @@ def test_remote_cellml_file_with_base_path():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+  </listOfSimulations>
 </sed>
 """
     file = File(utils.REMOTE_FILE)
@@ -115,8 +133,11 @@ def test_remote_cellml_file_without_base_path():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+  </listOfSimulations>
 </sed>
 """
     file = File(utils.REMOTE_FILE)
@@ -131,8 +152,11 @@ def test_relative_remote_cellml_file_with_base_path():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model000000001" language="urn:sedml:language:cellml" source="tests/res/cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="tests/res/cellml_2.cellml"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+  </listOfSimulations>
 </sed>
 """
     file = File(utils.REMOTE_FILE)

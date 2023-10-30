@@ -24,6 +24,16 @@ namespace libOpenCOR {
 
 class SedUniformTimeCourse::Impl: public SedSimulation::Impl
 {
+public:
+    double mInitialTime;
+    double mOutputStartTime;
+    double mOutputEndTime;
+    int mNumberOfSteps;
+
+    explicit Impl(double pInitialTime, double pOutputStartTime, double pOutputEndTime, int pNumberOfSteps,
+                  const SedDocumentPtr &pDocument);
+
+    void serialise(xmlNodePtr pNode, const std::string &pBasePath) const override;
 };
 
 } // namespace libOpenCOR
