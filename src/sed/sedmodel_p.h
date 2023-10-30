@@ -26,7 +26,6 @@ class SedModel::Impl: public SedBase::Impl
 {
 public:
     FilePtr mFile;
-    std::string mLanguage;
 
     explicit Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument);
 

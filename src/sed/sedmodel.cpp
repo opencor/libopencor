@@ -25,11 +25,9 @@ limitations under the License.
 namespace libOpenCOR {
 
 static constexpr auto ID_PREFIX = "model";
-static constexpr auto CELLML_LANGUAGE = "urn:sedml:language:cellml";
 
 SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
     : mFile(pFile)
-    , mLanguage(CELLML_LANGUAGE)
 {
     mId = pDocument->pimpl()->uniqueId(ID_PREFIX); //---GRY--- THIS SHOULD PROBABLY BE DONE ONLY WHEN SERIALISING...?
 }
@@ -39,7 +37,7 @@ void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) c
     auto *node = xmlNewNode(nullptr, constXmlCharPtr("model"));
 
     xmlNewProp(node, constXmlCharPtr("id"), constXmlCharPtr(mId));
-    xmlNewProp(node, constXmlCharPtr("language"), constXmlCharPtr(mLanguage));
+    xmlNewProp(node, constXmlCharPtr("language"), constXmlCharPtr("urn:sedml:language:cellml"));
 
     auto source = pBasePath.empty() ?
                       urlPath(mFile->path()) :
