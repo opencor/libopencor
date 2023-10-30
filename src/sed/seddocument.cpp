@@ -105,6 +105,15 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
     mModels.push_back(std::shared_ptr<SedModel> {new SedModel {pFile, pOwner}});
 }
 
+void SedDocument::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
+{
+    (void)pBasePath;
+
+    xmlNewProp(pNode, constXmlCharPtr("xmlns"), constXmlCharPtr(mXmlns));
+    xmlNewProp(pNode, constXmlCharPtr("level"), constXmlCharPtr(std::to_string(mLevel)));
+    xmlNewProp(pNode, constXmlCharPtr("version"), constXmlCharPtr(std::to_string(mVersion)));
+}
+
 std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 {
     // Serialise our SED-ML document using libxml2.
@@ -112,9 +121,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     auto *doc = xmlNewDoc(constXmlCharPtr("1.0"));
     auto *sedNode = xmlNewNode(nullptr, constXmlCharPtr("sed"));
 
-    xmlNewProp(sedNode, constXmlCharPtr("xmlns"), constXmlCharPtr(mXmlns));
-    xmlNewProp(sedNode, constXmlCharPtr("level"), constXmlCharPtr(std::to_string(mLevel)));
-    xmlNewProp(sedNode, constXmlCharPtr("version"), constXmlCharPtr(std::to_string(mVersion)));
+    serialise(sedNode, pBasePath);
 
     xmlDocSetRootElement(doc, sedNode);
 
@@ -138,7 +145,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
         auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
 
         for (const auto &model : mModels) {
-            model->pimpl()->populate(sedListOfModels, pBasePath);
+            model->pimpl()->serialise(sedListOfModels, pBasePath);
         }
 
         xmlAddChild(sedNode, sedListOfModels);

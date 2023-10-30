@@ -34,7 +34,7 @@ SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
     mId = pDocument->pimpl()->uniqueId(ID_PREFIX);
 }
 
-void SedModel::Impl::populate(xmlNodePtr pNode, const std::string &pBasePath) const
+void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
 {
     auto *node = xmlNewNode(nullptr, constXmlCharPtr("model"));
 

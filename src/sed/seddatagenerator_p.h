@@ -24,9 +24,6 @@ namespace libOpenCOR {
 
 class SedDataGenerator::Impl: public SedBase::Impl
 {
-public:
-    Impl() = default;
-    ~Impl() = default;
 };
 
 } // namespace libOpenCOR

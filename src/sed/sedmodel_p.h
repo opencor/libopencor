@@ -29,9 +29,8 @@ public:
     std::string mLanguage;
 
     Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument);
-    ~Impl() = default;
 
-    void populate(xmlNodePtr pNode, const std::string &pBasePath) const;
+    void serialise(xmlNodePtr pNode, const std::string &pBasePath) const override;
 };
 
 } // namespace libOpenCOR

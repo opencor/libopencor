@@ -42,14 +42,12 @@ public:
     std::vector<SedStylePtr> mStyles;
     std::vector<SedAlgorithmParameterPtr> mAlgorithmParameters;
 
-    Impl() = default;
-    ~Impl() = default;
-
     std::string uniqueId(const std::string &pPrefix);
 
     void initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner);
     void initialiseWithCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner);
 
+    void serialise(xmlNodePtr pNode, const std::string &pBasePath) const override;
     std::string serialise(const std::string &pBasePath = {}) const;
 };
 

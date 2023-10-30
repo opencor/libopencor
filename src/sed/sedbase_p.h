@@ -31,9 +31,11 @@ public:
     std::string mName;
     std::string mMetaId;
 
+    virtual ~Impl() = default;
+
     static const xmlChar *constXmlCharPtr(const std::string &pString);
 
-    void populate(xmlNodePtr pNode) const;
+    virtual void serialise(xmlNodePtr pNode, const std::string &pBasePath) const = 0;
 };
 
 } // namespace libOpenCOR
