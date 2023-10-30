@@ -16,21 +16,14 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/file.h"
-#include "libopencor/issue.h"
-#include "libopencor/logger.h"
-#include "libopencor/sedabstracttask.h"
-#include "libopencor/sedalgorithmparameter.h"
-#include "libopencor/sedbase.h"
-#include "libopencor/seddatadescription.h"
-#include "libopencor/seddatagenerator.h"
-#include "libopencor/seddocument.h"
-#include "libopencor/sedmodel.h"
-#include "libopencor/sedoutput.h"
-#include "libopencor/sedsimulation.h"
-#include "libopencor/sedstyle.h"
+#include "sedsimulation_p.h"
+
 #include "libopencor/seduniformtimecourse.h"
-#include "libopencor/solver.h"
-#include "libopencor/solverinfo.h"
-#include "libopencor/solverproperty.h"
-#include "libopencor/version.h"
+
+namespace libOpenCOR {
+
+class SedUniformTimeCourse::Impl: public SedSimulation::Impl
+{
+};
+
+} // namespace libOpenCOR

@@ -66,4 +66,8 @@ void sedApi(py::module_ &m)
     // SedStyle API.
 
     py::class_<libOpenCOR::SedStyle, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedStyle>> sedStyle(m, "SedStyle");
+
+    // SedUniformTimeCourse API.
+
+    py::class_<libOpenCOR::SedUniformTimeCourse, libOpenCOR::SedSimulation, std::shared_ptr<libOpenCOR::SedUniformTimeCourse>> SedUniformTimeCourse(m, "SedUniformTimeCourse");
 }

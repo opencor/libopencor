@@ -16,17 +16,18 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/sedbase.h"
+#include "libopencor/sedsimulation.h"
 
 namespace libOpenCOR {
 
 /**
- * @brief The SedSimulation class.
+ * @brief The SedUniformTimeCourse class.
  *
- * The SedSimulation class is used to describe a simulation in the context of a simulation experiment description.
+ * The SedUniformTimeCourse class is used to describe a uniform time course simulation in the context of a simulation
+ * experiment description.
  */
 
-class LIBOPENCOR_EXPORT SedSimulation: public SedBase
+class LIBOPENCOR_EXPORT SedUniformTimeCourse: public SedSimulation
 {
 public:
     /**
@@ -34,19 +35,19 @@ public:
      */
 
     //---GRY---
-    // ~SedSimulation() override; /**< Destructor, @private. */
+    // ~SedUniformTimeCourse() override; /**< Destructor, @private. */
 
-    SedSimulation(const SedSimulation &pOther) = delete; /**< No copy constructor allowed, @private. */
-    SedSimulation(SedSimulation &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+    SedUniformTimeCourse(const SedUniformTimeCourse &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SedUniformTimeCourse(SedUniformTimeCourse &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
-    SedSimulation &operator=(const SedSimulation &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
-    SedSimulation &operator=(SedSimulation &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+    SedUniformTimeCourse &operator=(const SedUniformTimeCourse &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SedUniformTimeCourse &operator=(SedUniformTimeCourse &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-protected:
+private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     //---GRY---
-    // explicit SedSimulation(); /**< Constructor @private. */
+    // explicit SedUniformTimeCourse(); /**< Constructor @private. */
 
     // Impl *pimpl(); /**< Private implementation pointer, @private. */
     // const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
