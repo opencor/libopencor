@@ -26,7 +26,7 @@ namespace libOpenCOR {
 class CellmlFileRuntime::Impl: public Logger::Impl
 {
 public:
-    Impl(const CellmlFilePtr &pCellmlFile);
+    explicit Impl(const CellmlFilePtr &pCellmlFile);
     ~Impl() = default;
 };
 

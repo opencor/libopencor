@@ -28,7 +28,7 @@ public:
     FilePtr mFile;
     std::string mLanguage;
 
-    Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument);
+    explicit Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument);
 
     void serialise(xmlNodePtr pNode, const std::string &pBasePath) const override;
 };
