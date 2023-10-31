@@ -54,8 +54,6 @@ StringVector SolverHeun::Impl::hiddenProperties(const StringStringMap &pProperti
 SolverHeun::Impl::Impl()
     : SolverOde::Impl()
 {
-    mIsValid = true;
-
     mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
 }
 

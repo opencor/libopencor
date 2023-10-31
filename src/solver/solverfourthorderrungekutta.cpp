@@ -54,8 +54,6 @@ StringVector SolverFourthOrderRungeKutta::Impl::hiddenProperties(const StringStr
 SolverFourthOrderRungeKutta::Impl::Impl()
     : SolverOde::Impl()
 {
-    mIsValid = true;
-
     mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
 }
 

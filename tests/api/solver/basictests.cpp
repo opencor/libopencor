@@ -112,95 +112,88 @@ TEST(BasicSolverTest, solversInfo)
     checkSecondOrderRungeKuttaSolver(solversInfo[FIVE]);
 }
 
-TEST(BasicSolverTest, unknownSolver)
-{
-    auto solver = libOpenCOR::Solver::create("Unknown");
-
-    EXPECT_EQ(solver, nullptr);
-}
-
 TEST(BasicSolverTest, cvodeById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000019");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, cvodeByName)
 {
     auto solver = libOpenCOR::Solver::create("CVODE");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, forwardEulerById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000030");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, forwardEulerByName)
 {
     auto solver = libOpenCOR::Solver::create("Forward Euler");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, fourthOrderRungeKuttaById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000032");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, fourthOrderRungeKuttaByName)
 {
     auto solver = libOpenCOR::Solver::create("Fourth-order Runge-Kutta");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, heunById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000301");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, heunByName)
 {
     auto solver = libOpenCOR::Solver::create("Heun");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, kinsolById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000282");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, kinsolByName)
 {
     auto solver = libOpenCOR::Solver::create("KINSOL");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, secondOrderRungeKuttaById)
 {
     auto solver = libOpenCOR::Solver::create("KISAO:0000381");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, secondOrderRungeKuttaByName)
 {
     auto solver = libOpenCOR::Solver::create("Second-order Runge-Kutta");
 
-    EXPECT_TRUE(solver->isValid());
+    EXPECT_NE(solver, nullptr);
 }
 
 TEST(BasicSolverTest, properties)

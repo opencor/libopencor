@@ -54,8 +54,6 @@ StringVector SolverForwardEuler::Impl::hiddenProperties(const StringStringMap &p
 SolverForwardEuler::Impl::Impl()
     : SolverOde::Impl()
 {
-    mIsValid = true;
-
     mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
 }
 

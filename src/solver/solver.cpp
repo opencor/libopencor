@@ -203,11 +203,6 @@ SolverInfoPtrVector Solver::solversInfo()
     return Solver::Impl::SolversInfo;
 }
 
-bool Solver::isValid() const
-{
-    return pimpl()->mIsValid;
-}
-
 std::string Solver::property(const std::string &pIdOrName)
 {
     return pimpl()->property(pIdOrName);

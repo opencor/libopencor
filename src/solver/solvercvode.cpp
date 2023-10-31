@@ -214,8 +214,6 @@ StringVector SolverCvode::Impl::hiddenProperties(const StringStringMap &pPropert
 SolverCvode::Impl::Impl()
     : SolverOde::Impl()
 {
-    mIsValid = true;
-
     mProperties[MAXIMUM_STEP_ID] = toString(MAXIMUM_STEP_DEFAULT_VALUE);
     mProperties[MAXIMUM_NUMBER_OF_STEPS_ID] = toString(MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE);
     mProperties[INTEGRATION_METHOD_ID] = INTEGRATION_METHOD_DEFAULT_VALUE;

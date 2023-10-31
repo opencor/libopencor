@@ -121,8 +121,6 @@ StringVector SolverKinsol::Impl::hiddenProperties(const StringStringMap &pProper
 SolverKinsol::Impl::Impl()
     : SolverNla::Impl()
 {
-    mIsValid = true;
-
     mProperties[MAXIMUM_NUMBER_OF_ITERATIONS_ID] = toString(MAXIMUM_NUMBER_OF_ITERATIONS_DEFAULT_VALUE);
     mProperties[LINEAR_SOLVER_ID] = LINEAR_SOLVER_DEFAULT_VALUE;
     mProperties[UPPER_HALF_BANDWIDTH_ID] = toString(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE);

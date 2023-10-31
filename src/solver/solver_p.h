@@ -33,7 +33,6 @@ public:
     static StringSolverCreateMap SolversCreate;
     static SolverInfoPtrVector SolversInfo;
 
-    bool mIsValid = false;
     StringStringMap mProperties;
 
     static void registerSolvers();

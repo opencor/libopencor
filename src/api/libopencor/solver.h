@@ -94,16 +94,6 @@ public:
     static SolverInfoPtrVector solversInfo();
 
     /**
-     * @brief Return whether this solver is valid.
-     *
-     * Return whether this solver is valid.
-     *
-     * @return @c true if this solver is valid, @c false otherwise.
-     */
-
-    bool isValid() const;
-
-    /**
      * @brief Get some information about this solver.
      *
      * Return some information about this solver.

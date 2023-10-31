@@ -39,12 +39,6 @@ describe("Solver basic tests", () => {
     checkSecondOrderRungeKuttaSolver(solversInfo.get(5));
   });
 
-  test("Unknown solver", () => {
-    const solver = new libopencor.Solver("Unknown");
-
-    expect(solver.isValid()).toBe(false);
-  });
-
   test("CVODE by (KiSAO) id", () => {
     const solver = new libopencor.Solver("KISAO:0000019");
 
@@ -52,7 +46,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000019");
     expect(solver.name()).toBe("CVODE");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("CVODE by name", () => {
@@ -62,7 +56,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000019");
     expect(solver.name()).toBe("CVODE");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Forward Euler by (KiSAO) id", () => {
@@ -72,7 +66,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000030");
     expect(solver.name()).toBe("Forward Euler");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Forward Euler by name", () => {
@@ -82,7 +76,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000030");
     expect(solver.name()).toBe("Forward Euler");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Fourth-order Runge-Kutta by (KiSAO) id", () => {
@@ -92,7 +86,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000032");
     expect(solver.name()).toBe("Fourth-order Runge-Kutta");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Fourth-order Runge-Kutta by name", () => {
@@ -102,7 +96,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000032");
     expect(solver.name()).toBe("Fourth-order Runge-Kutta");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Heun by (KiSAO) id", () => {
@@ -112,7 +106,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000301");
     expect(solver.name()).toBe("Heun");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Heun by name", () => {
@@ -122,7 +116,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000301");
     expect(solver.name()).toBe("Heun");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("KINSOL by (KiSAO) id", () => {
@@ -132,7 +126,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000282");
     expect(solver.name()).toBe("KINSOL");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("KINSOL by name", () => {
@@ -142,7 +136,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000282");
     expect(solver.name()).toBe("KINSOL");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Second-order Runge-Kutta by (KiSAO) id", () => {
@@ -152,7 +146,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000381");
     expect(solver.name()).toBe("Second-order Runge-Kutta");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Second-order Runge-Kutta by name", () => {
@@ -162,7 +156,7 @@ describe("Solver basic tests", () => {
     expect(solver.id()).toBe("KISAO:0000381");
     expect(solver.name()).toBe("Second-order Runge-Kutta");
 
-    expect(solver.isValid()).toBe(true);
+    expect(solver).not.toBe(null);
   });
 
   test("Properties", () => {
