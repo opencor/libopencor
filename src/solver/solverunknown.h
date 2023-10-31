@@ -35,6 +35,10 @@ public:
 
     SolverInfoPtr info() const override;
 
+    Solver::Type type() const override;
+    std::string id() const override;
+    std::string name() const override;
+
 private:
     class Impl;
 

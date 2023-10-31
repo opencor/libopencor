@@ -25,10 +25,6 @@ const noHiddenProperties = [];
 export function checkCvodeSolver(solverInfo) {
   // Properties.
 
-  expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-  expect(solverInfo.id()).toBe("KISAO:0000019");
-  expect(solverInfo.name()).toBe("CVODE");
-
   const solverInfoProperties = solverInfo.properties();
 
   expect(solverInfoProperties.size()).toBe(11);
@@ -343,10 +339,6 @@ export function checkCvodeSolver(solverInfo) {
 export function checkForwardEulerSolver(solverInfo) {
   // Properties.
 
-  expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-  expect(solverInfo.id()).toBe("KISAO:0000030");
-  expect(solverInfo.name()).toBe("Forward Euler");
-
   const properties = solverInfo.properties();
 
   expect(properties.size()).toBe(1);
@@ -375,10 +367,6 @@ export function checkForwardEulerSolver(solverInfo) {
 
 export function checkFourthOrderRungeKuttaSolver(solverInfo) {
   // Properties.
-
-  expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-  expect(solverInfo.id()).toBe("KISAO:0000032");
-  expect(solverInfo.name()).toBe("Fourth-order Runge-Kutta");
 
   const properties = solverInfo.properties();
 
@@ -409,10 +397,6 @@ export function checkFourthOrderRungeKuttaSolver(solverInfo) {
 export function checkHeunSolver(solverInfo) {
   // Properties.
 
-  expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-  expect(solverInfo.id()).toBe("KISAO:0000301");
-  expect(solverInfo.name()).toBe("Heun");
-
   const properties = solverInfo.properties();
 
   expect(properties.size()).toBe(1);
@@ -441,10 +425,6 @@ export function checkHeunSolver(solverInfo) {
 
 export function checkKinsolSolver(solverInfo) {
   // Properties.
-
-  expect(solverInfo.type().value).toBe(libopencor.Solver.Type.NLA.value);
-  expect(solverInfo.id()).toBe("KISAO:0000282");
-  expect(solverInfo.name()).toBe("KINSOL");
 
   const solverInfoProperties = solverInfo.properties();
 
@@ -569,10 +549,6 @@ export function checkKinsolSolver(solverInfo) {
 
 export function checkSecondOrderRungeKuttaSolver(solverInfo) {
   // Properties.
-
-  expect(solverInfo.type().value).toBe(libopencor.Solver.Type.ODE.value);
-  expect(solverInfo.id()).toBe("KISAO:0000381");
-  expect(solverInfo.name()).toBe("Second-order Runge-Kutta");
 
   const properties = solverInfo.properties();
 

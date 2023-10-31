@@ -532,6 +532,21 @@ SolverInfoPtr SolverCvode::info() const
     return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverCvode::Impl::ID]];
 }
 
+Solver::Type SolverCvode::type() const
+{
+    return Type::ODE;
+}
+
+std::string SolverCvode::id() const
+{
+    return Impl::ID;
+}
+
+std::string SolverCvode::name() const
+{
+    return Impl::NAME;
+}
+
 bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                              ComputeRates pComputeRates)
 {

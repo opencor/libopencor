@@ -27,10 +27,7 @@ void solverApi(py::module_ &m)
 
     py::class_<libOpenCOR::SolverInfo, libOpenCOR::SolverInfoPtr> solverInfo(m, "SolverInfo");
 
-    solverInfo.def_property_readonly("type", &libOpenCOR::SolverInfo::type, "Get the type of the Solver object.")
-        .def_property_readonly("id", &libOpenCOR::SolverInfo::id, "Get the (KiSAO) id of the Solver object.")
-        .def_property_readonly("name", &libOpenCOR::SolverInfo::name, "Get the name of the Solver object.")
-        .def_property_readonly("properties", &libOpenCOR::SolverInfo::properties, "Get the properties of the Solver object.")
+    solverInfo.def_property_readonly("properties", &libOpenCOR::SolverInfo::properties, "Get the properties of the Solver object.")
         .def("hidden_properties", &libOpenCOR::SolverInfo::hiddenProperties, "Get the properties of the Solver object that should be hidden.");
 
     // SolverProperty API.
@@ -70,5 +67,8 @@ void solverApi(py::module_ &m)
         .def("property", &libOpenCOR::Solver::property, "Get the property of the Solver object.")
         .def("set_property", &libOpenCOR::Solver::setProperty, "Set the property of the Solver object.")
         .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of the Solver object.")
-        .def("set_properties", &libOpenCOR::Solver::setProperties, "Set the properties of the Solver object.");
+        .def("set_properties", &libOpenCOR::Solver::setProperties, "Set the properties of the Solver object.")
+        .def_property_readonly("type", &libOpenCOR::Solver::type, "Get the type of the Solver object.")
+        .def_property_readonly("id", &libOpenCOR::Solver::id, "Get the (KiSAO) id of the Solver object.")
+        .def_property_readonly("name", &libOpenCOR::Solver::name, "Get the name of the Solver object.");
 }

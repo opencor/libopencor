@@ -159,6 +159,36 @@ public:
 
     void setProperties(const StringStringMap &pProperties);
 
+    /**
+     * @brief Get the type of the solver.
+     *
+     * Return the type of the solver.
+     *
+     * @return The type, as a @ref Solver::Type, of the solver.
+     */
+
+    virtual Solver::Type type() const = 0;
+
+    /**
+     * @brief Get the (KiSAO) id of the solver.
+     *
+     * Return the (KiSAO) id of the solver.
+     *
+     * @return The (KiSAO) id, as a @c std::string, of the solver.
+     */
+
+    virtual std::string id() const = 0;
+
+    /**
+     * @brief Get the name of the solver.
+     *
+     * Return the name of the solver.
+     *
+     * @return The name, as a @c std::string, of the solver.
+     */
+
+    virtual std::string name() const = 0;
+
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

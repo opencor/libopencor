@@ -52,36 +52,6 @@ public:
     SolverInfo &operator=(SolverInfo &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the type of the solver.
-     *
-     * Return the type of the solver.
-     *
-     * @return The type, as a @ref Solver::Type, of the solver.
-     */
-
-    Solver::Type type() const;
-
-    /**
-     * @brief Get the (KiSAO) id of the solver.
-     *
-     * Return the (KiSAO) id of the solver.
-     *
-     * @return The (KiSAO) id, as a @c std::string, of the solver.
-     */
-
-    std::string id() const;
-
-    /**
-     * @brief Get the name of the solver.
-     *
-     * Return the name of the solver.
-     *
-     * @return The name, as a @c std::string, of the solver.
-     */
-
-    std::string name() const;
-
-    /**
      * @brief Get the properties of the solver.
      *
      * Return the properties of the solver.
@@ -111,8 +81,7 @@ private:
 
     Impl *mPimpl;
 
-    explicit SolverInfo(Solver::Type pType, const std::string &pId, const std::string &pName,
-                        const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties); /**< Constructor, @private. */
+    explicit SolverInfo(const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

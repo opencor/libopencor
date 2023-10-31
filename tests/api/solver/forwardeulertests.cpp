@@ -26,6 +26,10 @@ TEST(ForwardEulerSolverTest, basic)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Forward Euler"));
 
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000030");
+    EXPECT_EQ(solver->name(), "Forward Euler");
+
     checkForwardEulerSolver(solver->info());
 }
 

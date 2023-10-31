@@ -178,6 +178,21 @@ SolverInfoPtr SolverHeun::info() const
     return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverHeun::Impl::ID]];
 }
 
+Solver::Type SolverHeun::type() const
+{
+    return Type::ODE;
+}
+
+std::string SolverHeun::id() const
+{
+    return Impl::ID;
+}
+
+std::string SolverHeun::name() const
+{
+    return Impl::NAME;
+}
+
 bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             ComputeRates pComputeRates)
 {

@@ -151,6 +151,21 @@ SolverInfoPtr SolverForwardEuler::info() const
     return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverForwardEuler::Impl::ID]];
 }
 
+Solver::Type SolverForwardEuler::type() const
+{
+    return Type::ODE;
+}
+
+std::string SolverForwardEuler::id() const
+{
+    return Impl::ID;
+}
+
+std::string SolverForwardEuler::name() const
+{
+    return Impl::NAME;
+}
+
 bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                     ComputeRates pComputeRates)
 {

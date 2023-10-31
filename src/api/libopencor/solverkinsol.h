@@ -45,6 +45,10 @@ public:
 
     SolverInfoPtr info() const override;
 
+    Solver::Type type() const override;
+    std::string id() const override;
+    std::string name() const override;
+
     bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 
 private:

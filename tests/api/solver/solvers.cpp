@@ -27,10 +27,6 @@ void checkCvodeSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 {
     // Properties.
 
-    EXPECT_EQ(pSolverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(pSolverInfo->id(), "KISAO:0000019");
-    EXPECT_EQ(pSolverInfo->name(), "CVODE");
-
     auto solverInfoProperties = pSolverInfo->properties();
 
     EXPECT_EQ(solverInfoProperties.size(), 11);
@@ -271,10 +267,6 @@ void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 {
     // Properties.
 
-    EXPECT_EQ(pSolverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(pSolverInfo->id(), "KISAO:0000030");
-    EXPECT_EQ(pSolverInfo->name(), "Forward Euler");
-
     auto properties = pSolverInfo->properties();
 
     EXPECT_EQ(properties.size(), 1);
@@ -299,10 +291,6 @@ void checkForwardEulerSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 void checkFourthOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 {
     // Properties.
-
-    EXPECT_EQ(pSolverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(pSolverInfo->id(), "KISAO:0000032");
-    EXPECT_EQ(pSolverInfo->name(), "Fourth-order Runge-Kutta");
 
     auto properties = pSolverInfo->properties();
 
@@ -329,10 +317,6 @@ void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 {
     // Properties.
 
-    EXPECT_EQ(pSolverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(pSolverInfo->id(), "KISAO:0000301");
-    EXPECT_EQ(pSolverInfo->name(), "Heun");
-
     auto properties = pSolverInfo->properties();
 
     EXPECT_EQ(properties.size(), 1);
@@ -357,10 +341,6 @@ void checkHeunSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 void checkKinsolSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 {
     // Properties.
-
-    EXPECT_EQ(pSolverInfo->type(), libOpenCOR::Solver::Type::NLA);
-    EXPECT_EQ(pSolverInfo->id(), "KISAO:0000282");
-    EXPECT_EQ(pSolverInfo->name(), "KINSOL");
 
     auto solverInfoProperties = pSolverInfo->properties();
 
@@ -459,10 +439,6 @@ void checkKinsolSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 void checkSecondOrderRungeKuttaSolver(const libOpenCOR::SolverInfoPtr &pSolverInfo)
 {
     // Properties.
-
-    EXPECT_EQ(pSolverInfo->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(pSolverInfo->id(), "KISAO:0000381");
-    EXPECT_EQ(pSolverInfo->name(), "Second-order Runge-Kutta");
 
     auto properties = pSolverInfo->properties();
 

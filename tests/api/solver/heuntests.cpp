@@ -26,6 +26,10 @@ TEST(HeunSolverTest, basic)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Heun"));
 
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000301");
+    EXPECT_EQ(solver->name(), "Heun");
+
     checkHeunSolver(solver->info());
 }
 

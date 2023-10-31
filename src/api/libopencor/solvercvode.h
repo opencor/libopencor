@@ -45,6 +45,10 @@ public:
 
     SolverInfoPtr info() const override;
 
+    Solver::Type type() const override;
+    std::string id() const override;
+    std::string name() const override;
+
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
     bool reinitialise(double pVoi) override;

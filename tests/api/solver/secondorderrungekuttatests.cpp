@@ -26,6 +26,10 @@ TEST(SecondOrderRungeKuttaSolverTest, basic)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Second-order Runge-Kutta"));
 
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000381");
+    EXPECT_EQ(solver->name(), "Second-order Runge-Kutta");
+
     checkSecondOrderRungeKuttaSolver(solver->info());
 }
 

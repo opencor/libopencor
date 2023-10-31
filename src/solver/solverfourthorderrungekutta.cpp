@@ -212,6 +212,21 @@ SolverInfoPtr SolverFourthOrderRungeKutta::info() const
     return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverFourthOrderRungeKutta::Impl::ID]];
 }
 
+Solver::Type SolverFourthOrderRungeKutta::type() const
+{
+    return Type::ODE;
+}
+
+std::string SolverFourthOrderRungeKutta::id() const
+{
+    return Impl::ID;
+}
+
+std::string SolverFourthOrderRungeKutta::name() const
+{
+    return Impl::NAME;
+}
+
 bool SolverFourthOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                              double *pVariables, ComputeRates pComputeRates)
 {

@@ -27,6 +27,10 @@ TEST(KinsolSolverTest, basic)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverNla>(libOpenCOR::Solver::create("KINSOL"));
 
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::NLA);
+    EXPECT_EQ(solver->id(), "KISAO:0000282");
+    EXPECT_EQ(solver->name(), "KINSOL");
+
     checkKinsolSolver(solver->info());
 }
 

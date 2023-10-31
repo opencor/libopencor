@@ -18,25 +18,19 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SolverInfoPtr SolverInfo::Impl::create(Solver::Type pType, const std::string &pId, const std::string &pName,
-                                       const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties)
+SolverInfoPtr SolverInfo::Impl::create(const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties)
 {
-    return SolverInfoPtr {new SolverInfo {pType, pId, pName, pProperties, pHiddenProperties}};
+    return SolverInfoPtr {new SolverInfo {pProperties, pHiddenProperties}};
 }
 
-SolverInfo::Impl::Impl(Solver::Type pType, const std::string &pId, const std::string &pName,
-                       const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties)
-    : mType(pType)
-    , mId(pId)
-    , mName(pName)
-    , mProperties(pProperties)
+SolverInfo::Impl::Impl(const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties)
+    : mProperties(pProperties)
     , mHiddenProperties(pHiddenProperties)
 {
 }
 
-SolverInfo::SolverInfo(Solver::Type pType, const std::string &pId, const std::string &pName,
-                       const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties)
-    : mPimpl(new Impl(pType, pId, pName, pProperties, pHiddenProperties))
+SolverInfo::SolverInfo(const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties)
+    : mPimpl(new Impl(pProperties, pHiddenProperties))
 {
 }
 
@@ -46,21 +40,6 @@ SolverInfo::~SolverInfo()
     delete mPimpl;
 }
 #endif
-
-Solver::Type SolverInfo::type() const
-{
-    return mPimpl->mType;
-}
-
-std::string SolverInfo::id() const
-{
-    return mPimpl->mId;
-}
-
-std::string SolverInfo::name() const
-{
-    return mPimpl->mName;
-}
 
 SolverPropertyPtrVector SolverInfo::properties() const
 {

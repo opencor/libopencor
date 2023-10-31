@@ -324,6 +324,21 @@ SolverInfoPtr SolverKinsol::info() const
     return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverKinsol::Impl::ID]];
 }
 
+Solver::Type SolverKinsol::type() const
+{
+    return Type::NLA;
+}
+
+std::string SolverKinsol::id() const
+{
+    return Impl::ID;
+}
+
+std::string SolverKinsol::name() const
+{
+    return Impl::NAME;
+}
+
 bool SolverKinsol::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
 {
     return pimpl()->solve(pComputeSystem, pU, pN, pUserData);

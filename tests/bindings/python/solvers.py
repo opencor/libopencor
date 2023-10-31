@@ -24,10 +24,6 @@ no_hidden_properties = []
 def check_cvode_solver(solver_info):
     # Properties.
 
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.id == "KISAO:0000019"
-    assert solver_info.name == "CVODE"
-
     solver_info_properties = solver_info.properties
 
     assert len(solver_info_properties) == 11
@@ -316,10 +312,6 @@ def check_cvode_solver(solver_info):
 def check_forward_euler_solver(solver_info):
     # Properties.
 
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.id == "KISAO:0000030"
-    assert solver_info.name == "Forward Euler"
-
     properties = solver_info.properties
 
     assert len(properties) == 1
@@ -345,10 +337,6 @@ def check_forward_euler_solver(solver_info):
 
 def check_fourth_order_runge_kutta_solver(solver_info):
     # Properties.
-
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.id == "KISAO:0000032"
-    assert solver_info.name == "Fourth-order Runge-Kutta"
 
     properties = solver_info.properties
 
@@ -376,10 +364,6 @@ def check_fourth_order_runge_kutta_solver(solver_info):
 def check_heun_solver(solver_info):
     # Properties.
 
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.id == "KISAO:0000301"
-    assert solver_info.name == "Heun"
-
     properties = solver_info.properties
 
     assert len(properties) == 1
@@ -405,10 +389,6 @@ def check_heun_solver(solver_info):
 
 def check_kinsol_solver(solver_info):
     # Properties.
-
-    assert solver_info.type == Solver.Type.Nla
-    assert solver_info.id == "KISAO:0000282"
-    assert solver_info.name == "KINSOL"
 
     solver_info_properties = solver_info.properties
 
@@ -520,10 +500,6 @@ def check_kinsol_solver(solver_info):
 
 def check_second_order_runge_kutta_solver(solver_info):
     # Properties.
-
-    assert solver_info.type == Solver.Type.Ode
-    assert solver_info.id == "KISAO:0000381"
-    assert solver_info.name == "Second-order Runge-Kutta"
 
     properties = solver_info.properties
 

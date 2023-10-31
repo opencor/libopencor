@@ -86,10 +86,12 @@ void Solver::Impl::registerSolver(Type pType, const std::string &pId, const std:
                                   SolverCreate pCreate, const SolverPropertyPtrVector &pProperties,
                                   SolverInfo::HiddenProperties pHiddenProperties)
 {
+    (void)pType;
+
     Solver::Impl::SolversIndex[pId] = SolversInfo.size();
     Solver::Impl::SolversId[pName] = pId;
     Solver::Impl::SolversCreate[pId] = pCreate;
-    Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pType, pId, pName, pProperties, pHiddenProperties));
+    Solver::Impl::SolversInfo.push_back(SolverInfo::Impl::create(pProperties, pHiddenProperties));
 }
 
 SolverPropertyPtr Solver::Impl::createProperty(SolverProperty::Type pType, const std::string &pId,

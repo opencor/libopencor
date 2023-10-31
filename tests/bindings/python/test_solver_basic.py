@@ -46,11 +46,19 @@ def test_unknown_solver():
 def test_cvode_by_id():
     solver = Solver("KISAO:0000019")
 
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000019"
+    assert solver.name == "CVODE"
+
     assert solver.is_valid == True
 
 
 def test_cvode_by_name():
     solver = Solver("CVODE")
+
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000019"
+    assert solver.name == "CVODE"
 
     assert solver.is_valid == True
 
@@ -58,11 +66,19 @@ def test_cvode_by_name():
 def test_forward_euler_by_id():
     solver = Solver("KISAO:0000030")
 
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000030"
+    assert solver.name == "Forward Euler"
+
     assert solver.is_valid == True
 
 
 def test_forward_euler_by_name():
     solver = Solver("Forward Euler")
+
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000030"
+    assert solver.name == "Forward Euler"
 
     assert solver.is_valid == True
 
@@ -70,11 +86,19 @@ def test_forward_euler_by_name():
 def test_fourth_order_runge_kutta_by_id():
     solver = Solver("KISAO:0000032")
 
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000032"
+    assert solver.name == "Fourth-order Runge-Kutta"
+
     assert solver.is_valid == True
 
 
 def test_fourth_order_runge_kutta_by_name():
     solver = Solver("Fourth-order Runge-Kutta")
+
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000032"
+    assert solver.name == "Fourth-order Runge-Kutta"
 
     assert solver.is_valid == True
 
@@ -82,11 +106,19 @@ def test_fourth_order_runge_kutta_by_name():
 def test_heun_by_id():
     solver = Solver("KISAO:0000301")
 
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000301"
+    assert solver.name == "Heun"
+
     assert solver.is_valid == True
 
 
 def test_heun_by_name():
     solver = Solver("Heun")
+
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000301"
+    assert solver.name == "Heun"
 
     assert solver.is_valid == True
 
@@ -94,11 +126,19 @@ def test_heun_by_name():
 def test_kinsol_by_id():
     solver = Solver("KISAO:0000282")
 
+    assert solver.type == Solver.Type.Nla
+    assert solver.id == "KISAO:0000282"
+    assert solver.name == "KINSOL"
+
     assert solver.is_valid == True
 
 
 def test_kinsol_by_name():
     solver = Solver("KINSOL")
+
+    assert solver.type == Solver.Type.Nla
+    assert solver.id == "KISAO:0000282"
+    assert solver.name == "KINSOL"
 
     assert solver.is_valid == True
 
@@ -106,11 +146,19 @@ def test_kinsol_by_name():
 def test_second_order_runge_kutta_by_id():
     solver = Solver("KISAO:0000381")
 
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000381"
+    assert solver.name == "Second-order Runge-Kutta"
+
     assert solver.is_valid == True
 
 
 def test_second_order_runge_kutta_by_name():
     solver = Solver("Second-order Runge-Kutta")
+
+    assert solver.type == Solver.Type.Ode
+    assert solver.id == "KISAO:0000381"
+    assert solver.name == "Second-order Runge-Kutta"
 
     assert solver.is_valid == True
 

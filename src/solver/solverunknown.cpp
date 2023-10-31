@@ -58,4 +58,19 @@ SolverInfoPtr SolverUnknown::info() const
     return nullptr;
 }
 
+Solver::Type SolverUnknown::type() const
+{
+    return Type::ODE;
+}
+
+std::string SolverUnknown::id() const
+{
+    return {};
+}
+
+std::string SolverUnknown::name() const
+{
+    return {};
+}
+
 } // namespace libOpenCOR

@@ -177,6 +177,21 @@ SolverInfoPtr SolverSecondOrderRungeKutta::info() const
     return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverSecondOrderRungeKutta::Impl::ID]];
 }
 
+Solver::Type SolverSecondOrderRungeKutta::type() const
+{
+    return Type::ODE;
+}
+
+std::string SolverSecondOrderRungeKutta::id() const
+{
+    return Impl::ID;
+}
+
+std::string SolverSecondOrderRungeKutta::name() const
+{
+    return Impl::NAME;
+}
+
 bool SolverSecondOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                              double *pVariables, ComputeRates pComputeRates)
 {

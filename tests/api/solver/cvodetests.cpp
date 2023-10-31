@@ -26,6 +26,10 @@ TEST(CvodeSolverTest, basic)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("CVODE"));
 
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000019");
+    EXPECT_EQ(solver->name(), "CVODE");
+
     checkCvodeSolver(solver->info());
 }
 

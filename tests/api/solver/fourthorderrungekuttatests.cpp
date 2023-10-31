@@ -26,6 +26,10 @@ TEST(FourthOrderRungeKuttaSolverTest, basic)
 {
     auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("Fourth-order Runge-Kutta"));
 
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000032");
+    EXPECT_EQ(solver->name(), "Fourth-order Runge-Kutta");
+
     checkFourthOrderRungeKuttaSolver(solver->info());
 }
 
