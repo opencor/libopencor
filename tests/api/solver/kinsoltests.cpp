@@ -17,8 +17,6 @@ limitations under the License.
 #include "nlamodel.h"
 #include "solvers.h"
 
-#include "gtest/gtest.h"
-
 #include "tests/utils.h"
 
 #include <libopencor>

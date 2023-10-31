@@ -17,8 +17,6 @@ limitations under the License.
 #include "nlamodel.h"
 #include "solvernla_p.h"
 
-#include "gtest/gtest.h"
-
 #include <cmath>
 
 namespace NlaModel {

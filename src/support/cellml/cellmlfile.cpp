@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "cellmlfile_p.h"
-
 #include "cellmlfileruntime.h"
 #include "utils.h"
 

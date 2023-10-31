@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "sedmlfile_p.h"
-
 #include "utils.h"
 
 #include "libopencor/file.h"

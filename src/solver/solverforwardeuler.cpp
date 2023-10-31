@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "solverforwardeuler_p.h"
-#include "utils.h"
 
 namespace libOpenCOR {
 

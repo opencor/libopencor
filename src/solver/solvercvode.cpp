@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "solvercvode_p.h"
-#include "utils.h"
 
 #include <algorithm>
 

@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "solverheun_p.h"
-#include "utils.h"
 
 namespace libOpenCOR {
 

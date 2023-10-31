@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "solverkinsol_p.h"
-#include "utils.h"
 
 #include <algorithm>
 

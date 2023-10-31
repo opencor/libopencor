@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "solversecondorderrungekutta_p.h"
-#include "utils.h"
 
 namespace libOpenCOR {
 
