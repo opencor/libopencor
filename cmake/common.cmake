@@ -382,6 +382,9 @@ function(prepare_test TARGET)
 
     configure_target(${TARGET})
 
+    target_include_directories(${TARGET} PRIVATE
+                               $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/logger>)
+
     list(APPEND TEST_TARGETS "${TARGET}")
 
     set(TEST_TARGETS ${TEST_TARGETS} PARENT_SCOPE)

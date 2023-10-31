@@ -16,8 +16,6 @@ limitations under the License.
 
 #pragma once
 
-#include "unittestingexport.h"
-
 #include "libopencor/solver.h"
 
 namespace libOpenCOR {
@@ -46,8 +44,5 @@ protected:
 
     explicit SolverNla(Impl *pPimpl);
 };
-
-void LIBOPENCOR_UNIT_TESTING_EXPORT nlaSolve(SolverNla *pSolver, void (*pObjectiveFunction)(double *, double *, void *),
-                                             double *pU, size_t pN, void *pData);
 
 } // namespace libOpenCOR
