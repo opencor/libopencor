@@ -20,7 +20,6 @@ limitations under the License.
 #include "utils.h"
 
 #include "libopencor/solver.h"
-#include "libopencor/solverinfo.h"
 #include "libopencor/solverproperty.h"
 
 namespace libOpenCOR {
@@ -28,17 +27,14 @@ namespace libOpenCOR {
 class Solver::Impl: public Logger::Impl
 {
 public:
-    static StringSizetMap SolversIndex;
     static StringStringMap SolversId;
     static StringSolverCreateMap SolversCreate;
-    static SolverInfoPtrVector SolversInfo;
 
     StringStringMap mProperties;
 
     static void registerSolvers();
     static void registerSolver(Type pType, const std::string &pId, const std::string &pName, SolverCreate pCreate,
-                               const SolverPropertyPtrVector &pProperties,
-                               SolverInfo::HiddenProperties pHiddenProperties);
+                               const SolverPropertyPtrVector &pProperties);
     static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pId,
                                             const std::string &pName, const StringVector &pListValues,
                                             const std::string &pDefaultValue, bool pHasVoiUnit);

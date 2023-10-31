@@ -43,8 +43,6 @@ public:
     SolverHeun &operator=(const SolverHeun &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverHeun &operator=(SolverHeun &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-    SolverInfoPtr info() const override;
-
     Solver::Type type() const override;
     std::string id() const override;
     std::string name() const override;

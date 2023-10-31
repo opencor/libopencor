@@ -43,13 +43,6 @@ SolverPropertyPtrVector SolverFourthOrderRungeKutta::Impl::propertiesInfo()
     };
 }
 
-StringVector SolverFourthOrderRungeKutta::Impl::hiddenProperties(const StringStringMap &pProperties)
-{
-    (void)pProperties;
-
-    return {};
-}
-
 SolverFourthOrderRungeKutta::Impl::Impl()
     : SolverOde::Impl()
 {
@@ -202,11 +195,6 @@ SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl()
 const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
-}
-
-SolverInfoPtr SolverFourthOrderRungeKutta::info() const
-{
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverFourthOrderRungeKutta::Impl::ID]];
 }
 
 Solver::Type SolverFourthOrderRungeKutta::type() const

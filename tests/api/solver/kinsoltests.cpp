@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "nlamodel.h"
-#include "solvers.h"
 
 #include "tests/utils.h"
 
@@ -28,8 +27,6 @@ TEST(KinsolSolverTest, basic)
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::NLA);
     EXPECT_EQ(solver->id(), "KISAO:0000282");
     EXPECT_EQ(solver->name(), "KINSOL");
-
-    checkKinsolSolver(solver->info());
 }
 
 TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithNonNumber)

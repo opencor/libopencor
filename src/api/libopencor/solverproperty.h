@@ -22,9 +22,9 @@ limitations under the License.
 namespace libOpenCOR {
 
 /**
- * @brief The SolverInfo class.
+ * @brief The SolverProperty class.
  *
- * The SolverInfo class is used to access various information about a solver.
+ * The SolverProperty class is used to access some information about a solver property.
  */
 
 class LIBOPENCOR_EXPORT SolverProperty

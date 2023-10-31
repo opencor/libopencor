@@ -120,7 +120,6 @@ public:
 
     static SolverPtr create();
     static SolverPropertyPtrVector propertiesInfo();
-    static StringVector hiddenProperties(const StringStringMap &pProperties);
 
     SUNContext mContext = nullptr;
 

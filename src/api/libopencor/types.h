@@ -37,23 +37,18 @@ using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @
 class Solver;
 using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
 
-class SolverInfo;
-using SolverInfoPtr = std::shared_ptr<SolverInfo>; /**< Type definition for the shared @ref SolverInfo pointer. */
-
 class SolverProperty;
 using SolverPropertyPtr = std::shared_ptr<SolverProperty>; /**< Type definition for the shared @ref SolverProperty pointer. */
 
 // Vectors.
 
 using IssuePtrVector = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
-using SolverInfoPtrVector = std::vector<SolverInfoPtr>; /**< Type definition for a vector of @ref SolverInfo pointers. */
 using SolverPropertyPtrVector = std::vector<SolverPropertyPtr>; /**< Type definition for a vector of @ref SolverProperty pointers. */
 using StringVector = std::vector<std::string>; /**< Type definition for a vector of strings. */
 using UnsignedCharVector = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
 
 // Maps.
 
-using StringSizetMap = std::map<std::string, size_t>; /**< Type definition for a map of sizes. */
 using StringStringMap = std::map<std::string, std::string>; /**< Type definition for a map of strings. */
 
 } // namespace libcellml

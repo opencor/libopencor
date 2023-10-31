@@ -43,13 +43,6 @@ SolverPropertyPtrVector SolverSecondOrderRungeKutta::Impl::propertiesInfo()
     };
 }
 
-StringVector SolverSecondOrderRungeKutta::Impl::hiddenProperties(const StringStringMap &pProperties)
-{
-    (void)pProperties;
-
-    return {};
-}
-
 SolverSecondOrderRungeKutta::Impl::Impl()
     : SolverOde::Impl()
 {
@@ -167,11 +160,6 @@ SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl()
 const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
-}
-
-SolverInfoPtr SolverSecondOrderRungeKutta::info() const
-{
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverSecondOrderRungeKutta::Impl::ID]];
 }
 
 Solver::Type SolverSecondOrderRungeKutta::type() const

@@ -43,13 +43,6 @@ SolverPropertyPtrVector SolverHeun::Impl::propertiesInfo()
     };
 }
 
-StringVector SolverHeun::Impl::hiddenProperties(const StringStringMap &pProperties)
-{
-    (void)pProperties;
-
-    return {};
-}
-
 SolverHeun::Impl::Impl()
     : SolverOde::Impl()
 {
@@ -168,11 +161,6 @@ SolverHeun::Impl *SolverHeun::pimpl()
 const SolverHeun::Impl *SolverHeun::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
-}
-
-SolverInfoPtr SolverHeun::info() const
-{
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverHeun::Impl::ID]];
 }
 
 Solver::Type SolverHeun::type() const

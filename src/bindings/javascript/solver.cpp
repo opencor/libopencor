@@ -18,13 +18,6 @@ limitations under the License.
 
 void solverApi()
 {
-    // SolverInfo API.
-
-    emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
-        .smart_ptr<libOpenCOR::SolverInfoPtr>("SolverInfo")
-        .function("properties", &libOpenCOR::SolverInfo::properties)
-        .function("hiddenProperties", &libOpenCOR::SolverInfo::hiddenProperties);
-
     // SolverProperty API.
 
     emscripten::enum_<libOpenCOR::SolverProperty::Type>("SolverProperty.Type")
@@ -60,7 +53,6 @@ void solverApi()
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
         .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
-        .class_function("solversInfo", &libOpenCOR::Solver::solversInfo)
         .function("property", &libOpenCOR::Solver::property)
         .function("setProperty", &libOpenCOR::Solver::setProperty)
         .function("properties", &libOpenCOR::Solver::properties)

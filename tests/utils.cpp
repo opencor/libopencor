@@ -42,15 +42,6 @@ void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles, const
     }
 }
 
-void expectEqualHiddenProperties(const StringVector &pHiddenProperties, const StringVector &pExpectedHiddenProperties)
-{
-    EXPECT_EQ(pHiddenProperties.size(), pExpectedHiddenProperties.size());
-
-    for (size_t i = 0; i < pHiddenProperties.size(); ++i) {
-        EXPECT_EQ(pHiddenProperties[i], pExpectedHiddenProperties[i]);
-    }
-}
-
 std::string resourcePath(const std::string &pResourceRelativePath)
 {
     return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;

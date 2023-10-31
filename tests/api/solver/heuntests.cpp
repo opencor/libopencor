@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "odemodel.h"
-#include "solvers.h"
 
 #include "tests/utils.h"
 
@@ -28,8 +27,6 @@ TEST(HeunSolverTest, basic)
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solver->id(), "KISAO:0000301");
     EXPECT_EQ(solver->name(), "Heun");
-
-    checkHeunSolver(solver->info());
 }
 
 TEST(HeunSolverTest, stepValueWithNonNumber)

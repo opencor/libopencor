@@ -23,13 +23,6 @@ namespace py = pybind11;
 
 void solverApi(py::module_ &m)
 {
-    // SolverInfo API.
-
-    py::class_<libOpenCOR::SolverInfo, libOpenCOR::SolverInfoPtr> solverInfo(m, "SolverInfo");
-
-    solverInfo.def_property_readonly("properties", &libOpenCOR::SolverInfo::properties, "Get the properties of the Solver object.")
-        .def("hidden_properties", &libOpenCOR::SolverInfo::hiddenProperties, "Get the properties of the Solver object that should be hidden.");
-
     // SolverProperty API.
 
     py::class_<libOpenCOR::SolverProperty, libOpenCOR::SolverPropertyPtr> solverProperty(m, "SolverProperty");
@@ -62,7 +55,6 @@ void solverApi(py::module_ &m)
         .export_values();
 
     solver.def(py::init(&libOpenCOR::Solver::create), "Create a Solver object.")
-        .def_static("solvers_info", &libOpenCOR::Solver::solversInfo, "Get the solvers information.")
         .def("property", &libOpenCOR::Solver::property, "Get the property of the Solver object.")
         .def("set_property", &libOpenCOR::Solver::setProperty, "Set the property of the Solver object.")
         .def_property_readonly("properties", &libOpenCOR::Solver::properties, "Get the properties of the Solver object.")

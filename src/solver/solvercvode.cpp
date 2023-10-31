@@ -175,41 +175,6 @@ SolverPropertyPtrVector SolverCvode::Impl::propertiesInfo()
     };
 }
 
-StringVector SolverCvode::Impl::hiddenProperties(const StringStringMap &pProperties)
-{
-    StringVector res;
-    auto iterationType = valueFromProperties(ITERATION_TYPE_ID, ITERATION_TYPE_NAME, pProperties);
-
-    if (iterationType == NEWTON_ITERATION_TYPE) {
-        auto linearSolver = valueFromProperties(LINEAR_SOLVER_ID, LINEAR_SOLVER_NAME, pProperties);
-
-        if ((linearSolver == DENSE_LINEAR_SOLVER)
-            || (linearSolver == DIAGONAL_LINEAR_SOLVER)) {
-            res.push_back(PRECONDITIONER_ID);
-            res.push_back(UPPER_HALF_BANDWIDTH_ID);
-            res.push_back(LOWER_HALF_BANDWIDTH_ID);
-        } else if (linearSolver == BANDED_LINEAR_SOLVER) {
-            res.push_back(PRECONDITIONER_ID);
-        } else if ((linearSolver == GMRES_LINEAR_SOLVER)
-                   || (linearSolver == BICGSTAB_LINEAR_SOLVER)
-                   || (linearSolver == TFQMR_LINEAR_SOLVER)) {
-            auto preconditioner = valueFromProperties(PRECONDITIONER_ID, PRECONDITIONER_NAME, pProperties);
-
-            if (preconditioner == NO_PRECONDITIONER) {
-                res.push_back(UPPER_HALF_BANDWIDTH_ID);
-                res.push_back(LOWER_HALF_BANDWIDTH_ID);
-            }
-        }
-    } else if (iterationType == FUNCTIONAL_ITERATION_TYPE) {
-        res.push_back(LINEAR_SOLVER_ID);
-        res.push_back(PRECONDITIONER_ID);
-        res.push_back(UPPER_HALF_BANDWIDTH_ID);
-        res.push_back(LOWER_HALF_BANDWIDTH_ID);
-    }
-
-    return res;
-}
-
 SolverCvode::Impl::Impl()
     : SolverOde::Impl()
 {
@@ -522,11 +487,6 @@ SolverCvode::Impl *SolverCvode::pimpl()
 const SolverCvode::Impl *SolverCvode::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
-}
-
-SolverInfoPtr SolverCvode::info() const
-{
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverCvode::Impl::ID]];
 }
 
 Solver::Type SolverCvode::type() const

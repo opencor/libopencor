@@ -14,27 +14,6 @@
 
 
 from libopencor import Solver
-from solvers import (
-    check_cvode_solver,
-    check_forward_euler_solver,
-    check_fourth_order_runge_kutta_solver,
-    check_heun_solver,
-    check_kinsol_solver,
-    check_second_order_runge_kutta_solver,
-)
-
-
-def test_solvers_info():
-    solvers_info = Solver.solvers_info()
-
-    assert len(solvers_info) == 6
-
-    check_cvode_solver(solvers_info[0])
-    check_forward_euler_solver(solvers_info[1])
-    check_fourth_order_runge_kutta_solver(solvers_info[2])
-    check_heun_solver(solvers_info[3])
-    check_kinsol_solver(solvers_info[4])
-    check_second_order_runge_kutta_solver(solvers_info[5])
 
 
 def test_cvode_by_id():

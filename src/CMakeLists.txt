@@ -81,7 +81,6 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverforwardeuler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverfourthorderrungekutta.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverheun.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverinfo.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverkinsol.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solvernla.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverode.h
@@ -108,7 +107,6 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverfourthorderrungekutta.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverheun.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverkinsol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvernla.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.cpp
@@ -154,7 +152,6 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverforwardeuler_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverfourthorderrungekutta_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverheun_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverinfo_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverkinsol_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvernla_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode_p.h

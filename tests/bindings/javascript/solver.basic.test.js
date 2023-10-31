@@ -15,30 +15,10 @@ limitations under the License.
 */
 
 import libOpenCOR from "./libopencor.js";
-import {
-  libopencor,
-  checkCvodeSolver,
-  checkForwardEulerSolver,
-  checkFourthOrderRungeKuttaSolver,
-  checkHeunSolver,
-  checkKinsolSolver,
-  checkSecondOrderRungeKuttaSolver,
-} from "./solvers.js";
+
+const libopencor = await libOpenCOR();
 
 describe("Solver basic tests", () => {
-  test("Solvers info", () => {
-    const solversInfo = libopencor.Solver.solversInfo();
-
-    expect(solversInfo.size()).toBe(6);
-
-    checkCvodeSolver(solversInfo.get(0));
-    checkForwardEulerSolver(solversInfo.get(1));
-    checkFourthOrderRungeKuttaSolver(solversInfo.get(2));
-    checkHeunSolver(solversInfo.get(3));
-    checkKinsolSolver(solversInfo.get(4));
-    checkSecondOrderRungeKuttaSolver(solversInfo.get(5));
-  });
-
   test("CVODE by (KiSAO) id", () => {
     const solver = new libopencor.Solver("KISAO:0000019");
 

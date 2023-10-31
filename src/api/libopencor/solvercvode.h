@@ -43,8 +43,6 @@ public:
     SolverCvode &operator=(const SolverCvode &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverCvode &operator=(SolverCvode &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-    SolverInfoPtr info() const override;
-
     Solver::Type type() const override;
     std::string id() const override;
     std::string name() const override;

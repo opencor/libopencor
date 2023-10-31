@@ -101,22 +101,6 @@ SolverPropertyPtrVector SolverKinsol::Impl::propertiesInfo()
     };
 }
 
-StringVector SolverKinsol::Impl::hiddenProperties(const StringStringMap &pProperties)
-{
-    StringVector res;
-    auto linearSolver = valueFromProperties(LINEAR_SOLVER_ID, LINEAR_SOLVER_NAME, pProperties);
-
-    if ((linearSolver == DENSE_LINEAR_SOLVER)
-        || (linearSolver == GMRES_LINEAR_SOLVER)
-        || (linearSolver == BICGSTAB_LINEAR_SOLVER)
-        || (linearSolver == TFQMR_LINEAR_SOLVER)) {
-        res.push_back(UPPER_HALF_BANDWIDTH_ID);
-        res.push_back(LOWER_HALF_BANDWIDTH_ID);
-    }
-
-    return res;
-}
-
 SolverKinsol::Impl::Impl()
     : SolverNla::Impl()
 {
@@ -315,11 +299,6 @@ const SolverKinsol::Impl *SolverKinsol::pimpl() const
     return static_cast<const Impl *>(SolverNla::pimpl());
 }
 */
-
-SolverInfoPtr SolverKinsol::info() const
-{
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverKinsol::Impl::ID]];
-}
 
 Solver::Type SolverKinsol::type() const
 {

@@ -24,7 +24,6 @@ limitations under the License.
 #include "libopencor/solverforwardeuler.h"
 #include "libopencor/solverfourthorderrungekutta.h"
 #include "libopencor/solverheun.h"
-#include "libopencor/solverinfo.h"
 #include "libopencor/solverkinsol.h"
 #include "libopencor/solvernla.h"
 #include "libopencor/solverode.h"

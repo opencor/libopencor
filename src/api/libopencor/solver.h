@@ -84,26 +84,6 @@ public:
     static SolverPtr create(const std::string &pIdOrName);
 
     /**
-     * @brief Get various information about the solvers that are available.
-     *
-     * Get various information about the solvers that are available.
-     *
-     * @return The information, as a @ref SolverInfoPtrVector, about the solvers that are available.
-     */
-
-    static SolverInfoPtrVector solversInfo();
-
-    /**
-     * @brief Get some information about this solver.
-     *
-     * Return some information about this solver.
-     *
-     * @return Some information, as a @ref SolverInfo, about this solver.
-     */
-
-    virtual SolverInfoPtr info() const = 0;
-
-    /**
      * @brief Get the value of a property of this solver.
      *
      * Get the value of a property, which (KiSAO) id or name is given, of this solver.

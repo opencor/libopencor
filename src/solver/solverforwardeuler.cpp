@@ -43,13 +43,6 @@ SolverPropertyPtrVector SolverForwardEuler::Impl::propertiesInfo()
     };
 }
 
-StringVector SolverForwardEuler::Impl::hiddenProperties(const StringStringMap &pProperties)
-{
-    (void)pProperties;
-
-    return {};
-}
-
 SolverForwardEuler::Impl::Impl()
     : SolverOde::Impl()
 {
@@ -141,11 +134,6 @@ SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
 const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 {
     return static_cast<const Impl *>(SolverOde::pimpl());
-}
-
-SolverInfoPtr SolverForwardEuler::info() const
-{
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverForwardEuler::Impl::ID]];
 }
 
 Solver::Type SolverForwardEuler::type() const

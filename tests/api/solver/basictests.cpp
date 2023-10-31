@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solvers.h"
-
 #include "tests/utils.h"
 
 #include <libcellml>
@@ -88,28 +86,6 @@ TEST(BasicSolverTest, checkNlaModel1)
 TEST(BasicSolverTest, checkNlaModel2)
 {
     checkModel("nla", "2");
-}
-
-TEST(BasicSolverTest, solversInfo)
-{
-    static const auto ZERO = 0;
-    static const auto ONE = 1;
-    static const auto TWO = 2;
-    static const auto THREE = 3;
-    static const auto FOUR = 4;
-    static const auto FIVE = 5;
-    static const auto SIX = 6;
-
-    auto solversInfo = libOpenCOR::Solver::solversInfo();
-
-    EXPECT_EQ(solversInfo.size(), SIX);
-
-    checkCvodeSolver(solversInfo[ZERO]);
-    checkForwardEulerSolver(solversInfo[ONE]);
-    checkFourthOrderRungeKuttaSolver(solversInfo[TWO]);
-    checkHeunSolver(solversInfo[THREE]);
-    checkKinsolSolver(solversInfo[FOUR]);
-    checkSecondOrderRungeKuttaSolver(solversInfo[FIVE]);
 }
 
 TEST(BasicSolverTest, cvodeById)
