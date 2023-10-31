@@ -20,29 +20,55 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverNla class.
+ *
+ * The SolverNla class is used to represent an NLA solver.
+ */
+
 class SolverNla: public Solver
 {
 public:
-    using ComputeSystem = void (*)(double *pU, double *pF, void *pUserData);
+    using ComputeSystem = void (*)(double *pU, double *pF, void *pUserData); /**< Signature of the method that computes the system of NLA equations. */
 
-    SolverNla() = delete;
-    ~SolverNla() override = default;
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
-    SolverNla(const SolverNla &pOther) = delete;
-    SolverNla(SolverNla &&pOther) noexcept = delete;
+    SolverNla() = delete; /**< No default constructor allowed, @private. */
+    ~SolverNla() override = default; /**< Destructor, @private. */
 
-    SolverNla &operator=(const SolverNla &pRhs) = delete;
-    SolverNla &operator=(SolverNla &&pRhs) noexcept = delete;
+    SolverNla(const SolverNla &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverNla(SolverNla &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    SolverNla &operator=(const SolverNla &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverNla &operator=(SolverNla &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+
+    /**
+     * @brief Solve the NLA system.
+     *
+     * Solve the NLA system.
+     *
+     * @param pComputeSystem The method that computes the system of NLA equations.
+     * @param pU The initial guess for the solution of the NLA system.
+     * @param pN The number of variables in the NLA system.
+     * @param pUserData Some user data that may be passed to @p pComputeSystem.
+     *
+     * @return @c true if the NLA system could be solved, @c false otherwise.
+     *
+     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
+     * our solvers.
+     */
 
     virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData = nullptr) = 0;
 
 protected:
-    class Impl;
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverNla(Impl *pPimpl);
+    explicit SolverNla(Impl *pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

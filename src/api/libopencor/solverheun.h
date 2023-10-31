@@ -20,18 +20,28 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverHeun class.
+ *
+ * The SolverHeun class is used to represent the Heun solver.
+ */
+
 class SolverHeun: public SolverOde
 {
     friend class Solver;
 
 public:
-    ~SolverHeun() override;
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
-    SolverHeun(const SolverHeun &pOther) = delete;
-    SolverHeun(SolverHeun &&pOther) noexcept = delete;
+    ~SolverHeun() override; /**< Destructor, @private. */
 
-    SolverHeun &operator=(const SolverHeun &pRhs) = delete;
-    SolverHeun &operator=(SolverHeun &&pRhs) noexcept = delete;
+    SolverHeun(const SolverHeun &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverHeun(SolverHeun &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    SolverHeun &operator=(const SolverHeun &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverHeun &operator=(SolverHeun &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     SolverInfoPtr info() const override;
 
@@ -41,12 +51,12 @@ public:
     bool solve(double &pVoi, double pVoiEnd) const override;
 
 private:
-    class Impl;
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverHeun();
+    explicit SolverHeun(); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

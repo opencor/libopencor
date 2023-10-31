@@ -20,30 +20,40 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverKinsol class.
+ *
+ * The SolverKinsol class is used to represent the KINSOL solver.
+ */
+
 class SolverKinsol: public SolverNla
 {
     friend class Solver;
 
 public:
-    ~SolverKinsol() override;
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
-    SolverKinsol(const SolverKinsol &pOther) = delete;
-    SolverKinsol(SolverKinsol &&pOther) noexcept = delete;
+    ~SolverKinsol() override; /**< Destructor, @private. */
 
-    SolverKinsol &operator=(const SolverKinsol &pRhs) = delete;
-    SolverKinsol &operator=(SolverKinsol &&pRhs) noexcept = delete;
+    SolverKinsol(const SolverKinsol &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverKinsol(SolverKinsol &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    SolverKinsol &operator=(const SolverKinsol &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverKinsol &operator=(SolverKinsol &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     SolverInfoPtr info() const override;
 
     bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 
 private:
-    class Impl;
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverKinsol();
+    explicit SolverKinsol(); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

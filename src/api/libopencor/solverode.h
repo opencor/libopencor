@@ -20,33 +20,89 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverOde class.
+ *
+ * The SolverOde class is used to represent an ODE solver.
+ */
+
 class SolverOde: public Solver
 {
 public:
-    using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
+    using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables); /**< Signature of the method that computes the rates of the ODE system. */
 
-    SolverOde() = delete;
-    ~SolverOde() override = default;
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
-    SolverOde(const SolverOde &pOther) = delete;
-    SolverOde(SolverOde &&pOther) noexcept = delete;
+    SolverOde() = delete; /**< No default constructor allowed, @private. */
+    ~SolverOde() override = default; /**< Destructor, @private. */
 
-    SolverOde &operator=(const SolverOde &pRhs) = delete;
-    SolverOde &operator=(SolverOde &&pRhs) noexcept = delete;
+    SolverOde(const SolverOde &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverOde(SolverOde &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    SolverOde &operator=(const SolverOde &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverOde &operator=(SolverOde &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+
+    /**
+     * @brief Initialise the solver.
+     *
+     * Initialise the solver.
+     *
+     * @param pVoi the value of the variable of integration.
+     * @param pSize the size of the ODE system.
+     * @param pStates the array of state values.
+     * @param pRates the array of rate values.
+     * @param pVariables the array of variable values.
+     * @param pComputeRates the method that computes the rates of the ODE system.
+     *
+     * @return @c true if the solver could be initialised, @c false otherwise.
+     *
+     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
+     * our solvers.
+     */
 
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             ComputeRates pComputeRates) = 0;
+
+    /**
+     * @brief Reinitialise the solver.
+     *
+     * Reinitialise the solver.
+     *
+     * @param pVoi the value of the variable of integration.
+     *
+     * @return @c true if the solver could be reinitialised, @c false otherwise.
+     *
+     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
+     * our solvers.
+     */
+
     virtual bool reinitialise(double pVoi);
+
+    /**
+     * @brief Solve the ODE system.
+     *
+     * Solve the ODE system.
+     *
+     * @param pVoi the value of the variable of integration.
+     * @param pVoiEnd the end value of the variable of integration.
+     *
+     * @return @c true if the ODE system could be solved, @c false otherwise.
+     *
+     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
+     * our solvers.
+     */
 
     virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
 
 protected:
-    class Impl;
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverOde(Impl *pPimpl);
+    explicit SolverOde(Impl *pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

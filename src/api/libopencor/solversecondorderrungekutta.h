@@ -20,18 +20,28 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverSecondOrderRungeKutta class.
+ *
+ * The SolverSecondOrderRungeKutta class is used to represent the second-order Runge-Kutta solver.
+ */
+
 class SolverSecondOrderRungeKutta: public SolverOde
 {
     friend class Solver;
 
 public:
-    ~SolverSecondOrderRungeKutta() override;
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
-    SolverSecondOrderRungeKutta(const SolverSecondOrderRungeKutta &pOther) = delete;
-    SolverSecondOrderRungeKutta(SolverSecondOrderRungeKutta &&pOther) noexcept = delete;
+    ~SolverSecondOrderRungeKutta() override; /**< Destructor, @private. */
 
-    SolverSecondOrderRungeKutta &operator=(const SolverSecondOrderRungeKutta &pRhs) = delete;
-    SolverSecondOrderRungeKutta &operator=(SolverSecondOrderRungeKutta &&pRhs) noexcept = delete;
+    SolverSecondOrderRungeKutta(const SolverSecondOrderRungeKutta &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverSecondOrderRungeKutta(SolverSecondOrderRungeKutta &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    SolverSecondOrderRungeKutta &operator=(const SolverSecondOrderRungeKutta &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverSecondOrderRungeKutta &operator=(SolverSecondOrderRungeKutta &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     SolverInfoPtr info() const override;
 
@@ -41,12 +51,12 @@ public:
     bool solve(double &pVoi, double pVoiEnd) const override;
 
 private:
-    class Impl;
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverSecondOrderRungeKutta();
+    explicit SolverSecondOrderRungeKutta(); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

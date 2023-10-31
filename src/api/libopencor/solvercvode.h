@@ -20,18 +20,28 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+/**
+ * @brief The SolverCvode class.
+ *
+ * The SolverCvode class is used to represent the CVODE solver.
+ */
+
 class SolverCvode: public SolverOde
 {
     friend class Solver;
 
 public:
-    ~SolverCvode() override;
+    /**
+     * Constructors, destructor, and assignment operators.
+     */
 
-    SolverCvode(const SolverCvode &pOther) = delete;
-    SolverCvode(SolverCvode &&pOther) noexcept = delete;
+    ~SolverCvode() override; /**< Destructor, @private. */
 
-    SolverCvode &operator=(const SolverCvode &pRhs) = delete;
-    SolverCvode &operator=(SolverCvode &&pRhs) noexcept = delete;
+    SolverCvode(const SolverCvode &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverCvode(SolverCvode &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+
+    SolverCvode &operator=(const SolverCvode &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverCvode &operator=(SolverCvode &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     SolverInfoPtr info() const override;
 
@@ -42,12 +52,12 @@ public:
     bool solve(double &pVoi, double pVoiEnd) const override;
 
 private:
-    class Impl;
+    class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl();
-    const Impl *pimpl() const;
+    Impl *pimpl(); /**< Private implementation pointer, @private. */
+    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverCvode();
+    explicit SolverCvode(); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR
