@@ -44,6 +44,8 @@ public:
     SolverOde &operator=(const SolverOde &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverOde &operator=(SolverOde &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
+    Solver::Type type() const override;
+
     /**
      * @brief Initialise the solver.
      *

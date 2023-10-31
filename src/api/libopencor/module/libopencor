@@ -27,6 +27,6 @@ limitations under the License.
 #include "libopencor/solverkinsol.h"
 #include "libopencor/solvernla.h"
 #include "libopencor/solverode.h"
-#include "libopencor/solverproperty.h"
+#include "libopencor/solverodefixedstep.h"
 #include "libopencor/solversecondorderrungekutta.h"
 #include "libopencor/version.h"

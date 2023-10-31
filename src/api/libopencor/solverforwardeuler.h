@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solverode.h"
+#include "libopencor/solverodefixedstep.h"
 
 namespace libOpenCOR {
 
@@ -26,7 +26,7 @@ namespace libOpenCOR {
  * The SolverCvode class is used to represent the forward Euler solver.
  */
 
-class SolverForwardEuler: public SolverOde
+class LIBOPENCOR_EXPORT SolverForwardEuler: public SolverOdeFixedStep
 {
     friend class Solver;
 
@@ -43,7 +43,20 @@ public:
     SolverForwardEuler &operator=(const SolverForwardEuler &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverForwardEuler &operator=(SolverForwardEuler &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-    Solver::Type type() const override;
+    /**
+     * @brief Create a @ref SolverForwardEuler object.
+     *
+     * Factory method to create a @ref SolverForwardEuler object:
+     *
+     * ```
+     * auto solver = libOpenCOR::SolverForwardEuler::create();
+     * ```
+     *
+     * @return A smart pointer to a @ref SolverForwardEuler object.
+     */
+
+    static SolverForwardEulerPtr create();
+
     std::string id() const override;
     std::string name() const override;
 

@@ -63,32 +63,31 @@ namespace Model2 {
 
 namespace Model1 {
 
-std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName)
+double *initialise(libOpenCOR::SolverNla *pSolver)
 {
-    auto solver = std::static_pointer_cast<libOpenCOR::SolverNla>(libOpenCOR::Solver::create(pSolverName));
-    auto *variables = Model1::createVariablesArray();
+    static const libOpenCOR::Doubles GUESSES = {1.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0};
 
-    KINSOL_NLA_SOLVER = solver.get();
+    KINSOL_NLA_SOLVER = pSolver;
+
+    auto *variables = Model1::createVariablesArray();
 
     Model1::initialiseVariables(variables);
     Model1::computeComputedConstants(variables);
 
-    static const libOpenCOR::Doubles GUESSES = {1.0};
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0};
-
     EXPECT_EQ_DOUBLES(variables, GUESSES, ABSOLUTE_ERRORS);
 
-    return std::make_tuple(solver, variables);
+    return variables;
 }
 
 void compute(double *pVariables)
 {
     // Solve the model using KINSOL, initialising everything first.
 
-    Model1::computeVariables(pVariables);
-
     static const libOpenCOR::Doubles SOLUTIONS = {3.0};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00001};
+
+    Model1::computeVariables(pVariables);
 
     EXPECT_EQ_DOUBLES(pVariables, SOLUTIONS, ABSOLUTE_ERRORS);
 
@@ -108,32 +107,31 @@ void finalise(double *pVariables)
 
 namespace Model2 {
 
-std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName)
+double *initialise(libOpenCOR::SolverNla *pSolver)
 {
-    auto solver = std::static_pointer_cast<libOpenCOR::SolverNla>(libOpenCOR::Solver::create(pSolverName));
-    auto *variables = Model2::createVariablesArray();
+    static const libOpenCOR::Doubles GUESSES = {1.0, 1.0, 1.0};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
 
-    KINSOL_NLA_SOLVER = solver.get();
+    KINSOL_NLA_SOLVER = pSolver;
+
+    auto *variables = Model2::createVariablesArray();
 
     Model2::initialiseVariables(variables);
     Model2::computeComputedConstants(variables);
 
-    static const libOpenCOR::Doubles GUESSES = {1.0, 1.0, 1.0};
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
-
     EXPECT_EQ_DOUBLES(variables, GUESSES, ABSOLUTE_ERRORS);
 
-    return std::make_tuple(solver, variables);
+    return variables;
 }
 
 void compute(double *pVariables)
 {
     // Solve the model using KINSOL, initialising everything first.
 
-    Model2::computeVariables(pVariables);
-
     static const libOpenCOR::Doubles SOLUTIONS = {3.0, 7.0, -5.0};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00001, 0.00001, 0.00001};
+
+    Model2::computeVariables(pVariables);
 
     EXPECT_EQ_DOUBLES(pVariables, SOLUTIONS, ABSOLUTE_ERRORS);
 

@@ -20,38 +20,15 @@ limitations under the License.
 #include "utils.h"
 
 #include "libopencor/solver.h"
-#include "libopencor/solverproperty.h"
 
 namespace libOpenCOR {
 
 class Solver::Impl: public Logger::Impl
 {
 public:
-    static StringStringMap SolversId;
-    static StringSolverCreateMap SolversCreate;
-
-    StringStringMap mProperties;
-
-    static void registerSolvers();
-    static void registerSolver(Type pType, const std::string &pId, const std::string &pName, SolverCreate pCreate,
-                               const SolverPropertyPtrVector &pProperties);
-    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pId,
-                                            const std::string &pName, const StringVector &pListValues,
-                                            const std::string &pDefaultValue, bool pHasVoiUnit);
-    static std::string valueFromProperties(const std::string &pId, const std::string &pName,
-                                           const StringStringMap &pProperties);
-
     virtual ~Impl() = default;
 
-    virtual StringStringMap propertiesId() const = 0;
-
     std::string id(const std::string &pIdOrName) const;
-
-    std::string property(const std::string &pIdOrName);
-    void setProperty(const std::string &pIdOrName, const std::string &pValue);
-
-    StringStringMap properties() const;
-    void setProperties(const StringStringMap &pProperties);
 };
 
 } // namespace libOpenCOR

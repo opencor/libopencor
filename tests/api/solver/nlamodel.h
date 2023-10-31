@@ -26,7 +26,7 @@ namespace Model1 {
 
 #include "../../res/api/solver/nla/model1.h"
 
-std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName);
+double *initialise(libOpenCOR::SolverNla *pSolver);
 void compute(double *pVariables);
 void finalise(double *pVariables);
 
@@ -36,7 +36,7 @@ namespace Model2 {
 
 #include "../../res/api/solver/nla/model2.h"
 
-std::tuple<std::shared_ptr<libOpenCOR::SolverNla>, double *> initialise(const std::string &pSolverName);
+double *initialise(libOpenCOR::SolverNla *pSolver);
 void compute(double *pVariables);
 void finalise(double *pVariables);
 

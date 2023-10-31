@@ -16,17 +16,17 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solverodefixedstep.h"
+#include "libopencor/solverode.h"
 
 namespace libOpenCOR {
 
 /**
- * @brief The SolverHeun class.
+ * @brief The SolverCvode class.
  *
- * The SolverHeun class is used to represent the Heun solver.
+ * The SolverCvode class is used to represent the forward Euler solver.
  */
 
-class LIBOPENCOR_EXPORT SolverHeun: public SolverOdeFixedStep
+class LIBOPENCOR_EXPORT SolverOdeFixedStep: public SolverOde
 {
     friend class Solver;
 
@@ -35,43 +35,42 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SolverHeun() override; /**< Destructor, @private. */
+    SolverOdeFixedStep(const SolverOdeFixedStep &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SolverOdeFixedStep(SolverOdeFixedStep &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
-    SolverHeun(const SolverHeun &pOther) = delete; /**< No copy constructor allowed, @private. */
-    SolverHeun(SolverHeun &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
-
-    SolverHeun &operator=(const SolverHeun &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
-    SolverHeun &operator=(SolverHeun &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+    SolverOdeFixedStep &operator=(const SolverOdeFixedStep &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SolverOdeFixedStep &operator=(SolverOdeFixedStep &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Create a @ref SolverHeun object.
+     * @brief Get the step used by the solver.
      *
-     * Factory method to create a @ref SolverHeun object:
+     * Return the step used by the solver.
      *
-     * ```
-     * auto solver = libOpenCOR::SolverHeun::create();
-     * ```
-     *
-     * @return A smart pointer to a @ref SolverHeun object.
+     * @return The step used by the solver.
      */
 
-    static SolverHeunPtr create();
+    double step() const;
 
-    std::string id() const override;
-    std::string name() const override;
+    /**
+     * @brief Set the step to be used by the solver.
+     *
+     * Set the step to be used by the solver.
+     *
+     * @param pStep The step to be used by the solver.
+     */
+
+    void setStep(double pStep);
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
 
-    bool solve(double &pVoi, double pVoiEnd) const override;
-
-private:
+protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit SolverHeun(); /**< Constructor, @private. */
+    explicit SolverOdeFixedStep(Impl *pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

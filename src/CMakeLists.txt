@@ -84,7 +84,7 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverkinsol.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solvernla.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverode.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverproperty.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverodefixedstep.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solversecondorderrungekutta.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/version.h
 )
@@ -110,7 +110,7 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverkinsol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvernla.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverodefixedstep.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solversecondorderrungekutta.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.cpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfileruntime.cpp
@@ -155,7 +155,7 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverkinsol_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvernla_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverode_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverproperty_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/solver/solverodefixedstep_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solversecondorderrungekutta_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/support/cellml/cellmlfile.h

@@ -43,8 +43,8 @@ struct SolverKinsolData
     N_Vector uVector = nullptr;
     N_Vector onesVector = nullptr;
 
-    SUNMatrix matrix = nullptr;
-    SUNLinearSolver linearSolver = nullptr;
+    SUNMatrix sunMatrix = nullptr;
+    SUNLinearSolver sunLinearSolver = nullptr;
 
     SolverKinsolUserData *userData = nullptr;
 };
@@ -52,48 +52,16 @@ struct SolverKinsolData
 class SolverKinsol::Impl: public SolverNla::Impl
 {
 public:
-    // Linear solvers.
-
-    static const std::string DENSE_LINEAR_SOLVER;
-    static const std::string BANDED_LINEAR_SOLVER;
-    static const std::string GMRES_LINEAR_SOLVER;
-    static const std::string BICGSTAB_LINEAR_SOLVER;
-    static const std::string TFQMR_LINEAR_SOLVER;
-
-    // Properties information.
-
-    static const Solver::Type TYPE = Solver::Type::NLA;
-    static const std::string ID;
-    static const std::string NAME;
-
-    static const std::string MAXIMUM_NUMBER_OF_ITERATIONS_ID;
-    static const std::string MAXIMUM_NUMBER_OF_ITERATIONS_NAME;
-    static constexpr int MAXIMUM_NUMBER_OF_ITERATIONS_DEFAULT_VALUE = 200;
-
-    static const std::string LINEAR_SOLVER_ID;
-    static const std::string LINEAR_SOLVER_NAME;
-    static const StringVector LINEAR_SOLVER_LIST;
-    static const std::string LINEAR_SOLVER_DEFAULT_VALUE;
-
-    static const std::string UPPER_HALF_BANDWIDTH_ID;
-    static const std::string UPPER_HALF_BANDWIDTH_NAME;
-    static constexpr int UPPER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
-
-    static const std::string LOWER_HALF_BANDWIDTH_ID;
-    static const std::string LOWER_HALF_BANDWIDTH_NAME;
-    static constexpr int LOWER_HALF_BANDWIDTH_DEFAULT_VALUE = 0;
+    int mMaximumNumberOfIterations = 200;
+    LinearSolver mLinearSolver = LinearSolver::DENSE;
+    int mUpperHalfBandwidth = 0;
+    int mLowerHalfBandwidth = 0;
 
     // Solver.
 
-    static SolverPtr create();
-    static SolverPropertyPtrVector propertiesInfo();
-
     std::map<ComputeSystem, SolverKinsolData> mData;
 
-    explicit Impl();
     ~Impl() override;
-
-    StringStringMap propertiesId() const override;
 
     bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 };

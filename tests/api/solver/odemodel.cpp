@@ -46,9 +46,11 @@ namespace OdeModel {
 #    pragma clang diagnostic pop
 #endif
 
-std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> initialise(const std::string &pSolverName)
+std::tuple<double *, double *, double *> initialise()
 {
-    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create(pSolverName));
+    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
+    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0, 0.0};
+
     auto *states = createStatesArray();
     auto *rates = createStatesArray();
     auto *variables = createVariablesArray();
@@ -58,12 +60,9 @@ std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *>
     computeRates(0.0, states, rates, variables);
     computeVariables(0.0, states, rates, variables);
 
-    static const libOpenCOR::Doubles INITIAL_STATES = {0.0, 0.6, 0.05, 0.325};
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0, 0.0};
-
     EXPECT_EQ_DOUBLES(states, INITIAL_STATES, ABSOLUTE_ERRORS);
 
-    return std::make_tuple(solver, states, rates, variables);
+    return std::make_tuple(states, rates, variables);
 }
 
 void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,

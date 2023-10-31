@@ -18,49 +18,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-// Properties information.
-
-const std::string SolverSecondOrderRungeKutta::Impl::ID = "KISAO:0000381"; // NOLINT
-const std::string SolverSecondOrderRungeKutta::Impl::NAME = "Second-order Runge-Kutta"; // NOLINT
-
-const std::string SolverSecondOrderRungeKutta::Impl::STEP_ID = "KISAO:0000483"; // NOLINT
-const std::string SolverSecondOrderRungeKutta::Impl::STEP_NAME = "Step"; // NOLINT
-
 // Solver.
-
-SolverPtr SolverSecondOrderRungeKutta::Impl::create()
-{
-    return std::shared_ptr<SolverSecondOrderRungeKutta> {new SolverSecondOrderRungeKutta {}};
-}
-
-SolverPropertyPtrVector SolverSecondOrderRungeKutta::Impl::propertiesInfo()
-{
-    return {
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
-                                     {},
-                                     toString(STEP_DEFAULT_VALUE),
-                                     true),
-    };
-}
-
-SolverSecondOrderRungeKutta::Impl::Impl()
-    : SolverOde::Impl()
-{
-    mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
-}
 
 SolverSecondOrderRungeKutta::Impl::~Impl()
 {
     delete[] mYk;
-}
-
-StringStringMap SolverSecondOrderRungeKutta::Impl::propertiesId() const
-{
-    static const StringStringMap PROPERTIES_ID = {
-        {STEP_NAME, STEP_ID},
-    };
-
-    return PROPERTIES_ID;
 }
 
 bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
@@ -68,15 +30,9 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
 {
     removeAllIssues();
 
-    // Retrieve the solver's properties.
+    // Initialise the ODE solver itself.
 
-    bool ok = true;
-
-    mStep = toDouble(mProperties[STEP_ID], ok);
-
-    if (!ok || (mStep <= 0.0)) {
-        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_ID] + R"("). It must be a floating point number greater than zero.)");
-
+    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates)) {
         return false;
     }
 
@@ -84,9 +40,7 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
 
     mYk = new double[pSize] {};
 
-    // Initialise the ODE solver itself.
-
-    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
+    return true;
 }
 
 bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
@@ -104,7 +58,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
     auto realStep = mStep;
     auto realHalfStep = HALF * realStep;
 
-    while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
+    while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
 
         if (pVoi + realStep > pVoiEnd) {
@@ -134,7 +88,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
 
         // Update the variable of integration.
 
-        pVoi = libOpenCOR::fuzzyCompare(realStep, mStep) ?
+        pVoi = fuzzyCompare(realStep, mStep) ?
                    voiStart + static_cast<double>(++voiCounter) * mStep :
                    pVoiEnd;
     }
@@ -143,7 +97,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
 }
 
 SolverSecondOrderRungeKutta::SolverSecondOrderRungeKutta()
-    : SolverOde(new Impl())
+    : SolverOdeFixedStep(new Impl())
 {
 }
 
@@ -154,27 +108,27 @@ SolverSecondOrderRungeKutta::~SolverSecondOrderRungeKutta()
 
 SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl()
 {
-    return static_cast<Impl *>(SolverOde::pimpl());
+    return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
 const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() const
 {
-    return static_cast<const Impl *>(SolverOde::pimpl());
+    return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
 
-Solver::Type SolverSecondOrderRungeKutta::type() const
+SolverSecondOrderRungeKuttaPtr SolverSecondOrderRungeKutta::create()
 {
-    return Type::ODE;
+    return SolverSecondOrderRungeKuttaPtr {new SolverSecondOrderRungeKutta {}};
 }
 
 std::string SolverSecondOrderRungeKutta::id() const
 {
-    return Impl::ID;
+    return "KISAO:0000381";
 }
 
 std::string SolverSecondOrderRungeKutta::name() const
 {
-    return Impl::NAME;
+    return "Second-order Runge-Kutta";
 }
 
 bool SolverSecondOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,

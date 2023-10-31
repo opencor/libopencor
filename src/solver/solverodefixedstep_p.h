@@ -16,24 +16,19 @@ limitations under the License.
 
 #pragma once
 
-#include "logger_p.h"
+#include "solverode_p.h"
 
-#include "libopencor/solverproperty.h"
+#include "libopencor/solverodefixedstep.h"
 
 namespace libOpenCOR {
 
-class SolverProperty::Impl
+class SolverOdeFixedStep::Impl: public SolverOde::Impl
 {
 public:
-    Type mType;
-    std::string mId;
-    std::string mName;
-    StringVector mListValues;
-    std::string mDefaultValue;
-    bool mHasVoiUnit;
+    double mStep = 1.0;
 
-    explicit Impl(Type pType, const std::string &pId, const std::string &pName, const StringVector &pListValues,
-                  const std::string &pDefaultValue, bool pHasVoiUnit);
+    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+                    ComputeRates pComputeRates) override;
 };
 
 } // namespace libOpenCOR

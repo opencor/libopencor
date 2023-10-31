@@ -33,10 +33,6 @@ namespace libOpenCOR {
 using ConstCharPtrVector = std::vector<const char *>;
 using FileVector = std::vector<File *>;
 
-using SolverCreate = SolverPtr (*)();
-
-using StringSolverCreateMap = std::map<std::string, SolverCreate>;
-
 #ifdef NDEBUG
 #    define ASSERT_EQ(x, y) \
         (void)x; \
@@ -83,15 +79,9 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 UnsignedCharVector LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem::path &pFilePath);
 #endif
 
-std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(bool pBoolean);
 std::string toString(int pNumber);
 std::string toString(size_t pNumber);
 std::string toString(double pNumber);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedCharVector &pBytes);
-
-bool toBool(const std::string &pString, bool &pOk);
-int LIBOPENCOR_UNIT_TESTING_EXPORT toInt(const std::string &pString, bool &pOk);
-size_t LIBOPENCOR_UNIT_TESTING_EXPORT toSizeT(const std::string &pString, bool &pOk);
-double LIBOPENCOR_UNIT_TESTING_EXPORT toDouble(const std::string &pString, bool &pOk);
 
 } // namespace libOpenCOR

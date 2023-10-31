@@ -36,11 +36,14 @@ SolverNla::Impl *SolverNla::pimpl()
     return static_cast<Impl *>(Solver::pimpl());
 }
 
-/*---GRY---
 const SolverNla::Impl *SolverNla::pimpl() const
 {
     return static_cast<const Impl *>(Solver::pimpl());
 }
-*/
+
+Solver::Type SolverNla::type() const
+{
+    return Type::NLA;
+}
 
 } // namespace libOpenCOR

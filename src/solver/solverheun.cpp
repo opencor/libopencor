@@ -18,36 +18,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-// Properties information.
-
-const std::string SolverHeun::Impl::ID = "KISAO:0000301"; // NOLINT
-const std::string SolverHeun::Impl::NAME = "Heun"; // NOLINT
-
-const std::string SolverHeun::Impl::STEP_ID = "KISAO:0000483"; // NOLINT
-const std::string SolverHeun::Impl::STEP_NAME = "Step"; // NOLINT
-
 // Solver.
-
-SolverPtr SolverHeun::Impl::create()
-{
-    return std::shared_ptr<SolverHeun> {new SolverHeun {}};
-}
-
-SolverPropertyPtrVector SolverHeun::Impl::propertiesInfo()
-{
-    return {
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
-                                     {},
-                                     toString(STEP_DEFAULT_VALUE),
-                                     true),
-    };
-}
-
-SolverHeun::Impl::Impl()
-    : SolverOde::Impl()
-{
-    mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
-}
 
 SolverHeun::Impl::~Impl()
 {
@@ -55,29 +26,14 @@ SolverHeun::Impl::~Impl()
     delete[] mYk;
 }
 
-StringStringMap SolverHeun::Impl::propertiesId() const
-{
-    static const StringStringMap PROPERTIES_ID = {
-        {STEP_NAME, STEP_ID},
-    };
-
-    return PROPERTIES_ID;
-}
-
 bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                   ComputeRates pComputeRates)
 {
     removeAllIssues();
 
-    // Retrieve the solver's properties.
+    // Initialise the ODE solver itself.
 
-    bool ok = true;
-
-    mStep = toDouble(mProperties[STEP_ID], ok);
-
-    if (!ok || (mStep <= 0.0)) {
-        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_ID] + R"("). It must be a floating point number greater than zero.)");
-
+    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates)) {
         return false;
     }
 
@@ -86,9 +42,7 @@ bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, do
     mK = new double[pSize] {};
     mYk = new double[pSize] {};
 
-    // Initialise the ODE solver itself.
-
-    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
+    return true;
 }
 
 bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
@@ -104,7 +58,7 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
     auto realStep = mStep;
     auto realHalfStep = HALF * realStep;
 
-    while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
+    while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
 
         if (pVoi + realStep > pVoiEnd) {
@@ -135,7 +89,7 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 
         // Update the variable of integration.
 
-        pVoi = libOpenCOR::fuzzyCompare(realStep, mStep) ?
+        pVoi = fuzzyCompare(realStep, mStep) ?
                    voiStart + static_cast<double>(++voiCounter) * mStep :
                    pVoiEnd;
     }
@@ -144,7 +98,7 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 }
 
 SolverHeun::SolverHeun()
-    : SolverOde(new Impl())
+    : SolverOdeFixedStep(new Impl())
 {
 }
 
@@ -155,27 +109,27 @@ SolverHeun::~SolverHeun()
 
 SolverHeun::Impl *SolverHeun::pimpl()
 {
-    return static_cast<Impl *>(SolverOde::pimpl());
+    return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
 const SolverHeun::Impl *SolverHeun::pimpl() const
 {
-    return static_cast<const Impl *>(SolverOde::pimpl());
+    return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
 
-Solver::Type SolverHeun::type() const
+SolverHeunPtr SolverHeun::create()
 {
-    return Type::ODE;
+    return SolverHeunPtr {new SolverHeun {}};
 }
 
 std::string SolverHeun::id() const
 {
-    return Impl::ID;
+    return "KISAO:0000301";
 }
 
 std::string SolverHeun::name() const
 {
-    return Impl::NAME;
+    return "Heun";
 }
 
 bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

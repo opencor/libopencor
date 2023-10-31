@@ -23,30 +23,6 @@ namespace py = pybind11;
 
 void solverApi(py::module_ &m)
 {
-    // SolverProperty API.
-
-    py::class_<libOpenCOR::SolverProperty, libOpenCOR::SolverPropertyPtr> solverProperty(m, "SolverProperty");
-
-    py::enum_<libOpenCOR::SolverProperty::Type>(solverProperty, "Type")
-        .value("Boolean", libOpenCOR::SolverProperty::Type::Boolean)
-        .value("Integer", libOpenCOR::SolverProperty::Type::Integer)
-        .value("IntegerGt0", libOpenCOR::SolverProperty::Type::IntegerGt0)
-        .value("IntegerGe0", libOpenCOR::SolverProperty::Type::IntegerGe0)
-        .value("Double", libOpenCOR::SolverProperty::Type::Double)
-        .value("DoubleGt0", libOpenCOR::SolverProperty::Type::DoubleGt0)
-        .value("DoubleGe0", libOpenCOR::SolverProperty::Type::DoubleGe0)
-        .value("List", libOpenCOR::SolverProperty::Type::List)
-        .export_values();
-
-    solverProperty.def_property_readonly("type", &libOpenCOR::SolverProperty::type, "Get the type of the SolverProperty object.")
-        .def_property_readonly("id", &libOpenCOR::SolverProperty::id, "Get the (KiSAO) id of the SolverProperty object.")
-        .def_property_readonly("name", &libOpenCOR::SolverProperty::name, "Get the name of the SolverProperty object.")
-        .def_property_readonly("list_values", &libOpenCOR::SolverProperty::listValues, "Get the list of values of the SolverProperty object.")
-        .def_property_readonly("default_value", &libOpenCOR::SolverProperty::defaultValue, "Get the default value of the SolverProperty object.")
-        .def_property_readonly("has_voi_unit", &libOpenCOR::SolverProperty::hasVoiUnit, "Get whether the SolverProperty object has VOI unit.");
-
-    // Solver API.
-
     py::class_<libOpenCOR::Solver, libOpenCOR::Logger, libOpenCOR::SolverPtr> solver(m, "Solver");
 
     py::enum_<libOpenCOR::Solver::Type>(solver, "Type")

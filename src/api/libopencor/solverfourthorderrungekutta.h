@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solverode.h"
+#include "libopencor/solverodefixedstep.h"
 
 namespace libOpenCOR {
 
@@ -26,7 +26,7 @@ namespace libOpenCOR {
  * The SolverFourthOrderRungeKutta class is used to represent the fourth-order Runge-Kutta solver.
  */
 
-class SolverFourthOrderRungeKutta: public SolverOde
+class LIBOPENCOR_EXPORT SolverFourthOrderRungeKutta: public SolverOdeFixedStep
 {
     friend class Solver;
 
@@ -43,7 +43,20 @@ public:
     SolverFourthOrderRungeKutta &operator=(const SolverFourthOrderRungeKutta &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverFourthOrderRungeKutta &operator=(SolverFourthOrderRungeKutta &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-    Solver::Type type() const override;
+    /**
+     * @brief Create a @ref SolverFourthOrderRungeKutta object.
+     *
+     * Factory method to create a @ref SolverFourthOrderRungeKutta object:
+     *
+     * ```
+     * auto solver = libOpenCOR::SolverFourthOrderRungeKutta::create();
+     * ```
+     *
+     * @return A smart pointer to a @ref SolverFourthOrderRungeKutta object.
+     */
+
+    static SolverFourthOrderRungeKuttaPtr create();
+
     std::string id() const override;
     std::string name() const override;
 

@@ -22,58 +22,24 @@ limitations under the License.
 
 TEST(CvodeSolverTest, basic)
 {
-    auto solver = std::static_pointer_cast<libOpenCOR::SolverOde>(libOpenCOR::Solver::create("CVODE"));
+    auto solver = libOpenCOR::SolverCvode::create();
 
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solver->id(), "KISAO:0000019");
     EXPECT_EQ(solver->name(), "CVODE");
 }
 
-TEST(CvodeSolverTest, maximumStepValueWithNonNumber)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Maximum step" property has an invalid value ("abc"). It must be a floating point number greater or equal to zero.)"},
-    };
-
-    solver->setProperty("Maximum step", "abc");
-
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
 TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
+    static const auto RELATIVE_TOLERANCE = -1.234;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Maximum step" property has an invalid value ("-1.234"). It must be a floating point number greater or equal to zero.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The maximum step cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    solver->setProperty("Maximum step", "-1.234");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, maximumNumberOfStepsValueWithNonNumber)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Maximum number of steps" property has an invalid value ("abc"). It must be a floating point number greater than zero.)"},
-    };
-
-    solver->setProperty("Maximum number of steps", "abc");
+    solver->setMaximumStep(RELATIVE_TOLERANCE);
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -83,107 +49,15 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithNonNumber)
 
 TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
+    static const auto MAXIMUM_NUMBER_OF_STEPS = 0;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Maximum number of steps" property has an invalid value ("0"). It must be a floating point number greater than zero.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The maximum number of steps cannot be equal to 0. It must be greater than 0."},
     };
 
-    solver->setProperty("Maximum number of steps", "0");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, integrationMethodValueWithUnknownValue)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Integration method" property has an invalid value ("Unknown integration method"). It must be equal to either "Adams-Moulton" or "BDF".)"},
-    };
-
-    solver->setProperty("Integration method", "Unknown integration method");
-
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, iterationTypeValueWithUnknownValue)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Iteration type" property has an invalid value ("Unknown iteration type"). It must be equal to either "Functional" or "Newton".)"},
-    };
-
-    solver->setProperty("Iteration type", "Unknown iteration type");
-
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, linearSolverValueWithUnknownValue)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Linear solver" property has an invalid value ("Unknown linear solver"). It must be equal to either "Dense", "Banded", "Diagonal", "GMRES", "BiCGStab", or "TFQMR".)"},
-    };
-
-    solver->setProperty("Linear solver", "Unknown linear solver");
-
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, preconditionerValueWithUnknownValue)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Preconditioner" property has an invalid value ("Unknown preconditioner"). It must be equal to either "None" or "Banded".)"},
-    };
-
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "Unknown preconditioner");
-
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNonNumber)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 3.)"},
-    };
-
-    solver->setProperty("Linear solver", "Banded");
-    solver->setProperty("Upper half-bandwidth", "abc");
+    solver->setMaximumNumberOfSteps(MAXIMUM_NUMBER_OF_STEPS);
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -193,16 +67,16 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNonNumber)
 
 TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooSmall)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
+    static const auto UPPER_HALF_BANDWIDTH = -1;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 3.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     };
 
-    solver->setProperty("Linear solver", "Banded");
-    solver->setProperty("Upper half-bandwidth", "-1");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
+    solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -212,35 +86,16 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooS
 
 TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooBig)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
+    static const auto UPPER_HALF_BANDWIDTH = 4;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Upper half-bandwidth" property has an invalid value ("4"). It must be an integer number between 0 and 3.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
     };
 
-    solver->setProperty("Linear solver", "Banded");
-    solver->setProperty("Upper half-bandwidth", "4");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNonNumber)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("abc"). It must be an integer number between 0 and 3.)"},
-    };
-
-    solver->setProperty("Linear solver", "Banded");
-    solver->setProperty("Lower half-bandwidth", "abc");
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
+    solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -250,16 +105,16 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNonNumber)
 
 TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooSmall)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
+    static const auto LOWER_HALF_BANDWIDTH = -1;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("-1"). It must be an integer number between 0 and 3.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     };
 
-    solver->setProperty("Linear solver", "Banded");
-    solver->setProperty("Lower half-bandwidth", "-1");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
+    solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -269,34 +124,16 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooS
 
 TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooBig)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
+    static const auto LOWER_HALF_BANDWIDTH = 4;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Lower half-bandwidth" property has an invalid value ("4"). It must be an integer number between 0 and 3.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
     };
 
-    solver->setProperty("Linear solver", "Banded");
-    solver->setProperty("Lower half-bandwidth", "4");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, relativeToleranceValueWithNonNumber)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Relative tolerance" property has an invalid value ("abc"). It must be a floating point number greater or equal to zero.)"},
-    };
-
-    solver->setProperty("Relative tolerance", "abc");
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
+    solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -306,33 +143,15 @@ TEST(CvodeSolverTest, relativeToleranceValueWithNonNumber)
 
 TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
+    static const auto RELATIVE_TOLERANCE = -1.234;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Relative tolerance" property has an invalid value ("-1.234"). It must be a floating point number greater or equal to zero.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    solver->setProperty("Relative tolerance", "-1.234");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, absoluteToleranceValueWithNonNumber)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Absolute tolerance" property has an invalid value ("abc"). It must be a floating point number greater or equal to zero.)"},
-    };
-
-    solver->setProperty("Absolute tolerance", "abc");
+    solver->setRelativeTolerance(RELATIVE_TOLERANCE);
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -342,33 +161,15 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithNonNumber)
 
 TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
+    static const auto RELATIVE_TOLERANCE = -1.234;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Absolute tolerance" property has an invalid value ("-1.234"). It must be a floating point number greater or equal to zero.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    solver->setProperty("Absolute tolerance", "-1.234");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
-
-    OdeModel::finalise(states, rates, variables);
-}
-
-TEST(CvodeSolverTest, interpolateSolutionValueWithNonBoolean)
-{
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Customise and initialise our solver using a step value that is not a floating point number.
-
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The "Interpolate solution" property has an invalid value ("Non boolean"). It must be equal to either "True" or "False".)"},
-    };
-
-    solver->setProperty("Interpolate solution", "Non boolean");
+    solver->setAbsoluteTolerance(RELATIVE_TOLERANCE);
 
     EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
@@ -378,12 +179,11 @@ TEST(CvodeSolverTest, interpolateSolutionValueWithNonBoolean)
 
 TEST(CvodeSolverTest, solve)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
+
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -392,14 +192,13 @@ TEST(CvodeSolverTest, solve)
 
 TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015419, 0.5960555, 0.053035143, 0.317770590};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.000001, 0.0000001, 0.000000001, 0.000000001};
 
-    solver->setProperty("Interpolate solution", "False");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setInterpolateSolution(false);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -408,14 +207,13 @@ TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 
 TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015419, 0.5960555, 0.0530351, 0.3177705};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.000001, 0.0000001, 0.0000001, 0.0000001};
 
-    solver->setProperty("Integration method", "Adams-Moulton");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setIntegrationMethod(libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -424,14 +222,13 @@ TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 
 TEST(CvodeSolverTest, solveWithFunctionalIterationType)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.01541, 0.5960555, 0.0530351, 0.317770};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00001, 0.0000001, 0.0000001, 0.000001};
 
-    solver->setProperty("Iteration type", "Functional");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setIterationType(libOpenCOR::SolverCvode::IterationType::FUNCTIONAL);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -440,14 +237,13 @@ TEST(CvodeSolverTest, solveWithFunctionalIterationType)
 
 TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.015, 0.596, 0.0530, 0.317};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.001, 0.001, 0.0001, 0.001};
 
-    solver->setProperty("Linear solver", "Banded");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -456,14 +252,13 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 
 TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.053035, 0.317770};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.000001, 0.000001};
 
-    solver->setProperty("Linear solver", "Diagonal");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::DIAGONAL);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -472,14 +267,13 @@ TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolver)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.053032, 0.317773};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.000001, 0.000001};
 
-    solver->setProperty("Linear solver", "GMRES");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -488,14 +282,13 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolver)
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.0530327, 0.317773};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.0000001, 0.000001};
 
-    solver->setProperty("Linear solver", "BiCGStab");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -504,14 +297,13 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.053032, 0.317773};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.000001, 0.000001};
 
-    solver->setProperty("Linear solver", "TFQMR");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -520,15 +312,14 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
 
-    solver->setProperty("Linear solver", "GMRES");
-    solver->setProperty("Preconditioner", "None");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
+    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NONE);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -537,15 +328,14 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
 
-    solver->setProperty("Linear solver", "BiCGStab");
-    solver->setProperty("Preconditioner", "None");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
+    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NONE);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -554,15 +344,14 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
 {
-    const auto [solver, states, rates, variables] = OdeModel::initialise("CVODE");
-
-    // Compute our model.
-
     static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.053035, 0.3177705};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.000001, 0.0000001};
 
-    solver->setProperty("Linear solver", "TFQMR");
-    solver->setProperty("Preconditioner", "None");
+    auto solver = libOpenCOR::SolverCvode::create();
+    auto [states, rates, variables] = OdeModel::initialise();
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
+    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NONE);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 

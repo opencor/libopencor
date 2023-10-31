@@ -18,66 +18,16 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-// Properties information.
-
-const std::string SolverForwardEuler::Impl::ID = "KISAO:0000030"; // NOLINT
-const std::string SolverForwardEuler::Impl::NAME = "Forward Euler"; // NOLINT
-
-const std::string SolverForwardEuler::Impl::STEP_ID = "KISAO:0000483"; // NOLINT
-const std::string SolverForwardEuler::Impl::STEP_NAME = "Step"; // NOLINT
-
 // Solver.
-
-SolverPtr SolverForwardEuler::Impl::create()
-{
-    return std::shared_ptr<SolverForwardEuler> {new SolverForwardEuler {}};
-}
-
-SolverPropertyPtrVector SolverForwardEuler::Impl::propertiesInfo()
-{
-    return {
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGt0, STEP_ID, STEP_NAME,
-                                     {},
-                                     toString(STEP_DEFAULT_VALUE),
-                                     true),
-    };
-}
-
-SolverForwardEuler::Impl::Impl()
-    : SolverOde::Impl()
-{
-    mProperties[STEP_ID] = toString(STEP_DEFAULT_VALUE);
-}
-
-StringStringMap SolverForwardEuler::Impl::propertiesId() const
-{
-    static const StringStringMap PROPERTIES_ID = {
-        {STEP_NAME, STEP_ID},
-    };
-
-    return PROPERTIES_ID;
-}
 
 bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                           double *pVariables, ComputeRates pComputeRates)
 {
     removeAllIssues();
 
-    // Retrieve the solver's properties.
-
-    bool ok = true;
-
-    mStep = toDouble(mProperties[STEP_ID], ok);
-
-    if (!ok || (mStep <= 0.0)) {
-        addError(R"(The "Step" property has an invalid value (")" + mProperties[STEP_ID] + R"("). It must be a floating point number greater than zero.)");
-
-        return false;
-    }
-
     // Initialise the ODE solver itself.
 
-    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
+    return SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
@@ -89,7 +39,7 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
     size_t voiCounter = 0;
     auto realStep = mStep;
 
-    while (!libOpenCOR::fuzzyCompare(pVoi, pVoiEnd)) {
+    while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
 
         if (pVoi + realStep > pVoiEnd) {
@@ -108,7 +58,7 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
 
         // Update the variable of integration.
 
-        pVoi = libOpenCOR::fuzzyCompare(realStep, mStep) ?
+        pVoi = fuzzyCompare(realStep, mStep) ?
                    voiStart + static_cast<double>(++voiCounter) * mStep :
                    pVoiEnd;
     }
@@ -117,7 +67,7 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
 }
 
 SolverForwardEuler::SolverForwardEuler()
-    : SolverOde(new Impl())
+    : SolverOdeFixedStep(new Impl())
 {
 }
 
@@ -128,27 +78,27 @@ SolverForwardEuler::~SolverForwardEuler()
 
 SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
 {
-    return static_cast<Impl *>(SolverOde::pimpl());
+    return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
 const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 {
-    return static_cast<const Impl *>(SolverOde::pimpl());
+    return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
 
-Solver::Type SolverForwardEuler::type() const
+SolverForwardEulerPtr SolverForwardEuler::create()
 {
-    return Type::ODE;
+    return SolverForwardEulerPtr {new SolverForwardEuler()};
 }
 
 std::string SolverForwardEuler::id() const
 {
-    return Impl::ID;
+    return "KISAO:0000030";
 }
 
 std::string SolverForwardEuler::name() const
 {
-    return Impl::NAME;
+    return "Forward Euler";
 }
 
 bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

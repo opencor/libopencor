@@ -1,0 +1,74 @@
+/*
+Copyright libOpenCOR contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+#include "solverodefixedstep_p.h"
+
+namespace libOpenCOR {
+
+// Solver.
+
+bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                          double *pVariables, ComputeRates pComputeRates)
+{
+    // Initialise the ODE solver itself.
+
+    if (!SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates)) {
+        return false;
+    }
+
+    // Check the solver's properties.
+
+    if (mStep <= 0.0) {
+        addError(R"(The step cannot be equal to )" + toString(mStep) + R"(. It must be greater than 0.)");
+
+        return false;
+    }
+
+    return true;
+}
+
+SolverOdeFixedStep::SolverOdeFixedStep(Impl *pPimpl)
+    : SolverOde(pPimpl)
+{
+}
+
+SolverOdeFixedStep::Impl *SolverOdeFixedStep::pimpl()
+{
+    return static_cast<Impl *>(SolverOde::pimpl());
+}
+
+const SolverOdeFixedStep::Impl *SolverOdeFixedStep::pimpl() const
+{
+    return static_cast<const Impl *>(SolverOde::pimpl());
+}
+
+double SolverOdeFixedStep::step() const
+{
+    return pimpl()->mStep;
+}
+
+void SolverOdeFixedStep::setStep(double pStep)
+{
+    pimpl()->mStep = pStep;
+}
+
+bool SolverOdeFixedStep::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+                                    ComputeRates pComputeRates)
+{
+    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
+}
+
+} // namespace libOpenCOR

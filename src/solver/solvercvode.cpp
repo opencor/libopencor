@@ -33,76 +33,6 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-// Integration methods.
-
-const std::string SolverCvode::Impl::ADAMS_MOULTON_METHOD = "Adams-Moulton"; // NOLINT
-const std::string SolverCvode::Impl::BDF_METHOD = "BDF"; // NOLINT
-
-// Iteration types.
-
-const std::string SolverCvode::Impl::FUNCTIONAL_ITERATION_TYPE = "Functional"; // NOLINT
-const std::string SolverCvode::Impl::NEWTON_ITERATION_TYPE = "Newton"; // NOLINT
-
-// Linear solvers.
-
-const std::string SolverCvode::Impl::DENSE_LINEAR_SOLVER = "Dense"; // NOLINT
-const std::string SolverCvode::Impl::BANDED_LINEAR_SOLVER = "Banded"; // NOLINT
-const std::string SolverCvode::Impl::DIAGONAL_LINEAR_SOLVER = "Diagonal"; // NOLINT
-const std::string SolverCvode::Impl::GMRES_LINEAR_SOLVER = "GMRES"; // NOLINT
-const std::string SolverCvode::Impl::BICGSTAB_LINEAR_SOLVER = "BiCGStab"; // NOLINT
-const std::string SolverCvode::Impl::TFQMR_LINEAR_SOLVER = "TFQMR"; // NOLINT
-
-// Preconditioners.
-
-const std::string SolverCvode::Impl::NO_PRECONDITIONER = "None"; // NOLINT
-const std::string SolverCvode::Impl::BANDED_PRECONDITIONER = "Banded"; // NOLINT
-
-// Properties information.
-
-const std::string SolverCvode::Impl::ID = "KISAO:0000019"; // NOLINT
-const std::string SolverCvode::Impl::NAME = "CVODE"; // NOLINT
-
-const std::string SolverCvode::Impl::MAXIMUM_STEP_ID = "KISAO:0000467"; // NOLINT
-const std::string SolverCvode::Impl::MAXIMUM_STEP_NAME = "Maximum step"; // NOLINT
-
-const std::string SolverCvode::Impl::MAXIMUM_NUMBER_OF_STEPS_ID = "KISAO:0000415"; // NOLINT
-const std::string SolverCvode::Impl::MAXIMUM_NUMBER_OF_STEPS_NAME = "Maximum number of steps"; // NOLINT
-
-const std::string SolverCvode::Impl::INTEGRATION_METHOD_ID = "KISAO:0000475"; // NOLINT
-const std::string SolverCvode::Impl::INTEGRATION_METHOD_NAME = "Integration method"; // NOLINT
-const StringVector SolverCvode::Impl::INTEGRATION_METHOD_LIST = {ADAMS_MOULTON_METHOD, BDF_METHOD}; // NOLINT
-const std::string SolverCvode::Impl::INTEGRATION_METHOD_DEFAULT_VALUE = BDF_METHOD; // NOLINT
-
-const std::string SolverCvode::Impl::ITERATION_TYPE_ID = "KISAO:0000476"; // NOLINT
-const std::string SolverCvode::Impl::ITERATION_TYPE_NAME = "Iteration type"; // NOLINT
-const StringVector SolverCvode::Impl::ITERATION_TYPE_LIST = {FUNCTIONAL_ITERATION_TYPE, NEWTON_ITERATION_TYPE}; // NOLINT
-const std::string SolverCvode::Impl::ITERATION_TYPE_DEFAULT_VALUE = NEWTON_ITERATION_TYPE; // NOLINT
-
-const std::string SolverCvode::Impl::LINEAR_SOLVER_ID = "KISAO:0000477"; // NOLINT
-const std::string SolverCvode::Impl::LINEAR_SOLVER_NAME = "Linear solver"; // NOLINT
-const StringVector SolverCvode::Impl::LINEAR_SOLVER_LIST = {DENSE_LINEAR_SOLVER, BANDED_LINEAR_SOLVER, DIAGONAL_LINEAR_SOLVER, GMRES_LINEAR_SOLVER, BICGSTAB_LINEAR_SOLVER, TFQMR_LINEAR_SOLVER}; // NOLINT
-const std::string SolverCvode::Impl::LINEAR_SOLVER_DEFAULT_VALUE = DENSE_LINEAR_SOLVER; // NOLINT
-
-const std::string SolverCvode::Impl::PRECONDITIONER_ID = "KISAO:0000478"; // NOLINT
-const std::string SolverCvode::Impl::PRECONDITIONER_NAME = "Preconditioner"; // NOLINT
-const StringVector SolverCvode::Impl::PRECONDITIONER_LIST = {NO_PRECONDITIONER, BANDED_PRECONDITIONER}; // NOLINT
-const std::string SolverCvode::Impl::PRECONDITIONER_DEFAULT_VALUE = BANDED_PRECONDITIONER; // NOLINT
-
-const std::string SolverCvode::Impl::UPPER_HALF_BANDWIDTH_ID = "KISAO:0000479"; // NOLINT
-const std::string SolverCvode::Impl::UPPER_HALF_BANDWIDTH_NAME = "Upper half-bandwidth"; // NOLINT
-
-const std::string SolverCvode::Impl::LOWER_HALF_BANDWIDTH_ID = "KISAO:0000480"; // NOLINT
-const std::string SolverCvode::Impl::LOWER_HALF_BANDWIDTH_NAME = "Lower half-bandwidth"; // NOLINT
-
-const std::string SolverCvode::Impl::RELATIVE_TOLERANCE_ID = "KISAO:0000209"; // NOLINT
-const std::string SolverCvode::Impl::RELATIVE_TOLERANCE_NAME = "Relative tolerance"; // NOLINT
-
-const std::string SolverCvode::Impl::ABSOLUTE_TOLERANCE_ID = "KISAO:0000211"; // NOLINT
-const std::string SolverCvode::Impl::ABSOLUTE_TOLERANCE_NAME = "Absolute tolerance"; // NOLINT
-
-const std::string SolverCvode::Impl::INTERPOLATE_SOLUTION_ID = "KISAO:0000481"; // NOLINT
-const std::string SolverCvode::Impl::INTERPOLATE_SOLUTION_NAME = "Interpolate solution"; // NOLINT
-
 // Right-hand side function.
 
 namespace {
@@ -120,110 +50,20 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 
 // Solver.
 
-SolverPtr SolverCvode::Impl::create()
-{
-    return std::shared_ptr<SolverCvode> {new SolverCvode {}};
-}
-
-SolverPropertyPtrVector SolverCvode::Impl::propertiesInfo()
-{
-    return {
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGe0, MAXIMUM_STEP_ID, MAXIMUM_STEP_NAME,
-                                     {},
-                                     toString(MAXIMUM_STEP_DEFAULT_VALUE),
-                                     true),
-        Solver::Impl::createProperty(SolverProperty::Type::IntegerGt0, MAXIMUM_NUMBER_OF_STEPS_ID, MAXIMUM_NUMBER_OF_STEPS_NAME,
-                                     {},
-                                     toString(MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE),
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::List, INTEGRATION_METHOD_ID, INTEGRATION_METHOD_NAME,
-                                     INTEGRATION_METHOD_LIST,
-                                     INTEGRATION_METHOD_DEFAULT_VALUE,
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::List, ITERATION_TYPE_ID, ITERATION_TYPE_NAME,
-                                     ITERATION_TYPE_LIST,
-                                     ITERATION_TYPE_DEFAULT_VALUE,
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::List, LINEAR_SOLVER_ID, LINEAR_SOLVER_NAME,
-                                     LINEAR_SOLVER_LIST,
-                                     LINEAR_SOLVER_DEFAULT_VALUE,
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::List, PRECONDITIONER_ID, PRECONDITIONER_NAME,
-                                     PRECONDITIONER_LIST,
-                                     PRECONDITIONER_DEFAULT_VALUE,
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::IntegerGe0, UPPER_HALF_BANDWIDTH_ID, UPPER_HALF_BANDWIDTH_NAME,
-                                     {},
-                                     toString(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE),
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::IntegerGe0, LOWER_HALF_BANDWIDTH_ID, LOWER_HALF_BANDWIDTH_NAME,
-                                     {},
-                                     toString(LOWER_HALF_BANDWIDTH_DEFAULT_VALUE),
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGe0, RELATIVE_TOLERANCE_ID, RELATIVE_TOLERANCE_NAME,
-                                     {},
-                                     toString(RELATIVE_TOLERANCE_DEFAULT_VALUE),
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::DoubleGe0, ABSOLUTE_TOLERANCE_ID, ABSOLUTE_TOLERANCE_NAME,
-                                     {},
-                                     toString(ABSOLUTE_TOLERANCE_DEFAULT_VALUE),
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::Boolean, INTERPOLATE_SOLUTION_ID, INTERPOLATE_SOLUTION_NAME,
-                                     {},
-                                     toString(INTERPOLATE_SOLUTION_DEFAULT_VALUE),
-                                     false),
-    };
-}
-
-SolverCvode::Impl::Impl()
-    : SolverOde::Impl()
-{
-    mProperties[MAXIMUM_STEP_ID] = toString(MAXIMUM_STEP_DEFAULT_VALUE);
-    mProperties[MAXIMUM_NUMBER_OF_STEPS_ID] = toString(MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE);
-    mProperties[INTEGRATION_METHOD_ID] = INTEGRATION_METHOD_DEFAULT_VALUE;
-    mProperties[ITERATION_TYPE_ID] = ITERATION_TYPE_DEFAULT_VALUE;
-    mProperties[LINEAR_SOLVER_ID] = LINEAR_SOLVER_DEFAULT_VALUE;
-    mProperties[PRECONDITIONER_ID] = PRECONDITIONER_DEFAULT_VALUE;
-    mProperties[UPPER_HALF_BANDWIDTH_ID] = toString(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE);
-    mProperties[LOWER_HALF_BANDWIDTH_ID] = toString(LOWER_HALF_BANDWIDTH_DEFAULT_VALUE);
-    mProperties[RELATIVE_TOLERANCE_ID] = toString(RELATIVE_TOLERANCE_DEFAULT_VALUE);
-    mProperties[ABSOLUTE_TOLERANCE_ID] = toString(ABSOLUTE_TOLERANCE_DEFAULT_VALUE);
-    mProperties[INTERPOLATE_SOLUTION_ID] = toString(INTERPOLATE_SOLUTION_DEFAULT_VALUE);
-}
-
 SolverCvode::Impl::~Impl()
 {
-    if (mContext != nullptr) {
+    if (mSunContext != nullptr) {
         N_VDestroy_Serial(mStatesVector);
-        SUNLinSolFree(mLinearSolver);
-        SUNNonlinSolFree(mNonLinearSolver);
-        SUNMatDestroy(mMatrix);
+        SUNLinSolFree(mSunLinearSolver);
+        SUNNonlinSolFree(mSunNonLinearSolver);
+        SUNMatDestroy(mSunMatrix);
 
         CVodeFree(&mSolver);
 
-        SUNContext_Free(&mContext);
+        SUNContext_Free(&mSunContext);
 
         delete mUserData;
     }
-}
-
-StringStringMap SolverCvode::Impl::propertiesId() const
-{
-    static const StringStringMap PROPERTIES_ID = {
-        {MAXIMUM_STEP_NAME, MAXIMUM_STEP_ID},
-        {MAXIMUM_NUMBER_OF_STEPS_NAME, MAXIMUM_NUMBER_OF_STEPS_ID},
-        {INTEGRATION_METHOD_NAME, INTEGRATION_METHOD_ID},
-        {ITERATION_TYPE_NAME, ITERATION_TYPE_ID},
-        {LINEAR_SOLVER_NAME, LINEAR_SOLVER_ID},
-        {PRECONDITIONER_NAME, PRECONDITIONER_ID},
-        {UPPER_HALF_BANDWIDTH_NAME, UPPER_HALF_BANDWIDTH_ID},
-        {LOWER_HALF_BANDWIDTH_NAME, LOWER_HALF_BANDWIDTH_ID},
-        {RELATIVE_TOLERANCE_NAME, RELATIVE_TOLERANCE_ID},
-        {ABSOLUTE_TOLERANCE_NAME, ABSOLUTE_TOLERANCE_ID},
-        {INTERPOLATE_SOLUTION_NAME, INTERPOLATE_SOLUTION_ID},
-    };
-
-    return PROPERTIES_ID;
 }
 
 bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
@@ -231,104 +71,60 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 {
     removeAllIssues();
 
-    // Retrieve the solver's properties.
+    // Initialise the ODE solver itself.
 
-    bool ok = true;
-    auto maximumStep = MAXIMUM_STEP_DEFAULT_VALUE;
-    auto maximumNumberOfSteps = MAXIMUM_NUMBER_OF_STEPS_DEFAULT_VALUE;
-    auto integrationMethod = INTEGRATION_METHOD_DEFAULT_VALUE;
-    auto iterationType = ITERATION_TYPE_DEFAULT_VALUE;
-    auto linearSolver = LINEAR_SOLVER_DEFAULT_VALUE;
-    auto preconditioner = PRECONDITIONER_DEFAULT_VALUE;
-    auto upperHalfBandwidth = UPPER_HALF_BANDWIDTH_DEFAULT_VALUE;
-    auto lowerHalfBandwidth = LOWER_HALF_BANDWIDTH_DEFAULT_VALUE;
-    auto relativeTolerance = RELATIVE_TOLERANCE_DEFAULT_VALUE;
-    auto absoluteTolerance = ABSOLUTE_TOLERANCE_DEFAULT_VALUE;
-
-    maximumStep = toDouble(mProperties[MAXIMUM_STEP_ID], ok);
-
-    if (!ok || (maximumStep < 0.0)) {
-        addError(R"(The ")" + MAXIMUM_STEP_NAME + R"(" property has an invalid value (")" + mProperties[MAXIMUM_STEP_ID] + R"("). It must be a floating point number greater or equal to zero.)");
+    if (!SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates)) {
+        return false;
     }
 
-    maximumNumberOfSteps = toInt(mProperties[MAXIMUM_NUMBER_OF_STEPS_ID], ok);
+    // Check the solver's properties.
 
-    if (!ok || (maximumNumberOfSteps <= 0)) {
-        addError(R"(The ")" + MAXIMUM_NUMBER_OF_STEPS_NAME + R"(" property has an invalid value (")" + mProperties[MAXIMUM_NUMBER_OF_STEPS_ID] + R"("). It must be a floating point number greater than zero.)");
+    if (mMaximumStep < 0.0) {
+        addError("The maximum step cannot be equal to " + toString(mMaximumStep) + ". It must be greater or equal to 0.");
     }
 
-    integrationMethod = mProperties[INTEGRATION_METHOD_ID];
-
-    if (std::find(INTEGRATION_METHOD_LIST.begin(), INTEGRATION_METHOD_LIST.end(), integrationMethod) == INTEGRATION_METHOD_LIST.end()) {
-        addError(R"(The ")" + INTEGRATION_METHOD_NAME + R"(" property has an invalid value (")" + mProperties[INTEGRATION_METHOD_ID] + R"("). It must be equal to either ")" + ADAMS_MOULTON_METHOD + R"(" or ")" + BDF_METHOD + R"(".)");
+    if (mMaximumNumberOfSteps <= 0) {
+        addError("The maximum number of steps cannot be equal to " + toString(mMaximumNumberOfSteps) + ". It must be greater than 0.");
     }
 
-    iterationType = mProperties[ITERATION_TYPE_ID];
-
-    if (std::find(ITERATION_TYPE_LIST.begin(), ITERATION_TYPE_LIST.end(), iterationType) == ITERATION_TYPE_LIST.end()) {
-        addError(R"(The ")" + ITERATION_TYPE_NAME + R"(" property has an invalid value (")" + mProperties[ITERATION_TYPE_ID] + R"("). It must be equal to either ")" + FUNCTIONAL_ITERATION_TYPE + R"(" or ")" + NEWTON_ITERATION_TYPE + R"(".)");
-    } else if (iterationType == NEWTON_ITERATION_TYPE) {
+    if (mIterationType == IterationType::NEWTON) {
         // We are dealing with a Newton iteration type, so we need a linear solver.
 
-        linearSolver = mProperties[LINEAR_SOLVER_ID];
+        bool needUpperAndLowerHalfBandwidths = false;
 
-        if (std::find(LINEAR_SOLVER_LIST.begin(), LINEAR_SOLVER_LIST.end(), linearSolver) == LINEAR_SOLVER_LIST.end()) {
-            addError(R"(The ")" + LINEAR_SOLVER_NAME + R"(" property has an invalid value (")" + mProperties[LINEAR_SOLVER_ID] + R"("). It must be equal to either ")" + DENSE_LINEAR_SOLVER + R"(", ")" + BANDED_LINEAR_SOLVER + R"(", ")" + DIAGONAL_LINEAR_SOLVER + R"(", ")" + GMRES_LINEAR_SOLVER + R"(", ")" + BICGSTAB_LINEAR_SOLVER + R"(", or ")" + TFQMR_LINEAR_SOLVER + R"(".)");
-        } else {
-            bool needUpperAndLowerHalfBandwidths = false;
+        if (mLinearSolver == LinearSolver::BANDED) {
+            // We are dealing with a banded linear solver, so we need both an upper and a lower half bandwidth.
 
-            if (linearSolver == BANDED_LINEAR_SOLVER) {
-                // We are dealing with a banded linear solver, so we need both an upper and a lower half bandwidth.
+            needUpperAndLowerHalfBandwidths = true;
+        } else if ((mLinearSolver == LinearSolver::GMRES)
+                   || (mLinearSolver == LinearSolver::BICGSTAB)
+                   || (mLinearSolver == LinearSolver::TFQMR)) {
+            // We are dealing with a GMRES/Bi-CGStab/TFQMR linear solver, so we may need a preconditioner.
+
+            if (mPreconditioner == Preconditioner::BANDED) {
+                // We are dealing with a banded preconditioner, so we need both an upper and a lower half bandwidth.
 
                 needUpperAndLowerHalfBandwidths = true;
-            } else if ((linearSolver == GMRES_LINEAR_SOLVER)
-                       || (linearSolver == BICGSTAB_LINEAR_SOLVER)
-                       || (linearSolver == TFQMR_LINEAR_SOLVER)) {
-                // We are dealing with a GMRES/Bi-CGStab/TFQMR linear solver, so we may need a preconditioner.
+            }
+        }
 
-                preconditioner = mProperties[PRECONDITIONER_ID];
-
-                if (std::find(PRECONDITIONER_LIST.begin(), PRECONDITIONER_LIST.end(), preconditioner) == PRECONDITIONER_LIST.end()) {
-                    addError(R"(The ")" + PRECONDITIONER_NAME + R"(" property has an invalid value (")" + mProperties[PRECONDITIONER_ID] + R"("). It must be equal to either ")" + NO_PRECONDITIONER + R"(" or ")" + BANDED_PRECONDITIONER + R"(".)");
-                } else if (preconditioner == BANDED_PRECONDITIONER) {
-                    // We are dealing with a banded preconditioner, so we need both an upper and a lower half bandwidth.
-
-                    needUpperAndLowerHalfBandwidths = true;
-                }
+        if (needUpperAndLowerHalfBandwidths) {
+            if ((mUpperHalfBandwidth < 0) || (mUpperHalfBandwidth >= static_cast<int>(pSize))) {
+                addError("The upper half-bandwidth cannot be equal to " + toString(mUpperHalfBandwidth) + ". It must be between 0 and " + toString(pSize - 1) + ".");
             }
 
-            if (needUpperAndLowerHalfBandwidths) {
-                upperHalfBandwidth = toInt(mProperties[UPPER_HALF_BANDWIDTH_ID], ok);
-
-                if (!ok || (upperHalfBandwidth < 0) || (upperHalfBandwidth >= static_cast<int>(pSize))) {
-                    addError(R"(The ")" + UPPER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[UPPER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize - 1) + R"(.)");
-                }
-
-                lowerHalfBandwidth = toInt(mProperties[LOWER_HALF_BANDWIDTH_ID], ok);
-
-                if (!ok || (lowerHalfBandwidth < 0) || (lowerHalfBandwidth >= static_cast<int>(pSize))) {
-                    addError(R"(The ")" + LOWER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[LOWER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pSize - 1) + R"(.)");
-                }
+            if ((mLowerHalfBandwidth < 0) || (mLowerHalfBandwidth >= static_cast<int>(pSize))) {
+                addError("The lower half-bandwidth cannot be equal to " + toString(mLowerHalfBandwidth) + ". It must be between 0 and " + toString(pSize - 1) + ".");
             }
         }
     }
 
-    relativeTolerance = toDouble(mProperties[RELATIVE_TOLERANCE_ID], ok);
-
-    if (!ok || (relativeTolerance < 0.0)) {
-        addError(R"(The ")" + RELATIVE_TOLERANCE_NAME + R"(" property has an invalid value (")" + mProperties[RELATIVE_TOLERANCE_ID] + R"("). It must be a floating point number greater or equal to zero.)");
+    if (mRelativeTolerance < 0.0) {
+        addError("The relative tolerance cannot be equal to " + toString(mRelativeTolerance) + ". It must be greater or equal to 0.");
     }
 
-    absoluteTolerance = toDouble(mProperties[ABSOLUTE_TOLERANCE_ID], ok);
-
-    if (!ok || (absoluteTolerance < 0.0)) {
-        addError(R"(The ")" + ABSOLUTE_TOLERANCE_NAME + R"(" property has an invalid value (")" + mProperties[ABSOLUTE_TOLERANCE_ID] + R"("). It must be a floating point number greater or equal to zero.)");
-    }
-
-    mInterpolateSolution = toBool(mProperties[INTERPOLATE_SOLUTION_ID], ok);
-
-    if (!ok) {
-        addError(R"(The ")" + INTERPOLATE_SOLUTION_NAME + R"(" property has an invalid value (")" + mProperties[INTERPOLATE_SOLUTION_ID] + R"("). It must be equal to either "True" or "False".)");
+    if (mAbsoluteTolerance < 0.0) {
+        addError("The absolute tolerance cannot be equal to " + toString(mAbsoluteTolerance) + ". It must be greater or equal to 0.");
     }
 
     // Check whether we have had issues and, if so, then leave.
@@ -339,17 +135,17 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Create our SUNDIALS context.
 
-    ASSERT_EQ(SUNContext_Create(nullptr, &mContext), 0);
+    ASSERT_EQ(SUNContext_Create(nullptr, &mSunContext), 0);
 
     // Create our CVODES solver.
 
-    mSolver = CVodeCreate((integrationMethod == BDF_METHOD) ? CV_BDF : CV_ADAMS, mContext);
+    mSolver = CVodeCreate((mIntegrationMethod == IntegrationMethod::BDF) ? CV_BDF : CV_ADAMS, mSunContext);
 
     ASSERT_NE(mSolver, nullptr);
 
     // Initialise our CVODES solver.
 
-    mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mContext);
+    mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mSunContext);
 
     ASSERT_NE(mStatesVector, nullptr);
     ASSERT_EQ(CVodeInit(mSolver, rhsFunction, pVoi, mStatesVector), CV_SUCCESS);
@@ -362,98 +158,100 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Set our maximum step.
 
-    ASSERT_EQ(CVodeSetMaxStep(mSolver, maximumStep), CV_SUCCESS);
+    ASSERT_EQ(CVodeSetMaxStep(mSolver, mMaximumStep), CV_SUCCESS);
 
     // Set our maximum number of steps.
 
-    ASSERT_EQ(CVodeSetMaxNumSteps(mSolver, maximumNumberOfSteps), CV_SUCCESS);
+    ASSERT_EQ(CVodeSetMaxNumSteps(mSolver, mMaximumNumberOfSteps), CV_SUCCESS);
 
     // Set our linear solver, if needed.
 
-    if (iterationType == NEWTON_ITERATION_TYPE) {
-        if (linearSolver == DENSE_LINEAR_SOLVER) {
-            mMatrix = SUNDenseMatrix(static_cast<int64_t>(pSize), static_cast<int64_t>(pSize), mContext);
+    if (mIterationType == IterationType::NEWTON) {
+        if (mLinearSolver == LinearSolver::DENSE) {
+            mSunMatrix = SUNDenseMatrix(static_cast<int64_t>(pSize), static_cast<int64_t>(pSize), mSunContext);
 
-            ASSERT_NE(mMatrix, nullptr);
+            ASSERT_NE(mSunMatrix, nullptr);
 
-            mLinearSolver = SUNLinSol_Dense(mStatesVector, mMatrix, mContext);
+            mSunLinearSolver = SUNLinSol_Dense(mStatesVector, mSunMatrix, mSunContext);
 
-            ASSERT_NE(mLinearSolver, nullptr);
+            ASSERT_NE(mSunLinearSolver, nullptr);
 
-            ASSERT_EQ(CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix), CVLS_SUCCESS);
-        } else if (linearSolver == BANDED_LINEAR_SOLVER) {
-            mMatrix = SUNBandMatrix(static_cast<int64_t>(pSize),
-                                    static_cast<int64_t>(upperHalfBandwidth), static_cast<int64_t>(lowerHalfBandwidth),
-                                    mContext);
+            ASSERT_EQ(CVodeSetLinearSolver(mSolver, mSunLinearSolver, mSunMatrix), CVLS_SUCCESS);
+        } else if (mLinearSolver == LinearSolver::BANDED) {
+            mSunMatrix = SUNBandMatrix(static_cast<int64_t>(pSize),
+                                       static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
+                                       mSunContext);
 
-            ASSERT_NE(mMatrix, nullptr);
+            ASSERT_NE(mSunMatrix, nullptr);
 
-            mLinearSolver = SUNLinSol_Band(mStatesVector, mMatrix, mContext);
+            mSunLinearSolver = SUNLinSol_Band(mStatesVector, mSunMatrix, mSunContext);
 
-            ASSERT_NE(mLinearSolver, nullptr);
+            ASSERT_NE(mSunLinearSolver, nullptr);
 
-            ASSERT_EQ(CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix), CVLS_SUCCESS);
-        } else if (linearSolver == DIAGONAL_LINEAR_SOLVER) {
+            ASSERT_EQ(CVodeSetLinearSolver(mSolver, mSunLinearSolver, mSunMatrix), CVLS_SUCCESS);
+        } else if (mLinearSolver == LinearSolver::DIAGONAL) {
             ASSERT_EQ(CVDiag(mSolver), CVDIAG_SUCCESS);
         } else {
             // We are dealing with a GMRES/Bi-CGStab/TFQMR linear solver, so we may need a preconditioner.
 
-            if (preconditioner == BANDED_PRECONDITIONER) {
-                if (linearSolver == GMRES_LINEAR_SOLVER) {
-                    mLinearSolver = SUNLinSol_SPGMR(mStatesVector, PREC_LEFT, 0, mContext);
-                } else if (linearSolver == BICGSTAB_LINEAR_SOLVER) {
-                    mLinearSolver = SUNLinSol_SPBCGS(mStatesVector, PREC_LEFT, 0, mContext);
+            if (mPreconditioner == Preconditioner::BANDED) {
+                if (mLinearSolver == LinearSolver::GMRES) {
+                    mSunLinearSolver = SUNLinSol_SPGMR(mStatesVector, PREC_LEFT, 0, mSunContext);
+                } else if (mLinearSolver == LinearSolver::BICGSTAB) {
+                    mSunLinearSolver = SUNLinSol_SPBCGS(mStatesVector, PREC_LEFT, 0, mSunContext);
                 } else {
-                    mLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, PREC_LEFT, 0, mContext);
+                    mSunLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, PREC_LEFT, 0, mSunContext);
                 }
 
-                ASSERT_NE(mLinearSolver, nullptr);
+                ASSERT_NE(mSunLinearSolver, nullptr);
 
-                ASSERT_EQ(CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix), CVLS_SUCCESS);
+                ASSERT_EQ(CVodeSetLinearSolver(mSolver, mSunLinearSolver, mSunMatrix), CVLS_SUCCESS);
                 ASSERT_EQ(CVBandPrecInit(mSolver, static_cast<int64_t>(pSize),
-                                         static_cast<int64_t>(upperHalfBandwidth),
-                                         static_cast<int64_t>(lowerHalfBandwidth)),
+                                         static_cast<int64_t>(mUpperHalfBandwidth),
+                                         static_cast<int64_t>(mLowerHalfBandwidth)),
                           CVLS_SUCCESS);
             } else {
-                if (linearSolver == GMRES_LINEAR_SOLVER) {
-                    mLinearSolver = SUNLinSol_SPGMR(mStatesVector, PREC_NONE, 0, mContext);
-                } else if (linearSolver == BICGSTAB_LINEAR_SOLVER) {
-                    mLinearSolver = SUNLinSol_SPBCGS(mStatesVector, PREC_NONE, 0, mContext);
+                if (mLinearSolver == LinearSolver::GMRES) {
+                    mSunLinearSolver = SUNLinSol_SPGMR(mStatesVector, PREC_NONE, 0, mSunContext);
+                } else if (mLinearSolver == LinearSolver::BICGSTAB) {
+                    mSunLinearSolver = SUNLinSol_SPBCGS(mStatesVector, PREC_NONE, 0, mSunContext);
                 } else {
-                    mLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, PREC_NONE, 0, mContext);
+                    mSunLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, PREC_NONE, 0, mSunContext);
                 }
 
-                ASSERT_NE(mLinearSolver, nullptr);
+                ASSERT_NE(mSunLinearSolver, nullptr);
 
-                ASSERT_EQ(CVodeSetLinearSolver(mSolver, mLinearSolver, mMatrix), CVLS_SUCCESS);
+                ASSERT_EQ(CVodeSetLinearSolver(mSolver, mSunLinearSolver, mSunMatrix), CVLS_SUCCESS);
             }
         }
     } else {
-        mNonLinearSolver = SUNNonlinSol_FixedPoint(mStatesVector, 0, mContext);
+        mSunNonLinearSolver = SUNNonlinSol_FixedPoint(mStatesVector, 0, mSunContext);
 
-        ASSERT_NE(mNonLinearSolver, nullptr);
+        ASSERT_NE(mSunNonLinearSolver, nullptr);
 
-        CVodeSetNonlinearSolver(mSolver, mNonLinearSolver);
+        CVodeSetNonlinearSolver(mSolver, mSunNonLinearSolver);
     }
 
     // Set our relative and absolute tolerances.
 
-    ASSERT_EQ(CVodeSStolerances(mSolver, relativeTolerance, absoluteTolerance), CV_SUCCESS);
+    ASSERT_EQ(CVodeSStolerances(mSolver, mRelativeTolerance, mAbsoluteTolerance), CV_SUCCESS);
 
-    // Initialise the ODE solver itself.
-
-    return SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
+    return true;
 }
 
 bool SolverCvode::Impl::reinitialise(double pVoi)
 {
+    // Reinitialise the ODE solver itself.
+
+    if (!SolverOde::Impl::reinitialise(pVoi)) {
+        return false;
+    }
+
     // Reinitialise our CVODES solver.
 
     ASSERT_EQ(CVodeReInit(mSolver, pVoi, mStatesVector), CV_SUCCESS);
 
-    // Reinitialise the ODE solver itself.
-
-    return SolverOde::Impl::reinitialise(pVoi);
+    return true;
 }
 
 bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
@@ -489,19 +287,129 @@ const SolverCvode::Impl *SolverCvode::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-Solver::Type SolverCvode::type() const
+SolverCvodePtr SolverCvode::create()
 {
-    return Type::ODE;
+    return SolverCvodePtr {new SolverCvode {}};
 }
 
 std::string SolverCvode::id() const
 {
-    return Impl::ID;
+    return "KISAO:0000019";
 }
 
 std::string SolverCvode::name() const
 {
-    return Impl::NAME;
+    return "CVODE";
+}
+
+double SolverCvode::maximumStep() const
+{
+    return pimpl()->mMaximumStep;
+}
+
+void SolverCvode::setMaximumStep(double pMaximumStep)
+{
+    pimpl()->mMaximumStep = pMaximumStep;
+}
+
+int SolverCvode::maximumNumberOfSteps() const
+{
+    return pimpl()->mMaximumNumberOfSteps;
+}
+
+void SolverCvode::setMaximumNumberOfSteps(int pMaximumNumberOfSteps)
+{
+    pimpl()->mMaximumNumberOfSteps = pMaximumNumberOfSteps;
+}
+
+SolverCvode::IntegrationMethod SolverCvode::integrationMethod() const
+{
+    return pimpl()->mIntegrationMethod;
+}
+
+void SolverCvode::setIntegrationMethod(SolverCvode::IntegrationMethod pIntegrationMethod)
+{
+    pimpl()->mIntegrationMethod = pIntegrationMethod;
+}
+
+SolverCvode::IterationType SolverCvode::iterationType() const
+{
+    return pimpl()->mIterationType;
+}
+
+void SolverCvode::setIterationType(SolverCvode::IterationType pIterationType)
+{
+    pimpl()->mIterationType = pIterationType;
+}
+
+SolverCvode::LinearSolver SolverCvode::linearSolver() const
+{
+    return pimpl()->mLinearSolver;
+}
+
+void SolverCvode::setLinearSolver(SolverCvode::LinearSolver pLinearSolver)
+{
+    pimpl()->mLinearSolver = pLinearSolver;
+}
+
+SolverCvode::Preconditioner SolverCvode::preconditioner() const
+{
+    return pimpl()->mPreconditioner;
+}
+
+void SolverCvode::setPreconditioner(SolverCvode::Preconditioner pPreconditioner)
+{
+    pimpl()->mPreconditioner = pPreconditioner;
+}
+
+int SolverCvode::upperHalfBandwidth() const
+{
+    return pimpl()->mUpperHalfBandwidth;
+}
+
+void SolverCvode::setUpperHalfBandwidth(int pUpperHalfBandwidth)
+{
+    pimpl()->mUpperHalfBandwidth = pUpperHalfBandwidth;
+}
+
+int SolverCvode::lowerHalfBandwidth() const
+{
+    return pimpl()->mLowerHalfBandwidth;
+}
+
+void SolverCvode::setLowerHalfBandwidth(int pLowerHalfBandwidth)
+{
+    pimpl()->mLowerHalfBandwidth = pLowerHalfBandwidth;
+}
+
+double SolverCvode::relativeTolerance() const
+{
+    return pimpl()->mRelativeTolerance;
+}
+
+void SolverCvode::setRelativeTolerance(double pRelativeTolerance)
+{
+    pimpl()->mRelativeTolerance = pRelativeTolerance;
+}
+
+double SolverCvode::absoluteTolerance() const
+{
+    return pimpl()->mAbsoluteTolerance;
+}
+
+void SolverCvode::setAbsoluteTolerance(double pAbsoluteTolerance)
+{
+    pimpl()->mAbsoluteTolerance = pAbsoluteTolerance;
+}
+
+bool SolverCvode::interpolateSolution() const
+{
+    return pimpl()->mInterpolateSolution;
+}
+
+void SolverCvode::setInterpolateSolution(bool pInterpolateSolution)
+{
+    pimpl()->mInterpolateSolution = pInterpolateSolution;
 }
 
 bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

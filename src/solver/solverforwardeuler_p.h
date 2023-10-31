@@ -16,36 +16,15 @@ limitations under the License.
 
 #pragma once
 
-#include "solverode_p.h"
+#include "solverodefixedstep_p.h"
 
 #include "libopencor/solverforwardeuler.h"
 
 namespace libOpenCOR {
 
-class SolverForwardEuler::Impl: public SolverOde::Impl
+class SolverForwardEuler::Impl: public SolverOdeFixedStep::Impl
 {
 public:
-    // Properties information.
-
-    static const Solver::Type TYPE = Solver::Type::ODE;
-    static const std::string ID;
-    static const std::string NAME;
-
-    static const std::string STEP_ID;
-    static const std::string STEP_NAME;
-    static constexpr double STEP_DEFAULT_VALUE = 1.0;
-
-    // Solver.
-
-    static SolverPtr create();
-    static SolverPropertyPtrVector propertiesInfo();
-
-    double mStep = STEP_DEFAULT_VALUE;
-
-    explicit Impl();
-
-    StringStringMap propertiesId() const override;
-
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
 
