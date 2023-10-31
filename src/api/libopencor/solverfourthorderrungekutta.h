@@ -16,22 +16,22 @@ limitations under the License.
 
 #pragma once
 
-#include "solverode.h"
+#include "libopencor/solverode.h"
 
 namespace libOpenCOR {
 
-class SolverSecondOrderRungeKutta: public SolverOde
+class SolverFourthOrderRungeKutta: public SolverOde
 {
     friend class Solver;
 
 public:
-    ~SolverSecondOrderRungeKutta() override;
+    ~SolverFourthOrderRungeKutta() override;
 
-    SolverSecondOrderRungeKutta(const SolverSecondOrderRungeKutta &pOther) = delete;
-    SolverSecondOrderRungeKutta(SolverSecondOrderRungeKutta &&pOther) noexcept = delete;
+    SolverFourthOrderRungeKutta(const SolverFourthOrderRungeKutta &pOther) = delete;
+    SolverFourthOrderRungeKutta(SolverFourthOrderRungeKutta &&pOther) noexcept = delete;
 
-    SolverSecondOrderRungeKutta &operator=(const SolverSecondOrderRungeKutta &pRhs) = delete;
-    SolverSecondOrderRungeKutta &operator=(SolverSecondOrderRungeKutta &&pRhs) noexcept = delete;
+    SolverFourthOrderRungeKutta &operator=(const SolverFourthOrderRungeKutta &pRhs) = delete;
+    SolverFourthOrderRungeKutta &operator=(SolverFourthOrderRungeKutta &&pRhs) noexcept = delete;
 
     SolverInfoPtr info() const override;
 
@@ -46,7 +46,7 @@ private:
     Impl *pimpl();
     const Impl *pimpl() const;
 
-    explicit SolverSecondOrderRungeKutta();
+    explicit SolverFourthOrderRungeKutta();
 };
 
 } // namespace libOpenCOR

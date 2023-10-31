@@ -16,27 +16,28 @@ limitations under the License.
 
 #pragma once
 
-#include "solverode.h"
+#include "libopencor/solverode.h"
 
 namespace libOpenCOR {
 
-class SolverFourthOrderRungeKutta: public SolverOde
+class SolverCvode: public SolverOde
 {
     friend class Solver;
 
 public:
-    ~SolverFourthOrderRungeKutta() override;
+    ~SolverCvode() override;
 
-    SolverFourthOrderRungeKutta(const SolverFourthOrderRungeKutta &pOther) = delete;
-    SolverFourthOrderRungeKutta(SolverFourthOrderRungeKutta &&pOther) noexcept = delete;
+    SolverCvode(const SolverCvode &pOther) = delete;
+    SolverCvode(SolverCvode &&pOther) noexcept = delete;
 
-    SolverFourthOrderRungeKutta &operator=(const SolverFourthOrderRungeKutta &pRhs) = delete;
-    SolverFourthOrderRungeKutta &operator=(SolverFourthOrderRungeKutta &&pRhs) noexcept = delete;
+    SolverCvode &operator=(const SolverCvode &pRhs) = delete;
+    SolverCvode &operator=(SolverCvode &&pRhs) noexcept = delete;
 
     SolverInfoPtr info() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
+    bool reinitialise(double pVoi) override;
 
     bool solve(double &pVoi, double pVoiEnd) const override;
 
@@ -46,7 +47,7 @@ private:
     Impl *pimpl();
     const Impl *pimpl() const;
 
-    explicit SolverFourthOrderRungeKutta();
+    explicit SolverCvode();
 };
 
 } // namespace libOpenCOR

@@ -17,7 +17,8 @@ limitations under the License.
 #pragma once
 
 #include "solverode_p.h"
-#include "solversecondorderrungekutta.h"
+
+#include "libopencor/solversecondorderrungekutta.h"
 
 namespace libOpenCOR {
 

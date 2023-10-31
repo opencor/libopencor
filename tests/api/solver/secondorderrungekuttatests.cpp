@@ -16,7 +16,6 @@ limitations under the License.
 
 #include "odemodel.h"
 #include "solvers.h"
-#include "solversecondorderrungekutta.h"
 #include "utils.h"
 
 #include "tests/utils.h"

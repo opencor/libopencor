@@ -17,7 +17,8 @@ limitations under the License.
 #pragma once
 
 #include "solvernla_p.h"
-#include "solverkinsol.h"
+
+#include "libopencor/solverkinsol.h"
 
 #include "sundialsbegin.h"
 #include "sundials/sundials_linearsolver.h"

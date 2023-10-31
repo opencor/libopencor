@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "odemodel.h"
-#include "solverheun.h"
 #include "solvers.h"
 #include "utils.h"
 

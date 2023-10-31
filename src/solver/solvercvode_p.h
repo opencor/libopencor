@@ -17,7 +17,8 @@ limitations under the License.
 #pragma once
 
 #include "solverode_p.h"
-#include "solvercvode.h"
+
+#include "libopencor/solvercvode.h"
 
 #include "sundialsbegin.h"
 #include "sundials/sundials_linearsolver.h"

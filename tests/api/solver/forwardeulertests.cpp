@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "odemodel.h"
-#include "solverforwardeuler.h"
 #include "solvers.h"
 #include "utils.h"
 
