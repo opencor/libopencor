@@ -84,7 +84,7 @@ void Solver::Impl::registerSolvers()
 
 void Solver::Impl::registerSolver(Type pType, const std::string &pId, const std::string &pName,
                                   SolverCreate pCreate, const SolverPropertyPtrVector &pProperties,
-                                  SolverInfo::HiddenPropertiesFunction pHiddenProperties)
+                                  SolverInfo::HiddenProperties pHiddenProperties)
 {
     Solver::Impl::SolversIndex[pId] = SolversInfo.size();
     Solver::Impl::SolversId[pName] = pId;

@@ -33,7 +33,7 @@ class LIBOPENCOR_EXPORT SolverInfo
     friend class Solver;
 
 public:
-    using HiddenPropertiesFunction = StringVector (*)(const StringStringMap &pProperties); /**< Signature of the method that returns the properties of the solver that should be hidden. */
+    using HiddenProperties = StringVector (*)(const StringStringMap &pProperties); /**< Signature of the method that returns the properties of the solver that should be hidden. */
 
     /**
      * Constructors, destructor, and assignment operators.
@@ -112,7 +112,7 @@ private:
     Impl *mPimpl;
 
     explicit SolverInfo(Solver::Type pType, const std::string &pId, const std::string &pName,
-                        const SolverPropertyPtrVector &pProperties, HiddenPropertiesFunction pHiddenProperties); /**< Constructor, @private. */
+                        const SolverPropertyPtrVector &pProperties, HiddenProperties pHiddenProperties); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR
