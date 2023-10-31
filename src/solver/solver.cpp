@@ -22,7 +22,6 @@ limitations under the License.
 #include "solverinfo_p.h"
 #include "solverkinsol_p.h"
 #include "solversecondorderrungekutta_p.h"
-#include "solverunknown_p.h"
 
 namespace libOpenCOR {
 
@@ -119,11 +118,6 @@ std::string Solver::Impl::valueFromProperties(const std::string &pId, const std:
     return {};
 }
 
-StringStringMap Solver::Impl::propertiesId() const
-{
-    return {};
-}
-
 std::string Solver::Impl::id(const std::string &pIdOrName) const
 {
     auto ids = propertiesId();
@@ -195,11 +189,7 @@ SolverPtr Solver::create(const std::string &pIdOrName)
     auto idIter = Solver::Impl::SolversId.find(pIdOrName);
     auto id = (idIter != Solver::Impl::SolversId.end()) ? idIter->second : pIdOrName;
 
-    if (auto iter = Solver::Impl::SolversCreate.find(id); iter != Solver::Impl::SolversCreate.end()) {
-        return iter->second();
-    }
-
-    return SolverUnknown::Impl::create();
+    return Solver::Impl::SolversCreate.find(id)->second();
 }
 
 SolverInfoPtrVector Solver::solversInfo()

@@ -22,8 +22,3 @@ TEST(CoverageSolverTest, solversInfoAlreadyInitialised)
 {
     libOpenCOR::Solver::solversInfo();
 }
-
-TEST(CoverageSolverTest, unknownSolverInfo)
-{
-    EXPECT_EQ(libOpenCOR::Solver::create("Unknown")->info(), nullptr);
-}

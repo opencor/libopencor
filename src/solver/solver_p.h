@@ -48,7 +48,7 @@ public:
 
     virtual ~Impl() = default;
 
-    virtual StringStringMap propertiesId() const;
+    virtual StringStringMap propertiesId() const = 0;
 
     std::string id(const std::string &pIdOrName) const;
 

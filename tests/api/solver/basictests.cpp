@@ -116,7 +116,7 @@ TEST(BasicSolverTest, unknownSolver)
 {
     auto solver = libOpenCOR::Solver::create("Unknown");
 
-    EXPECT_FALSE(solver->isValid());
+    EXPECT_EQ(solver, nullptr);
 }
 
 TEST(BasicSolverTest, cvodeById)
