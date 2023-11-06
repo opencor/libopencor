@@ -54,7 +54,7 @@ std::string textFileContents(const std::string &pFileName)
     auto res = libOpenCOR::toString(libOpenCOR::fileContents(libOpenCOR::resourcePath(pFileName)));
 
     // To retrieve a file contents as bytes will, on Windows, result in LF characters being converted to CR+LF, so
-    // convert back since we expect LF.
+    // convert them back since we expect LF.
 
     return regex_replace(res, CR_LF, "\n");
 }
