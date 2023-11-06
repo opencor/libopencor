@@ -26,7 +26,7 @@ namespace libOpenCOR {
  * The SolverOde class is used to represent an ODE solver.
  */
 
-class SolverOde: public Solver
+class LIBOPENCOR_EXPORT SolverOde: public Solver
 {
 public:
     using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables); /**< Signature of the method that computes the rates of the ODE system. */

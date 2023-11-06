@@ -26,7 +26,7 @@ namespace libOpenCOR {
  * The SolverNla class is used to represent an NLA solver.
  */
 
-class SolverNla: public Solver
+class LIBOPENCOR_EXPORT SolverNla: public Solver
 {
 public:
     using ComputeSystem = void (*)(double *pU, double *pF, void *pUserData); /**< Signature of the method that computes the system of NLA equations. */
