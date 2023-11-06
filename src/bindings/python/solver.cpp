@@ -23,8 +23,6 @@ namespace py = pybind11;
 
 void solverApi(py::module_ &m)
 {
-    py::class_<libOpenCOR::Solver, libOpenCOR::Logger, libOpenCOR::SolverPtr> solver(m, "Solver");
-
     py::enum_<libOpenCOR::Solver::Type>(solver, "Type")
         .value("Ode", libOpenCOR::Solver::Type::ODE)
         .value("Nla", libOpenCOR::Solver::Type::NLA)

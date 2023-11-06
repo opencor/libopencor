@@ -26,7 +26,6 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     // Vectors.
 
     emscripten::register_vector<libOpenCOR::IssuePtr>("IssuePtrVector");
-    emscripten::register_vector<std::string>("StringVector");
 
     // APIs.
 

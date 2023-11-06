@@ -34,9 +34,6 @@ using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @re
 class Logger;
 using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
 
-class Solver;
-using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
-
 class SolverCvode;
 using SolverCvodePtr = std::shared_ptr<SolverCvode>; /**< Type definition for the shared @ref SolverCvode pointer. */
 
@@ -58,7 +55,6 @@ using SolverSecondOrderRungeKuttaPtr = std::shared_ptr<SolverSecondOrderRungeKut
 // Vectors.
 
 using IssuePtrVector = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
-using StringVector = std::vector<std::string>; /**< Type definition for a vector of strings. */
 using UnsignedCharVector = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
 
 } // namespace libcellml
