@@ -57,8 +57,6 @@ public:
     int mUpperHalfBandwidth = 0;
     int mLowerHalfBandwidth = 0;
 
-    // Solver.
-
     std::map<ComputeSystem, SolverKinsolData> mData;
 
     ~Impl() override;
