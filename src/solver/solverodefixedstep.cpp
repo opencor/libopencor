@@ -32,7 +32,7 @@ bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pSt
     // Check the solver's properties.
 
     if (mStep <= 0.0) {
-        addError(R"(The step cannot be equal to )" + toString(mStep) + R"(. It must be greater than 0.)");
+        addError("The step cannot be equal to " + toString(mStep) + ". It must be greater than 0.");
 
         return false;
     }
