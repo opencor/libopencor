@@ -73,9 +73,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Initialise the ODE solver itself.
 
-    if (!SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates)) {
-        return false;
-    }
+    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 
     // Check the solver's properties.
 
@@ -243,9 +241,7 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 {
     // Reinitialise the ODE solver itself.
 
-    if (!SolverOde::Impl::reinitialise(pVoi)) {
-        return false;
-    }
+    SolverOde::Impl::reinitialise(pVoi);
 
     // Reinitialise our CVODES solver.
 

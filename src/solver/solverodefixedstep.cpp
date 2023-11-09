@@ -25,9 +25,7 @@ bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pSt
 {
     // Initialise the ODE solver itself.
 
-    if (!SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates)) {
-        return false;
-    }
+    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 
     // Check the solver's properties.
 
@@ -63,12 +61,6 @@ double SolverOdeFixedStep::step() const
 void SolverOdeFixedStep::setStep(double pStep)
 {
     pimpl()->mStep = pStep;
-}
-
-bool SolverOdeFixedStep::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                    ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
 } // namespace libOpenCOR
