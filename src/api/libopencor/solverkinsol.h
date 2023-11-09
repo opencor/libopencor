@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solvernla.h"
+#include "solvernla.h"
 
 namespace libOpenCOR {
 

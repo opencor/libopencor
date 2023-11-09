@@ -16,8 +16,6 @@ limitations under the License.
 
 #include "odemodel.h"
 
-#include "tests/utils.h"
-
 #include <libopencor>
 
 TEST(HeunSolverTest, basic)

@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solverode.h"
+#include "solverode.h"
 
 namespace libOpenCOR {
 

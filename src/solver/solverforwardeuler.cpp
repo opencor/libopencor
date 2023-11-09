@@ -88,7 +88,7 @@ const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 
 SolverForwardEulerPtr SolverForwardEuler::create()
 {
-    return SolverForwardEulerPtr {new SolverForwardEuler()};
+    return SolverForwardEulerPtr {new SolverForwardEuler {}};
 }
 
 std::string SolverForwardEuler::id() const
