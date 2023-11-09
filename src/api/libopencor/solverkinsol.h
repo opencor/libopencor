@@ -155,7 +155,7 @@ public:
 
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
 
-    bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData = nullptr) override;
+    bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

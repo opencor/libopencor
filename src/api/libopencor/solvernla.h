@@ -62,7 +62,7 @@ public:
      * our solvers.
      */
 
-    virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData = nullptr) = 0;
+    virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) = 0;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

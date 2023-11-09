@@ -74,12 +74,12 @@ public:
     /**
      * @brief The preconditioner.
      *
-     * The preconditioner, i.e. none or banded.
+     * The preconditioner, i.e. no or banded.
      */
 
     enum class Preconditioner
     {
-        NONE, /**< No preconditioner. */
+        NO, /**< No preconditioner. */
         BANDED /**< A banded preconditioner. */
     };
 

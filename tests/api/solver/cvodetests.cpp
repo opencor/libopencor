@@ -310,7 +310,7 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
     auto [states, rates, variables] = OdeModel::initialise();
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
-    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NONE);
+    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -326,7 +326,7 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
     auto [states, rates, variables] = OdeModel::initialise();
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
-    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NONE);
+    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
@@ -342,7 +342,7 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
     auto [states, rates, variables] = OdeModel::initialise();
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
-    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NONE);
+    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
     OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
 
