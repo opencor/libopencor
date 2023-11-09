@@ -93,7 +93,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
         bool needUpperAndLowerHalfBandwidths = false;
 
         if (mLinearSolver == LinearSolver::BANDED) {
-            // We are dealing with a banded linear solver, so we need both an upper and a lower half bandwidth.
+            // We are dealing with a banded linear solver, so we need both an upper and a lower half-bandwidth.
 
             needUpperAndLowerHalfBandwidths = true;
         } else if ((mLinearSolver == LinearSolver::GMRES)
@@ -102,7 +102,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
             // We are dealing with a GMRES/Bi-CGStab/TFQMR linear solver, so we may need a preconditioner.
 
             if (mPreconditioner == Preconditioner::BANDED) {
-                // We are dealing with a banded preconditioner, so we need both an upper and a lower half bandwidth.
+                // We are dealing with a banded preconditioner, so we need both an upper and a lower half-bandwidth.
 
                 needUpperAndLowerHalfBandwidths = true;
             }

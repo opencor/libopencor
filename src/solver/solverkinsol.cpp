@@ -82,7 +82,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
         bool needUpperAndLowerHalfBandwidths = false;
 
         if (mLinearSolver == LinearSolver::BANDED) {
-            // We are dealing with a banded linear solver, so we need both an upper and a lower half bandwidth.
+            // We are dealing with a banded linear solver, so we need both an upper and a lower half-bandwidth.
 
             needUpperAndLowerHalfBandwidths = true;
         }
