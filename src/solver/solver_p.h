@@ -27,8 +27,6 @@ class Solver::Impl: public Logger::Impl
 {
 public:
     virtual ~Impl() = default;
-
-    std::string id(const std::string &pIdOrName) const;
 };
 
 } // namespace libOpenCOR
