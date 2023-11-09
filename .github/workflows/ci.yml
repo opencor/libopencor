@@ -343,9 +343,7 @@ jobs:
         if: ${{ matrix.target == 'unit_testing' }}
         run: |
           cd build
-          # ninja ${{ matrix.target }}
-          ninja
-          ctest -V -R api_solver_tests
+          ninja ${{ matrix.target }}
       - name: JavaScript unit testing
         if: ${{ matrix.target == 'javascript_unit_testing' }}
         run: |
