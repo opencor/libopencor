@@ -137,7 +137,6 @@ function(configure_target TARGET)
                 -fuchsia-default-arguments-calls
                 ${DISABLED_FUCHSIA_CHECKS}
                 google-*
-                -google-default-arguments
                 hicpp-*
                 llvm-*
                 -llvm-header-guard
