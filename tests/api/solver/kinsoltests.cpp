@@ -27,14 +27,14 @@ TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
     };
 
     auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
 
     solver->setMaximumNumberOfIterations(0);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model2::VARIABLE_COUNT_2));
+    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model1::VARIABLE_COUNT_1, nullptr));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    NlaModel::Model2::finalise(variables);
+    NlaModel::Model1::finalise(variables);
 }
 
 TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooSmall)
@@ -49,7 +49,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(-1);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model2::VARIABLE_COUNT_2));
+    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model2::VARIABLE_COUNT_2, nullptr));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     NlaModel::Model2::finalise(variables);
@@ -58,25 +58,25 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
 TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooBig)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 3. It must be between 0 and 2."},
+        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 3. It must be between 0 and 1."},
     };
 
     auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(3);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model2::VARIABLE_COUNT_2));
+    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model1::VARIABLE_COUNT_1, nullptr));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    NlaModel::Model2::finalise(variables);
+    NlaModel::Model1::finalise(variables);
 }
 
 TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooSmall)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 1."},
+        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
     };
 
     auto solver = libOpenCOR::SolverKinsol::create();
@@ -85,7 +85,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(-1);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model1::VARIABLE_COUNT_1));
+    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model2::VARIABLE_COUNT_2, nullptr));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     NlaModel::Model2::finalise(variables);
@@ -98,15 +98,15 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
     };
 
     auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(2);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model1::VARIABLE_COUNT_1));
+    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model1::VARIABLE_COUNT_1, nullptr));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
-    NlaModel::Model2::finalise(variables);
+    NlaModel::Model1::finalise(variables);
 }
 
 TEST(KinsolSolverTest, solve)
@@ -122,7 +122,7 @@ TEST(KinsolSolverTest, solve)
 TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 {
     auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(2);
@@ -148,7 +148,7 @@ TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 {
     auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB);
 
