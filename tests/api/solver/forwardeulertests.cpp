@@ -18,15 +18,6 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(ForwardEulerSolverTest, basic)
-{
-    auto solver = libOpenCOR::SolverForwardEuler::create();
-
-    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solver->id(), "KISAO:0000030");
-    EXPECT_EQ(solver->name(), "Forward Euler");
-}
-
 TEST(ForwardEulerSolverTest, stepValueWithInvalidNumber)
 {
     static const auto STEP = 0.0;

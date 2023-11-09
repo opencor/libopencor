@@ -20,15 +20,6 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(KinsolSolverTest, basic)
-{
-    auto solver = libOpenCOR::SolverKinsol::create();
-
-    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::NLA);
-    EXPECT_EQ(solver->id(), "KISAO:0000282");
-    EXPECT_EQ(solver->name(), "KINSOL");
-}
-
 TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {

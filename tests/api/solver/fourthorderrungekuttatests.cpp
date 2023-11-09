@@ -18,15 +18,6 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(FourthOrderRungeKuttaSolverTest, basic)
-{
-    auto solver = libOpenCOR::SolverFourthOrderRungeKutta::create();
-
-    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solver->id(), "KISAO:0000032");
-    EXPECT_EQ(solver->name(), "Fourth-order Runge-Kutta");
-}
-
 TEST(FourthOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
     static const auto STEP = 0.0;

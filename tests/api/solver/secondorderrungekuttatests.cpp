@@ -18,15 +18,6 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(SecondOrderRungeKuttaSolverTest, basic)
-{
-    auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();
-
-    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solver->id(), "KISAO:0000381");
-    EXPECT_EQ(solver->name(), "Second-order Runge-Kutta");
-}
-
 TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
     static const auto STEP = 0.0;

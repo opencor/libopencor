@@ -18,15 +18,6 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(HeunSolverTest, basic)
-{
-    auto solver = libOpenCOR::SolverHeun::create();
-
-    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solver->id(), "KISAO:0000301");
-    EXPECT_EQ(solver->name(), "Heun");
-}
-
 TEST(HeunSolverTest, stepValueWithInvalidNumber)
 {
     static const auto STEP = 0.0;

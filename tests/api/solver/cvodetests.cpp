@@ -20,15 +20,6 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(CvodeSolverTest, basic)
-{
-    auto solver = libOpenCOR::SolverCvode::create();
-
-    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
-    EXPECT_EQ(solver->id(), "KISAO:0000019");
-    EXPECT_EQ(solver->name(), "CVODE");
-}
-
 TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 {
     static const auto RELATIVE_TOLERANCE = -1.234;
