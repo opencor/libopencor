@@ -19,123 +19,148 @@ import libOpenCOR from "./libopencor.js";
 const libopencor = await libOpenCOR();
 
 describe("Solver basic tests", () => {
-  test("CVODE by (KiSAO) id", () => {
-    const solver = new libopencor.Solver("KISAO:0000019");
+  test("CVODE solver", () => {
+    const solver = new libopencor.SolverCvode();
 
     expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solver.id()).toBe("KISAO:0000019");
     expect(solver.name()).toBe("CVODE");
 
-    expect(solver).not.toBe(null);
+    expect(solver.maximumStep()).toBe(0.0);
+    expect(solver.maximumNumberOfSteps()).toBe(500);
+    expect(solver.integrationMethod()).toBe(
+      libopencor.SolverCvode.IntegrationMethod.BDF,
+    );
+    expect(solver.iterationType()).toBe(
+      libopencor.SolverCvode.IterationType.NEWTON,
+    );
+    expect(solver.linearSolver()).toBe(
+      libopencor.SolverCvode.LinearSolver.DENSE,
+    );
+    expect(solver.preconditioner()).toBe(
+      libopencor.SolverCvode.Preconditioner.BANDED,
+    );
+    expect(solver.upperHalfBandwidth()).toBe(0);
+    expect(solver.lowerHalfBandwidth()).toBe(0);
+    expect(solver.relativeTolerance()).toBe(1.0e-7);
+    expect(solver.absoluteTolerance()).toBe(1.0e-7);
+    expect(solver.interpolateSolution()).toBe(true);
+
+    solver.setMaximumStep(1.23);
+    solver.setMaximumNumberOfSteps(123);
+    solver.setIntegrationMethod(
+      libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
+    );
+    solver.setIterationType(libopencor.SolverCvode.IterationType.FUNCTIONAL);
+    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.GMRES);
+    solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
+    solver.setUpperHalfBandwidth(3);
+    solver.setLowerHalfBandwidth(5);
+    solver.setRelativeTolerance(1.23e-5);
+    solver.setAbsoluteTolerance(3.45e-7);
+    solver.setInterpolateSolution(false);
+
+    expect(solver.maximumStep()).toBe(1.23);
+    expect(solver.maximumNumberOfSteps()).toBe(123);
+    expect(solver.integrationMethod()).toBe(
+      libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
+    );
+    expect(solver.iterationType()).toBe(
+      libopencor.SolverCvode.IterationType.FUNCTIONAL,
+    );
+    expect(solver.linearSolver()).toBe(
+      libopencor.SolverCvode.LinearSolver.GMRES,
+    );
+    expect(solver.preconditioner()).toBe(
+      libopencor.SolverCvode.Preconditioner.NO,
+    );
+    expect(solver.upperHalfBandwidth()).toBe(3);
+    expect(solver.lowerHalfBandwidth()).toBe(5);
+    expect(solver.relativeTolerance()).toBe(1.23e-5);
+    expect(solver.absoluteTolerance()).toBe(3.45e-7);
+    expect(solver.interpolateSolution()).toBe(false);
   });
 
-  test("CVODE by name", () => {
-    const solver = new libopencor.Solver("CVODE");
-
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000019");
-    expect(solver.name()).toBe("CVODE");
-
-    expect(solver).not.toBe(null);
-  });
-
-  test("Forward Euler by (KiSAO) id", () => {
-    const solver = new libopencor.Solver("KISAO:0000030");
+  test("Forward Euler solver", () => {
+    const solver = new libopencor.SolverForwardEuler();
 
     expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solver.id()).toBe("KISAO:0000030");
     expect(solver.name()).toBe("Forward Euler");
 
-    expect(solver).not.toBe(null);
+    expect(solver.step()).toBe(1.0);
+
+    solver.setStep(0.123);
+
+    expect(solver.step()).toBe(0.123);
   });
 
-  test("Forward Euler by name", () => {
-    const solver = new libopencor.Solver("Forward Euler");
-
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000030");
-    expect(solver.name()).toBe("Forward Euler");
-
-    expect(solver).not.toBe(null);
-  });
-
-  test("Fourth-order Runge-Kutta by (KiSAO) id", () => {
-    const solver = new libopencor.Solver("KISAO:0000032");
+  test("Fourth-order Runge-Kutta solver", () => {
+    const solver = new libopencor.SolverFourthOrderRungeKutta();
 
     expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solver.id()).toBe("KISAO:0000032");
     expect(solver.name()).toBe("Fourth-order Runge-Kutta");
 
-    expect(solver).not.toBe(null);
+    expect(solver.step()).toBe(1.0);
+
+    solver.setStep(0.123);
+
+    expect(solver.step()).toBe(0.123);
   });
 
-  test("Fourth-order Runge-Kutta by name", () => {
-    const solver = new libopencor.Solver("Fourth-order Runge-Kutta");
-
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000032");
-    expect(solver.name()).toBe("Fourth-order Runge-Kutta");
-
-    expect(solver).not.toBe(null);
-  });
-
-  test("Heun by (KiSAO) id", () => {
-    const solver = new libopencor.Solver("KISAO:0000301");
+  test("Heun solver", () => {
+    const solver = new libopencor.SolverHeun();
 
     expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solver.id()).toBe("KISAO:0000301");
     expect(solver.name()).toBe("Heun");
 
-    expect(solver).not.toBe(null);
+    expect(solver.step()).toBe(1.0);
+
+    solver.setStep(0.123);
+
+    expect(solver.step()).toBe(0.123);
   });
 
-  test("Heun by name", () => {
-    const solver = new libopencor.Solver("Heun");
-
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000301");
-    expect(solver.name()).toBe("Heun");
-
-    expect(solver).not.toBe(null);
-  });
-
-  test("KINSOL by (KiSAO) id", () => {
-    const solver = new libopencor.Solver("KISAO:0000282");
+  test("KINSOL solver", () => {
+    const solver = new libopencor.SolverKinsol();
 
     expect(solver.type().value).toBe(libopencor.Solver.Type.NLA.value);
     expect(solver.id()).toBe("KISAO:0000282");
     expect(solver.name()).toBe("KINSOL");
 
-    expect(solver).not.toBe(null);
+    expect(solver.maximumNumberOfIterations()).toBe(200);
+    expect(solver.linearSolver()).toBe(
+      libopencor.SolverKinsol.LinearSolver.DENSE,
+    );
+    expect(solver.upperHalfBandwidth()).toBe(0);
+    expect(solver.lowerHalfBandwidth()).toBe(0);
+
+    solver.setMaximumNumberOfIterations(123);
+    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.GMRES);
+    solver.setUpperHalfBandwidth(3);
+    solver.setLowerHalfBandwidth(5);
+
+    expect(solver.maximumNumberOfIterations()).toBe(123);
+    expect(solver.linearSolver()).toBe(
+      libopencor.SolverKinsol.LinearSolver.GMRES,
+    );
+    expect(solver.upperHalfBandwidth()).toBe(3);
+    expect(solver.lowerHalfBandwidth()).toBe(5);
   });
 
-  test("KINSOL by name", () => {
-    const solver = new libopencor.Solver("KINSOL");
-
-    expect(solver.type().value).toBe(libopencor.Solver.Type.NLA.value);
-    expect(solver.id()).toBe("KISAO:0000282");
-    expect(solver.name()).toBe("KINSOL");
-
-    expect(solver).not.toBe(null);
-  });
-
-  test("Second-order Runge-Kutta by (KiSAO) id", () => {
-    const solver = new libopencor.Solver("KISAO:0000381");
+  test("Second-order Runge-Kutta solver", () => {
+    const solver = new libopencor.SolverSecondOrderRungeKutta();
 
     expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
     expect(solver.id()).toBe("KISAO:0000381");
     expect(solver.name()).toBe("Second-order Runge-Kutta");
 
-    expect(solver).not.toBe(null);
-  });
+    expect(solver.step()).toBe(1.0);
 
-  test("Second-order Runge-Kutta by name", () => {
-    const solver = new libopencor.Solver("Second-order Runge-Kutta");
+    solver.setStep(0.123);
 
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000381");
-    expect(solver.name()).toBe("Second-order Runge-Kutta");
-
-    expect(solver).not.toBe(null);
+    expect(solver.step()).toBe(0.123);
   });
 });

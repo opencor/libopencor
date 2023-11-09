@@ -22,6 +22,12 @@ from .module import (
     Logger,
     # Solver API.
     Solver,
+    SolverCvode,
+    SolverForwardEuler,
+    SolverFourthOrderRungeKutta,
+    SolverHeun,
+    SolverKinsol,
+    SolverSecondOrderRungeKutta,
     # Version API.
     version,
     version_string,
@@ -50,6 +56,12 @@ __all__ = (
     "Logger",
     # Solver API.
     "Solver",
+    "SolverCvode",
+    "SolverForwardEuler",
+    "SolverFourthOrderRungeKutta",
+    "SolverHeun",
+    "SolverKinsol",
+    "SolverSecondOrderRungeKutta",
     # Version API.
     "version",
     "version_string",
