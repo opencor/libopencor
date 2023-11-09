@@ -23,7 +23,7 @@ namespace libOpenCOR {
 /**
  * @brief The SolverCvode class.
  *
- * The SolverCvode class is used to represent the CVODE solver.
+ * The SolverCvode class is used to represent the <a href="https://computing.llnl.gov/projects/sundials/cvode">CVODE</a> solver.
  */
 
 class LIBOPENCOR_EXPORT SolverCvode: public SolverOde

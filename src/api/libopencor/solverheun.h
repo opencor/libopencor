@@ -23,7 +23,7 @@ namespace libOpenCOR {
 /**
  * @brief The SolverHeun class.
  *
- * The SolverHeun class is used to represent the Heun solver.
+ * The SolverHeun class is used to represent the <a href="https://en.wikipedia.org/wiki/Heun's_method">Heun</a> solver.
  */
 
 class LIBOPENCOR_EXPORT SolverHeun: public SolverOdeFixedStep

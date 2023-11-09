@@ -61,7 +61,7 @@ public:
     /**
      * @brief Get the type of the solver.
      *
-     * Return the type of the solver.
+     * Return the type of the solver, i.e. @ref Solver::Type::ODE or @ref Solver::Type::NLA.
      *
      * @return The type, as a @ref Solver::Type, of the solver.
      */
@@ -71,7 +71,7 @@ public:
     /**
      * @brief Get the (KiSAO) id of the solver.
      *
-     * Return the (KiSAO) id of the solver.
+     * Return the (<a href="https://www.ebi.ac.uk/ols/ontologies/kisao">KiSAO</a>) id of the solver.
      *
      * @return The (KiSAO) id, as a @c std::string, of the solver.
      */
