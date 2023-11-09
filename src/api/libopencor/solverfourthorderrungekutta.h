@@ -28,8 +28,6 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverFourthOrderRungeKutta: public SolverOdeFixedStep
 {
-    friend class Solver;
-
 public:
     /**
      * Constructors, destructor, and assignment operators.

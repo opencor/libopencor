@@ -28,8 +28,6 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverForwardEuler: public SolverOdeFixedStep
 {
-    friend class Solver;
-
 public:
     /**
      * Constructors, destructor, and assignment operators.

@@ -28,8 +28,6 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverCvode: public SolverOde
 {
-    friend class Solver;
-
 public:
     /**
      * @brief The integration method.

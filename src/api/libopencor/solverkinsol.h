@@ -28,8 +28,6 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverKinsol: public SolverNla
 {
-    friend class Solver;
-
 public:
     /**
      * @brief The linear solver.
