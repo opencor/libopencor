@@ -85,12 +85,6 @@ void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles, const
     SCOPED_TRACE("Issue occurred here."); \
     libOpenCOR::expectEqualDoubles(pDoubles, pExpectedDoubles, pAbsoluteErrors)
 
-void expectEqualHiddenProperties(const StringVector &pHiddenProperties, const StringVector &pExpectedHiddenProperties);
-
-#define EXPECT_EQ_HIDDEN_PROPERTIES(pHiddenProperties, pExpectedHiddenProperties) \
-    SCOPED_TRACE("Issue occurred here."); \
-    libOpenCOR::expectEqualHiddenProperties(pHiddenProperties, pExpectedHiddenProperties)
-
 std::string resourcePath(const std::string &pResourceRelativePath = {});
 std::string textFileContents(const std::string &pFileName);
 

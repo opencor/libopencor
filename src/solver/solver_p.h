@@ -20,43 +20,13 @@ limitations under the License.
 #include "utils.h"
 
 #include "libopencor/solver.h"
-#include "libopencor/solverinfo.h"
-#include "libopencor/solverproperty.h"
 
 namespace libOpenCOR {
 
 class Solver::Impl: public Logger::Impl
 {
 public:
-    static StringSizetMap SolversIndex;
-    static StringStringMap SolversId;
-    static StringSolverCreateMap SolversCreate;
-    static SolverInfoPtrVector SolversInfo;
-
-    bool mIsValid = false;
-    StringStringMap mProperties;
-
-    static void registerSolvers();
-    static void registerSolver(Type pType, const std::string &pId, const std::string &pName, SolverCreate pCreate,
-                               const SolverPropertyPtrVector &pProperties,
-                               SolverInfo::HiddenPropertiesFunction pHiddenProperties);
-    static SolverPropertyPtr createProperty(SolverProperty::Type pType, const std::string &pId,
-                                            const std::string &pName, const StringVector &pListValues,
-                                            const std::string &pDefaultValue, bool pHasVoiUnit);
-    static std::string valueFromProperties(const std::string &pId, const std::string &pName,
-                                           const StringStringMap &pProperties);
-
     virtual ~Impl() = default;
-
-    virtual StringStringMap propertiesId() const;
-
-    std::string id(const std::string &pIdOrName) const;
-
-    std::string property(const std::string &pIdOrName);
-    void setProperty(const std::string &pIdOrName, const std::string &pValue);
-
-    StringStringMap properties() const;
-    void setProperties(const StringStringMap &pProperties);
 };
 
 } // namespace libOpenCOR

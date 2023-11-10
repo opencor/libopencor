@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "cellmlfile_p.h"
-
 #include "cellmlfileruntime.h"
 #include "utils.h"
 
@@ -29,7 +28,7 @@ CellmlFile::Impl::Impl(const libcellml::ModelPtr &pModel)
 }
 
 CellmlFile::CellmlFile(const libcellml::ModelPtr &pModel)
-    : Logger(new Impl(pModel))
+    : Logger(new Impl {pModel})
 {
 }
 

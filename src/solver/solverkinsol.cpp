@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "solverkinsol_p.h"
-#include "utils.h"
 
 #include <algorithm>
 
@@ -30,33 +29,6 @@ limitations under the License.
 #include "sundialsend.h"
 
 namespace libOpenCOR {
-
-// Linear solvers.
-
-const std::string SolverKinsol::Impl::DENSE_LINEAR_SOLVER = "Dense"; // NOLINT
-const std::string SolverKinsol::Impl::BANDED_LINEAR_SOLVER = "Banded"; // NOLINT
-const std::string SolverKinsol::Impl::GMRES_LINEAR_SOLVER = "GMRES"; // NOLINT
-const std::string SolverKinsol::Impl::BICGSTAB_LINEAR_SOLVER = "BiCGStab"; // NOLINT
-const std::string SolverKinsol::Impl::TFQMR_LINEAR_SOLVER = "TFQMR"; // NOLINT
-
-// Properties information.
-
-const std::string SolverKinsol::Impl::ID = "KISAO:0000282"; // NOLINT
-const std::string SolverKinsol::Impl::NAME = "KINSOL"; // NOLINT
-
-const std::string SolverKinsol::Impl::MAXIMUM_NUMBER_OF_ITERATIONS_ID = "KISAO:0000486"; // NOLINT
-const std::string SolverKinsol::Impl::MAXIMUM_NUMBER_OF_ITERATIONS_NAME = "Maximum number of iterations"; // NOLINT
-
-const std::string SolverKinsol::Impl::LINEAR_SOLVER_ID = "KISAO:0000477"; // NOLINT
-const std::string SolverKinsol::Impl::LINEAR_SOLVER_NAME = "Linear solver"; // NOLINT
-const StringVector SolverKinsol::Impl::LINEAR_SOLVER_LIST = {DENSE_LINEAR_SOLVER, BANDED_LINEAR_SOLVER, GMRES_LINEAR_SOLVER, BICGSTAB_LINEAR_SOLVER, TFQMR_LINEAR_SOLVER}; // NOLINT
-const std::string SolverKinsol::Impl::LINEAR_SOLVER_DEFAULT_VALUE = DENSE_LINEAR_SOLVER; // NOLINT
-
-const std::string SolverKinsol::Impl::UPPER_HALF_BANDWIDTH_ID = "KISAO:0000479"; // NOLINT
-const std::string SolverKinsol::Impl::UPPER_HALF_BANDWIDTH_NAME = "Upper half-bandwidth"; // NOLINT
-
-const std::string SolverKinsol::Impl::LOWER_HALF_BANDWIDTH_ID = "KISAO:0000480"; // NOLINT
-const std::string SolverKinsol::Impl::LOWER_HALF_BANDWIDTH_NAME = "Lower half-bandwidth"; // NOLINT
 
 // Compute system.
 
@@ -75,67 +47,13 @@ int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
 
 // Solver.
 
-SolverPtr SolverKinsol::Impl::create()
-{
-    return std::shared_ptr<SolverKinsol> {new SolverKinsol {}};
-}
-
-SolverPropertyPtrVector SolverKinsol::Impl::propertiesInfo()
-{
-    return {
-        Solver::Impl::createProperty(SolverProperty::Type::IntegerGt0, MAXIMUM_NUMBER_OF_ITERATIONS_ID, MAXIMUM_NUMBER_OF_ITERATIONS_NAME,
-                                     {},
-                                     toString(MAXIMUM_NUMBER_OF_ITERATIONS_DEFAULT_VALUE),
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::List, LINEAR_SOLVER_ID, LINEAR_SOLVER_NAME,
-                                     LINEAR_SOLVER_LIST,
-                                     LINEAR_SOLVER_DEFAULT_VALUE,
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::IntegerGe0, UPPER_HALF_BANDWIDTH_ID, UPPER_HALF_BANDWIDTH_NAME,
-                                     {},
-                                     toString(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE),
-                                     false),
-        Solver::Impl::createProperty(SolverProperty::Type::IntegerGe0, LOWER_HALF_BANDWIDTH_ID, LOWER_HALF_BANDWIDTH_NAME,
-                                     {},
-                                     toString(LOWER_HALF_BANDWIDTH_DEFAULT_VALUE),
-                                     false),
-    };
-}
-
-StringVector SolverKinsol::Impl::hiddenProperties(const StringStringMap &pProperties)
-{
-    StringVector res;
-    auto linearSolver = valueFromProperties(LINEAR_SOLVER_ID, LINEAR_SOLVER_NAME, pProperties);
-
-    if ((linearSolver == DENSE_LINEAR_SOLVER)
-        || (linearSolver == GMRES_LINEAR_SOLVER)
-        || (linearSolver == BICGSTAB_LINEAR_SOLVER)
-        || (linearSolver == TFQMR_LINEAR_SOLVER)) {
-        res.push_back(UPPER_HALF_BANDWIDTH_ID);
-        res.push_back(LOWER_HALF_BANDWIDTH_ID);
-    }
-
-    return res;
-}
-
-SolverKinsol::Impl::Impl()
-    : SolverNla::Impl()
-{
-    mIsValid = true;
-
-    mProperties[MAXIMUM_NUMBER_OF_ITERATIONS_ID] = toString(MAXIMUM_NUMBER_OF_ITERATIONS_DEFAULT_VALUE);
-    mProperties[LINEAR_SOLVER_ID] = LINEAR_SOLVER_DEFAULT_VALUE;
-    mProperties[UPPER_HALF_BANDWIDTH_ID] = toString(UPPER_HALF_BANDWIDTH_DEFAULT_VALUE);
-    mProperties[LOWER_HALF_BANDWIDTH_ID] = toString(LOWER_HALF_BANDWIDTH_DEFAULT_VALUE);
-}
-
 SolverKinsol::Impl::~Impl()
 {
     for (auto &data : mData) {
         N_VDestroy_Serial(data.second.uVector);
         N_VDestroy_Serial(data.second.onesVector);
-        SUNMatDestroy(data.second.matrix);
-        SUNLinSolFree(data.second.linearSolver);
+        SUNMatDestroy(data.second.sunMatrix);
+        SUNLinSolFree(data.second.sunLinearSolver);
 
         KINFree(&data.second.solver);
 
@@ -143,18 +61,6 @@ SolverKinsol::Impl::~Impl()
 
         delete data.second.userData;
     }
-}
-
-StringStringMap SolverKinsol::Impl::propertiesId() const
-{
-    static const StringStringMap PROPERTIES_ID = {
-        {MAXIMUM_NUMBER_OF_ITERATIONS_NAME, MAXIMUM_NUMBER_OF_ITERATIONS_ID},
-        {LINEAR_SOLVER_NAME, LINEAR_SOLVER_ID},
-        {UPPER_HALF_BANDWIDTH_NAME, UPPER_HALF_BANDWIDTH_ID},
-        {LOWER_HALF_BANDWIDTH_NAME, LOWER_HALF_BANDWIDTH_ID},
-    };
-
-    return PROPERTIES_ID;
 }
 
 bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
@@ -169,43 +75,25 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
         // We don't have any data associated with the given pComputeSystem, so get some by first making sure that the
         // solver's properties are all valid.
 
-        bool ok = true;
-        auto maximumNumberOfIterations = MAXIMUM_NUMBER_OF_ITERATIONS_DEFAULT_VALUE;
-        auto linearSolver = LINEAR_SOLVER_DEFAULT_VALUE;
-        auto upperHalfBandwidth = UPPER_HALF_BANDWIDTH_DEFAULT_VALUE;
-        auto lowerHalfBandwidth = LOWER_HALF_BANDWIDTH_DEFAULT_VALUE;
-
-        maximumNumberOfIterations = toInt(mProperties[MAXIMUM_NUMBER_OF_ITERATIONS_ID], ok);
-
-        if (!ok || (maximumNumberOfIterations <= 0)) {
-            addError(R"(The ")" + MAXIMUM_NUMBER_OF_ITERATIONS_NAME + R"(" property has an invalid value (")" + mProperties[MAXIMUM_NUMBER_OF_ITERATIONS_ID] + R"("). It must be a floating point number greater than zero.)");
+        if (mMaximumNumberOfIterations <= 0) {
+            addError("The maximum number of iterations cannot be equal to " + toString(mMaximumNumberOfIterations) + ". It must be greater than 0.");
         }
 
-        linearSolver = mProperties[LINEAR_SOLVER_ID];
+        bool needUpperAndLowerHalfBandwidths = false;
 
-        if (std::find(LINEAR_SOLVER_LIST.begin(), LINEAR_SOLVER_LIST.end(), linearSolver) == LINEAR_SOLVER_LIST.end()) {
-            addError(R"(The ")" + LINEAR_SOLVER_NAME + R"(" property has an invalid value (")" + mProperties[LINEAR_SOLVER_ID] + R"("). It must be equal to either ")" + DENSE_LINEAR_SOLVER + R"(", ")" + BANDED_LINEAR_SOLVER + R"(", ")" + GMRES_LINEAR_SOLVER + R"(", ")" + BICGSTAB_LINEAR_SOLVER + R"(", or ")" + TFQMR_LINEAR_SOLVER + R"(".)");
-        } else {
-            bool needUpperAndLowerHalfBandwidths = false;
+        if (mLinearSolver == LinearSolver::BANDED) {
+            // We are dealing with a banded linear solver, so we need both an upper and a lower half-bandwidth.
 
-            if (linearSolver == BANDED_LINEAR_SOLVER) {
-                // We are dealing with a banded linear solver, so we need both an upper and a lower half bandwidth.
+            needUpperAndLowerHalfBandwidths = true;
+        }
 
-                needUpperAndLowerHalfBandwidths = true;
+        if (needUpperAndLowerHalfBandwidths) {
+            if ((mUpperHalfBandwidth < 0) || (mUpperHalfBandwidth >= static_cast<int>(pN))) {
+                addError("The upper half-bandwidth cannot be equal to " + toString(mUpperHalfBandwidth) + ". It must be between 0 and " + toString(pN - 1) + ".");
             }
 
-            if (needUpperAndLowerHalfBandwidths) {
-                upperHalfBandwidth = toInt(mProperties[UPPER_HALF_BANDWIDTH_ID], ok);
-
-                if (!ok || (upperHalfBandwidth < 0) || (upperHalfBandwidth >= static_cast<int>(pN))) {
-                    addError(R"(The ")" + UPPER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[UPPER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pN - 1) + R"(.)");
-                }
-
-                lowerHalfBandwidth = toInt(mProperties[LOWER_HALF_BANDWIDTH_ID], ok);
-
-                if (!ok || (lowerHalfBandwidth < 0) || (lowerHalfBandwidth >= static_cast<int>(pN))) {
-                    addError(R"(The ")" + LOWER_HALF_BANDWIDTH_NAME + R"(" property has an invalid value (")" + mProperties[LOWER_HALF_BANDWIDTH_ID] + R"("). It must be an integer number between 0 and )" + toString(pN - 1) + R"(.)");
-                }
+            if ((mLowerHalfBandwidth < 0) || (mLowerHalfBandwidth >= static_cast<int>(pN))) {
+                addError("The lower half-bandwidth cannot be equal to " + toString(mLowerHalfBandwidth) + ". It must be between 0 and " + toString(pN - 1) + ".");
             }
         }
 
@@ -239,35 +127,35 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
         // Set our linear solver.
 
-        if (linearSolver == DENSE_LINEAR_SOLVER) {
-            data.matrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), data.context);
+        if (mLinearSolver == LinearSolver::DENSE) {
+            data.sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), data.context);
 
-            ASSERT_NE(data.matrix, nullptr);
+            ASSERT_NE(data.sunMatrix, nullptr);
 
-            data.linearSolver = SUNLinSol_Dense(data.uVector, data.matrix, data.context);
-        } else if (linearSolver == BANDED_LINEAR_SOLVER) {
-            data.matrix = SUNBandMatrix(static_cast<int64_t>(pN),
-                                        static_cast<int64_t>(upperHalfBandwidth), static_cast<int64_t>(lowerHalfBandwidth),
-                                        data.context);
+            data.sunLinearSolver = SUNLinSol_Dense(data.uVector, data.sunMatrix, data.context);
+        } else if (mLinearSolver == LinearSolver::BANDED) {
+            data.sunMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
+                                           static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
+                                           data.context);
 
-            ASSERT_NE(data.matrix, nullptr);
+            ASSERT_NE(data.sunMatrix, nullptr);
 
-            data.linearSolver = SUNLinSol_Band(data.uVector, data.matrix, data.context);
+            data.sunLinearSolver = SUNLinSol_Band(data.uVector, data.sunMatrix, data.context);
         } else {
-            data.matrix = nullptr;
+            data.sunMatrix = nullptr;
 
-            if (linearSolver == GMRES_LINEAR_SOLVER) {
-                data.linearSolver = SUNLinSol_SPGMR(data.uVector, PREC_NONE, 0, data.context);
-            } else if (linearSolver == BICGSTAB_LINEAR_SOLVER) {
-                data.linearSolver = SUNLinSol_SPBCGS(data.uVector, PREC_NONE, 0, data.context);
+            if (mLinearSolver == LinearSolver::GMRES) {
+                data.sunLinearSolver = SUNLinSol_SPGMR(data.uVector, PREC_NONE, 0, data.context);
+            } else if (mLinearSolver == LinearSolver::BICGSTAB) {
+                data.sunLinearSolver = SUNLinSol_SPBCGS(data.uVector, PREC_NONE, 0, data.context);
             } else {
-                data.linearSolver = SUNLinSol_SPTFQMR(data.uVector, PREC_NONE, 0, data.context);
+                data.sunLinearSolver = SUNLinSol_SPTFQMR(data.uVector, PREC_NONE, 0, data.context);
             }
         }
 
-        ASSERT_NE(data.linearSolver, nullptr);
+        ASSERT_NE(data.sunLinearSolver, nullptr);
 
-        ASSERT_EQ(KINSetLinearSolver(data.solver, data.linearSolver, data.matrix), KINLS_SUCCESS);
+        ASSERT_EQ(KINSetLinearSolver(data.solver, data.sunLinearSolver, data.sunMatrix), KINLS_SUCCESS);
 
         // Set our user data.
 
@@ -277,7 +165,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
         // Set our maximum number of iterations.
 
-        ASSERT_EQ(KINSetNumMaxIters(data.solver, maximumNumberOfIterations), KIN_SUCCESS);
+        ASSERT_EQ(KINSetNumMaxIters(data.solver, mMaximumNumberOfIterations), KIN_SUCCESS);
 
         // Keep track of our data.
 
@@ -298,7 +186,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 }
 
 SolverKinsol::SolverKinsol()
-    : SolverNla(new Impl())
+    : SolverNla(new Impl {})
 {
 }
 
@@ -312,16 +200,64 @@ SolverKinsol::Impl *SolverKinsol::pimpl()
     return static_cast<Impl *>(SolverNla::pimpl());
 }
 
-/*---GRY---
 const SolverKinsol::Impl *SolverKinsol::pimpl() const
 {
     return static_cast<const Impl *>(SolverNla::pimpl());
 }
-*/
 
-SolverInfoPtr SolverKinsol::info() const
+SolverKinsolPtr SolverKinsol::create()
 {
-    return Solver::solversInfo()[Solver::Impl::SolversIndex[SolverKinsol::Impl::ID]];
+    return std::shared_ptr<SolverKinsol> {new SolverKinsol {}};
+}
+
+std::string SolverKinsol::id() const
+{
+    return "KISAO:0000282";
+}
+
+std::string SolverKinsol::name() const
+{
+    return "KINSOL";
+}
+
+int SolverKinsol::maximumNumberOfIterations() const
+{
+    return pimpl()->mMaximumNumberOfIterations;
+}
+
+void SolverKinsol::setMaximumNumberOfIterations(int pMaximumNumberOfIterations)
+{
+    pimpl()->mMaximumNumberOfIterations = pMaximumNumberOfIterations;
+}
+
+SolverKinsol::LinearSolver SolverKinsol::linearSolver() const
+{
+    return pimpl()->mLinearSolver;
+}
+
+void SolverKinsol::setLinearSolver(LinearSolver pLinearSolver)
+{
+    pimpl()->mLinearSolver = pLinearSolver;
+}
+
+int SolverKinsol::upperHalfBandwidth() const
+{
+    return pimpl()->mUpperHalfBandwidth;
+}
+
+void SolverKinsol::setUpperHalfBandwidth(int pUpperHalfBandwidth)
+{
+    pimpl()->mUpperHalfBandwidth = pUpperHalfBandwidth;
+}
+
+int SolverKinsol::lowerHalfBandwidth() const
+{
+    return pimpl()->mLowerHalfBandwidth;
+}
+
+void SolverKinsol::setLowerHalfBandwidth(int pLowerHalfBandwidth)
+{
+    pimpl()->mLowerHalfBandwidth = pLowerHalfBandwidth;
 }
 
 bool SolverKinsol::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)

@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "sedmlfile_p.h"
-
 #include "utils.h"
 
 #include "libopencor/file.h"
@@ -38,7 +37,7 @@ SedmlFile::Impl::~Impl()
 }
 
 SedmlFile::SedmlFile(libsedml::SedDocument *pDocument)
-    : Logger(new Impl(pDocument))
+    : Logger(new Impl {pDocument})
 {
 }
 

@@ -18,43 +18,6 @@ limitations under the License.
 
 void solverApi()
 {
-    // SolverInfo API.
-
-    emscripten::class_<libOpenCOR::SolverInfo>("SolverInfo")
-        .smart_ptr<libOpenCOR::SolverInfoPtr>("SolverInfo")
-        .function("type", &libOpenCOR::SolverInfo::type)
-        .function("id", &libOpenCOR::SolverInfo::id)
-        .function("name", &libOpenCOR::SolverInfo::name)
-        .function("properties", &libOpenCOR::SolverInfo::properties)
-        .function("hiddenProperties", &libOpenCOR::SolverInfo::hiddenProperties);
-
-    // SolverProperty API.
-
-    emscripten::enum_<libOpenCOR::SolverProperty::Type>("SolverProperty.Type")
-        .value("Boolean", libOpenCOR::SolverProperty::Type::Boolean)
-        .value("Integer", libOpenCOR::SolverProperty::Type::Integer)
-        .value("IntegerGt0", libOpenCOR::SolverProperty::Type::IntegerGt0)
-        .value("IntegerGe0", libOpenCOR::SolverProperty::Type::IntegerGe0)
-        .value("Double", libOpenCOR::SolverProperty::Type::Double)
-        .value("DoubleGt0", libOpenCOR::SolverProperty::Type::DoubleGt0)
-        .value("DoubleGe0", libOpenCOR::SolverProperty::Type::DoubleGe0)
-        .value("List", libOpenCOR::SolverProperty::Type::List);
-
-    emscripten::class_<libOpenCOR::SolverProperty>("SolverProperty")
-        .smart_ptr<libOpenCOR::SolverPropertyPtr>("SolverProperty")
-        .function("type", &libOpenCOR::SolverProperty::type)
-        .function("id", &libOpenCOR::SolverProperty::id)
-        .function("name", &libOpenCOR::SolverProperty::name)
-        .function("listValues", &libOpenCOR::SolverProperty::listValues)
-        .function("defaultValue", &libOpenCOR::SolverProperty::defaultValue)
-        .function("hasVoiUnit", &libOpenCOR::SolverProperty::hasVoiUnit);
-
-    EM_ASM({
-        Module["SolverProperty"]["Type"] = Module["SolverProperty.Type"];
-
-        delete Module["SolverProperty.Type"];
-    });
-
     // Solver API.
 
     emscripten::enum_<libOpenCOR::Solver::Type>("Solver.Type")
@@ -62,17 +25,132 @@ void solverApi()
         .value("NLA", libOpenCOR::Solver::Type::NLA);
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
-        .smart_ptr_constructor("Solver", &libOpenCOR::Solver::create)
-        .class_function("solversInfo", &libOpenCOR::Solver::solversInfo)
-        .function("isValid", &libOpenCOR::Solver::isValid)
-        .function("property", &libOpenCOR::Solver::property)
-        .function("setProperty", &libOpenCOR::Solver::setProperty)
-        .function("properties", &libOpenCOR::Solver::properties)
-        .function("setProperties", &libOpenCOR::Solver::setProperties);
+        .function("type", &libOpenCOR::Solver::type)
+        .function("id", &libOpenCOR::Solver::id)
+        .function("name", &libOpenCOR::Solver::name);
 
     EM_ASM({
         Module["Solver"]["Type"] = Module["Solver.Type"];
 
         delete Module["Solver.Type"];
     });
+
+    // SolverOde API.
+
+    emscripten::class_<libOpenCOR::SolverOde, emscripten::base<libOpenCOR::Solver>>("SolverOde");
+
+    // SolverOdeFixedStep API.
+
+    emscripten::class_<libOpenCOR::SolverOdeFixedStep, emscripten::base<libOpenCOR::SolverOde>>("SolverOdeFixedStep")
+        .function("step", &libOpenCOR::SolverOdeFixedStep::step)
+        .function("setStep", &libOpenCOR::SolverOdeFixedStep::setStep);
+
+    // SolverNla API.
+
+    emscripten::class_<libOpenCOR::SolverNla, emscripten::base<libOpenCOR::Solver>>("SolverNla");
+
+    // SolverCvode API.
+
+    emscripten::enum_<libOpenCOR::SolverCvode::IntegrationMethod>("SolverCvode.IntegrationMethod")
+        .value("ADAMS_MOULTON", libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON)
+        .value("BDF", libOpenCOR::SolverCvode::IntegrationMethod::BDF);
+
+    emscripten::enum_<libOpenCOR::SolverCvode::IterationType>("SolverCvode.IterationType")
+        .value("FUNCTIONAL", libOpenCOR::SolverCvode::IterationType::FUNCTIONAL)
+        .value("NEWTON", libOpenCOR::SolverCvode::IterationType::NEWTON);
+
+    emscripten::enum_<libOpenCOR::SolverCvode::LinearSolver>("SolverCvode.LinearSolver")
+        .value("DENSE", libOpenCOR::SolverCvode::LinearSolver::DENSE)
+        .value("BANDED", libOpenCOR::SolverCvode::LinearSolver::BANDED)
+        .value("DIAGONAL", libOpenCOR::SolverCvode::LinearSolver::DIAGONAL)
+        .value("GMRES", libOpenCOR::SolverCvode::LinearSolver::GMRES)
+        .value("BICGSTAB", libOpenCOR::SolverCvode::LinearSolver::BICGSTAB)
+        .value("TFQMR", libOpenCOR::SolverCvode::LinearSolver::TFQMR);
+
+    emscripten::enum_<libOpenCOR::SolverCvode::Preconditioner>("SolverCvode.Preconditioner")
+        .value("NO", libOpenCOR::SolverCvode::Preconditioner::NO)
+        .value("BANDED", libOpenCOR::SolverCvode::Preconditioner::BANDED);
+
+    emscripten::class_<libOpenCOR::SolverCvode, emscripten::base<libOpenCOR::SolverOde>>("SolverCvode")
+        .smart_ptr_constructor("SolverCvode", &libOpenCOR::SolverCvode::create)
+        .function("maximumStep", &libOpenCOR::SolverCvode::maximumStep)
+        .function("setMaximumStep", &libOpenCOR::SolverCvode::setMaximumStep)
+        .function("maximumNumberOfSteps", &libOpenCOR::SolverCvode::maximumNumberOfSteps)
+        .function("setMaximumNumberOfSteps", &libOpenCOR::SolverCvode::setMaximumNumberOfSteps)
+        .function("integrationMethod", &libOpenCOR::SolverCvode::integrationMethod)
+        .function("setIntegrationMethod", &libOpenCOR::SolverCvode::setIntegrationMethod)
+        .function("iterationType", &libOpenCOR::SolverCvode::iterationType)
+        .function("setIterationType", &libOpenCOR::SolverCvode::setIterationType)
+        .function("linearSolver", &libOpenCOR::SolverCvode::linearSolver)
+        .function("setLinearSolver", &libOpenCOR::SolverCvode::setLinearSolver)
+        .function("preconditioner", &libOpenCOR::SolverCvode::preconditioner)
+        .function("setPreconditioner", &libOpenCOR::SolverCvode::setPreconditioner)
+        .function("upperHalfBandwidth", &libOpenCOR::SolverCvode::upperHalfBandwidth)
+        .function("setUpperHalfBandwidth", &libOpenCOR::SolverCvode::setUpperHalfBandwidth)
+        .function("lowerHalfBandwidth", &libOpenCOR::SolverCvode::lowerHalfBandwidth)
+        .function("setLowerHalfBandwidth", &libOpenCOR::SolverCvode::setLowerHalfBandwidth)
+        .function("relativeTolerance", &libOpenCOR::SolverCvode::relativeTolerance)
+        .function("setRelativeTolerance", &libOpenCOR::SolverCvode::setRelativeTolerance)
+        .function("absoluteTolerance", &libOpenCOR::SolverCvode::absoluteTolerance)
+        .function("setAbsoluteTolerance", &libOpenCOR::SolverCvode::setAbsoluteTolerance)
+        .function("interpolateSolution", &libOpenCOR::SolverCvode::interpolateSolution)
+        .function("setInterpolateSolution", &libOpenCOR::SolverCvode::setInterpolateSolution);
+
+    EM_ASM({
+        Module["SolverCvode"]["IntegrationMethod"] = Module["SolverCvode.IntegrationMethod"];
+        Module["SolverCvode"]["IterationType"] = Module["SolverCvode.IterationType"];
+        Module["SolverCvode"]["LinearSolver"] = Module["SolverCvode.LinearSolver"];
+        Module["SolverCvode"]["Preconditioner"] = Module["SolverCvode.Preconditioner"];
+
+        delete Module["SolverCvode.IntegrationMethod"];
+        delete Module["SolverCvode.IterationType"];
+        delete Module["SolverCvode.LinearSolver"];
+        delete Module["SolverCvode.Preconditioner"];
+    });
+
+    // SolverForwardEuler API.
+
+    emscripten::class_<libOpenCOR::SolverForwardEuler, emscripten::base<libOpenCOR::SolverOdeFixedStep>>("SolverForwardEuler")
+        .smart_ptr_constructor("SolverForwardEuler", &libOpenCOR::SolverForwardEuler::create);
+
+    // SolverFourthOrderRungeKutta API.
+
+    emscripten::class_<libOpenCOR::SolverFourthOrderRungeKutta, emscripten::base<libOpenCOR::SolverOdeFixedStep>>("SolverFourthOrderRungeKutta")
+        .smart_ptr_constructor("SolverFourthOrderRungeKutta", &libOpenCOR::SolverFourthOrderRungeKutta::create);
+
+    // SolverHeun API.
+
+    emscripten::class_<libOpenCOR::SolverHeun, emscripten::base<libOpenCOR::SolverOdeFixedStep>>("SolverHeun")
+        .smart_ptr_constructor("SolverHeun", &libOpenCOR::SolverHeun::create);
+
+    // SolverKinsol API.
+
+    emscripten::enum_<libOpenCOR::SolverKinsol::LinearSolver>("SolverKinsol.LinearSolver")
+        .value("DENSE", libOpenCOR::SolverKinsol::LinearSolver::DENSE)
+        .value("BANDED", libOpenCOR::SolverKinsol::LinearSolver::BANDED)
+        .value("GMRES", libOpenCOR::SolverKinsol::LinearSolver::GMRES)
+        .value("BICGSTAB", libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB)
+        .value("TFQMR", libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
+
+    emscripten::class_<libOpenCOR::SolverKinsol, emscripten::base<libOpenCOR::SolverNla>>("SolverKinsol")
+        .smart_ptr_constructor("SolverKinsol", &libOpenCOR::SolverKinsol::create)
+        .function("maximumNumberOfIterations", &libOpenCOR::SolverKinsol::maximumNumberOfIterations)
+        .function("setMaximumNumberOfIterations", &libOpenCOR::SolverKinsol::setMaximumNumberOfIterations)
+        .function("linearSolver", &libOpenCOR::SolverKinsol::linearSolver)
+        .function("setLinearSolver", &libOpenCOR::SolverKinsol::setLinearSolver)
+        .function("upperHalfBandwidth", &libOpenCOR::SolverKinsol::upperHalfBandwidth)
+        .function("setUpperHalfBandwidth", &libOpenCOR::SolverKinsol::setUpperHalfBandwidth)
+        .function("lowerHalfBandwidth", &libOpenCOR::SolverKinsol::lowerHalfBandwidth)
+        .function("setLowerHalfBandwidth", &libOpenCOR::SolverKinsol::setLowerHalfBandwidth);
+
+    EM_ASM({
+        Module["SolverKinsol"]["LinearSolver"] = Module["SolverKinsol.LinearSolver"];
+
+        delete Module["SolverKinsol.LinearSolver"];
+    });
+
+    // SolverSecondOrderRungeKutta API.
+
+    emscripten::class_<libOpenCOR::SolverSecondOrderRungeKutta, emscripten::base<libOpenCOR::SolverOdeFixedStep>>("SolverSecondOrderRungeKutta")
+        .smart_ptr_constructor("SolverSecondOrderRungeKutta", &libOpenCOR::SolverSecondOrderRungeKutta::create);
 }

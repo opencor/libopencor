@@ -16,38 +16,19 @@ limitations under the License.
 
 #pragma once
 
-#include "solverode.h"
+#include "solverode_p.h"
+
+#include "libopencor/solverodefixedstep.h"
 
 namespace libOpenCOR {
 
-class SolverCvode: public SolverOde
+class SolverOdeFixedStep::Impl: public SolverOde::Impl
 {
-    friend class Solver;
-
 public:
-    ~SolverCvode() override;
-
-    SolverCvode(const SolverCvode &pOther) = delete;
-    SolverCvode(SolverCvode &&pOther) noexcept = delete;
-
-    SolverCvode &operator=(const SolverCvode &pRhs) = delete;
-    SolverCvode &operator=(SolverCvode &&pRhs) noexcept = delete;
-
-    SolverInfoPtr info() const override;
+    double mStep = 1.0;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
-    bool reinitialise(double pVoi) override;
-
-    bool solve(double &pVoi, double pVoiEnd) const override;
-
-private:
-    class Impl;
-
-    Impl *pimpl();
-    const Impl *pimpl() const;
-
-    explicit SolverCvode();
 };
 
 } // namespace libOpenCOR

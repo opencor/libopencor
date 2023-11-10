@@ -48,12 +48,12 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a diagnostics engine.
 
-    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(new clang::DiagnosticOptions());
+    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(new clang::DiagnosticOptions {});
     std::string diagnostics;
     llvm::raw_string_ostream outputStream(diagnostics);
-    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(new clang::DiagnosticsEngine(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs()),
-                                                                                                             &*diagnosticOptions,
-                                                                                                             new clang::TextDiagnosticPrinter(outputStream, &*diagnosticOptions)));
+    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(new clang::DiagnosticsEngine {llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs {}),
+                                                                                                              &*diagnosticOptions,
+                                                                                                              new clang::TextDiagnosticPrinter {outputStream, &*diagnosticOptions}});
 
     diagnosticsEngine->setWarningsAsErrors(true);
 
@@ -157,7 +157,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
-    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction(llvm::unwrap(LLVMGetGlobalContext())));
+    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction {llvm::unwrap(LLVMGetGlobalContext())});
 
     if (!compilerInstance.ExecuteAction(*codeGenAction)) {
         addError("The given code could not be compiled.");
@@ -278,7 +278,7 @@ void *Compiler::Impl::function(const std::string &pName) const
 }
 
 Compiler::Compiler()
-    : Logger(new Impl())
+    : Logger(new Impl {})
 {
 }
 
@@ -299,7 +299,7 @@ const Compiler::Impl *Compiler::pimpl() const
 
 CompilerPtr Compiler::create()
 {
-    return CompilerPtr {new Compiler()};
+    return CompilerPtr {new Compiler {}};
 }
 
 bool Compiler::compile(const std::string &pCode)

@@ -56,6 +56,11 @@ const SolverOde::Impl *SolverOde::pimpl() const
     return static_cast<const Impl *>(Solver::pimpl());
 }
 
+Solver::Type SolverOde::type() const
+{
+    return Type::ODE;
+}
+
 bool SolverOde::reinitialise(double pVoi)
 {
     return pimpl()->reinitialise(pVoi);

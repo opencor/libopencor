@@ -52,17 +52,6 @@ export function expectIssues(logger, expectedIssues) {
   }
 }
 
-export function expectHiddenProperties(
-  hiddenProperties,
-  expectedHiddenProperties,
-) {
-  expect(hiddenProperties.size()).toBe(expectedHiddenProperties.length);
-
-  for (let i = 0; i < hiddenProperties.size(); ++i) {
-    expect(hiddenProperties.get(i)).toBe(expectedHiddenProperties[i]);
-  }
-}
-
 export function allocateMemory(module, arrayBuffer) {
   const memPtr = module._malloc(arrayBuffer.length);
   const mem = new Uint8Array(module.HEAPU8.buffer, memPtr, arrayBuffer.length);
