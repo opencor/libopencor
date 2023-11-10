@@ -132,7 +132,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
 }
 
 SolverFourthOrderRungeKutta::SolverFourthOrderRungeKutta()
-    : SolverOdeFixedStep(new Impl())
+    : SolverOdeFixedStep(new Impl {})
 {
 }
 

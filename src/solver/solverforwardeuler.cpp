@@ -67,7 +67,7 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
 }
 
 SolverForwardEuler::SolverForwardEuler()
-    : SolverOdeFixedStep(new Impl())
+    : SolverOdeFixedStep(new Impl {})
 {
 }
 

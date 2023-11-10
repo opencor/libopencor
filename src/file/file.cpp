@@ -143,7 +143,7 @@ UnsignedCharVector File::Impl::contents()
 }
 
 File::File(const std::string &pFileNameOrUrl)
-    : Logger(new Impl(pFileNameOrUrl))
+    : Logger(new Impl {pFileNameOrUrl})
 {
 }
 

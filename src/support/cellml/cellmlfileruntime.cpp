@@ -101,7 +101,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
 }
 
 CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile)
-    : Logger(new Impl(pCellmlFile))
+    : Logger(new Impl{pCellmlFile})
 {
 }
 

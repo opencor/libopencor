@@ -186,7 +186,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 }
 
 SolverKinsol::SolverKinsol()
-    : SolverNla(new Impl())
+    : SolverNla(new Impl {})
 {
 }
 

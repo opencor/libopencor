@@ -97,7 +97,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) cons
 }
 
 SolverSecondOrderRungeKutta::SolverSecondOrderRungeKutta()
-    : SolverOdeFixedStep(new Impl())
+    : SolverOdeFixedStep(new Impl {})
 {
 }
 

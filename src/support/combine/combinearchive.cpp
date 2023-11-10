@@ -33,7 +33,7 @@ CombineArchive::Impl::~Impl()
 }
 
 CombineArchive::CombineArchive(libcombine::CombineArchive *pArchive)
-    : Logger(new Impl(pArchive))
+    : Logger(new Impl {pArchive})
 {
 }
 
@@ -63,7 +63,7 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 #else
     // Try to retrieve a COMBINE archive.
 
-    auto *archive = new libcombine::CombineArchive();
+    auto *archive = new libcombine::CombineArchive {};
 
     if (archive->initializeFromArchive(pFile->fileName())) {
         return CombineArchivePtr {new CombineArchive {archive}};

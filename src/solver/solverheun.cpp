@@ -98,7 +98,7 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
 }
 
 SolverHeun::SolverHeun()
-    : SolverOdeFixedStep(new Impl())
+    : SolverOdeFixedStep(new Impl {})
 {
 }
 

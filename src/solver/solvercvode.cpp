@@ -264,7 +264,7 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
 }
 
 SolverCvode::SolverCvode()
-    : SolverOde(new Impl())
+    : SolverOde(new Impl {})
 {
 }
 

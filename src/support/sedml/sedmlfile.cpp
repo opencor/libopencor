@@ -37,7 +37,7 @@ SedmlFile::Impl::~Impl()
 }
 
 SedmlFile::SedmlFile(libsedml::SedDocument *pDocument)
-    : Logger(new Impl(pDocument))
+    : Logger(new Impl {pDocument})
 {
 }
 
