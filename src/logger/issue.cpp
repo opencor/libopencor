@@ -25,7 +25,7 @@ Issue::Impl::Impl(std::string pDescription, Type pType)
 }
 
 Issue::Issue(const std::string &pDescription, Type pType)
-    : mPimpl(new Impl(pDescription, pType))
+    : mPimpl(new Impl {pDescription, pType})
 {
 }
 

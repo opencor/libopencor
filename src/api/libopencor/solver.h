@@ -27,8 +27,7 @@ namespace libOpenCOR {
 /**
  * @brief The Solver class.
  *
- * The Solver class is used to get various information about the solvers that are available, as well as to @ref create a
- * solver.
+ * The Solver class is used to retrieve some basic information about a solver.
  */
 
 class LIBOPENCOR_EXPORT Solver: public Logger
@@ -60,104 +59,34 @@ public:
     Solver &operator=(Solver &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Create a @ref Solver object.
+     * @brief Get the type of the solver.
      *
-     * Factory method to create a @ref Solver object which (KiSAO) id or name is given:
+     * Return the type of the solver, i.e. @ref Solver::Type::ODE or @ref Solver::Type::NLA.
      *
-     * ```
-     * auto cvodeSolver = libOpenCOR::Solver::create("KISAO:0000019");
-     * auto anotherCvodeSolver = libOpenCOR::Solver::create("CVODE");
-     * ```
-     *
-     * The following <a href="https://en.wikipedia.org/wiki/Ordinary_differential_equation">ODE</a> solvers can be created:
-     *  - <a href="http://identifiers.org/biomodels.kisao:KISAO_0000019">`KISAO:0000019`</a> | <a href="https://computing.llnl.gov/projects/sundials/cvode">`CVODE`</a>;
-     *  - <a href="http://identifiers.org/biomodels.kisao:KISAO_0000030">`KISAO:0000030`</a> | <a href="https://en.wikipedia.org/wiki/Euler_method">`Forward Euler`</a>;
-     *  - <a href="http://identifiers.org/biomodels.kisao:KISAO_0000032">`KISAO:0000032`</a> | <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Fourth-order Runge-Kutta`</a>;
-     *  - <a href="http://identifiers.org/biomodels.kisao:KISAO_0000301">`KISAO:0000301`</a> | <a href="https://en.wikipedia.org/wiki/Heun's_method">`Heun`</a>; and
-     *  - <a href="http://identifiers.org/biomodels.kisao:KISAO_0000381">`KISAO:0000381`</a> | <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods">`Second-order Runge-Kutta`</a>.
-     *
-     * @param pIdOrName The (KiSAO) id or name, as a @c std::string, of the solver.
-     *
-     * @return A smart pointer to a @ref Solver object.
+     * @return The type, as a @ref Solver::Type, of the solver.
      */
 
-    static SolverPtr create(const std::string &pIdOrName);
+    virtual Solver::Type type() const = 0;
 
     /**
-     * @brief Get various information about the solvers that are available.
+     * @brief Get the (KiSAO) id of the solver.
      *
-     * Get various information about the solvers that are available.
+     * Return the (<a href="https://www.ebi.ac.uk/ols/ontologies/kisao">KiSAO</a>) id of the solver.
      *
-     * @return The information, as a @ref SolverInfoPtrVector, about the solvers that are available.
+     * @return The (KiSAO) id, as a @c std::string, of the solver.
      */
 
-    static SolverInfoPtrVector solversInfo();
+    virtual std::string id() const = 0;
 
     /**
-     * @brief Return whether this solver is valid.
+     * @brief Get the name of the solver.
      *
-     * Return whether this solver is valid.
+     * Return the name of the solver.
      *
-     * @return @c true if this solver is valid, @c false otherwise.
+     * @return The name, as a @c std::string, of the solver.
      */
 
-    bool isValid() const;
-
-    /**
-     * @brief Get some information about this solver.
-     *
-     * Return some information about this solver.
-     *
-     * @return Some information, as a @ref SolverInfo, about this solver.
-     */
-
-    virtual SolverInfoPtr info() const = 0;
-
-    /**
-     * @brief Get the value of a property of this solver.
-     *
-     * Get the value of a property, which (KiSAO) id or name is given, of this solver.
-     *
-     * @param pIdOrName The (KiSAO) id or name, as a @c std::string, of a property.
-     *
-     * @return The value, as a @c std::string, of the property of this solver.
-     */
-
-    std::string property(const std::string &pIdOrName);
-
-    /**
-     * @brief Set the value of a property of this solver.
-     *
-     * Set the value of a property, which (KiSAO) id or name is given, of this solver. If the (KiSAO) id or name is not
-     * supported by this solver then nothing is done.
-     *
-     * @param pIdOrName The (KiSAO) id or name, as a @c std::string, of a property of this solver.
-     * @param pValue The value, as a @c std::string, of a property of this solver.
-     */
-
-    void setProperty(const std::string &pIdOrName, const std::string &pValue);
-
-    /**
-     * @brief Get the properties of this solver.
-     *
-     * Get the properties of this solver.
-     *
-     * @return The properties, as a @ref StringStringMap, of this solver.
-     */
-
-    StringStringMap properties() const;
-
-    /**
-     * @brief Set the properties of this solver.
-     *
-     * Set the properties of this solver. If the (KiSAO) id or name of a property is not supported by this solver then
-     * nothing is done. If @p pProperties has an entry for both the (KiSAO) id and name of a property then the (KiSAO)
-     * id entry is used.
-     *
-     * @param pProperties The properties, as a @ref StringStringMap, of this solver.
-     */
-
-    void setProperties(const StringStringMap &pProperties);
+    virtual std::string name() const = 0;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

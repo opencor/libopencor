@@ -379,11 +379,6 @@ UnsignedCharVector fileContents(const std::filesystem::path &pFilePath)
 }
 #endif
 
-std::string toString(bool pBoolean)
-{
-    return pBoolean ? "True" : "False";
-}
-
 std::string toString(int pNumber)
 {
     std::ostringstream res;
@@ -414,61 +409,6 @@ std::string toString(double pNumber)
 std::string toString(const UnsignedCharVector &pBytes)
 {
     return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
-}
-
-bool toBool(const std::string &pString, bool &pOk)
-{
-    if (pString == "True") {
-        pOk = true;
-
-        return true;
-    }
-
-    if (pString == "False") {
-        pOk = true;
-
-        return false;
-    }
-
-    pOk = false;
-
-    return false;
-}
-
-int toInt(const std::string &pString, bool &pOk)
-{
-    auto res = 0;
-    std::stringstream stream(pString);
-
-    stream >> res;
-
-    pOk = !stream.fail() && stream.eof();
-
-    return res;
-}
-
-size_t toSizeT(const std::string &pString, bool &pOk)
-{
-    size_t res = 0;
-    std::stringstream stream(pString);
-
-    stream >> res;
-
-    pOk = !stream.fail() && stream.eof();
-
-    return res;
-}
-
-double toDouble(const std::string &pString, bool &pOk)
-{
-    auto res = 0.0;
-    std::stringstream stream(pString);
-
-    stream >> res;
-
-    pOk = !stream.fail() && stream.eof();
-
-    return res;
 }
 
 } // namespace libOpenCOR

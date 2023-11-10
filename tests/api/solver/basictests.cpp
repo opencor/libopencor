@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solvers.h"
-
 #include "tests/utils.h"
 
 #include <libcellml>
@@ -90,177 +88,156 @@ TEST(BasicSolverTest, checkNlaModel2)
     checkModel("nla", "2");
 }
 
-TEST(BasicSolverTest, solversInfo)
+TEST(BasicSolverTest, SolverCvode)
 {
-    static const auto ZERO = 0;
-    static const auto ONE = 1;
-    static const auto TWO = 2;
-    static const auto THREE = 3;
-    static const auto FOUR = 4;
-    static const auto FIVE = 5;
-    static const auto SIX = 6;
+    static const auto MAXIMUM_STEP = 1.23;
+    static const auto MAXIMUM_NUMBER_OF_STEPS = 123;
+    static const auto INTEGRATION_METHOD = libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON;
+    static const auto ITERATION_TYPE = libOpenCOR::SolverCvode::IterationType::FUNCTIONAL;
+    static const auto LINEAR_SOLVER = libOpenCOR::SolverCvode::LinearSolver::GMRES;
+    static const auto PRECONDITIONER = libOpenCOR::SolverCvode::Preconditioner::NO;
+    static const auto UPPER_HALF_BANDWIDTH = 3;
+    static const auto LOWER_HALF_BANDWIDTH = 5;
+    static const auto RELATIVE_TOLERANCE = 1.23e-5;
+    static const auto ABSOLUTE_TOLERANCE = 3.45e-7;
+    static const auto INTERPOLATE_SOLUTION = false;
 
-    auto solversInfo = libOpenCOR::Solver::solversInfo();
+    auto solver = libOpenCOR::SolverCvode::create();
 
-    EXPECT_EQ(solversInfo.size(), SIX);
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000019");
+    EXPECT_EQ(solver->name(), "CVODE");
 
-    checkCvodeSolver(solversInfo[ZERO]);
-    checkForwardEulerSolver(solversInfo[ONE]);
-    checkFourthOrderRungeKuttaSolver(solversInfo[TWO]);
-    checkHeunSolver(solversInfo[THREE]);
-    checkKinsolSolver(solversInfo[FOUR]);
-    checkSecondOrderRungeKuttaSolver(solversInfo[FIVE]);
+    EXPECT_EQ(solver->maximumStep(), 0.0);
+    EXPECT_EQ(solver->maximumNumberOfSteps(), 500);
+    EXPECT_EQ(solver->integrationMethod(), libOpenCOR::SolverCvode::IntegrationMethod::BDF);
+    EXPECT_EQ(solver->iterationType(), libOpenCOR::SolverCvode::IterationType::NEWTON);
+    EXPECT_EQ(solver->linearSolver(), libOpenCOR::SolverCvode::LinearSolver::DENSE);
+    EXPECT_EQ(solver->preconditioner(), libOpenCOR::SolverCvode::Preconditioner::BANDED);
+    EXPECT_EQ(solver->upperHalfBandwidth(), 0);
+    EXPECT_EQ(solver->lowerHalfBandwidth(), 0);
+    EXPECT_EQ(solver->relativeTolerance(), 1.0e-7);
+    EXPECT_EQ(solver->absoluteTolerance(), 1.0e-7);
+    EXPECT_EQ(solver->interpolateSolution(), true);
+
+    solver->setMaximumStep(MAXIMUM_STEP);
+    solver->setMaximumNumberOfSteps(MAXIMUM_NUMBER_OF_STEPS);
+    solver->setIntegrationMethod(INTEGRATION_METHOD);
+    solver->setIterationType(ITERATION_TYPE);
+    solver->setLinearSolver(LINEAR_SOLVER);
+    solver->setPreconditioner(PRECONDITIONER);
+    solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
+    solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
+    solver->setRelativeTolerance(RELATIVE_TOLERANCE);
+    solver->setAbsoluteTolerance(ABSOLUTE_TOLERANCE);
+    solver->setInterpolateSolution(INTERPOLATE_SOLUTION);
+
+    EXPECT_EQ(solver->maximumStep(), MAXIMUM_STEP);
+    EXPECT_EQ(solver->maximumNumberOfSteps(), MAXIMUM_NUMBER_OF_STEPS);
+    EXPECT_EQ(solver->integrationMethod(), INTEGRATION_METHOD);
+    EXPECT_EQ(solver->iterationType(), ITERATION_TYPE);
+    EXPECT_EQ(solver->linearSolver(), LINEAR_SOLVER);
+    EXPECT_EQ(solver->preconditioner(), PRECONDITIONER);
+    EXPECT_EQ(solver->upperHalfBandwidth(), UPPER_HALF_BANDWIDTH);
+    EXPECT_EQ(solver->lowerHalfBandwidth(), LOWER_HALF_BANDWIDTH);
+    EXPECT_EQ(solver->relativeTolerance(), RELATIVE_TOLERANCE);
+    EXPECT_EQ(solver->absoluteTolerance(), ABSOLUTE_TOLERANCE);
+    EXPECT_EQ(solver->interpolateSolution(), INTERPOLATE_SOLUTION);
 }
 
-TEST(BasicSolverTest, unknownSolver)
+TEST(BasicSolverTest, SolverForwardEuler)
 {
-    auto solver = libOpenCOR::Solver::create("Unknown");
+    static const auto STEP = 0.123;
 
-    EXPECT_FALSE(solver->isValid());
+    auto solver = libOpenCOR::SolverForwardEuler::create();
+
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000030");
+    EXPECT_EQ(solver->name(), "Forward Euler");
+
+    EXPECT_EQ(solver->step(), 1.0);
+
+    solver->setStep(STEP);
+
+    EXPECT_EQ(solver->step(), STEP);
 }
 
-TEST(BasicSolverTest, cvodeById)
+TEST(BasicSolverTest, SolverFourthOrderRungeKutta)
 {
-    auto solver = libOpenCOR::Solver::create("KISAO:0000019");
+    static const auto STEP = 0.123;
 
-    EXPECT_TRUE(solver->isValid());
+    auto solver = libOpenCOR::SolverFourthOrderRungeKutta::create();
+
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000032");
+    EXPECT_EQ(solver->name(), "Fourth-order Runge-Kutta");
+
+    EXPECT_EQ(solver->step(), 1.0);
+
+    solver->setStep(STEP);
+
+    EXPECT_EQ(solver->step(), STEP);
 }
 
-TEST(BasicSolverTest, cvodeByName)
+TEST(BasicSolverTest, SolverHeun)
 {
-    auto solver = libOpenCOR::Solver::create("CVODE");
+    static const auto STEP = 0.123;
 
-    EXPECT_TRUE(solver->isValid());
+    auto solver = libOpenCOR::SolverHeun::create();
+
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000301");
+    EXPECT_EQ(solver->name(), "Heun");
+
+    EXPECT_EQ(solver->step(), 1.0);
+
+    solver->setStep(STEP);
+
+    EXPECT_EQ(solver->step(), STEP);
 }
 
-TEST(BasicSolverTest, forwardEulerById)
+TEST(BasicSolverTest, SolverKinsol)
 {
-    auto solver = libOpenCOR::Solver::create("KISAO:0000030");
+    static const auto MAXIMUM_NUMBER_OF_ITERATIONS = 123;
+    static const auto LINEAR_SOLVER = libOpenCOR::SolverKinsol::LinearSolver::GMRES;
+    static const auto UPPER_HALF_BANDWIDTH = 3;
+    static const auto LOWER_HALF_BANDWIDTH = 5;
 
-    EXPECT_TRUE(solver->isValid());
+    auto solver = libOpenCOR::SolverKinsol::create();
+
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::NLA);
+    EXPECT_EQ(solver->id(), "KISAO:0000282");
+    EXPECT_EQ(solver->name(), "KINSOL");
+
+    EXPECT_EQ(solver->maximumNumberOfIterations(), 200);
+    EXPECT_EQ(solver->linearSolver(), libOpenCOR::SolverKinsol::LinearSolver::DENSE);
+    EXPECT_EQ(solver->upperHalfBandwidth(), 0);
+    EXPECT_EQ(solver->lowerHalfBandwidth(), 0);
+
+    solver->setMaximumNumberOfIterations(MAXIMUM_NUMBER_OF_ITERATIONS);
+    solver->setLinearSolver(LINEAR_SOLVER);
+    solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
+    solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
+
+    EXPECT_EQ(solver->maximumNumberOfIterations(), MAXIMUM_NUMBER_OF_ITERATIONS);
+    EXPECT_EQ(solver->linearSolver(), LINEAR_SOLVER);
+    EXPECT_EQ(solver->upperHalfBandwidth(), UPPER_HALF_BANDWIDTH);
+    EXPECT_EQ(solver->lowerHalfBandwidth(), LOWER_HALF_BANDWIDTH);
 }
 
-TEST(BasicSolverTest, forwardEulerByName)
+TEST(BasicSolverTest, SolverSecondOrderRungeKutta)
 {
-    auto solver = libOpenCOR::Solver::create("Forward Euler");
+    static const auto STEP = 0.123;
 
-    EXPECT_TRUE(solver->isValid());
-}
+    auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();
 
-TEST(BasicSolverTest, fourthOrderRungeKuttaById)
-{
-    auto solver = libOpenCOR::Solver::create("KISAO:0000032");
+    EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
+    EXPECT_EQ(solver->id(), "KISAO:0000381");
+    EXPECT_EQ(solver->name(), "Second-order Runge-Kutta");
 
-    EXPECT_TRUE(solver->isValid());
-}
+    EXPECT_EQ(solver->step(), 1.0);
 
-TEST(BasicSolverTest, fourthOrderRungeKuttaByName)
-{
-    auto solver = libOpenCOR::Solver::create("Fourth-order Runge-Kutta");
+    solver->setStep(STEP);
 
-    EXPECT_TRUE(solver->isValid());
-}
-
-TEST(BasicSolverTest, heunById)
-{
-    auto solver = libOpenCOR::Solver::create("KISAO:0000301");
-
-    EXPECT_TRUE(solver->isValid());
-}
-
-TEST(BasicSolverTest, heunByName)
-{
-    auto solver = libOpenCOR::Solver::create("Heun");
-
-    EXPECT_TRUE(solver->isValid());
-}
-
-TEST(BasicSolverTest, kinsolById)
-{
-    auto solver = libOpenCOR::Solver::create("KISAO:0000282");
-
-    EXPECT_TRUE(solver->isValid());
-}
-
-TEST(BasicSolverTest, kinsolByName)
-{
-    auto solver = libOpenCOR::Solver::create("KINSOL");
-
-    EXPECT_TRUE(solver->isValid());
-}
-
-TEST(BasicSolverTest, secondOrderRungeKuttaById)
-{
-    auto solver = libOpenCOR::Solver::create("KISAO:0000381");
-
-    EXPECT_TRUE(solver->isValid());
-}
-
-TEST(BasicSolverTest, secondOrderRungeKuttaByName)
-{
-    auto solver = libOpenCOR::Solver::create("Second-order Runge-Kutta");
-
-    EXPECT_TRUE(solver->isValid());
-}
-
-TEST(BasicSolverTest, properties)
-{
-    auto solver = libOpenCOR::Solver::create("Forward Euler");
-    auto properties = solver->properties();
-
-    EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("KISAO:0000483"), "1");
-    EXPECT_EQ(solver->property("Step"), "1");
-
-    solver->setProperty("Step", "1.23");
-
-    EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("KISAO:0000483"), "1.23");
-
-    solver->setProperty("KISAO:0000483", "7.89");
-
-    EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "7.89");
-
-    solver->setProperty("Unknown", "1.23");
-
-    EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "7.89");
-    EXPECT_EQ(solver->property("Unknown"), "");
-
-    properties["Step"] = "1.23";
-
-    EXPECT_EQ(properties.size(), 2);
-
-    solver->setProperties(properties);
-
-    EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "1");
-
-    properties["Unknown"] = "1.23";
-
-    EXPECT_EQ(properties.size(), 3);
-
-    solver->setProperties(properties);
-
-    EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "1");
-
-    properties["KISAO:0000483"] = "1.23";
-
-    EXPECT_EQ(properties.size(), 3);
-
-    solver->setProperties(properties);
-
-    EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "1.23");
-
-    properties.erase("KISAO:0000483");
-
-    EXPECT_EQ(properties.size(), 2);
-
-    solver->setProperties(properties);
-
-    EXPECT_EQ(solver->properties().size(), 1);
-    EXPECT_EQ(solver->property("Step"), "1.23");
+    EXPECT_EQ(solver->step(), STEP);
 }

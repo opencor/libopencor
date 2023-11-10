@@ -33,8 +33,12 @@ from .module import (
     SedStyle,
     # Solver API.
     Solver,
-    SolverInfo,
-    SolverProperty,
+    SolverCvode,
+    SolverForwardEuler,
+    SolverFourthOrderRungeKutta,
+    SolverHeun,
+    SolverKinsol,
+    SolverSecondOrderRungeKutta,
     # Version API.
     version,
     version_string,
@@ -74,8 +78,12 @@ __all__ = (
     "SedStyle",
     # Solver API.
     "Solver",
-    "SolverInfo",
-    "SolverProperty",
+    "SolverCvode",
+    "SolverForwardEuler",
+    "SolverFourthOrderRungeKutta",
+    "SolverHeun",
+    "SolverKinsol",
+    "SolverSecondOrderRungeKutta",
     # Version API.
     "version",
     "version_string",

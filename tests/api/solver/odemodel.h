@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "solverode.h"
+#include "libopencor/solverode.h"
 
 #include "tests/utils.h"
 
@@ -24,7 +24,7 @@ namespace OdeModel {
 
 #include "../../res/api/solver/ode/model.h"
 
-std::tuple<std::shared_ptr<libOpenCOR::SolverOde>, double *, double *, double *> initialise(const std::string &pSolverName);
+std::tuple<double *, double *, double *> initialise();
 void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
              double *pStates, double *pRates, double *pVariables,
              const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors);

@@ -25,9 +25,7 @@ if(LIBOPENCOR_DOCUMENTATION)
     foreach(DOCUMENTATION_NAME user developer)
         build_documentation(${DOCUMENTATION_NAME}_documentation
                             libopencor-${DOCUMENTATION_NAME}-documentation
-                            ${DOCUMENTATION_NAME}
-                            -DPYTHON_EXECUTABLE=${PYTHON_EXE}
-                            -DSPHINX_EXECUTABLE=${SPHINX_EXE})
+                            ${DOCUMENTATION_NAME})
     endforeach()
 
     # API documentation.

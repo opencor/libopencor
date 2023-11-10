@@ -64,23 +64,36 @@ using SedStylePtr = std::shared_ptr<SedStyle>; /**< Type definition for the shar
 class Solver;
 using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
 
-class SolverInfo;
-using SolverInfoPtr = std::shared_ptr<SolverInfo>; /**< Type definition for the shared @ref SolverInfo pointer. */
+class SolverCvode;
+using SolverCvodePtr = std::shared_ptr<SolverCvode>; /**< Type definition for the shared @ref SolverCvode pointer. */
 
-class SolverProperty;
-using SolverPropertyPtr = std::shared_ptr<SolverProperty>; /**< Type definition for the shared @ref SolverProperty pointer. */
+class SolverForwardEuler;
+using SolverForwardEulerPtr = std::shared_ptr<SolverForwardEuler>; /**< Type definition for the shared @ref SolverForwardEuler pointer. */
+
+class SolverFourthOrderRungeKutta;
+using SolverFourthOrderRungeKuttaPtr = std::shared_ptr<SolverFourthOrderRungeKutta>; /**< Type definition for the shared @ref SolverFourthOrderRungeKutta pointer. */
+
+class SolverHeun;
+using SolverHeunPtr = std::shared_ptr<SolverHeun>; /**< Type definition for the shared @ref SolverHeun pointer. */
+
+class SolverKinsol;
+using SolverKinsolPtr = std::shared_ptr<SolverKinsol>; /**< Type definition for the shared @ref SolverKinsol pointer. */
+
+class SolverNla;
+using SolverNlaPtr = std::shared_ptr<SolverNla>; /**< Type definition for the shared @ref SolverNla pointer. */
+
+class SolverOde;
+using SolverOdePtr = std::shared_ptr<SolverOde>; /**< Type definition for the shared @ref SolverOde pointer. */
+
+class SolverOdeFixedStep;
+using SolverOdeFixedStepPtr = std::shared_ptr<SolverOdeFixedStep>; /**< Type definition for the shared @ref SolverOdeFixedStep pointer. */
+
+class SolverSecondOrderRungeKutta;
+using SolverSecondOrderRungeKuttaPtr = std::shared_ptr<SolverSecondOrderRungeKutta>; /**< Type definition for the shared @ref SolverSecondOrderRungeKutta pointer. */
 
 // Vectors.
 
 using IssuePtrVector = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
-using SolverInfoPtrVector = std::vector<SolverInfoPtr>; /**< Type definition for a vector of @ref SolverInfo pointers. */
-using SolverPropertyPtrVector = std::vector<SolverPropertyPtr>; /**< Type definition for a vector of @ref SolverProperty pointers. */
-using StringVector = std::vector<std::string>; /**< Type definition for a vector of strings. */
 using UnsignedCharVector = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
-
-// Maps.
-
-using StringSizetMap = std::map<std::string, size_t>; /**< Type definition for a map of sizes. */
-using StringStringMap = std::map<std::string, std::string>; /**< Type definition for a map of strings. */
 
 } // namespace libcellml

@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "cellmlfileruntime_p.h"
-
 #include "compiler.h"
 
 namespace libOpenCOR {
@@ -102,7 +101,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
 }
 
 CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile)
-    : Logger(new Impl(pCellmlFile))
+    : Logger(new Impl{pCellmlFile})
 {
 }
 

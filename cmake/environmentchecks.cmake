@@ -144,6 +144,7 @@ endif()
 find_program(BLACK_EXE NAMES ${PREFERRED_BLACK_NAMES} black)
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
+find_program(EMCC_EXE NAMES ${PREFERRED_EMCC_NAMES} emcc)
 find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
 find_program(EMCONFIGURE_EXE NAMES ${PREFERRED_EMCONFIGURE_NAMES} emconfigure)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
@@ -246,16 +247,29 @@ else()
     set(CODE_ANALYSIS_ERROR_MESSAGE "Code analysis is requested but Clang-Tidy could not be found.")
 endif()
 
-if(EMCMAKE_EXE AND EMCONFIGURE_EXE)
-    set(JAVASCRIPT_BINDINGS_AVAILABLE TRUE)
+if(EMCC_EXE AND EMCMAKE_EXE AND EMCONFIGURE_EXE)
+    set(FORBIDDEN_EMCC_VERSION 3.1.48)
+
+    execute_process(COMMAND ${EMCC_EXE} --version
+                    OUTPUT_VARIABLE EMCC_VERSION
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_QUIET)
+
+    string(REGEX REPLACE "^emcc .* ([0-9]+\.[0-9]+\.[0-9]+).*" "\\1" EMCC_VERSION "${EMCC_VERSION}")
+
+    if(EMCC_VERSION VERSION_EQUAL FORBIDDEN_EMCC_VERSION)
+        set(JAVASCRIPT_BINDINGS_ERROR_MESSAGE "JavaScript bindings are requested and Emscripten ${EMCC_VERSION} was found, but it is known to cause problems. Please use another version of Emscripten.")
+    else()
+        set(JAVASCRIPT_BINDINGS_AVAILABLE TRUE)
+    endif()
 else()
-    set(JAVASCRIPT_BINDINGS_ERROR_MESSAGE "JavaScript bindings are requested but the emcmake and/or emconfigure tools could not be found.")
+    set(JAVASCRIPT_BINDINGS_ERROR_MESSAGE "JavaScript bindings are requested but the emcc, emcmake and/or emconfigure tools could not be found.")
 endif()
 
 if(JAVASCRIPT_BINDINGS_AVAILABLE AND NODE_EXE AND NPM_EXE)
     set(JAVASCRIPT_UNIT_TESTING_AVAILABLE TRUE)
 else()
-    set(JAVASCRIPT_UNIT_TESTING_ERROR_MESSAGE "JavaScript unit testing is requested but the emcmake, emconfigure, node, and/or npm tools could not be found.")
+    set(JAVASCRIPT_UNIT_TESTING_ERROR_MESSAGE "JavaScript unit testing is requested but the node and/or npm tools could not be found.")
 endif()
 
 if(FIND_EXE AND LLVM_COV_EXE AND LLVM_PROFDATA_EXE AND CODE_COVERAGE_COMPILER_FLAGS_OK)
@@ -296,7 +310,7 @@ endif()
 if(PYTHON_BINDINGS_AVAILABLE AND PYTEST_EXE)
     set(PYTHON_UNIT_TESTING_AVAILABLE TRUE)
 else()
-    set(PYTHON_UNIT_TESTING_ERROR_MESSAGE "Python unit testing is requested but Python libraries and/or the pytest tool could not be found.")
+    set(PYTHON_UNIT_TESTING_ERROR_MESSAGE "Python unit testing is requested but the pytest tool could not be found.")
 endif()
 
 if(PYTHON_UNIT_TESTING_AVAILABLE AND PYTHON_EXE)
@@ -332,6 +346,7 @@ mark_as_advanced(BLACK_EXE
                  BUILDCACHE_EXE
                  CLANG_FORMAT_EXE
                  CLANG_TIDY_EXE
+                 EMCC_EXE
                  EMCMAKE_EXE
                  EMCONFIGURE_EXE
                  FIND_EXE
