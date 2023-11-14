@@ -107,9 +107,6 @@ public:
 
     static SolverCvodePtr create();
 
-    std::string id() const override;
-    std::string name() const override;
-
     /**
      * @brief Get the maximum step used by the solver.
      *

@@ -59,7 +59,10 @@ public:
 
     std::map<ComputeSystem, SolverKinsolData> mData;
 
+    explicit Impl();
     ~Impl() override;
+
+    StringStringMap properties() const override;
 
     bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 };

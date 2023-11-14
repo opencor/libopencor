@@ -29,6 +29,18 @@ void Logger::Impl::addIssues(const LoggerPtr &pLogger)
     */
 }
 
+void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger)
+{
+    for (size_t i = 0; i < pLogger->issueCount(); ++i) {
+        auto issue = pLogger->issue(i);
+
+        addIssue(issue->description(),
+                 (issue->level() == libcellml::Issue::Level::ERROR)   ? Issue::Type::ERROR :
+                 (issue->level() == libcellml::Issue::Level::WARNING) ? Issue::Type::WARNING :
+                                                                        Issue::Type::MESSAGE);
+    }
+}
+
 void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
 {
     auto issue = IssuePtr {new Issue {pDescription, pType}};

@@ -15,8 +15,23 @@ limitations under the License.
 */
 
 #include "sedsimulation_p.h"
+#include "solvernla_p.h"
+#include "solverode_p.h"
 
 namespace libOpenCOR {
+
+void SedSimulation::Impl::serialise(xmlNodePtr pNode) const
+{
+    if ((mOdeSolver != nullptr) || (mNlaSolver != nullptr)) {
+        if (mOdeSolver != nullptr) {
+            mOdeSolver->pimpl()->serialise(pNode, true);
+        }
+
+        if (mNlaSolver != nullptr) {
+            mNlaSolver->pimpl()->serialise(pNode, false);
+        }
+    }
+}
 
 SedSimulation::SedSimulation(Impl *pPimpl)
     : SedBase(pPimpl)
@@ -34,5 +49,15 @@ const SedSimulation::Impl *SedSimulation::pimpl() const
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
 */
+
+void SedSimulation::setOdeSolver(const SolverOdePtr &pOdeSolver)
+{
+    pimpl()->mOdeSolver = pOdeSolver;
+}
+
+void SedSimulation::setNlaSolver(const SolverNlaPtr &pNlaSolver)
+{
+    pimpl()->mNlaSolver = pNlaSolver;
+}
 
 } // namespace libOpenCOR

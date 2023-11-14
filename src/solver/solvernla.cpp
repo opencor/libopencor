@@ -26,6 +26,11 @@ void nlaSolve(SolverNla *pSolver, void (*pObjectiveFunction)(double *, double *,
     pSolver->solve(pObjectiveFunction, pU, pN, pData);
 }
 
+SolverNla::Impl::Impl(const std::string &pId, const std::string &pName)
+    : Solver::Impl(pId, pName)
+{
+}
+
 SolverNla::SolverNla(Impl *pPimpl)
     : Solver(pPimpl)
 {

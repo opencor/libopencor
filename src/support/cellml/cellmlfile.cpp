@@ -22,13 +22,38 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-CellmlFile::Impl::Impl(const libcellml::ModelPtr &pModel)
+CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel)
     : mModel(pModel)
 {
+    // Resolve imports and flatten the model, if needed and possible.
+
+    if (mModel->hasUnresolvedImports()) {
+        auto importer = libcellml::Importer::create();
+
+        if (importer->resolveImports(mModel, stringToPath(pFile->path()).parent_path().string())) {
+            mModel = importer->flattenModel(mModel);
+        } else {
+            addIssues(importer);
+        }
+    }
+
+    // Analyse the model, if possible.
+
+    if (mErrors.empty()) {
+        auto analyser = libcellml::Analyser::create();
+
+        analyser->analyseModel(mModel);
+
+        mAnalyserModel = analyser->model();
+
+        if (analyser->errorCount() != 0) {
+            addIssues(analyser);
+        }
+    }
 }
 
-CellmlFile::CellmlFile(const libcellml::ModelPtr &pModel)
-    : Logger(new Impl {pModel})
+CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel)
+    : Logger(new Impl {pFile, pModel})
 {
 }
 
@@ -42,12 +67,10 @@ CellmlFile::Impl *CellmlFile::pimpl()
     return static_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const CellmlFile::Impl *CellmlFile::pimpl() const
 {
     return static_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 {
@@ -72,11 +95,16 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
         }
 
         if (isCellmlFile) {
-            return CellmlFilePtr {new CellmlFile {model}};
+            return CellmlFilePtr {new CellmlFile {pFile, model}};
         }
     }
 
     return nullptr;
+}
+
+libcellml::AnalyserModel::Type CellmlFile::type() const
+{
+    return (pimpl()->mAnalyserModel != nullptr) ? pimpl()->mAnalyserModel->type() : libcellml::AnalyserModel::Type::UNKNOWN;
 }
 
 /*---GRY---

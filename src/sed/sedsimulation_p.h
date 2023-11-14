@@ -19,11 +19,18 @@ limitations under the License.
 #include "sedbase_p.h"
 
 #include "libopencor/sedsimulation.h"
+#include "libopencor/solvernla.h"
+#include "libopencor/solverode.h"
 
 namespace libOpenCOR {
 
 class SedSimulation::Impl: public SedBase::Impl
 {
+public:
+    SolverOdePtr mOdeSolver;
+    SolverNlaPtr mNlaSolver;
+
+    void serialise(xmlNodePtr pNode) const override;
 };
 
 } // namespace libOpenCOR

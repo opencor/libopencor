@@ -20,6 +20,11 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverHeun::Impl::Impl()
+    : SolverOdeFixedStep::Impl("KISAO:0000301", "Heun")
+{
+}
+
 SolverHeun::Impl::~Impl()
 {
     delete[] mK;
@@ -120,16 +125,6 @@ const SolverHeun::Impl *SolverHeun::pimpl() const
 SolverHeunPtr SolverHeun::create()
 {
     return SolverHeunPtr {new SolverHeun {}};
-}
-
-std::string SolverHeun::id() const
-{
-    return "KISAO:0000301";
-}
-
-std::string SolverHeun::name() const
-{
-    return "Heun";
 }
 
 bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

@@ -25,6 +25,8 @@ namespace libOpenCOR {
 class SolverForwardEuler::Impl: public SolverOdeFixedStep::Impl
 {
 public:
+    explicit Impl();
+
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
 

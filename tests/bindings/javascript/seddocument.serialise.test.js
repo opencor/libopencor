@@ -34,57 +34,64 @@ describe("SedDocument serialise tests", () => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
-  test("Local CellML file with base path", () => {
-    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
+  function expectedSerialisation(source) {
+    return (
+      `<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="` +
+      source +
+      `"/>
   </listOfModels>
   <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
   </listOfSimulations>
 </sed>
-`;
+`
+    );
+  }
+
+  test("Local CellML file with base path", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt"),
+    );
   });
 
   test("Local CellML file without base path", () => {
-    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file:///some/path/file.txt"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-`;
     const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
-    expect(sed.serialise()).toBe(expectedSerialisation);
+    expect(sed.serialise()).toBe(
+      expectedSerialisation("file:///some/path/file.txt"),
+    );
   });
 
   test("Relative local CellML file with base path", () => {
-    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="some/path/file.txt"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-`;
     const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument();
 
@@ -92,81 +99,47 @@ describe("SedDocument serialise tests", () => {
     sed.initialise(file);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
-      expectedSerialisation,
+      expectedSerialisation("some/path/file.txt"),
     );
   });
 
   test("Relative local CellML file without base path", () => {
-    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-`;
     const file = new libopencor.File("file.txt");
     const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
-    expect(sed.serialise()).toBe(expectedSerialisation);
+    expect(sed.serialise()).toBe(expectedSerialisation("file.txt"));
   });
 
   test("Remote CellML file with base path", () => {
-    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-`;
     const file = new libopencor.File(utils.REMOTE_FILE);
     const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
-    expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(expectedSerialisation);
+    expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(
+      expectedSerialisation("cellml_2.cellml"),
+    );
   });
 
   test("Remote CellML file without base path", () => {
-    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-`;
     const file = new libopencor.File(utils.REMOTE_FILE);
     const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
     sed.initialise(file);
 
-    expect(sed.serialise()).toBe(expectedSerialisation);
+    expect(sed.serialise()).toBe(
+      expectedSerialisation(
+        "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml",
+      ),
+    );
   });
 
   test("Relative remote CellML file with base path", () => {
-    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="tests/res/cellml_2.cellml"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-`;
     const file = new libopencor.File(utils.REMOTE_FILE);
     const sed = new libopencor.SedDocument();
 
@@ -174,7 +147,7 @@ describe("SedDocument serialise tests", () => {
     sed.initialise(file);
 
     expect(sed.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
-      expectedSerialisation,
+      expectedSerialisation("tests/res/cellml_2.cellml"),
     );
   });
 });

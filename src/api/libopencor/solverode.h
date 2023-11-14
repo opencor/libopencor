@@ -28,6 +28,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverOde: public Solver
 {
+    friend class SedSimulation;
+
 public:
     using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables); /**< Signature of the method that computes the rates of the ODE system. */
 

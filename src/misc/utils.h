@@ -28,10 +28,16 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+#include <libxml/xmlstring.h>
+
 namespace libOpenCOR {
+
+static const std::string LIBOPENCOR_NAMESPACE = "https://opencor.ws/libopencor";
 
 using ConstCharPtrVector = std::vector<const char *>;
 using FileVector = std::vector<File *>;
+
+using StringStringMap = std::map<std::string, std::string>;
 
 #ifdef NDEBUG
 #    define ASSERT_EQ(x, y) \
@@ -85,5 +91,7 @@ std::string toString(int pNumber);
 std::string toString(size_t pNumber);
 std::string toString(double pNumber);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedCharVector &pBytes);
+
+const xmlChar *constXmlCharPtr(const std::string &pString);
 
 } // namespace libOpenCOR

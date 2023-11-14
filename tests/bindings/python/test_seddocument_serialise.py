@@ -19,149 +19,110 @@ import utils
 from utils import assert_issues
 
 
-def test_local_cellml_file_with_base_path():
-    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+def expected_serialisation(source):
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="{source}"/>
   </listOfModels>
   <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
   </listOfSimulations>
 </sed>
 """
+
+
+def test_local_cellml_file_with_base_path():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     sed = SedDocument()
 
     sed.initialise(file)
 
-    assert sed.serialise(utils.resource_path()) == expected_serialisation
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml"
+    )
 
 
 def test_local_cellml_file_without_base_path():
-    if platform.system() == "Windows":
-        expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file:///P:/some/path/file.txt"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-"""
-    else:
-        expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file:///some/path/file.txt"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-"""
-
     file = File(utils.LOCAL_FILE)
     sed = SedDocument()
 
     file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
     sed.initialise(file)
 
-    assert sed.serialise() == expected_serialisation
+    if platform.system() == "Windows":
+        assert sed.serialise() == expected_serialisation(
+            "file:///P:/some/path/file.txt"
+        )
+    else:
+        assert sed.serialise() == expected_serialisation("file:///some/path/file.txt")
 
 
 def test_relative_local_cellml_file_with_base_path():
-    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="tests/res/cellml_2.cellml"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-"""
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     sed = SedDocument()
 
     sed.initialise(file)
 
-    assert sed.serialise(utils.resource_path() + "../..") == expected_serialisation
+    assert sed.serialise(utils.resource_path() + "../..") == expected_serialisation(
+        "tests/res/cellml_2.cellml"
+    )
 
 
 def test_relative_local_cellml_file_without_base_path():
-    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-"""
     file = File(utils.CELLML_2_FILE)
     sed = SedDocument()
 
     file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
     sed.initialise(file)
 
-    assert sed.serialise() == expected_serialisation
+    assert sed.serialise() == expected_serialisation("cellml_2.cellml")
 
 
 def test_remote_cellml_file_with_base_path():
-    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-"""
     file = File(utils.REMOTE_FILE)
     sed = SedDocument()
 
     sed.initialise(file)
 
-    assert sed.serialise(utils.REMOTE_BASE_PATH) == expected_serialisation
+    assert sed.serialise(utils.REMOTE_BASE_PATH) == expected_serialisation(
+        "cellml_2.cellml"
+    )
 
 
 def test_remote_cellml_file_without_base_path():
-    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-"""
     file = File(utils.REMOTE_FILE)
     sed = SedDocument()
 
     sed.initialise(file)
 
-    assert sed.serialise() == expected_serialisation
+    assert sed.serialise() == expected_serialisation(
+        "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+    )
 
 
 def test_relative_remote_cellml_file_with_base_path():
-    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="tests/res/cellml_2.cellml"/>
-  </listOfModels>
-  <listOfSimulations>
-    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000"/>
-  </listOfSimulations>
-</sed>
-"""
     file = File(utils.REMOTE_FILE)
     sed = SedDocument()
 
     sed.initialise(file)
 
-    assert sed.serialise(utils.REMOTE_BASE_PATH + "/../..") == expected_serialisation
+    assert sed.serialise(utils.REMOTE_BASE_PATH + "/../..") == expected_serialisation(
+        "tests/res/cellml_2.cellml"
+    )

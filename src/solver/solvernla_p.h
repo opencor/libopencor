@@ -28,6 +28,8 @@ void LIBOPENCOR_UNIT_TESTING_EXPORT nlaSolve(SolverNla *pSolver, void (*pObjecti
 class SolverNla::Impl: public Solver::Impl
 {
 public:
+    explicit Impl(const std::string &pId, const std::string &pName);
+
     virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) = 0;
 };
 

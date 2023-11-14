@@ -21,12 +21,22 @@ limitations under the License.
 
 #include "libopencor/solver.h"
 
+#include <libxml/tree.h>
+
 namespace libOpenCOR {
 
 class Solver::Impl: public Logger::Impl
 {
 public:
+    std::string mId;
+    std::string mName;
+
+    explicit Impl(const std::string &pId, const std::string &pName);
     virtual ~Impl() = default;
+
+    void serialise(xmlNodePtr pNode, bool pOdeSolver) const;
+
+    virtual StringStringMap properties() const = 0;
 };
 
 } // namespace libOpenCOR

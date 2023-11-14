@@ -20,6 +20,11 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverForwardEuler::Impl::Impl()
+    : SolverOdeFixedStep::Impl("KISAO:0000030", "Forward Euler")
+{
+}
+
 bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                           double *pVariables, ComputeRates pComputeRates)
 {
@@ -89,16 +94,6 @@ const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 SolverForwardEulerPtr SolverForwardEuler::create()
 {
     return SolverForwardEulerPtr {new SolverForwardEuler {}};
-}
-
-std::string SolverForwardEuler::id() const
-{
-    return "KISAO:0000030";
-}
-
-std::string SolverForwardEuler::name() const
-{
-    return "Forward Euler";
 }
 
 bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

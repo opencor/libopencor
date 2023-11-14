@@ -20,6 +20,11 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverFourthOrderRungeKutta::Impl::Impl()
+    : SolverOdeFixedStep::Impl("KISAO:0000032", "Fourth-order Runge-Kutta")
+{
+}
+
 SolverFourthOrderRungeKutta::Impl::~Impl()
 {
     delete[] mK1;
@@ -154,16 +159,6 @@ const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() co
 SolverFourthOrderRungeKuttaPtr SolverFourthOrderRungeKutta::create()
 {
     return SolverFourthOrderRungeKuttaPtr {new SolverFourthOrderRungeKutta {}};
-}
-
-std::string SolverFourthOrderRungeKutta::id() const
-{
-    return "KISAO:0000032";
-}
-
-std::string SolverFourthOrderRungeKutta::name() const
-{
-    return "Fourth-order Runge-Kutta";
 }
 
 bool SolverFourthOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,

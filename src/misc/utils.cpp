@@ -411,4 +411,9 @@ std::string toString(const UnsignedCharVector &pBytes)
     return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
 }
 
+const xmlChar *constXmlCharPtr(const std::string &pString)
+{
+    return reinterpret_cast<const xmlChar *>(pString.c_str());
+}
+
 } // namespace libOpenCOR

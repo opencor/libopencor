@@ -20,6 +20,20 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverOdeFixedStep::Impl::Impl(const std::string &pId, const std::string &pName)
+    : SolverOde::Impl(pId, pName)
+{
+}
+
+StringStringMap SolverOdeFixedStep::Impl::properties() const
+{
+    StringStringMap res;
+
+    res["KISAO:0000483"] = toString(mStep);
+
+    return res;
+}
+
 bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                           double *pVariables, ComputeRates pComputeRates)
 {

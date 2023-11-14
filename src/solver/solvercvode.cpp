@@ -50,6 +50,11 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 
 // Solver.
 
+SolverCvode::Impl::Impl()
+    : SolverOde::Impl("KISAO:0000019", "CVODE")
+{
+}
+
 SolverCvode::Impl::~Impl()
 {
     if (mSunContext != nullptr) {
@@ -64,6 +69,30 @@ SolverCvode::Impl::~Impl()
 
         delete mUserData;
     }
+}
+
+StringStringMap SolverCvode::Impl::properties() const
+{
+    StringStringMap res;
+
+    res["KISAO:0000467"] = toString(mMaximumStep);
+    res["KISAO:0000415"] = toString(mMaximumNumberOfSteps);
+    res["KISAO:0000475"] = (mIntegrationMethod == IntegrationMethod::BDF) ? "BDF" : "Adams-Moulton";
+    res["KISAO:0000476"] = (mIterationType == IterationType::FUNCTIONAL) ? "Functional" : "Newton";
+    res["KISAO:0000477"] = (mLinearSolver == LinearSolver::DENSE)    ? "Dense" :
+                           (mLinearSolver == LinearSolver::BANDED)   ? "Banded" :
+                           (mLinearSolver == LinearSolver::DIAGONAL) ? "Diagonal" :
+                           (mLinearSolver == LinearSolver::GMRES)    ? "GMRES" :
+                           (mLinearSolver == LinearSolver::BICGSTAB) ? "BiCGStab" :
+                                                                       "TFQMR";
+    res["KISAO:0000478"] = (mPreconditioner == Preconditioner::NO) ? "No" : "Banded";
+    res["KISAO:0000479"] = toString(mUpperHalfBandwidth);
+    res["KISAO:0000480"] = toString(mLowerHalfBandwidth);
+    res["KISAO:0000209"] = toString(mRelativeTolerance);
+    res["KISAO:0000211"] = toString(mAbsoluteTolerance);
+    res["KISAO:0000481"] = mInterpolateSolution ? "true" : "false";
+
+    return res;
 }
 
 bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
@@ -286,16 +315,6 @@ const SolverCvode::Impl *SolverCvode::pimpl() const
 SolverCvodePtr SolverCvode::create()
 {
     return SolverCvodePtr {new SolverCvode {}};
-}
-
-std::string SolverCvode::id() const
-{
-    return "KISAO:0000019";
-}
-
-std::string SolverCvode::name() const
-{
-    return "CVODE";
 }
 
 double SolverCvode::maximumStep() const

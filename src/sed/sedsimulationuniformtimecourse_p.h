@@ -33,7 +33,7 @@ public:
     explicit Impl(double pInitialTime, double pOutputStartTime, double pOutputEndTime, int pNumberOfSteps,
                   const SedDocumentPtr &pDocument);
 
-    void serialise(xmlNodePtr pNode, const std::string &pBasePath) const override;
+    void serialise(xmlNodePtr pNode) const override;
 };
 
 } // namespace libOpenCOR

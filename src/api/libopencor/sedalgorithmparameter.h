@@ -29,6 +29,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedAlgorithmParameter: public SedBase
 {
+    friend class SedDocument;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.

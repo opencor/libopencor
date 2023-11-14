@@ -47,6 +47,11 @@ int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
 
 // Solver.
 
+SolverKinsol::Impl::Impl()
+    : SolverNla::Impl("KISAO:0000282", "KINSOL")
+{
+}
+
 SolverKinsol::Impl::~Impl()
 {
     for (auto &data : mData) {
@@ -61,6 +66,22 @@ SolverKinsol::Impl::~Impl()
 
         delete data.second.userData;
     }
+}
+
+StringStringMap SolverKinsol::Impl::properties() const
+{
+    StringStringMap res;
+
+    res["KISAO:0000486"] = toString(mMaximumNumberOfIterations);
+    res["KISAO:0000477"] = (mLinearSolver == LinearSolver::DENSE)    ? "Dense" :
+                           (mLinearSolver == LinearSolver::BANDED)   ? "Banded" :
+                           (mLinearSolver == LinearSolver::GMRES)    ? "GMRES" :
+                           (mLinearSolver == LinearSolver::BICGSTAB) ? "BiCGStab" :
+                                                                       "TFQMR";
+    res["KISAO:0000479"] = toString(mUpperHalfBandwidth);
+    res["KISAO:0000480"] = toString(mLowerHalfBandwidth);
+
+    return res;
 }
 
 bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
@@ -208,16 +229,6 @@ const SolverKinsol::Impl *SolverKinsol::pimpl() const
 SolverKinsolPtr SolverKinsol::create()
 {
     return SolverKinsolPtr {new SolverKinsol {}};
-}
-
-std::string SolverKinsol::id() const
-{
-    return "KISAO:0000282";
-}
-
-std::string SolverKinsol::name() const
-{
-    return "KINSOL";
 }
 
 int SolverKinsol::maximumNumberOfIterations() const

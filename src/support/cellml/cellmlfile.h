@@ -46,6 +46,8 @@ public:
 
     static CellmlFilePtr create(const FilePtr &pFile);
 
+    libcellml::AnalyserModel::Type type() const;
+
     libcellml::ModelPtr model() const;
 
     CellmlFileRuntimePtr runtime();
@@ -53,7 +55,7 @@ public:
 private:
     class Impl;
 
-    explicit CellmlFile(const libcellml::ModelPtr &pModel);
+    explicit CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel);
 
     Impl *pimpl();
     const Impl *pimpl() const;

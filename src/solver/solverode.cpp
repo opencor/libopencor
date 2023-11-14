@@ -18,6 +18,11 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+SolverOde::Impl::Impl(const std::string &pId, const std::string &pName)
+    : Solver::Impl(pId, pName)
+{
+}
+
 bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                  ComputeRates pComputeRates)
 {

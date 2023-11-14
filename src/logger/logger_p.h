@@ -19,6 +19,7 @@ limitations under the License.
 #include "libopencor/issue.h"
 #include "libopencor/logger.h"
 
+#include <libcellml>
 #include <vector>
 
 namespace libOpenCOR {
@@ -33,6 +34,8 @@ public:
     IssuePtrVector mMessages;
 
     static void addIssues(const LoggerPtr &pLogger);
+    void addIssues(const libcellml::LoggerPtr &pLogger);
+
     void addIssue(const std::string &pDescription, Issue::Type pType);
 
     void addError(const std::string &pDescription);

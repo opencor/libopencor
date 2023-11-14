@@ -27,6 +27,7 @@ class SolverSecondOrderRungeKutta::Impl: public SolverOdeFixedStep::Impl
 public:
     double *mYk = nullptr;
 
+    explicit Impl();
     ~Impl() override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

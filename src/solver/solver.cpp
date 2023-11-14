@@ -15,14 +15,44 @@ limitations under the License.
 */
 
 #include "solver_p.h"
-#include "solvercvode_p.h"
-#include "solverforwardeuler_p.h"
-#include "solverfourthorderrungekutta_p.h"
-#include "solverheun_p.h"
-#include "solverkinsol_p.h"
-#include "solversecondorderrungekutta_p.h"
 
 namespace libOpenCOR {
+
+Solver::Impl::Impl(const std::string &pId, const std::string &pName)
+    : mId(pId)
+    , mName(pName)
+{
+}
+
+void Solver::Impl::serialise(xmlNodePtr pNode, bool pOdeSolver) const
+{
+    // Solver information.
+
+    auto *algorithmNode = xmlNewNode(nullptr, constXmlCharPtr(pOdeSolver ? "algorithm" : "nlaAlgorithm"));
+
+    if (!pOdeSolver) {
+        xmlSetNs(algorithmNode, xmlNewNs(algorithmNode, constXmlCharPtr(LIBOPENCOR_NAMESPACE), nullptr));
+    }
+
+    xmlNewProp(algorithmNode, constXmlCharPtr("kisaoID"), constXmlCharPtr(mId));
+
+    xmlAddChild(pNode, algorithmNode);
+
+    // Solver properties information.
+
+    auto *propertiesNode = xmlNewNode(nullptr, constXmlCharPtr("listOfAlgorithmParameters"));
+
+    xmlAddChild(algorithmNode, propertiesNode);
+
+    for (auto const &property : properties()) {
+        auto *propertyNode = xmlNewNode(nullptr, constXmlCharPtr("algorithmParameter"));
+
+        xmlNewProp(propertyNode, constXmlCharPtr("kisaoID"), constXmlCharPtr(property.first));
+        xmlNewProp(propertyNode, constXmlCharPtr("value"), constXmlCharPtr(property.second));
+
+        xmlAddChild(propertiesNode, propertyNode);
+    }
+}
 
 Solver::Solver(Impl *pPimpl)
     : Logger(pPimpl)
@@ -37,6 +67,16 @@ Solver::Impl *Solver::pimpl()
 const Solver::Impl *Solver::pimpl() const
 {
     return static_cast<const Impl *>(Logger::pimpl());
+}
+
+std::string Solver::id() const
+{
+    return pimpl()->mId;
+}
+
+std::string Solver::name() const
+{
+    return pimpl()->mName;
 }
 
 } // namespace libOpenCOR

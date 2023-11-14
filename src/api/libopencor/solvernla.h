@@ -28,6 +28,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverNla: public Solver
 {
+    friend class SedSimulation;
+
 public:
     using ComputeSystem = void (*)(double *pU, double *pF, void *pUserData); /**< Signature of the method that computes the system of NLA equations. */
 

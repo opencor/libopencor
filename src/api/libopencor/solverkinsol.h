@@ -70,9 +70,6 @@ public:
 
     static SolverKinsolPtr create();
 
-    std::string id() const override;
-    std::string name() const override;
-
     /**
      * @brief Get the maximum number of iterations used by the solver.
      *

@@ -28,8 +28,9 @@ class CellmlFile::Impl: public Logger::Impl
 {
 public:
     libcellml::ModelPtr mModel;
+    libcellml::AnalyserModelPtr mAnalyserModel;
 
-    explicit Impl(const libcellml::ModelPtr &pModel);
+    explicit Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel);
     ~Impl() = default;
 };
 

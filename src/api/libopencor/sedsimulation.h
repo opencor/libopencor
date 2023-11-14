@@ -43,6 +43,26 @@ public:
     SedSimulation &operator=(const SedSimulation &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SedSimulation &operator=(SedSimulation &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
+    /**
+     * @brief Set the ODE solver for this simulation.
+     *
+     * Set the ODE solver for this simulation.
+     *
+     * @param pOdeSolver The ODE solver, as a @ref SolverOdePtr, for this simulation.
+     */
+
+    void setOdeSolver(const SolverOdePtr &pOdeSolver);
+
+    /**
+     * @brief Set the NLA solver for this simulation.
+     *
+     * Set the NLA solver for this simulation.
+     *
+     * @param pNlaSolver The NLA solver, as a @ref SolverNlaPtr, for this simulation.
+     */
+
+    void setNlaSolver(const SolverNlaPtr &pNlaSolver);
+
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

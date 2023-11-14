@@ -30,6 +30,7 @@ public:
     double *mK3 = nullptr;
     double *mYk = nullptr;
 
+    explicit Impl();
     ~Impl() override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,

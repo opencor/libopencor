@@ -32,9 +32,9 @@ SedSimulationUniformTimeCourse::Impl::Impl(double pInitialTime, double pOutputSt
     mId = pDocument->pimpl()->uniqueId(ID_PREFIX); //---GRY--- THIS SHOULD PROBABLY BE DONE ONLY WHEN SERIALISING...?
 }
 
-void SedSimulationUniformTimeCourse::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
+void SedSimulationUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
 {
-    (void)pBasePath;
+    // Serialise the uniform time course simulation.
 
     auto *node = xmlNewNode(nullptr, constXmlCharPtr("uniformTimeCourse"));
 
@@ -45,6 +45,10 @@ void SedSimulationUniformTimeCourse::Impl::serialise(xmlNodePtr pNode, const std
     xmlNewProp(node, constXmlCharPtr("numberOfSteps"), constXmlCharPtr(toString(mNumberOfSteps)));
 
     xmlAddChild(pNode, node);
+
+    // Serialise the rest of the simulation.
+
+    SedSimulation::Impl::serialise(node);
 }
 
 SedSimulationUniformTimeCourse::SedSimulationUniformTimeCourse(double pInitialTime, double pOutputStartTime,

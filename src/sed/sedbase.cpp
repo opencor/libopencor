@@ -18,12 +18,13 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-const xmlChar *SedBase::Impl::constXmlCharPtr(const std::string &pString)
+void SedBase::Impl::serialise(xmlNodePtr pNode) const
 {
-    return reinterpret_cast<const xmlChar *>(pString.c_str());
+    // Do nothing by default.
+
+    (void)pNode;
 }
 
-/*---GRY---
 void SedBase::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
 {
     // Do nothing by default.
@@ -31,7 +32,6 @@ void SedBase::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) co
     (void)pNode;
     (void)pBasePath;
 }
-*/
 
 SedBase::SedBase(Impl *pPimpl)
     : Logger(pPimpl)

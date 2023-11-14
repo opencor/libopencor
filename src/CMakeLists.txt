@@ -219,8 +219,10 @@ set(HEADER_FILES
     ${VERSION_HEADER_FILE}
 )
 
-include_directories(logger
+include_directories(file
+                    logger
                     misc
+                    solver
                     support/cellml
                     support/combine
                     support/sedml

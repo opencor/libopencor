@@ -62,7 +62,10 @@ public:
 
     SolverCvodeUserData *mUserData = nullptr;
 
+    explicit Impl();
     ~Impl() override;
+
+    StringStringMap properties() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;

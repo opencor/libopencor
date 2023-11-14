@@ -20,6 +20,11 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverSecondOrderRungeKutta::Impl::Impl()
+    : SolverOdeFixedStep::Impl("KISAO:0000381", "Second-order Runge-Kutta")
+{
+}
+
 SolverSecondOrderRungeKutta::Impl::~Impl()
 {
     delete[] mYk;
@@ -119,16 +124,6 @@ const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() co
 SolverSecondOrderRungeKuttaPtr SolverSecondOrderRungeKutta::create()
 {
     return SolverSecondOrderRungeKuttaPtr {new SolverSecondOrderRungeKutta {}};
-}
-
-std::string SolverSecondOrderRungeKutta::id() const
-{
-    return "KISAO:0000381";
-}
-
-std::string SolverSecondOrderRungeKutta::name() const
-{
-    return "Second-order Runge-Kutta";
 }
 
 bool SolverSecondOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,

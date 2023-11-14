@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "file_p.h"
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulationuniformtimecourse_p.h"
@@ -21,8 +22,11 @@ limitations under the License.
 #include "utils.h"
 
 #include "libopencor/file.h"
+#include "libopencor/sedalgorithmparameter.h"
 #include "libopencor/sedmodel.h"
 #include "libopencor/sedsimulationuniformtimecourse.h"
+#include "libopencor/solvercvode.h"
+#include "libopencor/solverkinsol.h"
 
 #include <sstream>
 
@@ -115,12 +119,33 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
                                                                                              OUTPUT_END_TIME_DEFAULT_VALUE,
                                                                                              NUMBER_OF_STEPS_DEFAULT_VALUE,
                                                                                              pOwner}};
+
+    mSimulations.push_back(simulation);
+
+    // Add the solvers needed to run the simulation, if any.
+
+    auto cellmlFileType = pFile->pimpl()->mCellmlFile->type();
+
+    if (cellmlFileType == libcellml::AnalyserModel::Type::ODE) {
+        // We are dealing with an ODE model, so we need an ODE solver to run it and we are going to do this using CVODE.
+
+        simulation->setOdeSolver(SolverCvode::create());
+    } else if (cellmlFileType == libcellml::AnalyserModel::Type::NLA) {
+        // We are dealing with an NLA system, so we need an NLA solver to solve it and we are going to do this using
+        // KINSOL.
+
+        simulation->setNlaSolver(SolverKinsol::create());
+    } else if (cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
+        // We are dealing with a DAE model, so we need both an ODE solver and an NLA solver to run it and we are going
+        // to do this using both CVODE and KINSOL.
+
+        simulation->setOdeSolver(SolverCvode::create());
+        simulation->setNlaSolver(SolverKinsol::create());
+    }
 }
 
-void SedDocument::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
+void SedDocument::Impl::serialise(xmlNodePtr pNode) const
 {
-    (void)pBasePath;
-
     xmlNewProp(pNode, constXmlCharPtr("xmlns"), constXmlCharPtr(mXmlns));
     xmlNewProp(pNode, constXmlCharPtr("level"), constXmlCharPtr(std::to_string(mLevel)));
     xmlNewProp(pNode, constXmlCharPtr("version"), constXmlCharPtr(std::to_string(mVersion)));
@@ -133,7 +158,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     auto *doc = xmlNewDoc(constXmlCharPtr("1.0"));
     auto *sedNode = xmlNewNode(nullptr, constXmlCharPtr("sed"));
 
-    serialise(sedNode, pBasePath);
+    serialise(sedNode);
 
     xmlDocSetRootElement(doc, sedNode);
 
@@ -169,7 +194,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
         auto *sedListOfSimulations = xmlNewNode(nullptr, constXmlCharPtr("listOfSimulations"));
 
         for (const auto &simulation : mSimulations) {
-            simulation->pimpl()->serialise(sedListOfSimulations, pBasePath);
+            simulation->pimpl()->serialise(sedListOfSimulations);
         }
 
         xmlAddChild(sedNode, sedListOfSimulations);
@@ -228,20 +253,6 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
         for (const auto &style : mStyles) {
             (void)style;
         }
-    }
-    */
-
-    // Add the algorithm parameters, if any, to our SED-ML document.
-
-    /*---GRY---
-    if (!mAlgorithmParameters.empty()) {
-        auto *sedListOfAlgorithmParameters = xmlNewNode(nullptr, constXmlCharPtr("listOfAlgorithmParameters"));
-
-        for (const auto &algorithmParameter : mAlgorithmParameters) {
-            (void)algorithmParameter;
-        }
-
-        xmlAddChild(sedNode, sedListOfAlgorithmParameters);
     }
     */
 

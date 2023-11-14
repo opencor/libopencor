@@ -40,15 +40,21 @@ public:
     std::vector<SedDataGeneratorPtr> mDataGenerators;
     std::vector<SedOutputPtr> mOutputs;
     std::vector<SedStylePtr> mStyles;
-    std::vector<SedAlgorithmParameterPtr> mAlgorithmParameters;
 
     std::string uniqueId(const std::string &pPrefix);
 
     void initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner);
     void initialiseWithCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner);
 
-    void serialise(xmlNodePtr pNode, const std::string &pBasePath) const override;
-    std::string serialise(const std::string &pBasePath = {}) const;
+#ifdef BUILDING_USING_CLANG
+    // Prevent Clang from complaining about SedDocument::Impl::serialise() hiding SedBase::Impl::serialise().
+
+    using SedBase::Impl::serialise;
+#endif
+
+    void serialise(xmlNodePtr pNode) const override;
+
+    std::string serialise(const std::string &pBasePath) const;
 };
 
 } // namespace libOpenCOR
