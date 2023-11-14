@@ -31,7 +31,7 @@ void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 
 void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
 {
-    auto issue = std::shared_ptr<Issue> {new Issue {pDescription, pType}};
+    auto issue = IssuePtr {new Issue {pDescription, pType}};
     mIssues.push_back(issue);
 
     mErrors.push_back(issue);

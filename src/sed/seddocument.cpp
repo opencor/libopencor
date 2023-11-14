@@ -100,7 +100,7 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
 {
     // Add a model for the given CellML file.
 
-    mModels.push_back(std::shared_ptr<SedModel> {new SedModel {pFile, pOwner}});
+    mModels.push_back(SedModelPtr {new SedModel {pFile, pOwner}});
 
     // Add a simulation: a uniform time course with an initial "time" and output start "time" of 0, an output end
     // "time" of 1,000, and a number of steps of 1,000.
@@ -110,11 +110,11 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
     static const double OUTPUT_END_TIME_DEFAULT_VALUE = 1000.0;
     static const int NUMBER_OF_STEPS_DEFAULT_VALUE = 1000;
 
-    mSimulations.push_back(std::shared_ptr<SedUniformTimeCourse> {new SedUniformTimeCourse {INITIAL_TIME_DEFAULT_VALUE,
-                                                                                            OUTPUT_START_TIME_DEFAULT_VALUE,
-                                                                                            OUTPUT_END_TIME_DEFAULT_VALUE,
-                                                                                            NUMBER_OF_STEPS_DEFAULT_VALUE,
-                                                                                            pOwner}});
+    mSimulations.push_back(SedUniformTimeCoursePtr {new SedUniformTimeCourse {INITIAL_TIME_DEFAULT_VALUE,
+                                                                              OUTPUT_START_TIME_DEFAULT_VALUE,
+                                                                              OUTPUT_END_TIME_DEFAULT_VALUE,
+                                                                              NUMBER_OF_STEPS_DEFAULT_VALUE,
+                                                                              pOwner}});
 }
 
 void SedDocument::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
@@ -284,7 +284,7 @@ const SedDocument::Impl *SedDocument::pimpl() const
 
 SedDocumentPtr SedDocument::create()
 {
-    return std::shared_ptr<SedDocument> {new SedDocument {}};
+    return SedDocumentPtr {new SedDocument {}};
 }
 
 void SedDocument::initialise(const FilePtr &pFile)

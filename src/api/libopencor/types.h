@@ -40,6 +40,9 @@ using SedAbstractTaskPtr = std::shared_ptr<SedAbstractTask>; /**< Type definitio
 class SedAlgorithmParameter;
 using SedAlgorithmParameterPtr = std::shared_ptr<SedAlgorithmParameter>; /**< Type definition for the shared @ref SedAlgorithmParameter pointer. */
 
+class SedBase;
+using SedBasePtr = std::shared_ptr<SedBase>; /**< Type definition for the shared @ref SedBase pointer. */
+
 class SedDataDescription;
 using SedDataDescriptionPtr = std::shared_ptr<SedDataDescription>; /**< Type definition for the shared @ref SedDataDescription pointer. */
 
@@ -60,6 +63,9 @@ using SedSimulationPtr = std::shared_ptr<SedSimulation>; /**< Type definition fo
 
 class SedStyle;
 using SedStylePtr = std::shared_ptr<SedStyle>; /**< Type definition for the shared @ref SedStyle pointer. */
+
+class SedUniformTimeCourse;
+using SedUniformTimeCoursePtr = std::shared_ptr<SedUniformTimeCourse>; /**< Type definition for the shared @ref SedUniformTimeCourse pointer. */
 
 class Solver;
 using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */

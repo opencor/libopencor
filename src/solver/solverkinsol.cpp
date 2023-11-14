@@ -207,7 +207,7 @@ const SolverKinsol::Impl *SolverKinsol::pimpl() const
 
 SolverKinsolPtr SolverKinsol::create()
 {
-    return std::shared_ptr<SolverKinsol> {new SolverKinsol {}};
+    return SolverKinsolPtr {new SolverKinsol {}};
 }
 
 std::string SolverKinsol::id() const

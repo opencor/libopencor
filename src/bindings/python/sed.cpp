@@ -24,27 +24,27 @@ void sedApi(py::module_ &m)
 {
     // SedBase API.
 
-    py::class_<libOpenCOR::SedBase, libOpenCOR::Logger, std::shared_ptr<libOpenCOR::SedBase>> sedBase(m, "SedBase");
+    py::class_<libOpenCOR::SedBase, libOpenCOR::Logger, libOpenCOR::SedBasePtr> sedBase(m, "SedBase");
 
     // SedAbstractTask API.
 
-    py::class_<libOpenCOR::SedAbstractTask, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedAbstractTask>> sedAbstractTask(m, "SedAbstractTask");
+    py::class_<libOpenCOR::SedAbstractTask, libOpenCOR::SedBase, libOpenCOR::SedAbstractTaskPtr> sedAbstractTask(m, "SedAbstractTask");
 
     // SedAlgorithmParameter API.
 
-    py::class_<libOpenCOR::SedAlgorithmParameter, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedAlgorithmParameter>> sedAlgorithmParameter(m, "SedAlgorithmParameter");
+    py::class_<libOpenCOR::SedAlgorithmParameter, libOpenCOR::SedBase, libOpenCOR::SedAlgorithmParameterPtr> sedAlgorithmParameter(m, "SedAlgorithmParameter");
 
     // SedDataDescription API.
 
-    py::class_<libOpenCOR::SedDataDescription, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedDataDescription>> sedDataDescription(m, "SedDataDescription");
+    py::class_<libOpenCOR::SedDataDescription, libOpenCOR::SedBase, libOpenCOR::SedDataDescriptionPtr> sedDataDescription(m, "SedDataDescription");
 
     // SedDataGenerator API.
 
-    py::class_<libOpenCOR::SedDataGenerator, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedDataGenerator>> sedDataGenerator(m, "SedDataGenerator");
+    py::class_<libOpenCOR::SedDataGenerator, libOpenCOR::SedBase, libOpenCOR::SedDataGeneratorPtr> sedDataGenerator(m, "SedDataGenerator");
 
     // SedDocument API.
 
-    py::class_<libOpenCOR::SedDocument, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedDocument>> sedDocument(m, "SedDocument");
+    py::class_<libOpenCOR::SedDocument, libOpenCOR::SedBase, libOpenCOR::SedDocumentPtr> sedDocument(m, "SedDocument");
 
     sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.")
         .def("initialise", &libOpenCOR::SedDocument::initialise, "Initialise this SedDocument object.", py::arg("file"))
@@ -53,21 +53,21 @@ void sedApi(py::module_ &m)
 
     // SedModel API.
 
-    py::class_<libOpenCOR::SedModel, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedModel>> sedModel(m, "SedModel");
+    py::class_<libOpenCOR::SedModel, libOpenCOR::SedBase, libOpenCOR::SedModelPtr> sedModel(m, "SedModel");
 
     // SedOutput API.
 
-    py::class_<libOpenCOR::SedOutput, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedOutput>> sedOutput(m, "SedOutput");
+    py::class_<libOpenCOR::SedOutput, libOpenCOR::SedBase, libOpenCOR::SedOutputPtr> sedOutput(m, "SedOutput");
 
     // SedSimulation API.
 
-    py::class_<libOpenCOR::SedSimulation, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedSimulation>> sedSimulation(m, "SedSimulation");
+    py::class_<libOpenCOR::SedSimulation, libOpenCOR::SedBase, libOpenCOR::SedSimulationPtr> sedSimulation(m, "SedSimulation");
 
     // SedStyle API.
 
-    py::class_<libOpenCOR::SedStyle, libOpenCOR::SedBase, std::shared_ptr<libOpenCOR::SedStyle>> sedStyle(m, "SedStyle");
+    py::class_<libOpenCOR::SedStyle, libOpenCOR::SedBase, libOpenCOR::SedStylePtr> sedStyle(m, "SedStyle");
 
     // SedUniformTimeCourse API.
 
-    py::class_<libOpenCOR::SedUniformTimeCourse, libOpenCOR::SedSimulation, std::shared_ptr<libOpenCOR::SedUniformTimeCourse>> SedUniformTimeCourse(m, "SedUniformTimeCourse");
+    py::class_<libOpenCOR::SedUniformTimeCourse, libOpenCOR::SedSimulation, libOpenCOR::SedUniformTimeCoursePtr> SedUniformTimeCourse(m, "SedUniformTimeCourse");
 }

@@ -25,8 +25,7 @@ namespace OdeModel {
 #include "../../res/api/solver/ode/model.h"
 
 std::tuple<double *, double *, double *> initialise();
-void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
-             double *pStates, double *pRates, double *pVariables,
+void compute(const libOpenCOR::SolverOdePtr &pSolver, double *pStates, double *pRates, double *pVariables,
              const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors);
 void finalise(double *pStates, double *pRates, double *pVariables);
 
