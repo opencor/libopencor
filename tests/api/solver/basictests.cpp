@@ -47,7 +47,28 @@ void checkModel(const std::string &pModelType, const std::string &pVersion = {})
     profile->setInterfaceHeaderString("#pragma once\n");
     profile->setImplementationHeaderString("#include \"[INTERFACE_FILE_NAME]\"\n");
 
-    if (pModelType == "nla") {
+    if (pModelType == "ode") {
+        profile->setImplementationCreateStatesArrayMethodString("double * createStatesArray()\n"
+                                                                "{\n"
+                                                                "    double *res = (double *) malloc(STATE_COUNT*sizeof(double));\n"
+                                                                "\n"
+                                                                "    for (size_t i = 0; i < STATE_COUNT; ++i) {\n"
+                                                                "        res[i] = strtod(\"NAN\", nullptr);\n"
+                                                                "    }\n"
+                                                                "\n"
+                                                                "    return res;\n"
+                                                                "}\n");
+        profile->setImplementationCreateVariablesArrayMethodString("double * createVariablesArray()\n"
+                                                                   "{\n"
+                                                                   "    double *res = (double *) malloc(VARIABLE_COUNT*sizeof(double));\n"
+                                                                   "\n"
+                                                                   "    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {\n"
+                                                                   "        res[i] = strtod(\"NAN\", nullptr);\n"
+                                                                   "    }\n"
+                                                                   "\n"
+                                                                   "    return res;\n"
+                                                                   "}\n");
+    } else {
         profile->setInterfaceFileNameString("model" + pVersion + ".h");
         profile->setInterfaceVariableCountString("extern const size_t VARIABLE_COUNT_" + pVersion + ";\n");
         profile->setImplementationVariableCountString("const size_t VARIABLE_COUNT_" + pVersion + " = [VARIABLE_COUNT];\n");
@@ -58,7 +79,7 @@ void checkModel(const std::string &pModelType, const std::string &pVersion = {})
                                                                                 "\n"
                                                                                 "    for (size_t i = 0; i < VARIABLE_COUNT_"
                                                                    + pVersion + "; ++i) {\n"
-                                                                                "        res[i] = NAN;\n"
+                                                                                "        res[i] = strtod(\"NAN\", nullptr);\n"
                                                                                 "    }\n"
                                                                                 "\n"
                                                                                 "    return res;\n"
