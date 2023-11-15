@@ -143,11 +143,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mDataDescriptions.empty()) {
         auto *sedListOfDataDescriptions = xmlNewNode(nullptr, constXmlCharPtr("listOfDataDescriptions"));
 
+        xmlAddChild(sedNode, sedListOfDataDescriptions);
+
         for (const auto &dataDescription : mDataDescriptions) {
             (void)dataDescription;
         }
-
-        xmlAddChild(sedNode, sedListOfDataDescriptions);
     }
     */
 
@@ -156,11 +156,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mModels.empty()) {
         auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
 
+        xmlAddChild(sedNode, sedListOfModels);
+
         for (const auto &model : mModels) {
             model->pimpl()->serialise(sedListOfModels, pBasePath);
         }
-
-        xmlAddChild(sedNode, sedListOfModels);
     }
 
     // Add the simulations, if any, to our SED-ML document.
@@ -181,11 +181,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mTasks.empty()) {
         auto *sedListOfTasks = xmlNewNode(nullptr, constXmlCharPtr("listOfTasks"));
 
+        xmlAddChild(sedNode, sedListOfTasks);
+
         for (const auto &task : mTasks) {
             (void)task;
         }
-
-        xmlAddChild(sedNode, sedListOfTasks);
     }
     */
 
@@ -195,11 +195,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mDataGenerators.empty()) {
         auto *sedListOfDataGenerators = xmlNewNode(nullptr, constXmlCharPtr("listOfDataGenerators"));
 
+        xmlAddChild(sedNode, sedListOfDataGenerators);
+
         for (const auto &dataGenerator : mDataGenerators) {
             (void)dataGenerator;
         }
-
-        xmlAddChild(sedNode, sedListOfDataGenerators);
     }
     */
 
@@ -223,11 +223,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mStyles.empty()) {
         auto *sedListOfStyles = xmlNewNode(nullptr, constXmlCharPtr("listOfStyles"));
 
+        xmlAddChild(sedNode, sedListOfStyles);
+
         for (const auto &style : mStyles) {
             (void)style;
         }
-
-        xmlAddChild(sedNode, sedListOfStyles);
     }
     */
 
