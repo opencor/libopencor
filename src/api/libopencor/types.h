@@ -61,11 +61,11 @@ using SedOutputPtr = std::shared_ptr<SedOutput>; /**< Type definition for the sh
 class SedSimulation;
 using SedSimulationPtr = std::shared_ptr<SedSimulation>; /**< Type definition for the shared @ref SedSimulation pointer. */
 
+class SedSimulationUniformTimeCourse;
+using SedSimulationUniformTimeCoursePtr = std::shared_ptr<SedSimulationUniformTimeCourse>; /**< Type definition for the shared @ref SedSimulationUniformTimeCourse pointer. */
+
 class SedStyle;
 using SedStylePtr = std::shared_ptr<SedStyle>; /**< Type definition for the shared @ref SedStyle pointer. */
-
-class SedUniformTimeCourse;
-using SedUniformTimeCoursePtr = std::shared_ptr<SedUniformTimeCourse>; /**< Type definition for the shared @ref SedUniformTimeCourse pointer. */
 
 class Solver;
 using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */

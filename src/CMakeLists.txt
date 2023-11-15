@@ -85,8 +85,8 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedmodel.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedoutput.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedsimulation.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedsimulationuniformtimecourse.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedstyle.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seduniformtimecourse.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solver.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solvercvode.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/solverforwardeuler.h
@@ -148,8 +148,8 @@ set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedmodel.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedoutput.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedsimulation.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedsimulationuniformtimecourse.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedstyle.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/sed/seduniformtimecourse.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
 )
 
@@ -166,8 +166,8 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedmodel_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedoutput_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedsimulation_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedsimulationuniformtimecourse_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedstyle_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/sed/seduniformtimecourse_p.h
     ${GIT_API_SOURCE_FILES}
     ${INTERNAL_SOURCE_FILES}
 )

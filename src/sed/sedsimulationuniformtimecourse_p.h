@@ -18,11 +18,11 @@ limitations under the License.
 
 #include "sedsimulation_p.h"
 
-#include "libopencor/seduniformtimecourse.h"
+#include "libopencor/sedsimulationuniformtimecourse.h"
 
 namespace libOpenCOR {
 
-class SedUniformTimeCourse::Impl: public SedSimulation::Impl
+class SedSimulationUniformTimeCourse::Impl: public SedSimulation::Impl
 {
 public:
     double mInitialTime;

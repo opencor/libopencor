@@ -15,15 +15,15 @@ limitations under the License.
 */
 
 #include "seddocument_p.h"
-#include "seduniformtimecourse_p.h"
+#include "sedsimulationuniformtimecourse_p.h"
 #include "utils.h"
 
 namespace libOpenCOR {
 
 static constexpr auto ID_PREFIX = "simulation";
 
-SedUniformTimeCourse::Impl::Impl(double pInitialTime, double pOutputStartTime, double pOutputEndTime,
-                                 int pNumberOfSteps, const SedDocumentPtr &pDocument)
+SedSimulationUniformTimeCourse::Impl::Impl(double pInitialTime, double pOutputStartTime, double pOutputEndTime,
+                                           int pNumberOfSteps, const SedDocumentPtr &pDocument)
     : mInitialTime(pInitialTime)
     , mOutputStartTime(pOutputStartTime)
     , mOutputEndTime(pOutputEndTime)
@@ -32,7 +32,7 @@ SedUniformTimeCourse::Impl::Impl(double pInitialTime, double pOutputStartTime, d
     mId = pDocument->pimpl()->uniqueId(ID_PREFIX); //---GRY--- THIS SHOULD PROBABLY BE DONE ONLY WHEN SERIALISING...?
 }
 
-void SedUniformTimeCourse::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
+void SedSimulationUniformTimeCourse::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
 {
     (void)pBasePath;
 
@@ -47,24 +47,25 @@ void SedUniformTimeCourse::Impl::serialise(xmlNodePtr pNode, const std::string &
     xmlAddChild(pNode, node);
 }
 
-SedUniformTimeCourse::SedUniformTimeCourse(double pInitialTime, double pOutputStartTime, double pOutputEndTime,
-                                           int pNumberOfSteps, const SedDocumentPtr &pDocument)
+SedSimulationUniformTimeCourse::SedSimulationUniformTimeCourse(double pInitialTime, double pOutputStartTime,
+                                                               double pOutputEndTime, int pNumberOfSteps,
+                                                               const SedDocumentPtr &pDocument)
     : SedSimulation(new Impl(pInitialTime, pOutputStartTime, pOutputEndTime, pNumberOfSteps, pDocument))
 {
 }
 
-SedUniformTimeCourse::~SedUniformTimeCourse()
+SedSimulationUniformTimeCourse::~SedSimulationUniformTimeCourse()
 {
     delete pimpl();
 }
 
-SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl()
+SedSimulationUniformTimeCourse::Impl *SedSimulationUniformTimeCourse::pimpl()
 {
-    return reinterpret_cast<SedUniformTimeCourse::Impl *>(SedSimulation::pimpl());
+    return reinterpret_cast<SedSimulationUniformTimeCourse::Impl *>(SedSimulation::pimpl());
 }
 
 /*---GRY---
-const SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl() const
+const SedSimulationUniformTimeCourse::Impl *SedSimulationUniformTimeCourse::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
 }

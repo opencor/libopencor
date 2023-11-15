@@ -58,11 +58,11 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedSimulation, emscripten::base<libOpenCOR::SedBase>>("SedSimulation");
 
+    // SedSimulationUniformTimeCourse API.
+
+    emscripten::class_<libOpenCOR::SedSimulationUniformTimeCourse, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationUniformTimeCourse");
+
     // SedStyle API.
 
     emscripten::class_<libOpenCOR::SedStyle, emscripten::base<libOpenCOR::SedBase>>("SedStyle");
-
-    // SedUniformTimeCourse API.
-
-    emscripten::class_<libOpenCOR::SedUniformTimeCourse, emscripten::base<libOpenCOR::SedSimulation>>("SedUniformTimeCourse");
 }

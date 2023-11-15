@@ -30,7 +30,7 @@ class LIBOPENCOR_EXPORT SedDocument: public SedBase
     , public std::enable_shared_from_this<SedDocument>
 {
     friend class SedModel;
-    friend class SedUniformTimeCourse;
+    friend class SedSimulationUniformTimeCourse;
 
 public:
     /**

@@ -16,13 +16,13 @@ limitations under the License.
 
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
-#include "seduniformtimecourse_p.h"
+#include "sedsimulationuniformtimecourse_p.h"
 
 #include "utils.h"
 
 #include "libopencor/file.h"
 #include "libopencor/sedmodel.h"
-#include "libopencor/seduniformtimecourse.h"
+#include "libopencor/sedsimulationuniformtimecourse.h"
 
 #include <sstream>
 
@@ -110,11 +110,11 @@ void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const Sed
     static const double OUTPUT_END_TIME_DEFAULT_VALUE = 1000.0;
     static const int NUMBER_OF_STEPS_DEFAULT_VALUE = 1000;
 
-    mSimulations.push_back(SedUniformTimeCoursePtr {new SedUniformTimeCourse {INITIAL_TIME_DEFAULT_VALUE,
-                                                                              OUTPUT_START_TIME_DEFAULT_VALUE,
-                                                                              OUTPUT_END_TIME_DEFAULT_VALUE,
-                                                                              NUMBER_OF_STEPS_DEFAULT_VALUE,
-                                                                              pOwner}});
+    auto simulation = SedSimulationUniformTimeCoursePtr {new SedSimulationUniformTimeCourse {INITIAL_TIME_DEFAULT_VALUE,
+                                                                                             OUTPUT_START_TIME_DEFAULT_VALUE,
+                                                                                             OUTPUT_END_TIME_DEFAULT_VALUE,
+                                                                                             NUMBER_OF_STEPS_DEFAULT_VALUE,
+                                                                                             pOwner}};
 }
 
 void SedDocument::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
