@@ -26,10 +26,6 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedAbstractTask, emscripten::base<libOpenCOR::SedBase>>("SedAbstractTask");
 
-    // SedAlgorithmParameter API.
-
-    emscripten::class_<libOpenCOR::SedAlgorithmParameter, emscripten::base<libOpenCOR::SedBase>>("SedAlgorithmParameter");
-
     // SedDataDescription API.
 
     emscripten::class_<libOpenCOR::SedDataDescription, emscripten::base<libOpenCOR::SedBase>>("SedDataDescription");

@@ -22,7 +22,6 @@ limitations under the License.
 #include "utils.h"
 
 #include "libopencor/file.h"
-#include "libopencor/sedalgorithmparameter.h"
 #include "libopencor/sedmodel.h"
 #include "libopencor/sedsimulationuniformtimecourse.h"
 #include "libopencor/solvercvode.h"

@@ -30,10 +30,6 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedAbstractTask, libOpenCOR::SedBase, libOpenCOR::SedAbstractTaskPtr> sedAbstractTask(m, "SedAbstractTask");
 
-    // SedAlgorithmParameter API.
-
-    py::class_<libOpenCOR::SedAlgorithmParameter, libOpenCOR::SedBase, libOpenCOR::SedAlgorithmParameterPtr> sedAlgorithmParameter(m, "SedAlgorithmParameter");
-
     // SedDataDescription API.
 
     py::class_<libOpenCOR::SedDataDescription, libOpenCOR::SedBase, libOpenCOR::SedDataDescriptionPtr> sedDataDescription(m, "SedDataDescription");
