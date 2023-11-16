@@ -25,13 +25,12 @@ namespace libOpenCOR {
 class SedSimulationUniformTimeCourse::Impl: public SedSimulation::Impl
 {
 public:
-    double mInitialTime;
-    double mOutputStartTime;
-    double mOutputEndTime;
-    int mNumberOfSteps;
+    double mInitialTime = 0.0;
+    double mOutputStartTime = 0.0;
+    double mOutputEndTime = 1000.0;
+    int mNumberOfSteps = 1000;
 
-    explicit Impl(double pInitialTime, double pOutputStartTime, double pOutputEndTime, int pNumberOfSteps,
-                  const SedDocumentPtr &pDocument);
+    explicit Impl(const SedDocumentPtr &pDocument);
 
     void serialise(xmlNodePtr pNode) const override;
 };

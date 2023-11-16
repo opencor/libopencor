@@ -27,16 +27,17 @@ namespace libOpenCOR {
 static constexpr auto ID_PREFIX = "model";
 
 SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
-    : mFile(pFile)
+    : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
+    , mFile(pFile)
 {
-    mId = pDocument->pimpl()->uniqueId(ID_PREFIX); //---GRY--- THIS SHOULD PROBABLY BE DONE ONLY WHEN SERIALISING...?
 }
 
 void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
 {
     auto *node = xmlNewNode(nullptr, constXmlCharPtr("model"));
 
-    xmlNewProp(node, constXmlCharPtr("id"), constXmlCharPtr(mId));
+    SedBase::Impl::serialise(node);
+
     xmlNewProp(node, constXmlCharPtr("language"), constXmlCharPtr("urn:sedml:language:cellml"));
 
     auto source = pBasePath.empty() ?
@@ -73,5 +74,10 @@ const SedModel::Impl *SedModel::pimpl() const
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
 */
+
+SedModelPtr SedModel::create(const FilePtr &pFile, const SedDocumentPtr &pDocument)
+{
+    return SedModelPtr {new SedModel {pFile, pDocument}};
+}
 
 } // namespace libOpenCOR

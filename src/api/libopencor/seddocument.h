@@ -26,11 +26,11 @@ namespace libOpenCOR {
  * The SedDocument class is used to describe a simulation experiment that adheres to the SED-ML specification.
  */
 
-class LIBOPENCOR_EXPORT SedDocument: public SedBase
+class LIBOPENCOR_EXPORT SedDocument: public Logger
     , public std::enable_shared_from_this<SedDocument>
 {
     friend class SedModel;
-    friend class SedSimulationUniformTimeCourse;
+    friend class SedSimulation;
 
 public:
     /**

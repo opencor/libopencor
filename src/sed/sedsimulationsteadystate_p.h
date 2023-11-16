@@ -14,36 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "seddatagenerator_p.h"
+#pragma once
+
+#include "sedsimulation_p.h"
+
+#include "libopencor/sedsimulationsteadystate.h"
 
 namespace libOpenCOR {
 
-/*---GRY---
-SedDataGenerator::SedDataGenerator()
-    : SedBase(new Impl {})
+class SedSimulationSteadyState::Impl: public SedSimulation::Impl
 {
-}
-*/
+public:
+    explicit Impl(const SedDocumentPtr &pDocument);
 
-/*---GRY---
-SedDataGenerator::~SedDataGenerator()
-{
-    delete pimpl();
-}
-*/
-
-/*---GRY---
-SedDataGenerator::Impl *SedDataGenerator::pimpl()
-{
-    return reinterpret_cast<Impl *>(SedBase::pimpl());
-}
-*/
-
-/*---GRY---
-const SedDataGenerator::Impl *SedDataGenerator::pimpl() const
-{
-    return reinterpret_cast<const Impl *>(SedBase::pimpl());
-}
-*/
+    void serialise(xmlNodePtr pNode) const override;
+};
 
 } // namespace libOpenCOR

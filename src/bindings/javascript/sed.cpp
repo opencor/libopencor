@@ -36,7 +36,7 @@ void sedApi()
 
     // SedDocument API.
 
-    emscripten::class_<libOpenCOR::SedDocument, emscripten::base<libOpenCOR::SedBase>>("SedDocument")
+    emscripten::class_<libOpenCOR::SedDocument, emscripten::base<libOpenCOR::Logger>>("SedDocument")
         .smart_ptr_constructor("SedDocument", &libOpenCOR::SedDocument::create)
         .function("initialise", &libOpenCOR::SedDocument::initialise)
         .function("serialise", emscripten::select_overload<std::string() const>(&libOpenCOR::SedDocument::serialise))
@@ -44,7 +44,8 @@ void sedApi()
 
     // SedModel API.
 
-    emscripten::class_<libOpenCOR::SedModel, emscripten::base<libOpenCOR::SedBase>>("SedModel");
+    emscripten::class_<libOpenCOR::SedModel, emscripten::base<libOpenCOR::SedBase>>("SedModel")
+        .smart_ptr_constructor("SedModel", &libOpenCOR::SedModel::create);
 
     // SedOutput API.
 
@@ -54,9 +55,20 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedSimulation, emscripten::base<libOpenCOR::SedBase>>("SedSimulation");
 
+    // SedSimulationOneStep API.
+
+    emscripten::class_<libOpenCOR::SedSimulationOneStep, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationOneStep")
+        .smart_ptr_constructor("SedSimulationOneStep", &libOpenCOR::SedSimulationOneStep::create);
+
+    // SedSimulationSteadyState API.
+
+    emscripten::class_<libOpenCOR::SedSimulationSteadyState, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationSteadyState")
+        .smart_ptr_constructor("SedSimulationSteadyState", &libOpenCOR::SedSimulationSteadyState::create);
+
     // SedSimulationUniformTimeCourse API.
 
-    emscripten::class_<libOpenCOR::SedSimulationUniformTimeCourse, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationUniformTimeCourse");
+    emscripten::class_<libOpenCOR::SedSimulationUniformTimeCourse, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationUniformTimeCourse")
+        .smart_ptr_constructor("SedSimulationUniformTimeCourse", &libOpenCOR::SedSimulationUniformTimeCourse::create);
 
     // SedStyle API.
 

@@ -14,14 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "seddocument_p.h"
 #include "sedsimulation_p.h"
 #include "solvernla_p.h"
 #include "solverode_p.h"
 
 namespace libOpenCOR {
 
+static constexpr auto ID_PREFIX = "simulation";
+
+SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
+    : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
+{
+}
+
 void SedSimulation::Impl::serialise(xmlNodePtr pNode) const
 {
+    SedBase::Impl::serialise(pNode);
+
     if ((mOdeSolver != nullptr) || (mNlaSolver != nullptr)) {
         if (mOdeSolver != nullptr) {
             mOdeSolver->pimpl()->serialise(pNode, true);

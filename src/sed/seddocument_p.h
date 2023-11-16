@@ -24,7 +24,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class SedDocument::Impl: public SedBase::Impl
+class SedDocument::Impl: public Logger::Impl
 {
 public:
     std::string mXmlns = "http://sed-ml.org/sed-ml/level1/version4";
@@ -44,17 +44,11 @@ public:
     std::string uniqueId(const std::string &pPrefix);
 
     void initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner);
-    void initialiseWithCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner);
+    void initialiseFromCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner);
 
-#ifdef BUILDING_USING_CLANG
-    // Prevent Clang from complaining about SedDocument::Impl::serialise() hiding SedBase::Impl::serialise().
+    void serialise(xmlNodePtr pNode) const;
 
-    using SedBase::Impl::serialise;
-#endif
-
-    void serialise(xmlNodePtr pNode) const override;
-
-    std::string serialise(const std::string &pBasePath) const;
+    std::string serialise(const std::string &pBasePath = {}) const;
 };
 
 } // namespace libOpenCOR

@@ -30,6 +30,8 @@ public:
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
 
+    explicit Impl(const SedDocumentPtr &pDocument);
+
     void serialise(xmlNodePtr pNode) const override;
 };
 

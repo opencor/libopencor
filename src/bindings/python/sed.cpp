@@ -40,7 +40,7 @@ void sedApi(py::module_ &m)
 
     // SedDocument API.
 
-    py::class_<libOpenCOR::SedDocument, libOpenCOR::SedBase, libOpenCOR::SedDocumentPtr> sedDocument(m, "SedDocument");
+    py::class_<libOpenCOR::SedDocument, libOpenCOR::Logger, libOpenCOR::SedDocumentPtr> sedDocument(m, "SedDocument");
 
     sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.")
         .def("initialise", &libOpenCOR::SedDocument::initialise, "Initialise this SedDocument object.", py::arg("file"))
@@ -51,6 +51,8 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedModel, libOpenCOR::SedBase, libOpenCOR::SedModelPtr> sedModel(m, "SedModel");
 
+    sedModel.def(py::init(&libOpenCOR::SedModel::create), "Create a SedModel object.");
+
     // SedOutput API.
 
     py::class_<libOpenCOR::SedOutput, libOpenCOR::SedBase, libOpenCOR::SedOutputPtr> sedOutput(m, "SedOutput");
@@ -59,9 +61,23 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedSimulation, libOpenCOR::SedBase, libOpenCOR::SedSimulationPtr> sedSimulation(m, "SedSimulation");
 
+    // SedSimulationOneStep API.
+
+    py::class_<libOpenCOR::SedSimulationOneStep, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationOneStepPtr> sedSimulationOneStep(m, "SedSimulationOneStep");
+
+    sedSimulationOneStep.def(py::init(&libOpenCOR::SedSimulationOneStep::create), "Create a SedSimulationOneStep object.");
+
+    // SedSimulationSteadyState API.
+
+    py::class_<libOpenCOR::SedSimulationSteadyState, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationSteadyStatePtr> sedSimulationSteadyState(m, "SedSimulationSteadyState");
+
+    sedSimulationSteadyState.def(py::init(&libOpenCOR::SedSimulationSteadyState::create), "Create a SedSimulationSteadyState object.");
+
     // SedSimulationUniformTimeCourse API.
 
-    py::class_<libOpenCOR::SedSimulationUniformTimeCourse, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationUniformTimeCoursePtr> SedSimulationUniformTimeCourse(m, "SedSimulationUniformTimeCourse");
+    py::class_<libOpenCOR::SedSimulationUniformTimeCourse, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationUniformTimeCoursePtr> sedSimulationUniformTimeCourse(m, "SedSimulationUniformTimeCourse");
+
+    sedSimulationUniformTimeCourse.def(py::init(&libOpenCOR::SedSimulationUniformTimeCourse::create), "Create a SedSimulationUniformTimeCourse object.");
 
     // SedStyle API.
 

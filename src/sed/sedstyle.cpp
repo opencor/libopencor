@@ -20,7 +20,7 @@ namespace libOpenCOR {
 
 /*---GRY---
 SedStyle::SedStyle()
-    : SedBase(new Impl())
+    : SedBase(new Impl {})
 {
 }
 */

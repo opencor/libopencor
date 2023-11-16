@@ -17,12 +17,13 @@ limitations under the License.
 #include "file_p.h"
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
-#include "sedsimulationuniformtimecourse_p.h"
+#include "sedsimulation_p.h"
 
 #include "utils.h"
 
 #include "libopencor/file.h"
 #include "libopencor/sedmodel.h"
+#include "libopencor/sedsimulationsteadystate.h"
 #include "libopencor/sedsimulationuniformtimecourse.h"
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverkinsol.h"
@@ -74,7 +75,7 @@ void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &p
 
         break;
     case File::Type::CELLML_FILE:
-        initialiseWithCellmlFile(pFile, pOwner);
+        initialiseFromCellmlFile(pFile, pOwner);
 
         break;
     case File::Type::SEDML_FILE:
@@ -99,45 +100,34 @@ void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &p
     }
 }
 
-void SedDocument::Impl::initialiseWithCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner)
+void SedDocument::Impl::initialiseFromCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner)
 {
     // Add a model for the given CellML file.
 
-    mModels.push_back(SedModelPtr {new SedModel {pFile, pOwner}});
+    mModels.push_back(SedModel::create(pFile, pOwner));
 
-    // Add a simulation: a uniform time course with an initial "time" and output start "time" of 0, an output end
-    // "time" of 1,000, and a number of steps of 1,000.
+    // Add a uniform time course simulation in the case of an ODE/DAE model while a steady state simulation in the case
+    // of an algebraic or NLA model.
 
-    static const double INITIAL_TIME_DEFAULT_VALUE = 0.0;
-    static const double OUTPUT_START_TIME_DEFAULT_VALUE = 0.0;
-    static const double OUTPUT_END_TIME_DEFAULT_VALUE = 1000.0;
-    static const int NUMBER_OF_STEPS_DEFAULT_VALUE = 1000;
+    SedSimulationPtr simulation;
+    auto cellmlFileType = pFile->pimpl()->mCellmlFile->type();
 
-    auto simulation = SedSimulationUniformTimeCoursePtr {new SedSimulationUniformTimeCourse {INITIAL_TIME_DEFAULT_VALUE,
-                                                                                             OUTPUT_START_TIME_DEFAULT_VALUE,
-                                                                                             OUTPUT_END_TIME_DEFAULT_VALUE,
-                                                                                             NUMBER_OF_STEPS_DEFAULT_VALUE,
-                                                                                             pOwner}};
+    if ((cellmlFileType == libcellml::AnalyserModel::Type::ODE)
+        || cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
+        simulation = SedSimulationUniformTimeCourse::create(pOwner);
+    } else {
+        simulation = SedSimulationSteadyState::create(pOwner);
+    }
 
     mSimulations.push_back(simulation);
 
-    // Add the solvers needed to run the simulation, if any.
-
-    auto cellmlFileType = pFile->pimpl()->mCellmlFile->type();
+    // Add the required solver(s) depending on the type of our model.
 
     if (cellmlFileType == libcellml::AnalyserModel::Type::ODE) {
-        // We are dealing with an ODE model, so we need an ODE solver to run it and we are going to do this using CVODE.
-
         simulation->setOdeSolver(SolverCvode::create());
     } else if (cellmlFileType == libcellml::AnalyserModel::Type::NLA) {
-        // We are dealing with an NLA system, so we need an NLA solver to solve it and we are going to do this using
-        // KINSOL.
-
         simulation->setNlaSolver(SolverKinsol::create());
     } else if (cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
-        // We are dealing with a DAE model, so we need both an ODE solver and an NLA solver to run it and we are going
-        // to do this using both CVODE and KINSOL.
-
         simulation->setOdeSolver(SolverCvode::create());
         simulation->setNlaSolver(SolverKinsol::create());
     }
@@ -155,11 +145,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     // Serialise our SED-ML document using libxml2.
 
     auto *doc = xmlNewDoc(constXmlCharPtr("1.0"));
-    auto *sedNode = xmlNewNode(nullptr, constXmlCharPtr("sed"));
+    auto *node = xmlNewNode(nullptr, constXmlCharPtr("sed"));
 
-    serialise(sedNode);
+    serialise(node);
 
-    xmlDocSetRootElement(doc, sedNode);
+    xmlDocSetRootElement(doc, node);
 
     // Add the data descriptions, if any, to our SED-ML document.
 
@@ -167,7 +157,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mDataDescriptions.empty()) {
         auto *sedListOfDataDescriptions = xmlNewNode(nullptr, constXmlCharPtr("listOfDataDescriptions"));
 
-        xmlAddChild(sedNode, sedListOfDataDescriptions);
+        xmlAddChild(node, sedListOfDataDescriptions);
 
         for (const auto &dataDescription : mDataDescriptions) {
             (void)dataDescription;
@@ -180,7 +170,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mModels.empty()) {
         auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
 
-        xmlAddChild(sedNode, sedListOfModels);
+        xmlAddChild(node, sedListOfModels);
 
         for (const auto &model : mModels) {
             model->pimpl()->serialise(sedListOfModels, pBasePath);
@@ -196,7 +186,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
             simulation->pimpl()->serialise(sedListOfSimulations);
         }
 
-        xmlAddChild(sedNode, sedListOfSimulations);
+        xmlAddChild(node, sedListOfSimulations);
     }
 
     // Add the tasks, if any, to our SED-ML document.
@@ -205,7 +195,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mTasks.empty()) {
         auto *sedListOfTasks = xmlNewNode(nullptr, constXmlCharPtr("listOfTasks"));
 
-        xmlAddChild(sedNode, sedListOfTasks);
+        xmlAddChild(node, sedListOfTasks);
 
         for (const auto &task : mTasks) {
             (void)task;
@@ -219,7 +209,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mDataGenerators.empty()) {
         auto *sedListOfDataGenerators = xmlNewNode(nullptr, constXmlCharPtr("listOfDataGenerators"));
 
-        xmlAddChild(sedNode, sedListOfDataGenerators);
+        xmlAddChild(node, sedListOfDataGenerators);
 
         for (const auto &dataGenerator : mDataGenerators) {
             (void)dataGenerator;
@@ -237,7 +227,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
             (void)output;
         }
 
-        xmlAddChild(sedNode, sedListOfOutputs);
+        xmlAddChild(node, sedListOfOutputs);
     }
     */
 
@@ -247,7 +237,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mStyles.empty()) {
         auto *sedListOfStyles = xmlNewNode(nullptr, constXmlCharPtr("listOfStyles"));
 
-        xmlAddChild(sedNode, sedListOfStyles);
+        xmlAddChild(node, sedListOfStyles);
 
         for (const auto &style : mStyles) {
             (void)style;
@@ -273,7 +263,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 }
 
 SedDocument::SedDocument()
-    : SedBase(new Impl())
+    : Logger(new Impl {})
 {
 }
 
@@ -284,12 +274,12 @@ SedDocument::~SedDocument()
 
 SedDocument::Impl *SedDocument::pimpl()
 {
-    return reinterpret_cast<Impl *>(SedBase::pimpl());
+    return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
 const SedDocument::Impl *SedDocument::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+    return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
 SedDocumentPtr SedDocument::create()
@@ -304,7 +294,7 @@ void SedDocument::initialise(const FilePtr &pFile)
 
 std::string SedDocument::serialise() const
 {
-    return serialise({});
+    return pimpl()->serialise();
 }
 
 std::string SedDocument::serialise(const std::string &pBasePath) const

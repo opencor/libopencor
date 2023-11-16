@@ -20,41 +20,27 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-static constexpr auto ID_PREFIX = "simulation";
-
-SedSimulationUniformTimeCourse::Impl::Impl(double pInitialTime, double pOutputStartTime, double pOutputEndTime,
-                                           int pNumberOfSteps, const SedDocumentPtr &pDocument)
-    : mInitialTime(pInitialTime)
-    , mOutputStartTime(pOutputStartTime)
-    , mOutputEndTime(pOutputEndTime)
-    , mNumberOfSteps(pNumberOfSteps)
+SedSimulationUniformTimeCourse::Impl::Impl(const SedDocumentPtr &pDocument)
+    : SedSimulation::Impl(pDocument)
 {
-    mId = pDocument->pimpl()->uniqueId(ID_PREFIX); //---GRY--- THIS SHOULD PROBABLY BE DONE ONLY WHEN SERIALISING...?
 }
 
 void SedSimulationUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
 {
-    // Serialise the uniform time course simulation.
-
     auto *node = xmlNewNode(nullptr, constXmlCharPtr("uniformTimeCourse"));
 
-    xmlNewProp(node, constXmlCharPtr("id"), constXmlCharPtr(mId));
+    SedSimulation::Impl::serialise(node);
+
     xmlNewProp(node, constXmlCharPtr("initialTime"), constXmlCharPtr(toString(mInitialTime)));
     xmlNewProp(node, constXmlCharPtr("outputStartTime"), constXmlCharPtr(toString(mOutputStartTime)));
     xmlNewProp(node, constXmlCharPtr("outputEndTime"), constXmlCharPtr(toString(mOutputEndTime)));
     xmlNewProp(node, constXmlCharPtr("numberOfSteps"), constXmlCharPtr(toString(mNumberOfSteps)));
 
     xmlAddChild(pNode, node);
-
-    // Serialise the rest of the simulation.
-
-    SedSimulation::Impl::serialise(node);
 }
 
-SedSimulationUniformTimeCourse::SedSimulationUniformTimeCourse(double pInitialTime, double pOutputStartTime,
-                                                               double pOutputEndTime, int pNumberOfSteps,
-                                                               const SedDocumentPtr &pDocument)
-    : SedSimulation(new Impl(pInitialTime, pOutputStartTime, pOutputEndTime, pNumberOfSteps, pDocument))
+SedSimulationUniformTimeCourse::SedSimulationUniformTimeCourse(const SedDocumentPtr &pDocument)
+    : SedSimulation(new Impl(pDocument))
 {
 }
 
@@ -74,5 +60,10 @@ const SedSimulationUniformTimeCourse::Impl *SedSimulationUniformTimeCourse::pimp
     return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
 }
 */
+
+SedSimulationUniformTimeCoursePtr SedSimulationUniformTimeCourse::create(const SedDocumentPtr &pDocument)
+{
+    return SedSimulationUniformTimeCoursePtr {new SedSimulationUniformTimeCourse {pDocument}};
+}
 
 } // namespace libOpenCOR

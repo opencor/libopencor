@@ -44,6 +44,25 @@ public:
     SedModel &operator=(const SedModel &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SedModel &operator=(SedModel &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
+    /**
+     * @brief Create a @ref SedModel object.
+     *
+     * Factory method to create a @ref SedModel object:
+     *
+     * ```
+     * auto file = libOpenCOR::File::create("/some/path/file.txt");
+     * auto sedDocument = libOpenCOR::SedDocument::create();
+     * auto sedModel = libOpenCOR::SedModel::create(file, sedDocument);
+     * ```
+     *
+     * @param pFile The @ref File object for which to create the @ref SedModel object.
+     * @param pDocument The @ref SedDocument object to which the @ref SedModel object belongs.
+     *
+     * @return A smart pointer to a @ref SedModel object.
+     */
+
+    static SedModelPtr create(const FilePtr &pFile, const SedDocumentPtr &pDocument);
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

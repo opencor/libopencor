@@ -58,6 +58,12 @@ using SedOutputPtr = std::shared_ptr<SedOutput>; /**< Type definition for the sh
 class SedSimulation;
 using SedSimulationPtr = std::shared_ptr<SedSimulation>; /**< Type definition for the shared @ref SedSimulation pointer. */
 
+class SedSimulationOneStep;
+using SedSimulationOneStepPtr = std::shared_ptr<SedSimulationOneStep>; /**< Type definition for the shared @ref SedSimulationOneStep pointer. */
+
+class SedSimulationSteadyState;
+using SedSimulationSteadyStatePtr = std::shared_ptr<SedSimulationSteadyState>; /**< Type definition for the shared @ref SedSimulationSteadyState pointer. */
+
 class SedSimulationUniformTimeCourse;
 using SedSimulationUniformTimeCoursePtr = std::shared_ptr<SedSimulationUniformTimeCourse>; /**< Type definition for the shared @ref SedSimulationUniformTimeCourse pointer. */
 

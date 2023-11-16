@@ -15,22 +15,27 @@ limitations under the License.
 */
 
 #include "sedbase_p.h"
+#include "utils.h"
 
 namespace libOpenCOR {
 
+SedBase::Impl::Impl(const std::string &pId)
+    : mId(pId)
+{
+}
+
 void SedBase::Impl::serialise(xmlNodePtr pNode) const
 {
-    // Do nothing by default.
-
-    (void)pNode;
+    if (!mId.empty()) {
+        xmlNewProp(pNode, constXmlCharPtr("id"), constXmlCharPtr(mId));
+    }
 }
 
 void SedBase::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
 {
-    // Do nothing by default.
-
-    (void)pNode;
     (void)pBasePath;
+
+    serialise(pNode);
 }
 
 SedBase::SedBase(Impl *pPimpl)

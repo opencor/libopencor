@@ -20,7 +20,7 @@ namespace libOpenCOR {
 
 /*---GRY---
 SedDataDescription::SedDataDescription()
-    : SedBase(new Impl())
+    : SedBase(new Impl {})
 {
 }
 */

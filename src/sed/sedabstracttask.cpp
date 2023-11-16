@@ -20,7 +20,7 @@ namespace libOpenCOR {
 
 /*---GRY---
 SedAbstractTask::SedAbstractTask()
-    : SedBase(new Impl())
+    : SedBase(new Impl {})
 {
 }
 */

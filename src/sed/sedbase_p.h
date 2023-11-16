@@ -31,6 +31,7 @@ public:
     std::string mName;
     std::string mMetaId;
 
+    explicit Impl(const std::string &pId = {});
     virtual ~Impl() = default;
 
     virtual void serialise(xmlNodePtr pNode) const;
