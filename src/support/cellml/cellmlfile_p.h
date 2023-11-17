@@ -30,7 +30,7 @@ public:
     libcellml::ModelPtr mModel;
     libcellml::AnalyserModelPtr mAnalyserModel;
 
-    explicit Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel);
+    explicit Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict);
     ~Impl() = default;
 };
 

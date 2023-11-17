@@ -56,7 +56,7 @@ public:
 private:
     class Impl;
 
-    explicit CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel);
+    explicit CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict);
 
     Impl *pimpl();
     const Impl *pimpl() const;

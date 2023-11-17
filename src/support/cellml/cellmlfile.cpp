@@ -22,13 +22,13 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel)
+CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
     : mModel(pModel)
 {
     // Resolve imports and flatten the model, if needed and possible.
 
     if (mModel->hasUnresolvedImports()) {
-        auto importer = libcellml::Importer::create();
+        auto importer = libcellml::Importer::create(pStrict);
 
         if (importer->resolveImports(mModel, stringToPath(pFile->path()).parent_path().string())) {
             mModel = importer->flattenModel(mModel);
@@ -52,8 +52,8 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel)
     }
 }
 
-CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel)
-    : Logger(new Impl {pFile, pModel})
+CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
+    : Logger(new Impl {pFile, pModel, pStrict})
 {
 }
 
@@ -79,14 +79,16 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     auto isCellmlFile = false;
 
     if (!pFile->contents().empty()) {
-        auto parser = libcellml::Parser::create();
+        auto strict = true;
+        auto parser = libcellml::Parser::create(strict);
         auto contents = toString(pFile->contents());
         auto model = parser->parseModel(contents);
 
         if (parser->errorCount() != 0) {
             // We couldn't parse the file contents as a CellML 2.0 file, so maybe it is a CellML 1.x file?
 
-            parser = libcellml::Parser::create(false);
+            strict = false;
+            parser = libcellml::Parser::create(strict);
             model = parser->parseModel(contents);
 
             isCellmlFile = parser->errorCount() == 0;
@@ -95,7 +97,7 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
         }
 
         if (isCellmlFile) {
-            return CellmlFilePtr {new CellmlFile {pFile, model}};
+            return CellmlFilePtr {new CellmlFile {pFile, model, strict}};
         }
     }
 

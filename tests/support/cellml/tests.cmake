@@ -18,5 +18,6 @@ list(APPEND TESTS ${TEST})
 
 set(${TEST}_CATEGORY support)
 set(${TEST}_SOURCE_FILES
+    ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/runtimetests.cpp
 )
