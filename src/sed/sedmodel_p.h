@@ -29,7 +29,13 @@ public:
 
     explicit Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument);
 
-    void serialise(xmlNodePtr pNode, const std::string &pBasePath) const override;
+#ifdef BUILDING_USING_CLANG
+    // Prevent Clang from complaining about SedModel::Impl::serialise() hiding SedBase::Impl::serialise().
+
+    using SedBase::Impl::serialise;
+#endif
+
+    void serialise(xmlNodePtr pNode, const std::string &pBasePath) const;
 };
 
 } // namespace libOpenCOR

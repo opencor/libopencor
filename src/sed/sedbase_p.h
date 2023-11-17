@@ -35,7 +35,6 @@ public:
     virtual ~Impl() = default;
 
     virtual void serialise(xmlNodePtr pNode) const;
-    virtual void serialise(xmlNodePtr pNode, const std::string &pBasePath) const;
 };
 
 } // namespace libOpenCOR
