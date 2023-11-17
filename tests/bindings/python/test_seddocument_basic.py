@@ -33,18 +33,14 @@ def test_unknown_file():
     ]
 
     file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert_issues(sed, expected_issues)
 
 
 def test_cellml_file():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert len(sed.issues) == 0
 
@@ -58,9 +54,7 @@ def test_sedml_file():
     ]
 
     file = File(utils.resource_path(utils.SEDML_2_FILE))
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert_issues(sed, expected_issues)
 
@@ -74,9 +68,7 @@ def test_combine_archive():
     ]
 
     file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert_issues(sed, expected_issues)
 
@@ -90,8 +82,6 @@ def test_irretrievable_file():
     ]
 
     file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert_issues(sed, expected_issues)

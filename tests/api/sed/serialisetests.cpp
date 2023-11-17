@@ -57,9 +57,7 @@ std::string expectedSerialisation(const std::string &pSource)
 TEST(SerialiseSedDocumentTest, localCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml"));
 }
@@ -67,10 +65,10 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithBasePath)
 TEST(SerialiseSedDocumentTest, localCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
-    auto sed = libOpenCOR::SedDocument::create();
 
     file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
-    sed->initialise(file);
+
+    auto sed = libOpenCOR::SedDocument::create(file);
 
 #ifdef BUILDING_USING_MSVC
     EXPECT_EQ(sed->serialise(), expectedSerialisation("file:///P:/some/path/file.txt"));
@@ -82,9 +80,7 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithoutBasePath)
 TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath().append("../..")), expectedSerialisation("tests/res/cellml_2.cellml"));
 }
@@ -92,10 +88,10 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithBasePath)
 TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
-    auto sed = libOpenCOR::SedDocument::create();
 
     file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
-    sed->initialise(file);
+
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(sed->serialise(), expectedSerialisation("cellml_2.cellml"));
 }
@@ -103,9 +99,7 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithoutBasePath)
 TEST(SerialiseSedDocumentTest, remoteCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(sed->serialise(libOpenCOR::REMOTE_BASE_PATH), expectedSerialisation("cellml_2.cellml"));
 }
@@ -113,9 +107,7 @@ TEST(SerialiseSedDocumentTest, remoteCellmlFileWithBasePath)
 TEST(SerialiseSedDocumentTest, remoteCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(sed->serialise(), expectedSerialisation("https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"));
 }
@@ -123,9 +115,7 @@ TEST(SerialiseSedDocumentTest, remoteCellmlFileWithoutBasePath)
 TEST(SerialiseSedDocumentTest, relativeRemoteCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ(sed->serialise(std::string(libOpenCOR::REMOTE_BASE_PATH).append("/../..")), expectedSerialisation("tests/res/cellml_2.cellml"));
 }

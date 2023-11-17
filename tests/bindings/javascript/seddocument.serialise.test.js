@@ -69,10 +69,10 @@ describe("SedDocument serialise tests", () => {
 
   test("Local CellML file with base path", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
+
+    const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
       expectedSerialisation("file.txt"),
@@ -81,10 +81,10 @@ describe("SedDocument serialise tests", () => {
 
   test("Local CellML file without base path", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
+
+    const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise()).toBe(
       expectedSerialisation("file:///some/path/file.txt"),
@@ -93,10 +93,10 @@ describe("SedDocument serialise tests", () => {
 
   test("Relative local CellML file with base path", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
+
+    const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
       expectedSerialisation("some/path/file.txt"),
@@ -105,20 +105,20 @@ describe("SedDocument serialise tests", () => {
 
   test("Relative local CellML file without base path", () => {
     const file = new libopencor.File("file.txt");
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
+
+    const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise()).toBe(expectedSerialisation("file.txt"));
   });
 
   test("Remote CellML file with base path", () => {
     const file = new libopencor.File(utils.REMOTE_FILE);
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
+
+    const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(
       expectedSerialisation("cellml_2.cellml"),
@@ -127,10 +127,10 @@ describe("SedDocument serialise tests", () => {
 
   test("Remote CellML file without base path", () => {
     const file = new libopencor.File(utils.REMOTE_FILE);
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
+
+    const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise()).toBe(
       expectedSerialisation(
@@ -141,10 +141,10 @@ describe("SedDocument serialise tests", () => {
 
   test("Relative remote CellML file with base path", () => {
     const file = new libopencor.File(utils.REMOTE_FILE);
-    const sed = new libopencor.SedDocument();
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-    sed.initialise(file);
+
+    const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
       expectedSerialisation("tests/res/cellml_2.cellml"),

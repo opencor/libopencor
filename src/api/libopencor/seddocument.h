@@ -54,20 +54,16 @@ public:
      * auto sedDocument = libOpenCOR::SedDocument::create();
      * ```
      *
+     * @param pFile The @ref File, if any, used to initialise this @ref SedDocument object.
+     *
      * @return A smart pointer to a @ref SedDocument object.
      */
 
-    static SedDocumentPtr create();
+    static SedDocumentPtr create(const FilePtr &pFile = {});
 
-    /**
-     * @brief Initialise this simulation experiment description using the given @ref File.
-     *
-     * Initialise this simulation experiment description using the given @ref File.
-     *
-     * @param pFile The @ref File used to initialise this simulation experiment description.
-     */
-
-    void initialise(const FilePtr &pFile);
+#ifdef __EMSCRIPTEN__
+    static SedDocumentPtr defaultCreate();
+#endif
 
     /**
      * @brief Get the serialised version of this simulation experiment description.

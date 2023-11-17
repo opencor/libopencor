@@ -25,7 +25,5 @@ TEST(CoverageSedDocumentTest, initialise)
 
     auto sed = libOpenCOR::SedDocument::create();
 
-    sed->initialise({});
-
     EXPECT_EQ(sed->serialise(), expectedSerialisation);
 }

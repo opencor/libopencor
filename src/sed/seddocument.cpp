@@ -282,15 +282,21 @@ const SedDocument::Impl *SedDocument::pimpl() const
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
-SedDocumentPtr SedDocument::create()
+SedDocumentPtr SedDocument::create(const FilePtr &pFile)
 {
-    return SedDocumentPtr {new SedDocument {}};
+    auto res = SedDocumentPtr {new SedDocument {}};
+
+    res->pimpl()->initialise(pFile, res);
+
+    return res;
 }
 
-void SedDocument::initialise(const FilePtr &pFile)
+#ifdef __EMSCRIPTEN__
+SedDocumentPtr SedDocument::defaultCreate()
 {
-    pimpl()->initialise(pFile, shared_from_this());
+    return create({});
 }
+#endif
 
 std::string SedDocument::serialise() const
 {

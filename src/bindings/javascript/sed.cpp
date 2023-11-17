@@ -37,8 +37,9 @@ void sedApi()
     // SedDocument API.
 
     emscripten::class_<libOpenCOR::SedDocument, emscripten::base<libOpenCOR::Logger>>("SedDocument")
-        .smart_ptr_constructor("SedDocument", &libOpenCOR::SedDocument::create)
-        .function("initialise", &libOpenCOR::SedDocument::initialise)
+        .smart_ptr<libOpenCOR::SedDocumentPtr>("SedDocument")
+        .constructor(&libOpenCOR::SedDocument::create)
+        .constructor(&libOpenCOR::SedDocument::defaultCreate)
         .function("serialise", emscripten::select_overload<std::string() const>(&libOpenCOR::SedDocument::serialise))
         .function("serialise", emscripten::select_overload<std::string(const std::string &) const>(&libOpenCOR::SedDocument::serialise));
 

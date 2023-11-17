@@ -34,9 +34,7 @@ TEST(BasicSedDocumentTest, unknownFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
@@ -44,9 +42,7 @@ TEST(BasicSedDocumentTest, unknownFile)
 TEST(BasicSedDocumentTest, cellmlFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_TRUE(sed->issues().empty());
 }
@@ -58,9 +54,7 @@ TEST(BasicSedDocumentTest, sedmlFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
@@ -72,9 +66,7 @@ TEST(BasicSedDocumentTest, combineArchive)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
@@ -86,9 +78,7 @@ TEST(BasicSedDocumentTest, irretrievableFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE));
-    auto sed = libOpenCOR::SedDocument::create();
-
-    sed->initialise(file);
+    auto sed = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }

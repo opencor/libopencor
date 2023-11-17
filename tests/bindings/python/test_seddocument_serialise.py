@@ -50,9 +50,7 @@ def expected_serialisation(source):
 
 def test_local_cellml_file_with_base_path():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert sed.serialise(utils.resource_path()) == expected_serialisation(
         "cellml_2.cellml"
@@ -61,10 +59,10 @@ def test_local_cellml_file_with_base_path():
 
 def test_local_cellml_file_without_base_path():
     file = File(utils.LOCAL_FILE)
-    sed = SedDocument()
 
     file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
-    sed.initialise(file)
+
+    sed = SedDocument(file)
 
     if platform.system() == "Windows":
         assert sed.serialise() == expected_serialisation(
@@ -76,9 +74,7 @@ def test_local_cellml_file_without_base_path():
 
 def test_relative_local_cellml_file_with_base_path():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert sed.serialise(utils.resource_path() + "../..") == expected_serialisation(
         "tests/res/cellml_2.cellml"
@@ -87,19 +83,17 @@ def test_relative_local_cellml_file_with_base_path():
 
 def test_relative_local_cellml_file_without_base_path():
     file = File(utils.CELLML_2_FILE)
-    sed = SedDocument()
 
     file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
-    sed.initialise(file)
+
+    sed = SedDocument(file)
 
     assert sed.serialise() == expected_serialisation("cellml_2.cellml")
 
 
 def test_remote_cellml_file_with_base_path():
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert sed.serialise(utils.REMOTE_BASE_PATH) == expected_serialisation(
         "cellml_2.cellml"
@@ -108,9 +102,7 @@ def test_remote_cellml_file_with_base_path():
 
 def test_remote_cellml_file_without_base_path():
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert sed.serialise() == expected_serialisation(
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
@@ -119,9 +111,7 @@ def test_remote_cellml_file_without_base_path():
 
 def test_relative_remote_cellml_file_with_base_path():
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument()
-
-    sed.initialise(file)
+    sed = SedDocument(file)
 
     assert sed.serialise(utils.REMOTE_BASE_PATH + "/../..") == expected_serialisation(
         "tests/res/cellml_2.cellml"
