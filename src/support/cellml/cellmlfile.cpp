@@ -107,18 +107,14 @@ libcellml::AnalyserModel::Type CellmlFile::type() const
     return (pimpl()->mAnalyserModel != nullptr) ? pimpl()->mAnalyserModel->type() : libcellml::AnalyserModel::Type::UNKNOWN;
 }
 
-/*---GRY---
 libcellml::ModelPtr CellmlFile::model() const
 {
     return pimpl()->mModel;
 }
-*/
 
-/*---GRY---
 CellmlFileRuntimePtr CellmlFile::runtime()
 {
     return CellmlFileRuntime::create(shared_from_this());
 }
-*/
 
 } // namespace libOpenCOR

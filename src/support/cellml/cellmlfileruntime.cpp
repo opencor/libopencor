@@ -36,6 +36,8 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
             Issue::Type type = Issue::Type::ERROR;
 
 #ifdef CODE_COVERAGE_ENABLED
+            //---GRY--- WE DON'T CURRENTLY HAVE TESTS THAT RESULTS IN MESSAGES SINCE libCellML's ANALYSER ONLY GENERATES
+            //          SOME WHEN SPECIFYING EXTERNAL VARIABLES AND WE DON'T YET SUPPORT THAT IN libOpenCOR.
             if (issue->level() == libcellml::Issue::Level::ERROR) {
                 type = Issue::Type::ERROR;
             } else {
@@ -101,7 +103,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
 }
 
 CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile)
-    : Logger(new Impl{pCellmlFile})
+    : Logger(new Impl {pCellmlFile})
 {
 }
 
