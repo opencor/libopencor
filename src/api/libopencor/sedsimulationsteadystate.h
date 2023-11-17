@@ -54,7 +54,7 @@ public:
      * auto sedSimulationSteadyState = libOpenCOR::SedSimulationSteadyState::create(sedDocument);
      * ```
      *
-     * @param pDocument The @ref SedDocument object to which the @ref SedSimulationSteadyState object belongs.
+     * @param pDocument The @ref SedDocument object to which the @ref SedSimulationSteadyState object is to belong.
      *
      * @return A smart pointer to a @ref SedSimulationSteadyState object.
      */

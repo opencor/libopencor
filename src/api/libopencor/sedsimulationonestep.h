@@ -54,7 +54,7 @@ public:
      * auto sedSimulationOneStep = libOpenCOR::SedSimulationOneStep::create(sedDocument);
      * ```
      *
-     * @param pDocument The @ref SedDocument object to which the @ref SedSimulationOneStep object belongs.
+     * @param pDocument The @ref SedDocument object to which the @ref SedSimulationOneStep object is to belong.
      *
      * @return A smart pointer to a @ref SedSimulationOneStep object.
      */

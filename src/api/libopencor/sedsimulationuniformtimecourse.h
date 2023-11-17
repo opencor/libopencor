@@ -54,7 +54,8 @@ public:
      * auto sedSimulationUniformTimeCourse = libOpenCOR::SedSimulationUniformTimeCourse::create(sedDocument);
      * ```
      *
-     * @param pDocument The @ref SedDocument object to which the @ref SedSimulationUniformTimeCourse object belongs.
+     * @param pDocument The @ref SedDocument object to which the @ref SedSimulationUniformTimeCourse object is to
+     * belong.
      *
      * @return A smart pointer to a @ref SedSimulationUniformTimeCourse object.
      */

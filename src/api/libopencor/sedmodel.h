@@ -56,7 +56,7 @@ public:
      * ```
      *
      * @param pFile The @ref File object for which to create the @ref SedModel object.
-     * @param pDocument The @ref SedDocument object to which the @ref SedModel object belongs.
+     * @param pDocument The @ref SedDocument object to which the @ref SedModel object is to belong.
      *
      * @return A smart pointer to a @ref SedModel object.
      */
