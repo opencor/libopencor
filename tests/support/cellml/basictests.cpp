@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(BasicCellmlTest, cellml_1_x_Model)
+TEST(BasicCellmlTest, cellml1xModel)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_1_X_FILE));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
@@ -28,7 +28,7 @@ TEST(BasicCellmlTest, cellml_1_x_Model)
     EXPECT_TRUE(cellmlFile->issues().empty());
 }
 
-TEST(BasicCellmlTest, cellml_2_Model)
+TEST(BasicCellmlTest, cellml2Model)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
