@@ -24,13 +24,13 @@ Solver::Impl::Impl(const std::string &pId, const std::string &pName)
 {
 }
 
-void Solver::Impl::serialise(xmlNodePtr pNode, bool pOdeSolver) const
+void Solver::Impl::serialise(xmlNodePtr pNode, bool pNlaAlgorithm) const
 {
     // Solver information.
 
-    auto *algorithmNode = xmlNewNode(nullptr, constXmlCharPtr(pOdeSolver ? "algorithm" : "nlaAlgorithm"));
+    auto *algorithmNode = xmlNewNode(nullptr, constXmlCharPtr(pNlaAlgorithm ? "nlaAlgorithm" : "algorithm"));
 
-    if (!pOdeSolver) {
+    if (pNlaAlgorithm) {
         xmlSetNs(algorithmNode, xmlNewNs(algorithmNode, constXmlCharPtr(LIBOPENCOR_NAMESPACE), nullptr));
     }
 

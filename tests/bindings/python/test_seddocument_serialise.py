@@ -13,10 +13,9 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue, SedDocument
+from libopencor import File, SedDocument
 import platform
 import utils
-from utils import assert_issues
 
 
 def expected_serialisation(source):
@@ -116,3 +115,90 @@ def test_relative_remote_cellml_file_with_base_path():
     assert sed.serialise(utils.REMOTE_BASE_PATH + "/../..") == expected_serialisation(
         "tests/res/cellml_2.cellml"
     )
+
+
+def test_dae_model():
+    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/dae.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+      <nlaAlgorithm xmlns="https://opencor.ws/libopencor" kisaoID="KISAO:0000282">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000486" value="200"/>
+        </listOfAlgorithmParameters>
+      </nlaAlgorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+</sed>
+"""
+
+    file = File(utils.resource_path("api/sed/dae.cellml"))
+    sed = SedDocument(file)
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation
+
+
+def test_nla_model():
+    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/nla.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <steadyState id="simulation1">
+      <algorithm kisaoID="KISAO:0000282">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000486" value="200"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </steadyState>
+  </listOfSimulations>
+</sed>
+"""
+
+    file = File(utils.resource_path("api/sed/nla.cellml"))
+    sed = SedDocument(file)
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation
+
+
+def test_algebraic_model():
+    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="api/sed/algebraic.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <steadyState id="simulation1"/>
+  </listOfSimulations>
+</sed>
+"""
+
+    file = File(utils.resource_path("api/sed/algebraic.cellml"))
+    sed = SedDocument(file)
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation

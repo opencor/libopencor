@@ -119,3 +119,90 @@ TEST(SerialiseSedDocumentTest, relativeRemoteCellmlFileWithBasePath)
 
     EXPECT_EQ(sed->serialise(std::string(libOpenCOR::REMOTE_BASE_PATH).append("/../..")), expectedSerialisation("tests/res/cellml_2.cellml"));
 }
+
+TEST(ModelTypeSedDocumentTest, daeModel)
+{
+    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "  <listOfModels>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"api/sed/dae.cellml\"/>\n"
+                                                     "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\">\n"
+                                                     "      <algorithm kisaoID=\"KISAO:0000019\">\n"
+                                                     "        <listOfAlgorithmParameters>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000209\" value=\"1e-07\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000211\" value=\"1e-07\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000415\" value=\"500\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000467\" value=\"0\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000475\" value=\"BDF\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000476\" value=\"Newton\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000477\" value=\"Dense\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000478\" value=\"Banded\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000479\" value=\"0\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000480\" value=\"0\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000481\" value=\"true\"/>\n"
+                                                     "        </listOfAlgorithmParameters>\n"
+                                                     "      </algorithm>\n"
+                                                     "      <nlaAlgorithm xmlns=\"https://opencor.ws/libopencor\" kisaoID=\"KISAO:0000282\">\n"
+                                                     "        <listOfAlgorithmParameters>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000477\" value=\"Dense\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000479\" value=\"0\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000480\" value=\"0\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000486\" value=\"200\"/>\n"
+                                                     "        </listOfAlgorithmParameters>\n"
+                                                     "      </nlaAlgorithm>\n"
+                                                     "    </uniformTimeCourse>\n"
+                                                     "  </listOfSimulations>\n"
+                                                     "</sed>\n";
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
+}
+
+TEST(ModelTypeSedDocumentTest, nlaModel)
+{
+    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "  <listOfModels>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"api/sed/nla.cellml\"/>\n"
+                                                     "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <steadyState id=\"simulation1\">\n"
+                                                     "      <algorithm kisaoID=\"KISAO:0000282\">\n"
+                                                     "        <listOfAlgorithmParameters>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000477\" value=\"Dense\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000479\" value=\"0\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000480\" value=\"0\"/>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000486\" value=\"200\"/>\n"
+                                                     "        </listOfAlgorithmParameters>\n"
+                                                     "      </algorithm>\n"
+                                                     "    </steadyState>\n"
+                                                     "  </listOfSimulations>\n"
+                                                     "</sed>\n";
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
+}
+
+TEST(ModelTypeSedDocumentTest, algebraicModel)
+{
+    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "  <listOfModels>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"api/sed/algebraic.cellml\"/>\n"
+                                                     "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <steadyState id=\"simulation1\"/>\n"
+                                                     "  </listOfSimulations>\n"
+                                                     "</sed>\n";
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
+}

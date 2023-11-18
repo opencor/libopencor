@@ -34,11 +34,11 @@ void SedSimulation::Impl::serialise(xmlNodePtr pNode) const
 
     if ((mOdeSolver != nullptr) || (mNlaSolver != nullptr)) {
         if (mOdeSolver != nullptr) {
-            mOdeSolver->pimpl()->serialise(pNode, true);
+            mOdeSolver->pimpl()->serialise(pNode);
         }
 
         if (mNlaSolver != nullptr) {
-            mNlaSolver->pimpl()->serialise(pNode, false);
+            mNlaSolver->pimpl()->serialise(pNode, mOdeSolver != nullptr);
         }
     }
 }

@@ -14,29 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+import libOpenCOR from "./libopencor.js";
 
-#include "logger_p.h"
-#include "utils.h"
+const libopencor = await libOpenCOR();
 
-#include "libopencor/solver.h"
+describe("SedDocument coverage tests", () => {
+  test("Initialise", () => {
+    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
+`;
+    const sed = new libopencor.SedDocument();
 
-#include <libxml/tree.h>
-
-namespace libOpenCOR {
-
-class Solver::Impl: public Logger::Impl
-{
-public:
-    std::string mId;
-    std::string mName;
-
-    explicit Impl(const std::string &pId, const std::string &pName);
-    virtual ~Impl() = default;
-
-    void serialise(xmlNodePtr pNode, bool pNlaAlgorithm = false) const;
-
-    virtual StringStringMap properties() const = 0;
-};
-
-} // namespace libOpenCOR
+    expect(sed.serialise()).toBe(expectedSerialisation);
+  });
+});
