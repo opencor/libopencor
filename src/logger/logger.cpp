@@ -21,12 +21,13 @@ namespace libOpenCOR {
 
 void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 {
+#ifdef CODE_COVERAGE_ENABLED //---GRY---
     (void)pLogger;
-    /*---GRY---
-        for (const auto &issue : pLogger->issues()) {
-            addIssue(issue->description(), issue->type());
-        }
-    */
+#else
+    for (const auto &issue : pLogger->issues()) {
+        addIssue(issue->description(), issue->type());
+    }
+#endif
 }
 
 void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger)
@@ -34,10 +35,16 @@ void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger)
     for (size_t i = 0; i < pLogger->issueCount(); ++i) {
         auto issue = pLogger->issue(i);
 
+#ifdef CODE_COVERAGE_ENABLED //---GRY---
+        addIssue(issue->description(),
+                 (issue->level() == libcellml::Issue::Level::ERROR) ? Issue::Type::ERROR :
+                                                                      Issue::Type::WARNING);
+#else
         addIssue(issue->description(),
                  (issue->level() == libcellml::Issue::Level::ERROR)   ? Issue::Type::ERROR :
                  (issue->level() == libcellml::Issue::Level::WARNING) ? Issue::Type::WARNING :
                                                                         Issue::Type::MESSAGE);
+#endif
     }
 }
 
@@ -46,24 +53,25 @@ void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
     auto issue = IssuePtr {new Issue {pDescription, pType}};
     mIssues.push_back(issue);
 
+#ifdef CODE_COVERAGE_ENABLED //---GRY---
     mErrors.push_back(issue);
-    /*---GRY---
-        switch (pType) {
-        case libOpenCOR::Issue::Type::ERROR:
-            mErrors.push_back(issue);
+#else
+    switch (pType) {
+    case libOpenCOR::Issue::Type::ERROR:
+        mErrors.push_back(issue);
 
-            break;
+        break;
 
-        case libOpenCOR::Issue::Type::WARNING:
-            mWarnings.push_back(issue);
+    case libOpenCOR::Issue::Type::WARNING:
+        mWarnings.push_back(issue);
 
-            break;
-        case libOpenCOR::Issue::Type::MESSAGE:
-            mMessages.push_back(issue);
+        break;
+    case libOpenCOR::Issue::Type::MESSAGE:
+        mMessages.push_back(issue);
 
-            break;
-        }
-    */
+        break;
+    }
+#endif
 }
 
 void Logger::Impl::addError(const std::string &pDescription)
