@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(CoverageCellmlTest, validRuntime)
+TEST(RuntimeCellmlTest, validRuntime)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
@@ -29,7 +29,7 @@ TEST(CoverageCellmlTest, validRuntime)
     EXPECT_TRUE(cellmlFileRuntime->issues().empty());
 }
 
-TEST(CoverageCellmlTest, invalidRuntimeBecauseOfAnalysisIssues)
+TEST(RuntimeCellmlTest, invalidRuntimeBecauseOfAnalysisIssues)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::WARNING, "The units in 'x = 1.0' in component 'my_component' are not equivalent. 'x' is in 'volt' (i.e. 'ampere^-1 x kilogram x metre^2 x second^-3') while '1.0' is 'dimensionless'."},
