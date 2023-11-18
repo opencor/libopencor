@@ -20,7 +20,23 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(CellmlFileTest, modelWithValidImports)
+TEST(BasicCellmlTest, cellml_1_x_Model)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_1_X_FILE));
+    auto cellmlFile = libOpenCOR::CellmlFile::create(file);
+
+    EXPECT_TRUE(cellmlFile->issues().empty());
+}
+
+TEST(BasicCellmlTest, cellml_2_Model)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto cellmlFile = libOpenCOR::CellmlFile::create(file);
+
+    EXPECT_TRUE(cellmlFile->issues().empty());
+}
+
+TEST(BasicCellmlTest, modelWithValidImports)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_valid_imports/model.cellml"));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
@@ -28,7 +44,7 @@ TEST(CellmlFileTest, modelWithValidImports)
     EXPECT_TRUE(cellmlFile->issues().empty());
 }
 
-TEST(CellmlFileTest, modelWithInvalidImports)
+TEST(BasicCellmlTest, modelWithInvalidImports)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_invalid_imports.cellml"));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
