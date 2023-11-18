@@ -33,7 +33,7 @@ public:
     IssuePtrVector mWarnings;
     IssuePtrVector mMessages;
 
-    static void addIssues(const LoggerPtr &pLogger);
+    void addIssues(const LoggerPtr &pLogger);
     void addIssues(const libcellml::LoggerPtr &pLogger);
 
     void addIssue(const std::string &pDescription, Issue::Type pType);
