@@ -328,11 +328,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void *>(&file));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 
-#    ifndef CODE_COVERAGE_ENABLED
     if (curl_easy_perform(curl) == CURLE_OK) {
-#    else
-    curl_easy_perform(curl);
-#    endif
         static constexpr int64_t HTTP_OK = 200;
 
         int64_t responseCode = 0;
@@ -340,9 +336,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
 
         res = responseCode == HTTP_OK;
-#    ifndef CODE_COVERAGE_ENABLED
     }
-#    endif
 
     curl_easy_cleanup(curl);
     curl_global_cleanup();

@@ -35,9 +35,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
             auto issue = analyser->issue(i);
             Issue::Type type = Issue::Type::ERROR;
 
-#ifdef CODE_COVERAGE_ENABLED
-            //---GRY--- WE DON'T CURRENTLY HAVE TESTS THAT RESULTS IN MESSAGES SINCE libCellML's ANALYSER ONLY GENERATES
-            //          SOME WHEN SPECIFYING EXTERNAL VARIABLES AND WE DON'T YET SUPPORT THAT IN libOpenCOR.
+#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT...
             if (issue->level() == libcellml::Issue::Level::ERROR) {
                 type = Issue::Type::ERROR;
             } else {
