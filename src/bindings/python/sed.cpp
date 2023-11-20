@@ -46,9 +46,12 @@ void sedApi(py::module_ &m)
     sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", py::arg("file") = libOpenCOR::FilePtr())
         .def("serialise", py::overload_cast<>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.")
         .def("serialise", py::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.", py::arg("base_path"))
+        .def_property_readonly("models", &libOpenCOR::SedDocument::models, "Return the models.")
+        .def("add_model", &libOpenCOR::SedDocument::addModel, "Add the model.")
+        .def("remove_model", &libOpenCOR::SedDocument::removeModel, "Remove the model.")
         .def_property_readonly("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
-        .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add the simulations.")
-        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove the simulations.");
+        .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add the simulation.")
+        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove the simulation.");
 
     // SedModel API.
 

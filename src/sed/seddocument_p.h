@@ -34,7 +34,7 @@ public:
     std::unordered_set<std::string> mIds;
 
     std::vector<SedDataDescriptionPtr> mDataDescriptions;
-    std::vector<SedModelPtr> mModels;
+    SedModelPtrVector mModels;
     SedSimulationPtrVector mSimulations;
     std::vector<SedAbstractTaskPtr> mTasks;
     std::vector<SedDataGeneratorPtr> mDataGenerators;
@@ -49,6 +49,9 @@ public:
     void serialise(xmlNodePtr pNode) const;
 
     std::string serialise(const std::string &pBasePath = {}) const;
+
+    bool addModel(const SedModelPtr &pModel);
+    bool removeModel(const SedModelPtr &pModel);
 
     bool addSimulation(const SedSimulationPtr &pSimulation);
     bool removeSimulation(const SedSimulationPtr &pSimulation);

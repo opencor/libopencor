@@ -89,6 +89,40 @@ public:
     std::string serialise(const std::string &pBasePath) const;
 
     /**
+     * @brief Return the models.
+     *
+     * Return the models.
+     *
+     * @return The models, as a @ref SedModelPtrVector.
+     */
+
+    SedModelPtrVector models() const;
+
+    /**
+     * @brief Add the model to this simulation experiment description.
+     *
+     * Add the model to this simulation experiment description.
+     *
+     * @param pModel The @ref SedModel object to be added.
+     *
+     * @return @c true if the model was added, @c false otherwise.
+     */
+
+    bool addModel(const SedModelPtr &pModel);
+
+    /**
+     * @brief Remove the model from this simulation experiment description.
+     *
+     * Remove the model from this simulation experiment description.
+     *
+     * @param pModel The @ref SedModel object to be removed.
+     *
+     * @return @c true if the model was removed, @c false otherwise.
+     */
+
+    bool removeModel(const SedModelPtr &pModel);
+
+    /**
      * @brief Return the simulations.
      *
      * Return the simulations.

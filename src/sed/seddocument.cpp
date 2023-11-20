@@ -103,7 +103,7 @@ void SedDocument::Impl::initialiseFromCellmlFile(const FilePtr &pFile, const Sed
 {
     // Add a model for the given CellML file.
 
-    mModels.push_back(SedModel::create(pFile, pOwner));
+    addModel(SedModel::create(pFile, pOwner));
 
     // Add a uniform time course simulation in the case of an ODE/DAE model while a steady state simulation in the case
     // of an algebraic or NLA model.
@@ -261,6 +261,40 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     return res.str();
 }
 
+bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
+{
+    if (pModel == nullptr) {
+        return false;
+    }
+
+    auto model = std::find_if(mModels.cbegin(), mModels.cend(), [&](const auto &s) {
+        return s == pModel;
+    });
+
+    if (model != mModels.end()) {
+        return false;
+    }
+
+    mModels.push_back(pModel);
+
+    return true;
+}
+
+bool SedDocument::Impl::removeModel(const SedModelPtr &pModel)
+{
+    auto model = std::find_if(mModels.cbegin(), mModels.cend(), [&](const auto &s) {
+        return s == pModel;
+    });
+
+    if (model != mModels.end()) {
+        mModels.erase(model);
+
+        return true;
+    }
+
+    return false;
+}
+
 bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
 {
     if (pSimulation == nullptr) {
@@ -339,6 +373,21 @@ std::string SedDocument::serialise() const
 std::string SedDocument::serialise(const std::string &pBasePath) const
 {
     return pimpl()->serialise(pBasePath);
+}
+
+SedModelPtrVector SedDocument::models() const
+{
+    return pimpl()->mModels;
+}
+
+bool SedDocument::addModel(const SedModelPtr &pModel)
+{
+    return pimpl()->addModel(pModel);
+}
+
+bool SedDocument::removeModel(const SedModelPtr &pModel)
+{
+    return pimpl()->removeModel(pModel);
 }
 
 SedSimulationPtrVector SedDocument::simulations() const
