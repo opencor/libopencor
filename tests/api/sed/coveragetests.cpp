@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "tests/utils.h"
+
 #include "gtest/gtest.h"
 
 #include <libopencor>
@@ -26,6 +28,29 @@ TEST(CoverageSedDocumentTest, initialise)
     auto sed = libOpenCOR::SedDocument::create();
 
     EXPECT_EQ(sed->serialise(), expectedSerialisation);
+}
+
+TEST(CoverageSedDocumentTest, sedDocumentModels)
+{
+    auto sed = libOpenCOR::SedDocument::create();
+
+    EXPECT_TRUE(sed->models().empty());
+    EXPECT_FALSE(sed->addModel(nullptr));
+
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto model = libOpenCOR::SedModel::create(file, sed);
+
+    EXPECT_TRUE(sed->addModel(model));
+
+    EXPECT_EQ(sed->models().size(), 1);
+    EXPECT_EQ(sed->models()[0], model);
+
+    EXPECT_FALSE(sed->addModel(model));
+    EXPECT_TRUE(sed->removeModel(model));
+
+    EXPECT_TRUE(sed->models().empty());
+
+    EXPECT_FALSE(sed->removeModel(nullptr));
 }
 
 TEST(CoverageSedDocumentTest, sedDocumentSimulations)

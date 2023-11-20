@@ -13,7 +13,8 @@
 # limitations under the License.
 
 
-from libopencor import SedDocument, SedSimulationUniformTimeCourse
+from libopencor import File, SedDocument, SedModel, SedSimulationUniformTimeCourse
+import utils
 
 
 def test_initialise():
@@ -24,6 +25,28 @@ def test_initialise():
     sed = SedDocument()
 
     assert sed.serialise() == expected_serialisation
+
+
+def test_models():
+    sed = SedDocument()
+
+    assert len(sed.models) == 0
+    assert sed.add_model(None) == False
+
+    file = File(utils.LOCAL_FILE)
+    model = SedModel(file, sed)
+
+    assert sed.add_model(model) == True
+
+    assert len(sed.models) == 1
+    assert sed.models[0] == model
+
+    assert sed.add_model(model) == False
+    assert sed.remove_model(model) == True
+
+    assert len(sed.models) == 0
+
+    assert sed.remove_model(None) == False
 
 
 def test_simulations():

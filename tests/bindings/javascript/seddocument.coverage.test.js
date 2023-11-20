@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 import libOpenCOR from "./libopencor.js";
+import * as utils from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
@@ -26,6 +27,28 @@ describe("SedDocument coverage tests", () => {
     const sed = new libopencor.SedDocument();
 
     expect(sed.serialise()).toBe(expectedSerialisation);
+  });
+
+  test("Model", () => {
+    const sed = new libopencor.SedDocument();
+
+    expect(sed.models().size()).toBe(0);
+    expect(sed.addModel(null)).toBe(false);
+
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const model = new libopencor.SedModel(file, sed);
+
+    expect(sed.addModel(model)).toBe(true);
+
+    expect(sed.models().size()).toBe(1);
+    expect(sed.models().get(0)).toStrictEqual(model);
+
+    expect(sed.addModel(model)).toBe(false);
+    expect(sed.removeModel(model)).toBe(true);
+
+    expect(sed.models().size()).toBe(0);
+
+    expect(sed.removeModel(null)).toBe(false);
   });
 
   test("Simulations", () => {
