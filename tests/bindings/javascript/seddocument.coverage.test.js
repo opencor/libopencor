@@ -27,4 +27,25 @@ describe("SedDocument coverage tests", () => {
 
     expect(sed.serialise()).toBe(expectedSerialisation);
   });
+
+  test("Simulations", () => {
+    const sed = new libopencor.SedDocument();
+
+    expect(sed.simulations().size()).toBe(0);
+    expect(sed.addSimulation(null)).toBe(false);
+
+    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+
+    expect(sed.addSimulation(simulation)).toBe(true);
+
+    expect(sed.simulations().size()).toBe(1);
+    expect(sed.simulations().get(0)).toStrictEqual(simulation);
+
+    expect(sed.addSimulation(simulation)).toBe(false);
+    expect(sed.removeSimulation(simulation)).toBe(true);
+
+    expect(sed.simulations().size()).toBe(0);
+
+    expect(sed.removeSimulation(null)).toBe(false);
+  });
 });

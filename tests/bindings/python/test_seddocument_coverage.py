@@ -13,8 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File, SedDocument
-import utils
+from libopencor import SedDocument, SedSimulationUniformTimeCourse
 
 
 def test_initialise():
@@ -25,3 +24,24 @@ def test_initialise():
     sed = SedDocument()
 
     assert sed.serialise() == expected_serialisation
+
+
+def test_simulations():
+    sed = SedDocument()
+
+    assert len(sed.simulations) == 0
+    assert sed.add_simulation(None) == False
+
+    simulation = SedSimulationUniformTimeCourse(sed)
+
+    assert sed.add_simulation(simulation) == True
+
+    assert len(sed.simulations) == 1
+    assert sed.simulations[0] == simulation
+
+    assert sed.add_simulation(simulation) == False
+    assert sed.remove_simulation(simulation) == True
+
+    assert len(sed.simulations) == 0
+
+    assert sed.remove_simulation(None) == False

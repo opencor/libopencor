@@ -27,3 +27,25 @@ TEST(CoverageSedDocumentTest, initialise)
 
     EXPECT_EQ(sed->serialise(), expectedSerialisation);
 }
+
+TEST(CoverageSedDocumentTest, sedDocumentSimulations)
+{
+    auto sed = libOpenCOR::SedDocument::create();
+
+    EXPECT_TRUE(sed->simulations().empty());
+    EXPECT_FALSE(sed->addSimulation(nullptr));
+
+    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+
+    EXPECT_TRUE(sed->addSimulation(simulation));
+
+    EXPECT_EQ(sed->simulations().size(), 1);
+    EXPECT_EQ(sed->simulations()[0], simulation);
+
+    EXPECT_FALSE(sed->addSimulation(simulation));
+    EXPECT_TRUE(sed->removeSimulation(simulation));
+
+    EXPECT_TRUE(sed->simulations().empty());
+
+    EXPECT_FALSE(sed->removeSimulation(nullptr));
+}
