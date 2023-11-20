@@ -53,21 +53,29 @@ SedSimulation::Impl *SedSimulation::pimpl()
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
 
-/*---GRY---
 const SedSimulation::Impl *SedSimulation::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
-*/
 
 void SedSimulation::setOdeSolver(const SolverOdePtr &pOdeSolver)
 {
     pimpl()->mOdeSolver = pOdeSolver;
 }
 
+SolverOdePtr SedSimulation::odeSolver() const
+{
+    return pimpl()->mOdeSolver;
+}
+
 void SedSimulation::setNlaSolver(const SolverNlaPtr &pNlaSolver)
 {
     pimpl()->mNlaSolver = pNlaSolver;
+}
+
+SolverNlaPtr SedSimulation::nlaSolver() const
+{
+    return pimpl()->mNlaSolver;
 }
 
 } // namespace libOpenCOR

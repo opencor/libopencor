@@ -54,6 +54,16 @@ public:
     void setOdeSolver(const SolverOdePtr &pOdeSolver);
 
     /**
+     * @brief Get the ODE solver for this simulation.
+     *
+     * Return the ODE Solver for this simulation.
+     *
+     * @return The ODE solver for this simulation.
+     */
+
+    SolverOdePtr odeSolver() const;
+
+    /**
      * @brief Set the NLA solver for this simulation.
      *
      * Set the NLA solver for this simulation.
@@ -62,6 +72,16 @@ public:
      */
 
     void setNlaSolver(const SolverNlaPtr &pNlaSolver);
+
+    /**
+     * @brief Get the NLA solver for this simulation.
+     *
+     * Return the NLA Solver for this simulation.
+     *
+     * @return The NLA solver for this simulation.
+     */
+
+    SolverNlaPtr nlaSolver() const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

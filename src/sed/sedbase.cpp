@@ -39,11 +39,9 @@ SedBase::Impl *SedBase::pimpl()
     return static_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const SedBase::Impl *SedBase::pimpl() const
 {
     return static_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
 } // namespace libOpenCOR

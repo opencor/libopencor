@@ -61,7 +61,11 @@ void sedApi()
     // SedSimulation API.
 
     emscripten::class_<libOpenCOR::SedSimulation, emscripten::base<libOpenCOR::SedBase>>("SedSimulation")
-        .smart_ptr<libOpenCOR::SedSimulationPtr>("SedSimulation");
+        .smart_ptr<libOpenCOR::SedSimulationPtr>("SedSimulation")
+        .function("odeSolver", &libOpenCOR::SedSimulation::odeSolver)
+        .function("setOdeSolver", &libOpenCOR::SedSimulation::setOdeSolver)
+        .function("nlaSolver", &libOpenCOR::SedSimulation::nlaSolver)
+        .function("setNlaSolver", &libOpenCOR::SedSimulation::setNlaSolver);
 
     // SedSimulationOneStep API.
 
