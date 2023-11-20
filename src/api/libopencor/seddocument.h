@@ -88,6 +88,40 @@ public:
 
     std::string serialise(const std::string &pBasePath) const;
 
+    /**
+     * @brief Return the simulations.
+     *
+     * Return the simulations.
+     *
+     * @return The simulations, as a @ref SedSimulationPtrVector.
+     */
+
+    SedSimulationPtrVector simulations() const;
+
+    /**
+     * @brief Add the simulation to this simulation experiment description.
+     *
+     * Add the simulation to this simulation experiment description.
+     *
+     * @param pSimulation The @ref SedSimulation object to be added.
+     *
+     * @return @c true if the simulation was added, @c false otherwise.
+     */
+
+    bool addSimulation(const SedSimulationPtr &pSimulation);
+
+    /**
+     * @brief Remove the simulation from this simulation experiment description.
+     *
+     * Remove the simulation from this simulation experiment description.
+     *
+     * @param pSimulation The @ref SedSimulation object to be removed.
+     *
+     * @return @c true if the simulation was removed, @c false otherwise.
+     */
+
+    bool removeSimulation(const SedSimulationPtr &pSimulation);
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

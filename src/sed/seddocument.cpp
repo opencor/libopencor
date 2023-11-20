@@ -118,7 +118,7 @@ void SedDocument::Impl::initialiseFromCellmlFile(const FilePtr &pFile, const Sed
         simulation = SedSimulationSteadyState::create(pOwner);
     }
 
-    mSimulations.push_back(simulation);
+    addSimulation(simulation);
 
     // Add the required solver(s) depending on the type of our model.
 
@@ -261,6 +261,40 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     return res.str();
 }
 
+bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
+{
+    if (pSimulation == nullptr) {
+        return false;
+    }
+
+    auto simulation = std::find_if(mSimulations.cbegin(), mSimulations.cend(), [&](const auto &s) {
+        return s == pSimulation;
+    });
+
+    if (simulation != mSimulations.end()) {
+        return false;
+    }
+
+    mSimulations.push_back(pSimulation);
+
+    return true;
+}
+
+bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
+{
+    auto simulation = std::find_if(mSimulations.cbegin(), mSimulations.cend(), [&](const auto &s) {
+        return s == pSimulation;
+    });
+
+    if (simulation != mSimulations.end()) {
+        mSimulations.erase(simulation);
+
+        return true;
+    }
+
+    return false;
+}
+
 SedDocument::SedDocument()
     : Logger(new Impl {})
 {
@@ -305,6 +339,21 @@ std::string SedDocument::serialise() const
 std::string SedDocument::serialise(const std::string &pBasePath) const
 {
     return pimpl()->serialise(pBasePath);
+}
+
+SedSimulationPtrVector SedDocument::simulations() const
+{
+    return pimpl()->mSimulations;
+}
+
+bool SedDocument::addSimulation(const SedSimulationPtr &pSimulation)
+{
+    return pimpl()->addSimulation(pSimulation);
+}
+
+bool SedDocument::removeSimulation(const SedSimulationPtr &pSimulation)
+{
+    return pimpl()->removeSimulation(pSimulation);
 }
 
 } // namespace libOpenCOR

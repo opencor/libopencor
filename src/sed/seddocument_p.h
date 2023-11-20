@@ -35,7 +35,7 @@ public:
 
     std::vector<SedDataDescriptionPtr> mDataDescriptions;
     std::vector<SedModelPtr> mModels;
-    std::vector<SedSimulationPtr> mSimulations;
+    SedSimulationPtrVector mSimulations;
     std::vector<SedAbstractTaskPtr> mTasks;
     std::vector<SedDataGeneratorPtr> mDataGenerators;
     std::vector<SedOutputPtr> mOutputs;
@@ -49,6 +49,9 @@ public:
     void serialise(xmlNodePtr pNode) const;
 
     std::string serialise(const std::string &pBasePath = {}) const;
+
+    bool addSimulation(const SedSimulationPtr &pSimulation);
+    bool removeSimulation(const SedSimulationPtr &pSimulation);
 };
 
 } // namespace libOpenCOR

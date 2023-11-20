@@ -29,6 +29,9 @@ from .module import (
     SedModel,
     SedOutput,
     SedSimulation,
+    SedSimulationOneStep,
+    SedSimulationSteadyState,
+    SedSimulationUniformTimeCourse,
     SedStyle,
     # Solver API.
     Solver,
@@ -73,6 +76,9 @@ __all__ = (
     "SedModel",
     "SedOutput",
     "SedSimulation",
+    "SedSimulationOneStep",
+    "SedSimulationSteadyState",
+    "SedSimulationUniformTimeCourse",
     "SedStyle",
     # Solver API.
     "Solver",

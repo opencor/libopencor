@@ -17,6 +17,7 @@ limitations under the License.
 #include <libopencor>
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace py = pybind11;
 
@@ -44,7 +45,10 @@ void sedApi(py::module_ &m)
 
     sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", py::arg("file") = libOpenCOR::FilePtr())
         .def("serialise", py::overload_cast<>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.")
-        .def("serialise", py::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.", py::arg("base_path"));
+        .def("serialise", py::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.", py::arg("base_path"))
+        .def_property_readonly("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
+        .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add the simulations.")
+        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove the simulations.");
 
     // SedModel API.
 

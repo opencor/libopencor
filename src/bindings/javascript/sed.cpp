@@ -41,7 +41,10 @@ void sedApi()
         .constructor(&libOpenCOR::SedDocument::create)
         .constructor(&libOpenCOR::SedDocument::defaultCreate)
         .function("serialise", emscripten::select_overload<std::string() const>(&libOpenCOR::SedDocument::serialise))
-        .function("serialise", emscripten::select_overload<std::string(const std::string &) const>(&libOpenCOR::SedDocument::serialise));
+        .function("serialise", emscripten::select_overload<std::string(const std::string &) const>(&libOpenCOR::SedDocument::serialise))
+        .function("simulations", &libOpenCOR::SedDocument::simulations)
+        .function("addSimulation", &libOpenCOR::SedDocument::addSimulation)
+        .function("removeSimulation", &libOpenCOR::SedDocument::removeSimulation);
 
     // SedModel API.
 
@@ -54,7 +57,8 @@ void sedApi()
 
     // SedSimulation API.
 
-    emscripten::class_<libOpenCOR::SedSimulation, emscripten::base<libOpenCOR::SedBase>>("SedSimulation");
+    emscripten::class_<libOpenCOR::SedSimulation, emscripten::base<libOpenCOR::SedBase>>("SedSimulation")
+        .smart_ptr<libOpenCOR::SedSimulationPtr>("SedSimulation");
 
     // SedSimulationOneStep API.
 
