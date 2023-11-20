@@ -74,3 +74,39 @@ TEST(CoverageSedDocumentTest, sedDocumentSimulations)
 
     EXPECT_FALSE(sed->removeSimulation(nullptr));
 }
+
+TEST(CoverageSedDocumentTest, sedSimulationOdeSolver)
+{
+    auto sed = libOpenCOR::SedDocument::create();
+    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+
+    EXPECT_EQ(simulation->odeSolver(), nullptr);
+
+    auto solver = libOpenCOR::SolverCvode::create();
+
+    simulation->setOdeSolver(solver);
+
+    EXPECT_EQ(simulation->odeSolver(), solver);
+
+    simulation->setOdeSolver(nullptr);
+
+    EXPECT_EQ(simulation->odeSolver(), nullptr);
+}
+
+TEST(CoverageSedDocumentTest, sedSimulationNlaSolver)
+{
+    auto sed = libOpenCOR::SedDocument::create();
+    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+
+    EXPECT_EQ(simulation->nlaSolver(), nullptr);
+
+    auto solver = libOpenCOR::SolverKinsol::create();
+
+    simulation->setNlaSolver(solver);
+
+    EXPECT_EQ(simulation->nlaSolver(), solver);
+
+    simulation->setNlaSolver(nullptr);
+
+    EXPECT_EQ(simulation->nlaSolver(), nullptr);
+}

@@ -71,4 +71,38 @@ describe("SedDocument coverage tests", () => {
 
     expect(sed.removeSimulation(null)).toBe(false);
   });
+
+  test("ODE solver", () => {
+    const sed = new libopencor.SedDocument();
+    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+
+    expect(simulation.odeSolver()).toBe(null);
+
+    const solver = new libopencor.SolverCvode();
+
+    simulation.setOdeSolver(solver);
+
+    expect(simulation.odeSolver()).toStrictEqual(solver);
+
+    simulation.setOdeSolver(null);
+
+    expect(simulation.odeSolver()).toBe(null);
+  });
+
+  test("NLA solver", () => {
+    const sed = new libopencor.SedDocument();
+    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+
+    expect(simulation.nlaSolver()).toBe(null);
+
+    const solver = new libopencor.SolverKinsol();
+
+    simulation.setNlaSolver(solver);
+
+    expect(simulation.nlaSolver()).toStrictEqual(solver);
+
+    simulation.setNlaSolver(null);
+
+    expect(simulation.nlaSolver()).toBe(null);
+  });
 });

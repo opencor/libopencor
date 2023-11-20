@@ -13,7 +13,14 @@
 # limitations under the License.
 
 
-from libopencor import File, SedDocument, SedModel, SedSimulationUniformTimeCourse
+from libopencor import (
+    File,
+    SedDocument,
+    SedModel,
+    SedSimulationUniformTimeCourse,
+    SolverCvode,
+    SolverKinsol,
+)
 import utils
 
 
@@ -68,3 +75,37 @@ def test_simulations():
     assert len(sed.simulations) == 0
 
     assert sed.remove_simulation(None) == False
+
+
+def test_ode_solver():
+    sed = SedDocument()
+    simulation = SedSimulationUniformTimeCourse(sed)
+
+    assert simulation.ode_solver == None
+
+    solver = SolverCvode()
+
+    simulation.ode_solver = solver
+
+    assert simulation.ode_solver == solver
+
+    simulation.ode_solver = None
+
+    assert simulation.ode_solver == None
+
+
+def test_nla_solver():
+    sed = SedDocument()
+    simulation = SedSimulationUniformTimeCourse(sed)
+
+    assert simulation.nla_solver == None
+
+    solver = SolverKinsol()
+
+    simulation.nla_solver = solver
+
+    assert simulation.nla_solver == solver
+
+    simulation.nla_solver = None
+
+    assert simulation.nla_solver == None
