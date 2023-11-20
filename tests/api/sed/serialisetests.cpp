@@ -206,3 +206,30 @@ TEST(ModelTypeSedDocumentTest, algebraicModel)
 
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
 }
+
+TEST(SerialiseSedDocumentTest, fixedStepOdeSolver)
+{
+    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "  <listOfModels>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
+                                                     "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"1000\" numberOfSteps=\"1000\">\n"
+                                                     "      <algorithm kisaoID=\"KISAO:0000030\">\n"
+                                                     "        <listOfAlgorithmParameters>\n"
+                                                     "          <algorithmParameter kisaoID=\"KISAO:0000483\" value=\"1\"/>\n"
+                                                     "        </listOfAlgorithmParameters>\n"
+                                                     "      </algorithm>\n"
+                                                     "    </uniformTimeCourse>\n"
+                                                     "  </listOfSimulations>\n"
+                                                     "</sed>\n";
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+
+    simulation->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
+}

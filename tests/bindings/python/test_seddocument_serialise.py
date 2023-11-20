@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File, SedDocument
+from libopencor import File, SedDocument, SolverForwardEuler
 import platform
 import utils
 
@@ -200,5 +200,32 @@ def test_algebraic_model():
 
     file = File(utils.resource_path("api/sed/algebraic.cellml"))
     sed = SedDocument(file)
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation
+
+
+def test_fixed_step_ode_solver():
+    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
+      <algorithm kisaoID="KISAO:0000030">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000483" value="1"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+</sed>
+"""
+
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+
+    simulation.ode_solver = SolverForwardEuler()
 
     assert sed.serialise(utils.resource_path()) == expected_serialisation

@@ -149,4 +149,31 @@ describe("SedDocument serialise tests", () => {
       expectedSerialisation("tests/res/cellml_2.cellml"),
     );
   });
+
+  test("Fixed-step ODE solver", () => {
+    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
+      <algorithm kisaoID="KISAO:0000030">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000483" value="1"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+</sed>
+`;
+
+    const file = new libopencor.File(utils.REMOTE_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+
+    simulation.setOdeSolver(new libopencor.SolverForwardEuler());
+
+    expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(expectedSerialisation);
+  });
 });
