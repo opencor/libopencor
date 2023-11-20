@@ -76,7 +76,7 @@ public:
      * @return The (KiSAO) id, as a @c std::string, of the solver.
      */
 
-    virtual std::string id() const;
+    std::string id() const;
 
     /**
      * @brief Get the name of the solver.
@@ -86,7 +86,7 @@ public:
      * @return The name, as a @c std::string, of the solver.
      */
 
-    virtual std::string name() const;
+    std::string name() const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
