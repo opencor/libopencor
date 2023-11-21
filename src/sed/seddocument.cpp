@@ -28,6 +28,7 @@ limitations under the License.
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverkinsol.h"
 
+#include <algorithm>
 #include <sstream>
 
 #include <libxml/tree.h>
