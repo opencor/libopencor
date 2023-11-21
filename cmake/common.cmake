@@ -112,6 +112,7 @@ function(configure_target TARGET)
                     -cppcoreguidelines-non-private-member-variables-in-classes
                 )
                 set(DISABLED_FUCHSIA_CHECKS
+                    -fuchsia-default-arguments-declarations
                     -fuchsia-statically-constructed-objects
                 )
                 set(MISC_CHECKS

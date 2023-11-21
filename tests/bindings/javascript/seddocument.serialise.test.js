@@ -33,7 +33,13 @@ describe("SedDocument serialise tests", () => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
-  function expectedSerialisation(source) {
+  function expectedSerialisation(source, parameters = {}) {
+    const integrationMethod = parameters["KISAO:0000475"] || "BDF";
+    const iterationType = parameters["KISAO:0000476"] || "Newton";
+    const linearSolver = parameters["KISAO:0000477"] || "Dense";
+    const preconditioner = parameters["KISAO:0000478"] || "Banded";
+    const interpolateSolution = parameters["KISAO:0000481"] || "true";
+
     return (
       `<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
@@ -50,13 +56,23 @@ describe("SedDocument serialise tests", () => {
           <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
           <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
           <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
-          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
-          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
-          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
-          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="` +
+      integrationMethod +
+      `"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="` +
+      iterationType +
+      `"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="` +
+      linearSolver +
+      `"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="` +
+      preconditioner +
+      `"/>
           <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
           <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
-          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="` +
+      interpolateSolution +
+      `"/>
         </listOfAlgorithmParameters>
       </algorithm>
     </uniformTimeCourse>
@@ -175,5 +191,138 @@ describe("SedDocument serialise tests", () => {
     simulation.setOdeSolver(new libopencor.SolverForwardEuler());
 
     expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(expectedSerialisation);
+  });
+
+  test("CVODE solver with the Adams-Moulton integration method", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setIntegrationMethod(
+      libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
+    );
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000475": "Adams-Moulton" }),
+    );
+  });
+
+  test("CVODE solver with a functional iteration type", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setIterationType(
+      libopencor.SolverCvode.IterationType.FUNCTIONAL,
+    );
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000476": "Functional" }),
+    );
+  });
+
+  test("CVODE solver with a banded linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setLinearSolver(
+      libopencor.SolverCvode.LinearSolver.BANDED,
+    );
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000477": "Banded" }),
+    );
+  });
+
+  test("CVODE solver with a diagonal linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setLinearSolver(
+      libopencor.SolverCvode.LinearSolver.DIAGONAL,
+    );
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000477": "Diagonal" }),
+    );
+  });
+
+  test("CVODE solver with a GMRES linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setLinearSolver(
+      libopencor.SolverCvode.LinearSolver.GMRES,
+    );
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000477": "GMRES" }),
+    );
+  });
+
+  test("CVODE solver with a BiCGStab linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setLinearSolver(
+      libopencor.SolverCvode.LinearSolver.BICGSTAB,
+    );
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000477": "BiCGStab" }),
+    );
+  });
+
+  test("CVODE solver with a TFQMR linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setLinearSolver(
+      libopencor.SolverCvode.LinearSolver.TFQMR,
+    );
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000477": "TFQMR" }),
+    );
+  });
+
+  test("CVODE solver with no preconditioner", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setPreconditioner(
+      libopencor.SolverCvode.Preconditioner.NO,
+    );
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000478": "No" }),
+    );
+  });
+
+  test("CVODE solver with no interpolate solution", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.odeSolver();
+
+    solver.setInterpolateSolution(false);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation("file.txt", { "KISAO:0000481": "false" }),
+    );
   });
 });

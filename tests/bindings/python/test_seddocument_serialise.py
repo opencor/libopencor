@@ -13,12 +13,38 @@
 # limitations under the License.
 
 
-from libopencor import File, SedDocument, SolverForwardEuler
+from libopencor import File, SedDocument, SolverCvode, SolverForwardEuler
 import platform
 import utils
 
 
-def expected_serialisation(source):
+def expected_serialisation(source, parameters=None):
+    integration_method = (
+        parameters["KISAO:0000475"]
+        if parameters and "KISAO:0000475" in parameters
+        else "BDF"
+    )
+    iteration_type = (
+        parameters["KISAO:0000476"]
+        if parameters and "KISAO:0000476" in parameters
+        else "Newton"
+    )
+    linear_solver = (
+        parameters["KISAO:0000477"]
+        if parameters and "KISAO:0000477" in parameters
+        else "Dense"
+    )
+    preconditioner = (
+        parameters["KISAO:0000478"]
+        if parameters and "KISAO:0000478" in parameters
+        else "Banded"
+    )
+    interpolate_solution = (
+        parameters["KISAO:0000481"]
+        if parameters and "KISAO:0000481" in parameters
+        else "true"
+    )
+
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
@@ -32,13 +58,13 @@ def expected_serialisation(source):
           <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
           <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
           <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
-          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
-          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
-          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
-          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="{integration_method}"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="{iteration_type}"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="{linear_solver}"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="{preconditioner}"/>
           <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
           <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
-          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="{interpolate_solution}"/>
         </listOfAlgorithmParameters>
       </algorithm>
     </uniformTimeCourse>
@@ -229,3 +255,120 @@ def test_fixed_step_ode_solver():
     simulation.ode_solver = SolverForwardEuler()
 
     assert sed.serialise(utils.resource_path()) == expected_serialisation
+
+
+def test_cvode_solver_with_adams_moulton_interation_method():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.integration_method = SolverCvode.IntegrationMethod.AdamsMoulton
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000475": "Adams-Moulton"}
+    )
+
+
+def test_cvode_solver_with_functional_iteration_type():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.iteration_type = SolverCvode.IterationType.Functional
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000476": "Functional"}
+    )
+
+
+def test_cvode_solver_with_banded_linear_solver():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.linear_solver = SolverCvode.LinearSolver.Banded
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000477": "Banded"}
+    )
+
+
+def test_cvode_solver_with_diagonal_linear_solver():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.linear_solver = SolverCvode.LinearSolver.Diagonal
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000477": "Diagonal"}
+    )
+
+
+def test_cvode_solver_with_gmres_linear_solver():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.linear_solver = SolverCvode.LinearSolver.Gmres
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000477": "GMRES"}
+    )
+
+
+def test_cvode_solver_with_bicgstab_linear_solver():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.linear_solver = SolverCvode.LinearSolver.Bicgstab
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000477": "BiCGStab"}
+    )
+
+
+def test_cvode_solver_with_tfqmr_linear_solver():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.linear_solver = SolverCvode.LinearSolver.Tfqmr
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000477": "TFQMR"}
+    )
+
+
+def test_cvode_solver_with_no_preconditioner():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.preconditioner = SolverCvode.Preconditioner.No
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000478": "No"}
+    )
+
+
+def test_cvode_solver_with_no_interpolate_solution():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    solver = simulation.ode_solver
+
+    solver.interpolate_solution = False
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation(
+        "cellml_2.cellml", {"KISAO:0000481": "false"}
+    )

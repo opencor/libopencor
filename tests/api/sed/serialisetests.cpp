@@ -22,8 +22,14 @@ limitations under the License.
 
 namespace {
 
-std::string expectedSerialisation(const std::string &pSource)
+std::string expectedSerialisation(const std::string &pSource, const std::map<std::string, std::string> &pParameters = {})
 {
+    auto integrationMethod = pParameters.find("KISAO:0000475");
+    auto iterationType = pParameters.find("KISAO:0000476");
+    auto linearSolver = pParameters.find("KISAO:0000477");
+    auto preconditioner = pParameters.find("KISAO:0000478");
+    auto interpolateSolution = pParameters.find("KISAO:0000481");
+
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
            "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
            "  <listOfModels>\n"
@@ -38,18 +44,38 @@ std::string expectedSerialisation(const std::string &pSource)
                        "          <algorithmParameter kisaoID=\"KISAO:0000211\" value=\"1e-07\"/>\n"
                        "          <algorithmParameter kisaoID=\"KISAO:0000415\" value=\"500\"/>\n"
                        "          <algorithmParameter kisaoID=\"KISAO:0000467\" value=\"0\"/>\n"
-                       "          <algorithmParameter kisaoID=\"KISAO:0000475\" value=\"BDF\"/>\n"
-                       "          <algorithmParameter kisaoID=\"KISAO:0000476\" value=\"Newton\"/>\n"
-                       "          <algorithmParameter kisaoID=\"KISAO:0000477\" value=\"Dense\"/>\n"
-                       "          <algorithmParameter kisaoID=\"KISAO:0000478\" value=\"Banded\"/>\n"
-                       "          <algorithmParameter kisaoID=\"KISAO:0000479\" value=\"0\"/>\n"
-                       "          <algorithmParameter kisaoID=\"KISAO:0000480\" value=\"0\"/>\n"
-                       "          <algorithmParameter kisaoID=\"KISAO:0000481\" value=\"true\"/>\n"
-                       "        </listOfAlgorithmParameters>\n"
-                       "      </algorithm>\n"
-                       "    </uniformTimeCourse>\n"
-                       "  </listOfSimulations>\n"
-                       "</sed>\n";
+                       "          <algorithmParameter kisaoID=\"KISAO:0000475\" value=\""
+           + ((integrationMethod != pParameters.end()) ?
+                  integrationMethod->second :
+                  "BDF")
+           + "\"/>\n"
+             "          <algorithmParameter kisaoID=\"KISAO:0000476\" value=\""
+           + ((iterationType != pParameters.end()) ?
+                  iterationType->second :
+                  "Newton")
+           + "\"/>\n"
+             "          <algorithmParameter kisaoID=\"KISAO:0000477\" value=\""
+           + ((linearSolver != pParameters.end()) ?
+                  linearSolver->second :
+                  "Dense")
+           + "\"/>\n"
+             "          <algorithmParameter kisaoID=\"KISAO:0000478\" value=\""
+           + ((preconditioner != pParameters.end()) ?
+                  preconditioner->second :
+                  "Banded")
+           + "\"/>\n"
+             "          <algorithmParameter kisaoID=\"KISAO:0000479\" value=\"0\"/>\n"
+             "          <algorithmParameter kisaoID=\"KISAO:0000480\" value=\"0\"/>\n"
+             "          <algorithmParameter kisaoID=\"KISAO:0000481\" value=\""
+           + ((interpolateSolution != pParameters.end()) ?
+                  interpolateSolution->second :
+                  "true")
+           + "\"/>\n"
+             "        </listOfAlgorithmParameters>\n"
+             "      </algorithm>\n"
+             "    </uniformTimeCourse>\n"
+             "  </listOfSimulations>\n"
+             "</sed>\n";
 }
 
 } // namespace
@@ -232,4 +258,112 @@ TEST(SerialiseSedDocumentTest, fixedStepOdeSolver)
     simulation->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
 
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithAdamsMoultonInterationMethod)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setIntegrationMethod(libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000475", "Adams-Moulton"}}));
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithFunctionalIterationType)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setIterationType(libOpenCOR::SolverCvode::IterationType::FUNCTIONAL);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000476", "Functional"}}));
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithBandedLinearSolver)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "Banded"}}));
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithDiagonalLinearSolver)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::DIAGONAL);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "Diagonal"}}));
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithGmresLinearSolver)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "GMRES"}}));
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithBicgstabLinearSolver)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "BiCGStab"}}));
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithTfqmrLinearSolver)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "TFQMR"}}));
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithNoPreconditioner)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000478", "No"}}));
+}
+
+TEST(SerialiseSedDocumentTest, cvodeSolverWithNoInterpolateSolution)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = sed->simulations()[0];
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+
+    solver->setInterpolateSolution(false);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation("cellml_2.cellml", {{"KISAO:0000481", "false"}}));
 }
