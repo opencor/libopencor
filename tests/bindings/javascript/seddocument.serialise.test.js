@@ -264,7 +264,9 @@ describe("SedDocument serialise tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(kinsolExpectedSerialisation());
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      kinsolExpectedSerialisation(),
+    );
   });
 
   test("Algebraic model", () => {
@@ -281,7 +283,10 @@ describe("SedDocument serialise tests", () => {
 
     const file = new libopencor.File(utils.LOCAL_FILE);
 
-    file.setContents(someAlgebraicContentsPtr, utils.SOME_ALGEBRAIC_CONTENTS.length);
+    file.setContents(
+      someAlgebraicContentsPtr,
+      utils.SOME_ALGEBRAIC_CONTENTS.length,
+    );
 
     const sed = new libopencor.SedDocument(file);
 
@@ -332,7 +337,9 @@ describe("SedDocument serialise tests", () => {
     );
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000475": "Adams-Moulton" }),
+      cvodeExpectedSerialisation("file.txt", {
+        "KISAO:0000475": "Adams-Moulton",
+      }),
     );
   });
 
