@@ -463,4 +463,68 @@ describe("SedDocument serialise tests", () => {
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000481": "false" }),
     );
   });
+
+  test("KINSOL solver with a banded linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.nlaSolver();
+
+    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      kinsolExpectedSerialisation({ "KISAO:0000477": "Banded" }),
+    );
+  });
+
+  test("KINSOL solver with a GMRES linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.nlaSolver();
+
+    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.GMRES);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      kinsolExpectedSerialisation({ "KISAO:0000477": "GMRES" }),
+    );
+  });
+
+  test("KINSOL solver with a BiCGStab linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.nlaSolver();
+
+    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BICGSTAB);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      kinsolExpectedSerialisation({ "KISAO:0000477": "BiCGStab" }),
+    );
+  });
+
+  test("KINSOL solver with a TFQMR linear solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+    const solver = simulation.nlaSolver();
+
+    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.TFQMR);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),
+    );
+  });
 });
