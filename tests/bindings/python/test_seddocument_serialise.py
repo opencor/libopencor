@@ -13,7 +13,14 @@
 # limitations under the License.
 
 
-from libopencor import File, SedDocument, SolverCvode, SolverForwardEuler, SolverKinsol
+from libopencor import (
+    File,
+    SedDocument,
+    SedSimulationOneStep,
+    SolverCvode,
+    SolverForwardEuler,
+    SolverKinsol,
+)
 import platform
 import utils
 
@@ -454,3 +461,27 @@ def test_kinsol_solver_with_tfqmr_linear_solver():
     assert sed.serialise(utils.resource_path()) == kinsol_expected_serialisation(
         {"KISAO:0000477": "TFQMR"}
     )
+
+
+def test_one_step_simulation():
+    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="simulation2" step="1"/>
+  </listOfSimulations>
+</sed>
+"""
+
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+
+    sed.remove_simulation(sed.simulations[0])
+
+    simulation = SedSimulationOneStep(sed)
+
+    sed.add_simulation(simulation)
+
+    assert sed.serialise(utils.resource_path()) == expected_serialisation

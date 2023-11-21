@@ -527,4 +527,31 @@ describe("SedDocument serialise tests", () => {
       kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),
     );
   });
+
+  test("One-step simulation", () => {
+    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+  </listOfModels>
+  <listOfSimulations>
+    <oneStep id="simulation2" step="1"/>
+  </listOfSimulations>
+</sed>
+`;
+
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    sed.removeSimulation(sed.simulations().get(0));
+
+    const simulation = new libopencor.SedSimulationOneStep(sed);
+
+    sed.addSimulation(simulation);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
+  });
 });

@@ -424,3 +424,27 @@ TEST(ModelTypeSedDocumentTest, kinsolWithTfmqrLinearSolver)
 
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), kinsolExpectedSerialisation({{"KISAO:0000477", "TFQMR"}}));
 }
+
+TEST(ModelTypeSedDocumentTest, oneStepSimulation)
+{
+    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "  <listOfModels>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
+                                                     "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <oneStep id=\"simulation2\" step=\"1\"/>\n"
+                                                     "  </listOfSimulations>\n"
+                                                     "</sed>\n";
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    sed->removeSimulation(sed->simulations()[0]);
+
+    auto simulation = libOpenCOR::SedSimulationOneStep::create(sed);
+
+    sed->addSimulation(simulation);
+
+    EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
+}
