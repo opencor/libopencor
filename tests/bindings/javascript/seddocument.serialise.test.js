@@ -21,19 +21,37 @@ const libopencor = await libOpenCOR();
 
 describe("SedDocument serialise tests", () => {
   let someCellmlContentsPtr;
+  let someAlgebraicContentsPtr;
+  let someDaeContentsPtr;
+  let someNlaContentsPtr;
 
   beforeAll(() => {
     someCellmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_CELLML_CONTENTS,
     );
+    someAlgebraicContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_ALGEBRAIC_CONTENTS,
+    );
+    someDaeContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_DAE_CONTENTS,
+    );
+    someNlaContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_NLA_CONTENTS,
+    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someAlgebraicContentsPtr);
+    utils.freeMemory(libopencor, someDaeContentsPtr);
+    utils.freeMemory(libopencor, someNlaContentsPtr);
   });
 
-  function expectedSerialisation(source, parameters = {}) {
+  function cvodeExpectedSerialisation(source, parameters = {}) {
     const integrationMethod = parameters["KISAO:0000475"] || "BDF";
     const iterationType = parameters["KISAO:0000476"] || "Newton";
     const linearSolver = parameters["KISAO:0000477"] || "Dense";
@@ -82,6 +100,34 @@ describe("SedDocument serialise tests", () => {
     );
   }
 
+  function kinsolExpectedSerialisation(parameters = {}) {
+    const linearSolver = parameters["KISAO:0000477"] || "Dense";
+
+    return (
+      `<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+  </listOfModels>
+  <listOfSimulations>
+    <steadyState id="simulation1">
+      <algorithm kisaoID="KISAO:0000282">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000477" value="` +
+      linearSolver +
+      `"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000486" value="200"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </steadyState>
+  </listOfSimulations>
+</sed>
+`
+    );
+  }
+
   test("Local CellML file with base path", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
@@ -90,7 +136,7 @@ describe("SedDocument serialise tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt"),
+      cvodeExpectedSerialisation("file.txt"),
     );
   });
 
@@ -102,7 +148,7 @@ describe("SedDocument serialise tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise()).toBe(
-      expectedSerialisation("file:///some/path/file.txt"),
+      cvodeExpectedSerialisation("file:///some/path/file.txt"),
     );
   });
 
@@ -114,7 +160,7 @@ describe("SedDocument serialise tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
-      expectedSerialisation("some/path/file.txt"),
+      cvodeExpectedSerialisation("some/path/file.txt"),
     );
   });
 
@@ -125,7 +171,7 @@ describe("SedDocument serialise tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.serialise()).toBe(expectedSerialisation("file.txt"));
+    expect(sed.serialise()).toBe(cvodeExpectedSerialisation("file.txt"));
   });
 
   test("Remote CellML file with base path", () => {
@@ -136,7 +182,7 @@ describe("SedDocument serialise tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(
-      expectedSerialisation("cellml_2.cellml"),
+      cvodeExpectedSerialisation("cellml_2.cellml"),
     );
   });
 
@@ -148,7 +194,7 @@ describe("SedDocument serialise tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise()).toBe(
-      expectedSerialisation(
+      cvodeExpectedSerialisation(
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml",
       ),
     );
@@ -162,8 +208,84 @@ describe("SedDocument serialise tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
-      expectedSerialisation("tests/res/cellml_2.cellml"),
+      cvodeExpectedSerialisation("tests/res/cellml_2.cellml"),
     );
+  });
+
+  test("DAE model", () => {
+    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+      <nlaAlgorithm xmlns="https://opencor.ws/libopencor" kisaoID="KISAO:0000282">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000486" value="200"/>
+        </listOfAlgorithmParameters>
+      </nlaAlgorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+</sed>
+`;
+
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
+  });
+
+  test("NLA model", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(kinsolExpectedSerialisation());
+  });
+
+  test("Algebraic model", () => {
+    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
+<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+  </listOfModels>
+  <listOfSimulations>
+    <steadyState id="simulation1"/>
+  </listOfSimulations>
+</sed>
+`;
+
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someAlgebraicContentsPtr, utils.SOME_ALGEBRAIC_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
   });
 
   test("Fixed-step ODE solver", () => {
@@ -210,7 +332,7 @@ describe("SedDocument serialise tests", () => {
     );
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000475": "Adams-Moulton" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000475": "Adams-Moulton" }),
     );
   });
 
@@ -226,7 +348,7 @@ describe("SedDocument serialise tests", () => {
     solver.setIterationType(libopencor.SolverCvode.IterationType.FUNCTIONAL);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000476": "Functional" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000476": "Functional" }),
     );
   });
 
@@ -242,7 +364,7 @@ describe("SedDocument serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000477": "Banded" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "Banded" }),
     );
   });
 
@@ -258,7 +380,7 @@ describe("SedDocument serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.DIAGONAL);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000477": "Diagonal" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "Diagonal" }),
     );
   });
 
@@ -274,7 +396,7 @@ describe("SedDocument serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.GMRES);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000477": "GMRES" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "GMRES" }),
     );
   });
 
@@ -290,7 +412,7 @@ describe("SedDocument serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BICGSTAB);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000477": "BiCGStab" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "BiCGStab" }),
     );
   });
 
@@ -306,7 +428,7 @@ describe("SedDocument serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.TFQMR);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000477": "TFQMR" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "TFQMR" }),
     );
   });
 
@@ -322,7 +444,7 @@ describe("SedDocument serialise tests", () => {
     solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000478": "No" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000478": "No" }),
     );
   });
 
@@ -338,7 +460,7 @@ describe("SedDocument serialise tests", () => {
     solver.setInterpolateSolution(false);
 
     expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      expectedSerialisation("file.txt", { "KISAO:0000481": "false" }),
+      cvodeExpectedSerialisation("file.txt", { "KISAO:0000481": "false" }),
     );
   });
 });
