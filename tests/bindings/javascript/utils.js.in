@@ -41,6 +41,16 @@ export const SOME_WARNING_CELLML_CONTENTS = stringToArrayBuffer(
 );
 export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
 
+export const SOME_ALGEBRAIC_CONTENTS = stringToArrayBuffer(
+  `@SOME_ALGEBRAIC_CONTENTS@`,
+);
+export const SOME_DAE_CONTENTS = stringToArrayBuffer(
+  `@SOME_DAE_CONTENTS@`,
+);
+export const SOME_NLA_CONTENTS = stringToArrayBuffer(
+  `@SOME_NLA_CONTENTS@`,
+);
+
 export function expectIssues(logger, expectedIssues) {
   const issues = logger.issues();
 

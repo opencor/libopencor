@@ -52,6 +52,14 @@ string(REGEX REPLACE "\n" "\" \\n\"" SOME_WARNING_CELLML_CONTENTS_C "${SOME_WARN
 string(REPLACE "\"" "\\\"" SOME_SEDML_CONTENTS "${SOME_SEDML_CONTENTS}")
 string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_CONTENTS_C "${SOME_SEDML_CONTENTS}")
 
+file(READ res/api/sed/algebraic.cellml SOME_ALGEBRAIC_CONTENTS)
+file(READ res/api/sed/dae.cellml SOME_DAE_CONTENTS)
+file(READ res/api/sed/nla.cellml SOME_NLA_CONTENTS)
+
+string(REPLACE "\"" "\\\"" SOME_ALGEBRAIC_CONTENTS "${SOME_ALGEBRAIC_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_DAE_CONTENTS "${SOME_DAE_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_NLA_CONTENTS "${SOME_NLA_CONTENTS}")
+
 configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/misc
