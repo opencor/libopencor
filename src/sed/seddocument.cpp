@@ -287,6 +287,7 @@ bool SedDocument::Impl::removeModel(const SedModelPtr &pModel)
     });
 
     if (model != mModels.end()) {
+        mIds.erase((*model)->pimpl()->mId);
         mModels.erase(model);
 
         return true;
@@ -321,6 +322,7 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
     });
 
     if (simulation != mSimulations.end()) {
+        mIds.erase((*simulation)->pimpl()->mId);
         mSimulations.erase(simulation);
 
         return true;

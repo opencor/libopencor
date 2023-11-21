@@ -470,7 +470,7 @@ def test_one_step_simulation():
     <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
   <listOfSimulations>
-    <oneStep id="simulation2" step="1"/>
+    <oneStep id="simulation1" step="1"/>
   </listOfSimulations>
 </sed>
 """

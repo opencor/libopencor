@@ -433,7 +433,7 @@ TEST(ModelTypeSedDocumentTest, oneStepSimulation)
                                                      "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
                                                      "  <listOfSimulations>\n"
-                                                     "    <oneStep id=\"simulation2\" step=\"1\"/>\n"
+                                                     "    <oneStep id=\"simulation1\" step=\"1\"/>\n"
                                                      "  </listOfSimulations>\n"
                                                      "</sed>\n";
 

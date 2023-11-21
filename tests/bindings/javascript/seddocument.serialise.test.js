@@ -542,7 +542,7 @@ describe("SedDocument serialise tests", () => {
     <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
   </listOfModels>
   <listOfSimulations>
-    <oneStep id="simulation2" step="1"/>
+    <oneStep id="simulation1" step="1"/>
   </listOfSimulations>
 </sed>
 `;
