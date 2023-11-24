@@ -62,8 +62,8 @@ public:
      *
      * @return @c true if the solver could be initialised, @c false otherwise.
      *
-     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
-     * our solvers.
+     * @warning ---GRY--- This API will change once we have SED-ML support. It is (currently) as it is so that we can
+     * test our solvers.
      */
 
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
@@ -78,8 +78,8 @@ public:
      *
      * @return @c true if the solver could be reinitialised, @c false otherwise.
      *
-     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
-     * our solvers.
+     * @warning ---GRY--- This API will change once we have SED-ML support. It is (currently) as it is so that we can
+     * test our solvers.
      */
 
     virtual bool reinitialise(double pVoi);
@@ -94,8 +94,8 @@ public:
      *
      * @return @c true if the ODE system could be solved, @c false otherwise.
      *
-     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
-     * our solvers.
+     * @warning ---GRY--- This API will change once we have SED-ML support. It is (currently) as it is so that we can
+     * test our solvers.
      */
 
     virtual bool solve(double &pVoi, double pVoiEnd) const = 0;

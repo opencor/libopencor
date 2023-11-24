@@ -65,7 +65,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
 #ifndef __EMSCRIPTEN__
     // Generate some code for the model and compile it, should the analysis have been fine.
 
-    if (mIssues.empty()) {
+    if (mErrors.empty()) {
         auto generator = libcellml::Generator::create();
         auto generatorProfile = libcellml::GeneratorProfile::create();
 

@@ -60,8 +60,8 @@ public:
      *
      * @return @c true if the NLA system could be solved, @c false otherwise.
      *
-     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
-     * our solvers.
+     * @warning ---GRY--- This API will change once we have SED-ML support. It is (currently) as it is so that we can
+     * test our solvers.
      */
 
     virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) = 0;
