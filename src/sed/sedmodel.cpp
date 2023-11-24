@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "file_p.h"
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 #include "utils.h"
@@ -30,6 +31,38 @@ SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
     : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
     , mFile(pFile)
 {
+}
+
+bool SedModel::Impl::isValid()
+{
+    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT CELLML FILES. THIS WILL CLEARLY CHANGE IN THE FUTURE...
+
+    switch (mFile->pimpl()->mCellmlFile->type()) {
+    case libcellml::AnalyserModel::Type::INVALID:
+        addError("The CellML file is invalid.");
+
+        break;
+    case libcellml::AnalyserModel::Type::OVERCONSTRAINED:
+        addError("The CellML file is overconstrained.");
+
+        break;
+    case libcellml::AnalyserModel::Type::UNDERCONSTRAINED:
+        addError("The CellML file is underconstrained.");
+
+        break;
+    case libcellml::AnalyserModel::Type::UNSUITABLY_CONSTRAINED:
+        addError("The CellML file is unsuitably constrained.");
+
+        break;
+    default: // libcellml::AnalyserModel::Type::UNKNOWN (we should never get this type),
+             // libcellml::AnalyserModel::Type::ALGEBRAIC,
+             // libcellml::AnalyserModel::Type::DAE,
+             // libcellml::AnalyserModel::Type::NLA, or
+             // libcellml::AnalyserModel::Type::ODE.
+        break;
+    }
+
+    return mErrors.empty();
 }
 
 void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const

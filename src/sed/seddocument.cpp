@@ -133,6 +133,57 @@ void SedDocument::Impl::initialiseFromCellmlFile(const FilePtr &pFile, const Sed
     }
 }
 
+bool SedDocument::Impl::isValid()
+{
+    // Make sure that we have one model and one simulation.
+
+    if (mModels.size() != 1) {
+        addError("A simulation experiment description must (currently) have exactly one model.");
+    }
+
+    if (mSimulations.size() != 1) {
+        addError("A simulation experiment description must (currently) have exactly one simulation.");
+    }
+
+    // Make sure that all our models are valid.
+
+    for (const auto &model : mModels) {
+        if (!model->pimpl()->isValid()) {
+            addIssues(model);
+        }
+    }
+
+    // Note: simulations are always valid, so no need to check them.
+
+    //---GRY--- WE DON'T (CURRENTLY) SUPPORT ANY OF THE OTHER SED-ML CONCEPTS, HENCE WE CHECK A FEW MORE THINGS HERE.
+
+    // Make sure that the simulation has the expected solver(s).
+
+    if (mErrors.empty()) {
+        auto model = mModels[0];
+        auto simulation = mSimulations[0];
+        auto cellmlFileType = model->pimpl()->mFile->pimpl()->mCellmlFile->type();
+
+        if ((cellmlFileType == libcellml::AnalyserModel::Type::ODE)
+            && (simulation->odeSolver() == nullptr)) {
+            addError("The simulation is to be linked to an ODE model and must therefore specify an ODE solver.");
+        } else if ((cellmlFileType == libcellml::AnalyserModel::Type::NLA)
+                   && (simulation->nlaSolver() == nullptr)) {
+            addError("The simulation is to be linked to an NLA model and must therefore specify an NLA solver.");
+        } else if (cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
+            if (simulation->odeSolver() == nullptr) {
+                addError("The simulation is to be linked to a DAE model and must therefore specify an ODE solver.");
+            }
+
+            if (simulation->nlaSolver() == nullptr) {
+                addError("The simulation is to be linked to a DAE model and must therefore specify an NLA solver.");
+            }
+        }
+    }
+
+    return mErrors.empty();
+}
+
 void SedDocument::Impl::serialise(xmlNodePtr pNode) const
 {
     xmlNewProp(pNode, constXmlCharPtr("xmlns"), constXmlCharPtr(mXmlns));
@@ -332,6 +383,25 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
     return false;
 }
 
+bool SedDocument::Impl::start()
+{
+    removeAllIssues();
+
+    // Make sure that we are valid.
+
+    if (!isValid()) {
+        return false;
+    }
+
+    static const int I_MAX = 1000000;
+
+    //---GRY---
+    for (int i = 0; i < I_MAX; ++i) {
+    }
+
+    return true;
+}
+
 SedDocument::SedDocument()
     : Logger(new Impl {})
 {
@@ -406,6 +476,11 @@ bool SedDocument::addSimulation(const SedSimulationPtr &pSimulation)
 bool SedDocument::removeSimulation(const SedSimulationPtr &pSimulation)
 {
     return pimpl()->removeSimulation(pSimulation);
+}
+
+bool SedDocument::start()
+{
+    return pimpl()->start();
 }
 
 } // namespace libOpenCOR

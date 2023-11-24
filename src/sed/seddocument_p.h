@@ -46,6 +46,8 @@ public:
     void initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner);
     void initialiseFromCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner);
 
+    bool isValid();
+
     void serialise(xmlNodePtr pNode) const;
 
     std::string serialise(const std::string &pBasePath = {}) const;
@@ -55,6 +57,8 @@ public:
 
     bool addSimulation(const SedSimulationPtr &pSimulation);
     bool removeSimulation(const SedSimulationPtr &pSimulation);
+
+    bool start();
 };
 
 } // namespace libOpenCOR

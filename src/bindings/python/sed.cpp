@@ -51,7 +51,8 @@ void sedApi(py::module_ &m)
         .def("remove_model", &libOpenCOR::SedDocument::removeModel, "Remove a model.")
         .def_property_readonly("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
         .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add a simulation.")
-        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.");
+        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.")
+        .def("start", &libOpenCOR::SedDocument::start, "Start this SedDocument object.");
 
     // SedModel API.
 

@@ -47,7 +47,8 @@ void sedApi()
         .function("removeModel", &libOpenCOR::SedDocument::removeModel)
         .function("simulations", &libOpenCOR::SedDocument::simulations)
         .function("addSimulation", &libOpenCOR::SedDocument::addSimulation)
-        .function("removeSimulation", &libOpenCOR::SedDocument::removeSimulation);
+        .function("removeSimulation", &libOpenCOR::SedDocument::removeSimulation)
+        .function("start", &libOpenCOR::SedDocument::start);
 
     // SedModel API.
 
