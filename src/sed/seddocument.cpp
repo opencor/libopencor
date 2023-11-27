@@ -153,7 +153,13 @@ bool SedDocument::Impl::isValid()
         }
     }
 
-    // Note: simulations are always valid, so no need to check them.
+    // Simulations are always valid, so we don't need to check them, but for coverage reasons we do.
+
+#ifdef CODE_COVERAGE_ENABLED
+    for (const auto &simulation : mSimulations) {
+        simulation->pimpl()->isValid();
+    }
+#endif
 
     //---GRY--- WE DON'T (CURRENTLY) SUPPORT ANY OF THE OTHER SED-ML CONCEPTS, HENCE WE CHECK A FEW MORE THINGS HERE.
 

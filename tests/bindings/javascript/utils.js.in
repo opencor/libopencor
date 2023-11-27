@@ -47,6 +47,16 @@ export const SOME_ALGEBRAIC_CONTENTS = stringToArrayBuffer(
 export const SOME_DAE_CONTENTS = stringToArrayBuffer(`@SOME_DAE_CONTENTS@`);
 export const SOME_NLA_CONTENTS = stringToArrayBuffer(`@SOME_NLA_CONTENTS@`);
 
+export const SOME_OVERCONSTRAINED_CONTENTS = stringToArrayBuffer(
+  `@SOME_OVERCONSTRAINED_CONTENTS@`,
+);
+export const SOME_UNDERCONSTRAINED_CONTENTS = stringToArrayBuffer(
+  `@SOME_UNDERCONSTRAINED_CONTENTS@`,
+);
+export const SOME_UNSUITABLY_CONSTRAINED_CONTENTS = stringToArrayBuffer(
+  `@SOME_UNSUITABLY_CONSTRAINED_CONTENTS@`,
+);
+
 export function expectIssues(logger, expectedIssues) {
   const issues = logger.issues();
 

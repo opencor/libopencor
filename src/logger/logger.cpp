@@ -21,13 +21,9 @@ namespace libOpenCOR {
 
 void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 {
-#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT...
-    (void)pLogger;
-#else
     for (const auto &issue : pLogger->issues()) {
         addIssue(issue->description(), issue->type());
     }
-#endif
 }
 
 void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger)

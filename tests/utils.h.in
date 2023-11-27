@@ -37,6 +37,7 @@ inline constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
 
 inline constexpr auto UNKNOWN_FILE = "unknown_file.txt";
 inline constexpr auto SBML_FILE = "sbml.sbml";
+inline constexpr auto ERROR_CELLML_FILE = "error.cellml";
 inline constexpr auto ERROR_SEDML_FILE = "error.sedml";
 inline constexpr auto CELLML_1_X_FILE = "cellml_1_x.cellml";
 inline constexpr auto SEDML_1_X_FILE = "cellml_1_x.sedml";
