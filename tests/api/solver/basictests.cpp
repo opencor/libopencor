@@ -33,9 +33,6 @@ void checkModel(const std::string &pModelType, const std::string &pVersion = {})
     analyser->analyseModel(model);
 
     EXPECT_EQ(analyser->issueCount(), size_t(0));
-    for (size_t i = 0; i < analyser->issueCount(); ++i) {
-        printf(">>> %s\n", analyser->issue(i)->description().c_str()); // NOLINT
-    }
 
     auto analyserModel = analyser->model();
     auto generator = libcellml::Generator::create();
