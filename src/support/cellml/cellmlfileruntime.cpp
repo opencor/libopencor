@@ -31,35 +31,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
     if (analyser->issueCount() != 0) {
         // The analyser reported some issues, so make them ours.
 
-        for (size_t i = 0; i < analyser->issueCount(); ++i) {
-            auto issue = analyser->issue(i);
-            Issue::Type type = Issue::Type::ERROR;
-
-#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT...
-            if (issue->level() == libcellml::Issue::Level::ERROR) {
-                type = Issue::Type::ERROR;
-            } else {
-                type = Issue::Type::WARNING;
-            }
-#else
-            switch (issue->level()) {
-            case libcellml::Issue::Level::ERROR:
-                type = Issue::Type::ERROR;
-
-                break;
-            case libcellml::Issue::Level::WARNING:
-                type = Issue::Type::WARNING;
-
-                break;
-            default: // libcellml::Issue::Level::MESSAGE.
-                type = Issue::Type::MESSAGE;
-
-                break;
-            }
-#endif
-
-            addIssue(issue->description(), type);
-        }
+        addIssues(analyser);
     }
 
 #ifndef __EMSCRIPTEN__
