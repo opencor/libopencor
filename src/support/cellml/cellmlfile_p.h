@@ -27,6 +27,8 @@ namespace libOpenCOR {
 class CellmlFile::Impl: public Logger::Impl
 {
 public:
+    libcellml::AnalyserPtr mAnalyser = libcellml::Analyser::create();
+
     libcellml::ModelPtr mModel;
     libcellml::AnalyserModelPtr mAnalyserModel;
 

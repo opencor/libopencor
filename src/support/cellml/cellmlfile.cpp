@@ -37,18 +37,17 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
         }
     }
 
-    // Analyse the model, if possible.
+    // Analyse the model.
+    // Note: we do this even if there are some errors (as a result of resolving imports). This is so that we can
+    //       retrieve the analyser's issues if needed (e.g., when wanting to retrieve a runtime) and so that we don't
+    //       have to test mAnalyserModel for nullity everywhere.
 
-    if (mErrors.empty()) {
-        auto analyser = libcellml::Analyser::create();
+    mAnalyser->analyseModel(mModel);
 
-        analyser->analyseModel(mModel);
+    mAnalyserModel = mAnalyser->model();
 
-        mAnalyserModel = analyser->model();
-
-        if (analyser->errorCount() != 0) {
-            addIssues(analyser);
-        }
+    if (mAnalyser->errorCount() != 0) {
+        addIssues(mAnalyser);
     }
 }
 
@@ -106,12 +105,17 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 
 libcellml::AnalyserModel::Type CellmlFile::type() const
 {
-    return (pimpl()->mAnalyserModel != nullptr) ? pimpl()->mAnalyserModel->type() : libcellml::AnalyserModel::Type::UNKNOWN;
+    return pimpl()->mAnalyserModel->type();
 }
 
-libcellml::ModelPtr CellmlFile::model() const
+libcellml::AnalyserPtr CellmlFile::analyser() const
 {
-    return pimpl()->mModel;
+    return pimpl()->mAnalyser;
+}
+
+libcellml::AnalyserModelPtr CellmlFile::analyserModel() const
+{
+    return pimpl()->mAnalyserModel;
 }
 
 CellmlFileRuntimePtr CellmlFile::runtime()

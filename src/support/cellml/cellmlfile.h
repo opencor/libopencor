@@ -49,7 +49,8 @@ public:
 
     libcellml::AnalyserModel::Type type() const;
 
-    libcellml::ModelPtr model() const;
+    libcellml::AnalyserPtr analyser() const;
+    libcellml::AnalyserModelPtr analyserModel() const;
 
     CellmlFileRuntimePtr runtime();
 

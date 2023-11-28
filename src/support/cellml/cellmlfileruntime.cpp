@@ -21,23 +21,14 @@ namespace libOpenCOR {
 
 CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
 {
-    // Analyse the model.
+    auto cellmlFileAnalyser = pCellmlFile->analyser();
 
-    auto analyser = libcellml::Analyser::create();
-    auto printer = libcellml::Printer::create();
-
-    analyser->analyseModel(pCellmlFile->model());
-
-    if (analyser->issueCount() != 0) {
-        // The analyser reported some issues, so make them ours.
-
-        addIssues(analyser);
-    }
-
+    if (cellmlFileAnalyser->errorCount() != 0) {
+        addIssues(cellmlFileAnalyser);
 #ifndef __EMSCRIPTEN__
-    // Generate some code for the model and compile it, should the analysis have been fine.
+    } else {
+        // Generate some code for the model and compile it, should the analysis have been fine.
 
-    if (mErrors.empty()) {
         auto generator = libcellml::Generator::create();
         auto generatorProfile = libcellml::GeneratorProfile::create();
 
@@ -54,7 +45,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
         generatorProfile->setImplementationCreateVariablesArrayMethodString("");
         generatorProfile->setImplementationDeleteArrayMethodString("");
 
-        generator->setModel(analyser->model());
+        generator->setModel(pCellmlFile->analyserModel());
         generator->setProfile(generatorProfile);
 
         auto compiler = Compiler::create();
@@ -68,8 +59,8 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
             addIssues(compiler);
         }
 #    endif
-    }
 #endif
+    }
 }
 
 CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile)
