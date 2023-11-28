@@ -399,11 +399,17 @@ bool SedDocument::Impl::start()
         return false;
     }
 
-    static const int I_MAX = 1000000;
+    // Get a runtime for the model.
 
-    //---GRY---
-    for (int i = 0; i < I_MAX; ++i) {
+    auto runtime = mModels[0]->pimpl()->mFile->pimpl()->mCellmlFile->runtime();
+
+#ifndef CODE_COVERAGE_ENABLED
+    if (!runtime->errors().empty()) {
+        addIssues(runtime);
+
+        return false;
     }
+#endif
 
     return true;
 }
