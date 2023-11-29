@@ -31,7 +31,7 @@ bool SedBase::Impl::isValid()
 
 void SedBase::Impl::serialise(xmlNodePtr pNode) const
 {
-    xmlNewProp(pNode, constXmlCharPtr("id"), constXmlCharPtr(mId));
+    xmlNewProp(pNode, toConstXmlCharPtr("id"), toConstXmlCharPtr(mId));
 }
 
 SedBase::SedBase(Impl *pPimpl)

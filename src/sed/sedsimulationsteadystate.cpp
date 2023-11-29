@@ -27,7 +27,7 @@ SedSimulationSteadyState::Impl::Impl(const SedDocumentPtr &pDocument)
 
 void SedSimulationSteadyState::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, constXmlCharPtr("steadyState"));
+    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("steadyState"));
 
     SedSimulation::Impl::serialise(node);
 

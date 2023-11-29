@@ -27,11 +27,11 @@ SedSimulationOneStep::Impl::Impl(const SedDocumentPtr &pDocument)
 
 void SedSimulationOneStep::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, constXmlCharPtr("oneStep"));
+    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("oneStep"));
 
     SedSimulation::Impl::serialise(node);
 
-    xmlNewProp(node, constXmlCharPtr("step"), constXmlCharPtr(toString(mStep)));
+    xmlNewProp(node, toConstXmlCharPtr("step"), toConstXmlCharPtr(toString(mStep)));
 
     xmlAddChild(pNode, node);
 }

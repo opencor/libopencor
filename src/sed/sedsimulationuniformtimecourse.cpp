@@ -27,14 +27,14 @@ SedSimulationUniformTimeCourse::Impl::Impl(const SedDocumentPtr &pDocument)
 
 void SedSimulationUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, constXmlCharPtr("uniformTimeCourse"));
+    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("uniformTimeCourse"));
 
     SedSimulation::Impl::serialise(node);
 
-    xmlNewProp(node, constXmlCharPtr("initialTime"), constXmlCharPtr(toString(mInitialTime)));
-    xmlNewProp(node, constXmlCharPtr("outputStartTime"), constXmlCharPtr(toString(mOutputStartTime)));
-    xmlNewProp(node, constXmlCharPtr("outputEndTime"), constXmlCharPtr(toString(mOutputEndTime)));
-    xmlNewProp(node, constXmlCharPtr("numberOfSteps"), constXmlCharPtr(toString(mNumberOfSteps)));
+    xmlNewProp(node, toConstXmlCharPtr("initialTime"), toConstXmlCharPtr(toString(mInitialTime)));
+    xmlNewProp(node, toConstXmlCharPtr("outputStartTime"), toConstXmlCharPtr(toString(mOutputStartTime)));
+    xmlNewProp(node, toConstXmlCharPtr("outputEndTime"), toConstXmlCharPtr(toString(mOutputEndTime)));
+    xmlNewProp(node, toConstXmlCharPtr("numberOfSteps"), toConstXmlCharPtr(toString(mNumberOfSteps)));
 
     xmlAddChild(pNode, node);
 }

@@ -67,11 +67,11 @@ bool SedModel::Impl::isValid()
 
 void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
 {
-    auto *node = xmlNewNode(nullptr, constXmlCharPtr("model"));
+    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("model"));
 
     SedBase::Impl::serialise(node);
 
-    xmlNewProp(node, constXmlCharPtr("language"), constXmlCharPtr("urn:sedml:language:cellml"));
+    xmlNewProp(node, toConstXmlCharPtr("language"), toConstXmlCharPtr("urn:sedml:language:cellml"));
 
     auto source = pBasePath.empty() ?
                       urlPath(mFile->path()) :
@@ -81,7 +81,7 @@ void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) c
                       relativePath(mFile->path(), pBasePath);
 #endif
 
-    xmlNewProp(node, constXmlCharPtr("source"), constXmlCharPtr(source));
+    xmlNewProp(node, toConstXmlCharPtr("source"), toConstXmlCharPtr(source));
 
     xmlAddChild(pNode, node);
 }

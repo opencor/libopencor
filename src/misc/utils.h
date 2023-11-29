@@ -92,6 +92,6 @@ std::string toString(size_t pNumber);
 std::string toString(double pNumber);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedCharVector &pBytes);
 
-const xmlChar *constXmlCharPtr(const std::string &pString);
+const xmlChar *toConstXmlCharPtr(const std::string &pString);
 
 } // namespace libOpenCOR

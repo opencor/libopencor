@@ -192,17 +192,17 @@ bool SedDocument::Impl::isValid()
 
 void SedDocument::Impl::serialise(xmlNodePtr pNode) const
 {
-    xmlNewProp(pNode, constXmlCharPtr("xmlns"), constXmlCharPtr(mXmlns));
-    xmlNewProp(pNode, constXmlCharPtr("level"), constXmlCharPtr(std::to_string(mLevel)));
-    xmlNewProp(pNode, constXmlCharPtr("version"), constXmlCharPtr(std::to_string(mVersion)));
+    xmlNewProp(pNode, toConstXmlCharPtr("xmlns"), toConstXmlCharPtr(mXmlns));
+    xmlNewProp(pNode, toConstXmlCharPtr("level"), toConstXmlCharPtr(std::to_string(mLevel)));
+    xmlNewProp(pNode, toConstXmlCharPtr("version"), toConstXmlCharPtr(std::to_string(mVersion)));
 }
 
 std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 {
     // Serialise our SED-ML document using libxml2.
 
-    auto *doc = xmlNewDoc(constXmlCharPtr("1.0"));
-    auto *node = xmlNewNode(nullptr, constXmlCharPtr("sed"));
+    auto *doc = xmlNewDoc(toConstXmlCharPtr("1.0"));
+    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("sed"));
 
     serialise(node);
 
@@ -212,7 +212,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mDataDescriptions.empty()) {
-        auto *sedListOfDataDescriptions = xmlNewNode(nullptr, constXmlCharPtr("listOfDataDescriptions"));
+        auto *sedListOfDataDescriptions = xmlNewNode(nullptr, toConstXmlCharPtr("listOfDataDescriptions"));
 
         xmlAddChild(node, sedListOfDataDescriptions);
 
@@ -225,7 +225,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     // Add the models, if any, to our SED-ML document.
 
     if (!mModels.empty()) {
-        auto *sedListOfModels = xmlNewNode(nullptr, constXmlCharPtr("listOfModels"));
+        auto *sedListOfModels = xmlNewNode(nullptr, toConstXmlCharPtr("listOfModels"));
 
         xmlAddChild(node, sedListOfModels);
 
@@ -237,7 +237,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     // Add the simulations, if any, to our SED-ML document.
 
     if (!mSimulations.empty()) {
-        auto *sedListOfSimulations = xmlNewNode(nullptr, constXmlCharPtr("listOfSimulations"));
+        auto *sedListOfSimulations = xmlNewNode(nullptr, toConstXmlCharPtr("listOfSimulations"));
 
         for (const auto &simulation : mSimulations) {
             simulation->pimpl()->serialise(sedListOfSimulations);
@@ -250,7 +250,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mTasks.empty()) {
-        auto *sedListOfTasks = xmlNewNode(nullptr, constXmlCharPtr("listOfTasks"));
+        auto *sedListOfTasks = xmlNewNode(nullptr, toConstXmlCharPtr("listOfTasks"));
 
         xmlAddChild(node, sedListOfTasks);
 
@@ -264,7 +264,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mDataGenerators.empty()) {
-        auto *sedListOfDataGenerators = xmlNewNode(nullptr, constXmlCharPtr("listOfDataGenerators"));
+        auto *sedListOfDataGenerators = xmlNewNode(nullptr, toConstXmlCharPtr("listOfDataGenerators"));
 
         xmlAddChild(node, sedListOfDataGenerators);
 
@@ -278,7 +278,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mOutputs.empty()) {
-        auto *sedListOfOutputs = xmlNewNode(nullptr, constXmlCharPtr("listOfOutputs"));
+        auto *sedListOfOutputs = xmlNewNode(nullptr, toConstXmlCharPtr("listOfOutputs"));
 
         for (const auto &output : mOutputs) {
             (void)output;
@@ -292,7 +292,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mStyles.empty()) {
-        auto *sedListOfStyles = xmlNewNode(nullptr, constXmlCharPtr("listOfStyles"));
+        auto *sedListOfStyles = xmlNewNode(nullptr, toConstXmlCharPtr("listOfStyles"));
 
         xmlAddChild(node, sedListOfStyles);
 
