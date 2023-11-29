@@ -41,6 +41,15 @@ public:
     std::vector<SedOutputPtr> mOutputs;
     std::vector<SedStylePtr> mStyles;
 
+    double mVoi = 0.0; //---GRY--- THIS SHOULD BE MOVED TO A SedAbstract OBJECT...
+    double *mStates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A SedAbstract OBJECT...
+    double *mRates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A SedAbstract OBJECT...
+    double *mVariables = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A SedAbstract OBJECT...
+
+    ~Impl();
+
+    void resetArrays();
+
     std::string uniqueId(const std::string &pPrefix);
 
     void initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner);

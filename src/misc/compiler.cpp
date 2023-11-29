@@ -73,6 +73,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
                                                              "-g", "-O0",
 #endif
                                                              "-fno-math-errno",
+                                                             "-fno-stack-protector",
                                                              DUMMY_FILE_NAME};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
@@ -262,6 +263,22 @@ bool Compiler::Impl::compile(const std::string &pCode)
     return res;
 }
 
+bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
+{
+    // Add the given function to our ORC-based JIT.
+
+    if ((mLljit != nullptr) && !pName.empty() && (pFunction != nullptr)
+        && mLljit->getMainJITDylib().define(llvm::orc::absoluteSymbols({
+            {mLljit->mangleAndIntern(pName), llvm::JITEvaluatedSymbol(llvm::pointerToJITTargetAddress(pFunction), llvm::JITSymbolFlags::Exported)},
+        }))) {
+        addError("The " + pName + "() function could not be added to the compiler.");
+
+        return false;
+    }
+
+    return true;
+}
+
 void *Compiler::Impl::function(const std::string &pName) const
 {
     // Return the address of the requested function.
@@ -305,6 +322,11 @@ CompilerPtr Compiler::create()
 bool Compiler::compile(const std::string &pCode)
 {
     return pimpl()->compile(pCode);
+}
+
+bool Compiler::addFunction(const std::string &pName, void *pFunction)
+{
+    return pimpl()->addFunction(pName, pFunction);
 }
 
 void *Compiler::function(const std::string &pName) const

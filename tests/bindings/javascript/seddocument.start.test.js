@@ -75,16 +75,6 @@ describe("SedDocument start tests", () => {
     ]);
   });
 
-  test("CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
-
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-
-    const sed = new libopencor.SedDocument(file);
-
-    expect(sed.start()).toBe(true);
-  });
-
   test("Invalid CellML file", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 

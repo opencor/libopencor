@@ -75,6 +75,7 @@ function(configure_target TARGET)
             set(COMPILE_OPTIONS
                 -Weverything
                 -Wno-c++98-compat
+                -Wno-c++98-compat-pedantic
                 -Wno-disabled-macro-expansion
                 -Wno-exit-time-destructors
                 -Wno-global-constructors
@@ -83,12 +84,6 @@ function(configure_target TARGET)
                 -Wno-unsafe-buffer-usage
                 -Wno-weak-vtables
             )
-
-            if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
-                list(APPEND COMPILE_OPTIONS
-                    -Wno-c++98-compat-pedantic
-                )
-            endif()
 
             target_compile_options(${TARGET} PRIVATE
                                    ${COMPILE_OPTIONS})

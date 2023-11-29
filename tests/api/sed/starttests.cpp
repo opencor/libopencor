@@ -33,14 +33,6 @@ TEST(StartSedDocumentTest, noFile)
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(StartSedDocumentTest, cellmlFile)
-{
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
-
-    EXPECT_TRUE(sed->start());
-}
-
 TEST(StartSedDocumentTest, invalidCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
@@ -93,6 +85,22 @@ TEST(StartSedDocumentTest, unsuitablyConstrainedCellmlFile)
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
+TEST(StartSedDocumentTest, algebraicModel)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(sed->start());
+}
+
+TEST(StartSedDocumentTest, odeModel)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(sed->start());
+}
+
 TEST(StartSedDocumentTest, odeModelWithNoOdeSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
@@ -101,14 +109,19 @@ TEST(StartSedDocumentTest, odeModelWithNoOdeSolver)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = sed->simulations()[0];
 
-    EXPECT_TRUE(sed->start());
-
-    simulation->setOdeSolver(nullptr);
+    sed->simulations()[0]->setOdeSolver(nullptr);
 
     EXPECT_FALSE(sed->start());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
+}
+
+TEST(StartSedDocumentTest, nlaModel)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(sed->start());
 }
 
 TEST(StartSedDocumentTest, nlaModelWithNoNlaSolver)
@@ -119,14 +132,19 @@ TEST(StartSedDocumentTest, nlaModelWithNoNlaSolver)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = sed->simulations()[0];
 
-    EXPECT_TRUE(sed->start());
-
-    simulation->setNlaSolver(nullptr);
+    sed->simulations()[0]->setNlaSolver(nullptr);
 
     EXPECT_FALSE(sed->start());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
+}
+
+TEST(StartSedDocumentTest, daeModel)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(sed->start());
 }
 
 TEST(StartSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
@@ -139,8 +157,6 @@ TEST(StartSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
     auto simulation = sed->simulations()[0];
-
-    EXPECT_TRUE(sed->start());
 
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);

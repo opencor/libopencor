@@ -118,9 +118,9 @@ libcellml::AnalyserModelPtr CellmlFile::analyserModel() const
     return pimpl()->mAnalyserModel;
 }
 
-CellmlFileRuntimePtr CellmlFile::runtime()
+CellmlFileRuntimePtr CellmlFile::runtime(const SolverNlaPtr &pNlaSolver)
 {
-    return CellmlFileRuntime::create(shared_from_this());
+    return CellmlFileRuntime::create(shared_from_this(), pNlaSolver);
 }
 
 } // namespace libOpenCOR

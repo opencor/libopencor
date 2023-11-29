@@ -373,6 +373,23 @@ UnsignedCharVector fileContents(const std::filesystem::path &pFilePath)
 }
 #endif
 
+char *nlaSolverAddress(SolverNla *pNlaSolver)
+{
+    std::ostringstream oss;
+
+    oss << pNlaSolver;
+
+    auto str = oss.str();
+    auto len = str.size();
+    auto *res = new char[len + 1];
+
+    std::copy(str.begin(), str.end(), res);
+
+    res[len] = '\0'; // NOLINT
+
+    return res;
+}
+
 std::string toString(int pNumber)
 {
     std::ostringstream res;

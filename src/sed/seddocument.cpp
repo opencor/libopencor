@@ -35,6 +35,22 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+SedDocument::Impl::~Impl()
+{
+    resetArrays();
+}
+
+void SedDocument::Impl::resetArrays()
+{
+    delete[] mStates;
+    delete[] mRates;
+    delete[] mVariables;
+
+    mStates = nullptr;
+    mRates = nullptr;
+    mVariables = nullptr;
+}
+
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 {
     size_t counter = 0;
@@ -401,7 +417,8 @@ bool SedDocument::Impl::start()
 
     // Get a runtime for the model.
 
-    auto runtime = mModels[0]->pimpl()->mFile->pimpl()->mCellmlFile->runtime();
+    auto cellmlFile = mModels[0]->pimpl()->mFile->pimpl()->mCellmlFile;
+    auto runtime = cellmlFile->runtime(mSimulations[0]->nlaSolver());
 
 #ifndef CODE_COVERAGE_ENABLED
     if (!runtime->errors().empty()) {
@@ -410,6 +427,38 @@ bool SedDocument::Impl::start()
         return false;
     }
 #endif
+
+    // Create our various arrays.
+
+    resetArrays();
+
+    auto cellmlFileType = cellmlFile->type();
+    auto differentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
+                             || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
+    auto analyserModel = cellmlFile->analyserModel();
+
+    if (differentialModel) {
+        mStates = new double[analyserModel->stateCount()];
+        mRates = new double[analyserModel->stateCount()];
+        mVariables = new double[analyserModel->variableCount()];
+    } else {
+        mVariables = new double[analyserModel->variableCount()];
+    }
+
+    // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
+    // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
+    // initialise our variables and compute computed constants and variables.
+
+    if (differentialModel) {
+        runtime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
+        runtime->computeComputedConstants()(mVariables); // NOLINT
+        runtime->computeRates()(mVoi, mStates, mRates, mVariables); // NOLINT
+        runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+    } else {
+        runtime->initialiseVariablesForAlgebraicModel()(mVariables); // NOLINT
+        runtime->computeComputedConstants()(mVariables); // NOLINT
+        runtime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
+    }
 
     return true;
 }

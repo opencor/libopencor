@@ -16,14 +16,21 @@ limitations under the License.
 
 #include "solvernla_p.h"
 
+#include <sstream>
+
 namespace libOpenCOR {
 
-void nlaSolve(SolverNla *pSolver, void (*pObjectiveFunction)(double *, double *, void *),
+void nlaSolve(const char *pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
               double *pU, size_t pN, void *pData)
 {
-    ASSERT_NE(pSolver, nullptr);
+    std::istringstream iss(pNlaSolverAddress);
+    void *ptr = nullptr;
 
-    pSolver->solve(pObjectiveFunction, pU, pN, pData);
+    iss >> ptr;
+
+    ASSERT_NE(ptr, nullptr);
+
+    reinterpret_cast<SolverNla *>(ptr)->solve(pObjectiveFunction, pU, pN, pData);
 }
 
 SolverNla::Impl::Impl(const std::string &pId, const std::string &pName)

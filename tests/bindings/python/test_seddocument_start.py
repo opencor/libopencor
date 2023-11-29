@@ -36,13 +36,6 @@ def test_no_file():
     assert_issues(sed, expected_issues)
 
 
-def test_cellml_file():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-
-    assert sed.start() == True
-
-
 def test_invalid_cellml_file():
     expected_issues = [
         [

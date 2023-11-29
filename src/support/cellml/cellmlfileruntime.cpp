@@ -16,10 +16,11 @@ limitations under the License.
 
 #include "cellmlfileruntime_p.h"
 #include "compiler.h"
+#include "solvernla_p.h"
 
 namespace libOpenCOR {
 
-CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
+CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
     auto cellmlFileAnalyser = pCellmlFile->analyser();
 
@@ -27,8 +28,11 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
         addIssues(cellmlFileAnalyser);
 #ifndef __EMSCRIPTEN__
     } else {
-        // Generate some code for the model and compile it, should the analysis have been fine.
+        // Generate some code for the given CellML file.
 
+        auto cellmlFileType = pCellmlFile->type();
+        auto differentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
+                                 || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
         auto generator = libcellml::Generator::create();
         auto generatorProfile = libcellml::GeneratorProfile::create();
 
@@ -45,26 +49,83 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile)
         generatorProfile->setImplementationCreateVariablesArrayMethodString("");
         generatorProfile->setImplementationDeleteArrayMethodString("");
 
+        if (pNlaSolver != nullptr) {
+            generatorProfile->setExternNlaSolveMethodString("typedef unsigned long long size_t;\n"
+                                                            "\n"
+                                                            "extern void nlaSolve(const char *, void (*objectiveFunction)(double *, double *, void *),\n"
+                                                            "                     double *u, size_t n, void *data);\n");
+            generatorProfile->setNlaSolveCallString(differentialModel,
+                                                    std::string("nlaSolve(\"") + nlaSolverAddress(pNlaSolver.get()) + "\", objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
+        }
+
         generator->setModel(pCellmlFile->analyserModel());
         generator->setProfile(generatorProfile);
 
-        auto compiler = Compiler::create();
+        // Compile the generated code.
+
+        mCompiler = Compiler::create();
 
 #    ifdef CODE_COVERAGE_ENABLED
-        compiler->compile(generator->implementationCode());
+        mCompiler->compile(generator->implementationCode());
 #    else
-        if (!compiler->compile(generator->implementationCode())) {
+        if (!mCompiler->compile(generator->implementationCode())) {
             // The compilation failed, so add the issues it generated.
 
-            addIssues(compiler);
+            addIssues(mCompiler);
+
+            return;
         }
 #    endif
+
+        // Make sure that our compiler knows about nlaSolve(), if needed.
+
+        if (((cellmlFileType == libcellml::AnalyserModel::Type::NLA)
+             || (cellmlFileType == libcellml::AnalyserModel::Type::DAE))
+            && !mCompiler->addFunction("nlaSolve", reinterpret_cast<void *>(nlaSolve))) {
+            addIssues(mCompiler);
+
+            return;
+        }
+
+        // Retrieve our algebraic/differential functions and make sure that we managed to retrieve them.
+
+        if (differentialModel) {
+            mInitialiseVariablesForDifferentialModel = reinterpret_cast<InitialiseVariablesForDifferentialModelFunction>(mCompiler->function("initialiseVariables"));
+            mComputeComputedConstants = reinterpret_cast<ComputeComputedConstantsFunction>(mCompiler->function("computeComputedConstants"));
+            mComputeRates = reinterpret_cast<ComputeRatesFunction>(mCompiler->function("computeRates"));
+            mComputeVariablesForDifferentialModel = reinterpret_cast<ComputeVariablesForDifferentialModelFunction>(mCompiler->function("computeVariables"));
+
+            if ((mInitialiseVariablesForDifferentialModel == nullptr)
+                || (mComputeComputedConstants == nullptr)
+                || (mComputeRates == nullptr)
+                || (mComputeVariablesForDifferentialModel == nullptr)) {
+                if (cellmlFileType == libcellml::AnalyserModel::Type::ODE) {
+                    addError("The functions needed to compute the ODE model could not be retrieved.");
+                } else {
+                    addError("The functions needed to compute the DAE model could not be retrieved.");
+                }
+            }
+        } else {
+            mInitialiseVariablesForAlgebraicModel = reinterpret_cast<InitialiseVariablesForAlgebraicModelFunction>(mCompiler->function("initialiseVariables"));
+            mComputeComputedConstants = reinterpret_cast<ComputeComputedConstantsFunction>(mCompiler->function("computeComputedConstants"));
+            mComputeVariablesForAlgebraicModel = reinterpret_cast<ComputeVariablesForAlgebraicModelFunction>(mCompiler->function("computeVariables"));
+
+            if ((mInitialiseVariablesForAlgebraicModel == nullptr)
+                || (mComputeComputedConstants == nullptr)
+                || (mComputeVariablesForAlgebraicModel == nullptr)) {
+                if (cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC) {
+                    addError("The functions needed to compute the algebraic model could not be retrieved.");
+                } else {
+                    addError("The functions needed to compute the NLA model could not be retrieved.");
+                }
+            }
+        }
 #endif
     }
 }
 
-CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile)
-    : Logger(new Impl {pCellmlFile})
+CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
+    : Logger(new Impl {pCellmlFile, pNlaSolver})
 {
 }
 
@@ -78,16 +139,44 @@ CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl()
     return static_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl() const
 {
     return static_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
-CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile)
+CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
-    return CellmlFileRuntimePtr {new CellmlFileRuntime {pCellmlFile}};
+    return CellmlFileRuntimePtr {new CellmlFileRuntime {pCellmlFile, pNlaSolver}};
+}
+
+CellmlFileRuntime::InitialiseVariablesForAlgebraicModelFunction CellmlFileRuntime::initialiseVariablesForAlgebraicModel() const
+{
+    return pimpl()->mInitialiseVariablesForAlgebraicModel;
+}
+
+CellmlFileRuntime::InitialiseVariablesForDifferentialModelFunction CellmlFileRuntime::initialiseVariablesForDifferentialModel() const
+{
+    return pimpl()->mInitialiseVariablesForDifferentialModel;
+}
+
+CellmlFileRuntime::ComputeComputedConstantsFunction CellmlFileRuntime::computeComputedConstants() const
+{
+    return pimpl()->mComputeComputedConstants;
+}
+
+CellmlFileRuntime::ComputeRatesFunction CellmlFileRuntime::computeRates() const
+{
+    return pimpl()->mComputeRates;
+}
+
+CellmlFileRuntime::ComputeVariablesForAlgebraicModelFunction CellmlFileRuntime::computeVariablesForAlgebraicModel() const
+{
+    return pimpl()->mComputeVariablesForAlgebraicModel;
+}
+
+CellmlFileRuntime::ComputeVariablesForDifferentialModelFunction CellmlFileRuntime::computeVariablesForDifferentialModel() const
+{
+    return pimpl()->mComputeVariablesForDifferentialModel;
 }
 
 } // namespace libOpenCOR
