@@ -28,6 +28,7 @@ class CellmlFileRuntime::Impl: public Logger::Impl
 {
 public:
     CompilerPtr mCompiler = nullptr;
+    char *mNlaSolverAddress = nullptr;
 
     InitialiseVariablesForDifferentialModelFunction mInitialiseVariablesForDifferentialModel;
     InitialiseVariablesForAlgebraicModelFunction mInitialiseVariablesForAlgebraicModel = nullptr;
@@ -37,7 +38,7 @@ public:
     ComputeVariablesForAlgebraicModelFunction mComputeVariablesForAlgebraicModel = nullptr;
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
-    ~Impl() = default;
+    ~Impl();
 };
 
 } // namespace libOpenCOR

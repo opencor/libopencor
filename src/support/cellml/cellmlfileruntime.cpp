@@ -50,12 +50,14 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         generatorProfile->setImplementationDeleteArrayMethodString("");
 
         if (pNlaSolver != nullptr) {
+            mNlaSolverAddress = nlaSolverAddress(pNlaSolver.get());
+
             generatorProfile->setExternNlaSolveMethodString("typedef unsigned long long size_t;\n"
                                                             "\n"
                                                             "extern void nlaSolve(const char *, void (*objectiveFunction)(double *, double *, void *),\n"
                                                             "                     double *u, size_t n, void *data);\n");
             generatorProfile->setNlaSolveCallString(differentialModel,
-                                                    std::string("nlaSolve(\"") + nlaSolverAddress(pNlaSolver.get()) + "\", objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
+                                                    std::string("nlaSolve(\"") + mNlaSolverAddress + "\", objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
         }
 
         generator->setModel(pCellmlFile->analyserModel());
@@ -134,6 +136,11 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         }
 #endif
     }
+}
+
+CellmlFileRuntime::Impl::~Impl()
+{
+    delete[] mNlaSolverAddress;
 }
 
 CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
