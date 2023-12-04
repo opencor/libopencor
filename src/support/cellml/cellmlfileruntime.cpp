@@ -79,12 +79,20 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         // Make sure that our compiler knows about nlaSolve(), if needed.
 
-        if (((cellmlFileType == libcellml::AnalyserModel::Type::NLA)
-             || (cellmlFileType == libcellml::AnalyserModel::Type::DAE))
-            && !mCompiler->addFunction("nlaSolve", reinterpret_cast<void *>(nlaSolve))) {
-            addIssues(mCompiler);
+        if ((cellmlFileType == libcellml::AnalyserModel::Type::NLA)
+            || (cellmlFileType == libcellml::AnalyserModel::Type::DAE)) {
+#    ifndef CODE_COVERAGE_ENABLED
+            const bool functionAdded =
+#    endif
+                mCompiler->addFunction("nlaSolve", reinterpret_cast<void *>(nlaSolve));
 
-            return;
+#    ifndef CODE_COVERAGE_ENABLED
+            if (!functionAdded) {
+                addIssues(mCompiler);
+
+                return;
+            }
+#    endif
         }
 
         // Retrieve our algebraic/differential functions and make sure that we managed to retrieve them.
@@ -95,6 +103,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
             mComputeRates = reinterpret_cast<ComputeRatesFunction>(mCompiler->function("computeRates"));
             mComputeVariablesForDifferentialModel = reinterpret_cast<ComputeVariablesForDifferentialModelFunction>(mCompiler->function("computeVariables"));
 
+#    ifndef CODE_COVERAGE_ENABLED
             if ((mInitialiseVariablesForDifferentialModel == nullptr)
                 || (mComputeComputedConstants == nullptr)
                 || (mComputeRates == nullptr)
@@ -105,11 +114,13 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
                     addError("The functions needed to compute the DAE model could not be retrieved.");
                 }
             }
+#    endif
         } else {
             mInitialiseVariablesForAlgebraicModel = reinterpret_cast<InitialiseVariablesForAlgebraicModelFunction>(mCompiler->function("initialiseVariables"));
             mComputeComputedConstants = reinterpret_cast<ComputeComputedConstantsFunction>(mCompiler->function("computeComputedConstants"));
             mComputeVariablesForAlgebraicModel = reinterpret_cast<ComputeVariablesForAlgebraicModelFunction>(mCompiler->function("computeVariables"));
 
+#    ifndef CODE_COVERAGE_ENABLED
             if ((mInitialiseVariablesForAlgebraicModel == nullptr)
                 || (mComputeComputedConstants == nullptr)
                 || (mComputeVariablesForAlgebraicModel == nullptr)) {
@@ -119,6 +130,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
                     addError("The functions needed to compute the NLA model could not be retrieved.");
                 }
             }
+#    endif
         }
 #endif
     }

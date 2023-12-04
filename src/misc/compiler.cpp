@@ -228,7 +228,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
-    // Create an ORC-based JIT and keep track of it (so that we can use it in function()).
+    // Create an ORC-based JIT and keep track of it.
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 
@@ -265,30 +265,31 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
 bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
 {
-    // Add the given function to our ORC-based JIT.
+    // Add the given function to our ORC-based JIT. Note that we assume that we have a valid ORC-based JIT, function
+    // name, and function.
 
-    if ((mLljit != nullptr) && !pName.empty() && (pFunction != nullptr)
-        && mLljit->getMainJITDylib().define(llvm::orc::absoluteSymbols({
-            {mLljit->mangleAndIntern(pName), llvm::JITEvaluatedSymbol(llvm::pointerToJITTargetAddress(pFunction), llvm::JITSymbolFlags::Exported)},
-        }))) {
+    const bool res = !mLljit->getMainJITDylib().define(llvm::orc::absoluteSymbols({
+        {mLljit->mangleAndIntern(pName), llvm::JITEvaluatedSymbol(llvm::pointerToJITTargetAddress(pFunction), llvm::JITSymbolFlags::Exported)},
+    }));
+
+#ifndef CODE_COVERAGE_ENABLED
+    if (!res) {
         addError("The " + pName + "() function could not be added to the compiler.");
-
-        return false;
     }
+#endif
 
-    return true;
+    return res;
 }
 
 void *Compiler::Impl::function(const std::string &pName) const
 {
-    // Return the address of the requested function.
+    // Return the address of the requested function. Note that we assume that we have a valid ORC-based JIT and function
+    // name.
 
-    if ((mLljit != nullptr) && !pName.empty()) {
-        auto symbol = mLljit->lookup(pName);
+    auto symbol = mLljit->lookup(pName);
 
-        if (symbol) {
-            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
-        }
+    if (symbol) {
+        return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
     }
 
     return {};

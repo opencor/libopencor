@@ -32,15 +32,6 @@ public:
 
 TEST_F(CompilerTest, basic)
 {
-    // Cannot retrieve a function if nothing has been compiled.
-
-    EXPECT_EQ(nullptr, mCompiler->function(""));
-
-    // To compile an empty string is nonsensical, but still possible.
-
-    EXPECT_TRUE(mCompiler->compile(""));
-    EXPECT_EQ(nullptr, mCompiler->function(""));
-
     // Add "void" to our string.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_01 = {
