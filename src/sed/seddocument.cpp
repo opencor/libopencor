@@ -415,18 +415,19 @@ bool SedDocument::Impl::start()
         return false;
     }
 
+#ifndef __EMSCRIPTEN__
     // Get a runtime for the model.
 
     auto cellmlFile = mModels[0]->pimpl()->mFile->pimpl()->mCellmlFile;
     auto runtime = cellmlFile->runtime(mSimulations[0]->nlaSolver());
 
-#ifndef CODE_COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     if (!runtime->errors().empty()) {
         addIssues(runtime);
 
         return false;
     }
-#endif
+#    endif
 
     // Create our various arrays.
 
@@ -459,6 +460,7 @@ bool SedDocument::Impl::start()
         runtime->computeComputedConstants()(mVariables); // NOLINT
         runtime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
     }
+#endif
 
     return true;
 }

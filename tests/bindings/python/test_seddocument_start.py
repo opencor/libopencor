@@ -94,3 +94,88 @@ def test_unsuitable_constrained_cellml_file():
 
     assert sed.start() == False
     assert_issues(sed, expected_issues)
+
+
+def test_algebraic_model():
+    file = File(utils.resource_path("api/sed/algebraic.cellml"))
+    sed = SedDocument(file)
+
+    assert sed.start() == True
+
+
+def test_ode_model():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+
+    assert sed.start() == True
+
+
+def test_ode_model_with_no_ode_solver():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "The simulation is to be linked to an ODE model and must therefore specify an ODE solver.",
+        ],
+    ]
+
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+
+    sed.simulations[0].ode_solver = None
+
+    assert sed.start() == False
+    assert_issues(sed, expected_issues)
+
+
+def test_nla_model():
+    file = File(utils.resource_path("api/sed/nla.cellml"))
+    sed = SedDocument(file)
+
+    assert sed.start() == True
+
+
+def test_nla_model_with_no_nla_solver():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "The simulation is to be linked to an NLA model and must therefore specify an NLA solver.",
+        ],
+    ]
+
+    file = File(utils.resource_path("api/sed/nla.cellml"))
+    sed = SedDocument(file)
+
+    sed.simulations[0].nla_solver = None
+
+    assert sed.start() == False
+    assert_issues(sed, expected_issues)
+
+
+def test_dae_model():
+    file = File(utils.resource_path("api/sed/dae.cellml"))
+    sed = SedDocument(file)
+
+    assert sed.start() == True
+
+
+def test_dae_model_with_no_ode_or_nla_solver():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "The simulation is to be linked to a DAE model and must therefore specify an ODE solver.",
+        ],
+        [
+            Issue.Type.Error,
+            "The simulation is to be linked to a DAE model and must therefore specify an NLA solver.",
+        ],
+    ]
+
+    file = File(utils.resource_path("api/sed/dae.cellml"))
+    sed = SedDocument(file)
+    simulation = sed.simulations[0]
+
+    simulation.ode_solver = None
+    simulation.nla_solver = None
+
+    assert sed.start() == False
+    assert_issues(sed, expected_issues)

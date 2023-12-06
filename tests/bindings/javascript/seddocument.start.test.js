@@ -26,6 +26,9 @@ describe("SedDocument start tests", () => {
   let someOverconstrainedContentsPtr;
   let someUnderconstrainedContentsPtr;
   let someUnsuitablyConstrainedContentsPtr;
+  let someAlgebraicContentsPtr;
+  let someNlaContentsPtr;
+  let someDaeContentsPtr;
 
   beforeAll(() => {
     someCellmlContentsPtr = utils.allocateMemory(
@@ -48,6 +51,18 @@ describe("SedDocument start tests", () => {
       libopencor,
       utils.SOME_UNSUITABLY_CONSTRAINED_CONTENTS,
     );
+    someAlgebraicContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_ALGEBRAIC_CONTENTS,
+    );
+    someNlaContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_NLA_CONTENTS,
+    );
+    someDaeContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_DAE_CONTENTS,
+    );
   });
 
   afterAll(() => {
@@ -56,6 +71,9 @@ describe("SedDocument start tests", () => {
     utils.freeMemory(libopencor, someOverconstrainedContentsPtr);
     utils.freeMemory(libopencor, someUnderconstrainedContentsPtr);
     utils.freeMemory(libopencor, someUnsuitablyConstrainedContentsPtr);
+    utils.freeMemory(libopencor, someAlgebraicContentsPtr);
+    utils.freeMemory(libopencor, someNlaContentsPtr);
+    utils.freeMemory(libopencor, someDaeContentsPtr);
   });
 
   test("No file", () => {
@@ -142,6 +160,112 @@ describe("SedDocument start tests", () => {
       [
         libopencor.Issue.Type.ERROR,
         "The CellML file is unsuitably constrained.",
+      ],
+    ]);
+  });
+
+  test("Algebraic model", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(
+      someAlgebraicContentsPtr,
+      utils.SOME_ALGEBRAIC_CONTENTS.length,
+    );
+
+    const sed = new libopencor.SedDocument(file);
+
+    expect(sed.start()).toBe(true);
+  });
+
+  test("ODE model", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    expect(sed.start()).toBe(true);
+  });
+
+  test("ODE model with no ODE solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    sed.simulations().get(0).setOdeSolver(null);
+
+    expect(sed.start()).toBe(false);
+
+    expectIssues(sed, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "The simulation is to be linked to an ODE model and must therefore specify an ODE solver.",
+      ],
+    ]);
+  });
+
+  test("NLA model", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    expect(sed.start()).toBe(true);
+  });
+
+  test("NLA model with no NLA solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    sed.simulations().get(0).setNlaSolver(null);
+
+    expect(sed.start()).toBe(false);
+
+    expectIssues(sed, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "The simulation is to be linked to an NLA model and must therefore specify an NLA solver.",
+      ],
+    ]);
+  });
+
+  test("DAE model", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    expect(sed.start()).toBe(true);
+  });
+
+  test("DAE model with no ODE or NLA solver", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+    const simulation = sed.simulations().get(0);
+
+    simulation.setOdeSolver(null);
+    simulation.setNlaSolver(null);
+
+    expect(sed.start()).toBe(false);
+
+    expectIssues(sed, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "The simulation is to be linked to a DAE model and must therefore specify an ODE solver.",
+      ],
+      [
+        libopencor.Issue.Type.ERROR,
+        "The simulation is to be linked to a DAE model and must therefore specify an NLA solver.",
       ],
     ]);
   });
