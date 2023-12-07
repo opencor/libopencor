@@ -62,6 +62,92 @@ public:
 
     static SedSimulationUniformTimeCoursePtr create(const SedDocumentPtr &pDocument);
 
+    /**
+     * @brief Get the initial time used by the simulation.
+     *
+     * Return the initial time used by the simulation.
+     *
+     * @return The initial time used by the simulation.
+     *
+     * @warning ---GRY--- The initial time of a simulation is currently ignored. We currently assume that the initial
+     * time is always the same as the output start time.
+     */
+
+    double initialTime() const;
+
+    /**
+     * @brief Set the initial time to be used by the simulation.
+     *
+     * Set the initial time to be used by the simulation.
+     *
+     * @param pInitialTime The initial time to be used by the simulation.
+     *
+     * @warning ---GRY--- The initial time of a simulation is currently ignored. We currently assume that the initial
+     * time is always the same as the output start time.
+     */
+
+    void setInitialTime(double pInitialTime);
+
+    /**
+     * @brief Get the output start time used by the simulation.
+     *
+     * Return the output start time used by the simulation.
+     *
+     * @return The output start time used by the simulation.
+     */
+
+    double outputStartTime() const;
+
+    /**
+     * @brief Set the output start time to be used by the simulation.
+     *
+     * Set the output start time to be used by the simulation.
+     *
+     * @param pOutputStartTime The output start time to be used by the simulation.
+     */
+
+    void setOutputStartTime(double pOutputStartTime);
+
+    /**
+     * @brief Get the output end time used by the simulation.
+     *
+     * Return the output end time used by the simulation.
+     *
+     * @return The output end time used by the simulation.
+     */
+
+    double outputEndTime() const;
+
+    /**
+     * @brief Set the output end time to be used by the simulation.
+     *
+     * Set the output end time to be used by the simulation.
+     *
+     * @param pOutputEndTime The output end time to be used by the simulation.
+     */
+
+    void setOutputEndTime(double pOutputEndTime);
+
+    /**
+     * @brief Get the number of steps used by the simulation.
+     *
+     * Return the number of steps used by the simulation.
+     *
+     * @return The number of steps used by the simulation.
+     */
+
+    int numberOfSteps() const;
+
+    /**
+     * @brief Set the number of steps to be used by the simulation.
+     *
+     * Set the number of steps to be used by the simulation.
+     *
+     * @param pNumberOfSteps The number of steps to be used by the simulation.
+     */
+
+    void setNumberOfSteps(int pNumberOfSteps);
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

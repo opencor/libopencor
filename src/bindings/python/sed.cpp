@@ -88,7 +88,11 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedSimulationUniformTimeCourse, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationUniformTimeCoursePtr> sedSimulationUniformTimeCourse(m, "SedSimulationUniformTimeCourse");
 
-    sedSimulationUniformTimeCourse.def(py::init(&libOpenCOR::SedSimulationUniformTimeCourse::create), "Create a SedSimulationUniformTimeCourse object.", py::arg("document"));
+    sedSimulationUniformTimeCourse.def(py::init(&libOpenCOR::SedSimulationUniformTimeCourse::create), "Create a SedSimulationUniformTimeCourse object.", py::arg("document"))
+        .def_property("initial_time", &libOpenCOR::SedSimulationUniformTimeCourse::initialTime, &libOpenCOR::SedSimulationUniformTimeCourse::setInitialTime, "The initial time of the SedSimulationUniformTimeCourse object.")
+        .def_property("output_start_time", &libOpenCOR::SedSimulationUniformTimeCourse::outputStartTime, &libOpenCOR::SedSimulationUniformTimeCourse::setOutputStartTime, "The output start time of the SedSimulationUniformTimeCourse object.")
+        .def_property("output_end_time", &libOpenCOR::SedSimulationUniformTimeCourse::outputEndTime, &libOpenCOR::SedSimulationUniformTimeCourse::setOutputEndTime, "The output end time of the SedSimulationUniformTimeCourse object.")
+        .def_property("number_of_steps", &libOpenCOR::SedSimulationUniformTimeCourse::numberOfSteps, &libOpenCOR::SedSimulationUniformTimeCourse::setNumberOfSteps, "The number of steps of the SedSimulationUniformTimeCourse object.");
 
     // SedStyle API.
 

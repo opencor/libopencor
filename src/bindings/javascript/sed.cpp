@@ -83,7 +83,15 @@ void sedApi()
     // SedSimulationUniformTimeCourse API.
 
     emscripten::class_<libOpenCOR::SedSimulationUniformTimeCourse, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationUniformTimeCourse")
-        .smart_ptr_constructor("SedSimulationUniformTimeCourse", &libOpenCOR::SedSimulationUniformTimeCourse::create);
+        .smart_ptr_constructor("SedSimulationUniformTimeCourse", &libOpenCOR::SedSimulationUniformTimeCourse::create)
+        .function("initialTime", &libOpenCOR::SedSimulationUniformTimeCourse::initialTime)
+        .function("setInitialTime", &libOpenCOR::SedSimulationUniformTimeCourse::setInitialTime)
+        .function("outputStartTime", &libOpenCOR::SedSimulationUniformTimeCourse::outputStartTime)
+        .function("setOutputStartTime", &libOpenCOR::SedSimulationUniformTimeCourse::setOutputStartTime)
+        .function("outputEndTime", &libOpenCOR::SedSimulationUniformTimeCourse::outputEndTime)
+        .function("setOutputEndTime", &libOpenCOR::SedSimulationUniformTimeCourse::setOutputEndTime)
+        .function("numberOfSteps", &libOpenCOR::SedSimulationUniformTimeCourse::numberOfSteps)
+        .function("setNumberOfSteps", &libOpenCOR::SedSimulationUniformTimeCourse::setNumberOfSteps);
 
     // SedStyle API.
 

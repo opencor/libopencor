@@ -54,16 +54,54 @@ SedSimulationUniformTimeCourse::Impl *SedSimulationUniformTimeCourse::pimpl()
     return reinterpret_cast<SedSimulationUniformTimeCourse::Impl *>(SedSimulation::pimpl());
 }
 
-/*---GRY---
 const SedSimulationUniformTimeCourse::Impl *SedSimulationUniformTimeCourse::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
 }
-*/
 
 SedSimulationUniformTimeCoursePtr SedSimulationUniformTimeCourse::create(const SedDocumentPtr &pDocument)
 {
     return SedSimulationUniformTimeCoursePtr {new SedSimulationUniformTimeCourse {pDocument}};
+}
+
+double SedSimulationUniformTimeCourse::initialTime() const
+{
+    return pimpl()->mInitialTime;
+}
+
+void SedSimulationUniformTimeCourse::setInitialTime(double pInitialTime)
+{
+    pimpl()->mInitialTime = pInitialTime;
+}
+
+double SedSimulationUniformTimeCourse::outputStartTime() const
+{
+    return pimpl()->mOutputStartTime;
+}
+
+void SedSimulationUniformTimeCourse::setOutputStartTime(double pOutputStartTime)
+{
+    pimpl()->mOutputStartTime = pOutputStartTime;
+}
+
+double SedSimulationUniformTimeCourse::outputEndTime() const
+{
+    return pimpl()->mOutputEndTime;
+}
+
+void SedSimulationUniformTimeCourse::setOutputEndTime(double pOutputEndTime)
+{
+    pimpl()->mOutputEndTime = pOutputEndTime;
+}
+
+int SedSimulationUniformTimeCourse::numberOfSteps() const
+{
+    return pimpl()->mNumberOfSteps;
+}
+
+void SedSimulationUniformTimeCourse::setNumberOfSteps(int pNumberOfSteps)
+{
+    pimpl()->mNumberOfSteps = pNumberOfSteps;
 }
 
 } // namespace libOpenCOR
