@@ -71,7 +71,9 @@ void sedApi()
     // SedSimulationOneStep API.
 
     emscripten::class_<libOpenCOR::SedSimulationOneStep, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationOneStep")
-        .smart_ptr_constructor("SedSimulationOneStep", &libOpenCOR::SedSimulationOneStep::create);
+        .smart_ptr_constructor("SedSimulationOneStep", &libOpenCOR::SedSimulationOneStep::create)
+        .function("step", &libOpenCOR::SedSimulationOneStep::step)
+        .function("setStep", &libOpenCOR::SedSimulationOneStep::setStep);
 
     // SedSimulationSteadyState API.
 

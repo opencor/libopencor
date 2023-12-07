@@ -75,7 +75,8 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedSimulationOneStep, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationOneStepPtr> sedSimulationOneStep(m, "SedSimulationOneStep");
 
-    sedSimulationOneStep.def(py::init(&libOpenCOR::SedSimulationOneStep::create), "Create a SedSimulationOneStep object.", py::arg("document"));
+    sedSimulationOneStep.def(py::init(&libOpenCOR::SedSimulationOneStep::create), "Create a SedSimulationOneStep object.", py::arg("document"))
+        .def_property("step", &libOpenCOR::SedSimulationOneStep::step, &libOpenCOR::SedSimulationOneStep::setStep, "The step of the SedSimulationOneStep object.");
 
     // SedSimulationSteadyState API.
 

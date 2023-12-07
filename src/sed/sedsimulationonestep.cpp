@@ -51,16 +51,24 @@ SedSimulationOneStep::Impl *SedSimulationOneStep::pimpl()
     return reinterpret_cast<SedSimulationOneStep::Impl *>(SedSimulation::pimpl());
 }
 
-/*---GRY---
 const SedSimulationOneStep::Impl *SedSimulationOneStep::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
 }
-*/
 
 SedSimulationOneStepPtr SedSimulationOneStep::create(const SedDocumentPtr &pDocument)
 {
     return SedSimulationOneStepPtr {new SedSimulationOneStep {pDocument}};
+}
+
+double SedSimulationOneStep::step() const
+{
+    return pimpl()->mStep;
+}
+
+void SedSimulationOneStep::setStep(double pStep)
+{
+    pimpl()->mStep = pStep;
 }
 
 } // namespace libOpenCOR
