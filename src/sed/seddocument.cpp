@@ -60,7 +60,7 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 
     auto res = stream.str();
 
-#ifndef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT...
+#ifndef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
     while (mIds.contains(res)) {
         stream.str({});
 

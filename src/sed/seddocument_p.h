@@ -41,10 +41,10 @@ public:
     std::vector<SedOutputPtr> mOutputs;
     std::vector<SedStylePtr> mStyles;
 
-    double mVoi = 0.0; //---GRY--- THIS SHOULD BE MOVED TO A SedAbstract OBJECT...
-    double *mStates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A SedAbstract OBJECT...
-    double *mRates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A SedAbstract OBJECT...
-    double *mVariables = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A SedAbstract OBJECT...
+    double mVoi = 0.0; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
+    double *mStates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
+    double *mRates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
+    double *mVariables = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
 
     ~Impl();
 

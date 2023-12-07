@@ -35,7 +35,7 @@ SedModel::Impl::Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument)
 
 bool SedModel::Impl::isValid()
 {
-    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT CELLML FILES. THIS WILL CLEARLY CHANGE IN THE FUTURE...
+    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT CELLML FILES. THIS WILL CLEARLY CHANGE IN THE FUTURE.
 
     switch (mFile->pimpl()->mCellmlFile->type()) {
     case libcellml::AnalyserModel::Type::INVALID:

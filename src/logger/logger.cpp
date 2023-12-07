@@ -31,7 +31,7 @@ void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger)
     for (size_t i = 0; i < pLogger->issueCount(); ++i) {
         auto issue = pLogger->issue(i);
 
-#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT...
+#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
         addIssue(issue->description(),
                  (issue->level() == libcellml::Issue::Level::ERROR) ? Issue::Type::ERROR :
                                                                       Issue::Type::WARNING);
@@ -49,7 +49,7 @@ void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
     auto issue = IssuePtr {new Issue {pDescription, pType}};
     mIssues.push_back(issue);
 
-#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT...
+#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
     mErrors.push_back(issue);
 #else
     switch (pType) {
