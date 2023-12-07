@@ -86,10 +86,12 @@ SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
+/*---GRY---
 const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
+*/
 
 SolverForwardEulerPtr SolverForwardEuler::create()
 {

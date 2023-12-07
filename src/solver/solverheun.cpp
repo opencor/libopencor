@@ -117,10 +117,12 @@ SolverHeun::Impl *SolverHeun::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
+/*---GRY---
 const SolverHeun::Impl *SolverHeun::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
+*/
 
 SolverHeunPtr SolverHeun::create()
 {

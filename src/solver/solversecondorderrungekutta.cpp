@@ -116,10 +116,12 @@ SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
+/*---GRY---
 const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
+*/
 
 SolverSecondOrderRungeKuttaPtr SolverSecondOrderRungeKutta::create()
 {

@@ -38,7 +38,7 @@ limitations under the License.
 
 #define LIBOPENCOR_DEBUGGING
 
-#ifdef LIBOPENCOR_DEBUGGING
+#if defined(LIBOPENCOR_DEBUGGING) && !defined(CODE_COVERAGE_ENABLED)
 namespace {
 
 void outputDifferentialModelHeader(size_t pStatesCount, size_t pVariablesCount)
@@ -90,9 +90,9 @@ void outputNonDifferentialModel(double *pVariables, size_t pVariablesCount)
     printf("---------------------------------------[END]\n"); // NOLINT
     fflush(stdout); // NOLINT
 }
-#endif
 
 } // namespace
+#endif
 
 namespace libOpenCOR {
 
@@ -528,7 +528,7 @@ bool SedDocument::Impl::start()
         runtime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
     }
 
-#    ifdef LIBOPENCOR_DEBUGGING
+#    if defined(LIBOPENCOR_DEBUGGING) && !defined(CODE_COVERAGE_ENABLED)
     static const auto CSV = true;
 
     if (differentialModel) {
@@ -566,7 +566,7 @@ bool SedDocument::Impl::start()
 
             runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
 
-#    ifdef LIBOPENCOR_DEBUGGING
+#    if defined(LIBOPENCOR_DEBUGGING) && !defined(CODE_COVERAGE_ENABLED)
             outputDifferentialModel(mVoi, mStates, mRates, mVariables, analyserModel->stateCount(), analyserModel->variableCount(), CSV);
 #    endif
         }

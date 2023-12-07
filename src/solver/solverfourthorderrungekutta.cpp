@@ -151,10 +151,12 @@ SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
+/*---GRY---
 const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
+*/
 
 SolverFourthOrderRungeKuttaPtr SolverFourthOrderRungeKutta::create()
 {
