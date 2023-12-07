@@ -98,7 +98,7 @@ public:
      * test our solvers.
      */
 
-    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
+    virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

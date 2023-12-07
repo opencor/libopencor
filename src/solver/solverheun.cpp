@@ -50,7 +50,7 @@ bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, do
     return true;
 }
 
-bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // We compute the following:
     //   k = f(t_n, Y_n)
@@ -133,7 +133,7 @@ bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *
     return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverHeun::solve(double &pVoi, double pVoiEnd) const
+bool SolverHeun::solve(double &pVoi, double pVoiEnd)
 {
     return pimpl()->solve(pVoi, pVoiEnd);
 }

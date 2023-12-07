@@ -37,6 +37,16 @@ namespace libOpenCOR {
 
 namespace {
 
+void errorHandler(int pErrorCode, const char *pModule, const char *pFunction, char *pErrorMessage, void *pUserData)
+{
+    (void)pModule;
+    (void)pFunction;
+
+    if (pErrorCode != CV_WARNING) {
+        *static_cast<std::string *>(pUserData) = pErrorMessage;
+    }
+}
+
 int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
@@ -170,6 +180,10 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     ASSERT_NE(mSolver, nullptr);
 
+    // Use our own error handler.
+
+    ASSERT_EQ(CVodeSetErrHandlerFn(mSolver, errorHandler, &mErrorMessage), CV_SUCCESS);
+
     // Initialise our CVODE solver.
 
     mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mSunContext);
@@ -279,7 +293,7 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
     return true;
 }
 
-bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // Solve the model using interpolation, if needed.
 
@@ -287,7 +301,15 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
         ASSERT_EQ(CVodeSetStopTime(mSolver, pVoiEnd), CV_SUCCESS);
     }
 
-    return CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL) == CV_SUCCESS;
+    auto res = CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL);
+
+    if (res < CV_SUCCESS) {
+        addError(mErrorMessage);
+
+        return false;
+    }
+
+    return true;
 }
 
 SolverCvode::SolverCvode()
@@ -436,7 +458,7 @@ bool SolverCvode::reinitialise(double pVoi)
     return pimpl()->reinitialise(pVoi);
 }
 
-bool SolverCvode::solve(double &pVoi, double pVoiEnd) const
+bool SolverCvode::solve(double &pVoi, double pVoiEnd)
 {
     return pimpl()->solve(pVoi, pVoiEnd);
 }

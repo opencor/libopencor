@@ -54,7 +54,7 @@ bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
     return true;
 }
 
-bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // We compute the following:
     //   k1 = f(t_n, Y_n)
@@ -167,7 +167,7 @@ bool SolverFourthOrderRungeKutta::initialise(double pVoi, size_t pSize, double *
     return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverFourthOrderRungeKutta::solve(double &pVoi, double pVoiEnd) const
+bool SolverFourthOrderRungeKutta::solve(double &pVoi, double pVoiEnd)
 {
     return pimpl()->solve(pVoi, pVoiEnd);
 }

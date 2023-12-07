@@ -35,7 +35,7 @@ bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pSt
     return SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // We compute the following:
     //   Y_n+1 = Y_n + h * f(t_n, Y_n)
@@ -102,7 +102,7 @@ bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, 
     return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverForwardEuler::solve(double &pVoi, double pVoiEnd) const
+bool SolverForwardEuler::solve(double &pVoi, double pVoiEnd)
 {
     return pimpl()->solve(pVoi, pVoiEnd);
 }

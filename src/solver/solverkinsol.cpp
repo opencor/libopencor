@@ -34,6 +34,16 @@ namespace libOpenCOR {
 
 namespace {
 
+void errorHandler(int pErrorCode, const char *pModule, const char *pFunction, char *pErrorMessage, void *pUserData)
+{
+    (void)pModule;
+    (void)pFunction;
+
+    if (pErrorCode != KIN_WARNING) {
+        *static_cast<std::string *>(pUserData) = pErrorMessage;
+    }
+}
+
 int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
 {
     auto *userData = static_cast<SolverKinsolUserData *>(pUserData);
@@ -134,6 +144,10 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
         ASSERT_NE(data.solver, nullptr);
 
+        // Use our own error handler.
+
+        ASSERT_EQ(KINSetErrHandlerFn(data.solver, errorHandler, &mErrorMessage), KIN_SUCCESS);
+
         // Initialise our KINSOL solver.
 
         data.uVector = N_VMake_Serial(static_cast<int64_t>(pN), pU, data.context);
@@ -198,10 +212,14 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
     }
 
     // Solve the model.
-    // Note: we use ASSERT_GE() since upon success KINSol() will return either KIN_SUCCESS, KIN_INITIAL_GUESS_OK, or
-    //       KIN_STEP_LT_STPTOL.
 
-    ASSERT_GE(KINSol(data.solver, data.uVector, KIN_LINESEARCH, data.onesVector, data.onesVector), KIN_SUCCESS);
+    auto res = KINSol(data.solver, data.uVector, KIN_LINESEARCH, data.onesVector, data.onesVector);
+
+    if (res < KIN_SUCCESS) {
+        addError(mErrorMessage);
+
+        return false;
+    }
 
     return true;
 }

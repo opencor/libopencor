@@ -52,6 +52,8 @@ struct SolverKinsolData
 class SolverKinsol::Impl: public SolverNla::Impl
 {
 public:
+    std::string mErrorMessage;
+
     int mMaximumNumberOfIterations = 200;
     LinearSolver mLinearSolver = LinearSolver::DENSE;
     int mUpperHalfBandwidth = 0;

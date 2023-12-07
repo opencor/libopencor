@@ -331,7 +331,7 @@ public:
                     ComputeRates pComputeRates) override;
     bool reinitialise(double pVoi) override;
 
-    bool solve(double &pVoi, double pVoiEnd) const override;
+    bool solve(double &pVoi, double pVoiEnd) override;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

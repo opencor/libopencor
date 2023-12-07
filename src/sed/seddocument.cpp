@@ -454,8 +454,8 @@ bool SedDocument::Impl::start()
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
 
-    auto uniformTimeCourseSimulation = static_cast<SedSimulationUniformTimeCourse *>(simulation.get());
-    auto uniformTimeCourseSimulationPimpl = uniformTimeCourseSimulation->pimpl();
+    auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedSimulationUniformTimeCourse>(simulation) : nullptr;
+    auto *uniformTimeCourseSimulationPimpl = differentialModel ? uniformTimeCourseSimulation->pimpl() : nullptr;
 
     if (differentialModel) {
         mVoi = uniformTimeCourseSimulationPimpl->mOutputStartTime;
@@ -469,30 +469,34 @@ bool SedDocument::Impl::start()
         runtime->computeComputedConstants()(mVariables); // NOLINT
         runtime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
     }
-#endif
 
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (differentialModel) {
         // Initialise the ODE solver.
 
-        auto uniformTimeCourseSimulation = static_cast<SedSimulationUniformTimeCourse *>(simulation.get());
         auto odeSolver = uniformTimeCourseSimulation->odeSolver();
 
         odeSolver->initialise(mVoi, analyserModel->stateCount(), mStates, mRates, mVariables, runtime->computeRates());
 
         // Compute the differential model.
 
+        auto voiStart = mVoi;
         auto voiEnd = uniformTimeCourseSimulationPimpl->mOutputEndTime;
         auto voiInterval = (voiEnd - mVoi) / uniformTimeCourseSimulationPimpl->mNumberOfSteps;
         size_t voiCounter = 0;
 
         while (!fuzzyCompare(mVoi, voiEnd)) {
-            odeSolver->solve(mVoi, std::min(mVoi + static_cast<double>(++voiCounter) * voiInterval, voiEnd));
+            if (!odeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
+                addIssues(odeSolver);
+
+                return false;
+            }
 
             runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
         }
     }
+#endif
 
     return true;
 }

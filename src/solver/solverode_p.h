@@ -39,7 +39,7 @@ public:
                             ComputeRates pComputeRates) = 0;
     virtual bool reinitialise(double pVoi);
 
-    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
+    virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 };
 
 } // namespace libOpenCOR
