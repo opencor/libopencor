@@ -33,6 +33,9 @@ limitations under the License.
 
 #include <libxml/tree.h>
 
+//---GRY--- THE BELOW HEADER SHOULD BE REMOVED ONCE WE CAN RUN A SIMULATION THROUGH A TASK OBJECT.
+#include "sedsimulationuniformtimecourse_p.h"
+
 namespace libOpenCOR {
 
 SedDocument::Impl::~Impl()
@@ -419,7 +422,8 @@ bool SedDocument::Impl::start()
     // Get a runtime for the model.
 
     auto cellmlFile = mModels[0]->pimpl()->mFile->pimpl()->mCellmlFile;
-    auto runtime = cellmlFile->runtime(mSimulations[0]->nlaSolver());
+    auto simulation = mSimulations[0];
+    auto runtime = cellmlFile->runtime(simulation->nlaSolver());
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!runtime->errors().empty()) {
@@ -450,7 +454,12 @@ bool SedDocument::Impl::start()
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
 
+    auto uniformTimeCourseSimulation = static_cast<SedSimulationUniformTimeCourse *>(simulation.get());
+    auto uniformTimeCourseSimulationPimpl = uniformTimeCourseSimulation->pimpl();
+
     if (differentialModel) {
+        mVoi = uniformTimeCourseSimulationPimpl->mOutputStartTime;
+
         runtime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
         runtime->computeComputedConstants()(mVariables); // NOLINT
         runtime->computeRates()(mVoi, mStates, mRates, mVariables); // NOLINT
@@ -461,6 +470,29 @@ bool SedDocument::Impl::start()
         runtime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
     }
 #endif
+
+    // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
+
+    if (differentialModel) {
+        // Initialise the ODE solver.
+
+        auto uniformTimeCourseSimulation = static_cast<SedSimulationUniformTimeCourse *>(simulation.get());
+        auto odeSolver = uniformTimeCourseSimulation->odeSolver();
+
+        odeSolver->initialise(mVoi, analyserModel->stateCount(), mStates, mRates, mVariables, runtime->computeRates());
+
+        // Compute the differential model.
+
+        auto voiEnd = uniformTimeCourseSimulationPimpl->mOutputEndTime;
+        auto voiInterval = (voiEnd - mVoi) / uniformTimeCourseSimulationPimpl->mNumberOfSteps;
+        size_t voiCounter = 0;
+
+        while (!fuzzyCompare(mVoi, voiEnd)) {
+            odeSolver->solve(mVoi, std::min(mVoi + static_cast<double>(++voiCounter) * voiInterval, voiEnd));
+
+            runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+        }
+    }
 
     return true;
 }
