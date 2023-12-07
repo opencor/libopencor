@@ -36,6 +36,64 @@ limitations under the License.
 //---GRY--- THE BELOW HEADER SHOULD BE REMOVED ONCE WE CAN RUN A SIMULATION THROUGH A TASK OBJECT.
 #include "sedsimulationuniformtimecourse_p.h"
 
+#define LIBOPENCOR_DEBUGGING
+
+#ifdef LIBOPENCOR_DEBUGGING
+namespace {
+
+void outputDifferentialModelHeader(size_t pStatesCount, size_t pVariablesCount)
+{
+    printf("voi"); // NOLINT
+    for (size_t i = 0; i < pStatesCount; ++i) {
+        printf(",state_%d", static_cast<int>(i)); // NOLINT
+    }
+    for (size_t i = 0; i < pVariablesCount; ++i) {
+        printf(",variable_%d", static_cast<int>(i)); // NOLINT
+    }
+    printf("\n"); // NOLINT
+}
+
+void outputDifferentialModel(double voi, double *pStates, double *pRates, double *pVariables, size_t pStatesCount, size_t pVariablesCount, bool pCsv)
+{
+    if (pCsv) {
+        printf("%g", voi); // NOLINT
+        for (size_t i = 0; i < pStatesCount; ++i) {
+            printf(",%g", pStates[i]); // NOLINT
+        }
+        for (size_t i = 0; i < pVariablesCount; ++i) {
+            printf(",%g", pVariables[i]); // NOLINT
+        }
+        printf("\n"); // NOLINT
+    } else {
+        printf("---------[%g]---------[BEGIN]\n", voi); // NOLINT
+        for (size_t i = 0; i < pStatesCount; ++i) {
+            printf(">>> STATES[%d]: %g\n", static_cast<int>(i), pStates[i]); // NOLINT
+        }
+        for (size_t i = 0; i < pStatesCount; ++i) {
+            printf(">>> RATES[%d]: %g\n", static_cast<int>(i), pRates[i]); // NOLINT
+        }
+        for (size_t i = 0; i < pVariablesCount; ++i) {
+            printf(">>> VARIABLES[%d]: %g\n", static_cast<int>(i), pVariables[i]); // NOLINT
+        }
+        printf("---------[%g]---------[END]\n", voi); // NOLINT
+    }
+
+    fflush(stdout); // NOLINT
+}
+
+void outputNonDifferentialModel(double *pVariables, size_t pVariablesCount)
+{
+    printf("---------------------------------------[BEGIN]\n"); // NOLINT
+    for (size_t i = 0; i < pVariablesCount; ++i) {
+        printf(">>> VARIABLES[%d]: %g\n", static_cast<int>(i), pVariables[i]); // NOLINT
+    }
+    printf("---------------------------------------[END]\n"); // NOLINT
+    fflush(stdout); // NOLINT
+}
+#endif
+
+} // namespace
+
 namespace libOpenCOR {
 
 SedDocument::Impl::~Impl()
@@ -470,6 +528,19 @@ bool SedDocument::Impl::start()
         runtime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
     }
 
+#    ifdef LIBOPENCOR_DEBUGGING
+    static const auto CSV = true;
+
+    if (differentialModel) {
+        if (CSV) {
+            outputDifferentialModelHeader(analyserModel->stateCount(), analyserModel->variableCount());
+        }
+        outputDifferentialModel(mVoi, mStates, mRates, mVariables, analyserModel->stateCount(), analyserModel->variableCount(), CSV);
+    } else {
+        outputNonDifferentialModel(mVariables, analyserModel->variableCount());
+    }
+#    endif
+
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (differentialModel) {
@@ -494,6 +565,10 @@ bool SedDocument::Impl::start()
             }
 
             runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+
+#    ifdef LIBOPENCOR_DEBUGGING
+            outputDifferentialModel(mVoi, mStates, mRates, mVariables, analyserModel->stateCount(), analyserModel->variableCount(), CSV);
+#    endif
         }
     }
 #endif
