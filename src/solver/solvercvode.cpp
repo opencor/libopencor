@@ -67,6 +67,11 @@ SolverCvode::Impl::Impl()
 
 SolverCvode::Impl::~Impl()
 {
+    resetInternals();
+}
+
+void SolverCvode::Impl::resetInternals()
+{
     if (mSunContext != nullptr) {
         N_VDestroy_Serial(mStatesVector);
         SUNLinSolFree(mSunLinearSolver);
@@ -108,6 +113,7 @@ StringStringMap SolverCvode::Impl::properties() const
 bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                    ComputeRates pComputeRates)
 {
+    resetInternals();
     removeAllIssues();
 
     // Initialise the ODE solver itself.

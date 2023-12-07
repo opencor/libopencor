@@ -67,6 +67,8 @@ public:
     explicit Impl();
     ~Impl() override;
 
+    void resetInternals();
+
     StringStringMap properties() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
