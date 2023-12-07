@@ -287,9 +287,7 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
         ASSERT_EQ(CVodeSetStopTime(mSolver, pVoiEnd), CV_SUCCESS);
     }
 
-    ASSERT_EQ(CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL), CV_SUCCESS);
-
-    return true;
+    return CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL) == CV_SUCCESS;
 }
 
 SolverCvode::SolverCvode()
