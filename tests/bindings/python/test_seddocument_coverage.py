@@ -17,6 +17,7 @@ from libopencor import (
     File,
     SedDocument,
     SedModel,
+    SedSimulationOneStep,
     SedSimulationUniformTimeCourse,
     SolverCvode,
     SolverKinsol,
@@ -109,3 +110,36 @@ def test_nla_solver():
     simulation.nla_solver = None
 
     assert simulation.nla_solver == None
+
+
+def test_sed_simulation_one_step():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = SedSimulationOneStep(sed)
+
+    assert simulation.step == 1.0
+
+    simulation.step = 1.23
+
+    assert simulation.step == 1.23
+
+
+def test_sed_simulation_uniform_time_course():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    simulation = SedSimulationUniformTimeCourse(sed)
+
+    assert simulation.initial_time == 0.0
+    assert simulation.output_start_time == 0.0
+    assert simulation.output_end_time == 1000.0
+    assert simulation.number_of_steps == 1000
+
+    simulation.initial_time = 1.23
+    simulation.output_start_time = 4.56
+    simulation.output_end_time = 7.89
+    simulation.number_of_steps = 10
+
+    assert simulation.initial_time == 1.23
+    assert simulation.output_start_time == 4.56
+    assert simulation.output_end_time == 7.89
+    assert simulation.number_of_steps == 10

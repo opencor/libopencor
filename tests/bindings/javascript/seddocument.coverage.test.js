@@ -105,4 +105,37 @@ describe("SedDocument coverage tests", () => {
 
     expect(simulation.nlaSolver()).toBe(null);
   });
+
+  test("SedSimulationOneStep", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = new libopencor.SedSimulationOneStep(sed);
+
+    expect(simulation.step()).toBe(1.0);
+
+    simulation.setStep(1.23);
+
+    expect(simulation.step()).toBe(1.23);
+  });
+
+  test("SedSimulationUniformTimeCourse", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const sed = new libopencor.SedDocument(file);
+    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+
+    expect(simulation.initialTime()).toBe(0.0);
+    expect(simulation.outputStartTime()).toBe(0.0);
+    expect(simulation.outputEndTime()).toBe(1000.0);
+    expect(simulation.numberOfSteps()).toBe(1000);
+
+    simulation.setInitialTime(1.23);
+    simulation.setOutputStartTime(4.56);
+    simulation.setOutputEndTime(7.89);
+    simulation.setNumberOfSteps(10);
+
+    expect(simulation.initialTime()).toBe(1.23);
+    expect(simulation.outputStartTime()).toBe(4.56);
+    expect(simulation.outputEndTime()).toBe(7.89);
+    expect(simulation.numberOfSteps()).toBe(10);
+  });
 });

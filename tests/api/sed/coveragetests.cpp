@@ -110,3 +110,45 @@ TEST(CoverageSedDocumentTest, sedSimulationNlaSolver)
 
     EXPECT_EQ(simulation->nlaSolver(), nullptr);
 }
+
+TEST(CoverageSedDocumentTest, sedSimulationOneStep)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = libOpenCOR::SedSimulationOneStep::create(sed);
+
+    static const auto STEP = 1.23;
+
+    EXPECT_EQ(simulation->step(), 1.0);
+
+    simulation->setStep(STEP);
+
+    EXPECT_EQ(simulation->step(), STEP);
+}
+
+TEST(CoverageSedDocumentTest, sedSimulationUniformTimeCourse)
+{
+    static const auto INITIAL_TIME = 1.23;
+    static const auto OUTPUT_START_TIME = 4.56;
+    static const auto OUTPUT_END_TIME = 7.89;
+    static const auto NUMBER_OF_STEPS = 10;
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+
+    EXPECT_EQ(simulation->initialTime(), 0.0);
+    EXPECT_EQ(simulation->outputStartTime(), 0.0);
+    EXPECT_EQ(simulation->outputEndTime(), 1000.0);
+    EXPECT_EQ(simulation->numberOfSteps(), 1000);
+
+    simulation->setInitialTime(INITIAL_TIME);
+    simulation->setOutputStartTime(OUTPUT_START_TIME);
+    simulation->setOutputEndTime(OUTPUT_END_TIME);
+    simulation->setNumberOfSteps(NUMBER_OF_STEPS);
+
+    EXPECT_EQ(simulation->initialTime(), INITIAL_TIME);
+    EXPECT_EQ(simulation->outputStartTime(), OUTPUT_START_TIME);
+    EXPECT_EQ(simulation->outputEndTime(), OUTPUT_END_TIME);
+    EXPECT_EQ(simulation->numberOfSteps(), NUMBER_OF_STEPS);
+}
