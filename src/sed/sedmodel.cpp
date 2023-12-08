@@ -62,6 +62,8 @@ bool SedModel::Impl::isValid()
         break;
     }
 
+    addIssues(mFile->pimpl()->mCellmlFile);
+
     return mErrors.empty();
 }
 
