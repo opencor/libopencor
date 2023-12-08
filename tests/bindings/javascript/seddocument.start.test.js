@@ -252,7 +252,6 @@ describe("SedDocument start tests", () => {
     ]);
   });
 
-  /*---GRY--- TO BE RE-ENABLED ONCE WE KNOW WHAT SETTINGS SHOULD BE USED.
   test("DAE model", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
@@ -262,7 +261,6 @@ describe("SedDocument start tests", () => {
 
     expect(sed.start()).toBe(true);
   });
-  */
 
   test("DAE model with no ODE or NLA solver", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);

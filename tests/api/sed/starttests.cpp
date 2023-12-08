@@ -157,7 +157,6 @@ TEST(StartSedDocumentTest, nlaModelWithNoNlaSolver)
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-/*---GRY--- TO BE RE-ENABLED ONCE WE KNOW WHAT SETTINGS SHOULD BE USED.
 TEST(StartSedDocumentTest, daeModel)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
@@ -165,7 +164,6 @@ TEST(StartSedDocumentTest, daeModel)
 
     EXPECT_TRUE(sed->start());
 }
-*/
 
 TEST(StartSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
 {

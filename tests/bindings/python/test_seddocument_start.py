@@ -167,12 +167,11 @@ def test_nla_model_with_no_nla_solver():
     assert_issues(sed, expected_issues)
 
 
-# ---GRY--- TO BE RE-ENABLED ONCE WE KNOW WHAT SETTINGS SHOULD BE USED.
-# def test_dae_model():
-#     file = File(utils.resource_path("api/sed/dae.cellml"))
-#     sed = SedDocument(file)
+def test_dae_model():
+    file = File(utils.resource_path("api/sed/dae.cellml"))
+    sed = SedDocument(file)
 
-#     assert sed.start() == True
+    assert sed.start() == True
 
 
 def test_dae_model_with_no_ode_or_nla_solver():
