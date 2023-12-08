@@ -9,7 +9,7 @@
     Equation:
      • a + b = c + d
     -->
-    <component name="my_algebraic_eqn">
+    <component name="my_component">
         <variable initial_value="1" name="a" units="dimensionless"/>
         <variable name="b" units="dimensionless"/>
         <variable name="c" units="dimensionless"/>
