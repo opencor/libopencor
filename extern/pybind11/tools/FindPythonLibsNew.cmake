@@ -95,8 +95,10 @@ if(NOT PythonLibsNew_FIND_VERSION)
   set(PythonLibsNew_FIND_VERSION "3.6")
 endif()
 
+cmake_policy(SET CMP0148 OLD) #---LIBOPENCOR---
 find_package(PythonInterp ${PythonLibsNew_FIND_VERSION} ${_pythonlibs_required}
              ${_pythonlibs_quiet})
+cmake_policy(SET CMP0148 NEW) #---LIBOPENCOR---
 
 if(NOT PYTHONINTERP_FOUND)
   set(PYTHONLIBS_FOUND FALSE)
