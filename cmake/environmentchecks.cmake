@@ -107,29 +107,24 @@ endif()
 
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 
-# Look for various packages and programs.
-# Note: when it comes to finding Python, we try to use the registry after the environment variables on Windows and to
-#       find frameworks after standard libraries or headers on macOS. (On GitHub Actions, it helps finding the correct
-#       version of Python on Windows.)
-
-if("${Python_FIND_REGISTRY}" STREQUAL "")
-    set(Python_FIND_REGISTRY "LAST")
-endif()
-
-if("${Python_FIND_FRAMEWORK}" STREQUAL "")
-    set(Python_FIND_FRAMEWORK "LAST")
-endif()
+# Look for Doxygen.
 
 find_package(Doxygen)
-find_package(Python ${PREFERRED_PYTHON_VERSION} COMPONENTS Interpreter Development)
 
-if(NOT WIN32 AND NOT APPLE)
-    # Some third-party libraries get built with threads support (and so do our tests, though this can be disabled by
-    # setting GTEST_DISABLE_PTHREADS to ON), so make sure that it's present since libOpenCOR will need to be linked
-    # against pthreads as a result.
+# Look for Python.
 
-    find_package(Threads REQUIRED)
-endif()
+add_subdirectory(extern/pybind11)
+
+mark_as_advanced(PYBIND11_FINDPYTHON
+                 PYBIND11_INSTALL
+                 PYBIND11_INTERNALS_VERSION
+                 PYBIND11_NOPYTHON
+                 PYBIND11_PYTHON_VERSION
+                 PYBIND11_PYTHONLIBS_OVERWRITE
+                 PYBIND11_SIMPLE_GIL_MANAGEMENT
+                 PYBIND11_TEST)
+
+# Look for various programs.
 
 find_program(BUILDCACHE_EXE buildcache)
 
@@ -165,16 +160,8 @@ if(DOXYGEN_EXECUTABLE)
     set(DOXYGEN_EXE ${DOXYGEN_EXECUTABLE})
 endif()
 
-if(Python_EXECUTABLE)
-    set(PYTHON_EXE ${Python_EXECUTABLE})
-elseif(Python3_EXECUTABLE)
-    set(PYTHON_EXE ${Python3_EXECUTABLE})
-endif()
-
-if(Python_LIBRARIES)
-    set(PYTHON_LIBRARIES ${Python_LIBRARIES})
-elseif(Python3_LIBRARY)
-    set(PYTHON_LIBRARIES ${Python3_LIBRARY})
+if(PYTHON_EXECUTABLE)
+    set(PYTHON_EXE ${PYTHON_EXECUTABLE})
 endif()
 
 # Check some compiler flags.
