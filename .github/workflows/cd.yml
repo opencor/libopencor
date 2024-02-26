@@ -8,6 +8,105 @@ on:
   workflow_dispatch:
 
 jobs:
+  libraries:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: 'Windows static library (Intel)'
+            os: windows-latest
+            msvc_arch: amd64
+            shared_libs: OFF
+          - name: 'Windows shared library (Intel)'
+            os: windows-latest
+            msvc_arch: amd64
+            shared_libs: ON
+          - name: 'Windows static library (ARM)'
+            os: windows-latest
+            msvc_arch: amd64_arm64
+            shared_libs: OFF
+          - name: 'Windows shared library (ARM)'
+            os: windows-latest
+            msvc_arch: amd64_arm64
+            shared_libs: ON
+          - name: 'Linux static library (Intel)'
+            os: ubuntu-latest
+            shared_libs: OFF
+          - name: 'Linux shared library (Intel)'
+            os: ubuntu-latest
+            shared_libs: ON
+          - name: 'Linux static library (ARM)'
+            os: ubuntu-latest
+            arch: arm
+            shared_libs: OFF
+            cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
+          - name: 'Linux shared library (ARM)'
+            os: ubuntu-latest
+            arch: arm
+            shared_libs: ON
+            cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
+          - name: 'macOS static library (Intel)'
+            os: macos-latest
+            shared_libs: OFF
+          - name: 'macOS shared library (Intel)'
+            os: macos-latest
+            shared_libs: ON
+          - name: 'macOS static library (ARM)'
+            os: macos-14
+            shared_libs: OFF
+          - name: 'macOS shared library (ARM)'
+            os: macos-14
+            shared_libs: ON
+    env:
+      BUILDCACHE_ACCURACY: STRICT
+      BUILDCACHE_COMPRESS_FORMAT: ZSTD
+      BUILDCACHE_DEBUG: -1
+      BUILDCACHE_LOG_FILE: ""
+    steps:
+      - name: Check out libOpenCOR
+        uses: actions/checkout@v3
+      - name: Install ARM compiler
+        if: ${{ matrix.arch == 'arm' }}
+        run: |
+          sudo apt update
+          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+      - name: Install buildcache
+        uses: mikehardy/buildcache-action@v2
+        with:
+          cache_key: libraries-${{ matrix.os }}-${{ matrix.shared_libs }}
+      - name: Configure MSVC
+        if: ${{ runner.os == 'Windows' }}
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.msvc_arch }}
+      - name: Configure libOpenCOR
+        run: |
+          mkdir build
+          cd build
+          ${{ matrix.cmake_prereqs }} cmake -G Ninja -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
+      - name: Build libOpenCOR
+        run: |
+          cd build
+          ninja
+      - name: Package libOpenCOR
+        run: |
+          cd build
+          cpack
+      - name: Upload libraries
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ./build/libOpenCOR-*
+      - name: Release libraries
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./build/libOpenCOR-*
   python_wheels:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
