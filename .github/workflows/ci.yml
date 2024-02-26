@@ -103,7 +103,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'JavaScript'
+          - name: 'JavaScript bindings'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -117,7 +117,7 @@ jobs:
             shared_libs: OFF
             unit_testing: OFF
             target: javascript_unit_testing
-          - name: 'Windows Python'
+          - name: 'Windows Python bindings'
             os: windows-latest
             build_type: Release
             code_analysis: OFF
@@ -132,7 +132,7 @@ jobs:
             unit_testing: OFF
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
-          - name: 'Linux Python'
+          - name: 'Linux Python bindings'
             os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
@@ -147,7 +147,7 @@ jobs:
             unit_testing: OFF
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
-          - name: 'macOS Python'
+          - name: 'macOS Python bindings'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -305,7 +305,7 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Emscripten
-        if: ${{ matrix.name == 'JavaScript' }}
+        if: ${{ matrix.target == 'javascript_unit_testing' }}
         run: brew install emscripten
       - name: Install Prettier
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
@@ -333,7 +333,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_bindings }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_unit_testing }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_bindings }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_unit_testing }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
       - name: Build libOpenCOR
         if: ${{ matrix.target == 'unit_testing' || matrix.target == 'javascript_unit_testing' }}
         run: |

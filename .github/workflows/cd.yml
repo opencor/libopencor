@@ -48,3 +48,43 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ./wheelhouse/*.whl
+  webassembly:
+    name: WebAssembly
+    runs-on: macos-latest
+    env:
+      BUILDCACHE_ACCURACY: STRICT
+      BUILDCACHE_COMPRESS_FORMAT: ZSTD
+      BUILDCACHE_DEBUG: -1
+      BUILDCACHE_LOG_FILE: ""
+    steps:
+      - name: Check out libOpenCOR
+        uses: actions/checkout@v3
+      - name: Install CMake and Ninja
+        uses: lukka/get-cmake@latest
+      - name: Install buildcache
+        uses: mikehardy/buildcache-action@v2
+        with:
+          cache_key: cd-webassembly
+      - name: Install Emscripten
+        run: brew install emscripten
+      - name: Configure libOpenCOR
+        run: |
+          mkdir build
+          cd build
+          cmake -G Ninja .. -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DUNIT_TESTING=OFF
+          cmake -G Ninja -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DJAVASCRIPT_UNIT_TESTING=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=OFF -DUNIT_TESTING=OFF ..
+      - name: Build WebAssembly
+        run: |
+          cd build
+          ninja
+      - name: Upload WebAssembly artifact
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: WebAssembly
+          path: ./build/src/bindings/javascript/build/src/libopencor.*
+      - name: Release WebAssembly
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./build/src/bindings/javascript/build/src/libopencor.*
