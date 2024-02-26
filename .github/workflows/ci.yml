@@ -103,7 +103,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'JavaScript'
+          - name: 'JavaScript bindings'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -117,7 +117,7 @@ jobs:
             shared_libs: OFF
             unit_testing: OFF
             target: javascript_unit_testing
-          - name: 'Windows Python'
+          - name: 'Windows Python bindings'
             os: windows-latest
             build_type: Release
             code_analysis: OFF
@@ -132,7 +132,7 @@ jobs:
             unit_testing: OFF
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
-          - name: 'Linux Python'
+          - name: 'Linux Python bindings'
             os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
@@ -147,7 +147,7 @@ jobs:
             unit_testing: OFF
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
-          - name: 'macOS Python'
+          - name: 'macOS Python bindings'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
