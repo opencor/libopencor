@@ -64,14 +64,13 @@ jobs:
       - name: Install buildcache
         uses: mikehardy/buildcache-action@v2
         with:
-          cache_key: cd-webassembly
+          cache_key: webassembly
       - name: Install Emscripten
         run: brew install emscripten
       - name: Configure libOpenCOR
         run: |
           mkdir build
           cd build
-          cmake -G Ninja .. -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DUNIT_TESTING=OFF
           cmake -G Ninja -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DJAVASCRIPT_UNIT_TESTING=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=OFF -DUNIT_TESTING=OFF ..
       - name: Build WebAssembly
         run: |
