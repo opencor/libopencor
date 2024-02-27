@@ -213,6 +213,13 @@ if(EMSCRIPTEN)
                           COMPILE_FLAGS "-O3"
                           LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sINLINING_LIMIT --bind")
 
+    # Create a ZIP file for our generated .js and .wasm files.
+
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${CMAKE_BINARY_DIR}/../../../../WebAssembly.zip" --format=zip
+                                                       "${CMAKE_PROJECT_NAME}.js"
+                                                       "${CMAKE_PROJECT_NAME}.wasm")
+
     # Copy our generated .js and .wasm files over.
 
     foreach(FILE_EXTENSION js wasm)
