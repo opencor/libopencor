@@ -203,7 +203,7 @@ else()
     set(JAVASCRIPT_BINDINGS_DIR ${CMAKE_BINARY_DIR}/${JAVASCRIPT_SOURCE_DIR})
 endif()
 
-if (EMSCRIPTEN)
+if(EMSCRIPTEN)
     add_executable(${CMAKE_PROJECT_NAME}
                    ${API_HEADER_FILES}
                    ${SOURCE_FILES}
