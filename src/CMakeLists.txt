@@ -365,8 +365,17 @@ list(APPEND GIT_SOURCE_FILES
 
 # Install libOpenCOR itself.
 
+if(APPLE)
+    # On macOS, we need to specify the COMPONENT option otherwise our package will be empty.
+    # Note: we don't want to specify the COMPONENT option on Windows since NSIS will otherwise make it a selectable
+    #       option which we don't want.
+
+    set(LIBOPENCOR_COMPONENT_OPTION COMPONENT Runtime)
+endif()
+
 install(TARGETS ${CMAKE_PROJECT_NAME}
         EXPORT ${CMAKE_PROJECT_NAME}Targets
+        ${LIBOPENCOR_COMPONENT_OPTION}
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
