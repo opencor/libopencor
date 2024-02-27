@@ -79,7 +79,16 @@ elseif(APPLE)
     endif()
 else()
     if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-        set(DEFAULT_TARGET_ARCHITECTURE Intel)
+        # On an Intel-based system, we can cross-compile for ARM, so we need to check which compiler is actually being
+        # used.
+
+        string(FIND "${CMAKE_CXX_COMPILER}" "aarch64-linux-gnu" INDEX)
+
+        if(NOT INDEX EQUAL -1)
+            set(DEFAULT_TARGET_ARCHITECTURE ARM)
+        else()
+            set(DEFAULT_TARGET_ARCHITECTURE Intel)
+        endif()
     elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
         set(DEFAULT_TARGET_ARCHITECTURE ARM)
     endif()
