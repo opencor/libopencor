@@ -118,8 +118,10 @@ jobs:
             os: windows-latest
           - name: 'Linux Python wheels'
             os: ubuntu-latest
-          - name: 'macOS Python wheels'
+          - name: 'macOS Python wheels (Intel)'
             os: macos-latest
+          - name: 'macOS Python wheels (ARM)'
+            os: macos-14
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v3
