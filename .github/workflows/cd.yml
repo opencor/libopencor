@@ -118,8 +118,10 @@ jobs:
             os: windows-latest
           - name: 'Linux Python wheels'
             os: ubuntu-latest
-          - name: 'macOS Python wheels'
+          - name: 'macOS Python wheels (Intel)'
             os: macos-latest
+          - name: 'macOS Python wheels (ARM)'
+            os: macos-14
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v3
@@ -180,9 +182,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WebAssembly
-          path: ./build/WebAssembly.zip
+          path: ./build/libOpenCOR-*
       - name: Release WebAssembly
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         uses: softprops/action-gh-release@v1
         with:
-          files: ./build/WebAssembly.zip
+          files: ./build/libOpenCOR-*

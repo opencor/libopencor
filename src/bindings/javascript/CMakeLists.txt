@@ -67,6 +67,7 @@ else()
                                                               -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
                                                               -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
                                                               -DNATIVE_PREBUILT_DIR=${PREBUILT_DIR}
+                                                              -DREAL_CMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
                       COMMAND ${CMAKE_COMMAND} --build build)
 
     add_dependencies(${CMAKE_PROJECT_NAME} ${JAVASCRIPT_BINDINGS_TARGET})
