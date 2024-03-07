@@ -107,8 +107,7 @@ def garbage(line):
 
 def memcheck(valgrind, test, test_path):
     os.system(
-        valgrind
-        + f" --tool=memcheck --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 {test_path} 1>{test}.txt 2>{test}.err 3>{test}.xml"
+        f"{valgrind} --tool=memcheck --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 {test_path} 1>{test}.txt 2>{test}.err 3>{test}.xml"
     )
 
     return "".join(list(filter(garbage, open(f"{test}.xml").readlines())))
@@ -118,7 +117,7 @@ def run_test(valgrind, test, test_path):
     sys.stdout.write(f"-- Checking memory in {test} - ")
 
     if not os.access(test_path, os.X_OK):
-        sys.stdout.write("not found\n")
+        sys.stdout.write("Not found\n")
 
         return False
 
