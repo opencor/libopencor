@@ -42,6 +42,10 @@ def test_invalid_cellml_file():
             Issue.Type.Error,
             "The CellML file is invalid.",
         ],
+        [
+            Issue.Type.Error,
+            "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
+        ],
     ]
 
     file = File(utils.resource_path(utils.ERROR_CELLML_FILE))
@@ -56,6 +60,10 @@ def test_overconstrained_cellml_file():
         [
             Issue.Type.Error,
             "The CellML file is overconstrained.",
+        ],
+        [
+            Issue.Type.Error,
+            "Variable 'x' in component 'my_component' is computed more than once.",
         ],
     ]
 
@@ -72,6 +80,10 @@ def test_underconstrained_cellml_file():
             Issue.Type.Error,
             "The CellML file is underconstrained.",
         ],
+        [
+            Issue.Type.Error,
+            "The type of variable 'x' in component 'my_component' is unknown.",
+        ],
     ]
 
     file = File(utils.resource_path("api/sed/underconstrained.cellml"))
@@ -86,6 +98,14 @@ def test_unsuitable_constrained_cellml_file():
         [
             Issue.Type.Error,
             "The CellML file is unsuitably constrained.",
+        ],
+        [
+            Issue.Type.Error,
+            "Variable 'y' in component 'my_component' is computed more than once.",
+        ],
+        [
+            Issue.Type.Error,
+            "The type of variable 'x' in component 'my_component' is unknown.",
         ],
     ]
 

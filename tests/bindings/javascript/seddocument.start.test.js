@@ -107,6 +107,10 @@ describe("SedDocument start tests", () => {
 
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
+      [
+        libopencor.Issue.Type.ERROR,
+        "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
+      ],
     ]);
   });
 
@@ -124,6 +128,10 @@ describe("SedDocument start tests", () => {
 
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
+      [
+        libopencor.Issue.Type.ERROR,
+        "Variable 'x' in component 'my_component' is computed more than once.",
+      ],
     ]);
   });
 
@@ -141,6 +149,10 @@ describe("SedDocument start tests", () => {
 
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
+      [
+        libopencor.Issue.Type.ERROR,
+        "The type of variable 'x' in component 'my_component' is unknown.",
+      ],
     ]);
   });
 
@@ -160,6 +172,14 @@ describe("SedDocument start tests", () => {
       [
         libopencor.Issue.Type.ERROR,
         "The CellML file is unsuitably constrained.",
+      ],
+      [
+        libopencor.Issue.Type.ERROR,
+        "Variable 'y' in component 'my_component' is computed more than once.",
+      ],
+      [
+        libopencor.Issue.Type.ERROR,
+        "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
   });
