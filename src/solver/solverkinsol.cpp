@@ -39,9 +39,15 @@ void errorHandler(int pErrorCode, const char *pModule, const char *pFunction, ch
     (void)pModule;
     (void)pFunction;
 
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pErrorCode;
+#else
     if (pErrorCode != KIN_WARNING) {
-        *static_cast<std::string *>(pUserData) = pErrorMessage;
-    }
+#endif
+    *static_cast<std::string *>(pUserData) = pErrorMessage;
+#ifndef CODE_COVERAGE_ENABLED
+}
+#endif
 }
 
 int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)

@@ -42,9 +42,15 @@ void errorHandler(int pErrorCode, const char *pModule, const char *pFunction, ch
     (void)pModule;
     (void)pFunction;
 
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pErrorCode;
+#else
     if (pErrorCode != CV_WARNING) {
-        *static_cast<std::string *>(pUserData) = pErrorMessage;
-    }
+#endif
+    *static_cast<std::string *>(pUserData) = pErrorMessage;
+#ifndef CODE_COVERAGE_ENABLED
+}
+#endif
 }
 
 int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
