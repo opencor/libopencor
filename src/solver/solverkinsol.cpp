@@ -206,9 +206,14 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
         mData[pComputeSystem] = data;
     } else {
-        // We are already initialised, so just reuse our previous data.
+        // We are already initialised, so just reuse our previous data, although we need to:
+        //  - provide a new ones vector since the previous one will have been released; and
+        //  - update the user data since it can (somehow) be located at a different address from one call to another.
 
         data = iter->second;
+
+        data.onesVector = N_VNew_Serial(static_cast<int64_t>(pN), data.context);
+        data.userData->userData = pUserData;
     }
 
     // Solve the model.
