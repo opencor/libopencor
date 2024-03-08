@@ -270,7 +270,7 @@ jobs:
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_LOG_FILE: ""
       DOXYGEN_VERSION: 1.9.3
-      LLVMCLANG_VERSION: 16.0.6
+      LLVMCLANG_VERSION: 17.0.6
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v3
