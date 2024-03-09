@@ -34,21 +34,24 @@ namespace libOpenCOR {
 
 namespace {
 
+#ifndef CODE_COVERAGE_ENABLED
 void errorHandler(int pErrorCode, const char *pModule, const char *pFunction, char *pErrorMessage, void *pUserData)
 {
     (void)pModule;
     (void)pFunction;
 
-#ifdef CODE_COVERAGE_ENABLED
-    (void)pErrorCode;
-#else
     if (pErrorCode != KIN_WARNING) {
-#endif
-    *static_cast<std::string *>(pUserData) = pErrorMessage;
-#ifndef CODE_COVERAGE_ENABLED
+        *static_cast<std::string *>(pUserData) = pErrorMessage;
+    }
 }
 #endif
-}
+
+struct SolverKinsolUserData
+{
+    SolverNla::ComputeSystem computeSystem = nullptr;
+
+    void *userData = nullptr;
+};
 
 int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
 {
@@ -66,22 +69,6 @@ int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
 SolverKinsol::Impl::Impl()
     : SolverNla::Impl("KISAO:0000282", "KINSOL")
 {
-}
-
-SolverKinsol::Impl::~Impl()
-{
-    for (auto &data : mData) {
-        N_VDestroy_Serial(data.second.uVector);
-        N_VDestroy_Serial(data.second.onesVector);
-        SUNMatDestroy(data.second.sunMatrix);
-        SUNLinSolFree(data.second.sunLinearSolver);
-
-        KINFree(&data.second.solver);
-
-        SUNContext_Free(&data.second.context);
-
-        delete data.second.userData;
-    }
 }
 
 StringStringMap SolverKinsol::Impl::properties() const
@@ -104,133 +91,142 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 {
     removeAllIssues();
 
-    // Check whether we need to initialise our data or whether we can just reuse it.
+    // We don't have any data associated with the given pComputeSystem, so get some by first making sure that the
+    // solver's properties are all valid.
 
-    SolverKinsolData data;
-
-    if (auto iter = mData.find(pComputeSystem); iter == mData.end()) {
-        // We don't have any data associated with the given pComputeSystem, so get some by first making sure that the
-        // solver's properties are all valid.
-
-        if (mMaximumNumberOfIterations <= 0) {
-            addError("The maximum number of iterations cannot be equal to " + toString(mMaximumNumberOfIterations) + ". It must be greater than 0.");
-        }
-
-        bool needUpperAndLowerHalfBandwidths = false;
-
-        if (mLinearSolver == LinearSolver::BANDED) {
-            // We are dealing with a banded linear solver, so we need both an upper and a lower half-bandwidth.
-
-            needUpperAndLowerHalfBandwidths = true;
-        }
-
-        if (needUpperAndLowerHalfBandwidths) {
-            if ((mUpperHalfBandwidth < 0) || (mUpperHalfBandwidth >= static_cast<int>(pN))) {
-                addError("The upper half-bandwidth cannot be equal to " + toString(mUpperHalfBandwidth) + ". It must be between 0 and " + toString(pN - 1) + ".");
-            }
-
-            if ((mLowerHalfBandwidth < 0) || (mLowerHalfBandwidth >= static_cast<int>(pN))) {
-                addError("The lower half-bandwidth cannot be equal to " + toString(mLowerHalfBandwidth) + ". It must be between 0 and " + toString(pN - 1) + ".");
-            }
-        }
-
-        // Check whether we had errors and, if so, then leave.
-
-        if (!mErrors.empty()) {
-            return false;
-        }
-
-        // Create our SUNDIALS context.
-
-        ASSERT_EQ(SUNContext_Create(nullptr, &data.context), 0);
-
-        // Create our KINSOL solver.
-
-        data.solver = KINCreate(data.context);
-
-        ASSERT_NE(data.solver, nullptr);
-
-        // Use our own error handler.
-
-        ASSERT_EQ(KINSetErrHandlerFn(data.solver, errorHandler, &mErrorMessage), KIN_SUCCESS);
-
-        // Initialise our KINSOL solver.
-
-        data.uVector = N_VMake_Serial(static_cast<int64_t>(pN), pU, data.context);
-        data.onesVector = N_VNew_Serial(static_cast<int64_t>(pN), data.context);
-
-        ASSERT_NE(data.uVector, nullptr);
-        ASSERT_NE(data.onesVector, nullptr);
-
-        N_VConst(1.0, data.onesVector);
-
-        ASSERT_EQ(KINInit(data.solver, computeSystem, data.uVector), KIN_SUCCESS);
-
-        // Set our linear solver.
-
-        if (mLinearSolver == LinearSolver::DENSE) {
-            data.sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), data.context);
-
-            ASSERT_NE(data.sunMatrix, nullptr);
-
-            data.sunLinearSolver = SUNLinSol_Dense(data.uVector, data.sunMatrix, data.context);
-        } else if (mLinearSolver == LinearSolver::BANDED) {
-            data.sunMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
-                                           static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
-                                           data.context);
-
-            ASSERT_NE(data.sunMatrix, nullptr);
-
-            data.sunLinearSolver = SUNLinSol_Band(data.uVector, data.sunMatrix, data.context);
-        } else {
-            data.sunMatrix = nullptr;
-
-            if (mLinearSolver == LinearSolver::GMRES) {
-                data.sunLinearSolver = SUNLinSol_SPGMR(data.uVector, PREC_NONE, 0, data.context);
-            } else if (mLinearSolver == LinearSolver::BICGSTAB) {
-                data.sunLinearSolver = SUNLinSol_SPBCGS(data.uVector, PREC_NONE, 0, data.context);
-            } else {
-                data.sunLinearSolver = SUNLinSol_SPTFQMR(data.uVector, PREC_NONE, 0, data.context);
-            }
-        }
-
-        ASSERT_NE(data.sunLinearSolver, nullptr);
-
-        ASSERT_EQ(KINSetLinearSolver(data.solver, data.sunLinearSolver, data.sunMatrix), KINLS_SUCCESS);
-
-        // Set our user data.
-
-        data.userData = new SolverKinsolUserData {pComputeSystem, pUserData};
-
-        ASSERT_EQ(KINSetUserData(data.solver, data.userData), KIN_SUCCESS);
-
-        // Set our maximum number of iterations.
-
-        ASSERT_EQ(KINSetNumMaxIters(data.solver, mMaximumNumberOfIterations), KIN_SUCCESS);
-
-        // Keep track of our data.
-
-        mData[pComputeSystem] = data;
-    } else {
-        // We are already initialised, so just reuse our previous data, although we need to:
-        //  - provide a new ones vector since the previous one will have been released; and
-        //  - update the user data since it can (somehow) be located at a different address from one call to another.
-
-        data = iter->second;
-
-        data.onesVector = N_VNew_Serial(static_cast<int64_t>(pN), data.context);
-        data.userData->userData = pUserData;
+    if (mMaximumNumberOfIterations <= 0) {
+        addError("The maximum number of iterations cannot be equal to " + toString(mMaximumNumberOfIterations) + ". It must be greater than 0.");
     }
+
+    bool needUpperAndLowerHalfBandwidths = false;
+
+    if (mLinearSolver == LinearSolver::BANDED) {
+        // We are dealing with a banded linear solver, so we need both an upper and a lower half-bandwidth.
+
+        needUpperAndLowerHalfBandwidths = true;
+    }
+
+    if (needUpperAndLowerHalfBandwidths) {
+        if ((mUpperHalfBandwidth < 0) || (mUpperHalfBandwidth >= static_cast<int>(pN))) {
+            addError("The upper half-bandwidth cannot be equal to " + toString(mUpperHalfBandwidth) + ". It must be between 0 and " + toString(pN - 1) + ".");
+        }
+
+        if ((mLowerHalfBandwidth < 0) || (mLowerHalfBandwidth >= static_cast<int>(pN))) {
+            addError("The lower half-bandwidth cannot be equal to " + toString(mLowerHalfBandwidth) + ". It must be between 0 and " + toString(pN - 1) + ".");
+        }
+    }
+
+    // Check whether we had errors and, if so, then leave.
+
+    if (!mErrors.empty()) {
+        return false;
+    }
+
+    // Create our SUNDIALS context.
+
+    SUNContext context = nullptr;
+
+    ASSERT_EQ(SUNContext_Create(nullptr, &context), 0);
+
+    // Create our KINSOL solver.
+
+    auto *solver = KINCreate(context);
+
+    ASSERT_NE(solver, nullptr);
+
+    // Use our own error handler.
+
+#ifndef CODE_COVERAGE_ENABLED
+    ASSERT_EQ(KINSetErrHandlerFn(solver, errorHandler, &mErrorMessage), KIN_SUCCESS);
+#endif
+
+    // Initialise our KINSOL solver.
+
+    auto *uVector = N_VMake_Serial(static_cast<int64_t>(pN), pU, context);
+    auto *onesVector = N_VNew_Serial(static_cast<int64_t>(pN), context);
+
+    ASSERT_NE(uVector, nullptr);
+    ASSERT_NE(onesVector, nullptr);
+
+    N_VConst(1.0, onesVector);
+
+    ASSERT_EQ(KINInit(solver, computeSystem, uVector), KIN_SUCCESS);
+
+    // Set our linear solver.
+
+    SUNMatrix sunMatrix = nullptr;
+    SUNLinearSolver sunLinearSolver = nullptr;
+
+    if (mLinearSolver == LinearSolver::DENSE) {
+        sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), context);
+
+        ASSERT_NE(sunMatrix, nullptr);
+
+        sunLinearSolver = SUNLinSol_Dense(uVector, sunMatrix, context);
+    } else if (mLinearSolver == LinearSolver::BANDED) {
+        sunMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
+                                  static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
+                                  context);
+
+        ASSERT_NE(sunMatrix, nullptr);
+
+        sunLinearSolver = SUNLinSol_Band(uVector, sunMatrix, context);
+    } else {
+        sunMatrix = nullptr;
+
+        if (mLinearSolver == LinearSolver::GMRES) {
+            sunLinearSolver = SUNLinSol_SPGMR(uVector, PREC_NONE, 0, context);
+        } else if (mLinearSolver == LinearSolver::BICGSTAB) {
+            sunLinearSolver = SUNLinSol_SPBCGS(uVector, PREC_NONE, 0, context);
+        } else {
+            sunLinearSolver = SUNLinSol_SPTFQMR(uVector, PREC_NONE, 0, context);
+        }
+    }
+
+    ASSERT_NE(sunLinearSolver, nullptr);
+
+    ASSERT_EQ(KINSetLinearSolver(solver, sunLinearSolver, sunMatrix), KINLS_SUCCESS);
+
+    // Set our user data.
+
+    SolverKinsolUserData userData;
+
+    userData.computeSystem = pComputeSystem;
+    userData.userData = pUserData;
+
+    ASSERT_EQ(KINSetUserData(solver, &userData), KIN_SUCCESS);
+
+    // Set our maximum number of iterations.
+
+    ASSERT_EQ(KINSetNumMaxIters(solver, mMaximumNumberOfIterations), KIN_SUCCESS);
 
     // Solve the model.
 
-    auto res = KINSol(data.solver, data.uVector, KIN_LINESEARCH, data.onesVector, data.onesVector);
+#ifndef CODE_COVERAGE_ENABLED
+    auto res =
+#endif
+        KINSol(solver, uVector, KIN_LINESEARCH, onesVector, onesVector);
 
+    // Release some memory.
+
+    N_VDestroy_Serial(uVector);
+    N_VDestroy_Serial(onesVector);
+    SUNMatDestroy(sunMatrix);
+    SUNLinSolFree(sunLinearSolver);
+
+    KINFree(&solver);
+
+    SUNContext_Free(&context);
+
+    // Check whether everything went fine.
+
+#ifndef CODE_COVERAGE_ENABLED
     if (res < KIN_SUCCESS) {
         addError(mErrorMessage);
 
         return false;
     }
+#endif
 
     return true;
 }

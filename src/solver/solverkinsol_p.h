@@ -27,28 +27,6 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-struct SolverKinsolUserData
-{
-    SolverNla::ComputeSystem computeSystem = nullptr;
-
-    void *userData = nullptr;
-};
-
-struct SolverKinsolData
-{
-    SUNContext context = nullptr;
-
-    void *solver = nullptr;
-
-    N_Vector uVector = nullptr;
-    N_Vector onesVector = nullptr;
-
-    SUNMatrix sunMatrix = nullptr;
-    SUNLinearSolver sunLinearSolver = nullptr;
-
-    SolverKinsolUserData *userData = nullptr;
-};
-
 class SolverKinsol::Impl: public SolverNla::Impl
 {
 public:
@@ -59,10 +37,7 @@ public:
     int mUpperHalfBandwidth = 0;
     int mLowerHalfBandwidth = 0;
 
-    std::map<ComputeSystem, SolverKinsolData> mData;
-
     explicit Impl();
-    ~Impl() override;
 
     StringStringMap properties() const override;
 
