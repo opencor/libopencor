@@ -22,6 +22,7 @@
 import math
 import multiprocessing
 import os
+import platform
 import shutil
 import sys
 import xml.dom.minidom
@@ -87,14 +88,34 @@ class BackTrace:
 
 def parse_errors(output):
     res = []
-    dom = xml.dom.minidom.parseString(output)
-    error = dom.getElementsByTagName("error")
 
-    for stack in error:
-        back_trace = BackTrace(stack)
+    if platform.system() == "Linux":
+        dom = xml.dom.minidom.parseString(output)
+        error = dom.getElementsByTagName("error")
 
-        if back_trace.is_leak():
-            res.append(back_trace)
+        for stack in error:
+            back_trace = BackTrace(stack)
+
+            if back_trace.is_leak():
+                res.append(back_trace)
+    else:
+        leaks_report_line = 0
+        lines = ""
+
+        for line in output.split("\n"):
+            if leaks_report_line == 0:
+                if line.startswith("leaks Report Version"):
+                    leaks_report_line = 1
+            else:
+                lines += line + "\n"
+
+                leaks_report_line += 1
+
+                if leaks_report_line == 3:
+                    if "0 leaks for 0 total leaked bytes." in line:
+                        return []
+
+        res.append(lines)
 
     return res
 
@@ -105,24 +126,28 @@ def garbage(line):
     )
 
 
-def memcheck(valgrind, test, test_path):
-    os.system(
-        valgrind
-        + f" --tool=memcheck --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 {test_path} 1>{test}.txt 2>{test}.err 3>{test}.xml"
-    )
+def check_memory(tool, test, test_path):
+    if platform.system() == "Linux":
+        os.system(
+            f"{tool} --tool=memcheck --child-silent-after-fork=yes --leak-check=full --xml=yes --xml-fd=3 --num-callers=50 {test_path} 1>{test}.txt 2>{test}.err 3>{test}.xml"
+        )
 
-    return "".join(list(filter(garbage, open(f"{test}.xml").readlines())))
+        return "".join(list(filter(garbage, open(f"{test}.xml").readlines())))
+    else:
+        os.system(f"{tool} --quiet -atExit -- {test_path} 1>{test}.txt 2>{test}.err")
+
+        return open(f"{test}.txt").read()
 
 
-def run_test(valgrind, test, test_path):
+def run_test(tool, test, test_path):
     sys.stdout.write(f"-- Checking memory in {test} - ")
 
     if not os.access(test_path, os.X_OK):
-        sys.stdout.write("not found\n")
+        sys.stdout.write("Not found\n")
 
         return False
 
-    errors = parse_errors(memcheck(valgrind, test, test_path))
+    errors = parse_errors(check_memory(tool, test, test_path))
 
     if len(errors) == 0:
         sys.stdout.write("Success\n")
@@ -141,12 +166,20 @@ def run_test(valgrind, test, test_path):
 
 if __name__ == "__main__":
     if len(sys.argv) > 2:
-        valgrind = shutil.which("valgrind")
+        if platform.system() == "Linux":
+            tool = shutil.which("valgrind")
 
-        if valgrind == None:
-            sys.stderr.write("-- Valgrind could not be found.\n")
+            if tool == None:
+                sys.stderr.write("-- Valgrind could not be found.\n")
 
-            sys.exit(3)
+                sys.exit(3)
+        else:
+            tool = shutil.which("leaks")
+
+            if tool == None:
+                sys.stderr.write("-- Leaks could not be found.\n")
+
+                sys.exit(3)
 
         exit_code = 0
         tests_dir = sys.argv[1]
@@ -155,7 +188,7 @@ if __name__ == "__main__":
         with multiprocessing.Pool(multiprocessing.cpu_count()) as process:
             results = process.starmap(
                 run_test,
-                [(valgrind, test, os.path.join(tests_dir, test)) for test in tests],
+                [(tool, test, os.path.join(tests_dir, test)) for test in tests],
             )
 
         successes = []
