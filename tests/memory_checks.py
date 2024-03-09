@@ -177,7 +177,7 @@ if __name__ == "__main__":
             tool = shutil.which("leaks")
 
             if tool == None:
-                sys.stderr.write("-- Leaks could not be found.\n")
+                sys.stderr.write("-- The leaks tool could not be found.\n")
 
                 sys.exit(3)
 
