@@ -62,7 +62,7 @@ public:
     SUNLinearSolver mSunLinearSolver = nullptr;
     SUNNonlinearSolver mSunNonLinearSolver = nullptr;
 
-    SolverCvodeUserData *mUserData = nullptr;
+    SolverCvodeUserData mUserData;
 
     explicit Impl();
     ~Impl() override;

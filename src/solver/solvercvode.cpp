@@ -87,8 +87,6 @@ void SolverCvode::Impl::resetInternals()
         CVodeFree(&mSolver);
 
         SUNContext_Free(&mSunContext);
-
-        delete mUserData;
     }
 }
 
@@ -205,9 +203,10 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Set our user data.
 
-    mUserData = new SolverCvodeUserData {pVariables, pComputeRates};
+    mUserData.variables = pVariables;
+    mUserData.computeRates = pComputeRates;
 
-    ASSERT_EQ(CVodeSetUserData(mSolver, mUserData), CV_SUCCESS);
+    ASSERT_EQ(CVodeSetUserData(mSolver, &mUserData), CV_SUCCESS);
 
     // Set our maximum step.
 
