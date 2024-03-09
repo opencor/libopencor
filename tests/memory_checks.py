@@ -20,6 +20,7 @@
 #       https://invent.kde.org/kdevelop/kdevelop/-/blob/3973/veritas/tests/runMemcheck.py).
 
 import math
+import multiprocessing
 import os
 import platform
 import shutil
@@ -183,7 +184,6 @@ if __name__ == "__main__":
         exit_code = 0
         tests_dir = sys.argv[1]
         tests = sys.argv[2:]
-        results = []
 
         with multiprocessing.Pool(multiprocessing.cpu_count()) as process:
             results = process.starmap(
