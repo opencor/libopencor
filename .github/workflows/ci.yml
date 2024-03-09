@@ -237,7 +237,7 @@ jobs:
             context: PATH=/usr/local/opt/llvm/bin:$PATH CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++
             target: code_coverage
           - name: 'Memory checks'
-            os: ubuntu-latest
+            os: macos-latest
             build_type: Debug
             code_analysis: OFF
             code_coverage: OFF
@@ -270,7 +270,7 @@ jobs:
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_LOG_FILE: ""
       DOXYGEN_VERSION: 1.9.3
-      LLVMCLANG_VERSION: 16.0.6
+      LLVMCLANG_VERSION: 17.0.6
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v3
@@ -313,11 +313,6 @@ jobs:
       - name: Install Black
         if: ${{ matrix.target == 'python_check_code_formatting' }}
         run: pip3 install black
-      - name: Install Valgrind
-        if: ${{ matrix.memory_checks == 'ON' }}
-        run: |
-          sudo apt update
-          sudo apt install valgrind
       - name: Install pytest and pytest-html
         if: ${{ matrix.target == 'python_unit_testing' }}
         run: pip3 install pytest pytest-html

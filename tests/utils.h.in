@@ -33,36 +33,36 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-inline constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
+static constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
 
-inline constexpr auto UNKNOWN_FILE = "unknown_file.txt";
-inline constexpr auto SBML_FILE = "sbml.sbml";
-inline constexpr auto ERROR_CELLML_FILE = "error.cellml";
-inline constexpr auto ERROR_SEDML_FILE = "error.sedml";
-inline constexpr auto CELLML_1_X_FILE = "cellml_1_x.cellml";
-inline constexpr auto SEDML_1_X_FILE = "cellml_1_x.sedml";
-inline constexpr auto COMBINE_1_X_ARCHIVE = "cellml_1_x.omex";
-inline constexpr auto CELLML_2_FILE = "cellml_2.cellml";
-inline constexpr auto SEDML_2_FILE = "cellml_2.sedml";
-inline constexpr auto COMBINE_2_ARCHIVE = "cellml_2.omex";
-inline constexpr auto IRRETRIEVABLE_FILE = "irretrievable_file.txt";
+static constexpr auto UNKNOWN_FILE = "unknown_file.txt";
+static constexpr auto SBML_FILE = "sbml.sbml";
+static constexpr auto ERROR_CELLML_FILE = "error.cellml";
+static constexpr auto ERROR_SEDML_FILE = "error.sedml";
+static constexpr auto CELLML_1_X_FILE = "cellml_1_x.cellml";
+static constexpr auto SEDML_1_X_FILE = "cellml_1_x.sedml";
+static constexpr auto COMBINE_1_X_ARCHIVE = "cellml_1_x.omex";
+static constexpr auto CELLML_2_FILE = "cellml_2.cellml";
+static constexpr auto SEDML_2_FILE = "cellml_2.sedml";
+static constexpr auto COMBINE_2_ARCHIVE = "cellml_2.omex";
+static constexpr auto IRRETRIEVABLE_FILE = "irretrievable_file.txt";
 
 #ifdef _WIN32
-inline constexpr auto LOCAL_FILE = R"(P:\some\path\file.txt)";
+static constexpr auto LOCAL_FILE = R"(P:\some\path\file.txt)";
 #else
-inline constexpr auto LOCAL_FILE = "/some/path/file.txt";
+static constexpr auto LOCAL_FILE = "/some/path/file.txt";
 #endif
 
-inline constexpr auto HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
-inline constexpr auto REMOTE_BASE_PATH = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
-inline constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
-inline constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt";
+static constexpr auto HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+static constexpr auto REMOTE_BASE_PATH = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
+static constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+static constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt";
 
-inline constexpr auto SOME_UNKNOWN_CONTENTS = "Some unknown contents...";
-inline constexpr auto SOME_CELLML_CONTENTS = "@SOME_CELLML_CONTENTS_C@";
-inline constexpr auto SOME_ERROR_CELLML_CONTENTS = "@SOME_ERROR_CELLML_CONTENTS_C@";
-inline constexpr auto SOME_WARNING_CELLML_CONTENTS = "@SOME_WARNING_CELLML_CONTENTS_C@";
-inline constexpr auto SOME_SEDML_CONTENTS = "@SOME_SEDML_CONTENTS_C@";
+static constexpr auto SOME_UNKNOWN_CONTENTS = "Some unknown contents...";
+static constexpr auto SOME_CELLML_CONTENTS = "@SOME_CELLML_CONTENTS_C@";
+static constexpr auto SOME_ERROR_CELLML_CONTENTS = "@SOME_ERROR_CELLML_CONTENTS_C@";
+static constexpr auto SOME_WARNING_CELLML_CONTENTS = "@SOME_WARNING_CELLML_CONTENTS_C@";
+static constexpr auto SOME_SEDML_CONTENTS = "@SOME_SEDML_CONTENTS_C@";
 
 typedef struct
 {

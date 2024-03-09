@@ -153,7 +153,12 @@ find_program(PATCH_EXE NAMES ${PREFERRED_PATCH_NAMES} patch)
 find_program(PRETTIER_EXE NAMES ${PREFERRED_PRETTIER_NAMES} prettier)
 find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
 find_program(SPHINX_EXE NAMES ${PREFERRED_SPHINX_NAMES} sphinx-build sphinx-build2)
-find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
+
+if(APPLE)
+    find_program(LEAKS_EXE NAMES ${PREFERRED_LEAKS_NAMES} leaks)
+elseif(NOT WIN32)
+    find_program(VALGRIND_EXE NAMES ${PREFERRED_VALGRIND_NAMES} valgrind)
+endif()
 
 # Create some aliases.
 
@@ -309,10 +314,15 @@ if(PYTHON_UNIT_TESTING_AVAILABLE AND PYTHON_EXE)
     endif()
 endif()
 
-if(PYTHON_EXE AND VALGRIND_EXE)
+if(   (APPLE AND LEAKS_EXE)
+   OR (NOT WIN32 AND PYTHON_EXE AND VALGRIND_EXE))
     set(MEMORY_CHECKS_AVAILABLE TRUE)
 else()
-    set(MEMORY_CHECKS_ERROR_MESSAGE "Memory checks are requested but Python and/or Valgrind could not be found.")
+    if(APPLE)
+        set(MEMORY_CHECKS_ERROR_MESSAGE "Memory checks are requested but the leaks tool could not be found.")
+    else()
+        set(MEMORY_CHECKS_ERROR_MESSAGE "Memory checks are requested but Python and/or Valgrind could not be found.")
+    endif()
 endif()
 
 # Hide the CMake options that are not directly relevant to libOpenCOR.
@@ -339,6 +349,7 @@ mark_as_advanced(BLACK_EXE
                  EMCONFIGURE_EXE
                  FIND_EXE
                  GIT_EXE
+                 LEAKS_EXE
                  LLVM_COV_EXE
                  LLVM_PROFDATA_EXE
                  NODE_EXE
