@@ -408,6 +408,45 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
     return false;
 }
 
+// #define PRINT_VALUES
+
+#ifdef PRINT_VALUES
+namespace {
+
+void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
+{
+    printf("t"); // NOLINT
+
+    for (auto &state : pAnalyserModel->states()) {
+        printf(",%s", state->variable()->name().c_str()); // NOLINT
+    }
+
+    for (auto &variable : pAnalyserModel->variables()) {
+        printf(",%s", variable->variable()->name().c_str()); // NOLINT
+    }
+
+    printf("\n"); // NOLINT
+}
+
+void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
+                 double pVoi, double *pStates, double *pVariables)
+{
+    printf("%f", pVoi); // NOLINT
+
+    for (size_t i = 0; i < pAnalyserModel->states().size(); ++i) {
+        printf(",%f", pStates[i]); // NOLINT
+    }
+
+    for (size_t i = 0; i < pAnalyserModel->variables().size(); ++i) {
+        printf(",%f", pVariables[i]); // NOLINT
+    }
+
+    printf("\n"); // NOLINT
+}
+
+} // namespace
+#endif
+
 bool SedDocument::Impl::start()
 {
     removeAllIssues();
@@ -453,6 +492,9 @@ bool SedDocument::Impl::start()
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
+#    ifdef PRINT_VALUES
+    printHeader(analyserModel);
+#    endif
 
     auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedSimulationUniformTimeCourse>(simulation) : nullptr;
     auto *uniformTimeCourseSimulationPimpl = differentialModel ? uniformTimeCourseSimulation->pimpl() : nullptr;
@@ -478,6 +520,9 @@ bool SedDocument::Impl::start()
         auto odeSolver = uniformTimeCourseSimulation->odeSolver();
 
         odeSolver->initialise(mVoi, analyserModel->stateCount(), mStates, mRates, mVariables, runtime->computeRates());
+#    ifdef PRINT_VALUES
+        printValues(analyserModel, mVoi, mStates, mVariables);
+#    endif
 
         // Compute the differential model.
 
@@ -494,6 +539,9 @@ bool SedDocument::Impl::start()
             }
 
             runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+#    ifdef PRINT_VALUES
+            printValues(analyserModel, mVoi, mStates, mVariables);
+#    endif
         }
     }
 #endif
