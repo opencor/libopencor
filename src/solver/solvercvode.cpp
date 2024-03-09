@@ -176,7 +176,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
         addError("The absolute tolerance cannot be equal to " + toString(mAbsoluteTolerance) + ". It must be greater or equal to 0.");
     }
 
-    // Check whether we have had issues and, if so, then leave.
+    // Check whether we have had errors and, if so, then leave.
 
     if (!mErrors.empty()) {
         return false;
