@@ -127,21 +127,21 @@ def test_ode_model():
     expected_issues = [
         [
             Issue.Type.Error,
-            "At t = 3.29968, mxstep steps taken before reaching tout.",
+            "At t = 0.00140014, mxstep steps taken before reaching tout.",
         ],
     ]
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     sed = SedDocument(file)
     simulation = sed.simulations[0]
+    cvode = simulation.ode_solver
 
-    simulation.number_of_steps = 10
+    cvode.maximum_number_of_steps = 10
 
     assert sed.start() == False
     assert_issues(sed, expected_issues)
 
-    simulation.output_end_time = 50.0
-    simulation.number_of_steps = 50000
+    cvode.maximum_number_of_steps = 500
 
     assert sed.start() == True
 

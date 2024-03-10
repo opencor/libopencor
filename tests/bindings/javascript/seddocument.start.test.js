@@ -204,22 +204,22 @@ describe("SedDocument start tests", () => {
 
     const sed = new libopencor.SedDocument(file);
     const simulation = sed.simulations().get(0);
+    const cvode = simulation.odeSolver();
 
     /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
-    simulation.setNumberOfSteps(10);
+    cvode.setMaximumNumberOfSteps(10);
 
     expect(sed.start()).toBe(false);
 
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
-        "At t = 3.29968, mxstep steps taken before reaching tout.",
+        "At t = 0.00140014, mxstep steps taken before reaching tout.",
       ],
     ]);
     */
 
-    simulation.setOutputEndTime(50.0);
-    simulation.setNumberOfSteps(50000);
+    cvode.setMaximumNumberOfSteps(500);
 
     expect(sed.start()).toBe(true);
   });
