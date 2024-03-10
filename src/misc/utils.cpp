@@ -175,12 +175,14 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 }
 
 namespace {
+
 std::filesystem::path canonicalPath(const std::string &pPath)
 {
     auto [isLocalPath, path] = retrieveFileInfo(pPath);
 
     return stringToPath(path);
 }
+
 } // namespace
 
 std::string relativePath(const std::string &pPath, const std::string &pBasePath)
