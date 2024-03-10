@@ -141,8 +141,22 @@ TEST(StartSedDocumentTest, odeModelWithNoOdeSolver)
 
 TEST(StartSedDocumentTest, nlaModel)
 {
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
+        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
+    };
+
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSimulationSteadyState>(sed->simulations()[0]);
+    auto kinsol = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+
+    kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
+    kinsol->setUpperHalfBandwidth(-1);
+
+    EXPECT_FALSE(sed->start());
+    EXPECT_EQ_ISSUES(sed, expectedIssues);
+
+    kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
     EXPECT_TRUE(sed->start());
 }
@@ -164,8 +178,22 @@ TEST(StartSedDocumentTest, nlaModelWithNoNlaSolver)
 
 TEST(StartSedDocumentTest, daeModel)
 {
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
+        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
+    };
+
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSimulationUniformTimeCourse>(sed->simulations()[0]);
+    auto kinsol = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+
+    kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
+    kinsol->setUpperHalfBandwidth(-1);
+
+    EXPECT_FALSE(sed->start());
+    EXPECT_EQ_ISSUES(sed, expectedIssues);
+
+    kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
     EXPECT_TRUE(sed->start());
 }

@@ -514,6 +514,8 @@ bool SedDocument::Impl::start()
 
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
+    auto nlaSolver = differentialModel ? uniformTimeCourseSimulation->nlaSolver() : dynamic_pointer_cast<SedSimulationSteadyState>(simulation)->nlaSolver();
+
     if (differentialModel) {
         // Initialise the ODE solver.
 
@@ -538,11 +540,21 @@ bool SedDocument::Impl::start()
                 return false;
             }
 
+            if ((nlaSolver != nullptr) && !nlaSolver->issues().empty()) {
+                addIssues(nlaSolver);
+
+                return false;
+            }
+
             runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
 #    ifdef PRINT_VALUES
             printValues(analyserModel, mVoi, mStates, mVariables);
 #    endif
         }
+    } else if ((nlaSolver != nullptr) && !nlaSolver->issues().empty()) {
+        addIssues(nlaSolver);
+
+        return false;
     }
 #endif
 
