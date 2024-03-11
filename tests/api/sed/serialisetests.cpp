@@ -31,7 +31,7 @@ std::string cvodeExpectedSerialisation(const std::string &pSource, const std::ma
     auto interpolateSolution = pParameters.find("KISAO:0000481");
 
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-           "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+           "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
            "  <listOfModels>\n"
            "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\""
            + pSource + "\"/>\n"
@@ -75,7 +75,7 @@ std::string cvodeExpectedSerialisation(const std::string &pSource, const std::ma
              "      </algorithm>\n"
              "    </uniformTimeCourse>\n"
              "  </listOfSimulations>\n"
-             "</sed>\n";
+             "</sedML>\n";
 }
 
 std::string kinsolExpectedSerialisation(const std::map<std::string, std::string> &pParameters = {})
@@ -83,7 +83,7 @@ std::string kinsolExpectedSerialisation(const std::map<std::string, std::string>
     auto linearSolver = pParameters.find("KISAO:0000477");
 
     return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-           "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+           "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
            "  <listOfModels>\n"
            "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"api/sed/nla.cellml\"/>\n"
            "  </listOfModels>\n"
@@ -103,7 +103,7 @@ std::string kinsolExpectedSerialisation(const std::map<std::string, std::string>
              "      </algorithm>\n"
              "    </steadyState>\n"
              "  </listOfSimulations>\n"
-             "</sed>\n";
+             "</sedML>\n";
 }
 
 } // namespace
@@ -177,7 +177,7 @@ TEST(SerialiseSedDocumentTest, relativeRemoteCellmlFileWithBasePath)
 TEST(ModelTypeSedDocumentTest, daeModel)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
                                                      "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"api/sed/dae.cellml\"/>\n"
                                                      "  </listOfModels>\n"
@@ -208,7 +208,7 @@ TEST(ModelTypeSedDocumentTest, daeModel)
                                                      "      </nlaAlgorithm>\n"
                                                      "    </uniformTimeCourse>\n"
                                                      "  </listOfSimulations>\n"
-                                                     "</sed>\n";
+                                                     "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -227,14 +227,14 @@ TEST(ModelTypeSedDocumentTest, nlaModel)
 TEST(ModelTypeSedDocumentTest, algebraicModel)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
                                                      "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"api/sed/algebraic.cellml\"/>\n"
                                                      "  </listOfModels>\n"
                                                      "  <listOfSimulations>\n"
                                                      "    <steadyState id=\"simulation1\"/>\n"
                                                      "  </listOfSimulations>\n"
-                                                     "</sed>\n";
+                                                     "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -245,7 +245,7 @@ TEST(ModelTypeSedDocumentTest, algebraicModel)
 TEST(SerialiseSedDocumentTest, fixedStepOdeSolver)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
                                                      "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
@@ -258,7 +258,7 @@ TEST(SerialiseSedDocumentTest, fixedStepOdeSolver)
                                                      "      </algorithm>\n"
                                                      "    </uniformTimeCourse>\n"
                                                      "  </listOfSimulations>\n"
-                                                     "</sed>\n";
+                                                     "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -428,14 +428,14 @@ TEST(ModelTypeSedDocumentTest, kinsolWithTfmqrLinearSolver)
 TEST(ModelTypeSedDocumentTest, oneStepSimulation)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
                                                      "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
                                                      "  <listOfSimulations>\n"
                                                      "    <oneStep id=\"simulation1\" step=\"1\"/>\n"
                                                      "  </listOfSimulations>\n"
-                                                     "</sed>\n";
+                                                     "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);

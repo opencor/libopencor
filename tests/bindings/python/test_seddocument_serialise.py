@@ -53,7 +53,7 @@ def cvode_expected_serialisation(source, parameters=None):
     )
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="{source}"/>
   </listOfModels>
@@ -76,7 +76,7 @@ def cvode_expected_serialisation(source, parameters=None):
       </algorithm>
     </uniformTimeCourse>
   </listOfSimulations>
-</sed>
+</sedML>
 """
 
 
@@ -88,7 +88,7 @@ def kinsol_expected_serialisation(parameters=None):
     )
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="api/sed/nla.cellml"/>
   </listOfModels>
@@ -104,7 +104,7 @@ def kinsol_expected_serialisation(parameters=None):
       </algorithm>
     </steadyState>
   </listOfSimulations>
-</sed>
+</sedML>
 """
 
 
@@ -182,7 +182,7 @@ def test_relative_remote_cellml_file_with_base_path():
 
 def test_dae_model():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="api/sed/dae.cellml"/>
   </listOfModels>
@@ -213,7 +213,7 @@ def test_dae_model():
       </nlaAlgorithm>
     </uniformTimeCourse>
   </listOfSimulations>
-</sed>
+</sedML>
 """
 
     file = File(utils.resource_path("api/sed/dae.cellml"))
@@ -224,7 +224,7 @@ def test_dae_model():
 
 def test_nla_model():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="api/sed/nla.cellml"/>
   </listOfModels>
@@ -240,7 +240,7 @@ def test_nla_model():
       </algorithm>
     </steadyState>
   </listOfSimulations>
-</sed>
+</sedML>
 """
 
     file = File(utils.resource_path("api/sed/nla.cellml"))
@@ -251,14 +251,14 @@ def test_nla_model():
 
 def test_algebraic_model():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="api/sed/algebraic.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <steadyState id="simulation1"/>
   </listOfSimulations>
-</sed>
+</sedML>
 """
 
     file = File(utils.resource_path("api/sed/algebraic.cellml"))
@@ -269,7 +269,7 @@ def test_algebraic_model():
 
 def test_fixed_step_ode_solver():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
@@ -282,7 +282,7 @@ def test_fixed_step_ode_solver():
       </algorithm>
     </uniformTimeCourse>
   </listOfSimulations>
-</sed>
+</sedML>
 """
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
@@ -465,14 +465,14 @@ def test_kinsol_solver_with_tfqmr_linear_solver():
 
 def test_one_step_simulation():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <oneStep id="simulation1" step="1"/>
   </listOfSimulations>
-</sed>
+</sedML>
 """
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
