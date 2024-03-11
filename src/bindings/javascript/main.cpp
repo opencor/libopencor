@@ -27,8 +27,13 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     // Vectors.
 
     emscripten::register_vector<libOpenCOR::IssuePtr>("IssuePtrVector");
+    emscripten::register_vector<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTaskPtrVector");
+    emscripten::register_vector<libOpenCOR::SedDataDescriptionPtr>("SedDataDescriptionPtrVector");
+    emscripten::register_vector<libOpenCOR::SedDataGeneratorPtr>("SedDataGeneratorPtrVector");
     emscripten::register_vector<libOpenCOR::SedModelPtr>("SedModelPtrVector");
+    emscripten::register_vector<libOpenCOR::SedOutputPtr>("SedOutputPtrVector");
     emscripten::register_vector<libOpenCOR::SedSimulationPtr>("SedSimulationPtrVector");
+    emscripten::register_vector<libOpenCOR::SedStylePtr>("SedStylePtrVector");
 
     // APIs.
 

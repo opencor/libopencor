@@ -33,13 +33,13 @@ public:
 
     std::unordered_set<std::string> mIds;
 
-    std::vector<SedDataDescriptionPtr> mDataDescriptions;
+    SedDataDescriptionPtrVector mDataDescriptions;
     SedModelPtrVector mModels;
     SedSimulationPtrVector mSimulations;
-    std::vector<SedAbstractTaskPtr> mTasks;
-    std::vector<SedDataGeneratorPtr> mDataGenerators;
-    std::vector<SedOutputPtr> mOutputs;
-    std::vector<SedStylePtr> mStyles;
+    SedAbstractTaskPtrVector mTasks;
+    SedDataGeneratorPtrVector mDataGenerators;
+    SedOutputPtrVector mOutputs;
+    SedStylePtrVector mStyles;
 
     double mVoi = 0.0; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
     double *mStates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
