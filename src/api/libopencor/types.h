@@ -103,8 +103,13 @@ using SolverSecondOrderRungeKuttaPtr = std::shared_ptr<SolverSecondOrderRungeKut
 // Vectors.
 
 using IssuePtrVector = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
+using SedAbstractTaskPtrVector = std::vector<SedAbstractTaskPtr>; /**< Type definition for a vector of @ref SedAbstractTask pointers. */
+using SedDataDescriptionPtrVector = std::vector<SedDataDescriptionPtr>; /**< Type definition for a vector of @ref SedDataDescription pointers. */
+using SedDataGeneratorPtrVector = std::vector<SedDataGeneratorPtr>; /**< Type definition for a vector of @ref SedDataGenerator pointers. */
 using SedModelPtrVector = std::vector<SedModelPtr>; /**< Type definition for a vector of @ref SedModel pointers. */
+using SedOutputPtrVector = std::vector<SedOutputPtr>; /**< Type definition for a vector of @ref SedOutput pointers. */
 using SedSimulationPtrVector = std::vector<SedSimulationPtr>; /**< Type definition for a vector of @ref SedSimulation pointers. */
+using SedStylePtrVector = std::vector<SedStylePtr>; /**< Type definition for a vector of @ref SedStyle pointers. */
 using UnsignedCharVector = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
 
 } // namespace libcellml
