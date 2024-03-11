@@ -26,7 +26,7 @@ TEST(RuntimeCellmlTest, validRuntime)
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
     auto cellmlFileRuntime = cellmlFile->runtime();
 
-    EXPECT_TRUE(cellmlFileRuntime->issues().empty());
+    EXPECT_FALSE(cellmlFileRuntime->hasIssues());
 }
 
 TEST(RuntimeCellmlTest, invalidRuntimeBecauseOfAnalysisIssues)

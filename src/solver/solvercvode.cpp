@@ -176,7 +176,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Check whether we have had errors and, if so, then leave.
 
-    if (!mErrors.empty()) {
+    if (hasErrors()) {
         return false;
     }
 

@@ -64,7 +64,7 @@ bool SedModel::Impl::isValid()
 
     addIssues(mFile->pimpl()->mCellmlFile);
 
-    return mErrors.empty();
+    return !hasErrors();
 }
 
 void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const

@@ -25,7 +25,7 @@ TEST(BasicCellmlTest, cellml1xModel)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_1_X_FILE));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
 
-    EXPECT_TRUE(cellmlFile->issues().empty());
+    EXPECT_FALSE(cellmlFile->hasIssues());
 }
 
 TEST(BasicCellmlTest, cellml2Model)
@@ -33,7 +33,7 @@ TEST(BasicCellmlTest, cellml2Model)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
 
-    EXPECT_TRUE(cellmlFile->issues().empty());
+    EXPECT_FALSE(cellmlFile->hasIssues());
 }
 
 TEST(BasicCellmlTest, modelWithValidImports)
@@ -41,7 +41,7 @@ TEST(BasicCellmlTest, modelWithValidImports)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_valid_imports/model.cellml"));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
 
-    EXPECT_TRUE(cellmlFile->issues().empty());
+    EXPECT_FALSE(cellmlFile->hasIssues());
 }
 
 TEST(BasicCellmlTest, modelWithInvalidImports)

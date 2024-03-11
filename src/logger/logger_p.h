@@ -33,6 +33,11 @@ public:
     IssuePtrVector mWarnings;
     IssuePtrVector mMessages;
 
+    bool hasIssues() const;
+    bool hasErrors() const;
+    bool hasWarnings() const;
+    bool hasMessages() const;
+
     void addIssues(const LoggerPtr &pLogger);
     void addIssues(const libcellml::LoggerPtr &pLogger);
 

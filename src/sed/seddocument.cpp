@@ -184,7 +184,7 @@ bool SedDocument::Impl::isValid()
 
     // Make sure that the simulation has the expected solver(s).
 
-    if (mErrors.empty()) {
+    if (!hasErrors()) {
         auto model = mModels[0];
         auto simulation = mSimulations[0];
         auto cellmlFileType = model->pimpl()->mFile->pimpl()->mCellmlFile->type();
@@ -206,7 +206,7 @@ bool SedDocument::Impl::isValid()
         }
     }
 
-    return mErrors.empty();
+    return !hasErrors();
 }
 
 void SedDocument::Impl::serialise(xmlNodePtr pNode) const
@@ -465,7 +465,7 @@ bool SedDocument::Impl::start()
     auto runtime = cellmlFile->runtime(simulation->nlaSolver());
 
 #    ifndef CODE_COVERAGE_ENABLED
-    if (!runtime->errors().empty()) {
+    if (runtime->hasErrors()) {
         addIssues(runtime);
 
         return false;
@@ -540,7 +540,7 @@ bool SedDocument::Impl::start()
                 return false;
             }
 
-            if ((nlaSolver != nullptr) && !nlaSolver->issues().empty()) {
+            if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
                 addIssues(nlaSolver);
 
                 return false;
@@ -551,7 +551,7 @@ bool SedDocument::Impl::start()
             printValues(analyserModel, mVoi, mStates, mVariables);
 #    endif
         }
-    } else if ((nlaSolver != nullptr) && !nlaSolver->issues().empty()) {
+    } else if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
         addIssues(nlaSolver);
 
         return false;

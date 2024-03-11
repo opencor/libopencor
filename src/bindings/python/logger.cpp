@@ -27,9 +27,13 @@ void loggerApi(py::module_ &m)
 
     py::class_<libOpenCOR::Logger, libOpenCOR::LoggerPtr> logger(m, "Logger");
 
-    logger.def_property_readonly("issues", &libOpenCOR::Logger::issues, "Return the issues.")
+    logger.def_property_readonly("has_issues", &libOpenCOR::Logger::hasIssues, "Return whether there are some issues.")
+        .def_property_readonly("issues", &libOpenCOR::Logger::issues, "Return the issues.")
+        .def_property_readonly("has_errors", &libOpenCOR::Logger::hasErrors, "Return whether there are some errors.")
         .def_property_readonly("errors", &libOpenCOR::Logger::errors, "Return the errors.")
+        .def_property_readonly("has_warnings", &libOpenCOR::Logger::hasWarnings, "Return whether there are some warnings.")
         .def_property_readonly("warnings", &libOpenCOR::Logger::warnings, "Return the warnings.")
+        .def_property_readonly("has_messages", &libOpenCOR::Logger::hasMessages, "Return whether there are some messages.")
         .def_property_readonly("messages", &libOpenCOR::Logger::messages, "Return the messages.");
 
     // Issue API.

@@ -118,7 +118,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
     // Check whether we had errors and, if so, then leave.
 
-    if (!mErrors.empty()) {
+    if (hasErrors()) {
         return false;
     }
 

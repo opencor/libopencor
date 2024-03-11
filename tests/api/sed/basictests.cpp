@@ -24,7 +24,7 @@ TEST(BasicSedDocumentTest, noFile)
 {
     auto sed = libOpenCOR::SedDocument::create();
 
-    EXPECT_TRUE(sed->issues().empty());
+    EXPECT_FALSE(sed->hasIssues());
 }
 
 TEST(BasicSedDocumentTest, unknownFile)
@@ -44,7 +44,7 @@ TEST(BasicSedDocumentTest, cellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_TRUE(sed->issues().empty());
+    EXPECT_FALSE(sed->hasIssues());
 }
 
 TEST(BasicSedDocumentTest, sedmlFile)

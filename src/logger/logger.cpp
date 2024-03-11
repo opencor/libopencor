@@ -19,6 +19,26 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+bool Logger::Impl::hasIssues() const
+{
+    return !mIssues.empty();
+}
+
+bool Logger::Impl::hasErrors() const
+{
+    return !mErrors.empty();
+}
+
+bool Logger::Impl::hasWarnings() const
+{
+    return !mWarnings.empty();
+}
+
+bool Logger::Impl::hasMessages() const
+{
+    return !mMessages.empty();
+}
+
 void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 {
     for (const auto &issue : pLogger->issues()) {
@@ -113,9 +133,19 @@ const Logger::Impl *Logger::pimpl() const
     return mPimpl;
 }
 
+bool Logger::hasIssues() const
+{
+    return pimpl()->hasIssues();
+}
+
 IssuePtrVector Logger::issues() const
 {
     return pimpl()->mIssues;
+}
+
+bool Logger::hasErrors() const
+{
+    return pimpl()->hasErrors();
 }
 
 IssuePtrVector Logger::errors() const
@@ -123,9 +153,19 @@ IssuePtrVector Logger::errors() const
     return pimpl()->mErrors;
 }
 
+bool Logger::hasWarnings() const
+{
+    return pimpl()->hasWarnings();
+}
+
 IssuePtrVector Logger::warnings() const
 {
     return pimpl()->mWarnings;
+}
+
+bool Logger::hasMessages() const
+{
+    return pimpl()->hasMessages();
 }
 
 IssuePtrVector Logger::messages() const

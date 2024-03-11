@@ -18,6 +18,13 @@ limitations under the License.
 
 #include <libopencor>
 
+TEST(CoverageLoggerTest, hasErrors)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+
+    EXPECT_FALSE(file->hasErrors());
+}
+
 TEST(CoverageLoggerTest, errors)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
@@ -25,11 +32,25 @@ TEST(CoverageLoggerTest, errors)
     EXPECT_TRUE(file->errors().empty());
 }
 
+TEST(CoverageLoggerTest, hasWarnings)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+
+    EXPECT_FALSE(file->hasWarnings());
+}
+
 TEST(CoverageLoggerTest, warnings)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
 
     EXPECT_TRUE(file->warnings().empty());
+}
+
+TEST(CoverageLoggerTest, hasMessages)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+
+    EXPECT_FALSE(file->hasMessages());
 }
 
 TEST(CoverageLoggerTest, messages)
