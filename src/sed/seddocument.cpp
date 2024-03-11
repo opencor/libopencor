@@ -80,7 +80,7 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 
 void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner)
 {
-    // Check whether we were given a file.
+    // Make sure that we were given a file.
 
     if (pFile == nullptr) {
         return;
