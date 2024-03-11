@@ -38,7 +38,7 @@ def test_initialise():
 def test_models():
     sed = SedDocument()
 
-    assert len(sed.models) == 0
+    assert sed.has_models == False
     assert sed.add_model(None) == False
 
     file = File(utils.LOCAL_FILE)
@@ -52,7 +52,7 @@ def test_models():
     assert sed.add_model(model) == False
     assert sed.remove_model(model) == True
 
-    assert len(sed.models) == 0
+    assert sed.has_models == False
 
     assert sed.remove_model(None) == False
 
@@ -60,7 +60,7 @@ def test_models():
 def test_simulations():
     sed = SedDocument()
 
-    assert len(sed.simulations) == 0
+    assert sed.has_simulations == False
     assert sed.add_simulation(None) == False
 
     simulation = SedSimulationUniformTimeCourse(sed)
@@ -73,7 +73,7 @@ def test_simulations():
     assert sed.add_simulation(simulation) == False
     assert sed.remove_simulation(simulation) == True
 
-    assert len(sed.simulations) == 0
+    assert sed.has_simulations == False
 
     assert sed.remove_simulation(None) == False
 
