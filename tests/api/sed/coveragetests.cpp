@@ -23,7 +23,7 @@ limitations under the License.
 TEST(CoverageSedDocumentTest, initialise)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                                     "<sed xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\"/>\n";
+                                                     "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\"/>\n";
 
     auto sed = libOpenCOR::SedDocument::create();
 

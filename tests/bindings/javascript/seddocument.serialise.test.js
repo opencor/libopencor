@@ -60,7 +60,7 @@ describe("SedDocument serialise tests", () => {
 
     return (
       `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="` +
       source +
@@ -95,7 +95,7 @@ describe("SedDocument serialise tests", () => {
       </algorithm>
     </uniformTimeCourse>
   </listOfSimulations>
-</sed>
+</sedML>
 `
     );
   }
@@ -105,7 +105,7 @@ describe("SedDocument serialise tests", () => {
 
     return (
       `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
   </listOfModels>
@@ -123,7 +123,7 @@ describe("SedDocument serialise tests", () => {
       </algorithm>
     </steadyState>
   </listOfSimulations>
-</sed>
+</sedML>
 `
     );
   }
@@ -214,7 +214,7 @@ describe("SedDocument serialise tests", () => {
 
   test("DAE model", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
   </listOfModels>
@@ -245,7 +245,7 @@ describe("SedDocument serialise tests", () => {
       </nlaAlgorithm>
     </uniformTimeCourse>
   </listOfSimulations>
-</sed>
+</sedML>
 `;
 
     const file = new libopencor.File(utils.LOCAL_FILE);
@@ -271,14 +271,14 @@ describe("SedDocument serialise tests", () => {
 
   test("Algebraic model", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
   </listOfModels>
   <listOfSimulations>
     <steadyState id="simulation1"/>
   </listOfSimulations>
-</sed>
+</sedML>
 `;
 
     const file = new libopencor.File(utils.LOCAL_FILE);
@@ -295,7 +295,7 @@ describe("SedDocument serialise tests", () => {
 
   test("Fixed-step ODE solver", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
@@ -308,7 +308,7 @@ describe("SedDocument serialise tests", () => {
       </algorithm>
     </uniformTimeCourse>
   </listOfSimulations>
-</sed>
+</sedML>
 `;
 
     const file = new libopencor.File(utils.REMOTE_FILE);
@@ -537,14 +537,14 @@ describe("SedDocument serialise tests", () => {
 
   test("One-step simulation", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
-<sed xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
   </listOfModels>
   <listOfSimulations>
     <oneStep id="simulation1" step="1"/>
   </listOfSimulations>
-</sed>
+</sedML>
 `;
 
     const file = new libopencor.File(utils.LOCAL_FILE);
