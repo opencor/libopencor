@@ -34,7 +34,7 @@ TEST(CoverageSedDocumentTest, sedDocumentModels)
 {
     auto sed = libOpenCOR::SedDocument::create();
 
-    EXPECT_TRUE(sed->models().empty());
+    EXPECT_FALSE(sed->hasModels());
     EXPECT_FALSE(sed->addModel(nullptr));
 
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
@@ -48,7 +48,7 @@ TEST(CoverageSedDocumentTest, sedDocumentModels)
     EXPECT_FALSE(sed->addModel(model));
     EXPECT_TRUE(sed->removeModel(model));
 
-    EXPECT_TRUE(sed->models().empty());
+    EXPECT_FALSE(sed->hasModels());
 
     EXPECT_FALSE(sed->removeModel(nullptr));
 }
@@ -57,7 +57,7 @@ TEST(CoverageSedDocumentTest, sedDocumentSimulations)
 {
     auto sed = libOpenCOR::SedDocument::create();
 
-    EXPECT_TRUE(sed->simulations().empty());
+    EXPECT_FALSE(sed->hasSimulations());
     EXPECT_FALSE(sed->addSimulation(nullptr));
 
     auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
@@ -70,7 +70,7 @@ TEST(CoverageSedDocumentTest, sedDocumentSimulations)
     EXPECT_FALSE(sed->addSimulation(simulation));
     EXPECT_TRUE(sed->removeSimulation(simulation));
 
-    EXPECT_TRUE(sed->simulations().empty());
+    EXPECT_FALSE(sed->hasSimulations());
 
     EXPECT_FALSE(sed->removeSimulation(nullptr));
 }

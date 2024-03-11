@@ -607,6 +607,11 @@ std::string SedDocument::serialise(const std::string &pBasePath) const
     return pimpl()->serialise(pBasePath);
 }
 
+bool SedDocument::hasModels() const
+{
+    return !pimpl()->mModels.empty();
+}
+
 SedModelPtrVector SedDocument::models() const
 {
     return pimpl()->mModels;
@@ -620,6 +625,11 @@ bool SedDocument::addModel(const SedModelPtr &pModel)
 bool SedDocument::removeModel(const SedModelPtr &pModel)
 {
     return pimpl()->removeModel(pModel);
+}
+
+bool SedDocument::hasSimulations() const
+{
+    return !pimpl()->mSimulations.empty();
 }
 
 SedSimulationPtrVector SedDocument::simulations() const

@@ -32,7 +32,7 @@ describe("SedDocument coverage tests", () => {
   test("Model", () => {
     const sed = new libopencor.SedDocument();
 
-    expect(sed.models().size()).toBe(0);
+    expect(sed.hasModels()).toBe(false);
     expect(sed.addModel(null)).toBe(false);
 
     const file = new libopencor.File(utils.LOCAL_FILE);
@@ -46,7 +46,7 @@ describe("SedDocument coverage tests", () => {
     expect(sed.addModel(model)).toBe(false);
     expect(sed.removeModel(model)).toBe(true);
 
-    expect(sed.models().size()).toBe(0);
+    expect(sed.hasModels()).toBe(false);
 
     expect(sed.removeModel(null)).toBe(false);
   });
@@ -54,7 +54,7 @@ describe("SedDocument coverage tests", () => {
   test("Simulations", () => {
     const sed = new libopencor.SedDocument();
 
-    expect(sed.simulations().size()).toBe(0);
+    expect(sed.hasSimulations()).toBe(false);
     expect(sed.addSimulation(null)).toBe(false);
 
     const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
@@ -67,7 +67,7 @@ describe("SedDocument coverage tests", () => {
     expect(sed.addSimulation(simulation)).toBe(false);
     expect(sed.removeSimulation(simulation)).toBe(true);
 
-    expect(sed.simulations().size()).toBe(0);
+    expect(sed.hasSimulations()).toBe(false);
 
     expect(sed.removeSimulation(null)).toBe(false);
   });

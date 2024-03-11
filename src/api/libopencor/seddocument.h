@@ -89,6 +89,16 @@ public:
     std::string serialise(const std::string &pBasePath) const;
 
     /**
+     * @brief Return whether there are some models.
+     *
+     * Return whether there are some models.
+     *
+     * @return @c true if there are some models, @c false otherwise.
+     */
+
+    bool hasModels() const;
+
+    /**
      * @brief Return the models.
      *
      * Return the models.
@@ -121,6 +131,16 @@ public:
      */
 
     bool removeModel(const SedModelPtr &pModel);
+
+    /**
+     * @brief Return whether there are some simulations.
+     *
+     * Return whether there are some simulations.
+     *
+     * @return @c true if there are some simulations, @c false otherwise.
+     */
+
+    bool hasSimulations() const;
 
     /**
      * @brief Return the simulations.
