@@ -67,7 +67,7 @@ public:
     bool addSimulation(const SedSimulationPtr &pSimulation);
     bool removeSimulation(const SedSimulationPtr &pSimulation);
 
-    bool start();
+    bool run();
 };
 
 } // namespace libOpenCOR

@@ -50,7 +50,7 @@ void sedApi()
         .function("simulations", &libOpenCOR::SedDocument::simulations)
         .function("addSimulation", &libOpenCOR::SedDocument::addSimulation)
         .function("removeSimulation", &libOpenCOR::SedDocument::removeSimulation)
-        .function("start", &libOpenCOR::SedDocument::start);
+        .function("run", &libOpenCOR::SedDocument::run);
 
     // SedModel API.
 
