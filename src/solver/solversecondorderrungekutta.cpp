@@ -128,15 +128,4 @@ SolverSecondOrderRungeKuttaPtr SolverSecondOrderRungeKutta::create()
     return SolverSecondOrderRungeKuttaPtr {new SolverSecondOrderRungeKutta {}};
 }
 
-bool SolverSecondOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                             double *pVariables, ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverSecondOrderRungeKutta::solve(double &pVoi, double pVoiEnd)
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
-}
-
 } // namespace libOpenCOR

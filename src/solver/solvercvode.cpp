@@ -458,20 +458,4 @@ void SolverCvode::setInterpolateSolution(bool pInterpolateSolution)
     pimpl()->mInterpolateSolution = pInterpolateSolution;
 }
 
-bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                             ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverCvode::reinitialise(double pVoi)
-{
-    return pimpl()->reinitialise(pVoi);
-}
-
-bool SolverCvode::solve(double &pVoi, double pVoiEnd)
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
-}
-
 } // namespace libOpenCOR
