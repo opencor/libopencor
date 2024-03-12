@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(StartSedDocumentTest, noFile)
+TEST(RunSedDocumentTest, noFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description must (currently) have exactly one model."},
@@ -29,11 +29,11 @@ TEST(StartSedDocumentTest, noFile)
 
     auto sed = libOpenCOR::SedDocument::create();
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(StartSedDocumentTest, invalidCellmlFile)
+TEST(RunSedDocumentTest, invalidCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is invalid."},
@@ -43,11 +43,11 @@ TEST(StartSedDocumentTest, invalidCellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(StartSedDocumentTest, overconstrainedCellmlFile)
+TEST(RunSedDocumentTest, overconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is overconstrained."},
@@ -57,11 +57,11 @@ TEST(StartSedDocumentTest, overconstrainedCellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(StartSedDocumentTest, underconstrainedCellmlFile)
+TEST(RunSedDocumentTest, underconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is underconstrained."},
@@ -71,11 +71,11 @@ TEST(StartSedDocumentTest, underconstrainedCellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/underconstrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(StartSedDocumentTest, unsuitablyConstrainedCellmlFile)
+TEST(RunSedDocumentTest, unsuitablyConstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is unsuitably constrained."},
@@ -86,19 +86,19 @@ TEST(StartSedDocumentTest, unsuitablyConstrainedCellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsuitably_constrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(StartSedDocumentTest, algebraicModel)
+TEST(RunSedDocumentTest, algebraicModel)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_TRUE(sed->start());
+    EXPECT_TRUE(sed->run());
 }
 
-TEST(StartSedDocumentTest, odeModel)
+TEST(RunSedDocumentTest, odeModel)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140014, mxstep steps taken before reaching tout."},
@@ -114,17 +114,17 @@ TEST(StartSedDocumentTest, odeModel)
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 
     static const auto OK_MAXIMUM_NUMBER_OF_STEPS = 500;
 
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
-    EXPECT_TRUE(sed->start());
+    EXPECT_TRUE(sed->run());
 }
 
-TEST(StartSedDocumentTest, odeModelWithNoOdeSolver)
+TEST(RunSedDocumentTest, odeModelWithNoOdeSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The simulation is to be linked to an ODE model and must therefore specify an ODE solver."},
@@ -135,11 +135,11 @@ TEST(StartSedDocumentTest, odeModelWithNoOdeSolver)
 
     sed->simulations()[0]->setOdeSolver(nullptr);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(StartSedDocumentTest, nlaModel)
+TEST(RunSedDocumentTest, nlaModel)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
@@ -153,15 +153,15 @@ TEST(StartSedDocumentTest, nlaModel)
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    EXPECT_TRUE(sed->start());
+    EXPECT_TRUE(sed->run());
 }
 
-TEST(StartSedDocumentTest, nlaModelWithNoNlaSolver)
+TEST(RunSedDocumentTest, nlaModelWithNoNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The simulation is to be linked to an NLA model and must therefore specify an NLA solver."},
@@ -172,11 +172,11 @@ TEST(StartSedDocumentTest, nlaModelWithNoNlaSolver)
 
     sed->simulations()[0]->setNlaSolver(nullptr);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(StartSedDocumentTest, daeModel)
+TEST(RunSedDocumentTest, daeModel)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
@@ -190,15 +190,15 @@ TEST(StartSedDocumentTest, daeModel)
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    EXPECT_TRUE(sed->start());
+    EXPECT_TRUE(sed->run());
 }
 
-TEST(StartSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
+TEST(RunSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The simulation is to be linked to a DAE model and must therefore specify an ODE solver."},
@@ -212,6 +212,6 @@ TEST(StartSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);
 
-    EXPECT_FALSE(sed->start());
+    EXPECT_FALSE(sed->run());
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }

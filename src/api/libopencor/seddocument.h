@@ -177,14 +177,14 @@ public:
     bool removeSimulation(const SedSimulationPtr &pSimulation);
 
     /**
-     * @brief Start this simulation experiment description.
+     * @brief Run this simulation experiment description.
      *
-     * Start this simulation experiment description, if valid, in its own thread.
+     * Run this simulation experiment description, if valid, in its own thread.
      *
-     * @return @c true if this simulation experiment description was started, @c false otherwise.
+     * @return @c true if this simulation experiment description was run, @c false otherwise.
      */
 
-    bool start();
+    bool run();
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

@@ -449,7 +449,7 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
 } // namespace
 #endif
 
-bool SedDocument::Impl::start()
+bool SedDocument::Impl::run()
 {
     removeAllIssues();
 
@@ -649,9 +649,9 @@ bool SedDocument::removeSimulation(const SedSimulationPtr &pSimulation)
     return pimpl()->removeSimulation(pSimulation);
 }
 
-bool SedDocument::start()
+bool SedDocument::run()
 {
-    return pimpl()->start();
+    return pimpl()->run();
 }
 
 } // namespace libOpenCOR
