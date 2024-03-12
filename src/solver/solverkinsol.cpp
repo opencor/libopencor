@@ -296,9 +296,4 @@ void SolverKinsol::setLowerHalfBandwidth(int pLowerHalfBandwidth)
     pimpl()->mLowerHalfBandwidth = pLowerHalfBandwidth;
 }
 
-bool SolverKinsol::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
-{
-    return pimpl()->solve(pComputeSystem, pU, pN, pUserData);
-}
-
 } // namespace libOpenCOR

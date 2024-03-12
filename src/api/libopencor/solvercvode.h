@@ -327,12 +327,6 @@ public:
 
     void setInterpolateSolution(bool pInterpolateSolution);
 
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
-    bool reinitialise(double pVoi) override;
-
-    bool solve(double &pVoi, double pVoiEnd) override;
-
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

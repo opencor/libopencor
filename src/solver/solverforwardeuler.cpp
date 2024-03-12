@@ -98,15 +98,4 @@ SolverForwardEulerPtr SolverForwardEuler::create()
     return SolverForwardEulerPtr {new SolverForwardEuler {}};
 }
 
-bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                    ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverForwardEuler::solve(double &pVoi, double pVoiEnd)
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
-}
-
 } // namespace libOpenCOR
