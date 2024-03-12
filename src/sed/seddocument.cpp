@@ -155,6 +155,8 @@ void SedDocument::Impl::initialiseFromCellmlFile(const FilePtr &pFile, const Sed
 bool SedDocument::Impl::isValid()
 {
     // Make sure that we have one model and one simulation.
+    //---GRY--- THESE "ERRORS" WILL NEED TO BE REMOVED SINCE SED-ML ALLOWS A DOCUMENT TO HAVE NO MODELS AND/OR NO
+    //          SIMULATIONS.
 
     if (mModels.size() != 1) {
         addError("A simulation experiment description must (currently) have exactly one model.");
