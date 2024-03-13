@@ -68,10 +68,10 @@ void sedApi()
 
     // SedRepeatedTask API.
 
-/*---GRY---
-    emscripten::class_<libOpenCOR::SedRepeatedTask, emscripten::base<libOpenCOR::SedAbstractTask>>("SedRepeatedTask")
-        .smart_ptr_constructor("SedRepeatedTask", &libOpenCOR::SedRepeatedTask::create);
-*/
+    /*---GRY---
+        emscripten::class_<libOpenCOR::SedRepeatedTask, emscripten::base<libOpenCOR::SedAbstractTask>>("SedRepeatedTask")
+            .smart_ptr_constructor("SedRepeatedTask", &libOpenCOR::SedRepeatedTask::create);
+    */
 
     // SedSimulation API.
 
