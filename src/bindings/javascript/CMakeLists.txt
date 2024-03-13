@@ -12,6 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# JavaScript source files.
+# Note: this is always set so that we can those files to GIT_SOURCE_FILES whether or not we are building our JavaScript
+#       bindings.
+
 set(JAVASCRIPT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
@@ -22,53 +26,57 @@ set(JAVASCRIPT_SOURCE_FILES
     CACHE INTERNAL "JavaScript source files."
 )
 
-if(EMSCRIPTEN)
-    # Add some sources to our WASM version of libOpenCOR so we can access its internals.
+# Only build our JavaScript bindings if needed.
 
-    target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-                   ${JAVASCRIPT_SOURCE_FILES})
+if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
+    if(EMSCRIPTEN)
+        # Add some sources to our WASM version of libOpenCOR so we can access its internals.
 
-    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-                               $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
+        target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+                       ${JAVASCRIPT_SOURCE_FILES})
 
-    # Use the variables that we passed to CMake but that may or may not end up being used.
-    # Note: this prevents us from getting a warning about unused variables.
+        target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
 
-    set(DUMMY
-        ${BUILDCACHE_EXE}
-        ${CCACHE_EXE}
-        ${CLCACHE_EXE}
-        ${EMCMAKE_EXE}
-        ${EMCONFIGURE_EXE}
-        ${NATIVE_PREBUILT_DIR}
-    )
-else()
-    # Build our JavaScript bindings.
+        # Use the variables that we passed to CMake but that may or may not end up being used.
+        # Note: this prevents us from getting a warning about unused variables.
 
-    set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
+        set(DUMMY
+            ${BUILDCACHE_EXE}
+            ${CCACHE_EXE}
+            ${CLCACHE_EXE}
+            ${EMCMAKE_EXE}
+            ${EMCONFIGURE_EXE}
+            ${NATIVE_PREBUILT_DIR}
+        )
+    else()
+        # Build our JavaScript bindings.
 
-    add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
-                      COMMAND ${EMCMAKE_EXE} ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S ${CMAKE_SOURCE_DIR} -B build
-                                                              -DBUILDCACHE_EXE=${BUILDCACHE_EXE}
-                                                              -DCCACHE_EXE=${CCACHE_EXE}
-                                                              -DCLCACHE_EXE=${CLCACHE_EXE}
-                                                              -DEMCMAKE_EXE=${EMCMAKE_EXE}
-                                                              -DEMCONFIGURE_EXE=${EMCONFIGURE_EXE}
-                                                              -DLIBOPENCOR_BUILD_TYPE=${LIBOPENCOR_BUILD_TYPE}
-                                                              -DLIBOPENCOR_COMPILER_CACHING=${LIBOPENCOR_COMPILER_CACHING}
-                                                              -DLIBOPENCOR_JAVASCRIPT_UNIT_TESTING=${LIBOPENCOR_JAVASCRIPT_UNIT_TESTING}
-                                                              -DLIBOPENCOR_PREBUILT_LIBCELLML=${LIBOPENCOR_PREBUILT_LIBCELLML}
-                                                              -DLIBOPENCOR_PREBUILT_LIBCOMBINE=${LIBOPENCOR_PREBUILT_LIBCOMBINE}
-                                                              -DLIBOPENCOR_PREBUILT_LIBNUML=${LIBOPENCOR_PREBUILT_LIBNUML}
-                                                              -DLIBOPENCOR_PREBUILT_LIBSBML=${LIBOPENCOR_PREBUILT_LIBSBML}
-                                                              -DLIBOPENCOR_PREBUILT_LIBSEDML=${LIBOPENCOR_PREBUILT_LIBSEDML}
-                                                              -DLIBOPENCOR_PREBUILT_LIBXML2=${LIBOPENCOR_PREBUILT_LIBXML2}
-                                                              -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}
-                                                              -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
-                                                              -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
-                                                              -DNATIVE_PREBUILT_DIR=${PREBUILT_DIR}
-                                                              -DREAL_CMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
-                      COMMAND ${CMAKE_COMMAND} --build build)
+        set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
 
-    add_dependencies(${CMAKE_PROJECT_NAME} ${JAVASCRIPT_BINDINGS_TARGET})
+        add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
+                          COMMAND ${EMCMAKE_EXE} ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S ${CMAKE_SOURCE_DIR} -B build
+                                                                  -DBUILDCACHE_EXE=${BUILDCACHE_EXE}
+                                                                  -DCCACHE_EXE=${CCACHE_EXE}
+                                                                  -DCLCACHE_EXE=${CLCACHE_EXE}
+                                                                  -DEMCMAKE_EXE=${EMCMAKE_EXE}
+                                                                  -DEMCONFIGURE_EXE=${EMCONFIGURE_EXE}
+                                                                  -DLIBOPENCOR_BUILD_TYPE=${LIBOPENCOR_BUILD_TYPE}
+                                                                  -DLIBOPENCOR_COMPILER_CACHING=${LIBOPENCOR_COMPILER_CACHING}
+                                                                  -DLIBOPENCOR_JAVASCRIPT_UNIT_TESTING=${LIBOPENCOR_JAVASCRIPT_UNIT_TESTING}
+                                                                  -DLIBOPENCOR_PREBUILT_LIBCELLML=${LIBOPENCOR_PREBUILT_LIBCELLML}
+                                                                  -DLIBOPENCOR_PREBUILT_LIBCOMBINE=${LIBOPENCOR_PREBUILT_LIBCOMBINE}
+                                                                  -DLIBOPENCOR_PREBUILT_LIBNUML=${LIBOPENCOR_PREBUILT_LIBNUML}
+                                                                  -DLIBOPENCOR_PREBUILT_LIBSBML=${LIBOPENCOR_PREBUILT_LIBSBML}
+                                                                  -DLIBOPENCOR_PREBUILT_LIBSEDML=${LIBOPENCOR_PREBUILT_LIBSEDML}
+                                                                  -DLIBOPENCOR_PREBUILT_LIBXML2=${LIBOPENCOR_PREBUILT_LIBXML2}
+                                                                  -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}
+                                                                  -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
+                                                                  -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
+                                                                  -DNATIVE_PREBUILT_DIR=${PREBUILT_DIR}
+                                                                  -DREAL_CMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
+                          COMMAND ${CMAKE_COMMAND} --build build)
+
+        add_dependencies(${CMAKE_PROJECT_NAME} ${JAVASCRIPT_BINDINGS_TARGET})
+    endif()
 endif()

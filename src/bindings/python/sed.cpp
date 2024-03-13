@@ -72,11 +72,11 @@ void sedApi(py::module_ &m)
 
     // SedRepeatedTask API.
 
-/*---GRY---
-    py::class_<libOpenCOR::SedRepeatedTask, libOpenCOR::SedAbstractTask, libOpenCOR::SedRepeatedTaskPtr> sedRepeatedTask(m, "SedRepeatedTask");
+    /*---GRY---
+        py::class_<libOpenCOR::SedRepeatedTask, libOpenCOR::SedAbstractTask, libOpenCOR::SedRepeatedTaskPtr> sedRepeatedTask(m, "SedRepeatedTask");
 
-    sedRepeatedTask.def(py::init(&libOpenCOR::SedRepeatedTask::create), "Create a SedRepeatedTask object.", py::arg("document"));
-*/
+        sedRepeatedTask.def(py::init(&libOpenCOR::SedRepeatedTask::create), "Create a SedRepeatedTask object.", py::arg("document"));
+    */
 
     // SedSimulation API.
 
