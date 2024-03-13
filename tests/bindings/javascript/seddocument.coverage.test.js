@@ -72,6 +72,27 @@ describe("SedDocument coverage tests", () => {
     expect(sed.removeSimulation(null)).toBe(false);
   });
 
+  test("Tasks", () => {
+    const sed = new libopencor.SedDocument();
+
+    expect(sed.hasTasks()).toBe(false);
+    expect(sed.addTask(null)).toBe(false);
+
+    const task = new libopencor.SedTask(sed);
+
+    expect(sed.addTask(task)).toBe(true);
+
+    expect(sed.tasks().size()).toBe(1);
+    expect(sed.tasks().get(0)).toStrictEqual(task);
+
+    expect(sed.addTask(task)).toBe(false);
+    expect(sed.removeTask(task)).toBe(true);
+
+    expect(sed.hasTasks()).toBe(false);
+
+    expect(sed.removeTask(null)).toBe(false);
+  });
+
   test("ODE solver", () => {
     const sed = new libopencor.SedDocument();
     const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);

@@ -19,6 +19,7 @@ from libopencor import (
     SedModel,
     SedSimulationOneStep,
     SedSimulationUniformTimeCourse,
+    SedTask,
     SolverCvode,
     SolverKinsol,
 )
@@ -76,6 +77,27 @@ def test_simulations():
     assert sed.has_simulations == False
 
     assert sed.remove_simulation(None) == False
+
+
+def test_tasks():
+    sed = SedDocument()
+
+    assert sed.has_tasks == False
+    assert sed.add_task(None) == False
+
+    task = SedTask(sed)
+
+    assert sed.add_task(task) == True
+
+    assert len(sed.tasks) == 1
+    assert sed.tasks[0] == task
+
+    assert sed.add_task(task) == False
+    assert sed.remove_task(task) == True
+
+    assert sed.has_tasks == False
+
+    assert sed.remove_task(None) == False
 
 
 def test_ode_solver():

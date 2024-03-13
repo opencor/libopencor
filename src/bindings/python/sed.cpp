@@ -54,6 +54,10 @@ void sedApi(py::module_ &m)
         .def_property_readonly("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
         .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add a simulation.")
         .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.")
+        .def_property_readonly("has_tasks", &libOpenCOR::SedDocument::hasTasks, "Return whether there are some tasks.")
+        .def_property_readonly("tasks", &libOpenCOR::SedDocument::tasks, "Return the tasks.")
+        .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.")
+        .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.")
         .def("run", &libOpenCOR::SedDocument::run, "Run this SedDocument object.");
 
     // SedModel API.
@@ -65,6 +69,14 @@ void sedApi(py::module_ &m)
     // SedOutput API.
 
     py::class_<libOpenCOR::SedOutput, libOpenCOR::SedBase, libOpenCOR::SedOutputPtr> sedOutput(m, "SedOutput");
+
+    // SedRepeatedTask API.
+
+/*---GRY---
+    py::class_<libOpenCOR::SedRepeatedTask, libOpenCOR::SedAbstractTask, libOpenCOR::SedRepeatedTaskPtr> sedRepeatedTask(m, "SedRepeatedTask");
+
+    sedRepeatedTask.def(py::init(&libOpenCOR::SedRepeatedTask::create), "Create a SedRepeatedTask object.", py::arg("document"));
+*/
 
     // SedSimulation API.
 
@@ -99,4 +111,10 @@ void sedApi(py::module_ &m)
     // SedStyle API.
 
     py::class_<libOpenCOR::SedStyle, libOpenCOR::SedBase, libOpenCOR::SedStylePtr> sedStyle(m, "SedStyle");
+
+    // SedTask API.
+
+    py::class_<libOpenCOR::SedTask, libOpenCOR::SedAbstractTask, libOpenCOR::SedTaskPtr> sedTask(m, "SedTask");
+
+    sedTask.def(py::init(&libOpenCOR::SedTask::create), "Create a SedTask object.", py::arg("document"));
 }

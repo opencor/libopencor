@@ -29,6 +29,7 @@ namespace libOpenCOR {
 class LIBOPENCOR_EXPORT SedDocument: public Logger
     , public std::enable_shared_from_this<SedDocument>
 {
+    friend class SedAbstractTask;
     friend class SedModel;
     friend class SedSimulation;
 
@@ -175,6 +176,50 @@ public:
      */
 
     bool removeSimulation(const SedSimulationPtr &pSimulation);
+
+    /**
+     * @brief Return whether there are some tasks.
+     *
+     * Return whether there are some tasks.
+     *
+     * @return @c true if there are some tasks, @c false otherwise.
+     */
+
+    bool hasTasks() const;
+
+    /**
+     * @brief Return the tasks.
+     *
+     * Return the tasks.
+     *
+     * @return The tasks, as a @ref SedAbstractTaskPtrVector.
+     */
+
+    SedAbstractTaskPtrVector tasks() const;
+
+    /**
+     * @brief Add the task to this simulation experiment description.
+     *
+     * Add the task to this simulation experiment description.
+     *
+     * @param pTask The @ref SedAbstractTask object to be added.
+     *
+     * @return @c true if the task was added, @c false otherwise.
+     */
+
+    bool addTask(const SedAbstractTaskPtr &pTask);
+
+    /**
+     * @brief Remove the task from this simulation experiment description.
+     *
+     * Remove the task from this simulation experiment description.
+     *
+     * @param pTask The @ref SedAbstractTask object to be removed.
+     *
+     * @return @c true if the task was removed, @c false otherwise.
+     */
+
+    bool removeTask(const SedAbstractTaskPtr &pTask);
 
     /**
      * @brief Run this simulation experiment description.

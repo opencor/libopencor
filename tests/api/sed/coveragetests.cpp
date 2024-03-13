@@ -75,6 +75,28 @@ TEST(CoverageSedDocumentTest, sedDocumentSimulations)
     EXPECT_FALSE(sed->removeSimulation(nullptr));
 }
 
+TEST(CoverageSedDocumentTest, sedDocumentTasks)
+{
+    auto sed = libOpenCOR::SedDocument::create();
+
+    EXPECT_FALSE(sed->hasTasks());
+    EXPECT_FALSE(sed->addTask(nullptr));
+
+    auto task = libOpenCOR::SedTask::create(sed);
+
+    EXPECT_TRUE(sed->addTask(task));
+
+    EXPECT_EQ(sed->tasks().size(), 1);
+    EXPECT_EQ(sed->tasks()[0], task);
+
+    EXPECT_FALSE(sed->addTask(task));
+    EXPECT_TRUE(sed->removeTask(task));
+
+    EXPECT_FALSE(sed->hasTasks());
+
+    EXPECT_FALSE(sed->removeTask(nullptr));
+}
+
 TEST(CoverageSedDocumentTest, sedSimulationOdeSolver)
 {
     auto sed = libOpenCOR::SedDocument::create();
