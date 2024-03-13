@@ -28,11 +28,14 @@ from .module import (
     SedDocument,
     SedModel,
     SedOutput,
+    # ---GRY---
+    # SedRepeatedTask,
     SedSimulation,
     SedSimulationOneStep,
     SedSimulationSteadyState,
     SedSimulationUniformTimeCourse,
     SedStyle,
+    SedTask,
     # Solver API.
     Solver,
     SolverCvode,

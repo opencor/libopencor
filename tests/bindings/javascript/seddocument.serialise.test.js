@@ -95,6 +95,9 @@ describe("SedDocument serialise tests", () => {
       </algorithm>
     </uniformTimeCourse>
   </listOfSimulations>
+  <listOfTasks>
+    <task id="task1"/>
+  </listOfTasks>
 </sedML>
 `
     );
@@ -123,6 +126,9 @@ describe("SedDocument serialise tests", () => {
       </algorithm>
     </steadyState>
   </listOfSimulations>
+  <listOfTasks>
+    <task id="task1"/>
+  </listOfTasks>
 </sedML>
 `
     );
@@ -245,6 +251,9 @@ describe("SedDocument serialise tests", () => {
       </nlaAlgorithm>
     </uniformTimeCourse>
   </listOfSimulations>
+  <listOfTasks>
+    <task id="task1"/>
+  </listOfTasks>
 </sedML>
 `;
 
@@ -278,6 +287,9 @@ describe("SedDocument serialise tests", () => {
   <listOfSimulations>
     <steadyState id="simulation1"/>
   </listOfSimulations>
+  <listOfTasks>
+    <task id="task1"/>
+  </listOfTasks>
 </sedML>
 `;
 
@@ -308,6 +320,9 @@ describe("SedDocument serialise tests", () => {
       </algorithm>
     </uniformTimeCourse>
   </listOfSimulations>
+  <listOfTasks>
+    <task id="task1"/>
+  </listOfTasks>
 </sedML>
 `;
 
@@ -544,6 +559,9 @@ describe("SedDocument serialise tests", () => {
   <listOfSimulations>
     <oneStep id="simulation1" step="1"/>
   </listOfSimulations>
+  <listOfTasks>
+    <task id="task1"/>
+  </listOfTasks>
 </sedML>
 `;
 

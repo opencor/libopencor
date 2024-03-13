@@ -75,6 +75,9 @@ std::string cvodeExpectedSerialisation(const std::string &pSource, const std::ma
              "      </algorithm>\n"
              "    </uniformTimeCourse>\n"
              "  </listOfSimulations>\n"
+             "  <listOfTasks>\n"
+             "    <task id=\"task1\"/>\n"
+             "  </listOfTasks>\n"
              "</sedML>\n";
 }
 
@@ -103,6 +106,9 @@ std::string kinsolExpectedSerialisation(const std::map<std::string, std::string>
              "      </algorithm>\n"
              "    </steadyState>\n"
              "  </listOfSimulations>\n"
+             "  <listOfTasks>\n"
+             "    <task id=\"task1\"/>\n"
+             "  </listOfTasks>\n"
              "</sedML>\n";
 }
 
@@ -208,6 +214,9 @@ TEST(ModelTypeSedDocumentTest, daeModel)
                                                      "      </nlaAlgorithm>\n"
                                                      "    </uniformTimeCourse>\n"
                                                      "  </listOfSimulations>\n"
+                                                     "  <listOfTasks>\n"
+                                                     "    <task id=\"task1\"/>\n"
+                                                     "  </listOfTasks>\n"
                                                      "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
@@ -234,6 +243,9 @@ TEST(ModelTypeSedDocumentTest, algebraicModel)
                                                      "  <listOfSimulations>\n"
                                                      "    <steadyState id=\"simulation1\"/>\n"
                                                      "  </listOfSimulations>\n"
+                                                     "  <listOfTasks>\n"
+                                                     "    <task id=\"task1\"/>\n"
+                                                     "  </listOfTasks>\n"
                                                      "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
@@ -258,6 +270,9 @@ TEST(SerialiseSedDocumentTest, fixedStepOdeSolver)
                                                      "      </algorithm>\n"
                                                      "    </uniformTimeCourse>\n"
                                                      "  </listOfSimulations>\n"
+                                                     "  <listOfTasks>\n"
+                                                     "    <task id=\"task1\"/>\n"
+                                                     "  </listOfTasks>\n"
                                                      "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
@@ -435,6 +450,9 @@ TEST(ModelTypeSedDocumentTest, oneStepSimulation)
                                                      "  <listOfSimulations>\n"
                                                      "    <oneStep id=\"simulation1\" step=\"1\"/>\n"
                                                      "  </listOfSimulations>\n"
+                                                     "  <listOfTasks>\n"
+                                                     "    <task id=\"task1\"/>\n"
+                                                     "  </listOfTasks>\n"
                                                      "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));

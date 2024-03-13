@@ -24,7 +24,8 @@ void sedApi()
 
     // SedAbstractTask API.
 
-    emscripten::class_<libOpenCOR::SedAbstractTask, emscripten::base<libOpenCOR::SedBase>>("SedAbstractTask");
+    emscripten::class_<libOpenCOR::SedAbstractTask, emscripten::base<libOpenCOR::SedBase>>("SedAbstractTask")
+        .smart_ptr<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTask");
 
     // SedDataDescription API.
 
@@ -50,6 +51,10 @@ void sedApi()
         .function("simulations", &libOpenCOR::SedDocument::simulations)
         .function("addSimulation", &libOpenCOR::SedDocument::addSimulation)
         .function("removeSimulation", &libOpenCOR::SedDocument::removeSimulation)
+        .function("hasTasks", &libOpenCOR::SedDocument::hasTasks)
+        .function("tasks", &libOpenCOR::SedDocument::tasks)
+        .function("addTask", &libOpenCOR::SedDocument::addTask)
+        .function("removeTask", &libOpenCOR::SedDocument::removeTask)
         .function("run", &libOpenCOR::SedDocument::run);
 
     // SedModel API.
@@ -60,6 +65,13 @@ void sedApi()
     // SedOutput API.
 
     emscripten::class_<libOpenCOR::SedOutput, emscripten::base<libOpenCOR::SedBase>>("SedOutput");
+
+    // SedRepeatedTask API.
+
+/*---GRY---
+    emscripten::class_<libOpenCOR::SedRepeatedTask, emscripten::base<libOpenCOR::SedAbstractTask>>("SedRepeatedTask")
+        .smart_ptr_constructor("SedRepeatedTask", &libOpenCOR::SedRepeatedTask::create);
+*/
 
     // SedSimulation API.
 
@@ -98,4 +110,9 @@ void sedApi()
     // SedStyle API.
 
     emscripten::class_<libOpenCOR::SedStyle, emscripten::base<libOpenCOR::SedBase>>("SedStyle");
+
+    // SedTask API.
+
+    emscripten::class_<libOpenCOR::SedTask, emscripten::base<libOpenCOR::SedAbstractTask>>("SedTask")
+        .smart_ptr_constructor("SedTask", &libOpenCOR::SedTask::create);
 }

@@ -67,6 +67,9 @@ public:
     bool addSimulation(const SedSimulationPtr &pSimulation);
     bool removeSimulation(const SedSimulationPtr &pSimulation);
 
+    bool addTask(const SedAbstractTaskPtr &pTask);
+    bool removeTask(const SedAbstractTaskPtr &pTask);
+
     bool run();
 };
 

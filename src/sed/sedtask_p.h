@@ -16,13 +16,13 @@ limitations under the License.
 
 #pragma once
 
-#include "sedbase_p.h"
+#include "sedabstracttask_p.h"
 
-#include "libopencor/sedabstracttask.h"
+#include "libopencor/sedtask.h"
 
 namespace libOpenCOR {
 
-class SedAbstractTask::Impl: public SedBase::Impl
+class SedTask::Impl: public SedAbstractTask::Impl
 {
 public:
     explicit Impl(const SedDocumentPtr &pDocument);

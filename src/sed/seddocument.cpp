@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "file_p.h"
+#include "sedabstracttask_p.h"
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
@@ -25,6 +26,7 @@ limitations under the License.
 #include "libopencor/sedmodel.h"
 #include "libopencor/sedsimulationsteadystate.h"
 #include "libopencor/sedsimulationuniformtimecourse.h"
+#include "libopencor/sedtask.h"
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverkinsol.h"
 
@@ -150,6 +152,10 @@ void SedDocument::Impl::initialiseFromCellmlFile(const FilePtr &pFile, const Sed
         simulation->setOdeSolver(SolverCvode::create());
         simulation->setNlaSolver(SolverKinsol::create());
     }
+
+    // Add a task.
+
+    addTask(SedTask::create(pOwner));
 }
 
 bool SedDocument::Impl::isValid()
@@ -269,7 +275,6 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     // Add the tasks, if any, to our SED-ML document.
 
-    /*---GRY---
     if (!mTasks.empty()) {
         auto *sedListOfTasks = xmlNewNode(nullptr, toConstXmlCharPtr("listOfTasks"));
 
@@ -279,7 +284,6 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
         xmlAddChild(node, sedListOfTasks);
     }
-    */
 
     // Add the data generators, if any, to our SED-ML document.
 
@@ -403,6 +407,41 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
     if (simulation != mSimulations.end()) {
         mIds.erase((*simulation)->pimpl()->mId);
         mSimulations.erase(simulation);
+
+        return true;
+    }
+
+    return false;
+}
+
+bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
+{
+    if (pTask == nullptr) {
+        return false;
+    }
+
+    auto task = std::find_if(mTasks.cbegin(), mTasks.cend(), [&](const auto &t) {
+        return t == pTask;
+    });
+
+    if (task != mTasks.end()) {
+        return false;
+    }
+
+    mTasks.push_back(pTask);
+
+    return true;
+}
+
+bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
+{
+    auto task = std::find_if(mTasks.cbegin(), mTasks.cend(), [&](const auto &t) {
+        return t == pTask;
+    });
+
+    if (task != mTasks.end()) {
+        mIds.erase((*task)->pimpl()->mId);
+        mTasks.erase(task);
 
         return true;
     }
@@ -647,6 +686,26 @@ bool SedDocument::addSimulation(const SedSimulationPtr &pSimulation)
 bool SedDocument::removeSimulation(const SedSimulationPtr &pSimulation)
 {
     return pimpl()->removeSimulation(pSimulation);
+}
+
+bool SedDocument::hasTasks() const
+{
+    return !pimpl()->mTasks.empty();
+}
+
+SedAbstractTaskPtrVector SedDocument::tasks() const
+{
+    return pimpl()->mTasks;
+}
+
+bool SedDocument::addTask(const SedAbstractTaskPtr &pTask)
+{
+    return pimpl()->addTask(pTask);
+}
+
+bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
+{
+    return pimpl()->removeTask(pTask);
 }
 
 bool SedDocument::run()

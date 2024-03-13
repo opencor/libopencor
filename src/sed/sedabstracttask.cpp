@@ -15,29 +15,31 @@ limitations under the License.
 */
 
 #include "sedabstracttask_p.h"
+#include "seddocument_p.h"
 
 namespace libOpenCOR {
 
-/*---GRY---
-SedAbstractTask::SedAbstractTask()
-    : SedBase(new Impl {})
+static constexpr auto ID_PREFIX = "task";
+
+SedAbstractTask::Impl::Impl(const SedDocumentPtr &pDocument)
+    : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
 {
 }
-*/
 
-/*---GRY---
-SedAbstractTask::~SedAbstractTask()
+void SedAbstractTask::Impl::serialise(xmlNodePtr pNode) const
 {
-    delete pimpl();
+    SedBase::Impl::serialise(pNode);
 }
-*/
 
-/*---GRY---
+SedAbstractTask::SedAbstractTask(Impl *pPimpl)
+    : SedBase(pPimpl)
+{
+}
+
 SedAbstractTask::Impl *SedAbstractTask::pimpl()
 {
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
-*/
 
 /*---GRY---
 const SedAbstractTask::Impl *SedAbstractTask::pimpl() const
