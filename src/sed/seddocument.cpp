@@ -273,11 +273,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mTasks.empty()) {
         auto *sedListOfTasks = xmlNewNode(nullptr, toConstXmlCharPtr("listOfTasks"));
 
-        xmlAddChild(node, sedListOfTasks);
-
         for (const auto &task : mTasks) {
-            (void)task;
+            task->pimpl()->serialise(sedListOfTasks);
         }
+
+        xmlAddChild(node, sedListOfTasks);
     }
     */
 
@@ -287,11 +287,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mDataGenerators.empty()) {
         auto *sedListOfDataGenerators = xmlNewNode(nullptr, toConstXmlCharPtr("listOfDataGenerators"));
 
-        xmlAddChild(node, sedListOfDataGenerators);
-
         for (const auto &dataGenerator : mDataGenerators) {
-            (void)dataGenerator;
+            dataGenerator->pimpl()->serialise(sedListOfDataGenerators);
         }
+
+        xmlAddChild(node, sedListOfDataGenerators);
     }
     */
 
@@ -302,7 +302,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
         auto *sedListOfOutputs = xmlNewNode(nullptr, toConstXmlCharPtr("listOfOutputs"));
 
         for (const auto &output : mOutputs) {
-            (void)output;
+            output->pimpl()->serialise(sedListOfOutputs);
         }
 
         xmlAddChild(node, sedListOfOutputs);
@@ -315,11 +315,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     if (!mStyles.empty()) {
         auto *sedListOfStyles = xmlNewNode(nullptr, toConstXmlCharPtr("listOfStyles"));
 
-        xmlAddChild(node, sedListOfStyles);
-
         for (const auto &style : mStyles) {
-            (void)style;
+            style->pimpl()->serialise(sedListOfStyles);
         }
+
+        xmlAddChild(node, sedListOfStyles);
     }
     */
 
