@@ -48,7 +48,7 @@ def test_cellml_file():
 def test_sedml_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            Issue.Type.Message,
             "A simulation experiment description cannot (currently) be created using a SED-ML file.",
         ],
     ]
@@ -62,7 +62,7 @@ def test_sedml_file():
 def test_combine_archive():
     expected_issues = [
         [
-            Issue.Type.Error,
+            Issue.Type.Message,
             "A simulation experiment description cannot (currently) be created using a COMBINE archive.",
         ],
     ]

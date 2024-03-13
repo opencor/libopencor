@@ -50,7 +50,7 @@ TEST(BasicSedDocumentTest, cellmlFile)
 TEST(BasicSedDocumentTest, sedmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot (currently) be created using a SED-ML file."},
+        {libOpenCOR::Issue::Type::MESSAGE, "A simulation experiment description cannot (currently) be created using a SED-ML file."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
@@ -62,7 +62,7 @@ TEST(BasicSedDocumentTest, sedmlFile)
 TEST(BasicSedDocumentTest, combineArchive)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot (currently) be created using a COMBINE archive."},
+        {libOpenCOR::Issue::Type::MESSAGE, "A simulation experiment description cannot (currently) be created using a COMBINE archive."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
