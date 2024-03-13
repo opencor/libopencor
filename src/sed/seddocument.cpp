@@ -98,17 +98,17 @@ void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &p
 
         break;
     case File::Type::SEDML_FILE:
-        addError("A simulation experiment description cannot (currently) be created using a SED-ML file.");
+        addMessage("A simulation experiment description cannot (currently) be created using a SED-ML file.");
 
         break;
 #ifdef __EMSCRIPTEN__
     default: // File::Type::COMBINE_ARCHIVE.
-        addError("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
+        addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
 
         break;
 #else
     case File::Type::COMBINE_ARCHIVE:
-        addError("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
+        addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
 
         break;
     default: // File::Type::IRRETRIEVABLE_FILE.

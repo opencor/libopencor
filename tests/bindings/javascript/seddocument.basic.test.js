@@ -89,7 +89,7 @@ describe("SedDocument basic tests", () => {
 
     expectIssues(sed, [
       [
-        libopencor.Issue.Type.ERROR,
+        libopencor.Issue.Type.MESSAGE,
         "A simulation experiment description cannot (currently) be created using a SED-ML file.",
       ],
     ]);
@@ -105,7 +105,7 @@ describe("SedDocument basic tests", () => {
 
     expectIssues(sed, [
       [
-        libopencor.Issue.Type.ERROR,
+        libopencor.Issue.Type.MESSAGE,
         "A simulation experiment description cannot (currently) be created using a COMBINE archive.",
       ],
     ]);

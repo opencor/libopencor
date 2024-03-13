@@ -102,12 +102,10 @@ void Logger::Impl::addWarning(const std::string &pDescription)
 }
 */
 
-/*---GRY---
 void Logger::Impl::addMessage(const std::string &pDescription)
 {
     addIssue(pDescription, Issue::Type::MESSAGE);
 }
-*/
 
 void Logger::Impl::removeAllIssues()
 {
