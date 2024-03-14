@@ -21,13 +21,12 @@ limitations under the License.
 namespace libOpenCOR {
 
 /**
- * @brief The SedSimulationOneStep class.
+ * @brief The SedOneStep class.
  *
- * The SedSimulationOneStep class is used to describe a one step simulation in the context of a simulation experiment
- * description.
+ * The SedOneStep class is used to describe a one step simulation in the context of a simulation experiment description.
  */
 
-class LIBOPENCOR_EXPORT SedSimulationOneStep: public SedSimulation
+class LIBOPENCOR_EXPORT SedOneStep: public SedSimulation
 {
     friend class SedDocument;
 
@@ -36,30 +35,30 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SedSimulationOneStep() override; /**< Destructor, @private. */
+    ~SedOneStep() override; /**< Destructor, @private. */
 
-    SedSimulationOneStep(const SedSimulationOneStep &pOther) = delete; /**< No copy constructor allowed, @private. */
-    SedSimulationOneStep(SedSimulationOneStep &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+    SedOneStep(const SedOneStep &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SedOneStep(SedOneStep &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
-    SedSimulationOneStep &operator=(const SedSimulationOneStep &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
-    SedSimulationOneStep &operator=(SedSimulationOneStep &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+    SedOneStep &operator=(const SedOneStep &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SedOneStep &operator=(SedOneStep &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Create a @ref SedSimulationOneStep object.
+     * @brief Create a @ref SedOneStep object.
      *
-     * Factory method to create a @ref SedSimulationOneStep object:
+     * Factory method to create a @ref SedOneStep object:
      *
      * ```
-     * auto sedDocument = libOpenCOR::SedDocument::create();
-     * auto sedSimulationOneStep = libOpenCOR::SedSimulationOneStep::create(sedDocument);
+     * auto sed = libOpenCOR::SedDocument::create();
+     * auto simulation = libOpenCOR::SedOneStep::create(sed);
      * ```
      *
-     * @param pDocument The @ref SedDocument object to which the @ref SedSimulationOneStep object is to belong.
+     * @param pDocument The @ref SedDocument object to which the @ref SedOneStep object is to belong.
      *
-     * @return A smart pointer to a @ref SedSimulationOneStep object.
+     * @return A smart pointer to a @ref SedOneStep object.
      */
 
-    static SedSimulationOneStepPtr create(const SedDocumentPtr &pDocument);
+    static SedOneStepPtr create(const SedDocumentPtr &pDocument);
 
     /**
      * @brief Get the step used by this simulation.
@@ -84,7 +83,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedSimulationOneStep(const SedDocumentPtr &pDocument); /**< Constructor @private. */
+    explicit SedOneStep(const SedDocumentPtr &pDocument); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

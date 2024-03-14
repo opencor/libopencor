@@ -21,13 +21,13 @@ limitations under the License.
 namespace libOpenCOR {
 
 /**
- * @brief The SedSimulationUniformTimeCourse class.
+ * @brief The SedUniformTimeCourse class.
  *
- * The SedSimulationUniformTimeCourse class is used to describe a uniform time course simulation in the context of a
- * simulation experiment description.
+ * The SedUniformTimeCourse class is used to describe a uniform time course simulation in the context of a simulation
+ * experiment description.
  */
 
-class LIBOPENCOR_EXPORT SedSimulationUniformTimeCourse: public SedSimulation
+class LIBOPENCOR_EXPORT SedUniformTimeCourse: public SedSimulation
 {
     friend class SedDocument;
 
@@ -36,31 +36,31 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SedSimulationUniformTimeCourse() override; /**< Destructor, @private. */
+    ~SedUniformTimeCourse() override; /**< Destructor, @private. */
 
-    SedSimulationUniformTimeCourse(const SedSimulationUniformTimeCourse &pOther) = delete; /**< No copy constructor allowed, @private. */
-    SedSimulationUniformTimeCourse(SedSimulationUniformTimeCourse &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+    SedUniformTimeCourse(const SedUniformTimeCourse &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SedUniformTimeCourse(SedUniformTimeCourse &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
-    SedSimulationUniformTimeCourse &operator=(const SedSimulationUniformTimeCourse &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
-    SedSimulationUniformTimeCourse &operator=(SedSimulationUniformTimeCourse &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+    SedUniformTimeCourse &operator=(const SedUniformTimeCourse &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SedUniformTimeCourse &operator=(SedUniformTimeCourse &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Create a @ref SedSimulationUniformTimeCourse object.
+     * @brief Create a @ref SedUniformTimeCourse object.
      *
-     * Factory method to create a @ref SedSimulationUniformTimeCourse object:
+     * Factory method to create a @ref SedUniformTimeCourse object:
      *
      * ```
-     * auto sedDocument = libOpenCOR::SedDocument::create();
-     * auto sedSimulationUniformTimeCourse = libOpenCOR::SedSimulationUniformTimeCourse::create(sedDocument);
+     * auto sed = libOpenCOR::SedDocument::create();
+     * auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
      * ```
      *
-     * @param pDocument The @ref SedDocument object to which the @ref SedSimulationUniformTimeCourse object is to
+     * @param pDocument The @ref SedDocument object to which the @ref SedUniformTimeCourse object is to
      * belong.
      *
-     * @return A smart pointer to a @ref SedSimulationUniformTimeCourse object.
+     * @return A smart pointer to a @ref SedUniformTimeCourse object.
      */
 
-    static SedSimulationUniformTimeCoursePtr create(const SedDocumentPtr &pDocument);
+    static SedUniformTimeCoursePtr create(const SedDocumentPtr &pDocument);
 
     /**
      * @brief Get the initial time used by this simulation.
@@ -151,7 +151,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedSimulationUniformTimeCourse(const SedDocumentPtr &pDocument); /**< Constructor @private. */
+    explicit SedUniformTimeCourse(const SedDocumentPtr &pDocument); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

@@ -460,7 +460,7 @@ TEST(ModelTypeSedDocumentTest, oneStepSimulation)
 
     sed->removeSimulation(sed->simulations()[0]);
 
-    auto simulation = libOpenCOR::SedSimulationOneStep::create(sed);
+    auto simulation = libOpenCOR::SedOneStep::create(sed);
 
     sed->addSimulation(simulation);
 

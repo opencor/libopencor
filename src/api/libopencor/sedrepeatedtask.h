@@ -47,8 +47,8 @@ public:
      * Factory method to create a @ref SedRepeatedTask object:
      *
      * ```
-     * auto sedDocument = libOpenCOR::SedDocument::create();
-     * auto sedTask = libOpenCOR::SedRepeatedTask::create(sedDocument);
+     * auto sed = libOpenCOR::SedDocument::create();
+     * auto task = libOpenCOR::SedRepeatedTask::create(sed);
      * ```
      *
      * @param pDocument The @ref SedDocument object to which the @ref SedRepeatedTask object is to belong.

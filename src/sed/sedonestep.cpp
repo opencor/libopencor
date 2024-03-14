@@ -15,17 +15,17 @@ limitations under the License.
 */
 
 #include "seddocument_p.h"
-#include "sedsimulationonestep_p.h"
+#include "sedonestep_p.h"
 #include "utils.h"
 
 namespace libOpenCOR {
 
-SedSimulationOneStep::Impl::Impl(const SedDocumentPtr &pDocument)
+SedOneStep::Impl::Impl(const SedDocumentPtr &pDocument)
     : SedSimulation::Impl(pDocument)
 {
 }
 
-void SedSimulationOneStep::Impl::serialise(xmlNodePtr pNode) const
+void SedOneStep::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("oneStep"));
 
@@ -36,37 +36,37 @@ void SedSimulationOneStep::Impl::serialise(xmlNodePtr pNode) const
     xmlAddChild(pNode, node);
 }
 
-SedSimulationOneStep::SedSimulationOneStep(const SedDocumentPtr &pDocument)
+SedOneStep::SedOneStep(const SedDocumentPtr &pDocument)
     : SedSimulation(new Impl(pDocument))
 {
 }
 
-SedSimulationOneStep::~SedSimulationOneStep()
+SedOneStep::~SedOneStep()
 {
     delete pimpl();
 }
 
-SedSimulationOneStep::Impl *SedSimulationOneStep::pimpl()
+SedOneStep::Impl *SedOneStep::pimpl()
 {
-    return reinterpret_cast<SedSimulationOneStep::Impl *>(SedSimulation::pimpl());
+    return reinterpret_cast<SedOneStep::Impl *>(SedSimulation::pimpl());
 }
 
-const SedSimulationOneStep::Impl *SedSimulationOneStep::pimpl() const
+const SedOneStep::Impl *SedOneStep::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
 }
 
-SedSimulationOneStepPtr SedSimulationOneStep::create(const SedDocumentPtr &pDocument)
+SedOneStepPtr SedOneStep::create(const SedDocumentPtr &pDocument)
 {
-    return SedSimulationOneStepPtr {new SedSimulationOneStep {pDocument}};
+    return SedOneStepPtr {new SedOneStep {pDocument}};
 }
 
-double SedSimulationOneStep::step() const
+double SedOneStep::step() const
 {
     return pimpl()->mStep;
 }
 
-void SedSimulationOneStep::setStep(double pStep)
+void SedOneStep::setStep(double pStep)
 {
     pimpl()->mStep = pStep;
 }

@@ -52,6 +52,9 @@ using SedDocumentPtr = std::shared_ptr<SedDocument>; /**< Type definition for th
 class SedModel;
 using SedModelPtr = std::shared_ptr<SedModel>; /**< Type definition for the shared @ref SedModel pointer. */
 
+class SedOneStep;
+using SedOneStepPtr = std::shared_ptr<SedOneStep>; /**< Type definition for the shared @ref SedOneStep pointer. */
+
 class SedOutput;
 using SedOutputPtr = std::shared_ptr<SedOutput>; /**< Type definition for the shared @ref SedOutput pointer. */
 
@@ -61,20 +64,17 @@ using SedRepeatedTaskPtr = std::shared_ptr<SedRepeatedTask>; /**< Type definitio
 class SedSimulation;
 using SedSimulationPtr = std::shared_ptr<SedSimulation>; /**< Type definition for the shared @ref SedSimulation pointer. */
 
-class SedSimulationOneStep;
-using SedSimulationOneStepPtr = std::shared_ptr<SedSimulationOneStep>; /**< Type definition for the shared @ref SedSimulationOneStep pointer. */
-
-class SedSimulationSteadyState;
-using SedSimulationSteadyStatePtr = std::shared_ptr<SedSimulationSteadyState>; /**< Type definition for the shared @ref SedSimulationSteadyState pointer. */
-
-class SedSimulationUniformTimeCourse;
-using SedSimulationUniformTimeCoursePtr = std::shared_ptr<SedSimulationUniformTimeCourse>; /**< Type definition for the shared @ref SedSimulationUniformTimeCourse pointer. */
+class SedSteadyState;
+using SedSteadyStatePtr = std::shared_ptr<SedSteadyState>; /**< Type definition for the shared @ref SedSteadyState pointer. */
 
 class SedStyle;
 using SedStylePtr = std::shared_ptr<SedStyle>; /**< Type definition for the shared @ref SedStyle pointer. */
 
 class SedTask;
 using SedTaskPtr = std::shared_ptr<SedTask>; /**< Type definition for the shared @ref SedTask pointer. */
+
+class SedUniformTimeCourse;
+using SedUniformTimeCoursePtr = std::shared_ptr<SedUniformTimeCourse>; /**< Type definition for the shared @ref SedUniformTimeCourse pointer. */
 
 class Solver;
 using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */

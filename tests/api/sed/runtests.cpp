@@ -106,7 +106,7 @@ TEST(RunSedDocumentTest, odeModel)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSimulationUniformTimeCourse>(sed->simulations()[0]);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
 
     static const auto NOK_MAXIMUM_NUMBER_OF_STEPS = 10;
 
@@ -147,7 +147,7 @@ TEST(RunSedDocumentTest, nlaModel)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSimulationSteadyState>(sed->simulations()[0]);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
     auto kinsol = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
@@ -184,7 +184,7 @@ TEST(RunSedDocumentTest, daeModel)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSimulationUniformTimeCourse>(sed->simulations()[0]);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
     auto kinsol = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);

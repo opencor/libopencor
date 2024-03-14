@@ -16,7 +16,7 @@
 from libopencor import (
     File,
     SedDocument,
-    SedSimulationOneStep,
+    SedOneStep,
     SolverCvode,
     SolverForwardEuler,
     SolverKinsol,
@@ -501,7 +501,7 @@ def test_one_step_simulation():
 
     sed.remove_simulation(sed.simulations[0])
 
-    simulation = SedSimulationOneStep(sed)
+    simulation = SedOneStep(sed)
 
     sed.add_simulation(simulation)
 
