@@ -20,6 +20,22 @@ import * as utils from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("SedDocument coverage tests", () => {
+  function sedTaskExpectedSerialisation(withProperties) {
+    return (
+      `<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfTasks>
+    <task id="task1"` +
+      (withProperties
+        ? ` modelReference="model1" simulationReference="simulation1"`
+        : ``) +
+      `/>
+  </listOfTasks>
+</sedML>
+`
+    );
+  }
+
   test("Initialise", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
@@ -78,12 +94,28 @@ describe("SedDocument coverage tests", () => {
     expect(sed.hasTasks()).toBe(false);
     expect(sed.addTask(null)).toBe(false);
 
-    const task = new libopencor.SedTask(sed);
+    const file = new libopencor.File(utils.LOCAL_FILE);
+    const model = new libopencor.SedModel(sed, file);
+    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+    const task = new libopencor.SedTask(sed, model, simulation);
+
+    expect(task.model()).not.toBe(null);
+    expect(task.simulation()).not.toBe(null);
 
     expect(sed.addTask(task)).toBe(true);
 
     expect(sed.tasks().size()).toBe(1);
     expect(sed.tasks().get(0)).toStrictEqual(task);
+
+    expect(sed.serialise()).toBe(sedTaskExpectedSerialisation(true));
+
+    task.setModel(null);
+    task.setSimulation(null);
+
+    expect(task.model()).toBe(null);
+    expect(task.simulation()).toBe(null);
+
+    expect(sed.serialise()).toBe(sedTaskExpectedSerialisation(false));
 
     expect(sed.addTask(task)).toBe(false);
     expect(sed.removeTask(task)).toBe(true);

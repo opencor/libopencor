@@ -75,6 +75,22 @@ TEST(CoverageSedDocumentTest, sedDocumentSimulations)
     EXPECT_FALSE(sed->removeSimulation(nullptr));
 }
 
+namespace {
+
+std::string sedTaskExpectedSerialisation(bool pWithProperties)
+{
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+           "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+           "  <listOfTasks>\n"
+           "    <task id=\"task1\""
+           + std::string(pWithProperties ? R"( modelReference="model1" simulationReference="simulation1")" : "")
+           + "/>\n"
+             "  </listOfTasks>\n"
+             "</sedML>\n";
+}
+
+} // namespace
+
 TEST(CoverageSedDocumentTest, sedDocumentTasks)
 {
     auto sed = libOpenCOR::SedDocument::create();
@@ -82,12 +98,28 @@ TEST(CoverageSedDocumentTest, sedDocumentTasks)
     EXPECT_FALSE(sed->hasTasks());
     EXPECT_FALSE(sed->addTask(nullptr));
 
-    auto task = libOpenCOR::SedTask::create(sed);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto model = libOpenCOR::SedModel::create(sed, file);
+    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+    auto task = libOpenCOR::SedTask::create(sed, model, simulation);
+
+    EXPECT_NE(task->model(), nullptr);
+    EXPECT_NE(task->simulation(), nullptr);
 
     EXPECT_TRUE(sed->addTask(task));
 
     EXPECT_EQ(sed->tasks().size(), 1);
     EXPECT_EQ(sed->tasks()[0], task);
+
+    EXPECT_EQ(sed->serialise(), sedTaskExpectedSerialisation(true));
+
+    task->setModel(nullptr);
+    task->setSimulation(nullptr);
+
+    EXPECT_EQ(task->model(), nullptr);
+    EXPECT_EQ(task->simulation(), nullptr);
+
+    EXPECT_EQ(sed->serialise(), sedTaskExpectedSerialisation(false));
 
     EXPECT_FALSE(sed->addTask(task));
     EXPECT_TRUE(sed->removeTask(task));

@@ -79,18 +79,50 @@ def test_simulations():
     assert sed.remove_simulation(None) == False
 
 
+def sed_task_expected_serialisation(with_properties):
+    properties = (
+        ' modelReference="model1" simulationReference="simulation1"'
+        if with_properties
+        else ""
+    )
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfTasks>
+    <task id="task1"{properties}/>
+  </listOfTasks>
+</sedML>
+"""
+
+
 def test_tasks():
     sed = SedDocument()
 
     assert sed.has_tasks == False
     assert sed.add_task(None) == False
 
-    task = SedTask(sed)
+    file = File(utils.LOCAL_FILE)
+    model = SedModel(sed, file)
+    simulation = SedSimulationUniformTimeCourse(sed)
+    task = SedTask(sed, model, simulation)
+
+    assert task.model != None
+    assert task.simulation != None
 
     assert sed.add_task(task) == True
 
     assert len(sed.tasks) == 1
     assert sed.tasks[0] == task
+
+    assert sed.serialise() == sed_task_expected_serialisation(True)
+
+    task.model = None
+    task.simulation = None
+
+    assert task.model == None
+    assert task.simulation == None
+
+    assert sed.serialise() == sed_task_expected_serialisation(False)
 
     assert sed.add_task(task) == False
     assert sed.remove_task(task) == True
