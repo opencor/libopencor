@@ -114,5 +114,9 @@ void sedApi()
     // SedTask API.
 
     emscripten::class_<libOpenCOR::SedTask, emscripten::base<libOpenCOR::SedAbstractTask>>("SedTask")
-        .smart_ptr_constructor("SedTask", &libOpenCOR::SedTask::create);
+        .smart_ptr_constructor("SedTask", &libOpenCOR::SedTask::create)
+        .function("model", &libOpenCOR::SedTask::model)
+        .function("setModel", &libOpenCOR::SedTask::setModel)
+        .function("simulation", &libOpenCOR::SedTask::simulation)
+        .function("setSimulation", &libOpenCOR::SedTask::setSimulation);
 }

@@ -41,11 +41,9 @@ SedAbstractTask::Impl *SedAbstractTask::pimpl()
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
 
-/*---GRY---
 const SedAbstractTask::Impl *SedAbstractTask::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
-*/
 
 } // namespace libOpenCOR

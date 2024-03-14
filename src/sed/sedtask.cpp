@@ -49,16 +49,34 @@ SedTask::Impl *SedTask::pimpl()
     return reinterpret_cast<SedTask::Impl *>(SedAbstractTask::pimpl());
 }
 
-/*---GRY---
 const SedTask::Impl *SedTask::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedAbstractTask::pimpl());
 }
-*/
 
 SedTaskPtr SedTask::create(const SedDocumentPtr &pDocument)
 {
     return SedTaskPtr {new SedTask {pDocument}};
+}
+
+SedModelPtr SedTask::model() const
+{
+    return pimpl()->mModel;
+}
+
+void SedTask::setModel(const SedModelPtr &pModel)
+{
+    pimpl()->mModel = pModel;
+}
+
+SedSimulationPtr SedTask::simulation() const
+{
+    return pimpl()->mSimulation;
+}
+
+void SedTask::setSimulation(const SedSimulationPtr &pSimulation)
+{
+    pimpl()->mSimulation = pSimulation;
 }
 
 } // namespace libOpenCOR

@@ -25,6 +25,9 @@ namespace libOpenCOR {
 class SedTask::Impl: public SedAbstractTask::Impl
 {
 public:
+    SedModelPtr mModel;
+    SedSimulationPtr mSimulation;
+
     explicit Impl(const SedDocumentPtr &pDocument);
 
     void serialise(xmlNodePtr pNode) const override;

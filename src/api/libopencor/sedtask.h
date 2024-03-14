@@ -58,6 +58,46 @@ public:
 
     static SedTaskPtr create(const SedDocumentPtr &pDocument);
 
+    /**
+     * @brief Get the model used by this task.
+     *
+     * Return the model used by this task.
+     *
+     * @return The model, as a @ref SedModelPtr, used by this task.
+     */
+
+    SedModelPtr model() const;
+
+    /**
+     * @brief Set the model to be used by this task.
+     *
+     * Set the model to be used by this task.
+     *
+     * @param pModel The model to be used by this task.
+     */
+
+    void setModel(const SedModelPtr &pModel);
+
+    /**
+     * @brief Get the simulation used by this task.
+     *
+     * Return the simulation used by this task.
+     *
+     * @return The simulation, as a @ref SedSimulationPtr, used by this task.
+     */
+
+    SedSimulationPtr simulation() const;
+
+    /**
+     * @brief Set the simulation to be used by this task.
+     *
+     * Set the simulation to be used by this task.
+     *
+     * @param pSimulation The simulation to be used by this task.
+     */
+
+    void setSimulation(const SedSimulationPtr &pSimulation);
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
