@@ -346,6 +346,11 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     return res.str();
 }
 
+bool SedDocument::Impl::hasModels() const
+{
+    return !mModels.empty();
+}
+
 bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
 {
     if (pModel == nullptr) {
@@ -381,6 +386,11 @@ bool SedDocument::Impl::removeModel(const SedModelPtr &pModel)
     return false;
 }
 
+bool SedDocument::Impl::hasSimulations() const
+{
+    return !mSimulations.empty();
+}
+
 bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
 {
     if (pSimulation == nullptr) {
@@ -414,6 +424,11 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
     }
 
     return false;
+}
+
+bool SedDocument::Impl::hasTasks() const
+{
+    return !mTasks.empty();
 }
 
 bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
@@ -652,7 +667,7 @@ std::string SedDocument::serialise(const std::string &pBasePath) const
 
 bool SedDocument::hasModels() const
 {
-    return !pimpl()->mModels.empty();
+    return pimpl()->hasModels();
 }
 
 SedModelPtrVector SedDocument::models() const
@@ -672,7 +687,7 @@ bool SedDocument::removeModel(const SedModelPtr &pModel)
 
 bool SedDocument::hasSimulations() const
 {
-    return !pimpl()->mSimulations.empty();
+    return pimpl()->hasSimulations();
 }
 
 SedSimulationPtrVector SedDocument::simulations() const
@@ -692,7 +707,7 @@ bool SedDocument::removeSimulation(const SedSimulationPtr &pSimulation)
 
 bool SedDocument::hasTasks() const
 {
-    return !pimpl()->mTasks.empty();
+    return pimpl()->hasTasks();
 }
 
 SedAbstractTaskPtrVector SedDocument::tasks() const
