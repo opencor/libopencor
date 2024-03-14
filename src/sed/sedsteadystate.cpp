@@ -15,17 +15,17 @@ limitations under the License.
 */
 
 #include "seddocument_p.h"
-#include "sedsimulationsteadystate_p.h"
+#include "sedsteadystate_p.h"
 #include "utils.h"
 
 namespace libOpenCOR {
 
-SedSimulationSteadyState::Impl::Impl(const SedDocumentPtr &pDocument)
+SedSteadyState::Impl::Impl(const SedDocumentPtr &pDocument)
     : SedSimulation::Impl(pDocument)
 {
 }
 
-void SedSimulationSteadyState::Impl::serialise(xmlNodePtr pNode) const
+void SedSteadyState::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("steadyState"));
 
@@ -34,31 +34,31 @@ void SedSimulationSteadyState::Impl::serialise(xmlNodePtr pNode) const
     xmlAddChild(pNode, node);
 }
 
-SedSimulationSteadyState::SedSimulationSteadyState(const SedDocumentPtr &pDocument)
+SedSteadyState::SedSteadyState(const SedDocumentPtr &pDocument)
     : SedSimulation(new Impl(pDocument))
 {
 }
 
-SedSimulationSteadyState::~SedSimulationSteadyState()
+SedSteadyState::~SedSteadyState()
 {
     delete pimpl();
 }
 
-SedSimulationSteadyState::Impl *SedSimulationSteadyState::pimpl()
+SedSteadyState::Impl *SedSteadyState::pimpl()
 {
-    return reinterpret_cast<SedSimulationSteadyState::Impl *>(SedSimulation::pimpl());
+    return reinterpret_cast<SedSteadyState::Impl *>(SedSimulation::pimpl());
 }
 
 /*---GRY---
-const SedSimulationSteadyState::Impl *SedSimulationSteadyState::pimpl() const
+const SedSteadyState::Impl *SedSteadyState::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
 }
 */
 
-SedSimulationSteadyStatePtr SedSimulationSteadyState::create(const SedDocumentPtr &pDocument)
+SedSteadyStatePtr SedSteadyState::create(const SedDocumentPtr &pDocument)
 {
-    return SedSimulationSteadyStatePtr {new SedSimulationSteadyState {pDocument}};
+    return SedSteadyStatePtr {new SedSteadyState {pDocument}};
 }
 
 } // namespace libOpenCOR

@@ -73,7 +73,7 @@ describe("SedDocument coverage tests", () => {
     expect(sed.hasSimulations()).toBe(false);
     expect(sed.addSimulation(null)).toBe(false);
 
-    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+    const simulation = new libopencor.SedUniformTimeCourse(sed);
 
     expect(sed.addSimulation(simulation)).toBe(true);
 
@@ -96,7 +96,7 @@ describe("SedDocument coverage tests", () => {
 
     const file = new libopencor.File(utils.LOCAL_FILE);
     const model = new libopencor.SedModel(sed, file);
-    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+    const simulation = new libopencor.SedUniformTimeCourse(sed);
     const task = new libopencor.SedTask(sed, model, simulation);
 
     expect(task.model()).not.toBe(null);
@@ -127,7 +127,7 @@ describe("SedDocument coverage tests", () => {
 
   test("ODE solver", () => {
     const sed = new libopencor.SedDocument();
-    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+    const simulation = new libopencor.SedUniformTimeCourse(sed);
 
     expect(simulation.odeSolver()).toBe(null);
 
@@ -144,7 +144,7 @@ describe("SedDocument coverage tests", () => {
 
   test("NLA solver", () => {
     const sed = new libopencor.SedDocument();
-    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+    const simulation = new libopencor.SedUniformTimeCourse(sed);
 
     expect(simulation.nlaSolver()).toBe(null);
 
@@ -159,10 +159,10 @@ describe("SedDocument coverage tests", () => {
     expect(simulation.nlaSolver()).toBe(null);
   });
 
-  test("SedSimulationOneStep", () => {
+  test("SedOneStep", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument(file);
-    const simulation = new libopencor.SedSimulationOneStep(sed);
+    const simulation = new libopencor.SedOneStep(sed);
 
     expect(simulation.step()).toBe(1.0);
 
@@ -171,10 +171,10 @@ describe("SedDocument coverage tests", () => {
     expect(simulation.step()).toBe(1.23);
   });
 
-  test("SedSimulationUniformTimeCourse", () => {
+  test("SedUniformTimeCourse", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
     const sed = new libopencor.SedDocument(file);
-    const simulation = new libopencor.SedSimulationUniformTimeCourse(sed);
+    const simulation = new libopencor.SedUniformTimeCourse(sed);
 
     expect(simulation.initialTime()).toBe(0.0);
     expect(simulation.outputStartTime()).toBe(0.0);

@@ -82,30 +82,30 @@ void sedApi()
         .function("nlaSolver", &libOpenCOR::SedSimulation::nlaSolver)
         .function("setNlaSolver", &libOpenCOR::SedSimulation::setNlaSolver);
 
-    // SedSimulationOneStep API.
+    // SedOneStep API.
 
-    emscripten::class_<libOpenCOR::SedSimulationOneStep, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationOneStep")
-        .smart_ptr_constructor("SedSimulationOneStep", &libOpenCOR::SedSimulationOneStep::create)
-        .function("step", &libOpenCOR::SedSimulationOneStep::step)
-        .function("setStep", &libOpenCOR::SedSimulationOneStep::setStep);
+    emscripten::class_<libOpenCOR::SedOneStep, emscripten::base<libOpenCOR::SedSimulation>>("SedOneStep")
+        .smart_ptr_constructor("SedOneStep", &libOpenCOR::SedOneStep::create)
+        .function("step", &libOpenCOR::SedOneStep::step)
+        .function("setStep", &libOpenCOR::SedOneStep::setStep);
 
-    // SedSimulationSteadyState API.
+    // SedSteadyState API.
 
-    emscripten::class_<libOpenCOR::SedSimulationSteadyState, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationSteadyState")
-        .smart_ptr_constructor("SedSimulationSteadyState", &libOpenCOR::SedSimulationSteadyState::create);
+    emscripten::class_<libOpenCOR::SedSteadyState, emscripten::base<libOpenCOR::SedSimulation>>("SedSteadyState")
+        .smart_ptr_constructor("SedSteadyState", &libOpenCOR::SedSteadyState::create);
 
-    // SedSimulationUniformTimeCourse API.
+    // SedUniformTimeCourse API.
 
-    emscripten::class_<libOpenCOR::SedSimulationUniformTimeCourse, emscripten::base<libOpenCOR::SedSimulation>>("SedSimulationUniformTimeCourse")
-        .smart_ptr_constructor("SedSimulationUniformTimeCourse", &libOpenCOR::SedSimulationUniformTimeCourse::create)
-        .function("initialTime", &libOpenCOR::SedSimulationUniformTimeCourse::initialTime)
-        .function("setInitialTime", &libOpenCOR::SedSimulationUniformTimeCourse::setInitialTime)
-        .function("outputStartTime", &libOpenCOR::SedSimulationUniformTimeCourse::outputStartTime)
-        .function("setOutputStartTime", &libOpenCOR::SedSimulationUniformTimeCourse::setOutputStartTime)
-        .function("outputEndTime", &libOpenCOR::SedSimulationUniformTimeCourse::outputEndTime)
-        .function("setOutputEndTime", &libOpenCOR::SedSimulationUniformTimeCourse::setOutputEndTime)
-        .function("numberOfSteps", &libOpenCOR::SedSimulationUniformTimeCourse::numberOfSteps)
-        .function("setNumberOfSteps", &libOpenCOR::SedSimulationUniformTimeCourse::setNumberOfSteps);
+    emscripten::class_<libOpenCOR::SedUniformTimeCourse, emscripten::base<libOpenCOR::SedSimulation>>("SedUniformTimeCourse")
+        .smart_ptr_constructor("SedUniformTimeCourse", &libOpenCOR::SedUniformTimeCourse::create)
+        .function("initialTime", &libOpenCOR::SedUniformTimeCourse::initialTime)
+        .function("setInitialTime", &libOpenCOR::SedUniformTimeCourse::setInitialTime)
+        .function("outputStartTime", &libOpenCOR::SedUniformTimeCourse::outputStartTime)
+        .function("setOutputStartTime", &libOpenCOR::SedUniformTimeCourse::setOutputStartTime)
+        .function("outputEndTime", &libOpenCOR::SedUniformTimeCourse::outputEndTime)
+        .function("setOutputEndTime", &libOpenCOR::SedUniformTimeCourse::setOutputEndTime)
+        .function("numberOfSteps", &libOpenCOR::SedUniformTimeCourse::numberOfSteps)
+        .function("setNumberOfSteps", &libOpenCOR::SedUniformTimeCourse::setNumberOfSteps);
 
     // SedStyle API.
 

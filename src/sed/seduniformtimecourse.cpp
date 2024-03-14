@@ -15,17 +15,17 @@ limitations under the License.
 */
 
 #include "seddocument_p.h"
-#include "sedsimulationuniformtimecourse_p.h"
+#include "seduniformtimecourse_p.h"
 #include "utils.h"
 
 namespace libOpenCOR {
 
-SedSimulationUniformTimeCourse::Impl::Impl(const SedDocumentPtr &pDocument)
+SedUniformTimeCourse::Impl::Impl(const SedDocumentPtr &pDocument)
     : SedSimulation::Impl(pDocument)
 {
 }
 
-void SedSimulationUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
+void SedUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("uniformTimeCourse"));
 
@@ -39,67 +39,67 @@ void SedSimulationUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
     xmlAddChild(pNode, node);
 }
 
-SedSimulationUniformTimeCourse::SedSimulationUniformTimeCourse(const SedDocumentPtr &pDocument)
+SedUniformTimeCourse::SedUniformTimeCourse(const SedDocumentPtr &pDocument)
     : SedSimulation(new Impl(pDocument))
 {
 }
 
-SedSimulationUniformTimeCourse::~SedSimulationUniformTimeCourse()
+SedUniformTimeCourse::~SedUniformTimeCourse()
 {
     delete pimpl();
 }
 
-SedSimulationUniformTimeCourse::Impl *SedSimulationUniformTimeCourse::pimpl()
+SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl()
 {
-    return reinterpret_cast<SedSimulationUniformTimeCourse::Impl *>(SedSimulation::pimpl());
+    return reinterpret_cast<SedUniformTimeCourse::Impl *>(SedSimulation::pimpl());
 }
 
-const SedSimulationUniformTimeCourse::Impl *SedSimulationUniformTimeCourse::pimpl() const
+const SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
 }
 
-SedSimulationUniformTimeCoursePtr SedSimulationUniformTimeCourse::create(const SedDocumentPtr &pDocument)
+SedUniformTimeCoursePtr SedUniformTimeCourse::create(const SedDocumentPtr &pDocument)
 {
-    return SedSimulationUniformTimeCoursePtr {new SedSimulationUniformTimeCourse {pDocument}};
+    return SedUniformTimeCoursePtr {new SedUniformTimeCourse {pDocument}};
 }
 
-double SedSimulationUniformTimeCourse::initialTime() const
+double SedUniformTimeCourse::initialTime() const
 {
     return pimpl()->mInitialTime;
 }
 
-void SedSimulationUniformTimeCourse::setInitialTime(double pInitialTime)
+void SedUniformTimeCourse::setInitialTime(double pInitialTime)
 {
     pimpl()->mInitialTime = pInitialTime;
 }
 
-double SedSimulationUniformTimeCourse::outputStartTime() const
+double SedUniformTimeCourse::outputStartTime() const
 {
     return pimpl()->mOutputStartTime;
 }
 
-void SedSimulationUniformTimeCourse::setOutputStartTime(double pOutputStartTime)
+void SedUniformTimeCourse::setOutputStartTime(double pOutputStartTime)
 {
     pimpl()->mOutputStartTime = pOutputStartTime;
 }
 
-double SedSimulationUniformTimeCourse::outputEndTime() const
+double SedUniformTimeCourse::outputEndTime() const
 {
     return pimpl()->mOutputEndTime;
 }
 
-void SedSimulationUniformTimeCourse::setOutputEndTime(double pOutputEndTime)
+void SedUniformTimeCourse::setOutputEndTime(double pOutputEndTime)
 {
     pimpl()->mOutputEndTime = pOutputEndTime;
 }
 
-int SedSimulationUniformTimeCourse::numberOfSteps() const
+int SedUniformTimeCourse::numberOfSteps() const
 {
     return pimpl()->mNumberOfSteps;
 }
 
-void SedSimulationUniformTimeCourse::setNumberOfSteps(int pNumberOfSteps)
+void SedUniformTimeCourse::setNumberOfSteps(int pNumberOfSteps)
 {
     pimpl()->mNumberOfSteps = pNumberOfSteps;
 }

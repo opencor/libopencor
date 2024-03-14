@@ -85,28 +85,28 @@ void sedApi(py::module_ &m)
     sedSimulation.def_property("ode_solver", &libOpenCOR::SedSimulation::odeSolver, &libOpenCOR::SedSimulation::setOdeSolver, "The ODE solver for the SedSimulation object.")
         .def_property("nla_solver", &libOpenCOR::SedSimulation::nlaSolver, &libOpenCOR::SedSimulation::setNlaSolver, "The NLA solver for the SedSimulation object.");
 
-    // SedSimulationOneStep API.
+    // SedOneStep API.
 
-    py::class_<libOpenCOR::SedSimulationOneStep, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationOneStepPtr> sedSimulationOneStep(m, "SedSimulationOneStep");
+    py::class_<libOpenCOR::SedOneStep, libOpenCOR::SedSimulation, libOpenCOR::SedOneStepPtr> sedOneStep(m, "SedOneStep");
 
-    sedSimulationOneStep.def(py::init(&libOpenCOR::SedSimulationOneStep::create), "Create a SedSimulationOneStep object.", py::arg("document"))
-        .def_property("step", &libOpenCOR::SedSimulationOneStep::step, &libOpenCOR::SedSimulationOneStep::setStep, "The step of the SedSimulationOneStep object.");
+    sedOneStep.def(py::init(&libOpenCOR::SedOneStep::create), "Create a SedOneStep object.", py::arg("document"))
+        .def_property("step", &libOpenCOR::SedOneStep::step, &libOpenCOR::SedOneStep::setStep, "The step of the SedOneStep object.");
 
-    // SedSimulationSteadyState API.
+    // SedSteadyState API.
 
-    py::class_<libOpenCOR::SedSimulationSteadyState, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationSteadyStatePtr> sedSimulationSteadyState(m, "SedSimulationSteadyState");
+    py::class_<libOpenCOR::SedSteadyState, libOpenCOR::SedSimulation, libOpenCOR::SedSteadyStatePtr> sedSteadyState(m, "SedSteadyState");
 
-    sedSimulationSteadyState.def(py::init(&libOpenCOR::SedSimulationSteadyState::create), "Create a SedSimulationSteadyState object.", py::arg("document"));
+    sedSteadyState.def(py::init(&libOpenCOR::SedSteadyState::create), "Create a SedSteadyState object.", py::arg("document"));
 
-    // SedSimulationUniformTimeCourse API.
+    // SedUniformTimeCourse API.
 
-    py::class_<libOpenCOR::SedSimulationUniformTimeCourse, libOpenCOR::SedSimulation, libOpenCOR::SedSimulationUniformTimeCoursePtr> sedSimulationUniformTimeCourse(m, "SedSimulationUniformTimeCourse");
+    py::class_<libOpenCOR::SedUniformTimeCourse, libOpenCOR::SedSimulation, libOpenCOR::SedUniformTimeCoursePtr> sedUniformTimeCourse(m, "SedUniformTimeCourse");
 
-    sedSimulationUniformTimeCourse.def(py::init(&libOpenCOR::SedSimulationUniformTimeCourse::create), "Create a SedSimulationUniformTimeCourse object.", py::arg("document"))
-        .def_property("initial_time", &libOpenCOR::SedSimulationUniformTimeCourse::initialTime, &libOpenCOR::SedSimulationUniformTimeCourse::setInitialTime, "The initial time of the SedSimulationUniformTimeCourse object.")
-        .def_property("output_start_time", &libOpenCOR::SedSimulationUniformTimeCourse::outputStartTime, &libOpenCOR::SedSimulationUniformTimeCourse::setOutputStartTime, "The output start time of the SedSimulationUniformTimeCourse object.")
-        .def_property("output_end_time", &libOpenCOR::SedSimulationUniformTimeCourse::outputEndTime, &libOpenCOR::SedSimulationUniformTimeCourse::setOutputEndTime, "The output end time of the SedSimulationUniformTimeCourse object.")
-        .def_property("number_of_steps", &libOpenCOR::SedSimulationUniformTimeCourse::numberOfSteps, &libOpenCOR::SedSimulationUniformTimeCourse::setNumberOfSteps, "The number of steps of the SedSimulationUniformTimeCourse object.");
+    sedUniformTimeCourse.def(py::init(&libOpenCOR::SedUniformTimeCourse::create), "Create a SedUniformTimeCourse object.", py::arg("document"))
+        .def_property("initial_time", &libOpenCOR::SedUniformTimeCourse::initialTime, &libOpenCOR::SedUniformTimeCourse::setInitialTime, "The initial time of the SedUniformTimeCourse object.")
+        .def_property("output_start_time", &libOpenCOR::SedUniformTimeCourse::outputStartTime, &libOpenCOR::SedUniformTimeCourse::setOutputStartTime, "The output start time of the SedUniformTimeCourse object.")
+        .def_property("output_end_time", &libOpenCOR::SedUniformTimeCourse::outputEndTime, &libOpenCOR::SedUniformTimeCourse::setOutputEndTime, "The output end time of the SedUniformTimeCourse object.")
+        .def_property("number_of_steps", &libOpenCOR::SedUniformTimeCourse::numberOfSteps, &libOpenCOR::SedUniformTimeCourse::setNumberOfSteps, "The number of steps of the SedUniformTimeCourse object.");
 
     // SedStyle API.
 

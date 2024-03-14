@@ -24,9 +24,9 @@ limitations under the License.
 
 #include "libopencor/file.h"
 #include "libopencor/sedmodel.h"
-#include "libopencor/sedsimulationsteadystate.h"
-#include "libopencor/sedsimulationuniformtimecourse.h"
+#include "libopencor/sedsteadystate.h"
 #include "libopencor/sedtask.h"
+#include "libopencor/seduniformtimecourse.h"
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverkinsol.h"
 
@@ -36,7 +36,7 @@ limitations under the License.
 #include <libxml/tree.h>
 
 //---GRY--- THE BELOW HEADER SHOULD BE REMOVED ONCE WE CAN RUN A SIMULATION THROUGH A TASK OBJECT.
-#include "sedsimulationuniformtimecourse_p.h"
+#include "seduniformtimecourse_p.h"
 
 namespace libOpenCOR {
 
@@ -137,9 +137,9 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
 
     if ((cellmlFileType == libcellml::AnalyserModel::Type::ODE)
         || cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
-        simulation = SedSimulationUniformTimeCourse::create(pOwner);
+        simulation = SedUniformTimeCourse::create(pOwner);
     } else {
-        simulation = SedSimulationSteadyState::create(pOwner);
+        simulation = SedSteadyState::create(pOwner);
     }
 
     addSimulation(simulation);
@@ -539,7 +539,7 @@ bool SedDocument::Impl::run()
     printHeader(analyserModel);
 #    endif
 
-    auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedSimulationUniformTimeCourse>(simulation) : nullptr;
+    auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(simulation) : nullptr;
     auto *uniformTimeCourseSimulationPimpl = differentialModel ? uniformTimeCourseSimulation->pimpl() : nullptr;
 
     if (differentialModel) {
@@ -557,7 +557,7 @@ bool SedDocument::Impl::run()
 
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
-    auto nlaSolver = differentialModel ? uniformTimeCourseSimulation->nlaSolver() : dynamic_pointer_cast<SedSimulationSteadyState>(simulation)->nlaSolver();
+    auto nlaSolver = differentialModel ? uniformTimeCourseSimulation->nlaSolver() : dynamic_pointer_cast<SedSteadyState>(simulation)->nlaSolver();
 
     if (differentialModel) {
         // Initialise the ODE solver.

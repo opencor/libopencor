@@ -573,7 +573,7 @@ describe("SedDocument serialise tests", () => {
 
     sed.removeSimulation(sed.simulations().get(0));
 
-    const simulation = new libopencor.SedSimulationOneStep(sed);
+    const simulation = new libopencor.SedOneStep(sed);
 
     sed.addSimulation(simulation);
 

@@ -60,7 +60,7 @@ TEST(CoverageSedDocumentTest, sedDocumentSimulations)
     EXPECT_FALSE(sed->hasSimulations());
     EXPECT_FALSE(sed->addSimulation(nullptr));
 
-    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+    auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
 
     EXPECT_TRUE(sed->addSimulation(simulation));
 
@@ -100,7 +100,7 @@ TEST(CoverageSedDocumentTest, sedDocumentTasks)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto model = libOpenCOR::SedModel::create(sed, file);
-    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+    auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
     auto task = libOpenCOR::SedTask::create(sed, model, simulation);
 
     EXPECT_NE(task->model(), nullptr);
@@ -132,7 +132,7 @@ TEST(CoverageSedDocumentTest, sedDocumentTasks)
 TEST(CoverageSedDocumentTest, sedSimulationOdeSolver)
 {
     auto sed = libOpenCOR::SedDocument::create();
-    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+    auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
 
     EXPECT_EQ(simulation->odeSolver(), nullptr);
 
@@ -150,7 +150,7 @@ TEST(CoverageSedDocumentTest, sedSimulationOdeSolver)
 TEST(CoverageSedDocumentTest, sedSimulationNlaSolver)
 {
     auto sed = libOpenCOR::SedDocument::create();
-    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+    auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
 
     EXPECT_EQ(simulation->nlaSolver(), nullptr);
 
@@ -165,11 +165,11 @@ TEST(CoverageSedDocumentTest, sedSimulationNlaSolver)
     EXPECT_EQ(simulation->nlaSolver(), nullptr);
 }
 
-TEST(CoverageSedDocumentTest, sedSimulationOneStep)
+TEST(CoverageSedDocumentTest, sedOneStep)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = libOpenCOR::SedSimulationOneStep::create(sed);
+    auto simulation = libOpenCOR::SedOneStep::create(sed);
 
     static const auto STEP = 1.23;
 
@@ -180,7 +180,7 @@ TEST(CoverageSedDocumentTest, sedSimulationOneStep)
     EXPECT_EQ(simulation->step(), STEP);
 }
 
-TEST(CoverageSedDocumentTest, sedSimulationUniformTimeCourse)
+TEST(CoverageSedDocumentTest, sedUniformTimeCourse)
 {
     static const auto INITIAL_TIME = 1.23;
     static const auto OUTPUT_START_TIME = 4.56;
@@ -189,7 +189,7 @@ TEST(CoverageSedDocumentTest, sedSimulationUniformTimeCourse)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = libOpenCOR::SedSimulationUniformTimeCourse::create(sed);
+    auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
 
     EXPECT_EQ(simulation->initialTime(), 0.0);
     EXPECT_EQ(simulation->outputStartTime(), 0.0);

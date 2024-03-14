@@ -17,9 +17,9 @@ from libopencor import (
     File,
     SedDocument,
     SedModel,
-    SedSimulationOneStep,
-    SedSimulationUniformTimeCourse,
+    SedOneStep,
     SedTask,
+    SedUniformTimeCourse,
     SolverCvode,
     SolverKinsol,
 )
@@ -64,7 +64,7 @@ def test_simulations():
     assert sed.has_simulations == False
     assert sed.add_simulation(None) == False
 
-    simulation = SedSimulationUniformTimeCourse(sed)
+    simulation = SedUniformTimeCourse(sed)
 
     assert sed.add_simulation(simulation) == True
 
@@ -103,7 +103,7 @@ def test_tasks():
 
     file = File(utils.LOCAL_FILE)
     model = SedModel(sed, file)
-    simulation = SedSimulationUniformTimeCourse(sed)
+    simulation = SedUniformTimeCourse(sed)
     task = SedTask(sed, model, simulation)
 
     assert task.model != None
@@ -134,7 +134,7 @@ def test_tasks():
 
 def test_ode_solver():
     sed = SedDocument()
-    simulation = SedSimulationUniformTimeCourse(sed)
+    simulation = SedUniformTimeCourse(sed)
 
     assert simulation.ode_solver == None
 
@@ -151,7 +151,7 @@ def test_ode_solver():
 
 def test_nla_solver():
     sed = SedDocument()
-    simulation = SedSimulationUniformTimeCourse(sed)
+    simulation = SedUniformTimeCourse(sed)
 
     assert simulation.nla_solver == None
 
@@ -169,7 +169,7 @@ def test_nla_solver():
 def test_sed_simulation_one_step():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     sed = SedDocument(file)
-    simulation = SedSimulationOneStep(sed)
+    simulation = SedOneStep(sed)
 
     assert simulation.step == 1.0
 
@@ -181,7 +181,7 @@ def test_sed_simulation_one_step():
 def test_sed_simulation_uniform_time_course():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     sed = SedDocument(file)
-    simulation = SedSimulationUniformTimeCourse(sed)
+    simulation = SedUniformTimeCourse(sed)
 
     assert simulation.initial_time == 0.0
     assert simulation.output_start_time == 0.0

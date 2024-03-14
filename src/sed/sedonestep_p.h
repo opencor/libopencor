@@ -18,13 +18,15 @@ limitations under the License.
 
 #include "sedsimulation_p.h"
 
-#include "libopencor/sedsimulationsteadystate.h"
+#include "libopencor/sedonestep.h"
 
 namespace libOpenCOR {
 
-class SedSimulationSteadyState::Impl: public SedSimulation::Impl
+class SedOneStep::Impl: public SedSimulation::Impl
 {
 public:
+    double mStep = 1.0;
+
     explicit Impl(const SedDocumentPtr &pDocument);
 
     void serialise(xmlNodePtr pNode) const override;
