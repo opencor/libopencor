@@ -73,6 +73,8 @@ public:
     bool addTask(const SedAbstractTaskPtr &pTask);
     bool removeTask(const SedAbstractTaskPtr &pTask);
 
+    bool runTask(const SedTaskPtr &pTask);
+    bool runTask(const SedAbstractTaskPtr &pTask);
     bool run();
 };
 

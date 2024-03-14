@@ -28,6 +28,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedTask: public SedAbstractTask
 {
+    friend class SedDocument;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.

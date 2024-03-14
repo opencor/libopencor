@@ -15,6 +15,7 @@
 
 from libopencor import (
     File,
+    Issue,
     SedDocument,
     SedModel,
     SedOneStep,
@@ -24,6 +25,7 @@ from libopencor import (
     SolverKinsol,
 )
 import utils
+from utils import assert_issues
 
 
 def test_initialise():
@@ -123,6 +125,20 @@ def test_tasks():
     assert task.simulation == None
 
     assert sed.serialise() == sed_task_expected_serialisation(False)
+
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "Task 'task1' requires a model.",
+        ],
+        [
+            Issue.Type.Error,
+            "Task 'task1' requires a simulation.",
+        ],
+    ]
+
+    assert sed.run() == False
+    assert_issues(sed, expected_issues)
 
     assert sed.add_task(task) == False
     assert sed.remove_task(task) == True

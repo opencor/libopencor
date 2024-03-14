@@ -117,6 +117,12 @@ describe("SedDocument coverage tests", () => {
 
     expect(sed.serialise()).toBe(sedTaskExpectedSerialisation(false));
 
+    expect(sed.run()).toBe(false);
+    expectIssues(sed, [
+      [libopencor.Issue.Type.ERROR, "Task 'task1' requires a model."],
+      [libopencor.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
+    ]);
+
     expect(sed.addTask(task)).toBe(false);
     expect(sed.removeTask(task)).toBe(true);
 
