@@ -80,7 +80,6 @@ describe("SedDocument run tests", () => {
     const sed = new libopencor.SedDocument();
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -100,7 +99,6 @@ describe("SedDocument run tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
       [
@@ -121,7 +119,6 @@ describe("SedDocument run tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
       [
@@ -142,7 +139,6 @@ describe("SedDocument run tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
       [
@@ -163,7 +159,6 @@ describe("SedDocument run tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -206,7 +201,6 @@ describe("SedDocument run tests", () => {
     cvode.setMaximumNumberOfSteps(10);
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -230,7 +224,6 @@ describe("SedDocument run tests", () => {
     sed.simulations().get(0).setOdeSolver(null);
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -259,7 +252,6 @@ describe("SedDocument run tests", () => {
     sed.simulations().get(0).setNlaSolver(null);
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -290,7 +282,6 @@ describe("SedDocument run tests", () => {
     simulation.setNlaSolver(null);
 
     expect(sed.run()).toBe(false);
-
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
