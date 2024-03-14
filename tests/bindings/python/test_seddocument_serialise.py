@@ -77,7 +77,7 @@ def cvode_expected_serialisation(source, parameters=None):
     </uniformTimeCourse>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 """
@@ -108,7 +108,7 @@ def kinsol_expected_serialisation(parameters=None):
     </steadyState>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 """
@@ -220,7 +220,7 @@ def test_dae_model():
     </uniformTimeCourse>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 """
@@ -250,7 +250,7 @@ def test_nla_model():
     </steadyState>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 """
@@ -271,7 +271,7 @@ def test_algebraic_model():
     <steadyState id="simulation1"/>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 """
@@ -298,7 +298,7 @@ def test_fixed_step_ode_solver():
     </uniformTimeCourse>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 """
@@ -491,7 +491,7 @@ def test_one_step_simulation():
     <oneStep id="simulation1" step="1"/>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 """

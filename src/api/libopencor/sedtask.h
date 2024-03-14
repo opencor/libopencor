@@ -52,11 +52,14 @@ public:
      * ```
      *
      * @param pDocument The @ref SedDocument object to which the @ref SedTask object is to belong.
+     * @param pModel The model to be used by this task.
+     * @param pSimulation The simulation to be used by this task.
      *
      * @return A smart pointer to a @ref SedTask object.
      */
 
-    static SedTaskPtr create(const SedDocumentPtr &pDocument);
+    static SedTaskPtr create(const SedDocumentPtr &pDocument, const SedModelPtr &pModel,
+                             const SedSimulationPtr &pSimulation);
 
     /**
      * @brief Get the model used by this task.
@@ -101,7 +104,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedTask(const SedDocumentPtr &pDocument); /**< Constructor @private. */
+    explicit SedTask(const SedDocumentPtr &pDocument, const SedModelPtr &pModel, const SedSimulationPtr &pSimulation); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

@@ -96,7 +96,7 @@ describe("SedDocument serialise tests", () => {
     </uniformTimeCourse>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 `
@@ -127,7 +127,7 @@ describe("SedDocument serialise tests", () => {
     </steadyState>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 `
@@ -252,7 +252,7 @@ describe("SedDocument serialise tests", () => {
     </uniformTimeCourse>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 `;
@@ -288,7 +288,7 @@ describe("SedDocument serialise tests", () => {
     <steadyState id="simulation1"/>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 `;
@@ -321,7 +321,7 @@ describe("SedDocument serialise tests", () => {
     </uniformTimeCourse>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 `;
@@ -560,7 +560,7 @@ describe("SedDocument serialise tests", () => {
     <oneStep id="simulation1" step="1"/>
   </listOfSimulations>
   <listOfTasks>
-    <task id="task1"/>
+    <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
 `;
