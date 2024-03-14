@@ -116,7 +116,7 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedTask, libOpenCOR::SedAbstractTask, libOpenCOR::SedTaskPtr> sedTask(m, "SedTask");
 
-    sedTask.def(py::init(&libOpenCOR::SedTask::create), "Create a SedTask object.", py::arg("document"))
+    sedTask.def(py::init(&libOpenCOR::SedTask::create), "Create a SedTask object.", py::arg("document"), py::arg("model"), py::arg("simulation"))
         .def_property("model", &libOpenCOR::SedTask::model, &libOpenCOR::SedTask::setModel, "The model of the SedTask object.")
         .def_property("simulation", &libOpenCOR::SedTask::simulation, &libOpenCOR::SedTask::setSimulation, "The simulation of the SedTask object.");
 }

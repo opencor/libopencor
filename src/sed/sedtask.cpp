@@ -15,13 +15,18 @@ limitations under the License.
 */
 
 #include "seddocument_p.h"
+#include "sedmodel_p.h"
+#include "sedsimulation_p.h"
 #include "sedtask_p.h"
 #include "utils.h"
 
 namespace libOpenCOR {
 
-SedTask::Impl::Impl(const SedDocumentPtr &pDocument)
+SedTask::Impl::Impl(const SedDocumentPtr &pDocument, const SedModelPtr &pModel,
+                    const SedSimulationPtr &pSimulation)
     : SedAbstractTask::Impl(pDocument)
+    , mModel(pModel)
+    , mSimulation(pSimulation)
 {
 }
 
@@ -31,11 +36,19 @@ void SedTask::Impl::serialise(xmlNodePtr pNode) const
 
     SedAbstractTask::Impl::serialise(node);
 
+    if (mModel != nullptr) {
+        xmlNewProp(node, toConstXmlCharPtr("modelReference"), toConstXmlCharPtr(mModel->pimpl()->mId));
+    }
+
+    if (mSimulation != nullptr) {
+        xmlNewProp(node, toConstXmlCharPtr("simulationReference"), toConstXmlCharPtr(mSimulation->pimpl()->mId));
+    }
+
     xmlAddChild(pNode, node);
 }
 
-SedTask::SedTask(const SedDocumentPtr &pDocument)
-    : SedAbstractTask(new Impl(pDocument))
+SedTask::SedTask(const SedDocumentPtr &pDocument, const SedModelPtr &pModel, const SedSimulationPtr &pSimulation)
+    : SedAbstractTask(new Impl(pDocument, pModel, pSimulation))
 {
 }
 
@@ -54,9 +67,10 @@ const SedTask::Impl *SedTask::pimpl() const
     return reinterpret_cast<const Impl *>(SedAbstractTask::pimpl());
 }
 
-SedTaskPtr SedTask::create(const SedDocumentPtr &pDocument)
+SedTaskPtr SedTask::create(const SedDocumentPtr &pDocument, const SedModelPtr &pModel,
+                           const SedSimulationPtr &pSimulation)
 {
-    return SedTaskPtr {new SedTask {pDocument}};
+    return SedTaskPtr {new SedTask {pDocument, pModel, pSimulation}};
 }
 
 SedModelPtr SedTask::model() const

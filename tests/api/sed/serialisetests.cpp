@@ -76,7 +76,7 @@ std::string cvodeExpectedSerialisation(const std::string &pSource, const std::ma
              "    </uniformTimeCourse>\n"
              "  </listOfSimulations>\n"
              "  <listOfTasks>\n"
-             "    <task id=\"task1\"/>\n"
+             "    <task id=\"task1\" modelReference=\"model1\" simulationReference=\"simulation1\"/>\n"
              "  </listOfTasks>\n"
              "</sedML>\n";
 }
@@ -107,7 +107,7 @@ std::string kinsolExpectedSerialisation(const std::map<std::string, std::string>
              "    </steadyState>\n"
              "  </listOfSimulations>\n"
              "  <listOfTasks>\n"
-             "    <task id=\"task1\"/>\n"
+             "    <task id=\"task1\" modelReference=\"model1\" simulationReference=\"simulation1\"/>\n"
              "  </listOfTasks>\n"
              "</sedML>\n";
 }
@@ -215,7 +215,7 @@ TEST(ModelTypeSedDocumentTest, daeModel)
                                                      "    </uniformTimeCourse>\n"
                                                      "  </listOfSimulations>\n"
                                                      "  <listOfTasks>\n"
-                                                     "    <task id=\"task1\"/>\n"
+                                                     "    <task id=\"task1\" modelReference=\"model1\" simulationReference=\"simulation1\"/>\n"
                                                      "  </listOfTasks>\n"
                                                      "</sedML>\n";
 
@@ -244,7 +244,7 @@ TEST(ModelTypeSedDocumentTest, algebraicModel)
                                                      "    <steadyState id=\"simulation1\"/>\n"
                                                      "  </listOfSimulations>\n"
                                                      "  <listOfTasks>\n"
-                                                     "    <task id=\"task1\"/>\n"
+                                                     "    <task id=\"task1\" modelReference=\"model1\" simulationReference=\"simulation1\"/>\n"
                                                      "  </listOfTasks>\n"
                                                      "</sedML>\n";
 
@@ -271,7 +271,7 @@ TEST(SerialiseSedDocumentTest, fixedStepOdeSolver)
                                                      "    </uniformTimeCourse>\n"
                                                      "  </listOfSimulations>\n"
                                                      "  <listOfTasks>\n"
-                                                     "    <task id=\"task1\"/>\n"
+                                                     "    <task id=\"task1\" modelReference=\"model1\" simulationReference=\"simulation1\"/>\n"
                                                      "  </listOfTasks>\n"
                                                      "</sedML>\n";
 
@@ -451,7 +451,7 @@ TEST(ModelTypeSedDocumentTest, oneStepSimulation)
                                                      "    <oneStep id=\"simulation1\" step=\"1\"/>\n"
                                                      "  </listOfSimulations>\n"
                                                      "  <listOfTasks>\n"
-                                                     "    <task id=\"task1\"/>\n"
+                                                     "    <task id=\"task1\" modelReference=\"model1\" simulationReference=\"simulation1\"/>\n"
                                                      "  </listOfTasks>\n"
                                                      "</sedML>\n";
 

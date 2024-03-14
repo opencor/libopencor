@@ -28,7 +28,7 @@ public:
     SedModelPtr mModel;
     SedSimulationPtr mSimulation;
 
-    explicit Impl(const SedDocumentPtr &pDocument);
+    explicit Impl(const SedDocumentPtr &pDocument, const SedModelPtr &pModel, const SedSimulationPtr &pSimulation);
 
     void serialise(xmlNodePtr pNode) const override;
 };

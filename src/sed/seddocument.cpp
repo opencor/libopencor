@@ -125,7 +125,9 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
 {
     // Add a model for the given CellML file.
 
-    addModel(SedModel::create(pOwner, pFile));
+    auto model = SedModel::create(pOwner, pFile);
+
+    addModel(model);
 
     // Add a uniform time course simulation in the case of an ODE/DAE model while a steady state simulation in the case
     // of an algebraic or NLA model.
@@ -155,7 +157,7 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
 
     // Add a task.
 
-    addTask(SedTask::create(pOwner));
+    addTask(SedTask::create(pOwner, model, simulation));
 }
 
 bool SedDocument::Impl::isValid()
