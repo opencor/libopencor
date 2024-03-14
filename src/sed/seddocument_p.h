@@ -61,12 +61,15 @@ public:
 
     std::string serialise(const std::string &pBasePath = {}) const;
 
+    bool hasModels() const;
     bool addModel(const SedModelPtr &pModel);
     bool removeModel(const SedModelPtr &pModel);
 
+    bool hasSimulations() const;
     bool addSimulation(const SedSimulationPtr &pSimulation);
     bool removeSimulation(const SedSimulationPtr &pSimulation);
 
+    bool hasTasks() const;
     bool addTask(const SedAbstractTaskPtr &pTask);
     bool removeTask(const SedAbstractTaskPtr &pTask);
 
