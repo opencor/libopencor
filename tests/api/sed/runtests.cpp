@@ -23,8 +23,7 @@ limitations under the License.
 TEST(RunSedDocumentTest, noFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description must (currently) have exactly one model."},
-        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description must (currently) have exactly one simulation."},
+        {libOpenCOR::Issue::Type::ERROR, "The simulation experiment description does not contain any tasks to run."},
     };
 
     auto sed = libOpenCOR::SedDocument::create();
