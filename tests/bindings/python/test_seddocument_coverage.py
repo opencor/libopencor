@@ -43,7 +43,7 @@ def test_models():
     assert sed.add_model(None) == False
 
     file = File(utils.LOCAL_FILE)
-    model = SedModel(file, sed)
+    model = SedModel(sed, file)
 
     assert sed.add_model(model) == True
 

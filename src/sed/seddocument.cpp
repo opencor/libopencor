@@ -80,7 +80,7 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
     return res;
 }
 
-void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner)
+void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
     // Make sure that we were given a file.
 
@@ -96,7 +96,7 @@ void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &p
 
         break;
     case File::Type::CELLML_FILE:
-        initialiseFromCellmlFile(pFile, pOwner);
+        initialiseFromCellmlFile(pOwner, pFile);
 
         break;
     case File::Type::SEDML_FILE:
@@ -121,11 +121,11 @@ void SedDocument::Impl::initialise(const FilePtr &pFile, const SedDocumentPtr &p
     }
 }
 
-void SedDocument::Impl::initialiseFromCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner)
+void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
     // Add a model for the given CellML file.
 
-    addModel(SedModel::create(pFile, pOwner));
+    addModel(SedModel::create(pOwner, pFile));
 
     // Add a uniform time course simulation in the case of an ODE/DAE model while a steady state simulation in the case
     // of an algebraic or NLA model.
@@ -626,7 +626,7 @@ SedDocumentPtr SedDocument::create(const FilePtr &pFile)
 {
     auto res = SedDocumentPtr {new SedDocument {}};
 
-    res->pimpl()->initialise(pFile, res);
+    res->pimpl()->initialise(res, pFile);
 
     return res;
 }

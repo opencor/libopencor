@@ -36,7 +36,7 @@ describe("SedDocument coverage tests", () => {
     expect(sed.addModel(null)).toBe(false);
 
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const model = new libopencor.SedModel(file, sed);
+    const model = new libopencor.SedModel(sed, file);
 
     expect(sed.addModel(model)).toBe(true);
 
