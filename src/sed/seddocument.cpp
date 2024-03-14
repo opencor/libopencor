@@ -162,18 +162,6 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
 
 bool SedDocument::Impl::isValid()
 {
-    // Make sure that we have one model and one simulation.
-    //---GRY--- THESE "ERRORS" WILL NEED TO BE REMOVED SINCE SED-ML ALLOWS A DOCUMENT TO HAVE NO MODELS AND/OR NO
-    //          SIMULATIONS.
-
-    if (mModels.size() != 1) {
-        addError("A simulation experiment description must (currently) have exactly one model.");
-    }
-
-    if (mSimulations.size() != 1) {
-        addError("A simulation experiment description must (currently) have exactly one simulation.");
-    }
-
     // Make sure that all our models are valid.
 
     for (const auto &model : mModels) {
@@ -508,6 +496,16 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
 bool SedDocument::Impl::run()
 {
     removeAllIssues();
+
+    // Check whether there are some outputs that should be generated or, failing that, whether there are some tasks that
+    // could be run.
+    //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
+
+    if (!hasTasks()) {
+        addError("The simulation experiment description does not contain any tasks to run.");
+
+        return false;
+    }
 
     // Make sure that we are valid.
 

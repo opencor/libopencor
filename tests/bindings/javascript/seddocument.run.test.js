@@ -84,11 +84,7 @@ describe("SedDocument run tests", () => {
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
-        "A simulation experiment description must (currently) have exactly one model.",
-      ],
-      [
-        libopencor.Issue.Type.ERROR,
-        "A simulation experiment description must (currently) have exactly one simulation.",
+        "The simulation experiment description does not contain any tasks to run.",
       ],
     ]);
   });

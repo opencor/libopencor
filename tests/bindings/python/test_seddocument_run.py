@@ -22,11 +22,7 @@ def test_no_file():
     expected_issues = [
         [
             Issue.Type.Error,
-            "A simulation experiment description must (currently) have exactly one model.",
-        ],
-        [
-            Issue.Type.Error,
-            "A simulation experiment description must (currently) have exactly one simulation.",
+            "The simulation experiment description does not contain any tasks to run.",
         ],
     ]
 
