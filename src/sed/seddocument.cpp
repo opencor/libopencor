@@ -19,6 +19,7 @@ limitations under the License.
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
+#include "sedtask_p.h"
 
 #include "utils.h"
 
@@ -493,6 +494,51 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
 } // namespace
 #endif
 
+bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
+{
+    auto taskPimpl = pTask->pimpl();
+
+    taskPimpl->removeAllIssues();
+
+    // Make sure that we have both a model and a simulation.
+
+    auto model = pTask->model();
+
+    if (model == nullptr) {
+        taskPimpl->addError("Task '" + taskPimpl->mId + "' requires a model.");
+    }
+
+    auto simulation = pTask->simulation();
+
+    if (simulation == nullptr) {
+        taskPimpl->addError("Task '" + taskPimpl->mId + "' requires a simulation.");
+    }
+
+    if (taskPimpl->hasIssues()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool SedDocument::Impl::runTask(const SedAbstractTaskPtr &pTask)
+{
+    // Run the given task.
+    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT THAT pTask IS INDEED A SedTask.
+
+    auto task = dynamic_pointer_cast<SedTask>(pTask);
+
+    ASSERT_NE(task, nullptr);
+
+    if (!runTask(task)) {
+        addIssues(task);
+
+        return false;
+    }
+
+    return true;
+}
+
 bool SedDocument::Impl::run()
 {
     removeAllIssues();
@@ -501,11 +547,25 @@ bool SedDocument::Impl::run()
     // could be run.
     //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
 
-    if (!hasTasks()) {
+    if (hasTasks()) {
+        bool res = true;
+
+        for (const auto &task : mTasks) {
+            if (!runTask(task)) {
+                res = false;
+            }
+        }
+
+        if (!res) {
+            return false;
+        }
+    } else {
         addError("The simulation experiment description does not contain any tasks to run.");
 
         return false;
     }
+
+    return true;
 
     // Make sure that we are valid.
 

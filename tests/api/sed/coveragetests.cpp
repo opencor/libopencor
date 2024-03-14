@@ -121,6 +121,14 @@ TEST(CoverageSedDocumentTest, sedDocumentTasks)
 
     EXPECT_EQ(sed->serialise(), sedTaskExpectedSerialisation(false));
 
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
+        {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a model."},
+        {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a simulation."},
+    };
+
+    EXPECT_FALSE(sed->run());
+    EXPECT_EQ_ISSUES(sed, expectedIssues);
+
     EXPECT_FALSE(sed->addTask(task));
     EXPECT_TRUE(sed->removeTask(task));
 
