@@ -38,7 +38,7 @@ TEST(CoverageSedDocumentTest, sedDocumentModels)
     EXPECT_FALSE(sed->addModel(nullptr));
 
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
-    auto model = libOpenCOR::SedModel::create(file, sed);
+    auto model = libOpenCOR::SedModel::create(sed, file);
 
     EXPECT_TRUE(sed->addModel(model));
 

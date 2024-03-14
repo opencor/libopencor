@@ -52,8 +52,8 @@ public:
 
     std::string uniqueId(const std::string &pPrefix);
 
-    void initialise(const FilePtr &pFile, const SedDocumentPtr &pOwner);
-    void initialiseFromCellmlFile(const FilePtr &pFile, const SedDocumentPtr &pOwner);
+    void initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile);
+    void initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
 
     bool isValid();
 

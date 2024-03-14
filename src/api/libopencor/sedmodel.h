@@ -50,23 +50,23 @@ public:
      * Factory method to create a @ref SedModel object:
      *
      * ```
-     * auto file = libOpenCOR::File::create("/some/path/file.txt");
      * auto sedDocument = libOpenCOR::SedDocument::create();
-     * auto sedModel = libOpenCOR::SedModel::create(file, sedDocument);
+     * auto file = libOpenCOR::File::create("/some/path/file.txt");
+     * auto sedModel = libOpenCOR::SedModel::create(sedDocument, file);
      * ```
      *
-     * @param pFile The @ref File object for which to create the @ref SedModel object.
      * @param pDocument The @ref SedDocument object to which the @ref SedModel object is to belong.
+     * @param pFile The @ref File object for which to create the @ref SedModel object.
      *
      * @return A smart pointer to a @ref SedModel object.
      */
 
-    static SedModelPtr create(const FilePtr &pFile, const SedDocumentPtr &pDocument);
+    static SedModelPtr create(const SedDocumentPtr &pDocument, const FilePtr &pFile);
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedModel(const FilePtr &pFile, const SedDocumentPtr &pDocument); /**< Constructor @private. */
+    explicit SedModel(const SedDocumentPtr &pDocument, const FilePtr &pFile); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

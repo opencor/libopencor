@@ -27,7 +27,7 @@ class SedModel::Impl: public SedBase::Impl
 public:
     FilePtr mFile;
 
-    explicit Impl(const FilePtr &pFile, const SedDocumentPtr &pDocument);
+    explicit Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile);
 
     bool isValid() override;
 
