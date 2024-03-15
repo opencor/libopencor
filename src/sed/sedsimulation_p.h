@@ -27,8 +27,6 @@ namespace libOpenCOR {
 class SedSimulation::Impl: public SedBase::Impl
 {
 public:
-    using SedBase::Impl::isValid;
-
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
 

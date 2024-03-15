@@ -24,11 +24,6 @@ SedBase::Impl::Impl(const std::string &pId)
 {
 }
 
-bool SedBase::Impl::isValid()
-{
-    return true;
-}
-
 void SedBase::Impl::serialise(xmlNodePtr pNode) const
 {
     xmlNewProp(pNode, toConstXmlCharPtr("id"), toConstXmlCharPtr(mId));

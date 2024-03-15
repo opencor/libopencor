@@ -34,8 +34,6 @@ public:
     explicit Impl(const std::string &pId = {});
     virtual ~Impl() = default;
 
-    virtual bool isValid();
-
     virtual void serialise(xmlNodePtr pNode) const;
 };
 
