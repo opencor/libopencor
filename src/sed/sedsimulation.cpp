@@ -14,7 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "file_p.h"
 #include "seddocument_p.h"
+#include "sedmodel_p.h"
 #include "sedsimulation_p.h"
 #include "solvernla_p.h"
 #include "solverode_p.h"
@@ -26,6 +28,27 @@ static constexpr auto ID_PREFIX = "simulation";
 SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
     : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
 {
+}
+
+bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
+{
+    auto modelType = pModel->pimpl()->mFile->pimpl()->mCellmlFile->type();
+
+    if ((modelType == libcellml::AnalyserModel::Type::ODE) && (mOdeSolver == nullptr)) {
+        addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an ODE solver.");
+    } else if ((modelType == libcellml::AnalyserModel::Type::NLA) && (mNlaSolver == nullptr)) {
+        addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an NLA solver.");
+    } else if (modelType == libcellml::AnalyserModel::Type::DAE) {
+        if (mOdeSolver == nullptr) {
+            addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an ODE solver.");
+        }
+
+        if (mNlaSolver == nullptr) {
+            addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an NLA solver.");
+        }
+    }
+
+    return !hasErrors();
 }
 
 void SedSimulation::Impl::serialise(xmlNodePtr pNode) const

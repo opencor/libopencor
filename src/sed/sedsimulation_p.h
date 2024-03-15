@@ -27,10 +27,14 @@ namespace libOpenCOR {
 class SedSimulation::Impl: public SedBase::Impl
 {
 public:
+    using SedBase::Impl::isValid;
+
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
 
     explicit Impl(const SedDocumentPtr &pDocument);
+
+    bool isValid(const SedModelPtr &pModel);
 
     void serialise(xmlNodePtr pNode) const override;
 };
