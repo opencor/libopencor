@@ -146,7 +146,7 @@ def test_ode_model_with_no_ode_solver():
     expected_issues = [
         [
             Issue.Type.Error,
-            "The simulation is to be linked to an ODE model and must therefore specify an ODE solver.",
+            "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver.",
         ],
     ]
 
@@ -170,7 +170,7 @@ def test_nla_model_with_no_nla_solver():
     expected_issues = [
         [
             Issue.Type.Error,
-            "The simulation is to be linked to an NLA model and must therefore specify an NLA solver.",
+            "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver.",
         ],
     ]
 
@@ -194,11 +194,11 @@ def test_dae_model_with_no_ode_or_nla_solver():
     expected_issues = [
         [
             Issue.Type.Error,
-            "The simulation is to be linked to a DAE model and must therefore specify an ODE solver.",
+            "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver.",
         ],
         [
             Issue.Type.Error,
-            "The simulation is to be linked to a DAE model and must therefore specify an NLA solver.",
+            "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver.",
         ],
     ]
 

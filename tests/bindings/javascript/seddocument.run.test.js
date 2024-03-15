@@ -227,7 +227,7 @@ describe("SedDocument run tests", () => {
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
-        "The simulation is to be linked to an ODE model and must therefore specify an ODE solver.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver.",
       ],
     ]);
   });
@@ -255,7 +255,7 @@ describe("SedDocument run tests", () => {
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
-        "The simulation is to be linked to an NLA model and must therefore specify an NLA solver.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver.",
       ],
     ]);
   });
@@ -285,11 +285,11 @@ describe("SedDocument run tests", () => {
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
-        "The simulation is to be linked to a DAE model and must therefore specify an ODE solver.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver.",
       ],
       [
         libopencor.Issue.Type.ERROR,
-        "The simulation is to be linked to a DAE model and must therefore specify an NLA solver.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver.",
       ],
     ]);
   });

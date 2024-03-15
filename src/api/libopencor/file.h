@@ -34,6 +34,7 @@ class LIBOPENCOR_EXPORT File: public Logger
 {
     friend class SedDocument;
     friend class SedModel;
+    friend class SedSimulation;
 
 public:
     /**

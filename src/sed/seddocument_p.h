@@ -55,8 +55,6 @@ public:
     void initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile);
     void initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
 
-    bool isValid();
-
     void serialise(xmlNodePtr pNode) const;
 
     std::string serialise(const std::string &pBasePath = {}) const;

@@ -126,7 +126,7 @@ TEST(RunSedDocumentTest, odeModel)
 TEST(RunSedDocumentTest, odeModelWithNoOdeSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "The simulation is to be linked to an ODE model and must therefore specify an ODE solver."},
+        {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
@@ -163,7 +163,7 @@ TEST(RunSedDocumentTest, nlaModel)
 TEST(RunSedDocumentTest, nlaModelWithNoNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "The simulation is to be linked to an NLA model and must therefore specify an NLA solver."},
+        {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
@@ -200,8 +200,8 @@ TEST(RunSedDocumentTest, daeModel)
 TEST(RunSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::ERROR, "The simulation is to be linked to a DAE model and must therefore specify an ODE solver."},
-        {libOpenCOR::Issue::Type::ERROR, "The simulation is to be linked to a DAE model and must therefore specify an NLA solver."},
+        {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver."},
+        {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
