@@ -453,44 +453,17 @@ bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
 
     taskPimpl->removeAllIssues();
 
-    // Make sure that we have both a model and a simulation.
+    // Make sure that the task is valid.
 
-    auto model = pTask->model();
-
-    if (model == nullptr) {
-        taskPimpl->addError("Task '" + taskPimpl->mId + "' requires a model.");
-    }
-
-    auto simulation = pTask->simulation();
-
-    if (simulation == nullptr) {
-        taskPimpl->addError("Task '" + taskPimpl->mId + "' requires a simulation.");
-    }
-
-    if (taskPimpl->hasIssues()) {
-        return false;
-    }
-
-    // Make sure that the model is valid.
-
-    if (!model->pimpl()->isValid()) {
-        taskPimpl->addIssues(model);
-
-        return false;
-    }
-
-    // Make sure that the simulation is valid for the model.
-
-    if (!simulation->pimpl()->isValid(model)) {
-        taskPimpl->addIssues(simulation);
-
+    if (!taskPimpl->isValid()) {
         return false;
     }
 
 #ifndef __EMSCRIPTEN__
     // Get a runtime for the model.
 
-    auto cellmlFile = model->pimpl()->mFile->pimpl()->mCellmlFile;
+    auto cellmlFile = taskPimpl->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
+    auto simulation = taskPimpl->mSimulation;
     auto runtime = cellmlFile->runtime(simulation->nlaSolver());
 
 #    ifndef CODE_COVERAGE_ENABLED

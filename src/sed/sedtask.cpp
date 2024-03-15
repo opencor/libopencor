@@ -30,6 +30,37 @@ SedTask::Impl::Impl(const SedDocumentPtr &pDocument, const SedModelPtr &pModel,
 {
 }
 
+bool SedTask::Impl::isValid()
+{
+    // Make sure that we have both a model and a simulation.
+
+    if (mModel == nullptr) {
+        addError("Task '" + mId + "' requires a model.");
+    }
+
+    if (mSimulation == nullptr) {
+        addError("Task '" + mId + "' requires a simulation.");
+    }
+
+    if (hasIssues()) {
+        return false;
+    }
+
+    // Make sure that the model is valid.
+
+    if (!mModel->pimpl()->isValid()) {
+        addIssues(mModel);
+    }
+
+    // Make sure that the simulation is valid for the model.
+
+    if (!mSimulation->pimpl()->isValid(mModel)) {
+        addIssues(mSimulation);
+    }
+
+    return !hasIssues();
+}
+
 void SedTask::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("task"));

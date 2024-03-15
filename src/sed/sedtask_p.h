@@ -30,6 +30,8 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument, const SedModelPtr &pModel, const SedSimulationPtr &pSimulation);
 
+    bool isValid();
+
     void serialise(xmlNodePtr pNode) const override;
 };
 
