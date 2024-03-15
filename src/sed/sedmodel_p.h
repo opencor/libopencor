@@ -29,7 +29,7 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile);
 
-    bool isValid() override;
+    bool isValid();
 
 #ifdef BUILDING_USING_CLANG
     // Prevent Clang from complaining about SedModel::Impl::serialise() hiding SedBase::Impl::serialise().
