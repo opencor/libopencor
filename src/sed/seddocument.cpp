@@ -449,7 +449,7 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
 
 bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
 {
-    auto taskPimpl = pTask->pimpl();
+    auto *taskPimpl = pTask->pimpl();
 
     taskPimpl->removeAllIssues();
 
@@ -487,58 +487,10 @@ bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
         return false;
     }
 
-    return true;
-}
-
-bool SedDocument::Impl::runTask(const SedAbstractTaskPtr &pTask)
-{
-    // Run the given task.
-    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT THAT pTask IS INDEED A SedTask.
-
-    auto task = dynamic_pointer_cast<SedTask>(pTask);
-
-    ASSERT_NE(task, nullptr);
-
-    if (!runTask(task)) {
-        addIssues(task);
-
-        return false;
-    }
-
-    return true;
-}
-
-bool SedDocument::Impl::run()
-{
-    removeAllIssues();
-
-    // Check whether there are some outputs that should be generated or, failing that, whether there are some tasks that
-    // could be run.
-    //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
-
-    if (hasTasks()) {
-        bool res = true;
-
-        for (const auto &task : mTasks) {
-            if (!runTask(task)) {
-                res = false;
-            }
-        }
-
-        if (!res) {
-            return false;
-        }
-    } else {
-        addError("The simulation experiment description does not contain any tasks to run.");
-
-        return false;
-    }
-
 #ifndef __EMSCRIPTEN__
     // Get a runtime for the model.
 
-    auto cellmlFile = mModels[0]->pimpl()->mFile->pimpl()->mCellmlFile;
-    auto simulation = mSimulations[0];
+    auto cellmlFile = model->pimpl()->mFile->pimpl()->mCellmlFile;
     auto runtime = cellmlFile->runtime(simulation->nlaSolver());
 
 #    ifndef CODE_COVERAGE_ENABLED
@@ -634,6 +586,53 @@ bool SedDocument::Impl::run()
         return false;
     }
 #endif
+
+    return true;
+}
+
+bool SedDocument::Impl::runTask(const SedAbstractTaskPtr &pTask)
+{
+    // Run the given task.
+    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT THAT pTask IS INDEED A SedTask.
+
+    auto task = dynamic_pointer_cast<SedTask>(pTask);
+
+    ASSERT_NE(task, nullptr);
+
+    if (!runTask(task)) {
+        addIssues(task);
+
+        return false;
+    }
+
+    return true;
+}
+
+bool SedDocument::Impl::run()
+{
+    removeAllIssues();
+
+    // Check whether there are some outputs that should be generated or, failing that, whether there are some tasks that
+    // could be run.
+    //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
+
+    if (hasTasks()) {
+        bool res = true;
+
+        for (const auto &task : mTasks) {
+            if (!runTask(task)) {
+                res = false;
+            }
+        }
+
+        if (!res) {
+            return false;
+        }
+    } else {
+        addError("The simulation experiment description does not contain any tasks to run.");
+
+        return false;
+    }
 
     return true;
 }
