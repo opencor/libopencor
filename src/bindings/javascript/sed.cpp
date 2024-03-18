@@ -57,6 +57,11 @@ void sedApi()
         .function("removeTask", &libOpenCOR::SedDocument::removeTask)
         .function("run", &libOpenCOR::SedDocument::run);
 
+    // SedJob API.
+
+    emscripten::class_<libOpenCOR::SedJob, emscripten::base<libOpenCOR::Logger>>("SedJob")
+        .smart_ptr<libOpenCOR::SedJobPtr>("SedJob");
+
     // SedModel API.
 
     emscripten::class_<libOpenCOR::SedModel, emscripten::base<libOpenCOR::SedBase>>("SedModel")

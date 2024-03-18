@@ -60,6 +60,10 @@ void sedApi(py::module_ &m)
         .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.")
         .def("run", &libOpenCOR::SedDocument::run, "Run this SedDocument object.");
 
+    // SedJob API.
+
+    py::class_<libOpenCOR::SedJob, libOpenCOR::Logger, libOpenCOR::SedJobPtr> sedJob(m, "SedJob");
+
     // SedModel API.
 
     py::class_<libOpenCOR::SedModel, libOpenCOR::SedBase, libOpenCOR::SedModelPtr> sedModel(m, "SedModel");

@@ -49,6 +49,9 @@ using SedDataGeneratorPtr = std::shared_ptr<SedDataGenerator>; /**< Type definit
 class SedDocument;
 using SedDocumentPtr = std::shared_ptr<SedDocument>; /**< Type definition for the shared @ref SedDocument pointer. */
 
+class SedJob;
+using SedJobPtr = std::shared_ptr<SedJob>; /**< Type definition for the shared @ref SedJob pointer. */
+
 class SedModel;
 using SedModelPtr = std::shared_ptr<SedModel>; /**< Type definition for the shared @ref SedModel pointer. */
 
