@@ -28,7 +28,7 @@ TEST(RunSedDocumentTest, noFile)
 
     auto sed = libOpenCOR::SedDocument::create();
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
@@ -42,7 +42,7 @@ TEST(RunSedDocumentTest, invalidCellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
@@ -56,7 +56,7 @@ TEST(RunSedDocumentTest, overconstrainedCellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
@@ -70,7 +70,7 @@ TEST(RunSedDocumentTest, underconstrainedCellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/underconstrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
@@ -85,7 +85,7 @@ TEST(RunSedDocumentTest, unsuitablyConstrainedCellmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsuitably_constrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
@@ -94,7 +94,7 @@ TEST(RunSedDocumentTest, algebraicModel)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_TRUE(sed->run());
+    EXPECT_NE(sed->run(), nullptr);
 }
 
 TEST(RunSedDocumentTest, odeModel)
@@ -113,14 +113,14 @@ TEST(RunSedDocumentTest, odeModel)
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 
     static const auto OK_MAXIMUM_NUMBER_OF_STEPS = 500;
 
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
-    EXPECT_TRUE(sed->run());
+    EXPECT_NE(sed->run(), nullptr);
 }
 
 TEST(RunSedDocumentTest, odeModelWithNoOdeSolver)
@@ -134,7 +134,7 @@ TEST(RunSedDocumentTest, odeModelWithNoOdeSolver)
 
     sed->simulations()[0]->setOdeSolver(nullptr);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
@@ -152,12 +152,12 @@ TEST(RunSedDocumentTest, nlaModel)
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    EXPECT_TRUE(sed->run());
+    EXPECT_NE(sed->run(), nullptr);
 }
 
 TEST(RunSedDocumentTest, nlaModelWithNoNlaSolver)
@@ -171,7 +171,7 @@ TEST(RunSedDocumentTest, nlaModelWithNoNlaSolver)
 
     sed->simulations()[0]->setNlaSolver(nullptr);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
@@ -189,12 +189,12 @@ TEST(RunSedDocumentTest, daeModel)
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    EXPECT_TRUE(sed->run());
+    EXPECT_NE(sed->run(), nullptr);
 }
 
 TEST(RunSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
@@ -211,6 +211,6 @@ TEST(RunSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);
 
-    EXPECT_FALSE(sed->run());
+    EXPECT_EQ(sed->run(), nullptr);
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }

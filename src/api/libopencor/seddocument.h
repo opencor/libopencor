@@ -226,10 +226,10 @@ public:
      *
      * Run this simulation experiment description, if valid, in its own thread.
      *
-     * @return @c true if this simulation experiment description was run, @c false otherwise.
+     * @return A smart pointer to a @ref SedJob object.
      */
 
-    bool run();
+    SedJobPtr run();
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

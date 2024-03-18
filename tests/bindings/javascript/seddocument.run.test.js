@@ -79,7 +79,7 @@ describe("SedDocument run tests", () => {
   test("No file", () => {
     const sed = new libopencor.SedDocument();
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -98,7 +98,7 @@ describe("SedDocument run tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
       [
@@ -118,7 +118,7 @@ describe("SedDocument run tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
       [
@@ -138,7 +138,7 @@ describe("SedDocument run tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
       [
@@ -158,7 +158,7 @@ describe("SedDocument run tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -185,7 +185,7 @@ describe("SedDocument run tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.run()).toBe(true);
+    expect(sed.run()).not.toBe(null);
   });
 
   test("ODE model", () => {
@@ -200,7 +200,7 @@ describe("SedDocument run tests", () => {
     /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
     cvode.setMaximumNumberOfSteps(10);
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -211,7 +211,7 @@ describe("SedDocument run tests", () => {
 
     cvode.setMaximumNumberOfSteps(500);
 
-    expect(sed.run()).toBe(true);
+    expect(sed.run()).not.toBe(null);
   });
 
   test("ODE model with no ODE solver", () => {
@@ -223,7 +223,7 @@ describe("SedDocument run tests", () => {
 
     sed.simulations().get(0).setOdeSolver(null);
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -239,7 +239,7 @@ describe("SedDocument run tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.run()).toBe(true);
+    expect(sed.run()).not.toBe(null);
   });
 
   test("NLA model with no NLA solver", () => {
@@ -251,7 +251,7 @@ describe("SedDocument run tests", () => {
 
     sed.simulations().get(0).setNlaSolver(null);
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
@@ -267,7 +267,7 @@ describe("SedDocument run tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.run()).toBe(true);
+    expect(sed.run()).not.toBe(null);
   });
 
   test("DAE model with no ODE or NLA solver", () => {
@@ -281,7 +281,7 @@ describe("SedDocument run tests", () => {
     simulation.setOdeSolver(null);
     simulation.setNlaSolver(null);
 
-    expect(sed.run()).toBe(false);
+    expect(sed.run()).toBe(null);
     expectIssues(sed, [
       [
         libopencor.Issue.Type.ERROR,
