@@ -73,7 +73,7 @@ public:
 
     bool runTask(const SedTaskPtr &pTask);
     bool runTask(const SedAbstractTaskPtr &pTask);
-    bool run();
+    SedJobPtr run();
 };
 
 } // namespace libOpenCOR

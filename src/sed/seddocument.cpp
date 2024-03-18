@@ -17,6 +17,7 @@ limitations under the License.
 #include "file_p.h"
 #include "sedabstracttask_p.h"
 #include "seddocument_p.h"
+#include "sedjob_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
 #include "sedtask_p.h"
@@ -581,7 +582,7 @@ bool SedDocument::Impl::runTask(const SedAbstractTaskPtr &pTask)
     return true;
 }
 
-bool SedDocument::Impl::run()
+SedJobPtr SedDocument::Impl::run()
 {
     removeAllIssues();
 
@@ -599,15 +600,15 @@ bool SedDocument::Impl::run()
         }
 
         if (!res) {
-            return false;
+            return nullptr;
         }
     } else {
         addError("The simulation experiment description does not contain any tasks to run.");
 
-        return false;
+        return nullptr;
     }
 
-    return true;
+    return SedJob::Impl::create();
 }
 
 SedDocument::SedDocument()
@@ -716,7 +717,7 @@ bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
     return pimpl()->removeTask(pTask);
 }
 
-bool SedDocument::run()
+SedJobPtr SedDocument::run()
 {
     return pimpl()->run();
 }
