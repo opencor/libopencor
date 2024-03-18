@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/sedbase.h"
+#include "libopencor/logger.h"
 
 namespace libOpenCOR {
 

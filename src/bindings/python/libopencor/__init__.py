@@ -79,6 +79,8 @@ __all__ = (
     "SedModel",
     "SedOneStep",
     "SedOutput",
+    # ---GRY---
+    # "SedRepeatedTask",
     "SedSimulation",
     "SedSteadyState",
     "SedStyle",

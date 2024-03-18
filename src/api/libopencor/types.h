@@ -118,4 +118,4 @@ using SedSimulationPtrVector = std::vector<SedSimulationPtr>; /**< Type definiti
 using SedStylePtrVector = std::vector<SedStylePtr>; /**< Type definition for a vector of @ref SedStyle pointers. */
 using UnsignedCharVector = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
 
-} // namespace libcellml
+} // namespace libOpenCOR
