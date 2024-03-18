@@ -21,7 +21,7 @@ from utils import assert_issues
 def test_no_file():
     sed = SedDocument()
 
-    assert len(sed.issues) == 0
+    assert sed.has_issues == False
 
 
 def test_unknown_file():
@@ -42,7 +42,7 @@ def test_cellml_file():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     sed = SedDocument(file)
 
-    assert len(sed.issues) == 0
+    assert sed.has_issues == False
 
 
 def test_sedml_file():

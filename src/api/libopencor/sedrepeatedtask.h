@@ -23,7 +23,7 @@ namespace libOpenCOR {
 /**
  * @brief The SedRepeatedTask class.
  *
- * The SedRepeatedTask class is used to describe a task in the context of a simulation experiment description.
+ * The SedRepeatedTask class is used to describe a repeated task in the context of a simulation experiment description.
  */
 
 class LIBOPENCOR_EXPORT SedRepeatedTask: public SedAbstractTask

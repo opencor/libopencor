@@ -49,7 +49,7 @@ describe("SedDocument basic tests", () => {
   test("No file", () => {
     const sed = new libopencor.SedDocument();
 
-    expect(sed.issues().size()).toBe(0);
+    expect(sed.hasIssues()).toBe(false);
   });
 
   test("Unknown file", () => {
@@ -77,7 +77,7 @@ describe("SedDocument basic tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expect(sed.issues().size()).toBe(0);
+    expect(sed.hasIssues()).toBe(false);
   });
 
   test("SED-ML file", () => {
