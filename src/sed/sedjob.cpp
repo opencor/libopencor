@@ -33,4 +33,16 @@ SedJob::~SedJob()
     delete pimpl();
 }
 
+SedJob::Impl *SedJob::pimpl()
+{
+    return reinterpret_cast<Impl *>(Logger::pimpl());
+}
+
+/*---GRY---
+const SedJob::Impl *SedJob::pimpl() const
+{
+    return reinterpret_cast<const Impl *>(Logger::pimpl());
+}
+*/
+
 } // namespace libOpenCOR

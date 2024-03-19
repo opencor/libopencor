@@ -137,8 +137,9 @@ def test_tasks():
         ],
     ]
 
-    assert sed.run() == None
-    assert_issues(sed, expected_issues)
+    job = sed.run()
+
+    assert_issues(job, expected_issues)
 
     assert sed.add_task(task) == False
     assert sed.remove_task(task) == True

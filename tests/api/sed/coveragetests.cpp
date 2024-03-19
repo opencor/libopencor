@@ -126,8 +126,9 @@ TEST(CoverageSedDocumentTest, sedDocumentTasks)
         {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a simulation."},
     };
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    auto job = sed->run();
+
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 
     EXPECT_FALSE(sed->addTask(task));
     EXPECT_TRUE(sed->removeTask(task));
