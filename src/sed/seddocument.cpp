@@ -448,7 +448,7 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
 } // namespace
 #endif
 
-bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
+void SedDocument::Impl::runTask(const SedJobPtr &pJob, const SedTaskPtr &pTask)
 {
     auto *taskPimpl = pTask->pimpl();
 
@@ -457,7 +457,9 @@ bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
     // Make sure that the task is valid.
 
     if (!taskPimpl->isValid()) {
-        return false;
+        pJob->pimpl()->addIssues(pTask);
+
+        return;
     }
 
 #ifndef __EMSCRIPTEN__
@@ -469,9 +471,9 @@ bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (runtime->hasErrors()) {
-        addIssues(runtime);
+        pJob->pimpl()->addIssues(runtime);
 
-        return false;
+        return;
     }
 #    endif
 
@@ -538,15 +540,15 @@ bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
 
         while (!fuzzyCompare(mVoi, voiEnd)) {
             if (!odeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
-                addIssues(odeSolver);
+                pJob->pimpl()->addIssues(odeSolver);
 
-                return false;
+                return;
             }
 
             if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
-                addIssues(nlaSolver);
+                pJob->pimpl()->addIssues(nlaSolver);
 
-                return false;
+                return;
             }
 
             runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
@@ -555,31 +557,9 @@ bool SedDocument::Impl::runTask(const SedTaskPtr &pTask)
 #    endif
         }
     } else if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
-        addIssues(nlaSolver);
-
-        return false;
+        pJob->pimpl()->addIssues(nlaSolver);
     }
 #endif
-
-    return true;
-}
-
-bool SedDocument::Impl::runTask(const SedAbstractTaskPtr &pTask)
-{
-    // Run the given task.
-    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT THAT pTask IS INDEED A SedTask.
-
-    auto task = dynamic_pointer_cast<SedTask>(pTask);
-
-    ASSERT_NE(task, nullptr);
-
-    if (!runTask(task)) {
-        addIssues(task);
-
-        return false;
-    }
-
-    return true;
 }
 
 SedJobPtr SedDocument::Impl::run()
@@ -590,25 +570,24 @@ SedJobPtr SedDocument::Impl::run()
     // could be run.
     //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
 
+    auto job = SedJob::Impl::create();
+
     if (hasTasks()) {
-        bool res = true;
-
         for (const auto &task : mTasks) {
-            if (!runTask(task)) {
-                res = false;
-            }
-        }
+            // Run the given task.
+            //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT THAT pTask IS INDEED A SedTask.
 
-        if (!res) {
-            return nullptr;
+            auto crtTask = dynamic_pointer_cast<SedTask>(task);
+
+            ASSERT_NE(crtTask, nullptr);
+
+            runTask(job, crtTask);
         }
     } else {
-        addError("The simulation experiment description does not contain any tasks to run.");
-
-        return nullptr;
+        job->pimpl()->addError("The simulation experiment description does not contain any tasks to run.");
     }
 
-    return SedJob::Impl::create();
+    return job;
 }
 
 SedDocument::SedDocument()

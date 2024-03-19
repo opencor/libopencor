@@ -27,9 +27,9 @@ TEST(RunSedDocumentTest, noFile)
     };
 
     auto sed = libOpenCOR::SedDocument::create();
+    auto job = sed->run();
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 }
 
 TEST(RunSedDocumentTest, invalidCellmlFile)
@@ -41,9 +41,9 @@ TEST(RunSedDocumentTest, invalidCellmlFile)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
+    auto job = sed->run();
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 }
 
 TEST(RunSedDocumentTest, overconstrainedCellmlFile)
@@ -55,9 +55,9 @@ TEST(RunSedDocumentTest, overconstrainedCellmlFile)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
+    auto job = sed->run();
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 }
 
 TEST(RunSedDocumentTest, underconstrainedCellmlFile)
@@ -69,9 +69,9 @@ TEST(RunSedDocumentTest, underconstrainedCellmlFile)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/underconstrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
+    auto job = sed->run();
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 }
 
 TEST(RunSedDocumentTest, unsuitablyConstrainedCellmlFile)
@@ -84,17 +84,18 @@ TEST(RunSedDocumentTest, unsuitablyConstrainedCellmlFile)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsuitably_constrained.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
+    auto job = sed->run();
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 }
 
 TEST(RunSedDocumentTest, algebraicModel)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
+    auto job = sed->run();
 
-    EXPECT_NE(sed->run(), nullptr);
+    EXPECT_FALSE(job->hasIssues());
 }
 
 TEST(RunSedDocumentTest, odeModel)
@@ -113,14 +114,17 @@ TEST(RunSedDocumentTest, odeModel)
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    auto job = sed->run();
+
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 
     static const auto OK_MAXIMUM_NUMBER_OF_STEPS = 500;
 
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
-    EXPECT_NE(sed->run(), nullptr);
+    job = sed->run();
+
+    EXPECT_FALSE(job->hasIssues());
 }
 
 TEST(RunSedDocumentTest, odeModelWithNoOdeSolver)
@@ -134,8 +138,9 @@ TEST(RunSedDocumentTest, odeModelWithNoOdeSolver)
 
     sed->simulations()[0]->setOdeSolver(nullptr);
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    auto job = sed->run();
+
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 }
 
 TEST(RunSedDocumentTest, nlaModel)
@@ -152,12 +157,15 @@ TEST(RunSedDocumentTest, nlaModel)
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    auto job = sed->run();
+
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    EXPECT_NE(sed->run(), nullptr);
+    job = sed->run();
+
+    EXPECT_FALSE(job->hasIssues());
 }
 
 TEST(RunSedDocumentTest, nlaModelWithNoNlaSolver)
@@ -171,8 +179,9 @@ TEST(RunSedDocumentTest, nlaModelWithNoNlaSolver)
 
     sed->simulations()[0]->setNlaSolver(nullptr);
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    auto job = sed->run();
+
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 }
 
 TEST(RunSedDocumentTest, daeModel)
@@ -189,12 +198,15 @@ TEST(RunSedDocumentTest, daeModel)
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    auto job = sed->run();
+
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    EXPECT_NE(sed->run(), nullptr);
+    job = sed->run();
+
+    EXPECT_FALSE(job->hasIssues());
 }
 
 TEST(RunSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
@@ -211,6 +223,7 @@ TEST(RunSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);
 
-    EXPECT_EQ(sed->run(), nullptr);
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    auto job = sed->run();
+
+    EXPECT_EQ_ISSUES(job, expectedIssues);
 }
