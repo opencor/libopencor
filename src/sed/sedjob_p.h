@@ -25,7 +25,18 @@ namespace libOpenCOR {
 class SedJob::Impl: public Logger::Impl
 {
 public:
+    double mVoi = 0.0;
+    double *mStates = nullptr;
+    double *mRates = nullptr;
+    double *mVariables = nullptr;
+
     static SedJobPtr create();
+
+    ~Impl();
+
+    void resetArrays();
+
+    void run(const SedModelPtr &pModel, const SedSimulationPtr &pSimulation);
 };
 
 } // namespace libOpenCOR

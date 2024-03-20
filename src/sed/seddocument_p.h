@@ -41,15 +41,6 @@ public:
     SedOutputPtrVector mOutputs;
     SedStylePtrVector mStyles;
 
-    double mVoi = 0.0; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
-    double *mStates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
-    double *mRates = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
-    double *mVariables = nullptr; //---GRY--- THIS SHOULD BE MOVED TO A TASK OBJECT.
-
-    ~Impl();
-
-    void resetArrays();
-
     std::string uniqueId(const std::string &pPrefix);
 
     void initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile);

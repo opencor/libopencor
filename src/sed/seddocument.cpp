@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "file_p.h"
-#include "sedabstracttask_p.h"
 #include "seddocument_p.h"
 #include "sedjob_p.h"
 #include "sedmodel_p.h"
@@ -32,31 +31,9 @@ limitations under the License.
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverkinsol.h"
 
-#include <algorithm>
 #include <sstream>
 
-#include <libxml/tree.h>
-
-//---GRY--- THE BELOW HEADER SHOULD BE REMOVED ONCE WE CAN RUN A SIMULATION THROUGH A TASK OBJECT.
-#include "seduniformtimecourse_p.h"
-
 namespace libOpenCOR {
-
-SedDocument::Impl::~Impl()
-{
-    resetArrays();
-}
-
-void SedDocument::Impl::resetArrays()
-{
-    delete[] mStates;
-    delete[] mRates;
-    delete[] mVariables;
-
-    mStates = nullptr;
-    mRates = nullptr;
-    mVariables = nullptr;
-}
 
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 {
@@ -463,102 +440,9 @@ void SedDocument::Impl::runTask(const SedJobPtr &pJob, const SedTaskPtr &pTask)
     }
 
 #ifndef __EMSCRIPTEN__
-    // Get a runtime for the model.
+    // Run our job.
 
-    auto cellmlFile = taskPimpl->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
-    auto simulation = taskPimpl->mSimulation;
-    auto runtime = cellmlFile->runtime(simulation->nlaSolver());
-
-#    ifndef CODE_COVERAGE_ENABLED
-    if (runtime->hasErrors()) {
-        pJob->pimpl()->addIssues(runtime);
-
-        return;
-    }
-#    endif
-
-    // Create our various arrays.
-
-    resetArrays();
-
-    auto cellmlFileType = cellmlFile->type();
-    auto differentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
-                             || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
-    auto analyserModel = cellmlFile->analyserModel();
-
-    if (differentialModel) {
-        mStates = new double[analyserModel->stateCount()];
-        mRates = new double[analyserModel->stateCount()];
-        mVariables = new double[analyserModel->variableCount()];
-    } else {
-        mVariables = new double[analyserModel->variableCount()];
-    }
-
-    // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
-    // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
-    // initialise our variables and compute computed constants and variables.
-#    ifdef PRINT_VALUES
-    printHeader(analyserModel);
-#    endif
-
-    auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(simulation) : nullptr;
-    auto *uniformTimeCourseSimulationPimpl = differentialModel ? uniformTimeCourseSimulation->pimpl() : nullptr;
-
-    if (differentialModel) {
-        mVoi = uniformTimeCourseSimulationPimpl->mOutputStartTime;
-
-        runtime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
-        runtime->computeComputedConstants()(mVariables); // NOLINT
-        runtime->computeRates()(mVoi, mStates, mRates, mVariables); // NOLINT
-        runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
-    } else {
-        runtime->initialiseVariablesForAlgebraicModel()(mVariables); // NOLINT
-        runtime->computeComputedConstants()(mVariables); // NOLINT
-        runtime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
-    }
-
-    // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
-
-    auto nlaSolver = differentialModel ? uniformTimeCourseSimulation->nlaSolver() : dynamic_pointer_cast<SedSteadyState>(simulation)->nlaSolver();
-
-    if (differentialModel) {
-        // Initialise the ODE solver.
-
-        auto odeSolver = uniformTimeCourseSimulation->odeSolver();
-
-        odeSolver->initialise(mVoi, analyserModel->stateCount(), mStates, mRates, mVariables, runtime->computeRates());
-#    ifdef PRINT_VALUES
-        printValues(analyserModel, mVoi, mStates, mVariables);
-#    endif
-
-        // Compute the differential model.
-
-        auto voiStart = mVoi;
-        auto voiEnd = uniformTimeCourseSimulationPimpl->mOutputEndTime;
-        auto voiInterval = (voiEnd - mVoi) / uniformTimeCourseSimulationPimpl->mNumberOfSteps;
-        size_t voiCounter = 0;
-
-        while (!fuzzyCompare(mVoi, voiEnd)) {
-            if (!odeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
-                pJob->pimpl()->addIssues(odeSolver);
-
-                return;
-            }
-
-            if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
-                pJob->pimpl()->addIssues(nlaSolver);
-
-                return;
-            }
-
-            runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
-#    ifdef PRINT_VALUES
-            printValues(analyserModel, mVoi, mStates, mVariables);
-#    endif
-        }
-    } else if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
-        pJob->pimpl()->addIssues(nlaSolver);
-    }
+    pJob->pimpl()->run(taskPimpl->mModel, taskPimpl->mSimulation);
 #endif
 }
 

@@ -29,7 +29,7 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedUniformTimeCourse: public SedSimulation
 {
-    friend class SedDocument;
+    friend class SedJob;
 
 public:
     /**
