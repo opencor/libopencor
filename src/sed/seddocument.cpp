@@ -28,6 +28,7 @@ limitations under the License.
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverkinsol.h"
 
+#include <algorithm>
 #include <sstream>
 
 namespace libOpenCOR {
@@ -383,66 +384,6 @@ bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
     return false;
 }
 
-// #define PRINT_VALUES
-
-#ifdef PRINT_VALUES
-namespace {
-
-void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
-{
-    printf("t"); // NOLINT
-
-    for (auto &state : pAnalyserModel->states()) {
-        printf(",%s", state->variable()->name().c_str()); // NOLINT
-    }
-
-    for (auto &variable : pAnalyserModel->variables()) {
-        printf(",%s", variable->variable()->name().c_str()); // NOLINT
-    }
-
-    printf("\n"); // NOLINT
-}
-
-void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
-                 double pVoi, double *pStates, double *pVariables)
-{
-    printf("%f", pVoi); // NOLINT
-
-    for (size_t i = 0; i < pAnalyserModel->states().size(); ++i) {
-        printf(",%f", pStates[i]); // NOLINT
-    }
-
-    for (size_t i = 0; i < pAnalyserModel->variables().size(); ++i) {
-        printf(",%f", pVariables[i]); // NOLINT
-    }
-
-    printf("\n"); // NOLINT
-}
-
-} // namespace
-#endif
-
-void SedDocument::Impl::createTaskIstance(const SedInstancePtr &pInstance, const SedTaskPtr &pTask)
-{
-    auto *taskPimpl = pTask->pimpl();
-
-    taskPimpl->removeAllIssues();
-
-    // Make sure that the task is valid.
-
-    if (!taskPimpl->isValid()) {
-        pInstance->pimpl()->addIssues(pTask);
-
-        return;
-    }
-
-#ifndef __EMSCRIPTEN__
-    // Run our instance.
-
-    pInstance->pimpl()->run(taskPimpl->mModel, taskPimpl->mSimulation);
-#endif
-}
-
 SedInstancePtr SedDocument::Impl::createInstance()
 {
     removeAllIssues();
@@ -454,15 +395,30 @@ SedInstancePtr SedDocument::Impl::createInstance()
     auto instance = SedInstance::Impl::create();
 
     if (hasTasks()) {
+        // Make sure that all the tasks are valid.
+
+        auto tasksValid = true;
+
         for (const auto &task : mTasks) {
-            // Run the given task.
-            //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT THAT pTask IS INDEED A SedTask.
+            auto *taskPimpl = task->pimpl();
 
-            auto crtTask = dynamic_pointer_cast<SedTask>(task);
+            taskPimpl->removeAllIssues();
 
-            ASSERT_NE(crtTask, nullptr);
+            // Make sure that the task is valid.
 
-            createTaskIstance(instance, crtTask);
+            if (!taskPimpl->isValid()) {
+                instance->pimpl()->addIssues(task);
+
+                tasksValid = false;
+            }
+        }
+
+        // Create an instance of all the tasks, if they are all valid.
+
+        if (tasksValid) {
+            for (const auto &task : mTasks) {
+                instance->pimpl()->createInstanceTask(task);
+            }
         }
     } else {
         instance->pimpl()->addError("The simulation experiment description does not contain any tasks to run.");

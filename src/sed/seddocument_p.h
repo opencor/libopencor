@@ -62,7 +62,6 @@ public:
     bool addTask(const SedAbstractTaskPtr &pTask);
     bool removeTask(const SedAbstractTaskPtr &pTask);
 
-    void createTaskIstance(const SedInstancePtr &pInstance, const SedTaskPtr &pTask);
     SedInstancePtr createInstance();
 };
 

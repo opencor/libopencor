@@ -29,6 +29,13 @@ SedRepeatedTask::Impl::Impl(const SedDocumentPtr &pDocument)
 */
 
 /*---GRY---
+bool SedRepeatedTask::Impl::isValid()
+{
+    return true;
+}
+*/
+
+/*---GRY---
 void SedRepeatedTask::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("repeatedTask"));

@@ -27,6 +27,8 @@ class SedRepeatedTask::Impl: public SedAbstractTask::Impl
 public:
     explicit Impl(const SedDocumentPtr &pDocument);
 
+    bool isValid() override;
+
     void serialise(xmlNodePtr pNode) const override;
 };
 

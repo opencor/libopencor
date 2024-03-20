@@ -17,6 +17,7 @@ limitations under the License.
 #include "file_p.h"
 #include "sedinstance_p.h"
 #include "sedmodel_p.h"
+#include "sedtask_p.h"
 #include "seduniformtimecourse_p.h"
 
 #include "utils.h"
@@ -47,16 +48,65 @@ void SedInstance::Impl::resetArrays()
     mVariables = nullptr;
 }
 
-void SedInstance::Impl::run(const SedModelPtr &pModel, const SedSimulationPtr &pSimulation)
+#define PRINT_VALUES
+
+#ifdef PRINT_VALUES
+namespace {
+
+void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
 {
+    printf("t"); // NOLINT
+
+    for (auto &state : pAnalyserModel->states()) {
+        printf(",%s", state->variable()->name().c_str()); // NOLINT
+    }
+
+    for (auto &variable : pAnalyserModel->variables()) {
+        printf(",%s", variable->variable()->name().c_str()); // NOLINT
+    }
+
+    printf("\n"); // NOLINT
+}
+
+void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
+                 double pVoi, double *pStates, double *pVariables)
+{
+    printf("%f", pVoi); // NOLINT
+
+    for (size_t i = 0; i < pAnalyserModel->states().size(); ++i) {
+        printf(",%f", pStates[i]); // NOLINT
+    }
+
+    for (size_t i = 0; i < pAnalyserModel->variables().size(); ++i) {
+        printf(",%f", pVariables[i]); // NOLINT
+    }
+
+    printf("\n"); // NOLINT
+}
+
+} // namespace
+#endif
+
+void SedInstance::Impl::createInstanceTask(const SedAbstractTaskPtr &pTask)
+{
+    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT (FOR NOW) THAT pTask IS INDEED A SedTask.
+
+    auto task = dynamic_pointer_cast<SedTask>(pTask);
+
+    ASSERT_NE(task, nullptr);
+
+#ifndef __EMSCRIPTEN__
     // Get a runtime for the model.
 
-    auto cellmlFile = pModel->pimpl()->mFile->pimpl()->mCellmlFile;
-    auto runtime = cellmlFile->runtime(pSimulation->nlaSolver());
+    auto *taskPimpl = task->pimpl();
+    auto cellmlFile = taskPimpl->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
+    auto simulation = taskPimpl->mSimulation;
+
+    mRuntime = cellmlFile->runtime(simulation->nlaSolver());
 
 #    ifndef CODE_COVERAGE_ENABLED
-    if (runtime->hasErrors()) {
-        addIssues(runtime);
+    if (mRuntime->hasErrors()) {
+        addIssues(mRuntime);
 
         return;
     }
@@ -86,32 +136,32 @@ void SedInstance::Impl::run(const SedModelPtr &pModel, const SedSimulationPtr &p
     printHeader(analyserModel);
 #    endif
 
-    auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(pSimulation) : nullptr;
+    auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(simulation) : nullptr;
     auto *uniformTimeCourseSimulationPimpl = differentialModel ? uniformTimeCourseSimulation->pimpl() : nullptr;
 
     if (differentialModel) {
         mVoi = uniformTimeCourseSimulationPimpl->mOutputStartTime;
 
-        runtime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
-        runtime->computeComputedConstants()(mVariables); // NOLINT
-        runtime->computeRates()(mVoi, mStates, mRates, mVariables); // NOLINT
-        runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+        mRuntime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
+        mRuntime->computeComputedConstants()(mVariables); // NOLINT
+        mRuntime->computeRates()(mVoi, mStates, mRates, mVariables); // NOLINT
+        mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
     } else {
-        runtime->initialiseVariablesForAlgebraicModel()(mVariables); // NOLINT
-        runtime->computeComputedConstants()(mVariables); // NOLINT
-        runtime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
+        mRuntime->initialiseVariablesForAlgebraicModel()(mVariables); // NOLINT
+        mRuntime->computeComputedConstants()(mVariables); // NOLINT
+        mRuntime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
     }
 
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
-    auto nlaSolver = differentialModel ? uniformTimeCourseSimulation->nlaSolver() : dynamic_pointer_cast<SedSteadyState>(pSimulation)->nlaSolver();
+    auto nlaSolver = differentialModel ? uniformTimeCourseSimulation->nlaSolver() : dynamic_pointer_cast<SedSteadyState>(simulation)->nlaSolver();
 
     if (differentialModel) {
         // Initialise the ODE solver.
 
         auto odeSolver = uniformTimeCourseSimulation->odeSolver();
 
-        odeSolver->initialise(mVoi, analyserModel->stateCount(), mStates, mRates, mVariables, runtime->computeRates());
+        odeSolver->initialise(mVoi, analyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeRates());
 #    ifdef PRINT_VALUES
         printValues(analyserModel, mVoi, mStates, mVariables);
 #    endif
@@ -136,7 +186,7 @@ void SedInstance::Impl::run(const SedModelPtr &pModel, const SedSimulationPtr &p
                 return;
             }
 
-            runtime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+            mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
 #    ifdef PRINT_VALUES
             printValues(analyserModel, mVoi, mStates, mVariables);
 #    endif
@@ -144,6 +194,7 @@ void SedInstance::Impl::run(const SedModelPtr &pModel, const SedSimulationPtr &p
     } else if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
         addIssues(nlaSolver);
     }
+#endif
 }
 
 SedInstance::SedInstance()

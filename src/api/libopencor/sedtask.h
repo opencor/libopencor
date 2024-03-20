@@ -28,7 +28,7 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedTask: public SedAbstractTask
 {
-    friend class SedDocument;
+    friend class SedInstance;
 
 public:
     /**
