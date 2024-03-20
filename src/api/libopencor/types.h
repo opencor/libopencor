@@ -52,6 +52,9 @@ using SedDocumentPtr = std::shared_ptr<SedDocument>; /**< Type definition for th
 class SedInstance;
 using SedInstancePtr = std::shared_ptr<SedInstance>; /**< Type definition for the shared @ref SedInstance pointer. */
 
+class SedInstanceTask;
+using SedInstanceTaskPtr = std::shared_ptr<SedInstanceTask>; /**< Type definition for the shared @ref SedInstanceTask pointer. */
+
 class SedModel;
 using SedModelPtr = std::shared_ptr<SedModel>; /**< Type definition for the shared @ref SedModel pointer. */
 
