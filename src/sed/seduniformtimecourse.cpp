@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "seddocument_p.h"
 #include "seduniformtimecourse_p.h"
+
 #include "utils.h"
 
 namespace libOpenCOR {

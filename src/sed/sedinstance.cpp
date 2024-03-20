@@ -21,11 +21,8 @@ limitations under the License.
 
 #include "utils.h"
 
-#include "libopencor/file.h"
-#include "libopencor/sedmodel.h"
 #include "libopencor/sedsimulation.h"
 #include "libopencor/sedsteadystate.h"
-#include "libopencor/seduniformtimecourse.h"
 
 namespace libOpenCOR {
 

@@ -18,6 +18,7 @@ limitations under the License.
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
 #include "sedtask_p.h"
+
 #include "utils.h"
 
 namespace libOpenCOR {
