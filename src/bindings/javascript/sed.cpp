@@ -62,6 +62,11 @@ void sedApi()
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance");
 
+    // SedInstanceTask API.
+
+    emscripten::class_<libOpenCOR::SedInstanceTask, emscripten::base<libOpenCOR::Logger>>("SedInstanceTask")
+        .smart_ptr<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTask");
+
     // SedModel API.
 
     emscripten::class_<libOpenCOR::SedModel, emscripten::base<libOpenCOR::SedBase>>("SedModel")
