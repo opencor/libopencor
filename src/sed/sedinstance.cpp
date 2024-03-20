@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 #include "file_p.h"
-#include "sedjob_p.h"
+#include "sedinstance_p.h"
 #include "sedmodel_p.h"
 #include "seduniformtimecourse_p.h"
 
@@ -29,17 +29,17 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SedJobPtr SedJob::Impl::create()
+SedInstancePtr SedInstance::Impl::create()
 {
-    return SedJobPtr {new SedJob()};
+    return SedInstancePtr {new SedInstance()};
 }
 
-SedJob::Impl::~Impl()
+SedInstance::Impl::~Impl()
 {
     resetArrays();
 }
 
-void SedJob::Impl::resetArrays()
+void SedInstance::Impl::resetArrays()
 {
     delete[] mStates;
     delete[] mRates;
@@ -50,7 +50,7 @@ void SedJob::Impl::resetArrays()
     mVariables = nullptr;
 }
 
-void SedJob::Impl::run(const SedModelPtr &pModel, const SedSimulationPtr &pSimulation)
+void SedInstance::Impl::run(const SedModelPtr &pModel, const SedSimulationPtr &pSimulation)
 {
     // Get a runtime for the model.
 
@@ -149,23 +149,23 @@ void SedJob::Impl::run(const SedModelPtr &pModel, const SedSimulationPtr &pSimul
     }
 }
 
-SedJob::SedJob()
+SedInstance::SedInstance()
     : Logger(new Impl())
 {
 }
 
-SedJob::~SedJob()
+SedInstance::~SedInstance()
 {
     delete pimpl();
 }
 
-SedJob::Impl *SedJob::pimpl()
+SedInstance::Impl *SedInstance::pimpl()
 {
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
 /*---GRY---
-const SedJob::Impl *SedJob::pimpl() const
+const SedInstance::Impl *SedInstance::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }

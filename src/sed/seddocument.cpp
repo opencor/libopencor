@@ -16,7 +16,7 @@ limitations under the License.
 
 #include "file_p.h"
 #include "seddocument_p.h"
-#include "sedjob_p.h"
+#include "sedinstance_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
 #include "sedtask_p.h"
@@ -425,7 +425,7 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
 } // namespace
 #endif
 
-void SedDocument::Impl::runTask(const SedJobPtr &pJob, const SedTaskPtr &pTask)
+void SedDocument::Impl::createTaskIstance(const SedInstancePtr &pInstance, const SedTaskPtr &pTask)
 {
     auto *taskPimpl = pTask->pimpl();
 
@@ -434,19 +434,19 @@ void SedDocument::Impl::runTask(const SedJobPtr &pJob, const SedTaskPtr &pTask)
     // Make sure that the task is valid.
 
     if (!taskPimpl->isValid()) {
-        pJob->pimpl()->addIssues(pTask);
+        pInstance->pimpl()->addIssues(pTask);
 
         return;
     }
 
 #ifndef __EMSCRIPTEN__
-    // Run our job.
+    // Run our instance.
 
-    pJob->pimpl()->run(taskPimpl->mModel, taskPimpl->mSimulation);
+    pInstance->pimpl()->run(taskPimpl->mModel, taskPimpl->mSimulation);
 #endif
 }
 
-SedJobPtr SedDocument::Impl::run()
+SedInstancePtr SedDocument::Impl::createInstance()
 {
     removeAllIssues();
 
@@ -454,7 +454,7 @@ SedJobPtr SedDocument::Impl::run()
     // could be run.
     //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
 
-    auto job = SedJob::Impl::create();
+    auto instance = SedInstance::Impl::create();
 
     if (hasTasks()) {
         for (const auto &task : mTasks) {
@@ -465,13 +465,13 @@ SedJobPtr SedDocument::Impl::run()
 
             ASSERT_NE(crtTask, nullptr);
 
-            runTask(job, crtTask);
+            createTaskIstance(instance, crtTask);
         }
     } else {
-        job->pimpl()->addError("The simulation experiment description does not contain any tasks to run.");
+        instance->pimpl()->addError("The simulation experiment description does not contain any tasks to run.");
     }
 
-    return job;
+    return instance;
 }
 
 SedDocument::SedDocument()
@@ -580,9 +580,9 @@ bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
     return pimpl()->removeTask(pTask);
 }
 
-SedJobPtr SedDocument::run()
+SedInstancePtr SedDocument::createInstance()
 {
-    return pimpl()->run();
+    return pimpl()->createInstance();
 }
 
 } // namespace libOpenCOR

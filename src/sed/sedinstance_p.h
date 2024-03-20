@@ -18,11 +18,11 @@ limitations under the License.
 
 #include "logger_p.h"
 
-#include "libopencor/sedjob.h"
+#include "libopencor/sedinstance.h"
 
 namespace libOpenCOR {
 
-class SedJob::Impl: public Logger::Impl
+class SedInstance::Impl: public Logger::Impl
 {
 public:
     double mVoi = 0.0;
@@ -30,7 +30,7 @@ public:
     double *mRates = nullptr;
     double *mVariables = nullptr;
 
-    static SedJobPtr create();
+    static SedInstancePtr create();
 
     ~Impl();
 

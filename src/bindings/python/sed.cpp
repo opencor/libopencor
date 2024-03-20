@@ -58,11 +58,11 @@ void sedApi(py::module_ &m)
         .def_property_readonly("tasks", &libOpenCOR::SedDocument::tasks, "Return the tasks.")
         .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.")
         .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.")
-        .def("run", &libOpenCOR::SedDocument::run, "Run this SedDocument object.");
+        .def("create_instance", &libOpenCOR::SedDocument::createInstance, "Create an instance of this SedDocument object.");
 
-    // SedJob API.
+    // SedInstance API.
 
-    py::class_<libOpenCOR::SedJob, libOpenCOR::Logger, libOpenCOR::SedJobPtr> sedJob(m, "SedJob");
+    py::class_<libOpenCOR::SedInstance, libOpenCOR::Logger, libOpenCOR::SedInstancePtr> sedInstance(m, "SedInstance");
 
     // SedModel API.
 
