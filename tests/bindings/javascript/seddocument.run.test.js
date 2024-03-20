@@ -78,9 +78,9 @@ describe("SedDocument run tests", () => {
 
   test("No file", () => {
     const sed = new libopencor.SedDocument();
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The simulation experiment description does not contain any tasks to run.",
@@ -97,9 +97,9 @@ describe("SedDocument run tests", () => {
     );
 
     const sed = new libopencor.SedDocument(file);
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
       [
         libopencor.Issue.Type.ERROR,
@@ -117,9 +117,9 @@ describe("SedDocument run tests", () => {
     );
 
     const sed = new libopencor.SedDocument(file);
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
       [
         libopencor.Issue.Type.ERROR,
@@ -137,9 +137,9 @@ describe("SedDocument run tests", () => {
     );
 
     const sed = new libopencor.SedDocument(file);
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
       [
         libopencor.Issue.Type.ERROR,
@@ -157,9 +157,9 @@ describe("SedDocument run tests", () => {
     );
 
     const sed = new libopencor.SedDocument(file);
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The CellML file is unsuitably constrained.",
@@ -184,9 +184,9 @@ describe("SedDocument run tests", () => {
     );
 
     const sed = new libopencor.SedDocument(file);
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expect(job.hasIssues()).toBe(false);
+    expect(instance.hasIssues()).toBe(false);
   });
 
   test("ODE model", () => {
@@ -201,9 +201,9 @@ describe("SedDocument run tests", () => {
     /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
     cvode.setMaximumNumberOfSteps(10);
 
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "At t = 0.00140014, mxstep steps taken before reaching tout.",
@@ -213,9 +213,9 @@ describe("SedDocument run tests", () => {
 
     cvode.setMaximumNumberOfSteps(500);
 
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expect(job.hasIssues()).toBe(false);
+    expect(instance.hasIssues()).toBe(false);
   });
 
   test("ODE model with no ODE solver", () => {
@@ -227,9 +227,9 @@ describe("SedDocument run tests", () => {
 
     sed.simulations().get(0).setOdeSolver(null);
 
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver.",
@@ -243,9 +243,9 @@ describe("SedDocument run tests", () => {
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
     const sed = new libopencor.SedDocument(file);
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expect(job.hasIssues()).toBe(false);
+    expect(instance.hasIssues()).toBe(false);
   });
 
   test("NLA model with no NLA solver", () => {
@@ -257,9 +257,9 @@ describe("SedDocument run tests", () => {
 
     sed.simulations().get(0).setNlaSolver(null);
 
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver.",
@@ -273,9 +273,9 @@ describe("SedDocument run tests", () => {
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
     const sed = new libopencor.SedDocument(file);
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expect(job.hasIssues()).toBe(false);
+    expect(instance.hasIssues()).toBe(false);
   });
 
   test("DAE model with no ODE or NLA solver", () => {
@@ -289,9 +289,9 @@ describe("SedDocument run tests", () => {
     simulation.setOdeSolver(null);
     simulation.setNlaSolver(null);
 
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver.",

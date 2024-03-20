@@ -222,14 +222,14 @@ public:
     bool removeTask(const SedAbstractTaskPtr &pTask);
 
     /**
-     * @brief Run this simulation experiment description.
+     * @brief Create an instance of this simulation experiment description.
      *
-     * Run this simulation experiment description, if valid, in its own thread.
+     * Create an instance of this simulation experiment description.
      *
-     * @return A smart pointer to a @ref SedJob object.
+     * @return A smart pointer to a @ref SedInstance object.
      */
 
-    SedJobPtr run();
+    SedInstancePtr createInstance();
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

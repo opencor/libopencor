@@ -21,12 +21,12 @@ limitations under the License.
 namespace libOpenCOR {
 
 /**
- * @brief The SedJob class.
+ * @brief The SedInstance class.
  *
- * The SedJob class is used to describe a run in the context of a simulation experiment description.
+ * The SedInstance class is used to describe an instance of a simulation experiment description.
  */
 
-class LIBOPENCOR_EXPORT SedJob: public Logger
+class LIBOPENCOR_EXPORT SedInstance: public Logger
 {
     friend class SedDocument;
 
@@ -35,18 +35,18 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SedJob() override; /**< Destructor, @private. */
+    ~SedInstance() override; /**< Destructor, @private. */
 
-    SedJob(const SedJob &pOther) = delete; /**< No copy constructor allowed, @private. */
-    SedJob(SedJob &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
+    SedInstance(const SedInstance &pOther) = delete; /**< No copy constructor allowed, @private. */
+    SedInstance(SedInstance &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
-    SedJob &operator=(const SedJob &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
-    SedJob &operator=(SedJob &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
+    SedInstance &operator=(const SedInstance &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
+    SedInstance &operator=(SedInstance &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedJob(); /**< Constructor @private. */
+    explicit SedInstance(); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

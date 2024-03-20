@@ -118,9 +118,9 @@ describe("SedDocument coverage tests", () => {
 
     expect(sed.serialise()).toBe(sedTaskExpectedSerialisation(false));
 
-    const job = sed.run();
+    const instance = sed.createInstance();
 
-    expectIssues(job, [
+    expectIssues(instance, [
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a model."],
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
     ]);

@@ -62,8 +62,8 @@ public:
     bool addTask(const SedAbstractTaskPtr &pTask);
     bool removeTask(const SedAbstractTaskPtr &pTask);
 
-    void runTask(const SedJobPtr &pJob, const SedTaskPtr &pTask);
-    SedJobPtr run();
+    void createTaskIstance(const SedInstancePtr &pInstance, const SedTaskPtr &pTask);
+    SedInstancePtr createInstance();
 };
 
 } // namespace libOpenCOR

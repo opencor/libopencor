@@ -27,9 +27,9 @@ def test_no_file():
     ]
 
     sed = SedDocument()
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
 
 
 def test_invalid_cellml_file():
@@ -46,9 +46,9 @@ def test_invalid_cellml_file():
 
     file = File(utils.resource_path(utils.ERROR_CELLML_FILE))
     sed = SedDocument(file)
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
 
 
 def test_overconstrained_cellml_file():
@@ -65,9 +65,9 @@ def test_overconstrained_cellml_file():
 
     file = File(utils.resource_path("api/sed/overconstrained.cellml"))
     sed = SedDocument(file)
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
 
 
 def test_underconstrained_cellml_file():
@@ -84,9 +84,9 @@ def test_underconstrained_cellml_file():
 
     file = File(utils.resource_path("api/sed/underconstrained.cellml"))
     sed = SedDocument(file)
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
 
 
 def test_unsuitable_constrained_cellml_file():
@@ -107,17 +107,17 @@ def test_unsuitable_constrained_cellml_file():
 
     file = File(utils.resource_path("api/sed/unsuitably_constrained.cellml"))
     sed = SedDocument(file)
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
 
 
 def test_algebraic_model():
     file = File(utils.resource_path("api/sed/algebraic.cellml"))
     sed = SedDocument(file)
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert job.has_issues == False
+    assert instance.has_issues == False
 
 
 def test_ode_model():
@@ -135,15 +135,15 @@ def test_ode_model():
 
     cvode.maximum_number_of_steps = 10
 
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
 
     cvode.maximum_number_of_steps = 500
 
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert job.has_issues == False
+    assert instance.has_issues == False
 
 
 def test_ode_model_with_no_ode_solver():
@@ -159,17 +159,17 @@ def test_ode_model_with_no_ode_solver():
 
     sed.simulations[0].ode_solver = None
 
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
 
 
 def test_nla_model():
     file = File(utils.resource_path("api/sed/nla.cellml"))
     sed = SedDocument(file)
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert job.has_issues == False
+    assert instance.has_issues == False
 
 
 def test_nla_model_with_no_nla_solver():
@@ -185,17 +185,17 @@ def test_nla_model_with_no_nla_solver():
 
     sed.simulations[0].nla_solver = None
 
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
 
 
 def test_dae_model():
     file = File(utils.resource_path("api/sed/dae.cellml"))
     sed = SedDocument(file)
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert job.has_issues == False
+    assert instance.has_issues == False
 
 
 def test_dae_model_with_no_ode_or_nla_solver():
@@ -217,6 +217,6 @@ def test_dae_model_with_no_ode_or_nla_solver():
     simulation.ode_solver = None
     simulation.nla_solver = None
 
-    job = sed.run()
+    instance = sed.create_instance()
 
-    assert_issues(job, expected_issues)
+    assert_issues(instance, expected_issues)
