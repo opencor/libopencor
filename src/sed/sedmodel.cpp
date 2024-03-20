@@ -19,8 +19,6 @@ limitations under the License.
 #include "sedmodel_p.h"
 #include "utils.h"
 
-#include "libopencor/file.h"
-
 #include <filesystem>
 
 namespace libOpenCOR {
