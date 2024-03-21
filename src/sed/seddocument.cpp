@@ -384,47 +384,6 @@ bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
     return false;
 }
 
-SedInstancePtr SedDocument::Impl::createInstance()
-{
-    // Check whether there are some outputs that should be generated or, failing that, whether there are some tasks that
-    // could be run.
-    //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
-
-    auto instance = SedInstance::Impl::create();
-
-    if (hasTasks()) {
-        // Make sure that all the tasks are valid.
-
-        auto tasksValid = true;
-
-        for (const auto &task : mTasks) {
-            auto *taskPimpl = task->pimpl();
-
-            taskPimpl->removeAllIssues();
-
-            // Make sure that the task is valid.
-
-            if (!taskPimpl->isValid()) {
-                instance->pimpl()->addIssues(task);
-
-                tasksValid = false;
-            }
-        }
-
-        // Create an instance of all the tasks, if they are all valid.
-
-        if (tasksValid) {
-            for (const auto &task : mTasks) {
-                instance->pimpl()->createInstanceTask(task);
-            }
-        }
-    } else {
-        instance->pimpl()->addError("The simulation experiment description does not contain any tasks to run.");
-    }
-
-    return instance;
-}
-
 SedDocument::SedDocument()
     : Logger(new Impl {})
 {
@@ -533,7 +492,7 @@ bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
 
 SedInstancePtr SedDocument::createInstance()
 {
-    return pimpl()->createInstance();
+    return SedInstance::Impl::create(shared_from_this());
 }
 
 } // namespace libOpenCOR

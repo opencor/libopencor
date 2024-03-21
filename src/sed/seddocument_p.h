@@ -61,8 +61,6 @@ public:
     bool hasTasks() const;
     bool addTask(const SedAbstractTaskPtr &pTask);
     bool removeTask(const SedAbstractTaskPtr &pTask);
-
-    SedInstancePtr createInstance();
 };
 
 } // namespace libOpenCOR
