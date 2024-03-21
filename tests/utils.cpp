@@ -23,6 +23,23 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+void printIssues(const LoggerPtr &pLogger)
+{
+    printf("---[ISSUES]---[BEGIN]\n"); // NOLINT
+
+    for (auto &issue : pLogger->issues()) {
+        auto type = (issue->type() == Issue::Type::ERROR) ?
+                        "ERROR" :
+                    (issue->type() == Issue::Type::WARNING) ?
+                        "WARNING" :
+                        "MESSAGE";
+
+        printf("%s: %s\n", type, issue->description().c_str()); // NOLINT
+    }
+
+    printf("---[ISSUES]---[END]\n"); // NOLINT
+}
+
 void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues)
 {
     auto issues = pLogger->issues();
