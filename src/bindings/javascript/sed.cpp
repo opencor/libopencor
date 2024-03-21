@@ -60,7 +60,8 @@ void sedApi()
     // SedInstance API.
 
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
-        .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance");
+        .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
+        .function("run", &libOpenCOR::SedInstance::run);
 
     // SedInstanceTask API.
 

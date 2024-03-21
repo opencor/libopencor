@@ -13,12 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+#include "libopencor/solvercvode.h"
 
 #include "file_p.h"
 #include "sedinstancetask_p.h"
 #include "sedmodel_p.h"
 #include "sedtask_p.h"
 #include "seduniformtimecourse_p.h"
+#include "solvernla_p.h"
+#include "solverode_p.h"
 
 #include "utils.h"
 
@@ -83,11 +86,17 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 #ifndef __EMSCRIPTEN__
     // Get a runtime for the model.
 
-    auto *taskPimpl = task->pimpl();
-    auto cellmlFile = taskPimpl->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
-    auto simulation = taskPimpl->mSimulation;
+    auto cellmlFile = task->pimpl()->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
 
-    mRuntime = cellmlFile->runtime(simulation->nlaSolver());
+    mDifferentialModel = differentialModel(cellmlFile);
+    mSimulation = task->pimpl()->mSimulation;
+
+    auto odeSolver = mSimulation->odeSolver();
+    auto nlaSolver = mSimulation->nlaSolver();
+
+    mOdeSolver = (odeSolver != nullptr) ? dynamic_pointer_cast<SolverOde>(odeSolver->pimpl()->duplicate()) : nullptr;
+    mNlaSolver = (nlaSolver != nullptr) ? dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
+    mRuntime = cellmlFile->runtime(mNlaSolver);
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (mRuntime->hasErrors()) {
@@ -99,33 +108,27 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     // Create our various arrays.
 
-    resetArrays();
+    mAnalyserModel = cellmlFile->analyserModel();
 
-    auto cellmlFileType = cellmlFile->type();
-    auto differentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
-                             || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
-    auto analyserModel = cellmlFile->analyserModel();
-
-    if (differentialModel) {
-        mStates = new double[analyserModel->stateCount()];
-        mRates = new double[analyserModel->stateCount()];
-        mVariables = new double[analyserModel->variableCount()];
+    if (mDifferentialModel) {
+        mStates = new double[mAnalyserModel->stateCount()];
+        mRates = new double[mAnalyserModel->stateCount()];
+        mVariables = new double[mAnalyserModel->variableCount()];
     } else {
-        mVariables = new double[analyserModel->variableCount()];
+        mVariables = new double[mAnalyserModel->variableCount()];
     }
 
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
 #    ifdef PRINT_VALUES
-    printHeader(analyserModel);
+    printHeader(mAnalyserModel);
 #    endif
 
-    auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(simulation) : nullptr;
-    auto *uniformTimeCourseSimulationPimpl = differentialModel ? uniformTimeCourseSimulation->pimpl() : nullptr;
+    mSedUniformTimeCourse = mDifferentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
-    if (differentialModel) {
-        mVoi = uniformTimeCourseSimulationPimpl->mOutputStartTime;
+    if (mDifferentialModel) {
+        mVoi = mSedUniformTimeCourse->pimpl()->mOutputStartTime;
 
         mRuntime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
         mRuntime->computeComputedConstants()(mVariables); // NOLINT
@@ -137,48 +140,23 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
         mRuntime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
     }
 
-    // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
+    // Make sure that the NLA solver, should it have been used, didn't report any issues.
 
-    auto nlaSolver = differentialModel ? uniformTimeCourseSimulation->nlaSolver() : dynamic_pointer_cast<SedSteadyState>(simulation)->nlaSolver();
-
-    if (differentialModel) {
-        // Initialise the ODE solver.
-
-        auto odeSolver = uniformTimeCourseSimulation->odeSolver();
-
-        odeSolver->initialise(mVoi, analyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeRates());
-#    ifdef PRINT_VALUES
-        printValues(analyserModel, mVoi, mStates, mVariables);
-#    endif
-
-        // Compute the differential model.
-
-        auto voiStart = mVoi;
-        auto voiEnd = uniformTimeCourseSimulationPimpl->mOutputEndTime;
-        auto voiInterval = (voiEnd - mVoi) / uniformTimeCourseSimulationPimpl->mNumberOfSteps;
-        size_t voiCounter = 0;
-
-        while (!fuzzyCompare(mVoi, voiEnd)) {
-            if (!odeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
-                addIssues(odeSolver);
-
-                return;
-            }
-
-            if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
-                addIssues(nlaSolver);
-
-                return;
-            }
-
-            mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
-#    ifdef PRINT_VALUES
-            printValues(analyserModel, mVoi, mStates, mVariables);
-#    endif
-        }
-    } else if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
-        addIssues(nlaSolver);
+    if (hasSolverIssues()) {
+        return;
     }
+
+    // Initialise the ODE solver, if needed.
+
+    if (mDifferentialModel) {
+        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeRates())
+            && hasSolverIssues()) {
+            return;
+        }
+    }
+#    ifdef PRINT_VALUES
+    printValues(mAnalyserModel, mVoi, mStates, mVariables);
+#    endif
 #endif
 }
 
@@ -196,6 +174,57 @@ void SedInstanceTask::Impl::resetArrays()
     mStates = nullptr;
     mRates = nullptr;
     mVariables = nullptr;
+}
+
+bool SedInstanceTask::Impl::hasSolverIssues()
+{
+    if ((mOdeSolver != nullptr) && mOdeSolver->hasIssues()) {
+        addIssues(mOdeSolver);
+    }
+
+    if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+        addIssues(mNlaSolver);
+    }
+
+    return hasIssues();
+}
+
+void SedInstanceTask::Impl::run()
+{
+    // Make sure that the instance task doesn't have any issues.
+
+    if (hasIssues()) {
+        return;
+    }
+
+#ifndef __EMSCRIPTEN__
+    // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
+
+    if (mDifferentialModel) {
+        // Compute the differential model.
+
+        auto voiStart = mVoi;
+        auto voiEnd = mSedUniformTimeCourse->pimpl()->mOutputEndTime;
+        auto voiInterval = (voiEnd - mVoi) / mSedUniformTimeCourse->pimpl()->mNumberOfSteps;
+        size_t voiCounter = 0;
+
+        while (!fuzzyCompare(mVoi, voiEnd)) {
+            if (!mOdeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))
+                && hasSolverIssues()) {
+                return;
+            }
+
+            mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+
+            if (hasSolverIssues()) {
+                return;
+            }
+#    ifdef PRINT_VALUES
+            printValues(mAnalyserModel, mVoi, mStates, mVariables);
+#    endif
+        }
+    }
+#endif
 }
 
 SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask)

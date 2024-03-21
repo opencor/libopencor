@@ -27,7 +27,13 @@ namespace libOpenCOR {
 class SedInstanceTask::Impl: public Logger::Impl
 {
 public:
-    CellmlFileRuntimePtr mRuntime = nullptr;
+    CellmlFileRuntimePtr mRuntime;
+    SedSimulationPtr mSimulation;
+    SedUniformTimeCoursePtr mSedUniformTimeCourse;
+    bool mDifferentialModel;
+    libcellml::AnalyserModelPtr mAnalyserModel;
+    SolverOdePtr mOdeSolver;
+    SolverNlaPtr mNlaSolver;
 
     double mVoi = 0.0;
     double *mStates = nullptr;
@@ -40,6 +46,10 @@ public:
     ~Impl();
 
     void resetArrays();
+
+    bool hasSolverIssues();
+
+    void run();
 };
 
 } // namespace libOpenCOR

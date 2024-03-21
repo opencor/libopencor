@@ -186,6 +186,8 @@ describe("SedDocument run tests", () => {
     const sed = new libopencor.SedDocument(file);
     const instance = sed.createInstance();
 
+    instance.run();
+
     expect(instance.hasIssues()).toBe(false);
   });
 
@@ -203,6 +205,10 @@ describe("SedDocument run tests", () => {
 
     const instance = sed.createInstance();
 
+    expect(instance.hasIssues()).toBe(false);
+
+    instance.run();
+
     expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
@@ -214,6 +220,8 @@ describe("SedDocument run tests", () => {
     cvode.setMaximumNumberOfSteps(500);
 
     const instance = sed.createInstance();
+
+    instance.run();
 
     expect(instance.hasIssues()).toBe(false);
   });
@@ -243,7 +251,26 @@ describe("SedDocument run tests", () => {
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
     const sed = new libopencor.SedDocument(file);
-    const instance = sed.createInstance();
+    const simulation = sed.simulations().get(0);
+    const kinsol = simulation.nlaSolver();
+
+    kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
+    kinsol.setUpperHalfBandwidth(-1);
+
+    let instance = sed.createInstance();
+
+    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
+    expectIssues(instance, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+      ],
+    ]);
+    */
+
+    kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
+
+    instance = sed.createInstance();
 
     expect(instance.hasIssues()).toBe(false);
   });
@@ -273,7 +300,39 @@ describe("SedDocument run tests", () => {
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
     const sed = new libopencor.SedDocument(file);
-    const instance = sed.createInstance();
+    const simulation = sed.simulations().get(0);
+    const kinsol = simulation.nlaSolver();
+
+    kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
+    kinsol.setUpperHalfBandwidth(-1);
+
+    let instance = sed.createInstance();
+
+    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
+    expectIssues(instance, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+      ],
+    ]);
+    */
+
+    instance.run();
+
+    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
+    expectIssues(instance, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+      ],
+    ]);
+    */
+
+    kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
+
+    instance = sed.createInstance();
+
+    instance.run();
 
     expect(instance.hasIssues()).toBe(false);
   });

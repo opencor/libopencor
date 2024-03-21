@@ -429,4 +429,12 @@ const xmlChar *toConstXmlCharPtr(const std::string &pString)
     return reinterpret_cast<const xmlChar *>(pString.c_str());
 }
 
+bool differentialModel(const CellmlFilePtr &pCellmlFile)
+{
+    auto type = pCellmlFile->type();
+
+    return (type == libcellml::AnalyserModel::Type::ODE)
+           || (type == libcellml::AnalyserModel::Type::DAE);
+}
+
 } // namespace libOpenCOR

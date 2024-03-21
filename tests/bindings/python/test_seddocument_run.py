@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue, SedDocument
+from libopencor import File, Issue, SedDocument, SolverKinsol
 import utils
 from utils import assert_issues
 
@@ -117,6 +117,8 @@ def test_algebraic_model():
     sed = SedDocument(file)
     instance = sed.create_instance()
 
+    instance.run()
+
     assert instance.has_issues == False
 
 
@@ -137,11 +139,17 @@ def test_ode_model():
 
     instance = sed.create_instance()
 
+    assert instance.has_issues == False
+
+    instance.run()
+
     assert_issues(instance, expected_issues)
 
     cvode.maximum_number_of_steps = 500
 
     instance = sed.create_instance()
+
+    instance.run()
 
     assert instance.has_issues == False
 
@@ -165,8 +173,27 @@ def test_ode_model_with_no_ode_solver():
 
 
 def test_nla_model():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+        ],
+    ]
+
     file = File(utils.resource_path("api/sed/nla.cellml"))
     sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    kinsol = simulation.nla_solver
+
+    kinsol.linear_solver = SolverKinsol.LinearSolver.Banded
+    kinsol.upper_half_bandwidth = -1
+
+    instance = sed.create_instance()
+
+    assert_issues(instance, expected_issues)
+
+    kinsol.linear_solver = SolverKinsol.LinearSolver.Dense
+
     instance = sed.create_instance()
 
     assert instance.has_issues == False
@@ -191,9 +218,34 @@ def test_nla_model_with_no_nla_solver():
 
 
 def test_dae_model():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+        ],
+    ]
+
     file = File(utils.resource_path("api/sed/dae.cellml"))
     sed = SedDocument(file)
+    simulation = sed.simulations[0]
+    kinsol = simulation.nla_solver
+
+    kinsol.linear_solver = SolverKinsol.LinearSolver.Banded
+    kinsol.upper_half_bandwidth = -1
+
     instance = sed.create_instance()
+
+    assert_issues(instance, expected_issues)
+
+    instance.run()
+
+    assert_issues(instance, expected_issues)
+
+    kinsol.linear_solver = SolverKinsol.LinearSolver.Dense
+
+    instance = sed.create_instance()
+
+    instance.run()
 
     assert instance.has_issues == False
 

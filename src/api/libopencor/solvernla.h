@@ -28,6 +28,7 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverNla: public Solver
 {
+    friend class SedInstanceTask;
     friend class SedSimulation;
 
 public:

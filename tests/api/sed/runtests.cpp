@@ -95,6 +95,8 @@ TEST(RunSedDocumentTest, algebraicModel)
     auto sed = libOpenCOR::SedDocument::create(file);
     auto instance = sed->createInstance();
 
+    instance->run();
+
     EXPECT_FALSE(instance->hasIssues());
 }
 
@@ -116,6 +118,10 @@ TEST(RunSedDocumentTest, odeModel)
 
     auto instance = sed->createInstance();
 
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 
     static const auto OK_MAXIMUM_NUMBER_OF_STEPS = 500;
@@ -123,6 +129,8 @@ TEST(RunSedDocumentTest, odeModel)
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
     instance = sed->createInstance();
+
+    instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
 }
@@ -202,9 +210,15 @@ TEST(RunSedDocumentTest, daeModel)
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 
+    instance->run();
+
+    EXPECT_EQ_ISSUES(instance, expectedIssues);
+
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
     instance = sed->createInstance();
+
+    instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
 }
