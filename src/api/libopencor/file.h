@@ -33,7 +33,7 @@ class LIBOPENCOR_EXPORT File: public Logger
     , public std::enable_shared_from_this<File>
 {
     friend class SedDocument;
-    friend class SedInstance;
+    friend class SedInstanceTask;
     friend class SedModel;
     friend class SedSimulation;
 

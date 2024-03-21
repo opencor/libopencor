@@ -29,7 +29,7 @@ namespace libOpenCOR {
 class LIBOPENCOR_EXPORT SedModel: public SedBase
 {
     friend class SedDocument;
-    friend class SedInstance;
+    friend class SedInstanceTask;
     friend class SedSimulation;
     friend class SedTask;
 

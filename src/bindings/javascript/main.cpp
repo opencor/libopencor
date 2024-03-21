@@ -30,6 +30,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     emscripten::register_vector<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTaskPtrVector");
     emscripten::register_vector<libOpenCOR::SedDataDescriptionPtr>("SedDataDescriptionPtrVector");
     emscripten::register_vector<libOpenCOR::SedDataGeneratorPtr>("SedDataGeneratorPtrVector");
+    emscripten::register_vector<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTaskPtrVector");
     emscripten::register_vector<libOpenCOR::SedModelPtr>("SedModelPtrVector");
     emscripten::register_vector<libOpenCOR::SedOutputPtr>("SedOutputPtrVector");
     emscripten::register_vector<libOpenCOR::SedSimulationPtr>("SedSimulationPtrVector");

@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "logger_p.h"
 
+#include "cellmlfileruntime.h"
+
 #include "libopencor/sedinstancetask.h"
 
 namespace libOpenCOR {
@@ -25,7 +27,19 @@ namespace libOpenCOR {
 class SedInstanceTask::Impl: public Logger::Impl
 {
 public:
-    static SedInstanceTaskPtr create();
+    CellmlFileRuntimePtr mRuntime = nullptr;
+
+    double mVoi = 0.0;
+    double *mStates = nullptr;
+    double *mRates = nullptr;
+    double *mVariables = nullptr;
+
+    static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask);
+
+    explicit Impl(const SedAbstractTaskPtr &pTask);
+    ~Impl();
+
+    void resetArrays();
 };
 
 } // namespace libOpenCOR
