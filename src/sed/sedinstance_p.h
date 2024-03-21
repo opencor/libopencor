@@ -30,6 +30,8 @@ public:
     SedInstanceTaskPtrVector mTasks;
 
     explicit Impl(const SedDocumentPtr &pDocument);
+
+    void run();
 };
 
 } // namespace libOpenCOR

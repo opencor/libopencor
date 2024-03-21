@@ -62,7 +62,6 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
 
                 mTasks.push_back(taskInstance);
 
-                //---GRY--- THE BELOW SHOULD BE DONE UPON RUNNING A TASK, NOT UPON CREATING IT.
                 if (taskInstance->hasIssues()) {
                     addIssues(taskInstance);
                 }
@@ -70,6 +69,21 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
         }
     } else {
         addError("The simulation experiment description does not contain any tasks to run.");
+    }
+}
+
+void SedInstance::Impl::run()
+{
+    // Run all the tasks associated with this instance unless they have some issues.
+
+    for (const auto &task : mTasks) {
+        if (!task->hasIssues()) {
+            task->pimpl()->run();
+
+            if (task->hasIssues()) {
+                addIssues(task);
+            }
+        }
     }
 }
 
@@ -94,5 +108,10 @@ const SedInstance::Impl *SedInstance::pimpl() const
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 */
+
+void SedInstance::run()
+{
+    pimpl()->run();
+}
 
 } // namespace libOpenCOR

@@ -64,6 +64,8 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedInstance, libOpenCOR::Logger, libOpenCOR::SedInstancePtr> sedInstance(m, "SedInstance");
 
+    sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run the tasks associated with this SedInstance object.");
+
     // SedInstanceTask API.
 
     py::class_<libOpenCOR::SedInstanceTask, libOpenCOR::Logger, libOpenCOR::SedInstanceTaskPtr> sedInstanceTask(m, "SedInstanceTask");

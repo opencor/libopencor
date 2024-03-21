@@ -43,6 +43,14 @@ public:
     SedInstance &operator=(const SedInstance &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SedInstance &operator=(SedInstance &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
+    /**
+     * @brief Run all the tasks associated with this instance.
+     *
+     * Run all the tasks associated with this instance.
+     */
+
+    void run();
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

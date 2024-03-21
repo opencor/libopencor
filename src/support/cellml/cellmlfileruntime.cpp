@@ -29,11 +29,12 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         addIssues(cellmlFileAnalyser);
 #ifndef __EMSCRIPTEN__
     } else {
+        // Determine the type of the model.
+
+        auto differentialModel = libOpenCOR::differentialModel(pCellmlFile);
+
         // Generate some code for the given CellML file.
 
-        auto cellmlFileType = pCellmlFile->type();
-        auto differentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
-                                 || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
         auto generator = libcellml::Generator::create();
         auto generatorProfile = libcellml::GeneratorProfile::create();
 
@@ -81,6 +82,8 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 #    endif
 
         // Make sure that our compiler knows about nlaSolve(), if needed.
+
+        auto cellmlFileType = pCellmlFile->type();
 
         if ((cellmlFileType == libcellml::AnalyserModel::Type::NLA)
             || (cellmlFileType == libcellml::AnalyserModel::Type::DAE)) {

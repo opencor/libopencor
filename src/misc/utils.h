@@ -16,6 +16,7 @@ limitations under the License.
 
 #pragma once
 
+#include "cellmlfile.h"
 #include "unittestingexport.h"
 
 #include "libopencor/types.h"
@@ -95,5 +96,7 @@ std::string toString(double pNumber);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedCharVector &pBytes);
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
+
+bool differentialModel(const CellmlFilePtr &pCellmlFile);
 
 } // namespace libOpenCOR
