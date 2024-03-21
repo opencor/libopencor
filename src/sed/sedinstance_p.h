@@ -32,8 +32,9 @@ public:
     double *mRates = nullptr;
     double *mVariables = nullptr;
 
-    static SedInstancePtr create();
+    static SedInstancePtr create(const SedDocumentPtr &pDocument);
 
+    explicit Impl(const SedDocumentPtr &pDocument);
     ~Impl();
 
     void resetArrays();

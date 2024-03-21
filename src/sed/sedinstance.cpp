@@ -22,14 +22,54 @@ limitations under the License.
 
 #include "utils.h"
 
+#include "libopencor/seddocument.h"
 #include "libopencor/sedsimulation.h"
 #include "libopencor/sedsteadystate.h"
 
 namespace libOpenCOR {
 
-SedInstancePtr SedInstance::Impl::create()
+SedInstancePtr SedInstance::Impl::create(const SedDocumentPtr &pDocument)
 {
-    return SedInstancePtr {new SedInstance()};
+    return SedInstancePtr {new SedInstance(pDocument)};
+}
+
+SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
+    : Logger::Impl()
+{
+    // Check whether there are some outputs that should be generated or, failing that, whether there are some tasks that
+    // could be run.
+    //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
+
+    if (pDocument->hasTasks()) {
+        // Make sure that all the tasks are valid.
+
+        auto tasks = pDocument->tasks();
+        auto tasksValid = true;
+
+        for (const auto &task : tasks) {
+            auto *taskPimpl = task->pimpl();
+
+            taskPimpl->removeAllIssues();
+
+            // Make sure that the task is valid.
+
+            if (!taskPimpl->isValid()) {
+                addIssues(task);
+
+                tasksValid = false;
+            }
+        }
+
+        // Create an instance of all the tasks, if they are all valid.
+
+        if (tasksValid) {
+            for (const auto &task : tasks) {
+                createInstanceTask(task);
+            }
+        }
+    } else {
+        addError("The simulation experiment description does not contain any tasks to run.");
+    }
 }
 
 SedInstance::Impl::~Impl()
@@ -197,8 +237,8 @@ void SedInstance::Impl::createInstanceTask(const SedAbstractTaskPtr &pTask)
 #endif
 }
 
-SedInstance::SedInstance()
-    : Logger(new Impl())
+SedInstance::SedInstance(const SedDocumentPtr &pDocument)
+    : Logger(new Impl(pDocument))
 {
 }
 
