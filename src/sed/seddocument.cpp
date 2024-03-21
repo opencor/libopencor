@@ -386,8 +386,6 @@ bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
 
 SedInstancePtr SedDocument::Impl::createInstance()
 {
-    removeAllIssues();
-
     // Check whether there are some outputs that should be generated or, failing that, whether there are some tasks that
     // could be run.
     //---GRY--- WE DON'T CURRENTLY SUPPORT OUTPUTS, SO WE JUST CHECK FOR TASKS FOR NOW.
