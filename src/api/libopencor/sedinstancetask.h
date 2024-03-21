@@ -29,6 +29,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedInstanceTask: public Logger
 {
+    friend class SedInstance;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.
@@ -45,7 +47,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedInstanceTask(); /**< Constructor @private. */
+    explicit SedInstanceTask(const SedAbstractTaskPtr &pTask); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

@@ -118,6 +118,7 @@ using IssuePtrVector = std::vector<IssuePtr>; /**< Type definition for a vector 
 using SedAbstractTaskPtrVector = std::vector<SedAbstractTaskPtr>; /**< Type definition for a vector of @ref SedAbstractTask pointers. */
 using SedDataDescriptionPtrVector = std::vector<SedDataDescriptionPtr>; /**< Type definition for a vector of @ref SedDataDescription pointers. */
 using SedDataGeneratorPtrVector = std::vector<SedDataGeneratorPtr>; /**< Type definition for a vector of @ref SedDataGenerator pointers. */
+using SedInstanceTaskPtrVector = std::vector<SedInstanceTaskPtr>; /**< Type definition for a vector of @ref SedInstanceTask pointers. */
 using SedModelPtrVector = std::vector<SedModelPtr>; /**< Type definition for a vector of @ref SedModel pointers. */
 using SedOutputPtrVector = std::vector<SedOutputPtr>; /**< Type definition for a vector of @ref SedOutput pointers. */
 using SedSimulationPtrVector = std::vector<SedSimulationPtr>; /**< Type definition for a vector of @ref SedSimulation pointers. */

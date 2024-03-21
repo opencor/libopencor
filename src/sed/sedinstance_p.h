@@ -25,21 +25,11 @@ namespace libOpenCOR {
 class SedInstance::Impl: public Logger::Impl
 {
 public:
-    CellmlFileRuntimePtr mRuntime = nullptr;
-
-    double mVoi = 0.0;
-    double *mStates = nullptr;
-    double *mRates = nullptr;
-    double *mVariables = nullptr;
-
     static SedInstancePtr create(const SedDocumentPtr &pDocument);
 
+    SedInstanceTaskPtrVector mTasks;
+
     explicit Impl(const SedDocumentPtr &pDocument);
-    ~Impl();
-
-    void resetArrays();
-
-    void createInstanceTask(const SedAbstractTaskPtr &pTask);
 };
 
 } // namespace libOpenCOR

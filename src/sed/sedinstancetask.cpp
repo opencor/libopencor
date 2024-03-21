@@ -14,17 +14,192 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "file_p.h"
 #include "sedinstancetask_p.h"
+#include "sedmodel_p.h"
+#include "sedtask_p.h"
+#include "seduniformtimecourse_p.h"
+
+#include "utils.h"
+
+#include "libopencor/sedsimulation.h"
+#include "libopencor/sedsteadystate.h"
 
 namespace libOpenCOR {
 
-SedInstanceTaskPtr SedInstanceTask::Impl::create()
+// #define PRINT_VALUES
+
+#ifdef PRINT_VALUES
+namespace {
+
+void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
 {
-    return SedInstanceTaskPtr {new SedInstanceTask()};
+    printf("t"); // NOLINT
+
+    for (auto &state : pAnalyserModel->states()) {
+        printf(",%s", state->variable()->name().c_str()); // NOLINT
+    }
+
+    for (auto &variable : pAnalyserModel->variables()) {
+        printf(",%s", variable->variable()->name().c_str()); // NOLINT
+    }
+
+    printf("\n"); // NOLINT
 }
 
-SedInstanceTask::SedInstanceTask()
-    : Logger(new Impl())
+void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
+                 double pVoi, double *pStates, double *pVariables)
+{
+    printf("%f", pVoi); // NOLINT
+
+    for (size_t i = 0; i < pAnalyserModel->states().size(); ++i) {
+        printf(",%f", pStates[i]); // NOLINT
+    }
+
+    for (size_t i = 0; i < pAnalyserModel->variables().size(); ++i) {
+        printf(",%f", pVariables[i]); // NOLINT
+    }
+
+    printf("\n"); // NOLINT
+}
+
+} // namespace
+#endif
+
+SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask)
+{
+    return SedInstanceTaskPtr {new SedInstanceTask(pTask)};
+}
+
+SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
+{
+    //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT (FOR NOW) THAT pTask IS INDEED A SedTask
+    //          OBJECT.
+
+    auto task = dynamic_pointer_cast<SedTask>(pTask);
+
+    ASSERT_NE(task, nullptr);
+
+#ifndef __EMSCRIPTEN__
+    // Get a runtime for the model.
+
+    auto *taskPimpl = task->pimpl();
+    auto cellmlFile = taskPimpl->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
+    auto simulation = taskPimpl->mSimulation;
+
+    mRuntime = cellmlFile->runtime(simulation->nlaSolver());
+
+#    ifndef CODE_COVERAGE_ENABLED
+    if (mRuntime->hasErrors()) {
+        addIssues(mRuntime);
+
+        return;
+    }
+#    endif
+
+    // Create our various arrays.
+
+    resetArrays();
+
+    auto cellmlFileType = cellmlFile->type();
+    auto differentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
+                             || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
+    auto analyserModel = cellmlFile->analyserModel();
+
+    if (differentialModel) {
+        mStates = new double[analyserModel->stateCount()];
+        mRates = new double[analyserModel->stateCount()];
+        mVariables = new double[analyserModel->variableCount()];
+    } else {
+        mVariables = new double[analyserModel->variableCount()];
+    }
+
+    // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
+    // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
+    // initialise our variables and compute computed constants and variables.
+#    ifdef PRINT_VALUES
+    printHeader(analyserModel);
+#    endif
+
+    auto uniformTimeCourseSimulation = differentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(simulation) : nullptr;
+    auto *uniformTimeCourseSimulationPimpl = differentialModel ? uniformTimeCourseSimulation->pimpl() : nullptr;
+
+    if (differentialModel) {
+        mVoi = uniformTimeCourseSimulationPimpl->mOutputStartTime;
+
+        mRuntime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
+        mRuntime->computeComputedConstants()(mVariables); // NOLINT
+        mRuntime->computeRates()(mVoi, mStates, mRates, mVariables); // NOLINT
+        mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+    } else {
+        mRuntime->initialiseVariablesForAlgebraicModel()(mVariables); // NOLINT
+        mRuntime->computeComputedConstants()(mVariables); // NOLINT
+        mRuntime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
+    }
+
+    // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
+
+    auto nlaSolver = differentialModel ? uniformTimeCourseSimulation->nlaSolver() : dynamic_pointer_cast<SedSteadyState>(simulation)->nlaSolver();
+
+    if (differentialModel) {
+        // Initialise the ODE solver.
+
+        auto odeSolver = uniformTimeCourseSimulation->odeSolver();
+
+        odeSolver->initialise(mVoi, analyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeRates());
+#    ifdef PRINT_VALUES
+        printValues(analyserModel, mVoi, mStates, mVariables);
+#    endif
+
+        // Compute the differential model.
+
+        auto voiStart = mVoi;
+        auto voiEnd = uniformTimeCourseSimulationPimpl->mOutputEndTime;
+        auto voiInterval = (voiEnd - mVoi) / uniformTimeCourseSimulationPimpl->mNumberOfSteps;
+        size_t voiCounter = 0;
+
+        while (!fuzzyCompare(mVoi, voiEnd)) {
+            if (!odeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
+                addIssues(odeSolver);
+
+                return;
+            }
+
+            if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
+                addIssues(nlaSolver);
+
+                return;
+            }
+
+            mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+#    ifdef PRINT_VALUES
+            printValues(analyserModel, mVoi, mStates, mVariables);
+#    endif
+        }
+    } else if ((nlaSolver != nullptr) && nlaSolver->hasIssues()) {
+        addIssues(nlaSolver);
+    }
+#endif
+}
+
+SedInstanceTask::Impl::~Impl()
+{
+    resetArrays();
+}
+
+void SedInstanceTask::Impl::resetArrays()
+{
+    delete[] mStates;
+    delete[] mRates;
+    delete[] mVariables;
+
+    mStates = nullptr;
+    mRates = nullptr;
+    mVariables = nullptr;
+}
+
+SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask)
+    : Logger(new Impl(pTask))
 {
 }
 
@@ -38,9 +213,11 @@ SedInstanceTask::Impl *SedInstanceTask::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
+/*---GRY---
 const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
+*/
 
 } // namespace libOpenCOR
