@@ -25,6 +25,15 @@ SolverOdeFixedStep::Impl::Impl(const std::string &pId, const std::string &pName)
 {
 }
 
+SolverPtr SolverOdeFixedStep::Impl::duplicate(const SolverOdeFixedStepPtr &pSolver)
+{
+    auto solverPimpl = pSolver->pimpl();
+
+    solverPimpl->mStep = mStep;
+
+    return pSolver;
+}
+
 StringStringMap SolverOdeFixedStep::Impl::properties() const
 {
     StringStringMap res;

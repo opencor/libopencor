@@ -34,6 +34,8 @@ public:
     explicit Impl(const std::string &pId, const std::string &pName);
     virtual ~Impl() = default;
 
+    virtual SolverPtr duplicate() = 0;
+
     void serialise(xmlNodePtr pNode, bool pNlaAlgorithm = false) const;
 
     virtual StringStringMap properties() const = 0;

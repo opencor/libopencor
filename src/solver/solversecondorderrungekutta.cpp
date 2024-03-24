@@ -30,6 +30,11 @@ SolverSecondOrderRungeKutta::Impl::~Impl()
     delete[] mYk;
 }
 
+SolverPtr SolverSecondOrderRungeKutta::Impl::duplicate()
+{
+    return SolverOdeFixedStep::Impl::duplicate(SolverSecondOrderRungeKutta::create());
+}
+
 bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                                    double *pVariables, ComputeRates pComputeRates)
 {

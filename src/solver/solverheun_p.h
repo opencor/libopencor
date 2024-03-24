@@ -31,6 +31,8 @@ public:
     explicit Impl();
     ~Impl() override;
 
+    SolverPtr duplicate() override;
+
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
 

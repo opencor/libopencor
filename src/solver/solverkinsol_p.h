@@ -39,6 +39,8 @@ public:
 
     explicit Impl();
 
+    SolverPtr duplicate() override;
+
     StringStringMap properties() const override;
 
     bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;

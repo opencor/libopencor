@@ -25,9 +25,13 @@ namespace libOpenCOR {
 class SolverOdeFixedStep::Impl: public SolverOde::Impl
 {
 public:
+    using SolverOde::Impl::duplicate;
+
     double mStep = 1.0;
 
     explicit Impl(const std::string &pId, const std::string &pName);
+
+    SolverPtr duplicate(const SolverOdeFixedStepPtr &pSolver);
 
     StringStringMap properties() const override;
 

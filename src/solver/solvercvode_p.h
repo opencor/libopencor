@@ -67,6 +67,8 @@ public:
     explicit Impl();
     ~Impl() override;
 
+    SolverPtr duplicate() override;
+
     void resetInternals();
 
     StringStringMap properties() const override;
