@@ -33,6 +33,11 @@ SolverFourthOrderRungeKutta::Impl::~Impl()
     delete[] mYk;
 }
 
+SolverPtr SolverFourthOrderRungeKutta::Impl::duplicate()
+{
+    return SolverOdeFixedStep::Impl::duplicate(SolverFourthOrderRungeKutta::create());
+}
+
 bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                                    double *pVariables, ComputeRates pComputeRates)
 {

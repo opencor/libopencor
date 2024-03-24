@@ -25,6 +25,11 @@ SolverForwardEuler::Impl::Impl()
 {
 }
 
+SolverPtr SolverForwardEuler::Impl::duplicate()
+{
+    return SolverOdeFixedStep::Impl::duplicate(SolverForwardEuler::create());
+}
+
 bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                           double *pVariables, ComputeRates pComputeRates)
 {

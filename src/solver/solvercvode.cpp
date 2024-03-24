@@ -76,6 +76,26 @@ SolverCvode::Impl::~Impl()
     resetInternals();
 }
 
+SolverPtr SolverCvode::Impl::duplicate()
+{
+    auto solver = SolverCvode::create();
+    auto solverPimpl = solver->pimpl();
+
+    solverPimpl->mMaximumStep = mMaximumStep;
+    solverPimpl->mMaximumNumberOfSteps = mMaximumNumberOfSteps;
+    solverPimpl->mIntegrationMethod = mIntegrationMethod;
+    solverPimpl->mIterationType = mIterationType;
+    solverPimpl->mLinearSolver = mLinearSolver;
+    solverPimpl->mPreconditioner = mPreconditioner;
+    solverPimpl->mUpperHalfBandwidth = mUpperHalfBandwidth;
+    solverPimpl->mLowerHalfBandwidth = mLowerHalfBandwidth;
+    solverPimpl->mRelativeTolerance = mRelativeTolerance;
+    solverPimpl->mAbsoluteTolerance = mAbsoluteTolerance;
+    solverPimpl->mInterpolateSolution = mInterpolateSolution;
+
+    return solver;
+}
+
 void SolverCvode::Impl::resetInternals()
 {
     if (mSunContext != nullptr) {

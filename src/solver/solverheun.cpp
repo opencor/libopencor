@@ -31,6 +31,11 @@ SolverHeun::Impl::~Impl()
     delete[] mYk;
 }
 
+SolverPtr SolverHeun::Impl::duplicate()
+{
+    return SolverOdeFixedStep::Impl::duplicate(SolverHeun::create());
+}
+
 bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                   ComputeRates pComputeRates)
 {
