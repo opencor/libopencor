@@ -215,3 +215,21 @@ TEST(CoverageSedDocumentTest, sedUniformTimeCourse)
     EXPECT_EQ(simulation->outputEndTime(), OUTPUT_END_TIME);
     EXPECT_EQ(simulation->numberOfSteps(), NUMBER_OF_STEPS);
 }
+
+TEST(CoverageSedDocumentTest, solverImplDuplicate)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+
+    sed->simulations()[0]->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
+    sed->createInstance()->run();
+
+    sed->simulations()[0]->setOdeSolver(libOpenCOR::SolverFourthOrderRungeKutta::create());
+    sed->createInstance()->run();
+
+    sed->simulations()[0]->setOdeSolver(libOpenCOR::SolverHeun::create());
+    sed->createInstance()->run();
+
+    sed->simulations()[0]->setOdeSolver(libOpenCOR::SolverSecondOrderRungeKutta::create());
+    sed->createInstance()->run();
+}

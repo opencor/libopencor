@@ -21,6 +21,19 @@ import { expectIssues } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("SedDocument coverage tests", () => {
+  let someCellmlContentsPtr;
+
+  beforeAll(() => {
+    someCellmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_CELLML_CONTENTS,
+    );
+  });
+
+  afterAll(() => {
+    utils.freeMemory(libopencor, someCellmlContentsPtr);
+  });
+
   function sedTaskExpectedSerialisation(withProperties) {
     return (
       `<?xml version="1.0" encoding="UTF-8"?>
@@ -198,5 +211,31 @@ describe("SedDocument coverage tests", () => {
     expect(simulation.outputStartTime()).toBe(4.56);
     expect(simulation.outputEndTime()).toBe(7.89);
     expect(simulation.numberOfSteps()).toBe(10);
+  });
+
+  test("SolverImplDuplicate", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+
+    sed.simulations().get(0).setOdeSolver(new libopencor.SolverForwardEuler());
+    sed.createInstance().run();
+
+    sed
+      .simulations()
+      .get(0)
+      .setOdeSolver(new libopencor.SolverFourthOrderRungeKutta());
+    sed.createInstance().run();
+
+    sed.simulations().get(0).setOdeSolver(new libopencor.SolverHeun());
+    sed.createInstance().run();
+
+    sed
+      .simulations()
+      .get(0)
+      .setOdeSolver(new libopencor.SolverSecondOrderRungeKutta());
+    sed.createInstance().run();
   });
 });

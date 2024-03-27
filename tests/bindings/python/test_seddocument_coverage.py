@@ -22,7 +22,11 @@ from libopencor import (
     SedTask,
     SedUniformTimeCourse,
     SolverCvode,
+    SolverForwardEuler,
+    SolverFourthOrderRungeKutta,
+    SolverHeun,
     SolverKinsol,
+    SolverSecondOrderRungeKutta,
 )
 import utils
 from utils import assert_issues
@@ -214,3 +218,20 @@ def test_sed_simulation_uniform_time_course():
     assert simulation.output_start_time == 4.56
     assert simulation.output_end_time == 7.89
     assert simulation.number_of_steps == 10
+
+
+def test_solver_impl_duplicate():
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+
+    sed.simulations[0].ode_solver = SolverForwardEuler()
+    sed.create_instance().run()
+
+    sed.simulations[0].ode_solver = SolverFourthOrderRungeKutta()
+    sed.create_instance().run()
+
+    sed.simulations[0].ode_solver = SolverHeun()
+    sed.create_instance().run()
+
+    sed.simulations[0].ode_solver = SolverSecondOrderRungeKutta()
+    sed.create_instance().run()
