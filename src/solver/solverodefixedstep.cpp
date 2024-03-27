@@ -25,9 +25,9 @@ SolverOdeFixedStep::Impl::Impl(const std::string &pId, const std::string &pName)
 {
 }
 
-SolverPtr SolverOdeFixedStep::Impl::duplicate(const SolverOdeFixedStepPtr &pSolver)
+SolverPtr SolverOdeFixedStep::Impl::duplicate(const SolverOdeFixedStepPtr &pSolver) const
 {
-    auto solverPimpl = pSolver->pimpl();
+    auto *solverPimpl = pSolver->pimpl();
 
     solverPimpl->mStep = mStep;
 

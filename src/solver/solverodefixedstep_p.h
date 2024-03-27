@@ -31,7 +31,7 @@ public:
 
     explicit Impl(const std::string &pId, const std::string &pName);
 
-    SolverPtr duplicate(const SolverOdeFixedStepPtr &pSolver);
+    SolverPtr duplicate(const SolverOdeFixedStepPtr &pSolver) const;
 
     StringStringMap properties() const override;
 
