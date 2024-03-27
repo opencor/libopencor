@@ -19,7 +19,7 @@ import * as utils from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
-describe("SedDocument serialise tests", () => {
+describe("Sed serialise tests", () => {
   let someCellmlContentsPtr;
   let someAlgebraicContentsPtr;
   let someDaeContentsPtr;

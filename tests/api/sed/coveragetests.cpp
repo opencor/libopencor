@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(CoverageSedDocumentTest, initialise)
+TEST(CoverageSedTest, initialise)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\"/>\n";
@@ -30,7 +30,7 @@ TEST(CoverageSedDocumentTest, initialise)
     EXPECT_EQ(sed->serialise(), expectedSerialisation);
 }
 
-TEST(CoverageSedDocumentTest, sedDocumentModels)
+TEST(CoverageSedTest, sedDocumentModels)
 {
     auto sed = libOpenCOR::SedDocument::create();
 
@@ -53,7 +53,7 @@ TEST(CoverageSedDocumentTest, sedDocumentModels)
     EXPECT_FALSE(sed->removeModel(nullptr));
 }
 
-TEST(CoverageSedDocumentTest, sedDocumentSimulations)
+TEST(CoverageSedTest, sedDocumentSimulations)
 {
     auto sed = libOpenCOR::SedDocument::create();
 
@@ -91,7 +91,7 @@ std::string sedTaskExpectedSerialisation(bool pWithProperties)
 
 } // namespace
 
-TEST(CoverageSedDocumentTest, sedDocumentTasks)
+TEST(CoverageSedTest, sedDocumentTasks)
 {
     auto sed = libOpenCOR::SedDocument::create();
 
@@ -138,7 +138,7 @@ TEST(CoverageSedDocumentTest, sedDocumentTasks)
     EXPECT_FALSE(sed->removeTask(nullptr));
 }
 
-TEST(CoverageSedDocumentTest, sedSimulationOdeSolver)
+TEST(CoverageSedTest, sedSimulationOdeSolver)
 {
     auto sed = libOpenCOR::SedDocument::create();
     auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
@@ -156,7 +156,7 @@ TEST(CoverageSedDocumentTest, sedSimulationOdeSolver)
     EXPECT_EQ(simulation->odeSolver(), nullptr);
 }
 
-TEST(CoverageSedDocumentTest, sedSimulationNlaSolver)
+TEST(CoverageSedTest, sedSimulationNlaSolver)
 {
     auto sed = libOpenCOR::SedDocument::create();
     auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
@@ -174,7 +174,7 @@ TEST(CoverageSedDocumentTest, sedSimulationNlaSolver)
     EXPECT_EQ(simulation->nlaSolver(), nullptr);
 }
 
-TEST(CoverageSedDocumentTest, sedOneStep)
+TEST(CoverageSedTest, sedOneStep)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -189,7 +189,7 @@ TEST(CoverageSedDocumentTest, sedOneStep)
     EXPECT_EQ(simulation->step(), STEP);
 }
 
-TEST(CoverageSedDocumentTest, sedUniformTimeCourse)
+TEST(CoverageSedTest, sedUniformTimeCourse)
 {
     static const auto INITIAL_TIME = 1.23;
     static const auto OUTPUT_START_TIME = 4.56;
@@ -216,7 +216,7 @@ TEST(CoverageSedDocumentTest, sedUniformTimeCourse)
     EXPECT_EQ(simulation->numberOfSteps(), NUMBER_OF_STEPS);
 }
 
-TEST(CoverageSedDocumentTest, solverImplDuplicate)
+TEST(CoverageSedTest, solverImplDuplicate)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);

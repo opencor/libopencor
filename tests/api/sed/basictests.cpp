@@ -20,14 +20,14 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(BasicSedDocumentTest, noFile)
+TEST(BasicSedTest, noFile)
 {
     auto sed = libOpenCOR::SedDocument::create();
 
     EXPECT_FALSE(sed->hasIssues());
 }
 
-TEST(BasicSedDocumentTest, unknownFile)
+TEST(BasicSedTest, unknownFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an unknown file."},
@@ -39,7 +39,7 @@ TEST(BasicSedDocumentTest, unknownFile)
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(BasicSedDocumentTest, cellmlFile)
+TEST(BasicSedTest, cellmlFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -47,7 +47,7 @@ TEST(BasicSedDocumentTest, cellmlFile)
     EXPECT_FALSE(sed->hasIssues());
 }
 
-TEST(BasicSedDocumentTest, sedmlFile)
+TEST(BasicSedTest, sedmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::MESSAGE, "A simulation experiment description cannot (currently) be created using a SED-ML file."},
@@ -59,7 +59,7 @@ TEST(BasicSedDocumentTest, sedmlFile)
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(BasicSedDocumentTest, combineArchive)
+TEST(BasicSedTest, combineArchive)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::MESSAGE, "A simulation experiment description cannot (currently) be created using a COMBINE archive."},
@@ -71,7 +71,7 @@ TEST(BasicSedDocumentTest, combineArchive)
     EXPECT_EQ_ISSUES(sed, expectedIssues);
 }
 
-TEST(BasicSedDocumentTest, irretrievableFile)
+TEST(BasicSedTest, irretrievableFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an irretrievable file."},
