@@ -74,7 +74,7 @@ SolverKinsol::Impl::Impl()
 SolverPtr SolverKinsol::Impl::duplicate()
 {
     auto solver = SolverKinsol::create();
-    auto solverPimpl = solver->pimpl();
+    auto *solverPimpl = solver->pimpl();
 
     solverPimpl->mMaximumNumberOfIterations = mMaximumNumberOfIterations;
     solverPimpl->mLinearSolver = mLinearSolver;

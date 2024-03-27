@@ -79,7 +79,7 @@ SolverCvode::Impl::~Impl()
 SolverPtr SolverCvode::Impl::duplicate()
 {
     auto solver = SolverCvode::create();
-    auto solverPimpl = solver->pimpl();
+    auto *solverPimpl = solver->pimpl();
 
     solverPimpl->mMaximumStep = mMaximumStep;
     solverPimpl->mMaximumNumberOfSteps = mMaximumNumberOfSteps;
