@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(RunSedDocumentTest, noFile)
+TEST(RunSedTest, noFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The simulation experiment description does not contain any tasks to run."},
@@ -32,7 +32,7 @@ TEST(RunSedDocumentTest, noFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedDocumentTest, invalidCellmlFile)
+TEST(RunSedTest, invalidCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is invalid."},
@@ -46,7 +46,7 @@ TEST(RunSedDocumentTest, invalidCellmlFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedDocumentTest, overconstrainedCellmlFile)
+TEST(RunSedTest, overconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is overconstrained."},
@@ -60,7 +60,7 @@ TEST(RunSedDocumentTest, overconstrainedCellmlFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedDocumentTest, underconstrainedCellmlFile)
+TEST(RunSedTest, underconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is underconstrained."},
@@ -74,7 +74,7 @@ TEST(RunSedDocumentTest, underconstrainedCellmlFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedDocumentTest, unsuitablyConstrainedCellmlFile)
+TEST(RunSedTest, unsuitablyConstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is unsuitably constrained."},
@@ -89,7 +89,7 @@ TEST(RunSedDocumentTest, unsuitablyConstrainedCellmlFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedDocumentTest, algebraicModel)
+TEST(RunSedTest, algebraicModel)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -100,7 +100,7 @@ TEST(RunSedDocumentTest, algebraicModel)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(RunSedDocumentTest, odeModel)
+TEST(RunSedTest, odeModel)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140014, mxstep steps taken before reaching tout."},
@@ -135,7 +135,7 @@ TEST(RunSedDocumentTest, odeModel)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(RunSedDocumentTest, odeModelWithNoOdeSolver)
+TEST(RunSedTest, odeModelWithNoOdeSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver."},
@@ -151,7 +151,7 @@ TEST(RunSedDocumentTest, odeModelWithNoOdeSolver)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedDocumentTest, nlaModel)
+TEST(RunSedTest, nlaModel)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
@@ -176,7 +176,7 @@ TEST(RunSedDocumentTest, nlaModel)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(RunSedDocumentTest, nlaModelWithNoNlaSolver)
+TEST(RunSedTest, nlaModelWithNoNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver."},
@@ -192,7 +192,7 @@ TEST(RunSedDocumentTest, nlaModelWithNoNlaSolver)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedDocumentTest, daeModel)
+TEST(RunSedTest, daeModel)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
@@ -223,7 +223,7 @@ TEST(RunSedDocumentTest, daeModel)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(RunSedDocumentTest, daeModelWithNoOdeOrNlaSolver)
+TEST(RunSedTest, daeModelWithNoOdeOrNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver."},

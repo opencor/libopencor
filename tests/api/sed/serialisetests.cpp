@@ -114,7 +114,7 @@ std::string kinsolExpectedSerialisation(const std::map<std::string, std::string>
 
 } // namespace
 
-TEST(SerialiseSedDocumentTest, localCellmlFileWithBasePath)
+TEST(SerialiseSedTest, localCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -122,7 +122,7 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithBasePath)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
 
-TEST(SerialiseSedDocumentTest, localCellmlFileWithoutBasePath)
+TEST(SerialiseSedTest, localCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
 
@@ -137,7 +137,7 @@ TEST(SerialiseSedDocumentTest, localCellmlFileWithoutBasePath)
 #endif
 }
 
-TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithBasePath)
+TEST(SerialiseSedTest, relativeLocalCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -145,7 +145,7 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithBasePath)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath().append("../..")), cvodeExpectedSerialisation("tests/res/cellml_2.cellml"));
 }
 
-TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithoutBasePath)
+TEST(SerialiseSedTest, relativeLocalCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
 
@@ -156,7 +156,7 @@ TEST(SerialiseSedDocumentTest, relativeLocalCellmlFileWithoutBasePath)
     EXPECT_EQ(sed->serialise(), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
 
-TEST(SerialiseSedDocumentTest, remoteCellmlFileWithBasePath)
+TEST(SerialiseSedTest, remoteCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -164,7 +164,7 @@ TEST(SerialiseSedDocumentTest, remoteCellmlFileWithBasePath)
     EXPECT_EQ(sed->serialise(libOpenCOR::REMOTE_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
 
-TEST(SerialiseSedDocumentTest, remoteCellmlFileWithoutBasePath)
+TEST(SerialiseSedTest, remoteCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -172,7 +172,7 @@ TEST(SerialiseSedDocumentTest, remoteCellmlFileWithoutBasePath)
     EXPECT_EQ(sed->serialise(), cvodeExpectedSerialisation("https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"));
 }
 
-TEST(SerialiseSedDocumentTest, relativeRemoteCellmlFileWithBasePath)
+TEST(SerialiseSedTest, relativeRemoteCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -254,7 +254,7 @@ TEST(ModelTypeSedDocumentTest, algebraicModel)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
 }
 
-TEST(SerialiseSedDocumentTest, fixedStepOdeSolver)
+TEST(SerialiseSedTest, fixedStepOdeSolver)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
@@ -284,7 +284,7 @@ TEST(SerialiseSedDocumentTest, fixedStepOdeSolver)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), expectedSerialisation);
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithAdamsMoultonInterationMethod)
+TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonInterationMethod)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -296,7 +296,7 @@ TEST(SerialiseSedDocumentTest, cvodeSolverWithAdamsMoultonInterationMethod)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000475", "Adams-Moulton"}}));
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithFunctionalIterationType)
+TEST(SerialiseSedTest, cvodeSolverWithFunctionalIterationType)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -308,7 +308,7 @@ TEST(SerialiseSedDocumentTest, cvodeSolverWithFunctionalIterationType)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000476", "Functional"}}));
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithBandedLinearSolver)
+TEST(SerialiseSedTest, cvodeSolverWithBandedLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -320,7 +320,7 @@ TEST(SerialiseSedDocumentTest, cvodeSolverWithBandedLinearSolver)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "Banded"}}));
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithDiagonalLinearSolver)
+TEST(SerialiseSedTest, cvodeSolverWithDiagonalLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -332,7 +332,7 @@ TEST(SerialiseSedDocumentTest, cvodeSolverWithDiagonalLinearSolver)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "Diagonal"}}));
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithGmresLinearSolver)
+TEST(SerialiseSedTest, cvodeSolverWithGmresLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -344,7 +344,7 @@ TEST(SerialiseSedDocumentTest, cvodeSolverWithGmresLinearSolver)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "GMRES"}}));
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithBicgstabLinearSolver)
+TEST(SerialiseSedTest, cvodeSolverWithBicgstabLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -356,7 +356,7 @@ TEST(SerialiseSedDocumentTest, cvodeSolverWithBicgstabLinearSolver)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "BiCGStab"}}));
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithTfqmrLinearSolver)
+TEST(SerialiseSedTest, cvodeSolverWithTfqmrLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -368,7 +368,7 @@ TEST(SerialiseSedDocumentTest, cvodeSolverWithTfqmrLinearSolver)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "TFQMR"}}));
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithNoPreconditioner)
+TEST(SerialiseSedTest, cvodeSolverWithNoPreconditioner)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
@@ -380,7 +380,7 @@ TEST(SerialiseSedDocumentTest, cvodeSolverWithNoPreconditioner)
     EXPECT_EQ(sed->serialise(libOpenCOR::resourcePath()), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000478", "No"}}));
 }
 
-TEST(SerialiseSedDocumentTest, cvodeSolverWithNoInterpolateSolution)
+TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);

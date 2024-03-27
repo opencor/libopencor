@@ -20,7 +20,7 @@ import { expectIssues } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
-describe("SedDocument coverage tests", () => {
+describe("Sed coverage tests", () => {
   let someCellmlContentsPtr;
 
   beforeAll(() => {
