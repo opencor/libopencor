@@ -142,15 +142,18 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     // Make sure that the NLA solver, should it have been used, didn't report any issues.
 
-    if (hasSolverIssues()) {
+    if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+        addIssues(mNlaSolver);
+
         return;
     }
 
     // Initialise the ODE solver, if needed.
 
     if (mDifferentialModel) {
-        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeRates())
-            && hasSolverIssues()) {
+        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeRates())) {
+            addIssues(mOdeSolver);
+
             return;
         }
     }
@@ -176,19 +179,6 @@ void SedInstanceTask::Impl::resetArrays()
     mVariables = nullptr;
 }
 
-bool SedInstanceTask::Impl::hasSolverIssues()
-{
-    if ((mOdeSolver != nullptr) && mOdeSolver->hasIssues()) {
-        addIssues(mOdeSolver);
-    }
-
-    if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
-        addIssues(mNlaSolver);
-    }
-
-    return hasIssues();
-}
-
 void SedInstanceTask::Impl::run()
 {
     // Make sure that the instance task doesn't have any issues.
@@ -209,14 +199,17 @@ void SedInstanceTask::Impl::run()
         size_t voiCounter = 0;
 
         while (!fuzzyCompare(mVoi, voiEnd)) {
-            if (!mOdeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))
-                && hasSolverIssues()) {
+            if (!mOdeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
+                addIssues(mOdeSolver);
+
                 return;
             }
 
             mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
 
-            if (hasSolverIssues()) {
+            if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+                addIssues(mNlaSolver);
+
                 return;
             }
 #    ifdef PRINT_VALUES

@@ -47,8 +47,6 @@ public:
 
     void resetArrays();
 
-    bool hasSolverIssues();
-
     void run();
 };
 
