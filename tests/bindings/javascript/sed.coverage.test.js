@@ -213,7 +213,9 @@ describe("Sed coverage tests", () => {
     expect(simulation.numberOfSteps()).toBe(10);
   });
 
-  test("SolverImplDuplicate", () => {
+  test("Solver", () => {
+    // Get the duplicate() method of different solvers to be covered.
+
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);

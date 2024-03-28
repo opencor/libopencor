@@ -216,8 +216,10 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
     EXPECT_EQ(simulation->numberOfSteps(), NUMBER_OF_STEPS);
 }
 
-TEST(CoverageSedTest, solverImplDuplicate)
+TEST(CoverageSedTest, solver)
 {
+    // Get the duplicate() method of different solvers to be covered.
+
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto sed = libOpenCOR::SedDocument::create(file);
 
