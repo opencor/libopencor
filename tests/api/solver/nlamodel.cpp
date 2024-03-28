@@ -18,12 +18,13 @@ limitations under the License.
 #include "solvernla_p.h"
 
 #include <cmath>
+#include <cstdlib>
 
 namespace NlaModel {
 
 namespace {
 
-libOpenCOR::SolverNla *KINSOL_NLA_SOLVER = nullptr;
+char *KINSOL_NLA_SOLVER = nullptr;
 
 } // namespace
 
@@ -68,7 +69,7 @@ double *initialise(libOpenCOR::SolverNla *pSolver)
     static const libOpenCOR::Doubles GUESSES = {1.0};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0};
 
-    KINSOL_NLA_SOLVER = pSolver;
+    KINSOL_NLA_SOLVER = libOpenCOR::nlaSolverAddress(pSolver);
 
     auto *variables = Model1::createVariablesArray();
 
@@ -101,6 +102,8 @@ void compute(double *pVariables)
 void finalise(double *pVariables)
 {
     Model1::deleteArray(pVariables);
+
+    delete[] KINSOL_NLA_SOLVER;
 }
 
 } // namespace Model1
@@ -112,7 +115,7 @@ double *initialise(libOpenCOR::SolverNla *pSolver)
     static const libOpenCOR::Doubles GUESSES = {1.0, 1.0, 1.0};
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0, 0.0, 0.0};
 
-    KINSOL_NLA_SOLVER = pSolver;
+    KINSOL_NLA_SOLVER = libOpenCOR::nlaSolverAddress(pSolver);
 
     auto *variables = Model2::createVariablesArray();
 
@@ -145,6 +148,8 @@ void compute(double *pVariables)
 void finalise(double *pVariables)
 {
     Model2::deleteArray(pVariables);
+
+    delete[] KINSOL_NLA_SOLVER;
 }
 
 } // namespace Model2

@@ -107,9 +107,6 @@ public:
 
     static SolverCvodePtr create();
 
-    std::string id() const override;
-    std::string name() const override;
-
     /**
      * @brief Get the maximum step used by the solver.
      *
@@ -329,12 +326,6 @@ public:
      */
 
     void setInterpolateSolution(bool pInterpolateSolution);
-
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
-    bool reinitialise(double pVoi) override;
-
-    bool solve(double &pVoi, double pVoiEnd) const override;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

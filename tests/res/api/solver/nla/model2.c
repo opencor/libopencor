@@ -18,7 +18,7 @@ double * createVariablesArray()
     double *res = (double *) malloc(VARIABLE_COUNT_2*sizeof(double));
 
     for (size_t i = 0; i < VARIABLE_COUNT_2; ++i) {
-        res[i] = NAN;
+        res[i] = strtod("NAN", nullptr);
     }
 
     return res;

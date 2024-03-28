@@ -20,9 +20,19 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverSecondOrderRungeKutta::Impl::Impl()
+    : SolverOdeFixedStep::Impl("KISAO:0000381", "Second-order Runge-Kutta")
+{
+}
+
 SolverSecondOrderRungeKutta::Impl::~Impl()
 {
     delete[] mYk;
+}
+
+SolverPtr SolverSecondOrderRungeKutta::Impl::duplicate()
+{
+    return SolverOdeFixedStep::Impl::duplicate(SolverSecondOrderRungeKutta::create());
 }
 
 bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
@@ -43,7 +53,7 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
     return true;
 }
 
-bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // We compute the following:
     //   k1 = f(t_n, Y_n)
@@ -111,35 +121,16 @@ SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
+/*---GRY---
 const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
+*/
 
 SolverSecondOrderRungeKuttaPtr SolverSecondOrderRungeKutta::create()
 {
     return SolverSecondOrderRungeKuttaPtr {new SolverSecondOrderRungeKutta {}};
-}
-
-std::string SolverSecondOrderRungeKutta::id() const
-{
-    return "KISAO:0000381";
-}
-
-std::string SolverSecondOrderRungeKutta::name() const
-{
-    return "Second-order Runge-Kutta";
-}
-
-bool SolverSecondOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                             double *pVariables, ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverSecondOrderRungeKutta::solve(double &pVoi, double pVoiEnd) const
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
 }
 
 } // namespace libOpenCOR

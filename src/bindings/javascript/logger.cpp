@@ -21,9 +21,13 @@ void loggerApi()
     // Logger API.
 
     emscripten::class_<libOpenCOR::Logger>("Logger")
+        .function("hasIssues", &libOpenCOR::Logger::hasIssues)
         .function("issues", &libOpenCOR::Logger::issues)
+        .function("hasErrors", &libOpenCOR::Logger::hasErrors)
         .function("errors", &libOpenCOR::Logger::errors)
+        .function("hasWarnings", &libOpenCOR::Logger::hasWarnings)
         .function("warnings", &libOpenCOR::Logger::warnings)
+        .function("hasMessages", &libOpenCOR::Logger::hasMessages)
         .function("messages", &libOpenCOR::Logger::messages);
 
     // Issue API.

@@ -34,6 +34,54 @@ using IssuePtr = std::shared_ptr<Issue>; /**< Type definition for the shared @re
 class Logger;
 using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @ref Logger pointer. */
 
+class SedAbstractTask;
+using SedAbstractTaskPtr = std::shared_ptr<SedAbstractTask>; /**< Type definition for the shared @ref SedAbstractTask pointer. */
+
+class SedBase;
+using SedBasePtr = std::shared_ptr<SedBase>; /**< Type definition for the shared @ref SedBase pointer. */
+
+class SedDataDescription;
+using SedDataDescriptionPtr = std::shared_ptr<SedDataDescription>; /**< Type definition for the shared @ref SedDataDescription pointer. */
+
+class SedDataGenerator;
+using SedDataGeneratorPtr = std::shared_ptr<SedDataGenerator>; /**< Type definition for the shared @ref SedDataGenerator pointer. */
+
+class SedDocument;
+using SedDocumentPtr = std::shared_ptr<SedDocument>; /**< Type definition for the shared @ref SedDocument pointer. */
+
+class SedInstance;
+using SedInstancePtr = std::shared_ptr<SedInstance>; /**< Type definition for the shared @ref SedInstance pointer. */
+
+class SedInstanceTask;
+using SedInstanceTaskPtr = std::shared_ptr<SedInstanceTask>; /**< Type definition for the shared @ref SedInstanceTask pointer. */
+
+class SedModel;
+using SedModelPtr = std::shared_ptr<SedModel>; /**< Type definition for the shared @ref SedModel pointer. */
+
+class SedOneStep;
+using SedOneStepPtr = std::shared_ptr<SedOneStep>; /**< Type definition for the shared @ref SedOneStep pointer. */
+
+class SedOutput;
+using SedOutputPtr = std::shared_ptr<SedOutput>; /**< Type definition for the shared @ref SedOutput pointer. */
+
+class SedRepeatedTask;
+using SedRepeatedTaskPtr = std::shared_ptr<SedRepeatedTask>; /**< Type definition for the shared @ref SedRepeatedTask pointer. */
+
+class SedSimulation;
+using SedSimulationPtr = std::shared_ptr<SedSimulation>; /**< Type definition for the shared @ref SedSimulation pointer. */
+
+class SedSteadyState;
+using SedSteadyStatePtr = std::shared_ptr<SedSteadyState>; /**< Type definition for the shared @ref SedSteadyState pointer. */
+
+class SedStyle;
+using SedStylePtr = std::shared_ptr<SedStyle>; /**< Type definition for the shared @ref SedStyle pointer. */
+
+class SedTask;
+using SedTaskPtr = std::shared_ptr<SedTask>; /**< Type definition for the shared @ref SedTask pointer. */
+
+class SedUniformTimeCourse;
+using SedUniformTimeCoursePtr = std::shared_ptr<SedUniformTimeCourse>; /**< Type definition for the shared @ref SedUniformTimeCourse pointer. */
+
 class Solver;
 using SolverPtr = std::shared_ptr<Solver>; /**< Type definition for the shared @ref Solver pointer. */
 
@@ -67,6 +115,14 @@ using SolverSecondOrderRungeKuttaPtr = std::shared_ptr<SolverSecondOrderRungeKut
 // Vectors.
 
 using IssuePtrVector = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
+using SedAbstractTaskPtrVector = std::vector<SedAbstractTaskPtr>; /**< Type definition for a vector of @ref SedAbstractTask pointers. */
+using SedDataDescriptionPtrVector = std::vector<SedDataDescriptionPtr>; /**< Type definition for a vector of @ref SedDataDescription pointers. */
+using SedDataGeneratorPtrVector = std::vector<SedDataGeneratorPtr>; /**< Type definition for a vector of @ref SedDataGenerator pointers. */
+using SedInstanceTaskPtrVector = std::vector<SedInstanceTaskPtr>; /**< Type definition for a vector of @ref SedInstanceTask pointers. */
+using SedModelPtrVector = std::vector<SedModelPtr>; /**< Type definition for a vector of @ref SedModel pointers. */
+using SedOutputPtrVector = std::vector<SedOutputPtr>; /**< Type definition for a vector of @ref SedOutput pointers. */
+using SedSimulationPtrVector = std::vector<SedSimulationPtr>; /**< Type definition for a vector of @ref SedSimulation pointers. */
+using SedStylePtrVector = std::vector<SedStylePtr>; /**< Type definition for a vector of @ref SedStyle pointers. */
 using UnsignedCharVector = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
 
-} // namespace libcellml
+} // namespace libOpenCOR

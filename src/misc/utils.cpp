@@ -54,9 +54,9 @@ std::string wideStringToString(const std::wstring &pString)
 
 std::string forwardSlashPath(const std::string &pPath)
 {
-    static constexpr auto FORWARD_SLASH = "/";
     static constexpr auto BACKSLASH = "\\\\";
     static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
+    static constexpr auto FORWARD_SLASH = "/";
 
     return std::regex_replace(pPath, BACKSLASH_REGEX, FORWARD_SLASH);
 }
@@ -172,6 +172,40 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
 #else
                 + canonicalFileName(res)};
 #endif
+}
+
+namespace {
+
+std::filesystem::path canonicalPath(const std::string &pPath)
+{
+    auto [isLocalPath, path] = retrieveFileInfo(pPath);
+
+    return stringToPath(path);
+}
+
+} // namespace
+
+std::string relativePath(const std::string &pPath, const std::string &pBasePath)
+{
+    return std::filesystem::relative(canonicalPath(pPath), canonicalPath(pBasePath)).string();
+}
+
+std::string urlPath(const std::string &pPath)
+{
+    auto [isLocalPath, path] = retrieveFileInfo(pPath);
+
+    if (isLocalPath && stringToPath(path).is_absolute()) {
+        static const std::string FILE_SCHEME = "file://";
+#ifdef BUILDING_USING_MSVC
+        static constexpr auto FORWARD_SLASH = "/";
+
+        return FILE_SCHEME + FORWARD_SLASH + forwardSlashPath(path);
+#else
+        return FILE_SCHEME + path;
+#endif
+    }
+
+    return path;
 }
 
 #ifndef __EMSCRIPTEN__
@@ -296,11 +330,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void *>(&file));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 
-#    ifndef CODE_COVERAGE_ENABLED
     if (curl_easy_perform(curl) == CURLE_OK) {
-#    else
-    curl_easy_perform(curl);
-#    endif
         static constexpr int64_t HTTP_OK = 200;
 
         int64_t responseCode = 0;
@@ -308,9 +338,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
 
         res = responseCode == HTTP_OK;
-#    ifndef CODE_COVERAGE_ENABLED
     }
-#    endif
 
     curl_easy_cleanup(curl);
     curl_global_cleanup();
@@ -347,6 +375,23 @@ UnsignedCharVector fileContents(const std::filesystem::path &pFilePath)
 }
 #endif
 
+char *nlaSolverAddress(SolverNla *pNlaSolver)
+{
+    std::ostringstream oss;
+
+    oss << pNlaSolver;
+
+    auto str = oss.str();
+    auto len = str.size();
+    auto *res = new char[len + 1];
+
+    std::copy(str.begin(), str.end(), res);
+
+    res[len] = '\0'; // NOLINT
+
+    return res;
+}
+
 std::string toString(int pNumber)
 {
     std::ostringstream res;
@@ -377,6 +422,19 @@ std::string toString(double pNumber)
 std::string toString(const UnsignedCharVector &pBytes)
 {
     return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
+}
+
+const xmlChar *toConstXmlCharPtr(const std::string &pString)
+{
+    return reinterpret_cast<const xmlChar *>(pString.c_str());
+}
+
+bool differentialModel(const CellmlFilePtr &pCellmlFile)
+{
+    auto type = pCellmlFile->type();
+
+    return (type == libcellml::AnalyserModel::Type::ODE)
+           || (type == libcellml::AnalyserModel::Type::DAE);
 }
 
 } // namespace libOpenCOR

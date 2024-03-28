@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "cellmlfileruntime.h"
+#include "unittestingexport.h"
 
 #include "libopencor/logger.h"
 
@@ -31,7 +32,7 @@ using CellmlFilePtr = std::shared_ptr<CellmlFile>;
 class CellmlFileRuntime;
 using CellmlFileRuntimePtr = std::shared_ptr<CellmlFileRuntime>;
 
-class CellmlFile: public Logger
+class LIBOPENCOR_UNIT_TESTING_EXPORT CellmlFile: public Logger
     , public std::enable_shared_from_this<CellmlFile>
 {
 public:
@@ -46,14 +47,17 @@ public:
 
     static CellmlFilePtr create(const FilePtr &pFile);
 
-    libcellml::ModelPtr model() const;
+    libcellml::AnalyserModel::Type type() const;
 
-    CellmlFileRuntimePtr runtime();
+    libcellml::AnalyserPtr analyser() const;
+    libcellml::AnalyserModelPtr analyserModel() const;
+
+    CellmlFileRuntimePtr runtime(const SolverNlaPtr &pNlaSolver = {});
 
 private:
     class Impl;
 
-    explicit CellmlFile(const libcellml::ModelPtr &pModel);
+    explicit CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict);
 
     Impl *pimpl();
     const Impl *pimpl() const;

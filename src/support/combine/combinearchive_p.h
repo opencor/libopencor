@@ -27,7 +27,7 @@ class CombineArchive::Impl: public Logger::Impl
 public:
     libcombine::CombineArchive *mArchive;
 
-    Impl(libcombine::CombineArchive *pArchive);
+    explicit Impl(libcombine::CombineArchive *pArchive);
     ~Impl();
 };
 

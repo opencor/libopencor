@@ -20,7 +20,6 @@
 #       https://invent.kde.org/kdevelop/kdevelop/-/blob/3973/veritas/tests/runMemcheck.py).
 
 import math
-import multiprocessing
 import os
 import platform
 import shutil
@@ -177,19 +176,17 @@ if __name__ == "__main__":
             tool = shutil.which("leaks")
 
             if tool == None:
-                sys.stderr.write("-- Leaks could not be found.\n")
+                sys.stderr.write("-- The leaks tool could not be found.\n")
 
                 sys.exit(3)
 
         exit_code = 0
         tests_dir = sys.argv[1]
         tests = sys.argv[2:]
+        results = []
 
-        with multiprocessing.Pool(multiprocessing.cpu_count()) as process:
-            results = process.starmap(
-                run_test,
-                [(tool, test, os.path.join(tests_dir, test)) for test in tests],
-            )
+        for test in tests:
+            results.append(run_test(tool, test, os.path.join(tests_dir, test)))
 
         successes = []
         failures = []

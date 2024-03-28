@@ -22,6 +22,7 @@ RESOURCE_LOCATION = "@RESOURCE_LOCATION@"
 
 UNKNOWN_FILE = "unknown_file.txt"
 SBML_FILE = "sbml.sbml"
+ERROR_CELLML_FILE = "error.cellml"
 ERROR_SEDML_FILE = "error.sedml"
 CELLML_1_X_FILE = "cellml_1_x.cellml"
 SEDML_1_X_FILE = "cellml_1_x.sedml"

@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "compiler_p.h"
+
 #include "utils.h"
 
 #include <iostream>
@@ -73,6 +74,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
                                                              "-g", "-O0",
 #endif
                                                              "-fno-math-errno",
+                                                             "-fno-stack-protector",
                                                              DUMMY_FILE_NAME};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
@@ -152,8 +154,45 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Map our code to a memory buffer.
 
+    auto code = R"(
+// Arithmetic operators.
+
+extern double pow(double, double);
+extern double sqrt(double);
+extern double fabs(double);
+extern double exp(double);
+extern double log(double);
+extern double log10(double);
+extern double ceil(double);
+extern double floor(double);
+extern double fmod(double, double);
+
+// Trigonometric operators.
+
+extern double sin(double);
+extern double cos(double);
+extern double tan(double);
+
+extern double sinh(double);
+extern double cosh(double);
+extern double tanh(double);
+
+extern double asin(double);
+extern double acos(double);
+extern double atan(double);
+
+extern double asinh(double);
+extern double acosh(double);
+extern double atanh(double);
+
+// Constants.
+
+#define INFINITY (__builtin_inf())
+#define NAN (__builtin_nan(""))
+)" + pCode;
+
     compilerInstance.getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
-                                                                           llvm::MemoryBuffer::getMemBuffer(pCode).release());
+                                                                           llvm::MemoryBuffer::getMemBuffer(code).release());
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
@@ -227,7 +266,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
-    // Create an ORC-based JIT and keep track of it (so that we can use it in function()).
+    // Create an ORC-based JIT and keep track of it.
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 
@@ -240,6 +279,20 @@ bool Compiler::Impl::compile(const std::string &pCode)
 #endif
 
     mLljit = std::move(*lljit);
+
+    // Make sure that we can find various mathematical functions in the standard C library.
+
+    auto dynamicLibrarySearchGenerator = llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess(mLljit->getDataLayout().getGlobalPrefix());
+
+#ifndef CODE_COVERAGE_ENABLED
+    if (!dynamicLibrarySearchGenerator) {
+        addError("The dynamic library search generator could not be created.");
+
+        return false;
+    }
+#endif
+
+    mLljit->getMainJITDylib().addGenerator(std::move(*dynamicLibrarySearchGenerator));
 
     // Add our LLVM bitcode module to our ORC-based JIT.
 
@@ -262,16 +315,33 @@ bool Compiler::Impl::compile(const std::string &pCode)
     return res;
 }
 
+bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
+{
+    // Add the given function to our ORC-based JIT. Note that we assume that we have a valid ORC-based JIT, function
+    // name, and function.
+
+    const bool res = !mLljit->getMainJITDylib().define(llvm::orc::absoluteSymbols({
+        {mLljit->mangleAndIntern(pName), llvm::JITEvaluatedSymbol(llvm::pointerToJITTargetAddress(pFunction), llvm::JITSymbolFlags::Exported)},
+    }));
+
+#ifndef CODE_COVERAGE_ENABLED
+    if (!res) {
+        addError("The " + pName + "() function could not be added to the compiler.");
+    }
+#endif
+
+    return res;
+}
+
 void *Compiler::Impl::function(const std::string &pName) const
 {
-    // Return the address of the requested function.
+    // Return the address of the requested function. Note that we assume that we have a valid ORC-based JIT and function
+    // name.
 
-    if ((mLljit != nullptr) && !pName.empty()) {
-        auto symbol = mLljit->lookup(pName);
+    auto symbol = mLljit->lookup(pName);
 
-        if (symbol) {
-            return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
-        }
+    if (symbol) {
+        return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
     }
 
     return {};
@@ -305,6 +375,11 @@ CompilerPtr Compiler::create()
 bool Compiler::compile(const std::string &pCode)
 {
     return pimpl()->compile(pCode);
+}
+
+bool Compiler::addFunction(const std::string &pName, void *pFunction)
+{
+    return pimpl()->addFunction(pName, pFunction);
 }
 
 void *Compiler::function(const std::string &pName) const

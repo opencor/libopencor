@@ -33,11 +33,13 @@ public:
 
     ComputeRates mComputeRates = nullptr;
 
+    explicit Impl(const std::string &pId, const std::string &pName);
+
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             ComputeRates pComputeRates) = 0;
     virtual bool reinitialise(double pVoi);
 
-    virtual bool solve(double &pVoi, double pVoiEnd) const = 0;
+    virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 };
 
 } // namespace libOpenCOR

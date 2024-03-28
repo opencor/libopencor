@@ -38,6 +38,8 @@ struct SolverCvodeUserData
 class SolverCvode::Impl: public SolverOde::Impl
 {
 public:
+    std::string mErrorMessage;
+
     double mMaximumStep = 0.0;
     int mMaximumNumberOfSteps = 500;
     IntegrationMethod mIntegrationMethod = IntegrationMethod::BDF;
@@ -60,15 +62,22 @@ public:
     SUNLinearSolver mSunLinearSolver = nullptr;
     SUNNonlinearSolver mSunNonLinearSolver = nullptr;
 
-    SolverCvodeUserData *mUserData = nullptr;
+    SolverCvodeUserData mUserData;
 
+    explicit Impl();
     ~Impl() override;
+
+    SolverPtr duplicate() override;
+
+    void resetInternals();
+
+    StringStringMap properties() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
     bool reinitialise(double pVoi) override;
 
-    bool solve(double &pVoi, double pVoiEnd) const override;
+    bool solve(double &pVoi, double pVoiEnd) override;
 };
 
 } // namespace libOpenCOR
