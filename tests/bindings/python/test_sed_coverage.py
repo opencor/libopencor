@@ -257,3 +257,25 @@ def test_solver():
     instance.run()
 
     assert instance.has_issues == False
+
+
+def test_sed_instance_task():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
+        ],
+    ]
+
+    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    sed = SedDocument(file)
+    solver = sed.simulations[0].ode_solver
+
+    solver.linear_solver = SolverCvode.LinearSolver.Banded
+    solver.upper_half_bandwidth = -1
+
+    instance = sed.create_instance()
+
+    instance.run()
+
+    assert_issues(instance, expected_issues)
