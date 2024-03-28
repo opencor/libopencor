@@ -223,21 +223,41 @@ describe("Sed coverage tests", () => {
     const sed = new libopencor.SedDocument(file);
 
     sed.simulations().get(0).setOdeSolver(new libopencor.SolverForwardEuler());
-    sed.createInstance().run();
+
+    let instance = sed.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
 
     sed
       .simulations()
       .get(0)
       .setOdeSolver(new libopencor.SolverFourthOrderRungeKutta());
-    sed.createInstance().run();
+
+    instance = sed.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
 
     sed.simulations().get(0).setOdeSolver(new libopencor.SolverHeun());
-    sed.createInstance().run();
+
+    instance = sed.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
 
     sed
       .simulations()
       .get(0)
       .setOdeSolver(new libopencor.SolverSecondOrderRungeKutta());
-    sed.createInstance().run();
+
+    instance = sed.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
   });
 });

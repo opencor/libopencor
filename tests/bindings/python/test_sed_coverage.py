@@ -227,13 +227,33 @@ def test_solver():
     sed = SedDocument(file)
 
     sed.simulations[0].ode_solver = SolverForwardEuler()
-    sed.create_instance().run()
+
+    instance = sed.create_instance()
+
+    instance.run()
+
+    assert instance.has_issues == False
 
     sed.simulations[0].ode_solver = SolverFourthOrderRungeKutta()
-    sed.create_instance().run()
+
+    instance = sed.create_instance()
+
+    instance.run()
+
+    assert instance.has_issues == False
 
     sed.simulations[0].ode_solver = SolverHeun()
-    sed.create_instance().run()
+
+    instance = sed.create_instance()
+
+    instance.run()
+
+    assert instance.has_issues == False
 
     sed.simulations[0].ode_solver = SolverSecondOrderRungeKutta()
-    sed.create_instance().run()
+
+    instance = sed.create_instance()
+
+    instance.run()
+
+    assert instance.has_issues == False
