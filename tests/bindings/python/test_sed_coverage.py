@@ -220,7 +220,9 @@ def test_sed_simulation_uniform_time_course():
     assert simulation.number_of_steps == 10
 
 
-def test_solver_impl_duplicate():
+def test_solver():
+    # Get the duplicate() method of different solvers to be covered.
+
     file = File(utils.resource_path(utils.CELLML_2_FILE))
     sed = SedDocument(file)
 
