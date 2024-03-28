@@ -224,14 +224,34 @@ TEST(CoverageSedTest, solver)
     auto sed = libOpenCOR::SedDocument::create(file);
 
     sed->simulations()[0]->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
-    sed->createInstance()->run();
+
+    auto instance = sed->createInstance();
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
 
     sed->simulations()[0]->setOdeSolver(libOpenCOR::SolverFourthOrderRungeKutta::create());
-    sed->createInstance()->run();
+
+    instance = sed->createInstance();
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
 
     sed->simulations()[0]->setOdeSolver(libOpenCOR::SolverHeun::create());
-    sed->createInstance()->run();
+
+    instance = sed->createInstance();
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
 
     sed->simulations()[0]->setOdeSolver(libOpenCOR::SolverSecondOrderRungeKutta::create());
-    sed->createInstance()->run();
+
+    instance = sed->createInstance();
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
 }
