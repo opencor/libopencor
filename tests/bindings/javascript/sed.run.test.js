@@ -240,7 +240,7 @@ describe("Sed run tests", () => {
     expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
       ],
     ]);
   });
@@ -289,7 +289,7 @@ describe("Sed run tests", () => {
     expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
   });
@@ -353,11 +353,11 @@ describe("Sed run tests", () => {
     expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
       ],
       [
         libopencor.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
   });
