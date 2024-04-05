@@ -83,14 +83,10 @@ else()
 
     # Patch some of our CMake configuration files.
 
-    if(EMSCRIPTEN)
-        set(PACKAGE_MODE noconfig)
+    if(RELEASE_MODE)
+        set(PACKAGE_MODE release)
     else()
-        if(RELEASE_MODE)
-            set(PACKAGE_MODE release)
-        else()
-            set(PACKAGE_MODE debug)
-        endif()
+        set(PACKAGE_MODE debug)
     endif()
 
     set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/Libssh2Config-${PACKAGE_MODE}.cmake)
