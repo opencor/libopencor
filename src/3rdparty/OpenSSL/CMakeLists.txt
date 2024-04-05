@@ -71,69 +71,50 @@ else()
 
     set(CONFIG_OPTIONS no-shared no-tests no-threads --prefix=${INSTALL_DIR})
 
-    if(EMSCRIPTEN)
-        set(EMCONFIGURE_PERL_EXECUTABLE ${EMCONFIGURE_EXE} ${PERL_EXECUTABLE})
+    if(WIN32)
+        list(APPEND CONFIG_OPTIONS no-asm)
 
-        list(APPEND CONFIG_OPTIONS "-no-asm")
-
-        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/Makefile)
-
-        list(APPEND PATCH_COMMANDS
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/CROSS_COMPILE=[^\\\\n]*\\\\n/CROSS_COMPILE=\\\\n/" ${MAKEFILE}
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/CNF_CFLAGS=[^\\\\n]*\\\\n/CNF_CFLAGS=\\\\n/" ${MAKEFILE}
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/CNF_LDFLAGS=[^\\\\n]*\\\\n/CNF_LDFLAGS=\\\\n/" ${MAKEFILE}
-            )
-    else()
-        set(EMCONFIGURE_PERL_EXECUTABLE ${PERL_EXECUTABLE})
-
-        if(WIN32)
-            list(APPEND CONFIG_OPTIONS no-asm)
-
-            if(RELEASE_MODE)
-                if(INTEL_MODE)
-                    set(PLATFORM VC-WIN64A)
-                else()
-                    set(PLATFORM VC-WIN64-ARM)
-                endif()
-            else()
-                if(INTEL_MODE)
-                    set(PLATFORM debug-VC-WIN64A)
-                else()
-                    set(PLATFORM debug-VC-WIN64-ARM)
-                endif()
-            endif()
-
-            # Patch the generated makefile since it contains non-escaped paths that result in our build to fail. (Not
-            # sure why this is the case, but that's the situation!)
-
-            set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
-
-            set(PATCH_COMMANDS
-                COMMAND
-                    ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
-                COMMAND
-                    ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
-            )
-        elseif(APPLE)
+        if(RELEASE_MODE)
             if(INTEL_MODE)
-                set(PLATFORM darwin64-x86_64-cc)
+                set(PLATFORM VC-WIN64A)
             else()
-                set(PLATFORM darwin64-arm64-cc)
+                set(PLATFORM VC-WIN64-ARM)
             endif()
-
-            list(APPEND CONFIG_OPTIONS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
         else()
             if(INTEL_MODE)
-                set(PLATFORM linux-x86_64)
+                set(PLATFORM debug-VC-WIN64A)
             else()
-                set(PLATFORM linux-aarch64)
+                set(PLATFORM debug-VC-WIN64-ARM)
             endif()
-
-            list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
         endif()
+
+        # Patch the generated makefile since it contains non-escaped paths that result in our build to fail. (Not sure
+        # why this is the case, but that's the situation!)
+
+        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
+
+        set(PATCH_COMMANDS
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
+            COMMAND
+                ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
+        )
+    elseif(APPLE)
+        if(INTEL_MODE)
+            set(PLATFORM darwin64-x86_64-cc)
+        else()
+            set(PLATFORM darwin64-arm64-cc)
+        endif()
+
+        list(APPEND CONFIG_OPTIONS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
+    else()
+        if(INTEL_MODE)
+            set(PLATFORM linux-x86_64)
+        else()
+            set(PLATFORM linux-aarch64)
+        endif()
+
+        list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
     endif()
 
     build_package(${PACKAGE_NAME}
@@ -141,7 +122,7 @@ else()
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CONFIGURE_COMMAND
-            ${EMCONFIGURE_PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
+            ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
         ${PATCH_COMMANDS}
         BUILD_COMMAND
             ${MAKE_NMAKE_COMMAND}
