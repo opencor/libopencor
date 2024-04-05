@@ -32,6 +32,11 @@ namespace libOpenCOR {
 class LIBOPENCOR_EXPORT File: public Logger
     , public std::enable_shared_from_this<File>
 {
+    friend class SedDocument;
+    friend class SedInstanceTask;
+    friend class SedModel;
+    friend class SedSimulation;
+
 public:
     /**
      * @brief The type of a file.

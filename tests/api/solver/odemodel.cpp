@@ -20,6 +20,7 @@ limitations under the License.
 #include "tests/utils.h"
 
 #include <cmath>
+#include <cstdlib>
 
 namespace OdeModel {
 
@@ -65,8 +66,7 @@ std::tuple<double *, double *, double *> initialise()
     return std::make_tuple(states, rates, variables);
 }
 
-void compute(const std::shared_ptr<libOpenCOR::SolverOde> &pSolver,
-             double *pStates, double *pRates, double *pVariables,
+void compute(const libOpenCOR::SolverOdePtr &pSolver, double *pStates, double *pRates, double *pVariables,
              const libOpenCOR::Doubles &pFinalStates, const libOpenCOR::Doubles &pAbsoluteErrors)
 {
     // Initialise the ODE solver.

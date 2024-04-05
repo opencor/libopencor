@@ -18,6 +18,7 @@ limitations under the License.
 
 void fileApi();
 void loggerApi();
+void sedApi();
 void solverApi();
 void versionApi();
 
@@ -26,12 +27,21 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     // Vectors.
 
     emscripten::register_vector<libOpenCOR::IssuePtr>("IssuePtrVector");
+    emscripten::register_vector<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTaskPtrVector");
+    emscripten::register_vector<libOpenCOR::SedDataDescriptionPtr>("SedDataDescriptionPtrVector");
+    emscripten::register_vector<libOpenCOR::SedDataGeneratorPtr>("SedDataGeneratorPtrVector");
+    emscripten::register_vector<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTaskPtrVector");
+    emscripten::register_vector<libOpenCOR::SedModelPtr>("SedModelPtrVector");
+    emscripten::register_vector<libOpenCOR::SedOutputPtr>("SedOutputPtrVector");
+    emscripten::register_vector<libOpenCOR::SedSimulationPtr>("SedSimulationPtrVector");
+    emscripten::register_vector<libOpenCOR::SedStylePtr>("SedStylePtrVector");
 
     // APIs.
 
     loggerApi(); // Note: it needs to be first since it is used by some other APIs.
 
     fileApi();
+    sedApi();
     solverApi();
     versionApi();
 }

@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "cellmlfile_p.h"
+
 #include "cellmlfileruntime.h"
 #include "utils.h"
 
@@ -22,13 +23,37 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-CellmlFile::Impl::Impl(const libcellml::ModelPtr &pModel)
+CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
     : mModel(pModel)
 {
+    // Resolve imports and flatten the model, if needed and possible.
+
+    if (mModel->hasUnresolvedImports()) {
+        auto importer = libcellml::Importer::create(pStrict);
+
+        if (importer->resolveImports(mModel, stringToPath(pFile->path()).parent_path().string())) {
+            mModel = importer->flattenModel(mModel);
+        } else {
+            addIssues(importer);
+        }
+    }
+
+    // Analyse the model.
+    // Note: we do this even if there are some errors (as a result of resolving imports). This is so that we can
+    //       retrieve the analyser's issues if needed (e.g., when wanting to retrieve a runtime) and so that we don't
+    //       have to test mAnalyserModel for nullity everywhere.
+
+    mAnalyser->analyseModel(mModel);
+
+    mAnalyserModel = mAnalyser->model();
+
+    if (mAnalyser->errorCount() != 0) {
+        addIssues(mAnalyser);
+    }
 }
 
-CellmlFile::CellmlFile(const libcellml::ModelPtr &pModel)
-    : Logger(new Impl {pModel})
+CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
+    : Logger(new Impl {pFile, pModel, pStrict})
 {
 }
 
@@ -42,12 +67,10 @@ CellmlFile::Impl *CellmlFile::pimpl()
     return static_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const CellmlFile::Impl *CellmlFile::pimpl() const
 {
     return static_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 {
@@ -56,14 +79,16 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     auto isCellmlFile = false;
 
     if (!pFile->contents().empty()) {
-        auto parser = libcellml::Parser::create();
+        auto strict = true;
+        auto parser = libcellml::Parser::create(strict);
         auto contents = toString(pFile->contents());
         auto model = parser->parseModel(contents);
 
         if (parser->errorCount() != 0) {
             // We couldn't parse the file contents as a CellML 2.0 file, so maybe it is a CellML 1.x file?
 
-            parser = libcellml::Parser::create(false);
+            strict = false;
+            parser = libcellml::Parser::create(strict);
             model = parser->parseModel(contents);
 
             isCellmlFile = parser->errorCount() == 0;
@@ -72,25 +97,31 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
         }
 
         if (isCellmlFile) {
-            return CellmlFilePtr {new CellmlFile {model}};
+            return CellmlFilePtr {new CellmlFile {pFile, model, strict}};
         }
     }
 
     return nullptr;
 }
 
-/*---GRY---
-libcellml::ModelPtr CellmlFile::model() const
+libcellml::AnalyserModel::Type CellmlFile::type() const
 {
-    return pimpl()->mModel;
+    return pimpl()->mAnalyserModel->type();
 }
-*/
 
-/*---GRY---
-CellmlFileRuntimePtr CellmlFile::runtime()
+libcellml::AnalyserPtr CellmlFile::analyser() const
 {
-    return CellmlFileRuntime::create(shared_from_this());
+    return pimpl()->mAnalyser;
 }
-*/
+
+libcellml::AnalyserModelPtr CellmlFile::analyserModel() const
+{
+    return pimpl()->mAnalyserModel;
+}
+
+CellmlFileRuntimePtr CellmlFile::runtime(const SolverNlaPtr &pNlaSolver)
+{
+    return CellmlFileRuntime::create(shared_from_this(), pNlaSolver);
+}
 
 } // namespace libOpenCOR

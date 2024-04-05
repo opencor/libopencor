@@ -28,6 +28,9 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SolverNla: public Solver
 {
+    friend class SedInstanceTask;
+    friend class SedSimulation;
+
 public:
     using ComputeSystem = void (*)(double *pU, double *pF, void *pUserData); /**< Signature of the method that computes the system of NLA equations. */
 
@@ -57,12 +60,9 @@ public:
      * @param pUserData Some user data that may be passed to @p pComputeSystem.
      *
      * @return @c true if the NLA system could be solved, @c false otherwise.
-     *
-     * @warning ---GRY--- This API will change once we have SED-ML support. It is currently as it is so that we can test
-     * our solvers.
      */
 
-    virtual bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) = 0;
+    bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData);
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

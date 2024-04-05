@@ -20,6 +20,24 @@ from .module import (
     Issue,
     # Logger API.
     Logger,
+    # Sed API.
+    SedAbstractTask,
+    SedBase,
+    SedDataDescription,
+    SedDataGenerator,
+    SedDocument,
+    SedInstance,
+    SedInstanceTask,
+    SedModel,
+    SedOneStep,
+    SedOutput,
+    # ---GRY---
+    # SedRepeatedTask,
+    SedSimulation,
+    SedSteadyState,
+    SedStyle,
+    SedTask,
+    SedUniformTimeCourse,
     # Solver API.
     Solver,
     SolverCvode,
@@ -54,6 +72,24 @@ __all__ = (
     "Issue",
     # Logger API.
     "Logger",
+    # Sed API.
+    "SedAbstractTask",
+    "SedBase",
+    "SedDataDescription",
+    "SedDataGenerator",
+    "SedDocument",
+    "SedInstance",
+    "SedInstanceTask",
+    "SedModel",
+    "SedOneStep",
+    "SedOutput",
+    # ---GRY---
+    # "SedRepeatedTask",
+    "SedSimulation",
+    "SedSteadyState",
+    "SedStyle",
+    "SedTask",
+    "SedUniformTimeCourse",
     # Solver API.
     "Solver",
     "SolverCvode",

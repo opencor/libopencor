@@ -33,6 +33,14 @@ describe("Issue coverage tests", () => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
+  test("hasErrors()", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.hasErrors()).toBe(false);
+  });
+
   test("errors()", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
@@ -41,12 +49,28 @@ describe("Issue coverage tests", () => {
     expect(file.errors().size()).toBe(0);
   });
 
+  test("hasWarnings()", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.hasWarnings()).toBe(false);
+  });
+
   test("warnings()", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.warnings().size()).toBe(0);
+  });
+
+  test("hasMessages()", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.hasMessages()).toBe(false);
   });
 
   test("messages()", () => {

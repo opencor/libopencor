@@ -1,0 +1,767 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="coverage" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+    <component name="my_component">
+        <variable initial_value="0" name="x" units="dimensionless"/>
+        <variable name="t" units="dimensionless"/>
+        <variable name="eqnEq" units="dimensionless"/>
+        <variable name="eqnNeq" units="dimensionless"/>
+        <variable name="eqnLt" units="dimensionless"/>
+        <variable name="eqnLeq" units="dimensionless"/>
+        <variable name="eqnGt" units="dimensionless"/>
+        <variable name="eqnGeq" units="dimensionless"/>
+        <variable name="eqnAnd" units="dimensionless"/>
+        <variable name="eqnOr" units="dimensionless"/>
+        <variable name="eqnXor" units="dimensionless"/>
+        <variable name="eqnNot" units="dimensionless"/>
+        <variable name="eqnPlus" units="dimensionless"/>
+        <variable name="eqnPlusMultiple" units="dimensionless"/>
+        <variable name="eqnPlusUnary" units="dimensionless"/>
+        <variable name="eqnMinus" units="dimensionless"/>
+        <variable name="eqnMinusUnary" units="dimensionless"/>
+        <variable name="eqnTimes" units="dimensionless"/>
+        <variable name="eqnTimesMultiple" units="dimensionless"/>
+        <variable name="eqnDivide" units="dimensionless"/>
+        <variable name="eqnPower" units="dimensionless"/>
+        <variable name="eqnPowerSqr" units="dimensionless"/>
+        <variable name="eqnPowerSqrt" units="dimensionless"/>
+        <variable name="eqnRoot" units="dimensionless"/>
+        <variable name="eqnRootSqrt" units="dimensionless"/>
+        <variable name="eqnRootSqrtOther" units="dimensionless"/>
+        <variable name="eqnAbs" units="dimensionless"/>
+        <variable name="eqnExp" units="dimensionless"/>
+        <variable name="eqnLn" units="dimensionless"/>
+        <variable name="eqnLog" units="dimensionless"/>
+        <variable name="eqnLog2" units="dimensionless"/>
+        <variable name="eqnLog10" units="dimensionless"/>
+        <variable name="eqnLogBase" units="dimensionless"/>
+        <variable name="eqnCeiling" units="dimensionless"/>
+        <variable name="eqnFloor" units="dimensionless"/>
+        <variable name="eqnMin" units="dimensionless"/>
+        <variable name="eqnMinMultiple" units="dimensionless"/>
+        <variable name="eqnMax" units="dimensionless"/>
+        <variable name="eqnMaxMultiple" units="dimensionless"/>
+        <variable name="eqnRem" units="dimensionless"/>
+        <variable name="eqnSin" units="dimensionless"/>
+        <variable name="eqnCos" units="dimensionless"/>
+        <variable name="eqnTan" units="dimensionless"/>
+        <variable name="eqnSec" units="dimensionless"/>
+        <variable name="eqnCsc" units="dimensionless"/>
+        <variable name="eqnCot" units="dimensionless"/>
+        <variable name="eqnSinh" units="dimensionless"/>
+        <variable name="eqnCosh" units="dimensionless"/>
+        <variable name="eqnTanh" units="dimensionless"/>
+        <variable name="eqnSech" units="dimensionless"/>
+        <variable name="eqnCsch" units="dimensionless"/>
+        <variable name="eqnCoth" units="dimensionless"/>
+        <variable name="eqnArcsin" units="dimensionless"/>
+        <variable name="eqnArccos" units="dimensionless"/>
+        <variable name="eqnArctan" units="dimensionless"/>
+        <variable name="eqnArcsec" units="dimensionless"/>
+        <variable name="eqnArccsc" units="dimensionless"/>
+        <variable name="eqnArccot" units="dimensionless"/>
+        <variable name="eqnArcsinh" units="dimensionless"/>
+        <variable name="eqnArccosh" units="dimensionless"/>
+        <variable name="eqnArctanh" units="dimensionless"/>
+        <variable name="eqnArcsech" units="dimensionless"/>
+        <variable name="eqnArccsch" units="dimensionless"/>
+        <variable name="eqnArccoth" units="dimensionless"/>
+        <variable name="eqnPiecewise" units="dimensionless"/>
+        <variable name="eqnPiecewiseWithin" units="dimensionless"/>
+        <variable name="eqnCi" units="dimensionless"/>
+        <variable name="eqnCnInteger" units="dimensionless"/>
+        <variable name="eqnCnDouble" units="dimensionless"/>
+        <variable name="eqnCnIntegerWithExponent" units="dimensionless"/>
+        <variable name="eqnCnDoubleWithExponent" units="dimensionless"/>
+        <variable name="eqnTrue" units="dimensionless"/>
+        <variable name="eqnFalse" units="dimensionless"/>
+        <variable name="eqnExponentiale" units="dimensionless"/>
+        <variable name="eqnPi" units="dimensionless"/>
+        <variable name="eqnInfinity" units="dimensionless"/>
+        <variable name="eqnNotanumber" units="dimensionless"/>
+        <variable initial_value="1" name="a" units="dimensionless"/>
+        <variable initial_value="2" name="b" units="dimensionless"/>
+        <variable initial_value="3" name="c" units="dimensionless"/>
+        <variable initial_value="4" name="d" units="dimensionless"/>
+        <variable initial_value="5" name="e" units="dimensionless"/>
+        <variable initial_value="6" name="f" units="dimensionless"/>
+        <variable initial_value="7" name="g" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x</ci>
+                </apply>
+                <ci>a</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnEq</ci>
+                <apply>
+                    <eq/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnNeq</ci>
+                <apply>
+                    <neq/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnLt</ci>
+                <apply>
+                    <lt/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnLeq</ci>
+                <apply>
+                    <leq/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnGt</ci>
+                <apply>
+                    <gt/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnGeq</ci>
+                <apply>
+                    <geq/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnAnd</ci>
+                <apply>
+                    <and/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnOr</ci>
+                <apply>
+                    <or/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnXor</ci>
+                <apply>
+                    <xor/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnNot</ci>
+                <apply>
+                    <not/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnPlus</ci>
+                <apply>
+                    <plus/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnPlusMultiple</ci>
+                <apply>
+                    <plus/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                    <ci>c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnPlusUnary</ci>
+                <apply>
+                    <plus/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnMinus</ci>
+                <apply>
+                    <minus/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnMinusUnary</ci>
+                <apply>
+                    <minus/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnTimes</ci>
+                <apply>
+                    <times/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnTimesMultiple</ci>
+                <apply>
+                    <times/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                    <ci>c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnDivide</ci>
+                <apply>
+                    <divide/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnPower</ci>
+                <apply>
+                    <power/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnPowerSqr</ci>
+                <apply>
+                    <power/>
+                    <ci>a</ci>
+                    <cn cellml:units="dimensionless">2</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnPowerSqrt</ci>
+                <apply>
+                    <power/>
+                    <ci>a</ci>
+                    <cn cellml:units="dimensionless">0.5</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnRoot</ci>
+                <apply>
+                    <root/>
+                    <degree>
+                        <ci>b</ci>
+                    </degree>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnRootSqrt</ci>
+                <apply>
+                    <root/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnRootSqrtOther</ci>
+                <apply>
+                    <root/>
+                    <degree>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </degree>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnAbs</ci>
+                <apply>
+                    <abs/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnExp</ci>
+                <apply>
+                    <exp/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnLn</ci>
+                <apply>
+                    <ln/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnLog</ci>
+                <apply>
+                    <log/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnLog2</ci>
+                <apply>
+                    <log/>
+                    <logbase>
+                        <cn cellml:units="dimensionless">2</cn>
+                    </logbase>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnLog10</ci>
+                <apply>
+                    <log/>
+                    <logbase>
+                        <cn cellml:units="dimensionless">10</cn>
+                    </logbase>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnLogBase</ci>
+                <apply>
+                    <log/>
+                    <logbase>
+                        <ci>b</ci>
+                    </logbase>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCeiling</ci>
+                <apply>
+                    <ceiling/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnFloor</ci>
+                <apply>
+                    <floor/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnMin</ci>
+                <apply>
+                    <min/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnMinMultiple</ci>
+                <apply>
+                    <min/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                    <ci>c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnMax</ci>
+                <apply>
+                    <max/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnMaxMultiple</ci>
+                <apply>
+                    <max/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                    <ci>c</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnRem</ci>
+                <apply>
+                    <rem/>
+                    <ci>a</ci>
+                    <ci>b</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnSin</ci>
+                <apply>
+                    <sin/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCos</ci>
+                <apply>
+                    <cos/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnTan</ci>
+                <apply>
+                    <tan/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnSec</ci>
+                <apply>
+                    <sec/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCsc</ci>
+                <apply>
+                    <csc/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCot</ci>
+                <apply>
+                    <cot/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnSinh</ci>
+                <apply>
+                    <sinh/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCosh</ci>
+                <apply>
+                    <cosh/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnTanh</ci>
+                <apply>
+                    <tanh/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnSech</ci>
+                <apply>
+                    <sech/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCsch</ci>
+                <apply>
+                    <csch/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCoth</ci>
+                <apply>
+                    <coth/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArcsin</ci>
+                <apply>
+                    <arcsin/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArccos</ci>
+                <apply>
+                    <arccos/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArctan</ci>
+                <apply>
+                    <arctan/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArcsec</ci>
+                <apply>
+                    <arcsec/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArccsc</ci>
+                <apply>
+                    <arccsc/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArccot</ci>
+                <apply>
+                    <arccot/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArcsinh</ci>
+                <apply>
+                    <arcsinh/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArccosh</ci>
+                <apply>
+                    <arccosh/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArctanh</ci>
+                <apply>
+                    <arctanh/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArcsech</ci>
+                <apply>
+                    <arcsech/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArccsch</ci>
+                <apply>
+                    <arccsch/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnArccoth</ci>
+                <apply>
+                    <arccoth/>
+                    <ci>a</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnPiecewise</ci>
+                <piecewise>
+                    <piece>
+                        <ci>a</ci>
+                        <apply>
+                            <gt/>
+                            <ci>a</ci>
+                            <ci>b</ci>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <ci>c</ci>
+                        <apply>
+                            <gt/>
+                            <ci>c</ci>
+                            <ci>d</ci>
+                        </apply>
+                    </piece>
+                    <piece>
+                        <ci>e</ci>
+                        <apply>
+                            <gt/>
+                            <ci>e</ci>
+                            <ci>f</ci>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <ci>g</ci>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>eqnPiecewiseWithin</ci>
+                <apply>
+                    <plus/>
+                    <cn cellml:units="dimensionless">123</cn>
+                    <piecewise>
+                        <piece>
+                            <ci>a</ci>
+                            <apply>
+                                <gt/>
+                                <ci>a</ci>
+                                <ci>b</ci>
+                            </apply>
+                        </piece>
+                        <piece>
+                            <ci>c</ci>
+                            <apply>
+                                <gt/>
+                                <ci>c</ci>
+                                <ci>d</ci>
+                            </apply>
+                        </piece>
+                        <piece>
+                            <ci>e</ci>
+                            <apply>
+                                <gt/>
+                                <ci>e</ci>
+                                <ci>f</ci>
+                            </apply>
+                        </piece>
+                        <otherwise>
+                            <ci>g</ci>
+                        </otherwise>
+                    </piecewise>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCi</ci>
+                <ci>a</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCnInteger</ci>
+                <cn cellml:units="dimensionless">123</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCnDouble</ci>
+                <cn cellml:units="dimensionless">123.456789</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCnIntegerWithExponent</ci>
+                <cn cellml:units="dimensionless" type="e-notation">123<sep/>99</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnCnDoubleWithExponent</ci>
+                <cn cellml:units="dimensionless" type="e-notation">123.456789<sep/>99</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnTrue</ci>
+                <true/>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnFalse</ci>
+                <false/>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnExponentiale</ci>
+                <exponentiale/>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnPi</ci>
+                <pi/>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnInfinity</ci>
+                <infinity/>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>eqnNotanumber</ci>
+                <notanumber/>
+            </apply>
+        </math>
+    </component>
+</model>

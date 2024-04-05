@@ -25,10 +25,14 @@ namespace libOpenCOR {
 class SolverForwardEuler::Impl: public SolverOdeFixedStep::Impl
 {
 public:
+    explicit Impl();
+
+    SolverPtr duplicate() override;
+
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     ComputeRates pComputeRates) override;
 
-    bool solve(double &pVoi, double pVoiEnd) const override;
+    bool solve(double &pVoi, double pVoiEnd) override;
 };
 
 } // namespace libOpenCOR

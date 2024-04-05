@@ -16,10 +16,13 @@
 
 include(api/file/tests.cmake)
 include(api/logger/tests.cmake)
+include(api/sed/tests.cmake)
 include(api/solver/tests.cmake)
 include(api/version/tests.cmake)
 
 include(misc/compiler/tests.cmake)
+
+include(support/cellml/tests.cmake)
 
 # Prepare our different tests.
 
@@ -49,10 +52,25 @@ string(REGEX REPLACE "\n" "\" \\n\"" SOME_WARNING_CELLML_CONTENTS_C "${SOME_WARN
 string(REPLACE "\"" "\\\"" SOME_SEDML_CONTENTS "${SOME_SEDML_CONTENTS}")
 string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_CONTENTS_C "${SOME_SEDML_CONTENTS}")
 
+file(READ res/api/sed/algebraic.cellml SOME_ALGEBRAIC_CONTENTS)
+file(READ res/api/sed/dae.cellml SOME_DAE_CONTENTS)
+file(READ res/api/sed/nla.cellml SOME_NLA_CONTENTS)
+file(READ res/api/sed/overconstrained.cellml SOME_OVERCONSTRAINED_CONTENTS)
+file(READ res/api/sed/underconstrained.cellml SOME_UNDERCONSTRAINED_CONTENTS)
+file(READ res/api/sed/unsuitably_constrained.cellml SOME_UNSUITABLY_CONSTRAINED_CONTENTS)
+
+string(REPLACE "\"" "\\\"" SOME_ALGEBRAIC_CONTENTS "${SOME_ALGEBRAIC_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_DAE_CONTENTS "${SOME_DAE_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_NLA_CONTENTS "${SOME_NLA_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_OVERCONSTRAINED_CONTENTS "${SOME_OVERCONSTRAINED_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_UNDERCONSTRAINED_CONTENTS "${SOME_UNDERCONSTRAINED_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_UNSUITABLY_CONSTRAINED_CONTENTS "${SOME_UNSUITABLY_CONSTRAINED_CONTENTS}")
+
 configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/misc
                     ${CMAKE_SOURCE_DIR}/src/solver
+                    ${CMAKE_SOURCE_DIR}/src/support/cellml
                     ${CMAKE_BINARY_DIR})
 
 foreach(TEST ${TESTS})

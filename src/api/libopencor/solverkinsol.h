@@ -70,9 +70,6 @@ public:
 
     static SolverKinsolPtr create();
 
-    std::string id() const override;
-    std::string name() const override;
-
     /**
      * @brief Get the maximum number of iterations used by the solver.
      *
@@ -152,8 +149,6 @@ public:
      */
 
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
-
-    bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

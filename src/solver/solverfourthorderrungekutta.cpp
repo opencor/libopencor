@@ -20,12 +20,22 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverFourthOrderRungeKutta::Impl::Impl()
+    : SolverOdeFixedStep::Impl("KISAO:0000032", "Fourth-order Runge-Kutta")
+{
+}
+
 SolverFourthOrderRungeKutta::Impl::~Impl()
 {
     delete[] mK1;
     delete[] mK2;
     delete[] mK3;
     delete[] mYk;
+}
+
+SolverPtr SolverFourthOrderRungeKutta::Impl::duplicate()
+{
+    return SolverOdeFixedStep::Impl::duplicate(SolverFourthOrderRungeKutta::create());
 }
 
 bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
@@ -49,7 +59,7 @@ bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
     return true;
 }
 
-bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // We compute the following:
     //   k1 = f(t_n, Y_n)
@@ -146,35 +156,16 @@ SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
+/*---GRY---
 const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
+*/
 
 SolverFourthOrderRungeKuttaPtr SolverFourthOrderRungeKutta::create()
 {
     return SolverFourthOrderRungeKuttaPtr {new SolverFourthOrderRungeKutta {}};
-}
-
-std::string SolverFourthOrderRungeKutta::id() const
-{
-    return "KISAO:0000032";
-}
-
-std::string SolverFourthOrderRungeKutta::name() const
-{
-    return "Fourth-order Runge-Kutta";
-}
-
-bool SolverFourthOrderRungeKutta::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                             double *pVariables, ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverFourthOrderRungeKutta::solve(double &pVoi, double pVoiEnd) const
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
 }
 
 } // namespace libOpenCOR

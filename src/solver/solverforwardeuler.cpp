@@ -20,6 +20,16 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverForwardEuler::Impl::Impl()
+    : SolverOdeFixedStep::Impl("KISAO:0000030", "Forward Euler")
+{
+}
+
+SolverPtr SolverForwardEuler::Impl::duplicate()
+{
+    return SolverOdeFixedStep::Impl::duplicate(SolverForwardEuler::create());
+}
+
 bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                           double *pVariables, ComputeRates pComputeRates)
 {
@@ -30,7 +40,7 @@ bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pSt
     return SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
 }
 
-bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // We compute the following:
     //   Y_n+1 = Y_n + h * f(t_n, Y_n)
@@ -81,35 +91,16 @@ SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
+/*---GRY---
 const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
+*/
 
 SolverForwardEulerPtr SolverForwardEuler::create()
 {
     return SolverForwardEulerPtr {new SolverForwardEuler {}};
-}
-
-std::string SolverForwardEuler::id() const
-{
-    return "KISAO:0000030";
-}
-
-std::string SolverForwardEuler::name() const
-{
-    return "Forward Euler";
-}
-
-bool SolverForwardEuler::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                    ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverForwardEuler::solve(double &pVoi, double pVoiEnd) const
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
 }
 
 } // namespace libOpenCOR

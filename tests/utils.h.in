@@ -37,6 +37,7 @@ static constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
 
 static constexpr auto UNKNOWN_FILE = "unknown_file.txt";
 static constexpr auto SBML_FILE = "sbml.sbml";
+static constexpr auto ERROR_CELLML_FILE = "error.cellml";
 static constexpr auto ERROR_SEDML_FILE = "error.sedml";
 static constexpr auto CELLML_1_X_FILE = "cellml_1_x.cellml";
 static constexpr auto SEDML_1_X_FILE = "cellml_1_x.sedml";
@@ -62,6 +63,8 @@ static constexpr auto SOME_CELLML_CONTENTS = "@SOME_CELLML_CONTENTS_C@";
 static constexpr auto SOME_ERROR_CELLML_CONTENTS = "@SOME_ERROR_CELLML_CONTENTS_C@";
 static constexpr auto SOME_WARNING_CELLML_CONTENTS = "@SOME_WARNING_CELLML_CONTENTS_C@";
 static constexpr auto SOME_SEDML_CONTENTS = "@SOME_SEDML_CONTENTS_C@";
+
+void printIssues(const LoggerPtr &pLogger);
 
 typedef struct
 {

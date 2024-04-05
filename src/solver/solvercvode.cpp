@@ -37,6 +37,22 @@ namespace libOpenCOR {
 
 namespace {
 
+void errorHandler(int pErrorCode, const char *pModule, const char *pFunction, char *pErrorMessage, void *pUserData)
+{
+    (void)pModule;
+    (void)pFunction;
+
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pErrorCode;
+#else
+    if (pErrorCode != CV_WARNING) {
+#endif
+    *static_cast<std::string *>(pUserData) = pErrorMessage;
+#ifndef CODE_COVERAGE_ENABLED
+}
+#endif
+}
+
 int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
@@ -50,7 +66,37 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 
 // Solver.
 
+SolverCvode::Impl::Impl()
+    : SolverOde::Impl("KISAO:0000019", "CVODE")
+{
+}
+
 SolverCvode::Impl::~Impl()
+{
+    resetInternals();
+}
+
+SolverPtr SolverCvode::Impl::duplicate()
+{
+    auto solver = SolverCvode::create();
+    auto *solverPimpl = solver->pimpl();
+
+    solverPimpl->mMaximumStep = mMaximumStep;
+    solverPimpl->mMaximumNumberOfSteps = mMaximumNumberOfSteps;
+    solverPimpl->mIntegrationMethod = mIntegrationMethod;
+    solverPimpl->mIterationType = mIterationType;
+    solverPimpl->mLinearSolver = mLinearSolver;
+    solverPimpl->mPreconditioner = mPreconditioner;
+    solverPimpl->mUpperHalfBandwidth = mUpperHalfBandwidth;
+    solverPimpl->mLowerHalfBandwidth = mLowerHalfBandwidth;
+    solverPimpl->mRelativeTolerance = mRelativeTolerance;
+    solverPimpl->mAbsoluteTolerance = mAbsoluteTolerance;
+    solverPimpl->mInterpolateSolution = mInterpolateSolution;
+
+    return solver;
+}
+
+void SolverCvode::Impl::resetInternals()
 {
     if (mSunContext != nullptr) {
         N_VDestroy_Serial(mStatesVector);
@@ -61,14 +107,37 @@ SolverCvode::Impl::~Impl()
         CVodeFree(&mSolver);
 
         SUNContext_Free(&mSunContext);
-
-        delete mUserData;
     }
+}
+
+StringStringMap SolverCvode::Impl::properties() const
+{
+    StringStringMap res;
+
+    res["KISAO:0000467"] = toString(mMaximumStep);
+    res["KISAO:0000415"] = toString(mMaximumNumberOfSteps);
+    res["KISAO:0000475"] = (mIntegrationMethod == IntegrationMethod::BDF) ? "BDF" : "Adams-Moulton";
+    res["KISAO:0000476"] = (mIterationType == IterationType::FUNCTIONAL) ? "Functional" : "Newton";
+    res["KISAO:0000477"] = (mLinearSolver == LinearSolver::DENSE)    ? "Dense" :
+                           (mLinearSolver == LinearSolver::BANDED)   ? "Banded" :
+                           (mLinearSolver == LinearSolver::DIAGONAL) ? "Diagonal" :
+                           (mLinearSolver == LinearSolver::GMRES)    ? "GMRES" :
+                           (mLinearSolver == LinearSolver::BICGSTAB) ? "BiCGStab" :
+                                                                       "TFQMR";
+    res["KISAO:0000478"] = (mPreconditioner == Preconditioner::NO) ? "No" : "Banded";
+    res["KISAO:0000479"] = toString(mUpperHalfBandwidth);
+    res["KISAO:0000480"] = toString(mLowerHalfBandwidth);
+    res["KISAO:0000209"] = toString(mRelativeTolerance);
+    res["KISAO:0000211"] = toString(mAbsoluteTolerance);
+    res["KISAO:0000481"] = mInterpolateSolution ? "true" : "false";
+
+    return res;
 }
 
 bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                                    ComputeRates pComputeRates)
 {
+    resetInternals();
     removeAllIssues();
 
     // Initialise the ODE solver itself.
@@ -125,9 +194,9 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
         addError("The absolute tolerance cannot be equal to " + toString(mAbsoluteTolerance) + ". It must be greater or equal to 0.");
     }
 
-    // Check whether we have had issues and, if so, then leave.
+    // Check whether we got some errors.
 
-    if (!mIssues.empty()) {
+    if (hasErrors()) {
         return false;
     }
 
@@ -135,13 +204,17 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     ASSERT_EQ(SUNContext_Create(nullptr, &mSunContext), 0);
 
-    // Create our CVODES solver.
+    // Create our CVODE solver.
 
     mSolver = CVodeCreate((mIntegrationMethod == IntegrationMethod::BDF) ? CV_BDF : CV_ADAMS, mSunContext);
 
     ASSERT_NE(mSolver, nullptr);
 
-    // Initialise our CVODES solver.
+    // Use our own error handler.
+
+    ASSERT_EQ(CVodeSetErrHandlerFn(mSolver, errorHandler, &mErrorMessage), CV_SUCCESS);
+
+    // Initialise our CVODE solver.
 
     mStatesVector = N_VMake_Serial(static_cast<int64_t>(pSize), pStates, mSunContext);
 
@@ -150,9 +223,10 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Set our user data.
 
-    mUserData = new SolverCvodeUserData {pVariables, pComputeRates};
+    mUserData.variables = pVariables;
+    mUserData.computeRates = pComputeRates;
 
-    ASSERT_EQ(CVodeSetUserData(mSolver, mUserData), CV_SUCCESS);
+    ASSERT_EQ(CVodeSetUserData(mSolver, &mUserData), CV_SUCCESS);
 
     // Set our maximum step.
 
@@ -243,14 +317,14 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 
     SolverOde::Impl::reinitialise(pVoi);
 
-    // Reinitialise our CVODES solver.
+    // Reinitialise our CVODE solver.
 
     ASSERT_EQ(CVodeReInit(mSolver, pVoi, mStatesVector), CV_SUCCESS);
 
     return true;
 }
 
-bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // Solve the model using interpolation, if needed.
 
@@ -258,7 +332,13 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd) const
         ASSERT_EQ(CVodeSetStopTime(mSolver, pVoiEnd), CV_SUCCESS);
     }
 
-    ASSERT_EQ(CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL), CV_SUCCESS);
+    auto res = CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL);
+
+    if (res < CV_SUCCESS) {
+        addError(mErrorMessage);
+
+        return false;
+    }
 
     return true;
 }
@@ -286,16 +366,6 @@ const SolverCvode::Impl *SolverCvode::pimpl() const
 SolverCvodePtr SolverCvode::create()
 {
     return SolverCvodePtr {new SolverCvode {}};
-}
-
-std::string SolverCvode::id() const
-{
-    return "KISAO:0000019";
-}
-
-std::string SolverCvode::name() const
-{
-    return "CVODE";
 }
 
 double SolverCvode::maximumStep() const
@@ -406,22 +476,6 @@ bool SolverCvode::interpolateSolution() const
 void SolverCvode::setInterpolateSolution(bool pInterpolateSolution)
 {
     pimpl()->mInterpolateSolution = pInterpolateSolution;
-}
-
-bool SolverCvode::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                             ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverCvode::reinitialise(double pVoi)
-{
-    return pimpl()->reinitialise(pVoi);
-}
-
-bool SolverCvode::solve(double &pVoi, double pVoiEnd) const
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
 }
 
 } // namespace libOpenCOR

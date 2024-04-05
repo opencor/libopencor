@@ -27,7 +27,7 @@ class SedmlFile::Impl: public Logger::Impl
 public:
     libsedml::SedDocument *mDocument;
 
-    Impl(libsedml::SedDocument *pDocument);
+    explicit Impl(libsedml::SedDocument *pDocument);
     ~Impl();
 };
 

@@ -33,6 +33,8 @@ public:
 
     bool compile(const std::string &pCode);
 
+    bool addFunction(const std::string &pName, void *pFunction);
+
     void *function(const std::string &pName) const;
 };
 

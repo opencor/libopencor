@@ -27,39 +27,21 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-struct SolverKinsolUserData
-{
-    SolverNla::ComputeSystem computeSystem = nullptr;
-
-    void *userData = nullptr;
-};
-
-struct SolverKinsolData
-{
-    SUNContext context = nullptr;
-
-    void *solver = nullptr;
-
-    N_Vector uVector = nullptr;
-    N_Vector onesVector = nullptr;
-
-    SUNMatrix sunMatrix = nullptr;
-    SUNLinearSolver sunLinearSolver = nullptr;
-
-    SolverKinsolUserData *userData = nullptr;
-};
-
 class SolverKinsol::Impl: public SolverNla::Impl
 {
 public:
+    std::string mErrorMessage;
+
     int mMaximumNumberOfIterations = 200;
     LinearSolver mLinearSolver = LinearSolver::DENSE;
     int mUpperHalfBandwidth = 0;
     int mLowerHalfBandwidth = 0;
 
-    std::map<ComputeSystem, SolverKinsolData> mData;
+    explicit Impl();
 
-    ~Impl() override;
+    SolverPtr duplicate() override;
+
+    StringStringMap properties() const override;
 
     bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 };

@@ -31,6 +31,13 @@ using CellmlFileRuntimePtr = std::shared_ptr<CellmlFileRuntime>;
 class CellmlFileRuntime: public Logger
 {
 public:
+    using InitialiseVariablesForAlgebraicModelFunction = void (*)(double *pVariables);
+    using InitialiseVariablesForDifferentialModelFunction = void (*)(double *pStates, double *pRates, double *pVariables);
+    using ComputeComputedConstantsFunction = void (*)(double *pVariables);
+    using ComputeRatesFunction = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
+    using ComputeVariablesForAlgebraicModelFunction = void (*)(double *pVariables);
+    using ComputeVariablesForDifferentialModelFunction = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
+
     CellmlFileRuntime() = delete;
     ~CellmlFileRuntime() override;
 
@@ -40,12 +47,19 @@ public:
     CellmlFileRuntime &operator=(const CellmlFileRuntime &pRhs) = delete;
     CellmlFileRuntime &operator=(CellmlFileRuntime &&pRhs) noexcept = delete;
 
-    static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile);
+    static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
+
+    InitialiseVariablesForAlgebraicModelFunction initialiseVariablesForAlgebraicModel() const;
+    InitialiseVariablesForDifferentialModelFunction initialiseVariablesForDifferentialModel() const;
+    ComputeComputedConstantsFunction computeComputedConstants() const;
+    ComputeRatesFunction computeRates() const;
+    ComputeVariablesForAlgebraicModelFunction computeVariablesForAlgebraicModel() const;
+    ComputeVariablesForDifferentialModelFunction computeVariablesForDifferentialModel() const;
 
 private:
     class Impl;
 
-    explicit CellmlFileRuntime(const CellmlFilePtr &pCellmlFile);
+    explicit CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 
     Impl *pimpl();
     const Impl *pimpl() const;

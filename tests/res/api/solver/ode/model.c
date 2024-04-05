@@ -43,7 +43,7 @@ double * createStatesArray()
     double *res = (double *) malloc(STATE_COUNT*sizeof(double));
 
     for (size_t i = 0; i < STATE_COUNT; ++i) {
-        res[i] = NAN;
+        res[i] = strtod("NAN", nullptr);
     }
 
     return res;
@@ -54,7 +54,7 @@ double * createVariablesArray()
     double *res = (double *) malloc(VARIABLE_COUNT*sizeof(double));
 
     for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
-        res[i] = NAN;
+        res[i] = strtod("NAN", nullptr);
     }
 
     return res;

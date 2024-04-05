@@ -16,6 +16,7 @@ limitations under the License.
 
 #pragma once
 
+#include "cellmlfile.h"
 #include "unittestingexport.h"
 
 #include "libopencor/types.h"
@@ -28,10 +29,16 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+#include <libxml/xmlstring.h>
+
 namespace libOpenCOR {
+
+static const std::string LIBOPENCOR_NAMESPACE = "https://opencor.ws/libopencor";
 
 using ConstCharPtrVector = std::vector<const char *>;
 using FileVector = std::vector<File *>;
+
+using StringStringMap = std::map<std::string, std::string>;
 
 #ifdef NDEBUG
 #    define ASSERT_EQ(x, y) \
@@ -72,6 +79,8 @@ std::string forwardSlashPath(const std::string &pPath);
 std::filesystem::path stringToPath(const std::string &pString);
 
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl);
+std::string relativePath(const std::string &pPath, const std::string &pBasePath);
+std::string urlPath(const std::string &pPath);
 
 #ifndef __EMSCRIPTEN__
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
@@ -79,9 +88,15 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 UnsignedCharVector LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem::path &pFilePath);
 #endif
 
+char LIBOPENCOR_UNIT_TESTING_EXPORT *nlaSolverAddress(SolverNla *pNlaSolver);
+
 std::string toString(int pNumber);
 std::string toString(size_t pNumber);
 std::string toString(double pNumber);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedCharVector &pBytes);
+
+const xmlChar *toConstXmlCharPtr(const std::string &pString);
+
+bool differentialModel(const CellmlFilePtr &pCellmlFile);
 
 } // namespace libOpenCOR

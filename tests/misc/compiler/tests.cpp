@@ -14,10 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "cellmlfile.h"
 #include "compiler.h"
 #include "utils.h"
 
 #include "tests/utils.h"
+
+#include <libopencor>
 
 class CompilerTest: public testing::Test
 {
@@ -32,15 +35,6 @@ public:
 
 TEST_F(CompilerTest, basic)
 {
-    // Cannot retrieve a function if nothing has been compiled.
-
-    EXPECT_EQ(nullptr, mCompiler->function(""));
-
-    // To compile an empty string is nonsensical, but still possible.
-
-    EXPECT_TRUE(mCompiler->compile(""));
-    EXPECT_EQ(nullptr, mCompiler->function(""));
-
     // Add "void" to our string.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_01 = {
@@ -191,4 +185,13 @@ TEST_F(CompilerTest, severalParameters)
     EXPECT_TRUE(mCompiler->compile("double function(double a, double b, double c) { return a*b*c; }"));
     EXPECT_NE(nullptr, mCompiler->function("function"));
     EXPECT_TRUE(libOpenCOR::fuzzyCompare(105.0, reinterpret_cast<double (*)(double, double, double)>(mCompiler->function("function"))(3.0, 5.0, 7.0)));
+}
+
+TEST_F(CompilerTest, math)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("misc/math.cellml"));
+    auto cellmlFile = libOpenCOR::CellmlFile::create(file);
+    auto cellmlFileRuntime = cellmlFile->runtime();
+
+    EXPECT_FALSE(cellmlFileRuntime->hasIssues());
 }

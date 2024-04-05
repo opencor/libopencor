@@ -20,10 +20,20 @@ namespace libOpenCOR {
 
 // Solver.
 
+SolverHeun::Impl::Impl()
+    : SolverOdeFixedStep::Impl("KISAO:0000301", "Heun")
+{
+}
+
 SolverHeun::Impl::~Impl()
 {
     delete[] mK;
     delete[] mYk;
+}
+
+SolverPtr SolverHeun::Impl::duplicate()
+{
+    return SolverOdeFixedStep::Impl::duplicate(SolverHeun::create());
 }
 
 bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
@@ -45,7 +55,7 @@ bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, do
     return true;
 }
 
-bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd) const
+bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // We compute the following:
     //   k = f(t_n, Y_n)
@@ -112,35 +122,16 @@ SolverHeun::Impl *SolverHeun::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
+/*---GRY---
 const SolverHeun::Impl *SolverHeun::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
+*/
 
 SolverHeunPtr SolverHeun::create()
 {
     return SolverHeunPtr {new SolverHeun {}};
-}
-
-std::string SolverHeun::id() const
-{
-    return "KISAO:0000301";
-}
-
-std::string SolverHeun::name() const
-{
-    return "Heun";
-}
-
-bool SolverHeun::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                            ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverHeun::solve(double &pVoi, double pVoiEnd) const
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
 }
 
 } // namespace libOpenCOR

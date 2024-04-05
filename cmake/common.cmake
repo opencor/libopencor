@@ -75,19 +75,15 @@ function(configure_target TARGET)
             set(COMPILE_OPTIONS
                 -Weverything
                 -Wno-c++98-compat
+                -Wno-c++98-compat-pedantic
                 -Wno-disabled-macro-expansion
                 -Wno-exit-time-destructors
                 -Wno-global-constructors
                 -Wno-padded
+                -Wno-switch-enum
                 -Wno-unsafe-buffer-usage
                 -Wno-weak-vtables
             )
-
-            if(NOT "${TARGET}" STREQUAL "${CMAKE_PROJECT_NAME}")
-                list(APPEND COMPILE_OPTIONS
-                    -Wno-c++98-compat-pedantic
-                )
-            endif()
 
             target_compile_options(${TARGET} PRIVATE
                                    ${COMPILE_OPTIONS})
@@ -111,6 +107,7 @@ function(configure_target TARGET)
                     -cppcoreguidelines-non-private-member-variables-in-classes
                 )
                 set(DISABLED_FUCHSIA_CHECKS
+                    -fuchsia-default-arguments-declarations
                     -fuchsia-statically-constructed-objects
                 )
                 set(MISC_CHECKS

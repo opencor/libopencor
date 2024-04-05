@@ -16,6 +16,7 @@ limitations under the License.
 
 #pragma once
 
+#include "compiler.h"
 #include "logger_p.h"
 
 #include "cellmlfile.h"
@@ -26,8 +27,18 @@ namespace libOpenCOR {
 class CellmlFileRuntime::Impl: public Logger::Impl
 {
 public:
-    Impl(const CellmlFilePtr &pCellmlFile);
-    ~Impl() = default;
+    CompilerPtr mCompiler = nullptr;
+    char *mNlaSolverAddress = nullptr;
+
+    InitialiseVariablesForDifferentialModelFunction mInitialiseVariablesForDifferentialModel;
+    InitialiseVariablesForAlgebraicModelFunction mInitialiseVariablesForAlgebraicModel = nullptr;
+    ComputeComputedConstantsFunction mComputeComputedConstants = nullptr;
+    ComputeRatesFunction mComputeRates = nullptr;
+    ComputeVariablesForDifferentialModelFunction mComputeVariablesForDifferentialModel = nullptr;
+    ComputeVariablesForAlgebraicModelFunction mComputeVariablesForAlgebraicModel = nullptr;
+
+    explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
+    ~Impl();
 };
 
 } // namespace libOpenCOR

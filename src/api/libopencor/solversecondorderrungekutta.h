@@ -55,14 +55,6 @@ public:
 
     static SolverSecondOrderRungeKuttaPtr create();
 
-    std::string id() const override;
-    std::string name() const override;
-
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
-
-    bool solve(double &pVoi, double pVoiEnd) const override;
-
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

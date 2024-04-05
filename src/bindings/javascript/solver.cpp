@@ -37,7 +37,8 @@ void solverApi()
 
     // SolverOde API.
 
-    emscripten::class_<libOpenCOR::SolverOde, emscripten::base<libOpenCOR::Solver>>("SolverOde");
+    emscripten::class_<libOpenCOR::SolverOde, emscripten::base<libOpenCOR::Solver>>("SolverOde")
+        .smart_ptr<libOpenCOR::SolverOdePtr>("SolverOde");
 
     // SolverOdeFixedStep API.
 
@@ -47,7 +48,8 @@ void solverApi()
 
     // SolverNla API.
 
-    emscripten::class_<libOpenCOR::SolverNla, emscripten::base<libOpenCOR::Solver>>("SolverNla");
+    emscripten::class_<libOpenCOR::SolverNla, emscripten::base<libOpenCOR::Solver>>("SolverNla")
+        .smart_ptr<libOpenCOR::SolverNlaPtr>("SolverNla");
 
     // SolverCvode API.
 
