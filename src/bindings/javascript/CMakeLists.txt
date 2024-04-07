@@ -30,7 +30,7 @@ set(JAVASCRIPT_SOURCE_FILES
 
 if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
     if(EMSCRIPTEN)
-        # Add some sources to our WASM version of libOpenCOR so we can access its internals.
+        # Add some sources to our WebAssembly version of libOpenCOR so we can access its internals.
 
         target_sources(${CMAKE_PROJECT_NAME} PRIVATE
                        ${JAVASCRIPT_SOURCE_FILES})
