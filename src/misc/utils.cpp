@@ -346,7 +346,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     file.close();
 
     if (res) {
-        return std::make_tuple(true, filePath);
+        return {true, filePath};
     }
 
     std::filesystem::remove(filePath);
