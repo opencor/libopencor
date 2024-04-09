@@ -63,7 +63,7 @@ std::tuple<double *, double *, double *> initialise()
 
     EXPECT_EQ_DOUBLES(states, INITIAL_STATES, ABSOLUTE_ERRORS);
 
-    return std::make_tuple(states, rates, variables);
+    return {states, rates, variables};
 }
 
 void compute(const libOpenCOR::SolverOdePtr &pSolver, double *pStates, double *pRates, double *pVariables,
