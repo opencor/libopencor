@@ -114,7 +114,7 @@ std::string canonicalFileName(const std::string &pFileName)
     // The file name may be relative rather than absolute, in which case we need to remove the forward slash that got
     // added (at the beginning of the file name) by std::filesystem::weakly_canonical().
 
-    if (pFileName.find(FORWARD_SLASH) != 0) {
+    if (!pFileName.starts_with(FORWARD_SLASH)) {
         static const auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
 
         res.erase(0, FORWARD_SLASH_LENGTH);
@@ -149,12 +149,12 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
     auto requiresHttpScheme = false;
     auto requiresHttpsScheme = false;
 
-    if (pFileNameOrUrl.find(FILE_SCHEME) == 0) {
+    if (pFileNameOrUrl.starts_with(FILE_SCHEME)) {
         schemeLength = FILE_SCHEME_LENGTH;
-    } else if (pFileNameOrUrl.find(HTTP_SCHEME) == 0) {
+    } else if (pFileNameOrUrl.starts_with(HTTP_SCHEME)) {
         schemeLength = HTTP_SCHEME_LENGTH;
         requiresHttpScheme = true;
-    } else if (pFileNameOrUrl.find(HTTPS_SCHEME) == 0) {
+    } else if (pFileNameOrUrl.starts_with(HTTPS_SCHEME)) {
         schemeLength = HTTPS_SCHEME_LENGTH;
         requiresHttpsScheme = true;
     }

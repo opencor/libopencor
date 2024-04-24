@@ -39,7 +39,7 @@ TEST(FourthOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 TEST(FourthOrderRungeKuttaSolverTest, solve)
 {
     static const auto STEP = 0.0123;
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.01538470269835, 0.596055526314677, 0.053034933968590, 0.31777081396617829};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.01538470269835, 0.596055526314677, 0.053034933968590, 0.31777081396617829}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00000000000001, 0.000000000000001, 0.000000000000001, 0.00000000000000001};
 
     auto solver = libOpenCOR::SolverFourthOrderRungeKutta::create();

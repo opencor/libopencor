@@ -39,7 +39,7 @@ TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 TEST(SecondOrderRungeKuttaSolverTest, solve)
 {
     static const auto STEP = 0.0123;
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.01541887962884, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.01541887962884, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00000000000001, 0.00000000000000001, 0.000000000000000001, 0.00000000000000001};
 
     auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();

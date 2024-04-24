@@ -39,7 +39,7 @@ TEST(HeunSolverTest, stepValueWithInvalidNumber)
 TEST(HeunSolverTest, solve)
 {
     static const auto STEP = 0.0123;
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.01531692617934, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.01531692617934, 0.59605534768942003, 0.053034525171798914, 0.3177712353656742}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00000000000001, 0.00000000000000001, 0.000000000000000001, 0.00000000000000001};
 
     auto solver = libOpenCOR::SolverHeun::create();
