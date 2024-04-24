@@ -170,7 +170,7 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 
 TEST(CvodeSolverTest, solve)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -183,7 +183,7 @@ TEST(CvodeSolverTest, solve)
 
 TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015419, 0.5960555, 0.053035143, 0.317770590};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015419, 0.5960555, 0.053035143, 0.317770590}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.000001, 0.0000001, 0.000000001, 0.000000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -198,7 +198,7 @@ TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 
 TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015419, 0.5960555, 0.0530351, 0.3177705};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015419, 0.5960555, 0.0530351, 0.3177705}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.000001, 0.0000001, 0.0000001, 0.0000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -213,7 +213,7 @@ TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 
 TEST(CvodeSolverTest, solveWithFunctionalIterationType)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.01541, 0.5960555, 0.0530351, 0.317770};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.01541, 0.5960555, 0.0530351, 0.317770}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00001, 0.0000001, 0.0000001, 0.000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -228,7 +228,7 @@ TEST(CvodeSolverTest, solveWithFunctionalIterationType)
 
 TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015, 0.596, 0.0530, 0.317};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.015, 0.596, 0.0530, 0.317}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.001, 0.001, 0.0001, 0.001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -243,7 +243,7 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 
 TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.053035, 0.317770};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.053035, 0.317770}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.000001, 0.000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -258,7 +258,7 @@ TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.053032, 0.317773};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.053032, 0.317773}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.000001, 0.000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -273,7 +273,7 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolver)
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.0530327, 0.317773};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.0530327, 0.317773}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.0000001, 0.000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -288,7 +288,7 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.053032, 0.317773};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.053032, 0.317773}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.000001, 0.000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -303,7 +303,7 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -319,7 +319,7 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
 
     auto solver = libOpenCOR::SolverCvode::create();
@@ -335,7 +335,7 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.053035, 0.3177705};
+    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.053035, 0.3177705}; // NOLINT
     static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.000001, 0.0000001};
 
     auto solver = libOpenCOR::SolverCvode::create();

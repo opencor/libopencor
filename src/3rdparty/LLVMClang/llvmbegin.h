@@ -66,6 +66,7 @@ limitations under the License.
 #    pragma clang diagnostic ignored "-Wsign-conversion"
 #    pragma clang diagnostic ignored "-Wsigned-enum-bitfield"
 #    pragma clang diagnostic ignored "-Wsuggest-destructor-override"
+#    pragma clang diagnostic ignored "-Wswitch-default"
 #    pragma clang diagnostic ignored "-Wswitch-enum"
 #    pragma clang diagnostic ignored "-Wtautological-type-limit-compare"
 #    pragma clang diagnostic ignored "-Wundefined-func-template"
