@@ -162,6 +162,12 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         set(REAL_PACKAGE_FILE ${INSTALL_DIR}/${PACKAGE_FILE})
         set(PACKAGE_URL "https://github.com/opencor/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
 
+        if("${PACKAGE_NAME}" STREQUAL "libCellML")
+            #---GRY--- THIS IS TEMPORARY UNTIL libCellML HAS AN OFFICIAL RELEASE WITH THE INTERPRETER.
+
+            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/0695749/${PACKAGE_FILE}")
+        endif()
+
         file(DOWNLOAD ${PACKAGE_URL} ${REAL_PACKAGE_FILE} STATUS STATUS)
 
         # Uncompress the package, should we have managed to retrieve it.

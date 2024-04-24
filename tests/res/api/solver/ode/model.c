@@ -2,7 +2,7 @@
 
 #include "model.h"
 
-const char VERSION[] = "0.4.0.post0";
+const char VERSION[] = "0.5.0.post0";
 const char LIBCELLML_VERSION[] = "0.5.0";
 
 const size_t STATE_COUNT = 4;
