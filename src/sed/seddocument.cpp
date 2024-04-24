@@ -68,10 +68,6 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
     // Make sure that the given file is supported.
 
     switch (pFile->type()) {
-    case File::Type::UNKNOWN_FILE:
-        addError("A simulation experiment description cannot be created using an unknown file.");
-
-        break;
     case File::Type::CELLML_FILE:
         initialiseFromCellmlFile(pOwner, pFile);
 
@@ -80,21 +76,20 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
         addMessage("A simulation experiment description cannot (currently) be created using a SED-ML file.");
 
         break;
-#ifdef __EMSCRIPTEN__
-    default: // File::Type::COMBINE_ARCHIVE.
-        addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
-
-        break;
-#else
     case File::Type::COMBINE_ARCHIVE:
         addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
 
         break;
-    default: // File::Type::IRRETRIEVABLE_FILE.
+#ifndef __EMSCRIPTEN__
+    case File::Type::IRRETRIEVABLE_FILE:
         addError("A simulation experiment description cannot be created using an irretrievable file.");
 
         break;
 #endif
+    default: // File::Type::UNKNOWN_FILE.
+        addError("A simulation experiment description cannot be created using an unknown file.");
+
+        break;
     }
 }
 

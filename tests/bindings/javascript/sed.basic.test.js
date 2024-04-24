@@ -95,7 +95,7 @@ describe("Sed basic tests", () => {
     ]);
   });
 
-  /*---GRY---
+  /*---GRY--- TO BE UNCOMMENTED ONCE WE HAVE SUPPORT FOR COMBINE ARCHIVES (see https://github.com/opencor/libopencor/issues/214).
   test("COMBINE archive", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 

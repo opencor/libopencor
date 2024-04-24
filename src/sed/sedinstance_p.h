@@ -25,9 +25,9 @@ namespace libOpenCOR {
 class SedInstance::Impl: public Logger::Impl
 {
 public:
-    static SedInstancePtr create(const SedDocumentPtr &pDocument);
-
     SedInstanceTaskPtrVector mTasks;
+
+    static SedInstancePtr create(const SedDocumentPtr &pDocument);
 
     explicit Impl(const SedDocumentPtr &pDocument);
 

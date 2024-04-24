@@ -353,9 +353,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 
     return {};
 }
-#endif
 
-#ifndef __EMSCRIPTEN__
 UnsignedCharVector fileContents(const std::filesystem::path &pFilePath)
 {
     // Retrieve and return the contents of the given file.

@@ -16,9 +16,8 @@ limitations under the License.
 
 #pragma once
 
-#include "logger_p.h"
-
 #include "cellmlfileruntime.h"
+#include "logger_p.h"
 
 #include "libopencor/sedinstancetask.h"
 

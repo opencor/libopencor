@@ -58,8 +58,6 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 {
 #ifdef __EMSCRIPTEN__
     (void)pFile;
-
-    return nullptr;
 #else
     // Try to retrieve a COMBINE archive.
 
@@ -70,9 +68,9 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
     }
 
     delete archive;
+#endif
 
     return nullptr;
-#endif
 }
 
 } // namespace libOpenCOR
