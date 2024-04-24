@@ -60,7 +60,7 @@
                     </span>
 
                     <p class="note"><small>
-                        <span class="note">Note:</span> only CellML files with no imports can (currently) be processed.
+                        <span class="bold">Note:</span> only CellML files with no imports can (currently) be processed.
                     </small></p>
                 </div>
             </div>
@@ -68,21 +68,17 @@
             <button type="button" class="btn btn-secondary reset-button" id="resetFile"><i class="fa fa-recycle"></i></button>
 
             <div class="file-info">
-                <table class="file-info-table">
-                    <tr>
-                        <td><span class="property">File name:</span></td>
-                        <td><span id="fileName"></span></td>
-                    </tr>
-                    <tr>
-                        <td><span class="property">File type:</span></td>
-                        <td><span id="fileType"></span></td>
-                    </tr>
-                </table>
+                <p class="info">
+                    <span>
+                        <span class="bold" id="fileName"></span> is of <span class="bold" id="fileType"></span> type.
+                    </span>
+                    <span id="fileAdditionalInfo"></span>
+                </p>
             </div>
 
             <div class="file-error">
                 <p class="error">
-                    <span class="property">Error:</span> <span id="fileError"></span>
+                    <span class="bold">Error:</span> <span id="fileError"></span>
                 </p>
             </div>
         </div>

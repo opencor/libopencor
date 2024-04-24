@@ -71,23 +71,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             libopencorFile.setContents(memPtr, file.size);
 
-            let libopencorFileType = "unknown file";
+            let fileType = "unknown";
+            let fileAdditionalInfo = "";
 
-            switch (libopencorFile.type()) {
-              case libopencor.File.Type.CELLML_FILE:
-                libopencorFileType = "CellML file";
-
-                break;
-              case libopencor.File.Type.SEDML_FILE:
-                libopencorFileType = "SED-ML file";
-
-                break;
-              default:
-                break;
+            if (libopencorFile.type() == libopencor.File.Type.CELLML_FILE) {
+              fileType = "CellML";
+              fileAdditionalInfo = "Blah...";
+            } else if (libopencorFile.type() == libopencor.File.Type.SEDML_FILE) {
+              fileType = "SED-ML";
             }
 
             document.getElementById("fileName").innerHTML = file.name;
-            document.getElementById("fileType").innerHTML = libopencorFileType;
+            document.getElementById("fileType").innerHTML = fileType;
+            document.getElementById("fileAdditionalInfo").innerHTML = fileAdditionalInfo;
 
             updateFileUi("block", "none", "block");
           } catch (exception) {

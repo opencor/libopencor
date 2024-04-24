@@ -77,10 +77,6 @@
     flex-direction: column;
 }
 
-.file-info-table {
-    margin: 1rem;
-}
-
 .file-error {
     border: 1px dashed #aa2929;
 }
@@ -103,6 +99,7 @@
     --bs-btn-font-size: 0.75rem;
 }
 
+p.info,
 p.error {
     margin: 1rem;
 }
@@ -111,8 +108,6 @@ p.note {
     margin-top: 1rem;
 }
 
-span.note,
-span.property {
+span.bold {
     font-weight: bold;
-    text-decoration: underline;
 }
