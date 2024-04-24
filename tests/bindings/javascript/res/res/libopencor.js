@@ -146,8 +146,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("sundialsVersionString").innerHTML =
       libopencor.sundialsVersionString();
 
-    // Show our home page.
+    // Start with our simulation page.
 
-    showPage("Home");
+    showPage("Simulation");
   });
 });
