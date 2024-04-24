@@ -15,7 +15,7 @@
 set(PACKAGE_NAME libCellML)
 set(PACKAGE_VERSION 0.5.0)
 set(PACKAGE_REPOSITORY libcellml)
-set(RELEASE_TAG v0.5.0)
+set(RELEASE_TAG 0.5.0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -34,7 +34,7 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         67b8aeda04b896c59a2144e9922fd8bda6e52452)
+                         5e44f398a8454c6fc14b32d8db7f3680eabcc2e3)
     else()
         if(WIN32)
             if(RELEASE_MODE)
@@ -66,7 +66,7 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 cc33300cb65f19d20a05772f625cf7377ad67e14)
+                                 b48540b0852c3c87db220837fe47b78e88585d4a)
             endif()
         else()
             if(INTEL_MODE)
@@ -85,7 +85,8 @@ else()
 
     build_package(${PACKAGE_NAME}
         URL
-            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+            # https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/8fe2e97.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF

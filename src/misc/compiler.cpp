@@ -165,6 +165,8 @@ extern double log(double);
 extern double log10(double);
 extern double ceil(double);
 extern double floor(double);
+extern double fmin(double, double);
+extern double fmax(double, double);
 extern double fmod(double, double);
 
 // Trigonometric operators.
