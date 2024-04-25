@@ -33,6 +33,21 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+SedDocumentPtr SedDocument::Impl::create(const FilePtr &pFile, bool pCompiled)
+{
+    auto res = SedDocumentPtr {new SedDocument {pCompiled}};
+
+    res->pimpl()->initialise(res, pFile);
+
+    return res;
+}
+
+SedDocument::Impl::Impl(bool mCompiled)
+    : Logger::Impl()
+    , mCompiled(mCompiled)
+{
+}
+
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 {
     size_t counter = 0;
@@ -379,8 +394,8 @@ bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
     return false;
 }
 
-SedDocument::SedDocument()
-    : Logger(new Impl {})
+SedDocument::SedDocument(bool pCompiled)
+    : Logger(new Impl {pCompiled})
 {
 }
 
@@ -399,21 +414,33 @@ const SedDocument::Impl *SedDocument::pimpl() const
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
-SedDocumentPtr SedDocument::create(const FilePtr &pFile)
+#ifndef __EMSCRIPTEN__
+SedDocumentPtr SedDocument::create(const FilePtr &pFile, bool pCompiled)
 {
-    auto res = SedDocumentPtr {new SedDocument {}};
-
-    res->pimpl()->initialise(res, pFile);
-
-    return res;
-}
-
-#ifdef __EMSCRIPTEN__
-SedDocumentPtr SedDocument::defaultCreate()
-{
-    return create({});
+    return SedDocument::Impl::create(pFile, pCompiled);
 }
 #endif
+
+#ifdef __EMSCRIPTEN__
+SedDocumentPtr SedDocument::createWithFile(const FilePtr &pFile)
+#else
+SedDocumentPtr SedDocument::create(const FilePtr &pFile)
+#endif
+{
+    return SedDocument::Impl::create(pFile, false);
+}
+
+#ifndef __EMSCRIPTEN__
+SedDocumentPtr SedDocument::create(bool pCompiled)
+{
+    return SedDocument::Impl::create({}, pCompiled);
+}
+#endif
+
+SedDocumentPtr SedDocument::create()
+{
+    return SedDocument::Impl::create({}, false);
+}
 
 std::string SedDocument::serialise() const
 {

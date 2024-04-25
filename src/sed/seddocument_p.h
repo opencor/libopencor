@@ -31,6 +31,8 @@ public:
     size_t mLevel = 1;
     size_t mVersion = 4;
 
+    bool mCompiled;
+
     std::unordered_set<std::string> mIds;
 
     SedDataDescriptionPtrVector mDataDescriptions;
@@ -40,6 +42,10 @@ public:
     SedDataGeneratorPtrVector mDataGenerators;
     SedOutputPtrVector mOutputs;
     SedStylePtrVector mStyles;
+
+    static SedDocumentPtr create(const FilePtr &pFile, bool pCompiled);
+
+    explicit Impl(bool pCompiled);
 
     std::string uniqueId(const std::string &pPrefix);
 

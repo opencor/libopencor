@@ -43,7 +43,22 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedDocument, libOpenCOR::Logger, libOpenCOR::SedDocumentPtr> sedDocument(m, "SedDocument");
 
-    sedDocument.def(py::init(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", py::arg("file") = libOpenCOR::FilePtr())
+    sedDocument.def(py::init([](const libOpenCOR::FilePtr &pFile, bool pCompiled) {
+                        return libOpenCOR::SedDocument::create(pFile, pCompiled);
+                    }),
+                    "Create a SedDocument object.", py::arg("file"), py::arg("compiled"))
+        .def(py::init([](const libOpenCOR::FilePtr &pFile) {
+                 return libOpenCOR::SedDocument::create(pFile);
+             }),
+             "Create a SedDocument object.", py::arg("file"))
+        .def(py::init([](bool pCompiled) {
+                 return libOpenCOR::SedDocument::create(pCompiled);
+             }),
+             "Create a SedDocument object.", py::arg("compiled"))
+        .def(py::init([]() {
+                 return libOpenCOR::SedDocument::create();
+             }),
+             "Create a SedDocument object.")
         .def("serialise", py::overload_cast<>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.")
         .def("serialise", py::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.", py::arg("base_path"))
         .def_property_readonly("has_models", &libOpenCOR::SedDocument::hasModels, "Return whether there are some models.")

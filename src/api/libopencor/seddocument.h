@@ -52,7 +52,26 @@ public:
      * Factory method to create a @ref SedDocument object:
      *
      * ```
-     * auto sed = libOpenCOR::SedDocument::create();
+     * auto sed = libOpenCOR::SedDocument::create(file, compiled);
+     * ```
+     *
+     * @param pFile The @ref File, if any, used to initialise this @ref SedDocument object.
+     * @param pCompiled Whether the @ref SedDocument object is to be compiled (as opposed to being interpreted).
+     *
+     * @return A smart pointer to a @ref SedDocument object.
+     */
+
+#ifndef __EMSCRIPTEN__
+    static SedDocumentPtr create(const FilePtr &pFile, bool pCompiled);
+#endif
+
+    /**
+     * @brief Create a @ref SedDocument object.
+     *
+     * Factory method to create a @ref SedDocument object:
+     *
+     * ```
+     * auto sed = libOpenCOR::SedDocument::create(file);
      * ```
      *
      * @param pFile The @ref File, if any, used to initialise this @ref SedDocument object.
@@ -60,11 +79,43 @@ public:
      * @return A smart pointer to a @ref SedDocument object.
      */
 
-    static SedDocumentPtr create(const FilePtr &pFile = {});
-
 #ifdef __EMSCRIPTEN__
-    static SedDocumentPtr defaultCreate();
+    static SedDocumentPtr createWithFile(const FilePtr &pFile);
+#else
+    static SedDocumentPtr create(const FilePtr &pFile);
 #endif
+
+    /**
+     * @brief Create a @ref SedDocument object.
+     *
+     * Factory method to create a @ref SedDocument object:
+     *
+     * ```
+     * auto sed = libOpenCOR::SedDocument::create(compiled);
+     * ```
+     *
+     * @param pCompiled Whether the @ref SedDocument object is to be compiled (as opposed to being interpreted).
+     *
+     * @return A smart pointer to a @ref SedDocument object.
+     */
+
+#ifndef __EMSCRIPTEN__
+    static SedDocumentPtr create(bool pCompiled);
+#endif
+
+    /**
+     * @brief Create a @ref SedDocument object.
+     *
+     * Factory method to create a @ref SedDocument object:
+     *
+     * ```
+     * auto sed = libOpenCOR::SedDocument::create();
+     * ```
+     *
+     * @return A smart pointer to a @ref SedDocument object.
+     */
+
+    static SedDocumentPtr create();
 
     /**
      * @brief Get the serialised version of this simulation experiment description.
@@ -234,7 +285,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedDocument(); /**< Constructor @private. */
+    explicit SedDocument(bool pCompiled); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
