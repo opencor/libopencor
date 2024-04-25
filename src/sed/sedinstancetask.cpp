@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "libopencor/solvercvode.h"
+
+#include "sedinstancetask_p.h"
 
 #include "file_p.h"
-#include "sedinstancetask_p.h"
 #include "sedmodel_p.h"
 #include "sedtask_p.h"
 #include "seduniformtimecourse_p.h"

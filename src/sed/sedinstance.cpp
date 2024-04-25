@@ -14,8 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedabstracttask_p.h"
 #include "sedinstance_p.h"
+
+#include "sedabstracttask_p.h"
 #include "sedinstancetask_p.h"
 
 #include "libopencor/seddocument.h"

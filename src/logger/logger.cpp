@@ -14,8 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "issue_p.h"
 #include "logger_p.h"
+
+#include "issue_p.h"
 
 namespace libOpenCOR {
 
