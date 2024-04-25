@@ -200,7 +200,6 @@ describe("Sed run tests", () => {
     const simulation = sed.simulations().get(0);
     const cvode = simulation.odeSolver();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
     cvode.setMaximumNumberOfSteps(10);
 
     const instance = sed.createInstance();
@@ -215,11 +214,10 @@ describe("Sed run tests", () => {
         "At t = 0.00140014, mxstep steps taken before reaching tout.",
       ],
     ]);
-    */
 
     cvode.setMaximumNumberOfSteps(500);
 
-    const instance = sed.createInstance();
+    instance = sed.createInstance();
 
     instance.run();
 
@@ -259,14 +257,12 @@ describe("Sed run tests", () => {
 
     let instance = sed.createInstance();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
     expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
-    */
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
@@ -308,25 +304,21 @@ describe("Sed run tests", () => {
 
     let instance = sed.createInstance();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
     expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
-    */
 
     instance.run();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
     expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
-    */
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 

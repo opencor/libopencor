@@ -276,13 +276,11 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
     expectIssues(instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
       ],
     ]);
-    */
   });
 });
