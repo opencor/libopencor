@@ -45,7 +45,8 @@ public:
     CellmlFileRuntime &operator=(const CellmlFileRuntime &pRhs) = delete;
     CellmlFileRuntime &operator=(CellmlFileRuntime &&pRhs) noexcept = delete;
 
-    static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
+    static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
+                                       bool pCompiled);
 
     InitialiseVariablesForAlgebraicModelFunction initialiseVariablesForAlgebraicModel() const;
     InitialiseVariablesForDifferentialModelFunction initialiseVariablesForDifferentialModel() const;
@@ -57,7 +58,7 @@ public:
 private:
     class Impl;
 
-    explicit CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
+    explicit CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled);
 
     Impl *pimpl();
     const Impl *pimpl() const;

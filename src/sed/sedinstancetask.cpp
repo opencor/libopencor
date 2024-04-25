@@ -16,6 +16,7 @@ limitations under the License.
 #include "libopencor/solvercvode.h"
 
 #include "file_p.h"
+#include "seddocument_p.h"
 #include "sedinstancetask_p.h"
 #include "sedmodel_p.h"
 #include "sedtask_p.h"
@@ -95,7 +96,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     mOdeSolver = (odeSolver != nullptr) ? dynamic_pointer_cast<SolverOde>(odeSolver->pimpl()->duplicate()) : nullptr;
     mNlaSolver = (nlaSolver != nullptr) ? dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
-    mRuntime = cellmlFile->runtime(mNlaSolver);
+    mRuntime = cellmlFile->runtime(mNlaSolver, task->pimpl()->mDocument->pimpl()->mCompiled);
 
 #ifndef CODE_COVERAGE_ENABLED
     if (mRuntime->hasErrors()) {

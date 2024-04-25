@@ -21,8 +21,10 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
+CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled)
 {
+    (void)pCompiled;
+
     auto cellmlFileAnalyser = pCellmlFile->analyser();
 
     if (cellmlFileAnalyser->errorCount() != 0) {
@@ -147,8 +149,8 @@ CellmlFileRuntime::Impl::~Impl()
     delete[] mNlaSolverAddress;
 }
 
-CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
-    : Logger(new Impl {pCellmlFile, pNlaSolver})
+CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled)
+    : Logger(new Impl {pCellmlFile, pNlaSolver, pCompiled})
 {
 }
 
@@ -167,9 +169,10 @@ const CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl() const
     return static_cast<const Impl *>(Logger::pimpl());
 }
 
-CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
+CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
+                                               bool pCompiled)
 {
-    return CellmlFileRuntimePtr {new CellmlFileRuntime {pCellmlFile, pNlaSolver}};
+    return CellmlFileRuntimePtr {new CellmlFileRuntime {pCellmlFile, pNlaSolver, pCompiled}};
 }
 
 CellmlFileRuntime::InitialiseVariablesForAlgebraicModelFunction CellmlFileRuntime::initialiseVariablesForAlgebraicModel() const

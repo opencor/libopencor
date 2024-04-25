@@ -25,6 +25,8 @@ namespace libOpenCOR {
 class SedAbstractTask::Impl: public SedBase::Impl
 {
 public:
+    SedDocumentPtr mDocument;
+
     explicit Impl(const SedDocumentPtr &pDocument);
 
     virtual bool isValid() = 0;

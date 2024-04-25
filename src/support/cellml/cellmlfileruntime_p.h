@@ -37,7 +37,7 @@ public:
     ComputeVariablesForDifferentialModelFunction mComputeVariablesForDifferentialModel = nullptr;
     ComputeVariablesForAlgebraicModelFunction mComputeVariablesForAlgebraicModel = nullptr;
 
-    explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
+    explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled);
     ~Impl();
 };
 
