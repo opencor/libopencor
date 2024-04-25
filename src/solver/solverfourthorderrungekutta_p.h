@@ -36,7 +36,8 @@ public:
     SolverPtr duplicate() override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
+                    CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                    CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
 
     bool solve(double &pVoi, double pVoiEnd) override;
 };

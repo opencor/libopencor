@@ -71,6 +71,16 @@ public:
     Type type() const;
 
     /**
+     * @brief Get the type of this issue as a @c std::string.
+     *
+     * Return the type of this issue as a @c std::string.
+     *
+     * @return The type of this issue as a @c std::string.
+     */
+
+    std::string typeAsString() const;
+
+    /**
      * @brief Get the description of this issue.
      *
      * Return the @c std::string description of this issue.

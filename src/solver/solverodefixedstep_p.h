@@ -36,7 +36,8 @@ public:
     StringStringMap properties() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
+                    CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                    CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
 };
 
 } // namespace libOpenCOR

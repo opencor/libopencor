@@ -50,6 +50,16 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
     if (mAnalyser->errorCount() != 0) {
         addIssues(mAnalyser);
     }
+
+    //---GRY--- WHEN USING OUR JavaScript BINDINGS, TEMPORARILY MAKE SURE THAT THE MODEL IS EITHER AN ALGEBRAIC MODEL OR AN ODE MODEL.
+
+#ifdef __EMSCRIPTEN__
+    if (!hasIssues()
+        && (mAnalyserModel->type() != libcellml::AnalyserModel::Type::ALGEBRAIC)
+        && (mAnalyserModel->type() != libcellml::AnalyserModel::Type::ODE)) {
+        addError("The CellML file is neither an algebraic model nor an ODE model. Only such models are currently supported.");
+    }
+#endif
 }
 
 CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)

@@ -45,7 +45,7 @@
         </div>
 
         <div class="page" id="pageSimulation">
-            <div class="drop-area">
+            <div class="drop-area" id="dropArea">
                 <input class="drop-area-input" id="dropAreaInput" type="file">
 
                 <div class="drop-area-div"">
@@ -67,18 +67,22 @@
 
             <button type="button" class="btn btn-secondary reset-button" id="resetFile"><i class="fa fa-recycle"></i></button>
 
-            <div class="file-info">
+            <div class="file info" id="fileInfo">
                 <p class="info">
-                    <span>
-                        <span class="bold" id="fileName"></span> is of <span class="bold" id="fileType"></span> type.
-                    </span>
-                    <span id="fileAdditionalInfo"></span>
+                    <span class="bold" id="fileName"></span> is of <span class="bold" id="fileType"></span> type.
                 </p>
             </div>
 
-            <div class="file-error">
+            <div class="file info" id="fileIssues">
+                <p class="info issues">
+                    <span class="bold">Issues:</span>
+                </p>
+                <ul id="issues"/>
+            </div>
+
+            <div class="file error" id="fileError">
                 <p class="error">
-                    <span class="bold">Error:</span> <span id="fileError"></span>
+                    <span class="bold">Error:</span> <span id="errorMessage"></span>
                 </p>
             </div>
         </div>

@@ -29,22 +29,26 @@ class CellmlFileRuntime::Impl: public Logger::Impl
 public:
 #ifndef __EMSCRIPTEN__
     CompilerPtr mCompiler = nullptr;
+#endif
+
     char *mNlaSolverAddress = nullptr;
 
-    InitialiseVariablesForDifferentialModelFunction mInitialiseVariablesForDifferentialModel = nullptr;
-    InitialiseVariablesForAlgebraicModelFunction mInitialiseVariablesForAlgebraicModel = nullptr;
-    ComputeComputedConstantsFunction mComputeComputedConstants = nullptr;
-    ComputeRatesFunction mComputeRates = nullptr;
-    ComputeVariablesForDifferentialModelFunction mComputeVariablesForDifferentialModel = nullptr;
-    ComputeVariablesForAlgebraicModelFunction mComputeVariablesForAlgebraicModel = nullptr;
-#endif
+    InitialiseCompiledVariablesForAlgebraicModel mInitialiseCompiledVariablesForAlgebraicModel = nullptr;
+    InitialiseCompiledVariablesForDifferentialModel mInitialiseCompiledVariablesForDifferentialModel = nullptr;
+    ComputeCompiledComputedConstants mComputeCompiledComputedConstants = nullptr;
+    ComputeCompiledRates mComputeCompiledRates = nullptr;
+    ComputeCompiledVariablesForAlgebraicModel mComputeCompiledVariablesForAlgebraicModel = nullptr;
+    ComputeCompiledVariablesForDifferentialModel mComputeCompiledVariablesForDifferentialModel = nullptr;
 
-    libcellml::InterpreterPtr mInterpreter = nullptr;
+    InitialiseInterpretedVariablesForAlgebraicModel mInitialiseInterpretedVariablesForAlgebraicModel = nullptr;
+    InitialiseInterpretedVariablesForDifferentialModel mInitialiseInterpretedVariablesForDifferentialModel = nullptr;
+    ComputeInterpretedComputedConstants mComputeInterpretedComputedConstants = nullptr;
+    ComputeInterpretedRates mComputeInterpretedRates = nullptr;
+    ComputeInterpretedVariablesForAlgebraicModel mComputeInterpretedVariablesForAlgebraicModel = nullptr;
+    ComputeInterpretedVariablesForDifferentialModel mComputeInterpretedVariablesForDifferentialModel = nullptr;
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled);
-#ifndef __EMSCRIPTEN__
     ~Impl();
-#endif
 };
 
 } // namespace libOpenCOR

@@ -70,7 +70,7 @@ void compute(const libOpenCOR::SolverOdePtr &pSolver, double *pStates, double *p
 
     static constexpr auto VOI_START = 0.0;
 
-    EXPECT_TRUE(pSolver->pimpl()->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates));
+    EXPECT_TRUE(pSolver->pimpl()->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates, nullptr));
 
     // Compute the ODE model.
 

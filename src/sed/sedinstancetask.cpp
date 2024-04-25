@@ -30,7 +30,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-#define PRINT_VALUES
+// #define PRINT_VALUES
 
 #ifdef PRINT_VALUES
 namespace {
@@ -87,8 +87,10 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     // Get a runtime for the model.
 
     auto cellmlFile = task->pimpl()->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
+    auto cellmlFileType = cellmlFile->type();
 
-    mDifferentialModel = differentialModel(cellmlFile);
+    mDifferentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
+                         || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
     mSimulation = task->pimpl()->mSimulation;
 
     auto odeSolver = mSimulation->odeSolver();
@@ -109,14 +111,13 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     // Create/retrieve our various arrays.
 
     mAnalyserModel = cellmlFile->analyserModel();
-    mInterpreter = mRuntime->interpreter();
 
     if (mDifferentialModel) {
-        mStates = mCompiled ? new double[mAnalyserModel->stateCount()] : mInterpreter->states().data();
-        mRates = mCompiled ? new double[mAnalyserModel->stateCount()] : mInterpreter->rates().data();
-        mVariables = mCompiled ? new double[mAnalyserModel->variableCount()] : mInterpreter->variables().data();
+        mStates = new double[mAnalyserModel->stateCount()];
+        mRates = new double[mAnalyserModel->stateCount()];
+        mVariables = new double[mAnalyserModel->variableCount()];
     } else {
-        mVariables = mCompiled ? new double[mAnalyserModel->variableCount()] : mInterpreter->variables().data();
+        mVariables = new double[mAnalyserModel->variableCount()];
     }
 
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -139,10 +140,10 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
             mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
         } else {
 #endif
-            mRuntime->initialiseInterpretedVariables();
-            mRuntime->computeInterpretedComputedConstants();
-            mRuntime->computeInterpretedRates(mVoi);
-            mRuntime->computeInterpretedVariables(mVoi);
+            mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mVariables);
+            mRuntime->computeInterpretedComputedConstants()(mVariables);
+            mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mVariables);
+            mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
 #ifndef __EMSCRIPTEN__
         }
     } else if (mCompiled) {
@@ -151,9 +152,9 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
         mRuntime->computeCompiledVariablesForAlgebraicModel()(mVariables); // NOLINT
 #endif
     } else {
-        mRuntime->initialiseInterpretedVariables();
-        mRuntime->computeInterpretedComputedConstants();
-        mRuntime->computeInterpretedVariables();
+        mRuntime->initialiseInterpretedVariablesForAlgebraicModel()(mVariables);
+        mRuntime->computeInterpretedComputedConstants()(mVariables);
+        mRuntime->computeInterpretedVariablesForAlgebraicModel()(mVariables);
     }
 
     // Make sure that the NLA solver, should it have been used, didn't report any issues.
@@ -167,12 +168,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     // Initialise the ODE solver, if needed.
 
     if (mDifferentialModel) {
-#ifndef __EMSCRIPTEN__
-        if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeCompiledRates())) {
-#else
-        //---GRY--- PASS A PROPER FUNTION TO COMPUTE THE RATES.
-        if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, nullptr)) {
-#endif
+        if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeCompiledRates(), mRuntime->computeInterpretedRates())) {
             addIssues(mOdeSolver);
 
             return;
@@ -185,16 +181,13 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 
 SedInstanceTask::Impl::~Impl()
 {
-    if (mRuntime->isCompiled()) {
-        delete[] mStates;
-        delete[] mRates;
-        delete[] mVariables;
-    }
+    delete[] mStates;
+    delete[] mRates;
+    delete[] mVariables;
 }
 
 void SedInstanceTask::Impl::run()
 {
-#ifndef __EMSCRIPTEN__
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {
@@ -212,33 +205,32 @@ void SedInstanceTask::Impl::run()
                 return;
             }
 
-#    ifndef __EMSCRIPTEN__
+#ifndef __EMSCRIPTEN__
             if (mCompiled) {
                 mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
             } else {
-#    endif
-                mRuntime->computeInterpretedVariables(mVoi);
-#    ifndef __EMSCRIPTEN__
+#endif
+                mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+#ifndef __EMSCRIPTEN__
             }
-#    endif
+#endif
 
             //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD ALLOW
             //          TRIGGER NLA ISSUES HERE, WHICH WE DON'T HAVE YET HENCE WE DISABLE THE FOLLOWING CODE WHEN DOING
             //          CODE COVERAGE.
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
             if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
                 addIssues(mNlaSolver);
 
                 return;
             }
-#    endif
-#    ifdef PRINT_VALUES
+#endif
+#ifdef PRINT_VALUES
             printValues(mAnalyserModel, mVoi, mStates, mVariables);
-#    endif
+#endif
         }
     }
-#endif
 }
 
 SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask, bool pCompiled)

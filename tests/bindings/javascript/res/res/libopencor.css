@@ -7,8 +7,7 @@
 }
 
 .drop-area,
-.file-error,
-.file-info,
+.file,
 .reset-button {
     position: relative;
     margin: 1rem auto;
@@ -17,8 +16,7 @@
 }
 
 .drop-area,
-.file-error,
-.file-info {
+.file {
     border-radius: 13px;
 }
 
@@ -44,7 +42,7 @@
 
 .drop-area-invalid-file-s,
 .drop-area-invalid-file-s i,
-.file-error {
+.error {
     border-color: #aa2929;
     background-color: #290000;
     color: #aa2929;
@@ -70,23 +68,21 @@
     z-index: 1;
 }
 
-.file-error,
-.file-info {
+.file {
     top: var(--offset);
     display: flex;
     flex-direction: column;
 }
 
-.file-error {
+.error {
     border: 1px dashed #aa2929;
 }
 
-.file-info {
+.info {
     border: 1px dashed #a5a5a5;
 }
 
-.file-error,
-.file-info,
+.file,
 .page,
 .reset-button {
     display: none;
@@ -99,9 +95,18 @@
     --bs-btn-font-size: 0.75rem;
 }
 
+li {
+    margin-left: 0.5rem;
+}
+
 p.info,
 p.error {
     margin: 1rem;
+    border: none;
+}
+
+p.issues {
+    margin-bottom: 0;
 }
 
 p.note {

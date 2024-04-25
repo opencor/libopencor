@@ -97,6 +97,4 @@ std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedCharVector &pB
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
 
-bool differentialModel(const CellmlFilePtr &pCellmlFile);
-
 } // namespace libOpenCOR

@@ -40,6 +40,7 @@ void loggerApi()
     emscripten::class_<libOpenCOR::Issue>("Issue")
         .smart_ptr<libOpenCOR::IssuePtr>("Issue")
         .function("type", &libOpenCOR::Issue::type)
+        .function("typeAsString", &libOpenCOR::Issue::typeAsString)
         .function("description", &libOpenCOR::Issue::description);
 
     EM_ASM({

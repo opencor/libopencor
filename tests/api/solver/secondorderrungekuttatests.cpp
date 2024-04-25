@@ -28,7 +28,7 @@ TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 
     solver->setStep(STEP);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);

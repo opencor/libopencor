@@ -109,7 +109,7 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
     auto cellmlFileType = pFile->pimpl()->mCellmlFile->type();
 
     if ((cellmlFileType == libcellml::AnalyserModel::Type::ODE)
-        || cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
+        || (cellmlFileType == libcellml::AnalyserModel::Type::DAE)) {
         simulation = SedUniformTimeCourse::create(pOwner);
     } else {
         simulation = SedSteadyState::create(pOwner);

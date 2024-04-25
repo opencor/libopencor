@@ -24,7 +24,8 @@ SolverOde::Impl::Impl(const std::string &pId, const std::string &pName)
 }
 
 bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                 ComputeRates pComputeRates)
+                                 CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                                 CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
     (void)pVoi;
 
@@ -34,7 +35,8 @@ bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     mRates = pRates;
     mVariables = pVariables;
 
-    mComputeRates = pComputeRates;
+    mComputeCompiledRates = pComputeCompiledRates;
+    mComputeInterpretedRates = pComputeInterpretedRates;
 
     return true;
 }
@@ -44,6 +46,15 @@ bool SolverOde::Impl::reinitialise(double pVoi)
     (void)pVoi;
 
     return true;
+}
+
+void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pVariables)
+{
+    if (mComputeCompiledRates != nullptr) {
+        mComputeCompiledRates(pVoi, pStates, pRates, pVariables);
+    } else {
+        mComputeInterpretedRates(pVoi, pStates, pRates, pVariables);
+    }
 }
 
 SolverOde::SolverOde(Impl *pPimpl)

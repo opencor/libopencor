@@ -47,5 +47,6 @@ void loggerApi(py::module_ &m)
         .export_values();
 
     issue.def_property_readonly("type", &libOpenCOR::Issue::type, "Get the type of this Issue object.")
+        .def_property_readonly("type_as_string", &libOpenCOR::Issue::typeAsString, "Get the type of this Issue object as a string.")
         .def_property_readonly("description", &libOpenCOR::Issue::description, "Get the description for this Issue object.");
 }

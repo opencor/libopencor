@@ -36,13 +36,16 @@ SolverPtr SolverSecondOrderRungeKutta::Impl::duplicate()
 }
 
 bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                                   double *pVariables, ComputeRates pComputeRates)
+                                                   double *pVariables,
+                                                   CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                                                   CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
     removeAllIssues();
 
     // Initialise the ODE solver itself.
 
-    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates)) {
+    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates,
+                                              pComputeInterpretedRates)) {
         return false;
     }
 
@@ -78,7 +81,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n, Y_n).
 
-        mComputeRates(pVoi, mStates, mRates, mVariables);
+        computeRates(pVoi, mStates, mRates, mVariables);
 
         // Compute Y_n + h / 2 * k1.
 
@@ -88,7 +91,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n + h / 2, Y_n + h / 2 * k1).
 
-        mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
+        computeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
 
         // Compute Y_n+1.
 

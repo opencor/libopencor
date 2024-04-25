@@ -39,13 +39,16 @@ SolverPtr SolverFourthOrderRungeKutta::Impl::duplicate()
 }
 
 bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                                   double *pVariables, ComputeRates pComputeRates)
+                                                   double *pVariables,
+                                                   CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                                                   CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
     removeAllIssues();
 
     // Initialise the ODE solver itself.
 
-    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates)) {
+    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates,
+                                              pComputeInterpretedRates)) {
         return false;
     }
 
@@ -90,7 +93,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n, Y_n).
 
-        mComputeRates(pVoi, mStates, mRates, mVariables);
+        computeRates(pVoi, mStates, mRates, mVariables);
 
         // Compute k1 and Y_n + h / 2 * k1.
 
@@ -101,7 +104,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n + h / 2, Y_n + h / 2 * k1).
 
-        mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
+        computeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
 
         // Compute k2 and Y_n + h / 2 * k2.
 
@@ -112,7 +115,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n + h / 2, Y_n + h / 2 * k2).
 
-        mComputeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
+        computeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
 
         // Compute k3 and Y_n + h * k3.
 
@@ -123,7 +126,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n + h, Y_n + h * k3).
 
-        mComputeRates(pVoi + realStep, mYk, mRates, mVariables);
+        computeRates(pVoi + realStep, mYk, mRates, mVariables);
 
         // Compute Y_n+1.
 

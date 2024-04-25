@@ -100,7 +100,7 @@ TEST(RunSedTest, algebraicModel)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(RunSedTest, odeModel)
+void runOdeModel(bool pCompiled)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140014, mxstep steps taken before reaching tout."},
@@ -116,7 +116,7 @@ TEST(RunSedTest, odeModel)
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
-    auto instance = sed->createInstance();
+    auto instance = sed->createInstance(pCompiled);
 
     EXPECT_FALSE(instance->hasIssues());
 
@@ -128,11 +128,21 @@ TEST(RunSedTest, odeModel)
 
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
-    instance = sed->createInstance();
+    instance = sed->createInstance(pCompiled);
 
     instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(RunSedTest, compiledOdeModel)
+{
+    runOdeModel(true);
+}
+
+TEST(RunSedTest, interpretedOdeModel)
+{
+    runOdeModel(false);
 }
 
 TEST(RunSedTest, odeModelWithNoOdeSolver)
@@ -150,6 +160,8 @@ TEST(RunSedTest, odeModelWithNoOdeSolver)
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
+
+//---GRY--- AS FOR THE ODE MODEL, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THE TEST.
 
 TEST(RunSedTest, nlaModel)
 {

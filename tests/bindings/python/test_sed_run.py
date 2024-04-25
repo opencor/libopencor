@@ -122,7 +122,7 @@ def test_algebraic_model():
     assert instance.has_issues == False
 
 
-def test_ode_model():
+def run_ode_model(compiled):
     expected_issues = [
         [
             Issue.Type.Error,
@@ -137,7 +137,7 @@ def test_ode_model():
 
     cvode.maximum_number_of_steps = 10
 
-    instance = sed.create_instance()
+    instance = sed.create_instance(compiled)
 
     assert instance.has_issues == False
 
@@ -147,11 +147,19 @@ def test_ode_model():
 
     cvode.maximum_number_of_steps = 500
 
-    instance = sed.create_instance()
+    instance = sed.create_instance(compiled)
 
     instance.run()
 
     assert instance.has_issues == False
+
+
+def test_compiled_ode_model():
+    run_ode_model(True)
+
+
+def test_interpreted_ode_model():
+    run_ode_model(False)
 
 
 def test_ode_model_with_no_ode_solver():
@@ -171,6 +179,8 @@ def test_ode_model_with_no_ode_solver():
 
     assert_issues(instance, expected_issues)
 
+
+#---GRY--- AS FOR THE ODE MODEL, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THE TEST.
 
 def test_nla_model():
     expected_issues = [

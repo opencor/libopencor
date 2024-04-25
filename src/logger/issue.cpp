@@ -39,6 +39,18 @@ Issue::Type Issue::type() const
     return mPimpl->mType;
 }
 
+std::string Issue::typeAsString() const
+{
+    switch (mPimpl->mType) {
+    case Type::ERROR:
+        return "Error";
+    case Type::WARNING:
+        return "Warning";
+    default: // Type::MESSAGE.
+        return "Message";
+    }
+}
+
 std::string Issue::description() const
 {
     return mPimpl->mDescription;
