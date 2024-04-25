@@ -168,10 +168,10 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 
     if (mDifferentialModel) {
 #ifndef __EMSCRIPTEN__
-        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeCompiledRates())) {
+        if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeCompiledRates())) {
 #else
         //---GRY--- PASS A PROPER FUNTION TO COMPUTE THE RATES.
-        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, nullptr)) {
+        if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, nullptr)) {
 #endif
             addIssues(mOdeSolver);
 
@@ -206,7 +206,7 @@ void SedInstanceTask::Impl::run()
         size_t voiCounter = 0;
 
         while (!fuzzyCompare(mVoi, voiEnd)) {
-            if (!mOdeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
+            if (!mOdeSolver->pimpl()->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
                 addIssues(mOdeSolver);
 
                 return;

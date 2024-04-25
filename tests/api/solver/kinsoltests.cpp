@@ -16,10 +16,6 @@ limitations under the License.
 
 #include "nlamodel.h"
 
-#include "tests/utils.h"
-
-#include <libopencor>
-
 TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {

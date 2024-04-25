@@ -16,9 +16,18 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solverode.h"
+#define protected public
+#define private public
+
+#include "solvercvode_p.h"
+#include "solverforwardeuler_p.h"
+#include "solverfourthorderrungekutta_p.h"
+#include "solverheun_p.h"
+#include "solversecondorderrungekutta_p.h"
 
 #include "tests/utils.h"
+
+#include <libopencor>
 
 namespace OdeModel {
 

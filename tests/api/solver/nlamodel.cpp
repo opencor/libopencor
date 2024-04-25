@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "nlamodel.h"
-#include "solvernla_p.h"
 
 #include <cmath>
 #include <cstdlib>

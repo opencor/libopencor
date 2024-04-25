@@ -16,9 +16,11 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/solvernla.h"
+#include "solvernla_p.h"
 
 #include "tests/utils.h"
+
+#include <libopencor>
 
 namespace NlaModel {
 

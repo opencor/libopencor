@@ -16,10 +16,6 @@ limitations under the License.
 
 #include "odemodel.h"
 
-#include "tests/utils.h"
-
-#include <libopencor>
-
 TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 {
     static const auto RELATIVE_TOLERANCE = -1.234;
@@ -32,7 +28,7 @@ TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 
     solver->setMaximumStep(RELATIVE_TOLERANCE);
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);
@@ -50,7 +46,7 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
 
     solver->setMaximumNumberOfSteps(MAXIMUM_NUMBER_OF_STEPS);
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);
@@ -69,7 +65,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooS
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);
@@ -88,7 +84,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooB
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);
@@ -107,7 +103,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooS
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);
@@ -126,7 +122,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooB
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);
@@ -144,7 +140,7 @@ TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
 
     solver->setRelativeTolerance(RELATIVE_TOLERANCE);
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);
@@ -162,7 +158,7 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 
     solver->setAbsoluteTolerance(RELATIVE_TOLERANCE);
 
-    EXPECT_FALSE(solver->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
+    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates));
     EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
 
     OdeModel::finalise(states, rates, variables);

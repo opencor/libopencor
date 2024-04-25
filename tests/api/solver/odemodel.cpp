@@ -15,9 +15,6 @@ limitations under the License.
 */
 
 #include "odemodel.h"
-#include "utils.h"
-
-#include "tests/utils.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -73,7 +70,7 @@ void compute(const libOpenCOR::SolverOdePtr &pSolver, double *pStates, double *p
 
     static constexpr auto VOI_START = 0.0;
 
-    EXPECT_TRUE(pSolver->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates));
+    EXPECT_TRUE(pSolver->pimpl()->initialise(VOI_START, STATE_COUNT, pStates, pRates, pVariables, computeRates));
 
     // Compute the ODE model.
 
@@ -84,7 +81,7 @@ void compute(const libOpenCOR::SolverOdePtr &pSolver, double *pStates, double *p
     size_t voiCounter = 0;
 
     while (!libOpenCOR::fuzzyCompare(voi, VOI_END)) {
-        EXPECT_TRUE(pSolver->solve(voi, std::min(VOI_START + static_cast<double>(++voiCounter) * VOI_INTERVAL, VOI_END)));
+        EXPECT_TRUE(pSolver->pimpl()->solve(voi, std::min(VOI_START + static_cast<double>(++voiCounter) * VOI_INTERVAL, VOI_END)));
 
         computeVariables(voi, pStates, pRates, pVariables);
     }
@@ -93,7 +90,7 @@ void compute(const libOpenCOR::SolverOdePtr &pSolver, double *pStates, double *p
 
     // Reinitialise the ODE model (for coverage reasons).
 
-    EXPECT_TRUE(pSolver->reinitialise(VOI_START));
+    EXPECT_TRUE(pSolver->pimpl()->reinitialise(VOI_START));
 }
 
 void finalise(double *pStates, double *pRates, double *pVariables)
