@@ -83,7 +83,6 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     ASSERT_NE(task, nullptr);
 
-#ifndef __EMSCRIPTEN__
     // Get a runtime for the model.
 
     auto cellmlFile = task->pimpl()->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
@@ -98,13 +97,13 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     mNlaSolver = (nlaSolver != nullptr) ? dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
     mRuntime = cellmlFile->runtime(mNlaSolver);
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (mRuntime->hasErrors()) {
         addIssues(mRuntime);
 
         return;
     }
-#    endif
+#endif
 
     // Create our various arrays.
 
@@ -121,9 +120,9 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
-#    ifdef PRINT_VALUES
+#ifdef PRINT_VALUES
     printHeader(mAnalyserModel);
-#    endif
+#endif
 
     mSedUniformTimeCourse = mDifferentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
@@ -157,9 +156,8 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
             return;
         }
     }
-#    ifdef PRINT_VALUES
+#ifdef PRINT_VALUES
     printValues(mAnalyserModel, mVoi, mStates, mVariables);
-#    endif
 #endif
 }
 
