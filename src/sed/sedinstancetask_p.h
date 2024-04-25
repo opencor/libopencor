@@ -33,6 +33,8 @@ public:
     libcellml::AnalyserModelPtr mAnalyserModel;
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
+    bool mCompiled = true;
+    libcellml::InterpreterPtr mInterpreter;
 
     double mVoi = 0.0;
     double *mStates = nullptr;
@@ -43,8 +45,6 @@ public:
 
     explicit Impl(const SedAbstractTaskPtr &pTask);
     ~Impl();
-
-    void resetArrays();
 
     void run();
 };

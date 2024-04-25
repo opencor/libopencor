@@ -52,7 +52,7 @@ public:
     libcellml::AnalyserPtr analyser() const;
     libcellml::AnalyserModelPtr analyserModel() const;
 
-    CellmlFileRuntimePtr runtime(const SolverNlaPtr &pNlaSolver, bool pCompiled);
+    CellmlFileRuntimePtr runtime(const SolverNlaPtr &pNlaSolver = {}, bool pCompiled = true);
 
 private:
     class Impl;

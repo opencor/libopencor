@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
+#include <libcellml>
+
 namespace libOpenCOR {
 
 class CellmlFile;
@@ -48,12 +50,23 @@ public:
     static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
                                        bool pCompiled);
 
-    InitialiseVariablesForAlgebraicModelFunction initialiseVariablesForAlgebraicModel() const;
-    InitialiseVariablesForDifferentialModelFunction initialiseVariablesForDifferentialModel() const;
-    ComputeComputedConstantsFunction computeComputedConstants() const;
-    ComputeRatesFunction computeRates() const;
-    ComputeVariablesForAlgebraicModelFunction computeVariablesForAlgebraicModel() const;
-    ComputeVariablesForDifferentialModelFunction computeVariablesForDifferentialModel() const;
+    bool isCompiled() const;
+
+    libcellml::InterpreterPtr interpreter() const;
+
+#ifndef __EMSCRIPTEN__
+    InitialiseVariablesForAlgebraicModelFunction initialiseCompiledVariablesForAlgebraicModel() const;
+    InitialiseVariablesForDifferentialModelFunction initialiseCompiledVariablesForDifferentialModel() const;
+    ComputeComputedConstantsFunction computeCompiledComputedConstants() const;
+    ComputeRatesFunction computeCompiledRates() const;
+    ComputeVariablesForAlgebraicModelFunction computeCompiledVariablesForAlgebraicModel() const;
+    ComputeVariablesForDifferentialModelFunction computeCompiledVariablesForDifferentialModel() const;
+#endif
+
+    void initialiseInterpretedVariables() const;
+    void computeInterpretedComputedConstants() const;
+    void computeInterpretedRates(double pVoi = 0.0) const;
+    void computeInterpretedVariables(double pVoi = 0.0) const;
 
 private:
     class Impl;

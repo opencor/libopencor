@@ -27,18 +27,24 @@ namespace libOpenCOR {
 class CellmlFileRuntime::Impl: public Logger::Impl
 {
 public:
+#ifndef __EMSCRIPTEN__
     CompilerPtr mCompiler = nullptr;
     char *mNlaSolverAddress = nullptr;
 
-    InitialiseVariablesForDifferentialModelFunction mInitialiseVariablesForDifferentialModel;
+    InitialiseVariablesForDifferentialModelFunction mInitialiseVariablesForDifferentialModel = nullptr;
     InitialiseVariablesForAlgebraicModelFunction mInitialiseVariablesForAlgebraicModel = nullptr;
     ComputeComputedConstantsFunction mComputeComputedConstants = nullptr;
     ComputeRatesFunction mComputeRates = nullptr;
     ComputeVariablesForDifferentialModelFunction mComputeVariablesForDifferentialModel = nullptr;
     ComputeVariablesForAlgebraicModelFunction mComputeVariablesForAlgebraicModel = nullptr;
+#endif
+
+    libcellml::InterpreterPtr mInterpreter = nullptr;
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled);
+#ifndef __EMSCRIPTEN__
     ~Impl();
+#endif
 };
 
 } // namespace libOpenCOR

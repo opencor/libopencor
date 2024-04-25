@@ -31,7 +31,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-// #define PRINT_VALUES
+#define PRINT_VALUES
 
 #ifdef PRINT_VALUES
 namespace {
@@ -106,16 +106,18 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     }
 #endif
 
-    // Create our various arrays.
+    // Create/retrieve our various arrays.
 
     mAnalyserModel = cellmlFile->analyserModel();
+    mCompiled = mRuntime->isCompiled();
+    mInterpreter = mRuntime->interpreter();
 
     if (mDifferentialModel) {
-        mStates = new double[mAnalyserModel->stateCount()];
-        mRates = new double[mAnalyserModel->stateCount()];
-        mVariables = new double[mAnalyserModel->variableCount()];
+        mStates = mCompiled ? new double[mAnalyserModel->stateCount()] : mInterpreter->states().data();
+        mRates = mCompiled ? new double[mAnalyserModel->stateCount()] : mInterpreter->rates().data();
+        mVariables = mCompiled ? new double[mAnalyserModel->variableCount()] : mInterpreter->variables().data();
     } else {
-        mVariables = new double[mAnalyserModel->variableCount()];
+        mVariables = mCompiled ? new double[mAnalyserModel->variableCount()] : mInterpreter->variables().data();
     }
 
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -127,17 +129,32 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     mSedUniformTimeCourse = mDifferentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
-    if (mDifferentialModel) {
+    if (mSedUniformTimeCourse != nullptr) {
         mVoi = mSedUniformTimeCourse->pimpl()->mOutputStartTime;
 
-        mRuntime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
-        mRuntime->computeComputedConstants()(mVariables); // NOLINT
-        mRuntime->computeRates()(mVoi, mStates, mRates, mVariables); // NOLINT
-        mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+#ifndef __EMSCRIPTEN__
+        if (mCompiled) {
+            mRuntime->initialiseCompiledVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
+            mRuntime->computeCompiledComputedConstants()(mVariables); // NOLINT
+            mRuntime->computeCompiledRates()(mVoi, mStates, mRates, mVariables); // NOLINT
+            mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+        } else {
+#endif
+            mRuntime->initialiseInterpretedVariables();
+            mRuntime->computeInterpretedComputedConstants();
+            mRuntime->computeInterpretedRates(mVoi);
+            mRuntime->computeInterpretedVariables(mVoi);
+#ifndef __EMSCRIPTEN__
+        }
+    } else if (mCompiled) {
+        mRuntime->initialiseCompiledVariablesForAlgebraicModel()(mVariables); // NOLINT
+        mRuntime->computeCompiledComputedConstants()(mVariables); // NOLINT
+        mRuntime->computeCompiledVariablesForAlgebraicModel()(mVariables); // NOLINT
+#endif
     } else {
-        mRuntime->initialiseVariablesForAlgebraicModel()(mVariables); // NOLINT
-        mRuntime->computeComputedConstants()(mVariables); // NOLINT
-        mRuntime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
+        mRuntime->initialiseInterpretedVariables();
+        mRuntime->computeInterpretedComputedConstants();
+        mRuntime->computeInterpretedVariables();
     }
 
     // Make sure that the NLA solver, should it have been used, didn't report any issues.
@@ -151,7 +168,12 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     // Initialise the ODE solver, if needed.
 
     if (mDifferentialModel) {
-        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeRates())) {
+#ifndef __EMSCRIPTEN__
+        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeCompiledRates())) {
+#else
+        //---GRY--- PASS A PROPER FUNTION TO COMPUTE THE RATES.
+        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, nullptr)) {
+#endif
             addIssues(mOdeSolver);
 
             return;
@@ -164,18 +186,11 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
 SedInstanceTask::Impl::~Impl()
 {
-    resetArrays();
-}
-
-void SedInstanceTask::Impl::resetArrays()
-{
-    delete[] mStates;
-    delete[] mRates;
-    delete[] mVariables;
-
-    mStates = nullptr;
-    mRates = nullptr;
-    mVariables = nullptr;
+    if (mRuntime->isCompiled()) {
+        delete[] mStates;
+        delete[] mRates;
+        delete[] mVariables;
+    }
 }
 
 void SedInstanceTask::Impl::run()
@@ -198,7 +213,15 @@ void SedInstanceTask::Impl::run()
                 return;
             }
 
-            mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+#    ifndef __EMSCRIPTEN__
+            if (mCompiled) {
+                mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+            } else {
+#    endif
+                mRuntime->computeInterpretedVariables(mVoi);
+#    ifndef __EMSCRIPTEN__
+            }
+#    endif
 
             //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD ALLOW
             //          TRIGGER NLA ISSUES HERE, WHICH WE DON'T HAVE YET HENCE WE DISABLE THE FOLLOWING CODE WHEN DOING

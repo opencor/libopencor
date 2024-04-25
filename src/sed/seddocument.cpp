@@ -42,9 +42,9 @@ SedDocumentPtr SedDocument::Impl::create(const FilePtr &pFile, bool pCompiled)
     return res;
 }
 
-SedDocument::Impl::Impl(bool mCompiled)
+SedDocument::Impl::Impl(bool pCompiled)
     : Logger::Impl()
-    , mCompiled(mCompiled)
+    , mCompiled(pCompiled)
 {
 }
 
@@ -423,12 +423,15 @@ SedDocumentPtr SedDocument::create(const FilePtr &pFile, bool pCompiled)
 
 #ifdef __EMSCRIPTEN__
 SedDocumentPtr SedDocument::createWithFile(const FilePtr &pFile)
-#else
-SedDocumentPtr SedDocument::create(const FilePtr &pFile)
-#endif
 {
     return SedDocument::Impl::create(pFile, false);
 }
+#else
+SedDocumentPtr SedDocument::create(const FilePtr &pFile)
+{
+    return SedDocument::Impl::create(pFile, true);
+}
+#endif
 
 #ifndef __EMSCRIPTEN__
 SedDocumentPtr SedDocument::create(bool pCompiled)
