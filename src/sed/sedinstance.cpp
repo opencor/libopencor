@@ -22,12 +22,12 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SedInstancePtr SedInstance::Impl::create(const SedDocumentPtr &pDocument)
+SedInstancePtr SedInstance::Impl::create(const SedDocumentPtr &pDocument, bool pCompiled)
 {
-    return SedInstancePtr {new SedInstance(pDocument)};
+    return SedInstancePtr {new SedInstance(pDocument, pCompiled)};
 }
 
-SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
+SedInstance::Impl::Impl(const SedDocumentPtr &pDocument, bool pCompiled)
     : Logger::Impl()
 {
     // Check whether there are some outputs that should be generated or, failing that, whether there are some tasks that
@@ -58,7 +58,7 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
 
         if (tasksValid) {
             for (const auto &task : tasks) {
-                auto taskInstance = SedInstanceTask::Impl::create(task);
+                auto taskInstance = SedInstanceTask::Impl::create(task, pCompiled);
 
                 mTasks.push_back(taskInstance);
 
@@ -87,8 +87,8 @@ void SedInstance::Impl::run()
     }
 }
 
-SedInstance::SedInstance(const SedDocumentPtr &pDocument)
-    : Logger(new Impl(pDocument))
+SedInstance::SedInstance(const SedDocumentPtr &pDocument, bool pCompiled)
+    : Logger(new Impl(pDocument, pCompiled))
 {
 }
 

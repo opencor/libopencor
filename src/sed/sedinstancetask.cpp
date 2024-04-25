@@ -16,7 +16,6 @@ limitations under the License.
 #include "libopencor/solvercvode.h"
 
 #include "file_p.h"
-#include "seddocument_p.h"
 #include "sedinstancetask_p.h"
 #include "sedmodel_p.h"
 #include "sedtask_p.h"
@@ -70,12 +69,13 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
 } // namespace
 #endif
 
-SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask)
+SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask, bool pCompiled)
 {
-    return SedInstanceTaskPtr {new SedInstanceTask(pTask)};
+    return SedInstanceTaskPtr {new SedInstanceTask(pTask, pCompiled)};
 }
 
-SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
+SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
+    : mCompiled(pCompiled)
 {
     //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT (FOR NOW) THAT pTask IS INDEED A SedTask
     //          OBJECT.
@@ -96,7 +96,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     mOdeSolver = (odeSolver != nullptr) ? dynamic_pointer_cast<SolverOde>(odeSolver->pimpl()->duplicate()) : nullptr;
     mNlaSolver = (nlaSolver != nullptr) ? dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
-    mRuntime = cellmlFile->runtime(mNlaSolver, task->pimpl()->mDocument->pimpl()->mCompiled);
+    mRuntime = cellmlFile->runtime(mNlaSolver, mCompiled);
 
 #ifndef CODE_COVERAGE_ENABLED
     if (mRuntime->hasErrors()) {
@@ -109,7 +109,6 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     // Create/retrieve our various arrays.
 
     mAnalyserModel = cellmlFile->analyserModel();
-    mCompiled = mRuntime->isCompiled();
     mInterpreter = mRuntime->interpreter();
 
     if (mDifferentialModel) {
@@ -242,8 +241,8 @@ void SedInstanceTask::Impl::run()
 #endif
 }
 
-SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask)
-    : Logger(new Impl(pTask))
+SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask, bool pCompiled)
+    : Logger(new Impl(pTask, pCompiled))
 {
 }
 

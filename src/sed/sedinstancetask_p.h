@@ -41,9 +41,9 @@ public:
     double *mRates = nullptr;
     double *mVariables = nullptr;
 
-    static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask);
+    static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask, bool pCompiled);
 
-    explicit Impl(const SedAbstractTaskPtr &pTask);
+    explicit Impl(const SedAbstractTaskPtr &pTask, bool pCompiled);
     ~Impl();
 
     void run();

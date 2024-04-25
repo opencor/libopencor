@@ -33,21 +33,6 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SedDocumentPtr SedDocument::Impl::create(const FilePtr &pFile, bool pCompiled)
-{
-    auto res = SedDocumentPtr {new SedDocument {pCompiled}};
-
-    res->pimpl()->initialise(res, pFile);
-
-    return res;
-}
-
-SedDocument::Impl::Impl(bool pCompiled)
-    : Logger::Impl()
-    , mCompiled(pCompiled)
-{
-}
-
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 {
     size_t counter = 0;
@@ -394,8 +379,8 @@ bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
     return false;
 }
 
-SedDocument::SedDocument(bool pCompiled)
-    : Logger(new Impl {pCompiled})
+SedDocument::SedDocument()
+    : Logger(new Impl {})
 {
 }
 
@@ -414,36 +399,21 @@ const SedDocument::Impl *SedDocument::pimpl() const
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
-#ifndef __EMSCRIPTEN__
-SedDocumentPtr SedDocument::create(const FilePtr &pFile, bool pCompiled)
-{
-    return SedDocument::Impl::create(pFile, pCompiled);
-}
-#endif
-
-#ifdef __EMSCRIPTEN__
-SedDocumentPtr SedDocument::createWithFile(const FilePtr &pFile)
-{
-    return SedDocument::Impl::create(pFile, false);
-}
-#else
 SedDocumentPtr SedDocument::create(const FilePtr &pFile)
 {
-    return SedDocument::Impl::create(pFile, true);
+    auto res = SedDocumentPtr {new SedDocument {}};
+
+    res->pimpl()->initialise(res, pFile);
+
+    return res;
+}
+
+#ifdef __EMSCRIPTEN__
+SedDocumentPtr SedDocument::defaultCreate()
+{
+    return create({});
 }
 #endif
-
-#ifndef __EMSCRIPTEN__
-SedDocumentPtr SedDocument::create(bool pCompiled)
-{
-    return SedDocument::Impl::create({}, pCompiled);
-}
-#endif
-
-SedDocumentPtr SedDocument::create()
-{
-    return SedDocument::Impl::create({}, false);
-}
 
 std::string SedDocument::serialise() const
 {
@@ -515,9 +485,16 @@ bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
     return pimpl()->removeTask(pTask);
 }
 
+#ifdef __EMSCRIPTEN__
 SedInstancePtr SedDocument::createInstance()
 {
-    return SedInstance::Impl::create(shared_from_this());
+    return SedInstance::Impl::create(shared_from_this(), false);
 }
+#else
+SedInstancePtr SedDocument::createInstance(bool pCompiled)
+{
+    return SedInstance::Impl::create(shared_from_this(), pCompiled);
+}
+#endif
 
 } // namespace libOpenCOR
