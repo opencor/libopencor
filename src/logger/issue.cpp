@@ -20,7 +20,7 @@ namespace libOpenCOR {
 
 Issue::Impl::Impl(Type pType, const std::string &pDescription)
     : mType(pType)
-    , mDescription(std::move(pDescription))
+    , mDescription(pDescription)
 {
 }
 
