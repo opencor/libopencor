@@ -18,14 +18,14 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-Issue::Impl::Impl(std::string pDescription, Type pType)
+Issue::Impl::Impl(Type pType, const std::string &pDescription)
     : mType(pType)
     , mDescription(std::move(pDescription))
 {
 }
 
-Issue::Issue(const std::string &pDescription, Type pType)
-    : mPimpl(new Impl {pDescription, pType})
+Issue::Issue(Type pType, const std::string &pDescription)
+    : mPimpl(new Impl {pType, pDescription})
 {
 }
 
