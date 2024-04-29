@@ -435,7 +435,7 @@ bool SedDocument::hasModels() const
     return pimpl()->hasModels();
 }
 
-SedModelPtrVector SedDocument::models() const
+SedModelPtrs SedDocument::models() const
 {
     return pimpl()->mModels;
 }
@@ -455,7 +455,7 @@ bool SedDocument::hasSimulations() const
     return pimpl()->hasSimulations();
 }
 
-SedSimulationPtrVector SedDocument::simulations() const
+SedSimulationPtrs SedDocument::simulations() const
 {
     return pimpl()->mSimulations;
 }
@@ -475,7 +475,7 @@ bool SedDocument::hasTasks() const
     return pimpl()->hasTasks();
 }
 
-SedAbstractTaskPtrVector SedDocument::tasks() const
+SedAbstractTaskPtrs SedDocument::tasks() const
 {
     return pimpl()->mTasks;
 }

@@ -126,7 +126,7 @@ TEST(SerialiseSedTest, localCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
 
-    file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_CELLML_CONTENTS));
 
     auto sed = libOpenCOR::SedDocument::create(file);
 
@@ -149,7 +149,7 @@ TEST(SerialiseSedTest, relativeLocalCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
 
-    file->setContents(libOpenCOR::charArrayToVector(libOpenCOR::SOME_CELLML_CONTENTS));
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_CELLML_CONTENTS));
 
     auto sed = libOpenCOR::SedDocument::create(file);
 

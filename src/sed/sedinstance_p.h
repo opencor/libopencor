@@ -27,7 +27,7 @@ class SedInstance::Impl: public Logger::Impl
 public:
     static SedInstancePtr create(const SedDocumentPtr &pDocument);
 
-    SedInstanceTaskPtrVector mTasks;
+    SedInstanceTaskPtrs mTasks;
 
     explicit Impl(const SedDocumentPtr &pDocument);
 

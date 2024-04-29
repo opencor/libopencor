@@ -145,20 +145,20 @@ public:
      *
      * Return the contents of this file.
      *
-     * @return The contents, as an @ref UnsignedCharVector, of this file.
+     * @return The contents, as an @ref UnsignedChars, of this file.
      */
 
-    UnsignedCharVector contents();
+    UnsignedChars contents();
 
     /**
      * @brief Set the contents of this file.
      *
      * Set the contents of this file.
      *
-     * @param pContents The contents, as an @ref UnsignedCharVector, of this file.
+     * @param pContents The contents, as an @ref UnsignedChars, of this file.
      */
 
-    void setContents(const UnsignedCharVector &pContents);
+    void setContents(const UnsignedChars &pContents);
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

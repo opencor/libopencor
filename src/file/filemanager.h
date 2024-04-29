@@ -35,7 +35,7 @@ public:
     FilePtr file(const std::string &pFileNameOrUrl) const;
 
 private:
-    FileVector mFiles;
+    Files mFiles;
 };
 
 } // namespace libOpenCOR

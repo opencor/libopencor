@@ -91,6 +91,6 @@ void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles, const
 std::string resourcePath(const std::string &pResourceRelativePath = {});
 std::string textFileContents(const std::string &pFileName);
 
-UnsignedCharVector charArrayToVector(const char *pContents);
+UnsignedChars charArrayToUnsignedChars(const char *pContents);
 
 } // namespace libOpenCOR

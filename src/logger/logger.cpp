@@ -136,7 +136,7 @@ bool Logger::hasIssues() const
     return pimpl()->hasIssues();
 }
 
-IssuePtrVector Logger::issues() const
+IssuePtrs Logger::issues() const
 {
     return pimpl()->mIssues;
 }
@@ -146,7 +146,7 @@ bool Logger::hasErrors() const
     return pimpl()->hasErrors();
 }
 
-IssuePtrVector Logger::errors() const
+IssuePtrs Logger::errors() const
 {
     return pimpl()->mErrors;
 }
@@ -156,7 +156,7 @@ bool Logger::hasWarnings() const
     return pimpl()->hasWarnings();
 }
 
-IssuePtrVector Logger::warnings() const
+IssuePtrs Logger::warnings() const
 {
     return pimpl()->mWarnings;
 }
@@ -166,7 +166,7 @@ bool Logger::hasMessages() const
     return pimpl()->hasMessages();
 }
 
-IssuePtrVector Logger::messages() const
+IssuePtrs Logger::messages() const
 {
     return pimpl()->mMessages;
 }

@@ -60,10 +60,10 @@ public:
      *
      * Return the issues.
      *
-     * @return The issues, as an @ref IssuePtrVector.
+     * @return The issues, as an @ref IssuePtrs.
      */
 
-    IssuePtrVector issues() const;
+    IssuePtrs issues() const;
 
     /**
      * @brief Return whether there are some errors.
@@ -80,10 +80,10 @@ public:
      *
      * Return the errors.
      *
-     * @return The errors, as a @ref IssuePtrVector of type @ref Issue::Type::ERROR.
+     * @return The errors, as a @ref IssuePtrs of type @ref Issue::Type::ERROR.
      */
 
-    IssuePtrVector errors() const;
+    IssuePtrs errors() const;
 
     /**
      * @brief Return whether there are some warnings.
@@ -100,10 +100,10 @@ public:
      *
      * Return the warnings.
      *
-     * @return The warnings, as a @ref IssuePtrVector of type @ref Issue::Type::WARNING.
+     * @return The warnings, as a @ref IssuePtrs of type @ref Issue::Type::WARNING.
      */
 
-    IssuePtrVector warnings() const;
+    IssuePtrs warnings() const;
 
     /**
      * @brief Return whether there are some messages.
@@ -120,10 +120,10 @@ public:
      *
      * Return the messages.
      *
-     * @return The messages, as a @ref IssuePtrVector of type @ref Issue::Type::MESSAGE.
+     * @return The messages, as a @ref IssuePtrs of type @ref Issue::Type::MESSAGE.
      */
 
-    IssuePtrVector messages() const;
+    IssuePtrs messages() const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

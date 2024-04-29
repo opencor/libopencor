@@ -155,15 +155,15 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
     // Initialise our KINSOL solver.
 
-    auto *uVector = N_VMake_Serial(static_cast<int64_t>(pN), pU, context);
-    auto *onesVector = N_VNew_Serial(static_cast<int64_t>(pN), context);
+    auto *u = N_VMake_Serial(static_cast<int64_t>(pN), pU, context);
+    auto *ones = N_VNew_Serial(static_cast<int64_t>(pN), context);
 
-    ASSERT_NE(uVector, nullptr);
-    ASSERT_NE(onesVector, nullptr);
+    ASSERT_NE(u, nullptr);
+    ASSERT_NE(ones, nullptr);
 
-    N_VConst(1.0, onesVector);
+    N_VConst(1.0, ones);
 
-    ASSERT_EQ(KINInit(solver, computeSystem, uVector), KIN_SUCCESS);
+    ASSERT_EQ(KINInit(solver, computeSystem, u), KIN_SUCCESS);
 
     // Set our linear solver.
 
@@ -175,7 +175,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
         ASSERT_NE(sunMatrix, nullptr);
 
-        sunLinearSolver = SUNLinSol_Dense(uVector, sunMatrix, context);
+        sunLinearSolver = SUNLinSol_Dense(u, sunMatrix, context);
     } else if (mLinearSolver == LinearSolver::BANDED) {
         sunMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
                                   static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
@@ -183,16 +183,16 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
         ASSERT_NE(sunMatrix, nullptr);
 
-        sunLinearSolver = SUNLinSol_Band(uVector, sunMatrix, context);
+        sunLinearSolver = SUNLinSol_Band(u, sunMatrix, context);
     } else {
         sunMatrix = nullptr;
 
         if (mLinearSolver == LinearSolver::GMRES) {
-            sunLinearSolver = SUNLinSol_SPGMR(uVector, PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPGMR(u, PREC_NONE, 0, context);
         } else if (mLinearSolver == LinearSolver::BICGSTAB) {
-            sunLinearSolver = SUNLinSol_SPBCGS(uVector, PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPBCGS(u, PREC_NONE, 0, context);
         } else {
-            sunLinearSolver = SUNLinSol_SPTFQMR(uVector, PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPTFQMR(u, PREC_NONE, 0, context);
         }
     }
 
@@ -218,12 +218,12 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 #ifndef CODE_COVERAGE_ENABLED
     auto res =
 #endif
-        KINSol(solver, uVector, KIN_LINESEARCH, onesVector, onesVector);
+        KINSol(solver, u, KIN_LINESEARCH, ones, ones);
 
     // Release some memory.
 
-    N_VDestroy_Serial(uVector);
-    N_VDestroy_Serial(onesVector);
+    N_VDestroy_Serial(u);
+    N_VDestroy_Serial(ones);
     SUNMatDestroy(sunMatrix);
     SUNLinSolFree(sunLinearSolver);
 
