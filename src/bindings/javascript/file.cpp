@@ -44,7 +44,7 @@ void fileApi()
         .function("setContents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis, uintptr_t pContents, size_t pSize) {
                       auto contents = reinterpret_cast<unsigned char *>(pContents);
 
-                      pThis->setContents(libOpenCOR::UnsignedCharVector(contents, contents + pSize));
+                      pThis->setContents(libOpenCOR::UnsignedChars(contents, contents + pSize));
                   }));
 
     EM_ASM({

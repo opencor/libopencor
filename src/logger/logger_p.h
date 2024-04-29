@@ -27,11 +27,11 @@ namespace libOpenCOR {
 class Logger::Impl
 {
 public:
-    IssuePtrVector mIssues;
+    IssuePtrs mIssues;
 
-    IssuePtrVector mErrors;
-    IssuePtrVector mWarnings;
-    IssuePtrVector mMessages;
+    IssuePtrs mErrors;
+    IssuePtrs mWarnings;
+    IssuePtrs mMessages;
 
     bool hasIssues() const;
     bool hasErrors() const;
@@ -41,7 +41,7 @@ public:
     void addIssues(const LoggerPtr &pLogger);
     void addIssues(const libcellml::LoggerPtr &pLogger);
 
-    void addIssue(const std::string &pDescription, Issue::Type pType);
+    void addIssue(Issue::Type pType, const std::string &pDescription);
 
     void addError(const std::string &pDescription);
     void addWarning(const std::string &pDescription);
