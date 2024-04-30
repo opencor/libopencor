@@ -43,7 +43,7 @@ bool Logger::Impl::hasMessages() const
 void Logger::Impl::addIssues(const LoggerPtr &pLogger)
 {
     for (const auto &issue : pLogger->issues()) {
-        addIssue(issue->description(), issue->type());
+        addIssue(issue->type(), issue->description());
     }
 }
 
@@ -53,21 +53,21 @@ void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger)
         auto issue = pLogger->issue(i);
 
 #ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
-        addIssue(issue->description(),
-                 (issue->level() == libcellml::Issue::Level::ERROR) ? Issue::Type::ERROR :
-                                                                      Issue::Type::WARNING);
+        addIssue((issue->level() == libcellml::Issue::Level::ERROR) ? Issue::Type::ERROR :
+                                                                      Issue::Type::WARNING,
+                 issue->description());
 #else
-        addIssue(issue->description(),
-                 (issue->level() == libcellml::Issue::Level::ERROR)   ? Issue::Type::ERROR :
+        addIssue((issue->level() == libcellml::Issue::Level::ERROR)   ? Issue::Type::ERROR :
                  (issue->level() == libcellml::Issue::Level::WARNING) ? Issue::Type::WARNING :
-                                                                        Issue::Type::MESSAGE);
+                                                                        Issue::Type::MESSAGE,
+                 issue->description());
 #endif
     }
 }
 
-void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
+void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription)
 {
-    auto issue = IssuePtr {new Issue {pDescription, pType}};
+    auto issue = IssuePtr {new Issue {pType, pDescription}};
     mIssues.push_back(issue);
 
 #ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
@@ -93,19 +93,19 @@ void Logger::Impl::addIssue(const std::string &pDescription, Issue::Type pType)
 
 void Logger::Impl::addError(const std::string &pDescription)
 {
-    addIssue(pDescription, Issue::Type::ERROR);
+    addIssue(Issue::Type::ERROR, pDescription);
 }
 
 /*---GRY---
 void Logger::Impl::addWarning(const std::string &pDescription)
 {
-    addIssue(pDescription, Issue::Type::WARNING);
+    addIssue(Issue::Type::WARNING, pDescription);
 }
 */
 
 void Logger::Impl::addMessage(const std::string &pDescription)
 {
-    addIssue(pDescription, Issue::Type::MESSAGE);
+    addIssue(Issue::Type::MESSAGE, pDescription);
 }
 
 void Logger::Impl::removeAllIssues()
@@ -137,7 +137,7 @@ bool Logger::hasIssues() const
     return pimpl()->hasIssues();
 }
 
-IssuePtrVector Logger::issues() const
+IssuePtrs Logger::issues() const
 {
     return pimpl()->mIssues;
 }
@@ -147,7 +147,7 @@ bool Logger::hasErrors() const
     return pimpl()->hasErrors();
 }
 
-IssuePtrVector Logger::errors() const
+IssuePtrs Logger::errors() const
 {
     return pimpl()->mErrors;
 }
@@ -157,7 +157,7 @@ bool Logger::hasWarnings() const
     return pimpl()->hasWarnings();
 }
 
-IssuePtrVector Logger::warnings() const
+IssuePtrs Logger::warnings() const
 {
     return pimpl()->mWarnings;
 }
@@ -167,7 +167,7 @@ bool Logger::hasMessages() const
     return pimpl()->hasMessages();
 }
 
-IssuePtrVector Logger::messages() const
+IssuePtrs Logger::messages() const
 {
     return pimpl()->mMessages;
 }

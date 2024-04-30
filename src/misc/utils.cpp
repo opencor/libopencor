@@ -354,7 +354,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     return {};
 }
 
-UnsignedCharVector fileContents(const std::filesystem::path &pFilePath)
+UnsignedChars fileContents(const std::filesystem::path &pFilePath)
 {
     // Retrieve and return the contents of the given file.
 
@@ -365,7 +365,7 @@ UnsignedCharVector fileContents(const std::filesystem::path &pFilePath)
     }
 
     const auto fileSize = std::filesystem::file_size(pFilePath);
-    UnsignedCharVector contents(fileSize);
+    UnsignedChars contents(fileSize);
 
     file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT
 
@@ -417,7 +417,7 @@ std::string toString(double pNumber)
     return res.str();
 }
 
-std::string toString(const UnsignedCharVector &pBytes)
+std::string toString(const UnsignedChars &pBytes)
 {
     return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
 }

@@ -26,15 +26,15 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
 {
     // Vectors.
 
-    emscripten::register_vector<libOpenCOR::IssuePtr>("IssuePtrVector");
-    emscripten::register_vector<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTaskPtrVector");
-    emscripten::register_vector<libOpenCOR::SedDataDescriptionPtr>("SedDataDescriptionPtrVector");
-    emscripten::register_vector<libOpenCOR::SedDataGeneratorPtr>("SedDataGeneratorPtrVector");
-    emscripten::register_vector<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTaskPtrVector");
-    emscripten::register_vector<libOpenCOR::SedModelPtr>("SedModelPtrVector");
-    emscripten::register_vector<libOpenCOR::SedOutputPtr>("SedOutputPtrVector");
-    emscripten::register_vector<libOpenCOR::SedSimulationPtr>("SedSimulationPtrVector");
-    emscripten::register_vector<libOpenCOR::SedStylePtr>("SedStylePtrVector");
+    emscripten::register_vector<libOpenCOR::IssuePtr>("IssuePtrs");
+    emscripten::register_vector<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTaskPtrs");
+    emscripten::register_vector<libOpenCOR::SedDataDescriptionPtr>("SedDataDescriptionPtrs");
+    emscripten::register_vector<libOpenCOR::SedDataGeneratorPtr>("SedDataGeneratorPtrs");
+    emscripten::register_vector<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTaskPtrs");
+    emscripten::register_vector<libOpenCOR::SedModelPtr>("SedModelPtrs");
+    emscripten::register_vector<libOpenCOR::SedOutputPtr>("SedOutputPtrs");
+    emscripten::register_vector<libOpenCOR::SedSimulationPtr>("SedSimulationPtrs");
+    emscripten::register_vector<libOpenCOR::SedStylePtr>("SedStylePtrs");
 
     // APIs.
 

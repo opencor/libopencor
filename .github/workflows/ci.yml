@@ -234,7 +234,7 @@ jobs:
             python_unit_testing: OFF
             shared_libs: ON
             unit_testing: ON
-            context: PATH=/usr/local/opt/llvm/bin:$PATH CC=/usr/local/opt/llvm/bin/clang CXX=/usr/local/opt/llvm/bin/clang++
+            context: PATH=/opt/homebrew/opt/llvm/bin:$PATH CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++
             target: code_coverage
           - name: 'Memory checks'
             os: ubuntu-latest
@@ -274,6 +274,10 @@ jobs:
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v3
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
@@ -285,7 +289,9 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
       - name: Install LLVM
         if: ${{ matrix.target == 'code_coverage' }}
-        run: brew install --overwrite llvm
+        run: |
+          brew install --overwrite llvm
+          brew info llvm
       - name: Install Clang
         if: ${{ matrix.name == 'Code analysis' }}
         run: |

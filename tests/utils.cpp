@@ -76,7 +76,7 @@ std::string textFileContents(const std::string &pFileName)
     return regex_replace(res, CR_LF, "\n");
 }
 
-UnsignedCharVector charArrayToVector(const char *pContents)
+UnsignedChars charArrayToUnsignedChars(const char *pContents)
 {
     return {pContents, pContents + strlen(pContents)}; // NOLINT
 }

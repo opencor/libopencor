@@ -33,13 +33,13 @@ public:
 
     std::unordered_set<std::string> mIds;
 
-    SedDataDescriptionPtrVector mDataDescriptions;
-    SedModelPtrVector mModels;
-    SedSimulationPtrVector mSimulations;
-    SedAbstractTaskPtrVector mTasks;
-    SedDataGeneratorPtrVector mDataGenerators;
-    SedOutputPtrVector mOutputs;
-    SedStylePtrVector mStyles;
+    SedDataDescriptionPtrs mDataDescriptions;
+    SedModelPtrs mModels;
+    SedSimulationPtrs mSimulations;
+    SedAbstractTaskPtrs mTasks;
+    SedDataGeneratorPtrs mDataGenerators;
+    SedOutputPtrs mOutputs;
+    SedStylePtrs mStyles;
 
     std::string uniqueId(const std::string &pPrefix);
 

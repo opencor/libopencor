@@ -105,10 +105,10 @@ public:
      *
      * Return the models.
      *
-     * @return The models, as a @ref SedModelPtrVector.
+     * @return The models, as a @ref SedModelPtrs.
      */
 
-    SedModelPtrVector models() const;
+    SedModelPtrs models() const;
 
     /**
      * @brief Add the model to this simulation experiment description.
@@ -149,10 +149,10 @@ public:
      *
      * Return the simulations.
      *
-     * @return The simulations, as a @ref SedSimulationPtrVector.
+     * @return The simulations, as a @ref SedSimulationPtrs.
      */
 
-    SedSimulationPtrVector simulations() const;
+    SedSimulationPtrs simulations() const;
 
     /**
      * @brief Add the simulation to this simulation experiment description.
@@ -193,10 +193,10 @@ public:
      *
      * Return the tasks.
      *
-     * @return The tasks, as a @ref SedAbstractTaskPtrVector.
+     * @return The tasks, as a @ref SedAbstractTaskPtrs.
      */
 
-    SedAbstractTaskPtrVector tasks() const;
+    SedAbstractTaskPtrs tasks() const;
 
     /**
      * @brief Add the task to this simulation experiment description.
