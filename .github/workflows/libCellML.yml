@@ -111,4 +111,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WebAssembly
-          path: ./build/*.tar.gz
+          path: ./build/*wasm.tar.gz
