@@ -86,7 +86,7 @@ else()
     build_package(${PACKAGE_NAME}
         URL
             # https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
-            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/8fe2e97.tar.gz
+            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/987b3db.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF
