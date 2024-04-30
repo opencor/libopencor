@@ -22,11 +22,24 @@ function showError(error) {
   updateFileUi(false, false, true, true);
 }
 
-function updateFileUi(fileInfoDisplay, fileIssuesDisplay, fileErrorDisplay, resetButtonDisplay) {
-  document.getElementById("fileInfo").style.display = fileInfoDisplay ? "block" : "none";
-  document.getElementById("fileIssues").style.display = fileIssuesDisplay ? "block" : "none";
-  document.getElementById("fileError").style.display = fileErrorDisplay ? "block" : "none";
-  document.getElementById("resetFile").style.display = resetButtonDisplay ? "block" : "none";
+function updateFileUi(
+  fileInfoDisplay,
+  fileIssuesDisplay,
+  fileErrorDisplay,
+  resetButtonDisplay,
+) {
+  document.getElementById("fileInfo").style.display = fileInfoDisplay
+    ? "block"
+    : "none";
+  document.getElementById("fileIssues").style.display = fileIssuesDisplay
+    ? "block"
+    : "none";
+  document.getElementById("fileError").style.display = fileErrorDisplay
+    ? "block"
+    : "none";
+  document.getElementById("resetFile").style.display = resetButtonDisplay
+    ? "block"
+    : "none";
 }
 
 export function resetFile() {
@@ -106,7 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
                   const issue = fileIssues.get(i);
                   const issueElement = document.createElement("li");
 
-                  issueElement.innerHTML = String.raw`<span class="bold">` + issue.typeAsString() + ":</span> " + formattedIssueDescription(issue.description());
+                  issueElement.innerHTML =
+                    String.raw`<span class="bold">` +
+                    issue.typeAsString() +
+                    ":</span> " +
+                    formattedIssueDescription(issue.description());
 
                   issuesElement.appendChild(issueElement);
                 }
