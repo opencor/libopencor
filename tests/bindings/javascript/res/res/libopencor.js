@@ -88,8 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
               fileType = "SED-ML";
             }
 
-console.log(">>> CellML file: " + ((file.type() === libopencor.File.Type.CELLML_FILE) ? "yes" : "no"));
-
             document.getElementById("fileName").innerHTML = inputFile.name;
             document.getElementById("fileType").innerHTML = fileType;
 

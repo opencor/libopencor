@@ -96,13 +96,13 @@ jobs:
         run: |
           cd build
           cpack
-      - name: Upload libraries
+      - name: Upload libOpenCOR artifacts
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
           path: ./build/libOpenCOR-*
-      - name: Release libraries
+      - name: Release libOpenCOR
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         uses: softprops/action-gh-release@v1
         with:
