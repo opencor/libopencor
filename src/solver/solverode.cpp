@@ -36,7 +36,7 @@ bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     mVariables = pVariables;
 
     mComputeCompiledRates = pComputeCompiledRates;
-    mComputeInterpretedRates = pComputeInterpretedRates;
+    mComputeInterpretedRates = std::move(pComputeInterpretedRates);
 
     return true;
 }
@@ -48,7 +48,7 @@ bool SolverOde::Impl::reinitialise(double pVoi)
     return true;
 }
 
-void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pVariables)
+void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pVariables) const
 {
     if (mComputeCompiledRates != nullptr) {
         mComputeCompiledRates(pVoi, pStates, pRates, pVariables);

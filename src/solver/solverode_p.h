@@ -43,7 +43,7 @@ public:
 
     virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 
-    void computeRates(double pVoi, double *pStates, double *pRates, double *pVariables);
+    void computeRates(double pVoi, double *pStates, double *pRates, double *pVariables) const;
 };
 
 } // namespace libOpenCOR
