@@ -38,10 +38,10 @@ jobs:
             cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
             build_type: Release
           - name: 'macOS (Intel)'
-            os: macos-latest
+            os: macos-13
             build_type: Release
           - name: 'macOS (ARM)'
-            os: macos-14
+            os: macos-latest
             build_type: Release
     env:
       BUILDCACHE_ACCURACY: STRICT

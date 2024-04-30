@@ -48,16 +48,16 @@ jobs:
             shared_libs: ON
             cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'macOS static library (Intel)'
-            os: macos-latest
+            os: macos-13
             shared_libs: OFF
           - name: 'macOS shared library (Intel)'
-            os: macos-latest
+            os: macos-13
             shared_libs: ON
           - name: 'macOS static library (ARM)'
-            os: macos-14
+            os: macos-latest
             shared_libs: OFF
           - name: 'macOS shared library (ARM)'
-            os: macos-14
+            os: macos-latest
             shared_libs: ON
     env:
       BUILDCACHE_ACCURACY: STRICT
@@ -119,9 +119,9 @@ jobs:
           - name: 'Linux Python wheels'
             os: ubuntu-latest
           - name: 'macOS Python wheels (Intel)'
-            os: macos-latest
+            os: macos-13
           - name: 'macOS Python wheels (ARM)'
-            os: macos-14
+            os: macos-latest
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v3
