@@ -133,7 +133,7 @@ describe("Sed coverage tests", () => {
 
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a model."],
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
     ]);
@@ -276,7 +276,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",

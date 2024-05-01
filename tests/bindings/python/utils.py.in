@@ -13,7 +13,9 @@
 # limitations under the License.
 
 
-import os
+from libopencor import (
+    Issue,
+)
 import platform
 
 
@@ -63,6 +65,13 @@ def assert_issues(logger, expected_issues):
     for i in range(len(issues)):
         assert issues[i].type == expected_issues[i][0]
         assert issues[i].description == expected_issues[i][1]
+
+        if issues[i].type == Issue.Type.Error:
+            assert issues[i].type_as_string == "Error"
+        elif issues[i].type == Issue.Type.Warning:
+            assert issues[i].type_as_string == "Warning"
+        else:
+            assert issues[i].type_as_string == "Message"
 
 
 def resource_path(relative_path=""):

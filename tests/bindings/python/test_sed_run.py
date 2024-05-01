@@ -112,14 +112,22 @@ def test_unsuitable_constrained_cellml_file():
     assert_issues(instance, expected_issues)
 
 
-def test_algebraic_model():
+def run_algebraic_model(compiled):
     file = File(utils.resource_path("api/sed/algebraic.cellml"))
     sed = SedDocument(file)
-    instance = sed.create_instance()
+    instance = sed.create_instance(compiled)
 
     instance.run()
 
     assert instance.has_issues == False
+
+
+def test_compiled_algebraic_model():
+    run_algebraic_model(True)
+
+
+def test_interpreted_algebraic_model():
+    run_algebraic_model(False)
 
 
 def run_ode_model(compiled):
