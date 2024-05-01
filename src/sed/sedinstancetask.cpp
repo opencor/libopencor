@@ -108,7 +108,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     }
 #endif
 
-    // Create/retrieve our various arrays.
+    // Create our various arrays.
 
     mAnalyserModel = cellmlFile->analyserModel();
 
@@ -123,6 +123,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
+
 #ifdef PRINT_VALUES
     printHeader(mAnalyserModel);
 #endif
@@ -134,10 +135,10 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 
 #ifndef __EMSCRIPTEN__
         if (mCompiled) {
-            mRuntime->initialiseCompiledVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
-            mRuntime->computeCompiledComputedConstants()(mVariables); // NOLINT
-            mRuntime->computeCompiledRates()(mVoi, mStates, mRates, mVariables); // NOLINT
-            mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+            mRuntime->initialiseCompiledVariablesForDifferentialModel()(mStates, mRates, mVariables);
+            mRuntime->computeCompiledComputedConstants()(mVariables);
+            mRuntime->computeCompiledRates()(mVoi, mStates, mRates, mVariables);
+            mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
         } else {
 #endif
             mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mVariables);
@@ -147,9 +148,9 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 #ifndef __EMSCRIPTEN__
         }
     } else if (mCompiled) {
-        mRuntime->initialiseCompiledVariablesForAlgebraicModel()(mVariables); // NOLINT
-        mRuntime->computeCompiledComputedConstants()(mVariables); // NOLINT
-        mRuntime->computeCompiledVariablesForAlgebraicModel()(mVariables); // NOLINT
+        mRuntime->initialiseCompiledVariablesForAlgebraicModel()(mVariables);
+        mRuntime->computeCompiledComputedConstants()(mVariables);
+        mRuntime->computeCompiledVariablesForAlgebraicModel()(mVariables);
 #endif
     } else {
         mRuntime->initialiseInterpretedVariablesForAlgebraicModel()(mVariables);
@@ -174,6 +175,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
             return;
         }
     }
+
 #ifdef PRINT_VALUES
     printValues(mAnalyserModel, mVoi, mStates, mVariables);
 #endif
@@ -226,6 +228,7 @@ void SedInstanceTask::Impl::run()
                 return;
             }
 #endif
+
 #ifdef PRINT_VALUES
             printValues(mAnalyserModel, mVoi, mStates, mVariables);
 #endif
