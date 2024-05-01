@@ -209,7 +209,7 @@ void SedInstanceTask::Impl::run()
 
 #ifndef __EMSCRIPTEN__
             if (mCompiled) {
-                mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+                mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
             } else {
 #endif
                 mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);

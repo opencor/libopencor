@@ -57,7 +57,7 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
     if (!hasIssues()
         && (mAnalyserModel->type() != libcellml::AnalyserModel::Type::ALGEBRAIC)
         && (mAnalyserModel->type() != libcellml::AnalyserModel::Type::ODE)) {
-        addError("The CellML file is neither an algebraic model nor an ODE model. Only such models are currently supported.");
+        addError("Only CellML files describing either an algebraic model or an ODE model are currently supported.");
     }
 #endif
 }

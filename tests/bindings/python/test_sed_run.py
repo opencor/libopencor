@@ -188,7 +188,7 @@ def test_ode_model_with_no_ode_solver():
     assert_issues(instance, expected_issues)
 
 
-# ---GRY--- AS FOR THE ODE MODEL, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THE TEST.
+# ---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
 
 
 def test_nla_model():
