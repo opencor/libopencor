@@ -82,12 +82,6 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
 
 using Doubles = std::vector<double>;
 
-void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles, const Doubles &pAbsoluteErrors);
-
-#define EXPECT_EQ_DOUBLES(pDoubles, pExpectedDoubles, pAbsoluteErrors) \
-    SCOPED_TRACE("Issue occurred here."); \
-    libOpenCOR::expectEqualDoubles(pDoubles, pExpectedDoubles, pAbsoluteErrors)
-
 std::string resourcePath(const std::string &pResourceRelativePath = {});
 std::string textFileContents(const std::string &pFileName);
 

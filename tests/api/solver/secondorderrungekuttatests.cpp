@@ -14,38 +14,59 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "odemodel.h"
+#include "gtest/gtest.h"
+
+#include "tests/utils.h"
+
+#include <libopencor>
 
 TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
     static const auto STEP = 0.0;
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, R"(The step cannot be equal to 0. It must be greater than 0.)"},
+        {libOpenCOR::Issue::Type::ERROR, "The step cannot be equal to 0. It must be greater than 0."},
     };
 
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
     auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();
-    auto [states, rates, variables] = OdeModel::initialise();
 
     solver->setStep(STEP);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    simulation->setOdeSolver(solver);
 
-    OdeModel::finalise(states, rates, variables);
+    auto instance = sed->createInstance();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
-TEST(SecondOrderRungeKuttaSolverTest, solve)
+void secondOrderRungeKuttaSolve(bool pCompiled)
 {
     static const auto STEP = 0.0123;
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.01541887962884, 0.59605549615736997, 0.053035139074127761, 0.31777058428249821}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00000000000001, 0.00000000000000001, 0.000000000000000001, 0.00000000000000001};
 
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
     auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();
-    auto [states, rates, variables] = OdeModel::initialise();
 
     solver->setStep(STEP);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    simulation->setOdeSolver(solver);
 
-    OdeModel::finalise(states, rates, variables);
+    auto instance = sed->createInstance(pCompiled);
+
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+}
+
+TEST(SecondOrderRungeKuttaSolverTest, compiledSolve)
+{
+    secondOrderRungeKuttaSolve(true);
+}
+
+TEST(SecondOrderRungeKuttaSolverTest, interpretedSolve)
+{
+    secondOrderRungeKuttaSolve(false);
 }

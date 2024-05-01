@@ -39,7 +39,9 @@ public:
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                             CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                             CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) = 0;
+    /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     virtual bool reinitialise(double pVoi);
+    */
 
     virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 

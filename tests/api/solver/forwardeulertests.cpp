@@ -14,7 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "odemodel.h"
+#include "gtest/gtest.h"
+
+#include "tests/utils.h"
+
+#include <libopencor>
 
 TEST(ForwardEulerSolverTest, stepValueWithInvalidNumber)
 {
@@ -23,29 +27,46 @@ TEST(ForwardEulerSolverTest, stepValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The step cannot be equal to 0. It must be greater than 0."},
     };
 
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
     auto solver = libOpenCOR::SolverForwardEuler::create();
-    auto [states, rates, variables] = OdeModel::initialise();
 
     solver->setStep(STEP);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    simulation->setOdeSolver(solver);
 
-    OdeModel::finalise(states, rates, variables);
+    auto instance = sed->createInstance();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
-TEST(ForwardEulerSolverTest, solve)
+void forwardEulerSolve(bool pCompiled)
 {
     static const auto STEP = 0.0123;
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.01532944976231, 0.59604909855484645, 0.0530348730065467, 0.31777429461290835}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00000000000001, 0.00000000000000001, 0.0000000000000001, 0.00000000000000001};
 
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
     auto solver = libOpenCOR::SolverForwardEuler::create();
-    auto [states, rates, variables] = OdeModel::initialise();
 
     solver->setStep(STEP);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    simulation->setOdeSolver(solver);
 
-    OdeModel::finalise(states, rates, variables);
+    auto instance = sed->createInstance(pCompiled);
+
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+}
+
+TEST(ForwardEulerSolverTest, compiledSolve)
+{
+    forwardEulerSolve(true);
+}
+
+TEST(ForwardEulerSolverTest, interpretedSolve)
+{
+    forwardEulerSolve(false);
 }

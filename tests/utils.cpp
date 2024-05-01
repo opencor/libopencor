@@ -60,13 +60,6 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
     }
 }
 
-void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles, const Doubles &pAbsoluteErrors)
-{
-    for (size_t i = 0; i < pExpectedDoubles.size(); ++i) {
-        EXPECT_NEAR(pDoubles[i], pExpectedDoubles[i], pAbsoluteErrors[i]); // NOLINT
-    }
-}
-
 std::string resourcePath(const std::string &pResourceRelativePath)
 {
     return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;

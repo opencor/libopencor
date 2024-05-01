@@ -14,7 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "odemodel.h"
+#include "gtest/gtest.h"
+
+#include "tests/utils.h"
+
+#include <libopencor>
 
 TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 {
@@ -23,15 +27,16 @@ TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The maximum step cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setMaximumStep(RELATIVE_TOLERANCE);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
@@ -41,15 +46,16 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The maximum number of steps cannot be equal to 0. It must be greater than 0."},
     };
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setMaximumNumberOfSteps(MAXIMUM_NUMBER_OF_STEPS);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooSmall)
@@ -59,16 +65,17 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooS
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     };
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooBig)
@@ -78,16 +85,17 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooB
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
     };
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooSmall)
@@ -97,16 +105,17 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooS
         {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     };
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooBig)
@@ -116,16 +125,17 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooB
         {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
     };
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
@@ -135,15 +145,16 @@ TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setRelativeTolerance(RELATIVE_TOLERANCE);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
@@ -153,194 +164,214 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setAbsoluteTolerance(RELATIVE_TOLERANCE);
 
-    EXPECT_FALSE(solver->pimpl()->initialise(0.0, OdeModel::STATE_COUNT, states, rates, variables, OdeModel::computeRates, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
-TEST(CvodeSolverTest, solve)
+void cvodeSolve(bool pCompiled)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto instance = sed->createInstance(pCompiled);
 
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    instance->run();
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+}
 
-    OdeModel::finalise(states, rates, variables);
+TEST(CvodeSolverTest, compiledSolve)
+{
+    cvodeSolve(true);
+}
+
+TEST(CvodeSolverTest, interpretedSolve)
+{
+    cvodeSolve(false);
 }
 
 TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015419, 0.5960555, 0.053035143, 0.317770590}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.000001, 0.0000001, 0.000000001, 0.000000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setInterpolateSolution(false);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015419, 0.5960555, 0.0530351, 0.3177705}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.000001, 0.0000001, 0.0000001, 0.0000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setIntegrationMethod(libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithFunctionalIterationType)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.01541, 0.5960555, 0.0530351, 0.317770}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.00001, 0.0000001, 0.0000001, 0.000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setIterationType(libOpenCOR::SolverCvode::IterationType::FUNCTIONAL);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.015, 0.596, 0.0530, 0.317}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.001, 0.001, 0.0001, 0.001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.053035, 0.317770}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.000001, 0.000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::DIAGONAL);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.053032, 0.317773}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.000001, 0.000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.0530327, 0.317773}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.0000001, 0.000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0150, 0.59605, 0.053032, 0.317773}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.00001, 0.000001, 0.000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.0530351, 0.3177705}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.0000001, 0.0000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
 {
-    static const libOpenCOR::Doubles FINAL_STATES = {-0.0154, 0.596055, 0.053035, 0.3177705}; // NOLINT
-    static const libOpenCOR::Doubles ABSOLUTE_ERRORS = {0.0001, 0.000001, 0.000001, 0.0000001};
-
-    auto solver = libOpenCOR::SolverCvode::create();
-    auto [states, rates, variables] = OdeModel::initialise();
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
-    OdeModel::compute(solver, states, rates, variables, FINAL_STATES, ABSOLUTE_ERRORS);
+    auto instance = sed->createInstance();
 
-    OdeModel::finalise(states, rates, variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
