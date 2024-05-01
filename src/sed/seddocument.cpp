@@ -67,30 +67,24 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
     }
 
     // Make sure that the given file is supported.
+    // Note: we would normally have a switch statement, but then code covereage doesn't cover the lines where we check
+    //       for __EMSCRIPTEN__. Could it be an issue with llvm-cov not properly handling C++ directives within a witch
+    //       statement?
 
-    switch (pFile->type()) {
-    case File::Type::CELLML_FILE:
+    auto fileType = pFile->type();
+
+    if (fileType == File::Type::CELLML_FILE) {
         initialiseFromCellmlFile(pOwner, pFile);
-
-        break;
-    case File::Type::SEDML_FILE:
+    } else if (fileType == File::Type::SEDML_FILE) {
         addMessage("A simulation experiment description cannot (currently) be created using a SED-ML file.");
-
-        break;
-    case File::Type::COMBINE_ARCHIVE:
+    } else if (fileType == File::Type::COMBINE_ARCHIVE) {
         addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
-
-        break;
 #ifndef __EMSCRIPTEN__
-    case File::Type::IRRETRIEVABLE_FILE:
+    } else if (fileType == File::Type::IRRETRIEVABLE_FILE) {
         addError("A simulation experiment description cannot be created using an irretrievable file.");
-
-        break;
 #endif
-    default: // File::Type::UNKNOWN_FILE.
+    } else { // File::Type::UNKNOWN_FILE.
         addError("A simulation experiment description cannot be created using an unknown file.");
-
-        break;
     }
 }
 
