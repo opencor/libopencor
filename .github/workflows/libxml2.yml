@@ -1,4 +1,4 @@
-name: libCellML
+name: libxml2
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  libCellML:
+  libxml2:
     uses: ./.github/workflows/build-third-party-library.yml
     with:
-      third_party_library_name: LIBCELLML
+      third_party_library_name: LIBXML2
