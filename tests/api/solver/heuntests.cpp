@@ -41,6 +41,8 @@ TEST(HeunSolverTest, stepValueWithInvalidNumber)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+namespace {
+
 void heunSolve(bool pCompiled)
 {
     static const auto STEP = 0.0123;
@@ -60,6 +62,8 @@ void heunSolve(bool pCompiled)
 
     //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
+
+} // namespace
 
 TEST(HeunSolverTest, compiledSolve)
 {

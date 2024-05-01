@@ -41,6 +41,8 @@ TEST(FourthOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+namespace {
+
 void fourthOrderRungeKuttaSolve(bool pCompiled)
 {
     static const auto STEP = 0.0123;
@@ -60,6 +62,8 @@ void fourthOrderRungeKuttaSolve(bool pCompiled)
 
     //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
+
+} // namespace
 
 TEST(FourthOrderRungeKuttaSolverTest, compiledSolve)
 {

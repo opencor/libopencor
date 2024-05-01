@@ -176,6 +176,8 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+namespace {
+
 void cvodeSolve(bool pCompiled)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
@@ -186,6 +188,8 @@ void cvodeSolve(bool pCompiled)
 
     //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
+
+} // namespace
 
 TEST(CvodeSolverTest, compiledSolve)
 {
