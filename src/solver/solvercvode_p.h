@@ -77,7 +77,9 @@ public:
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                     CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
+    /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     bool reinitialise(double pVoi) override;
+    */
 
     bool solve(double &pVoi, double pVoiEnd) override;
 };

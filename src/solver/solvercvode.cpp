@@ -317,6 +317,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     return true;
 }
 
+/*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
 bool SolverCvode::Impl::reinitialise(double pVoi)
 {
     // Reinitialise the ODE solver itself.
@@ -329,6 +330,7 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 
     return true;
 }
+*/
 
 bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 {

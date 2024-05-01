@@ -41,12 +41,14 @@ bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     return true;
 }
 
+/*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
 bool SolverOde::Impl::reinitialise(double pVoi)
 {
     (void)pVoi;
 
     return true;
 }
+*/
 
 void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pVariables) const
 {
