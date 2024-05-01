@@ -89,6 +89,8 @@ TEST(RunSedTest, unsuitablyConstrainedCellmlFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
+namespace {
+
 void runAlgebraicModel(bool pCompiled)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
@@ -100,6 +102,8 @@ void runAlgebraicModel(bool pCompiled)
     EXPECT_FALSE(instance->hasIssues());
 }
 
+} // namespace
+
 TEST(RunSedTest, compiledAlgebraicModel)
 {
     runAlgebraicModel(true);
@@ -109,6 +113,8 @@ TEST(RunSedTest, interpretedAlgebraicModel)
 {
     runAlgebraicModel(false);
 }
+
+namespace {
 
 void runOdeModel(bool pCompiled)
 {
@@ -144,6 +150,8 @@ void runOdeModel(bool pCompiled)
 
     EXPECT_FALSE(instance->hasIssues());
 }
+
+} // namespace
 
 TEST(RunSedTest, compiledOdeModel)
 {
