@@ -19,6 +19,7 @@ from libopencor import (
     SedDocument,
     SedModel,
     SedOneStep,
+    SedSteadyState,
     SedTask,
     SedUniformTimeCourse,
     SolverCvode,
@@ -70,15 +71,21 @@ def test_simulations():
     assert sed.has_simulations == False
     assert sed.add_simulation(None) == False
 
-    simulation = SedUniformTimeCourse(sed)
+    uniformTimeCourse = SedUniformTimeCourse(sed)
+    steadyState = SedSteadyState(sed)
 
-    assert sed.add_simulation(simulation) == True
+    assert sed.add_simulation(uniformTimeCourse) == True
+    assert sed.add_simulation(steadyState) == True
 
-    assert len(sed.simulations) == 1
-    assert sed.simulations[0] == simulation
+    assert len(sed.simulations) == 2
+    assert sed.simulations[0] == uniformTimeCourse
+    assert sed.simulations[1] == steadyState
 
-    assert sed.add_simulation(simulation) == False
-    assert sed.remove_simulation(simulation) == True
+    assert sed.add_simulation(uniformTimeCourse) == False
+    assert sed.remove_simulation(uniformTimeCourse) == True
+
+    assert sed.add_simulation(steadyState) == False
+    assert sed.remove_simulation(steadyState) == True
 
     assert sed.has_simulations == False
 

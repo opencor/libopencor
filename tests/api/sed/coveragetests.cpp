@@ -60,15 +60,21 @@ TEST(CoverageSedTest, sedDocumentSimulations)
     EXPECT_FALSE(sed->hasSimulations());
     EXPECT_FALSE(sed->addSimulation(nullptr));
 
-    auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
+    auto uniformTimeCourse = libOpenCOR::SedUniformTimeCourse::create(sed);
+    auto steadyState = libOpenCOR::SedSteadyState::create(sed);
 
-    EXPECT_TRUE(sed->addSimulation(simulation));
+    EXPECT_TRUE(sed->addSimulation(uniformTimeCourse));
+    EXPECT_TRUE(sed->addSimulation(steadyState));
 
-    EXPECT_EQ(sed->simulations().size(), 1);
-    EXPECT_EQ(sed->simulations()[0], simulation);
+    EXPECT_EQ(sed->simulations().size(), 2);
+    EXPECT_EQ(sed->simulations()[0], uniformTimeCourse);
+    EXPECT_EQ(sed->simulations()[1], steadyState);
 
-    EXPECT_FALSE(sed->addSimulation(simulation));
-    EXPECT_TRUE(sed->removeSimulation(simulation));
+    EXPECT_FALSE(sed->addSimulation(uniformTimeCourse));
+    EXPECT_TRUE(sed->removeSimulation(uniformTimeCourse));
+
+    EXPECT_FALSE(sed->addSimulation(steadyState));
+    EXPECT_TRUE(sed->removeSimulation(steadyState));
 
     EXPECT_FALSE(sed->hasSimulations());
 
