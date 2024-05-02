@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "logger_p.h"
+
 #include "utils.h"
 
 #include "libopencor/solver.h"
