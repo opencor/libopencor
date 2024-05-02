@@ -5,6 +5,6 @@ on:
 
 jobs:
   SUNDIALS:
-    uses: ./.github/workflows/res/buildThirdPartyLibrary.yml
+    uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: SUNDIALS
