@@ -1,3 +1,5 @@
+name: Build third-party library
+
 on:
   workflow_call:
     inputs:
