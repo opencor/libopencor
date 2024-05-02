@@ -51,6 +51,7 @@ export function resetFile() {
   updateFileUi(false, false, false, false);
 }
 
+let sed = null;
 const { lightningChart } = lcjs;
 const lc = lightningChart({
   license: "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
@@ -66,10 +67,27 @@ const lineSeries = chart.addLineSeries()
                         .setName("");
 
 export function run() {
+  const simulation = sed.simulations().get(0);
+
+  if (simulation.constructor.name === "SedUniformTimeCourse") {
+    // simulation.setOutputEndTime(50.0);
+    // simulation.setNumberOfSteps(50000);
+    simulation.setOutputEndTime(1.0);
+    simulation.setNumberOfSteps(1000);
+  }
+
+  const instance = sed.createInstance();
+
+  console.time("Elapsed time");
+  instance.run();
+  console.timeEnd("Elapsed time");
+
+  const voi = instance.voi();
+  const state = instance.state(0);
   let dataSet = [];
 
-  for (let i = 0.0; i < 12.6; i += 0.1) {
-      dataSet.push({ x: i, y: Math.sin(i)-1.0+0.2*Math.random(10.0) });
+  for (let i = 0; i < voi.size(); ++i) {
+    dataSet.push({ x: voi.get(i), y: state.get(i) });
   }
 
   lineSeries.clear();
@@ -162,21 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
               } else {
                 // Run the model.
 
-                const sed = new libopencor.SedDocument(file);
-                const simulation = sed.simulations().get(0);
-
-                if (simulation.constructor.name === "SedUniformTimeCourse") {
-                  simulation.setOutputEndTime(50.0);
-                  simulation.setNumberOfSteps(50000);
-                  // simulation.setOutputEndTime(1.0);
-                  // simulation.setNumberOfSteps(1000);
-                }
-
-                const instance = sed.createInstance();
-
-                console.time("Elapsed time");
-                instance.run();
-                console.timeEnd("Elapsed time");
+                sed = new libopencor.SedDocument(file);
 
                 run();
               }

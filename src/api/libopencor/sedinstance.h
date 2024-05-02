@@ -51,6 +51,21 @@ public:
 
     void run();
 
+    //---GRY--- THE BELOW METHODS ARE ONLY HERE SO THAT WE CAN QUICKLY DEMONSTRATE HOW THINGS CAN WORK FROM JavaScript.
+
+    Doubles voi() const; /**< Get the values of the variable of integration. */
+    Doubles state(size_t pIndex) const; /**< Get the values of the state. */
+    Doubles rate(size_t pIndex) const; /**< Get the values of the rate. */
+    Doubles variable(size_t pIndex) const; /**< Get the values of the variable. */
+
+    std::string voiName() const; /**< Get the name of the variable of integration. */
+    std::string stateName(size_t pIndex) const; /**< Get the name of the state. */
+    std::string rateName(size_t pIndex) const; /**< Get the name of the rate. */
+    std::string variableName(size_t pIndex) const; /**< Get the name of the variable. */
+
+    size_t stateCount() const; /**< Get the size of the state. */
+    size_t variableCount() const; /**< Get the size of the variable. */
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

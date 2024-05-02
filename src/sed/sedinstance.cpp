@@ -103,16 +103,86 @@ SedInstance::Impl *SedInstance::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const SedInstance::Impl *SedInstance::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
 void SedInstance::run()
 {
     pimpl()->run();
+}
+
+//---GRY--- THE BELOW METHODS ARE ONLY HERE SO THAT WE CAN QUICKLY DEMONSTRATE HOW THINGS CAN WORK FROM JavaScript.
+
+Doubles SedInstance::voi() const
+{
+    return dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mResults.voi;
+}
+
+Doubles SedInstance::state(size_t pIndex) const
+{
+    return dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mResults.states[pIndex];
+}
+
+Doubles SedInstance::rate(size_t pIndex) const
+{
+    return dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mResults.rates[pIndex];
+}
+
+Doubles SedInstance::variable(size_t pIndex) const
+{
+    return dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mResults.variables[pIndex];
+}
+
+std::string SedInstance::voiName() const
+{
+    auto analyserModel = dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mAnalyserModel;
+    auto variable = analyserModel->voi()->variable();
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(variable->parent());
+
+    return component->name() + "." + variable->name();
+}
+
+std::string SedInstance::stateName(size_t pIndex) const
+{
+    auto analyserModel = dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mAnalyserModel;
+    auto variable = analyserModel->states()[pIndex]->variable();
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(variable->parent());
+
+    return component->name() + "." + variable->name();
+}
+
+std::string SedInstance::rateName(size_t pIndex) const
+{
+    auto analyserModel = dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mAnalyserModel;
+    auto variable = analyserModel->states()[pIndex]->variable();
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(variable->parent());
+
+    return component->name() + "." + variable->name() + "'";
+}
+
+std::string SedInstance::variableName(size_t pIndex) const
+{
+    auto analyserModel = dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mAnalyserModel;
+    auto variable = analyserModel->variables()[pIndex]->variable();
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(variable->parent());
+
+    return component->name() + "." + variable->name();
+}
+
+size_t SedInstance::stateCount() const
+{
+    auto analyserModel = dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mAnalyserModel;
+
+    return analyserModel->stateCount();
+}
+
+size_t SedInstance::variableCount() const
+{
+    auto analyserModel = dynamic_pointer_cast<SedInstanceTask>(pimpl()->mTasks[0])->pimpl()->mAnalyserModel;
+
+    return analyserModel->variableCount();
 }
 
 } // namespace libOpenCOR

@@ -38,7 +38,6 @@ static const std::string LIBOPENCOR_NAMESPACE = "https://opencor.ws/libopencor";
 static const double NAN = std::numeric_limits<double>::quiet_NaN();
 
 using ConstCharPtrs = std::vector<const char *>;
-using Doubles = std::vector<double>;
 using Files = std::vector<File *>;
 
 using StringStringMap = std::map<std::string, std::string>;

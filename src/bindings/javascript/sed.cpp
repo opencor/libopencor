@@ -61,7 +61,21 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
-        .function("run", &libOpenCOR::SedInstance::run);
+        .function("run", &libOpenCOR::SedInstance::run)
+
+        //---GRY--- THE BELOW METHODS ARE ONLY HERE SO THAT WE CAN QUICKLY DEMONSTRATE HOW THINGS CAN WORK FROM
+        //          JavaScript.
+
+        .function("voi", &libOpenCOR::SedInstance::voi)
+        .function("state", &libOpenCOR::SedInstance::state)
+        .function("rate", &libOpenCOR::SedInstance::rate)
+        .function("variable", &libOpenCOR::SedInstance::variable)
+        .function("voiName", &libOpenCOR::SedInstance::voiName)
+        .function("stateName", &libOpenCOR::SedInstance::stateName)
+        .function("rateName", &libOpenCOR::SedInstance::rateName)
+        .function("variableName", &libOpenCOR::SedInstance::variableName)
+        .function("stateCount", &libOpenCOR::SedInstance::stateCount)
+        .function("variableCount", &libOpenCOR::SedInstance::variableCount);
 
     // SedInstanceTask API.
 
