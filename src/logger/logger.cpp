@@ -14,8 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "issue_p.h"
 #include "logger_p.h"
+
+#include "issue_p.h"
 
 namespace libOpenCOR {
 
@@ -82,7 +83,7 @@ void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription)
         mWarnings.push_back(issue);
 
         break;
-    case libOpenCOR::Issue::Type::MESSAGE:
+    default: // libOpenCOR::Issue::Type::MESSAGE:
         mMessages.push_back(issue);
 
         break;

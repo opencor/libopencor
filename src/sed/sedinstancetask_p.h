@@ -16,9 +16,8 @@ limitations under the License.
 
 #pragma once
 
-#include "logger_p.h"
-
 #include "cellmlfileruntime.h"
+#include "logger_p.h"
 
 #include "libopencor/sedinstancetask.h"
 
@@ -34,18 +33,17 @@ public:
     libcellml::AnalyserModelPtr mAnalyserModel;
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
+    bool mCompiled = true;
 
     double mVoi = 0.0;
     double *mStates = nullptr;
     double *mRates = nullptr;
     double *mVariables = nullptr;
 
-    static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask);
+    static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask, bool pCompiled);
 
-    explicit Impl(const SedAbstractTaskPtr &pTask);
+    explicit Impl(const SedAbstractTaskPtr &pTask, bool pCompiled);
     ~Impl();
-
-    void resetArrays();
 
     void run();
 };

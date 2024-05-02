@@ -32,7 +32,8 @@ struct SolverCvodeUserData
 {
     double *variables = nullptr;
 
-    SolverOde::ComputeRates computeRates = nullptr;
+    CellmlFileRuntime::ComputeCompiledRates computeCompiledRates = nullptr;
+    CellmlFileRuntime::ComputeInterpretedRates computeInterpretedRates = nullptr;
 };
 
 class SolverCvode::Impl: public SolverOde::Impl
@@ -74,8 +75,11 @@ public:
     StringStringMap properties() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates) override;
+                    CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                    CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
+    /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     bool reinitialise(double pVoi) override;
+    */
 
     bool solve(double &pVoi, double pVoiEnd) override;
 };

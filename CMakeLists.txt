@@ -515,7 +515,11 @@ else()
     # Build libOpenCOR.
 
     add_subdirectory(src)
+endif()
 
+# Carry on if we are not building our JavaScript bindings and we don't only want to build some third-party libraries.
+
+if(NOT EMSCRIPTEN AND NOT ONLY_BUILD_THIRD_PARTY_LIBRARIES)
     # Enable unit testing.
 
     if(LIBOPENCOR_UNIT_TESTING)

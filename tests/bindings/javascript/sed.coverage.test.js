@@ -87,15 +87,21 @@ describe("Sed coverage tests", () => {
     expect(sed.hasSimulations()).toBe(false);
     expect(sed.addSimulation(null)).toBe(false);
 
-    const simulation = new libopencor.SedUniformTimeCourse(sed);
+    const uniform_time_course = new libopencor.SedUniformTimeCourse(sed);
+    const steady_state = new libopencor.SedSteadyState(sed);
 
-    expect(sed.addSimulation(simulation)).toBe(true);
+    expect(sed.addSimulation(uniform_time_course)).toBe(true);
+    expect(sed.addSimulation(steady_state)).toBe(true);
 
-    expect(sed.simulations().size()).toBe(1);
-    expect(sed.simulations().get(0)).toStrictEqual(simulation);
+    expect(sed.simulations().size()).toBe(2);
+    expect(sed.simulations().get(0)).toStrictEqual(uniform_time_course);
+    expect(sed.simulations().get(1)).toStrictEqual(steady_state);
 
-    expect(sed.addSimulation(simulation)).toBe(false);
-    expect(sed.removeSimulation(simulation)).toBe(true);
+    expect(sed.addSimulation(uniform_time_course)).toBe(false);
+    expect(sed.removeSimulation(uniform_time_course)).toBe(true);
+
+    expect(sed.addSimulation(steady_state)).toBe(false);
+    expect(sed.removeSimulation(steady_state)).toBe(true);
 
     expect(sed.hasSimulations()).toBe(false);
 
@@ -133,7 +139,7 @@ describe("Sed coverage tests", () => {
 
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a model."],
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
     ]);
@@ -276,13 +282,11 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
       ],
     ]);
-    */
   });
 });

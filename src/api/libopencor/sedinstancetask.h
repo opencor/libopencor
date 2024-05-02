@@ -47,7 +47,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedInstanceTask(const SedAbstractTaskPtr &pTask); /**< Constructor @private. */
+    explicit SedInstanceTask(const SedAbstractTaskPtr &pTask, bool pCompiled); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

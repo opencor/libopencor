@@ -1,0 +1,10 @@
+name: libSBML
+
+on:
+  workflow_dispatch:
+
+jobs:
+  libSBML:
+    uses: ./.github/workflows/build-third-party-library.yml
+    with:
+      third_party_library_name: LIBSBML

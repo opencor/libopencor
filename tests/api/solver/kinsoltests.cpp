@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "nlamodel.h"
+#include "gtest/gtest.h"
 
 #include "tests/utils.h"
 
@@ -26,15 +26,16 @@ TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The maximum number of iterations cannot be equal to 0. It must be greater than 0."},
     };
 
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setMaximumNumberOfIterations(0);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model1::VARIABLE_COUNT_1, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model1::finalise(variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooSmall)
@@ -43,34 +44,36 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
     };
 
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(-1);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model2::VARIABLE_COUNT_2, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model2::finalise(variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooBig)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 3. It must be between 0 and 1."},
+        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0."},
     };
 
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
-    solver->setUpperHalfBandwidth(3);
+    solver->setUpperHalfBandwidth(1);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model1::VARIABLE_COUNT_1, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model1::finalise(variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooSmall)
@@ -79,92 +82,114 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
         {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
     };
 
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(-1);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model2::VARIABLE_COUNT_2, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model2::finalise(variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooBig)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to 2. It must be between 0 and 1."},
+        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0."},
     };
 
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
-    solver->setLowerHalfBandwidth(2);
+    solver->setLowerHalfBandwidth(1);
 
-    EXPECT_FALSE(solver->solve(nullptr, variables, NlaModel::Model1::VARIABLE_COUNT_1, nullptr));
-    EXPECT_EQ_ISSUES(solver, EXPECTED_ISSUES);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model1::finalise(variables);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
+
+//---GRY--- RENAME THIS TEST compiledSolve AND CREATE ONE CALLED interpretedSolve ONCE WE CAN INTERPRET NLA-BASED
+//          MODELS.
 
 TEST(KinsolSolverTest, solve)
 {
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model1::compute(variables);
+    instance->run();
 
-    NlaModel::Model1::finalise(variables);
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 {
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(2);
     solver->setLowerHalfBandwidth(2);
 
-    NlaModel::Model2::compute(variables);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model2::finalise(variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 {
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::GMRES);
 
-    NlaModel::Model1::compute(variables);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model1::finalise(variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 {
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model2::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB);
 
-    NlaModel::Model2::compute(variables);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model2::finalise(variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }
 
 TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
 {
-    auto solver = libOpenCOR::SolverKinsol::create();
-    auto *variables = NlaModel::Model1::initialise(static_pointer_cast<libOpenCOR::SolverNla>(solver).get());
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
 
-    NlaModel::Model1::compute(variables);
+    auto instance = sed->createInstance();
 
-    NlaModel::Model1::finalise(variables);
+    instance->run();
+
+    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
 }

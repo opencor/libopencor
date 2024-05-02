@@ -30,6 +30,7 @@ class LIBOPENCOR_EXPORT SedDocument: public Logger
     , public std::enable_shared_from_this<SedDocument>
 {
     friend class SedAbstractTask;
+    friend class SedInstanceTask;
     friend class SedModel;
     friend class SedSimulation;
 
@@ -226,10 +227,17 @@ public:
      *
      * Create an instance of this simulation experiment description.
      *
+     * @param pCompiled Whether the instance of this simulation experiment description is to be compiled (as opposed to
+     * being interpreted).
+     *
      * @return A smart pointer to a @ref SedInstance object.
      */
 
+#ifdef __EMSCRIPTEN__
     SedInstancePtr createInstance();
+#else
+    SedInstancePtr createInstance(bool pCompiled = true);
+#endif
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

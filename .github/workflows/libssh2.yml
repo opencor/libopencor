@@ -1,0 +1,10 @@
+name: libssh2
+
+on:
+  workflow_dispatch:
+
+jobs:
+  libssh2:
+    uses: ./.github/workflows/build-third-party-library.yml
+    with:
+      third_party_library_name: LIBSSH2

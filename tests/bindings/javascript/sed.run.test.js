@@ -80,7 +80,7 @@ describe("Sed run tests", () => {
     const sed = new libopencor.SedDocument();
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The simulation experiment description does not contain any tasks to run.",
@@ -99,7 +99,7 @@ describe("Sed run tests", () => {
     const sed = new libopencor.SedDocument(file);
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
       [
         libopencor.Issue.Type.ERROR,
@@ -119,7 +119,7 @@ describe("Sed run tests", () => {
     const sed = new libopencor.SedDocument(file);
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
       [
         libopencor.Issue.Type.ERROR,
@@ -139,7 +139,7 @@ describe("Sed run tests", () => {
     const sed = new libopencor.SedDocument(file);
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
       [
         libopencor.Issue.Type.ERROR,
@@ -159,7 +159,7 @@ describe("Sed run tests", () => {
     const sed = new libopencor.SedDocument(file);
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The CellML file is unsuitably constrained.",
@@ -200,26 +200,24 @@ describe("Sed run tests", () => {
     const simulation = sed.simulations().get(0);
     const cvode = simulation.odeSolver();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
     cvode.setMaximumNumberOfSteps(10);
 
-    const instance = sed.createInstance();
+    let instance = sed.createInstance();
 
     expect(instance.hasIssues()).toBe(false);
 
     instance.run();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "At t = 0.00140014, mxstep steps taken before reaching tout.",
       ],
     ]);
-    */
 
     cvode.setMaximumNumberOfSteps(500);
 
-    const instance = sed.createInstance();
+    instance = sed.createInstance();
 
     instance.run();
 
@@ -237,7 +235,7 @@ describe("Sed run tests", () => {
 
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
@@ -245,6 +243,7 @@ describe("Sed run tests", () => {
     ]);
   });
 
+  /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("NLA model", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
@@ -259,14 +258,12 @@ describe("Sed run tests", () => {
 
     let instance = sed.createInstance();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
-    */
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
@@ -286,14 +283,16 @@ describe("Sed run tests", () => {
 
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
   });
+  */
 
+  /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("DAE model", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
@@ -308,25 +307,21 @@ describe("Sed run tests", () => {
 
     let instance = sed.createInstance();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
-    */
 
     instance.run();
 
-    /*---GRY--- TO BE RE-ENABLED ONCE WE CAN RUN A SIMULATION FROM JavaScript.
-    expectIssues(instance, [
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
-    */
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
@@ -336,6 +331,7 @@ describe("Sed run tests", () => {
 
     expect(instance.hasIssues()).toBe(false);
   });
+  */
 
   test("DAE model with no ODE or NLA solver", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
@@ -350,7 +346,8 @@ describe("Sed run tests", () => {
 
     const instance = sed.createInstance();
 
-    expectIssues(instance, [
+    /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
+    expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
@@ -360,5 +357,6 @@ describe("Sed run tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
+    */
   });
 });

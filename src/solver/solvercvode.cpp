@@ -57,7 +57,11 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
 
-    userData->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
+    if (userData->computeCompiledRates != nullptr) {
+        userData->computeCompiledRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
+    } else {
+        userData->computeInterpretedRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
+    }
 
     return 0;
 }
@@ -135,14 +139,15 @@ StringStringMap SolverCvode::Impl::properties() const
 }
 
 bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                   ComputeRates pComputeRates)
+                                   CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                                   CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
     resetInternals();
     removeAllIssues();
 
     // Initialise the ODE solver itself.
 
-    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
+    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates, pComputeInterpretedRates);
 
     // Check the solver's properties.
 
@@ -224,7 +229,8 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     // Set our user data.
 
     mUserData.variables = pVariables;
-    mUserData.computeRates = pComputeRates;
+    mUserData.computeCompiledRates = pComputeCompiledRates;
+    mUserData.computeInterpretedRates = pComputeInterpretedRates;
 
     ASSERT_EQ(CVodeSetUserData(mSolver, &mUserData), CV_SUCCESS);
 
@@ -311,6 +317,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     return true;
 }
 
+/*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
 bool SolverCvode::Impl::reinitialise(double pVoi)
 {
     // Reinitialise the ODE solver itself.
@@ -323,6 +330,7 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 
     return true;
 }
+*/
 
 bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 {

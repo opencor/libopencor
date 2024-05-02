@@ -62,7 +62,7 @@ describe("Sed basic tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expectIssues(sed, [
+    expectIssues(libopencor, sed, [
       [
         libopencor.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using an unknown file.",
@@ -87,7 +87,7 @@ describe("Sed basic tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expectIssues(sed, [
+    expectIssues(libopencor, sed, [
       [
         libopencor.Issue.Type.MESSAGE,
         "A simulation experiment description cannot (currently) be created using a SED-ML file.",
@@ -95,7 +95,7 @@ describe("Sed basic tests", () => {
     ]);
   });
 
-  /*---GRY---
+  /*---GRY--- TO BE UNCOMMENTED ONCE WE HAVE SUPPORT FOR COMBINE ARCHIVES (see https://github.com/opencor/libopencor/issues/214).
   test("COMBINE archive", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
@@ -103,7 +103,7 @@ describe("Sed basic tests", () => {
 
     const sed = new libopencor.SedDocument(file);
 
-    expectIssues(sed, [
+    expectIssues(libopencor, sed, [
       [
         libopencor.Issue.Type.MESSAGE,
         "A simulation experiment description cannot (currently) be created using a COMBINE archive.",

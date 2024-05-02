@@ -50,6 +50,16 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
     if (mAnalyser->errorCount() != 0) {
         addIssues(mAnalyser);
     }
+
+    //---GRY--- WHEN USING OUR JavaScript BINDINGS, TEMPORARILY MAKE SURE THAT THE MODEL IS EITHER AN ALGEBRAIC MODEL OR AN ODE MODEL.
+
+#ifdef __EMSCRIPTEN__
+    if (!hasIssues()
+        && (mAnalyserModel->type() != libcellml::AnalyserModel::Type::ALGEBRAIC)
+        && (mAnalyserModel->type() != libcellml::AnalyserModel::Type::ODE)) {
+        addError("Only CellML files describing either an algebraic model or an ODE model are currently supported.");
+    }
+#endif
 }
 
 CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
@@ -119,9 +129,9 @@ libcellml::AnalyserModelPtr CellmlFile::analyserModel() const
     return pimpl()->mAnalyserModel;
 }
 
-CellmlFileRuntimePtr CellmlFile::runtime(const SolverNlaPtr &pNlaSolver)
+CellmlFileRuntimePtr CellmlFile::runtime(const SolverNlaPtr &pNlaSolver, bool pCompiled)
 {
-    return CellmlFileRuntime::create(shared_from_this(), pNlaSolver);
+    return CellmlFileRuntime::create(shared_from_this(), pNlaSolver, pCompiled);
 }
 
 } // namespace libOpenCOR

@@ -1,0 +1,10 @@
+name: libNuML
+
+on:
+  workflow_dispatch:
+
+jobs:
+  libNuML:
+    uses: ./.github/workflows/build-third-party-library.yml
+    with:
+      third_party_library_name: LIBNUML

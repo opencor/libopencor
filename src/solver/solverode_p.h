@@ -31,15 +31,21 @@ public:
     double *mRates = nullptr;
     double *mVariables = nullptr;
 
-    ComputeRates mComputeRates = nullptr;
+    CellmlFileRuntime::ComputeCompiledRates mComputeCompiledRates = nullptr;
+    CellmlFileRuntime::ComputeInterpretedRates mComputeInterpretedRates = nullptr;
 
     explicit Impl(const std::string &pId, const std::string &pName);
 
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                            ComputeRates pComputeRates) = 0;
+                            CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                            CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) = 0;
+    /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     virtual bool reinitialise(double pVoi);
+    */
 
     virtual bool solve(double &pVoi, double pVoiEnd) = 0;
+
+    void computeRates(double pVoi, double *pStates, double *pRates, double *pVariables) const;
 };
 
 } // namespace libOpenCOR

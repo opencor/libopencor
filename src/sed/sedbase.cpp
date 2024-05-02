@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "sedbase_p.h"
+
 #include "utils.h"
 
 namespace libOpenCOR {

@@ -14,8 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "file_p.h"
 #include "seddocument_p.h"
+
+#include "file_p.h"
 #include "sedinstance_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
@@ -42,7 +43,6 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 
     auto res = stream.str();
 
-#ifndef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
     while (mIds.contains(res)) {
         stream.str({});
 
@@ -50,7 +50,6 @@ std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 
         res = stream.str();
     }
-#endif
 
     mIds.insert(res);
 
@@ -66,35 +65,24 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
     }
 
     // Make sure that the given file is supported.
+    // Note: we would normally have a switch statement, but then code covereage doesn't cover the lines where we check
+    //       for __EMSCRIPTEN__. Could it be an issue with llvm-cov not properly handling C++ directives within a switch
+    //       statement?
 
-    switch (pFile->type()) {
-    case File::Type::UNKNOWN_FILE:
-        addError("A simulation experiment description cannot be created using an unknown file.");
+    auto fileType = pFile->type();
 
-        break;
-    case File::Type::CELLML_FILE:
+    if (fileType == File::Type::CELLML_FILE) {
         initialiseFromCellmlFile(pOwner, pFile);
-
-        break;
-    case File::Type::SEDML_FILE:
+    } else if (fileType == File::Type::SEDML_FILE) {
         addMessage("A simulation experiment description cannot (currently) be created using a SED-ML file.");
-
-        break;
-#ifdef __EMSCRIPTEN__
-    default: // File::Type::COMBINE_ARCHIVE.
+    } else if (fileType == File::Type::COMBINE_ARCHIVE) {
         addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
-
-        break;
-#else
-    case File::Type::COMBINE_ARCHIVE:
-        addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
-
-        break;
-    default: // File::Type::IRRETRIEVABLE_FILE.
+#ifndef __EMSCRIPTEN__
+    } else if (fileType == File::Type::IRRETRIEVABLE_FILE) {
         addError("A simulation experiment description cannot be created using an irretrievable file.");
-
-        break;
 #endif
+    } else { // File::Type::UNKNOWN_FILE.
+        addError("A simulation experiment description cannot be created using an unknown file.");
     }
 }
 
@@ -113,7 +101,7 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
     auto cellmlFileType = pFile->pimpl()->mCellmlFile->type();
 
     if ((cellmlFileType == libcellml::AnalyserModel::Type::ODE)
-        || cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
+        || (cellmlFileType == libcellml::AnalyserModel::Type::DAE)) {
         simulation = SedUniformTimeCourse::create(pOwner);
     } else {
         simulation = SedSteadyState::create(pOwner);
@@ -490,9 +478,16 @@ bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
     return pimpl()->removeTask(pTask);
 }
 
+#ifdef __EMSCRIPTEN__
 SedInstancePtr SedDocument::createInstance()
 {
-    return SedInstance::Impl::create(shared_from_this());
+    return SedInstance::Impl::create(shared_from_this(), false);
 }
+#else
+SedInstancePtr SedDocument::createInstance(bool pCompiled)
+{
+    return SedInstance::Impl::create(shared_from_this(), pCompiled);
+}
+#endif
 
 } // namespace libOpenCOR

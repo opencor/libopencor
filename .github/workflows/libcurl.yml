@@ -1,0 +1,10 @@
+name: libcurl
+
+on:
+  workflow_dispatch:
+
+jobs:
+  libcurl:
+    uses: ./.github/workflows/build-third-party-library.yml
+    with:
+      third_party_library_name: LIBCURL

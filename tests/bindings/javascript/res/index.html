@@ -8,8 +8,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link href="res/libopencor.css" rel="stylesheet">
 </head>
 
@@ -40,15 +40,12 @@
     <div class="p-2">
         <div class="page" id="pageHome">
             <p>
-                Welcome to this very simple JavaScript bindings test page for libOpenCOR.
-            </p>
-            <p>
-                Just click on the links above to navigate through the different pages.
+                Welcome to this test page for <a href="https://opencor.ws/libopencor">libOpenCOR</a>!
             </p>
         </div>
 
         <div class="page" id="pageSimulation">
-            <div class="drop-area">
+            <div class="drop-area" id="dropArea">
                 <input class="drop-area-input" id="dropAreaInput" type="file">
 
                 <div class="drop-area-div"">
@@ -63,29 +60,29 @@
                     </span>
 
                     <p class="note"><small>
-                        <span class="note">Note:</span> only CellML files with no imports can (currently) be processed.
+                        <span class="bold">Note:</span> only CellML files with no imports can (currently) be processed.
                     </small></p>
                 </div>
             </div>
 
-            <button type="button" class="btn btn-secondary reset-button" id="resetFile"><i class="fa fa-refresh"></i></button>
+            <button type="button" class="btn btn-secondary reset-button" id="resetFile"><i class="fa fa-recycle"></i></button>
 
-            <div class="file-info">
-                <table class="file-info-table">
-                    <tr>
-                        <td><span class="property">File name:</span></td>
-                        <td><span id="fileName"></span></td>
-                    </tr>
-                    <tr>
-                        <td><span class="property">File type:</span></td>
-                        <td><span id="fileType"></span></td>
-                    </tr>
-                </table>
+            <div class="file info" id="fileInfo">
+                <p class="info">
+                    <span class="bold" id="fileName"></span> is of <span class="bold" id="fileType"></span> type.
+                </p>
             </div>
 
-            <div class="file-error">
+            <div class="file info" id="fileIssues">
+                <p class="info issues">
+                    <span class="bold">Issues:</span>
+                </p>
+                <ul id="issues"/>
+            </div>
+
+            <div class="file error" id="fileError">
                 <p class="error">
-                    <span class="property">Error:</span> <span id="fileError"></span>
+                    <span class="bold">Error:</span> <span id="errorMessage"></span>
                 </p>
             </div>
         </div>
@@ -158,7 +155,7 @@
         document.querySelector("#resetFile").addEventListener("click", resetFile.bind(null));
     </script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

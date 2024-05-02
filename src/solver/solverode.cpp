@@ -24,7 +24,8 @@ SolverOde::Impl::Impl(const std::string &pId, const std::string &pName)
 }
 
 bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                                 ComputeRates pComputeRates)
+                                 CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
+                                 CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
     (void)pVoi;
 
@@ -34,16 +35,28 @@ bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     mRates = pRates;
     mVariables = pVariables;
 
-    mComputeRates = pComputeRates;
+    mComputeCompiledRates = pComputeCompiledRates;
+    mComputeInterpretedRates = std::move(pComputeInterpretedRates);
 
     return true;
 }
 
+/*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
 bool SolverOde::Impl::reinitialise(double pVoi)
 {
     (void)pVoi;
 
     return true;
+}
+*/
+
+void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pVariables) const
+{
+    if (mComputeCompiledRates != nullptr) {
+        mComputeCompiledRates(pVoi, pStates, pRates, pVariables);
+    } else {
+        mComputeInterpretedRates(pVoi, pStates, pRates, pVariables);
+    }
 }
 
 SolverOde::SolverOde(Impl *pPimpl)
@@ -64,22 +77,6 @@ const SolverOde::Impl *SolverOde::pimpl() const
 Solver::Type SolverOde::type() const
 {
     return Type::ODE;
-}
-
-bool SolverOde::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                           ComputeRates pComputeRates)
-{
-    return pimpl()->initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeRates);
-}
-
-bool SolverOde::reinitialise(double pVoi)
-{
-    return pimpl()->reinitialise(pVoi);
-}
-
-bool SolverOde::solve(double &pVoi, double pVoiEnd)
-{
-    return pimpl()->solve(pVoi, pVoiEnd);
 }
 
 } // namespace libOpenCOR

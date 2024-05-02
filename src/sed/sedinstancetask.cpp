@@ -13,10 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-#include "libopencor/solvercvode.h"
+
+#include "sedinstancetask_p.h"
 
 #include "file_p.h"
-#include "sedinstancetask_p.h"
 #include "sedmodel_p.h"
 #include "sedtask_p.h"
 #include "seduniformtimecourse_p.h"
@@ -69,12 +69,13 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
 } // namespace
 #endif
 
-SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask)
+SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask, bool pCompiled)
 {
-    return SedInstanceTaskPtr {new SedInstanceTask(pTask)};
+    return SedInstanceTaskPtr {new SedInstanceTask(pTask, pCompiled)};
 }
 
-SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
+SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
+    : mCompiled(pCompiled)
 {
     //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT (FOR NOW) THAT pTask IS INDEED A SedTask
     //          OBJECT.
@@ -83,12 +84,13 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     ASSERT_NE(task, nullptr);
 
-#ifndef __EMSCRIPTEN__
     // Get a runtime for the model.
 
     auto cellmlFile = task->pimpl()->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
+    auto cellmlFileType = cellmlFile->type();
 
-    mDifferentialModel = differentialModel(cellmlFile);
+    mDifferentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
+                         || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
     mSimulation = task->pimpl()->mSimulation;
 
     auto odeSolver = mSimulation->odeSolver();
@@ -96,15 +98,15 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     mOdeSolver = (odeSolver != nullptr) ? dynamic_pointer_cast<SolverOde>(odeSolver->pimpl()->duplicate()) : nullptr;
     mNlaSolver = (nlaSolver != nullptr) ? dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
-    mRuntime = cellmlFile->runtime(mNlaSolver);
+    mRuntime = cellmlFile->runtime(mNlaSolver, mCompiled);
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (mRuntime->hasErrors()) {
         addIssues(mRuntime);
 
         return;
     }
-#    endif
+#endif
 
     // Create our various arrays.
 
@@ -121,23 +123,39 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
-#    ifdef PRINT_VALUES
+
+#ifdef PRINT_VALUES
     printHeader(mAnalyserModel);
-#    endif
+#endif
 
     mSedUniformTimeCourse = mDifferentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
-    if (mDifferentialModel) {
+    if (mSedUniformTimeCourse != nullptr) {
         mVoi = mSedUniformTimeCourse->pimpl()->mOutputStartTime;
 
-        mRuntime->initialiseVariablesForDifferentialModel()(mStates, mRates, mVariables); // NOLINT
-        mRuntime->computeComputedConstants()(mVariables); // NOLINT
-        mRuntime->computeRates()(mVoi, mStates, mRates, mVariables); // NOLINT
-        mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+#ifndef __EMSCRIPTEN__
+        if (mCompiled) {
+            mRuntime->initialiseCompiledVariablesForDifferentialModel()(mStates, mRates, mVariables);
+            mRuntime->computeCompiledComputedConstants()(mVariables);
+            mRuntime->computeCompiledRates()(mVoi, mStates, mRates, mVariables);
+            mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+        } else {
+#endif
+            mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mVariables);
+            mRuntime->computeInterpretedComputedConstants()(mVariables);
+            mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mVariables);
+            mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+#ifndef __EMSCRIPTEN__
+        }
+    } else if (mCompiled) {
+        mRuntime->initialiseCompiledVariablesForAlgebraicModel()(mVariables);
+        mRuntime->computeCompiledComputedConstants()(mVariables);
+        mRuntime->computeCompiledVariablesForAlgebraicModel()(mVariables);
+#endif
     } else {
-        mRuntime->initialiseVariablesForAlgebraicModel()(mVariables); // NOLINT
-        mRuntime->computeComputedConstants()(mVariables); // NOLINT
-        mRuntime->computeVariablesForAlgebraicModel()(mVariables); // NOLINT
+        mRuntime->initialiseInterpretedVariablesForAlgebraicModel()(mVariables);
+        mRuntime->computeInterpretedComputedConstants()(mVariables);
+        mRuntime->computeInterpretedVariablesForAlgebraicModel()(mVariables);
     }
 
     // Make sure that the NLA solver, should it have been used, didn't report any issues.
@@ -151,37 +169,27 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     // Initialise the ODE solver, if needed.
 
     if (mDifferentialModel) {
-        if (!mOdeSolver->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeRates())) {
+        if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeCompiledRates(), mRuntime->computeInterpretedRates())) {
             addIssues(mOdeSolver);
 
             return;
         }
     }
-#    ifdef PRINT_VALUES
+
+#ifdef PRINT_VALUES
     printValues(mAnalyserModel, mVoi, mStates, mVariables);
-#    endif
 #endif
 }
 
 SedInstanceTask::Impl::~Impl()
 {
-    resetArrays();
-}
-
-void SedInstanceTask::Impl::resetArrays()
-{
     delete[] mStates;
     delete[] mRates;
     delete[] mVariables;
-
-    mStates = nullptr;
-    mRates = nullptr;
-    mVariables = nullptr;
 }
 
 void SedInstanceTask::Impl::run()
 {
-#ifndef __EMSCRIPTEN__
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {
@@ -193,35 +201,43 @@ void SedInstanceTask::Impl::run()
         size_t voiCounter = 0;
 
         while (!fuzzyCompare(mVoi, voiEnd)) {
-            if (!mOdeSolver->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
+            if (!mOdeSolver->pimpl()->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
                 addIssues(mOdeSolver);
 
                 return;
             }
 
-            mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables); // NOLINT
+#ifndef __EMSCRIPTEN__
+            if (mCompiled) {
+                mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+            } else {
+#endif
+                mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+#ifndef __EMSCRIPTEN__
+            }
+#endif
 
             //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD ALLOW
             //          TRIGGER NLA ISSUES HERE, WHICH WE DON'T HAVE YET HENCE WE DISABLE THE FOLLOWING CODE WHEN DOING
             //          CODE COVERAGE.
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
             if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
                 addIssues(mNlaSolver);
 
                 return;
             }
-#    endif
-#    ifdef PRINT_VALUES
+#endif
+
+#ifdef PRINT_VALUES
             printValues(mAnalyserModel, mVoi, mStates, mVariables);
-#    endif
+#endif
         }
     }
-#endif
 }
 
-SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask)
-    : Logger(new Impl(pTask))
+SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask, bool pCompiled)
+    : Logger(new Impl(pTask, pCompiled))
 {
 }
 

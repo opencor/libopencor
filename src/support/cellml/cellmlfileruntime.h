@@ -16,9 +16,10 @@ limitations under the License.
 
 #pragma once
 
-#include "cellmlfile.h"
-
 #include "libopencor/logger.h"
+
+#include <functional>
+#include <libcellml>
 
 namespace libOpenCOR {
 
@@ -31,12 +32,19 @@ using CellmlFileRuntimePtr = std::shared_ptr<CellmlFileRuntime>;
 class CellmlFileRuntime: public Logger
 {
 public:
-    using InitialiseVariablesForAlgebraicModelFunction = void (*)(double *pVariables);
-    using InitialiseVariablesForDifferentialModelFunction = void (*)(double *pStates, double *pRates, double *pVariables);
-    using ComputeComputedConstantsFunction = void (*)(double *pVariables);
-    using ComputeRatesFunction = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
-    using ComputeVariablesForAlgebraicModelFunction = void (*)(double *pVariables);
-    using ComputeVariablesForDifferentialModelFunction = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
+    using InitialiseCompiledVariablesForAlgebraicModel = void (*)(double *pVariables);
+    using InitialiseCompiledVariablesForDifferentialModel = void (*)(double *pStates, double *pRates, double *pVariables);
+    using ComputeCompiledComputedConstants = void (*)(double *pVariables);
+    using ComputeCompiledRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
+    using ComputeCompiledVariablesForAlgebraicModel = void (*)(double *pVariables);
+    using ComputeCompiledVariablesForDifferentialModel = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
+
+    using InitialiseInterpretedVariablesForAlgebraicModel = std::function<void(double *pVariables)>;
+    using InitialiseInterpretedVariablesForDifferentialModel = std::function<void(double *pStates, double *pRates, double *pVariables)>;
+    using ComputeInterpretedComputedConstants = std::function<void(double *pVariables)>;
+    using ComputeInterpretedRates = std::function<void(double pVoi, double *pStates, double *pRates, double *pVariables)>;
+    using ComputeInterpretedVariablesForAlgebraicModel = std::function<void(double *pVariables)>;
+    using ComputeInterpretedVariablesForDifferentialModel = std::function<void(double pVoi, double *pStates, double *pRates, double *pVariables)>;
 
     CellmlFileRuntime() = delete;
     ~CellmlFileRuntime() override;
@@ -47,19 +55,27 @@ public:
     CellmlFileRuntime &operator=(const CellmlFileRuntime &pRhs) = delete;
     CellmlFileRuntime &operator=(CellmlFileRuntime &&pRhs) noexcept = delete;
 
-    static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
+    static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
+                                       bool pCompiled);
 
-    InitialiseVariablesForAlgebraicModelFunction initialiseVariablesForAlgebraicModel() const;
-    InitialiseVariablesForDifferentialModelFunction initialiseVariablesForDifferentialModel() const;
-    ComputeComputedConstantsFunction computeComputedConstants() const;
-    ComputeRatesFunction computeRates() const;
-    ComputeVariablesForAlgebraicModelFunction computeVariablesForAlgebraicModel() const;
-    ComputeVariablesForDifferentialModelFunction computeVariablesForDifferentialModel() const;
+    InitialiseCompiledVariablesForAlgebraicModel initialiseCompiledVariablesForAlgebraicModel() const;
+    InitialiseCompiledVariablesForDifferentialModel initialiseCompiledVariablesForDifferentialModel() const;
+    ComputeCompiledComputedConstants computeCompiledComputedConstants() const;
+    ComputeCompiledRates computeCompiledRates() const;
+    ComputeCompiledVariablesForAlgebraicModel computeCompiledVariablesForAlgebraicModel() const;
+    ComputeCompiledVariablesForDifferentialModel computeCompiledVariablesForDifferentialModel() const;
+
+    InitialiseInterpretedVariablesForAlgebraicModel initialiseInterpretedVariablesForAlgebraicModel() const;
+    InitialiseInterpretedVariablesForDifferentialModel initialiseInterpretedVariablesForDifferentialModel() const;
+    ComputeInterpretedComputedConstants computeInterpretedComputedConstants() const;
+    ComputeInterpretedRates computeInterpretedRates() const;
+    ComputeInterpretedVariablesForAlgebraicModel computeInterpretedVariablesForAlgebraicModel() const;
+    ComputeInterpretedVariablesForDifferentialModel computeInterpretedVariablesForDifferentialModel() const;
 
 private:
     class Impl;
 
-    explicit CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
+    explicit CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled);
 
     Impl *pimpl();
     const Impl *pimpl() const;

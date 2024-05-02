@@ -32,8 +32,6 @@ class LIBOPENCOR_EXPORT SolverOde: public Solver
     friend class SedSimulation;
 
 public:
-    using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables); /**< Signature of the method that computes the rates of the ODE system. */
-
     /**
      * Constructors, destructor, and assignment operators.
      */
@@ -48,49 +46,6 @@ public:
     SolverOde &operator=(SolverOde &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     Solver::Type type() const override;
-
-    /**
-     * @brief Initialise the solver.
-     *
-     * Initialise the solver.
-     *
-     * @param pVoi the value of the variable of integration.
-     * @param pSize the size of the ODE system.
-     * @param pStates the array of state values.
-     * @param pRates the array of rate values.
-     * @param pVariables the array of variable values.
-     * @param pComputeRates the method that computes the rates of the ODE system.
-     *
-     * @return @c true if the solver could be initialised, @c false otherwise.
-     */
-
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
-                    ComputeRates pComputeRates);
-
-    /**
-     * @brief Reinitialise the solver.
-     *
-     * Reinitialise the solver.
-     *
-     * @param pVoi the value of the variable of integration.
-     *
-     * @return @c true if the solver could be reinitialised, @c false otherwise.
-     */
-
-    bool reinitialise(double pVoi);
-
-    /**
-     * @brief Solve the ODE system.
-     *
-     * Solve the ODE system.
-     *
-     * @param pVoi the value of the variable of integration.
-     * @param pVoiEnd the end value of the variable of integration.
-     *
-     * @return @c true if the ODE system could be solved, @c false otherwise.
-     */
-
-    bool solve(double &pVoi, double pVoiEnd);
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

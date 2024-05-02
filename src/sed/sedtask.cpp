@@ -14,10 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "sedtask_p.h"
+
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
-#include "sedtask_p.h"
 
 #include "utils.h"
 

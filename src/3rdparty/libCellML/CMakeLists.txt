@@ -30,53 +30,53 @@ else()
     set(CMAKE_DIR lib/cmake)
 endif()
 
-if(LIBOPENCOR_PREBUILT_LIBCELLML OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
+if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         67b8aeda04b896c59a2144e9922fd8bda6e52452)
+                         9fc6254c9eb9a574c5f0736937e90382c87da533)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     a2d2555c60de750dfcf42bf3040ffa903919b5e4)
+                                     5b0aa69fc09659705851bad924ad9bcc1e3ac2b9)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     f00d15f699dcf253e8d85e91d0965d6ae248323c)
+                                     926f60f6861a3a29fb69e91ed830e7aa79125346)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     883cafe9b6e993db2f7ebce5d04a02566e77d0b6)
+                                     a08555bab6dc8de348baded059bb1ad6827923af)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     32b0f6ed51eb5863fb1f409a1f045ced4fb36f07)
+                                     cddaf4c78f18d9e8a47c794a2f0fa13cddc9f222)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 eb486f76b6d274b0695c2ac7a817754f01560a48)
+                                 70d39e1ad85ea060693f328dfd65d295e424eb41)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 cc33300cb65f19d20a05772f625cf7377ad67e14)
+                                 c5025de0a25e21857a688bbd51779e5bf17070d6)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1845bdb763b9d1e8b7acbebdc4495be2e5393262)
+                                 1abf3d2fd78b0692d9e18f8aa51ade8231cfabc0)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 97aa4c2b0b046f67a08fab1106fbe698c7b927d5)
+                                 ffe67306d9096f232e5cb6c83243c57f53915b61)
             endif()
         endif()
     endif()
@@ -85,7 +85,8 @@ else()
 
     build_package(${PACKAGE_NAME}
         URL
-            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+            # https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/987b3db.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF

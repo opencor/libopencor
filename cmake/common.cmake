@@ -146,6 +146,7 @@ function(configure_target TARGET)
                 -modernize-use-trailing-return-type
                 performance-*
                 readability-*
+                -readability-avoid-nested-conditional-operator
                 -readability-function-cognitive-complexity
                 -readability-identifier-length
                 ${READABILITY_CHECKS}

@@ -55,7 +55,7 @@ describe("File type tests", () => {
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
-    expectIssues(file, [
+    expectIssues(libopencor, file, [
       [
         libopencor.Issue.Type.ERROR,
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",

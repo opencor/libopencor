@@ -49,13 +49,14 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
     for (size_t i = 0; i < issues.size(); ++i) {
         EXPECT_EQ(issues[i]->type(), pExpectedIssues[i].type);
         EXPECT_EQ(issues[i]->description(), pExpectedIssues[i].description);
-    }
-}
 
-void expectEqualDoubles(double *pDoubles, const Doubles &pExpectedDoubles, const Doubles &pAbsoluteErrors)
-{
-    for (size_t i = 0; i < pExpectedDoubles.size(); ++i) {
-        EXPECT_NEAR(pDoubles[i], pExpectedDoubles[i], pAbsoluteErrors[i]); // NOLINT
+        if (issues[i]->type() == Issue::Type::ERROR) {
+            EXPECT_EQ(issues[i]->typeAsString(), "Error");
+        } else if (issues[i]->type() == Issue::Type::WARNING) {
+            EXPECT_EQ(issues[i]->typeAsString(), "Warning");
+        } else {
+            EXPECT_EQ(issues[i]->typeAsString(), "Message");
+        }
     }
 }
 

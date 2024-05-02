@@ -1,0 +1,10 @@
+name: libCellML
+
+on:
+  workflow_dispatch:
+
+jobs:
+  libCellML:
+    uses: ./.github/workflows/build-third-party-library.yml
+    with:
+      third_party_library_name: LIBCELLML

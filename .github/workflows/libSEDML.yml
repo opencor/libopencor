@@ -1,0 +1,10 @@
+name: libSEDML
+
+on:
+  workflow_dispatch:
+
+jobs:
+  libSEDML:
+    uses: ./.github/workflows/build-third-party-library.yml
+    with:
+      third_party_library_name: LIBSEDML
