@@ -113,11 +113,17 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     mAnalyserModel = cellmlFile->analyserModel();
 
     if (mDifferentialModel) {
-        mStates = new double[mAnalyserModel->stateCount()];
-        mRates = new double[mAnalyserModel->stateCount()];
-        mVariables = new double[mAnalyserModel->variableCount()];
+        mStateDoubles.resize(mAnalyserModel->stateCount(), NAN);
+        mRateDoubles.resize(mAnalyserModel->stateCount(), NAN);
+        mVariableDoubles.resize(mAnalyserModel->variableCount(), NAN);
+
+        mStates = mStateDoubles.data();
+        mRates = mRateDoubles.data();
+        mVariables = mVariableDoubles.data();
     } else {
-        mVariables = new double[mAnalyserModel->variableCount()];
+        mVariableDoubles.resize(mAnalyserModel->variableCount(), NAN);
+
+        mVariables = mVariableDoubles.data();
     }
 
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -179,13 +185,6 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 #ifdef PRINT_VALUES
     printValues(mAnalyserModel, mVoi, mStates, mVariables);
 #endif
-}
-
-SedInstanceTask::Impl::~Impl()
-{
-    delete[] mStates;
-    delete[] mRates;
-    delete[] mVariables;
 }
 
 void SedInstanceTask::Impl::run()

@@ -19,6 +19,8 @@ limitations under the License.
 #include "cellmlfileruntime.h"
 #include "logger_p.h"
 
+#include "utils.h"
+
 #include "libopencor/sedinstancetask.h"
 
 namespace libOpenCOR {
@@ -40,10 +42,13 @@ public:
     double *mRates = nullptr;
     double *mVariables = nullptr;
 
+    Doubles mStateDoubles;
+    Doubles mRateDoubles;
+    Doubles mVariableDoubles;
+
     static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask, bool pCompiled);
 
     explicit Impl(const SedAbstractTaskPtr &pTask, bool pCompiled);
-    ~Impl();
 
     void run();
 };
