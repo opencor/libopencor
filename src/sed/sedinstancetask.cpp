@@ -187,11 +187,40 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 #endif
 }
 
+void SedInstanceTask::Impl::trackResults(size_t pIndex)
+{
+    mResults.voi[pIndex] = mVoi;
+
+    for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
+        mResults.states[i][pIndex] = mStates[i];
+        mResults.rates[i][pIndex] = mRates[i];
+    }
+
+    for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
+        mResults.variables[i][pIndex] = mVariables[i];
+    }
+}
+
 void SedInstanceTask::Impl::run()
 {
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {
+        // Initialise our results structure.
+
+        auto resultsSize = mSedUniformTimeCourse->pimpl()->mNumberOfSteps + 1;
+
+        mResults.voi.resize(resultsSize, NAN);
+        mResults.states.resize(mAnalyserModel->stateCount(), Doubles(resultsSize, NAN));
+        mResults.rates.resize(mAnalyserModel->stateCount(), Doubles(resultsSize, NAN));
+        mResults.variables.resize(mAnalyserModel->variableCount(), Doubles(resultsSize, NAN));
+
+        // Track our initial results.
+
+        size_t index = 0;
+
+        trackResults(index);
+
         // Compute the differential model.
 
         auto voiStart = mVoi;
@@ -227,6 +256,8 @@ void SedInstanceTask::Impl::run()
                 return;
             }
 #endif
+
+            trackResults(++index);
 
 #ifdef PRINT_VALUES
             printValues(mAnalyserModel, mVoi, mStates, mVariables);

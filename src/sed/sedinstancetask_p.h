@@ -25,6 +25,14 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+struct SedInstanceTaskResults
+{
+    Doubles voi;
+    std::vector<Doubles> states;
+    std::vector<Doubles> rates;
+    std::vector<Doubles> variables;
+};
+
 class SedInstanceTask::Impl: public Logger::Impl
 {
 public:
@@ -46,9 +54,13 @@ public:
     Doubles mRateDoubles;
     Doubles mVariableDoubles;
 
+    SedInstanceTaskResults mResults;
+
     static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask, bool pCompiled);
 
     explicit Impl(const SedAbstractTaskPtr &pTask, bool pCompiled);
+
+    void trackResults(size_t pIndex);
 
     void run();
 };
