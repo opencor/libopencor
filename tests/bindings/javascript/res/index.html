@@ -73,14 +73,21 @@
                 </p>
             </div>
 
-            <div class="file info" id="fileIssues">
+            <div class="file info last" id="fileIssues">
                 <p class="info issues">
                     <span class="bold">Issues:</span>
                 </p>
                 <ul id="issues"/>
             </div>
 
-            <div class="file error" id="fileError">
+            <div class="file info last simulation" id="simulation">
+                <button type="button" class="btn btn-secondary run-button" id="run">Run</button>
+
+                <div id="plottingArea">
+                </div>
+            </div>
+
+            <div class="file error last" id="fileError">
                 <p class="error">
                     <span class="bold">Error:</span> <span id="errorMessage"></span>
                 </p>
@@ -146,16 +153,19 @@
     </div>
 
     <script type="module">
-        import { resetFile, showPage } from "./res/libopencor.js";
+        import { resetFile, run, showPage } from "./res/libopencor.js";
 
         document.querySelector("#navHome").addEventListener("click", showPage.bind(null, "Home"));
         document.querySelector("#navSimulation").addEventListener("click", showPage.bind(null, "Simulation"));
         document.querySelector("#navVersions").addEventListener("click", showPage.bind(null, "Versions"));
 
         document.querySelector("#resetFile").addEventListener("click", resetFile.bind(null));
+
+        document.querySelector("#run").addEventListener("click", run.bind(null));
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@arction/lcjs@5.1.1/dist/lcjs.iife.js"></script>
 </body>
 
 </html>

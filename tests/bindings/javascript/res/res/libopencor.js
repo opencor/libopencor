@@ -40,12 +40,40 @@ function updateFileUi(
   document.getElementById("resetFile").style.display = resetButtonDisplay
     ? "block"
     : "none";
+  document.getElementById("simulation").style.display = fileInfoDisplay && !fileIssuesDisplay
+    ? "block"
+    : "none";
 }
 
 export function resetFile() {
   document.getElementById("dropAreaInput").value = "";
 
   updateFileUi(false, false, false, false);
+}
+
+const { lightningChart } = lcjs;
+const lc = lightningChart({
+  license: "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
+  licenseInformation: {
+      appTitle: "LightningChart JS Trial",
+      company: "LightningChart Ltd."
+  },
+})
+const chart = lc.ChartXY({ container: document.getElementById('plottingArea') })
+                .setTitle("")
+                .setAnimationsEnabled(false);
+const lineSeries = chart.addLineSeries()
+                        .setName("");
+
+export function run() {
+  let dataSet = [];
+
+  for (let i = 0.0; i < 12.6; i += 0.1) {
+      dataSet.push({ x: i, y: Math.sin(i)-1.0+0.2*Math.random(10.0) });
+  }
+
+  lineSeries.clear();
+  lineSeries.add(dataSet);
 }
 
 function formattedIssueDescription(issue) {
@@ -70,6 +98,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (hasValidFile) {
         let inputFile = input.files[0];
         let fileReader = new FileReader();
+
+        input.value = ""; // Allow the user to select the same file again.
 
         fileReader.readAsArrayBuffer(inputFile);
 
@@ -147,6 +177,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.time("Elapsed time");
                 instance.run();
                 console.timeEnd("Elapsed time");
+
+                run();
               }
             }
 

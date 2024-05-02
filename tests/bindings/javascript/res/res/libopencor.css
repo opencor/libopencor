@@ -1,5 +1,7 @@
 :root {
     --offset: -45px;
+    --plotting-area-width: calc(100% - 5rem);
+    --plotting-area-height: 480px;
 }
 
 .center {
@@ -8,7 +10,8 @@
 
 .drop-area,
 .file,
-.reset-button {
+.reset-button,
+.run-button {
     position: relative;
     margin: 1rem auto;
     display: flex;
@@ -78,14 +81,18 @@
     border: 1px dashed #aa2929;
 }
 
-.info {
-    border: 1px dashed #a5a5a5;
-}
-
 .file,
 .page,
 .reset-button {
     display: none;
+}
+
+.info {
+    border: 1px dashed #a5a5a5;
+}
+
+.last {
+    margin-bottom: -2.5rem;
 }
 
 .reset-button {
@@ -93,6 +100,16 @@
     left: 269px;
     --bs-btn-padding-y: 0.25rem;
     --bs-btn-font-size: 0.75rem;
+}
+
+.run-button {
+    left: calc(50% - 2rem);
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-font-size: 0.75rem;
+}
+
+.simulation {
+    height: calc(var(--plotting-area-height) + 1.75rem);
 }
 
 li {
@@ -115,4 +132,11 @@ p.note {
 
 span.bold {
     font-weight: bold;
+}
+
+#plottingArea {
+    top: var(--offset);
+    margin: 1rem auto 1rem 1rem;
+    width: var(--plotting-area-width);
+    height: var(--plotting-area-height);
 }
