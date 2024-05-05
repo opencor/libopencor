@@ -62,6 +62,7 @@ public:
 
     void trackResults(size_t pIndex);
 
+    void initialise();
     void run();
 };
 

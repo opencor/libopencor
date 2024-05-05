@@ -126,6 +126,27 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
         mVariables = mVariableDoubles.data();
     }
 
+    // Initialise our model.
+
+    initialise();
+}
+
+void SedInstanceTask::Impl::trackResults(size_t pIndex)
+{
+    mResults.voi[pIndex] = mVoi;
+
+    for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
+        mResults.states[i][pIndex] = mStates[i];
+        mResults.rates[i][pIndex] = mRates[i];
+    }
+
+    for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
+        mResults.variables[i][pIndex] = mVariables[i];
+    }
+}
+
+void SedInstanceTask::Impl::initialise()
+{
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
@@ -187,22 +208,13 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 #endif
 }
 
-void SedInstanceTask::Impl::trackResults(size_t pIndex)
-{
-    mResults.voi[pIndex] = mVoi;
-
-    for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
-        mResults.states[i][pIndex] = mStates[i];
-        mResults.rates[i][pIndex] = mRates[i];
-    }
-
-    for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
-        mResults.variables[i][pIndex] = mVariables[i];
-    }
-}
-
 void SedInstanceTask::Impl::run()
 {
+    // (Re)initialise our model.
+    // Note: reinitialise our model in case we are running our model multiple times.
+
+    initialise();
+
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {
