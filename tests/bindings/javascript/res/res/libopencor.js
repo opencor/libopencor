@@ -26,7 +26,7 @@ function updateFileUi(
   fileInfoDisplay,
   fileIssuesDisplay,
   fileErrorDisplay,
-  resetButtonDisplay,
+  resetButtonDisplay
 ) {
   document.getElementById("fileInfo").style.display = fileInfoDisplay
     ? "block"
@@ -82,19 +82,20 @@ let simulation = null;
 let instance = null;
 const { lightningChart } = lcjs;
 const lc = lightningChart({
-                            license: "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
-                            licenseInformation: {
-                              appTitle: "LightningChart JS Trial",
-                              company: "LightningChart Ltd."
-                            },
-                          })
-const chart = lc.ChartXY({
-                           container: document.getElementById("plottingArea"),
-                         })
-                .setTitle("")
-                .setAnimationsEnabled(false);
-const lineSeries = chart.addLineSeries()
-                        .setName("");
+  license:
+    "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
+  licenseInformation: {
+    appTitle: "LightningChart JS Trial",
+    company: "LightningChart Ltd.",
+  },
+});
+const chart = lc
+  .ChartXY({
+    container: document.getElementById("plottingArea"),
+  })
+  .setTitle("")
+  .setAnimationsEnabled(false);
+const lineSeries = chart.addLineSeries().setName("");
 
 export function run() {
   console.time("Elapsed time");
@@ -152,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const mem = new Uint8Array(
               libopencor.HEAPU8.buffer,
               memPtr,
-              inputFile.size,
+              inputFile.size
             );
 
             mem.set(new Uint8Array(fileArrayBuffer));
