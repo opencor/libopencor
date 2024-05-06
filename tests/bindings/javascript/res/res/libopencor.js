@@ -51,33 +51,52 @@ export function resetFile() {
   updateFileUi(false, false, false, false);
 }
 
+function addAxisElement(axis, name) {
+  if (name === "--") {
+    axis.append("<hr>");
+  } else {
+    axis.append("<option>" + name + "</option>");
+  }
+}
+
+function populateAxis(axisId) {
+  const axis = $("#" + axisId);
+
+  axis.empty();
+
+  addAxisElement(axis, instance.voiName());
+  addAxisElement(axis, "--");
+
+  for (let i = 0; i < instance.stateCount(); ++i) {
+    addAxisElement(axis, instance.stateName(i));
+    addAxisElement(axis, instance.rateName(i));
+  }
+
+  for (let i = 0; i < instance.variableCount(); ++i) {
+    addAxisElement(axis, instance.variableName(i));
+  }
+}
+
 let sed = null;
+let simulation = null;
+let instance = null;
 const { lightningChart } = lcjs;
 const lc = lightningChart({
-  license: "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
-  licenseInformation: {
-      appTitle: "LightningChart JS Trial",
-      company: "LightningChart Ltd."
-  },
-})
-const chart = lc.ChartXY({ container: document.getElementById('plottingArea') })
+                            license: "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
+                            licenseInformation: {
+                              appTitle: "LightningChart JS Trial",
+                              company: "LightningChart Ltd."
+                            },
+                          })
+const chart = lc.ChartXY({
+                           container: document.getElementById("plottingArea"),
+                         })
                 .setTitle("")
                 .setAnimationsEnabled(false);
 const lineSeries = chart.addLineSeries()
                         .setName("");
 
 export function run() {
-  const simulation = sed.simulations().get(0);
-
-  if (simulation.constructor.name === "SedUniformTimeCourse") {
-    // simulation.setOutputEndTime(50.0);
-    // simulation.setNumberOfSteps(50000);
-    simulation.setOutputEndTime(1.0);
-    simulation.setNumberOfSteps(1000);
-  }
-
-  const instance = sed.createInstance();
-
   console.time("Elapsed time");
   instance.run();
   console.timeEnd("Elapsed time");
@@ -92,6 +111,9 @@ export function run() {
 
   lineSeries.clear();
   lineSeries.add(dataSet);
+
+  chart.getDefaultAxisX().fit();
+  chart.getDefaultAxisY().fit();
 }
 
 function formattedIssueDescription(issue) {
@@ -178,9 +200,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 showIssues = true;
               } else {
-                // Run the model.
+                // Retrieve some information about the simulation.
 
                 sed = new libopencor.SedDocument(file);
+                simulation = sed.simulations().get(0);
+
+                if (simulation.constructor.name === "SedUniformTimeCourse") {
+                  simulation.setOutputEndTime(50.0);
+                  simulation.setNumberOfSteps(50000);
+                  // simulation.setOutputEndTime(1.0);
+                  // simulation.setNumberOfSteps(1000);
+                }
+
+                instance = sed.createInstance();
+
+                // Populate the X and Y axis dropdown lists.
+
+                populateAxis("xAxis");
+                populateAxis("yAxis");
+
+                // Reset the plotting area.
+
+                lineSeries.clear();
+
+                // Run the model.
 
                 run();
               }

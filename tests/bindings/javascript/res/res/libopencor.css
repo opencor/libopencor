@@ -10,8 +10,7 @@
 
 .drop-area,
 .file,
-.reset-button,
-.run-button {
+.reset-button {
     position: relative;
     margin: 1rem auto;
     display: flex;
@@ -95,25 +94,19 @@
     margin-bottom: -2.5rem;
 }
 
+.reset-button,
+.run-button {
+    --bs-btn-padding-y: 0.25rem;
+    --bs-btn-font-size: 0.75rem;
+}
+
 .reset-button {
     top: var(--offset);
     left: 269px;
-    --bs-btn-padding-y: 0.25rem;
-    --bs-btn-font-size: 0.75rem;
 }
 
 .run-button {
-    left: calc(50% - 2rem);
-    --bs-btn-padding-y: 0.25rem;
-    --bs-btn-font-size: 0.75rem;
-}
-
-.simulation {
-    height: calc(var(--plotting-area-height) + 1.75rem);
-}
-
-li {
-    margin-left: 0.5rem;
+    width: 100%;
 }
 
 p.info,
@@ -135,7 +128,6 @@ span.bold {
 }
 
 #plottingArea {
-    top: var(--offset);
     margin: 1rem auto 1rem 1rem;
     width: var(--plotting-area-width);
     height: var(--plotting-area-height);

@@ -80,10 +80,19 @@
                 <ul id="issues"/>
             </div>
 
-            <div class="file info last simulation" id="simulation">
-                <button type="button" class="btn btn-secondary run-button" id="run">Run</button>
-
+            <div class="file info last row simulation" id="simulation">
                 <div id="plottingArea">
+                </div>
+                <div class="mb-3">
+                    <label>X:</label>
+                    <select class="form-select" id="xAxis">
+                    </select>
+                    <label>Y:</label>
+                    <select class="form-select" id="yAxis">
+                    </select>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-secondary mb-3 run-button" id="run">Run</button>
                 </div>
             </div>
 
@@ -171,6 +180,14 @@
 
         $("#resetFile").on("click", function() {
             resetFile()
+        });
+
+        $("#xAxis").on("change", function() {
+            changeAxis();
+        });
+
+        $("#yAxis").on("change", function() {
+            changeAxis();
         });
 
         $("#run").on("click", function() {
