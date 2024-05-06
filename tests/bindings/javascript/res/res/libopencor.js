@@ -17,7 +17,7 @@ function showError(error) {
     error += ".";
   }
 
-  document.getElementById("errorMessage").innerHTML = error;
+  $("#errorMessage").html(error);
 
   updateFileUi(false, false, true, true);
 }
@@ -28,25 +28,18 @@ function updateFileUi(
   fileErrorDisplay,
   resetButtonDisplay
 ) {
-  document.getElementById("fileInfo").style.display = fileInfoDisplay
-    ? "block"
-    : "none";
-  document.getElementById("fileIssues").style.display = fileIssuesDisplay
-    ? "block"
-    : "none";
-  document.getElementById("fileError").style.display = fileErrorDisplay
-    ? "block"
-    : "none";
-  document.getElementById("resetFile").style.display = resetButtonDisplay
-    ? "block"
-    : "none";
-  document.getElementById("simulation").style.display = fileInfoDisplay && !fileIssuesDisplay
-    ? "block"
-    : "none";
+  $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
+  $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
+  $("#fileError").css("display", fileErrorDisplay ? "block" : "none");
+  $("#resetFile").css("display", resetButtonDisplay ? "block" : "none");
+  $("#simulation").css(
+    "display",
+    fileInfoDisplay && !fileIssuesDisplay ? "block" : "none"
+  );
 }
 
 export function resetFile() {
-  document.getElementById("dropAreaInput").value = "";
+  $("#dropAreaInput").value = "";
 
   updateFileUi(false, false, false, false);
 }
@@ -91,7 +84,7 @@ const lc = lightningChart({
 });
 const chart = lc
   .ChartXY({
-    container: document.getElementById("plottingArea"),
+    container: $("#plottingArea")[0],
   })
   .setTitle("")
   .setAnimationsEnabled(false);
@@ -131,8 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
   libOpenCOR().then((libopencor) => {
     // Simulation page.
 
-    const input = document.getElementById("dropAreaInput");
-    const dropArea = document.getElementById("dropArea");
+    const input = $("#dropAreaInput")[0];
+    const dropArea = $("#dropArea")[0];
     let hasValidFile = false;
 
     input.addEventListener("change", (event) => {
@@ -172,8 +165,8 @@ document.addEventListener("DOMContentLoaded", () => {
               fileType = "SED-ML";
             }
 
-            document.getElementById("fileName").innerHTML = inputFile.name;
-            document.getElementById("fileType").innerHTML = fileType;
+            $("#fileName").html(inputFile.name);
+            $("#fileType").html(fileType);
 
             // Display any issues with the file or run it.
 
@@ -181,22 +174,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (file.type() === libopencor.File.Type.CELLML_FILE) {
               if (file.hasIssues()) {
-                const issuesElement = document.getElementById("issues");
+                const issuesElement = $("#issues");
                 const fileIssues = file.issues();
 
-                issuesElement.replaceChildren();
+                issuesElement.empty();
 
                 for (let i = 0; i < fileIssues.size(); ++i) {
                   const issue = fileIssues.get(i);
-                  const issueElement = document.createElement("li");
 
-                  issueElement.innerHTML =
-                    String.raw`<span class="bold">` +
-                    issue.typeAsString() +
-                    ":</span> " +
-                    formattedIssueDescription(issue.description());
-
-                  issuesElement.appendChild(issueElement);
+                  issuesElement.append(
+                    '<li><span class="bold">' +
+                      issue.typeAsString() +
+                      ":</span>" +
+                      formattedIssueDescription(issue.description()) +
+                      "</li>"
+                  );
                 }
 
                 showIssues = true;
@@ -267,25 +259,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Versions page.
 
-    document.getElementById("version").innerHTML = libopencor.version();
-    document.getElementById("versionString").innerHTML =
-      libopencor.versionString();
-    document.getElementById("libcellmlVersion").innerHTML =
-      libopencor.libcellmlVersion();
-    document.getElementById("libcellmlVersionString").innerHTML =
-      libopencor.libcellmlVersionString();
-    document.getElementById("libcombineVersion").innerHTML =
-      libopencor.libcombineVersion();
-    document.getElementById("libcombineVersionString").innerHTML =
-      libopencor.libcombineVersionString();
-    document.getElementById("libsedmlVersion").innerHTML =
-      libopencor.libsedmlVersion();
-    document.getElementById("libsedmlVersionString").innerHTML =
-      libopencor.libsedmlVersionString();
-    document.getElementById("sundialsVersion").innerHTML =
-      libopencor.sundialsVersion();
-    document.getElementById("sundialsVersionString").innerHTML =
-      libopencor.sundialsVersionString();
+    $("#version").html(libopencor.version());
+    $("#versionString").html(libopencor.versionString());
+    $("#libcellmlVersion").html(libopencor.libcellmlVersion());
+    $("#libcellmlVersionString").html(libopencor.libcellmlVersionString());
+    $("#libcombineVersion").html(libopencor.libcombineVersion());
+    $("#libcombineVersionString").html(libopencor.libcombineVersionString());
+    $("#libsedmlVersion").html(libopencor.libsedmlVersion());
+    $("#libsedmlVersionString").html(libopencor.libsedmlVersionString());
+    $("#sundialsVersion").html(libopencor.sundialsVersion());
+    $("#sundialsVersionString").html(libopencor.sundialsVersionString());
 
     // Start with our simulation page.
 
