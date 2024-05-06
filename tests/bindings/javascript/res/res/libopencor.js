@@ -95,12 +95,30 @@ export function run() {
   instance.run();
   console.timeEnd("Elapsed time");
 
-  const voi = instance.voi();
-  const state = instance.state(0);
+  changeAxis();
+}
+
+function axisArray(index) {
+  if (index === 0) {
+    return instance.voi();
+  } else if (index <= 2 * instance.stateCount()) {
+    if (index % 2 !== 0) {
+      return instance.state((index - 1) / 2);
+    } else {
+      return instance.rate(index / 2 - 1);
+    }
+  } else {
+    return instance.variable(index - 1 - 2 * instance.stateCount());
+  }
+}
+
+export function changeAxis() {
+  const xArray = axisArray($("#xAxis").prop("selectedIndex"));
+  const yArray = axisArray($("#yAxis").prop("selectedIndex"));
   let dataSet = [];
 
-  for (let i = 0; i < voi.size(); ++i) {
-    dataSet.push({ x: voi.get(i), y: state.get(i) });
+  for (let i = 0; i < xArray.size(); ++i) {
+    dataSet.push({ x: xArray.get(i), y: yArray.get(i) });
   }
 
   lineSeries.clear();
@@ -211,6 +229,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 populateAxis("xAxis");
                 populateAxis("yAxis");
+
+                // By default we plot the first state variable against the VOI.
+
+                $("#xAxis").val(instance.voiName());
+                $("#yAxis").val(instance.stateName(0));
 
                 // Reset the plotting area.
 
