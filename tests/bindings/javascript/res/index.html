@@ -152,20 +152,31 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@arction/lcjs@5.1.1/dist/lcjs.iife.js"></script>
+
     <script type="module">
         import { resetFile, run, showPage } from "./res/libopencor.js";
 
-        document.querySelector("#navHome").addEventListener("click", showPage.bind(null, "Home"));
-        document.querySelector("#navSimulation").addEventListener("click", showPage.bind(null, "Simulation"));
-        document.querySelector("#navVersions").addEventListener("click", showPage.bind(null, "Versions"));
+        $("#navHome").on("click", function() {
+            showPage("Home");
+        });
+        $("#navSimulation").on("click", function() {
+            showPage("Simulation")
+        });
+        $("#navVersions").on("click", function() {
+            showPage("Versions")
+        });
 
-        document.querySelector("#resetFile").addEventListener("click", resetFile.bind(null));
+        $("#resetFile").on("click", function() {
+            resetFile()
+        });
 
-        document.querySelector("#run").addEventListener("click", run.bind(null));
+        $("#run").on("click", function() {
+            run()
+        });
     </script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@arction/lcjs@5.1.1/dist/lcjs.iife.js"></script>
 </body>
 
 </html>
