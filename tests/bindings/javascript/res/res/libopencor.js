@@ -1,3 +1,23 @@
+let sed = null;
+let simulation = null;
+let instance = null;
+const { lightningChart } = lcjs;
+const lc = lightningChart({
+  license:
+    "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
+  licenseInformation: {
+    appTitle: "LightningChart JS Trial",
+    company: "LightningChart Ltd.",
+  },
+});
+const chart = lc
+  .ChartXY({
+    container: $("#plottingArea")[0],
+  })
+  .setTitle("")
+  .setAnimationsEnabled(false);
+const lineSeries = chart.addLineSeries().setName("");
+
 export function showPage(page) {
   document.querySelectorAll(".nav-link").forEach((crtPage) => {
     if (crtPage.id === "nav" + page) {
@@ -70,26 +90,6 @@ function populateAxis(axisId) {
   }
 }
 
-let sed = null;
-let simulation = null;
-let instance = null;
-const { lightningChart } = lcjs;
-const lc = lightningChart({
-  license:
-    "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
-  licenseInformation: {
-    appTitle: "LightningChart JS Trial",
-    company: "LightningChart Ltd.",
-  },
-});
-const chart = lc
-  .ChartXY({
-    container: $("#plottingArea")[0],
-  })
-  .setTitle("")
-  .setAnimationsEnabled(false);
-const lineSeries = chart.addLineSeries().setName("");
-
 export function run() {
   console.time("Elapsed time");
   instance.run();
@@ -123,6 +123,7 @@ export function changeAxis() {
 
   lineSeries.clear();
   lineSeries.add(dataSet);
+  // lineSeries.addArraysXY(xArray, yArray);
 
   chart.getDefaultAxisX().fit();
   chart.getDefaultAxisY().fit();
