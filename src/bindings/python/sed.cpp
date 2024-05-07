@@ -64,11 +64,24 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedInstance, libOpenCOR::Logger, libOpenCOR::SedInstancePtr> sedInstance(m, "SedInstance");
 
-    sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run the tasks associated with this SedInstance object.");
+    sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run the tasks associated with this SedInstance object.")
+        .def("tasks", &libOpenCOR::SedInstance::tasks, "Return the tasks.");
 
     // SedInstanceTask API.
 
     py::class_<libOpenCOR::SedInstanceTask, libOpenCOR::Logger, libOpenCOR::SedInstanceTaskPtr> sedInstanceTask(m, "SedInstanceTask");
+
+    sedInstanceTask.def("voi", &libOpenCOR::SedInstanceTask::voi, "Return the values of the variable of integration.")
+        .def("voi_name", &libOpenCOR::SedInstanceTask::voiName, "Return the name of the variable of integration.")
+        .def("state_count", &libOpenCOR::SedInstanceTask::stateCount, "Return the number of states.")
+        .def("state", &libOpenCOR::SedInstanceTask::state, "Return the values of a state.")
+        .def("state_name", &libOpenCOR::SedInstanceTask::stateName, "Return the name of a state.")
+        .def("rate_count", &libOpenCOR::SedInstanceTask::rateCount, "Return the number of rates.")
+        .def("rate", &libOpenCOR::SedInstanceTask::rate, "Return the values of a rate.")
+        .def("rate_name", &libOpenCOR::SedInstanceTask::rateName, "Return the name of a rate.")
+        .def("variable_count", &libOpenCOR::SedInstanceTask::variableCount, "Return the number of variables.")
+        .def("variable", &libOpenCOR::SedInstanceTask::variable, "Return the values of a variable.")
+        .def("variable_name", &libOpenCOR::SedInstanceTask::variableName, "Return the name of a variable.");
 
     // SedModel API.
 

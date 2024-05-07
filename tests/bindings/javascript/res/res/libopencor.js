@@ -1,6 +1,7 @@
 let sed = null;
 let simulation = null;
 let instance = null;
+let instanceTask = null;
 const { lightningChart } = lcjs;
 const lc = lightningChart({
   license:
@@ -77,16 +78,16 @@ function populateAxis(axisId) {
 
   axis.empty();
 
-  addAxisElement(axis, instance.voiName());
+  addAxisElement(axis, instanceTask.voiName());
   addAxisElement(axis, "--");
 
-  for (let i = 0; i < instance.stateCount(); ++i) {
-    addAxisElement(axis, instance.stateName(i));
-    addAxisElement(axis, instance.rateName(i));
+  for (let i = 0; i < instanceTask.stateCount(); ++i) {
+    addAxisElement(axis, instanceTask.stateName(i));
+    addAxisElement(axis, instanceTask.rateName(i));
   }
 
-  for (let i = 0; i < instance.variableCount(); ++i) {
-    addAxisElement(axis, instance.variableName(i));
+  for (let i = 0; i < instanceTask.variableCount(); ++i) {
+    addAxisElement(axis, instanceTask.variableName(i));
   }
 }
 
@@ -100,15 +101,15 @@ export function run() {
 
 function axisArray(index) {
   if (index === 0) {
-    return instance.voi();
-  } else if (index <= 2 * instance.stateCount()) {
+    return instanceTask.voi();
+  } else if (index <= 2 * instanceTask.stateCount()) {
     if (index % 2 !== 0) {
-      return instance.state((index - 1) / 2);
+      return instanceTask.state((index - 1) / 2);
     } else {
-      return instance.rate(index / 2 - 1);
+      return instanceTask.rate(index / 2 - 1);
     }
   } else {
-    return instance.variable(index - 1 - 2 * instance.stateCount());
+    return instanceTask.variable(index - 1 - 2 * instanceTask.stateCount());
   }
 }
 
@@ -225,6 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
 
                 instance = sed.createInstance();
+                instanceTask = instance.tasks().get(0);
 
                 // Populate the X and Y axis dropdown lists.
 
@@ -233,8 +235,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // By default we plot the first state variable against the VOI.
 
-                $("#xAxis").val(instance.voiName());
-                $("#yAxis").val(instance.stateName(0));
+                $("#xAxis").val(instanceTask.voiName());
+                $("#yAxis").val(instanceTask.stateName(0));
 
                 // Reset the plotting area.
 

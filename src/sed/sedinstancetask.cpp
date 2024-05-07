@@ -280,6 +280,72 @@ void SedInstanceTask::Impl::run()
     }
 }
 
+Doubles SedInstanceTask::Impl::state(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return mResults.states[pIndex];
+}
+
+Doubles SedInstanceTask::Impl::rate(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return mResults.rates[pIndex];
+}
+
+Doubles SedInstanceTask::Impl::variable(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->variableCount()) {
+        return {};
+    }
+
+    return mResults.variables[pIndex];
+}
+
+std::string SedInstanceTask::Impl::name(const libcellml::VariablePtr &pVariable) const
+{
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
+
+    return component->name() + "." + pVariable->name();
+}
+
+std::string SedInstanceTask::Impl::voiName() const
+{
+    return name(mAnalyserModel->voi()->variable());
+}
+
+std::string SedInstanceTask::Impl::stateName(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return name(mAnalyserModel->states()[pIndex]->variable());
+}
+
+std::string SedInstanceTask::Impl::rateName(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return name(mAnalyserModel->states()[pIndex]->variable()) + "'";
+}
+
+std::string SedInstanceTask::Impl::variableName(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->variableCount()) {
+        return {};
+    }
+
+    return name(mAnalyserModel->variables()[pIndex]->variable());
+}
+
 SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask, bool pCompiled)
     : Logger(new Impl(pTask, pCompiled))
 {
@@ -295,11 +361,64 @@ SedInstanceTask::Impl *SedInstanceTask::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
-*/
+
+Doubles SedInstanceTask::voi() const
+{
+    return pimpl()->mResults.voi;
+}
+
+std::string SedInstanceTask::voiName() const
+{
+    return pimpl()->voiName();
+}
+
+size_t SedInstanceTask::stateCount() const
+{
+    return pimpl()->mAnalyserModel->stateCount();
+}
+
+Doubles SedInstanceTask::state(size_t pIndex) const
+{
+    return pimpl()->state(pIndex);
+}
+
+std::string SedInstanceTask::stateName(size_t pIndex) const
+{
+    return pimpl()->stateName(pIndex);
+}
+
+size_t SedInstanceTask::rateCount() const
+{
+    return stateCount();
+}
+
+Doubles SedInstanceTask::rate(size_t pIndex) const
+{
+    return pimpl()->rate(pIndex);
+}
+
+std::string SedInstanceTask::rateName(size_t pIndex) const
+{
+    return pimpl()->rateName(pIndex);
+}
+
+size_t SedInstanceTask::variableCount() const
+{
+    return pimpl()->mAnalyserModel->variableCount();
+}
+
+Doubles SedInstanceTask::variable(size_t pIndex) const
+{
+    return pimpl()->variable(pIndex);
+}
+
+std::string SedInstanceTask::variableName(size_t pIndex) const
+{
+    return pimpl()->variableName(pIndex);
+}
 
 } // namespace libOpenCOR

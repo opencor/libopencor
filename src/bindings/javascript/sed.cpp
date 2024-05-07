@@ -62,25 +62,23 @@ void sedApi()
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
         .function("run", &libOpenCOR::SedInstance::run)
-
-        //---GRY--- THE BELOW METHODS ARE ONLY HERE SO THAT WE CAN QUICKLY DEMONSTRATE HOW THINGS CAN WORK FROM
-        //          JavaScript.
-
-        .function("voi", &libOpenCOR::SedInstance::voi)
-        .function("state", &libOpenCOR::SedInstance::state)
-        .function("rate", &libOpenCOR::SedInstance::rate)
-        .function("variable", &libOpenCOR::SedInstance::variable)
-        .function("voiName", &libOpenCOR::SedInstance::voiName)
-        .function("stateName", &libOpenCOR::SedInstance::stateName)
-        .function("rateName", &libOpenCOR::SedInstance::rateName)
-        .function("variableName", &libOpenCOR::SedInstance::variableName)
-        .function("stateCount", &libOpenCOR::SedInstance::stateCount)
-        .function("variableCount", &libOpenCOR::SedInstance::variableCount);
+        .function("tasks", &libOpenCOR::SedInstance::tasks);
 
     // SedInstanceTask API.
 
     emscripten::class_<libOpenCOR::SedInstanceTask, emscripten::base<libOpenCOR::Logger>>("SedInstanceTask")
-        .smart_ptr<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTask");
+        .smart_ptr<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTask")
+        .function("voi", &libOpenCOR::SedInstanceTask::voi)
+        .function("voiName", &libOpenCOR::SedInstanceTask::voiName)
+        .function("stateCount", &libOpenCOR::SedInstanceTask::stateCount)
+        .function("state", &libOpenCOR::SedInstanceTask::state)
+        .function("stateName", &libOpenCOR::SedInstanceTask::stateName)
+        .function("rateCount", &libOpenCOR::SedInstanceTask::rateCount)
+        .function("rate", &libOpenCOR::SedInstanceTask::rate)
+        .function("rateName", &libOpenCOR::SedInstanceTask::rateName)
+        .function("variableCount", &libOpenCOR::SedInstanceTask::variableCount)
+        .function("variable", &libOpenCOR::SedInstanceTask::variable)
+        .function("variableName", &libOpenCOR::SedInstanceTask::variableName);
 
     // SedModel API.
 
