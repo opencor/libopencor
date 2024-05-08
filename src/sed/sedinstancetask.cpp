@@ -41,6 +41,7 @@ void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
 
     for (auto &state : pAnalyserModel->states()) {
         printf(",%s", state->variable()->name().c_str()); // NOLINT
+        printf(",%s'", state->variable()->name().c_str()); // NOLINT
     }
 
     for (auto &variable : pAnalyserModel->variables()) {
@@ -51,12 +52,13 @@ void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
 }
 
 void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
-                 double pVoi, double *pStates, double *pVariables)
+                 double pVoi, double *pStates, double *pRates, double *pVariables)
 {
     printf("%f", pVoi); // NOLINT
 
     for (size_t i = 0; i < pAnalyserModel->states().size(); ++i) {
         printf(",%f", pStates[i]); // NOLINT
+        printf(",%f", pRates[i]); // NOLINT
     }
 
     for (size_t i = 0; i < pAnalyserModel->variables().size(); ++i) {
@@ -204,7 +206,7 @@ void SedInstanceTask::Impl::initialise()
     }
 
 #ifdef PRINT_VALUES
-    printValues(mAnalyserModel, mVoi, mStates, mVariables);
+    printValues(mAnalyserModel, mVoi, mStates, mRates, mVariables);
 #endif
 }
 
@@ -272,7 +274,7 @@ void SedInstanceTask::Impl::run()
             trackResults(++index);
 
 #ifdef PRINT_VALUES
-            printValues(mAnalyserModel, mVoi, mStates, mVariables);
+            printValues(mAnalyserModel, mVoi, mStates, mRates, mVariables);
 #endif
         }
     }
