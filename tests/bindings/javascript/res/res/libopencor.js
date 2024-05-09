@@ -87,9 +87,22 @@ function populateAxis(axisId) {
 }
 
 export function run() {
+  // Reset the plotting area (in case we have some simulation results).
+
+  lineSeries.clear();
+
+  // Retrieve the duration of the simulation and the number of steps.
+
+  simulation.setOutputEndTime($("#endingPoint").val());
+  simulation.setNumberOfSteps($("#endingPoint").val() / $("#pointInterval").val());
+
+  // Run the simulation.
+
   console.time("Elapsed time");
   instance.run();
   console.timeEnd("Elapsed time");
+
+  // Plot the results by pretending that we changed the axis.
 
   changeAxis();
 }
@@ -112,6 +125,7 @@ function axisArray(index) {
 
 export function changeAxis() {
   lineSeries.clear();
+
   lineSeries.addArraysXY(
     axisArray($("#xAxis").prop("selectedIndex")),
     axisArray($("#yAxis").prop("selectedIndex")),
@@ -208,16 +222,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 sed = new libopencor.SedDocument(file);
                 simulation = sed.simulations().get(0);
-
-                if (simulation.constructor.name === "SedUniformTimeCourse") {
-                  simulation.setOutputEndTime(50.0);
-                  simulation.setNumberOfSteps(50000);
-                  // simulation.setOutputEndTime(1.0);
-                  // simulation.setNumberOfSteps(1000);
-                }
-
                 instance = sed.createInstance();
                 instanceTask = instance.tasks().get(0);
+
+                $("#endingPoint").val(simulation.outputEndTime());
+                $("#endingPointUnit").text(instanceTask.voiUnit());
+
+                $("#pointInterval").val(
+                  simulation.outputEndTime() / simulation.numberOfSteps(),
+                );
+                $("#pointIntervalUnit").text(instanceTask.voiUnit());
 
                 // Populate the X and Y axis dropdown lists.
 
@@ -229,13 +243,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 $("#xAxis").val(instanceTask.voiName());
                 $("#yAxis").val(instanceTask.stateName(0));
 
-                // Reset the plotting area.
+                // Reset the plotting area (in case we have some simulation results and we dropped a new file).
 
                 lineSeries.clear();
-
-                // Run the model.
-
-                run();
               }
             }
 

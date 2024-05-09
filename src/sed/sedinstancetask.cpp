@@ -122,10 +122,16 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
         mStates = mStateDoubles.data();
         mRates = mRateDoubles.data();
         mVariables = mVariableDoubles.data();
+
+        mResults.states.resize(mAnalyserModel->stateCount(), {});
+        mResults.rates.resize(mAnalyserModel->stateCount(), {});
+        mResults.variables.resize(mAnalyserModel->variableCount(), {});
     } else {
         mVariableDoubles.resize(mAnalyserModel->variableCount(), NAN);
 
         mVariables = mVariableDoubles.data();
+
+        mResults.variables.resize(mAnalyserModel->variableCount(), {});
     }
 
     // Initialise our model.
@@ -225,9 +231,15 @@ void SedInstanceTask::Impl::run()
         auto resultsSize = mSedUniformTimeCourse->pimpl()->mNumberOfSteps + 1;
 
         mResults.voi.resize(resultsSize, NAN);
-        mResults.states.resize(mAnalyserModel->stateCount(), Doubles(resultsSize, NAN));
-        mResults.rates.resize(mAnalyserModel->stateCount(), Doubles(resultsSize, NAN));
-        mResults.variables.resize(mAnalyserModel->variableCount(), Doubles(resultsSize, NAN));
+
+        for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
+            mResults.states[i].resize(resultsSize, NAN);
+            mResults.rates[i].resize(resultsSize, NAN);
+        }
+
+        for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
+            mResults.variables[i].resize(resultsSize, NAN);
+        }
 
         // Track our initial results.
 
