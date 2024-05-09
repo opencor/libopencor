@@ -96,11 +96,15 @@
                     </div>
                     </select>
                     <label>X:</label>
-                    <select class="form-select" id="xAxis">
-                    </select>
+                    <div class="input-group">
+                        <select class="form-select" id="xAxis"></select>
+                        <span class="input-group-text" id="xAxisUnit"></span>
+                    </div>
                     <label>Y:</label>
-                    <select class="form-select" id="yAxis">
-                    </select>
+                    <div class="input-group">
+                        <select class="form-select" id="yAxis"></select>
+                        <span class="input-group-text" id="yAxisUnit"></span>
+                    </div>
                 </div>
                 <div>
                     <button type="button" class="btn btn-secondary mb-3 run-button w-100" id="run">Run</button>
@@ -177,7 +181,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@arction/lcjs@5.2.0/dist/lcjs.iife.js"></script>
 
     <script type="module">
-        import { changeAxis, resetFile, run, showPage } from "./res/libopencor.js";
+        import { resetFile, run, showPage, updatePlottingAreaAndAxesInfo } from "./res/libopencor.js";
 
         $("#navHome").on("click", function() {
             showPage("Home");
@@ -194,11 +198,11 @@
         });
 
         $("#xAxis").on("change", function() {
-            changeAxis();
+            updatePlottingAreaAndAxesInfo();
         });
 
         $("#yAxis").on("change", function() {
-            changeAxis();
+            updatePlottingAreaAndAxesInfo();
         });
 
         $("#run").on("click", function() {

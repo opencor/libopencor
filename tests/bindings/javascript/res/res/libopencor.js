@@ -94,7 +94,9 @@ export function run() {
   // Retrieve the duration of the simulation and the number of steps.
 
   simulation.setOutputEndTime($("#endingPoint").val());
-  simulation.setNumberOfSteps($("#endingPoint").val() / $("#pointInterval").val());
+  simulation.setNumberOfSteps(
+    $("#endingPoint").val() / $("#pointInterval").val(),
+  );
 
   // Run the simulation.
 
@@ -102,34 +104,41 @@ export function run() {
   instance.run();
   console.timeEnd("Elapsed time");
 
-  // Plot the results by pretending that we changed the axis.
+  // Plot the results.
 
-  changeAxis();
+  updatePlottingAreaAndAxesInfo();
 }
 
-function axisArray(index) {
+function axisInfo(index) {
   if (index === 0) {
-    return instanceTask.voiAsArray();
+    return [instanceTask.voiAsArray(), instanceTask.voiUnit()];
   } else if (index <= 2 * instanceTask.stateCount()) {
     if (index % 2 !== 0) {
-      return instanceTask.stateAsArray((index - 1) / 2);
+      const ndx = (index - 1) / 2;
+
+      return [instanceTask.stateAsArray(ndx), instanceTask.stateUnit(ndx)];
     } else {
-      return instanceTask.rateAsArray(index / 2 - 1);
+      const ndx = index / 2 - 1;
+
+      return [instanceTask.rateAsArray(ndx), instanceTask.rateUnit(ndx)];
     }
   } else {
-    return instanceTask.variableAsArray(
-      index - 1 - 2 * instanceTask.stateCount(),
-    );
+    const ndx = index - 1 - 2 * instanceTask.stateCount();
+
+    return [instanceTask.variableAsArray(ndx), instanceTask.variableUnit(ndx)];
   }
 }
 
-export function changeAxis() {
+export function updatePlottingAreaAndAxesInfo() {
   lineSeries.clear();
 
-  lineSeries.addArraysXY(
-    axisArray($("#xAxis").prop("selectedIndex")),
-    axisArray($("#yAxis").prop("selectedIndex")),
-  );
+  const [xAxisArray, xAxisUnit] = axisInfo($("#xAxis").prop("selectedIndex"));
+  const [yAxisArray, yAxisUnit] = axisInfo($("#yAxis").prop("selectedIndex"));
+
+  lineSeries.addArraysXY(xAxisArray, yAxisArray);
+
+  $("#xAxisUnit").text(xAxisUnit);
+  $("#yAxisUnit").text(yAxisUnit);
 
   chart.getDefaultAxisX().fit();
   chart.getDefaultAxisY().fit();
@@ -243,9 +252,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 $("#xAxis").val(instanceTask.voiName());
                 $("#yAxis").val(instanceTask.stateName(0));
 
-                // Reset the plotting area (in case we have some simulation results and we dropped a new file).
+                // Update the plotting area (in case we have some simulation results and we drop a new file) and the
+                // axes information.
 
-                lineSeries.clear();
+                updatePlottingAreaAndAxesInfo();
               }
             }
 
