@@ -66,11 +66,7 @@ export function resetFile() {
 }
 
 function addAxisElement(axis, name) {
-  if (name === "--") {
-    axis.append("<hr>");
-  } else {
-    axis.append("<option>" + name + "</option>");
-  }
+  axis.append("<option>" + name + "</option>");
 }
 
 function populateAxis(axisId) {
@@ -79,7 +75,6 @@ function populateAxis(axisId) {
   axis.empty();
 
   addAxisElement(axis, instanceTask.voiName());
-  addAxisElement(axis, "--");
 
   for (let i = 0; i < instanceTask.stateCount(); ++i) {
     addAxisElement(axis, instanceTask.stateName(i));
