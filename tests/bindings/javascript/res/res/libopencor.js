@@ -47,7 +47,7 @@ function updateFileUi(
   fileInfoDisplay,
   fileIssuesDisplay,
   fileErrorDisplay,
-  resetButtonDisplay
+  resetButtonDisplay,
 ) {
   $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
   $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
@@ -55,7 +55,7 @@ function updateFileUi(
   $("#resetFile").css("display", resetButtonDisplay ? "block" : "none");
   $("#simulation").css(
     "display",
-    fileInfoDisplay && !fileIssuesDisplay ? "block" : "none"
+    fileInfoDisplay && !fileIssuesDisplay ? "block" : "none",
   );
 }
 
@@ -109,7 +109,9 @@ function axisArray(index) {
       return instanceTask.rateAsArray(index / 2 - 1);
     }
   } else {
-    return instanceTask.variableAsArray(index - 1 - 2 * instanceTask.stateCount());
+    return instanceTask.variableAsArray(
+      index - 1 - 2 * instanceTask.stateCount(),
+    );
   }
 }
 
@@ -117,7 +119,7 @@ export function changeAxis() {
   lineSeries.clear();
   lineSeries.addArraysXY(
     axisArray($("#xAxis").prop("selectedIndex")),
-    axisArray($("#yAxis").prop("selectedIndex"))
+    axisArray($("#yAxis").prop("selectedIndex")),
   );
 
   chart.getDefaultAxisX().fit();
@@ -160,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const mem = new Uint8Array(
               libopencor.HEAPU8.buffer,
               memPtr,
-              inputFile.size
+              inputFile.size,
             );
 
             mem.set(new Uint8Array(fileArrayBuffer));
@@ -201,7 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
                       issue.typeAsString() +
                       ":</span>" +
                       formattedIssueDescription(issue.description()) +
-                      "</li>"
+                      "</li>",
                   );
                 }
 
