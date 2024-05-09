@@ -101,30 +101,24 @@ export function run() {
 
 function axisArray(index) {
   if (index === 0) {
-    return instanceTask.voi();
+    return instanceTask.voiAsArray();
   } else if (index <= 2 * instanceTask.stateCount()) {
     if (index % 2 !== 0) {
-      return instanceTask.state((index - 1) / 2);
+      return instanceTask.stateAsArray((index - 1) / 2);
     } else {
-      return instanceTask.rate(index / 2 - 1);
+      return instanceTask.rateAsArray(index / 2 - 1);
     }
   } else {
-    return instanceTask.variable(index - 1 - 2 * instanceTask.stateCount());
+    return instanceTask.variableAsArray(index - 1 - 2 * instanceTask.stateCount());
   }
 }
 
 export function changeAxis() {
-  const xArray = axisArray($("#xAxis").prop("selectedIndex"));
-  const yArray = axisArray($("#yAxis").prop("selectedIndex"));
-  let dataSet = [];
-
-  for (let i = 0; i < xArray.size(); ++i) {
-    dataSet.push({ x: xArray.get(i), y: yArray.get(i) });
-  }
-
   lineSeries.clear();
-  lineSeries.add(dataSet);
-  // lineSeries.addArraysXY(xArray, yArray);
+  lineSeries.addArraysXY(
+    axisArray($("#xAxis").prop("selectedIndex")),
+    axisArray($("#yAxis").prop("selectedIndex"))
+  );
 
   chart.getDefaultAxisX().fit();
   chart.getDefaultAxisY().fit();

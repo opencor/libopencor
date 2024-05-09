@@ -54,6 +54,10 @@ public:
 
     Doubles voi() const;
 
+#ifdef __EMSCRIPTEN__
+    emscripten::val voiAsArray() const;
+#endif
+
     /**
      * @brief Get the name of the variable of integration.
      *
@@ -85,6 +89,10 @@ public:
      */
 
     Doubles state(size_t pIndex) const;
+
+#ifdef __EMSCRIPTEN__
+    emscripten::val stateAsArray(size_t pIndex) const;
+#endif
 
     /**
      * @brief Get the name of the state at the given index.
@@ -120,6 +128,10 @@ public:
 
     Doubles rate(size_t pIndex) const;
 
+#ifdef __EMSCRIPTEN__
+    emscripten::val rateAsArray(size_t pIndex) const;
+#endif
+
     /**
      * @brief Get the name of the rate at the given index.
      *
@@ -153,6 +165,10 @@ public:
      */
 
     Doubles variable(size_t pIndex) const;
+
+#ifdef __EMSCRIPTEN__
+    emscripten::val variableAsArray(size_t pIndex) const;
+#endif
 
     /**
      * @brief Get the name of the variable at the given index.

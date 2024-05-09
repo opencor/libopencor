@@ -371,6 +371,13 @@ Doubles SedInstanceTask::voi() const
     return pimpl()->mResults.voi;
 }
 
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::voiAsArray() const
+{
+    return emscripten::val::array(voi());
+}
+#endif
+
 std::string SedInstanceTask::voiName() const
 {
     return pimpl()->voiName();
@@ -385,6 +392,13 @@ Doubles SedInstanceTask::state(size_t pIndex) const
 {
     return pimpl()->state(pIndex);
 }
+
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::stateAsArray(size_t pIndex) const
+{
+    return emscripten::val::array(state(pIndex));
+}
+#endif
 
 std::string SedInstanceTask::stateName(size_t pIndex) const
 {
@@ -401,6 +415,13 @@ Doubles SedInstanceTask::rate(size_t pIndex) const
     return pimpl()->rate(pIndex);
 }
 
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::rateAsArray(size_t pIndex) const
+{
+    return emscripten::val::array(rate(pIndex));
+}
+#endif
+
 std::string SedInstanceTask::rateName(size_t pIndex) const
 {
     return pimpl()->rateName(pIndex);
@@ -415,6 +436,13 @@ Doubles SedInstanceTask::variable(size_t pIndex) const
 {
     return pimpl()->variable(pIndex);
 }
+
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::variableAsArray(size_t pIndex) const
+{
+    return emscripten::val::array(variable(pIndex));
+}
+#endif
 
 std::string SedInstanceTask::variableName(size_t pIndex) const
 {
