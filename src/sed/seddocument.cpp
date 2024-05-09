@@ -65,7 +65,7 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
     }
 
     // Make sure that the given file is supported.
-    // Note: we would normally have a switch statement, but then code covereage doesn't cover the lines where we check
+    // Note: we would normally have a switch statement, but then code coverage doesn't cover the lines where we check
     //       for __EMSCRIPTEN__. Could it be an issue with llvm-cov not properly handling C++ directives within a switch
     //       statement?
 
