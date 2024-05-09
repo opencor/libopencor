@@ -72,9 +72,16 @@ public:
     std::string name(const libcellml::VariablePtr &pVariable) const;
 
     std::string voiName() const;
+    std::string voiUnit() const;
+
     std::string stateName(size_t pIndex) const;
+    std::string stateUnit(size_t pIndex) const;
+
     std::string rateName(size_t pIndex) const;
+    std::string rateUnit(size_t pIndex) const;
+
     std::string variableName(size_t pIndex) const;
+    std::string variableUnit(size_t pIndex) const;
 };
 
 } // namespace libOpenCOR

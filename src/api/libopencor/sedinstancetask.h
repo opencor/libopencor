@@ -69,6 +69,16 @@ public:
     std::string voiName() const;
 
     /**
+     * @brief Get the unit of the variable of integration.
+     *
+     * Get the unit of the variable of integration.
+     *
+     * @return The unit of the variable of integration.
+     */
+
+    std::string voiUnit() const;
+
+    /**
      * @brief Get the number of states.
      *
      * Get the number of states.
@@ -95,7 +105,7 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the state at the given index.
+     * @brief Get the name of the state.
      *
      * Get the name of the state at the given index.
      *
@@ -105,6 +115,18 @@ public:
      */
 
     std::string stateName(size_t pIndex) const;
+
+    /**
+     * @brief Get the unit of the state.
+     *
+     * Get the unit of the state at the given index.
+     *
+     * @param pIndex The index of the state.
+     *
+     * @return The unit of the state.
+     */
+
+    std::string stateUnit(size_t pIndex) const;
 
     /**
      * @brief Get the number of rates.
@@ -133,7 +155,7 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the rate at the given index.
+     * @brief Get the name of the rate.
      *
      * Get the name of the rate at the given index.
      *
@@ -143,6 +165,18 @@ public:
      */
 
     std::string rateName(size_t pIndex) const;
+
+    /**
+     * @brief Get the unit of the rate.
+     *
+     * Get the unit of the rate at the given index.
+     *
+     * @param pIndex The index of the rate.
+     *
+     * @return The unit of the rate.
+     */
+
+    std::string rateUnit(size_t pIndex) const;
 
     /**
      * @brief Get the number of variables.
@@ -171,7 +205,7 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the variable at the given index.
+     * @brief Get the name of the variable.
      *
      * Get the name of the variable at the given index.
      *
@@ -181,6 +215,18 @@ public:
      */
 
     std::string variableName(size_t pIndex) const;
+
+    /**
+     * @brief Get the unit of the variable.
+     *
+     * Get the unit of the variable at the given index.
+     *
+     * @param pIndex The index of the variable.
+     *
+     * @return The unit of the variable.
+     */
+
+    std::string variableUnit(size_t pIndex) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
