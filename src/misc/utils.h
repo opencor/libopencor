@@ -31,6 +31,10 @@ limitations under the License.
 
 #include <libxml/xmlstring.h>
 
+#ifdef NAN
+#    undef NAN
+#endif
+
 namespace libOpenCOR {
 
 static const std::string LIBOPENCOR_NAMESPACE = "https://opencor.ws/libopencor";
