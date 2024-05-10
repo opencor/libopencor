@@ -25,11 +25,6 @@ SolverSecondOrderRungeKutta::Impl::Impl()
 {
 }
 
-SolverSecondOrderRungeKutta::Impl::~Impl()
-{
-    delete[] mYk;
-}
-
 SolverPtr SolverSecondOrderRungeKutta::Impl::duplicate()
 {
     return SolverOdeFixedStep::Impl::duplicate(SolverSecondOrderRungeKutta::create());
@@ -51,7 +46,9 @@ bool SolverSecondOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
 
     // Create our various arrays.
 
-    mYk = new double[pSize] {};
+    mYkDoubles.resize(pSize, NAN);
+
+    mYk = mYkDoubles.data();
 
     return true;
 }

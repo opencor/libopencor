@@ -25,14 +25,6 @@ SolverFourthOrderRungeKutta::Impl::Impl()
 {
 }
 
-SolverFourthOrderRungeKutta::Impl::~Impl()
-{
-    delete[] mK1;
-    delete[] mK2;
-    delete[] mK3;
-    delete[] mYk;
-}
-
 SolverPtr SolverFourthOrderRungeKutta::Impl::duplicate()
 {
     return SolverOdeFixedStep::Impl::duplicate(SolverFourthOrderRungeKutta::create());
@@ -54,10 +46,15 @@ bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
 
     // Create our various arrays.
 
-    mK1 = new double[pSize] {};
-    mK2 = new double[pSize] {};
-    mK3 = new double[pSize] {};
-    mYk = new double[pSize] {};
+    mK1Doubles.resize(pSize, NAN);
+    mK2Doubles.resize(pSize, NAN);
+    mK3Doubles.resize(pSize, NAN);
+    mYkDoubles.resize(pSize, NAN);
+
+    mK1 = mK1Doubles.data();
+    mK2 = mK2Doubles.data();
+    mK3 = mK3Doubles.data();
+    mYk = mYkDoubles.data();
 
     return true;
 }

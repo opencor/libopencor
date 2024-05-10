@@ -27,8 +27,9 @@ class SolverSecondOrderRungeKutta::Impl: public SolverOdeFixedStep::Impl
 public:
     double *mYk = nullptr;
 
+    Doubles mYkDoubles;
+
     explicit Impl();
-    ~Impl() override;
 
     SolverPtr duplicate() override;
 

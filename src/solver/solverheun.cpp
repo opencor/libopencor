@@ -25,12 +25,6 @@ SolverHeun::Impl::Impl()
 {
 }
 
-SolverHeun::Impl::~Impl()
-{
-    delete[] mK;
-    delete[] mYk;
-}
-
 SolverPtr SolverHeun::Impl::duplicate()
 {
     return SolverOdeFixedStep::Impl::duplicate(SolverHeun::create());
@@ -51,8 +45,11 @@ bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, do
 
     // Create our various arrays.
 
-    mK = new double[pSize] {};
-    mYk = new double[pSize] {};
+    mKDoubles.resize(pSize, NAN);
+    mYkDoubles.resize(pSize, NAN);
+
+    mK = mKDoubles.data();
+    mYk = mYkDoubles.data();
 
     return true;
 }

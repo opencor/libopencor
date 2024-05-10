@@ -30,8 +30,12 @@ public:
     double *mK3 = nullptr;
     double *mYk = nullptr;
 
+    Doubles mK1Doubles;
+    Doubles mK2Doubles;
+    Doubles mK3Doubles;
+    Doubles mYkDoubles;
+
     explicit Impl();
-    ~Impl() override;
 
     SolverPtr duplicate() override;
 
