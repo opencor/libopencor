@@ -159,10 +159,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Simulation page.
 
     const input = $("#dropAreaInput")[0];
-    const dropArea = $("#dropArea")[0];
+    const dropArea = $("#dropArea");
     let hasValidFile = false;
 
-    input.addEventListener("change", (event) => {
+    input.onchange = () => {
       if (hasValidFile) {
         let inputFile = input.files[0];
         let fileReader = new FileReader();
@@ -271,26 +271,26 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         resetFile();
       }
-    });
+    };
 
     ["dragenter", "dragover"].forEach((eventName) => {
-      dropArea.addEventListener(eventName, (event) => {
+      dropArea[0].addEventListener(eventName, (event) => {
         if (event.dataTransfer.items.length === 1) {
           hasValidFile = true;
 
-          dropArea.classList.add("drop-area-valid-file");
+          dropArea.addClass("drop-area-valid-file");
         } else {
           hasValidFile = false;
 
-          dropArea.classList.add("drop-area-invalid-file-s");
+          dropArea.addClass("drop-area-invalid-file-s");
         }
       });
     });
 
     ["dragleave", "drop"].forEach((eventName) => {
-      dropArea.addEventListener(eventName, () => {
-        dropArea.classList.remove("drop-area-valid-file");
-        dropArea.classList.remove("drop-area-invalid-file-s");
+      dropArea.on(eventName, () => {
+        dropArea.removeClass("drop-area-valid-file");
+        dropArea.removeClass("drop-area-invalid-file-s");
       });
     });
 
