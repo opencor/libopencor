@@ -219,6 +219,29 @@ describe("Sed coverage tests", () => {
     expect(simulation.numberOfSteps()).toBe(10);
   });
 
+  test("SedInstanceTask", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    const sed = new libopencor.SedDocument(file);
+    const solver = sed.simulations().get(0).odeSolver();
+
+    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
+    solver.setUpperHalfBandwidth(-1);
+
+    const instance = sed.createInstance();
+
+    instance.run();
+
+    expectIssues(libopencor, instance, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
+      ],
+    ]);
+  });
+
   test("Solver", () => {
     // Get the duplicate() method of different solvers to be covered.
 
@@ -265,28 +288,5 @@ describe("Sed coverage tests", () => {
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
-  });
-
-  test("SedInstanceTask", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
-
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-
-    const sed = new libopencor.SedDocument(file);
-    const solver = sed.simulations().get(0).odeSolver();
-
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
-    solver.setUpperHalfBandwidth(-1);
-
-    const instance = sed.createInstance();
-
-    instance.run();
-
-    expectIssues(libopencor, instance, [
-      [
-        libopencor.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
-      ],
-    ]);
   });
 });

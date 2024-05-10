@@ -222,6 +222,27 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
     EXPECT_EQ(simulation->numberOfSteps(), NUMBER_OF_STEPS);
 }
 
+TEST(CoverageSedTest, sedInstanceTask)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
+    };
+    static const auto UPPER_HALF_BANDWIDTH = -1;
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto sed = libOpenCOR::SedDocument::create(file);
+    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(sed->simulations()[0]->odeSolver());
+
+    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
+    solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
+
+    auto instance = sed->createInstance();
+
+    instance->run();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
 TEST(CoverageSedTest, solver)
 {
     // Get the duplicate() method of different solvers to be covered.
@@ -260,25 +281,4 @@ TEST(CoverageSedTest, solver)
     instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
-}
-
-TEST(CoverageSedTest, sedInstanceTask)
-{
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
-    };
-    static const auto UPPER_HALF_BANDWIDTH = -1;
-
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(sed->simulations()[0]->odeSolver());
-
-    solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
-    solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
-
-    auto instance = sed->createInstance();
-
-    instance->run();
-
-    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
