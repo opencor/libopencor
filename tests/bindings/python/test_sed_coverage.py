@@ -1,6 +1,6 @@
 # Copyright libOpenCOR contributors.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the "License"
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -227,7 +227,7 @@ def test_sed_simulation_uniform_time_course():
     assert simulation.number_of_steps == 10
 
 
-def test_sed_instance_task():
+def test_sed_instance_and_sed_isntance_task():
     expected_issues = [
         [
             Issue.Type.Error,
@@ -243,6 +243,35 @@ def test_sed_instance_task():
     solver.upper_half_bandwidth = -1
 
     instance = sed.create_instance()
+    instance_task = instance.tasks()[0]
+
+    assert instance_task.voi() == []
+    assert instance_task.voi_name() == "main.t"
+    assert instance_task.voi_unit() == "dimensionless"
+
+    assert instance_task.state_count() == 3
+    assert instance_task.state(0) == []
+    assert instance_task.state(3) == []
+    assert instance_task.state_name(0) == "main.x"
+    assert instance_task.state_name(3) == ""
+    assert instance_task.state_unit(0) == "dimensionless"
+    assert instance_task.state_unit(3) == ""
+
+    assert instance_task.rate_count() == 3
+    assert instance_task.rate(0) == []
+    assert instance_task.rate(3) == []
+    assert instance_task.rate_name(0) == "main.x'"
+    assert instance_task.rate_name(3) == ""
+    assert instance_task.rate_unit(0) == "dimensionless/dimensionless"
+    assert instance_task.rate_unit(3) == ""
+
+    assert instance_task.variable_count() == 3
+    assert instance_task.variable(0) == []
+    assert instance_task.variable(3) == []
+    assert instance_task.variable_name(0) == "main.sigma"
+    assert instance_task.variable_name(3) == ""
+    assert instance_task.variable_unit(0) == "dimensionless"
+    assert instance_task.variable_unit(3) == ""
 
     instance.run()
 

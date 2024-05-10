@@ -219,7 +219,7 @@ describe("Sed coverage tests", () => {
     expect(simulation.numberOfSteps()).toBe(10);
   });
 
-  test("SedInstanceTask", () => {
+  test("SedInstanceAndSedInstanceTask", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
@@ -231,6 +231,42 @@ describe("Sed coverage tests", () => {
     solver.setUpperHalfBandwidth(-1);
 
     const instance = sed.createInstance();
+    const instanceTask = instance.tasks().get(0);
+
+    expect(instanceTask.voi().size()).toBe(0);
+    expect(instanceTask.voiAsArray()).toStrictEqual([]);
+    expect(instanceTask.voiName()).toBe("main.t");
+    expect(instanceTask.voiUnit()).toBe("dimensionless");
+
+    expect(instanceTask.stateCount()).toBe(3);
+    expect(instanceTask.state(0).size()).toBe(0);
+    expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.state(3).size()).toBe(0);
+    expect(instanceTask.stateAsArray(3)).toStrictEqual([]);
+    expect(instanceTask.stateName(0)).toBe("main.x");
+    expect(instanceTask.stateName(3)).toBe("");
+    expect(instanceTask.stateUnit(0)).toBe("dimensionless");
+    expect(instanceTask.stateUnit(3)).toBe("");
+
+    expect(instanceTask.rateCount()).toBe(3);
+    expect(instanceTask.rate(0).size()).toBe(0);
+    expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.rate(3).size()).toBe(0);
+    expect(instanceTask.rateAsArray(3)).toStrictEqual([]);
+    expect(instanceTask.rateName(0)).toBe("main.x'");
+    expect(instanceTask.rateName(3)).toBe("");
+    expect(instanceTask.rateUnit(0)).toBe("dimensionless/dimensionless");
+    expect(instanceTask.rateUnit(3)).toBe("");
+
+    expect(instanceTask.variableCount()).toBe(3);
+    expect(instanceTask.variable(0).size()).toBe(0);
+    expect(instanceTask.variableAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.variable(3).size()).toBe(0);
+    expect(instanceTask.variableAsArray(3)).toStrictEqual([]);
+    expect(instanceTask.variableName(0)).toBe("main.sigma");
+    expect(instanceTask.variableName(3)).toBe("");
+    expect(instanceTask.variableUnit(0)).toBe("dimensionless");
+    expect(instanceTask.variableUnit(3)).toBe("");
 
     instance.run();
 

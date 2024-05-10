@@ -222,7 +222,7 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
     EXPECT_EQ(simulation->numberOfSteps(), NUMBER_OF_STEPS);
 }
 
-TEST(CoverageSedTest, sedInstanceTask)
+TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
@@ -237,6 +237,37 @@ TEST(CoverageSedTest, sedInstanceTask)
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
     auto instance = sed->createInstance();
+    auto instanceTask = instance->tasks()[0];
+
+    static const auto NoDoubles = std::vector<double> {};
+
+    EXPECT_EQ(instanceTask->voi(), NoDoubles);
+    EXPECT_EQ(instanceTask->voiName(), "main.t");
+    EXPECT_EQ(instanceTask->voiUnit(), "dimensionless");
+
+    EXPECT_EQ(instanceTask->stateCount(), 3);
+    EXPECT_EQ(instanceTask->state(0), NoDoubles);
+    EXPECT_EQ(instanceTask->state(3), NoDoubles);
+    EXPECT_EQ(instanceTask->stateName(0), "main.x");
+    EXPECT_EQ(instanceTask->stateName(3), "");
+    EXPECT_EQ(instanceTask->stateUnit(0), "dimensionless");
+    EXPECT_EQ(instanceTask->stateUnit(3), "");
+
+    EXPECT_EQ(instanceTask->rateCount(), 3);
+    EXPECT_EQ(instanceTask->rate(0), NoDoubles);
+    EXPECT_EQ(instanceTask->rate(3), NoDoubles);
+    EXPECT_EQ(instanceTask->rateName(0), "main.x'");
+    EXPECT_EQ(instanceTask->rateName(3), "");
+    EXPECT_EQ(instanceTask->rateUnit(0), "dimensionless/dimensionless");
+    EXPECT_EQ(instanceTask->rateUnit(3), "");
+
+    EXPECT_EQ(instanceTask->variableCount(), 3);
+    EXPECT_EQ(instanceTask->variable(0), NoDoubles);
+    EXPECT_EQ(instanceTask->variable(3), NoDoubles);
+    EXPECT_EQ(instanceTask->variableName(0), "main.sigma");
+    EXPECT_EQ(instanceTask->variableName(3), "");
+    EXPECT_EQ(instanceTask->variableUnit(0), "dimensionless");
+    EXPECT_EQ(instanceTask->variableUnit(3), "");
 
     instance->run();
 
