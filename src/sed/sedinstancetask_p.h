@@ -69,8 +69,6 @@ public:
     Doubles rate(size_t pIndex) const;
     Doubles variable(size_t pIndex) const;
 
-    std::string name(const libcellml::VariablePtr &pVariable) const;
-
     std::string voiName() const;
     std::string voiUnit() const;
 

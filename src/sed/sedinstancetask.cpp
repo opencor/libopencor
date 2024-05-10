@@ -144,12 +144,12 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     mResults.voi[pIndex] = mVoi;
 
     for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
-        mResults.states[i][pIndex] = mStates[i];
-        mResults.rates[i][pIndex] = mRates[i];
+        mResults.states[i][pIndex] = mStates[i]; // NOLINT
+        mResults.rates[i][pIndex] = mRates[i]; // NOLINT
     }
 
     for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
-        mResults.variables[i][pIndex] = mVariables[i];
+        mResults.variables[i][pIndex] = mVariables[i]; // NOLINT
     }
 }
 
@@ -228,7 +228,7 @@ void SedInstanceTask::Impl::run()
     if (mDifferentialModel) {
         // Initialise our results structure.
 
-        auto resultsSize = mSedUniformTimeCourse->pimpl()->mNumberOfSteps + 1;
+        auto resultsSize = static_cast<size_t>(mSedUniformTimeCourse->pimpl()->mNumberOfSteps) + 1;
 
         mResults.voi.resize(resultsSize, NAN);
 
@@ -319,12 +319,16 @@ Doubles SedInstanceTask::Impl::variable(size_t pIndex) const
     return mResults.variables[pIndex];
 }
 
-std::string SedInstanceTask::Impl::name(const libcellml::VariablePtr &pVariable) const
+namespace {
+
+std::string name(const libcellml::VariablePtr &pVariable)
 {
     auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
 
     return component->name() + "." + pVariable->name();
 }
+
+} // namespace
 
 std::string SedInstanceTask::Impl::voiName() const
 {
