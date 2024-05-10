@@ -432,3 +432,15 @@ jobs:
       - name: pip uninstall libOpenCOR
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: pip3 uninstall -y libopencor
+  spell_check:
+    name: Spell check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out libOpenCOR
+        uses: actions/checkout@v4
+      - name: Spell check
+        uses: codespell-project/actions-codespell@v2
+        with:
+          check_filenames: true
+          skip: ./extern
+          exclude_file: .codespellexclude
