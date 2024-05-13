@@ -50,8 +50,8 @@ public:
      * Factory method to create a @ref SedSteadyState object:
      *
      * ```
-     * auto sed = libOpenCOR::SedDocument::create();
-     * auto simulation = libOpenCOR::SedSteadyState::create(sed);
+     * auto document = libOpenCOR::SedDocument::create();
+     * auto simulation = libOpenCOR::SedSteadyState::create(document);
      * ```
      *
      * @param pDocument The @ref SedDocument object to which the @ref SedSteadyState object is to belong.

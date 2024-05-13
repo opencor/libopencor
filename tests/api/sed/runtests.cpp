@@ -26,8 +26,8 @@ TEST(RunSedTest, noFile)
         {libOpenCOR::Issue::Type::ERROR, "The simulation experiment description does not contain any tasks to run."},
     };
 
-    auto sed = libOpenCOR::SedDocument::create();
-    auto instance = sed->createInstance();
+    auto document = libOpenCOR::SedDocument::create();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -40,8 +40,8 @@ TEST(RunSedTest, invalidCellmlFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto instance = sed->createInstance();
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -54,8 +54,8 @@ TEST(RunSedTest, overconstrainedCellmlFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto instance = sed->createInstance();
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -68,8 +68,8 @@ TEST(RunSedTest, underconstrainedCellmlFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/underconstrained.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto instance = sed->createInstance();
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -83,8 +83,8 @@ TEST(RunSedTest, unsuitablyConstrainedCellmlFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsuitably_constrained.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto instance = sed->createInstance();
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -94,8 +94,8 @@ namespace {
 void runAlgebraicModel(bool pCompiled)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto instance = sed->createInstance(pCompiled);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->createInstance(pCompiled);
 
     instance->run();
 
@@ -123,8 +123,8 @@ void runOdeModel(bool pCompiled)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
 
     static const auto NOK_MAXIMUM_NUMBER_OF_STEPS = 10;
 
@@ -132,7 +132,7 @@ void runOdeModel(bool pCompiled)
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
-    auto instance = sed->createInstance(pCompiled);
+    auto instance = document->createInstance(pCompiled);
 
     EXPECT_FALSE(instance->hasIssues());
 
@@ -144,7 +144,7 @@ void runOdeModel(bool pCompiled)
 
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
-    instance = sed->createInstance(pCompiled);
+    instance = document->createInstance(pCompiled);
 
     instance->run();
 
@@ -170,11 +170,11 @@ TEST(RunSedTest, odeModelWithNoOdeSolver)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto document = libOpenCOR::SedDocument::create(file);
 
-    sed->simulations()[0]->setOdeSolver(nullptr);
+    document->simulations()[0]->setOdeSolver(nullptr);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -188,20 +188,20 @@ TEST(RunSedTest, nlaModel)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto kinsol = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    instance = sed->createInstance();
+    instance = document->createInstance();
 
     EXPECT_FALSE(instance->hasIssues());
 }
@@ -213,11 +213,11 @@ TEST(RunSedTest, nlaModelWithNoNlaSolver)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto document = libOpenCOR::SedDocument::create(file);
 
-    sed->simulations()[0]->setNlaSolver(nullptr);
+    document->simulations()[0]->setNlaSolver(nullptr);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -229,14 +229,14 @@ TEST(RunSedTest, daeModel)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto kinsol = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 
@@ -246,7 +246,7 @@ TEST(RunSedTest, daeModel)
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    instance = sed->createInstance();
+    instance = document->createInstance();
 
     instance->run();
 
@@ -261,13 +261,13 @@ TEST(RunSedTest, daeModelWithNoOdeOrNlaSolver)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = sed->simulations()[0];
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = document->simulations()[0];
 
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }

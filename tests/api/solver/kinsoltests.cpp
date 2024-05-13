@@ -27,13 +27,13 @@ TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setMaximumNumberOfIterations(0);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -45,14 +45,14 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(-1);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -64,14 +64,14 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(1);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -83,14 +83,14 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(-1);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -102,14 +102,14 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(1);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -120,8 +120,8 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
 TEST(KinsolSolverTest, solve)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto instance = sed->createInstance();
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->createInstance();
 
     instance->run();
 
@@ -131,15 +131,15 @@ TEST(KinsolSolverTest, solve)
 TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(2);
     solver->setLowerHalfBandwidth(2);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     instance->run();
 
@@ -149,13 +149,13 @@ TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::GMRES);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     instance->run();
 
@@ -165,13 +165,13 @@ TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     instance->run();
 
@@ -181,13 +181,13 @@ TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     instance->run();
 

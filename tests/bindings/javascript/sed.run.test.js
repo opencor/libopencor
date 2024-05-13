@@ -77,8 +77,8 @@ describe("Sed run tests", () => {
   });
 
   test("No file", () => {
-    const sed = new libopencor.SedDocument();
-    const instance = sed.createInstance();
+    const document = new libopencor.SedDocument();
+    const instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [
@@ -96,8 +96,8 @@ describe("Sed run tests", () => {
       utils.SOME_ERROR_CELLML_CONTENTS.length,
     );
 
-    const sed = new libopencor.SedDocument(file);
-    const instance = sed.createInstance();
+    const document = new libopencor.SedDocument(file);
+    const instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
@@ -116,8 +116,8 @@ describe("Sed run tests", () => {
       utils.SOME_OVERCONSTRAINED_CONTENTS.length,
     );
 
-    const sed = new libopencor.SedDocument(file);
-    const instance = sed.createInstance();
+    const document = new libopencor.SedDocument(file);
+    const instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
@@ -136,8 +136,8 @@ describe("Sed run tests", () => {
       utils.SOME_UNDERCONSTRAINED_CONTENTS.length,
     );
 
-    const sed = new libopencor.SedDocument(file);
-    const instance = sed.createInstance();
+    const document = new libopencor.SedDocument(file);
+    const instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
@@ -156,8 +156,8 @@ describe("Sed run tests", () => {
       utils.SOME_UNSUITABLY_CONSTRAINED_CONTENTS.length,
     );
 
-    const sed = new libopencor.SedDocument(file);
-    const instance = sed.createInstance();
+    const document = new libopencor.SedDocument(file);
+    const instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [
@@ -183,8 +183,8 @@ describe("Sed run tests", () => {
       utils.SOME_ALGEBRAIC_CONTENTS.length,
     );
 
-    const sed = new libopencor.SedDocument(file);
-    const instance = sed.createInstance();
+    const document = new libopencor.SedDocument(file);
+    const instance = document.createInstance();
 
     instance.run();
 
@@ -196,13 +196,13 @@ describe("Sed run tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const cvode = simulation.odeSolver();
 
     cvode.setMaximumNumberOfSteps(10);
 
-    let instance = sed.createInstance();
+    let instance = document.createInstance();
 
     expect(instance.hasIssues()).toBe(false);
 
@@ -217,7 +217,7 @@ describe("Sed run tests", () => {
 
     cvode.setMaximumNumberOfSteps(500);
 
-    instance = sed.createInstance();
+    instance = document.createInstance();
 
     instance.run();
 
@@ -229,11 +229,11 @@ describe("Sed run tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    sed.simulations().get(0).setOdeSolver(null);
+    document.simulations().get(0).setOdeSolver(null);
 
-    const instance = sed.createInstance();
+    const instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [
@@ -249,14 +249,14 @@ describe("Sed run tests", () => {
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const kinsol = simulation.nlaSolver();
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
     kinsol.setUpperHalfBandwidth(-1);
 
-    let instance = sed.createInstance();
+    let instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [
@@ -267,7 +267,7 @@ describe("Sed run tests", () => {
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
-    instance = sed.createInstance();
+    instance = document.createInstance();
 
     expect(instance.hasIssues()).toBe(false);
   });
@@ -277,11 +277,11 @@ describe("Sed run tests", () => {
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    sed.simulations().get(0).setNlaSolver(null);
+    document.simulations().get(0).setNlaSolver(null);
 
-    const instance = sed.createInstance();
+    const instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [
@@ -298,14 +298,14 @@ describe("Sed run tests", () => {
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const kinsol = simulation.nlaSolver();
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
     kinsol.setUpperHalfBandwidth(-1);
 
-    let instance = sed.createInstance();
+    let instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [
@@ -325,7 +325,7 @@ describe("Sed run tests", () => {
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
-    instance = sed.createInstance();
+    instance = document.createInstance();
 
     instance.run();
 
@@ -338,13 +338,13 @@ describe("Sed run tests", () => {
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
 
     simulation.setOdeSolver(null);
     simulation.setNlaSolver(null);
 
-    const instance = sed.createInstance();
+    const instance = document.createInstance();
 
     /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
     expectIssues(libopencor, instance, [

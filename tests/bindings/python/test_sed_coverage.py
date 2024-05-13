@@ -38,58 +38,58 @@ def test_initialise():
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
 """
 
-    sed = SedDocument()
+    document = SedDocument()
 
-    assert sed.serialise() == expected_serialisation
+    assert document.serialise() == expected_serialisation
 
 
 def test_models():
-    sed = SedDocument()
+    document = SedDocument()
 
-    assert sed.has_models == False
-    assert sed.add_model(None) == False
+    assert document.has_models == False
+    assert document.add_model(None) == False
 
     file = File(utils.LOCAL_FILE)
-    model = SedModel(sed, file)
+    model = SedModel(document, file)
 
-    assert sed.add_model(model) == True
+    assert document.add_model(model) == True
 
-    assert len(sed.models) == 1
-    assert sed.models[0] == model
+    assert len(document.models) == 1
+    assert document.models[0] == model
 
-    assert sed.add_model(model) == False
-    assert sed.remove_model(model) == True
+    assert document.add_model(model) == False
+    assert document.remove_model(model) == True
 
-    assert sed.has_models == False
+    assert document.has_models == False
 
-    assert sed.remove_model(None) == False
+    assert document.remove_model(None) == False
 
 
 def test_simulations():
-    sed = SedDocument()
+    document = SedDocument()
 
-    assert sed.has_simulations == False
-    assert sed.add_simulation(None) == False
+    assert document.has_simulations == False
+    assert document.add_simulation(None) == False
 
-    uniformTimeCourse = SedUniformTimeCourse(sed)
-    steadyState = SedSteadyState(sed)
+    uniformTimeCourse = SedUniformTimeCourse(document)
+    steadyState = SedSteadyState(document)
 
-    assert sed.add_simulation(uniformTimeCourse) == True
-    assert sed.add_simulation(steadyState) == True
+    assert document.add_simulation(uniformTimeCourse) == True
+    assert document.add_simulation(steadyState) == True
 
-    assert len(sed.simulations) == 2
-    assert sed.simulations[0] == uniformTimeCourse
-    assert sed.simulations[1] == steadyState
+    assert len(document.simulations) == 2
+    assert document.simulations[0] == uniformTimeCourse
+    assert document.simulations[1] == steadyState
 
-    assert sed.add_simulation(uniformTimeCourse) == False
-    assert sed.remove_simulation(uniformTimeCourse) == True
+    assert document.add_simulation(uniformTimeCourse) == False
+    assert document.remove_simulation(uniformTimeCourse) == True
 
-    assert sed.add_simulation(steadyState) == False
-    assert sed.remove_simulation(steadyState) == True
+    assert document.add_simulation(steadyState) == False
+    assert document.remove_simulation(steadyState) == True
 
-    assert sed.has_simulations == False
+    assert document.has_simulations == False
 
-    assert sed.remove_simulation(None) == False
+    assert document.remove_simulation(None) == False
 
 
 def sed_task_expected_serialisation(with_properties):
@@ -109,25 +109,25 @@ def sed_task_expected_serialisation(with_properties):
 
 
 def test_tasks():
-    sed = SedDocument()
+    document = SedDocument()
 
-    assert sed.has_tasks == False
-    assert sed.add_task(None) == False
+    assert document.has_tasks == False
+    assert document.add_task(None) == False
 
     file = File(utils.LOCAL_FILE)
-    model = SedModel(sed, file)
-    simulation = SedUniformTimeCourse(sed)
-    task = SedTask(sed, model, simulation)
+    model = SedModel(document, file)
+    simulation = SedUniformTimeCourse(document)
+    task = SedTask(document, model, simulation)
 
     assert task.model != None
     assert task.simulation != None
 
-    assert sed.add_task(task) == True
+    assert document.add_task(task) == True
 
-    assert len(sed.tasks) == 1
-    assert sed.tasks[0] == task
+    assert len(document.tasks) == 1
+    assert document.tasks[0] == task
 
-    assert sed.serialise() == sed_task_expected_serialisation(True)
+    assert document.serialise() == sed_task_expected_serialisation(True)
 
     task.model = None
     task.simulation = None
@@ -135,7 +135,7 @@ def test_tasks():
     assert task.model == None
     assert task.simulation == None
 
-    assert sed.serialise() == sed_task_expected_serialisation(False)
+    assert document.serialise() == sed_task_expected_serialisation(False)
 
     expected_issues = [
         [
@@ -148,21 +148,21 @@ def test_tasks():
         ],
     ]
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
-    assert sed.add_task(task) == False
-    assert sed.remove_task(task) == True
+    assert document.add_task(task) == False
+    assert document.remove_task(task) == True
 
-    assert sed.has_tasks == False
+    assert document.has_tasks == False
 
-    assert sed.remove_task(None) == False
+    assert document.remove_task(None) == False
 
 
 def test_ode_solver():
-    sed = SedDocument()
-    simulation = SedUniformTimeCourse(sed)
+    document = SedDocument()
+    simulation = SedUniformTimeCourse(document)
 
     assert simulation.ode_solver == None
 
@@ -178,8 +178,8 @@ def test_ode_solver():
 
 
 def test_nla_solver():
-    sed = SedDocument()
-    simulation = SedUniformTimeCourse(sed)
+    document = SedDocument()
+    simulation = SedUniformTimeCourse(document)
 
     assert simulation.nla_solver == None
 
@@ -196,8 +196,8 @@ def test_nla_solver():
 
 def test_sed_simulation_one_step():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = SedOneStep(sed)
+    document = SedDocument(file)
+    simulation = SedOneStep(document)
 
     assert simulation.step == 1.0
 
@@ -208,8 +208,8 @@ def test_sed_simulation_one_step():
 
 def test_sed_simulation_uniform_time_course():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = SedUniformTimeCourse(sed)
+    document = SedDocument(file)
+    simulation = SedUniformTimeCourse(document)
 
     assert simulation.initial_time == 0.0
     assert simulation.output_start_time == 0.0
@@ -236,20 +236,20 @@ def test_sed_instance_and_sed_isntance_task():
     ]
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    solver = sed.simulations[0].ode_solver
+    document = SedDocument(file)
+    solver = document.simulations[0].ode_solver
 
     solver.linear_solver = SolverCvode.LinearSolver.Banded
     solver.upper_half_bandwidth = -1
 
-    instance = sed.create_instance()
-    instance_task = instance.tasks()[0]
+    instance = document.create_instance()
+    instance_task = instance.tasks[0]
 
-    assert instance_task.voi() == []
-    assert instance_task.voi_name() == "main.t"
-    assert instance_task.voi_unit() == "dimensionless"
+    assert instance_task.voi == []
+    assert instance_task.voi_name == "main.t"
+    assert instance_task.voi_unit == "dimensionless"
 
-    assert instance_task.state_count() == 3
+    assert instance_task.state_count == 3
     assert instance_task.state(0) == []
     assert instance_task.state(3) == []
     assert instance_task.state_name(0) == "main.x"
@@ -257,7 +257,7 @@ def test_sed_instance_and_sed_isntance_task():
     assert instance_task.state_unit(0) == "dimensionless"
     assert instance_task.state_unit(3) == ""
 
-    assert instance_task.rate_count() == 3
+    assert instance_task.rate_count == 3
     assert instance_task.rate(0) == []
     assert instance_task.rate(3) == []
     assert instance_task.rate_name(0) == "main.x'"
@@ -265,7 +265,7 @@ def test_sed_instance_and_sed_isntance_task():
     assert instance_task.rate_unit(0) == "dimensionless/dimensionless"
     assert instance_task.rate_unit(3) == ""
 
-    assert instance_task.variable_count() == 3
+    assert instance_task.variable_count == 3
     assert instance_task.variable(0) == []
     assert instance_task.variable(3) == []
     assert instance_task.variable_name(0) == "main.sigma"
@@ -282,35 +282,35 @@ def test_solver():
     # Get the duplicate() method of different solvers to be covered.
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    sed.simulations[0].ode_solver = SolverForwardEuler()
+    document.simulations[0].ode_solver = SolverForwardEuler()
 
-    instance = sed.create_instance()
-
-    instance.run()
-
-    assert instance.has_issues == False
-
-    sed.simulations[0].ode_solver = SolverFourthOrderRungeKutta()
-
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     instance.run()
 
     assert instance.has_issues == False
 
-    sed.simulations[0].ode_solver = SolverHeun()
+    document.simulations[0].ode_solver = SolverFourthOrderRungeKutta()
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     instance.run()
 
     assert instance.has_issues == False
 
-    sed.simulations[0].ode_solver = SolverSecondOrderRungeKutta()
+    document.simulations[0].ode_solver = SolverHeun()
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
+
+    instance.run()
+
+    assert instance.has_issues == False
+
+    document.simulations[0].ode_solver = SolverSecondOrderRungeKutta()
+
+    instance = document.create_instance()
 
     instance.run()
 

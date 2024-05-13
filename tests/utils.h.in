@@ -80,6 +80,13 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
     SCOPED_TRACE("Issue occurred here."); \
     libOpenCOR::expectEqualIssues(pLogger, pExpectedIssues)
 
+void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex, const libOpenCOR::Doubles &pStateValues,
+                       const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pVariableValues);
+
+#define EXPECT_EQ_VALUES(pInstanceTask, pIndex, pStateValues, pRateValues, pVariableValues) \
+    SCOPED_TRACE("Issue occurred here."); \
+    libOpenCOR::expectEqualValues(pInstanceTask, pIndex, pStateValues, pRateValues, pVariableValues)
+
 std::string resourcePath(const std::string &pResourceRelativePath = {});
 std::string textFileContents(const std::string &pFileName);
 

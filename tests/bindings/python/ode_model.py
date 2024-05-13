@@ -12,21 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(TEST solver)
 
-list(APPEND TESTS ${TEST})
+# from libopencor import File, Issue, SedDocument, SolverForwardEuler
+# import utils
+from utils import assert_values
 
-set(${TEST}_CATEGORY api)
-set(${TEST}_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/cvodetests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/forwardeulertests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/fourthorderrungekuttatests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/heuntests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/kinsoltests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/odemodel.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/secondorderrungekuttatests.cpp
-)
-set(${TEST}_HEADER_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/odemodel.h
-)
+
+def run(document, state_values, rate_values, variable_values, compiled):
+    simulation = document.simulations[0]
+
+    simulation.output_end_time = 50.0
+    simulation.number_of_steps = 50000
+
+    instance = document.create_instance(compiled)
+
+    instance.run()
+
+    instance_task = instance.tasks[0]
+
+    assert_values(instance_task, 13000, state_values, rate_values, variable_values)

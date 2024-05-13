@@ -14,11 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
-
-#include "tests/utils.h"
-
-#include <libopencor>
+#include "odemodel.h"
 
 TEST(HeunSolverTest, stepValueWithInvalidNumber)
 {
@@ -28,49 +24,50 @@ TEST(HeunSolverTest, stepValueWithInvalidNumber)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = libOpenCOR::SolverHeun::create();
 
     solver->setStep(STEP);
 
     simulation->setOdeSolver(solver);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 namespace {
 
-void heunSolve(bool pCompiled)
+void heunSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pRateValues,
+               const libOpenCOR::Doubles &pVariableValues, bool pCompiled)
 {
     static const auto STEP = 0.0123;
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = libOpenCOR::SolverHeun::create();
 
     solver->setStep(STEP);
 
     simulation->setOdeSolver(solver);
 
-    auto instance = sed->createInstance(pCompiled);
-
-    instance->run();
-
-    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+    OdeModel::run(document, pStateValues, pRateValues, pVariableValues, pCompiled);
 }
 
 } // namespace
 
+static const auto STATE_VALUES = std::vector<double>({-63.691259, 0.134516, 0.984133, 0.741370});
+static const auto RATE_VALUES = std::vector<double>({49.66942, -0.127532, -0.051693, 0.097711});
+static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.923478, -823.166811, 789.421406, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.951622, 0.116239, 0.002898, 0.966726, 12.0, 36.0, 0.539425, 0.056383});
+
 TEST(HeunSolverTest, compiledSolve)
 {
-    heunSolve(true);
+    heunSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, true);
 }
 
 TEST(HeunSolverTest, interpretedSolve)
 {
-    heunSolve(false);
+    heunSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, false);
 }

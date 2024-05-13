@@ -41,6 +41,16 @@ export const SOME_WARNING_CELLML_CONTENTS = stringToArrayBuffer(
 );
 export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
 
+export const SOME_ODE_MODEL_CONTENTS = stringToArrayBuffer(
+  `@SOME_ODE_MODEL_CONTENTS@`,
+);
+export const SOME_DAE_MODEL1_CONTENTS = stringToArrayBuffer(
+  `@SOME_DAE_MODEL1_CONTENTS@`,
+);
+export const SOME_DAE_MODEL2_CONTENTS = stringToArrayBuffer(
+  `@SOME_DAE_MODEL2_CONTENTS@`,
+);
+
 export const SOME_ALGEBRAIC_CONTENTS = stringToArrayBuffer(
   `@SOME_ALGEBRAIC_CONTENTS@`,
 );
@@ -73,6 +83,30 @@ export function expectIssues(libopencor, logger, expectedIssues) {
     } else {
       expect(issues.get(i).typeAsString()).toBe("Message");
     }
+  }
+}
+
+export function expectValues(
+  libopencor,
+  instanceTask,
+  index,
+  stateValues,
+  rateValues,
+  variableValues,
+) {
+  for (let i = 0; i < instanceTask.stateCount(); ++i) {
+    expect(instanceTask.stateAsArray(i)[index]).toBeCloseTo(stateValues[i], 6);
+  }
+
+  for (let i = 0; i < instanceTask.rateCount(); ++i) {
+    expect(instanceTask.rateAsArray(i)[index]).toBeCloseTo(rateValues[i], 6);
+  }
+
+  for (let i = 0; i < instanceTask.variableCount(); ++i) {
+    expect(instanceTask.variableAsArray(i)[index]).toBeCloseTo(
+      variableValues[i],
+      6,
+    );
   }
 }
 

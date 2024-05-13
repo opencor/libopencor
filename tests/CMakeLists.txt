@@ -52,6 +52,14 @@ string(REGEX REPLACE "\n" "\" \\n\"" SOME_WARNING_CELLML_CONTENTS_C "${SOME_WARN
 string(REPLACE "\"" "\\\"" SOME_SEDML_CONTENTS "${SOME_SEDML_CONTENTS}")
 string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_CONTENTS_C "${SOME_SEDML_CONTENTS}")
 
+file(READ res/api/solver/ode/model.cellml SOME_ODE_MODEL_CONTENTS)
+file(READ res/api/solver/nla/model1.cellml SOME_DAE_MODEL1_CONTENTS)
+file(READ res/api/solver/nla/model2.cellml SOME_DAE_MODEL2_CONTENTS)
+
+string(REPLACE "\"" "\\\"" SOME_ODE_MODEL_CONTENTS "${SOME_ODE_MODEL_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_DAE_MODEL1_CONTENTS "${SOME_DAE_MODEL1_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_DAE_MODEL2_CONTENTS "${SOME_DAE_MODEL2_CONTENTS}")
+
 file(READ res/api/sed/algebraic.cellml SOME_ALGEBRAIC_CONTENTS)
 file(READ res/api/sed/dae.cellml SOME_DAE_CONTENTS)
 file(READ res/api/sed/nla.cellml SOME_NLA_CONTENTS)

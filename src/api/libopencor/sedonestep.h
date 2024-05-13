@@ -49,8 +49,8 @@ public:
      * Factory method to create a @ref SedOneStep object:
      *
      * ```
-     * auto sed = libOpenCOR::SedDocument::create();
-     * auto simulation = libOpenCOR::SedOneStep::create(sed);
+     * auto document = libOpenCOR::SedDocument::create();
+     * auto simulation = libOpenCOR::SedOneStep::create(document);
      * ```
      *
      * @param pDocument The @ref SedDocument object to which the @ref SedOneStep object is to belong.

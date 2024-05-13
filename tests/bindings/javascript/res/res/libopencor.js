@@ -1,4 +1,4 @@
-let sed = null;
+let document = null;
 let simulation = null;
 let instance = null;
 let instanceTask = null;
@@ -20,16 +20,16 @@ const chart = lc
 const lineSeries = chart.addLineSeries().setName("");
 
 export function showPage(page) {
-  document.querySelectorAll(".nav-link").forEach((crtPage) => {
-    if (crtPage.id === "nav" + page) {
-      crtPage.classList.add("active");
+  $(".nav-link").each(function () {
+    if (this.id === "nav" + page) {
+      this.classList.add("active");
     } else {
-      crtPage.classList.remove("active");
+      this.classList.remove("active");
     }
   });
 
-  document.querySelectorAll(".page").forEach((crtPage) => {
-    crtPage.style.display = crtPage.id === "page" + page ? "block" : "none";
+  $(".page").each(function () {
+    this.style.display = this.id === "page" + page ? "block" : "none";
   });
 }
 
@@ -152,7 +152,7 @@ function formattedIssueDescription(issue) {
 
 import libOpenCOR from "../libopencor.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+$(() => {
   // Make sure that libOpenCOR is loaded before we do anything else.
 
   libOpenCOR().then((libopencor) => {
@@ -229,9 +229,9 @@ document.addEventListener("DOMContentLoaded", () => {
               } else {
                 // Retrieve some information about the simulation.
 
-                sed = new libopencor.SedDocument(file);
-                simulation = sed.simulations().get(0);
-                instance = sed.createInstance();
+                document = new libopencor.SedDocument(file);
+                simulation = document.simulations().get(0);
+                instance = document.createInstance();
                 instanceTask = instance.tasks().get(0);
 
                 $("#endingPoint").val(simulation.outputEndTime());

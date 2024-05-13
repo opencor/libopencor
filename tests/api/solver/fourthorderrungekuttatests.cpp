@@ -14,11 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
-
-#include "tests/utils.h"
-
-#include <libopencor>
+#include "odemodel.h"
 
 TEST(FourthOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
@@ -28,49 +24,50 @@ TEST(FourthOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = libOpenCOR::SolverFourthOrderRungeKutta::create();
 
     solver->setStep(STEP);
 
     simulation->setOdeSolver(solver);
 
-    auto instance = sed->createInstance();
+    auto instance = document->createInstance();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 namespace {
 
-void fourthOrderRungeKuttaSolve(bool pCompiled)
+void fourthOrderRungeKuttaSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pRateValues,
+                                const libOpenCOR::Doubles &pVariableValues, bool pCompiled)
 {
     static const auto STEP = 0.0123;
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
-    auto sed = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(sed->simulations()[0]);
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = libOpenCOR::SolverFourthOrderRungeKutta::create();
 
     solver->setStep(STEP);
 
     simulation->setOdeSolver(solver);
 
-    auto instance = sed->createInstance(pCompiled);
-
-    instance->run();
-
-    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+    OdeModel::run(document, pStateValues, pRateValues, pVariableValues, pCompiled);
 }
 
 } // namespace
 
+static const auto STATE_VALUES = std::vector<double>({-63.821233, 0.134844, 0.984267, 0.741105});
+static const auto RATE_VALUES = std::vector<double>({49.702735, -0.127922, -0.051225, 0.098266});
+static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.96247, -823.402257, 789.661995, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.963806, 0.115402, 0.002879, 0.967141, 12.0, 36.0, 0.540698, 0.056292});
+
 TEST(FourthOrderRungeKuttaSolverTest, compiledSolve)
 {
-    fourthOrderRungeKuttaSolve(true);
+    fourthOrderRungeKuttaSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, true);
 }
 
 TEST(FourthOrderRungeKuttaSolverTest, interpretedSolve)
 {
-    fourthOrderRungeKuttaSolve(false);
+    fourthOrderRungeKuttaSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, false);
 }

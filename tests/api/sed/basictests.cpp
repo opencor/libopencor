@@ -22,9 +22,9 @@ limitations under the License.
 
 TEST(BasicSedTest, noFile)
 {
-    auto sed = libOpenCOR::SedDocument::create();
+    auto document = libOpenCOR::SedDocument::create();
 
-    EXPECT_FALSE(sed->hasIssues());
+    EXPECT_FALSE(document->hasIssues());
 }
 
 TEST(BasicSedTest, unknownFile)
@@ -34,17 +34,17 @@ TEST(BasicSedTest, unknownFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(document, expectedIssues);
 }
 
 TEST(BasicSedTest, cellmlFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(sed->hasIssues());
+    EXPECT_FALSE(document->hasIssues());
 }
 
 TEST(BasicSedTest, sedmlFile)
@@ -54,9 +54,9 @@ TEST(BasicSedTest, sedmlFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(document, expectedIssues);
 }
 
 TEST(BasicSedTest, combineArchive)
@@ -66,9 +66,9 @@ TEST(BasicSedTest, combineArchive)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(document, expectedIssues);
 }
 
 TEST(BasicSedTest, irretrievableFile)
@@ -78,7 +78,7 @@ TEST(BasicSedTest, irretrievableFile)
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE));
-    auto sed = libOpenCOR::SedDocument::create(file);
+    auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(sed, expectedIssues);
+    EXPECT_EQ_ISSUES(document, expectedIssues);
 }
