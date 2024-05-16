@@ -21,19 +21,19 @@ jobs:
         include:
           - name: 'Windows release (Intel)'
             os: windows-latest
-            msvc_arch: amd64
+            arch: amd64
             build_type: Release
           - name: 'Windows debug (Intel)'
             os: windows-latest
-            msvc_arch: amd64
+            arch: amd64
             build_type: Debug
           - name: 'Windows release (ARM)'
             os: windows-latest
-            msvc_arch: amd64_arm64
+            arch: amd64_arm64
             build_type: Release
           - name: 'Windows debug (ARM)'
             os: windows-latest
-            msvc_arch: amd64_arm64
+            arch: amd64_arm64
             build_type: Debug
           - name: 'Linux (Intel)'
             os: ubuntu-latest
@@ -72,7 +72,7 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.msvc_arch }}
+          arch: ${{ matrix.arch }}
       - name: Configure libOpenCOR
         run: |
           mkdir build
