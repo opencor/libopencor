@@ -67,8 +67,6 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
 else()
     # Build our package.
 
-    set(LIBCLANG_BUILD_STATIC ON)
-
     if(INTEL_MODE)
         set(LLVM_TARGETS_TO_BUILD X86)
     else()
@@ -93,7 +91,7 @@ else()
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DLIBCLANG_BUILD_STATIC=${LIBCLANG_BUILD_STATIC}
+            -DLIBCLANG_BUILD_STATIC=ON
             -DLLVM_BUILD_RUNTIME=OFF
             -DLLVM_BUILD_RUNTIMES=OFF
             -DLLVM_BUILD_TOOLS=OFF
