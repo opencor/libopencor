@@ -18,7 +18,16 @@
 from utils import assert_values
 
 
-def run(document, state_values, rate_values, variable_values, compiled):
+def run(
+    document,
+    state_values,
+    state_abs_tols,
+    rate_values,
+    rate_abs_tols,
+    variable_values,
+    variable_abs_tols,
+    compiled=True,
+):
     simulation = document.simulations[0]
 
     simulation.output_end_time = 50.0
@@ -30,4 +39,13 @@ def run(document, state_values, rate_values, variable_values, compiled):
 
     instance_task = instance.tasks[0]
 
-    assert_values(instance_task, 13000, state_values, rate_values, variable_values)
+    assert_values(
+        instance_task,
+        13000,
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+    )

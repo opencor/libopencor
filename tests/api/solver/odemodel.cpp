@@ -19,7 +19,9 @@ limitations under the License.
 namespace OdeModel {
 
 void run(const libOpenCOR::SedDocumentPtr &pDocument, const libOpenCOR::Doubles &pStateValues,
-         const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pVariableValues, bool pCompiled)
+         const libOpenCOR::Doubles &pStateAbsTols, const libOpenCOR::Doubles &pRateValues,
+         const libOpenCOR::Doubles &pRateAbsTols, const libOpenCOR::Doubles &pVariableValues,
+         const libOpenCOR::Doubles &pVariableAbsTols, bool pCompiled)
 {
     static const auto OUTPUT_END_TIME = 50.0;
     static const auto NUMBER_OF_STEPS = 50000;
@@ -35,7 +37,7 @@ void run(const libOpenCOR::SedDocumentPtr &pDocument, const libOpenCOR::Doubles 
 
     auto instanceTask = instance->tasks()[0];
 
-    EXPECT_EQ_VALUES(instanceTask, 13000, pStateValues, pRateValues, pVariableValues);
+    EXPECT_EQ_VALUES(instanceTask, 13000, pStateValues, pStateAbsTols, pRateValues, pRateAbsTols, pVariableValues, pVariableAbsTols);
 }
 
 } // namespace OdeModel

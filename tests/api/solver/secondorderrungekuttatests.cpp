@@ -39,8 +39,10 @@ TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 
 namespace {
 
-void secondOrderRungeKuttaSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pRateValues,
-                                const libOpenCOR::Doubles &pVariableValues, bool pCompiled)
+void secondOrderRungeKuttaSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pStateAbsTols,
+                                const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
+                                const libOpenCOR::Doubles &pVariableValues, const libOpenCOR::Doubles &pVariableAbsTols,
+                                bool pCompiled)
 {
     static const auto STEP = 0.0123;
 
@@ -53,21 +55,24 @@ void secondOrderRungeKuttaSolve(const libOpenCOR::Doubles &pStateValues, const l
 
     simulation->setOdeSolver(solver);
 
-    OdeModel::run(document, pStateValues, pRateValues, pVariableValues, pCompiled);
+    OdeModel::run(document, pStateValues, pStateAbsTols, pRateValues, pRateAbsTols, pVariableValues, pVariableAbsTols, pCompiled);
 }
 
 } // namespace
 
 static const auto STATE_VALUES = std::vector<double>({-63.886525, 0.135009, 0.984334, 0.740971});
+static const auto STATE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001});
 static const auto RATE_VALUES = std::vector<double>({49.725722, -0.128194, -0.050903, 0.098651});
+static const auto RATE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001});
 static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.982058, -823.516942, 789.779614, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.969929, 0.114985, 0.00287, 0.967348, 12.0, 36.0, 0.541338, 0.056246});
+static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001});
 
 TEST(SecondOrderRungeKuttaSolverTest, compiledSolve)
 {
-    secondOrderRungeKuttaSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, true);
+    secondOrderRungeKuttaSolve(STATE_VALUES, STATE_ABS_TOLS, RATE_VALUES, RATE_ABS_TOLS, VARIABLE_VALUES, VARIABLE_ABS_TOLS, true);
 }
 
 TEST(SecondOrderRungeKuttaSolverTest, interpretedSolve)
 {
-    secondOrderRungeKuttaSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, false);
+    secondOrderRungeKuttaSolve(STATE_VALUES, STATE_ABS_TOLS, RATE_VALUES, RATE_ABS_TOLS, VARIABLE_VALUES, VARIABLE_ABS_TOLS, false);
 }

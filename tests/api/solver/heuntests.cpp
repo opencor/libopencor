@@ -39,8 +39,9 @@ TEST(HeunSolverTest, stepValueWithInvalidNumber)
 
 namespace {
 
-void heunSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pRateValues,
-               const libOpenCOR::Doubles &pVariableValues, bool pCompiled)
+void heunSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pStateAbsTols,
+               const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
+               const libOpenCOR::Doubles &pVariableValues, const libOpenCOR::Doubles &pVariableAbsTols, bool pCompiled)
 {
     static const auto STEP = 0.0123;
 
@@ -53,21 +54,24 @@ void heunSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Double
 
     simulation->setOdeSolver(solver);
 
-    OdeModel::run(document, pStateValues, pRateValues, pVariableValues, pCompiled);
+    OdeModel::run(document, pStateValues, pStateAbsTols, pRateValues, pRateAbsTols, pVariableValues, pVariableAbsTols, pCompiled);
 }
 
 } // namespace
 
-static const auto STATE_VALUES = std::vector<double>({-63.691259, 0.134516, 0.984133, 0.741370});
+static const auto STATE_VALUES = std::vector<double>({-63.691259, 0.134516, 0.984133, 0.74137});
+static const auto STATE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001});
 static const auto RATE_VALUES = std::vector<double>({49.66942, -0.127532, -0.051693, 0.097711});
+static const auto RATE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001});
 static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.923478, -823.166811, 789.421406, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.951622, 0.116239, 0.002898, 0.966726, 12.0, 36.0, 0.539425, 0.056383});
+static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001});
 
 TEST(HeunSolverTest, compiledSolve)
 {
-    heunSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, true);
+    heunSolve(STATE_VALUES, STATE_ABS_TOLS, RATE_VALUES, RATE_ABS_TOLS, VARIABLE_VALUES, VARIABLE_ABS_TOLS, true);
 }
 
 TEST(HeunSolverTest, interpretedSolve)
 {
-    heunSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, false);
+    heunSolve(STATE_VALUES, STATE_ABS_TOLS, RATE_VALUES, RATE_ABS_TOLS, VARIABLE_VALUES, VARIABLE_ABS_TOLS, false);
 }

@@ -61,18 +61,20 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
 }
 
 void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex, const libOpenCOR::Doubles &pStateValues,
-                       const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pVariableValues)
+                       const libOpenCOR::Doubles &pStateAbsTols, const libOpenCOR::Doubles &pRateValues,
+                       const libOpenCOR::Doubles &pRateAbsTols, const libOpenCOR::Doubles &pVariableValues,
+                       const libOpenCOR::Doubles &pVariableAbsTols)
 {
     for (size_t i = 0; i < pInstanceTask->stateCount(); ++i) {
-        EXPECT_NEAR(pInstanceTask->state(i)[pIndex], pStateValues[i], 0.000001);
+        EXPECT_NEAR(pInstanceTask->state(i)[pIndex], pStateValues[i], pStateAbsTols[i]);
     }
 
     for (size_t i = 0; i < pInstanceTask->rateCount(); ++i) {
-        EXPECT_NEAR(pInstanceTask->rate(i)[pIndex], pRateValues[i], 0.000001);
+        EXPECT_NEAR(pInstanceTask->rate(i)[pIndex], pRateValues[i], pRateAbsTols[i]);
     }
 
     for (size_t i = 0; i < pInstanceTask->variableCount(); ++i) {
-        EXPECT_NEAR(pInstanceTask->variable(i)[pIndex], pVariableValues[i], 0.000001);
+        EXPECT_NEAR(pInstanceTask->variable(i)[pIndex], pVariableValues[i], pVariableAbsTols[i]);
     }
 }
 

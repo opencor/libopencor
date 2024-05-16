@@ -44,7 +44,13 @@ def test_step_value_with_invalid_number():
 
 
 def fourth_order_runge_kutta_solve(
-    state_values, rate_values, variable_values, compiled
+    state_values,
+    state_abs_tols,
+    rate_values,
+    rate_abs_tols,
+    variable_values,
+    variable_abs_tols,
+    compiled,
 ):
     file = File(utils.resource_path("api/solver/ode/model.cellml"))
     document = SedDocument(file)
@@ -55,11 +61,22 @@ def fourth_order_runge_kutta_solve(
 
     simulation.ode_solver = solver
 
-    ode_model.run(document, state_values, rate_values, variable_values, compiled)
+    ode_model.run(
+        document,
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        compiled,
+    )
 
 
 state_values = [-63.821233, 0.134844, 0.984267, 0.741105]
+state_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 rate_values = [49.702735, -0.127922, -0.051225, 0.098266]
+rate_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 variable_values = [
     0.0,
     -15.96247,
@@ -80,11 +97,47 @@ variable_values = [
     0.540698,
     0.056292,
 ]
+variable_abs_tols = [
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+]
 
 
 def test_compiled_solve():
-    fourth_order_runge_kutta_solve(state_values, rate_values, variable_values, True)
+    fourth_order_runge_kutta_solve(
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        True,
+    )
 
 
 def test_interpreted_solve():
-    fourth_order_runge_kutta_solve(state_values, rate_values, variable_values, False)
+    fourth_order_runge_kutta_solve(
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        False,
+    )

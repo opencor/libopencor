@@ -39,8 +39,10 @@ TEST(ForwardEulerSolverTest, stepValueWithInvalidNumber)
 
 namespace {
 
-void forwardEulerSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pRateValues,
-                       const libOpenCOR::Doubles &pVariableValues, bool pCompiled)
+void forwardEulerSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pStateAbsTols,
+                       const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
+                       const libOpenCOR::Doubles &pVariableValues, const libOpenCOR::Doubles &pVariableAbsTols,
+                       bool pCompiled)
 {
     static const auto STEP = 0.0123;
 
@@ -53,21 +55,24 @@ void forwardEulerSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR
 
     simulation->setOdeSolver(solver);
 
-    OdeModel::run(document, pStateValues, pRateValues, pVariableValues, pCompiled);
+    OdeModel::run(document, pStateValues, pStateAbsTols, pRateValues, pRateAbsTols, pVariableValues, pVariableAbsTols, pCompiled);
 }
 
 } // namespace
 
 static const auto STATE_VALUES = std::vector<double>({-63.787727, 0.134748, 0.984255, 0.741178});
+static const auto STATE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001});
 static const auto RATE_VALUES = std::vector<double>({49.73577, -0.127963, -0.051257, 0.098331});
+static const auto RATE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001});
 static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.952418, -823.361177, 789.590304, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.960664, 0.115617, 0.002884, 0.967035, 12.0, 36.0, 0.54037, 0.056315});
+static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001});
 
 TEST(ForwardEulerSolverTest, compiledSolve)
 {
-    forwardEulerSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, true);
+    forwardEulerSolve(STATE_VALUES, STATE_ABS_TOLS, RATE_VALUES, RATE_ABS_TOLS, VARIABLE_VALUES, VARIABLE_ABS_TOLS, true);
 }
 
 TEST(ForwardEulerSolverTest, interpretedSolve)
 {
-    forwardEulerSolve(STATE_VALUES, RATE_VALUES, VARIABLE_VALUES, false);
+    forwardEulerSolve(STATE_VALUES, STATE_ABS_TOLS, RATE_VALUES, RATE_ABS_TOLS, VARIABLE_VALUES, VARIABLE_ABS_TOLS, false);
 }

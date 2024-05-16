@@ -43,7 +43,15 @@ def test_step_value_with_invalid_number():
     assert_issues(instance, expected_issues)
 
 
-def forward_euler_solve(state_values, rate_values, variable_values, compiled):
+def forward_euler_solve(
+    state_values,
+    state_abs_tols,
+    rate_values,
+    rate_abs_tols,
+    variable_values,
+    variable_abs_tols,
+    compiled,
+):
     file = File(utils.resource_path("api/solver/ode/model.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
@@ -53,11 +61,22 @@ def forward_euler_solve(state_values, rate_values, variable_values, compiled):
 
     simulation.ode_solver = solver
 
-    ode_model.run(document, state_values, rate_values, variable_values, compiled)
+    ode_model.run(
+        document,
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        compiled,
+    )
 
 
 state_values = [-63.787727, 0.134748, 0.984255, 0.741178]
+state_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 rate_values = [49.73577, -0.127963, -0.051257, 0.098331]
+rate_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 variable_values = [
     0.0,
     -15.952418,
@@ -78,11 +97,47 @@ variable_values = [
     0.54037,
     0.056315,
 ]
+variable_abs_tols = [
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+]
 
 
 def test_compiled_solve():
-    forward_euler_solve(state_values, rate_values, variable_values, True)
+    forward_euler_solve(
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        True,
+    )
 
 
 def test_interpreted_solve():
-    forward_euler_solve(state_values, rate_values, variable_values, False)
+    forward_euler_solve(
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        False,
+    )

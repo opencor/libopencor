@@ -43,7 +43,15 @@ def test_step_value_with_invalid_number():
     assert_issues(instance, expected_issues)
 
 
-def heun_solve(state_values, rate_values, variable_values, compiled):
+def heun_solve(
+    state_values,
+    state_abs_tols,
+    rate_values,
+    rate_abs_tols,
+    variable_values,
+    variable_abs_tols,
+    compiled,
+):
     file = File(utils.resource_path("api/solver/ode/model.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
@@ -53,11 +61,22 @@ def heun_solve(state_values, rate_values, variable_values, compiled):
 
     simulation.ode_solver = solver
 
-    ode_model.run(document, state_values, rate_values, variable_values, compiled)
+    ode_model.run(
+        document,
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        compiled,
+    )
 
 
 state_values = [-63.691259, 0.134516, 0.984133, 0.741370]
+state_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 rate_values = [49.66942, -0.127532, -0.051693, 0.097711]
+rate_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 variable_values = [
     0.0,
     -15.923478,
@@ -78,11 +97,47 @@ variable_values = [
     0.539425,
     0.056383,
 ]
+variable_abs_tols = [
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+    0.000001,
+]
 
 
 def test_compiled_solve():
-    heun_solve(state_values, rate_values, variable_values, True)
+    heun_solve(
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        True,
+    )
 
 
 def test_interpreted_solve():
-    heun_solve(state_values, rate_values, variable_values, False)
+    heun_solve(
+        state_values,
+        state_abs_tols,
+        rate_values,
+        rate_abs_tols,
+        variable_values,
+        variable_abs_tols,
+        False,
+    )

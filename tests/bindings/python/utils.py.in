@@ -75,20 +75,29 @@ def assert_issues(logger, expected_issues):
             assert issues[i].type_as_string == "Message"
 
 
-def assert_values(instance_task, index, state_values, rate_values, variable_values):
+def assert_values(
+    instance_task,
+    index,
+    state_values,
+    state_abs_tols,
+    rate_values,
+    rate_abs_tols,
+    variable_values,
+    variable_abs_tols,
+):
     for i in range(instance_task.state_count):
         assert instance_task.state(i)[index] == pytest.approx(
-            state_values[i], abs=0.000001
+            state_values[i], abs=state_abs_tols[i]
         )
 
     for i in range(instance_task.rate_count):
         assert instance_task.rate(i)[index] == pytest.approx(
-            rate_values[i], abs=0.000001
+            rate_values[i], abs=rate_abs_tols[i]
         )
 
     for i in range(instance_task.variable_count):
         assert instance_task.variable(i)[index] == pytest.approx(
-            variable_values[i], abs=0.000001
+            variable_values[i], abs=variable_abs_tols[i]
         )
 
 
