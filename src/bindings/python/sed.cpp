@@ -64,11 +64,28 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedInstance, libOpenCOR::Logger, libOpenCOR::SedInstancePtr> sedInstance(m, "SedInstance");
 
-    sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run the tasks associated with this SedInstance object.");
+    sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run the tasks associated with this SedInstance object.")
+        .def_property_readonly("tasks", &libOpenCOR::SedInstance::tasks, "Return the tasks.");
 
     // SedInstanceTask API.
 
     py::class_<libOpenCOR::SedInstanceTask, libOpenCOR::Logger, libOpenCOR::SedInstanceTaskPtr> sedInstanceTask(m, "SedInstanceTask");
+
+    sedInstanceTask.def_property_readonly("voi", &libOpenCOR::SedInstanceTask::voi, "Return the values of the variable of integration.")
+        .def_property_readonly("voi_name", &libOpenCOR::SedInstanceTask::voiName, "Return the name of the variable of integration.")
+        .def_property_readonly("voi_unit", &libOpenCOR::SedInstanceTask::voiUnit, "Return the unit of the variable of integration.")
+        .def_property_readonly("state_count", &libOpenCOR::SedInstanceTask::stateCount, "Return the number of states.")
+        .def("state", &libOpenCOR::SedInstanceTask::state, "Return the values of a state.")
+        .def("state_name", &libOpenCOR::SedInstanceTask::stateName, "Return the name of a state.")
+        .def("state_unit", &libOpenCOR::SedInstanceTask::stateUnit, "Return the unit of a state.")
+        .def_property_readonly("rate_count", &libOpenCOR::SedInstanceTask::rateCount, "Return the number of rates.")
+        .def("rate", &libOpenCOR::SedInstanceTask::rate, "Return the values of a rate.")
+        .def("rate_name", &libOpenCOR::SedInstanceTask::rateName, "Return the name of a rate.")
+        .def("rate_unit", &libOpenCOR::SedInstanceTask::rateUnit, "Return the unit of a rate.")
+        .def_property_readonly("variable_count", &libOpenCOR::SedInstanceTask::variableCount, "Return the number of variables.")
+        .def("variable", &libOpenCOR::SedInstanceTask::variable, "Return the values of a variable.")
+        .def("variable_name", &libOpenCOR::SedInstanceTask::variableName, "Return the name of a variable.")
+        .def("variable_unit", &libOpenCOR::SedInstanceTask::variableUnit, "Return the unit of a variable.");
 
     // SedModel API.
 

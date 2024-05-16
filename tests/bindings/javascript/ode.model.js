@@ -14,32 +14,32 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#pragma once
+import { expectValues } from "./utils.js";
 
-#include "logger_p.h"
+export function run(
+  libopencor,
+  document,
+  stateValues,
+  rateValues,
+  variableValues,
+) {
+  const simulation = document.simulations().get(0);
 
-#include "utils.h"
+  simulation.setOutputEndTime(50.0);
+  simulation.setNumberOfSteps(50000);
 
-#include "libopencor/solver.h"
+  const instance = document.createInstance();
 
-#include <libxml/tree.h>
+  instance.run();
 
-namespace libOpenCOR {
+  const instanceTask = instance.tasks().get(0);
 
-class Solver::Impl: public Logger::Impl
-{
-public:
-    std::string mId;
-    std::string mName;
-
-    explicit Impl(const std::string &pId, const std::string &pName);
-    virtual ~Impl() = default;
-
-    virtual SolverPtr duplicate() = 0;
-
-    void serialise(xmlNodePtr pNode, bool pNlaAlgorithm = false) const;
-
-    virtual StringStringMap properties() const = 0;
-};
-
-} // namespace libOpenCOR
+  expectValues(
+    libopencor,
+    instanceTask,
+    13000,
+    stateValues,
+    rateValues,
+    variableValues,
+  );
+}

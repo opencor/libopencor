@@ -50,8 +50,8 @@ public:
      * Factory method to create a @ref SedUniformTimeCourse object:
      *
      * ```
-     * auto sed = libOpenCOR::SedDocument::create();
-     * auto simulation = libOpenCOR::SedUniformTimeCourse::create(sed);
+     * auto document = libOpenCOR::SedDocument::create();
+     * auto simulation = libOpenCOR::SedUniformTimeCourse::create(document);
      * ```
      *
      * @param pDocument The @ref SedDocument object to which the @ref SedUniformTimeCourse object is to

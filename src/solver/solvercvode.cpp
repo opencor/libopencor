@@ -334,6 +334,15 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 
 bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 {
+    // Note: rate values are computed and handled internally by CVODE, so we can't access them and therefore need to
+    //       compute them ourselves. To do so, we keep track of the old state values (in mRates, to save memory) and
+    //       then update mRates once we have the new state values.
+
+    auto *oldStates = mRates;
+    auto oneOverdVoi = 1.0 / (pVoiEnd - pVoi);
+
+    std::copy(mStates, mStates + mSize, oldStates); // NOLINT
+
     // Solve the model using interpolation, if needed.
 
     if (!mInterpolateSolution) {
@@ -341,6 +350,14 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
     }
 
     auto res = CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL);
+
+    // Compute the rate values.
+
+    for (size_t i = 0; i < mSize; ++i) {
+        mRates[i] = oneOverdVoi * (mStates[i] - oldStates[i]); // NOLINT
+    }
+
+    // Make sure that everything went fine.
 
     if (res < CV_SUCCESS) {
         addError(mErrorMessage);

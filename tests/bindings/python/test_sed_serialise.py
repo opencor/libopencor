@@ -116,9 +116,9 @@ def kinsol_expected_serialisation(parameters=None):
 
 def test_local_cellml_file_with_base_path():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml"
     )
 
@@ -128,23 +128,23 @@ def test_local_cellml_file_without_base_path():
 
     file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
 
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
     if platform.system() == "Windows":
-        assert sed.serialise() == cvode_expected_serialisation(
+        assert document.serialise() == cvode_expected_serialisation(
             "file:///P:/some/path/file.txt"
         )
     else:
-        assert sed.serialise() == cvode_expected_serialisation(
+        assert document.serialise() == cvode_expected_serialisation(
             "file:///some/path/file.txt"
         )
 
 
 def test_relative_local_cellml_file_with_base_path():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise(
+    assert document.serialise(
         utils.resource_path() + "../.."
     ) == cvode_expected_serialisation("tests/res/cellml_2.cellml")
 
@@ -154,34 +154,34 @@ def test_relative_local_cellml_file_without_base_path():
 
     file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
 
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise() == cvode_expected_serialisation("cellml_2.cellml")
+    assert document.serialise() == cvode_expected_serialisation("cellml_2.cellml")
 
 
 def test_remote_cellml_file_with_base_path():
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise(utils.REMOTE_BASE_PATH) == cvode_expected_serialisation(
+    assert document.serialise(utils.REMOTE_BASE_PATH) == cvode_expected_serialisation(
         "cellml_2.cellml"
     )
 
 
 def test_remote_cellml_file_without_base_path():
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise() == cvode_expected_serialisation(
+    assert document.serialise() == cvode_expected_serialisation(
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
     )
 
 
 def test_relative_remote_cellml_file_with_base_path():
     file = File(utils.REMOTE_FILE)
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise(
+    assert document.serialise(
         utils.REMOTE_BASE_PATH + "/../.."
     ) == cvode_expected_serialisation("tests/res/cellml_2.cellml")
 
@@ -226,9 +226,9 @@ def test_dae_model():
 """
 
     file = File(utils.resource_path("api/sed/dae.cellml"))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise(utils.resource_path()) == expected_serialisation
+    assert document.serialise(utils.resource_path()) == expected_serialisation
 
 
 def test_nla_model():
@@ -256,9 +256,9 @@ def test_nla_model():
 """
 
     file = File(utils.resource_path("api/sed/nla.cellml"))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise(utils.resource_path()) == expected_serialisation
+    assert document.serialise(utils.resource_path()) == expected_serialisation
 
 
 def test_algebraic_model():
@@ -277,9 +277,9 @@ def test_algebraic_model():
 """
 
     file = File(utils.resource_path("api/sed/algebraic.cellml"))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    assert sed.serialise(utils.resource_path()) == expected_serialisation
+    assert document.serialise(utils.resource_path()) == expected_serialisation
 
 
 def test_fixed_step_ode_solver():
@@ -304,179 +304,179 @@ def test_fixed_step_ode_solver():
 """
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
 
     simulation.ode_solver = SolverForwardEuler()
 
-    assert sed.serialise(utils.resource_path()) == expected_serialisation
+    assert document.serialise(utils.resource_path()) == expected_serialisation
 
 
 def test_cvode_solver_with_adams_moulton_interation_method():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.integration_method = SolverCvode.IntegrationMethod.AdamsMoulton
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000475": "Adams-Moulton"}
     )
 
 
 def test_cvode_solver_with_functional_iteration_type():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.iteration_type = SolverCvode.IterationType.Functional
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000476": "Functional"}
     )
 
 
 def test_cvode_solver_with_banded_linear_solver():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.linear_solver = SolverCvode.LinearSolver.Banded
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "Banded"}
     )
 
 
 def test_cvode_solver_with_diagonal_linear_solver():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.linear_solver = SolverCvode.LinearSolver.Diagonal
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "Diagonal"}
     )
 
 
 def test_cvode_solver_with_gmres_linear_solver():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.linear_solver = SolverCvode.LinearSolver.Gmres
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "GMRES"}
     )
 
 
 def test_cvode_solver_with_bicgstab_linear_solver():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.linear_solver = SolverCvode.LinearSolver.Bicgstab
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "BiCGStab"}
     )
 
 
 def test_cvode_solver_with_tfqmr_linear_solver():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.linear_solver = SolverCvode.LinearSolver.Tfqmr
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "TFQMR"}
     )
 
 
 def test_cvode_solver_with_no_preconditioner():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.preconditioner = SolverCvode.Preconditioner.No
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000478": "No"}
     )
 
 
 def test_cvode_solver_with_no_interpolate_solution():
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.ode_solver
 
     solver.interpolate_solution = False
 
-    assert sed.serialise(utils.resource_path()) == cvode_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000481": "false"}
     )
 
 
 def test_kinsol_solver_with_banded_linear_solver():
     file = File(utils.resource_path("api/sed/nla.cellml"))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.nla_solver
 
     solver.linear_solver = SolverKinsol.LinearSolver.Banded
 
-    assert sed.serialise(utils.resource_path()) == kinsol_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == kinsol_expected_serialisation(
         {"KISAO:0000477": "Banded"}
     )
 
 
 def test_kinsol_solver_with_gmres_linear_solver():
     file = File(utils.resource_path("api/sed/nla.cellml"))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.nla_solver
 
     solver.linear_solver = SolverKinsol.LinearSolver.Gmres
 
-    assert sed.serialise(utils.resource_path()) == kinsol_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == kinsol_expected_serialisation(
         {"KISAO:0000477": "GMRES"}
     )
 
 
 def test_kinsol_solver_with_bicgstab_linear_solver():
     file = File(utils.resource_path("api/sed/nla.cellml"))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.nla_solver
 
     solver.linear_solver = SolverKinsol.LinearSolver.Bicgstab
 
-    assert sed.serialise(utils.resource_path()) == kinsol_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == kinsol_expected_serialisation(
         {"KISAO:0000477": "BiCGStab"}
     )
 
 
 def test_kinsol_solver_with_tfqmr_linear_solver():
     file = File(utils.resource_path("api/sed/nla.cellml"))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     solver = simulation.nla_solver
 
     solver.linear_solver = SolverKinsol.LinearSolver.Tfqmr
 
-    assert sed.serialise(utils.resource_path()) == kinsol_expected_serialisation(
+    assert document.serialise(utils.resource_path()) == kinsol_expected_serialisation(
         {"KISAO:0000477": "TFQMR"}
     )
 
@@ -497,12 +497,12 @@ def test_one_step_simulation():
 """
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    sed.remove_simulation(sed.simulations[0])
+    document.remove_simulation(document.simulations[0])
 
-    simulation = SedOneStep(sed)
+    simulation = SedOneStep(document)
 
-    sed.add_simulation(simulation)
+    document.add_simulation(simulation)
 
-    assert sed.serialise(utils.resource_path()) == expected_serialisation
+    assert document.serialise(utils.resource_path()) == expected_serialisation

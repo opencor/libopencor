@@ -259,9 +259,20 @@ if(EMSCRIPTEN)
                    ${SOURCE_FILES}
                    ${HEADER_FILES})
 
+    # Set the flags for our generated .js and .wasm files.
+    # Note #1: we use -O3 to get the best performance, -sALLOW_MEMORY_GROWTH to allow the memory to grow dynamically,
+    #          -sEXPORT_ES6=1 to export ES6 classes, -sEXPORTED_FUNCTIONS to export the functions we need,
+    #          -sINLINING_LIMIT to increase the inlining limit, -sSTACK_SIZE to increase the stack size, and --bind to
+    #          generate the necessary bindings.
+    # Note #2: by default, Emscripten uses 64KB of stack, but this is not enough for "complex" models such as the Zhang
+    #          et al. model (see https://github.com/agarny/COR/blob/master/Models/zhang_SAN_model_2000_all.cellml). For
+    #          that model, we need about 108KB of stack. However, Emscripten originally used to use 5MB of stack (see
+    #          https://github.com/emscripten-core/emscripten/pull/18191/files). So, here, we are using 4MB of stack,
+    #          which should be more than enough for any model.
+
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                           COMPILE_FLAGS "-O3"
-                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sINLINING_LIMIT --bind")
+                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sINLINING_LIMIT -sSTACK_SIZE=4MB --bind")
 
     # Create a ZIP file for our generated .js and .wasm files.
 

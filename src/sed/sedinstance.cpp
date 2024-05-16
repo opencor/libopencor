@@ -103,16 +103,19 @@ SedInstance::Impl *SedInstance::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const SedInstance::Impl *SedInstance::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
 void SedInstance::run()
 {
     pimpl()->run();
+}
+
+SedInstanceTaskPtrs SedInstance::tasks() const
+{
+    return pimpl()->mTasks;
 }
 
 } // namespace libOpenCOR

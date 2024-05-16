@@ -61,12 +61,32 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
-        .function("run", &libOpenCOR::SedInstance::run);
+        .function("run", &libOpenCOR::SedInstance::run)
+        .function("tasks", &libOpenCOR::SedInstance::tasks);
 
     // SedInstanceTask API.
 
     emscripten::class_<libOpenCOR::SedInstanceTask, emscripten::base<libOpenCOR::Logger>>("SedInstanceTask")
-        .smart_ptr<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTask");
+        .smart_ptr<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTask")
+        .function("voi", &libOpenCOR::SedInstanceTask::voi)
+        .function("voiAsArray", &libOpenCOR::SedInstanceTask::voiAsArray)
+        .function("voiName", &libOpenCOR::SedInstanceTask::voiName)
+        .function("voiUnit", &libOpenCOR::SedInstanceTask::voiUnit)
+        .function("stateCount", &libOpenCOR::SedInstanceTask::stateCount)
+        .function("state", &libOpenCOR::SedInstanceTask::state)
+        .function("stateAsArray", &libOpenCOR::SedInstanceTask::stateAsArray)
+        .function("stateName", &libOpenCOR::SedInstanceTask::stateName)
+        .function("stateUnit", &libOpenCOR::SedInstanceTask::stateUnit)
+        .function("rateCount", &libOpenCOR::SedInstanceTask::rateCount)
+        .function("rate", &libOpenCOR::SedInstanceTask::rate)
+        .function("rateAsArray", &libOpenCOR::SedInstanceTask::rateAsArray)
+        .function("rateName", &libOpenCOR::SedInstanceTask::rateName)
+        .function("rateUnit", &libOpenCOR::SedInstanceTask::rateUnit)
+        .function("variableCount", &libOpenCOR::SedInstanceTask::variableCount)
+        .function("variable", &libOpenCOR::SedInstanceTask::variable)
+        .function("variableAsArray", &libOpenCOR::SedInstanceTask::variableAsArray)
+        .function("variableName", &libOpenCOR::SedInstanceTask::variableName)
+        .function("variableUnit", &libOpenCOR::SedInstanceTask::variableUnit);
 
     // SedModel API.
 

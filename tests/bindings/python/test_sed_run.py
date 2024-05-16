@@ -26,8 +26,8 @@ def test_no_file():
         ],
     ]
 
-    sed = SedDocument()
-    instance = sed.create_instance()
+    document = SedDocument()
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
@@ -45,8 +45,8 @@ def test_invalid_cellml_file():
     ]
 
     file = File(utils.resource_path(utils.ERROR_CELLML_FILE))
-    sed = SedDocument(file)
-    instance = sed.create_instance()
+    document = SedDocument(file)
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
@@ -64,8 +64,8 @@ def test_overconstrained_cellml_file():
     ]
 
     file = File(utils.resource_path("api/sed/overconstrained.cellml"))
-    sed = SedDocument(file)
-    instance = sed.create_instance()
+    document = SedDocument(file)
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
@@ -83,8 +83,8 @@ def test_underconstrained_cellml_file():
     ]
 
     file = File(utils.resource_path("api/sed/underconstrained.cellml"))
-    sed = SedDocument(file)
-    instance = sed.create_instance()
+    document = SedDocument(file)
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
@@ -106,16 +106,16 @@ def test_unsuitable_constrained_cellml_file():
     ]
 
     file = File(utils.resource_path("api/sed/unsuitably_constrained.cellml"))
-    sed = SedDocument(file)
-    instance = sed.create_instance()
+    document = SedDocument(file)
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
 
 def run_algebraic_model(compiled):
     file = File(utils.resource_path("api/sed/algebraic.cellml"))
-    sed = SedDocument(file)
-    instance = sed.create_instance(compiled)
+    document = SedDocument(file)
+    instance = document.create_instance(compiled)
 
     instance.run()
 
@@ -139,13 +139,13 @@ def run_ode_model(compiled):
     ]
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     cvode = simulation.ode_solver
 
     cvode.maximum_number_of_steps = 10
 
-    instance = sed.create_instance(compiled)
+    instance = document.create_instance(compiled)
 
     assert instance.has_issues == False
 
@@ -155,7 +155,7 @@ def run_ode_model(compiled):
 
     cvode.maximum_number_of_steps = 500
 
-    instance = sed.create_instance(compiled)
+    instance = document.create_instance(compiled)
 
     instance.run()
 
@@ -179,11 +179,11 @@ def test_ode_model_with_no_ode_solver():
     ]
 
     file = File(utils.resource_path(utils.CELLML_2_FILE))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    sed.simulations[0].ode_solver = None
+    document.simulations[0].ode_solver = None
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
@@ -200,20 +200,20 @@ def test_nla_model():
     ]
 
     file = File(utils.resource_path("api/sed/nla.cellml"))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     kinsol = simulation.nla_solver
 
     kinsol.linear_solver = SolverKinsol.LinearSolver.Banded
     kinsol.upper_half_bandwidth = -1
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
     kinsol.linear_solver = SolverKinsol.LinearSolver.Dense
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     assert instance.has_issues == False
 
@@ -227,11 +227,11 @@ def test_nla_model_with_no_nla_solver():
     ]
 
     file = File(utils.resource_path("api/sed/nla.cellml"))
-    sed = SedDocument(file)
+    document = SedDocument(file)
 
-    sed.simulations[0].nla_solver = None
+    document.simulations[0].nla_solver = None
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
@@ -245,14 +245,14 @@ def test_dae_model():
     ]
 
     file = File(utils.resource_path("api/sed/dae.cellml"))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
     kinsol = simulation.nla_solver
 
     kinsol.linear_solver = SolverKinsol.LinearSolver.Banded
     kinsol.upper_half_bandwidth = -1
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
 
@@ -262,7 +262,7 @@ def test_dae_model():
 
     kinsol.linear_solver = SolverKinsol.LinearSolver.Dense
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     instance.run()
 
@@ -282,12 +282,12 @@ def test_dae_model_with_no_ode_or_nla_solver():
     ]
 
     file = File(utils.resource_path("api/sed/dae.cellml"))
-    sed = SedDocument(file)
-    simulation = sed.simulations[0]
+    document = SedDocument(file)
+    simulation = document.simulations[0]
 
     simulation.ode_solver = None
     simulation.nla_solver = None
 
-    instance = sed.create_instance()
+    instance = document.create_instance()
 
     assert_issues(instance, expected_issues)

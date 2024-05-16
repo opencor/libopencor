@@ -28,8 +28,10 @@ public:
     double *mK = nullptr;
     double *mYk = nullptr;
 
+    Doubles mKDoubles;
+    Doubles mYkDoubles;
+
     explicit Impl();
-    ~Impl() override;
 
     SolverPtr duplicate() override;
 

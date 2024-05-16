@@ -24,5 +24,9 @@ set(${TEST}_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/fourthorderrungekuttatests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/heuntests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/kinsoltests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/odemodel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/secondorderrungekuttatests.cpp
+)
+set(${TEST}_HEADER_FILES
+    ${CMAKE_CURRENT_LIST_DIR}/odemodel.h
 )

@@ -139,9 +139,9 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt"),
     );
   });
@@ -151,9 +151,9 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise()).toBe(
+    expect(document.serialise()).toBe(
       cvodeExpectedSerialisation("file:///some/path/file.txt"),
     );
   });
@@ -163,9 +163,9 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
       cvodeExpectedSerialisation("some/path/file.txt"),
     );
   });
@@ -175,9 +175,9 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise()).toBe(cvodeExpectedSerialisation("file.txt"));
+    expect(document.serialise()).toBe(cvodeExpectedSerialisation("file.txt"));
   });
 
   test("Remote CellML file with base path", () => {
@@ -185,9 +185,9 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(
+    expect(document.serialise(utils.REMOTE_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
   });
@@ -197,9 +197,9 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise()).toBe(
+    expect(document.serialise()).toBe(
       cvodeExpectedSerialisation(
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml",
       ),
@@ -211,9 +211,9 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
+    expect(document.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
       cvodeExpectedSerialisation("tests/res/cellml_2.cellml"),
     );
   });
@@ -261,9 +261,11 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation,
+    );
   });
 
   test("NLA model", () => {
@@ -271,9 +273,9 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation(),
     );
   });
@@ -300,9 +302,11 @@ describe("Sed serialise tests", () => {
       utils.SOME_ALGEBRAIC_CONTENTS.length,
     );
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation,
+    );
   });
 
   test("Fixed-step ODE solver", () => {
@@ -330,12 +334,14 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
 
     simulation.setOdeSolver(new libopencor.SolverForwardEuler());
 
-    expect(sed.serialise(utils.REMOTE_BASE_PATH)).toBe(expectedSerialisation);
+    expect(document.serialise(utils.REMOTE_BASE_PATH)).toBe(
+      expectedSerialisation,
+    );
   });
 
   test("CVODE solver with the Adams-Moulton integration method", () => {
@@ -343,15 +349,15 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setIntegrationMethod(
       libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
     );
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", {
         "KISAO:0000475": "Adams-Moulton",
       }),
@@ -363,13 +369,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setIterationType(libopencor.SolverCvode.IterationType.FUNCTIONAL);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000476": "Functional" }),
     );
   });
@@ -379,13 +385,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "Banded" }),
     );
   });
@@ -395,13 +401,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.DIAGONAL);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "Diagonal" }),
     );
   });
@@ -411,13 +417,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.GMRES);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "GMRES" }),
     );
   });
@@ -427,13 +433,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BICGSTAB);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "BiCGStab" }),
     );
   });
@@ -443,13 +449,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.TFQMR);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "TFQMR" }),
     );
   });
@@ -459,13 +465,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000478": "No" }),
     );
   });
@@ -475,13 +481,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.odeSolver();
 
     solver.setInterpolateSolution(false);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("file.txt", { "KISAO:0000481": "false" }),
     );
   });
@@ -491,13 +497,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.nlaSolver();
 
     solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "Banded" }),
     );
   });
@@ -507,13 +513,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.nlaSolver();
 
     solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.GMRES);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "GMRES" }),
     );
   });
@@ -523,13 +529,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.nlaSolver();
 
     solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BICGSTAB);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "BiCGStab" }),
     );
   });
@@ -539,13 +545,13 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-    const simulation = sed.simulations().get(0);
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
     const solver = simulation.nlaSolver();
 
     solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.TFQMR);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),
     );
   });
@@ -569,14 +575,16 @@ describe("Sed serialise tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    sed.removeSimulation(sed.simulations().get(0));
+    document.removeSimulation(document.simulations().get(0));
 
-    const simulation = new libopencor.SedOneStep(sed);
+    const simulation = new libopencor.SedOneStep(document);
 
-    sed.addSimulation(simulation);
+    document.addSimulation(simulation);
 
-    expect(sed.serialise(utils.LOCAL_BASE_PATH)).toBe(expectedSerialisation);
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation,
+    );
   });
 });

@@ -73,14 +73,45 @@
                 </p>
             </div>
 
-            <div class="file info" id="fileIssues">
+            <div class="file info last" id="fileIssues">
                 <p class="info issues">
                     <span class="bold">Issues:</span>
                 </p>
                 <ul id="issues"/>
             </div>
 
-            <div class="file error" id="fileError">
+            <div class="file info last row simulation" id="simulation">
+                <div id="plottingArea">
+                </div>
+                <div class="mb-3">
+                    <label>Ending point:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="endingPoint">
+                        <span class="input-group-text" id="endingPointUnit"></span>
+                    </div>
+                    <label>Point interval:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="pointInterval">
+                        <span class="input-group-text" id="pointIntervalUnit"></span>
+                    </div>
+                    </select>
+                    <label>X:</label>
+                    <div class="input-group">
+                        <select class="form-select" id="xAxis"></select>
+                        <span class="input-group-text" id="xAxisUnit"></span>
+                    </div>
+                    <label>Y:</label>
+                    <div class="input-group">
+                        <select class="form-select" id="yAxis"></select>
+                        <span class="input-group-text" id="yAxisUnit"></span>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-secondary mb-3 run-button w-100" id="run">Run</button>
+                </div>
+            </div>
+
+            <div class="file error last" id="fileError">
                 <p class="error">
                     <span class="bold">Error:</span> <span id="errorMessage"></span>
                 </p>
@@ -145,17 +176,39 @@
         </div>
     </div>
 
-    <script type="module">
-        import { resetFile, showPage } from "./res/libopencor.js";
-
-        document.querySelector("#navHome").addEventListener("click", showPage.bind(null, "Home"));
-        document.querySelector("#navSimulation").addEventListener("click", showPage.bind(null, "Simulation"));
-        document.querySelector("#navVersions").addEventListener("click", showPage.bind(null, "Versions"));
-
-        document.querySelector("#resetFile").addEventListener("click", resetFile.bind(null));
-    </script>
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@arction/lcjs@5.2.0/dist/lcjs.iife.js"></script>
+
+    <script type="module">
+        import { resetFile, run, showPage, updatePlottingAreaAndAxesInfo } from "./res/libopencor.js";
+
+        $("#navHome").on("click", function() {
+            showPage("Home");
+        });
+        $("#navSimulation").on("click", function() {
+            showPage("Simulation")
+        });
+        $("#navVersions").on("click", function() {
+            showPage("Versions")
+        });
+
+        $("#resetFile").on("click", function() {
+            resetFile()
+        });
+
+        $("#xAxis").on("change", function() {
+            updatePlottingAreaAndAxesInfo();
+        });
+
+        $("#yAxis").on("change", function() {
+            updatePlottingAreaAndAxesInfo();
+        });
+
+        $("#run").on("click", function() {
+            run()
+        });
+    </script>
 </body>
 
 </html>

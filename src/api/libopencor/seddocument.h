@@ -53,7 +53,7 @@ public:
      * Factory method to create a @ref SedDocument object:
      *
      * ```
-     * auto sed = libOpenCOR::SedDocument::create();
+     * auto document = libOpenCOR::SedDocument::create();
      * ```
      *
      * @param pFile The @ref File, if any, used to initialise this @ref SedDocument object.

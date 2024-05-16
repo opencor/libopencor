@@ -54,80 +54,80 @@ describe("Sed coverage tests", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
 `;
-    const sed = new libopencor.SedDocument();
+    const document = new libopencor.SedDocument();
 
-    expect(sed.serialise()).toBe(expectedSerialisation);
+    expect(document.serialise()).toBe(expectedSerialisation);
   });
 
   test("Model", () => {
-    const sed = new libopencor.SedDocument();
+    const document = new libopencor.SedDocument();
 
-    expect(sed.hasModels()).toBe(false);
-    expect(sed.addModel(null)).toBe(false);
+    expect(document.hasModels()).toBe(false);
+    expect(document.addModel(null)).toBe(false);
 
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const model = new libopencor.SedModel(sed, file);
+    const model = new libopencor.SedModel(document, file);
 
-    expect(sed.addModel(model)).toBe(true);
+    expect(document.addModel(model)).toBe(true);
 
-    expect(sed.models().size()).toBe(1);
-    expect(sed.models().get(0)).toStrictEqual(model);
+    expect(document.models().size()).toBe(1);
+    expect(document.models().get(0)).toStrictEqual(model);
 
-    expect(sed.addModel(model)).toBe(false);
-    expect(sed.removeModel(model)).toBe(true);
+    expect(document.addModel(model)).toBe(false);
+    expect(document.removeModel(model)).toBe(true);
 
-    expect(sed.hasModels()).toBe(false);
+    expect(document.hasModels()).toBe(false);
 
-    expect(sed.removeModel(null)).toBe(false);
+    expect(document.removeModel(null)).toBe(false);
   });
 
   test("Simulations", () => {
-    const sed = new libopencor.SedDocument();
+    const document = new libopencor.SedDocument();
 
-    expect(sed.hasSimulations()).toBe(false);
-    expect(sed.addSimulation(null)).toBe(false);
+    expect(document.hasSimulations()).toBe(false);
+    expect(document.addSimulation(null)).toBe(false);
 
-    const uniform_time_course = new libopencor.SedUniformTimeCourse(sed);
-    const steady_state = new libopencor.SedSteadyState(sed);
+    const uniform_time_course = new libopencor.SedUniformTimeCourse(document);
+    const steady_state = new libopencor.SedSteadyState(document);
 
-    expect(sed.addSimulation(uniform_time_course)).toBe(true);
-    expect(sed.addSimulation(steady_state)).toBe(true);
+    expect(document.addSimulation(uniform_time_course)).toBe(true);
+    expect(document.addSimulation(steady_state)).toBe(true);
 
-    expect(sed.simulations().size()).toBe(2);
-    expect(sed.simulations().get(0)).toStrictEqual(uniform_time_course);
-    expect(sed.simulations().get(1)).toStrictEqual(steady_state);
+    expect(document.simulations().size()).toBe(2);
+    expect(document.simulations().get(0)).toStrictEqual(uniform_time_course);
+    expect(document.simulations().get(1)).toStrictEqual(steady_state);
 
-    expect(sed.addSimulation(uniform_time_course)).toBe(false);
-    expect(sed.removeSimulation(uniform_time_course)).toBe(true);
+    expect(document.addSimulation(uniform_time_course)).toBe(false);
+    expect(document.removeSimulation(uniform_time_course)).toBe(true);
 
-    expect(sed.addSimulation(steady_state)).toBe(false);
-    expect(sed.removeSimulation(steady_state)).toBe(true);
+    expect(document.addSimulation(steady_state)).toBe(false);
+    expect(document.removeSimulation(steady_state)).toBe(true);
 
-    expect(sed.hasSimulations()).toBe(false);
+    expect(document.hasSimulations()).toBe(false);
 
-    expect(sed.removeSimulation(null)).toBe(false);
+    expect(document.removeSimulation(null)).toBe(false);
   });
 
   test("Tasks", () => {
-    const sed = new libopencor.SedDocument();
+    const document = new libopencor.SedDocument();
 
-    expect(sed.hasTasks()).toBe(false);
-    expect(sed.addTask(null)).toBe(false);
+    expect(document.hasTasks()).toBe(false);
+    expect(document.addTask(null)).toBe(false);
 
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const model = new libopencor.SedModel(sed, file);
-    const simulation = new libopencor.SedUniformTimeCourse(sed);
-    const task = new libopencor.SedTask(sed, model, simulation);
+    const model = new libopencor.SedModel(document, file);
+    const simulation = new libopencor.SedUniformTimeCourse(document);
+    const task = new libopencor.SedTask(document, model, simulation);
 
     expect(task.model()).not.toBe(null);
     expect(task.simulation()).not.toBe(null);
 
-    expect(sed.addTask(task)).toBe(true);
+    expect(document.addTask(task)).toBe(true);
 
-    expect(sed.tasks().size()).toBe(1);
-    expect(sed.tasks().get(0)).toStrictEqual(task);
+    expect(document.tasks().size()).toBe(1);
+    expect(document.tasks().get(0)).toStrictEqual(task);
 
-    expect(sed.serialise()).toBe(sedTaskExpectedSerialisation(true));
+    expect(document.serialise()).toBe(sedTaskExpectedSerialisation(true));
 
     task.setModel(null);
     task.setSimulation(null);
@@ -135,26 +135,26 @@ describe("Sed coverage tests", () => {
     expect(task.model()).toBe(null);
     expect(task.simulation()).toBe(null);
 
-    expect(sed.serialise()).toBe(sedTaskExpectedSerialisation(false));
+    expect(document.serialise()).toBe(sedTaskExpectedSerialisation(false));
 
-    const instance = sed.createInstance();
+    const instance = document.createInstance();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a model."],
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
     ]);
 
-    expect(sed.addTask(task)).toBe(false);
-    expect(sed.removeTask(task)).toBe(true);
+    expect(document.addTask(task)).toBe(false);
+    expect(document.removeTask(task)).toBe(true);
 
-    expect(sed.hasTasks()).toBe(false);
+    expect(document.hasTasks()).toBe(false);
 
-    expect(sed.removeTask(null)).toBe(false);
+    expect(document.removeTask(null)).toBe(false);
   });
 
   test("ODE solver", () => {
-    const sed = new libopencor.SedDocument();
-    const simulation = new libopencor.SedUniformTimeCourse(sed);
+    const document = new libopencor.SedDocument();
+    const simulation = new libopencor.SedUniformTimeCourse(document);
 
     expect(simulation.odeSolver()).toBe(null);
 
@@ -170,8 +170,8 @@ describe("Sed coverage tests", () => {
   });
 
   test("NLA solver", () => {
-    const sed = new libopencor.SedDocument();
-    const simulation = new libopencor.SedUniformTimeCourse(sed);
+    const document = new libopencor.SedDocument();
+    const simulation = new libopencor.SedUniformTimeCourse(document);
 
     expect(simulation.nlaSolver()).toBe(null);
 
@@ -188,8 +188,8 @@ describe("Sed coverage tests", () => {
 
   test("SedOneStep", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const sed = new libopencor.SedDocument(file);
-    const simulation = new libopencor.SedOneStep(sed);
+    const document = new libopencor.SedDocument(file);
+    const simulation = new libopencor.SedOneStep(document);
 
     expect(simulation.step()).toBe(1.0);
 
@@ -200,8 +200,8 @@ describe("Sed coverage tests", () => {
 
   test("SedUniformTimeCourse", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
-    const sed = new libopencor.SedDocument(file);
-    const simulation = new libopencor.SedUniformTimeCourse(sed);
+    const document = new libopencor.SedDocument(file);
+    const simulation = new libopencor.SedUniformTimeCourse(document);
 
     expect(simulation.initialTime()).toBe(0.0);
     expect(simulation.outputStartTime()).toBe(0.0);
@@ -219,66 +219,54 @@ describe("Sed coverage tests", () => {
     expect(simulation.numberOfSteps()).toBe(10);
   });
 
-  test("Solver", () => {
-    // Get the duplicate() method of different solvers to be covered.
-
+  test("SedInstanceAndSedInstanceTask", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
-
-    sed.simulations().get(0).setOdeSolver(new libopencor.SolverForwardEuler());
-
-    let instance = sed.createInstance();
-
-    instance.run();
-
-    expect(instance.hasIssues()).toBe(false);
-
-    sed
-      .simulations()
-      .get(0)
-      .setOdeSolver(new libopencor.SolverFourthOrderRungeKutta());
-
-    instance = sed.createInstance();
-
-    instance.run();
-
-    expect(instance.hasIssues()).toBe(false);
-
-    sed.simulations().get(0).setOdeSolver(new libopencor.SolverHeun());
-
-    instance = sed.createInstance();
-
-    instance.run();
-
-    expect(instance.hasIssues()).toBe(false);
-
-    sed
-      .simulations()
-      .get(0)
-      .setOdeSolver(new libopencor.SolverSecondOrderRungeKutta());
-
-    instance = sed.createInstance();
-
-    instance.run();
-
-    expect(instance.hasIssues()).toBe(false);
-  });
-
-  test("SedInstanceTask", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
-
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-
-    const sed = new libopencor.SedDocument(file);
-    const solver = sed.simulations().get(0).odeSolver();
+    const document = new libopencor.SedDocument(file);
+    const solver = document.simulations().get(0).odeSolver();
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setUpperHalfBandwidth(-1);
 
-    const instance = sed.createInstance();
+    const instance = document.createInstance();
+    const instanceTask = instance.tasks().get(0);
+
+    expect(instanceTask.voi().size()).toBe(0);
+    expect(instanceTask.voiAsArray()).toStrictEqual([]);
+    expect(instanceTask.voiName()).toBe("main.t");
+    expect(instanceTask.voiUnit()).toBe("dimensionless");
+
+    expect(instanceTask.stateCount()).toBe(3);
+    expect(instanceTask.state(0).size()).toBe(0);
+    expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.state(3).size()).toBe(0);
+    expect(instanceTask.stateAsArray(3)).toStrictEqual([]);
+    expect(instanceTask.stateName(0)).toBe("main.x");
+    expect(instanceTask.stateName(3)).toBe("");
+    expect(instanceTask.stateUnit(0)).toBe("dimensionless");
+    expect(instanceTask.stateUnit(3)).toBe("");
+
+    expect(instanceTask.rateCount()).toBe(3);
+    expect(instanceTask.rate(0).size()).toBe(0);
+    expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.rate(3).size()).toBe(0);
+    expect(instanceTask.rateAsArray(3)).toStrictEqual([]);
+    expect(instanceTask.rateName(0)).toBe("main.x'");
+    expect(instanceTask.rateName(3)).toBe("");
+    expect(instanceTask.rateUnit(0)).toBe("dimensionless/dimensionless");
+    expect(instanceTask.rateUnit(3)).toBe("");
+
+    expect(instanceTask.variableCount()).toBe(3);
+    expect(instanceTask.variable(0).size()).toBe(0);
+    expect(instanceTask.variableAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.variable(3).size()).toBe(0);
+    expect(instanceTask.variableAsArray(3)).toStrictEqual([]);
+    expect(instanceTask.variableName(0)).toBe("main.sigma");
+    expect(instanceTask.variableName(3)).toBe("");
+    expect(instanceTask.variableUnit(0)).toBe("dimensionless");
+    expect(instanceTask.variableUnit(3)).toBe("");
 
     instance.run();
 
@@ -288,5 +276,54 @@ describe("Sed coverage tests", () => {
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
       ],
     ]);
+  });
+
+  test("Solver", () => {
+    // Get the duplicate() method of different solvers to be covered.
+
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    const document = new libopencor.SedDocument(file);
+    const simulation = document.simulations().get(0);
+
+    simulation.setOdeSolver(new libopencor.SolverForwardEuler());
+
+    let instance = document.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
+
+    document
+      .simulations()
+      .get(0)
+      .setOdeSolver(new libopencor.SolverFourthOrderRungeKutta());
+
+    instance = document.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
+
+    document.simulations().get(0).setOdeSolver(new libopencor.SolverHeun());
+
+    instance = document.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
+
+    document
+      .simulations()
+      .get(0)
+      .setOdeSolver(new libopencor.SolverSecondOrderRungeKutta());
+
+    instance = document.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
   });
 });

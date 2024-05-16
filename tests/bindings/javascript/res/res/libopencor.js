@@ -1,14 +1,35 @@
+let document = null;
+let simulation = null;
+let instance = null;
+let instanceTask = null;
+const { lightningChart } = lcjs;
+const lc = lightningChart({
+  license:
+    "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
+  licenseInformation: {
+    appTitle: "LightningChart JS Trial",
+    company: "LightningChart Ltd.",
+  },
+});
+const chart = lc
+  .ChartXY({
+    container: $("#plottingArea")[0],
+  })
+  .setTitle("")
+  .setAnimationsEnabled(false);
+const lineSeries = chart.addLineSeries().setName("");
+
 export function showPage(page) {
-  document.querySelectorAll(".nav-link").forEach((crtPage) => {
-    if (crtPage.id === "nav" + page) {
-      crtPage.classList.add("active");
+  $(".nav-link").each(function () {
+    if (this.id === "nav" + page) {
+      this.classList.add("active");
     } else {
-      crtPage.classList.remove("active");
+      this.classList.remove("active");
     }
   });
 
-  document.querySelectorAll(".page").forEach((crtPage) => {
-    crtPage.style.display = crtPage.id === "page" + page ? "block" : "none";
+  $(".page").each(function () {
+    this.style.display = this.id === "page" + page ? "block" : "none";
   });
 }
 
@@ -17,7 +38,7 @@ function showError(error) {
     error += ".";
   }
 
-  document.getElementById("errorMessage").innerHTML = error;
+  $("#errorMessage").html(error);
 
   updateFileUi(false, false, true, true);
 }
@@ -28,24 +49,99 @@ function updateFileUi(
   fileErrorDisplay,
   resetButtonDisplay,
 ) {
-  document.getElementById("fileInfo").style.display = fileInfoDisplay
-    ? "block"
-    : "none";
-  document.getElementById("fileIssues").style.display = fileIssuesDisplay
-    ? "block"
-    : "none";
-  document.getElementById("fileError").style.display = fileErrorDisplay
-    ? "block"
-    : "none";
-  document.getElementById("resetFile").style.display = resetButtonDisplay
-    ? "block"
-    : "none";
+  $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
+  $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
+  $("#fileError").css("display", fileErrorDisplay ? "block" : "none");
+  $("#resetFile").css("display", resetButtonDisplay ? "block" : "none");
+  $("#simulation").css(
+    "display",
+    fileInfoDisplay && !fileIssuesDisplay ? "block" : "none",
+  );
 }
 
 export function resetFile() {
-  document.getElementById("dropAreaInput").value = "";
+  $("#dropAreaInput").value = "";
 
   updateFileUi(false, false, false, false);
+}
+
+function addAxisElement(axis, name) {
+  axis.append("<option>" + name + "</option>");
+}
+
+function populateAxis(axisId) {
+  const axis = $("#" + axisId);
+
+  axis.empty();
+
+  addAxisElement(axis, instanceTask.voiName());
+
+  for (let i = 0; i < instanceTask.stateCount(); ++i) {
+    addAxisElement(axis, instanceTask.stateName(i));
+    addAxisElement(axis, instanceTask.rateName(i));
+  }
+
+  for (let i = 0; i < instanceTask.variableCount(); ++i) {
+    addAxisElement(axis, instanceTask.variableName(i));
+  }
+}
+
+export function run() {
+  // Reset the plotting area (in case we have some simulation results).
+
+  lineSeries.clear();
+
+  // Retrieve the duration of the simulation and the number of steps.
+
+  simulation.setOutputEndTime($("#endingPoint").val());
+  simulation.setNumberOfSteps(
+    $("#endingPoint").val() / $("#pointInterval").val(),
+  );
+
+  // Run the simulation.
+
+  console.time("Elapsed time");
+  instance.run();
+  console.timeEnd("Elapsed time");
+
+  // Plot the results.
+
+  updatePlottingAreaAndAxesInfo();
+}
+
+function axisInfo(index) {
+  if (index === 0) {
+    return [instanceTask.voiAsArray(), instanceTask.voiUnit()];
+  } else if (index <= 2 * instanceTask.stateCount()) {
+    if (index % 2 !== 0) {
+      const ndx = (index - 1) / 2;
+
+      return [instanceTask.stateAsArray(ndx), instanceTask.stateUnit(ndx)];
+    } else {
+      const ndx = index / 2 - 1;
+
+      return [instanceTask.rateAsArray(ndx), instanceTask.rateUnit(ndx)];
+    }
+  } else {
+    const ndx = index - 1 - 2 * instanceTask.stateCount();
+
+    return [instanceTask.variableAsArray(ndx), instanceTask.variableUnit(ndx)];
+  }
+}
+
+export function updatePlottingAreaAndAxesInfo() {
+  lineSeries.clear();
+
+  const [xAxisArray, xAxisUnit] = axisInfo($("#xAxis").prop("selectedIndex"));
+  const [yAxisArray, yAxisUnit] = axisInfo($("#yAxis").prop("selectedIndex"));
+
+  lineSeries.addArraysXY(xAxisArray, yAxisArray);
+
+  $("#xAxisUnit").text(xAxisUnit);
+  $("#yAxisUnit").text(yAxisUnit);
+
+  chart.getDefaultAxisX().fit();
+  chart.getDefaultAxisY().fit();
 }
 
 function formattedIssueDescription(issue) {
@@ -56,20 +152,22 @@ function formattedIssueDescription(issue) {
 
 import libOpenCOR from "../libopencor.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+$(() => {
   // Make sure that libOpenCOR is loaded before we do anything else.
 
   libOpenCOR().then((libopencor) => {
     // Simulation page.
 
-    const input = document.getElementById("dropAreaInput");
-    const dropArea = document.getElementById("dropArea");
+    const input = $("#dropAreaInput")[0];
+    const dropArea = $("#dropArea");
     let hasValidFile = false;
 
-    input.addEventListener("change", (event) => {
+    input.onchange = () => {
       if (hasValidFile) {
         let inputFile = input.files[0];
         let fileReader = new FileReader();
+
+        input.value = ""; // Allow the user to select the same file again.
 
         fileReader.readAsArrayBuffer(inputFile);
 
@@ -101,8 +199,8 @@ document.addEventListener("DOMContentLoaded", () => {
               fileType = "SED-ML";
             }
 
-            document.getElementById("fileName").innerHTML = inputFile.name;
-            document.getElementById("fileType").innerHTML = fileType;
+            $("#fileName").html(inputFile.name);
+            $("#fileType").html(fileType);
 
             // Display any issues with the file or run it.
 
@@ -110,43 +208,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (file.type() === libopencor.File.Type.CELLML_FILE) {
               if (file.hasIssues()) {
-                const issuesElement = document.getElementById("issues");
+                const issuesElement = $("#issues");
                 const fileIssues = file.issues();
 
-                issuesElement.replaceChildren();
+                issuesElement.empty();
 
                 for (let i = 0; i < fileIssues.size(); ++i) {
                   const issue = fileIssues.get(i);
-                  const issueElement = document.createElement("li");
 
-                  issueElement.innerHTML =
-                    String.raw`<span class="bold">` +
-                    issue.typeAsString() +
-                    ":</span> " +
-                    formattedIssueDescription(issue.description());
-
-                  issuesElement.appendChild(issueElement);
+                  issuesElement.append(
+                    '<li><span class="bold">' +
+                      issue.typeAsString() +
+                      ":</span>" +
+                      formattedIssueDescription(issue.description()) +
+                      "</li>",
+                  );
                 }
 
                 showIssues = true;
               } else {
-                // Run the model.
+                // Retrieve some information about the simulation.
 
-                const sed = new libopencor.SedDocument(file);
-                const simulation = sed.simulations().get(0);
+                document = new libopencor.SedDocument(file);
+                simulation = document.simulations().get(0);
+                instance = document.createInstance();
+                instanceTask = instance.tasks().get(0);
 
-                if (simulation.constructor.name === "SedUniformTimeCourse") {
-                  simulation.setOutputEndTime(50.0);
-                  simulation.setNumberOfSteps(50000);
-                  // simulation.setOutputEndTime(1.0);
-                  // simulation.setNumberOfSteps(1000);
-                }
+                $("#endingPoint").val(simulation.outputEndTime());
+                $("#endingPointUnit").text(instanceTask.voiUnit());
 
-                const instance = sed.createInstance();
+                $("#pointInterval").val(
+                  simulation.outputEndTime() / simulation.numberOfSteps(),
+                );
+                $("#pointIntervalUnit").text(instanceTask.voiUnit());
 
-                console.time("Elapsed time");
-                instance.run();
-                console.timeEnd("Elapsed time");
+                // Populate the X and Y axis dropdown lists.
+
+                populateAxis("xAxis");
+                populateAxis("yAxis");
+
+                // By default we plot the first state variable against the VOI.
+
+                $("#xAxis").val(instanceTask.voiName());
+                $("#yAxis").val(instanceTask.stateName(0));
+
+                // Update the plotting area (in case we have some simulation results and we drop a new file) and the
+                // axes information.
+
+                updatePlottingAreaAndAxesInfo();
               }
             }
 
@@ -162,50 +271,41 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         resetFile();
       }
-    });
+    };
 
     ["dragenter", "dragover"].forEach((eventName) => {
-      dropArea.addEventListener(eventName, (event) => {
+      dropArea[0].addEventListener(eventName, (event) => {
         if (event.dataTransfer.items.length === 1) {
           hasValidFile = true;
 
-          dropArea.classList.add("drop-area-valid-file");
+          dropArea.addClass("drop-area-valid-file");
         } else {
           hasValidFile = false;
 
-          dropArea.classList.add("drop-area-invalid-file-s");
+          dropArea.addClass("drop-area-invalid-file-s");
         }
       });
     });
 
     ["dragleave", "drop"].forEach((eventName) => {
-      dropArea.addEventListener(eventName, () => {
-        dropArea.classList.remove("drop-area-valid-file");
-        dropArea.classList.remove("drop-area-invalid-file-s");
+      dropArea.on(eventName, () => {
+        dropArea.removeClass("drop-area-valid-file");
+        dropArea.removeClass("drop-area-invalid-file-s");
       });
     });
 
     // Versions page.
 
-    document.getElementById("version").innerHTML = libopencor.version();
-    document.getElementById("versionString").innerHTML =
-      libopencor.versionString();
-    document.getElementById("libcellmlVersion").innerHTML =
-      libopencor.libcellmlVersion();
-    document.getElementById("libcellmlVersionString").innerHTML =
-      libopencor.libcellmlVersionString();
-    document.getElementById("libcombineVersion").innerHTML =
-      libopencor.libcombineVersion();
-    document.getElementById("libcombineVersionString").innerHTML =
-      libopencor.libcombineVersionString();
-    document.getElementById("libsedmlVersion").innerHTML =
-      libopencor.libsedmlVersion();
-    document.getElementById("libsedmlVersionString").innerHTML =
-      libopencor.libsedmlVersionString();
-    document.getElementById("sundialsVersion").innerHTML =
-      libopencor.sundialsVersion();
-    document.getElementById("sundialsVersionString").innerHTML =
-      libopencor.sundialsVersionString();
+    $("#version").html(libopencor.version());
+    $("#versionString").html(libopencor.versionString());
+    $("#libcellmlVersion").html(libopencor.libcellmlVersion());
+    $("#libcellmlVersionString").html(libopencor.libcellmlVersionString());
+    $("#libcombineVersion").html(libopencor.libcombineVersion());
+    $("#libcombineVersionString").html(libopencor.libcombineVersionString());
+    $("#libsedmlVersion").html(libopencor.libsedmlVersion());
+    $("#libsedmlVersionString").html(libopencor.libsedmlVersionString());
+    $("#sundialsVersion").html(libopencor.sundialsVersion());
+    $("#sundialsVersionString").html(libopencor.sundialsVersionString());
 
     // Start with our simulation page.
 

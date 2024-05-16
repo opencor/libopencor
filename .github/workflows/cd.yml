@@ -66,7 +66,7 @@ jobs:
       BUILDCACHE_LOG_FILE: ""
     steps:
       - name: Check out libOpenCOR
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install ARM compiler
         if: ${{ matrix.arch == 'arm' }}
         run: |
@@ -124,7 +124,7 @@ jobs:
             os: macos-latest
     steps:
       - name: Check out libOpenCOR
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -159,7 +159,7 @@ jobs:
       BUILDCACHE_LOG_FILE: ""
     steps:
       - name: Check out libOpenCOR
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache

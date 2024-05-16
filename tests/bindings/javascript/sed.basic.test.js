@@ -47,9 +47,9 @@ describe("Sed basic tests", () => {
   });
 
   test("No file", () => {
-    const sed = new libopencor.SedDocument();
+    const document = new libopencor.SedDocument();
 
-    expect(sed.hasIssues()).toBe(false);
+    expect(document.hasIssues()).toBe(false);
   });
 
   test("Unknown file", () => {
@@ -60,9 +60,9 @@ describe("Sed basic tests", () => {
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expectIssues(libopencor, sed, [
+    expectIssues(libopencor, document, [
       [
         libopencor.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using an unknown file.",
@@ -75,9 +75,9 @@ describe("Sed basic tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expect(sed.hasIssues()).toBe(false);
+    expect(document.hasIssues()).toBe(false);
   });
 
   test("SED-ML file", () => {
@@ -85,9 +85,9 @@ describe("Sed basic tests", () => {
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expectIssues(libopencor, sed, [
+    expectIssues(libopencor, document, [
       [
         libopencor.Issue.Type.MESSAGE,
         "A simulation experiment description cannot (currently) be created using a SED-ML file.",
@@ -101,9 +101,9 @@ describe("Sed basic tests", () => {
 
     file.setContents(someCombineContentsPtr, utils.SOME_COMBINE_CONTENTS.length);
 
-    const sed = new libopencor.SedDocument(file);
+    const document = new libopencor.SedDocument(file);
 
-    expectIssues(libopencor, sed, [
+    expectIssues(libopencor, document, [
       [
         libopencor.Issue.Type.MESSAGE,
         "A simulation experiment description cannot (currently) be created using a COMBINE archive.",

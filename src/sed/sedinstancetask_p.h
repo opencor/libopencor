@@ -19,9 +19,19 @@ limitations under the License.
 #include "cellmlfileruntime.h"
 #include "logger_p.h"
 
+#include "utils.h"
+
 #include "libopencor/sedinstancetask.h"
 
 namespace libOpenCOR {
+
+struct SedInstanceTaskResults
+{
+    Doubles voi;
+    std::vector<Doubles> states;
+    std::vector<Doubles> rates;
+    std::vector<Doubles> variables;
+};
 
 class SedInstanceTask::Impl: public Logger::Impl
 {
@@ -40,12 +50,36 @@ public:
     double *mRates = nullptr;
     double *mVariables = nullptr;
 
+    Doubles mStateDoubles;
+    Doubles mRateDoubles;
+    Doubles mVariableDoubles;
+
+    SedInstanceTaskResults mResults;
+
     static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask, bool pCompiled);
 
     explicit Impl(const SedAbstractTaskPtr &pTask, bool pCompiled);
-    ~Impl();
 
+    void trackResults(size_t pIndex);
+
+    void initialise();
     void run();
+
+    Doubles state(size_t pIndex) const;
+    Doubles rate(size_t pIndex) const;
+    Doubles variable(size_t pIndex) const;
+
+    std::string voiName() const;
+    std::string voiUnit() const;
+
+    std::string stateName(size_t pIndex) const;
+    std::string stateUnit(size_t pIndex) const;
+
+    std::string rateName(size_t pIndex) const;
+    std::string rateUnit(size_t pIndex) const;
+
+    std::string variableName(size_t pIndex) const;
+    std::string variableUnit(size_t pIndex) const;
 };
 
 } // namespace libOpenCOR

@@ -31,9 +31,15 @@ limitations under the License.
 
 #include <libxml/xmlstring.h>
 
+#ifdef NAN
+#    undef NAN
+#endif
+
 namespace libOpenCOR {
 
 static const std::string LIBOPENCOR_NAMESPACE = "https://opencor.ws/libopencor";
+
+static const double NAN = std::numeric_limits<double>::quiet_NaN();
 
 using ConstCharPtrs = std::vector<const char *>;
 using Files = std::vector<File *>;

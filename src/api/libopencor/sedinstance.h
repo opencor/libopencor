@@ -51,6 +51,16 @@ public:
 
     void run();
 
+    /**
+     * @brief Return the tasks.
+     *
+     * Return the tasks.
+     *
+     * @return The tasks, as a @ref SedInstanceTaskPtrs.
+     */
+
+    SedInstanceTaskPtrs tasks() const;
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

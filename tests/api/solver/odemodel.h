@@ -16,30 +16,17 @@ limitations under the License.
 
 #pragma once
 
-#include "logger_p.h"
+#include "gtest/gtest.h"
 
-#include "utils.h"
+#include "tests/utils.h"
 
-#include "libopencor/solver.h"
+#include <libopencor>
 
-#include <libxml/tree.h>
+namespace OdeModel {
 
-namespace libOpenCOR {
+void run(const libOpenCOR::SedDocumentPtr &pDocument, const libOpenCOR::Doubles &pStateValues,
+         const libOpenCOR::Doubles &pStateAbsTols, const libOpenCOR::Doubles &pRateValues,
+         const libOpenCOR::Doubles &pRateAbsTols, const libOpenCOR::Doubles &pVariableValues,
+         const libOpenCOR::Doubles &pVariableAbsTols, bool pCompiled = true);
 
-class Solver::Impl: public Logger::Impl
-{
-public:
-    std::string mId;
-    std::string mName;
-
-    explicit Impl(const std::string &pId, const std::string &pName);
-    virtual ~Impl() = default;
-
-    virtual SolverPtr duplicate() = 0;
-
-    void serialise(xmlNodePtr pNode, bool pNlaAlgorithm = false) const;
-
-    virtual StringStringMap properties() const = 0;
-};
-
-} // namespace libOpenCOR
+} // namespace OdeModel

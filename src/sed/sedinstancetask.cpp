@@ -41,6 +41,7 @@ void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
 
     for (auto &state : pAnalyserModel->states()) {
         printf(",%s", state->variable()->name().c_str()); // NOLINT
+        printf(",%s'", state->variable()->name().c_str()); // NOLINT
     }
 
     for (auto &variable : pAnalyserModel->variables()) {
@@ -51,12 +52,13 @@ void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
 }
 
 void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
-                 double pVoi, double *pStates, double *pVariables)
+                 double pVoi, double *pStates, double *pRates, double *pVariables)
 {
     printf("%f", pVoi); // NOLINT
 
     for (size_t i = 0; i < pAnalyserModel->states().size(); ++i) {
         printf(",%f", pStates[i]); // NOLINT
+        printf(",%f", pRates[i]); // NOLINT
     }
 
     for (size_t i = 0; i < pAnalyserModel->variables().size(); ++i) {
@@ -113,13 +115,46 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     mAnalyserModel = cellmlFile->analyserModel();
 
     if (mDifferentialModel) {
-        mStates = new double[mAnalyserModel->stateCount()];
-        mRates = new double[mAnalyserModel->stateCount()];
-        mVariables = new double[mAnalyserModel->variableCount()];
+        mStateDoubles.resize(mAnalyserModel->stateCount(), NAN);
+        mRateDoubles.resize(mAnalyserModel->stateCount(), NAN);
+        mVariableDoubles.resize(mAnalyserModel->variableCount(), NAN);
+
+        mStates = mStateDoubles.data();
+        mRates = mRateDoubles.data();
+        mVariables = mVariableDoubles.data();
+
+        mResults.states.resize(mAnalyserModel->stateCount(), {});
+        mResults.rates.resize(mAnalyserModel->stateCount(), {});
+        mResults.variables.resize(mAnalyserModel->variableCount(), {});
     } else {
-        mVariables = new double[mAnalyserModel->variableCount()];
+        mVariableDoubles.resize(mAnalyserModel->variableCount(), NAN);
+
+        mVariables = mVariableDoubles.data();
+
+        mResults.variables.resize(mAnalyserModel->variableCount(), {});
     }
 
+    // Initialise our model.
+
+    initialise();
+}
+
+void SedInstanceTask::Impl::trackResults(size_t pIndex)
+{
+    mResults.voi[pIndex] = mVoi;
+
+    for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
+        mResults.states[i][pIndex] = mStates[i]; // NOLINT
+        mResults.rates[i][pIndex] = mRates[i]; // NOLINT
+    }
+
+    for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
+        mResults.variables[i][pIndex] = mVariables[i]; // NOLINT
+    }
+}
+
+void SedInstanceTask::Impl::initialise()
+{
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
@@ -177,22 +212,41 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     }
 
 #ifdef PRINT_VALUES
-    printValues(mAnalyserModel, mVoi, mStates, mVariables);
+    printValues(mAnalyserModel, mVoi, mStates, mRates, mVariables);
 #endif
-}
-
-SedInstanceTask::Impl::~Impl()
-{
-    delete[] mStates;
-    delete[] mRates;
-    delete[] mVariables;
 }
 
 void SedInstanceTask::Impl::run()
 {
+    // (Re)initialise our model.
+    // Note: reinitialise our model in case we are running our model multiple times.
+
+    initialise();
+
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {
+        // Initialise our results structure.
+
+        auto resultsSize = static_cast<size_t>(mSedUniformTimeCourse->pimpl()->mNumberOfSteps) + 1;
+
+        mResults.voi.resize(resultsSize, NAN);
+
+        for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
+            mResults.states[i].resize(resultsSize, NAN);
+            mResults.rates[i].resize(resultsSize, NAN);
+        }
+
+        for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
+            mResults.variables[i].resize(resultsSize, NAN);
+        }
+
+        // Track our initial results.
+
+        size_t index = 0;
+
+        trackResults(index);
+
         // Compute the differential model.
 
         auto voiStart = mVoi;
@@ -217,7 +271,7 @@ void SedInstanceTask::Impl::run()
             }
 #endif
 
-            //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD ALLOW
+            //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD
             //          TRIGGER NLA ISSUES HERE, WHICH WE DON'T HAVE YET HENCE WE DISABLE THE FOLLOWING CODE WHEN DOING
             //          CODE COVERAGE.
 
@@ -229,11 +283,115 @@ void SedInstanceTask::Impl::run()
             }
 #endif
 
+            trackResults(++index);
+
 #ifdef PRINT_VALUES
-            printValues(mAnalyserModel, mVoi, mStates, mVariables);
+            printValues(mAnalyserModel, mVoi, mStates, mRates, mVariables);
 #endif
         }
     }
+}
+
+Doubles SedInstanceTask::Impl::state(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return mResults.states[pIndex];
+}
+
+Doubles SedInstanceTask::Impl::rate(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return mResults.rates[pIndex];
+}
+
+Doubles SedInstanceTask::Impl::variable(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->variableCount()) {
+        return {};
+    }
+
+    return mResults.variables[pIndex];
+}
+
+namespace {
+
+std::string name(const libcellml::VariablePtr &pVariable)
+{
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
+
+    return component->name() + "." + pVariable->name();
+}
+
+} // namespace
+
+std::string SedInstanceTask::Impl::voiName() const
+{
+    return name(mAnalyserModel->voi()->variable());
+}
+
+std::string SedInstanceTask::Impl::voiUnit() const
+{
+    return mAnalyserModel->voi()->variable()->units()->name();
+}
+
+std::string SedInstanceTask::Impl::stateName(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return name(mAnalyserModel->states()[pIndex]->variable());
+}
+
+std::string SedInstanceTask::Impl::stateUnit(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return mAnalyserModel->states()[pIndex]->variable()->units()->name();
+}
+
+std::string SedInstanceTask::Impl::rateName(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return name(mAnalyserModel->states()[pIndex]->variable()) + "'";
+}
+
+std::string SedInstanceTask::Impl::rateUnit(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return mAnalyserModel->states()[pIndex]->variable()->units()->name() + "/" + voiUnit();
+}
+
+std::string SedInstanceTask::Impl::variableName(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->variableCount()) {
+        return {};
+    }
+
+    return name(mAnalyserModel->variables()[pIndex]->variable());
+}
+
+std::string SedInstanceTask::Impl::variableUnit(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->variableCount()) {
+        return {};
+    }
+
+    return mAnalyserModel->variables()[pIndex]->variable()->units()->name();
 }
 
 SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask, bool pCompiled)
@@ -251,11 +409,112 @@ SedInstanceTask::Impl *SedInstanceTask::pimpl()
     return reinterpret_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 {
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
-*/
+
+Doubles SedInstanceTask::voi() const
+{
+    return pimpl()->mResults.voi;
+}
+
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::voiAsArray() const
+{
+    return emscripten::val::array(voi());
+}
+#endif
+
+std::string SedInstanceTask::voiName() const
+{
+    return pimpl()->voiName();
+}
+
+std::string SedInstanceTask::voiUnit() const
+{
+    return pimpl()->voiUnit();
+}
+
+size_t SedInstanceTask::stateCount() const
+{
+    return pimpl()->mAnalyserModel->stateCount();
+}
+
+Doubles SedInstanceTask::state(size_t pIndex) const
+{
+    return pimpl()->state(pIndex);
+}
+
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::stateAsArray(size_t pIndex) const
+{
+    return emscripten::val::array(state(pIndex));
+}
+#endif
+
+std::string SedInstanceTask::stateName(size_t pIndex) const
+{
+    return pimpl()->stateName(pIndex);
+}
+
+std::string SedInstanceTask::stateUnit(size_t pIndex) const
+{
+    return pimpl()->stateUnit(pIndex);
+}
+
+size_t SedInstanceTask::rateCount() const
+{
+    return stateCount();
+}
+
+Doubles SedInstanceTask::rate(size_t pIndex) const
+{
+    return pimpl()->rate(pIndex);
+}
+
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::rateAsArray(size_t pIndex) const
+{
+    return emscripten::val::array(rate(pIndex));
+}
+#endif
+
+std::string SedInstanceTask::rateName(size_t pIndex) const
+{
+    return pimpl()->rateName(pIndex);
+}
+
+std::string SedInstanceTask::rateUnit(size_t pIndex) const
+{
+    return pimpl()->rateUnit(pIndex);
+}
+
+size_t SedInstanceTask::variableCount() const
+{
+    return pimpl()->mAnalyserModel->variableCount();
+}
+
+Doubles SedInstanceTask::variable(size_t pIndex) const
+{
+    return pimpl()->variable(pIndex);
+}
+
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::variableAsArray(size_t pIndex) const
+{
+    return emscripten::val::array(variable(pIndex));
+}
+#endif
+
+std::string SedInstanceTask::variableName(size_t pIndex) const
+{
+    return pimpl()->variableName(pIndex);
+}
+
+std::string SedInstanceTask::variableUnit(size_t pIndex) const
+{
+    return pimpl()->variableUnit(pIndex);
+}
 
 } // namespace libOpenCOR
