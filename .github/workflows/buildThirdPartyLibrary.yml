@@ -19,14 +19,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows release (Intel)'
-            os: windows-latest
-            msvc_arch: amd64
-            build_type: Release
-          - name: 'Windows debug (Intel)'
-            os: windows-latest
-            msvc_arch: amd64
-            build_type: Debug
+          # - name: 'Windows release (Intel)'
+          #   os: windows-latest
+          #   msvc_arch: amd64
+          #   build_type: Release
+          # - name: 'Windows debug (Intel)'
+          #   os: windows-latest
+          #   msvc_arch: amd64
+          #   build_type: Debug
           - name: 'Windows release (ARM)'
             os: windows-latest
             msvc_arch: amd64_arm64
@@ -35,20 +35,20 @@ jobs:
             os: windows-latest
             msvc_arch: amd64_arm64
             build_type: Debug
-          - name: 'Linux (Intel)'
-            os: ubuntu-latest
-            build_type: Release
+          # - name: 'Linux (Intel)'
+          #   os: ubuntu-latest
+          #   build_type: Release
           - name: 'Linux (ARM)'
             os: ubuntu-latest
             arch: arm
             cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
             build_type: Release
-          - name: 'macOS (Intel)'
-            os: macos-13
-            build_type: Release
-          - name: 'macOS (ARM)'
-            os: macos-latest
-            build_type: Release
+          # - name: 'macOS (Intel)'
+          #   os: macos-13
+          #   build_type: Release
+          # - name: 'macOS (ARM)'
+          #   os: macos-latest
+          #   build_type: Release
     env:
       BUILDCACHE_ACCURACY: STRICT
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
