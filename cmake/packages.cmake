@@ -49,7 +49,8 @@ function(build_package PACKAGE_NAME)
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     RESULT_VARIABLE RESULT
                     ERROR_VARIABLE ERROR
-                    OUTPUT_QUIET)
+    )
+                    # OUTPUT_QUIET)
 
     if(NOT RESULT EQUAL 0)
         message(FATAL_ERROR "${ERROR}")
@@ -59,7 +60,8 @@ function(build_package PACKAGE_NAME)
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     RESULT_VARIABLE RESULT
                     ERROR_VARIABLE ERROR
-                    OUTPUT_QUIET)
+    )
+                    # OUTPUT_QUIET)
 
     if(NOT RESULT EQUAL 0)
         message(FATAL_ERROR "${ERROR}")
