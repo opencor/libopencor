@@ -57,7 +57,9 @@ endif()
 
 # Determine our default target architecture.
 # Note: on Windows, the target architecture depends on the version of MSVC we are using (i.e. x64 or arm64), so we look
-#       for /x64/ and /arm64/ in CMAKE_CXX_COMPILER rather than just rely on the value of CMAKE_SYSTEM_PROCESSOR.
+#       for /x64/ and /arm64/ in CMAKE_CXX_COMPILER rather than just rely on the value of CMAKE_SYSTEM_PROCESSOR since
+#       there is no guarantee that it corresponds to the target architecture (see
+#       https://cmake.org/cmake/help/latest/variable/CMAKE_SYSTEM_PROCESSOR.html).
 
 if(WIN32)
     string(FIND "${CMAKE_CXX_COMPILER}" "/x64/" INDEX)
@@ -72,13 +74,13 @@ if(WIN32)
         endif()
     endif()
 elseif(APPLE)
-    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+    if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
         set(DEFAULT_TARGET_ARCHITECTURE Intel)
-    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "arm64")
+    elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "arm64")
         set(DEFAULT_TARGET_ARCHITECTURE ARM)
     endif()
 else()
-    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+    if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
         # On an Intel-based system, we can cross-compile for ARM, so we need to check which compiler is actually being
         # used.
 
@@ -89,7 +91,7 @@ else()
         else()
             set(DEFAULT_TARGET_ARCHITECTURE Intel)
         endif()
-    elseif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+    elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
         set(DEFAULT_TARGET_ARCHITECTURE ARM)
     endif()
 endif()
