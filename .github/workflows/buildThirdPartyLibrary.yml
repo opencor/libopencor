@@ -19,14 +19,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows release (Intel)'
-            os: windows-latest
-            arch: amd64
-            build_type: Release
-          - name: 'Windows debug (Intel)'
-            os: windows-latest
-            arch: amd64
-            build_type: Debug
+          # - name: 'Windows release (Intel)'
+          #   os: windows-latest
+          #   arch: amd64
+          #   build_type: Release
+          # - name: 'Windows debug (Intel)'
+          #   os: windows-latest
+          #   arch: amd64
+          #   build_type: Debug
           - name: 'Windows release (ARM)'
             os: windows-latest
             arch: amd64_arm64
@@ -35,20 +35,20 @@ jobs:
             os: windows-latest
             arch: amd64_arm64
             build_type: Debug
-          - name: 'Linux (Intel)'
-            os: ubuntu-latest
-            build_type: Release
-          - name: 'Linux (ARM)'
-            os: ubuntu-latest
-            arch: arm
-            cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
-            build_type: Release
-          - name: 'macOS (Intel)'
-            os: macos-13
-            build_type: Release
-          - name: 'macOS (ARM)'
-            os: macos-latest
-            build_type: Release
+          # - name: 'Linux (Intel)'
+          #   os: ubuntu-latest
+          #   build_type: Release
+          # - name: 'Linux (ARM)'
+          #   os: ubuntu-latest
+          #   arch: arm
+          #   cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
+          #   build_type: Release
+          # - name: 'macOS (Intel)'
+          #   os: macos-13
+          #   build_type: Release
+          # - name: 'macOS (ARM)'
+          #   os: macos-latest
+          #   build_type: Release
     env:
       BUILDCACHE_ACCURACY: STRICT
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
@@ -68,16 +68,31 @@ jobs:
         uses: mikehardy/buildcache-action@v2
         with:
           cache_key: libraries-${{ matrix.os }}-${{ matrix.shared_libs }}
+      - name: Configure MSVC (to build an Intel-based version of llvm-tblgen and clang-tblgen)
+        if: ${{ (runner.os == 'Windows') && (matrix.arch == 'amd64_arm64') }}
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64
+      - name: Build llvm-tblgen and clang-tblgen
+        if: ${{ (((runner.os == 'Windows') && (matrix.arch == 'amd64_arm64')) || ((runner.os == 'Linux') && (matrix.arch == 'arm'))) }}
+        shell: bash
+        run: |
+          source src/3rdparty/LLVMClang/scripts/buildllvmclangtblgen ${{ runner.os == 'Windows' }}
+          echo "DLLVMCLANG_LLVM_TABLEGEN=$DLLVMCLANG_LLVM_TABLEGEN" >> $GITHUB_ENV
+          echo "DLLVMCLANG_CLANG_TABLEGEN=$DLLVMCLANG_CLANG_TABLEGEN" >> $GITHUB_ENV
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
       - name: Configure libOpenCOR
+        shell: bash
         run: |
+          echo "DLLVMCLANG_LLVM_TABLEGEN=${{ env.DLLVMCLANG_LLVM_TABLEGEN }}"
+          echo "DLLVMCLANG_CLANG_TABLEGEN=${{ env.DLLVMCLANG_CLANG_TABLEGEN }}"
           mkdir build
           cd build
-          ${{ matrix.cmake_prereqs }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF ..
+          ${{ matrix.cmake_prereqs }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF ${{ env.DLLVMCLANG_LLVM_TABLEGEN }} ${{ env.DLLVMCLANG_CLANG_TABLEGEN }} ..
       - name: Upload library artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4

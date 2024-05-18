@@ -65,84 +65,6 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
         endif()
     endif()
 else()
-    # Build an Intel-based version of llvm-tblgen and clang-tblgen if we are using an Intel processor but are not
-    # building for it (i.e. we are building for an ARM processor).
-    # Note: this is the case when we want to build an ARM version of LLVM+Clang on Windows/Linux using GitHub Actions
-    #       (since they only provide Intel-based Windows/Linux runners).
-message(">>> LINK_DIRECTORIES: ${LINK_DIRECTORIES}")
-
-    set(LLVMCLANG_FILENAME ${RELEASE_TAG}.tar.gz)
-    set(LLVMCLANG_URL https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${LLVMCLANG_FILENAME})
-
-    if(INTEL_PROCESSOR AND NOT INTEL_MODE)
-        file(DOWNLOAD ${LLVMCLANG_URL} ${LLVMCLANG_FILENAME} STATUS STATUS)
-
-        list(GET STATUS 0 STATUS_CODE)
-
-        if(${STATUS_CODE} EQUAL 0)
-            execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xf ${LLVMCLANG_FILENAME}
-                            RESULT_VARIABLE RESULT
-                            OUTPUT_QUIET ERROR_QUIET)
-
-            file(REMOVE ${CMAKE_BINARY_DIR}/${LLVMCLANG_FILENAME})
-
-            if(RESULT EQUAL 0)
-                set(C_COMPILER -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER})
-                set(CXX_COMPILER -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER})
-                set(LLVMCLANG_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_REPOSITORY}-${RELEASE_TAG})
-
-                if(WIN32)
-                    string(REPLACE "arm64" "x64" C_COMPILER ${C_COMPILER})
-                    string(REPLACE "arm64" "x64" CXX_COMPILER ${CXX_COMPILER})
-                else()
-                    string(REPLACE "aarch64-linux-gnu-gcc" "cc" C_COMPILER ${C_COMPILER})
-                    string(REPLACE "aarch64-linux-gnu-g++" "c++" CXX_COMPILER ${CXX_COMPILER})
-                endif()
-message(">>> C_COMPILER:   ${C_COMPILER}")
-message(">>> CXX_COMPILER: ${CXX_COMPILER}")
-
-                execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S ./llvm -B build -DCMAKE_BUILD_TYPE=Release ${C_COMPILER} ${CXX_COMPILER} -DLLVM_ENABLE_PROJECTS=clang
-                                WORKING_DIRECTORY ${LLVMCLANG_DIR}
-                                RESULT_VARIABLE RESULT
-                                ERROR_VARIABLE ERROR
-                )
-                                # OUTPUT_QUIET)
-
-                if(NOT RESULT EQUAL 0)
-                    message(FATAL_ERROR "${ERROR}")
-                endif()
-
-                set(LLVMCLANG_BUILD_DIR ${LLVMCLANG_DIR}/build)
-
-                execute_process(COMMAND ${CMAKE_COMMAND} --build ${LLVMCLANG_BUILD_DIR} -t llvm-tblgen clang-tblgen
-                                WORKING_DIRECTORY ${LLVMCLANG_DIR}
-                                RESULT_VARIABLE RESULT
-                                ERROR_VARIABLE ERROR
-                )
-                                # OUTPUT_QUIET)
-
-                if(NOT RESULT EQUAL 0)
-                    message(FATAL_ERROR "${ERROR}")
-                endif()
-
-                set(LLVM_TABLEGEN ${LLVMCLANG_BUILD_DIR}/bin/llvm-tblgen${CMAKE_EXECUTABLE_SUFFIX})
-                set(CLANG_TABLEGEN ${LLVMCLANG_BUILD_DIR}/bin/clang-tblgen${CMAKE_EXECUTABLE_SUFFIX})
-            else()
-                message(FATAL_ERROR "LLVM+Clang ${PACKAGE_VERSION} (downloaded from ${LLVMCLANG_URL}) could not be uncompressed.")
-            endif()
-        else()
-            message(FATAL_ERROR "LLVM+Clang ${PACKAGE_VERSION} could not be retrieved from ${LLVMCLANG_URL}.")
-        endif()
-message(">>> CLANG_TABLEGEN: ${CLANG_TABLEGEN}")
-message(">>> LLVM_TABLEGEN:  ${LLVM_TABLEGEN}")
-
-        set(CLANG_TABLEGEN -DCLANG_TABLEGEN=${CLANG_TABLEGEN})
-        set(LLVM_TABLEGEN -DLLVM_TABLEGEN=${LLVM_TABLEGEN})
-else()
-message(">>> Not building llvm-tblgen and clang-tblgen...")
-    endif()
-# message(FATAL_ERROR "That's all Folks!")
-
     # Build our package.
 
     if(INTEL_MODE)
@@ -151,9 +73,21 @@ message(">>> Not building llvm-tblgen and clang-tblgen...")
         set(LLVM_TARGETS_TO_BUILD AArch64)
     endif()
 
+    if(LLVMCLANG_LLVM_TABLEGEN)
+message("LLVMCLANG_LLVM_TABLEGEN: ${LLVMCLANG_LLVM_TABLEGEN}")
+        set(LLVM_TABLEGEN -DLLVM_TABLEGEN=${LLVMCLANG_LLVM_TABLEGEN})
+    endif()
+
+    if(LLVMCLANG_CLANG_TABLEGEN)
+message("LLVMCLANG_CLANG_TABLEGEN: ${LLVMCLANG_CLANG_TABLEGEN}")
+        set(CLANG_TABLEGEN -DCLANG_TABLEGEN=${LLVMCLANG_CLANG_TABLEGEN})
+    endif()
+message("LLVM_TABLEGEN: ${LLVM_TABLEGEN}")
+message("CLANG_TABLEGEN: ${CLANG_TABLEGEN}")
+
     build_package(${PACKAGE_NAME}
         URL
-            ${LLVMCLANG_URL}
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         SOURCE_SUBDIR
             llvm
