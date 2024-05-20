@@ -11,9 +11,5 @@ cd llvm-project-llvmorg-$LLVMCLANG_VERSION
 cmake -G Ninja -S ./llvm -B build -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS=clang
 cmake --build build -t llvm-tblgen clang-tblgen
 
-if [ "$1" = "true" ]; then
-    EXTENSION=.exe
-fi
-
-export DLLVMCLANG_LLVM_TABLEGEN=-DLLVMCLANG_LLVM_TABLEGEN=$PWD/build/bin/llvm-tblgen$EXTENSION
-export DLLVMCLANG_CLANG_TABLEGEN=-DLLVMCLANG_CLANG_TABLEGEN=$PWD/build/bin/clang-tblgen$EXTENSION
+export DLLVMCLANG_LLVM_TABLEGEN=-DLLVMCLANG_LLVM_TABLEGEN=$PWD/build/bin/llvm-tblgen
+export DLLVMCLANG_CLANG_TABLEGEN=-DLLVMCLANG_CLANG_TABLEGEN=$PWD/build/bin/clang-tblgen

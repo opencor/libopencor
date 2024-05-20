@@ -31,10 +31,10 @@ jobs:
             os: windows-latest
             arch: amd64_arm64
             build_type: Release
-          - name: 'Windows debug (ARM)'
-            os: windows-latest
-            arch: amd64_arm64
-            build_type: Debug
+          # - name: 'Windows debug (ARM)'
+          #   os: windows-latest
+          #   arch: amd64_arm64
+          #   build_type: Debug
           # - name: 'Linux (Intel)'
           #   os: ubuntu-latest
           #   build_type: Release
@@ -77,7 +77,7 @@ jobs:
         if: ${{ (((runner.os == 'Windows') && (matrix.arch == 'amd64_arm64')) || ((runner.os == 'Linux') && (matrix.arch == 'arm'))) }}
         shell: bash
         run: |
-          source src/3rdparty/LLVMClang/scripts/buildllvmclangtblgen ${{ runner.os == 'Windows' }}
+          source src/3rdparty/LLVMClang/scripts/buildllvmclangtblgen
           echo "DLLVMCLANG_LLVM_TABLEGEN=$DLLVMCLANG_LLVM_TABLEGEN" >> $GITHUB_ENV
           echo "DLLVMCLANG_CLANG_TABLEGEN=$DLLVMCLANG_CLANG_TABLEGEN" >> $GITHUB_ENV
       - name: Configure MSVC
