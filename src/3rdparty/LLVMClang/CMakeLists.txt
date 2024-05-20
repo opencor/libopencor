@@ -15,7 +15,7 @@
 set(PACKAGE_NAME LLVMClang)
 set(PACKAGE_VERSION 14.0.3)
 set(PACKAGE_REPOSITORY llvm-project)
-set(RELEASE_TAG llvmorg-14.0.3)
+set(RELEASE_TAG llvmorg-14.0.3c)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -65,58 +65,6 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
         endif()
     endif()
 else()
-    # Build a version of llvm-tblgen and clang-tblgen for the host platform.
-    # Note: this is in case we want to build an ARM version of LLVM+Clang on an Intel host, as is the case when we want
-    #       to build a Windows/Linux ARM version of LLVM+Clang using GitHub Actions (which only provides Intel versions
-    #       of Windows/Linux).
-
-    set(LLVMCLANG_FILENAME ${RELEASE_TAG}.tar.gz)
-    set(LLVMCLANG_URL https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${LLVMCLANG_FILENAME})
-
-    file(DOWNLOAD ${LLVMCLANG_URL} ${LLVMCLANG_FILENAME} STATUS STATUS)
-
-    list(GET STATUS 0 STATUS_CODE)
-
-    if(${STATUS_CODE} EQUAL 0)
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xf ${LLVMCLANG_FILENAME}
-                        RESULT_VARIABLE RESULT
-                        OUTPUT_QUIET ERROR_QUIET)
-
-        file(REMOVE ${CMAKE_BINARY_DIR}/${LLVMCLANG_FILENAME})
-
-        if(RESULT EQUAL 0)
-            set(LLVMCLANG_DIR ${CMAKE_BINARY_DIR}/${PACKAGE_REPOSITORY}-${RELEASE_TAG})
-            set(LLVMCLANG_BUILD_DIR ${LLVMCLANG_DIR}/build)
-
-            execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S ./llvm -B build -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS=clang
-                            WORKING_DIRECTORY ${LLVMCLANG_DIR}
-                            RESULT_VARIABLE RESULT
-                            ERROR_VARIABLE ERROR
-                            OUTPUT_QUIET)
-
-            if(NOT RESULT EQUAL 0)
-                message(FATAL_ERROR "${ERROR}")
-            endif()
-
-            execute_process(COMMAND ${CMAKE_COMMAND} --build ${LLVMCLANG_BUILD_DIR} -t llvm-tblgen clang-tblgen
-                            WORKING_DIRECTORY ${LLVMCLANG_DIR}
-                            RESULT_VARIABLE RESULT
-                            ERROR_VARIABLE ERROR
-                            OUTPUT_QUIET)
-
-            if(NOT RESULT EQUAL 0)
-                message(FATAL_ERROR "${ERROR}")
-            endif()
-
-            set(LLVM_TABLEGEN ${LLVMCLANG_BUILD_DIR}/bin/llvm-tblgen${CMAKE_EXECUTABLE_SUFFIX})
-            set(CLANG_TABLEGEN ${LLVMCLANG_BUILD_DIR}/bin/clang-tblgen${CMAKE_EXECUTABLE_SUFFIX})
-        else()
-            message(FATAL_ERROR "LLVM+Clang ${PACKAGE_VERSION} (downloaded from ${LLVMCLANG_URL}) could not be uncompressed.")
-        endif()
-    else()
-        message(FATAL_ERROR "LLVM+Clang ${PACKAGE_VERSION} could not be retrieved from ${LLVMCLANG_URL}.")
-    endif()
-
     # Build our package.
 
     if(INTEL_MODE)
@@ -125,9 +73,17 @@ else()
         set(LLVM_TARGETS_TO_BUILD AArch64)
     endif()
 
+    if(LLVMCLANG_LLVM_TABLEGEN)
+        set(LLVM_TABLEGEN -DLLVM_TABLEGEN=${LLVMCLANG_LLVM_TABLEGEN})
+    endif()
+
+    if(LLVMCLANG_CLANG_TABLEGEN)
+        set(CLANG_TABLEGEN -DCLANG_TABLEGEN=${LLVMCLANG_CLANG_TABLEGEN})
+    endif()
+
     build_package(${PACKAGE_NAME}
         URL
-            ${LLVMCLANG_URL}
+            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         SOURCE_SUBDIR
             llvm
@@ -138,13 +94,14 @@ else()
             -DCLANG_INCLUDE_DOCS=OFF
             -DCLANG_INCLUDE_TESTS=OFF
             -DCLANG_PLUGIN_SUPPORT=OFF
-            -DCLANG_TABLEGEN=${CLANG_TABLEGEN}
+            ${CLANG_TABLEGEN}
             -DCLANG_TOOLING_BUILD_AST_INTROSPECTION=OFF
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DLIBCLANG_BUILD_STATIC=ON
+            -DLIBOPENCOR=ON
             -DLLVM_BUILD_RUNTIME=OFF
             -DLLVM_BUILD_RUNTIMES=OFF
             -DLLVM_BUILD_TOOLS=OFF
@@ -175,9 +132,8 @@ else()
             -DLLVM_INCLUDE_TESTS=OFF
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
-            -DLLVM_TABLEGEN=${LLVM_TABLEGEN}
+            ${LLVM_TABLEGEN}
             -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
-            ${TABLEGENS}
     )
 
     # Create our package.
