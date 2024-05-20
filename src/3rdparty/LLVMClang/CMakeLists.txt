@@ -15,7 +15,7 @@
 set(PACKAGE_NAME LLVMClang)
 set(PACKAGE_VERSION 14.0.3)
 set(PACKAGE_REPOSITORY llvm-project)
-set(RELEASE_TAG llvmorg-14.0.3c)
+set(RELEASE_TAG llvmorg-14.0.3d)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -57,7 +57,7 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d0ddcc07b4e7530d98db862c7fccd562f7436260)
+                             4bcb1a9bafffa9055bc3dd68c4a15fd1559465c5)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}

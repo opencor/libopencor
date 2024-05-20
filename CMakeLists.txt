@@ -25,12 +25,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Check whether we are building using cibuildwheel.
-
-if(DEFINED ENV{CIBUILDWHEEL})
-    set(CIBUILDWHEEL TRUE)
-endif()
-
 # Some common CMake policies, functions, and macros.
 
 foreach(POLICY CMP0144)
@@ -219,15 +213,6 @@ else()
 
     set(LIBOPENCOR_PREBUILT_LIBCELLML_DOCSTRING "Use the prebuilt version of libCellML.")
     set(LIBOPENCOR_PREBUILT_LIBCELLML ON CACHE BOOL "${LIBOPENCOR_PREBUILT_LIBCELLML_DOCSTRING}")
-
-    if(CIBUILDWHEEL AND NOT WIN32 AND NOT APPLE)
-        # Our prebuilt copy of libCellML needs __libc_single_threaded to be defined, which it is on Ubuntu, but not when
-        # building using cibuildwheel. Indeed, we need to build our Python wheels using manylinux_2_28 (so that we can
-        # use a more recent version of gcc since we need C++20) and it is based on AlmaLinux 8, which doesn't seem to
-        # define __libc_single_threaded. So, we need to build libCellML rather than use a prebuilt version of it.
-
-        set(PREBUILT_LIBCELLML OFF)
-    endif()
 
     if(NOT "${PREBUILT_LIBCELLML}" STREQUAL "")
         set(LIBOPENCOR_PREBUILT_LIBCELLML ${PREBUILT_LIBCELLML} CACHE BOOL "${LIBOPENCOR_PREBUILT_LIBCELLML_DOCSTRING}" FORCE)
