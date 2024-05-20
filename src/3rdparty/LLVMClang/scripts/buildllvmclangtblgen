@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LLVMCLANG_VERSION=14.0.3b
+LLVMCLANG_VERSION=14.0.3c
 
 curl -Ls https://github.com/opencor/llvm-project/archive/refs/tags/llvmorg-$LLVMCLANG_VERSION.zip -o llvm-project-llvmorg-$LLVMCLANG_VERSION.zip
 unzip -qq llvm-project-llvmorg-$LLVMCLANG_VERSION.zip

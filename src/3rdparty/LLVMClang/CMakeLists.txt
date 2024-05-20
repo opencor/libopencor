@@ -15,7 +15,7 @@
 set(PACKAGE_NAME LLVMClang)
 set(PACKAGE_VERSION 14.0.3)
 set(PACKAGE_REPOSITORY llvm-project)
-set(RELEASE_TAG llvmorg-14.0.3b)
+set(RELEASE_TAG llvmorg-14.0.3c)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -118,7 +118,6 @@ message("CLANG_TABLEGEN: ${CLANG_TABLEGEN}")
             -DLLVM_ENABLE_LIBEDIT=OFF
             -DLLVM_ENABLE_LIBPFM=OFF
             -DLLVM_ENABLE_LIBXML2=OFF
-            -DLLVM_BUILD_LLVM_C_DYLIB=OFF
             -DLLVM_ENABLE_MODULE_DEBUGGING=OFF
             -DLLVM_ENABLE_OCAMLDOC=OFF
             -DLLVM_ENABLE_PEDANTIC=OFF
