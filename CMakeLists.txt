@@ -492,11 +492,12 @@ else()
         endif()
     endif()
 
-    # Determine whether we are building using an Intel processor.
+    # Determine whether we are building in release mode.
+    # Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE, which
+    #       is likely to be the case when building a third-party library.
 
-    if(   "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "AMD64"
-       OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-        set(INTEL_PROCESSOR TRUE)
+    if(NOT "${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
+        set(RELEASE_MODE TRUE)
     endif()
 
     # Determine whether we are building for an Intel processor.
@@ -509,14 +510,6 @@ else()
         endif()
     elseif(APPLE)
         set(CMAKE_OSX_ARCHITECTURES arm64)
-    endif()
-
-    # Determine whether we are building in release mode.
-    # Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE, which
-    #       is likely to be the case when building a third-party library.
-
-    if(NOT "${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
-        set(RELEASE_MODE TRUE)
     endif()
 
     # Build libOpenCOR.
