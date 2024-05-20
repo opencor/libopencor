@@ -189,13 +189,6 @@ function(configure_target TARGET)
         endif()
     endif()
 
-    # Let libOpenCOR know whether we are building using cibuildwheel.
-
-    if(CIBUILDWHEEL)
-        target_compile_definitions(${TARGET} PRIVATE
-                                   BUILDING_USING_CIBUILDWHEEL)
-    endif()
-
     # Let the target know which operating system we are using.
 
     if(WIN32)
