@@ -122,7 +122,7 @@ function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_
             file(REMOVE ${PACKAGE_FILE})
         endif()
 
-        message(FATAL_ERROR "The ${PACKAGE_NAME} package could not be created.")
+        message(FATAL_ERROR "The ${PACKAGE_NAME} package could not be created (${ERROR}).")
     endif()
 endfunction()
 
@@ -187,13 +187,14 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
             execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xf ${REAL_PACKAGE_FILE}
                             WORKING_DIRECTORY ${INSTALL_DIR}
                             RESULT_VARIABLE RESULT
-                            OUTPUT_QUIET ERROR_QUIET)
+                            ERROR_VARIABLE ERROR
+                            OUTPUT_QUIET)
 
             if(NOT RESULT EQUAL 0)
                 file(REMOVE_RECURSE ${INSTALL_DIR})
 
                 message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
-                message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) could not be uncompressed.")
+                message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) could not be uncompressed (${ERROR}).")
             endif()
 
             file(REMOVE ${REAL_PACKAGE_FILE})
