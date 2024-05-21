@@ -347,7 +347,7 @@ endfunction()
 macro(add_target TARGET)
     add_custom_target(${TARGET} ${ARGN})
 
-    set(TARGETS "${TARGETS};${TARGET}")
+    list(APPEND TARGETS ${TARGET})
 
     list(SORT TARGETS)
 
