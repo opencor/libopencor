@@ -453,8 +453,8 @@ def test_solve_with_adams_moulton_integration_method():
 def test_solve_with_functional_iteration_type():
     state_values = [-63.886, 0.13501, 0.984334, 0.740972]
     state_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
-    rate_values = [49.7258, -0.12820, -0.05090, 0.09865]
-    rate_abs_tols = [0.0001, 0.00001, 0.00001, 0.00001]
+    rate_values = [49.726, -0.12820, -0.05090, 0.09865]
+    rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
     variable_values = [
         0.0,
         -15.982,
@@ -517,8 +517,8 @@ def test_solve_with_functional_iteration_type():
 def test_solve_with_banded_linear_solver():
     state_values = [-54.958, 0.114716, 0.971365, 0.756967]
     state_abs_tols = [0.001, 0.000001, 0.000001, 0.000001]
-    rate_values = [47.196, -0.102081, -0.09298, 0.062977]
-    rate_abs_tols = [0.001, 0.000001, 0.00001, 0.000001]
+    rate_values = [47.196, -0.10208, -0.09298, 0.06298]
+    rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
     variable_values = [
         0.0,
         -13.3035,
@@ -581,8 +581,8 @@ def test_solve_with_banded_linear_solver():
 def test_solve_with_diagonal_linear_solver():
     state_values = [-63.886, 0.13501, 0.984334, 0.740971]
     state_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
-    rate_values = [49.725, -0.128193, -0.050902, 0.09865]
-    rate_abs_tols = [0.001, 0.000001, 0.000001, 0.00001]
+    rate_values = [49.725, -0.128193, -0.05090, 0.09865]
+    rate_abs_tols = [0.001, 0.000001, 0.00001, 0.00001]
     variable_values = [
         0.0,
         -15.982,
@@ -900,13 +900,13 @@ def test_solve_with_gmres_linear_solver_and_no_preconditioner():
 
 
 def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
-    state_values = [-63.8859, 0.135007, 0.984333, 0.740972]
-    state_abs_tols = [0.0001, 0.000001, 0.000001, 0.000001]
-    rate_values = [49.7254, -0.128192, -0.050904, 0.098649]
-    rate_abs_tols = [0.0001, 0.000001, 0.000001, 0.000001]
+    state_values = [-63.886, 0.13501, 0.984333, 0.740972]
+    state_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
+    rate_values = [49.725, -0.12819, -0.050904, 0.098649]
+    rate_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
     variable_values = [
         0.0,
-        -15.98187,
+        -15.9819,
         -823.516,
         789.779,
         1.0,
@@ -915,18 +915,18 @@ def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
         0.3,
         -115.0,
         120.0,
-        3.96987,
-        0.114988,
+        3.9699,
+        0.11499,
         0.002869,
-        0.967346,
+        0.96735,
         12.0,
         36.0,
-        0.541332,
+        0.54133,
         0.056246,
     ]
     variable_abs_tols = [
         0.0,
-        0.00001,
+        0.0001,
         0.001,
         0.001,
         0.0,
@@ -935,13 +935,13 @@ def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
         0.0,
         0.0,
         0.0,
+        0.0001,
         0.00001,
         0.000001,
-        0.000001,
-        0.000001,
+        0.00001,
         0.0,
         0.0,
-        0.000001,
+        0.00001,
         0.000001,
     ]
 

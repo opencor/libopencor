@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME SUNDIALS)
-set(PACKAGE_VERSION v6.2.0)
+set(PACKAGE_VERSION v7.0.0)
 set(PACKAGE_REPOSITORY sundials)
-set(RELEASE_TAG v6.2.0-libopencor)
+set(RELEASE_TAG v7.0.0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -24,32 +24,32 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         42770edddf6ed996a55a50078e54e387ceb8da0a)
+                         78bce667f10758e3e5f2fcdc56a401514e323c0d)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 7bc8ba9a62a6bb8efd52bc7aea1f17aa2d8ef024)
+                                 4ae38fb1382236a092282c9cb5cd456db6ab746c)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1471019d8221d5f079a30baa0394e0dc54ba3edb)
+                                 b2725d3140839774a5f253d59f39fda2cd33cfe0)
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ef844d27b82a63b7167f3165e45ce78d20c3a7cf)
+                                 c55dc7e76e72eb2389b7902b67ccbe3e3a344ef0)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a2399ef9cf50d64c1dad7d6e554700a47adde9b2)
+                                 35e6771a04f8943353b3ebef009d04fd3ed02bdf)
             endif()
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b0d953dffcab7be7440d148bf334cac7913914dd)
+                             737f908f53c3a70224cea78ed5a5bf290207261c)
         endif()
     endif()
 else()
@@ -86,9 +86,9 @@ set(SUNDIALS_CMAKE_PACKAGE_NAME ${PACKAGE_NAME} CACHE INTERNAL "${PACKAGE_NAME}'
 set(SUNDIALS_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(SUNDIALS_LIBRARIES
     SUNDIALS::arkode_static
+    SUNDIALS::core_static
     SUNDIALS::cvode_static
     SUNDIALS::cvodes_static
-    SUNDIALS::generic_static
     SUNDIALS::ida_static
     SUNDIALS::idas_static
     SUNDIALS::kinsol_static

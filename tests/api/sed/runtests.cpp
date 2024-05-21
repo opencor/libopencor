@@ -119,7 +119,17 @@ namespace {
 void runOdeModel(bool pCompiled)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
+#if defined(BUILDING_ON_WINDOWS)
         {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140014, mxstep steps taken before reaching tout."},
+#elif defined(BUILDING_ON_LINUX)
+        {libOpenCOR::Issue::Type::ERROR, "At t = 1, mxstep steps taken before reaching tout."},
+#else
+#    ifdef BUILDING_ON_INTEL
+        {libOpenCOR::Issue::Type::ERROR, "At t = 5.00577e+06, mxstep steps taken before reaching tout."},
+#    else
+        {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140014, mxstep steps taken before reaching tout."},
+#    endif
+#endif
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));

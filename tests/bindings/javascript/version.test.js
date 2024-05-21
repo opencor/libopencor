@@ -40,7 +40,7 @@ describe("Version tests", () => {
   });
 
   test("SUNDIALS", () => {
-    expect(libopencor.sundialsVersion()).toBe(0x060200);
-    expect(libopencor.sundialsVersionString()).toBe("6.2.0");
+    expect(libopencor.sundialsVersion()).toBe(0x070000);
+    expect(libopencor.sundialsVersionString()).toBe("7.0.0");
   });
 });

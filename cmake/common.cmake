@@ -209,6 +209,16 @@ function(configure_target TARGET)
                                    BUILDING_ON_LINUX)
     endif()
 
+    # Let the target know which architecture we are using.
+
+    if(INTEL_MODE)
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_INTEL)
+    else()
+        target_compile_definitions(${TARGET} PRIVATE
+                                   BUILDING_ON_ARM)
+    endif()
+
     # Let the target know which compiler we are using.
 
     if(BUILDING_USING_MSVC)
