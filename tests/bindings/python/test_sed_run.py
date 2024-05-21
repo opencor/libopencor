@@ -14,6 +14,7 @@
 
 
 from libopencor import File, Issue, SedDocument, SolverKinsol
+import platform
 import utils
 from utils import assert_issues
 
@@ -134,7 +135,19 @@ def run_ode_model(compiled):
     expected_issues = [
         [
             Issue.Type.Error,
-            "At t = 0.00140014, mxstep steps taken before reaching tout.",
+            (
+                "At t = 0.00140014, mxstep steps taken before reaching tout."
+                if platform.system() == "Windows"
+                else (
+                    "At t = 1, mxstep steps taken before reaching tout."
+                    if platform.system() == "Linux"
+                    else (
+                        "At t = 5.00577e+06, mxstep steps taken before reaching tout."
+                        if platform.machine() == "x86_64"
+                        else "At t = 0.00140014, mxstep steps taken before reaching tout."
+                    )
+                )
+            ),
         ],
     ]
 
