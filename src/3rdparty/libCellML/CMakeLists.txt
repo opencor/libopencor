@@ -72,7 +72,7 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1abf3d2fd78b0692d9e18f8aa51ade8231cfabc0)
+                                 10e5dfa5b150971c5787c86938c00dafc2082735)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
