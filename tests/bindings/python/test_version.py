@@ -28,12 +28,12 @@ def test_version_string():
 
 def test_clang_version():
     assert isinstance(oc.clang_version(), int)
-    assert oc.clang_version() == 0x140003
+    assert oc.clang_version() == 0x180106
 
 
 def test_clang_version_string():
     assert isinstance(oc.clang_version_string(), str)
-    assert oc.clang_version_string() == "14.0.3"
+    assert oc.clang_version_string() == "18.1.6"
 
 
 def test_libcellml_version():
@@ -78,12 +78,12 @@ def test_libsedml_version_string():
 
 def test_llvm_version():
     assert isinstance(oc.llvm_version(), int)
-    assert oc.llvm_version() == 0x140003
+    assert oc.llvm_version() == 0x180106
 
 
 def test_llvm_version_string():
     assert isinstance(oc.llvm_version_string(), str)
-    assert oc.llvm_version_string() == "14.0.3"
+    assert oc.llvm_version_string() == "18.1.6"
 
 
 def test_sundials_version():

@@ -16,6 +16,7 @@ limitations under the License.
 
 #if defined(BUILDING_USING_MSVC)
 #    pragma warning(push)
+#    pragma warning(disable: 4003)
 #    pragma warning(disable: 4100)
 #    pragma warning(disable: 4127)
 #    pragma warning(disable: 4146)
@@ -25,6 +26,7 @@ limitations under the License.
 #    pragma warning(disable: 4291)
 #    pragma warning(disable: 4324)
 #    pragma warning(disable: 4389)
+#    pragma warning(disable: 4456)
 #    pragma warning(disable: 4458)
 #    pragma warning(disable: 4459)
 #    pragma warning(disable: 4624)
@@ -69,6 +71,7 @@ limitations under the License.
 #    pragma clang diagnostic ignored "-Wswitch-default"
 #    pragma clang diagnostic ignored "-Wswitch-enum"
 #    pragma clang diagnostic ignored "-Wtautological-type-limit-compare"
+#    pragma clang diagnostic ignored "-Wtautological-unsigned-zero-compare"
 #    pragma clang diagnostic ignored "-Wundefined-func-template"
 #    pragma clang diagnostic ignored "-Wunused-but-set-variable"
 #    pragma clang diagnostic ignored "-Wunused-parameter"
