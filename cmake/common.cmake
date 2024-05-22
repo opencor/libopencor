@@ -63,6 +63,13 @@ function(configure_target TARGET)
         endif()
     endif()
 
+    # Make it possible to use LLVM+Clang 18+ when building using MSVC (see
+    # https://github.com/llvm/llvm-project/issues/86028).
+
+    if(BUILDING_USING_MSVC)
+        target_compile_options(${TARGET} PRIVATE /Zc:preprocessor)
+    endif()
+
     # Analyse the code.
 
     if(LIBOPENCOR_CODE_ANALYSIS)
