@@ -120,7 +120,7 @@ if(LIBOPENCOR_UNIT_TESTING)
     endforeach()
 
     add_target(unit_testing
-               COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process
+               COMMAND ${CMAKE_CTEST_COMMAND} --force-new-ctest-process --output-on-failure
                DEPENDS ${TEST_TARGETS}
                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                USES_TERMINAL
