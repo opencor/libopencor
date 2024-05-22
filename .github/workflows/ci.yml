@@ -73,7 +73,37 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'macOS static library'
+          - name: 'macOS static library (Intel)'
+            os: macos-13
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+          - name: 'macOS shared library (Intel)'
+            os: macos-13
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+          - name: 'macOS static library (ARM)'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -88,7 +118,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'macOS shared library'
+          - name: 'macOS shared library (ARM)'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -147,7 +177,24 @@ jobs:
             unit_testing: OFF
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
-          - name: 'macOS Python bindings'
+          - name: 'macOS Python bindings (Intel)'
+            os: macos-13
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: ON
+            python_unit_testing: ON
+            shared_libs: OFF
+            unit_testing: OFF
+            context: PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
+            target: python_unit_testing
+            pip_install_prerequisites: sudo pip3 install cmake scikit-build
+            pip_install_test_and_uninstall: ON
+          - name: 'macOS Python bindings (ARM)'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
