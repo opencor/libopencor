@@ -30,8 +30,8 @@ describe("Version tests", () => {
   });
 
   test("libCOMBINE", () => {
-    expect(libopencor.libcombineVersion()).toBe(218);
-    expect(libopencor.libcombineVersionString()).toBe("0.2.18");
+    expect(libopencor.libcombineVersion()).toBe(220);
+    expect(libopencor.libcombineVersionString()).toBe("0.2.20");
   });
 
   test("libSEDML", () => {
