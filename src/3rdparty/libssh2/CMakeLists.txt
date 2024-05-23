@@ -23,25 +23,13 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 if(LIBOPENCOR_PREBUILT_LIBSSH2)
     if(WIN32)
         if(RELEASE_MODE)
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a036e09966b8fe4fb51799b6027ef751d2d853bf)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 d074e0a4ac949c7cfc4d74c56e7040fe25ee6332)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             a036e09966b8fe4fb51799b6027ef751d2d853bf)
         else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 61ad26586df1fbf494c43e12548898a285a84d4b)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 6532912f33cf074616d3d9e18888643061449fab)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             61ad26586df1fbf494c43e12548898a285a84d4b)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
@@ -54,15 +42,9 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
                              52a3363adaeeccf94116e689af1ed541bfa14aaa)
         endif()
     else()
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             748feccb81c12663f28023b171925ee255ed3acc)
-        else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             19e3ffa73e95969fa13beb7f8a37fecf4d595b6b)
-        endif()
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         748feccb81c12663f28023b171925ee255ed3acc)
     endif()
 else()
     # Build our package.

@@ -15,38 +15,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows static library (Intel)'
+          - name: 'Windows static library'
             os: windows-latest
-            msvc_arch: amd64
             shared_libs: OFF
-          - name: 'Windows shared library (Intel)'
+          - name: 'Windows shared library'
             os: windows-latest
-            msvc_arch: amd64
             shared_libs: ON
-          - name: 'Windows static library (ARM)'
-            os: windows-latest
-            msvc_arch: amd64_arm64
-            shared_libs: OFF
-          - name: 'Windows shared library (ARM)'
-            os: windows-latest
-            msvc_arch: amd64_arm64
-            shared_libs: ON
-          - name: 'Linux static library (Intel)'
+          - name: 'Linux static library'
             os: ubuntu-latest
             shared_libs: OFF
-          - name: 'Linux shared library (Intel)'
+          - name: 'Linux shared library'
             os: ubuntu-latest
             shared_libs: ON
-          - name: 'Linux static library (ARM)'
-            os: ubuntu-latest
-            arch: arm
-            shared_libs: OFF
-            cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
-          - name: 'Linux shared library (ARM)'
-            os: ubuntu-latest
-            arch: arm
-            shared_libs: ON
-            cmake_prereqs: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'macOS static library (Intel)'
             os: macos-13
             shared_libs: OFF
@@ -67,11 +47,6 @@ jobs:
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
-      - name: Install ARM compiler
-        if: ${{ matrix.arch == 'arm' }}
-        run: |
-          sudo apt update
-          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
@@ -81,13 +56,11 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: ${{ matrix.msvc_arch }}
       - name: Configure libOpenCOR
         run: |
           mkdir build
           cd build
-          ${{ matrix.cmake_prereqs }} cmake -G Ninja -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
+          cmake -G Ninja -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
       - name: Build libOpenCOR
         run: |
           cd build

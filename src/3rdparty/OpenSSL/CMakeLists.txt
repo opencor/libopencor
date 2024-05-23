@@ -23,25 +23,13 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 if(LIBOPENCOR_PREBUILT_OPENSSL)
     if(WIN32)
         if(RELEASE_MODE)
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 558ef03a9b9cce739a7f3e2699d5b698c8b2fba3)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 63abbd1d6540351d26af557a4a0bded041ca221b)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             558ef03a9b9cce739a7f3e2699d5b698c8b2fba3)
         else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 2bc0770b3d9abca54eaa5ddb1e434b28be7326ee)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 e801d457e4e1eba429e3f13f624a08cd03cd1f1c)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             2bc0770b3d9abca54eaa5ddb1e434b28be7326ee)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
@@ -54,15 +42,9 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
                              ae38760197be0715d0398cd88945ad74fe16ff45)
         endif()
     else()
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f3f1619acc385df0165fbb932fdf23f5b6eb5179)
-        else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             0411e8ce55a452ea6b72f031f4b07b9dba6b98df)
-        endif()
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         f3f1619acc385df0165fbb932fdf23f5b6eb5179)
     endif()
 else()
     # Build our package.
@@ -75,17 +57,9 @@ else()
         list(APPEND CONFIG_OPTIONS no-asm)
 
         if(RELEASE_MODE)
-            if(INTEL_MODE)
-                set(PLATFORM VC-WIN64A)
-            else()
-                set(PLATFORM VC-WIN64-ARM)
-            endif()
+            set(PLATFORM VC-WIN64A)
         else()
-            if(INTEL_MODE)
-                set(PLATFORM debug-VC-WIN64A)
-            else()
-                set(PLATFORM debug-VC-WIN64-ARM)
-            endif()
+            set(PLATFORM debug-VC-WIN64A)
         endif()
 
         # Patch the generated makefile since it contains non-escaped paths that result in our build to fail. (Not sure
@@ -108,11 +82,7 @@ else()
 
         list(APPEND CONFIG_OPTIONS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
     else()
-        if(INTEL_MODE)
-            set(PLATFORM linux-x86_64)
-        else()
-            set(PLATFORM linux-aarch64)
-        endif()
+        set(PLATFORM linux-x86_64)
 
         list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
     endif()
