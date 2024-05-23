@@ -84,7 +84,7 @@ endif()
 check_required_packages(zipper zlib)
 
 check_required_packages(libCellML libxml2 zlib)
-check_required_packages(libCOMBINE libSBML zipper zlib)
+check_required_packages(libCOMBINE libSBML libxml2 zipper zlib)
 
 if(NOT EMSCRIPTEN)
     check_required_packages(libcurl libssh2 OpenSSL zlib)
@@ -124,7 +124,7 @@ add_package(zipper) # Requires zlib.
 # Required third-party libraries.
 
 add_package(libCellML) # Requires libxml2 and zlib.
-add_package(libCOMBINE) # Requires libSBML, zipper, and zlib.
+add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
 
 if(NOT EMSCRIPTEN)
     add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.

@@ -38,8 +38,8 @@ TEST(VersionTest, libCellML)
 
 TEST(VersionTest, libCOMBINE)
 {
-    EXPECT_EQ(218U, libOpenCOR::libcombineVersion());
-    EXPECT_EQ("0.2.18", libOpenCOR::libcombineVersionString());
+    EXPECT_EQ(220U, libOpenCOR::libcombineVersion());
+    EXPECT_EQ("0.2.20", libOpenCOR::libcombineVersionString());
 }
 
 TEST(VersionTest, libcurl)
