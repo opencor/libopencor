@@ -17,19 +17,19 @@ jobs:
         include:
           - name: 'Windows static library (Intel)'
             os: windows-latest
-            msvc_arch: amd64
+            arch: amd64
             shared_libs: OFF
           - name: 'Windows shared library (Intel)'
             os: windows-latest
-            msvc_arch: amd64
+            arch: amd64
             shared_libs: ON
           - name: 'Windows static library (ARM)'
             os: windows-latest
-            msvc_arch: amd64_arm64
+            arch: amd64_arm64
             shared_libs: OFF
           - name: 'Windows shared library (ARM)'
             os: windows-latest
-            msvc_arch: amd64_arm64
+            arch: amd64_arm64
             shared_libs: ON
           - name: 'Linux static library (Intel)'
             os: ubuntu-latest
@@ -82,7 +82,7 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
         with:
-          arch: ${{ matrix.msvc_arch }}
+          arch: ${{ matrix.arch }}
       - name: Configure libOpenCOR
         run: |
           mkdir build
