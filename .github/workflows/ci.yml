@@ -268,7 +268,7 @@ jobs:
             shared_libs: OFF
             unit_testing: ON
             context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang++
-          - name: 'Coverage'
+          - name: 'Code coverage'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
