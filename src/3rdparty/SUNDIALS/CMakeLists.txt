@@ -28,25 +28,13 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
     else()
         if(WIN32)
             if(RELEASE_MODE)
-                if(INTEL_MODE)
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     4ae38fb1382236a092282c9cb5cd456db6ab746c)
-                else()
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     4419f51ce24717050f031e865898517e26e88540)
-                endif()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 4ae38fb1382236a092282c9cb5cd456db6ab746c)
             else()
-                if(INTEL_MODE)
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     b2725d3140839774a5f253d59f39fda2cd33cfe0)
-                else()
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     cc22427310becc6d3740bb2e23e9e624baaa6fd3)
-                endif()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 b2725d3140839774a5f253d59f39fda2cd33cfe0)
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
@@ -59,15 +47,9 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
                                  35e6771a04f8943353b3ebef009d04fd3ed02bdf)
             endif()
         else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 737f908f53c3a70224cea78ed5a5bf290207261c)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 286c7473cbba585a07b0e862483d327845e73916)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             737f908f53c3a70224cea78ed5a5bf290207261c)
         endif()
     endif()
 else()
