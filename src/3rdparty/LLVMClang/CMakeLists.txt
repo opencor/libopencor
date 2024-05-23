@@ -25,26 +25,26 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d024622993b4a6ce9825d1ab8c793fd8fc377ede)
+                             bbdbb972fd20adc8752afe47815b544c0787f520)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f4e03819089e51877fce8d113f1fe1ab1d122ba8)
+                             9855ca84efdc2ef54a41eee47a8db34ac953dd13)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             5590bf39cb92f618ec61ef58e6c2d4e64f8d7659)
+                             85f407ff82526778ebfbe5a7e5311b655c4ed725)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             fc62fd3d58aebcce82df22f70f3084ff233405de)
+                             4b07f621f8e8ce287922597aeb7b8255876d4b30)
         endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         c32bd8187344e918bde16d443cf038cf33e9aac3)
+                         05c1db4ffb9a451ad7261a53de17136dce8ec734)
     endif()
 else()
     # Build our package.
@@ -97,6 +97,7 @@ else()
             -DLLVM_ENABLE_TERMINFO=OFF
             -DLLVM_ENABLE_WARNINGS=OFF
             -DLLVM_ENABLE_ZLIB=OFF
+            -DLLVM_ENABLE_ZSTD=OFF
             -DLLVM_INCLUDE_BENCHMARKS=OFF
             -DLLVM_INCLUDE_DOCS=OFF
             -DLLVM_INCLUDE_EXAMPLES=OFF
