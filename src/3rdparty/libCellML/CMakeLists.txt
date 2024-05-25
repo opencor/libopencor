@@ -34,32 +34,32 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         9fc6254c9eb9a574c5f0736937e90382c87da533)
+                         a85d4bdcf3819c1ef52cb622f8a60b4e12cf9958)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5b0aa69fc09659705851bad924ad9bcc1e3ac2b9)
+                                 f9a1afc54f8b2c2bc77dea610721fcf9908ff5f2)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a08555bab6dc8de348baded059bb1ad6827923af)
+                                 8845626c5875fd59cc1b1c608fe21b2da62bb985)
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 70d39e1ad85ea060693f328dfd65d295e424eb41)
+                                 34fc7ba61acefd690ccb5acf50abef2ecd16aa56)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 c5025de0a25e21857a688bbd51779e5bf17070d6)
+                                 4932e559f95124b46627799854edf7d7bd0ebe34)
             endif()
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             10e5dfa5b150971c5787c86938c00dafc2082735)
+                             ca37a89cdae547287fd89fd7a9deb6a7431ff7a3)
         endif()
     endif()
 else()
@@ -68,7 +68,7 @@ else()
     build_package(${PACKAGE_NAME}
         URL
             # https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
-            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/987b3db.tar.gz
+            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/80c37fb.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF

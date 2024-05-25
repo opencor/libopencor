@@ -28,32 +28,32 @@ if(LIBOPENCOR_PREBUILT_LIBSBML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         11fe48981258511e093ea1ea16c3ba370a2da33b)
+                         488f019e2118998a42820eaab8c8efd6b13632e6)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 07e00c0cce28b617d98ed1d06178dff292aac771)
+                                 dcd88af5d2e7542292bde3c5519f94a1e7f328af)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 6f39b6611fd822055e15c8af9a1942bb9628859a)
+                                 d7c4bef59fe74b625ec3c6a439874ea9a545ec01)
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5dee5db5dfe960ec0a8d1b098c8939b020a13609)
+                                 eac3c9aa68f1070eecc68ff880a47d74817c541f)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 08039fecb28dbd0f644cdd38bc5c857718f7db1d)
+                                 17d10e6753f8152936eebc7eb78e6d00ee568c61)
             endif()
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             80d834206af0c3dbcd45d5e228288d16171ebc94)
+                             f1512573a1bab430af1ed8c0cd5a0201a28e73db)
         endif()
     endif()
 else()
