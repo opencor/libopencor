@@ -50,6 +50,14 @@ endif()
 
 add_subdirectory(3rdparty)
 
+if(ONLY_BUILD_THIRD_PARTY_LIBRARIES)
+    add_executable(${CMAKE_PROJECT_NAME} dummy.cpp)
+
+    add_subdirectory(bindings)
+
+    return()
+endif()
+
 # Configure the version file.
 
 foreach(VERSION_PART PROJECT_VERSION_MAJOR PROJECT_VERSION_MINOR PROJECT_VERSION_PATCH)

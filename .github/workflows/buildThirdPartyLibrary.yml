@@ -58,7 +58,6 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
       - name: Configure libOpenCOR
-        shell: bash
         run: |
           mkdir build
           cd build

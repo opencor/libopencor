@@ -32,6 +32,26 @@ function(check_dependent_packages PACKAGE)
     endif()
 endfunction()
 
+function(check_required_packages PACKAGE)
+    string(TOUPPER "${PACKAGE}" PACKAGE_UC)
+
+    if(NOT LIBOPENCOR_PREBUILT_${PACKAGE_UC})
+        foreach(REQUIRED_PACKAGE ${ARGN})
+            string(TOUPPER "${REQUIRED_PACKAGE}" DEPENDENT_PACKAGE_UC)
+
+            list(FIND REQUIRED_PACKAGES_TO_ADD ${REQUIRED_PACKAGE} INDEX)
+
+            if(INDEX EQUAL -1)
+                list(APPEND REQUIRED_PACKAGES_TO_ADD ${REQUIRED_PACKAGE})
+
+                list(SORT REQUIRED_PACKAGES_TO_ADD)
+
+                set(REQUIRED_PACKAGES_TO_ADD "${REQUIRED_PACKAGES_TO_ADD}" CACHE INTERNAL "Required packages to be added.")
+            endif()
+        endforeach()
+    endif()
+endfunction()
+
 function(build_package PACKAGE_NAME)
     # Configure and run a CMake script to build the package for us.
 
@@ -127,6 +147,18 @@ function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_
 endfunction()
 
 function(add_package PACKAGE)
+    # Check whether the package is one that we want to add.
+
+    if(ONLY_BUILD_THIRD_PARTY_LIBRARIES)
+        list(FIND PACKAGES_TO_ADD ${PACKAGE} INDEX)
+
+        if(INDEX EQUAL -1)
+            return()
+        endif()
+    endif()
+
+    # Add the package.
+
     add_subdirectory(${PACKAGE})
 
     # Keep track of the package.
