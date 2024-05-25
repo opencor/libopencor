@@ -92,7 +92,6 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
       - name: Configure libOpenCOR
-        shell: bash
         run: |
           mkdir build
           cd build
