@@ -30,7 +30,7 @@ foreach(PACKAGE ${PACKAGES})
     string(TOUPPER "${PACKAGE}" PACKAGE_UC)
 
     if(NOT LIBOPENCOR_PREBUILT_${PACKAGE_UC})
-        set(PACKAGES_TO_BUILD "${PACKAGES_TO_BUILD};${PACKAGE}")
+        list(APPEND PACKAGES_TO_BUILD ${PACKAGE})
     endif()
 endforeach()
 
@@ -124,10 +124,10 @@ add_package(zipper) # Requires zlib.
 # Required third-party libraries.
 
 add_package(libCellML) # Requires libxml2 and zlib.
-add_package(libCOMBINE) # Requires libSBML, zipper and zlib.
+add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
 
 if(NOT EMSCRIPTEN)
-    add_package(libcurl) # Requires libssh2, OpenSSL and zlib.
+    add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.
 endif()
 
 add_package(libSEDML) # Requires libNuML and libSBML.
