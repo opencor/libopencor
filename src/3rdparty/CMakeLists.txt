@@ -30,7 +30,7 @@ foreach(PACKAGE ${PACKAGES})
     string(TOUPPER "${PACKAGE}" PACKAGE_UC)
 
     if(NOT LIBOPENCOR_PREBUILT_${PACKAGE_UC})
-        set(PACKAGES_TO_BUILD "${PACKAGES_TO_BUILD};${PACKAGE}")
+        list(APPEND PACKAGES_TO_BUILD ${PACKAGE})
     endif()
 endforeach()
 
@@ -72,12 +72,37 @@ if(NOT "${DEPENDENT_PACKAGES_TO_BUILD}" STREQUAL "")
     endforeach()
 endif()
 
+# Keep track of which packages are required to build the requested packages.
+
+check_required_packages(libSBML libxml2)
+check_required_packages(libNuML libSBML)
+
+if(NOT EMSCRIPTEN)
+    check_required_packages(libssh2 OpenSSL)
+endif()
+
+check_required_packages(zipper zlib)
+
+check_required_packages(libCellML libxml2 zlib)
+check_required_packages(libCOMBINE libSBML libxml2 zipper zlib)
+
+if(NOT EMSCRIPTEN)
+    check_required_packages(libcurl libssh2 OpenSSL zlib)
+endif()
+
+check_required_packages(libSEDML libNuML libSBML)
+
 # Initialise/reset our available packages and third-party (special) header files.
 
 set(AVAILABLE_PACKAGES "" CACHE INTERNAL "Available packages.")
 set(THIRD_PARTY_HEADER_FILES "" CACHE INTERNAL "Third-party (special) header files.")
 
 # Prerequisite third-party libraries, respecting their own prerequisites.
+
+set(PACKAGES_TO_ADD ${REQUIRED_PACKAGES_TO_ADD} ${PACKAGES_TO_BUILD} ${DEPENDENT_PACKAGES_TO_BUILD})
+
+list(REMOVE_DUPLICATES PACKAGES_TO_ADD)
+list(SORT PACKAGES_TO_ADD)
 
 add_package(libxml2)
 
@@ -99,10 +124,10 @@ add_package(zipper) # Requires zlib.
 # Required third-party libraries.
 
 add_package(libCellML) # Requires libxml2 and zlib.
-add_package(libCOMBINE) # Requires libSBML, zipper and zlib.
+add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
 
 if(NOT EMSCRIPTEN)
-    add_package(libcurl) # Requires libssh2, OpenSSL and zlib.
+    add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.
 endif()
 
 add_package(libSEDML) # Requires libNuML and libSBML.

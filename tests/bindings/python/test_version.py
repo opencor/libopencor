@@ -28,12 +28,12 @@ def test_version_string():
 
 def test_clang_version():
     assert isinstance(oc.clang_version(), int)
-    assert oc.clang_version() == 0x140003
+    assert oc.clang_version() == 0x180106
 
 
 def test_clang_version_string():
     assert isinstance(oc.clang_version_string(), str)
-    assert oc.clang_version_string() == "14.0.3"
+    assert oc.clang_version_string() == "18.1.6"
 
 
 def test_libcellml_version():
@@ -48,12 +48,12 @@ def test_libcellml_version_string():
 
 def test_libcombine_version():
     assert isinstance(oc.libcombine_version(), int)
-    assert oc.libcombine_version() == 218
+    assert oc.libcombine_version() == 220
 
 
 def test_libcombine_version_string():
     assert isinstance(oc.libcombine_version_string(), str)
-    assert oc.libcombine_version_string() == "0.2.18"
+    assert oc.libcombine_version_string() == "0.2.20"
 
 
 def test_libcurl_version():
@@ -78,19 +78,19 @@ def test_libsedml_version_string():
 
 def test_llvm_version():
     assert isinstance(oc.llvm_version(), int)
-    assert oc.llvm_version() == 0x140003
+    assert oc.llvm_version() == 0x180106
 
 
 def test_llvm_version_string():
     assert isinstance(oc.llvm_version_string(), str)
-    assert oc.llvm_version_string() == "14.0.3"
+    assert oc.llvm_version_string() == "18.1.6"
 
 
 def test_sundials_version():
     assert isinstance(oc.sundials_version(), int)
-    assert oc.sundials_version() == 0x060200
+    assert oc.sundials_version() == 0x070000
 
 
 def test_sundials_version_string():
     assert isinstance(oc.sundials_version_string(), str)
-    assert oc.sundials_version_string() == "6.2.0"
+    assert oc.sundials_version_string() == "7.0.0"

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME LLVMClang)
-set(PACKAGE_VERSION 14.0.3)
+set(PACKAGE_VERSION 18.1.6)
 set(PACKAGE_REPOSITORY llvm-project)
-set(RELEASE_TAG llvmorg-14.0.3d)
+set(RELEASE_TAG llvmorg-18.1.6)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -23,46 +23,28 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 if(LIBOPENCOR_PREBUILT_LLVMCLANG)
     if(WIN32)
         if(RELEASE_MODE)
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8ce4afcab9008cb845b4044b16fc0873aeba418c)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 665eeefd2e331034e5962b9ec9114f5dd6826ed1)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             bbdbb972fd20adc8752afe47815b544c0787f520)
         else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 7a3168fd20a0f4c034f0c1252401ca17074095b9)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 24febbe8391b8c7dea406261c8b520671b3c38a6)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             9855ca84efdc2ef54a41eee47a8db34ac953dd13)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             006e8969fccc75f2c5020b69cb6a196c2e3c43b8)
+                             85f407ff82526778ebfbe5a7e5311b655c4ed725)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             edab86a319335dec8cd38fc86b3fd11ef71fb789)
+                             4b07f621f8e8ce287922597aeb7b8255876d4b30)
         endif()
     else()
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             acc80f89781960d71046c26ffb40593c8e91f476)
-        else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             25fe0235182221c14a897c0fe8e1d43041479ac8)
-        endif()
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         05c1db4ffb9a451ad7261a53de17136dce8ec734)
     endif()
 else()
     # Build our package.
@@ -71,14 +53,6 @@ else()
         set(LLVM_TARGETS_TO_BUILD X86)
     else()
         set(LLVM_TARGETS_TO_BUILD AArch64)
-    endif()
-
-    if(LLVMCLANG_LLVM_TABLEGEN)
-        set(LLVM_TABLEGEN -DLLVM_TABLEGEN=${LLVMCLANG_LLVM_TABLEGEN})
-    endif()
-
-    if(LLVMCLANG_CLANG_TABLEGEN)
-        set(CLANG_TABLEGEN -DCLANG_TABLEGEN=${LLVMCLANG_CLANG_TABLEGEN})
     endif()
 
     build_package(${PACKAGE_NAME}
@@ -94,7 +68,6 @@ else()
             -DCLANG_INCLUDE_DOCS=OFF
             -DCLANG_INCLUDE_TESTS=OFF
             -DCLANG_PLUGIN_SUPPORT=OFF
-            ${CLANG_TABLEGEN}
             -DCLANG_TOOLING_BUILD_AST_INTROSPECTION=OFF
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
@@ -124,6 +97,7 @@ else()
             -DLLVM_ENABLE_TERMINFO=OFF
             -DLLVM_ENABLE_WARNINGS=OFF
             -DLLVM_ENABLE_ZLIB=OFF
+            -DLLVM_ENABLE_ZSTD=OFF
             -DLLVM_INCLUDE_BENCHMARKS=OFF
             -DLLVM_INCLUDE_DOCS=OFF
             -DLLVM_INCLUDE_EXAMPLES=OFF
@@ -132,7 +106,6 @@ else()
             -DLLVM_INCLUDE_TESTS=OFF
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
-            ${LLVM_TABLEGEN}
             -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
     )
 
@@ -189,6 +162,7 @@ set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}
 set(LLVMCLANG_LIBRARIES
     clangAnalysis
     clangAnalysisFlowSensitive
+    clangAnalysisFlowSensitiveModels
     clangAPINotes
     clangAST
     clangASTMatchers
@@ -200,6 +174,7 @@ set(LLVMCLANG_LIBRARIES
     clangDriver
     clangDynamicASTMatchers
     clangEdit
+    clangExtractAPI
     clangFormat
     clangFrontend
     clangFrontendTool
@@ -215,11 +190,12 @@ set(LLVMCLANG_LIBRARIES
     clangStaticAnalyzerCheckers
     clangStaticAnalyzerCore
     clangStaticAnalyzerFrontend
-    clangTesting
+    clangSupport
     clangTooling
     clangToolingASTDiff
     clangToolingCore
     clangToolingInclusions
+    clangToolingInclusionsStdlib
     clangToolingRefactoring
     clangToolingSyntax
     clangTransformer
@@ -235,33 +211,44 @@ set(LLVMCLANG_LIBRARIES
     LLVMCFGuard
     LLVMCFIVerify
     LLVMCodeGen
+    LLVMCodeGenTypes
     LLVMCore
     LLVMCoroutines
     LLVMCoverage
+    LLVMDebugInfoBTF
     LLVMDebugInfoCodeView
     LLVMDebuginfod
     LLVMDebugInfoDWARF
     LLVMDebugInfoGSYM
+    LLVMDebugInfoLogicalView
     LLVMDebugInfoMSF
     LLVMDebugInfoPDB
     LLVMDemangle
     LLVMDiff
     LLVMDlltoolDriver
     LLVMDWARFLinker
+    LLVMDWARFLinkerClassic
+    LLVMDWARFLinkerParallel
     LLVMDWP
     LLVMExecutionEngine
     LLVMExegesis
     LLVMExtensions
     LLVMFileCheck
+    LLVMFrontendDriver
+    LLVMFrontendHLSL
+    LLVMFrontendOffloading
     LLVMFrontendOpenACC
     LLVMFrontendOpenMP
+    LLVMFuzzerCLI
     LLVMFuzzMutate
     LLVMGlobalISel
+    LLVMHipStdPar
     LLVMInstCombine
     LLVMInstrumentation
     LLVMInterfaceStub
     LLVMInterpreter
     LLVMipo
+    LLVMIRPrinter
     LLVMIRReader
     LLVMJITLink
     LLVMLibDriver
@@ -275,9 +262,11 @@ set(LLVMCLANG_LIBRARIES
     LLVMMCParser
     LLVMMIRParser
     LLVMObjCARCOpts
+    LLVMObjCopy
     LLVMObject
     LLVMObjectYAML
     LLVMOption
+    LLVMOrcDebugging
     LLVMOrcJIT
     LLVMOrcShared
     LLVMOrcTargetProcess
@@ -290,11 +279,15 @@ set(LLVMCLANG_LIBRARIES
     LLVMSupport
     LLVMSymbolize
     LLVMTableGen
+    LLVMTableGenCommon
     LLVMTableGenGlobalISel
     LLVMTarget
+    LLVMTargetParser
     LLVMTextAPI
+    LLVMTextAPIBinaryReader
     LLVMTransformUtils
     LLVMVectorize
+    LLVMWindowsDriver
     LLVMWindowsManifest
     LLVMXRay
     ${EXTRA_LLVMCLANG_LIBRARIES}

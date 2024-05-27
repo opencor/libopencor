@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCOMBINE)
-set(PACKAGE_VERSION 0.2.18)
+set(PACKAGE_VERSION 0.2.20)
 set(PACKAGE_REPOSITORY libCombine)
-set(RELEASE_TAG v0.2.18)
+set(RELEASE_TAG v0.2.20b)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -28,50 +28,32 @@ if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         21f9435b7de4bee3b71a6439152d07751f7490e9)
+                         bba8ce8929527e84d9aca91329d7959f930ae2ca)
     else()
         if(WIN32)
             if(RELEASE_MODE)
-                if(INTEL_MODE)
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     3694f8043163db0f0a140f50d63aca5230f30abe)
-                else()
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     75f4c3c895dddce5b0523a5f8392bf2efdff7f67)
-                endif()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 af256ee3c239c4834e472dfe7b723bc2e974d237)
             else()
-                if(INTEL_MODE)
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     22431c4e857d1f3a2661a880cb6142be905bfe66)
-                else()
-                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     41303bd3c6333aebfdf91571002520e6690cde77)
-                endif()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 68e967fb8673c853730b1277fb2a4ceffa948b44)
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1b7ec9932dd53f37e5bad7ae20f98a2c1f32f342)
+                                 ec3bbe156c96f3f7c3cc46e458aff7f9dc3de19c)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a8657b4e8d3b36ece2dd1571a830184500f89ea4)
+                                 a2192cc11cc9d272029bc25774eaff986bd41656)
             endif()
         else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 18ebd3acc651040f127f94284ed5241e2bb38380)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9bce82e9a99759bbc27ebf265c54f50033d51af8)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             f258c3b50f22c9cc3eb02d5c6b9377dd3d92b26e)
         endif()
     endif()
 else()
@@ -92,6 +74,8 @@ else()
             -DLIBSBML_LIBRARY=${LIBSBML_LIBRARY_FILE}
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
+            -DXML_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
+            -DXML_LIBRARY=${LIBXML2_LIBRARY_FILE}
             -DZIPPER_INCLUDE_DIR=${ZIPPER_INCLUDE_DIR}
             -DZIPPER_LIBRARY=${ZIPPER_LIBRARY_FILE}
             -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}

@@ -37,10 +37,13 @@ namespace libOpenCOR {
 
 namespace {
 
-void errorHandler(int pErrorCode, const char *pModule, const char *pFunction, char *pErrorMessage, void *pUserData)
+void errorHandler(int pLine, const char *pFunction, const char *pFile, const char *pErrorMessage, SUNErrCode pErrorCode,
+                  void *pUserData, SUNContext pSunContext)
 {
-    (void)pModule;
+    (void)pLine;
     (void)pFunction;
+    (void)pFile;
+    (void)pSunContext;
 
 #ifdef CODE_COVERAGE_ENABLED
     (void)pErrorCode;
@@ -109,6 +112,8 @@ void SolverCvode::Impl::resetInternals()
         SUNMatDestroy(mSunMatrix);
 
         CVodeFree(&mSolver);
+
+        SUNContext_PopErrHandler(mSunContext);
 
         SUNContext_Free(&mSunContext);
     }
@@ -207,7 +212,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Create our SUNDIALS context.
 
-    ASSERT_EQ(SUNContext_Create(nullptr, &mSunContext), 0);
+    ASSERT_EQ(SUNContext_Create(SUN_COMM_NULL, &mSunContext), 0);
 
     // Create our CVODE solver.
 
@@ -217,7 +222,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Use our own error handler.
 
-    ASSERT_EQ(CVodeSetErrHandlerFn(mSolver, errorHandler, &mErrorMessage), CV_SUCCESS);
+    ASSERT_EQ(SUNContext_PushErrHandler(mSunContext, errorHandler, &mErrorMessage), CV_SUCCESS);
 
     // Initialise our CVODE solver.
 
@@ -274,11 +279,11 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
             if (mPreconditioner == Preconditioner::BANDED) {
                 if (mLinearSolver == LinearSolver::GMRES) {
-                    mSunLinearSolver = SUNLinSol_SPGMR(mStatesVector, PREC_LEFT, 0, mSunContext);
+                    mSunLinearSolver = SUNLinSol_SPGMR(mStatesVector, SUN_PREC_LEFT, 0, mSunContext);
                 } else if (mLinearSolver == LinearSolver::BICGSTAB) {
-                    mSunLinearSolver = SUNLinSol_SPBCGS(mStatesVector, PREC_LEFT, 0, mSunContext);
+                    mSunLinearSolver = SUNLinSol_SPBCGS(mStatesVector, SUN_PREC_LEFT, 0, mSunContext);
                 } else {
-                    mSunLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, PREC_LEFT, 0, mSunContext);
+                    mSunLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, SUN_PREC_LEFT, 0, mSunContext);
                 }
 
                 ASSERT_NE(mSunLinearSolver, nullptr);
@@ -290,11 +295,11 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
                           CVLS_SUCCESS);
             } else {
                 if (mLinearSolver == LinearSolver::GMRES) {
-                    mSunLinearSolver = SUNLinSol_SPGMR(mStatesVector, PREC_NONE, 0, mSunContext);
+                    mSunLinearSolver = SUNLinSol_SPGMR(mStatesVector, SUN_PREC_NONE, 0, mSunContext);
                 } else if (mLinearSolver == LinearSolver::BICGSTAB) {
-                    mSunLinearSolver = SUNLinSol_SPBCGS(mStatesVector, PREC_NONE, 0, mSunContext);
+                    mSunLinearSolver = SUNLinSol_SPBCGS(mStatesVector, SUN_PREC_NONE, 0, mSunContext);
                 } else {
-                    mSunLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, PREC_NONE, 0, mSunContext);
+                    mSunLinearSolver = SUNLinSol_SPTFQMR(mStatesVector, SUN_PREC_NONE, 0, mSunContext);
                 }
 
                 ASSERT_NE(mSunLinearSolver, nullptr);
@@ -360,6 +365,12 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
     // Make sure that everything went fine.
 
     if (res < CV_SUCCESS) {
+#ifndef CODE_COVERAGE_ENABLED
+        if (mErrorMessage.back() != '.') {
+            mErrorMessage += '.';
+        }
+#endif
+
         addError(mErrorMessage);
 
         return false;

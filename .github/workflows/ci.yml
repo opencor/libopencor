@@ -73,7 +73,37 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'macOS static library'
+          - name: 'macOS static library (Intel)'
+            os: macos-13
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+          - name: 'macOS shared library (Intel)'
+            os: macos-13
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+          - name: 'macOS static library (ARM)'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -88,7 +118,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'macOS shared library'
+          - name: 'macOS shared library (ARM)'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -147,7 +177,24 @@ jobs:
             unit_testing: OFF
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
-          - name: 'macOS Python bindings'
+          - name: 'macOS Python bindings (Intel)'
+            os: macos-13
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: ON
+            python_unit_testing: ON
+            shared_libs: OFF
+            unit_testing: OFF
+            context: PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
+            target: python_unit_testing
+            pip_install_prerequisites: sudo pip3 install cmake scikit-build
+            pip_install_test_and_uninstall: ON
+          - name: 'macOS Python bindings (ARM)'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -221,7 +268,7 @@ jobs:
             shared_libs: OFF
             unit_testing: ON
             context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang++
-          - name: 'Coverage'
+          - name: 'Code coverage'
             os: macos-latest
             build_type: Release
             code_analysis: OFF
@@ -270,7 +317,7 @@ jobs:
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_LOG_FILE: ""
       DOXYGEN_VERSION: 1.9.3
-      LLVMCLANG_VERSION: 17.0.6
+      LLVMCLANG_VERSION: 18.1.6
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
@@ -288,12 +335,12 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
       - name: Install LLVM
-        if: ${{ matrix.target == 'code_coverage' }}
+        if: ${{ matrix.code_coverage == 'ON' }}
         run: |
           brew install --overwrite llvm
           brew info llvm
       - name: Install Clang
-        if: ${{ matrix.name == 'Code analysis' }}
+        if: ${{ matrix.code_analysis == 'ON' }}
         run: |
           wget https://github.com/opencor/gha/releases/download/ci/clang.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang /usr/local/bin
@@ -311,7 +358,7 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/ci/clang-tidy.$LLVMCLANG_VERSION.linux.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Emscripten
-        if: ${{ matrix.target == 'javascript_unit_testing' }}
+        if: ${{ matrix.javascript_unit_testing == 'ON' }}
         run: brew install --overwrite emscripten
       - name: Install Prettier
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
@@ -325,7 +372,7 @@ jobs:
           sudo apt update
           sudo apt install valgrind
       - name: Install pytest and pytest-html
-        if: ${{ matrix.target == 'python_unit_testing' }}
+        if: ${{ matrix.python_unit_testing == 'ON' }}
         run: pip3 install pytest pytest-html
       - name: Install Sphinx and some Sphinx packages
         if: ${{ matrix.documentation == 'ON' }}
@@ -341,27 +388,27 @@ jobs:
           cd build
           ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_bindings }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_unit_testing }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
       - name: Build libOpenCOR
-        if: ${{ (matrix.target == 'unit_testing') || (matrix.target == 'javascript_unit_testing') }}
+        if: ${{ (matrix.unit_testing == 'ON') || (matrix.javascript_unit_testing == 'ON') }}
         run: |
           cd build
           ninja
       - name: Unit testing
-        if: ${{ matrix.target == 'unit_testing' }}
+        if: ${{ matrix.unit_testing == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
       - name: JavaScript unit testing
-        if: ${{ matrix.target == 'javascript_unit_testing' }}
+        if: ${{ matrix.javascript_unit_testing == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
       - name: Python unit testing
-        if: ${{ matrix.target == 'python_unit_testing' }}
+        if: ${{ matrix.python_unit_testing == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
       - name: Python unit testing report
-        if: ${{ matrix.target == 'python_unit_testing' }}
+        if: ${{ matrix.python_unit_testing == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}_report
@@ -386,23 +433,23 @@ jobs:
           cd build
           ninja
       - name: Coverage
-        if: ${{ matrix.target == 'code_coverage' }}
+        if: ${{ matrix.code_coverage == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
           if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
       - name: Coverage report
-        if: ${{ matrix.target == 'code_coverage' }}
+        if: ${{ matrix.code_coverage == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}_report
       - name: Memory checks
-        if: ${{ matrix.target == 'memory_checks' }}
+        if: ${{ matrix.memory_checks == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
       - name: Documentation
-        if: ${{ matrix.target == 'documentation' }}
+        if: ${{ matrix.documentation == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}

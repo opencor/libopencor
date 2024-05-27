@@ -27,25 +27,13 @@ endif()
 if(LIBOPENCOR_PREBUILT_LIBCURL)
     if(WIN32)
         if(RELEASE_MODE)
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a0e03230c20533bea04ceba6a2587b8878eca80f)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 110614df0c1c9f8c627b22a19bcb2a9ed52e86d7)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             a0e03230c20533bea04ceba6a2587b8878eca80f)
         else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 f4352511ab7e1e90d691265a8d7814388e43aec2)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 158887aa551e1439e224a0a9763fd72f15756361)
-            endif()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             f4352511ab7e1e90d691265a8d7814388e43aec2)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
@@ -58,15 +46,9 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
                              d7e55af2f4f71599680b5c6dd1c3953b729548d0)
         endif()
     else()
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a1251435ea2228af7e87a9f6ed1d7bd89a7592a1)
-        else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             1d41aebf3040f0ae86845f4cac26b8f05e35abc1)
-        endif()
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         a1251435ea2228af7e87a9f6ed1d7bd89a7592a1)
     endif()
 else()
     # Build our package.

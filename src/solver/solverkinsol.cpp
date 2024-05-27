@@ -35,10 +35,13 @@ namespace libOpenCOR {
 namespace {
 
 #ifndef CODE_COVERAGE_ENABLED
-void errorHandler(int pErrorCode, const char *pModule, const char *pFunction, char *pErrorMessage, void *pUserData)
+void errorHandler(int pLine, const char *pFunction, const char *pFile, const char *pErrorMessage, SUNErrCode pErrorCode,
+                  void *pUserData, SUNContext pSunContext)
 {
-    (void)pModule;
+    (void)pLine;
     (void)pFunction;
+    (void)pFile;
+    (void)pSunContext;
 
     if (pErrorCode != KIN_WARNING) {
         *static_cast<std::string *>(pUserData) = pErrorMessage;
@@ -139,7 +142,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
     SUNContext context = nullptr;
 
-    ASSERT_EQ(SUNContext_Create(nullptr, &context), 0);
+    ASSERT_EQ(SUNContext_Create(SUN_COMM_NULL, &context), 0);
 
     // Create our KINSOL solver.
 
@@ -150,7 +153,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
     // Use our own error handler.
 
 #ifndef CODE_COVERAGE_ENABLED
-    ASSERT_EQ(KINSetErrHandlerFn(solver, errorHandler, &mErrorMessage), KIN_SUCCESS);
+    ASSERT_EQ(SUNContext_PushErrHandler(context, errorHandler, &mErrorMessage), KIN_SUCCESS);
 #endif
 
     // Initialise our KINSOL solver.
@@ -188,11 +191,11 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
         sunMatrix = nullptr;
 
         if (mLinearSolver == LinearSolver::GMRES) {
-            sunLinearSolver = SUNLinSol_SPGMR(u, PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPGMR(u, SUN_PREC_NONE, 0, context);
         } else if (mLinearSolver == LinearSolver::BICGSTAB) {
-            sunLinearSolver = SUNLinSol_SPBCGS(u, PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPBCGS(u, SUN_PREC_NONE, 0, context);
         } else {
-            sunLinearSolver = SUNLinSol_SPTFQMR(u, PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPTFQMR(u, SUN_PREC_NONE, 0, context);
         }
     }
 
@@ -228,6 +231,8 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
     SUNLinSolFree(sunLinearSolver);
 
     KINFree(&solver);
+
+    SUNContext_PopErrHandler(context);
 
     SUNContext_Free(&context);
 

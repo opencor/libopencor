@@ -32,11 +32,13 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
     if(EMSCRIPTEN)
         # Add some sources to our WebAssembly version of libOpenCOR so we can access its internals.
 
-        target_sources(${CMAKE_PROJECT_NAME} PRIVATE
-                       ${JAVASCRIPT_SOURCE_FILES})
+        if(NOT ONLY_BUILD_THIRD_PARTY_LIBRARIES)
+            target_sources(${CMAKE_PROJECT_NAME} PRIVATE
+                           ${JAVASCRIPT_SOURCE_FILES})
 
-        target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
-                                   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
+            target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+                                       $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/api/${CMAKE_PROJECT_NAME_LC}/module>)
+        endif()
 
         # Use the variables that we passed to CMake but that may or may not end up being used.
         # Note: this prevents us from getting a warning about unused variables.
@@ -47,7 +49,8 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
             ${CLCACHE_EXE}
             ${EMCMAKE_EXE}
             ${EMCONFIGURE_EXE}
-            ${NATIVE_PREBUILT_DIR}
+            ${LIBOPENCOR_JAVASCRIPT_UNIT_TESTING}
+            ${REAL_CMAKE_PROJECT_NAME}
         )
     else()
         # Build our JavaScript bindings.
@@ -73,7 +76,7 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                                                                   -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}
                                                                   -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
                                                                   -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
-                                                                  -DNATIVE_PREBUILT_DIR=${PREBUILT_DIR}
+                                                                  -DONLY_BUILD_THIRD_PARTY_LIBRARIES=${ONLY_BUILD_THIRD_PARTY_LIBRARIES}
                                                                   -DREAL_CMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
                           COMMAND ${CMAKE_COMMAND} --build build)
 

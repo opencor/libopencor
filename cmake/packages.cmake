@@ -22,11 +22,31 @@ function(check_dependent_packages PACKAGE)
             if(LIBOPENCOR_PREBUILT_${DEPENDENT_PACKAGE_UC})
                 set(LIBOPENCOR_PREBUILT_${DEPENDENT_PACKAGE_UC} OFF CACHE BOOL "${LIBOPENCOR_PREBUILT_${PACKAGE_UC}_DOCSTRING}" FORCE)
 
-                set(DEPENDENT_PACKAGES_TO_BUILD "${DEPENDENT_PACKAGES_TO_BUILD};${DEPENDENT_PACKAGE}")
+                list(APPEND DEPENDENT_PACKAGES_TO_BUILD ${DEPENDENT_PACKAGE})
 
                 list(SORT DEPENDENT_PACKAGES_TO_BUILD)
 
                 set(DEPENDENT_PACKAGES_TO_BUILD "${DEPENDENT_PACKAGES_TO_BUILD}" CACHE INTERNAL "Dependent packages to be built.")
+            endif()
+        endforeach()
+    endif()
+endfunction()
+
+function(check_required_packages PACKAGE)
+    string(TOUPPER "${PACKAGE}" PACKAGE_UC)
+
+    if(NOT LIBOPENCOR_PREBUILT_${PACKAGE_UC})
+        foreach(REQUIRED_PACKAGE ${ARGN})
+            string(TOUPPER "${REQUIRED_PACKAGE}" DEPENDENT_PACKAGE_UC)
+
+            list(FIND REQUIRED_PACKAGES_TO_ADD ${REQUIRED_PACKAGE} INDEX)
+
+            if(INDEX EQUAL -1)
+                list(APPEND REQUIRED_PACKAGES_TO_ADD ${REQUIRED_PACKAGE})
+
+                list(SORT REQUIRED_PACKAGES_TO_ADD)
+
+                set(REQUIRED_PACKAGES_TO_ADD "${REQUIRED_PACKAGES_TO_ADD}" CACHE INTERNAL "Required packages to be added.")
             endif()
         endforeach()
     endif()
@@ -127,11 +147,23 @@ function(create_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEASE_
 endfunction()
 
 function(add_package PACKAGE)
+    # Check whether the package is one that we want to add.
+
+    if(ONLY_BUILD_THIRD_PARTY_LIBRARIES)
+        list(FIND PACKAGES_TO_ADD ${PACKAGE} INDEX)
+
+        if(INDEX EQUAL -1)
+            return()
+        endif()
+    endif()
+
+    # Add the package.
+
     add_subdirectory(${PACKAGE})
 
     # Keep track of the package.
 
-    set(AVAILABLE_PACKAGES "${AVAILABLE_PACKAGES};${PACKAGE}")
+    list(APPEND AVAILABLE_PACKAGES ${PACKAGE})
 
     list(SORT AVAILABLE_PACKAGES)
 
@@ -141,7 +173,7 @@ function(add_package PACKAGE)
 
     file(GLOB PACKAGE_HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/${PACKAGE}/*.h")
 
-    set(THIRD_PARTY_HEADER_FILES "${THIRD_PARTY_HEADER_FILES};${PACKAGE_HEADER_FILES}")
+    list(APPEND THIRD_PARTY_HEADER_FILES ${PACKAGE_HEADER_FILES})
 
     set(THIRD_PARTY_HEADER_FILES "${THIRD_PARTY_HEADER_FILES}" CACHE INTERNAL "Third-party (special) header files.")
 endfunction()
@@ -241,10 +273,12 @@ else()
         set(TARGET_PLATFORM_ARCHITECTURE linux)
     endif()
 
-    if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
-        set(TARGET_PLATFORM_ARCHITECTURE ${TARGET_PLATFORM_ARCHITECTURE}.intel)
-    else()
-        set(TARGET_PLATFORM_ARCHITECTURE ${TARGET_PLATFORM_ARCHITECTURE}.arm)
+    if(APPLE)
+        if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
+            set(TARGET_PLATFORM_ARCHITECTURE ${TARGET_PLATFORM_ARCHITECTURE}.intel)
+        else()
+            set(TARGET_PLATFORM_ARCHITECTURE ${TARGET_PLATFORM_ARCHITECTURE}.arm)
+        endif()
     endif()
 endif()
 
