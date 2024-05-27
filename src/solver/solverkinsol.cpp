@@ -150,10 +150,11 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
     ASSERT_NE(solver, nullptr);
 
-    // Use our own error handler.
+    // Use our own error handler and disable the logger.
 
 #ifndef CODE_COVERAGE_ENABLED
     ASSERT_EQ(SUNContext_PushErrHandler(context, errorHandler, &mErrorMessage), KIN_SUCCESS);
+    ASSERT_EQ(SUNContext_SetLogger(context, nullptr), KIN_SUCCESS);
 #endif
 
     // Initialise our KINSOL solver.

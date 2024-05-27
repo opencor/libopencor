@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSBML)
-set(PACKAGE_VERSION 5.19.6)
+set(PACKAGE_VERSION 5.20.2)
 set(PACKAGE_REPOSITORY libsbml)
-set(RELEASE_TAG v5.19.6-libopencor)
+set(RELEASE_TAG v5.20.2b)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -28,32 +28,32 @@ if(LIBOPENCOR_PREBUILT_LIBSBML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         da5d9db8b53f0afebfc75fb4a6dbaa7fae17540e)
+                         11fe48981258511e093ea1ea16c3ba370a2da33b)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9908f803eaa644aa262df64c17243e38d1f5f8f4)
+                                 07e00c0cce28b617d98ed1d06178dff292aac771)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b8a48f56f18e495062ba20f087ab5097e0d4b2ce)
+                                 6f39b6611fd822055e15c8af9a1942bb9628859a)
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 f9d89084dd9bcb724e68beddcba924c6fb21147e)
+                                 5dee5db5dfe960ec0a8d1b098c8939b020a13609)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 694ad628772f8fd5009d6f048a4062079cafa5c8)
+                                 08039fecb28dbd0f644cdd38bc5c857718f7db1d)
             endif()
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b968f19fc3f91f6b639ba7df671025d0838780c8)
+                             80d834206af0c3dbcd45d5e228288d16171ebc94)
         endif()
     endif()
 else()

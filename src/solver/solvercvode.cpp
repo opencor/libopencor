@@ -220,9 +220,10 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     ASSERT_NE(mSolver, nullptr);
 
-    // Use our own error handler.
+    // Use our own error handler and disable the logger.
 
     ASSERT_EQ(SUNContext_PushErrHandler(mSunContext, errorHandler, &mErrorMessage), CV_SUCCESS);
+    ASSERT_EQ(SUNContext_SetLogger(mSunContext, nullptr), CV_SUCCESS);
 
     // Initialise our CVODE solver.
 
