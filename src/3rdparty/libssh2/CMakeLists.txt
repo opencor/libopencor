@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libssh2)
-set(PACKAGE_VERSION 1.10.0)
+set(PACKAGE_VERSION 1.11.0)
 set(PACKAGE_REPOSITORY libssh2)
-set(RELEASE_TAG libssh2-1.10.0)
+set(RELEASE_TAG libssh2-1.11.0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -25,26 +25,26 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a036e09966b8fe4fb51799b6027ef751d2d853bf)
+                             af719d88ecb750983ec9d6c6ca5cea456b58bc5b)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             61ad26586df1fbf494c43e12548898a285a84d4b)
+                             e0b998b00415258d9e335d005ae2a07e4f2a19b3)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             555726b2220a89d3de8c405297d2898311ff415e)
+                             fc6a42100feb766cb050938ebd0da3db26576c46)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             52a3363adaeeccf94116e689af1ed541bfa14aaa)
+                             daa12bcce6e69da42a25c0351df2e412e3d7b976)
         endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         748feccb81c12663f28023b171925ee255ed3acc)
+                         f28e2918a1af667a2609f31e628c6e94bb7610ab)
     endif()
 else()
     # Build our package.
@@ -55,12 +55,14 @@ else()
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBUILD_EXAMPLES=OFF
+            -DBUILD_SHARED_LIBS=OFF
+            -DBUILD_STATIC_LIBS=ON
             -DBUILD_TESTING=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DOPENSSL_CRYPTO_LIBRARY=${OPENSSL_LIBCRYPTO_LIBRARY_FILE}
-            -DOPENSSL_INCLUDE_DIR=${OPENSSL_INCLUDE_DIR}
-            -DOPENSSL_SSL_LIBRARY=${OPENSSL_LIBSSL_LIBRARY_FILE}
+            -DCRYPTO_BACKEND=OpenSSL
+            -DENABLE_ZLIB_COMPRESSION=OFF
+            -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
     )
 
     # Patch some of our CMake configuration files.
@@ -71,7 +73,7 @@ else()
         set(PACKAGE_MODE debug)
     endif()
 
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/Libssh2Config-${PACKAGE_MODE}.cmake)
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/Libssh2Config.cmake)
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
@@ -96,5 +98,5 @@ set(LIBSSH2_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory
 set(LIBSSH2_CMAKE_DIR ${INSTALL_DIR}/lib/cmake/libssh2 CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
 set(LIBSSH2_CMAKE_PACKAGE_NAME Libssh2 CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBSSH2_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBSSH2_LIBRARY Libssh2::libssh2 CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSSH2_LIBRARY Libssh2::libssh2_static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBSSH2_LIBRARY_FILE ${INSTALL_DIR}/lib/${PACKAGE_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")
