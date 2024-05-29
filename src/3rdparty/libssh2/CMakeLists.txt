@@ -25,26 +25,26 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             af719d88ecb750983ec9d6c6ca5cea456b58bc5b)
+                             9688b2a91f43b7789bc146f37aff90b3d6623db4)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e0b998b00415258d9e335d005ae2a07e4f2a19b3)
+                             900d0364ec5eb5cda48b262baae270a173ccbaee)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             fc6a42100feb766cb050938ebd0da3db26576c46)
+                             276a86463fc431e89600f533bd3b13133c22b326)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             daa12bcce6e69da42a25c0351df2e412e3d7b976)
+                             40c2e04655173653007519ffd34b87d19f101162)
         endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         f28e2918a1af667a2609f31e628c6e94bb7610ab)
+                         e30e3fa0fce8542692cd6f97ecf6eb663b5a4887)
     endif()
 else()
     # Build our package.
@@ -77,8 +77,7 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REPLACE "${OPENSSL_LIBCRYPTO_LIBRARY_FILE}" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "${OPENSSL_LIBSSL_LIBRARY_FILE}" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REGEX REPLACE "INTERFACE_LINK_LIBRARIES \"[^\"]*\"" "INTERFACE_LINK_LIBRARIES \"OpenSSL::libssl;OpenSSL::libcrypto\"" FILE_CONTENTS "${FILE_CONTENTS}")
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
