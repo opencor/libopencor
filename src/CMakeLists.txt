@@ -19,13 +19,12 @@ if(LIBOPENCOR_COMPILER_CACHING)
         set(CMAKE_C_COMPILER_LAUNCHER ${BUILDCACHE_EXE})
         set(CMAKE_CXX_COMPILER_LAUNCHER ${BUILDCACHE_EXE})
     elseif(CLCACHE_EXE)
-        set(CLCACHEWRAPPER ${CMAKE_CURRENT_BINARY_DIR}/clcachewrapper)
+        set(CLCACHEWRAPPER ${CMAKE_BINARY_DIR}/clcachewrapper)
 
-        execute_process(COMMAND ${CMAKE_C_COMPILER} /O2 /Fe${CLCACHEWRAPPER} ${CMAKE_SOURCE_DIR}/cmake/clcachewrapper.c
-                        RESULT_VARIABLE RESULT
-                        OUTPUT_QUIET ERROR_QUIET)
+        try_compile(CLCACHEWRAPPER_EXE ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake/clcachewrapper.c
+                    COPY_FILE ${CLCACHEWRAPPER})
 
-        if(RESULT EQUAL 0)
+        if(CLCACHEWRAPPER_EXE)
             set(CMAKE_C_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
             set(CMAKE_CXX_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
         endif()
