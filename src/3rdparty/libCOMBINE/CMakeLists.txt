@@ -15,7 +15,7 @@
 set(PACKAGE_NAME libCOMBINE)
 set(PACKAGE_VERSION 0.2.20)
 set(PACKAGE_REPOSITORY libCombine)
-set(RELEASE_TAG v0.2.20b)
+set(RELEASE_TAG v0.2.20-buffer)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -28,32 +28,32 @@ if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         fb6d723cb1f1ef533f8254d450abf227882f0e0b)
+                         e6f2c3c963b6a6b5e5cbc66919624327b9e36696)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9781459729e039c3275eae5da37ac2c1aa143032)
+                                 da9487061b1b816b49467a883c3d59e6ac029ccc)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8da2f4f272e49c79b4d87d8175fd5ccd966d4dab)
+                                 8202f992c22c3d6f98b53b99bb0795f6348e634f)
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ec6284679c7a85eafd3b92f4e97561383ffd2611)
+                                 43906fcb976cd8187785a568ce0e489fc542b98f)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5e2faaf876dc6b4acfaf05a1b1c147ad5633b1d3)
+                                 d480d451fbc16189c0238fe3bff70db5fe5c0ba3)
             endif()
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             fb8a6411e2f33422e20aaa64093967fef5829a10)
+                             8b2773d0cf12e4a343380178d14af8e7d9984165)
         endif()
     endif()
 else()
