@@ -380,7 +380,8 @@ function(add_target_property TARGET PROPERTY VALUE)
         set(NEW_VALUE "${VALUE}")
     endif()
 
-    set_target_properties(${TARGET} PROPERTIES ${PROPERTY} "${NEW_VALUE}")
+    set_target_properties(${TARGET} PROPERTIES
+                          ${PROPERTY} "${NEW_VALUE}")
 endfunction()
 
 function(prepare_test TARGET)
