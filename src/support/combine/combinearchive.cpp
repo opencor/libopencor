@@ -62,8 +62,9 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
     // Try to retrieve a COMBINE archive.
 
     auto *archive = new libcombine::CombineArchive {};
+    auto fileContents = pFile->contents();
 
-    if (archive->initializeFromArchive(pFile->fileName())) {
+    if (archive->initializeFromArchive(fileContents)) {
         return CombineArchivePtr {new CombineArchive {archive}};
     }
 
