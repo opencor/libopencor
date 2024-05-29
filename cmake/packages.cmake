@@ -68,8 +68,7 @@ function(build_package PACKAGE_NAME)
     execute_process(COMMAND ${CONFIGURE_COMMAND} -G "${CMAKE_GENERATOR}" -S . -B build
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     RESULT_VARIABLE RESULT
-                    ERROR_VARIABLE ERROR
-                    OUTPUT_QUIET)
+                    ERROR_VARIABLE ERROR)
 
     if(NOT RESULT EQUAL 0)
         message(FATAL_ERROR "${ERROR}")
@@ -78,8 +77,7 @@ function(build_package PACKAGE_NAME)
     execute_process(COMMAND ${CMAKE_COMMAND} --build build
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     RESULT_VARIABLE RESULT
-                    ERROR_VARIABLE ERROR
-                    OUTPUT_QUIET)
+                    ERROR_VARIABLE ERROR)
 
     if(NOT RESULT EQUAL 0)
         message(FATAL_ERROR "${ERROR}")
