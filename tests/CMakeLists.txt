@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Generate our base64 encoder.
+
+set(BASE64ENCODER ${CMAKE_BINARY_DIR}/base64encoder)
+
+try_compile(BASE64ENCODER_EXE ${CMAKE_BINARY_DIR}
+            SOURCES ${CMAKE_SOURCE_DIR}/cmake/base64encoder.cpp
+                    ${CMAKE_SOURCE_DIR}/extern/modp_b64/modp_b64.cc
+            COPY_FILE ${BASE64ENCODER})
+
+if(NOT BASE64ENCODER_EXE)
+    message(FATAL_ERROR "base64encoder could not be built...")
+endif()
+
 # Include our different tests.
 
 include(api/file/tests.cmake)
