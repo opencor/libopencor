@@ -56,20 +56,26 @@ const CombineArchive::Impl *CombineArchive::pimpl() const
 
 CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 {
-#ifdef __EMSCRIPTEN__
-    (void)pFile;
-#else
     // Try to retrieve a COMBINE archive.
+    // Note: a COMBINE archive is a ZIP file, so we make sure that it starts with 0x04034b50, which is the magic number
+    //       used by a ZIP file (we ignore empty and spanned ZIP files). Indeed, libCOMBINE may crash depending on the
+    //       file contents that is given to it.
 
-    auto *archive = new libcombine::CombineArchive {};
+    static const auto LS8 = 8U;
+    static const auto LS16 = 16U;
+    static const auto LS24 = 24U;
+    static const auto ZIP_MAGIC_NUMBER = 0x04034b50;
+
     auto fileContents = pFile->contents();
 
-    if (archive->initializeFromArchive(fileContents)) {
+    if ((fileContents.size() > 4)
+        && (fileContents[0] + (fileContents[1] << LS8) + (fileContents[2] << LS16) + (fileContents[3] << LS24) == ZIP_MAGIC_NUMBER)) {
+        auto *archive = new libcombine::CombineArchive {};
+
+        archive->initializeFromArchive(fileContents);
+
         return CombineArchivePtr {new CombineArchive {archive}};
     }
-
-    delete archive;
-#endif
 
     return nullptr;
 }

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+import base64
 from libopencor import (
     Issue,
 )
@@ -56,6 +57,9 @@ SOME_CELLML_CONTENTS = """@SOME_CELLML_CONTENTS@"""
 SOME_ERROR_CELLML_CONTENTS = """@SOME_ERROR_CELLML_CONTENTS@"""
 SOME_WARNING_CELLML_CONTENTS = """@SOME_WARNING_CELLML_CONTENTS@"""
 SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
+SOME_COMBINE_ARCHIVE_CONTENTS = base64.b64decode(
+    b"@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@"
+)
 
 
 def assert_issues(logger, expected_issues):
@@ -107,3 +111,7 @@ def resource_path(relative_path=""):
 
 def string_to_list(string):
     return [ord(x) for x in string]
+
+
+def binary_to_list(string):
+    return [x for x in string]

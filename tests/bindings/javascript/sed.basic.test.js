@@ -21,11 +21,15 @@ import { expectIssues } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("Sed basic tests", () => {
+  let someUnknownContentsPtr;
   let someCellmlContentsPtr;
   let someSedmlContentsPtr;
-  let someUnknownContentsPtr;
 
   beforeAll(() => {
+    someUnknownContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_UNKNOWN_CONTENTS,
+    );
     someCellmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_CELLML_CONTENTS,
@@ -34,16 +38,12 @@ describe("Sed basic tests", () => {
       libopencor,
       utils.SOME_SEDML_CONTENTS,
     );
-    someUnknownContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNKNOWN_CONTENTS,
-    );
   });
 
   afterAll(() => {
+    utils.freeMemory(libopencor, someUnknownContentsPtr);
     utils.freeMemory(libopencor, someCellmlContentsPtr);
     utils.freeMemory(libopencor, someSedmlContentsPtr);
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
   });
 
   test("No file", () => {
@@ -99,7 +99,10 @@ describe("Sed basic tests", () => {
   test("COMBINE archive", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
-    file.setContents(someCombineContentsPtr, utils.SOME_COMBINE_CONTENTS.length);
+    file.setContents(
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS,//someCombineArchiveContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+    );
 
     const document = new libopencor.SedDocument(file);
 

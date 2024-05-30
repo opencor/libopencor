@@ -65,6 +65,10 @@ string(REGEX REPLACE "\n" "\" \\n\"" SOME_WARNING_CELLML_CONTENTS_C "${SOME_WARN
 string(REPLACE "\"" "\\\"" SOME_SEDML_CONTENTS "${SOME_SEDML_CONTENTS}")
 string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_CONTENTS_C "${SOME_SEDML_CONTENTS}")
 
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/cellml_2.omex"
+                OUTPUT_VARIABLE SOME_BASE64_COMBINE_ARCHIVE_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 file(READ res/api/solver/ode/model.cellml SOME_ODE_MODEL_CONTENTS)
 file(READ res/api/solver/nla/model1.cellml SOME_DAE_MODEL1_CONTENTS)
 file(READ res/api/solver/nla/model2.cellml SOME_DAE_MODEL2_CONTENTS)
@@ -100,7 +104,9 @@ foreach(TEST ${TESTS})
             set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
         endif()
 
-        prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES} ${UTILS_SOURCE_FILE})
+        prepare_test(${TEST_CATEGORY}${TEST}_tests
+                     ${${TEST}_SOURCE_FILES}
+                     ${UTILS_SOURCE_FILE})
     endif()
 
     list(APPEND GIT_TESTS_SOURCE_FILES ${${TEST}_SOURCE_FILES})

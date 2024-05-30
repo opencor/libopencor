@@ -386,14 +386,25 @@ endfunction()
 
 function(prepare_test TARGET)
     # Prepare the given test.
+    # Note: we don't want modp_b64.cc to be subjected to Clang-Tidy, hence we compile it separately. From Cmake 3.27,,
+    #       we could use the CXX_CLANG_TIDY property to exclude it from Clang-Tidy, but for some reasons it's not
+    #       working, so we compile it separately (as suggested at https://stackoverflow.com/a/75858167).
 
     add_executable(${TARGET}
                    ${ARGN})
 
     add_dependencies(${TARGET} ${CMAKE_PROJECT_NAME})
 
+    set(MODP_B64_TARGET ${TARGET}_modp_b64)
+
+    add_library(${MODP_B64_TARGET} OBJECT ${CMAKE_SOURCE_DIR}/extern/modp_b64/modp_b64.cc)
+
+    set_target_properties(${MODP_B64_TARGET} PROPERTIES
+                          CXX_CLANG_TIDY "")
+
     target_link_libraries(${TARGET} PRIVATE
                           gtest_main
+                          ${MODP_B64_TARGET}
                           ${CMAKE_PROJECT_NAME})
 
     configure_target(${TARGET})

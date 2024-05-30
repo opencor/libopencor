@@ -116,3 +116,11 @@ def test_type_sedml_virtual_file():
     file.contents = utils.string_to_list(utils.SOME_SEDML_CONTENTS)
 
     assert file.type == File.Type.SedmlFile
+
+
+def test_type_combine_virtual_archive():
+    file = File(utils.LOCAL_FILE)
+
+    file.contents = utils.binary_to_list(utils.SOME_COMBINE_ARCHIVE_CONTENTS)
+
+    assert file.type == File.Type.CombineArchive

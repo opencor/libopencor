@@ -63,8 +63,10 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 {
     // Try to retrieve a SED-ML document.
 
-    if (!pFile->contents().empty()) {
-        auto *document = libsedml::readSedMLFromString(toString(pFile->contents()).c_str());
+    auto fileContents = pFile->contents();
+
+    if (!fileContents.empty()) {
+        auto *document = libsedml::readSedMLFromString(toString(fileContents).c_str());
 
         // A non-SED-ML file results in our SED-ML document having at least one error, the first of which being of id
         // libsedml::SedNotSchemaConformant (e.g., a CellML file, i.e. an XML file, but not a SED-ML one) or

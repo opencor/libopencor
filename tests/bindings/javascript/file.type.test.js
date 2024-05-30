@@ -24,6 +24,7 @@ describe("File type tests", () => {
   let someUnknownContentsPtr;
   let someCellmlContentsPtr;
   let someSedmlContentsPtr;
+  let someCombineArchiveContentsPtr;
 
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
@@ -38,12 +39,17 @@ describe("File type tests", () => {
       libopencor,
       utils.SOME_SEDML_CONTENTS,
     );
+    someCombineArchiveContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someUnknownContentsPtr);
     utils.freeMemory(libopencor, someCellmlContentsPtr);
     utils.freeMemory(libopencor, someSedmlContentsPtr);
+    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
   });
 
   test("Unknown file", () => {
@@ -77,5 +83,16 @@ describe("File type tests", () => {
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
     expect(file.type().value).toBe(libopencor.File.Type.SEDML_FILE.value);
+  });
+
+  test("COMBINE archive", () => {
+    const file = new libopencor.File(utils.LOCAL_FILE);
+
+    file.setContents(
+      someCombineArchiveContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+    );
+
+    expect(file.type().value).toBe(libopencor.File.Type.COMBINE_ARCHIVE.value);
   });
 });

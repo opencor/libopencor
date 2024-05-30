@@ -40,6 +40,9 @@ export const SOME_WARNING_CELLML_CONTENTS = stringToArrayBuffer(
   `@SOME_WARNING_CELLML_CONTENTS@`,
 );
 export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
+export const SOME_COMBINE_ARCHIVE_CONTENTS = stringToArrayBuffer(
+  atob("@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@"),
+);
 
 export const SOME_ODE_MODEL_CONTENTS = stringToArrayBuffer(
   `@SOME_ODE_MODEL_CONTENTS@`,
@@ -124,7 +127,5 @@ export function freeMemory(module, memPtr) {
 }
 
 function stringToArrayBuffer(string) {
-  const encoder = new TextEncoder();
-
-  return encoder.encode(string);
+  return Uint8Array.from(string, (c) => c.charCodeAt(0));
 }
