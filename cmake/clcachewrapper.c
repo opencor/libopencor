@@ -17,7 +17,7 @@ limitations under the License.
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char *argv[])
+int main(int pArgC, char *pArgV[])
 {
     // Call clcache with the given arguments, except the first one, which is the
     // full path to the MSVC compiler.
@@ -27,15 +27,15 @@ int main(int argc, char *argv[])
     char clcacheCommand[STRING_SIZE] = "clcache";
     int k = 6;
 
-    for (int i = 2; i < argc; ++i) {
+    for (int i = 2; i < pArgC; ++i) {
         clcacheCommand[++k] = ' ';
 
-        for (int j = 0; argv[i][j]; ++j) {
-            if (argv[i][j] == '\\') {
+        for (int j = 0; pArgV[i][j]; ++j) {
+            if (pArgV[i][j] == '\\') {
                 clcacheCommand[++k] = '\\';
                 clcacheCommand[++k] = '\\';
             } else {
-                clcacheCommand[++k] = argv[i][j];
+                clcacheCommand[++k] = pArgV[i][j];
             }
         }
     }
