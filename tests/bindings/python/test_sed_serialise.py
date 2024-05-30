@@ -126,7 +126,7 @@ def test_local_cellml_file_with_base_path():
 def test_local_cellml_file_without_base_path():
     file = File(utils.LOCAL_FILE)
 
-    file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
+    file.contents = utils.string_to_list(utils.SOME_CELLML_CONTENTS)
 
     document = SedDocument(file)
 
@@ -152,7 +152,7 @@ def test_relative_local_cellml_file_with_base_path():
 def test_relative_local_cellml_file_without_base_path():
     file = File(utils.CELLML_2_FILE)
 
-    file.set_contents(utils.string_to_list(utils.SOME_CELLML_CONTENTS))
+    file.contents = utils.string_to_list(utils.SOME_CELLML_CONTENTS)
 
     document = SedDocument(file)
 

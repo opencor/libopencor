@@ -20,7 +20,7 @@ import utils
 def test_empty_file():
     file = File(utils.LOCAL_FILE)
 
-    file.set_contents(utils.string_to_list(utils.NO_CONTENTS))
+    file.contents = utils.string_to_list(utils.NO_CONTENTS)
 
     assert file.type == File.Type.UnknownFile
 

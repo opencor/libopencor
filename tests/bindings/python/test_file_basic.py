@@ -104,7 +104,7 @@ def test_local_virtual_file():
 
     some_unknown_contents_list = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
 
-    file.set_contents(some_unknown_contents_list)
+    file.contents = some_unknown_contents_list
 
     assert file.type == File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
@@ -123,7 +123,7 @@ def test_remote_virtual_file():
 
     some_unknown_contents_list = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
 
-    file.set_contents(some_unknown_contents_list)
+    file.contents = some_unknown_contents_list
 
     assert file.type == File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
