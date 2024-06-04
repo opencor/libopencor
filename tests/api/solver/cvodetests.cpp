@@ -23,7 +23,7 @@ TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The maximum step cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -42,7 +42,7 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The maximum number of steps cannot be equal to 0. It must be greater than 0."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -61,7 +61,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooS
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -81,7 +81,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooB
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -101,7 +101,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooS
         {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -121,7 +121,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooB
         {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -141,7 +141,7 @@ TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -160,7 +160,7 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -178,7 +178,7 @@ void cvodeSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubl
                 const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
                 const libOpenCOR::Doubles &pVariableValues, const libOpenCOR::Doubles &pVariableAbsTols, bool pCompiled)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
 
     OdeModel::run(document, pStateValues, pStateAbsTols, pRateValues, pRateAbsTols, pVariableValues, pVariableAbsTols, pCompiled);
@@ -219,7 +219,7 @@ TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.982019, -823.51695, 789.77946, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.969916, 0.114985, 0.00287, 0.967348, 12.0, 36.0, 0.541337, 0.056246});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -238,7 +238,7 @@ TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.982, -823.52, 789.78, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.97, 0.11498, 0.002869, 0.96735, 12.0, 36.0, 0.5413, 0.05625});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.001, 0.01, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.00001, 0.000001, 0.00001, 0.0, 0.0, 0.0001, 0.00001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -257,7 +257,7 @@ TEST(CvodeSolverTest, solveWithFunctionalIterationType)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.982, -823.52, 789.78, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.9699, 0.11499, 0.00287, 0.96735, 12.0, 36.0, 0.54134, 0.056246});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.001, 0.01, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001, 0.00001, 0.00001, 0.00001, 0.0, 0.0, 0.00001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -276,7 +276,7 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -13.304, -791.43, 757.5, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.1534, 0.18883, 0.004484, 0.92385, 12.0, 36.0, 0.4547, 0.062887});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.001, 0.01, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001, 0.00001, 0.000001, 0.00001, 0.0, 0.0, 0.0001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -295,7 +295,7 @@ TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.98, -823.52, 789.78, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.9699, 0.11498, 0.00287, 0.96735, 12.0, 36.0, 0.54134, 0.056246});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.01, 0.01, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001, 0.00001, 0.00001, 0.00001, 0.0, 0.0, 0.00001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -314,7 +314,7 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolver)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, 6.03944, -5.198281, 0.022996, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 0.112958, 6.787605, 0.112665, 0.018857, 12.0, 36.0, 0.032306, 0.140794});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -333,7 +333,7 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, 6.039422, -5.198258, 0.022996, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 0.112959, 6.787581, 0.112665, 0.018857, 12.0, 36.0, 0.032306, 0.140793});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -352,7 +352,7 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, 6.03933, -5.1981, 0.023001, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 0.112961, 6.78747, 0.112663, 0.018857, 12.0, 36.0, 0.032307, 0.140793});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.00001, 0.0001, 0.000001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.000001, 0.00001, 0.000001, 0.000001, 0.0, 0.0, 0.000001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -371,7 +371,7 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.9821, -823.517, 789.779, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.9699, 0.11498, 0.00287, 0.967348, 12.0, 36.0, 0.54134, 0.056246});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.0001, 0.001, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001, 0.00001, 0.00001, 0.000001, 0.0, 0.0, 0.00001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -391,7 +391,7 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.9819, -823.52, 789.779, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.9699, 0.11499, 0.00287, 0.96735, 12.0, 36.0, 0.54133, 0.056246});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.0001, 0.01, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001, 0.00001, 0.00001, 0.00001, 0.0, 0.0, 0.00001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
@@ -411,7 +411,7 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -15.982, -823.52, 789.78, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.9699, 0.11499, 0.00287, 0.96735, 12.0, 36.0, 0.54133, 0.056246});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.001, 0.01, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001, 0.00001, 0.00001, 0.00001, 0.0, 0.0, 0.00001, 0.000001});
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());

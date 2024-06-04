@@ -27,7 +27,7 @@ def test_step_value_with_invalid_number():
         ],
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = SolverSecondOrderRungeKutta()
@@ -52,7 +52,7 @@ def second_order_runge_kutta_solve(
     variable_abs_tols,
     compiled,
 ):
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = SolverSecondOrderRungeKutta()
