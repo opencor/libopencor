@@ -69,13 +69,13 @@ execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/cellml
                 OUTPUT_VARIABLE SOME_BASE64_COMBINE_ARCHIVE_CONTENTS
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-file(READ res/api/solver/ode/model.cellml SOME_ODE_MODEL_CONTENTS)
-file(READ res/api/solver/nla/model1.cellml SOME_DAE_MODEL1_CONTENTS)
-file(READ res/api/solver/nla/model2.cellml SOME_DAE_MODEL2_CONTENTS)
+file(READ res/api/solver/ode.cellml SOME_SOLVER_ODE_CONTENTS)
+file(READ res/api/solver/nla1.cellml SOME_SOLVER_NLA1_CONTENTS)
+file(READ res/api/solver/nla2.cellml SOME_SOLVER_NLA2_CONTENTS)
 
-string(REPLACE "\"" "\\\"" SOME_ODE_MODEL_CONTENTS "${SOME_ODE_MODEL_CONTENTS}")
-string(REPLACE "\"" "\\\"" SOME_DAE_MODEL1_CONTENTS "${SOME_DAE_MODEL1_CONTENTS}")
-string(REPLACE "\"" "\\\"" SOME_DAE_MODEL2_CONTENTS "${SOME_DAE_MODEL2_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_SOLVER_ODE_CONTENTS "${SOME_SOLVER_ODE_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_SOLVER_NLA1_CONTENTS "${SOME_SOLVER_NLA1_CONTENTS}")
+string(REPLACE "\"" "\\\"" SOME_SOLVER_NLA2_CONTENTS "${SOME_SOLVER_NLA2_CONTENTS}")
 
 file(READ res/api/sed/algebraic.cellml SOME_ALGEBRAIC_CONTENTS)
 file(READ res/api/sed/dae.cellml SOME_DAE_CONTENTS)

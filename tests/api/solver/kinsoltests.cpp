@@ -26,7 +26,7 @@ TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The maximum number of iterations cannot be equal to 0. It must be greater than 0."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
@@ -44,7 +44,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
@@ -63,7 +63,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
@@ -82,7 +82,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
         {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
@@ -101,7 +101,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
         {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
@@ -119,7 +119,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
 
 TEST(KinsolSolverTest, solve)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto instance = document->createInstance();
 
@@ -130,7 +130,7 @@ TEST(KinsolSolverTest, solve)
 
 TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
@@ -148,7 +148,7 @@ TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 
 TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
@@ -164,7 +164,7 @@ TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 
 TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model2.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
@@ -180,7 +180,7 @@ TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 
 TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla/model1.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());

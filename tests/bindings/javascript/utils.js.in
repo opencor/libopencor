@@ -44,14 +44,14 @@ export const SOME_COMBINE_ARCHIVE_CONTENTS = stringToArrayBuffer(
   atob("@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@"),
 );
 
-export const SOME_ODE_MODEL_CONTENTS = stringToArrayBuffer(
-  `@SOME_ODE_MODEL_CONTENTS@`,
+export const SOME_SOLVER_ODE_CONTENTS = stringToArrayBuffer(
+  `@SOME_SOLVER_ODE_CONTENTS@`,
 );
-export const SOME_DAE_MODEL1_CONTENTS = stringToArrayBuffer(
-  `@SOME_DAE_MODEL1_CONTENTS@`,
+export const SOME_SOLVER_NLA1_CONTENTS = stringToArrayBuffer(
+  `@SOME_SOLVER_NLA1_CONTENTS@`,
 );
-export const SOME_DAE_MODEL2_CONTENTS = stringToArrayBuffer(
-  `@SOME_DAE_MODEL2_CONTENTS@`,
+export const SOME_SOLVER_NLA2_CONTENTS = stringToArrayBuffer(
+  `@SOME_SOLVER_NLA2_CONTENTS@`,
 );
 
 export const SOME_ALGEBRAIC_CONTENTS = stringToArrayBuffer(

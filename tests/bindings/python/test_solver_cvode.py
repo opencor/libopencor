@@ -28,7 +28,7 @@ def test_maximum_step_value_with_invalid_number():
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -48,7 +48,7 @@ def test_maximum_number_of_steps_value_with_invalid_number():
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -68,7 +68,7 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_sma
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -89,7 +89,7 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_big
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -110,7 +110,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_sma
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -131,7 +131,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_big
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -152,7 +152,7 @@ def test_relative_tolerance_value_with_invalid_number():
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -172,7 +172,7 @@ def test_absolute_tolerance_value_with_invalid_number():
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -193,7 +193,7 @@ def cvode_solve(
     variable_abs_tols,
     compiled,
 ):
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
 
     ode_model.run(
@@ -368,7 +368,7 @@ def test_solve_without_interpolate_solution():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -432,7 +432,7 @@ def test_solve_with_adams_moulton_integration_method():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -496,7 +496,7 @@ def test_solve_with_functional_iteration_type():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -560,7 +560,7 @@ def test_solve_with_banded_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -624,7 +624,7 @@ def test_solve_with_diagonal_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -688,7 +688,7 @@ def test_solve_with_gmres_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -752,7 +752,7 @@ def test_solve_with_bicgstab_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -816,7 +816,7 @@ def test_solve_with_tfqmr_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -880,7 +880,7 @@ def test_solve_with_gmres_linear_solver_and_no_preconditioner():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -945,7 +945,7 @@ def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -1010,7 +1010,7 @@ def test_solve_with_tfqmr_linear_solver_and_no_preconditioner():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode/model.cellml"))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver

@@ -23,7 +23,7 @@ TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
         {libOpenCOR::Issue::Type::ERROR, "The step cannot be equal to 0. It must be greater than 0."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();
@@ -46,7 +46,7 @@ void secondOrderRungeKuttaSolve(const libOpenCOR::Doubles &pStateValues, const l
 {
     static const auto STEP = 0.0123;
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode/model.cellml"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();
