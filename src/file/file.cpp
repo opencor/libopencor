@@ -172,7 +172,8 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
     // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage,
     // and return a new file object.
 
-    auto file = FileManager::instance().file(pFileNameOrUrl);
+    auto fileManager = FileManager::instance();
+    auto file = fileManager.file(pFileNameOrUrl);
 
     if (file != nullptr) {
         return file->shared_from_this();
@@ -182,7 +183,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
 
     res->pimpl()->checkType(res);
 
-    FileManager::instance().manage(res.get());
+    fileManager.manage(res.get());
 
     return res;
 }
