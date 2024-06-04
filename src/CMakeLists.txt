@@ -200,6 +200,7 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
