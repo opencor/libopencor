@@ -92,13 +92,15 @@ export function run() {
 
   // Run the simulation.
 
-  console.time("Elapsed time");
+  console.time("Computing time");
   instance.run();
-  console.timeEnd("Elapsed time");
+  console.timeEnd("Computing time");
 
   // Plot the results.
 
+  console.time("Plotting time");
   updatePlottingAreaAndAxesInfo();
+  console.timeEnd("Plotting time");
 }
 
 function axisInfo(index) {
