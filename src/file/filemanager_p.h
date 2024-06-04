@@ -16,30 +16,25 @@ limitations under the License.
 
 #pragma once
 
-#include "utils.h"
-
-#include "libopencor/file.h"
+#include "filemanager.h"
 
 #include <vector>
 
 namespace libOpenCOR {
 
-class FileManager
+using Files = std::vector<File *>;
+
+class FileManager::Impl
 {
 public:
-    static FileManager &instance();
+    Files mFiles;
+
+    static Impl &instance();
 
     void manage(File *pFile);
     void unmanage(File *pFile);
 
     FilePtr file(const std::string &pFileNameOrUrl) const;
-
-private:
-    class Impl;
-
-    Impl &mPimpl;
-
-    explicit FileManager();
 };
 
 } // namespace libOpenCOR
