@@ -67,15 +67,15 @@ bool Compiler::Impl::compile(const std::string &pCode)
     // Get a compilation object to which we pass some arguments.
 
     static constexpr auto DUMMY_FILE_NAME = "dummy.c";
-    static const ConstCharPtrs COMPILATION_ARGUMENTS = {"clang", "-fsyntax-only",
+    static const std::vector<const char *> COMPILATION_ARGUMENTS = {"clang", "-fsyntax-only",
 #ifdef NDEBUG
-                                                        "-O3",
+                                                                    "-O3",
 #else
-                                                        "-g", "-O0",
+                                                                    "-g", "-O0",
 #endif
-                                                        "-fno-math-errno",
-                                                        "-fno-stack-protector",
-                                                        DUMMY_FILE_NAME};
+                                                                    "-fno-math-errno",
+                                                                    "-fno-stack-protector",
+                                                                    DUMMY_FILE_NAME};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
 
