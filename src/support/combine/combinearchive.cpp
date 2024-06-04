@@ -72,7 +72,7 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
         && (fileContents[0] + (fileContents[1] << LS8) + (fileContents[2] << LS16) + (fileContents[3] << LS24) == ZIP_MAGIC_NUMBER)) {
         auto *archive = new libcombine::CombineArchive {};
 
-        archive->initializeFromArchive(fileContents);
+        archive->initializeFromBuffer(fileContents);
 
         return CombineArchivePtr {new CombineArchive {archive}};
     }
