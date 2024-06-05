@@ -41,6 +41,14 @@ Issue::Type Issue::type() const
 
 std::string Issue::typeAsString() const
 {
+#ifdef CODE_COVERAGE_ENABLED
+    switch (mPimpl->mType) {
+    case Type::ERROR:
+        return "Error";
+    default: // Type::WARNING.
+        return "Warning";
+    }
+#else
     switch (mPimpl->mType) {
     case Type::ERROR:
         return "Error";
@@ -49,6 +57,7 @@ std::string Issue::typeAsString() const
     default: // Type::MESSAGE.
         return "Message";
     }
+#endif
 }
 
 std::string Issue::description() const
