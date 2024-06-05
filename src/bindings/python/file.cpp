@@ -40,6 +40,5 @@ void fileApi(py::module_ &m)
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
         .def_property_readonly("path", &libOpenCOR::File::path, "Get the path for this File object.")
-        .def_property_readonly("contents", &libOpenCOR::File::contents, "Get the contents of this File object.")
-        .def("set_contents", &libOpenCOR::File::setContents, "Set the contents of this File object.");
+        .def_property("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.");
 }

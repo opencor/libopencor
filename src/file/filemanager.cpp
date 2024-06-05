@@ -14,30 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "filemanager.h"
+#include "filemanager_p.h"
 
 #include <algorithm>
 
 namespace libOpenCOR {
 
-FileManager &FileManager::instance()
+FileManager::Impl &FileManager::Impl::instance()
 {
-    static FileManager instance;
+    static Impl instance;
 
     return instance;
 }
 
-void FileManager::manage(File *pFile)
+void FileManager::Impl::manage(File *pFile)
 {
     mFiles.push_back(pFile);
 }
 
-void FileManager::unmanage(File *pFile)
+void FileManager::Impl::unmanage(File *pFile)
 {
     mFiles.erase(std::find(mFiles.cbegin(), mFiles.cend(), pFile));
 }
 
-FilePtr FileManager::file(const std::string &pFileNameOrUrl) const
+FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 {
 #if __clang_major__ < 16
     auto [tIsLocalFile, tFileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
@@ -57,6 +57,33 @@ FilePtr FileManager::file(const std::string &pFileNameOrUrl) const
     }
 
     return {};
+}
+
+FileManager &FileManager::instance()
+{
+    static FileManager instance;
+
+    return instance;
+}
+
+FileManager::FileManager()
+    : mPimpl(Impl::instance())
+{
+}
+
+void FileManager::manage(File *pFile)
+{
+    mPimpl.manage(pFile);
+}
+
+void FileManager::unmanage(File *pFile)
+{
+    mPimpl.unmanage(pFile);
+}
+
+FilePtr FileManager::file(const std::string &pFileNameOrUrl) const
+{
+    return mPimpl.file(pFileNameOrUrl);
 }
 
 } // namespace libOpenCOR

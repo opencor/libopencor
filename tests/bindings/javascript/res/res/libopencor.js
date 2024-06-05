@@ -3,15 +3,7 @@ let simulation = null;
 let instance = null;
 let instanceTask = null;
 const { lightningChart } = lcjs;
-const lc = lightningChart({
-  license:
-    "0002-nzAQF3zqMCpblLS99rf02G/6gxAtKwAxEC5o8jYpT4yyvi4PLN2GbqtlRwIftmLnHvzQLnGyUSxM3ZeY/K0T8CYy-MEUCIGFCtwYUZqBfv+B7Lu63gSSRGgNZ+XjiFIrVTIUzFYrPAiEAq8ycNenFAtDe4FEgMRaiR7qZSkoLp0mvXbtdOLhZ+0A=",
-  licenseInformation: {
-    appTitle: "LightningChart JS Trial",
-    company: "LightningChart Ltd.",
-  },
-});
-const chart = lc
+const chart = lightningChart()
   .ChartXY({
     container: $("#plottingArea")[0],
   })
@@ -100,13 +92,15 @@ export function run() {
 
   // Run the simulation.
 
-  console.time("Elapsed time");
+  console.time("Computing time");
   instance.run();
-  console.timeEnd("Elapsed time");
+  console.timeEnd("Computing time");
 
   // Plot the results.
 
+  console.time("Plotting time");
   updatePlottingAreaAndAxesInfo();
+  console.timeEnd("Plotting time");
 }
 
 function axisInfo(index) {

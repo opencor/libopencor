@@ -15,7 +15,7 @@
 set(PACKAGE_NAME libCOMBINE)
 set(PACKAGE_VERSION 0.2.20)
 set(PACKAGE_REPOSITORY libCombine)
-set(RELEASE_TAG v0.2.20b)
+set(RELEASE_TAG v0.2.20-buffer)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -28,32 +28,32 @@ if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         fb6d723cb1f1ef533f8254d450abf227882f0e0b)
+                         a6d9d575c87fb803fe63680d2b039e4e2aa4baed)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9781459729e039c3275eae5da37ac2c1aa143032)
+                                 c4d636fa1427eb6bb702e1e94a1b7149efd2ffb8)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8da2f4f272e49c79b4d87d8175fd5ccd966d4dab)
+                                 6940a27fc80f5171072d7d3a0824e641811bc6b8)
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ec6284679c7a85eafd3b92f4e97561383ffd2611)
+                                 0ad5a14ebbffd57c126d777116fa1f22aaa47ab0)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5e2faaf876dc6b4acfaf05a1b1c147ad5633b1d3)
+                                 1eb9641b388e060e99cf52da93f83f5e17a4d78e)
             endif()
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             fb8a6411e2f33422e20aaa64093967fef5829a10)
+                             2e0a1cd907d3fad09c20b8378e230ac10ba4a913)
         endif()
     endif()
 else()
@@ -67,7 +67,6 @@ else()
             -DBUILD_TEST=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DCMAKE_POLICY_DEFAULT_CMP0074:STRING=NEW
             -DLIBCOMBINE_SHARED_VERSION=OFF
             -DLIBCOMBINE_SKIP_SHARED_LIBRARY=ON
             -DLIBSBML_INCLUDE_DIR=${LIBSBML_INCLUDE_DIR}

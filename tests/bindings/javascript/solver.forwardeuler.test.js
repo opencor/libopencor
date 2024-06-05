@@ -22,25 +22,25 @@ import { expectIssues } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("Solver Forward Euler", () => {
-  let someOdeModelContentsPtr;
+  let someSolverOdeContentsPtr;
 
   beforeAll(() => {
-    someOdeModelContentsPtr = utils.allocateMemory(
+    someSolverOdeContentsPtr = utils.allocateMemory(
       libopencor,
-      utils.SOME_ODE_MODEL_CONTENTS,
+      utils.SOME_SOLVER_ODE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someOdeModelContentsPtr);
+    utils.freeMemory(libopencor, someSolverOdeContentsPtr);
   });
 
   test("Step value with invalid number", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(
-      someOdeModelContentsPtr,
-      utils.SOME_ODE_MODEL_CONTENTS.length,
+      someSolverOdeContentsPtr,
+      utils.SOME_SOLVER_ODE_CONTENTS.length,
     );
 
     const document = new libopencor.SedDocument(file);
@@ -65,8 +65,8 @@ describe("Solver Forward Euler", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(
-      someOdeModelContentsPtr,
-      utils.SOME_ODE_MODEL_CONTENTS.length,
+      someSolverOdeContentsPtr,
+      utils.SOME_SOLVER_ODE_CONTENTS.length,
     );
 
     const document = new libopencor.SedDocument(file);
