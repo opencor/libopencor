@@ -36,7 +36,8 @@ def test_chinese_files():
         File(utils.resource_path("i18n/文件夹/file.sedml")).type == File.Type.SedmlFile
     )
     assert (
-        File(utils.resource_path("i18n/文件夹/file.omex")).type == File.Type.CombineArchive
+        File(utils.resource_path("i18n/文件夹/file.omex")).type
+        == File.Type.CombineArchive
     )
 
 
