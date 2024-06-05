@@ -189,10 +189,10 @@ TEST(RunSedTest, odeModelWithNoOdeSolver)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-//---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
-
 TEST(RunSedTest, nlaModel)
 {
+    //---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
+
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     };
@@ -234,6 +234,8 @@ TEST(RunSedTest, nlaModelWithNoNlaSolver)
 
 TEST(RunSedTest, daeModel)
 {
+    //---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
+
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     };
