@@ -46,31 +46,17 @@ def test_cellml_file():
 
 
 def test_sedml_file():
-    expected_issues = [
-        [
-            Issue.Type.Message,
-            "A simulation experiment description cannot (currently) be created using a SED-ML file.",
-        ],
-    ]
-
     file = File(utils.resource_path(utils.SEDML_2_FILE))
     document = SedDocument(file)
 
-    assert_issues(document, expected_issues)
+    assert document.has_issues == False
 
 
 def test_combine_archive():
-    expected_issues = [
-        [
-            Issue.Type.Message,
-            "A simulation experiment description cannot (currently) be created using a COMBINE archive.",
-        ],
-    ]
-
     file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
     document = SedDocument(file)
 
-    assert_issues(document, expected_issues)
+    assert document.has_issues == False
 
 
 def test_irretrievable_file():

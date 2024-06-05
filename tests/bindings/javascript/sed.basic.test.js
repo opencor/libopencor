@@ -24,6 +24,7 @@ describe("Sed basic tests", () => {
   let someUnknownContentsPtr;
   let someCellmlContentsPtr;
   let someSedmlContentsPtr;
+  let someCombineArchiveContentsPtr;
 
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
@@ -38,12 +39,17 @@ describe("Sed basic tests", () => {
       libopencor,
       utils.SOME_SEDML_CONTENTS,
     );
+    someCombineArchiveContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someUnknownContentsPtr);
     utils.freeMemory(libopencor, someCellmlContentsPtr);
     utils.freeMemory(libopencor, someSedmlContentsPtr);
+    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
   });
 
   test("No file", () => {
@@ -87,31 +93,19 @@ describe("Sed basic tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    expectIssues(libopencor, document, [
-      [
-        libopencor.Issue.Type.MESSAGE,
-        "A simulation experiment description cannot (currently) be created using a SED-ML file.",
-      ],
-    ]);
+    expect(document.hasIssues()).toBe(false);
   });
 
-  /*---GRY--- TO BE UNCOMMENTED ONCE WE HAVE SUPPORT FOR COMBINE ARCHIVES (see https://github.com/opencor/libopencor/issues/214).
   test("COMBINE archive", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS,//someCombineArchiveContentsPtr,
+      someCombineArchiveContentsPtr,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
     );
 
     const document = new libopencor.SedDocument(file);
 
-    expectIssues(libopencor, document, [
-      [
-        libopencor.Issue.Type.MESSAGE,
-        "A simulation experiment description cannot (currently) be created using a COMBINE archive.",
-      ],
-    ]);
+    expect(document.hasIssues()).toBe(false);
   });
-  */
 });

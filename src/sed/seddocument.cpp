@@ -74,9 +74,9 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
     if (fileType == File::Type::CELLML_FILE) {
         initialiseFromCellmlFile(pOwner, pFile);
     } else if (fileType == File::Type::SEDML_FILE) {
-        addMessage("A simulation experiment description cannot (currently) be created using a SED-ML file.");
+        initialiseFromSedmlFile(pOwner, pFile);
     } else if (fileType == File::Type::COMBINE_ARCHIVE) {
-        addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
+        initialiseFromCombineArchive(pOwner, pFile);
 #ifndef __EMSCRIPTEN__
     } else if (fileType == File::Type::IRRETRIEVABLE_FILE) {
         addError("A simulation experiment description cannot be created using an irretrievable file.");
@@ -123,6 +123,18 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
     // Add a task.
 
     addTask(SedTask::create(pOwner, model, simulation));
+}
+
+void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
+{
+    (void)pOwner;
+    (void)pFile;
+}
+
+void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)
+{
+    (void)pOwner;
+    (void)pFile;
 }
 
 void SedDocument::Impl::serialise(xmlNodePtr pNode) const
