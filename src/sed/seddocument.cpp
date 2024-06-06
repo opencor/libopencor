@@ -146,7 +146,7 @@ void SedDocument::Impl::serialise(xmlNodePtr pNode) const
 
 std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 {
-    // Serialise our SED-ML document using libxml2.
+    // Serialise our SED-ML document.
 
     auto *doc = xmlNewDoc(toConstXmlCharPtr("1.0"));
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("sedML"));
