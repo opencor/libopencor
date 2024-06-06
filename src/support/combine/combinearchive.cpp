@@ -20,11 +20,31 @@ limitations under the License.
 
 #include <combine/combinearchive.h>
 
+#include <omex/CaContent.h>
+
 namespace libOpenCOR {
 
-CombineArchive::Impl::Impl(libcombine::CombineArchive *pArchive)
+CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive)
     : mArchive(pArchive)
 {
+    // Extract all the files contained in the COMBINE archive.
+
+    auto archiveLocation = pFile->fileName() + "_";
+
+    for (int i = 0; i < mArchive->getNumEntries(); ++i) {
+        const auto *entry = mArchive->getEntry(i);
+        auto location = archiveLocation + entry->getLocation();
+        auto file = File::create(location);
+
+        file->setContents(mArchive->extractEntryToBuffer(location));
+
+        mFiles.push_back(file); // So that the files (except the master file) don't get automatically deleted when we
+                                // get out of scope.
+
+        if (entry->getMaster()) {
+            mMasterFile = file;
+        }
+    }
 }
 
 CombineArchive::Impl::~Impl()
@@ -32,8 +52,8 @@ CombineArchive::Impl::~Impl()
     delete mArchive;
 }
 
-CombineArchive::CombineArchive(libcombine::CombineArchive *pArchive)
-    : Logger(new Impl {pArchive})
+CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive)
+    : Logger(new Impl {pFile, pArchive})
 {
 }
 
@@ -74,7 +94,7 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 
         archive->initializeFromBuffer(fileContents);
 
-        return CombineArchivePtr {new CombineArchive {archive}};
+        return CombineArchivePtr {new CombineArchive {pFile, archive}};
     }
 
     return nullptr;

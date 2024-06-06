@@ -26,8 +26,10 @@ class CombineArchive::Impl: public Logger::Impl
 {
 public:
     libcombine::CombineArchive *mArchive;
+    std::vector<FilePtr> mFiles;
+    FilePtr mMasterFile;
 
-    explicit Impl(libcombine::CombineArchive *pArchive);
+    explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive);
     ~Impl();
 };
 
