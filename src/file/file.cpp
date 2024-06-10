@@ -111,9 +111,14 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
     }
 }
 
+std::string File::Impl::fileName() const
+{
+    return pathToString(mFilePath);
+}
+
 std::string File::Impl::path() const
 {
-    return mUrl.empty() ? mFilePath.string() : mUrl;
+    return mUrl.empty() ? fileName() : mUrl;
 }
 
 #ifndef __EMSCRIPTEN__
@@ -176,7 +181,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
     auto file = fileManager.file(pFileNameOrUrl);
 
     if (file != nullptr) {
-        return file->shared_from_this();
+        return file;
     }
 
     auto res = FilePtr {new File {pFileNameOrUrl}};
@@ -195,7 +200,7 @@ File::Type File::type() const
 
 std::string File::fileName() const
 {
-    return pimpl()->mFilePath.string();
+    return pimpl()->fileName();
 }
 
 std::string File::url() const

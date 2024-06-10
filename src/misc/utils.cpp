@@ -47,11 +47,6 @@ bool fuzzyCompare(double pNb1, double pNb2)
 }
 
 #ifdef BUILDING_USING_MSVC
-std::string wideStringToString(const std::wstring &pString)
-{
-    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pString);
-}
-
 std::string forwardSlashPath(const std::string &pPath)
 {
     static constexpr auto BACKSLASH = "\\\\";
@@ -65,6 +60,15 @@ std::string forwardSlashPath(const std::string &pPath)
 std::filesystem::path stringToPath(const std::string &pString)
 {
     return std::u8string {pString.begin(), pString.end()};
+}
+
+std::string pathToString(const std::filesystem::path &pPath)
+{
+#if defined(BUILDING_USING_MSVC)
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pPath.wstring());
+#else
+    return pPath.string();
+#endif
 }
 
 namespace {
@@ -87,22 +91,18 @@ std::string canonicalFileName(const std::string &pFileName)
 
     std::filesystem::current_path(FORWARD_SLASH);
 
-#if defined(BUILDING_USING_MSVC)
-    auto res = wideStringToString(std::filesystem::weakly_canonical(stringToPath(pFileName)).wstring());
-#elif defined(BUILDING_USING_GNU) || defined(BUILDING_USING_CLANG)
-    auto res = std::filesystem::weakly_canonical(stringToPath(pFileName)).string();
-#else
+#ifdef __EMSCRIPTEN__
     static constexpr auto DUMMY_FOLDER = "/dummy";
 
     auto res = pFileName;
 
-    res = DUMMY_FOLDER + std::string((res.find(FORWARD_SLASH) != 0) ? FORWARD_SLASH : "") + res;
-    res = std::filesystem::weakly_canonical(stringToPath(res)).string();
+    res = DUMMY_FOLDER + std::string(res.starts_with(FORWARD_SLASH) ? "" : FORWARD_SLASH) + res;
+    res = pathToString(std::filesystem::weakly_canonical(stringToPath(res)));
 
     res.erase(0, strlen(DUMMY_FOLDER));
+#else
+    auto res = pathToString(std::filesystem::weakly_canonical(stringToPath(pFileName)));
 #endif
-
-    std::filesystem::current_path(currentPath);
 
 #if defined(BUILDING_USING_MSVC)
     // Replace "\"s with "/"s, if needed.
@@ -120,6 +120,8 @@ std::string canonicalFileName(const std::string &pFileName)
         res.erase(0, FORWARD_SLASH_LENGTH);
     }
 #endif
+
+    std::filesystem::current_path(currentPath);
 
     // Return the canonical version of the file name.
 
@@ -187,7 +189,7 @@ std::filesystem::path canonicalPath(const std::string &pPath)
 
 std::string relativePath(const std::string &pPath, const std::string &pBasePath)
 {
-    return std::filesystem::relative(canonicalPath(pPath), canonicalPath(pBasePath)).string();
+    return pathToString(std::filesystem::relative(canonicalPath(pPath), canonicalPath(pBasePath)));
 }
 
 std::string urlPath(const std::string &pPath)
@@ -250,7 +252,7 @@ std::filesystem::path uniqueFilePath()
     static const std::string LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     static const uint64_t LETTERS_SIZE = LETTERS.size();
 
-    static auto testFile = (std::filesystem::temp_directory_path() / "libOpenCOR_XXXXXX.tmp").string();
+    static auto testFile = pathToString(std::filesystem::temp_directory_path() / "libOpenCOR_XXXXXX.tmp");
 
     static const size_t XXXXXX_POS = testFile.size() - 6 - 4;
     static constexpr uint64_t MICROSECONDS_SHIFT = 16U;

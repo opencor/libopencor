@@ -74,12 +74,11 @@ using StringStringMap = std::map<std::string, std::string>;
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 #ifdef BUILDING_USING_MSVC
-std::string wideStringToString(const std::wstring &pString);
-
 std::string forwardSlashPath(const std::string &pPath);
 #endif
 
 std::filesystem::path stringToPath(const std::string &pString);
+std::string pathToString(const std::filesystem::path &pPath);
 
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl);
 std::string relativePath(const std::string &pPath, const std::string &pBasePath);
