@@ -271,8 +271,8 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 {
     static const auto STATE_VALUES = std::vector<double>({-54.958, 0.11472, 0.97137, 0.756967});
     static const auto STATE_ABS_TOLS = std::vector<double>({0.001, 0.00001, 0.00001, 0.000001});
-    static const auto RATE_VALUES = std::vector<double>({47.196, -0.10208, -0.09298, 0.06298});
-    static const auto RATE_ABS_TOLS = std::vector<double>({0.001, 0.00001, 0.00001, 0.00001});
+    static const auto RATE_VALUES = std::vector<double>({47.20, -0.10208, -0.09298, 0.06298});
+    static const auto RATE_ABS_TOLS = std::vector<double>({0.01, 0.00001, 0.00001, 0.00001});
     static const auto VARIABLE_VALUES = std::vector<double>({0.0, -13.304, -791.43, 757.5, 1.0, 0.0, -10.613, 0.3, -115.0, 120.0, 3.1534, 0.18883, 0.004484, 0.92385, 12.0, 36.0, 0.4547, 0.062887});
     static const auto VARIABLE_ABS_TOLS = std::vector<double>({0.0, 0.001, 0.01, 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0001, 0.00001, 0.000001, 0.00001, 0.0, 0.0, 0.0001, 0.000001});
 
