@@ -31,7 +31,7 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
     if (mModel->hasUnresolvedImports()) {
         auto importer = libcellml::Importer::create(pStrict);
 
-        if (importer->resolveImports(mModel, stringToPath(pFile->path()).parent_path().string())) {
+        if (importer->resolveImports(mModel, pathToString(stringToPath(pFile->path()).parent_path()))) {
             mModel = importer->flattenModel(mModel);
         } else {
             addIssues(importer);

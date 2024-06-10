@@ -47,6 +47,7 @@ public:
 
     void checkType(const FilePtr &pOwner, bool pResetType = false);
 
+    std::string fileName() const;
     std::string path() const;
 
 #ifndef __EMSCRIPTEN__

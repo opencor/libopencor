@@ -241,8 +241,8 @@ function(configure_target TARGET)
 
     # Let the target know that we are fine with using std::codecvt_utf8() even though it has been deprecated in C++17
     # (but no replacement has been provided yet).
-    # Note: this is so that we can convert a std::wstring to a std::string on Windows (see wideStringToString()), hence
-    #       the WIN32 check.
+    # Note: this is so that we can convert a std::wstring to a std::string on Windows (see pathToString()), hence the
+    #       WIN32 check.
 
     if(WIN32)
         target_compile_definitions(${TARGET} PRIVATE
