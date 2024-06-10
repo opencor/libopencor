@@ -16,6 +16,7 @@ limitations under the License.
 
 #include "sedmlfile_p.h"
 
+#include "filemanager.h"
 #include "utils.h"
 
 #include "libopencor/file.h"
@@ -27,9 +28,27 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SedmlFile::Impl::Impl(libsedml::SedDocument *pDocument)
+SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
     : mDocument(pDocument)
 {
+    // Retrieve the models used by our SED-ML file.
+
+    auto fileLocation = pathToString(stringToPath(pFile->fileName()).parent_path()) + "/";
+
+    for (unsigned int i = 0; i < mDocument->getNumModels(); ++i) {
+        auto source = mDocument->getModel(i)->getSource();
+        auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(source);
+
+#ifdef CODE_COVERAGE_ENABLED
+        //---GRY--- NEED A TEST WITH A SED-ML FILE THAT REFERS AN ABSOLUTE PATH AND ANOTHER THAT REFERS A REMOTE PATH.
+
+        mModelSources.push_back(fileLocation + fileNameOrUrl);
+#else
+        mModelSources.push_back((isLocalFile && stringToPath(fileNameOrUrl).is_relative()) ?
+                                    fileLocation + fileNameOrUrl :
+                                    fileNameOrUrl);
+#endif
+    }
 }
 
 SedmlFile::Impl::~Impl()
@@ -37,8 +56,28 @@ SedmlFile::Impl::~Impl()
     delete mDocument;
 }
 
-SedmlFile::SedmlFile(libsedml::SedDocument *pDocument)
-    : Logger(new Impl {pDocument})
+std::vector<FilePtr> SedmlFile::Impl::models()
+{
+    removeAllIssues();
+
+    std::vector<FilePtr> res;
+    auto fileManager = FileManager::instance();
+
+    for (const auto &modelSource : mModelSources) {
+        auto file = fileManager.file(modelSource);
+
+        if (file != nullptr) {
+            res.push_back(file);
+        } else {
+            addError("The model '" + modelSource + "' could not be found.");
+        }
+    }
+
+    return res;
+}
+
+SedmlFile::SedmlFile(const FilePtr &pFile, libsedml::SedDocument *pDocument)
+    : Logger(new Impl {pFile, pDocument})
 {
 }
 
@@ -76,13 +115,18 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
         if ((document->getNumErrors() == 0)
             || ((document->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
                 && (document->getError(0)->getErrorId() != libsbml::XMLContentEmpty))) {
-            return SedmlFilePtr {new SedmlFile {document}};
+            return SedmlFilePtr {new SedmlFile {pFile, document}};
         }
 
         delete document;
     }
 
     return nullptr;
+}
+
+std::vector<FilePtr> SedmlFile::models()
+{
+    return pimpl()->models();
 }
 
 } // namespace libOpenCOR

@@ -283,3 +283,14 @@ TEST(RunSedTest, daeModelWithNoOdeOrNlaSolver)
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
+
+TEST(RunSedTest, combineArchive)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->createInstance();
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+}

@@ -29,16 +29,16 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 {
     // Extract all the files contained in the COMBINE archive.
 
-    auto archiveLocation = pFile->fileName() + "_";
+    auto archiveLocation = pFile->fileName() + ".contents/";
 
     for (int i = 0; i < mArchive->getNumEntries(); ++i) {
         const auto *entry = mArchive->getEntry(i);
-        auto location = archiveLocation + entry->getLocation();
-        auto file = File::create(location);
+        auto location = entry->getLocation();
+        auto file = File::create(archiveLocation + location);
 
         file->setContents(mArchive->extractEntryToBuffer(location));
 
-        mFiles.push_back(file); // So that the files (except the master file) don't get automatically deleted when we
+        mFiles.push_back(file); // So that the files (besides the master file) don't get automatically deleted when we
                                 // get out of scope.
 
         if (entry->getMaster()) {
@@ -67,12 +67,10 @@ CombineArchive::Impl *CombineArchive::pimpl()
     return static_cast<Impl *>(Logger::pimpl());
 }
 
-/*---GRY---
 const CombineArchive::Impl *CombineArchive::pimpl() const
 {
     return static_cast<const Impl *>(Logger::pimpl());
 }
-*/
 
 CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 {
@@ -98,6 +96,11 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
     }
 
     return nullptr;
+}
+
+FilePtr CombineArchive::masterFile() const
+{
+    return pimpl()->mMasterFile;
 }
 
 } // namespace libOpenCOR

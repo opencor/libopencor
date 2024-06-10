@@ -29,6 +29,7 @@ describe("Sed run tests", () => {
   let someAlgebraicContentsPtr;
   let someNlaContentsPtr;
   let someDaeContentsPtr;
+  let someCombineArchiveContentsPtr;
 
   beforeAll(() => {
     someCellmlContentsPtr = utils.allocateMemory(
@@ -63,6 +64,10 @@ describe("Sed run tests", () => {
       libopencor,
       utils.SOME_DAE_CONTENTS,
     );
+    someCombineArchiveContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+    );
   });
 
   afterAll(() => {
@@ -74,6 +79,7 @@ describe("Sed run tests", () => {
     utils.freeMemory(libopencor, someAlgebraicContentsPtr);
     utils.freeMemory(libopencor, someNlaContentsPtr);
     utils.freeMemory(libopencor, someDaeContentsPtr);
+    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
   });
 
   test("No file", () => {
@@ -358,5 +364,21 @@ describe("Sed run tests", () => {
       ],
     ]);
     */
+  });
+
+  test("COMBINE archive", () => {
+    const file = new libopencor.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      someCombineArchiveContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+    );
+
+    const document = new libopencor.SedDocument(file);
+    const instance = document.createInstance();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
   });
 });

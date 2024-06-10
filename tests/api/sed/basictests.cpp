@@ -52,6 +52,12 @@ TEST(BasicSedTest, sedmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
 
+    EXPECT_TRUE(document->hasIssues());
+
+    auto neededFile = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+
+    document = libOpenCOR::SedDocument::create(file);
+
     EXPECT_FALSE(document->hasIssues());
 }
 

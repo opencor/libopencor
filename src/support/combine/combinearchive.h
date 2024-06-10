@@ -43,6 +43,8 @@ public:
 
     static CombineArchivePtr create(const FilePtr &pFile);
 
+    FilePtr masterFile() const;
+
 private:
     class Impl;
 

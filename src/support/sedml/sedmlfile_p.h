@@ -26,9 +26,12 @@ class SedmlFile::Impl: public Logger::Impl
 {
 public:
     libsedml::SedDocument *mDocument;
+    std::vector<std::string> mModelSources;
 
-    explicit Impl(libsedml::SedDocument *pDocument);
+    explicit Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument);
     ~Impl();
+
+    std::vector<FilePtr> models();
 };
 
 } // namespace libOpenCOR

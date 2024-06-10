@@ -43,10 +43,12 @@ public:
 
     static SedmlFilePtr create(const FilePtr &pFile);
 
+    std::vector<FilePtr> models();
+
 private:
     class Impl;
 
-    explicit SedmlFile(libsedml::SedDocument *pDocument);
+    explicit SedmlFile(const FilePtr &pFile, libsedml::SedDocument *pDocument);
 
     Impl *pimpl();
     const Impl *pimpl() const;

@@ -305,3 +305,13 @@ def test_dae_model_with_no_ode_or_nla_solver():
     instance = document.create_instance()
 
     assert_issues(instance, expected_issues)
+
+
+def test_combine_archive():
+    file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
+    document = SedDocument(file)
+    instance = document.create_instance()
+
+    instance.run()
+
+    assert instance.has_issues == False

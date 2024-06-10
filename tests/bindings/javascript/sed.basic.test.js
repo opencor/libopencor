@@ -91,7 +91,13 @@ describe("Sed basic tests", () => {
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    let document = new libopencor.SedDocument(file);
+
+    expect(document.hasIssues()).toBe(true);
+
+    const neededFile = new libopencor.File(utils.CELLML_FILE);
+
+    document = new libopencor.SedDocument(file);
 
     expect(document.hasIssues()).toBe(false);
   });

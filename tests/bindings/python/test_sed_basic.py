@@ -49,6 +49,12 @@ def test_sedml_file():
     file = File(utils.resource_path(utils.SEDML_2_FILE))
     document = SedDocument(file)
 
+    assert document.has_issues == True
+
+    needed_file = File(utils.resource_path(utils.CELLML_2_FILE))
+
+    document = SedDocument(file)
+
     assert document.has_issues == False
 
 
