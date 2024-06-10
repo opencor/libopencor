@@ -29,7 +29,7 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d06acbd45eab3093eec51d9902fc559ca05328c2)
+                             6dea26d89916b5c6413084027484b9835ee48226)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
