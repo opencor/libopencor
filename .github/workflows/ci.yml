@@ -13,36 +13,36 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - name: 'Windows static library'
-          #   os: windows-latest
-          #   build_type: Release
-          #   code_analysis: OFF
-          #   code_coverage: OFF
-          #   documentation: OFF
-          #   javascript_bindings: OFF
-          #   javascript_unit_testing: OFF
-          #   memory_checks: OFF
-          #   python_bindings: OFF
-          #   python_unit_testing: OFF
-          #   shared_libs: OFF
-          #   unit_testing: ON
-          #   target: unit_testing
-          #   install_uninstall_and_package: ON
-          # - name: 'Windows shared library'
-          #   os: windows-latest
-          #   build_type: Release
-          #   code_analysis: OFF
-          #   code_coverage: OFF
-          #   documentation: OFF
-          #   javascript_bindings: OFF
-          #   javascript_unit_testing: OFF
-          #   memory_checks: OFF
-          #   python_bindings: OFF
-          #   python_unit_testing: OFF
-          #   shared_libs: ON
-          #   unit_testing: ON
-          #   target: unit_testing
-          #   install_uninstall_and_package: ON
+          - name: 'Windows static library'
+            os: windows-latest
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+          - name: 'Windows shared library'
+            os: windows-latest
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
           - name: 'Linux static library'
             os: ubuntu-latest
             build_type: Release
@@ -147,21 +147,21 @@ jobs:
             shared_libs: OFF
             unit_testing: OFF
             target: javascript_unit_testing
-          # - name: 'Windows Python bindings'
-          #   os: windows-latest
-          #   build_type: Release
-          #   code_analysis: OFF
-          #   code_coverage: OFF
-          #   documentation: OFF
-          #   javascript_bindings: OFF
-          #   javascript_unit_testing: OFF
-          #   memory_checks: OFF
-          #   python_bindings: ON
-          #   python_unit_testing: ON
-          #   shared_libs: OFF
-          #   unit_testing: OFF
-          #   target: python_unit_testing
-          #   pip_install_test_and_uninstall: ON
+          - name: 'Windows Python bindings'
+            os: windows-latest
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: ON
+            python_unit_testing: ON
+            shared_libs: OFF
+            unit_testing: OFF
+            target: python_unit_testing
+            pip_install_test_and_uninstall: ON
           - name: 'Linux Python bindings'
             os: ubuntu-latest
             build_type: Release
