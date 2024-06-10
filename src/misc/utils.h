@@ -74,8 +74,6 @@ using StringStringMap = std::map<std::string, std::string>;
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 #ifdef BUILDING_USING_MSVC
-std::string wideStringToString(const std::wstring &pString);
-
 std::string forwardSlashPath(const std::string &pPath);
 #endif
 

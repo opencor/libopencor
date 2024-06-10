@@ -47,11 +47,6 @@ bool fuzzyCompare(double pNb1, double pNb2)
 }
 
 #ifdef BUILDING_USING_MSVC
-std::string wideStringToString(const std::wstring &pString)
-{
-    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pString);
-}
-
 std::string forwardSlashPath(const std::string &pPath)
 {
     static constexpr auto BACKSLASH = "\\\\";
@@ -70,7 +65,7 @@ std::filesystem::path stringToPath(const std::string &pString)
 std::string pathToString(const std::filesystem::path &pPath)
 {
 #if defined(BUILDING_USING_MSVC)
-    return wideStringToString(pPath.wstring());
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pPath.wstring());
 #else
     return pPath.string();
 #endif
@@ -109,8 +104,6 @@ std::string canonicalFileName(const std::string &pFileName)
     auto res = pathToString(std::filesystem::weakly_canonical(stringToPath(pFileName)));
 #endif
 
-    std::filesystem::current_path(currentPath);
-
 #if defined(BUILDING_USING_MSVC)
     // Replace "\"s with "/"s, if needed.
 
@@ -127,6 +120,8 @@ std::string canonicalFileName(const std::string &pFileName)
         res.erase(0, FORWARD_SLASH_LENGTH);
     }
 #endif
+
+    std::filesystem::current_path(currentPath);
 
     // Return the canonical version of the file name.
 

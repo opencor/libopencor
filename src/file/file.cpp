@@ -181,7 +181,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
     auto file = fileManager.file(pFileNameOrUrl);
 
     if (file != nullptr) {
-        return file->shared_from_this();
+        return file;
     }
 
     auto res = FilePtr {new File {pFileNameOrUrl}};
