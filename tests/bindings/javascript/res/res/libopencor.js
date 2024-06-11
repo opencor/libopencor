@@ -1,3 +1,4 @@
+let file = null;
 let document = null;
 let simulation = null;
 let instance = null;
@@ -179,7 +180,11 @@ $(() => {
 
             mem.set(new Uint8Array(fileArrayBuffer));
 
-            const file = new libopencor.File(inputFile.name);
+            if (file) {
+              file.delete();
+            }
+
+            file = new libopencor.File(inputFile.name);
 
             file.setContents(memPtr, inputFile.size);
 
@@ -222,6 +227,10 @@ $(() => {
                 showIssues = true;
               } else {
                 // Retrieve some information about the simulation.
+
+                if (document) {
+                  document.delete();
+                }
 
                 document = new libopencor.SedDocument(file);
                 simulation = document.simulations().get(0);
