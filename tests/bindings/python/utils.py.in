@@ -21,7 +21,7 @@ import platform
 import pytest
 
 
-RESOURCE_LOCATION = "@RESOURCE_LOCATION@"
+LOCAL_BASE_PATH = "@RESOURCE_LOCATION@"
 
 
 UNKNOWN_FILE = "unknown_file.txt"
@@ -106,7 +106,7 @@ def assert_values(
 
 
 def resource_path(relative_path=""):
-    return RESOURCE_LOCATION + "/" + relative_path
+    return LOCAL_BASE_PATH + "/" + relative_path
 
 
 def string_to_list(string):

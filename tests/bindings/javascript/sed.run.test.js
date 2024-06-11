@@ -89,7 +89,7 @@ describe("Sed run tests", () => {
   });
 
   test("Invalid CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(
       someErrorCellmlContentsPtr,
@@ -109,7 +109,7 @@ describe("Sed run tests", () => {
   });
 
   test("Overconstrained CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someOverconstrainedContentsPtr,
@@ -129,7 +129,7 @@ describe("Sed run tests", () => {
   });
 
   test("Underconstrained CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someUnderconstrainedContentsPtr,
@@ -149,7 +149,7 @@ describe("Sed run tests", () => {
   });
 
   test("UnsuitablyConstrained CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someUnsuitablyConstrainedContentsPtr,
@@ -176,7 +176,7 @@ describe("Sed run tests", () => {
   });
 
   test("Algebraic model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someAlgebraicContentsPtr,
@@ -192,7 +192,7 @@ describe("Sed run tests", () => {
   });
 
   test("ODE model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -225,7 +225,7 @@ describe("Sed run tests", () => {
   });
 
   test("ODE model with no ODE solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -245,7 +245,7 @@ describe("Sed run tests", () => {
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("NLA model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -273,7 +273,7 @@ describe("Sed run tests", () => {
   });
 
   test("NLA model with no NLA solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -294,7 +294,7 @@ describe("Sed run tests", () => {
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("DAE model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
@@ -334,7 +334,7 @@ describe("Sed run tests", () => {
   */
 
   test("DAE model with no ODE or NLA solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 

@@ -53,7 +53,7 @@ describe("File type tests", () => {
   });
 
   test("Unknown file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.UNKNOWN_FILE);
 
     file.setContents(
       someUnknownContentsPtr,
@@ -70,7 +70,7 @@ describe("File type tests", () => {
   });
 
   test("CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -78,7 +78,7 @@ describe("File type tests", () => {
   });
 
   test("SED-ML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.SEDML_FILE);
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
@@ -86,7 +86,7 @@ describe("File type tests", () => {
   });
 
   test("COMBINE archive", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       someCombineArchiveContentsPtr,

@@ -14,10 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export const UNKNOWN_FILE = "unknown_file.txt";
-
 export const LOCAL_BASE_PATH = "/some/path";
-export const LOCAL_FILE = "/some/path/file.txt";
+
+export const UNKNOWN_FILE = LOCAL_BASE_PATH + "/unknown_file.txt";
+export const ERROR_CELLML_FILE = LOCAL_BASE_PATH + "/error.cellml";
+export const CELLML_FILE = LOCAL_BASE_PATH + "/cellml_2.cellml";
+export const SEDML_FILE = LOCAL_BASE_PATH + "/cellml_2.sedml";
+export const COMBINE_ARCHIVE = LOCAL_BASE_PATH + "/cellml_2.omex";
+
+export const LOCAL_FILE = LOCAL_BASE_PATH + "/file.txt";
 
 export const HTTP_REMOTE_FILE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";

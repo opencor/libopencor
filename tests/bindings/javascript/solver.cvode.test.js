@@ -36,7 +36,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Maximum step value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -60,7 +60,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Maximum number of steps value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -84,7 +84,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Banded linear solver and upper half-bandwidth value with number too small", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -109,7 +109,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Banded linear solver and upper half-bandwidth value with number too big", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -134,7 +134,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Banded linear solver and lower half-bandwidth value with number too small", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -159,7 +159,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Banded linear solver and lower half-bandwidth value with number too big", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -184,7 +184,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Relative tolerance value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -208,7 +208,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Absolute tolerance value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -232,7 +232,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -255,7 +255,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve without interpolate solution", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -282,7 +282,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with Adams-Moulton integration method", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -311,7 +311,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with functional iteration type", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -338,7 +338,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with banded linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -365,7 +365,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with diagonal linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -392,7 +392,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with GMRES linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -419,7 +419,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with Bi-CGstab linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -445,7 +445,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with TFQMR linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -471,7 +471,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with GMRES linear solver and no preconditioner", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -499,7 +499,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with Bi-CGstab linear solver and no preconditioner", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -527,7 +527,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Solve with TFQMR linear solver and no preconditioner", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,

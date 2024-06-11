@@ -36,7 +36,7 @@ describe("Solver Forward Euler", () => {
   });
 
   test("Step value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -62,7 +62,7 @@ describe("Solver Forward Euler", () => {
   });
 
   test("Solve", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,

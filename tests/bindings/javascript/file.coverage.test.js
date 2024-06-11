@@ -21,7 +21,7 @@ const libopencor = await libOpenCOR();
 
 describe("File coverage tests", () => {
   test("Empty file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.UNKNOWN_FILE);
 
     file.setContents(null, 0);
 

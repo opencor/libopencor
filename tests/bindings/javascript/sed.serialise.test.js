@@ -110,7 +110,7 @@ describe("Sed serialise tests", () => {
       `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <steadyState id="simulation1">
@@ -135,49 +135,51 @@ describe("Sed serialise tests", () => {
   }
 
   test("Local CellML file with base path", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt"),
+      cvodeExpectedSerialisation("cellml_2.cellml"),
     );
   });
 
   test("Local CellML file without base path", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
 
     expect(document.serialise()).toBe(
-      cvodeExpectedSerialisation("file:///some/path/file.txt"),
+      cvodeExpectedSerialisation("file:///some/path/cellml_2.cellml"),
     );
   });
 
   test("Relative local CellML file with base path", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
-      cvodeExpectedSerialisation("some/path/file.txt"),
+      cvodeExpectedSerialisation("some/path/cellml_2.cellml"),
     );
   });
 
   test("Relative local CellML file without base path", () => {
-    const file = new libopencor.File("file.txt");
+    const file = new libopencor.File("cellml_2.cellml");
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
 
-    expect(document.serialise()).toBe(cvodeExpectedSerialisation("file.txt"));
+    expect(document.serialise()).toBe(
+      cvodeExpectedSerialisation("cellml_2.cellml"),
+    );
   });
 
   test("Remote CellML file with base path", () => {
@@ -222,7 +224,7 @@ describe("Sed serialise tests", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
@@ -257,7 +259,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
@@ -269,7 +271,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("NLA model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -284,7 +286,7 @@ describe("Sed serialise tests", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <steadyState id="simulation1"/>
@@ -295,7 +297,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(
       someAlgebraicContentsPtr,
@@ -345,7 +347,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with the Adams-Moulton integration method", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -358,14 +360,14 @@ describe("Sed serialise tests", () => {
     );
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", {
+      cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000475": "Adams-Moulton",
       }),
     );
   });
 
   test("CVODE solver with a functional iteration type", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -376,12 +378,14 @@ describe("Sed serialise tests", () => {
     solver.setIterationType(libopencor.SolverCvode.IterationType.FUNCTIONAL);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000476": "Functional" }),
+      cvodeExpectedSerialisation("cellml_2.cellml", {
+        "KISAO:0000476": "Functional",
+      }),
     );
   });
 
   test("CVODE solver with a banded linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -392,12 +396,14 @@ describe("Sed serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "Banded" }),
+      cvodeExpectedSerialisation("cellml_2.cellml", {
+        "KISAO:0000477": "Banded",
+      }),
     );
   });
 
   test("CVODE solver with a diagonal linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -408,12 +414,14 @@ describe("Sed serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.DIAGONAL);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "Diagonal" }),
+      cvodeExpectedSerialisation("cellml_2.cellml", {
+        "KISAO:0000477": "Diagonal",
+      }),
     );
   });
 
   test("CVODE solver with a GMRES linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -424,12 +432,14 @@ describe("Sed serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.GMRES);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "GMRES" }),
+      cvodeExpectedSerialisation("cellml_2.cellml", {
+        "KISAO:0000477": "GMRES",
+      }),
     );
   });
 
   test("CVODE solver with a BiCGStab linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -440,12 +450,14 @@ describe("Sed serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BICGSTAB);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "BiCGStab" }),
+      cvodeExpectedSerialisation("cellml_2.cellml", {
+        "KISAO:0000477": "BiCGStab",
+      }),
     );
   });
 
   test("CVODE solver with a TFQMR linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -456,12 +468,14 @@ describe("Sed serialise tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.TFQMR);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000477": "TFQMR" }),
+      cvodeExpectedSerialisation("cellml_2.cellml", {
+        "KISAO:0000477": "TFQMR",
+      }),
     );
   });
 
   test("CVODE solver with no preconditioner", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -472,12 +486,12 @@ describe("Sed serialise tests", () => {
     solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000478": "No" }),
+      cvodeExpectedSerialisation("cellml_2.cellml", { "KISAO:0000478": "No" }),
     );
   });
 
   test("CVODE solver with no interpolate solution", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -488,12 +502,14 @@ describe("Sed serialise tests", () => {
     solver.setInterpolateSolution(false);
 
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
-      cvodeExpectedSerialisation("file.txt", { "KISAO:0000481": "false" }),
+      cvodeExpectedSerialisation("cellml_2.cellml", {
+        "KISAO:0000481": "false",
+      }),
     );
   });
 
   test("KINSOL solver with a banded linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -509,7 +525,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a GMRES linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -525,7 +541,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a BiCGStab linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -541,7 +557,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a TFQMR linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -560,7 +576,7 @@ describe("Sed serialise tests", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="file.txt"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <oneStep id="simulation1" step="1"/>
@@ -571,7 +587,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 

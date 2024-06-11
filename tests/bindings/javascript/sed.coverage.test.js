@@ -59,13 +59,13 @@ describe("Sed coverage tests", () => {
     expect(document.serialise()).toBe(expectedSerialisation);
   });
 
-  test("Model", () => {
+  test("Models", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.hasModels()).toBe(false);
     expect(document.addModel(null)).toBe(false);
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.SEDML_FILE);
     const model = new libopencor.SedModel(document, file);
 
     expect(document.addModel(model)).toBe(true);
@@ -114,7 +114,7 @@ describe("Sed coverage tests", () => {
     expect(document.hasTasks()).toBe(false);
     expect(document.addTask(null)).toBe(false);
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.SEDML_FILE);
     const model = new libopencor.SedModel(document, file);
     const simulation = new libopencor.SedUniformTimeCourse(document);
     const task = new libopencor.SedTask(document, model, simulation);
@@ -187,7 +187,7 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedOneStep", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.SEDML_FILE);
     const document = new libopencor.SedDocument(file);
     const simulation = new libopencor.SedOneStep(document);
 
@@ -199,7 +199,7 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedUniformTimeCourse", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.SEDML_FILE);
     const document = new libopencor.SedDocument(file);
     const simulation = new libopencor.SedUniformTimeCourse(document);
 
@@ -220,7 +220,7 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedInstanceAndSedInstanceTask", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.SEDML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -281,7 +281,7 @@ describe("Sed coverage tests", () => {
   test("Solver", () => {
     // Get the duplicate() method of different solvers to be covered.
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 

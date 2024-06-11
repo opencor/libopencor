@@ -30,7 +30,7 @@ TEST(CoverageSedTest, initialise)
     EXPECT_EQ(document->serialise(), expectedSerialisation);
 }
 
-TEST(CoverageSedTest, sedDocumentModels)
+TEST(CoverageSedTest, models)
 {
     auto document = libOpenCOR::SedDocument::create();
 
@@ -53,7 +53,7 @@ TEST(CoverageSedTest, sedDocumentModels)
     EXPECT_FALSE(document->removeModel(nullptr));
 }
 
-TEST(CoverageSedTest, sedDocumentSimulations)
+TEST(CoverageSedTest, simulations)
 {
     auto document = libOpenCOR::SedDocument::create();
 
@@ -97,7 +97,7 @@ std::string sedTaskExpectedSerialisation(bool pWithProperties)
 
 } // namespace
 
-TEST(CoverageSedTest, sedDocumentTasks)
+TEST(CoverageSedTest, tasks)
 {
     auto document = libOpenCOR::SedDocument::create();
 
@@ -144,7 +144,7 @@ TEST(CoverageSedTest, sedDocumentTasks)
     EXPECT_FALSE(document->removeTask(nullptr));
 }
 
-TEST(CoverageSedTest, sedSimulationOdeSolver)
+TEST(CoverageSedTest, odeSolver)
 {
     auto document = libOpenCOR::SedDocument::create();
     auto simulation = libOpenCOR::SedUniformTimeCourse::create(document);
@@ -162,7 +162,7 @@ TEST(CoverageSedTest, sedSimulationOdeSolver)
     EXPECT_EQ(simulation->odeSolver(), nullptr);
 }
 
-TEST(CoverageSedTest, sedSimulationNlaSolver)
+TEST(CoverageSedTest, nlaSolver)
 {
     auto document = libOpenCOR::SedDocument::create();
     auto simulation = libOpenCOR::SedUniformTimeCourse::create(document);
