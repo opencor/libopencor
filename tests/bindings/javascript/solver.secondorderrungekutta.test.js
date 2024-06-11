@@ -59,6 +59,11 @@ describe("Solver Second-Order Runge-Kutta", () => {
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
+
+    instance.delete();
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Solve", () => {
@@ -88,5 +93,9 @@ describe("Solver Second-Order Runge-Kutta", () => {
         0.541338, 0.056246,
       ],
     );
+
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 });

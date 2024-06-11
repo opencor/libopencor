@@ -67,6 +67,8 @@ describe("File type tests", () => {
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
       ],
     ]);
+
+    file.delete();
   });
 
   test("CellML file", () => {
@@ -75,6 +77,8 @@ describe("File type tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.type().value).toBe(libopencor.File.Type.CELLML_FILE.value);
+
+    file.delete();
   });
 
   test("SED-ML file", () => {
@@ -83,6 +87,8 @@ describe("File type tests", () => {
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
     expect(file.type().value).toBe(libopencor.File.Type.SEDML_FILE.value);
+
+    file.delete();
   });
 
   test("COMBINE archive", () => {
@@ -94,5 +100,7 @@ describe("File type tests", () => {
     );
 
     expect(file.type().value).toBe(libopencor.File.Type.COMBINE_ARCHIVE.value);
+
+    file.delete();
   });
 });

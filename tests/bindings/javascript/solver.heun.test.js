@@ -59,6 +59,11 @@ describe("Solver Heun", () => {
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
+
+    instance.delete();
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Solve", () => {
@@ -88,5 +93,9 @@ describe("Solver Heun", () => {
         0.539425, 0.056383,
       ],
     );
+
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 });

@@ -39,6 +39,8 @@ describe("Issue coverage tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.hasErrors()).toBe(false);
+
+    file.delete();
   });
 
   test("errors()", () => {
@@ -47,6 +49,8 @@ describe("Issue coverage tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.errors().size()).toBe(0);
+
+    file.delete();
   });
 
   test("hasWarnings()", () => {
@@ -55,6 +59,8 @@ describe("Issue coverage tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.hasWarnings()).toBe(false);
+
+    file.delete();
   });
 
   test("warnings()", () => {
@@ -63,6 +69,8 @@ describe("Issue coverage tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.warnings().size()).toBe(0);
+
+    file.delete();
   });
 
   test("hasMessages()", () => {
@@ -71,6 +79,8 @@ describe("Issue coverage tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.hasMessages()).toBe(false);
+
+    file.delete();
   });
 
   test("messages()", () => {
@@ -79,5 +89,7 @@ describe("Issue coverage tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.messages().size()).toBe(0);
+
+    file.delete();
   });
 });

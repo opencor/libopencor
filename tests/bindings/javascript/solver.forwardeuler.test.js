@@ -59,6 +59,11 @@ describe("Solver Forward Euler", () => {
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
+
+    instance.delete();
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Solve", () => {
@@ -88,5 +93,9 @@ describe("Solver Forward Euler", () => {
         0.54037, 0.056315,
       ],
     );
+
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 });

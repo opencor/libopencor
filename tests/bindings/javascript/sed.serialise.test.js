@@ -144,6 +144,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Local CellML file without base path", () => {
@@ -156,6 +159,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise()).toBe(
       cvodeExpectedSerialisation("file:///some/path/cellml_2.cellml"),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Relative local CellML file with base path", () => {
@@ -168,6 +174,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
       cvodeExpectedSerialisation("some/path/cellml_2.cellml"),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Relative local CellML file without base path", () => {
@@ -180,6 +189,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise()).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Remote CellML file with base path", () => {
@@ -192,6 +204,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.REMOTE_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Remote CellML file without base path", () => {
@@ -206,6 +221,9 @@ describe("Sed serialise tests", () => {
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml",
       ),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Relative remote CellML file with base path", () => {
@@ -218,6 +236,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
       cvodeExpectedSerialisation("tests/res/cellml_2.cellml"),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("DAE model", () => {
@@ -268,6 +289,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       expectedSerialisation,
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("NLA model", () => {
@@ -280,6 +304,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation(),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Algebraic model", () => {
@@ -309,6 +336,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       expectedSerialisation,
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Fixed-step ODE solver", () => {
@@ -344,6 +374,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.REMOTE_BASE_PATH)).toBe(
       expectedSerialisation,
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with the Adams-Moulton integration method", () => {
@@ -364,6 +397,9 @@ describe("Sed serialise tests", () => {
         "KISAO:0000475": "Adams-Moulton",
       }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with a functional iteration type", () => {
@@ -382,6 +418,9 @@ describe("Sed serialise tests", () => {
         "KISAO:0000476": "Functional",
       }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with a banded linear solver", () => {
@@ -400,6 +439,9 @@ describe("Sed serialise tests", () => {
         "KISAO:0000477": "Banded",
       }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with a diagonal linear solver", () => {
@@ -418,6 +460,9 @@ describe("Sed serialise tests", () => {
         "KISAO:0000477": "Diagonal",
       }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with a GMRES linear solver", () => {
@@ -436,6 +481,9 @@ describe("Sed serialise tests", () => {
         "KISAO:0000477": "GMRES",
       }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with a BiCGStab linear solver", () => {
@@ -454,6 +502,9 @@ describe("Sed serialise tests", () => {
         "KISAO:0000477": "BiCGStab",
       }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with a TFQMR linear solver", () => {
@@ -472,6 +523,9 @@ describe("Sed serialise tests", () => {
         "KISAO:0000477": "TFQMR",
       }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with no preconditioner", () => {
@@ -488,6 +542,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", { "KISAO:0000478": "No" }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("CVODE solver with no interpolate solution", () => {
@@ -506,6 +563,9 @@ describe("Sed serialise tests", () => {
         "KISAO:0000481": "false",
       }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("KINSOL solver with a banded linear solver", () => {
@@ -522,6 +582,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "Banded" }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("KINSOL solver with a GMRES linear solver", () => {
@@ -538,6 +601,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "GMRES" }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("KINSOL solver with a BiCGStab linear solver", () => {
@@ -554,6 +620,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "BiCGStab" }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("KINSOL solver with a TFQMR linear solver", () => {
@@ -570,6 +639,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("One-step simulation", () => {
@@ -602,5 +674,9 @@ describe("Sed serialise tests", () => {
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       expectedSerialisation,
     );
+
+    simulation.delete();
+    document.delete();
+    file.delete();
   });
 });

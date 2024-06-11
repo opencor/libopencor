@@ -59,6 +59,8 @@ describe("File basic tests", () => {
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(libopencor, file, expectedUnknownFileIssues);
+
+    file.delete();
   });
 
   test("Remote file", () => {
@@ -79,5 +81,7 @@ describe("File basic tests", () => {
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(libopencor, file, expectedUnknownFileIssues);
+
+    file.delete();
   });
 });

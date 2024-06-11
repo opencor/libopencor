@@ -26,6 +26,8 @@ describe("File coverage tests", () => {
     file.setContents(null, 0);
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+
+    file.delete();
   });
 
   test("http remote file", () => {
@@ -37,6 +39,9 @@ describe("File coverage tests", () => {
     const file2 = new libopencor.File(utils.LOCAL_FILE);
 
     expect(file1).toStrictEqual(file2);
+
+    file1.delete();
+    file2.delete();
   });
 
   test("Same remote file", () => {
@@ -44,5 +49,8 @@ describe("File coverage tests", () => {
     const file2 = new libopencor.File(utils.REMOTE_FILE);
 
     expect(file1).toStrictEqual(file2);
+
+    file1.delete();
+    file2.delete();
   });
 });

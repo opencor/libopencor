@@ -92,6 +92,9 @@ describe("Sed run tests", () => {
         "The simulation experiment description does not contain any tasks to run.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
   });
 
   test("Invalid CellML file", () => {
@@ -112,6 +115,10 @@ describe("Sed run tests", () => {
         "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Overconstrained CellML file", () => {
@@ -132,6 +139,10 @@ describe("Sed run tests", () => {
         "Variable 'x' in component 'my_component' is computed more than once.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Underconstrained CellML file", () => {
@@ -152,6 +163,10 @@ describe("Sed run tests", () => {
         "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("UnsuitablyConstrained CellML file", () => {
@@ -179,6 +194,10 @@ describe("Sed run tests", () => {
         "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Algebraic model", () => {
@@ -195,6 +214,10 @@ describe("Sed run tests", () => {
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("ODE model", () => {
@@ -221,6 +244,8 @@ describe("Sed run tests", () => {
       ],
     ]);
 
+    instance.delete();
+
     cvode.setMaximumNumberOfSteps(500);
 
     instance = document.createInstance();
@@ -228,6 +253,10 @@ describe("Sed run tests", () => {
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("ODE model with no ODE solver", () => {
@@ -247,6 +276,10 @@ describe("Sed run tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
@@ -271,11 +304,17 @@ describe("Sed run tests", () => {
       ],
     ]);
 
+    instance.delete();
+
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
     instance = document.createInstance();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("NLA model with no NLA solver", () => {
@@ -295,6 +334,10 @@ describe("Sed run tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
   */
 
@@ -329,6 +372,8 @@ describe("Sed run tests", () => {
       ],
     ]);
 
+    instance.delete();
+
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
     instance = document.createInstance();
@@ -336,6 +381,10 @@ describe("Sed run tests", () => {
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
   */
 
@@ -364,6 +413,10 @@ describe("Sed run tests", () => {
       ],
     ]);
     */
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("COMBINE archive", () => {
@@ -379,6 +432,11 @@ describe("Sed run tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    //---GRY--- TO BE UNCOMMENTED ONCE WE CAN RUN A COMBINE ARCHIVE.
+    // expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 });

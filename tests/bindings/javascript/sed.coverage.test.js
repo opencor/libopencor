@@ -57,6 +57,8 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.serialise()).toBe(expectedSerialisation);
+
+    document.delete();
   });
 
   test("Models", () => {
@@ -79,6 +81,10 @@ describe("Sed coverage tests", () => {
     expect(document.hasModels()).toBe(false);
 
     expect(document.removeModel(null)).toBe(false);
+
+    model.delete();
+    file.delete();
+    document.delete();
   });
 
   test("Simulations", () => {
@@ -106,6 +112,10 @@ describe("Sed coverage tests", () => {
     expect(document.hasSimulations()).toBe(false);
 
     expect(document.removeSimulation(null)).toBe(false);
+
+    steady_state.delete();
+    uniform_time_course.delete();
+    document.delete();
   });
 
   test("Tasks", () => {
@@ -150,6 +160,12 @@ describe("Sed coverage tests", () => {
     expect(document.hasTasks()).toBe(false);
 
     expect(document.removeTask(null)).toBe(false);
+
+    task.delete();
+    simulation.delete();
+    model.delete();
+    file.delete();
+    document.delete();
   });
 
   test("ODE solver", () => {
@@ -167,6 +183,10 @@ describe("Sed coverage tests", () => {
     simulation.setOdeSolver(null);
 
     expect(simulation.odeSolver()).toBe(null);
+
+    solver.delete();
+    simulation.delete();
+    document.delete();
   });
 
   test("NLA solver", () => {
@@ -184,6 +204,10 @@ describe("Sed coverage tests", () => {
     simulation.setNlaSolver(null);
 
     expect(simulation.nlaSolver()).toBe(null);
+
+    solver.delete();
+    simulation.delete();
+    document.delete();
   });
 
   test("SedOneStep", () => {
@@ -196,6 +220,10 @@ describe("Sed coverage tests", () => {
     simulation.setStep(1.23);
 
     expect(simulation.step()).toBe(1.23);
+
+    simulation.delete();
+    document.delete();
+    file.delete();
   });
 
   test("SedUniformTimeCourse", () => {
@@ -217,6 +245,10 @@ describe("Sed coverage tests", () => {
     expect(simulation.outputStartTime()).toBe(4.56);
     expect(simulation.outputEndTime()).toBe(7.89);
     expect(simulation.numberOfSteps()).toBe(10);
+
+    simulation.delete();
+    document.delete();
+    file.delete();
   });
 
   test("SedInstanceAndSedInstanceTask", () => {
@@ -276,6 +308,10 @@ describe("Sed coverage tests", () => {
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Solver", () => {
@@ -287,8 +323,9 @@ describe("Sed coverage tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
+    let solver = new libopencor.SolverForwardEuler();
 
-    simulation.setOdeSolver(new libopencor.SolverForwardEuler());
+    simulation.setOdeSolver(solver);
 
     let instance = document.createInstance();
 
@@ -296,10 +333,12 @@ describe("Sed coverage tests", () => {
 
     expect(instance.hasIssues()).toBe(false);
 
-    document
-      .simulations()
-      .get(0)
-      .setOdeSolver(new libopencor.SolverFourthOrderRungeKutta());
+    instance.delete();
+    solver.delete();
+
+    solver = new libopencor.SolverFourthOrderRungeKutta();
+
+    simulation.setOdeSolver(solver);
 
     instance = document.createInstance();
 
@@ -307,7 +346,12 @@ describe("Sed coverage tests", () => {
 
     expect(instance.hasIssues()).toBe(false);
 
-    document.simulations().get(0).setOdeSolver(new libopencor.SolverHeun());
+    instance.delete();
+    solver.delete();
+
+    solver = new libopencor.SolverHeun();
+
+    simulation.setOdeSolver(solver);
 
     instance = document.createInstance();
 
@@ -315,15 +359,22 @@ describe("Sed coverage tests", () => {
 
     expect(instance.hasIssues()).toBe(false);
 
-    document
-      .simulations()
-      .get(0)
-      .setOdeSolver(new libopencor.SolverSecondOrderRungeKutta());
+    instance.delete();
+    solver.delete();
+
+    solver = new libopencor.SolverSecondOrderRungeKutta();
+
+    simulation.setOdeSolver(solver);
 
     instance = document.createInstance();
 
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 });

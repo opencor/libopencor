@@ -56,6 +56,8 @@ describe("Sed basic tests", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.hasIssues()).toBe(false);
+
+    document.delete();
   });
 
   test("Unknown file", () => {
@@ -74,6 +76,9 @@ describe("Sed basic tests", () => {
         "A simulation experiment description cannot be created using an unknown file.",
       ],
     ]);
+
+    document.delete();
+    file.delete();
   });
 
   test("CellML file", () => {
@@ -84,6 +89,9 @@ describe("Sed basic tests", () => {
     const document = new libopencor.SedDocument(file);
 
     expect(document.hasIssues()).toBe(false);
+
+    document.delete();
+    file.delete();
   });
 
   test("SED-ML file", () => {
@@ -95,11 +103,17 @@ describe("Sed basic tests", () => {
 
     expect(document.hasIssues()).toBe(true);
 
+    document.delete();
+
     const neededFile = new libopencor.File(utils.CELLML_FILE);
 
     document = new libopencor.SedDocument(file);
 
     expect(document.hasIssues()).toBe(false);
+
+    document.delete();
+    neededFile.delete();
+    file.delete();
   });
 
   test("COMBINE archive", () => {
@@ -113,5 +127,8 @@ describe("Sed basic tests", () => {
     const document = new libopencor.SedDocument(file);
 
     expect(document.hasIssues()).toBe(false);
+
+    document.delete();
+    file.delete();
   });
 });
