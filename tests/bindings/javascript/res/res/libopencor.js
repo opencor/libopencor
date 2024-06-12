@@ -190,12 +190,14 @@ $(() => {
 
             // Determine the type of the file.
 
-            let fileType = "unknown";
+            let fileType = "some unknown file";
 
             if (file.type() === libopencor.File.Type.CELLML_FILE) {
-              fileType = "CellML";
+              fileType = "a CellML file";
             } else if (file.type() === libopencor.File.Type.SEDML_FILE) {
-              fileType = "SED-ML";
+              fileType = "a SED-ML file";
+            } else if (file.type() === libopencor.File.Type.COMBINE_ARCHIVE) {
+              fileType = "a COMBINE archive";
             }
 
             $("#fileName").html(inputFile.name);
