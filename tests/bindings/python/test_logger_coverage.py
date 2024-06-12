@@ -18,36 +18,36 @@ import utils
 
 
 def test_has_errors():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
 
     assert not file.has_errors
 
 
 def test_errors():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
 
     assert len(file.errors) == 0
 
 
 def test_has_warnings():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
 
     assert not file.has_warnings
 
 
 def test_warnings():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
 
     assert len(file.warnings) == 0
 
 
 def test_has_messages():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
 
     assert not file.has_messages
 
 
 def test_messages():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
 
     assert len(file.messages) == 0

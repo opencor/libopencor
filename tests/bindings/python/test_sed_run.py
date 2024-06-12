@@ -45,7 +45,7 @@ def test_invalid_cellml_file():
         ],
     ]
 
-    file = File(utils.resource_path(utils.ERROR_CELLML_FILE))
+    file = File(utils.resource_path(utils.ErrorCellmlFile))
     document = SedDocument(file)
     instance = document.create_instance()
 
@@ -151,7 +151,7 @@ def run_ode_model(compiled):
         ],
     ]
 
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
     simulation = document.simulations[0]
     cvode = simulation.ode_solver
@@ -191,7 +191,7 @@ def test_ode_model_with_no_ode_solver():
         ],
     ]
 
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
 
     document.simulations[0].ode_solver = None
@@ -308,7 +308,7 @@ def test_dae_model_with_no_ode_or_nla_solver():
 
 
 def test_combine_archive():
-    file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
+    file = File(utils.resource_path(utils.Combine2Archive))
     document = SedDocument(file)
     instance = document.create_instance()
 

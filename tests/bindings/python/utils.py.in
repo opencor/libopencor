@@ -21,45 +21,41 @@ import platform
 import pytest
 
 
-LOCAL_BASE_PATH = "@RESOURCE_LOCATION@"
+LocalBasePath = "@RESOURCE_LOCATION@"
 
 
-UNKNOWN_FILE = "unknown_file.txt"
-SBML_FILE = "sbml.sbml"
-ERROR_CELLML_FILE = "error.cellml"
-ERROR_SEDML_FILE = "error.sedml"
-CELLML_1_X_FILE = "cellml_1_x.cellml"
-SEDML_1_X_FILE = "cellml_1_x.sedml"
-COMBINE_1_X_ARCHIVE = "cellml_1_x.omex"
-CELLML_2_FILE = "cellml_2.cellml"
-SEDML_2_FILE = "cellml_2.sedml"
-COMBINE_2_ARCHIVE = "cellml_2.omex"
-IRRETRIEVABLE_FILE = "irretrievable_file.txt"
+UnknownFile = "unknown_file.txt"
+SbmlFile = "sbml.sbml"
+ErrorCellmlFile = "error.cellml"
+ErrorSedmlFile = "error.sedml"
+Cellml1xFile = "cellml_1_x.cellml"
+Sedml1xFile = "cellml_1_x.sedml"
+Combine1xArchive = "cellml_1_x.omex"
+Cellml2File = "cellml_2.cellml"
+Sedml2File = "cellml_2.sedml"
+Combine2Archive = "cellml_2.omex"
+IrretrievableFile = "irretrievable_file.txt"
 
 
 if platform.system() == "Windows":
-    LOCAL_FILE = "P:\\some\\path\\file.txt"
+    LocalFile = "P:\\some\\path\\file.txt"
 else:
-    LOCAL_FILE = "/some/path/file.txt"
+    LocalFile = "/some/path/file.txt"
 
 
-HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-REMOTE_BASE_PATH = (
-    "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
-)
-REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt"
+HttpRemoteFile = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+RemoteBasePath = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
+RemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+IrretrievableRemoteFile = "https://some.domain.com/irretrievable_file.txt"
 
 
-NO_CONTENTS = ""
-SOME_UNKNOWN_CONTENTS = "Some unknown contents..."
-SOME_CELLML_CONTENTS = """@SOME_CELLML_CONTENTS@"""
-SOME_ERROR_CELLML_CONTENTS = """@SOME_ERROR_CELLML_CONTENTS@"""
-SOME_WARNING_CELLML_CONTENTS = """@SOME_WARNING_CELLML_CONTENTS@"""
-SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
-SOME_COMBINE_ARCHIVE_CONTENTS = base64.b64decode(
-    b"@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@"
-)
+NoContents = ""
+SomeUnknownContents = "Some unknown contents..."
+SomeCellmlContents = """@SOME_CELLML_CONTENTS@"""
+SomeErrorCellmlContents = """@SOME_ERROR_CELLML_CONTENTS@"""
+SomeWarningCellmlContents = """@SOME_WARNING_CELLML_CONTENTS@"""
+SomeSedmlContents = """@SOME_SEDML_CONTENTS@"""
+SomeCombineArchiveContents = base64.b64decode(b"@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@")
 
 
 def assert_issues(logger, expected_issues):
@@ -106,7 +102,7 @@ def assert_values(
 
 
 def resource_path(relative_path=""):
-    return LOCAL_BASE_PATH + "/" + relative_path
+    return LocalBasePath + "/" + relative_path
 
 
 def string_to_list(string):

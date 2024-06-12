@@ -49,7 +49,7 @@ def test_models():
     assert document.has_models == False
     assert document.add_model(None) == False
 
-    file = File(utils.LOCAL_FILE)
+    file = File(utils.LocalFile)
     model = SedModel(document, file)
 
     assert document.add_model(model) == True
@@ -114,7 +114,7 @@ def test_tasks():
     assert document.has_tasks == False
     assert document.add_task(None) == False
 
-    file = File(utils.LOCAL_FILE)
+    file = File(utils.LocalFile)
     model = SedModel(document, file)
     simulation = SedUniformTimeCourse(document)
     task = SedTask(document, model, simulation)
@@ -195,7 +195,7 @@ def test_nla_solver():
 
 
 def test_sed_simulation_one_step():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
     simulation = SedOneStep(document)
 
@@ -207,7 +207,7 @@ def test_sed_simulation_one_step():
 
 
 def test_sed_simulation_uniform_time_course():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
     simulation = SedUniformTimeCourse(document)
 
@@ -235,7 +235,7 @@ def test_sed_instance_and_sed_isntance_task():
         ],
     ]
 
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
     solver = document.simulations[0].ode_solver
 
@@ -281,7 +281,7 @@ def test_sed_instance_and_sed_isntance_task():
 def test_solver():
     # Get the duplicate() method of different solvers to be covered.
 
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
 
     document.simulations[0].ode_solver = SolverForwardEuler()

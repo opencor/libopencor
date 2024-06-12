@@ -31,96 +31,96 @@ def test_type_irretrievable_file():
         [Issue.Type.Error, "The file does not exist."],
     ]
 
-    file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
+    file = File(utils.resource_path(utils.IrretrievableFile))
 
     assert file.type == File.Type.IrretrievableFile
     assert_issues(file, expected_non_existing_file_issues)
 
 
 def test_type_unknown_file():
-    file = File(utils.resource_path(utils.UNKNOWN_FILE))
+    file = File(utils.resource_path(utils.UnknownFile))
 
     assert file.type == File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_sbml_file():
-    file = File(utils.resource_path(utils.SBML_FILE))
+    file = File(utils.resource_path(utils.SbmlFile))
 
     assert file.type == File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_error_sedml_file():
-    file = File(utils.resource_path(utils.ERROR_SEDML_FILE))
+    file = File(utils.resource_path(utils.ErrorSedmlFile))
 
     assert file.type == File.Type.SedmlFile
 
 
 def test_type_cellml_1_x_file():
-    file = File(utils.resource_path(utils.CELLML_1_X_FILE))
+    file = File(utils.resource_path(utils.Cellml1xFile))
 
     assert file.type == File.Type.CellmlFile
 
 
 def test_type_sedml_1_x_file():
-    file = File(utils.resource_path(utils.SEDML_1_X_FILE))
+    file = File(utils.resource_path(utils.Sedml1xFile))
 
     assert file.type == File.Type.SedmlFile
 
 
 def test_type_combine_1_x_archive():
-    file = File(utils.resource_path(utils.COMBINE_1_X_ARCHIVE))
+    file = File(utils.resource_path(utils.Combine1xArchive))
 
     assert file.type == File.Type.CombineArchive
 
 
 def test_type_cellml_2_file():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
 
     assert file.type == File.Type.CellmlFile
 
 
 def test_type_sedml_2_file():
-    file = File(utils.resource_path(utils.SEDML_2_FILE))
+    file = File(utils.resource_path(utils.Sedml2File))
 
     assert file.type == File.Type.SedmlFile
 
 
 def test_type_combine_2_archive():
-    file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
+    file = File(utils.resource_path(utils.Combine2Archive))
 
     assert file.type == File.Type.CombineArchive
 
 
 def test_type_unknown_virtual_file():
-    file = File(utils.LOCAL_FILE)
+    file = File(utils.LocalFile)
 
-    file.contents = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
+    file.contents = utils.string_to_list(utils.SomeUnknownContents)
 
     assert file.type == File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_cellml_virtual_file():
-    file = File(utils.LOCAL_FILE)
+    file = File(utils.LocalFile)
 
-    file.contents = utils.string_to_list(utils.SOME_CELLML_CONTENTS)
+    file.contents = utils.string_to_list(utils.SomeCellmlContents)
 
     assert file.type == File.Type.CellmlFile
 
 
 def test_type_sedml_virtual_file():
-    file = File(utils.LOCAL_FILE)
+    file = File(utils.LocalFile)
 
-    file.contents = utils.string_to_list(utils.SOME_SEDML_CONTENTS)
+    file.contents = utils.string_to_list(utils.SomeSedmlContents)
 
     assert file.type == File.Type.SedmlFile
 
 
 def test_type_combine_virtual_archive():
-    file = File(utils.LOCAL_FILE)
+    file = File(utils.LocalFile)
 
-    file.contents = utils.binary_to_list(utils.SOME_COMBINE_ARCHIVE_CONTENTS)
+    file.contents = utils.binary_to_list(utils.SomeCombineArchiveContents)
 
     assert file.type == File.Type.CombineArchive
