@@ -52,10 +52,32 @@ function updateFileUi(
   );
 }
 
+function resetObjects() {
+  if (file) {
+    file.delete();
+
+    file = null;
+  }
+
+  if (document) {
+    document.delete();
+
+    document = null;
+  }
+
+  if (instance) {
+    instance.delete();
+
+    instance = null;
+  }
+}
+
 export function resetFile() {
   $("#dropAreaInput").value = "";
 
   updateFileUi(false, false, false, false);
+
+  resetObjects();
 }
 
 function addAxisElement(axis, name) {
@@ -170,6 +192,8 @@ $(() => {
           try {
             // Retrieve the contents of the file.
 
+            resetObjects();
+
             const fileArrayBuffer = await inputFile.arrayBuffer();
             const memPtr = libopencor._malloc(inputFile.size);
             const mem = new Uint8Array(
@@ -179,10 +203,6 @@ $(() => {
             );
 
             mem.set(new Uint8Array(fileArrayBuffer));
-
-            if (file) {
-              file.delete();
-            }
 
             file = new libopencor.File(inputFile.name);
 
@@ -229,10 +249,6 @@ $(() => {
                 showIssues = true;
               } else {
                 // Retrieve some information about the simulation.
-
-                if (document) {
-                  document.delete();
-                }
 
                 document = new libopencor.SedDocument(file);
                 simulation = document.simulations().get(0);
