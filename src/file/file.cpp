@@ -56,6 +56,10 @@ File::Impl::Impl(const std::string &pFileNameOrUrl)
 
         addError("The file does not exist.");
     }
+#else
+    if (mFilePath.empty()) {
+        mFilePath = stringToPath("/some/path/file");
+    }
 #endif
 }
 

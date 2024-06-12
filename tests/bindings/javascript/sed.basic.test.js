@@ -24,6 +24,8 @@ describe("Sed basic tests", () => {
   let someUnknownContentsPtr;
   let someCellmlContentsPtr;
   let someSedmlContentsPtr;
+  let someSedmlWithAbsoluteCellmlFileContentsPtr;
+  let someSedmlWithRemoteCellmlFileContentsPtr;
   let someCombineArchiveContentsPtr;
   let someCombineArchiveWithNoManifestFileContentsPtr;
   let someCombineArchiveWithNoMasterFileContentsPtr;
@@ -41,6 +43,14 @@ describe("Sed basic tests", () => {
     someSedmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_SEDML_CONTENTS,
+    );
+    someSedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS,
+    );
+    someSedmlWithRemoteCellmlFileContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS,
     );
     someCombineArchiveContentsPtr = utils.allocateMemory(
       libopencor,
@@ -65,6 +75,8 @@ describe("Sed basic tests", () => {
     utils.freeMemory(libopencor, someUnknownContentsPtr);
     utils.freeMemory(libopencor, someCellmlContentsPtr);
     utils.freeMemory(libopencor, someSedmlContentsPtr);
+    utils.freeMemory(libopencor, someSedmlWithAbsoluteCellmlFileContentsPtr);
+    utils.freeMemory(libopencor, someSedmlWithRemoteCellmlFileContentsPtr);
     utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
     utils.freeMemory(
       libopencor,
@@ -131,6 +143,56 @@ describe("Sed basic tests", () => {
     document.delete();
 
     const neededFile = new libopencor.File(utils.CELLML_FILE);
+
+    document = new libopencor.SedDocument(file);
+
+    expect(document.hasIssues()).toBe(false);
+
+    document.delete();
+    neededFile.delete();
+    file.delete();
+  });
+
+  test("SED-ML file with absolute CellML file", () => {
+    const file = new libopencor.File(utils.SEDML_FILE);
+
+    file.setContents(
+      someSedmlWithAbsoluteCellmlFileContentsPtr,
+      utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS.length,
+    );
+
+    let document = new libopencor.SedDocument(file);
+
+    expect(document.hasIssues()).toBe(true);
+
+    document.delete();
+
+    const neededFile = new libopencor.File(utils.LOCAL_FILE);
+
+    document = new libopencor.SedDocument(file);
+
+    expect(document.hasIssues()).toBe(false);
+
+    document.delete();
+    neededFile.delete();
+    file.delete();
+  });
+
+  test("SED-ML file with remote CellML file", () => {
+    const file = new libopencor.File(utils.SEDML_FILE);
+
+    file.setContents(
+      someSedmlWithRemoteCellmlFileContentsPtr,
+      utils.SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS.length,
+    );
+
+    let document = new libopencor.SedDocument(file);
+
+    expect(document.hasIssues()).toBe(true);
+
+    document.delete();
+
+    const neededFile = new libopencor.File(utils.REMOTE_FILE);
 
     document = new libopencor.SedDocument(file);
 

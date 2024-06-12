@@ -58,6 +58,32 @@ def test_sedml_file():
     assert document.has_issues == False
 
 
+def test_sedml_file_with_absolute_cellml_file():
+    file = File(utils.resource_path("api/sed/absolute_cellml_file.sedml"))
+    document = SedDocument(file)
+
+    assert document.has_issues == True
+
+    needed_file = File(utils.LOCAL_FILE)
+
+    document = SedDocument(file)
+
+    assert document.has_issues == False
+
+
+def test_sedml_file_with_remote_cellml_file():
+    file = File(utils.resource_path("api/sed/remote_cellml_file.sedml"))
+    document = SedDocument(file)
+
+    assert document.has_issues == True
+
+    needed_file = File(utils.REMOTE_FILE)
+
+    document = SedDocument(file)
+
+    assert document.has_issues == False
+
+
 def test_combine_archive():
     file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
     document = SedDocument(file)

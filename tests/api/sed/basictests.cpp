@@ -61,6 +61,34 @@ TEST(BasicSedTest, sedmlFile)
     EXPECT_FALSE(document->hasIssues());
 }
 
+TEST(BasicSedTest, sedmlFileWithAbsoluteCellmlFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/absolute_cellml_file.sedml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(document->hasIssues());
+
+    auto neededFile = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+}
+
+TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/remote_cellml_file.sedml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(document->hasIssues());
+
+    auto neededFile = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
+
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+}
+
 TEST(BasicSedTest, combineArchive)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));

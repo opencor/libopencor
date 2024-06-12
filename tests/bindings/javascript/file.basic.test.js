@@ -67,7 +67,7 @@ describe("File basic tests", () => {
     const file = new libopencor.File(utils.REMOTE_FILE);
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
-    expect(file.fileName()).toBe("");
+    expect(file.fileName()).toBe("/some/path/file");
     expect(file.url()).toBe(utils.REMOTE_FILE);
     expect(file.path()).toBe(utils.REMOTE_FILE);
     expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);

@@ -39,15 +39,9 @@ SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
         auto source = mDocument->getModel(i)->getSource();
         auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(source);
 
-#ifdef CODE_COVERAGE_ENABLED
-        //---GRY--- NEED A TEST WITH A SED-ML FILE THAT REFERS AN ABSOLUTE PATH AND ANOTHER THAT REFERS A REMOTE PATH.
-
-        mModelSources.push_back(fileLocation + fileNameOrUrl);
-#else
         mModelSources.push_back((isLocalFile && stringToPath(fileNameOrUrl).is_relative()) ?
                                     fileLocation + fileNameOrUrl :
                                     fileNameOrUrl);
-#endif
     }
 }
 
