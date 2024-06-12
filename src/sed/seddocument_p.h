@@ -46,6 +46,7 @@ public:
     void initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile);
     void initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
     void initialiseFromSedmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
+    void initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile);
 
     void serialise(xmlNodePtr pNode) const;
 

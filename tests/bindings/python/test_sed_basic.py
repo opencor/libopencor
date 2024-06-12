@@ -65,6 +65,48 @@ def test_combine_archive():
     assert document.has_issues == False
 
 
+def test_combine_archive_with_no_manifest_file():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
+        ],
+    ]
+
+    file = File(utils.resource_path("api/sed/no_manifest_file.omex"))
+    document = SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_no_master_file():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
+        ],
+    ]
+
+    file = File(utils.resource_path("api/sed/no_master_file.omex"))
+    document = SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_sbml_file_as_master_file():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+        ],
+    ]
+
+    file = File(utils.resource_path("api/sed/sbml_file_as_master_file.omex"))
+    document = SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
 def test_irretrievable_file():
     expected_issues = [
         [

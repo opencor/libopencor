@@ -25,6 +25,9 @@ describe("Sed basic tests", () => {
   let someCellmlContentsPtr;
   let someSedmlContentsPtr;
   let someCombineArchiveContentsPtr;
+  let someCombineArchiveWithNoManifestFileContentsPtr;
+  let someCombineArchiveWithNoMasterFileContentsPtr;
+  let someCombineArchiveWithSbmlFileAsMasterFileContentsPtr;
 
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
@@ -43,6 +46,19 @@ describe("Sed basic tests", () => {
       libopencor,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS,
     );
+    someCombineArchiveWithNoManifestFileContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS,
+    );
+    someCombineArchiveWithNoMasterFileContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS,
+    );
+    someCombineArchiveWithSbmlFileAsMasterFileContentsPtr =
+      utils.allocateMemory(
+        libopencor,
+        utils.SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS,
+      );
   });
 
   afterAll(() => {
@@ -50,6 +66,15 @@ describe("Sed basic tests", () => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
     utils.freeMemory(libopencor, someSedmlContentsPtr);
     utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
+    utils.freeMemory(
+      libopencor,
+      someCombineArchiveWithNoManifestFileContentsPtr,
+    );
+    utils.freeMemory(libopencor, someCombineArchiveWithNoMasterFileContentsPtr);
+    utils.freeMemory(
+      libopencor,
+      someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,
+    );
   });
 
   test("No file", () => {
@@ -127,6 +152,69 @@ describe("Sed basic tests", () => {
     const document = new libopencor.SedDocument(file);
 
     expect(document.hasIssues()).toBe(false);
+
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with no manifest file", () => {
+    const file = new libopencor.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      someCombineArchiveWithNoManifestFileContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS.length,
+    );
+
+    const document = new libopencor.SedDocument(file);
+
+    expectIssues(libopencor, document, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
+      ],
+    ]);
+
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with no master file", () => {
+    const file = new libopencor.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      someCombineArchiveWithNoMasterFileContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS.length,
+    );
+
+    const document = new libopencor.SedDocument(file);
+
+    expectIssues(libopencor, document, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
+      ],
+    ]);
+
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with SBML file as master file", () => {
+    const file = new libopencor.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS.length,
+    );
+
+    const document = new libopencor.SedDocument(file);
+
+    expectIssues(libopencor, document, [
+      [
+        libopencor.Issue.Type.ERROR,
+        "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+      ],
+    ]);
 
     document.delete();
     file.delete();

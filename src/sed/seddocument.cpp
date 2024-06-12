@@ -76,9 +76,7 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
     } else if (fileType == File::Type::SEDML_FILE) {
         initialiseFromSedmlFile(pOwner, pFile);
     } else if (fileType == File::Type::COMBINE_ARCHIVE) {
-        // Initialise using the master file, be it a CellML file or a SED-ML file.
-
-        initialise(pOwner, pFile->pimpl()->mCombineArchive->masterFile());
+        initialiseFromCombineArchive(pOwner, pFile);
 #ifndef __EMSCRIPTEN__
     } else if (fileType == File::Type::IRRETRIEVABLE_FILE) {
         addError("A simulation experiment description cannot be created using an irretrievable file.");
@@ -141,6 +139,27 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
             auto model = SedModel::create(pOwner, modelFile);
 
             addModel(model);
+        }
+    }
+}
+
+void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)
+{
+    // Initialise ourselves using the master file, if available and possible.
+
+    auto masterFile = pFile->pimpl()->mCombineArchive->masterFile();
+
+    if (masterFile == nullptr) {
+        addError("A simulation experiment description cannot be created using a COMBINE archive with no master file.");
+    } else {
+        auto masterFileType = masterFile->type();
+
+        if (masterFileType == File::Type::CELLML_FILE) {
+            initialiseFromCellmlFile(pOwner, masterFile);
+        } else if (masterFileType == File::Type::SEDML_FILE) {
+            initialiseFromSedmlFile(pOwner, masterFile);
+        } else {
+            addError("A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).");
         }
     }
 }

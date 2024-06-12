@@ -295,3 +295,12 @@ TEST(RunSedTest, combineArchive)
     //---GRY--- TO BE UNCOMMENTED ONCE WE CAN RUN A COMBINE ARCHIVE.
     // EXPECT_FALSE(instance->hasIssues());
 }
+
+TEST(RunSedTest, combineArchiveWithCellmlFileAsMasterFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/cellml_file_as_master_file.omex"));
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->createInstance();
+
+    EXPECT_FALSE(instance->hasIssues());
+}

@@ -316,3 +316,18 @@ def test_combine_archive():
 
     # ---GRY--- TO BE UNCOMMENTED ONCE WE CAN RUN A COMBINE ARCHIVE.
     # assert instance.has_issues == False
+
+
+def test_combine_archive_with_cellml_file_as_master_file():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+        ],
+    ]
+
+    file = File(utils.resource_path("api/sed/cellml_file_as_master_file.omex"))
+    document = SedDocument(file)
+    instance = document.create_instance()
+
+    assert instance.has_issues == False

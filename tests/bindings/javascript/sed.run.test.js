@@ -30,6 +30,7 @@ describe("Sed run tests", () => {
   let someNlaContentsPtr;
   let someDaeContentsPtr;
   let someCombineArchiveContentsPtr;
+  let someCombineArchiveWithCellmlFileAsMasterFileContentsPtr;
 
   beforeAll(() => {
     someCellmlContentsPtr = utils.allocateMemory(
@@ -68,6 +69,11 @@ describe("Sed run tests", () => {
       libopencor,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS,
     );
+    someCombineArchiveWithCellmlFileAsMasterFileContentsPtr =
+      utils.allocateMemory(
+        libopencor,
+        utils.SOME_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS,
+      );
   });
 
   afterAll(() => {
@@ -80,6 +86,10 @@ describe("Sed run tests", () => {
     utils.freeMemory(libopencor, someNlaContentsPtr);
     utils.freeMemory(libopencor, someDaeContentsPtr);
     utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
+    utils.freeMemory(
+      libopencor,
+      someCombineArchiveWithCellmlFileAsMasterFileContentsPtr,
+    );
   });
 
   test("No file", () => {
@@ -434,6 +444,25 @@ describe("Sed run tests", () => {
 
     //---GRY--- TO BE UNCOMMENTED ONCE WE CAN RUN A COMBINE ARCHIVE.
     // expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with CellML file as master file", () => {
+    const file = new libopencor.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      someCombineArchiveWithCellmlFileAsMasterFileContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS
+        .length,
+    );
+
+    const document = new libopencor.SedDocument(file);
+    const instance = document.createInstance();
+
+    expect(instance.hasIssues()).toBe(false);
 
     instance.delete();
     document.delete();
