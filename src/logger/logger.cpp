@@ -71,7 +71,11 @@ void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription)
     mIssues.push_back(issue);
 
 #ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
-    mErrors.push_back(issue);
+    if (pType == Issue::Type::ERROR) {
+        mErrors.push_back(issue);
+    } else {
+        mWarnings.push_back(issue);
+    }
 #else
     switch (pType) {
     case libOpenCOR::Issue::Type::ERROR:
@@ -96,12 +100,10 @@ void Logger::Impl::addError(const std::string &pDescription)
     addIssue(Issue::Type::ERROR, pDescription);
 }
 
-/*---GRY---
 void Logger::Impl::addWarning(const std::string &pDescription)
 {
     addIssue(Issue::Type::WARNING, pDescription);
 }
-*/
 
 /*---GRY---
 void Logger::Impl::addMessage(const std::string &pDescription)

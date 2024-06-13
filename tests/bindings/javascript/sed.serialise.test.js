@@ -16,11 +16,13 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
+import { expectIssues } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
 describe("Sed serialise tests", () => {
   let someCellmlContentsPtr;
+  let someSedmlContentsPtr;
   let someAlgebraicContentsPtr;
   let someDaeContentsPtr;
   let someNlaContentsPtr;
@@ -29,6 +31,10 @@ describe("Sed serialise tests", () => {
     someCellmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_CELLML_CONTENTS,
+    );
+    someSedmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SEDML_CONTENTS,
     );
     someAlgebraicContentsPtr = utils.allocateMemory(
       libopencor,
@@ -46,6 +52,7 @@ describe("Sed serialise tests", () => {
 
   afterAll(() => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someSedmlContentsPtr);
     utils.freeMemory(libopencor, someAlgebraicContentsPtr);
     utils.freeMemory(libopencor, someDaeContentsPtr);
     utils.freeMemory(libopencor, someNlaContentsPtr);
@@ -678,5 +685,34 @@ describe("Sed serialise tests", () => {
     simulation.delete();
     document.delete();
     file.delete();
+  });
+
+  test("SED-ML file", () => {
+    const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+</sedML>
+`;
+
+    const file = new libopencor.File(utils.SEDML_FILE);
+
+    file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
+
+    let document = new libopencor.SedDocument(file);
+
+    expectIssues(libopencor, document, [
+      [
+        libopencor.Issue.Type.WARNING,
+        "The model 'cellml_2.cellml' could not be found. It has been automatically added, but it is empty.",
+      ],
+    ]);
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+      expectedSerialisation,
+    );
+
+    file.delete();
+    document.delete();
   });
 });

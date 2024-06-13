@@ -26,23 +26,14 @@ limitations under the License.
 #include <sedml/SedReader.h>
 #include "libsedmlend.h"
 
+#include <ranges>
+
 namespace libOpenCOR {
 
 SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
-    : mDocument(pDocument)
+    : mLocation(pathToString(stringToPath(pFile->fileName()).parent_path()) + "/")
+    , mDocument(pDocument)
 {
-    // Retrieve the models used by our SED-ML file.
-
-    auto fileLocation = pathToString(stringToPath(pFile->fileName()).parent_path()) + "/";
-
-    for (unsigned int i = 0; i < mDocument->getNumModels(); ++i) {
-        auto source = mDocument->getModel(i)->getSource();
-        auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(source);
-
-        mModelSources.push_back((isLocalFile && stringToPath(fileNameOrUrl).is_relative()) ?
-                                    fileLocation + fileNameOrUrl :
-                                    fileNameOrUrl);
-    }
 }
 
 SedmlFile::Impl::~Impl()
@@ -52,18 +43,27 @@ SedmlFile::Impl::~Impl()
 
 std::vector<FilePtr> SedmlFile::Impl::models()
 {
+    // Retrieve the models.
+
     removeAllIssues();
 
     std::vector<FilePtr> res;
     auto fileManager = FileManager::instance();
 
-    for (const auto &modelSource : mModelSources) {
+    for (unsigned int i = 0; i < mDocument->getNumModels(); ++i) {
+        auto source = mDocument->getModel(i)->getSource();
+        auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(source);
+        auto modelSource = (isLocalFile && stringToPath(fileNameOrUrl).is_relative()) ?
+                               mLocation + fileNameOrUrl :
+                               fileNameOrUrl;
         auto file = fileManager.file(modelSource);
 
         if (file != nullptr) {
             res.push_back(file);
         } else {
-            addError("The model '" + modelSource + "' could not be found.");
+            addWarning("The model '" + source + "' could not be found. It has been automatically added, but it is empty.");
+
+            res.push_back(File::create(modelSource));
         }
     }
 

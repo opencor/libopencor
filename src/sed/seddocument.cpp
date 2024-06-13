@@ -128,18 +128,15 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
 void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
     // Add the models.
+    // Note: if a model was not found, then add an empty version of it (see SedmlFile::Impl::models()).
 
     auto sedmlFile = pFile->pimpl()->mSedmlFile;
-    auto modelFiles = sedmlFile->models();
+    auto models = sedmlFile->models();
 
     addIssues(sedmlFile);
 
-    if (!hasErrors()) {
-        for (const auto &modelFile : modelFiles) {
-            auto model = SedModel::create(pOwner, modelFile);
-
-            addModel(model);
-        }
+    for (const auto &model : models) {
+        addModel(SedModel::create(pOwner, model));
     }
 }
 

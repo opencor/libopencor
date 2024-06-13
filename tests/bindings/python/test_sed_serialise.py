@@ -15,6 +15,7 @@
 
 from libopencor import (
     File,
+    Issue,
     SedDocument,
     SedOneStep,
     SolverCvode,
@@ -23,6 +24,7 @@ from libopencor import (
 )
 import platform
 import utils
+from utils import assert_issues
 
 
 def cvode_expected_serialisation(source, parameters=None):
@@ -505,4 +507,26 @@ def test_one_step_simulation():
 
     document.add_simulation(simulation)
 
+    assert document.serialise(utils.LocalBasePath) == expected_serialisation
+
+
+def test_sedml_file():
+    expected_issues = [
+        [
+            Issue.Type.Warning,
+            "The model 'cellml_2.cellml' could not be found. It has been automatically added, but it is empty.",
+        ],
+    ]
+    expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+  </listOfModels>
+</sedML>
+"""
+
+    file = File(utils.resource_path(utils.Sedml2File))
+    document = SedDocument(file)
+
+    assert_issues(document, expected_issues)
     assert document.serialise(utils.LocalBasePath) == expected_serialisation

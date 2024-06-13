@@ -466,3 +466,22 @@ TEST(SerialiseSedTest, oneStepSimulation)
 
     EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
 }
+
+TEST(SerialiseSedTest, sedmlFile)
+{
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
+        {libOpenCOR::Issue::Type::WARNING, "The model 'cellml_2.cellml' could not be found. It has been automatically added, but it is empty."},
+    };
+    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                                     "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
+                                                     "  <listOfModels>\n"
+                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
+                                                     "  </listOfModels>\n"
+                                                     "</sedML>\n";
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ_ISSUES(document, expectedIssues);
+    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
+}
