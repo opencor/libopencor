@@ -234,9 +234,9 @@ public:
      */
 
 #ifdef __EMSCRIPTEN__
-    SedInstancePtr createInstance();
+    SedInstancePtr instantiate();
 #else
-    SedInstancePtr createInstance(bool pCompiled = true);
+    SedInstancePtr instantiate(bool pCompiled = true);
 #endif
 
 private:

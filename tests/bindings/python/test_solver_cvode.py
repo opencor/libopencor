@@ -35,7 +35,7 @@ def test_maximum_step_value_with_invalid_number():
 
     solver.maximum_step = -1.234
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -55,7 +55,7 @@ def test_maximum_number_of_steps_value_with_invalid_number():
 
     solver.maximum_number_of_steps = 0
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -76,7 +76,7 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_sma
     solver.linear_solver = SolverCvode.LinearSolver.Banded
     solver.upper_half_bandwidth = -1
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -97,7 +97,7 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_big
     solver.linear_solver = SolverCvode.LinearSolver.Banded
     solver.upper_half_bandwidth = 4
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -118,7 +118,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_sma
     solver.linear_solver = SolverCvode.LinearSolver.Banded
     solver.lower_half_bandwidth = -1
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -139,7 +139,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_big
     solver.linear_solver = SolverCvode.LinearSolver.Banded
     solver.lower_half_bandwidth = 4
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -159,7 +159,7 @@ def test_relative_tolerance_value_with_invalid_number():
 
     solver.relative_tolerance = -1.234
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -179,7 +179,7 @@ def test_absolute_tolerance_value_with_invalid_number():
 
     solver.absolute_tolerance = -1.234
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 

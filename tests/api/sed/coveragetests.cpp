@@ -144,7 +144,7 @@ TEST(CoverageSedTest, tasks)
         {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a simulation."},
     };
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 
@@ -248,7 +248,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
     auto instanceTask = instance->tasks()[0];
 
     static const auto NoDoubles = std::vector<double> {};
@@ -295,7 +295,7 @@ TEST(CoverageSedTest, solver)
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     instance->run();
 
@@ -303,7 +303,7 @@ TEST(CoverageSedTest, solver)
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverFourthOrderRungeKutta::create());
 
-    instance = document->createInstance();
+    instance = document->instantiate();
 
     instance->run();
 
@@ -311,7 +311,7 @@ TEST(CoverageSedTest, solver)
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverHeun::create());
 
-    instance = document->createInstance();
+    instance = document->instantiate();
 
     instance->run();
 
@@ -319,7 +319,7 @@ TEST(CoverageSedTest, solver)
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverSecondOrderRungeKutta::create());
 
-    instance = document->createInstance();
+    instance = document->instantiate();
 
     instance->run();
 

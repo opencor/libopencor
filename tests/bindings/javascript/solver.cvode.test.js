@@ -49,7 +49,7 @@ describe("Solver CVODE", () => {
 
     solver.setMaximumStep(-1.234);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -77,7 +77,7 @@ describe("Solver CVODE", () => {
 
     solver.setMaximumNumberOfSteps(0);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -106,7 +106,7 @@ describe("Solver CVODE", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setUpperHalfBandwidth(-1);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -135,7 +135,7 @@ describe("Solver CVODE", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setUpperHalfBandwidth(4);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -164,7 +164,7 @@ describe("Solver CVODE", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setLowerHalfBandwidth(-1);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -193,7 +193,7 @@ describe("Solver CVODE", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setLowerHalfBandwidth(4);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -221,7 +221,7 @@ describe("Solver CVODE", () => {
 
     solver.setRelativeTolerance(-1.234);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -249,7 +249,7 @@ describe("Solver CVODE", () => {
 
     solver.setAbsoluteTolerance(-1.234);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [

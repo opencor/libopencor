@@ -252,7 +252,7 @@ $(() => {
 
                 document = new libopencor.SedDocument(file);
                 simulation = document.simulations().get(0);
-                instance = document.createInstance();
+                instance = document.instantiate();
                 instanceTask = instance.tasks().get(0);
 
                 $("#endingPoint").val(simulation.outputEndTime());

@@ -161,7 +161,7 @@ def test_tasks():
         ],
     ]
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -255,7 +255,7 @@ def test_sed_instance_and_sed_isntance_task():
     solver.linear_solver = SolverCvode.LinearSolver.Banded
     solver.upper_half_bandwidth = -1
 
-    instance = document.create_instance()
+    instance = document.instantiate()
     instance_task = instance.tasks[0]
 
     assert instance_task.voi == []
@@ -299,7 +299,7 @@ def test_solver():
 
     document.simulations[0].ode_solver = SolverForwardEuler()
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -307,7 +307,7 @@ def test_solver():
 
     document.simulations[0].ode_solver = SolverFourthOrderRungeKutta()
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -315,7 +315,7 @@ def test_solver():
 
     document.simulations[0].ode_solver = SolverHeun()
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -323,7 +323,7 @@ def test_solver():
 
     document.simulations[0].ode_solver = SolverSecondOrderRungeKutta()
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 

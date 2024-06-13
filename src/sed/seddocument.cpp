@@ -521,12 +521,12 @@ bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
 }
 
 #ifdef __EMSCRIPTEN__
-SedInstancePtr SedDocument::createInstance()
+SedInstancePtr SedDocument::instantiate()
 {
     return SedInstance::Impl::create(shared_from_this(), false);
 }
 #else
-SedInstancePtr SedDocument::createInstance(bool pCompiled)
+SedInstancePtr SedDocument::instantiate(bool pCompiled)
 {
     return SedInstance::Impl::create(shared_from_this(), pCompiled);
 }

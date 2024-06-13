@@ -55,7 +55,7 @@ void sedApi()
         .function("tasks", &libOpenCOR::SedDocument::tasks)
         .function("addTask", &libOpenCOR::SedDocument::addTask)
         .function("removeTask", &libOpenCOR::SedDocument::removeTask)
-        .function("createInstance", &libOpenCOR::SedDocument::createInstance);
+        .function("instantiate", &libOpenCOR::SedDocument::instantiate);
 
     // SedInstance API.
 

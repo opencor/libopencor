@@ -159,7 +159,7 @@ describe("Sed coverage tests", () => {
 
     expect(document.serialise()).toBe(sedTaskExpectedSerialisation(false));
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a model."],
@@ -274,7 +274,7 @@ describe("Sed coverage tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setUpperHalfBandwidth(-1);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
     const instanceTask = instance.tasks().get(0);
 
     expect(instanceTask.voi().size()).toBe(0);
@@ -339,7 +339,7 @@ describe("Sed coverage tests", () => {
 
     simulation.setOdeSolver(solver);
 
-    let instance = document.createInstance();
+    let instance = document.instantiate();
 
     instance.run();
 
@@ -352,7 +352,7 @@ describe("Sed coverage tests", () => {
 
     simulation.setOdeSolver(solver);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     instance.run();
 
@@ -365,7 +365,7 @@ describe("Sed coverage tests", () => {
 
     simulation.setOdeSolver(solver);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     instance.run();
 
@@ -378,7 +378,7 @@ describe("Sed coverage tests", () => {
 
     simulation.setOdeSolver(solver);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     instance.run();
 

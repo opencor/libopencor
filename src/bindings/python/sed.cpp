@@ -58,7 +58,7 @@ void sedApi(py::module_ &m)
         .def_property_readonly("tasks", &libOpenCOR::SedDocument::tasks, "Return the tasks.")
         .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.")
         .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.")
-        .def("create_instance", &libOpenCOR::SedDocument::createInstance, "Create an instance of this SedDocument object.", py::arg("compiled") = true);
+        .def("instantiate", &libOpenCOR::SedDocument::instantiate, "Create an instance of this SedDocument object.", py::arg("compiled") = true);
 
     // SedInstance API.
 

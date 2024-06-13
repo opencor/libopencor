@@ -28,7 +28,7 @@ def test_no_file():
     ]
 
     document = SedDocument()
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -47,7 +47,7 @@ def test_invalid_cellml_file():
 
     file = File(utils.resource_path(utils.ErrorCellmlFile))
     document = SedDocument(file)
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -66,7 +66,7 @@ def test_overconstrained_cellml_file():
 
     file = File(utils.resource_path("api/sed/overconstrained.cellml"))
     document = SedDocument(file)
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -85,7 +85,7 @@ def test_underconstrained_cellml_file():
 
     file = File(utils.resource_path("api/sed/underconstrained.cellml"))
     document = SedDocument(file)
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -108,7 +108,7 @@ def test_unsuitable_constrained_cellml_file():
 
     file = File(utils.resource_path("api/sed/unsuitably_constrained.cellml"))
     document = SedDocument(file)
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -116,7 +116,7 @@ def test_unsuitable_constrained_cellml_file():
 def run_algebraic_model(compiled):
     file = File(utils.resource_path("api/sed/algebraic.cellml"))
     document = SedDocument(file)
-    instance = document.create_instance(compiled)
+    instance = document.instantiate(compiled)
 
     instance.run()
 
@@ -158,7 +158,7 @@ def run_ode_model(compiled):
 
     cvode.maximum_number_of_steps = 10
 
-    instance = document.create_instance(compiled)
+    instance = document.instantiate(compiled)
 
     assert instance.has_issues == False
 
@@ -168,7 +168,7 @@ def run_ode_model(compiled):
 
     cvode.maximum_number_of_steps = 500
 
-    instance = document.create_instance(compiled)
+    instance = document.instantiate(compiled)
 
     instance.run()
 
@@ -196,7 +196,7 @@ def test_ode_model_with_no_ode_solver():
 
     document.simulations[0].ode_solver = None
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -219,13 +219,13 @@ def test_nla_model():
     kinsol.linear_solver = SolverKinsol.LinearSolver.Banded
     kinsol.upper_half_bandwidth = -1
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
     kinsol.linear_solver = SolverKinsol.LinearSolver.Dense
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert instance.has_issues == False
 
@@ -243,7 +243,7 @@ def test_nla_model_with_no_nla_solver():
 
     document.simulations[0].nla_solver = None
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -266,7 +266,7 @@ def test_dae_model():
     kinsol.linear_solver = SolverKinsol.LinearSolver.Banded
     kinsol.upper_half_bandwidth = -1
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -276,7 +276,7 @@ def test_dae_model():
 
     kinsol.linear_solver = SolverKinsol.LinearSolver.Dense
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -302,7 +302,7 @@ def test_dae_model_with_no_ode_or_nla_solver():
     simulation.ode_solver = None
     simulation.nla_solver = None
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -310,7 +310,7 @@ def test_dae_model_with_no_ode_or_nla_solver():
 def test_combine_archive():
     file = File(utils.resource_path(utils.Combine2Archive))
     document = SedDocument(file)
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -328,6 +328,6 @@ def test_combine_archive_with_cellml_file_as_master_file():
 
     file = File(utils.resource_path("api/sed/cellml_file_as_master_file.omex"))
     document = SedDocument(file)
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert instance.has_issues == False

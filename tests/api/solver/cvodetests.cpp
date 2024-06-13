@@ -30,7 +30,7 @@ TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 
     solver->setMaximumStep(RELATIVE_TOLERANCE);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -49,7 +49,7 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
 
     solver->setMaximumNumberOfSteps(MAXIMUM_NUMBER_OF_STEPS);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -69,7 +69,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooS
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -89,7 +89,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooB
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -109,7 +109,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooS
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -129,7 +129,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooB
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -148,7 +148,7 @@ TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
 
     solver->setRelativeTolerance(RELATIVE_TOLERANCE);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -167,7 +167,7 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 
     solver->setAbsoluteTolerance(RELATIVE_TOLERANCE);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }

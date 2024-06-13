@@ -33,7 +33,7 @@ def run(
     simulation.output_end_time = 50.0
     simulation.number_of_steps = 50000
 
-    instance = document.create_instance(compiled)
+    instance = document.instantiate(compiled)
 
     instance.run()
 

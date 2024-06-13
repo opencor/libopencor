@@ -94,7 +94,7 @@ describe("Sed instance tests", () => {
 
   test("No file", () => {
     const document = new libopencor.SedDocument();
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -116,7 +116,7 @@ describe("Sed instance tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
@@ -140,7 +140,7 @@ describe("Sed instance tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
@@ -164,7 +164,7 @@ describe("Sed instance tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
@@ -188,7 +188,7 @@ describe("Sed instance tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -219,7 +219,7 @@ describe("Sed instance tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     instance.run();
 
@@ -241,7 +241,7 @@ describe("Sed instance tests", () => {
 
     cvode.setMaximumNumberOfSteps(10);
 
-    let instance = document.createInstance();
+    let instance = document.instantiate();
 
     expect(instance.hasIssues()).toBe(false);
 
@@ -258,7 +258,7 @@ describe("Sed instance tests", () => {
 
     cvode.setMaximumNumberOfSteps(500);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     instance.run();
 
@@ -278,7 +278,7 @@ describe("Sed instance tests", () => {
 
     document.simulations().get(0).setOdeSolver(null);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -305,7 +305,7 @@ describe("Sed instance tests", () => {
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
     kinsol.setUpperHalfBandwidth(-1);
 
-    let instance = document.createInstance();
+    let instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -318,7 +318,7 @@ describe("Sed instance tests", () => {
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     expect(instance.hasIssues()).toBe(false);
 
@@ -336,7 +336,7 @@ describe("Sed instance tests", () => {
 
     document.simulations().get(0).setNlaSolver(null);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -364,7 +364,7 @@ describe("Sed instance tests", () => {
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
     kinsol.setUpperHalfBandwidth(-1);
 
-    let instance = document.createInstance();
+    let instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -386,7 +386,7 @@ describe("Sed instance tests", () => {
 
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     instance.run();
 
@@ -409,7 +409,7 @@ describe("Sed instance tests", () => {
     simulation.setOdeSolver(null);
     simulation.setNlaSolver(null);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
     expectIssues(libopencor, instance, [
@@ -438,7 +438,7 @@ describe("Sed instance tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     instance.run();
 
@@ -460,7 +460,7 @@ describe("Sed instance tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expect(instance.hasIssues()).toBe(false);
 

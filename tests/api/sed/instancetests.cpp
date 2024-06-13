@@ -27,7 +27,7 @@ TEST(InstanceSedTest, noFile)
     };
 
     auto document = libOpenCOR::SedDocument::create();
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -41,7 +41,7 @@ TEST(InstanceSedTest, invalidCellmlFile)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -55,7 +55,7 @@ TEST(InstanceSedTest, overconstrainedCellmlFile)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -69,7 +69,7 @@ TEST(InstanceSedTest, underconstrainedCellmlFile)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/underconstrained.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -84,7 +84,7 @@ TEST(InstanceSedTest, unsuitablyConstrainedCellmlFile)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsuitably_constrained.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -95,7 +95,7 @@ void runAlgebraicModel(bool pCompiled)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->createInstance(pCompiled);
+    auto instance = document->instantiate(pCompiled);
 
     instance->run();
 
@@ -142,7 +142,7 @@ void runOdeModel(bool pCompiled)
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
-    auto instance = document->createInstance(pCompiled);
+    auto instance = document->instantiate(pCompiled);
 
     EXPECT_FALSE(instance->hasIssues());
 
@@ -154,7 +154,7 @@ void runOdeModel(bool pCompiled)
 
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
-    instance = document->createInstance(pCompiled);
+    instance = document->instantiate(pCompiled);
 
     instance->run();
 
@@ -184,7 +184,7 @@ TEST(InstanceSedTest, odeModelWithNoOdeSolver)
 
     document->simulations()[0]->setOdeSolver(nullptr);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -205,13 +205,13 @@ TEST(InstanceSedTest, nlaModel)
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    instance = document->createInstance();
+    instance = document->instantiate();
 
     EXPECT_FALSE(instance->hasIssues());
 }
@@ -227,7 +227,7 @@ TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 
     document->simulations()[0]->setNlaSolver(nullptr);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -248,7 +248,7 @@ TEST(InstanceSedTest, daeModel)
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 
@@ -258,7 +258,7 @@ TEST(InstanceSedTest, daeModel)
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
-    instance = document->createInstance();
+    instance = document->instantiate();
 
     instance->run();
 
@@ -279,7 +279,7 @@ TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
@@ -288,7 +288,7 @@ TEST(InstanceSedTest, combineArchive)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     instance->run();
 
@@ -300,7 +300,7 @@ TEST(InstanceSedTest, combineArchiveWithCellmlFileAsMasterFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/cellml_file_as_master_file.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_FALSE(instance->hasIssues());
 }

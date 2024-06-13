@@ -36,7 +36,7 @@ def test_step_value_with_invalid_number():
 
     simulation.ode_solver = solver
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
