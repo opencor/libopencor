@@ -192,6 +192,15 @@ TEST(CoverageSedTest, nlaSolver)
     EXPECT_EQ(simulation->nlaSolver(), nullptr);
 }
 
+TEST(CoverageSedTest, sedBase)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = libOpenCOR::SedOneStep::create(document);
+
+    EXPECT_EQ(simulation->id(), "simulation2");
+}
+
 TEST(CoverageSedTest, sedOneStep)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));

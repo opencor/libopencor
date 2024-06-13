@@ -45,4 +45,14 @@ const SedBase::Impl *SedBase::pimpl() const
     return static_cast<const Impl *>(Logger::pimpl());
 }
 
+std::string SedBase::id() const
+{
+    return pimpl()->mId;
+}
+
+void SedBase::setId(const std::string &pId)
+{
+    pimpl()->mId = pId;
+}
+
 } // namespace libOpenCOR

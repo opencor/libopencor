@@ -42,6 +42,26 @@ public:
     SedBase &operator=(const SedBase &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SedBase &operator=(SedBase &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
+    /**
+     * @brief Get the id.
+     *
+     * Get the id.
+     *
+     * @return The id as a @c std::string.
+     */
+
+    std::string id() const;
+
+    /**
+     * @brief Set the id.
+     *
+     * Set the id.
+     *
+     * @param pId The id as a @c std::string.
+     */
+
+    void setId(const std::string &pId);
+
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

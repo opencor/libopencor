@@ -63,20 +63,26 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
                                mLocation + fileNameOrUrl :
                                fileNameOrUrl;
         auto file = fileManager.file(modelSource);
+        SedModelPtr model;
 
         if (file != nullptr) {
-            pDocument->addModel(SedModel::create(pDocument, file));
+            model = SedModel::create(pDocument, file);
         } else {
             addWarning("The model '" + source + "' could not be found. It has been automatically added, but it is empty.");
 
-            pDocument->addModel(SedModel::create(pDocument, File::create(modelSource)));
+            model = SedModel::create(pDocument, File::create(modelSource));
         }
+
+        model->setId(mDocument->getModel(i)->getId());
+
+        pDocument->addModel(model);
     }
 
     // Populate the simulations.
 
     for (unsigned int i = 0; i < mDocument->getNumSimulations(); ++i) {
         auto *sedSimulation = mDocument->getSimulation(i);
+        SedSimulationPtr simulation;
 
 #ifndef CODE_COVERAGE_ENABLED
         if (sedSimulation->isSedUniformTimeCourse()) {
@@ -89,7 +95,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             uniformTimeCourse->setOutputEndTime(sedUniformTimeCourse->getOutputEndTime());
             uniformTimeCourse->setNumberOfSteps(sedUniformTimeCourse->getNumberOfSteps());
 
-            pDocument->addSimulation(uniformTimeCourse);
+            simulation = uniformTimeCourse;
 #ifndef CODE_COVERAGE_ENABLED
         } else if (sedSimulation->isSedOneStep()) {
             auto *sedOneStep = reinterpret_cast<libsedml::SedOneStep *>(sedSimulation);
@@ -97,23 +103,27 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
             (void)sedOneStep;
 
-            pDocument->addSimulation(oneStep);
+            simulation = oneStep;
         } else if (sedSimulation->isSedSteadyState()) {
             auto *sedSteadyState = reinterpret_cast<libsedml::SedSteadyState *>(sedSimulation);
             auto steadyState = SedSteadyState::create(pDocument);
 
             (void)sedSteadyState;
 
-            pDocument->addSimulation(steadyState);
+            simulation = steadyState;
         } else { // SedAnalysis.
             auto *sedAnalysis = reinterpret_cast<libsedml::SedAnalysis *>(sedSimulation);
             auto analysis = SedAnalysis::create(pDocument);
 
             (void)sedAnalysis;
 
-            pDocument->addSimulation(analysis);
+            simulation = analysis;
         }
 #endif
+
+        simulation->setId(sedSimulation->getId());
+
+        pDocument->addSimulation(simulation);
     }
 }
 

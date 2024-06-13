@@ -475,7 +475,7 @@ TEST(SerialiseSedTest, sedmlFile)
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
                                                      "  <listOfModels>\n"
-                                                     "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
+                                                     "    <model id=\"model\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
                                                      "  <listOfSimulations>\n"
                                                      "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"50\" numberOfSteps=\"50000\"/>\n"

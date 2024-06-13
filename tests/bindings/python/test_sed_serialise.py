@@ -520,7 +520,7 @@ def test_sedml_file():
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
+    <model id="model" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
   <listOfSimulations>
     <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"50\" numberOfSteps=\"50000\"/>
