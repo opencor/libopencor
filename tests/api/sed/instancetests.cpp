@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <libopencor>
 
-TEST(RunSedTest, noFile)
+TEST(InstanceSedTest, noFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The simulation experiment description does not contain any tasks to run."},
@@ -32,7 +32,7 @@ TEST(RunSedTest, noFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedTest, invalidCellmlFile)
+TEST(InstanceSedTest, invalidCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is invalid."},
@@ -46,7 +46,7 @@ TEST(RunSedTest, invalidCellmlFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedTest, overconstrainedCellmlFile)
+TEST(InstanceSedTest, overconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is overconstrained."},
@@ -60,7 +60,7 @@ TEST(RunSedTest, overconstrainedCellmlFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedTest, underconstrainedCellmlFile)
+TEST(InstanceSedTest, underconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is underconstrained."},
@@ -74,7 +74,7 @@ TEST(RunSedTest, underconstrainedCellmlFile)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedTest, unsuitablyConstrainedCellmlFile)
+TEST(InstanceSedTest, unsuitablyConstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is unsuitably constrained."},
@@ -104,12 +104,12 @@ void runAlgebraicModel(bool pCompiled)
 
 } // namespace
 
-TEST(RunSedTest, compiledAlgebraicModel)
+TEST(InstanceSedTest, compiledAlgebraicModel)
 {
     runAlgebraicModel(true);
 }
 
-TEST(RunSedTest, interpretedAlgebraicModel)
+TEST(InstanceSedTest, interpretedAlgebraicModel)
 {
     runAlgebraicModel(false);
 }
@@ -163,17 +163,17 @@ void runOdeModel(bool pCompiled)
 
 } // namespace
 
-TEST(RunSedTest, compiledOdeModel)
+TEST(InstanceSedTest, compiledOdeModel)
 {
     runOdeModel(true);
 }
 
-TEST(RunSedTest, interpretedOdeModel)
+TEST(InstanceSedTest, interpretedOdeModel)
 {
     runOdeModel(false);
 }
 
-TEST(RunSedTest, odeModelWithNoOdeSolver)
+TEST(InstanceSedTest, odeModelWithNoOdeSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
@@ -189,7 +189,7 @@ TEST(RunSedTest, odeModelWithNoOdeSolver)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedTest, nlaModel)
+TEST(InstanceSedTest, nlaModel)
 {
     //---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
 
@@ -216,7 +216,7 @@ TEST(RunSedTest, nlaModel)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(RunSedTest, nlaModelWithNoNlaSolver)
+TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
@@ -232,7 +232,7 @@ TEST(RunSedTest, nlaModelWithNoNlaSolver)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedTest, daeModel)
+TEST(InstanceSedTest, daeModel)
 {
     //---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
 
@@ -265,7 +265,7 @@ TEST(RunSedTest, daeModel)
     EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(RunSedTest, daeModelWithNoOdeOrNlaSolver)
+TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
@@ -284,7 +284,7 @@ TEST(RunSedTest, daeModelWithNoOdeOrNlaSolver)
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 }
 
-TEST(RunSedTest, combineArchive)
+TEST(InstanceSedTest, combineArchive)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
     auto document = libOpenCOR::SedDocument::create(file);
@@ -296,7 +296,7 @@ TEST(RunSedTest, combineArchive)
     // EXPECT_FALSE(instance->hasIssues());
 }
 
-TEST(RunSedTest, combineArchiveWithCellmlFileAsMasterFile)
+TEST(InstanceSedTest, combineArchiveWithCellmlFileAsMasterFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/cellml_file_as_master_file.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
