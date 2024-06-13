@@ -112,6 +112,12 @@ void sedApi(py::module_ &m)
     sedSimulation.def_property("ode_solver", &libOpenCOR::SedSimulation::odeSolver, &libOpenCOR::SedSimulation::setOdeSolver, "The ODE solver for the SedSimulation object.")
         .def_property("nla_solver", &libOpenCOR::SedSimulation::nlaSolver, &libOpenCOR::SedSimulation::setNlaSolver, "The NLA solver for the SedSimulation object.");
 
+    // SedAnalysis API.
+
+    py::class_<libOpenCOR::SedAnalysis, libOpenCOR::SedSimulation, libOpenCOR::SedAnalysisPtr> sedAnalysis(m, "SedAnalysis");
+
+    sedAnalysis.def(py::init(&libOpenCOR::SedAnalysis::create), "Create a SedAnalysis object.", py::arg("document"));
+
     // SedOneStep API.
 
     py::class_<libOpenCOR::SedOneStep, libOpenCOR::SedSimulation, libOpenCOR::SedOneStepPtr> sedOneStep(m, "SedOneStep");

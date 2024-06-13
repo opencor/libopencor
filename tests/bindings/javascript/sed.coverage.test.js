@@ -94,20 +94,32 @@ describe("Sed coverage tests", () => {
     expect(document.addSimulation(null)).toBe(false);
 
     const uniform_time_course = new libopencor.SedUniformTimeCourse(document);
+    const one_step = new libopencor.SedOneStep(document);
     const steady_state = new libopencor.SedSteadyState(document);
+    const analysis = new libopencor.SedAnalysis(document);
 
     expect(document.addSimulation(uniform_time_course)).toBe(true);
+    expect(document.addSimulation(one_step)).toBe(true);
     expect(document.addSimulation(steady_state)).toBe(true);
+    expect(document.addSimulation(analysis)).toBe(true);
 
-    expect(document.simulations().size()).toBe(2);
+    expect(document.simulations().size()).toBe(4);
     expect(document.simulations().get(0)).toStrictEqual(uniform_time_course);
-    expect(document.simulations().get(1)).toStrictEqual(steady_state);
+    expect(document.simulations().get(1)).toStrictEqual(one_step);
+    expect(document.simulations().get(2)).toStrictEqual(steady_state);
+    expect(document.simulations().get(3)).toStrictEqual(analysis);
 
     expect(document.addSimulation(uniform_time_course)).toBe(false);
     expect(document.removeSimulation(uniform_time_course)).toBe(true);
 
+    expect(document.addSimulation(one_step)).toBe(false);
+    expect(document.removeSimulation(one_step)).toBe(true);
+
     expect(document.addSimulation(steady_state)).toBe(false);
     expect(document.removeSimulation(steady_state)).toBe(true);
+
+    expect(document.addSimulation(analysis)).toBe(false);
+    expect(document.removeSimulation(analysis)).toBe(true);
 
     expect(document.hasSimulations()).toBe(false);
 

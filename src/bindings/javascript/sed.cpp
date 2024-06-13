@@ -113,6 +113,11 @@ void sedApi()
         .function("nlaSolver", &libOpenCOR::SedSimulation::nlaSolver)
         .function("setNlaSolver", &libOpenCOR::SedSimulation::setNlaSolver);
 
+    // SedAnalysis API.
+
+    emscripten::class_<libOpenCOR::SedAnalysis, emscripten::base<libOpenCOR::SedSimulation>>("SedAnalysis")
+        .smart_ptr_constructor("SedAnalysis", &libOpenCOR::SedAnalysis::create);
+
     // SedOneStep API.
 
     emscripten::class_<libOpenCOR::SedOneStep, emscripten::base<libOpenCOR::SedSimulation>>("SedOneStep")

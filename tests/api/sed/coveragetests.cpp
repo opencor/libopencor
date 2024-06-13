@@ -61,20 +61,32 @@ TEST(CoverageSedTest, simulations)
     EXPECT_FALSE(document->addSimulation(nullptr));
 
     auto uniformTimeCourse = libOpenCOR::SedUniformTimeCourse::create(document);
+    auto oneStep = libOpenCOR::SedOneStep::create(document);
     auto steadyState = libOpenCOR::SedSteadyState::create(document);
+    auto analysis = libOpenCOR::SedAnalysis::create(document);
 
     EXPECT_TRUE(document->addSimulation(uniformTimeCourse));
+    EXPECT_TRUE(document->addSimulation(oneStep));
     EXPECT_TRUE(document->addSimulation(steadyState));
+    EXPECT_TRUE(document->addSimulation(analysis));
 
-    EXPECT_EQ(document->simulations().size(), 2);
+    EXPECT_EQ(document->simulations().size(), 4);
     EXPECT_EQ(document->simulations()[0], uniformTimeCourse);
-    EXPECT_EQ(document->simulations()[1], steadyState);
+    EXPECT_EQ(document->simulations()[1], oneStep);
+    EXPECT_EQ(document->simulations()[2], steadyState);
+    EXPECT_EQ(document->simulations()[3], analysis);
 
     EXPECT_FALSE(document->addSimulation(uniformTimeCourse));
     EXPECT_TRUE(document->removeSimulation(uniformTimeCourse));
 
+    EXPECT_FALSE(document->addSimulation(oneStep));
+    EXPECT_TRUE(document->removeSimulation(oneStep));
+
     EXPECT_FALSE(document->addSimulation(steadyState));
     EXPECT_TRUE(document->removeSimulation(steadyState));
+
+    EXPECT_FALSE(document->addSimulation(analysis));
+    EXPECT_TRUE(document->removeSimulation(analysis));
 
     EXPECT_FALSE(document->hasSimulations());
 

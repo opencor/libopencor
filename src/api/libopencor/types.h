@@ -37,6 +37,9 @@ using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @
 class SedAbstractTask;
 using SedAbstractTaskPtr = std::shared_ptr<SedAbstractTask>; /**< Type definition for the shared @ref SedAbstractTask pointer. */
 
+class SedAnalysis;
+using SedAnalysisPtr = std::shared_ptr<SedAnalysis>; /**< Type definition for the shared @ref SedAnalysis pointer. */
+
 class SedBase;
 using SedBasePtr = std::shared_ptr<SedBase>; /**< Type definition for the shared @ref SedBase pointer. */
 

@@ -138,6 +138,12 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
     for (const auto &model : models) {
         addModel(SedModel::create(pOwner, model));
     }
+
+    // Add the simulations.
+
+    for (const auto &simulation : sedmlFile->simulations(pOwner)) {
+        addSimulation(simulation);
+    }
 }
 
 void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)

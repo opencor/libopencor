@@ -477,6 +477,9 @@ TEST(SerialiseSedTest, sedmlFile)
                                                      "  <listOfModels>\n"
                                                      "    <model id=\"model1\" language=\"urn:sedml:language:cellml\" source=\"cellml_2.cellml\"/>\n"
                                                      "  </listOfModels>\n"
+                                                     "  <listOfSimulations>\n"
+                                                     "    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"50\" numberOfSteps=\"50000\"/>\n"
+                                                     "  </listOfSimulations>\n"
                                                      "</sedML>\n";
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));

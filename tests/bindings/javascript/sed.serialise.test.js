@@ -693,6 +693,9 @@ describe("Sed serialise tests", () => {
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
   </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id=\"simulation1\" initialTime=\"0\" outputStartTime=\"0\" outputEndTime=\"50\" numberOfSteps=\"50000\"/>
+  </listOfSimulations>
 </sedML>
 `;
 

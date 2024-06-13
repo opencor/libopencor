@@ -16,6 +16,7 @@
 from libopencor import (
     File,
     Issue,
+    SedAnalysis,
     SedDocument,
     SedModel,
     SedOneStep,
@@ -72,20 +73,32 @@ def test_simulations():
     assert document.add_simulation(None) == False
 
     uniformTimeCourse = SedUniformTimeCourse(document)
+    oneStep = SedOneStep(document)
     steadyState = SedSteadyState(document)
+    analysis = SedAnalysis(document)
 
     assert document.add_simulation(uniformTimeCourse) == True
+    assert document.add_simulation(oneStep) == True
     assert document.add_simulation(steadyState) == True
+    assert document.add_simulation(analysis) == True
 
-    assert len(document.simulations) == 2
+    assert len(document.simulations) == 4
     assert document.simulations[0] == uniformTimeCourse
-    assert document.simulations[1] == steadyState
+    assert document.simulations[1] == oneStep
+    assert document.simulations[2] == steadyState
+    assert document.simulations[3] == analysis
 
     assert document.add_simulation(uniformTimeCourse) == False
     assert document.remove_simulation(uniformTimeCourse) == True
 
+    assert document.add_simulation(oneStep) == False
+    assert document.remove_simulation(oneStep) == True
+
     assert document.add_simulation(steadyState) == False
     assert document.remove_simulation(steadyState) == True
+
+    assert document.add_simulation(analysis) == False
+    assert document.remove_simulation(analysis) == True
 
     assert document.has_simulations == False
 
