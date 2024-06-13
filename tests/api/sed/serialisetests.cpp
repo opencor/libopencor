@@ -180,7 +180,7 @@ TEST(SerialiseSedTest, relativeRemoteCellmlFileWithBasePath)
     EXPECT_EQ(document->serialise(std::string(libOpenCOR::REMOTE_BASE_PATH).append("/../..")), cvodeExpectedSerialisation("tests/res/cellml_2.cellml"));
 }
 
-TEST(ModelTypeSedDocumentTest, daeModel)
+TEST(SerialiseSedTest, daeModel)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
@@ -225,7 +225,7 @@ TEST(ModelTypeSedDocumentTest, daeModel)
     EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
 }
 
-TEST(ModelTypeSedDocumentTest, nlaModel)
+TEST(SerialiseSedTest, nlaModel)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
@@ -233,7 +233,7 @@ TEST(ModelTypeSedDocumentTest, nlaModel)
     EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation());
 }
 
-TEST(ModelTypeSedDocumentTest, algebraicModel)
+TEST(SerialiseSedTest, algebraicModel)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
@@ -392,7 +392,7 @@ TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
     EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000481", "false"}}));
 }
 
-TEST(ModelTypeSedDocumentTest, kinsolWithBandedLinearSolver)
+TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
@@ -404,7 +404,7 @@ TEST(ModelTypeSedDocumentTest, kinsolWithBandedLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation({{"KISAO:0000477", "Banded"}}));
 }
 
-TEST(ModelTypeSedDocumentTest, kinsolWithGmresLinearSolver)
+TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
@@ -416,7 +416,7 @@ TEST(ModelTypeSedDocumentTest, kinsolWithGmresLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation({{"KISAO:0000477", "GMRES"}}));
 }
 
-TEST(ModelTypeSedDocumentTest, kinsolWithBicgstabLinearSolver)
+TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
@@ -428,7 +428,7 @@ TEST(ModelTypeSedDocumentTest, kinsolWithBicgstabLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation({{"KISAO:0000477", "BiCGStab"}}));
 }
 
-TEST(ModelTypeSedDocumentTest, kinsolWithTfmqrLinearSolver)
+TEST(SerialiseSedTest, kinsolWithTfmqrLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
@@ -440,7 +440,7 @@ TEST(ModelTypeSedDocumentTest, kinsolWithTfmqrLinearSolver)
     EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation({{"KISAO:0000477", "TFQMR"}}));
 }
 
-TEST(ModelTypeSedDocumentTest, oneStepSimulation)
+TEST(SerialiseSedTest, oneStepSimulation)
 {
     static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
                                                      "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
