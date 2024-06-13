@@ -24,12 +24,6 @@ limitations under the License.
 
 #include "utils.h"
 
-#include "libopencor/sedsteadystate.h"
-#include "libopencor/seduniformtimecourse.h"
-#include "libopencor/solvercvode.h"
-#include "libopencor/solverkinsol.h"
-
-#include <algorithm>
 #include <sstream>
 
 namespace libOpenCOR {
@@ -88,68 +82,20 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
 
 void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    // Add a model for the given CellML file.
-
-    auto model = SedModel::create(pOwner, pFile);
-
-    addModel(model);
-
-    // Add a uniform time course simulation in the case of an ODE/DAE model while a steady state simulation in the case
-    // of an algebraic or NLA model.
-
-    SedSimulationPtr simulation;
-    auto cellmlFileType = pFile->pimpl()->mCellmlFile->type();
-
-    if ((cellmlFileType == libcellml::AnalyserModel::Type::ODE)
-        || (cellmlFileType == libcellml::AnalyserModel::Type::DAE)) {
-        simulation = SedUniformTimeCourse::create(pOwner);
-    } else {
-        simulation = SedSteadyState::create(pOwner);
-    }
-
-    addSimulation(simulation);
-
-    // Add the required solver(s) depending on the type of our model.
-
-    if (cellmlFileType == libcellml::AnalyserModel::Type::ODE) {
-        simulation->setOdeSolver(SolverCvode::create());
-    } else if (cellmlFileType == libcellml::AnalyserModel::Type::NLA) {
-        simulation->setNlaSolver(SolverKinsol::create());
-    } else if (cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
-        simulation->setOdeSolver(SolverCvode::create());
-        simulation->setNlaSolver(SolverKinsol::create());
-    }
-
-    // Add a task.
-
-    addTask(SedTask::create(pOwner, model, simulation));
+    pFile->pimpl()->mCellmlFile->populateDocument(pOwner);
 }
 
 void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    // Add the models.
-    // Note: if a model was not found, then add an empty version of it (see SedmlFile::Impl::models()).
-
     auto sedmlFile = pFile->pimpl()->mSedmlFile;
-    auto models = sedmlFile->models();
+
+    sedmlFile->populateDocument(pOwner);
 
     addIssues(sedmlFile);
-
-    for (const auto &model : models) {
-        addModel(SedModel::create(pOwner, model));
-    }
-
-    // Add the simulations.
-
-    for (const auto &simulation : sedmlFile->simulations(pOwner)) {
-        addSimulation(simulation);
-    }
 }
 
 void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    // Initialise ourselves using the master file, if available and possible.
-
     auto masterFile = pFile->pimpl()->mCombineArchive->masterFile();
 
     if (masterFile == nullptr) {

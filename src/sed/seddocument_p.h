@@ -44,7 +44,7 @@ public:
     std::string uniqueId(const std::string &pPrefix);
 
     void initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile);
-    void initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
+    static void initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
     void initialiseFromSedmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
     void initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile);
 

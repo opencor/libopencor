@@ -21,6 +21,8 @@ limitations under the License.
 
 #include "libopencor/file.h"
 #include "libopencor/sedanalysis.h"
+#include "libopencor/seddocument.h"
+#include "libopencor/sedmodel.h"
 #include "libopencor/sedonestep.h"
 #include "libopencor/sedsteadystate.h"
 #include "libopencor/seduniformtimecourse.h"
@@ -46,13 +48,12 @@ SedmlFile::Impl::~Impl()
     delete mDocument;
 }
 
-std::vector<FilePtr> SedmlFile::Impl::models()
+void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 {
-    // Retrieve the models.
+    // Populate the models.
 
     removeAllIssues();
 
-    std::vector<FilePtr> res;
     auto fileManager = FileManager::instance();
 
     for (unsigned int i = 0; i < mDocument->getNumModels(); ++i) {
@@ -64,22 +65,15 @@ std::vector<FilePtr> SedmlFile::Impl::models()
         auto file = fileManager.file(modelSource);
 
         if (file != nullptr) {
-            res.push_back(file);
+            pDocument->addModel(SedModel::create(pDocument, file));
         } else {
             addWarning("The model '" + source + "' could not be found. It has been automatically added, but it is empty.");
 
-            res.push_back(File::create(modelSource));
+            pDocument->addModel(SedModel::create(pDocument, File::create(modelSource)));
         }
     }
 
-    return res;
-}
-
-std::vector<SedSimulationPtr> SedmlFile::Impl::simulations(const SedDocumentPtr &pOwner) const
-{
-    // Retrieve the simulations.
-
-    std::vector<SedSimulationPtr> res;
+    // Populate the simulations.
 
     for (unsigned int i = 0; i < mDocument->getNumSimulations(); ++i) {
         auto *sedSimulation = mDocument->getSimulation(i);
@@ -88,41 +82,39 @@ std::vector<SedSimulationPtr> SedmlFile::Impl::simulations(const SedDocumentPtr 
         if (sedSimulation->isSedUniformTimeCourse()) {
 #endif
             auto *sedUniformTimeCourse = reinterpret_cast<libsedml::SedUniformTimeCourse *>(sedSimulation);
-            auto uniformTimeCourse = SedUniformTimeCourse::create(pOwner);
+            auto uniformTimeCourse = SedUniformTimeCourse::create(pDocument);
 
             uniformTimeCourse->setInitialTime(sedUniformTimeCourse->getInitialTime());
             uniformTimeCourse->setOutputStartTime(sedUniformTimeCourse->getOutputStartTime());
             uniformTimeCourse->setOutputEndTime(sedUniformTimeCourse->getOutputEndTime());
             uniformTimeCourse->setNumberOfSteps(sedUniformTimeCourse->getNumberOfSteps());
 
-            res.push_back(uniformTimeCourse);
+            pDocument->addSimulation(uniformTimeCourse);
 #ifndef CODE_COVERAGE_ENABLED
         } else if (sedSimulation->isSedOneStep()) {
             auto *sedOneStep = reinterpret_cast<libsedml::SedOneStep *>(sedSimulation);
-            auto oneStep = SedOneStep::create(pOwner);
+            auto oneStep = SedOneStep::create(pDocument);
 
             (void)sedOneStep;
 
-            res.push_back(oneStep);
+            pDocument->addSimulation(oneStep);
         } else if (sedSimulation->isSedSteadyState()) {
             auto *sedSteadyState = reinterpret_cast<libsedml::SedSteadyState *>(sedSimulation);
-            auto steadyState = SedSteadyState::create(pOwner);
+            auto steadyState = SedSteadyState::create(pDocument);
 
             (void)sedSteadyState;
 
-            res.push_back(steadyState);
+            pDocument->addSimulation(steadyState);
         } else { // SedAnalysis.
             auto *sedAnalysis = reinterpret_cast<libsedml::SedAnalysis *>(sedSimulation);
-            auto analysis = SedAnalysis::create(pOwner);
+            auto analysis = SedAnalysis::create(pDocument);
 
             (void)sedAnalysis;
 
-            res.push_back(analysis);
+            pDocument->addSimulation(analysis);
         }
 #endif
     }
-
-    return res;
 }
 
 SedmlFile::SedmlFile(const FilePtr &pFile, libsedml::SedDocument *pDocument)
@@ -140,10 +132,12 @@ SedmlFile::Impl *SedmlFile::pimpl()
     return static_cast<Impl *>(Logger::pimpl());
 }
 
+/*---GRY---
 const SedmlFile::Impl *SedmlFile::pimpl() const
 {
     return static_cast<const Impl *>(Logger::pimpl());
 }
+*/
 
 SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 {
@@ -171,14 +165,9 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
     return nullptr;
 }
 
-std::vector<FilePtr> SedmlFile::models()
+void SedmlFile::populateDocument(const SedDocumentPtr &pDocument)
 {
-    return pimpl()->models();
-}
-
-std::vector<SedSimulationPtr> SedmlFile::simulations(const SedDocumentPtr &pOwner) const
-{
-    return pimpl()->simulations(pOwner);
+    pimpl()->populateDocument(pDocument);
 }
 
 } // namespace libOpenCOR

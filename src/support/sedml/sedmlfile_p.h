@@ -32,8 +32,7 @@ public:
     explicit Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument);
     ~Impl();
 
-    std::vector<FilePtr> models();
-    std::vector<SedSimulationPtr> simulations(const SedDocumentPtr &pOwner) const;
+    void populateDocument(const SedDocumentPtr &pDocument);
 };
 
 } // namespace libOpenCOR

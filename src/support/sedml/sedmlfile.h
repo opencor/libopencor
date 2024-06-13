@@ -43,8 +43,7 @@ public:
 
     static SedmlFilePtr create(const FilePtr &pFile);
 
-    std::vector<FilePtr> models();
-    std::vector<SedSimulationPtr> simulations(const SedDocumentPtr &pOwner) const;
+    void populateDocument(const SedDocumentPtr &pDocument);
 
 private:
     class Impl;

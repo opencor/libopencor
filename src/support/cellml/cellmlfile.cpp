@@ -16,15 +16,22 @@ limitations under the License.
 
 #include "cellmlfile_p.h"
 
-#include "cellmlfileruntime.h"
 #include "utils.h"
 
 #include "libopencor/file.h"
+#include "libopencor/seddocument.h"
+#include "libopencor/sedmodel.h"
+#include "libopencor/sedsteadystate.h"
+#include "libopencor/sedtask.h"
+#include "libopencor/seduniformtimecourse.h"
+#include "libopencor/solvercvode.h"
+#include "libopencor/solverkinsol.h"
 
 namespace libOpenCOR {
 
 CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
-    : mModel(pModel)
+    : mFile(pFile)
+    , mModel(pModel)
 {
     // Resolve imports and flatten the model, if needed and possible.
 
@@ -60,6 +67,45 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
         addError("Only CellML files describing either an algebraic model or an ODE model are currently supported.");
     }
 #endif
+}
+
+void CellmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument) const
+{
+    // Add a model.
+
+    auto model = SedModel::create(pDocument, mFile.lock());
+
+    pDocument->addModel(model);
+
+    // Add a uniform time course simulation in the case of an ODE/DAE model while a steady state simulation in the case
+    // of an algebraic or NLA model.
+
+    SedSimulationPtr simulation;
+    auto type = mAnalyserModel->type();
+
+    if ((type == libcellml::AnalyserModel::Type::ODE)
+        || (type == libcellml::AnalyserModel::Type::DAE)) {
+        simulation = SedUniformTimeCourse::create(pDocument);
+    } else {
+        simulation = SedSteadyState::create(pDocument);
+    }
+
+    pDocument->addSimulation(simulation);
+
+    // Add the required solver(s) depending on the type of our model.
+
+    if (type == libcellml::AnalyserModel::Type::ODE) {
+        simulation->setOdeSolver(SolverCvode::create());
+    } else if (type == libcellml::AnalyserModel::Type::NLA) {
+        simulation->setNlaSolver(SolverKinsol::create());
+    } else if (type == libcellml::AnalyserModel::Type::DAE) {
+        simulation->setOdeSolver(SolverCvode::create());
+        simulation->setNlaSolver(SolverKinsol::create());
+    }
+
+    // Add a task.
+
+    pDocument->addTask(SedTask::create(pDocument, model, simulation));
 }
 
 CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
@@ -112,6 +158,11 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     }
 
     return nullptr;
+}
+
+void CellmlFile::populateDocument(const SedDocumentPtr &pDocument)
+{
+    pimpl()->populateDocument(pDocument);
 }
 
 libcellml::AnalyserModel::Type CellmlFile::type() const
