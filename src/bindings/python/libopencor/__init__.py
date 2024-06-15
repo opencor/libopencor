@@ -16,6 +16,7 @@ from .module import __doc__, __version__
 from .module import (
     # File API.
     File,
+    FileManager,
     # Issue API.
     Issue,
     # Logger API.
@@ -69,6 +70,7 @@ from .module import (
 __all__ = (
     # File API.
     "File",
+    "FileManager",
     # Issue API.
     "Issue",
     # Logger API.

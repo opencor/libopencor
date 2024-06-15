@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "filemanager.h"
+#include "libopencor/filemanager.h"
 
 #include <vector>
 
@@ -34,6 +34,8 @@ public:
     void manage(File *pFile);
     void unmanage(File *pFile);
 
+    bool hasFiles() const;
+    FilePtrs files() const;
     FilePtr file(const std::string &pFileNameOrUrl) const;
 };
 

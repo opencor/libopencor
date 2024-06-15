@@ -118,6 +118,7 @@ using SolverSecondOrderRungeKuttaPtr = std::shared_ptr<SolverSecondOrderRungeKut
 // Vectors.
 
 using Doubles = std::vector<double>; /**< Type definition for a vector of doubles. */
+using FilePtrs = std::vector<FilePtr>; /**< Type definition for a vector of @ref File pointers. */
 using IssuePtrs = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
 using SedAbstractTaskPtrs = std::vector<SedAbstractTaskPtr>; /**< Type definition for a vector of @ref SedAbstractTask pointers. */
 using SedDataDescriptionPtrs = std::vector<SedDataDescriptionPtr>; /**< Type definition for a vector of @ref SedDataDescription pointers. */

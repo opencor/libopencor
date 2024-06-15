@@ -52,4 +52,12 @@ void fileApi()
 
         delete Module["File.Type"];
     });
+
+    // FileManager API.
+
+    emscripten::class_<libOpenCOR::FileManager>("FileManager")
+        .class_function("instance", &libOpenCOR::FileManager::instance)
+        .function("hasFiles", &libOpenCOR::FileManager::hasFiles)
+        .function("files", &libOpenCOR::FileManager::files)
+        .function("file", &libOpenCOR::FileManager::file);
 }

@@ -89,6 +89,22 @@ void FileManager::Impl::unmanage(File *pFile)
 #endif
 }
 
+bool FileManager::Impl::hasFiles() const
+{
+    return !mFiles.empty();
+}
+
+FilePtrs FileManager::Impl::files() const
+{
+    FilePtrs res;
+
+    for (const auto &file : mFiles) {
+        res.push_back(file->shared_from_this());
+    }
+
+    return res;
+}
+
 FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 {
 #if __clang_major__ < 16
@@ -123,14 +139,14 @@ FileManager::FileManager()
 {
 }
 
-void FileManager::manage(File *pFile)
+bool FileManager::hasFiles() const
 {
-    mPimpl.manage(pFile);
+    return mPimpl.hasFiles();
 }
 
-void FileManager::unmanage(File *pFile)
+FilePtrs FileManager::files() const
 {
-    mPimpl.unmanage(pFile);
+    return mPimpl.files();
 }
 
 FilePtr FileManager::file(const std::string &pFileNameOrUrl) const

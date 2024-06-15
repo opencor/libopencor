@@ -27,6 +27,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     // Vectors.
 
     emscripten::register_vector<double>("Doubles");
+    emscripten::register_vector<libOpenCOR::FilePtr>("FilePtrs");
     emscripten::register_vector<libOpenCOR::IssuePtr>("IssuePtrs");
     emscripten::register_vector<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTaskPtrs");
     emscripten::register_vector<libOpenCOR::SedDataDescriptionPtr>("SedDataDescriptionPtrs");

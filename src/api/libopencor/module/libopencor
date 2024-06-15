@@ -17,6 +17,7 @@ limitations under the License.
 #pragma once
 
 #include "libopencor/file.h"
+#include "libopencor/filemanager.h"
 #include "libopencor/issue.h"
 #include "libopencor/logger.h"
 #include "libopencor/sedabstracttask.h"

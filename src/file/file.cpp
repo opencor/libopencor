@@ -16,9 +16,10 @@ limitations under the License.
 
 #include "file_p.h"
 
+#include "filemanager_p.h"
+
 #include "cellmlfile.h"
 #include "combinearchive.h"
-#include "filemanager.h"
 #include "sedmlfile.h"
 #include "utils.h"
 
@@ -162,7 +163,7 @@ File::~File()
 {
     // Have ourselves unmanaged.
 
-    FileManager::instance().unmanage(this);
+    FileManager::instance().mPimpl.unmanage(this);
 
     delete pimpl();
 }
@@ -193,7 +194,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
 
     res->pimpl()->checkType(res);
 
-    fileManager.manage(res.get());
+    fileManager.mPimpl.manage(res.get());
 
     return res;
 }

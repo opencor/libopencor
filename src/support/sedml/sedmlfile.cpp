@@ -16,10 +16,10 @@ limitations under the License.
 
 #include "sedmlfile_p.h"
 
-#include "filemanager.h"
 #include "utils.h"
 
 #include "libopencor/file.h"
+#include "libopencor/filemanager.h"
 #include "libopencor/sedanalysis.h"
 #include "libopencor/seddocument.h"
 #include "libopencor/sedmodel.h"

@@ -84,4 +84,28 @@ describe("File basic tests", () => {
 
     file.delete();
   });
+
+  test("File manager", () => {
+    const fileManager = libopencor.FileManager.instance();
+
+    expect(fileManager.hasFiles()).toBe(false);
+    expect(fileManager.files().size()).toBe(0);
+    expect(fileManager.file(utils.LOCAL_FILE)).toStrictEqual(null);
+
+    const localFile = new libopencor.File(utils.LOCAL_FILE);
+    const sameFileManager = libopencor.FileManager.instance();
+
+    expect(sameFileManager.hasFiles()).toBe(true);
+    expect(sameFileManager.files().size()).toBe(1);
+    expect(sameFileManager.file(utils.LOCAL_FILE)).toStrictEqual(localFile);
+
+    const remoteFile = new libopencor.File(utils.REMOTE_FILE);
+
+    expect(fileManager.hasFiles()).toBe(true);
+    expect(fileManager.files().size()).toBe(2);
+    expect(fileManager.file(utils.REMOTE_FILE)).toStrictEqual(remoteFile);
+
+    localFile.delete();
+    remoteFile.delete();
+  });
 });
