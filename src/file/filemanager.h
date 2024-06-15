@@ -16,8 +16,6 @@ limitations under the License.
 
 #pragma once
 
-#include "utils.h"
-
 #include "libopencor/file.h"
 
 #include <vector>

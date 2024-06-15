@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "filemanager_p.h"
 
+#include "utils.h"
+
 #include <algorithm>
 
 // #define PRINT_MANAGED_FILES

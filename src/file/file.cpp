@@ -20,6 +20,7 @@ limitations under the License.
 #include "combinearchive.h"
 #include "filemanager.h"
 #include "sedmlfile.h"
+#include "utils.h"
 
 #include <filesystem>
 
