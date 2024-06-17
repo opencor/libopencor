@@ -15,12 +15,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - name: 'Windows static library'
-          #   os: windows-latest
-          #   shared_libs: OFF
-          # - name: 'Windows shared library'
-          #   os: windows-latest
-          #   shared_libs: ON
+          - name: 'Windows static library'
+            os: windows-latest
+            shared_libs: OFF
+          - name: 'Windows shared library'
+            os: windows-latest
+            shared_libs: ON
           - name: 'Linux static library'
             os: ubuntu-latest
             shared_libs: OFF
@@ -87,8 +87,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - name: 'Windows Python wheels'
-          #   os: windows-latest
+          - name: 'Windows Python wheels'
+            os: windows-latest
           - name: 'Linux Python wheels'
             os: ubuntu-latest
           - name: 'macOS Python wheels (Intel)'
