@@ -19,12 +19,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - name: 'Windows release'
-          #   os: windows-latest
-          #   build_type: Release
-          # - name: 'Windows debug'
-          #   os: windows-latest
-          #   build_type: Debug
+          - name: 'Windows release'
+            os: windows-latest
+            build_type: Release
+          - name: 'Windows debug'
+            os: windows-latest
+            build_type: Debug
           - name: 'Linux'
             os: ubuntu-20.04
             # Note: we must use ubuntu-20.04 rather than ubuntu-latest (i.e. ubuntu-22.04 at this stage). Indeed,
