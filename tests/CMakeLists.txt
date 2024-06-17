@@ -227,15 +227,8 @@ endif()
 # Run our memory checks.
 
 if(LIBOPENCOR_MEMORY_CHECKS)
-    if(APPLE)
-        add_target(memory_checks
-                   COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/memory_checks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
-                   DEPENDS ${TEST_TARGETS}
-                   COMMENT "Running memory checks...")
-    elseif(NOT WIN32)
-        add_target(memory_checks
-                   COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/memory_checks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
-                   DEPENDS ${TEST_TARGETS}
-                   COMMENT "Running memory checks...")
-    endif()
+    add_target(memory_checks
+               COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/memory_checks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
+               DEPENDS ${TEST_TARGETS}
+               COMMENT "Running memory checks...")
 endif()
