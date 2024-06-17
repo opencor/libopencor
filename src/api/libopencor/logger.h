@@ -134,7 +134,7 @@ protected:
     explicit Logger(Impl *pPimpl); /**< Constructor, @private. */
 
 private:
-    Impl *mPimpl;
+    Impl *mPimpl; /**< The private implementation, @private. */
 };
 
 } // namespace libOpenCOR
