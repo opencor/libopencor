@@ -36,16 +36,16 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
     auto modelType = pModel->pimpl()->mFile->pimpl()->mCellmlFile->type();
 
     if ((modelType == libcellml::AnalyserModel::Type::ODE) && (mOdeSolver == nullptr)) {
-        addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an ODE solver but none is provided.");
+        addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an ODE solver but none is provided."));
     } else if ((modelType == libcellml::AnalyserModel::Type::NLA) && (mNlaSolver == nullptr)) {
-        addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an NLA solver but none is provided.");
+        addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an NLA solver but none is provided."));
     } else if (modelType == libcellml::AnalyserModel::Type::DAE) {
         if (mOdeSolver == nullptr) {
-            addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an ODE solver but none is provided.");
+            addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an ODE solver but none is provided."));
         }
 
         if (mNlaSolver == nullptr) {
-            addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an NLA solver but none is provided.");
+            addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an NLA solver but none is provided."));
         }
     }
 

@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sedML level="1" version="4" xmlns="http://sed-ml.org/sed-ml/level1/version4">
+    <listOfSimulations>
+        <oneStep id="oneStep1" step="3.69">
+            <algorithm kisaoID="KISAO:1234567"/>
+        </oneStep>
+        <oneStep id="oneStep2" step="3.69">
+            <algorithm kisaoID="KISAO:0000030">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000483" value="1.23"/>
+                    <algorithmParameter kisaoID="KISAO:1234567" value="Unknown"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep3" step="3.69">
+            <algorithm kisaoID="KISAO:0000032">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000483" value="-1.23"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep4" step="3.69">
+            <algorithm kisaoID="KISAO:0000301">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000483" value="nan"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep5" step="3.69">
+            <algorithm kisaoID="KISAO:0000381">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000483" value="1.23e456789"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep6" step="3.69">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000209" value="1e-03"/>
+                    <algorithmParameter kisaoID="KISAO:0000211" value="1e-05"/>
+                    <algorithmParameter kisaoID="KISAO:0000415" value="369"/>
+                    <algorithmParameter kisaoID="KISAO:0000467" value="0.01"/>
+                    <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+                    <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+                    <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="1"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="2"/>
+                    <algorithmParameter kisaoID="KISAO:0000481" value="false"/>
+                    <algorithmParameter kisaoID="KISAO:1234567" value="Unknown"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep7" step="3.69">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000209" value="-1e-03"/>
+                    <algorithmParameter kisaoID="KISAO:0000211" value="-1e-05"/>
+                    <algorithmParameter kisaoID="KISAO:0000415" value="-369"/>
+                    <algorithmParameter kisaoID="KISAO:0000467" value="-0.01"/>
+                    <algorithmParameter kisaoID="KISAO:0000475" value="Adams-Moulton"/>
+                    <algorithmParameter kisaoID="KISAO:0000476" value="Functional"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Banded"/>
+                    <algorithmParameter kisaoID="KISAO:0000478" value="No"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="-1"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="-2"/>
+                    <algorithmParameter kisaoID="KISAO:0000481" value="false"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep8" step="3.69">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000209" value="NotANumber"/>
+                    <algorithmParameter kisaoID="KISAO:0000211" value="NotANumber"/>
+                    <algorithmParameter kisaoID="KISAO:0000415" value="NotANumber"/>
+                    <algorithmParameter kisaoID="KISAO:0000467" value="NotANumber"/>
+                    <algorithmParameter kisaoID="KISAO:0000475" value="Unknown"/>
+                    <algorithmParameter kisaoID="KISAO:0000476" value="Unknown"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Diagonal"/>
+                    <algorithmParameter kisaoID="KISAO:0000478" value="Unknown"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="NotANumber"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="NotANumber"/>
+                    <algorithmParameter kisaoID="KISAO:0000481" value="True"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep9" step="3.69">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000209" value="1.23e456789"/>
+                    <algorithmParameter kisaoID="KISAO:0000211" value="1.23e456789"/>
+                    <algorithmParameter kisaoID="KISAO:0000415" value="1234567890123"/>
+                    <algorithmParameter kisaoID="KISAO:0000467" value="1.23e456789"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="GMRES"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="1234567890123"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="1234567890123"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep10" step="3.69">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="BiCGStab"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep11" step="3.69">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="TFQMR"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <oneStep id="oneStep12" step="3.69">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Unknown"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </oneStep>
+        <steadyState id="steadyState1">
+            <algorithm kisaoID="KISAO:0000282">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000486" value="123"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="1"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="2"/>
+                    <algorithmParameter kisaoID="KISAO:1234567" value="Unknown"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </steadyState>
+        <steadyState id="steadyState2">
+            <algorithm kisaoID="KISAO:0000282">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000486" value="-123"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Banded"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="-1"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="-2"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </steadyState>
+        <steadyState id="steadyState3">
+            <algorithm kisaoID="KISAO:0000282">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000486" value="NotANumber"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="GMRES"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="NotANumber"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="NotANumber"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </steadyState>
+        <steadyState id="steadyState4">
+            <algorithm kisaoID="KISAO:0000282">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000486" value="1234567890123"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="BiCGStab"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="1234567890123"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="1234567890123"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </steadyState>
+        <steadyState id="steadyState5">
+            <algorithm kisaoID="KISAO:0000282">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="TFQMR"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </steadyState>
+        <steadyState id="steadyState6">
+            <algorithm kisaoID="KISAO:0000282">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Unknown"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </steadyState>
+        <analysis id="analysis">
+            <algorithm kisaoID="KISAO:0000030">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000483" value="1.23"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </analysis>
+    </listOfSimulations>
+</sedML>

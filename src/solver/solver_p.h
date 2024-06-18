@@ -24,6 +24,12 @@ limitations under the License.
 
 #include <libxml/tree.h>
 
+namespace libsedml {
+
+class SedAlgorithm;
+
+} // namespace libsedml
+
 namespace libOpenCOR {
 
 class Solver::Impl: public Logger::Impl
@@ -36,6 +42,8 @@ public:
     virtual ~Impl() = default;
 
     virtual SolverPtr duplicate() = 0;
+
+    virtual void populate(libsedml::SedAlgorithm *pAlgorithm) = 0;
 
     void serialise(xmlNodePtr pNode, bool pNlaAlgorithm = false) const;
 

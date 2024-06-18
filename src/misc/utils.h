@@ -19,6 +19,8 @@ limitations under the License.
 #include "cellmlfile.h"
 #include "unittestingexport.h"
 
+#include "libopencor/solvercvode.h"
+#include "libopencor/solverkinsol.h"
 #include "libopencor/types.h"
 
 #ifndef NDEBUG
@@ -39,7 +41,7 @@ namespace libOpenCOR {
 
 static const std::string LIBOPENCOR_NAMESPACE = "https://opencor.ws/libopencor";
 
-static const double NAN = std::numeric_limits<double>::quiet_NaN();
+static const auto NAN = std::numeric_limits<double>::quiet_NaN();
 
 using StringStringMap = std::map<std::string, std::string>;
 
@@ -92,10 +94,35 @@ UnsignedChars LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem:
 
 char LIBOPENCOR_UNIT_TESTING_EXPORT *nlaSolverAddress(SolverNla *pNlaSolver);
 
+bool toBool(const std::string &pString);
+std::string toString(bool pBoolean);
+
+bool isInt(const std::string &pString);
+int toInt(const std::string &pString);
 std::string toString(int pNumber);
+
 std::string toString(size_t pNumber);
+
+bool isDouble(const std::string &pString);
+double toDouble(const std::string &pString);
 std::string toString(double pNumber);
+
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedChars &pBytes);
+
+SolverCvode::IntegrationMethod toCvodeIntegrationMethod(const std::string &pIntegrationMethod);
+std::string toString(SolverCvode::IntegrationMethod pIntegrationMethod);
+
+SolverCvode::IterationType toCvodeIterationType(const std::string &pIterationType);
+std::string toString(SolverCvode::IterationType pIterationType);
+
+SolverCvode::LinearSolver toCvodeLinearSolver(const std::string &pLinearSolver);
+std::string toString(SolverCvode::LinearSolver pLinearSolver);
+
+SolverCvode::Preconditioner toCvodePreconditioner(const std::string &pPreconditioner);
+std::string toString(SolverCvode::Preconditioner pPreconditioner);
+
+SolverKinsol::LinearSolver toKinsolLinearSolver(const std::string &pLinearSolver);
+std::string toString(SolverKinsol::LinearSolver pLinearSolver);
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
 

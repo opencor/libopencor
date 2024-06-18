@@ -107,7 +107,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
     static constexpr auto CLANG = "clang";
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
-        addError("The command name must be 'clang' while it is '" + std::string(command.getCreator().getName()) + "'.");
+        addError(std::string("The command name must be 'clang' while it is '").append(command.getCreator().getName()).append("'."));
 
         return false;
     }
@@ -328,7 +328,7 @@ bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
 
 #ifndef CODE_COVERAGE_ENABLED
     if (!res) {
-        addError("The " + pName + "() function could not be added to the compiler.");
+        addError(std::string("The ").append(pName).append("() function could not be added to the compiler."));
     }
 #endif
 

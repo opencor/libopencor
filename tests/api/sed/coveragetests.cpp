@@ -22,8 +22,9 @@ limitations under the License.
 
 TEST(CoverageSedTest, initialise)
 {
-    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                                     "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\"/>\n";
+    static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
+)";
 
     auto document = libOpenCOR::SedDocument::create();
 
@@ -97,14 +98,15 @@ namespace {
 
 std::string sedTaskExpectedSerialisation(bool pWithProperties)
 {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-           "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
-           "  <listOfTasks>\n"
-           "    <task id=\"task1\""
-           + std::string(pWithProperties ? R"( modelReference="model1" simulationReference="simulation1")" : "")
-           + "/>\n"
-             "  </listOfTasks>\n"
-             "</sedML>\n";
+    return std::string(R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfTasks>
+    <task id="task1")")
+        .append(pWithProperties ? R"( modelReference="model1" simulationReference="simulation1")" : "")
+        .append(R"(/>
+  </listOfTasks>
+</sedML>
+)");
 }
 
 } // namespace

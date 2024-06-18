@@ -37,11 +37,11 @@ bool SedTask::Impl::isValid()
     // Make sure that we have both a model and a simulation.
 
     if (mModel == nullptr) {
-        addError("Task '" + mId + "' requires a model.");
+        addError(std::string("Task '").append(mId).append("' requires a model."));
     }
 
     if (mSimulation == nullptr) {
-        addError("Task '" + mId + "' requires a simulation.");
+        addError(std::string("Task '").append(mId).append("' requires a simulation."));
     }
 
     if (hasIssues()) {

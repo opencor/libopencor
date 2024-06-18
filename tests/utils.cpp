@@ -87,14 +87,14 @@ std::string resourcePath(const std::string &pResourceRelativePath)
 
 std::string textFileContents(const std::string &pFileName)
 {
-    static const std::regex CR_LF("\\r\\n");
+    static const auto CRLF_REGEX = std::regex("\\r\\n");
 
     auto res = libOpenCOR::toString(libOpenCOR::fileContents(libOpenCOR::resourcePath(pFileName)));
 
     // To retrieve a file contents as bytes will, on Windows, result in LF characters being converted to CR+LF, so
     // convert them back since we expect LF.
 
-    return regex_replace(res, CR_LF, "\n");
+    return regex_replace(res, CRLF_REGEX, "\n");
 }
 
 UnsignedChars charArrayToUnsignedChars(const char *pContents)

@@ -27,9 +27,7 @@ class SedAnalysis::Impl: public SedSimulation::Impl
 public:
     explicit Impl(const SedDocumentPtr &pDocument);
 
-/*---GRY---
     void serialise(xmlNodePtr pNode) const override;
-*/
 };
 
 } // namespace libOpenCOR

@@ -37,6 +37,10 @@ limitations under the License.
 #    include <codecvt>
 #endif
 
+#ifdef NAN
+#    undef NAN
+#endif
+
 namespace libOpenCOR {
 
 bool fuzzyCompare(double pNb1, double pNb2)
@@ -392,6 +396,42 @@ char *nlaSolverAddress(SolverNla *pNlaSolver)
     return res;
 }
 
+bool toBool(const std::string &pString)
+{
+    return pString == "true";
+}
+
+std::string toString(bool pBoolean)
+{
+    return pBoolean ? "true" : "false";
+}
+
+bool isInt(const std::string &pString)
+{
+    static const auto INT_REGEX = std::regex("^([-+]?[1-9][0-9]*([eE][+]?[0-9]+)?|0)$");
+
+    if (std::regex_match(pString, INT_REGEX)) {
+        std::istringstream iss(pString);
+        int res = 0;
+
+        iss >> res;
+
+        return !iss.fail();
+    }
+
+    return false;
+}
+
+int toInt(const std::string &pString)
+{
+    std::istringstream iss(pString);
+    int res = 0;
+
+    iss >> res;
+
+    return res;
+}
+
 std::string toString(int pNumber)
 {
     std::ostringstream res;
@@ -410,6 +450,27 @@ std::string toString(size_t pNumber)
     return res.str();
 }
 
+bool isDouble(const std::string &pString)
+{
+    static const auto DOUBLE_REGEX = std::regex("^[+-]?[0-9]*\\.?[0-9]+([eE][+-]?[0-9]+)?$");
+
+    return std::regex_match(pString, DOUBLE_REGEX);
+}
+
+double toDouble(const std::string &pString)
+{
+    if (!isDouble(pString)) {
+        return NAN;
+    }
+
+    std::istringstream iss(pString);
+    double res = NAN;
+
+    iss >> res;
+
+    return iss.fail() ? NAN : res;
+}
+
 std::string toString(double pNumber)
 {
     std::ostringstream res;
@@ -422,6 +483,104 @@ std::string toString(double pNumber)
 std::string toString(const UnsignedChars &pBytes)
 {
     return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
+}
+
+SolverCvode::IntegrationMethod toCvodeIntegrationMethod(const std::string &pIntegrationMethod)
+{
+    return (pIntegrationMethod == "BDF") ?
+               SolverCvode::IntegrationMethod::BDF :
+               SolverCvode::IntegrationMethod::ADAMS_MOULTON;
+}
+
+std::string toString(SolverCvode::IntegrationMethod pIntegrationMethod)
+{
+    return (pIntegrationMethod == SolverCvode::IntegrationMethod::BDF) ?
+               "BDF" :
+               "Adams-Moulton";
+}
+
+SolverCvode::IterationType toCvodeIterationType(const std::string &pIterationType)
+{
+    return (pIterationType == "Functional") ?
+               SolverCvode::IterationType::FUNCTIONAL :
+               SolverCvode::IterationType::NEWTON;
+}
+
+std::string toString(SolverCvode::IterationType pIterationType)
+{
+    return (pIterationType == SolverCvode::IterationType::FUNCTIONAL) ?
+               "Functional" :
+               "Newton";
+}
+
+SolverCvode::LinearSolver toCvodeLinearSolver(const std::string &pLinearSolver)
+{
+    return (pLinearSolver == "Dense") ?
+               SolverCvode::LinearSolver::DENSE :
+           (pLinearSolver == "Banded") ?
+               SolverCvode::LinearSolver::BANDED :
+           (pLinearSolver == "Diagonal") ?
+               SolverCvode::LinearSolver::DIAGONAL :
+           (pLinearSolver == "GMRES") ?
+               SolverCvode::LinearSolver::GMRES :
+           (pLinearSolver == "BiCGStab") ?
+               SolverCvode::LinearSolver::BICGSTAB :
+               SolverCvode::LinearSolver::TFQMR;
+}
+
+std::string toString(SolverCvode::LinearSolver pLinearSolver)
+{
+    return (pLinearSolver == SolverCvode::LinearSolver::DENSE) ?
+               "Dense" :
+           (pLinearSolver == SolverCvode::LinearSolver::BANDED) ?
+               "Banded" :
+           (pLinearSolver == SolverCvode::LinearSolver::DIAGONAL) ?
+               "Diagonal" :
+           (pLinearSolver == SolverCvode::LinearSolver::GMRES) ?
+               "GMRES" :
+           (pLinearSolver == SolverCvode::LinearSolver::BICGSTAB) ?
+               "BiCGStab" :
+               "TFQMR";
+}
+
+SolverCvode::Preconditioner toCvodePreconditioner(const std::string &pPreconditioner)
+{
+    return (pPreconditioner == "No") ?
+               SolverCvode::Preconditioner::NO :
+               SolverCvode::Preconditioner::BANDED;
+}
+
+std::string toString(SolverCvode::Preconditioner pPreconditioner)
+{
+    return (pPreconditioner == SolverCvode::Preconditioner::NO) ?
+               "No" :
+               "Banded";
+}
+
+SolverKinsol::LinearSolver toKinsolLinearSolver(const std::string &pLinearSolver)
+{
+    return (pLinearSolver == "Dense") ?
+               SolverKinsol::LinearSolver::DENSE :
+           (pLinearSolver == "Banded") ?
+               SolverKinsol::LinearSolver::BANDED :
+           (pLinearSolver == "GMRES") ?
+               SolverKinsol::LinearSolver::GMRES :
+           (pLinearSolver == "BiCGStab") ?
+               SolverKinsol::LinearSolver::BICGSTAB :
+               SolverKinsol::LinearSolver::TFQMR;
+}
+
+std::string toString(SolverKinsol::LinearSolver pLinearSolver)
+{
+    return (pLinearSolver == SolverKinsol::LinearSolver::DENSE) ?
+               "Dense" :
+           (pLinearSolver == SolverKinsol::LinearSolver::BANDED) ?
+               "Banded" :
+           (pLinearSolver == SolverKinsol::LinearSolver::GMRES) ?
+               "GMRES" :
+           (pLinearSolver == SolverKinsol::LinearSolver::BICGSTAB) ?
+               "BiCGStab" :
+               "TFQMR";
 }
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString)

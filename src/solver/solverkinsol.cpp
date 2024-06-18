@@ -18,6 +18,10 @@ limitations under the License.
 
 #include <algorithm>
 
+#include "libsedmlbegin.h"
+#include <sedml/SedAlgorithm.h>
+#include "libsedmlend.h"
+
 #include "sundialsbegin.h"
 #include "kinsol/kinsol.h"
 #include "nvector/nvector_serial.h"
@@ -74,6 +78,51 @@ SolverKinsol::Impl::Impl()
 {
 }
 
+void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
+{
+    for (unsigned int i = 0; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
+        auto *algorithmParameter = pAlgorithm->getAlgorithmParameter(i);
+        auto kisaoId = algorithmParameter->getKisaoID();
+        auto value = algorithmParameter->getValue();
+
+        if (kisaoId == "KISAO:0000486") {
+            mMaximumNumberOfIterations = toInt(value);
+
+            if (!isInt(value) || (mMaximumNumberOfIterations <= 0)) {
+                addWarning(std::string("The maximum number of iterations ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater than 0. A maximum number of iterations of ").append(toString(DEFAULT_MAXIMUM_NUMBER_OF_ITERATIONS)).append(" will be used instead."));
+
+                mMaximumNumberOfIterations = DEFAULT_MAXIMUM_NUMBER_OF_ITERATIONS;
+            }
+        } else if (kisaoId == "KISAO:0000477") {
+            if ((value != "Dense") && (value != "Banded") && (value != "GMRES") && (value != "BiCGStab") && (value != "TFQMR")) {
+                addWarning(std::string("The linear solver ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A ").append(toString(DEFAULT_LINEAR_SOLVER)).append(" linear solver will be used instead."));
+
+                value = toString(DEFAULT_LINEAR_SOLVER);
+            }
+
+            mLinearSolver = toKinsolLinearSolver(value);
+        } else if (kisaoId == "KISAO:0000479") {
+            mUpperHalfBandwidth = toInt(value);
+
+            if (!isInt(value) || (mUpperHalfBandwidth < 0)) {
+                addWarning(std::string("The upper half-bandwidth ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. An upper half-bandwidth of ").append(toString(DEFAULT_UPPER_HALF_BANDWIDTH)).append(" will be used instead."));
+
+                mUpperHalfBandwidth = DEFAULT_UPPER_HALF_BANDWIDTH;
+            }
+        } else if (kisaoId == "KISAO:0000480") {
+            mLowerHalfBandwidth = toInt(value);
+
+            if (!isInt(value) || (mLowerHalfBandwidth < 0)) {
+                addWarning(std::string("The lower half-bandwidth ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A lower half-bandwidth of ").append(toString(DEFAULT_LOWER_HALF_BANDWIDTH)).append(" will be used instead."));
+
+                mLowerHalfBandwidth = DEFAULT_LOWER_HALF_BANDWIDTH;
+            }
+        } else {
+            addWarning(std::string("The parameter '").append(kisaoId).append("' is not recognised. It will be ignored."));
+        }
+    }
+}
+
 SolverPtr SolverKinsol::Impl::duplicate()
 {
     auto solver = SolverKinsol::create();
@@ -92,11 +141,7 @@ StringStringMap SolverKinsol::Impl::properties() const
     StringStringMap res;
 
     res["KISAO:0000486"] = toString(mMaximumNumberOfIterations);
-    res["KISAO:0000477"] = (mLinearSolver == LinearSolver::DENSE)    ? "Dense" :
-                           (mLinearSolver == LinearSolver::BANDED)   ? "Banded" :
-                           (mLinearSolver == LinearSolver::GMRES)    ? "GMRES" :
-                           (mLinearSolver == LinearSolver::BICGSTAB) ? "BiCGStab" :
-                                                                       "TFQMR";
+    res["KISAO:0000477"] = toString(mLinearSolver);
     res["KISAO:0000479"] = toString(mUpperHalfBandwidth);
     res["KISAO:0000480"] = toString(mLowerHalfBandwidth);
 
@@ -111,7 +156,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
     // solver's properties are all valid.
 
     if (mMaximumNumberOfIterations <= 0) {
-        addError("The maximum number of iterations cannot be equal to " + toString(mMaximumNumberOfIterations) + ". It must be greater than 0.");
+        addError(std::string("The maximum number of iterations cannot be equal to ").append(toString(mMaximumNumberOfIterations)).append(". It must be greater than 0."));
     }
 
     bool needUpperAndLowerHalfBandwidths = false;
@@ -124,11 +169,11 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
     if (needUpperAndLowerHalfBandwidths) {
         if ((mUpperHalfBandwidth < 0) || (mUpperHalfBandwidth >= static_cast<int>(pN))) {
-            addError("The upper half-bandwidth cannot be equal to " + toString(mUpperHalfBandwidth) + ". It must be between 0 and " + toString(pN - 1) + ".");
+            addError(std::string("The upper half-bandwidth cannot be equal to ").append(toString(mUpperHalfBandwidth)).append(". It must be between 0 and ").append(toString(pN - 1)).append("."));
         }
 
         if ((mLowerHalfBandwidth < 0) || (mLowerHalfBandwidth >= static_cast<int>(pN))) {
-            addError("The lower half-bandwidth cannot be equal to " + toString(mLowerHalfBandwidth) + ". It must be between 0 and " + toString(pN - 1) + ".");
+            addError(std::string("The lower half-bandwidth cannot be equal to ").append(toString(mLowerHalfBandwidth)).append(". It must be between 0 and ").append(toString(pN - 1)).append("."));
         }
     }
 

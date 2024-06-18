@@ -27,16 +27,14 @@ SedAnalysis::Impl::Impl(const SedDocumentPtr &pDocument)
 {
 }
 
-/*---GRY---
 void SedAnalysis::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("steadyState"));
+    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("analysis"));
 
     SedSimulation::Impl::serialise(node);
 
     xmlAddChild(pNode, node);
 }
-*/
 
 SedAnalysis::SedAnalysis(const SedDocumentPtr &pDocument)
     : SedSimulation(new Impl(pDocument))

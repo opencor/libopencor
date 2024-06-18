@@ -16,6 +16,9 @@ limitations under the License.
 
 #include "sedmlfile_p.h"
 
+#include "solvernla_p.h"
+#include "solverode_p.h"
+
 #include "utils.h"
 
 #include "libopencor/file.h"
@@ -26,10 +29,17 @@ limitations under the License.
 #include "libopencor/sedonestep.h"
 #include "libopencor/sedsteadystate.h"
 #include "libopencor/seduniformtimecourse.h"
+#include "libopencor/solvercvode.h"
+#include "libopencor/solverforwardeuler.h"
+#include "libopencor/solverfourthorderrungekutta.h"
+#include "libopencor/solverheun.h"
+#include "libopencor/solverkinsol.h"
+#include "libopencor/solversecondorderrungekutta.h"
 
 #include "libsedmlbegin.h"
 #include <sedml/SedDocument.h>
 #include <sedml/SedReader.h>
+#include <sedml/SedOneStep.h>
 #include <sedml/SedUniformTimeCourse.h>
 #include "libsedmlend.h"
 
@@ -68,7 +78,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         if (file != nullptr) {
             model = SedModel::create(pDocument, file);
         } else {
-            addWarning("The model '" + source + "' could not be found. It has been automatically added, but it is empty.");
+            addWarning(std::string("The model '").append(source).append("' could not be found. It has been automatically added, but it is empty."));
 
             model = SedModel::create(pDocument, File::create(modelSource));
         }
@@ -84,9 +94,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         auto *sedSimulation = mDocument->getSimulation(i);
         SedSimulationPtr simulation;
 
-#ifndef CODE_COVERAGE_ENABLED
         if (sedSimulation->isSedUniformTimeCourse()) {
-#endif
             auto *sedUniformTimeCourse = reinterpret_cast<libsedml::SedUniformTimeCourse *>(sedSimulation);
             auto uniformTimeCourse = SedUniformTimeCourse::create(pDocument);
 
@@ -96,34 +104,63 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             uniformTimeCourse->setNumberOfSteps(sedUniformTimeCourse->getNumberOfSteps());
 
             simulation = uniformTimeCourse;
-#ifndef CODE_COVERAGE_ENABLED
         } else if (sedSimulation->isSedOneStep()) {
             auto *sedOneStep = reinterpret_cast<libsedml::SedOneStep *>(sedSimulation);
             auto oneStep = SedOneStep::create(pDocument);
 
-            (void)sedOneStep;
+            oneStep->setStep(sedOneStep->getStep());
 
             simulation = oneStep;
         } else if (sedSimulation->isSedSteadyState()) {
-            auto *sedSteadyState = reinterpret_cast<libsedml::SedSteadyState *>(sedSimulation);
-            auto steadyState = SedSteadyState::create(pDocument);
-
-            (void)sedSteadyState;
-
-            simulation = steadyState;
+            simulation = SedSteadyState::create(pDocument);
         } else { // SedAnalysis.
-            auto *sedAnalysis = reinterpret_cast<libsedml::SedAnalysis *>(sedSimulation);
-            auto analysis = SedAnalysis::create(pDocument);
-
-            (void)sedAnalysis;
-
-            simulation = analysis;
+            simulation = SedAnalysis::create(pDocument);
         }
-#endif
 
         simulation->setId(sedSimulation->getId());
 
         pDocument->addSimulation(simulation);
+
+        // Populate the simulation's algorithm.
+
+        auto *sedAlgorithm = sedSimulation->getAlgorithm();
+        auto kisaoId = sedAlgorithm->getKisaoID();
+        SolverOdePtr odeSolver = nullptr;
+        SolverNlaPtr nlaSolver = nullptr;
+
+        if (kisaoId == "KISAO:0000019") {
+            odeSolver = SolverCvode::create();
+        } else if (kisaoId == "KISAO:0000030") {
+            odeSolver = SolverForwardEuler::create();
+        } else if (kisaoId == "KISAO:0000032") {
+            odeSolver = SolverFourthOrderRungeKutta::create();
+        } else if (kisaoId == "KISAO:0000301") {
+            odeSolver = SolverHeun::create();
+        } else if (kisaoId == "KISAO:0000282") {
+            nlaSolver = SolverKinsol::create();
+        } else if (kisaoId == "KISAO:0000381") {
+            odeSolver = SolverSecondOrderRungeKutta::create();
+        } else {
+            addWarning(std::string("The solver '").append(kisaoId).append("' is not recognised. The CVODE solver will be used instead."));
+
+            odeSolver = SolverCvode::create();
+        }
+
+        if (odeSolver != nullptr) {
+            odeSolver->pimpl()->populate(sedAlgorithm);
+
+            addIssues(odeSolver);
+
+            simulation->setOdeSolver(odeSolver);
+        }
+
+        if (nlaSolver != nullptr) {
+            nlaSolver->pimpl()->populate(sedAlgorithm);
+
+            addIssues(nlaSolver);
+
+            simulation->setNlaSolver(nlaSolver);
+        }
     }
 }
 

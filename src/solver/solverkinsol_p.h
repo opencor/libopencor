@@ -32,12 +32,19 @@ class SolverKinsol::Impl: public SolverNla::Impl
 public:
     std::string mErrorMessage;
 
-    int mMaximumNumberOfIterations = 200;
-    LinearSolver mLinearSolver = LinearSolver::DENSE;
-    int mUpperHalfBandwidth = 0;
-    int mLowerHalfBandwidth = 0;
+    static constexpr auto DEFAULT_MAXIMUM_NUMBER_OF_ITERATIONS = 200;
+    static constexpr auto DEFAULT_LINEAR_SOLVER = LinearSolver::DENSE;
+    static constexpr auto DEFAULT_UPPER_HALF_BANDWIDTH = 0;
+    static constexpr auto DEFAULT_LOWER_HALF_BANDWIDTH = 0;
+
+    int mMaximumNumberOfIterations = DEFAULT_MAXIMUM_NUMBER_OF_ITERATIONS;
+    LinearSolver mLinearSolver = DEFAULT_LINEAR_SOLVER;
+    int mUpperHalfBandwidth = DEFAULT_UPPER_HALF_BANDWIDTH;
+    int mLowerHalfBandwidth = DEFAULT_LOWER_HALF_BANDWIDTH;
 
     explicit Impl();
+
+    void populate(libsedml::SedAlgorithm *pAlgorithm) override;
 
     SolverPtr duplicate() override;
 
