@@ -16,37 +16,59 @@ limitations under the License.
 
 #include <libopencor>
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/nanobind.h>
+//---GRY--- CHECK WHICH STL HEADERS ARE REALLY NEEDED.
+#include <nanobind/stl/array.h>
+#include <nanobind/stl/bind_map.h>
+#include <nanobind/stl/bind_vector.h>
+#include <nanobind/stl/chrono.h>
+#include <nanobind/stl/complex.h>
+#include <nanobind/stl/filesystem.h>
+#include <nanobind/stl/function.h>
+#include <nanobind/stl/list.h>
+#include <nanobind/stl/map.h>
+#include <nanobind/stl/optional.h>
+#include <nanobind/stl/pair.h>
+#include <nanobind/stl/set.h>
+#include <nanobind/stl/shared_ptr.h>
+#include <nanobind/stl/string_view.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/tuple.h>
+#include <nanobind/stl/unique_ptr.h>
+#include <nanobind/stl/unordered_map.h>
+#include <nanobind/stl/unordered_set.h>
+#include <nanobind/stl/variant.h>
+#include <nanobind/stl/vector.h>
+#include <nanobind/stl/wstring.h>
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void loggerApi(py::module_ &m)
+void loggerApi(nb::module_ &m)
 {
     // Logger API.
 
-    py::class_<libOpenCOR::Logger, libOpenCOR::LoggerPtr> logger(m, "Logger");
+    nb::class_<libOpenCOR::Logger> logger(m, "Logger");
 
-    logger.def_property_readonly("has_issues", &libOpenCOR::Logger::hasIssues, "Return whether there are some issues.")
-        .def_property_readonly("issues", &libOpenCOR::Logger::issues, "Return the issues.")
-        .def_property_readonly("has_errors", &libOpenCOR::Logger::hasErrors, "Return whether there are some errors.")
-        .def_property_readonly("errors", &libOpenCOR::Logger::errors, "Return the errors.")
-        .def_property_readonly("has_warnings", &libOpenCOR::Logger::hasWarnings, "Return whether there are some warnings.")
-        .def_property_readonly("warnings", &libOpenCOR::Logger::warnings, "Return the warnings.")
-        .def_property_readonly("has_messages", &libOpenCOR::Logger::hasMessages, "Return whether there are some messages.")
-        .def_property_readonly("messages", &libOpenCOR::Logger::messages, "Return the messages.");
+    logger.def_prop_ro("has_issues", &libOpenCOR::Logger::hasIssues, "Return whether there are some issues.")
+        .def_prop_ro("issues", &libOpenCOR::Logger::issues, "Return the issues.")
+        .def_prop_ro("has_errors", &libOpenCOR::Logger::hasErrors, "Return whether there are some errors.")
+        .def_prop_ro("errors", &libOpenCOR::Logger::errors, "Return the errors.")
+        .def_prop_ro("has_warnings", &libOpenCOR::Logger::hasWarnings, "Return whether there are some warnings.")
+        .def_prop_ro("warnings", &libOpenCOR::Logger::warnings, "Return the warnings.")
+        .def_prop_ro("has_messages", &libOpenCOR::Logger::hasMessages, "Return whether there are some messages.")
+        .def_prop_ro("messages", &libOpenCOR::Logger::messages, "Return the messages.");
 
     // Issue API.
 
-    py::class_<libOpenCOR::Issue, libOpenCOR::IssuePtr> issue(m, "Issue");
+    nb::class_<libOpenCOR::Issue> issue(m, "Issue");
 
-    py::enum_<libOpenCOR::Issue::Type>(issue, "Type")
+    nb::enum_<libOpenCOR::Issue::Type>(issue, "Type")
         .value("Error", libOpenCOR::Issue::Type::ERROR)
         .value("Warning", libOpenCOR::Issue::Type::WARNING)
         .value("Message", libOpenCOR::Issue::Type::MESSAGE)
         .export_values();
 
-    issue.def_property_readonly("type", &libOpenCOR::Issue::type, "Get the type of this Issue object.")
-        .def_property_readonly("type_as_string", &libOpenCOR::Issue::typeAsString, "Get the type of this Issue object as a string.")
-        .def_property_readonly("description", &libOpenCOR::Issue::description, "Get the description for this Issue object.");
+    issue.def_prop_ro("type", &libOpenCOR::Issue::type, "Get the type of this Issue object.")
+        .def_prop_ro("type_as_string", &libOpenCOR::Issue::typeAsString, "Get the type of this Issue object as a string.")
+        .def_prop_ro("description", &libOpenCOR::Issue::description, "Get the description for this Issue object.");
 }

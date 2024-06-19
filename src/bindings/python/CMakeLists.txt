@@ -37,7 +37,11 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
 
-    pybind11_add_module(${PYTHON_BINDINGS_TARGET}
+    nanobind_add_module(${PYTHON_BINDINGS_TARGET}
+                        LTO
+                        NOMINSIZE
+                        NB_STATIC
+                        STABLE_ABI
                         ${PYTHON_SOURCE_FILES})
 
     set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
