@@ -45,6 +45,11 @@ public:
 
     FilePtr masterFile() const;
 
+    bool hasFiles() const;
+    Strings fileNames() const;
+    FilePtrs files() const;
+    FilePtr file(const std::string &pFileName) const;
+
 private:
     class Impl;
 

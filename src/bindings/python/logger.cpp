@@ -16,7 +16,6 @@ limitations under the License.
 
 #include <libopencor>
 
-#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;

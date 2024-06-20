@@ -45,7 +45,11 @@ void fileApi()
                       auto contents = reinterpret_cast<unsigned char *>(pContents);
 
                       pThis->setContents(libOpenCOR::UnsignedChars(contents, contents + pSize));
-                  }));
+                  }))
+        .function("hasChildFiles", &libOpenCOR::File::hasChildFiles)
+        .function("childFileNames", &libOpenCOR::File::childFileNames)
+        .function("childFiles", &libOpenCOR::File::childFiles)
+        .function("childFile", &libOpenCOR::File::childFile);
 
     EM_ASM({
         Module["File"]["Type"] = Module["File.Type"];

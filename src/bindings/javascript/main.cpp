@@ -37,6 +37,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     emscripten::register_vector<libOpenCOR::SedOutputPtr>("SedOutputPtrs");
     emscripten::register_vector<libOpenCOR::SedSimulationPtr>("SedSimulationPtrs");
     emscripten::register_vector<libOpenCOR::SedStylePtr>("SedStylePtrs");
+    emscripten::register_vector<std::string>("Strings");
 
     // APIs.
 

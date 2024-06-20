@@ -154,6 +154,42 @@ UnsignedChars File::Impl::contents()
     return mContents;
 }
 
+bool File::Impl::hasChildFiles() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->hasFiles();
+    }
+
+    return false;
+}
+
+Strings File::Impl::childFileNames() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->fileNames();
+    }
+
+    return {};
+}
+
+FilePtrs File::Impl::childFiles() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->files();
+    }
+
+    return {};
+}
+
+FilePtr File::Impl::childFile(const std::string &pFileName) const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->file(pFileName);
+    }
+
+    return {};
+}
+
 File::File(const std::string &pFileNameOrUrl)
     : Logger(new Impl {pFileNameOrUrl})
 {
@@ -229,6 +265,26 @@ void File::setContents(const UnsignedChars &pContents)
     pimpl()->setContents(pContents);
 
     pimpl()->checkType(shared_from_this(), true);
+}
+
+bool File::hasChildFiles() const
+{
+    return pimpl()->hasChildFiles();
+}
+
+Strings File::childFileNames() const
+{
+    return pimpl()->childFileNames();
+}
+
+FilePtrs File::childFiles() const
+{
+    return pimpl()->childFiles();
+}
+
+FilePtr File::childFile(const std::string &pFileName) const
+{
+    return pimpl()->childFile(pFileName);
 }
 
 } // namespace libOpenCOR

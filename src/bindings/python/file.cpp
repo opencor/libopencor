@@ -16,7 +16,6 @@ limitations under the License.
 
 #include <libopencor>
 
-#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
@@ -40,7 +39,11 @@ void fileApi(py::module_ &m)
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
         .def_property_readonly("path", &libOpenCOR::File::path, "Get the path for this File object.")
-        .def_property("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.");
+        .def_property("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.")
+        .def_property_readonly("has_child_files", &libOpenCOR::File::hasChildFiles, "Return whether this File object has some child files.")
+        .def_property_readonly("child_file_names", &libOpenCOR::File::childFileNames, "Return the child file names for this File object.")
+        .def_property_readonly("child_files", &libOpenCOR::File::childFiles, "Return the child files for this File object.")
+        .def("child_file", &libOpenCOR::File::childFile, "Get the requested child file for this File object.", py::arg("file_name"));
 
     // FileManager API.
 

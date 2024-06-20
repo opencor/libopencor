@@ -17,6 +17,7 @@ import base64
 from libopencor import (
     Issue,
 )
+import pathlib
 import platform
 import pytest
 
@@ -111,3 +112,20 @@ def string_to_list(string):
 
 def binary_to_list(string):
     return [x for x in string]
+
+
+def string_to_path(string):
+    return pathlib.Path(string)
+
+
+def path_to_string(path):
+    return str(path)
+
+
+def to_string(array):
+    return "".join([chr(x) for x in array])
+
+
+def text_file_contents(file_name):
+    with open(file_name, "r") as file:
+        return file.read()

@@ -160,6 +160,48 @@ public:
 
     void setContents(const UnsignedChars &pContents);
 
+    /**
+     * @brief Return whether this file has child files.
+     *
+     * Return whether this file has child files. This method is only relevant for COMBINE archives.
+     *
+     * @return @c true if this file has child files, @c false otherwise.
+     */
+
+    bool hasChildFiles() const;
+
+    /**
+     * @brief Return the child file names.
+     *
+     * Return the child file names. This method is only relevant for COMBINE archives.
+     *
+     * @return The child file names, as a @c std::vector of @c std::string.
+     */
+
+    Strings childFileNames() const;
+
+    /**
+     * @brief Return the child files.
+     *
+     * Return the child files. This method is only relevant for COMBINE archives.
+     *
+     * @return The child files, as a @c std::vector of @ref FilePtr.
+     */
+
+    FilePtrs childFiles() const;
+
+    /**
+     * @brief Return a child file.
+     *
+     * Return a child file. This method is only relevant for COMBINE archives.
+     *
+     * @param pFileName The name of the child file.
+     *
+     * @return The file, as a @ref FilePtr, if it is a child file of this file, @c nullptr otherwise.
+     */
+
+    FilePtr childFile(const std::string &pFileName) const;
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

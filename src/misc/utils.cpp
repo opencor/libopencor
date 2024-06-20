@@ -68,10 +68,12 @@ std::filesystem::path stringToPath(const std::string &pString)
 
 std::string pathToString(const std::filesystem::path &pPath)
 {
+    auto path = pPath;
+
 #if defined(BUILDING_USING_MSVC)
-    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pPath.wstring());
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path.make_preferred().wstring());
 #else
-    return pPath.string();
+    return path.make_preferred().string();
 #endif
 }
 

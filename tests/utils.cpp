@@ -89,7 +89,7 @@ std::string textFileContents(const std::string &pFileName)
 {
     static const auto CRLF_REGEX = std::regex("\\r\\n");
 
-    auto res = libOpenCOR::toString(libOpenCOR::fileContents(libOpenCOR::resourcePath(pFileName)));
+    auto res = libOpenCOR::toString(libOpenCOR::fileContents(pFileName));
 
     // To retrieve a file contents as bytes will, on Windows, result in LF characters being converted to CR+LF, so
     // convert them back since we expect LF.

@@ -128,6 +128,7 @@ using SedModelPtrs = std::vector<SedModelPtr>; /**< Type definition for a vector
 using SedOutputPtrs = std::vector<SedOutputPtr>; /**< Type definition for a vector of @ref SedOutput pointers. */
 using SedSimulationPtrs = std::vector<SedSimulationPtr>; /**< Type definition for a vector of @ref SedSimulation pointers. */
 using SedStylePtrs = std::vector<SedStylePtr>; /**< Type definition for a vector of @ref SedStyle pointers. */
+using Strings = std::vector<std::string>; /**< Type definition for a vector of strings. */
 using UnsignedChars = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
 
 } // namespace libOpenCOR

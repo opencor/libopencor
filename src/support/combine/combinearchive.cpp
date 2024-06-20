@@ -52,6 +52,28 @@ CombineArchive::Impl::~Impl()
     delete mArchive;
 }
 
+Strings CombineArchive::Impl::fileNames() const
+{
+    Strings res;
+
+    for (const auto &file : mFiles) {
+        res.push_back(file->fileName());
+    }
+
+    return res;
+}
+
+FilePtr CombineArchive::Impl::file(const std::string &pFileName) const
+{
+    for (const auto &file : mFiles) {
+        if (file->fileName() == pFileName) {
+            return file;
+        }
+    }
+
+    return nullptr;
+}
+
 CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive)
     : Logger(new Impl {pFile, pArchive})
 {
@@ -101,6 +123,26 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 FilePtr CombineArchive::masterFile() const
 {
     return pimpl()->mMasterFile;
+}
+
+bool CombineArchive::hasFiles() const
+{
+    return !pimpl()->mFiles.empty();
+}
+
+Strings CombineArchive::fileNames() const
+{
+    return pimpl()->fileNames();
+}
+
+FilePtrs CombineArchive::files() const
+{
+    return pimpl()->mFiles;
+}
+
+FilePtr CombineArchive::file(const std::string &pFileName) const
+{
+    return pimpl()->file(pFileName);
 }
 
 } // namespace libOpenCOR

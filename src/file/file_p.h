@@ -56,6 +56,11 @@ public:
 
     UnsignedChars contents();
     void setContents(const UnsignedChars &pContents);
+
+    bool hasChildFiles() const;
+    Strings childFileNames() const;
+    FilePtrs childFiles() const;
+    FilePtr childFile(const std::string &pFileName) const;
 };
 
 } // namespace libOpenCOR

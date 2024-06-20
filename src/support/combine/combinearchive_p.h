@@ -31,6 +31,9 @@ public:
 
     explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive);
     ~Impl();
+
+    Strings fileNames() const;
+    FilePtr file(const std::string &pFileName) const;
 };
 
 } // namespace libOpenCOR
