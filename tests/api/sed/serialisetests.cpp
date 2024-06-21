@@ -491,6 +491,9 @@ TEST(SerialiseSedTest, sedmlFile)
       </algorithm>
     </uniformTimeCourse>
   </listOfSimulations>
+  <listOfTasks>
+    <task id="task1" modelReference="model" simulationReference="simulation1"/>
+  </listOfTasks>
 </sedML>
 )";
 

@@ -28,6 +28,7 @@ limitations under the License.
 #include "libopencor/sedmodel.h"
 #include "libopencor/sedonestep.h"
 #include "libopencor/sedsteadystate.h"
+#include "libopencor/sedtask.h"
 #include "libopencor/seduniformtimecourse.h"
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverforwardeuler.h"
@@ -161,6 +162,18 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
             simulation->setNlaSolver(nlaSolver);
         }
+    }
+
+    // Populate the tasks.
+    //---GRY--- FOR NOW, WE CREATE ONE TASK IF WE HAVE ONE MODEL AND ONE SIMULATION. THIS IS SO THAT WE CAN MEET OUR
+    //          ISAN DEADLINE.
+
+#ifdef CODE_COVERAGE_ENABLED
+    if (mDocument->getNumModels() == 1) {
+#else
+    if ((mDocument->getNumModels() == 1) && (mDocument->getNumSimulations() == 1)) {
+#endif
+        pDocument->addTask(SedTask::create(pDocument, pDocument->models()[0], pDocument->simulations()[0]));
     }
 }
 
