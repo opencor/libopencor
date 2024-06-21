@@ -285,7 +285,7 @@ if(EMSCRIPTEN)
     # Create a ZIP file for our generated .js and .wasm files.
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E tar "cfv" "${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION_MAJOR}-${PROJECT_VERSION_MINOR}-${PROJECT_VERSION_PATCH}-WebAssembly.zip" --format=zip
+                       COMMAND ${CMAKE_COMMAND} -E tar "-cfv" "${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION_MAJOR}-${PROJECT_VERSION_MINOR}-${PROJECT_VERSION_PATCH}-WebAssembly.zip" --format=zip
                                                        "${CMAKE_PROJECT_NAME}.js"
                                                        "${CMAKE_PROJECT_NAME}.wasm")
 
