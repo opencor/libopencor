@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  libNuML:
+  libnuml:
+    name: libNuML
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: LIBNUML

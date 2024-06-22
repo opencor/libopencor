@@ -5,6 +5,7 @@ on:
 
 jobs:
   libxml2:
+    name: libxml2
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: LIBXML2
