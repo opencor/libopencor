@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  libCOMBINE:
+  libcombine:
+    name: libCOMBINE
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: LIBCOMBINE

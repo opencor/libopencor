@@ -5,6 +5,7 @@ on:
 
 jobs:
   libssh2:
+    name: libssh2
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: LIBSSH2
