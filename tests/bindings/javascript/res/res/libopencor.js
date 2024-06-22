@@ -33,7 +33,7 @@ function showError(error) {
 
   $("#errorMessage").html(error);
 
-  updateFileUi(false, false, true, true);
+  updateFileUi(false, false, true, true, false);
 }
 
 function updateFileUi(
@@ -41,15 +41,15 @@ function updateFileUi(
   fileIssuesDisplay,
   fileErrorDisplay,
   resetButtonDisplay,
+  simulationDisplay,
 ) {
   $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
   $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
   $("#fileError").css("display", fileErrorDisplay ? "block" : "none");
   $("#resetFile").css("display", resetButtonDisplay ? "block" : "none");
-  $("#simulation").css(
-    "display",
-    fileInfoDisplay && !fileIssuesDisplay ? "block" : "none",
-  );
+  $("#simulation").css("display", simulationDisplay ? "block" : "none");
+
+  listFiles();
 }
 
 function resetObjects() {
@@ -75,7 +75,7 @@ function resetObjects() {
 export function resetFile() {
   $("#dropAreaInput").value = "";
 
-  updateFileUi(false, false, false, false);
+  updateFileUi(false, false, false, false, false);
 
   resetObjects();
 }
@@ -211,6 +211,7 @@ $(() => {
             // Determine the type of the file.
 
             let fileType = "some unknown file";
+            let knownFile = true;
 
             if (file.type() === libopencor.File.Type.CELLML_FILE) {
               fileType = "a CellML file";
@@ -218,6 +219,8 @@ $(() => {
               fileType = "a SED-ML file";
             } else if (file.type() === libopencor.File.Type.COMBINE_ARCHIVE) {
               fileType = "a COMBINE archive";
+            } else {
+              knownFile = false;
             }
 
             $("#fileName").html(inputFile.name);
@@ -225,7 +228,7 @@ $(() => {
 
             // Display any issues with the file or run it.
 
-            let showIssues = false;
+            let hasIssues = false;
 
             if (file.type() === libopencor.File.Type.CELLML_FILE) {
               if (file.hasIssues()) {
@@ -246,7 +249,7 @@ $(() => {
                   );
                 }
 
-                showIssues = true;
+                hasIssues = true;
               } else {
                 // Retrieve some information about the simulation.
 
@@ -280,7 +283,7 @@ $(() => {
               }
             }
 
-            updateFileUi(true, showIssues, false, true);
+            updateFileUi(true, hasIssues, false, true, knownFile && !hasIssues);
           } catch (exception) {
             showError(exception.message);
           }
