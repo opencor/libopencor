@@ -16,11 +16,11 @@ limitations under the License.
 
 #include <libopencor>
 
-#include <pybind11/pybind11.h>
+#include <nanobind/stl/string.h>
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void versionApi(py::module_ &m)
+void versionApi(nb::module_ &m)
 {
     // Version API.
 
