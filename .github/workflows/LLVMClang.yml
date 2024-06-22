@@ -1,10 +1,11 @@
-name: LLVMClang
+name: LLVM+Clang
 
 on:
   workflow_dispatch:
 
 jobs:
-  LLVMClang:
+  llvm-clang:
+    name: LLVM+Clang
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: LLVMCLANG

@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  SUNDIALS:
+  sundials:
+  name: SUNDIALS
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: SUNDIALS

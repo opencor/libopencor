@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME LLVMClang)
-set(PACKAGE_VERSION 18.1.7)
+set(PACKAGE_VERSION 18.1.8)
 set(PACKAGE_REPOSITORY llvm-project)
-set(RELEASE_TAG llvmorg-18.1.7)
+set(RELEASE_TAG llvmorg-18.1.8)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -25,26 +25,26 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
         if(RELEASE_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             1bdfb7d051f0091cf786153a79a9d5312bb87670)
+                             843e3caf60ed5dffab9bd55326da195b6b850553)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             6dea26d89916b5c6413084027484b9835ee48226)
+                             bbdc5f37a97cdfb78748ee1f75d25f44ef24f707)
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e7077a192f2ed0dbf76dcdc2a001c9158c3e08f7)
+                             9478d8f5446e19ba9a496cb72d4bc1ff0c31d6f5)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             8cffe6a69c106dd33ae571558326ab7c502b1a05)
+                             519fee44fc83145bbbe7c027e5e78aa32a8bdbfa)
         endif()
     else()
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         5d0eddf27ddd288b4efe49498fa8f636fc40e18b)
+                         5e8c850c5272cfb95b743a8c1141f71dcd15c7f9)
     endif()
 else()
     # Build our package.

@@ -5,6 +5,7 @@ on:
 
 jobs:
   libcurl:
+    name: libcurl
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: LIBCURL

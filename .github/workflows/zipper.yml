@@ -5,6 +5,7 @@ on:
 
 jobs:
   zipper:
+    name: zipper
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: ZIPPER
