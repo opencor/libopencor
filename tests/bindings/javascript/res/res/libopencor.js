@@ -1,3 +1,4 @@
+let fileManager = null;
 let file = null;
 let document = null;
 let simulation = null;
@@ -34,6 +35,20 @@ function showError(error) {
   $("#errorMessage").html(error);
 
   updateFileUi(false, false, true, true, false);
+}
+
+function listFiles() {
+  if (fileManager.hasFiles()) {
+    console.log("Files:");
+
+    const files = fileManager.files();
+
+    for (let i = 0; i < files.size(); ++i) {
+      console.log(" - " + files.get(i).fileName());
+    }
+  } else {
+    console.log("No files.");
+  }
 }
 
 function updateFileUi(
@@ -78,6 +93,8 @@ export function resetFile() {
   updateFileUi(false, false, false, false, false);
 
   resetObjects();
+
+  listFiles();
 }
 
 function addAxisElement(axis, name) {
@@ -173,6 +190,10 @@ $(() => {
   // Make sure that libOpenCOR is loaded before we do anything else.
 
   libOpenCOR().then((libopencor) => {
+    // Keep track of the file manager.
+
+    fileManager = libopencor.FileManager.instance();
+
     // Simulation page.
 
     const input = $("#dropAreaInput")[0];
