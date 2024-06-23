@@ -47,6 +47,7 @@ void fileApi()
                       pThis->setContents(libOpenCOR::UnsignedChars(contents, contents + pSize));
                   }))
         .function("hasChildFiles", &libOpenCOR::File::hasChildFiles)
+        .function("childFileCount", &libOpenCOR::File::childFileCount)
         .function("childFileNames", &libOpenCOR::File::childFileNames)
         .function("childFiles", &libOpenCOR::File::childFiles)
         .function("childFile", &libOpenCOR::File::childFile);
@@ -62,6 +63,7 @@ void fileApi()
     emscripten::class_<libOpenCOR::FileManager>("FileManager")
         .class_function("instance", &libOpenCOR::FileManager::instance)
         .function("hasFiles", &libOpenCOR::FileManager::hasFiles)
+        .function("fileCount", &libOpenCOR::FileManager::fileCount)
         .function("files", &libOpenCOR::FileManager::files)
         .function("file", &libOpenCOR::FileManager::file);
 }

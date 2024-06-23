@@ -58,6 +58,7 @@ public:
     void setContents(const UnsignedChars &pContents);
 
     bool hasChildFiles() const;
+    size_t childFileCount() const;
     Strings childFileNames() const;
     FilePtrs childFiles() const;
     FilePtr childFile(const std::string &pFileName) const;

@@ -89,6 +89,7 @@ describe("File basic tests", () => {
     const fileManager = libopencor.FileManager.instance();
 
     expect(fileManager.hasFiles()).toBe(false);
+    expect(fileManager.fileCount()).toBe(0);
     expect(fileManager.files().size()).toBe(0);
     expect(fileManager.file(utils.LOCAL_FILE)).toStrictEqual(null);
 
@@ -96,12 +97,14 @@ describe("File basic tests", () => {
     const sameFileManager = libopencor.FileManager.instance();
 
     expect(sameFileManager.hasFiles()).toBe(true);
+    expect(sameFileManager.fileCount()).toBe(1);
     expect(sameFileManager.files().size()).toBe(1);
     expect(sameFileManager.file(utils.LOCAL_FILE)).toStrictEqual(localFile);
 
     const remoteFile = new libopencor.File(utils.REMOTE_FILE);
 
     expect(fileManager.hasFiles()).toBe(true);
+    expect(fileManager.fileCount()).toBe(2);
     expect(fileManager.files().size()).toBe(2);
     expect(fileManager.file(utils.REMOTE_FILE)).toStrictEqual(remoteFile);
 

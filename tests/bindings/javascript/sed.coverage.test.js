@@ -65,6 +65,8 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.hasModels()).toBe(false);
+    expect(document.modelCount()).toBe(0);
+    expect(document.models().size()).toBe(0);
     expect(document.addModel(null)).toBe(false);
 
     const file = new libopencor.File(utils.SEDML_FILE);
@@ -72,6 +74,8 @@ describe("Sed coverage tests", () => {
 
     expect(document.addModel(model)).toBe(true);
 
+    expect(document.hasModels()).toBe(true);
+    expect(document.modelCount()).toBe(1);
     expect(document.models().size()).toBe(1);
     expect(document.models().get(0)).toStrictEqual(model);
 
@@ -79,6 +83,8 @@ describe("Sed coverage tests", () => {
     expect(document.removeModel(model)).toBe(true);
 
     expect(document.hasModels()).toBe(false);
+    expect(document.modelCount()).toBe(0);
+    expect(document.models().size()).toBe(0);
 
     expect(document.removeModel(null)).toBe(false);
 
@@ -91,6 +97,8 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.hasSimulations()).toBe(false);
+    expect(document.simulationCount()).toBe(0);
+    expect(document.simulations().size()).toBe(0);
     expect(document.addSimulation(null)).toBe(false);
 
     const uniform_time_course = new libopencor.SedUniformTimeCourse(document);
@@ -103,6 +111,8 @@ describe("Sed coverage tests", () => {
     expect(document.addSimulation(steady_state)).toBe(true);
     expect(document.addSimulation(analysis)).toBe(true);
 
+    expect(document.hasSimulations()).toBe(true);
+    expect(document.simulationCount()).toBe(4);
     expect(document.simulations().size()).toBe(4);
     expect(document.simulations().get(0)).toStrictEqual(uniform_time_course);
     expect(document.simulations().get(1)).toStrictEqual(one_step);
@@ -122,6 +132,8 @@ describe("Sed coverage tests", () => {
     expect(document.removeSimulation(analysis)).toBe(true);
 
     expect(document.hasSimulations()).toBe(false);
+    expect(document.simulationCount()).toBe(0);
+    expect(document.simulations().size()).toBe(0);
 
     expect(document.removeSimulation(null)).toBe(false);
 
@@ -134,6 +146,8 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.hasTasks()).toBe(false);
+    expect(document.taskCount()).toBe(0);
+    expect(document.tasks().size()).toBe(0);
     expect(document.addTask(null)).toBe(false);
 
     const file = new libopencor.File(utils.SEDML_FILE);
@@ -146,6 +160,8 @@ describe("Sed coverage tests", () => {
 
     expect(document.addTask(task)).toBe(true);
 
+    expect(document.hasTasks()).toBe(true);
+    expect(document.taskCount()).toBe(1);
     expect(document.tasks().size()).toBe(1);
     expect(document.tasks().get(0)).toStrictEqual(task);
 
@@ -170,6 +186,8 @@ describe("Sed coverage tests", () => {
     expect(document.removeTask(task)).toBe(true);
 
     expect(document.hasTasks()).toBe(false);
+    expect(document.taskCount()).toBe(0);
+    expect(document.tasks().size()).toBe(0);
 
     expect(document.removeTask(null)).toBe(false);
 

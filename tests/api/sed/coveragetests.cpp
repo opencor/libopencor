@@ -36,6 +36,8 @@ TEST(CoverageSedTest, models)
     auto document = libOpenCOR::SedDocument::create();
 
     EXPECT_FALSE(document->hasModels());
+    EXPECT_EQ(document->modelCount(), 0);
+    EXPECT_EQ(document->models().size(), 0);
     EXPECT_FALSE(document->addModel(nullptr));
 
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
@@ -43,6 +45,8 @@ TEST(CoverageSedTest, models)
 
     EXPECT_TRUE(document->addModel(model));
 
+    EXPECT_TRUE(document->hasModels());
+    EXPECT_EQ(document->modelCount(), 1);
     EXPECT_EQ(document->models().size(), 1);
     EXPECT_EQ(document->models()[0], model);
 
@@ -50,6 +54,8 @@ TEST(CoverageSedTest, models)
     EXPECT_TRUE(document->removeModel(model));
 
     EXPECT_FALSE(document->hasModels());
+    EXPECT_EQ(document->modelCount(), 0);
+    EXPECT_EQ(document->models().size(), 0);
 
     EXPECT_FALSE(document->removeModel(nullptr));
 }
@@ -59,6 +65,8 @@ TEST(CoverageSedTest, simulations)
     auto document = libOpenCOR::SedDocument::create();
 
     EXPECT_FALSE(document->hasSimulations());
+    EXPECT_EQ(document->simulationCount(), 0);
+    EXPECT_EQ(document->simulations().size(), 0);
     EXPECT_FALSE(document->addSimulation(nullptr));
 
     auto uniformTimeCourse = libOpenCOR::SedUniformTimeCourse::create(document);
@@ -71,6 +79,8 @@ TEST(CoverageSedTest, simulations)
     EXPECT_TRUE(document->addSimulation(steadyState));
     EXPECT_TRUE(document->addSimulation(analysis));
 
+    EXPECT_TRUE(document->hasSimulations());
+    EXPECT_EQ(document->simulationCount(), 4);
     EXPECT_EQ(document->simulations().size(), 4);
     EXPECT_EQ(document->simulations()[0], uniformTimeCourse);
     EXPECT_EQ(document->simulations()[1], oneStep);
@@ -90,6 +100,8 @@ TEST(CoverageSedTest, simulations)
     EXPECT_TRUE(document->removeSimulation(analysis));
 
     EXPECT_FALSE(document->hasSimulations());
+    EXPECT_EQ(document->simulationCount(), 0);
+    EXPECT_EQ(document->simulations().size(), 0);
 
     EXPECT_FALSE(document->removeSimulation(nullptr));
 }
@@ -116,6 +128,8 @@ TEST(CoverageSedTest, tasks)
     auto document = libOpenCOR::SedDocument::create();
 
     EXPECT_FALSE(document->hasTasks());
+    EXPECT_EQ(document->taskCount(), 0);
+    EXPECT_EQ(document->tasks().size(), 0);
     EXPECT_FALSE(document->addTask(nullptr));
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
@@ -128,6 +142,8 @@ TEST(CoverageSedTest, tasks)
 
     EXPECT_TRUE(document->addTask(task));
 
+    EXPECT_TRUE(document->hasTasks());
+    EXPECT_EQ(document->taskCount(), 1);
     EXPECT_EQ(document->tasks().size(), 1);
     EXPECT_EQ(document->tasks()[0], task);
 
@@ -154,6 +170,8 @@ TEST(CoverageSedTest, tasks)
     EXPECT_TRUE(document->removeTask(task));
 
     EXPECT_FALSE(document->hasTasks());
+    EXPECT_EQ(document->taskCount(), 0);
+    EXPECT_EQ(document->tasks().size(), 0);
 
     EXPECT_FALSE(document->removeTask(nullptr));
 }

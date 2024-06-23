@@ -27,6 +27,7 @@ void doTestDataset(const std::string &pNumber, const std::vector<std::string> &p
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/dataset_" + pNumber + ".omex"));
 
     EXPECT_TRUE(file->hasChildFiles());
+    EXPECT_EQ(file->childFileCount(), pSpecificChildFileNames.size() + 1);
 
     auto childFileNames = file->childFileNames();
 
@@ -59,6 +60,7 @@ TEST(ChildFileTest, noChildFiles)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
 
     EXPECT_FALSE(file->hasChildFiles());
+    EXPECT_EQ(file->childFileCount(), 0);
     EXPECT_EQ(file->childFileNames().size(), 0);
     EXPECT_EQ(file->childFiles().size(), 0);
     EXPECT_EQ(file->childFile(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE)), nullptr);

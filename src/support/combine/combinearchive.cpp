@@ -130,6 +130,11 @@ bool CombineArchive::hasFiles() const
     return !pimpl()->mFiles.empty();
 }
 
+size_t CombineArchive::fileCount() const
+{
+    return pimpl()->mFiles.size();
+}
+
 Strings CombineArchive::fileNames() const
 {
     return pimpl()->fileNames();

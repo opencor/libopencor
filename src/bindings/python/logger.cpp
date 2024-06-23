@@ -27,12 +27,16 @@ void loggerApi(py::module_ &m)
     py::class_<libOpenCOR::Logger, libOpenCOR::LoggerPtr> logger(m, "Logger");
 
     logger.def_property_readonly("has_issues", &libOpenCOR::Logger::hasIssues, "Return whether there are some issues.")
+        .def_property_readonly("issue_count", &libOpenCOR::Logger::issueCount, "Return the number of issues.")
         .def_property_readonly("issues", &libOpenCOR::Logger::issues, "Return the issues.")
         .def_property_readonly("has_errors", &libOpenCOR::Logger::hasErrors, "Return whether there are some errors.")
+        .def_property_readonly("error_count", &libOpenCOR::Logger::errorCount, "Return the number of errors.")
         .def_property_readonly("errors", &libOpenCOR::Logger::errors, "Return the errors.")
         .def_property_readonly("has_warnings", &libOpenCOR::Logger::hasWarnings, "Return whether there are some warnings.")
+        .def_property_readonly("warning_count", &libOpenCOR::Logger::warningCount, "Return the number of warnings.")
         .def_property_readonly("warnings", &libOpenCOR::Logger::warnings, "Return the warnings.")
         .def_property_readonly("has_messages", &libOpenCOR::Logger::hasMessages, "Return whether there are some messages.")
+        .def_property_readonly("message_count", &libOpenCOR::Logger::messageCount, "Return the number of messages.")
         .def_property_readonly("messages", &libOpenCOR::Logger::messages, "Return the messages.");
 
     // Issue API.

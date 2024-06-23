@@ -35,6 +35,7 @@ public:
     void unmanage(File *pFile);
 
     bool hasFiles() const;
+    size_t fileCount() const;
     FilePtrs files() const;
     FilePtr file(const std::string &pFileNameOrUrl) const;
 };

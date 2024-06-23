@@ -94,6 +94,11 @@ bool FileManager::Impl::hasFiles() const
     return !mFiles.empty();
 }
 
+size_t FileManager::Impl::fileCount() const
+{
+    return mFiles.size();
+}
+
 FilePtrs FileManager::Impl::files() const
 {
     FilePtrs res;
@@ -142,6 +147,11 @@ FileManager::FileManager()
 bool FileManager::hasFiles() const
 {
     return mPimpl.hasFiles();
+}
+
+size_t FileManager::fileCount() const
+{
+    return mPimpl.fileCount();
 }
 
 FilePtrs FileManager::files() const

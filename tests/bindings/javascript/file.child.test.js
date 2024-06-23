@@ -62,6 +62,7 @@ describe("File type tests", () => {
     file.setContents(omexContentsPtr, omexContents.length);
 
     expect(file.hasChildFiles()).toBe(true);
+    expect(file.childFileCount()).toBe(specificChildFileNames.length + 1);
 
     const childFileNames = file.childFileNames();
 
@@ -97,6 +98,7 @@ describe("File type tests", () => {
     const file = new libopencor.File(utils.UNKNOWN_FILE);
 
     expect(file.hasChildFiles()).toBe(false);
+    expect(file.childFileCount()).toBe(0);
     expect(file.childFileNames().size()).toBe(0);
     expect(file.childFiles().size()).toBe(0);
     expect(file.childFile(utils.UNKNOWN_FILE)).toBeNull();

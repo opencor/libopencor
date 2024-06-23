@@ -171,6 +171,16 @@ public:
     bool hasChildFiles() const;
 
     /**
+     * @brief Return the number of child files.
+     *
+     * Return the number of child files. This method is only relevant for COMBINE archives.
+     *
+     * @return The number of child files.
+     */
+
+    size_t childFileCount() const;
+
+    /**
      * @brief Return the child file names.
      *
      * Return the child file names. This method is only relevant for COMBINE archives.

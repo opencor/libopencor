@@ -41,6 +41,7 @@ void fileApi(py::module_ &m)
         .def_property_readonly("path", &libOpenCOR::File::path, "Get the path for this File object.")
         .def_property("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.")
         .def_property_readonly("has_child_files", &libOpenCOR::File::hasChildFiles, "Return whether this File object has some child files.")
+        .def_property_readonly("child_file_count", &libOpenCOR::File::childFileCount, "Return the number of child files for this File object.")
         .def_property_readonly("child_file_names", &libOpenCOR::File::childFileNames, "Return the child file names for this File object.")
         .def_property_readonly("child_files", &libOpenCOR::File::childFiles, "Return the child files for this File object.")
         .def("child_file", &libOpenCOR::File::childFile, "Get the requested child file for this File object.", py::arg("file_name"));
@@ -51,6 +52,7 @@ void fileApi(py::module_ &m)
 
     fileManager.def_static("instance", &libOpenCOR::FileManager::instance, "Get the file manager instance.")
         .def("has_files", &libOpenCOR::FileManager::hasFiles, "Return whether there are managed files.")
+        .def("file_count", &libOpenCOR::FileManager::fileCount, "Return the number of managed files.")
         .def("files", &libOpenCOR::FileManager::files, "Return the managed files.")
         .def("file", &libOpenCOR::FileManager::file, "Get the requested managed file.", py::arg("file_name_or_url"));
 }

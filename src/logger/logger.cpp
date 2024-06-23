@@ -141,6 +141,11 @@ bool Logger::hasIssues() const
     return pimpl()->hasIssues();
 }
 
+size_t Logger::issueCount() const
+{
+    return pimpl()->mIssues.size();
+}
+
 IssuePtrs Logger::issues() const
 {
     return pimpl()->mIssues;
@@ -149,6 +154,11 @@ IssuePtrs Logger::issues() const
 bool Logger::hasErrors() const
 {
     return pimpl()->hasErrors();
+}
+
+size_t Logger::errorCount() const
+{
+    return pimpl()->mErrors.size();
 }
 
 IssuePtrs Logger::errors() const
@@ -161,6 +171,11 @@ bool Logger::hasWarnings() const
     return pimpl()->hasWarnings();
 }
 
+size_t Logger::warningCount() const
+{
+    return pimpl()->mWarnings.size();
+}
+
 IssuePtrs Logger::warnings() const
 {
     return pimpl()->mWarnings;
@@ -169,6 +184,11 @@ IssuePtrs Logger::warnings() const
 bool Logger::hasMessages() const
 {
     return pimpl()->hasMessages();
+}
+
+size_t Logger::messageCount() const
+{
+    return pimpl()->mMessages.size();
 }
 
 IssuePtrs Logger::messages() const

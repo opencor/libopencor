@@ -48,6 +48,8 @@ def test_models():
     document = SedDocument()
 
     assert document.has_models == False
+    assert document.model_count == 0
+    assert len(document.models) == 0
     assert document.add_model(None) == False
 
     file = File(utils.LocalFile)
@@ -55,6 +57,8 @@ def test_models():
 
     assert document.add_model(model) == True
 
+    assert document.has_models == True
+    assert document.model_count == 1
     assert len(document.models) == 1
     assert document.models[0] == model
 
@@ -62,6 +66,8 @@ def test_models():
     assert document.remove_model(model) == True
 
     assert document.has_models == False
+    assert document.model_count == 0
+    assert len(document.models) == 0
 
     assert document.remove_model(None) == False
 
@@ -70,6 +76,8 @@ def test_simulations():
     document = SedDocument()
 
     assert document.has_simulations == False
+    assert document.simulation_count == 0
+    assert len(document.simulations) == 0
     assert document.add_simulation(None) == False
 
     uniformTimeCourse = SedUniformTimeCourse(document)
@@ -82,6 +90,8 @@ def test_simulations():
     assert document.add_simulation(steadyState) == True
     assert document.add_simulation(analysis) == True
 
+    assert document.has_simulations == True
+    assert document.simulation_count == 4
     assert len(document.simulations) == 4
     assert document.simulations[0] == uniformTimeCourse
     assert document.simulations[1] == oneStep
@@ -101,6 +111,8 @@ def test_simulations():
     assert document.remove_simulation(analysis) == True
 
     assert document.has_simulations == False
+    assert document.simulation_count == 0
+    assert len(document.simulations) == 0
 
     assert document.remove_simulation(None) == False
 
@@ -125,6 +137,8 @@ def test_tasks():
     document = SedDocument()
 
     assert document.has_tasks == False
+    assert document.task_count == 0
+    assert len(document.tasks) == 0
     assert document.add_task(None) == False
 
     file = File(utils.LocalFile)
@@ -137,6 +151,8 @@ def test_tasks():
 
     assert document.add_task(task) == True
 
+    assert document.has_tasks == True
+    assert document.task_count == 1
     assert len(document.tasks) == 1
     assert document.tasks[0] == task
 
@@ -169,6 +185,8 @@ def test_tasks():
     assert document.remove_task(task) == True
 
     assert document.has_tasks == False
+    assert document.task_count == 0
+    assert len(document.tasks) == 0
 
     assert document.remove_task(None) == False
 

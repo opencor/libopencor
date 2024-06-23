@@ -22,6 +22,7 @@ def do_test_dataset(number, specific_child_file_names):
     file = File(utils.resource_path("api/file/dataset_" + str(number) + ".omex"))
 
     assert file.has_child_files == True
+    assert file.child_file_count == len(specific_child_file_names) + 1
 
     child_file_names = file.child_file_names
 
@@ -56,6 +57,7 @@ def test_type_no_child_files():
     file = File(utils.resource_path(utils.UnknownFile))
 
     assert file.has_child_files == False
+    assert file.child_file_count == 0
     assert len(file.child_file_names) == 0
     assert len(file.child_files) == 0
     assert file.child_file("unknown_file") is None

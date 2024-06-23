@@ -163,6 +163,15 @@ bool File::Impl::hasChildFiles() const
     return false;
 }
 
+size_t File::Impl::childFileCount() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->fileCount();
+    }
+
+    return 0;
+}
+
 Strings File::Impl::childFileNames() const
 {
     if (mType == Type::COMBINE_ARCHIVE) {
@@ -270,6 +279,11 @@ void File::setContents(const UnsignedChars &pContents)
 bool File::hasChildFiles() const
 {
     return pimpl()->hasChildFiles();
+}
+
+size_t File::childFileCount() const
+{
+    return pimpl()->childFileCount();
 }
 
 Strings File::childFileNames() const

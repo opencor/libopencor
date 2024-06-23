@@ -411,6 +411,11 @@ bool SedDocument::hasModels() const
     return pimpl()->hasModels();
 }
 
+size_t SedDocument::modelCount() const
+{
+    return pimpl()->mModels.size();
+}
+
 SedModelPtrs SedDocument::models() const
 {
     return pimpl()->mModels;
@@ -431,6 +436,11 @@ bool SedDocument::hasSimulations() const
     return pimpl()->hasSimulations();
 }
 
+size_t SedDocument::simulationCount() const
+{
+    return pimpl()->mSimulations.size();
+}
+
 SedSimulationPtrs SedDocument::simulations() const
 {
     return pimpl()->mSimulations;
@@ -449,6 +459,11 @@ bool SedDocument::removeSimulation(const SedSimulationPtr &pSimulation)
 bool SedDocument::hasTasks() const
 {
     return pimpl()->hasTasks();
+}
+
+size_t SedDocument::taskCount() const
+{
+    return pimpl()->mTasks.size();
 }
 
 SedAbstractTaskPtrs SedDocument::tasks() const

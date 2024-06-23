@@ -136,6 +136,7 @@ TEST(BasicFileTest, fileManager)
     auto fileManager = libOpenCOR::FileManager::instance();
 
     EXPECT_FALSE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 0);
     EXPECT_TRUE(fileManager.files().empty());
     EXPECT_EQ(fileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
 
@@ -143,12 +144,14 @@ TEST(BasicFileTest, fileManager)
     auto sameFileManager = libOpenCOR::FileManager::instance();
 
     EXPECT_TRUE(sameFileManager.hasFiles());
+    EXPECT_EQ(sameFileManager.fileCount(), 1);
     EXPECT_EQ(sameFileManager.files().size(), 1);
     EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), localFile);
 
     auto remoteFile = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
 
     EXPECT_TRUE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 2);
     EXPECT_EQ(fileManager.files().size(), 2);
     EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), remoteFile);
 }

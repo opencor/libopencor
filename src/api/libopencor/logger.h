@@ -56,6 +56,16 @@ public:
     bool hasIssues() const;
 
     /**
+     * @brief Return the number of issues.
+     *
+     * Return the number of issues.
+     *
+     * @return The number of issues.
+     */
+
+    size_t issueCount() const;
+
+    /**
      * @brief Return the issues.
      *
      * Return the issues.
@@ -74,6 +84,16 @@ public:
      */
 
     bool hasErrors() const;
+
+    /**
+     * @brief Return the number of errors.
+     *
+     * Return the number of errors.
+     *
+     * @return The number of errors.
+     */
+
+    size_t errorCount() const;
 
     /**
      * @brief Return the errors.
@@ -96,6 +116,16 @@ public:
     bool hasWarnings() const;
 
     /**
+     * @brief Return the number of warnings.
+     *
+     * Return the number of warnings.
+     *
+     * @return The number of warnings.
+     */
+
+    size_t warningCount() const;
+
+    /**
      * @brief Return the warnings.
      *
      * Return the warnings.
@@ -114,6 +144,16 @@ public:
      */
 
     bool hasMessages() const;
+
+    /**
+     * @brief Return the number of messages.
+     *
+     * Return the number of messages.
+     *
+     * @return The number of messages.
+     */
+
+    size_t messageCount() const;
 
     /**
      * @brief Return the messages.

@@ -54,6 +54,16 @@ public:
     bool hasFiles() const;
 
     /**
+     * @brief Return the number of managed files.
+     *
+     * Return the number of managed files.
+     *
+     * @return The number of managed files.
+     */
+
+    size_t fileCount() const;
+
+    /**
      * @brief Return the managed files.
      *
      * Return the managed files.

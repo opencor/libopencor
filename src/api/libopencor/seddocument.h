@@ -101,6 +101,16 @@ public:
     bool hasModels() const;
 
     /**
+     * @brief Return the number of models.
+     *
+     * Return the number of models.
+     *
+     * @return The number of models.
+     */
+
+    size_t modelCount() const;
+
+    /**
      * @brief Return the models.
      *
      * Return the models.
@@ -145,6 +155,16 @@ public:
     bool hasSimulations() const;
 
     /**
+     * @brief Return the number of simulations.
+     *
+     * Return the number of simulations.
+     *
+     * @return The number of simulations.
+     */
+
+    size_t simulationCount() const;
+
+    /**
      * @brief Return the simulations.
      *
      * Return the simulations.
@@ -187,6 +207,16 @@ public:
      */
 
     bool hasTasks() const;
+
+    /**
+     * @brief Return the number of tasks.
+     *
+     * Return the number of tasks.
+     *
+     * @return The number of tasks.
+     */
+
+    size_t taskCount() const;
 
     /**
      * @brief Return the tasks.
