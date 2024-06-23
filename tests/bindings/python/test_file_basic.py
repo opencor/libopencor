@@ -133,22 +133,22 @@ def test_remote_virtual_file():
 def test_file_manager():
     file_manager = FileManager.instance()
 
-    assert file_manager.has_files() == False
+    assert file_manager.has_files == False
     assert file_manager.file_count == 0
-    assert len(file_manager.files()) == 0
+    assert len(file_manager.files) == 0
     assert file_manager.file(utils.LocalFile) == None
 
     local_file = File(utils.LocalFile)
     same_file_manager = FileManager.instance()
 
-    assert same_file_manager.has_files() == True
+    assert same_file_manager.has_files == True
     assert same_file_manager.file_count == 1
-    assert len(file_manager.files()) == 1
+    assert len(file_manager.files) == 1
     assert same_file_manager.file(utils.LocalFile) == local_file
 
     remote_file = File(utils.RemoteFile)
 
-    assert file_manager.has_files() == True
+    assert file_manager.has_files == True
     assert file_manager.file_count == 2
-    assert len(file_manager.files()) == 2
+    assert len(file_manager.files) == 2
     assert file_manager.file(utils.RemoteFile) == remote_file
