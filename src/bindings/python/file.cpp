@@ -50,7 +50,7 @@ void fileApi(py::module_ &m)
     py::class_<libOpenCOR::FileManager, std::unique_ptr<libOpenCOR::FileManager, py::nodelete>> fileManager(m, "FileManager");
 
     fileManager.def_static("instance", &libOpenCOR::FileManager::instance, "Get the file manager instance.")
-        .def("has_files", &libOpenCOR::FileManager::hasFiles, "Return whether there are some files.")
-        .def("files", &libOpenCOR::FileManager::files, "Return the files.")
-        .def("file", &libOpenCOR::FileManager::file, "Get the requested file.", py::arg("file_name_or_url"));
+        .def("has_files", &libOpenCOR::FileManager::hasFiles, "Return whether there are managed files.")
+        .def("files", &libOpenCOR::FileManager::files, "Return the managed files.")
+        .def("file", &libOpenCOR::FileManager::file, "Get the requested managed file.", py::arg("file_name_or_url"));
 }

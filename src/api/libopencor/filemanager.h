@@ -44,33 +44,33 @@ public:
     static FileManager &instance();
 
     /**
-     * @brief Return whether there are some files.
+     * @brief Return whether there are managed files.
      *
-     * Return whether there are some files.
+     * Return whether there are managed files.
      *
-     * @return @c true if there are some files, @c false otherwise.
+     * @return @c true if there are managed files, @c false otherwise.
      */
 
     bool hasFiles() const;
 
     /**
-     * @brief Return the files.
+     * @brief Return the managed files.
      *
-     * Return the files.
+     * Return the managed files.
      *
-     * @return The files, as an @ref FilePtrs.
+     * @return The managed files, as an @ref FilePtrs.
      */
 
     FilePtrs files() const;
 
     /**
-     * @brief Get a given file.
+     * @brief Get a given managed file.
      *
-     * Get a given file.
+     * Get a given managed file.
      *
-     * @param pFileNameOrUrl The name of the file or its URL.
+     * @param pFileNameOrUrl The name of the managed file or its URL.
      *
-     * @return The file, as a @ref FilePtr, if it is managed by the file manager, @c nullptr otherwise.
+     * @return The managed file, as a @ref FilePtr, if it is managed by the file manager, @c nullptr otherwise.
      */
 
     FilePtr file(const std::string &pFileNameOrUrl) const;
