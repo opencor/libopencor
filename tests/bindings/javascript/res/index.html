@@ -65,7 +65,7 @@
                 </div>
             </div>
 
-            <button type="button" class="btn btn-secondary reset-button" id="resetFile"><i class="fa fa-recycle"></i></button>
+            <button type="button" class="btn btn-secondary reset-button" id="reset"><i class="fa fa-recycle"></i></button>
 
             <div class="file info" id="fileInfo">
                 <p class="info">
@@ -181,7 +181,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@arction/lcjs@4.2.1/dist/lcjs.iife.js"></script>
 
     <script type="module">
-        import { resetFile, run, showPage, updatePlottingAreaAndAxesInfo } from "./res/libopencor.js";
+        import { reset, run, showPage, updatePlottingAreaAndAxesInfo } from "./res/libopencor.js";
 
         $("#navHome").on("click", function() {
             showPage("Home");
@@ -193,8 +193,8 @@
             showPage("Versions");
         });
 
-        $("#resetFile").on("click", function() {
-            resetFile();
+        $("#reset").on("click", function() {
+            reset();
         });
 
         $("#xAxis").on("change", function() {

@@ -38,6 +38,8 @@ function showError(error) {
 }
 
 function listFiles() {
+  console.log("-------------------");
+
   if (fileManager.hasFiles()) {
     console.log("Files:");
 
@@ -61,19 +63,13 @@ function updateFileUi(
   $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
   $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
   $("#fileError").css("display", fileErrorDisplay ? "block" : "none");
-  $("#resetFile").css("display", resetButtonDisplay ? "block" : "none");
+  $("#reset").css("display", resetButtonDisplay ? "block" : "none");
   $("#simulation").css("display", simulationDisplay ? "block" : "none");
 
   listFiles();
 }
 
 function resetObjects() {
-  if (file) {
-    file.delete();
-
-    file = null;
-  }
-
   if (document) {
     document.delete();
 
@@ -87,14 +83,18 @@ function resetObjects() {
   }
 }
 
-export function resetFile() {
-  $("#dropAreaInput").value = "";
+export function reset() {
+  const files = fileManager.files();
 
-  updateFileUi(false, false, false, false, false);
+  for (let i = 0; i < fileManager.fileCount(); ++i) {
+    files.get(i).delete();
+  }
+
+  fileManager.reset();
 
   resetObjects();
 
-  listFiles();
+  updateFileUi(false, false, false, false, false);
 }
 
 function addAxisElement(axis, name) {
@@ -314,7 +314,7 @@ $(() => {
           showError(fileReader.error.message);
         };
       } else {
-        resetFile();
+        updateFileUi(false, false, false, false, false);
       }
     };
 
