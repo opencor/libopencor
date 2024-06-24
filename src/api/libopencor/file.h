@@ -106,8 +106,8 @@ public:
      *
      * Return the file name of this file. If the file is remote then we return the file name of its local copy.
      *
-     * @sa url
-     * @sa path
+     * @sa url()
+     * @sa path()
      *
      * @return The file name, as a @c std::string, of this file.
      */
@@ -119,8 +119,8 @@ public:
      *
      * Return the URL of this file. If the file is local then we return an empty string.
      *
-     * @sa fileName
-     * @sa path
+     * @sa fileName()
+     * @sa path()
      *
      * @return The URL, as a @c std::string, of this file.
      */
@@ -132,8 +132,8 @@ public:
      *
      * Return the path of this file. If the file is local then we return its file name otherwise its URL.
      *
-     * @sa fileName
-     * @sa url
+     * @sa fileName()
+     * @sa url()
      *
      * @return The path, as a @c std::string, of this file.
      */
