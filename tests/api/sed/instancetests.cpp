@@ -282,8 +282,7 @@ TEST(InstanceSedTest, combineArchive)
 
     instance->run();
 
-    //---GRY--- TO BE UNCOMMENTED ONCE WE CAN RUN A COMBINE ARCHIVE.
-    // EXPECT_FALSE(instance->hasIssues());
+    EXPECT_FALSE(instance->hasIssues());
 }
 
 TEST(InstanceSedTest, combineArchiveWithCellmlFileAsMasterFile)

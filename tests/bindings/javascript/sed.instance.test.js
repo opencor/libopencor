@@ -442,8 +442,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    //---GRY--- TO BE UNCOMMENTED ONCE WE CAN RUN A COMBINE ARCHIVE.
-    // expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues()).toBe(false);
 
     instance.delete();
     document.delete();

@@ -302,8 +302,7 @@ def test_combine_archive():
 
     instance.run()
 
-    # ---GRY--- TO BE UNCOMMENTED ONCE WE CAN RUN A COMBINE ARCHIVE.
-    # assert instance.has_issues == False
+    assert instance.has_issues == False
 
 
 def test_combine_archive_with_cellml_file_as_master_file():
