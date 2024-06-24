@@ -91,6 +91,16 @@ bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pSt
     return true;
 }
 
+double SolverOdeFixedStep::Impl::step() const
+{
+    return mStep;
+}
+
+void SolverOdeFixedStep::Impl::setStep(double pStep)
+{
+    mStep = pStep;
+}
+
 SolverOdeFixedStep::SolverOdeFixedStep(Impl *pPimpl)
     : SolverOde(pPimpl)
 {
@@ -108,12 +118,12 @@ const SolverOdeFixedStep::Impl *SolverOdeFixedStep::pimpl() const
 
 double SolverOdeFixedStep::step() const
 {
-    return pimpl()->mStep;
+    return pimpl()->step();
 }
 
 void SolverOdeFixedStep::setStep(double pStep)
 {
-    pimpl()->mStep = pStep;
+    pimpl()->setStep(pStep);
 }
 
 } // namespace libOpenCOR

@@ -69,15 +69,19 @@ public:
     Doubles rate(size_t pIndex) const;
     Doubles variable(size_t pIndex) const;
 
+    Doubles voi() const;
     std::string voiName() const;
     std::string voiUnit() const;
 
+    size_t stateCount() const;
     std::string stateName(size_t pIndex) const;
     std::string stateUnit(size_t pIndex) const;
 
+    size_t rateCount() const;
     std::string rateName(size_t pIndex) const;
     std::string rateUnit(size_t pIndex) const;
 
+    size_t variableCount() const;
     std::string variableName(size_t pIndex) const;
     std::string variableUnit(size_t pIndex) const;
 };

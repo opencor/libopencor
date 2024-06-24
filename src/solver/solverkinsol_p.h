@@ -50,6 +50,18 @@ public:
 
     StringStringMap properties() const override;
 
+    int maximumNumberOfIterations() const;
+    void setMaximumNumberOfIterations(int pMaximumNumberOfIterations);
+
+    LinearSolver linearSolver() const;
+    void setLinearSolver(LinearSolver pLinearSolver);
+
+    int upperHalfBandwidth() const;
+    void setUpperHalfBandwidth(int pUpperHalfBandwidth);
+
+    int lowerHalfBandwidth() const;
+    void setLowerHalfBandwidth(int pLowerHalfBandwidth);
+
     bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
 };
 

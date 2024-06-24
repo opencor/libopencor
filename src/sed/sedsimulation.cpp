@@ -52,6 +52,26 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
     return !hasErrors();
 }
 
+SolverOdePtr SedSimulation::Impl::odeSolver() const
+{
+    return mOdeSolver;
+}
+
+void SedSimulation::Impl::setOdeSolver(const SolverOdePtr &pOdeSolver)
+{
+    mOdeSolver = pOdeSolver;
+}
+
+SolverNlaPtr SedSimulation::Impl::nlaSolver() const
+{
+    return mNlaSolver;
+}
+
+void SedSimulation::Impl::setNlaSolver(const SolverNlaPtr &pNlaSolver)
+{
+    mNlaSolver = pNlaSolver;
+}
+
 void SedSimulation::Impl::serialise(xmlNodePtr pNode) const
 {
     SedBase::Impl::serialise(pNode);
@@ -82,24 +102,24 @@ const SedSimulation::Impl *SedSimulation::pimpl() const
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
 
-void SedSimulation::setOdeSolver(const SolverOdePtr &pOdeSolver)
-{
-    pimpl()->mOdeSolver = pOdeSolver;
-}
-
 SolverOdePtr SedSimulation::odeSolver() const
 {
-    return pimpl()->mOdeSolver;
+    return pimpl()->odeSolver();
 }
 
-void SedSimulation::setNlaSolver(const SolverNlaPtr &pNlaSolver)
+void SedSimulation::setOdeSolver(const SolverOdePtr &pOdeSolver)
 {
-    pimpl()->mNlaSolver = pNlaSolver;
+    pimpl()->setOdeSolver(pOdeSolver);
 }
 
 SolverNlaPtr SedSimulation::nlaSolver() const
 {
-    return pimpl()->mNlaSolver;
+    return pimpl()->nlaSolver();
+}
+
+void SedSimulation::setNlaSolver(const SolverNlaPtr &pNlaSolver)
+{
+    pimpl()->setNlaSolver(pNlaSolver);
 }
 
 } // namespace libOpenCOR

@@ -95,6 +95,39 @@ public:
     bool reinitialise(double pVoi) override;
     */
 
+    double maximumStep() const;
+    void setMaximumStep(double pMaximumStep);
+
+    int maximumNumberOfSteps() const;
+    void setMaximumNumberOfSteps(int pMaximumNumberOfSteps);
+
+    IntegrationMethod integrationMethod() const;
+    void setIntegrationMethod(IntegrationMethod pIntegrationMethod);
+
+    IterationType iterationType() const;
+    void setIterationType(IterationType pIterationType);
+
+    LinearSolver linearSolver() const;
+    void setLinearSolver(LinearSolver pLinearSolver);
+
+    Preconditioner preconditioner() const;
+    void setPreconditioner(Preconditioner pPreconditioner);
+
+    int upperHalfBandwidth() const;
+    void setUpperHalfBandwidth(int pUpperHalfBandwidth);
+
+    int lowerHalfBandwidth() const;
+    void setLowerHalfBandwidth(int pLowerHalfBandwidth);
+
+    double relativeTolerance() const;
+    void setRelativeTolerance(double pRelativeTolerance);
+
+    double absoluteTolerance() const;
+    void setAbsoluteTolerance(double pAbsoluteTolerance);
+
+    bool interpolateSolution() const;
+    void setInterpolateSolution(bool pInterpolateSolution);
+
     bool solve(double &pVoi, double pVoiEnd) override;
 };
 

@@ -27,6 +27,46 @@ SedUniformTimeCourse::Impl::Impl(const SedDocumentPtr &pDocument)
 {
 }
 
+double SedUniformTimeCourse::Impl::initialTime() const
+{
+    return mInitialTime;
+}
+
+void SedUniformTimeCourse::Impl::setInitialTime(double pInitialTime)
+{
+    mInitialTime = pInitialTime;
+}
+
+double SedUniformTimeCourse::Impl::outputStartTime() const
+{
+    return mOutputStartTime;
+}
+
+void SedUniformTimeCourse::Impl::setOutputStartTime(double pOutputStartTime)
+{
+    mOutputStartTime = pOutputStartTime;
+}
+
+double SedUniformTimeCourse::Impl::outputEndTime() const
+{
+    return mOutputEndTime;
+}
+
+void SedUniformTimeCourse::Impl::setOutputEndTime(double pOutputEndTime)
+{
+    mOutputEndTime = pOutputEndTime;
+}
+
+int SedUniformTimeCourse::Impl::numberOfSteps() const
+{
+    return mNumberOfSteps;
+}
+
+void SedUniformTimeCourse::Impl::setNumberOfSteps(int pNumberOfSteps)
+{
+    mNumberOfSteps = pNumberOfSteps;
+}
+
 void SedUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("uniformTimeCourse"));
@@ -68,42 +108,42 @@ SedUniformTimeCoursePtr SedUniformTimeCourse::create(const SedDocumentPtr &pDocu
 
 double SedUniformTimeCourse::initialTime() const
 {
-    return pimpl()->mInitialTime;
+    return pimpl()->initialTime();
 }
 
 void SedUniformTimeCourse::setInitialTime(double pInitialTime)
 {
-    pimpl()->mInitialTime = pInitialTime;
+    pimpl()->setInitialTime(pInitialTime);
 }
 
 double SedUniformTimeCourse::outputStartTime() const
 {
-    return pimpl()->mOutputStartTime;
+    return pimpl()->outputStartTime();
 }
 
 void SedUniformTimeCourse::setOutputStartTime(double pOutputStartTime)
 {
-    pimpl()->mOutputStartTime = pOutputStartTime;
+    pimpl()->setOutputStartTime(pOutputStartTime);
 }
 
 double SedUniformTimeCourse::outputEndTime() const
 {
-    return pimpl()->mOutputEndTime;
+    return pimpl()->outputEndTime();
 }
 
 void SedUniformTimeCourse::setOutputEndTime(double pOutputEndTime)
 {
-    pimpl()->mOutputEndTime = pOutputEndTime;
+    pimpl()->setOutputEndTime(pOutputEndTime);
 }
 
 int SedUniformTimeCourse::numberOfSteps() const
 {
-    return pimpl()->mNumberOfSteps;
+    return pimpl()->numberOfSteps();
 }
 
 void SedUniformTimeCourse::setNumberOfSteps(int pNumberOfSteps)
 {
-    pimpl()->mNumberOfSteps = pNumberOfSteps;
+    pimpl()->setNumberOfSteps(pNumberOfSteps);
 }
 
 } // namespace libOpenCOR

@@ -49,6 +49,20 @@ public:
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled);
     ~Impl();
+
+    CellmlFileRuntime::InitialiseCompiledVariablesForAlgebraicModel initialiseCompiledVariablesForAlgebraicModel() const;
+    CellmlFileRuntime::InitialiseCompiledVariablesForDifferentialModel initialiseCompiledVariablesForDifferentialModel() const;
+    CellmlFileRuntime::ComputeCompiledComputedConstants computeCompiledComputedConstants() const;
+    CellmlFileRuntime::ComputeCompiledRates computeCompiledRates() const;
+    CellmlFileRuntime::ComputeCompiledVariablesForAlgebraicModel computeCompiledVariablesForAlgebraicModel() const;
+    CellmlFileRuntime::ComputeCompiledVariablesForDifferentialModel computeCompiledVariablesForDifferentialModel() const;
+
+    CellmlFileRuntime::InitialiseInterpretedVariablesForAlgebraicModel initialiseInterpretedVariablesForAlgebraicModel() const;
+    CellmlFileRuntime::InitialiseInterpretedVariablesForDifferentialModel initialiseInterpretedVariablesForDifferentialModel() const;
+    CellmlFileRuntime::ComputeInterpretedComputedConstants computeInterpretedComputedConstants() const;
+    CellmlFileRuntime::ComputeInterpretedRates computeInterpretedRates() const;
+    CellmlFileRuntime::ComputeInterpretedVariablesForAlgebraicModel computeInterpretedVariablesForAlgebraicModel() const;
+    CellmlFileRuntime::ComputeInterpretedVariablesForDifferentialModel computeInterpretedVariablesForDifferentialModel() const;
 };
 
 } // namespace libOpenCOR

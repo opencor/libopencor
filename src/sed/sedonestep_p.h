@@ -29,6 +29,9 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument);
 
+    double step() const;
+    void setStep(double pStep);
+
     void serialise(xmlNodePtr pNode) const override;
 };
 

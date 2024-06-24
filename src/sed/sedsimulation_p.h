@@ -34,6 +34,12 @@ public:
 
     bool isValid(const SedModelPtr &pModel);
 
+    SolverOdePtr odeSolver() const;
+    void setOdeSolver(const SolverOdePtr &pOdeSolver);
+
+    SolverNlaPtr nlaSolver() const;
+    void setNlaSolver(const SolverNlaPtr &pNlaSolver);
+
     void serialise(xmlNodePtr pNode) const override;
 };
 

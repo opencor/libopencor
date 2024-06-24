@@ -52,6 +52,21 @@ CombineArchive::Impl::~Impl()
     delete mArchive;
 }
 
+FilePtr CombineArchive::Impl::masterFile() const
+{
+    return mMasterFile;
+}
+
+bool CombineArchive::Impl::hasFiles() const
+{
+    return mFiles.empty();
+}
+
+size_t CombineArchive::Impl::fileCount() const
+{
+    return mFiles.size();
+}
+
 Strings CombineArchive::Impl::fileNames() const
 {
     Strings res;
@@ -61,6 +76,11 @@ Strings CombineArchive::Impl::fileNames() const
     }
 
     return res;
+}
+
+FilePtrs CombineArchive::Impl::files() const
+{
+    return mFiles;
 }
 
 FilePtr CombineArchive::Impl::file(const std::string &pFileName) const
@@ -122,17 +142,17 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 
 FilePtr CombineArchive::masterFile() const
 {
-    return pimpl()->mMasterFile;
+    return pimpl()->masterFile();
 }
 
 bool CombineArchive::hasFiles() const
 {
-    return !pimpl()->mFiles.empty();
+    return !pimpl()->hasFiles();
 }
 
 size_t CombineArchive::fileCount() const
 {
-    return pimpl()->mFiles.size();
+    return pimpl()->fileCount();
 }
 
 Strings CombineArchive::fileNames() const
@@ -142,7 +162,7 @@ Strings CombineArchive::fileNames() const
 
 FilePtrs CombineArchive::files() const
 {
-    return pimpl()->mFiles;
+    return pimpl()->files();
 }
 
 FilePtr CombineArchive::file(const std::string &pFileName) const

@@ -25,9 +25,29 @@ bool Logger::Impl::hasIssues() const
     return !mIssues.empty();
 }
 
+size_t Logger::Impl::issueCount() const
+{
+    return mIssues.size();
+}
+
+IssuePtrs Logger::Impl::issues() const
+{
+    return mIssues;
+}
+
 bool Logger::Impl::hasErrors() const
 {
     return !mErrors.empty();
+}
+
+size_t Logger::Impl::errorCount() const
+{
+    return mErrors.size();
+}
+
+IssuePtrs Logger::Impl::errors() const
+{
+    return mErrors;
 }
 
 bool Logger::Impl::hasWarnings() const
@@ -35,9 +55,29 @@ bool Logger::Impl::hasWarnings() const
     return !mWarnings.empty();
 }
 
+size_t Logger::Impl::warningCount() const
+{
+    return mWarnings.size();
+}
+
+IssuePtrs Logger::Impl::warnings() const
+{
+    return mWarnings;
+}
+
 bool Logger::Impl::hasMessages() const
 {
     return !mMessages.empty();
+}
+
+size_t Logger::Impl::messageCount() const
+{
+    return mMessages.size();
+}
+
+IssuePtrs Logger::Impl::messages() const
+{
+    return mMessages;
 }
 
 void Logger::Impl::addIssues(const LoggerPtr &pLogger)
@@ -143,12 +183,12 @@ bool Logger::hasIssues() const
 
 size_t Logger::issueCount() const
 {
-    return pimpl()->mIssues.size();
+    return pimpl()->issueCount();
 }
 
 IssuePtrs Logger::issues() const
 {
-    return pimpl()->mIssues;
+    return pimpl()->issues();
 }
 
 bool Logger::hasErrors() const
@@ -158,12 +198,12 @@ bool Logger::hasErrors() const
 
 size_t Logger::errorCount() const
 {
-    return pimpl()->mErrors.size();
+    return pimpl()->errorCount();
 }
 
 IssuePtrs Logger::errors() const
 {
-    return pimpl()->mErrors;
+    return pimpl()->errors();
 }
 
 bool Logger::hasWarnings() const
@@ -173,12 +213,12 @@ bool Logger::hasWarnings() const
 
 size_t Logger::warningCount() const
 {
-    return pimpl()->mWarnings.size();
+    return pimpl()->warningCount();
 }
 
 IssuePtrs Logger::warnings() const
 {
-    return pimpl()->mWarnings;
+    return pimpl()->warnings();
 }
 
 bool Logger::hasMessages() const
@@ -188,12 +228,12 @@ bool Logger::hasMessages() const
 
 size_t Logger::messageCount() const
 {
-    return pimpl()->mMessages.size();
+    return pimpl()->messageCount();
 }
 
 IssuePtrs Logger::messages() const
 {
-    return pimpl()->mMessages;
+    return pimpl()->messages();
 }
 
 } // namespace libOpenCOR

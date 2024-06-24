@@ -25,6 +25,16 @@ SedBase::Impl::Impl(const std::string &pId)
 {
 }
 
+std::string SedBase::Impl::id() const
+{
+    return mId;
+}
+
+void SedBase::Impl::setId(const std::string &pId)
+{
+    mId = pId;
+}
+
 void SedBase::Impl::serialise(xmlNodePtr pNode) const
 {
     xmlNewProp(pNode, toConstXmlCharPtr("id"), toConstXmlCharPtr(mId));
@@ -47,12 +57,12 @@ const SedBase::Impl *SedBase::pimpl() const
 
 std::string SedBase::id() const
 {
-    return pimpl()->mId;
+    return pimpl()->id();
 }
 
 void SedBase::setId(const std::string &pId)
 {
-    pimpl()->mId = pId;
+    pimpl()->setId(pId);
 }
 
 } // namespace libOpenCOR

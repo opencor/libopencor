@@ -32,7 +32,11 @@ public:
     explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive);
     ~Impl();
 
+    FilePtr masterFile() const;
+    bool hasFiles() const;
+    size_t fileCount() const;
     Strings fileNames() const;
+    FilePtrs files() const;
     FilePtr file(const std::string &pFileName) const;
 };
 

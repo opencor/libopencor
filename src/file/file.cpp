@@ -117,9 +117,19 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
     }
 }
 
+File::Type File::Impl::type() const
+{
+    return mType;
+}
+
 std::string File::Impl::fileName() const
 {
     return pathToString(mFilePath);
+}
+
+std::string File::Impl::url() const
+{
+    return mUrl;
 }
 
 std::string File::Impl::path() const
@@ -246,7 +256,7 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
 
 File::Type File::type() const
 {
-    return pimpl()->mType;
+    return pimpl()->type();
 }
 
 std::string File::fileName() const
@@ -256,7 +266,7 @@ std::string File::fileName() const
 
 std::string File::url() const
 {
-    return pimpl()->mUrl;
+    return pimpl()->url();
 }
 
 std::string File::path() const

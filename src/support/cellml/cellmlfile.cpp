@@ -108,6 +108,27 @@ void CellmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument) const
     pDocument->addTask(SedTask::create(pDocument, model, simulation));
 }
 
+libcellml::AnalyserModel::Type CellmlFile::Impl::type() const
+{
+    return mAnalyserModel->type();
+}
+
+libcellml::AnalyserPtr CellmlFile::Impl::analyser() const
+{
+    return mAnalyser;
+}
+
+libcellml::AnalyserModelPtr CellmlFile::Impl::analyserModel() const
+{
+    return mAnalyserModel;
+}
+
+CellmlFileRuntimePtr CellmlFile::Impl::runtime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
+                                               bool pCompiled)
+{
+    return CellmlFileRuntime::create(pCellmlFile, pNlaSolver, pCompiled);
+}
+
 CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
     : Logger(new Impl {pFile, pModel, pStrict})
 {
@@ -167,22 +188,22 @@ void CellmlFile::populateDocument(const SedDocumentPtr &pDocument)
 
 libcellml::AnalyserModel::Type CellmlFile::type() const
 {
-    return pimpl()->mAnalyserModel->type();
+    return pimpl()->type();
 }
 
 libcellml::AnalyserPtr CellmlFile::analyser() const
 {
-    return pimpl()->mAnalyser;
+    return pimpl()->analyser();
 }
 
 libcellml::AnalyserModelPtr CellmlFile::analyserModel() const
 {
-    return pimpl()->mAnalyserModel;
+    return pimpl()->analyserModel();
 }
 
 CellmlFileRuntimePtr CellmlFile::runtime(const SolverNlaPtr &pNlaSolver, bool pCompiled)
 {
-    return CellmlFileRuntime::create(shared_from_this(), pNlaSolver, pCompiled);
+    return CellmlFile::Impl::runtime(shared_from_this(), pNlaSolver, pCompiled);
 }
 
 } // namespace libOpenCOR

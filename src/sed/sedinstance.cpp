@@ -88,6 +88,11 @@ void SedInstance::Impl::run()
     }
 }
 
+SedInstanceTaskPtrs SedInstance::Impl::tasks() const
+{
+    return mTasks;
+}
+
 SedInstance::SedInstance(const SedDocumentPtr &pDocument, bool pCompiled)
     : Logger(new Impl(pDocument, pCompiled))
 {
@@ -115,7 +120,7 @@ void SedInstance::run()
 
 SedInstanceTaskPtrs SedInstance::tasks() const
 {
-    return pimpl()->mTasks;
+    return pimpl()->tasks();
 }
 
 } // namespace libOpenCOR

@@ -245,6 +245,16 @@ bool SedDocument::Impl::hasModels() const
     return !mModels.empty();
 }
 
+size_t SedDocument::Impl::modelCount() const
+{
+    return mModels.size();
+}
+
+SedModelPtrs SedDocument::Impl::models() const
+{
+    return mModels;
+}
+
 bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
 {
     if (pModel == nullptr) {
@@ -285,6 +295,16 @@ bool SedDocument::Impl::hasSimulations() const
     return !mSimulations.empty();
 }
 
+size_t SedDocument::Impl::simulationCount() const
+{
+    return mSimulations.size();
+}
+
+SedSimulationPtrs SedDocument::Impl::simulations() const
+{
+    return mSimulations;
+}
+
 bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
 {
     if (pSimulation == nullptr) {
@@ -323,6 +343,16 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
 bool SedDocument::Impl::hasTasks() const
 {
     return !mTasks.empty();
+}
+
+size_t SedDocument::Impl::taskCount() const
+{
+    return mTasks.size();
+}
+
+SedAbstractTaskPtrs SedDocument::Impl::tasks() const
+{
+    return mTasks;
 }
 
 bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
@@ -413,12 +443,12 @@ bool SedDocument::hasModels() const
 
 size_t SedDocument::modelCount() const
 {
-    return pimpl()->mModels.size();
+    return pimpl()->modelCount();
 }
 
 SedModelPtrs SedDocument::models() const
 {
-    return pimpl()->mModels;
+    return pimpl()->models();
 }
 
 bool SedDocument::addModel(const SedModelPtr &pModel)
@@ -438,12 +468,12 @@ bool SedDocument::hasSimulations() const
 
 size_t SedDocument::simulationCount() const
 {
-    return pimpl()->mSimulations.size();
+    return pimpl()->simulationCount();
 }
 
 SedSimulationPtrs SedDocument::simulations() const
 {
-    return pimpl()->mSimulations;
+    return pimpl()->simulations();
 }
 
 bool SedDocument::addSimulation(const SedSimulationPtr &pSimulation)
@@ -463,12 +493,12 @@ bool SedDocument::hasTasks() const
 
 size_t SedDocument::taskCount() const
 {
-    return pimpl()->mTasks.size();
+    return pimpl()->taskCount();
 }
 
 SedAbstractTaskPtrs SedDocument::tasks() const
 {
-    return pimpl()->mTasks;
+    return pimpl()->tasks();
 }
 
 bool SedDocument::addTask(const SedAbstractTaskPtr &pTask)

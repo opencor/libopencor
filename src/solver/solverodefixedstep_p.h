@@ -42,6 +42,9 @@ public:
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
                     CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                     CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
+
+    double step() const;
+    void setStep(double pStep);
 };
 
 } // namespace libOpenCOR

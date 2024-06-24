@@ -148,6 +148,46 @@ StringStringMap SolverKinsol::Impl::properties() const
     return res;
 }
 
+int SolverKinsol::Impl::maximumNumberOfIterations() const
+{
+    return mMaximumNumberOfIterations;
+}
+
+void SolverKinsol::Impl::setMaximumNumberOfIterations(int pMaximumNumberOfIterations)
+{
+    mMaximumNumberOfIterations = pMaximumNumberOfIterations;
+}
+
+SolverKinsol::LinearSolver SolverKinsol::Impl::linearSolver() const
+{
+    return mLinearSolver;
+}
+
+void SolverKinsol::Impl::setLinearSolver(LinearSolver pLinearSolver)
+{
+    mLinearSolver = pLinearSolver;
+}
+
+int SolverKinsol::Impl::upperHalfBandwidth() const
+{
+    return mUpperHalfBandwidth;
+}
+
+void SolverKinsol::Impl::setUpperHalfBandwidth(int pUpperHalfBandwidth)
+{
+    mUpperHalfBandwidth = pUpperHalfBandwidth;
+}
+
+int SolverKinsol::Impl::lowerHalfBandwidth() const
+{
+    return mLowerHalfBandwidth;
+}
+
+void SolverKinsol::Impl::setLowerHalfBandwidth(int pLowerHalfBandwidth)
+{
+    mLowerHalfBandwidth = pLowerHalfBandwidth;
+}
+
 bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
 {
     removeAllIssues();
@@ -322,42 +362,42 @@ SolverKinsolPtr SolverKinsol::create()
 
 int SolverKinsol::maximumNumberOfIterations() const
 {
-    return pimpl()->mMaximumNumberOfIterations;
+    return pimpl()->maximumNumberOfIterations();
 }
 
 void SolverKinsol::setMaximumNumberOfIterations(int pMaximumNumberOfIterations)
 {
-    pimpl()->mMaximumNumberOfIterations = pMaximumNumberOfIterations;
+    pimpl()->setMaximumNumberOfIterations(pMaximumNumberOfIterations);
 }
 
 SolverKinsol::LinearSolver SolverKinsol::linearSolver() const
 {
-    return pimpl()->mLinearSolver;
+    return pimpl()->linearSolver();
 }
 
 void SolverKinsol::setLinearSolver(LinearSolver pLinearSolver)
 {
-    pimpl()->mLinearSolver = pLinearSolver;
+    pimpl()->setLinearSolver(pLinearSolver);
 }
 
 int SolverKinsol::upperHalfBandwidth() const
 {
-    return pimpl()->mUpperHalfBandwidth;
+    return pimpl()->upperHalfBandwidth();
 }
 
 void SolverKinsol::setUpperHalfBandwidth(int pUpperHalfBandwidth)
 {
-    pimpl()->mUpperHalfBandwidth = pUpperHalfBandwidth;
+    pimpl()->setUpperHalfBandwidth(pUpperHalfBandwidth);
 }
 
 int SolverKinsol::lowerHalfBandwidth() const
 {
-    return pimpl()->mLowerHalfBandwidth;
+    return pimpl()->lowerHalfBandwidth();
 }
 
 void SolverKinsol::setLowerHalfBandwidth(int pLowerHalfBandwidth)
 {
-    pimpl()->mLowerHalfBandwidth = pLowerHalfBandwidth;
+    pimpl()->setLowerHalfBandwidth(pLowerHalfBandwidth);
 }
 
 } // namespace libOpenCOR

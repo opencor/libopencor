@@ -63,6 +63,26 @@ bool SedTask::Impl::isValid()
     return !hasIssues();
 }
 
+SedModelPtr SedTask::Impl::model() const
+{
+    return mModel;
+}
+
+void SedTask::Impl::setModel(const SedModelPtr &pModel)
+{
+    mModel = pModel;
+}
+
+SedSimulationPtr SedTask::Impl::simulation() const
+{
+    return mSimulation;
+}
+
+void SedTask::Impl::setSimulation(const SedSimulationPtr &pSimulation)
+{
+    mSimulation = pSimulation;
+}
+
 void SedTask::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("task"));
@@ -108,22 +128,22 @@ SedTaskPtr SedTask::create(const SedDocumentPtr &pDocument, const SedModelPtr &p
 
 SedModelPtr SedTask::model() const
 {
-    return pimpl()->mModel;
+    return pimpl()->model();
 }
 
 void SedTask::setModel(const SedModelPtr &pModel)
 {
-    pimpl()->mModel = pModel;
+    pimpl()->setModel(pModel);
 }
 
 SedSimulationPtr SedTask::simulation() const
 {
-    return pimpl()->mSimulation;
+    return pimpl()->simulation();
 }
 
 void SedTask::setSimulation(const SedSimulationPtr &pSimulation)
 {
-    pimpl()->mSimulation = pSimulation;
+    pimpl()->setSimulation(pSimulation);
 }
 
 } // namespace libOpenCOR

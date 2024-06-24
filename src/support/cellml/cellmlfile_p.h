@@ -38,6 +38,13 @@ public:
     ~Impl() = default;
 
     void populateDocument(const SedDocumentPtr &pDocument) const;
+
+    libcellml::AnalyserModel::Type type() const;
+    libcellml::AnalyserPtr analyser() const;
+    libcellml::AnalyserModelPtr analyserModel() const;
+
+    static CellmlFileRuntimePtr runtime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
+                                        bool pCompiled);
 };
 
 } // namespace libOpenCOR
