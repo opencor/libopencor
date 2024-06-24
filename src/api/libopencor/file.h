@@ -85,11 +85,16 @@ public:
      *       its contents and type.
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
+     * @param pManaged Whether the file should be managed (by default, it is).
      *
      * @return A smart pointer to a @ref File object.
      */
 
-    static FilePtr create(const std::string &pFileNameOrUrl);
+    static FilePtr create(const std::string &pFileNameOrUrl, bool pManaged = true);
+
+#ifdef __EMSCRIPTEN__
+    static FilePtr defaultCreate(const std::string &pFileNameOrUrl);
+#endif
 
     /**
      * @brief Get the type of this file.
@@ -218,7 +223,7 @@ private:
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit File(const std::string &pFileNameOrUrl); /**< Constructor, @private. */
+    explicit File(const std::string &pFileNameOrUrl, bool pManaged); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

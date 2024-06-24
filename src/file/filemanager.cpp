@@ -82,7 +82,11 @@ void FileManager::Impl::manage(File *pFile)
 
 void FileManager::Impl::unmanage(File *pFile)
 {
-    mFiles.erase(std::find(mFiles.cbegin(), mFiles.cend(), pFile));
+    auto iter = std::find(mFiles.cbegin(), mFiles.cend(), pFile);
+
+    if (iter != mFiles.cend()) {
+        mFiles.erase(iter);
+    }
 
 #ifdef PRINT_MANAGED_FILES
     printListOfFiles(std::string("Unmanage ") + pFile->fileName(), mFiles);
@@ -142,6 +146,16 @@ FileManager &FileManager::instance()
 FileManager::FileManager()
     : mPimpl(Impl::instance())
 {
+}
+
+void FileManager::manage(const FilePtr &pFile)
+{
+    mPimpl.manage(pFile.get());
+}
+
+void FileManager::unmanage(const FilePtr &pFile)
+{
+    mPimpl.unmanage(pFile.get());
 }
 
 bool FileManager::hasFiles() const

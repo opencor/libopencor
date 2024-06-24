@@ -27,8 +27,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-File::Impl::Impl(const std::string &pFileNameOrUrl)
+File::Impl::Impl(const std::string &pFileNameOrUrl, bool pManaged)
     : Logger::Impl()
+    , mManaged(pManaged)
 {
     // Check whether we are dealing with a local file or a URL.
 
@@ -209,16 +210,18 @@ FilePtr File::Impl::childFile(const std::string &pFileName) const
     return {};
 }
 
-File::File(const std::string &pFileNameOrUrl)
-    : Logger(new Impl {pFileNameOrUrl})
+File::File(const std::string &pFileNameOrUrl, bool pManaged)
+    : Logger(new Impl {pFileNameOrUrl, pManaged})
 {
 }
 
 File::~File()
 {
-    // Have ourselves unmanaged.
+    // Have ourselves unmanaged, if needed.
 
-    FileManager::instance().mPimpl.unmanage(this);
+    if (pimpl()->mManaged) {
+        FileManager::instance().mPimpl.unmanage(this);
+    }
 
     delete pimpl();
 }
@@ -233,10 +236,10 @@ const File::Impl *File::pimpl() const
     return static_cast<const Impl *>(Logger::pimpl());
 }
 
-FilePtr File::create(const std::string &pFileNameOrUrl)
+FilePtr File::create(const std::string &pFileNameOrUrl, bool pManaged)
 {
-    // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage,
-    // and return a new file object.
+    // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage (if
+    // requested), and return a new file object.
 
     auto fileManager = FileManager::instance();
     auto file = fileManager.file(pFileNameOrUrl);
@@ -245,14 +248,23 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
         return file;
     }
 
-    auto res = FilePtr {new File {pFileNameOrUrl}};
+    auto res = FilePtr {new File {pFileNameOrUrl, pManaged}};
 
     res->pimpl()->checkType(res);
 
-    fileManager.mPimpl.manage(res.get());
+    if (pManaged) {
+        fileManager.mPimpl.manage(res.get());
+    }
 
     return res;
 }
+
+#ifdef __EMSCRIPTEN__
+FilePtr File::defaultCreate(const std::string &pFileNameOrUrl)
+{
+    return create(pFileNameOrUrl);
+}
+#endif
 
 File::Type File::type() const
 {

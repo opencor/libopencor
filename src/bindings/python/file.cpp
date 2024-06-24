@@ -34,7 +34,7 @@ void fileApi(py::module_ &m)
         .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE)
         .export_values();
 
-    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
+    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"), py::arg("managed") = true)
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
@@ -51,6 +51,8 @@ void fileApi(py::module_ &m)
     py::class_<libOpenCOR::FileManager, std::unique_ptr<libOpenCOR::FileManager, py::nodelete>> fileManager(m, "FileManager");
 
     fileManager.def_static("instance", &libOpenCOR::FileManager::instance, "Get the file manager instance.")
+        .def("manage", &libOpenCOR::FileManager::manage, "Manage the requested file.", py::arg("file"))
+        .def("unmanage", &libOpenCOR::FileManager::unmanage, "Unmanage the requested file.", py::arg("file"))
         .def_property_readonly("has_files", &libOpenCOR::FileManager::hasFiles, "Return whether there are managed files.")
         .def_property_readonly("file_count", &libOpenCOR::FileManager::fileCount, "Return the number of managed files.")
         .def_property_readonly("files", &libOpenCOR::FileManager::files, "Return the managed files.")

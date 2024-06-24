@@ -44,6 +44,30 @@ public:
     static FileManager &instance();
 
     /**
+     * @brief Manage a file.
+     *
+     * Manage a file.
+     *
+     * @param pFile The file to be managed.
+     *
+     * @sa unmanage()
+     */
+
+    void manage(const FilePtr &pFile);
+
+    /**
+     * @brief Unmanage a file.
+     *
+     * Unmanage a file.
+     *
+     * @param pFile The file to be unmanaged.
+     *
+     * @sa manage()
+     */
+
+    void unmanage(const FilePtr &pFile);
+
+    /**
      * @brief Return whether there are managed files.
      *
      * Return whether there are managed files.

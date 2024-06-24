@@ -108,7 +108,33 @@ describe("File basic tests", () => {
     expect(fileManager.files().size()).toBe(2);
     expect(fileManager.file(utils.REMOTE_FILE)).toStrictEqual(remoteFile);
 
+    const unknownFile = new libopencor.File(utils.UNKNOWN_FILE, false);
+
+    expect(sameFileManager.hasFiles()).toBe(true);
+    expect(sameFileManager.fileCount()).toBe(2);
+    expect(sameFileManager.files().size()).toBe(2);
+    expect(sameFileManager.file(utils.UNKNOWN_FILE)).toStrictEqual(null);
+
+    fileManager.manage(unknownFile);
+
+    expect(fileManager.hasFiles()).toBe(true);
+    expect(fileManager.fileCount()).toBe(3);
+    expect(fileManager.files().size()).toBe(3);
+    expect(fileManager.file(utils.UNKNOWN_FILE)).toStrictEqual(unknownFile);
+
+    sameFileManager.unmanage(localFile);
+    sameFileManager.unmanage(remoteFile);
+    sameFileManager.unmanage(unknownFile);
+
+    expect(sameFileManager.hasFiles()).toBe(false);
+    expect(sameFileManager.fileCount()).toBe(0);
+    expect(sameFileManager.files().size()).toBe(0);
+    expect(sameFileManager.file(utils.LOCAL_FILE)).toStrictEqual(null);
+    expect(sameFileManager.file(utils.REMOTE_FILE)).toStrictEqual(null);
+    expect(sameFileManager.file(utils.UNKNOWN_FILE)).toStrictEqual(null);
+
     localFile.delete();
     remoteFile.delete();
+    unknownFile.delete();
   });
 });
