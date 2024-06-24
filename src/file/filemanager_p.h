@@ -34,6 +34,8 @@ public:
     void manage(File *pFile);
     void unmanage(File *pFile);
 
+    void reset();
+
     bool hasFiles() const;
     size_t fileCount() const;
     FilePtrs files() const;

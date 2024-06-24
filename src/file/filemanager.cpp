@@ -93,6 +93,13 @@ void FileManager::Impl::unmanage(File *pFile)
 #endif
 }
 
+void FileManager::Impl::reset()
+{
+    for (const auto &file : mFiles) {
+        unmanage(file);
+    }
+}
+
 bool FileManager::Impl::hasFiles() const
 {
     return !mFiles.empty();
@@ -156,6 +163,11 @@ void FileManager::manage(const FilePtr &pFile)
 void FileManager::unmanage(const FilePtr &pFile)
 {
     mPimpl.unmanage(pFile.get());
+}
+
+void FileManager::reset()
+{
+    mPimpl.reset();
 }
 
 bool FileManager::hasFiles() const

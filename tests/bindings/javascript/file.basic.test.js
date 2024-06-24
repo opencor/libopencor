@@ -123,15 +123,19 @@ describe("File basic tests", () => {
     expect(fileManager.file(utils.UNKNOWN_FILE)).toStrictEqual(unknownFile);
 
     sameFileManager.unmanage(localFile);
-    sameFileManager.unmanage(remoteFile);
-    sameFileManager.unmanage(unknownFile);
 
-    expect(sameFileManager.hasFiles()).toBe(false);
-    expect(sameFileManager.fileCount()).toBe(0);
-    expect(sameFileManager.files().size()).toBe(0);
+    expect(sameFileManager.hasFiles()).toBe(true);
+    expect(sameFileManager.fileCount()).toBe(2);
+    expect(sameFileManager.files().size()).toBe(2);
     expect(sameFileManager.file(utils.LOCAL_FILE)).toStrictEqual(null);
-    expect(sameFileManager.file(utils.REMOTE_FILE)).toStrictEqual(null);
-    expect(sameFileManager.file(utils.UNKNOWN_FILE)).toStrictEqual(null);
+
+    fileManager.reset();
+
+    expect(fileManager.hasFiles()).toBe(false);
+    expect(fileManager.fileCount()).toBe(0);
+    expect(fileManager.files().size()).toBe(0);
+    expect(fileManager.file(utils.REMOTE_FILE)).toStrictEqual(null);
+    expect(fileManager.file(utils.UNKNOWN_FILE)).toStrictEqual(null);
 
     localFile.delete();
     remoteFile.delete();

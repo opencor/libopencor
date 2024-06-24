@@ -68,6 +68,16 @@ public:
     void unmanage(const FilePtr &pFile);
 
     /**
+     * @brief Reset the file manager.
+     *
+     * Reset the file manager by unmanaging all the files.
+     *
+     * @sa unmanage()
+     */
+
+    void reset();
+
+    /**
      * @brief Return whether there are managed files.
      *
      * Return whether there are managed files.

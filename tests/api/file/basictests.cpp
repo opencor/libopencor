@@ -170,13 +170,17 @@ TEST(BasicFileTest, fileManager)
     EXPECT_EQ(fileManager.file(libOpenCOR::UNKNOWN_FILE), unknownFile);
 
     sameFileManager.unmanage(localFile);
-    sameFileManager.unmanage(remoteFile);
-    sameFileManager.unmanage(unknownFile);
 
-    EXPECT_FALSE(sameFileManager.hasFiles());
-    EXPECT_EQ(sameFileManager.fileCount(), 0);
-    EXPECT_EQ(sameFileManager.files().size(), 0);
+    EXPECT_TRUE(sameFileManager.hasFiles());
+    EXPECT_EQ(sameFileManager.fileCount(), 2);
+    EXPECT_EQ(sameFileManager.files().size(), 2);
     EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
-    EXPECT_EQ(sameFileManager.file(libOpenCOR::REMOTE_FILE), nullptr);
-    EXPECT_EQ(sameFileManager.file(libOpenCOR::UNKNOWN_FILE), nullptr);
+
+    fileManager.reset();
+
+    EXPECT_FALSE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 0);
+    EXPECT_EQ(fileManager.files().size(), 0);
+    EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), nullptr);
+    EXPECT_EQ(fileManager.file(libOpenCOR::UNKNOWN_FILE), nullptr);
 }
