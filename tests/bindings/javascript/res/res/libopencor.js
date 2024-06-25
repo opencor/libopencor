@@ -132,6 +132,7 @@ export function run() {
 
   // Run the simulation.
 
+  console.log("-------------------");
   console.time("Computing time");
   instance.run();
   console.timeEnd("Computing time");
@@ -251,7 +252,7 @@ $(() => {
 
             let hasIssues = false;
 
-            if (file.type() === libopencor.File.Type.CELLML_FILE) {
+            if (knownFile) {
               if (file.hasIssues()) {
                 const issuesElement = $("#issues");
                 const fileIssues = file.issues();
