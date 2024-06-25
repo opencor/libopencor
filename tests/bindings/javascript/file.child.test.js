@@ -57,7 +57,7 @@ describe("File type tests", () => {
     jsonContents,
     specificChildFileNames,
   ) {
-    const file = new libopencor.File(utils.COMBINE_ARCHIVE);
+    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
 
     file.setContents(omexContentsPtr, omexContents.length);
 
@@ -95,7 +95,7 @@ describe("File type tests", () => {
   }
 
   test("No child files", () => {
-    const file = new libopencor.File(utils.UNKNOWN_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.UNKNOWN_FILE));
 
     expect(file.hasChildFiles()).toBe(false);
     expect(file.childFileCount()).toBe(0);

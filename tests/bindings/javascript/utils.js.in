@@ -16,13 +16,13 @@ limitations under the License.
 
 export const LOCAL_BASE_PATH = "/some/path";
 
-export const UNKNOWN_FILE = LOCAL_BASE_PATH + "/unknown_file.txt";
-export const ERROR_CELLML_FILE = LOCAL_BASE_PATH + "/error.cellml";
-export const CELLML_FILE = LOCAL_BASE_PATH + "/cellml_2.cellml";
-export const SEDML_FILE = LOCAL_BASE_PATH + "/cellml_2.sedml";
-export const COMBINE_ARCHIVE = LOCAL_BASE_PATH + "/cellml_2.omex";
+export const UNKNOWN_FILE = "unknown_file.txt";
+export const ERROR_CELLML_FILE = "error.cellml";
+export const CELLML_FILE = "cellml_2.cellml";
+export const SEDML_FILE = "cellml_2.sedml";
+export const COMBINE_ARCHIVE = "cellml_2.omex";
 
-export const LOCAL_FILE = LOCAL_BASE_PATH + "/file.txt";
+export const LOCAL_FILE = resourcePath("file.txt");
 
 export const HTTP_REMOTE_FILE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
@@ -173,4 +173,8 @@ export function freeMemory(module, memPtr) {
 
 function stringToArrayBuffer(string) {
   return Uint8Array.from(string, (c) => c.charCodeAt(0));
+}
+
+export function resourcePath(resourceRelativePath) {
+  return LOCAL_BASE_PATH + "/" + resourceRelativePath;
 }

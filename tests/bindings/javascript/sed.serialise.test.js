@@ -148,7 +148,7 @@ describe("Sed serialise tests", () => {
   }
 
   test("Local CellML file with base path", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -163,14 +163,14 @@ describe("Sed serialise tests", () => {
   });
 
   test("Local CellML file without base path", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.LOCAL_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
 
     expect(document.serialise()).toBe(
-      cvodeExpectedSerialisation("file:///some/path/cellml_2.cellml"),
+      cvodeExpectedSerialisation("file:///some/path/file.txt"),
     );
 
     document.delete();
@@ -178,7 +178,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("Relative local CellML file with base path", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -193,7 +193,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("Relative local CellML file without base path", () => {
-    const file = new libopencor.File("cellml_2.cellml");
+    const file = new libopencor.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -293,7 +293,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
@@ -308,7 +308,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("NLA model", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -337,7 +337,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someAlgebraicContentsPtr,
@@ -375,7 +375,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.REMOTE_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -384,7 +384,7 @@ describe("Sed serialise tests", () => {
 
     simulation.setOdeSolver(new libopencor.SolverForwardEuler());
 
-    expect(document.serialise(utils.REMOTE_BASE_PATH)).toBe(
+    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
       expectedSerialisation,
     );
 
@@ -393,7 +393,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with the Adams-Moulton integration method", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -416,7 +416,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a functional iteration type", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -437,7 +437,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a banded linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -458,7 +458,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a diagonal linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -479,7 +479,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a GMRES linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -500,7 +500,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a BiCGStab linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -521,7 +521,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a TFQMR linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -542,7 +542,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with no preconditioner", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -561,7 +561,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with no interpolate solution", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -582,7 +582,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a banded linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -601,7 +601,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a GMRES linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -620,7 +620,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a BiCGStab linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -639,7 +639,7 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a TFQMR linear solver", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -672,7 +672,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -724,7 +724,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.SEDML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
@@ -983,7 +983,7 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.SEDML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(
       someSedmlWithSimulationsContentsPtr,

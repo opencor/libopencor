@@ -241,7 +241,7 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedOneStep", () => {
-    const file = new libopencor.File(utils.SEDML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
     const document = new libopencor.SedDocument(file);
     const simulation = new libopencor.SedOneStep(document);
 
@@ -257,7 +257,7 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedUniformTimeCourse", () => {
-    const file = new libopencor.File(utils.SEDML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
     const document = new libopencor.SedDocument(file);
     const simulation = new libopencor.SedUniformTimeCourse(document);
 
@@ -282,7 +282,7 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedInstanceAndSedInstanceTask", () => {
-    const file = new libopencor.File(utils.SEDML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -347,7 +347,7 @@ describe("Sed coverage tests", () => {
   test("Solver", () => {
     // Get the duplicate() method of different solvers to be covered.
 
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
