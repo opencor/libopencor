@@ -225,7 +225,7 @@ def test_nla_solver():
     assert simulation.nla_solver == None
 
 
-def test_sed_simulation_one_step():
+def test_sed_one_step():
     file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
     simulation = SedOneStep(document)
@@ -237,7 +237,7 @@ def test_sed_simulation_one_step():
     assert simulation.step == 1.23
 
 
-def test_sed_simulation_uniform_time_course():
+def test_sed_uniform_time_course():
     file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
     simulation = SedUniformTimeCourse(document)
