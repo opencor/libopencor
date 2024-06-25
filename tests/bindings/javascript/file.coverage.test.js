@@ -34,6 +34,15 @@ describe("File coverage tests", () => {
     new libopencor.File(utils.HTTP_REMOTE_FILE);
   });
 
+  test("SED-ML file with no parent", () => {
+    const file = new libopencor.File(utils.SEDML_FILE);
+
+    file.setContents(
+      utils.SOME_SEDML_CONTENTS,
+      utils.SOME_SEDML_CONTENTS.length,
+    );
+  });
+
   test("Same local file", () => {
     const file1 = new libopencor.File(utils.LOCAL_FILE);
     const file2 = new libopencor.File(utils.LOCAL_FILE);

@@ -49,9 +49,12 @@ limitations under the License.
 namespace libOpenCOR {
 
 SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
-    : mLocation(pathToString(stringToPath(pFile->fileName()).parent_path()) + "/")
+    : mLocation(pathToString(stringToPath(pFile->fileName()).parent_path()))
     , mDocument(pDocument)
 {
+    if (!mLocation.empty()) {
+        mLocation += "/";
+    }
 }
 
 SedmlFile::Impl::~Impl()

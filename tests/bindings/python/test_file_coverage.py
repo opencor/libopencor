@@ -29,6 +29,12 @@ def test_http_remote_file():
     File(utils.HttpRemoteFile)
 
 
+def test_sedml_file_with_no_parent():
+    file = File(utils.Sedml2File)
+
+    file.contents = utils.string_to_list(utils.SomeSedmlContents)
+
+
 def test_irretrievable_remote_file():
     File(utils.IrretrievableRemoteFile)
 
