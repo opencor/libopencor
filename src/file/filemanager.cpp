@@ -95,9 +95,7 @@ void FileManager::Impl::unmanage(File *pFile)
 
 void FileManager::Impl::reset()
 {
-    for (const auto &file : mFiles) {
-        unmanage(file);
-    }
+    mFiles.clear();
 }
 
 bool FileManager::Impl::hasFiles() const
