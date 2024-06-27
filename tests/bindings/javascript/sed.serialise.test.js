@@ -71,13 +71,10 @@ describe("Sed serialise tests", () => {
     const preconditioner = parameters["KISAO:0000478"] || "Banded";
     const interpolateSolution = parameters["KISAO:0000481"] || "true";
 
-    return (
-      `<?xml version="1.0" encoding="UTF-8"?>
+    return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="` +
-      source +
-      `"/>
+    <model id="model1" language="urn:sedml:language:cellml" source="${source}"/>
   </listOfModels>
   <listOfSimulations>
     <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="1000" numberOfSteps="1000">
@@ -87,23 +84,13 @@ describe("Sed serialise tests", () => {
           <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
           <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
           <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
-          <algorithmParameter kisaoID="KISAO:0000475" value="` +
-      integrationMethod +
-      `"/>
-          <algorithmParameter kisaoID="KISAO:0000476" value="` +
-      iterationType +
-      `"/>
-          <algorithmParameter kisaoID="KISAO:0000477" value="` +
-      linearSolver +
-      `"/>
-          <algorithmParameter kisaoID="KISAO:0000478" value="` +
-      preconditioner +
-      `"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="${integrationMethod}"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="${iterationType}"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="${linearSolver}"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="${preconditioner}"/>
           <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
           <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
-          <algorithmParameter kisaoID="KISAO:0000481" value="` +
-      interpolateSolution +
-      `"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="${interpolateSolution}"/>
         </listOfAlgorithmParameters>
       </algorithm>
     </uniformTimeCourse>
@@ -112,15 +99,13 @@ describe("Sed serialise tests", () => {
     <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
-`
-    );
+`;
   }
 
   function kinsolExpectedSerialisation(parameters = {}) {
     const linearSolver = parameters["KISAO:0000477"] || "Dense";
 
-    return (
-      `<?xml version="1.0" encoding="UTF-8"?>
+    return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
@@ -129,9 +114,7 @@ describe("Sed serialise tests", () => {
     <steadyState id="simulation1">
       <algorithm kisaoID="KISAO:0000282">
         <listOfAlgorithmParameters>
-          <algorithmParameter kisaoID="KISAO:0000477" value="` +
-      linearSolver +
-      `"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="${linearSolver}"/>
           <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
           <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
           <algorithmParameter kisaoID="KISAO:0000486" value="200"/>
@@ -143,8 +126,7 @@ describe("Sed serialise tests", () => {
     <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
-`
-    );
+`;
   }
 
   test("Local CellML file with base path", () => {

@@ -35,19 +35,13 @@ describe("Sed coverage tests", () => {
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
-    return (
-      `<?xml version="1.0" encoding="UTF-8"?>
+    return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfTasks>
-    <task id="task1"` +
-      (withProperties
-        ? ` modelReference="model1" simulationReference="simulation1"`
-        : ``) +
-      `/>
+    <task id="task1"${withProperties ? ` modelReference="model1" simulationReference="simulation1"` : ``}/>
   </listOfTasks>
 </sedML>
-`
-    );
+`;
   }
 
   test("Initialise", () => {
