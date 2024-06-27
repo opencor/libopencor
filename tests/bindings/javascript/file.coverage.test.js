@@ -20,10 +20,36 @@ import * as utils from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("File coverage tests", () => {
+  let someNullCharacterContentsPtr;
+
+  beforeAll(() => {
+    someNullCharacterContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_NULL_CHARACTER_CONTENTS,
+    );
+  });
+
+  afterAll(() => {
+    utils.freeMemory(libopencor, someNullCharacterContentsPtr);
+  });
+
   test("Empty file", () => {
     const file = new libopencor.File(utils.UNKNOWN_FILE);
 
     file.setContents(null, 0);
+
+    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+
+    file.delete();
+  });
+
+  test("File with null character", () => {
+    const file = new libopencor.File(utils.UNKNOWN_FILE);
+
+    file.setContents(
+      someNullCharacterContentsPtr,
+      utils.SOME_NULL_CHARACTER_CONTENTS.length,
+    );
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
 

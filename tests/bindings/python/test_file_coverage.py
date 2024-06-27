@@ -25,6 +25,14 @@ def test_empty_file():
     assert file.type == File.Type.UnknownFile
 
 
+def test_file_with_null_character():
+    file = File(utils.LocalFile)
+
+    file.contents = utils.string_to_list("\0")
+
+    assert file.type == File.Type.UnknownFile
+
+
 def test_http_remote_file():
     File(utils.HttpRemoteFile)
 

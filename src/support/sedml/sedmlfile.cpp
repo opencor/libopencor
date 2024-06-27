@@ -208,7 +208,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 
     auto fileContents = pFile->contents();
 
-    if (!fileContents.empty()) {
+    if (!fileContents.empty() && (fileContents[0] != '\0')) {
         auto *document = libsedml::readSedMLFromString(toString(fileContents).c_str());
 
         // A non-SED-ML file results in our SED-ML document having at least one error, the first of which being of id

@@ -154,11 +154,12 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     // Try to parse the file contents as a CellML 2.0 file.
 
     auto isCellmlFile = false;
+    auto fileContents = pFile->contents();
 
-    if (!pFile->contents().empty()) {
+    if (!fileContents.empty() && (fileContents[0] != '\0')) {
         auto strict = true;
         auto parser = libcellml::Parser::create(strict);
-        auto contents = toString(pFile->contents());
+        auto contents = toString(fileContents);
         auto model = parser->parseModel(contents);
 
         if (parser->errorCount() != 0) {

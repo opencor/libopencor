@@ -27,6 +27,15 @@ TEST(CoverageFileTest, emptyFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
 }
 
+TEST(CoverageFileTest, fileWithNullCharacter)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    file->setContents({0});
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+}
+
 TEST(CoverageFileTest, httpRemoteFile)
 {
     libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_FILE);

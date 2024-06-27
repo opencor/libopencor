@@ -32,6 +32,7 @@ export const REMOTE_FILE =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 
 export const NO_CONTENTS = stringToArrayBuffer("");
+export const SOME_NULL_CHARACTER_CONTENTS = stringToArrayBuffer("\0");
 export const SOME_UNKNOWN_CONTENTS = stringToArrayBuffer(
   "Some unknown contents...",
 );
