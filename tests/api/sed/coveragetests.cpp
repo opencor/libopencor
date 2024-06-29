@@ -43,6 +43,8 @@ TEST(CoverageSedTest, models)
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
     auto model = libOpenCOR::SedModel::create(document, file);
 
+    EXPECT_EQ(model->file(), file);
+
     EXPECT_TRUE(document->addModel(model));
 
     EXPECT_TRUE(document->hasModels());

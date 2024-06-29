@@ -94,7 +94,8 @@ void sedApi()
     // SedModel API.
 
     emscripten::class_<libOpenCOR::SedModel, emscripten::base<libOpenCOR::SedBase>>("SedModel")
-        .smart_ptr_constructor("SedModel", &libOpenCOR::SedModel::create);
+        .smart_ptr_constructor("SedModel", &libOpenCOR::SedModel::create)
+        .function("file", &libOpenCOR::SedModel::file);
 
     // SedOutput API.
 

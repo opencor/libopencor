@@ -93,7 +93,8 @@ void sedApi(py::module_ &m)
 
     py::class_<libOpenCOR::SedModel, libOpenCOR::SedBase, libOpenCOR::SedModelPtr> sedModel(m, "SedModel");
 
-    sedModel.def(py::init(&libOpenCOR::SedModel::create), "Create a SedModel object.", py::arg("document"), py::arg("file"));
+    sedModel.def(py::init(&libOpenCOR::SedModel::create), "Create a SedModel object.", py::arg("document"), py::arg("file"))
+        .def_property_readonly("file", &libOpenCOR::SedModel::file, "Return the file.");
 
     // SedOutput API.
 

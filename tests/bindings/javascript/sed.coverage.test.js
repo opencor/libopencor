@@ -66,6 +66,8 @@ describe("Sed coverage tests", () => {
     const file = new libopencor.File(utils.SEDML_FILE);
     const model = new libopencor.SedModel(document, file);
 
+    expect(model.file()).toStrictEqual(file);
+
     expect(document.addModel(model)).toBe(true);
 
     expect(document.hasModels()).toBe(true);

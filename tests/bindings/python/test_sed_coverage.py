@@ -55,6 +55,8 @@ def test_models():
     file = File(utils.LocalFile)
     model = SedModel(document, file)
 
+    assert model.file == file
+
     assert document.add_model(model) == True
 
     assert document.has_models == True
