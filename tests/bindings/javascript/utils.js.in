@@ -24,8 +24,13 @@ export const COMBINE_ARCHIVE = "cellml_2.omex";
 
 export const LOCAL_FILE = resourcePath("file.txt");
 
-export const HTTP_REMOTE_FILE =
+// Note: the three following URLs use http rather than https to help with coverage testing.
+export const HTTP_REMOTE_CELLML_FILE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+export const HTTP_REMOTE_SEDML_FILE =
+  "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml";
+export const HTTP_REMOTE_COMBINE_ARCHIVE =
+  "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex";
 export const REMOTE_BASE_PATH =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
 export const REMOTE_FILE =

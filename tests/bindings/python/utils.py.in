@@ -44,7 +44,12 @@ else:
     LocalFile = "/some/path/file.txt"
 
 
-HttpRemoteFile = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+# Note: the three following URLs use http rather than https to help with coverage testing.
+HttpRemoteCellmlFile = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+HttpRemoteSedmlFile = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"
+HttpRemoteCombineArchive = (
+    "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
+)
 RemoteBasePath = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
 RemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
 IrretrievableRemoteFile = "https://some.domain.com/irretrievable_file.txt"

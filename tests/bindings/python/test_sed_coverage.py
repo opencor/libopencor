@@ -309,6 +309,17 @@ def test_sed_instance_and_sed_isntance_task():
     assert_issues(instance, expected_issues)
 
 
+def test_sed_document():
+    file = File(utils.resource_path(utils.HttpRemoteCellmlFile))
+    SedDocument(file)
+
+    file = File(utils.resource_path(utils.HttpRemoteSedmlFile))
+    SedDocument(file)
+
+    file = File(utils.resource_path(utils.HttpRemoteCombineArchive))
+    SedDocument(file)
+
+
 def test_solver():
     # Get the duplicate() method of different solvers to be covered.
 

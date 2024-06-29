@@ -338,6 +338,32 @@ describe("Sed coverage tests", () => {
     file.delete();
   });
 
+  test("SedDocument", () => {
+    let file = new libopencor.File(
+      utils.resourcePath(utils.HTTP_REMOTE_CELLML_FILE),
+    );
+    let document = new libopencor.SedDocument(file);
+
+    document.delete();
+    file.delete();
+
+    file = new libopencor.File(
+      utils.resourcePath(utils.HTTP_REMOTE_SEDML_FILE),
+    );
+    document = new libopencor.SedDocument(file);
+
+    document.delete();
+    file.delete();
+
+    file = new libopencor.File(
+      utils.resourcePath(utils.HTTP_REMOTE_COMBINE_ARCHIVE),
+    );
+    document = new libopencor.SedDocument(file);
+
+    document.delete();
+    file.delete();
+  });
+
   test("Solver", () => {
     // Get the duplicate() method of different solvers to be covered.
 

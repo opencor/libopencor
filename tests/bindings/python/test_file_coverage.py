@@ -33,10 +33,6 @@ def test_file_with_null_character():
     assert file.type == File.Type.UnknownFile
 
 
-def test_http_remote_file():
-    File(utils.HttpRemoteFile)
-
-
 def test_sedml_file_with_no_parent():
     file = File(utils.Sedml2File)
 

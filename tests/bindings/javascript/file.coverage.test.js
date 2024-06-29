@@ -56,10 +56,6 @@ describe("File coverage tests", () => {
     file.delete();
   });
 
-  test("http remote file", () => {
-    new libopencor.File(utils.HTTP_REMOTE_FILE);
-  });
-
   test("SED-ML file with no parent", () => {
     const file = new libopencor.File(utils.SEDML_FILE);
 

@@ -36,11 +36,6 @@ TEST(CoverageFileTest, fileWithNullCharacter)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
 }
 
-TEST(CoverageFileTest, httpRemoteFile)
-{
-    libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_FILE);
-}
-
 TEST(CoverageFileTest, sedmlFileWithNoParent)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::SEDML_2_FILE);

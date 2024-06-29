@@ -315,6 +315,18 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+TEST(CoverageSedTest, sedDocument)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_CELLML_FILE);
+    libOpenCOR::SedDocument::create(file);
+
+    file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_SEDML_FILE);
+    libOpenCOR::SedDocument::create(file);
+
+    file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_COMBINE_ARCHIVE);
+    libOpenCOR::SedDocument::create(file);
+}
+
 TEST(CoverageSedTest, solver)
 {
     // Get the duplicate() method of different solvers to be covered.
