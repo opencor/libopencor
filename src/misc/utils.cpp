@@ -333,6 +333,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     auto res = false;
     auto *curl = curl_easy_init();
 
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_URL, pUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void *>(&file));
