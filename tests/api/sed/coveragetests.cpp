@@ -22,26 +22,33 @@ limitations under the License.
 
 TEST(CoverageSedTest, initialise)
 {
-    static const std::string expectedSerialisation = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                                                     "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\"/>\n";
+    static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
+)";
 
     auto document = libOpenCOR::SedDocument::create();
 
     EXPECT_EQ(document->serialise(), expectedSerialisation);
 }
 
-TEST(CoverageSedTest, sedDocumentModels)
+TEST(CoverageSedTest, models)
 {
     auto document = libOpenCOR::SedDocument::create();
 
     EXPECT_FALSE(document->hasModels());
+    EXPECT_EQ(document->modelCount(), 0);
+    EXPECT_EQ(document->models().size(), 0);
     EXPECT_FALSE(document->addModel(nullptr));
 
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
     auto model = libOpenCOR::SedModel::create(document, file);
 
+    EXPECT_EQ(model->file(), file);
+
     EXPECT_TRUE(document->addModel(model));
 
+    EXPECT_TRUE(document->hasModels());
+    EXPECT_EQ(document->modelCount(), 1);
     EXPECT_EQ(document->models().size(), 1);
     EXPECT_EQ(document->models()[0], model);
 
@@ -49,34 +56,54 @@ TEST(CoverageSedTest, sedDocumentModels)
     EXPECT_TRUE(document->removeModel(model));
 
     EXPECT_FALSE(document->hasModels());
+    EXPECT_EQ(document->modelCount(), 0);
+    EXPECT_EQ(document->models().size(), 0);
 
     EXPECT_FALSE(document->removeModel(nullptr));
 }
 
-TEST(CoverageSedTest, sedDocumentSimulations)
+TEST(CoverageSedTest, simulations)
 {
     auto document = libOpenCOR::SedDocument::create();
 
     EXPECT_FALSE(document->hasSimulations());
+    EXPECT_EQ(document->simulationCount(), 0);
+    EXPECT_EQ(document->simulations().size(), 0);
     EXPECT_FALSE(document->addSimulation(nullptr));
 
     auto uniformTimeCourse = libOpenCOR::SedUniformTimeCourse::create(document);
+    auto oneStep = libOpenCOR::SedOneStep::create(document);
     auto steadyState = libOpenCOR::SedSteadyState::create(document);
+    auto analysis = libOpenCOR::SedAnalysis::create(document);
 
     EXPECT_TRUE(document->addSimulation(uniformTimeCourse));
+    EXPECT_TRUE(document->addSimulation(oneStep));
     EXPECT_TRUE(document->addSimulation(steadyState));
+    EXPECT_TRUE(document->addSimulation(analysis));
 
-    EXPECT_EQ(document->simulations().size(), 2);
+    EXPECT_TRUE(document->hasSimulations());
+    EXPECT_EQ(document->simulationCount(), 4);
+    EXPECT_EQ(document->simulations().size(), 4);
     EXPECT_EQ(document->simulations()[0], uniformTimeCourse);
-    EXPECT_EQ(document->simulations()[1], steadyState);
+    EXPECT_EQ(document->simulations()[1], oneStep);
+    EXPECT_EQ(document->simulations()[2], steadyState);
+    EXPECT_EQ(document->simulations()[3], analysis);
 
     EXPECT_FALSE(document->addSimulation(uniformTimeCourse));
     EXPECT_TRUE(document->removeSimulation(uniformTimeCourse));
 
+    EXPECT_FALSE(document->addSimulation(oneStep));
+    EXPECT_TRUE(document->removeSimulation(oneStep));
+
     EXPECT_FALSE(document->addSimulation(steadyState));
     EXPECT_TRUE(document->removeSimulation(steadyState));
 
+    EXPECT_FALSE(document->addSimulation(analysis));
+    EXPECT_TRUE(document->removeSimulation(analysis));
+
     EXPECT_FALSE(document->hasSimulations());
+    EXPECT_EQ(document->simulationCount(), 0);
+    EXPECT_EQ(document->simulations().size(), 0);
 
     EXPECT_FALSE(document->removeSimulation(nullptr));
 }
@@ -85,23 +112,26 @@ namespace {
 
 std::string sedTaskExpectedSerialisation(bool pWithProperties)
 {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-           "<sedML xmlns=\"http://sed-ml.org/sed-ml/level1/version4\" level=\"1\" version=\"4\">\n"
-           "  <listOfTasks>\n"
-           "    <task id=\"task1\""
-           + std::string(pWithProperties ? R"( modelReference="model1" simulationReference="simulation1")" : "")
-           + "/>\n"
-             "  </listOfTasks>\n"
-             "</sedML>\n";
+    return std::string(R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfTasks>
+    <task id="task1")")
+        .append(pWithProperties ? R"( modelReference="model1" simulationReference="simulation1")" : "")
+        .append(R"(/>
+  </listOfTasks>
+</sedML>
+)");
 }
 
 } // namespace
 
-TEST(CoverageSedTest, sedDocumentTasks)
+TEST(CoverageSedTest, tasks)
 {
     auto document = libOpenCOR::SedDocument::create();
 
     EXPECT_FALSE(document->hasTasks());
+    EXPECT_EQ(document->taskCount(), 0);
+    EXPECT_EQ(document->tasks().size(), 0);
     EXPECT_FALSE(document->addTask(nullptr));
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
@@ -114,6 +144,8 @@ TEST(CoverageSedTest, sedDocumentTasks)
 
     EXPECT_TRUE(document->addTask(task));
 
+    EXPECT_TRUE(document->hasTasks());
+    EXPECT_EQ(document->taskCount(), 1);
     EXPECT_EQ(document->tasks().size(), 1);
     EXPECT_EQ(document->tasks()[0], task);
 
@@ -132,7 +164,7 @@ TEST(CoverageSedTest, sedDocumentTasks)
         {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a simulation."},
     };
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, expectedIssues);
 
@@ -140,11 +172,13 @@ TEST(CoverageSedTest, sedDocumentTasks)
     EXPECT_TRUE(document->removeTask(task));
 
     EXPECT_FALSE(document->hasTasks());
+    EXPECT_EQ(document->taskCount(), 0);
+    EXPECT_EQ(document->tasks().size(), 0);
 
     EXPECT_FALSE(document->removeTask(nullptr));
 }
 
-TEST(CoverageSedTest, sedSimulationOdeSolver)
+TEST(CoverageSedTest, odeSolver)
 {
     auto document = libOpenCOR::SedDocument::create();
     auto simulation = libOpenCOR::SedUniformTimeCourse::create(document);
@@ -162,7 +196,7 @@ TEST(CoverageSedTest, sedSimulationOdeSolver)
     EXPECT_EQ(simulation->odeSolver(), nullptr);
 }
 
-TEST(CoverageSedTest, sedSimulationNlaSolver)
+TEST(CoverageSedTest, nlaSolver)
 {
     auto document = libOpenCOR::SedDocument::create();
     auto simulation = libOpenCOR::SedUniformTimeCourse::create(document);
@@ -178,6 +212,15 @@ TEST(CoverageSedTest, sedSimulationNlaSolver)
     simulation->setNlaSolver(nullptr);
 
     EXPECT_EQ(simulation->nlaSolver(), nullptr);
+}
+
+TEST(CoverageSedTest, sedBase)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto simulation = libOpenCOR::SedOneStep::create(document);
+
+    EXPECT_EQ(simulation->id(), "simulation2");
 }
 
 TEST(CoverageSedTest, sedOneStep)
@@ -236,19 +279,19 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
     auto instanceTask = instance->tasks()[0];
 
     static const auto NoDoubles = std::vector<double> {};
 
     EXPECT_EQ(instanceTask->voi(), NoDoubles);
-    EXPECT_EQ(instanceTask->voiName(), "main.t");
+    EXPECT_EQ(instanceTask->voiName(), "main/t");
     EXPECT_EQ(instanceTask->voiUnit(), "dimensionless");
 
     EXPECT_EQ(instanceTask->stateCount(), 3);
     EXPECT_EQ(instanceTask->state(0), NoDoubles);
     EXPECT_EQ(instanceTask->state(3), NoDoubles);
-    EXPECT_EQ(instanceTask->stateName(0), "main.x");
+    EXPECT_EQ(instanceTask->stateName(0), "main/x");
     EXPECT_EQ(instanceTask->stateName(3), "");
     EXPECT_EQ(instanceTask->stateUnit(0), "dimensionless");
     EXPECT_EQ(instanceTask->stateUnit(3), "");
@@ -256,7 +299,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     EXPECT_EQ(instanceTask->rateCount(), 3);
     EXPECT_EQ(instanceTask->rate(0), NoDoubles);
     EXPECT_EQ(instanceTask->rate(3), NoDoubles);
-    EXPECT_EQ(instanceTask->rateName(0), "main.x'");
+    EXPECT_EQ(instanceTask->rateName(0), "main/x'");
     EXPECT_EQ(instanceTask->rateName(3), "");
     EXPECT_EQ(instanceTask->rateUnit(0), "dimensionless/dimensionless");
     EXPECT_EQ(instanceTask->rateUnit(3), "");
@@ -264,7 +307,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     EXPECT_EQ(instanceTask->variableCount(), 3);
     EXPECT_EQ(instanceTask->variable(0), NoDoubles);
     EXPECT_EQ(instanceTask->variable(3), NoDoubles);
-    EXPECT_EQ(instanceTask->variableName(0), "main.sigma");
+    EXPECT_EQ(instanceTask->variableName(0), "main/sigma");
     EXPECT_EQ(instanceTask->variableName(3), "");
     EXPECT_EQ(instanceTask->variableUnit(0), "dimensionless");
     EXPECT_EQ(instanceTask->variableUnit(3), "");
@@ -272,6 +315,18 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     instance->run();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, sedDocument)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_CELLML_FILE);
+    libOpenCOR::SedDocument::create(file);
+
+    file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_SEDML_FILE);
+    libOpenCOR::SedDocument::create(file);
+
+    file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_COMBINE_ARCHIVE);
+    libOpenCOR::SedDocument::create(file);
 }
 
 TEST(CoverageSedTest, solver)
@@ -283,7 +338,7 @@ TEST(CoverageSedTest, solver)
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     instance->run();
 
@@ -291,7 +346,7 @@ TEST(CoverageSedTest, solver)
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverFourthOrderRungeKutta::create());
 
-    instance = document->createInstance();
+    instance = document->instantiate();
 
     instance->run();
 
@@ -299,7 +354,7 @@ TEST(CoverageSedTest, solver)
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverHeun::create());
 
-    instance = document->createInstance();
+    instance = document->instantiate();
 
     instance->run();
 
@@ -307,7 +362,7 @@ TEST(CoverageSedTest, solver)
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverSecondOrderRungeKutta::create());
 
-    instance = document->createInstance();
+    instance = document->instantiate();
 
     instance->run();
 

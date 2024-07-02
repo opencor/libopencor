@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Generate our base64 encoder.
+
+set(BASE64ENCODER ${CMAKE_BINARY_DIR}/base64encoder)
+
+try_compile(BASE64ENCODER_EXE ${CMAKE_BINARY_DIR}
+            SOURCES ${CMAKE_SOURCE_DIR}/cmake/base64encoder.cpp
+                    ${CMAKE_SOURCE_DIR}/extern/modp_b64/modp_b64.cc
+            COPY_FILE ${BASE64ENCODER})
+
+if(NOT BASE64ENCODER_EXE)
+    message(FATAL_ERROR "base64encoder could not be built...")
+endif()
+
 # Include our different tests.
 
 include(api/file/tests.cmake)
@@ -39,6 +52,9 @@ file(READ res/cellml_2.cellml SOME_CELLML_CONTENTS)
 file(READ res/error.cellml SOME_ERROR_CELLML_CONTENTS)
 file(READ res/warning.cellml SOME_WARNING_CELLML_CONTENTS)
 file(READ res/cellml_2.sedml SOME_SEDML_CONTENTS)
+file(READ res/api/sed/absolute_cellml_file.sedml SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS)
+file(READ res/api/sed/remote_cellml_file.sedml SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS)
+file(READ res/api/sed/simulations.sedml SOME_SEDML_WITH_SIMULATIONS_CONTENTS)
 
 string(REPLACE "\"" "\\\"" SOME_CELLML_CONTENTS "${SOME_CELLML_CONTENTS}")
 string(REGEX REPLACE "\n" "\" \\n\"" SOME_CELLML_CONTENTS_C "${SOME_CELLML_CONTENTS}")
@@ -51,6 +67,43 @@ string(REGEX REPLACE "\n" "\" \\n\"" SOME_WARNING_CELLML_CONTENTS_C "${SOME_WARN
 
 string(REPLACE "\"" "\\\"" SOME_SEDML_CONTENTS "${SOME_SEDML_CONTENTS}")
 string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_CONTENTS_C "${SOME_SEDML_CONTENTS}")
+
+string(REPLACE "\"" "\\\"" SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS "${SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS}")
+string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS_C "${SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS}")
+
+string(REPLACE "\"" "\\\"" SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS "${SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS}")
+string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS_C "${SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS}")
+
+string(REPLACE "\"" "\\\"" SOME_SEDML_WITH_SIMULATIONS_CONTENTS "${SOME_SEDML_WITH_SIMULATIONS_CONTENTS}")
+string(REGEX REPLACE "\n" "\" \\n\"" SOME_SEDML_WITH_SIMULATIONS_CONTENTS_C "${SOME_SEDML_WITH_SIMULATIONS_CONTENTS}")
+
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/cellml_2.omex"
+                OUTPUT_VARIABLE SOME_BASE64_COMBINE_ARCHIVE_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/sed/no_manifest_file.omex"
+                OUTPUT_VARIABLE SOME_BASE64_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/sed/no_master_file.omex"
+                OUTPUT_VARIABLE SOME_BASE64_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/sed/cellml_file_as_master_file.omex"
+                OUTPUT_VARIABLE SOME_BASE64_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+                execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/sed/sbml_file_as_master_file.omex"
+                OUTPUT_VARIABLE SOME_BASE64_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/file/dataset_135.omex"
+                OUTPUT_VARIABLE BASE64_DATASET_135_OMEX_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/file/dataset_135.json"
+                OUTPUT_VARIABLE BASE64_DATASET_135_JSON_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/file/dataset_157.omex"
+                OUTPUT_VARIABLE BASE64_DATASET_157_OMEX_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/file/dataset_157.json"
+                OUTPUT_VARIABLE BASE64_DATASET_157_JSON_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 file(READ res/api/solver/ode.cellml SOME_SOLVER_ODE_CONTENTS)
 file(READ res/api/solver/nla1.cellml SOME_SOLVER_NLA1_CONTENTS)
@@ -87,7 +140,9 @@ foreach(TEST ${TESTS})
             set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
         endif()
 
-        prepare_test(${TEST_CATEGORY}${TEST}_tests ${${TEST}_SOURCE_FILES} ${UTILS_SOURCE_FILE})
+        prepare_test(${TEST_CATEGORY}${TEST}_tests
+                     ${${TEST}_SOURCE_FILES}
+                     ${UTILS_SOURCE_FILE})
     endif()
 
     list(APPEND GIT_TESTS_SOURCE_FILES ${${TEST}_SOURCE_FILES})
@@ -188,15 +243,8 @@ endif()
 # Run our memory checks.
 
 if(LIBOPENCOR_MEMORY_CHECKS)
-    if(APPLE)
-        add_target(memory_checks
-                   COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/memory_checks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
-                   DEPENDS ${TEST_TARGETS}
-                   COMMENT "Running memory checks...")
-    elseif(NOT WIN32)
-        add_target(memory_checks
-                   COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/memory_checks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
-                   DEPENDS ${TEST_TARGETS}
-                   COMMENT "Running memory checks...")
-    endif()
+    add_target(memory_checks
+               COMMAND ${PYTHON_EXE} ${CMAKE_CURRENT_SOURCE_DIR}/memory_checks.py ${CMAKE_CURRENT_BINARY_DIR} ${TEST_TARGETS}
+               DEPENDS ${TEST_TARGETS}
+               COMMENT "Running memory checks...")
 endif()

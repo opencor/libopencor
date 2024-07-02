@@ -25,9 +25,29 @@ bool Logger::Impl::hasIssues() const
     return !mIssues.empty();
 }
 
+size_t Logger::Impl::issueCount() const
+{
+    return mIssues.size();
+}
+
+IssuePtrs Logger::Impl::issues() const
+{
+    return mIssues;
+}
+
 bool Logger::Impl::hasErrors() const
 {
     return !mErrors.empty();
+}
+
+size_t Logger::Impl::errorCount() const
+{
+    return mErrors.size();
+}
+
+IssuePtrs Logger::Impl::errors() const
+{
+    return mErrors;
 }
 
 bool Logger::Impl::hasWarnings() const
@@ -35,9 +55,29 @@ bool Logger::Impl::hasWarnings() const
     return !mWarnings.empty();
 }
 
+size_t Logger::Impl::warningCount() const
+{
+    return mWarnings.size();
+}
+
+IssuePtrs Logger::Impl::warnings() const
+{
+    return mWarnings;
+}
+
 bool Logger::Impl::hasMessages() const
 {
     return !mMessages.empty();
+}
+
+size_t Logger::Impl::messageCount() const
+{
+    return mMessages.size();
+}
+
+IssuePtrs Logger::Impl::messages() const
+{
+    return mMessages;
 }
 
 void Logger::Impl::addIssues(const LoggerPtr &pLogger)
@@ -71,7 +111,11 @@ void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription)
     mIssues.push_back(issue);
 
 #ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
-    mErrors.push_back(issue);
+    if (pType == Issue::Type::ERROR) {
+        mErrors.push_back(issue);
+    } else {
+        mWarnings.push_back(issue);
+    }
 #else
     switch (pType) {
     case libOpenCOR::Issue::Type::ERROR:
@@ -96,17 +140,17 @@ void Logger::Impl::addError(const std::string &pDescription)
     addIssue(Issue::Type::ERROR, pDescription);
 }
 
-/*---GRY---
 void Logger::Impl::addWarning(const std::string &pDescription)
 {
     addIssue(Issue::Type::WARNING, pDescription);
 }
-*/
 
+/*---GRY---
 void Logger::Impl::addMessage(const std::string &pDescription)
 {
     addIssue(Issue::Type::MESSAGE, pDescription);
 }
+*/
 
 void Logger::Impl::removeAllIssues()
 {
@@ -137,9 +181,14 @@ bool Logger::hasIssues() const
     return pimpl()->hasIssues();
 }
 
+size_t Logger::issueCount() const
+{
+    return pimpl()->issueCount();
+}
+
 IssuePtrs Logger::issues() const
 {
-    return pimpl()->mIssues;
+    return pimpl()->issues();
 }
 
 bool Logger::hasErrors() const
@@ -147,9 +196,14 @@ bool Logger::hasErrors() const
     return pimpl()->hasErrors();
 }
 
+size_t Logger::errorCount() const
+{
+    return pimpl()->errorCount();
+}
+
 IssuePtrs Logger::errors() const
 {
-    return pimpl()->mErrors;
+    return pimpl()->errors();
 }
 
 bool Logger::hasWarnings() const
@@ -157,9 +211,14 @@ bool Logger::hasWarnings() const
     return pimpl()->hasWarnings();
 }
 
+size_t Logger::warningCount() const
+{
+    return pimpl()->warningCount();
+}
+
 IssuePtrs Logger::warnings() const
 {
-    return pimpl()->mWarnings;
+    return pimpl()->warnings();
 }
 
 bool Logger::hasMessages() const
@@ -167,9 +226,14 @@ bool Logger::hasMessages() const
     return pimpl()->hasMessages();
 }
 
+size_t Logger::messageCount() const
+{
+    return pimpl()->messageCount();
+}
+
 IssuePtrs Logger::messages() const
 {
-    return pimpl()->mMessages;
+    return pimpl()->messages();
 }
 
 } // namespace libOpenCOR

@@ -32,42 +32,102 @@ def test_unknown_file():
         ],
     ]
 
-    file = File(utils.resource_path(utils.UNKNOWN_FILE))
+    file = File(utils.resource_path(utils.UnknownFile))
     document = SedDocument(file)
 
     assert_issues(document, expected_issues)
 
 
 def test_cellml_file():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = File(utils.resource_path(utils.Cellml2File))
     document = SedDocument(file)
 
     assert document.has_issues == False
 
 
 def test_sedml_file():
+    file = File(utils.resource_path(utils.Sedml2File))
+    document = SedDocument(file)
+
+    assert document.has_issues == True
+
+    needed_file = File(utils.resource_path(utils.Cellml2File))
+
+    document = SedDocument(file)
+
+    assert document.has_issues == False
+
+
+def test_sedml_file_with_absolute_cellml_file():
+    file = File(utils.resource_path("api/sed/absolute_cellml_file.sedml"))
+    document = SedDocument(file)
+
+    assert document.has_issues == True
+
+    needed_file = File(utils.LocalFile)
+
+    document = SedDocument(file)
+
+    assert document.has_issues == False
+
+
+def test_sedml_file_with_remote_cellml_file():
+    file = File(utils.resource_path("api/sed/remote_cellml_file.sedml"))
+    document = SedDocument(file)
+
+    assert document.has_issues == True
+
+    needed_file = File(utils.RemoteFile)
+
+    document = SedDocument(file)
+
+    assert document.has_issues == False
+
+
+def test_combine_archive():
+    file = File(utils.resource_path(utils.Combine2Archive))
+    document = SedDocument(file)
+
+    assert document.has_issues == False
+
+
+def test_combine_archive_with_no_manifest_file():
     expected_issues = [
         [
-            Issue.Type.Message,
-            "A simulation experiment description cannot (currently) be created using a SED-ML file.",
+            Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.SEDML_2_FILE))
+    file = File(utils.resource_path("api/sed/no_manifest_file.omex"))
     document = SedDocument(file)
 
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive():
+def test_combine_archive_with_no_master_file():
     expected_issues = [
         [
-            Issue.Type.Message,
-            "A simulation experiment description cannot (currently) be created using a COMBINE archive.",
+            Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
+    file = File(utils.resource_path("api/sed/no_master_file.omex"))
+    document = SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_sbml_file_as_master_file():
+    expected_issues = [
+        [
+            Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+        ],
+    ]
+
+    file = File(utils.resource_path("api/sed/sbml_file_as_master_file.omex"))
     document = SedDocument(file)
 
     assert_issues(document, expected_issues)
@@ -81,7 +141,7 @@ def test_irretrievable_file():
         ],
     ]
 
-    file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
+    file = File(utils.resource_path(utils.IrretrievableFile))
     document = SedDocument(file)
 
     assert_issues(document, expected_issues)

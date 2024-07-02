@@ -153,6 +153,46 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     }
 }
 
+namespace {
+
+std::string name(const libcellml::VariablePtr &pVariable) //---ISAN---
+{
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
+
+    return component->name() + "/" + pVariable->name();
+}
+
+} // namespace
+
+#ifdef __EMSCRIPTEN__
+void SedInstanceTask::Impl::applyInitialConditions() //---ISAN---
+{
+    for (const auto &[parameter, value] : mInitialConditions) {
+        bool isParameterSet = false;
+
+        for (const auto &state : mAnalyserModel->states()) {
+            if (name(state->variable()) == parameter) {
+                mStates[state->index()] = value;
+
+                isParameterSet = true;
+
+                break;
+            }
+        }
+
+        if (!isParameterSet) {
+            for (const auto &variable : mAnalyserModel->variables()) {
+                if (name(variable->variable()) == parameter) {
+                    mVariables[variable->index()] = value;
+
+                    break;
+                }
+            }
+        }
+    }
+}
+#endif
+
 void SedInstanceTask::Impl::initialise()
 {
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -177,6 +217,11 @@ void SedInstanceTask::Impl::initialise()
         } else {
 #endif
             mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mVariables);
+
+#ifdef __EMSCRIPTEN__
+            applyInitialConditions(); //---ISAN---
+#endif
+
             mRuntime->computeInterpretedComputedConstants()(mVariables);
             mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mVariables);
             mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
@@ -292,6 +337,13 @@ void SedInstanceTask::Impl::run()
     }
 }
 
+#ifdef __EMSCRIPTEN__
+void SedInstanceTask::Impl::addInitialCondition(const std::string &pParameter, double pValue) //---ISAN---
+{
+    mInitialConditions[pParameter] = pValue;
+}
+#endif
+
 Doubles SedInstanceTask::Impl::state(size_t pIndex) const
 {
     if (pIndex >= mAnalyserModel->stateCount()) {
@@ -319,16 +371,23 @@ Doubles SedInstanceTask::Impl::variable(size_t pIndex) const
     return mResults.variables[pIndex];
 }
 
+/*---ISAN---
 namespace {
 
 std::string name(const libcellml::VariablePtr &pVariable)
 {
     auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
 
-    return component->name() + "." + pVariable->name();
+    return component->name() + "/" + pVariable->name();
 }
 
 } // namespace
+*/
+
+Doubles SedInstanceTask::Impl::voi() const
+{
+    return mResults.voi;
+}
 
 std::string SedInstanceTask::Impl::voiName() const
 {
@@ -338,6 +397,11 @@ std::string SedInstanceTask::Impl::voiName() const
 std::string SedInstanceTask::Impl::voiUnit() const
 {
     return mAnalyserModel->voi()->variable()->units()->name();
+}
+
+size_t SedInstanceTask::Impl::stateCount() const
+{
+    return mAnalyserModel->stateCount();
 }
 
 std::string SedInstanceTask::Impl::stateName(size_t pIndex) const
@@ -358,6 +422,11 @@ std::string SedInstanceTask::Impl::stateUnit(size_t pIndex) const
     return mAnalyserModel->states()[pIndex]->variable()->units()->name();
 }
 
+size_t SedInstanceTask::Impl::rateCount() const
+{
+    return stateCount();
+}
+
 std::string SedInstanceTask::Impl::rateName(size_t pIndex) const
 {
     if (pIndex >= mAnalyserModel->stateCount()) {
@@ -374,6 +443,11 @@ std::string SedInstanceTask::Impl::rateUnit(size_t pIndex) const
     }
 
     return mAnalyserModel->states()[pIndex]->variable()->units()->name() + "/" + voiUnit();
+}
+
+size_t SedInstanceTask::Impl::variableCount() const
+{
+    return mAnalyserModel->variableCount();
 }
 
 std::string SedInstanceTask::Impl::variableName(size_t pIndex) const
@@ -416,7 +490,7 @@ const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 
 Doubles SedInstanceTask::voi() const
 {
-    return pimpl()->mResults.voi;
+    return pimpl()->voi();
 }
 
 #ifdef __EMSCRIPTEN__
@@ -438,7 +512,7 @@ std::string SedInstanceTask::voiUnit() const
 
 size_t SedInstanceTask::stateCount() const
 {
-    return pimpl()->mAnalyserModel->stateCount();
+    return pimpl()->stateCount();
 }
 
 Doubles SedInstanceTask::state(size_t pIndex) const
@@ -465,7 +539,7 @@ std::string SedInstanceTask::stateUnit(size_t pIndex) const
 
 size_t SedInstanceTask::rateCount() const
 {
-    return stateCount();
+    return pimpl()->rateCount();
 }
 
 Doubles SedInstanceTask::rate(size_t pIndex) const
@@ -492,7 +566,7 @@ std::string SedInstanceTask::rateUnit(size_t pIndex) const
 
 size_t SedInstanceTask::variableCount() const
 {
-    return pimpl()->mAnalyserModel->variableCount();
+    return pimpl()->variableCount();
 }
 
 Doubles SedInstanceTask::variable(size_t pIndex) const

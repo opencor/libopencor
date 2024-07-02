@@ -31,7 +31,7 @@ void run(const libOpenCOR::SedDocumentPtr &pDocument, const libOpenCOR::Doubles 
     simulation->setOutputEndTime(OUTPUT_END_TIME);
     simulation->setNumberOfSteps(NUMBER_OF_STEPS);
 
-    auto instance = pDocument->createInstance(pCompiled);
+    auto instance = pDocument->instantiate(pCompiled);
 
     instance->run();
 

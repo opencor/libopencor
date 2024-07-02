@@ -19,16 +19,20 @@ limitations under the License.
 #include "logger_p.h"
 
 #include "sedmlfile.h"
+#include "utils.h"
 
 namespace libOpenCOR {
 
 class SedmlFile::Impl: public Logger::Impl
 {
 public:
+    std::string mLocation;
     libsedml::SedDocument *mDocument;
 
-    explicit Impl(libsedml::SedDocument *pDocument);
+    explicit Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument);
     ~Impl();
+
+    void populateDocument(const SedDocumentPtr &pDocument);
 };
 
 } // namespace libOpenCOR

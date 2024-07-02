@@ -44,21 +44,29 @@ public:
     std::string uniqueId(const std::string &pPrefix);
 
     void initialise(const SedDocumentPtr &pOwner, const FilePtr &pFile);
-    void initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
+    static void initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
+    void initialiseFromSedmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile);
+    void initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile);
 
     void serialise(xmlNodePtr pNode) const;
 
     std::string serialise(const std::string &pBasePath = {}) const;
 
     bool hasModels() const;
+    size_t modelCount() const;
+    SedModelPtrs models() const;
     bool addModel(const SedModelPtr &pModel);
     bool removeModel(const SedModelPtr &pModel);
 
     bool hasSimulations() const;
+    size_t simulationCount() const;
+    SedSimulationPtrs simulations() const;
     bool addSimulation(const SedSimulationPtr &pSimulation);
     bool removeSimulation(const SedSimulationPtr &pSimulation);
 
     bool hasTasks() const;
+    size_t taskCount() const;
+    SedAbstractTaskPtrs tasks() const;
     bool addTask(const SedAbstractTaskPtr &pTask);
     bool removeTask(const SedAbstractTaskPtr &pTask);
 };

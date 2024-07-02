@@ -45,6 +45,10 @@ public:
     SolverNlaPtr mNlaSolver;
     bool mCompiled = true;
 
+#ifdef __EMSCRIPTEN__
+    std::map<std::string, double> mInitialConditions; //---ISAN---
+#endif
+
     double mVoi = 0.0;
     double *mStates = nullptr;
     double *mRates = nullptr;
@@ -62,22 +66,34 @@ public:
 
     void trackResults(size_t pIndex);
 
+#ifdef __EMSCRIPTEN__
+    void applyInitialConditions(); //---ISAN---
+#endif
+
     void initialise();
     void run();
+
+#ifdef __EMSCRIPTEN__
+    void addInitialCondition(const std::string &pParameter, double pValue); //---ISAN---
+#endif
 
     Doubles state(size_t pIndex) const;
     Doubles rate(size_t pIndex) const;
     Doubles variable(size_t pIndex) const;
 
+    Doubles voi() const;
     std::string voiName() const;
     std::string voiUnit() const;
 
+    size_t stateCount() const;
     std::string stateName(size_t pIndex) const;
     std::string stateUnit(size_t pIndex) const;
 
+    size_t rateCount() const;
     std::string rateName(size_t pIndex) const;
     std::string rateUnit(size_t pIndex) const;
 
+    size_t variableCount() const;
     std::string variableName(size_t pIndex) const;
     std::string variableUnit(size_t pIndex) const;
 };

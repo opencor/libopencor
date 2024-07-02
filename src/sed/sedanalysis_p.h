@@ -16,30 +16,18 @@ limitations under the License.
 
 #pragma once
 
-#include "utils.h"
+#include "sedsimulation_p.h"
 
-#include "libopencor/file.h"
-
-#include <vector>
+#include "libopencor/sedanalysis.h"
 
 namespace libOpenCOR {
 
-class FileManager
+class SedAnalysis::Impl: public SedSimulation::Impl
 {
 public:
-    static FileManager &instance();
+    explicit Impl(const SedDocumentPtr &pDocument);
 
-    void manage(File *pFile);
-    void unmanage(File *pFile);
-
-    FilePtr file(const std::string &pFileNameOrUrl) const;
-
-private:
-    class Impl;
-
-    Impl &mPimpl;
-
-    explicit FileManager();
+    void serialise(xmlNodePtr pNode) const override;
 };
 
 } // namespace libOpenCOR

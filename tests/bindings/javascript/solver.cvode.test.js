@@ -36,7 +36,7 @@ describe("Solver CVODE", () => {
   });
 
   test("Maximum step value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -49,7 +49,7 @@ describe("Solver CVODE", () => {
 
     solver.setMaximumStep(-1.234);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -57,10 +57,14 @@ describe("Solver CVODE", () => {
         "The maximum step cannot be equal to -1.234. It must be greater or equal to 0.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Maximum number of steps value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -73,7 +77,7 @@ describe("Solver CVODE", () => {
 
     solver.setMaximumNumberOfSteps(0);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -81,10 +85,14 @@ describe("Solver CVODE", () => {
         "The maximum number of steps cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Banded linear solver and upper half-bandwidth value with number too small", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -98,7 +106,7 @@ describe("Solver CVODE", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setUpperHalfBandwidth(-1);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -106,10 +114,14 @@ describe("Solver CVODE", () => {
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Banded linear solver and upper half-bandwidth value with number too big", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -123,7 +135,7 @@ describe("Solver CVODE", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setUpperHalfBandwidth(4);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -131,10 +143,14 @@ describe("Solver CVODE", () => {
         "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Banded linear solver and lower half-bandwidth value with number too small", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -148,7 +164,7 @@ describe("Solver CVODE", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setLowerHalfBandwidth(-1);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -156,10 +172,14 @@ describe("Solver CVODE", () => {
         "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Banded linear solver and lower half-bandwidth value with number too big", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -173,7 +193,7 @@ describe("Solver CVODE", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setLowerHalfBandwidth(4);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -181,10 +201,14 @@ describe("Solver CVODE", () => {
         "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Relative tolerance value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -197,7 +221,7 @@ describe("Solver CVODE", () => {
 
     solver.setRelativeTolerance(-1.234);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -205,10 +229,14 @@ describe("Solver CVODE", () => {
         "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Absolute tolerance value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -221,7 +249,7 @@ describe("Solver CVODE", () => {
 
     solver.setAbsoluteTolerance(-1.234);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -229,10 +257,14 @@ describe("Solver CVODE", () => {
         "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Solve", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -252,10 +284,13 @@ describe("Solver CVODE", () => {
         0.541333, 0.056246,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve without interpolate solution", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -279,10 +314,13 @@ describe("Solver CVODE", () => {
         0.056246,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with Adams-Moulton integration method", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -308,10 +346,13 @@ describe("Solver CVODE", () => {
         0.541354, 0.056245,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with functional iteration type", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -335,10 +376,13 @@ describe("Solver CVODE", () => {
         0.541335, 0.056246,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with banded linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -362,10 +406,13 @@ describe("Solver CVODE", () => {
         0.062887,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with diagonal linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -389,10 +436,13 @@ describe("Solver CVODE", () => {
         0.541338, 0.056246,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with GMRES linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -416,10 +466,13 @@ describe("Solver CVODE", () => {
         0.140794,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with Bi-CGstab linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -442,10 +495,13 @@ describe("Solver CVODE", () => {
         0.112959, 6.787581, 0.112665, 0.018857, 12.0, 36.0, 0.032306, 0.140793,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with TFQMR linear solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -468,10 +524,13 @@ describe("Solver CVODE", () => {
         0.112961, 6.787465, 0.112663, 0.018857, 12.0, 36.0, 0.032307, 0.140793,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with GMRES linear solver and no preconditioner", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -496,10 +555,13 @@ describe("Solver CVODE", () => {
         0.541336, 0.056246,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with Bi-CGstab linear solver and no preconditioner", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -524,10 +586,13 @@ describe("Solver CVODE", () => {
         0.541333, 0.056246,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 
   test("Solve with TFQMR linear solver and no preconditioner", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -552,5 +617,8 @@ describe("Solver CVODE", () => {
         0.541334, 0.056246,
       ],
     );
+
+    document.delete();
+    file.delete();
   });
 });

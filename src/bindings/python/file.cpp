@@ -16,7 +16,6 @@ limitations under the License.
 
 #include <libopencor>
 
-#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
@@ -35,10 +34,28 @@ void fileApi(py::module_ &m)
         .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE)
         .export_values();
 
-    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
+    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"), py::arg("managed") = true)
         .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
         .def_property_readonly("path", &libOpenCOR::File::path, "Get the path for this File object.")
-        .def_property("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.");
+        .def_property("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.")
+        .def_property_readonly("has_child_files", &libOpenCOR::File::hasChildFiles, "Return whether this File object has some child files.")
+        .def_property_readonly("child_file_count", &libOpenCOR::File::childFileCount, "Return the number of child files for this File object.")
+        .def_property_readonly("child_file_names", &libOpenCOR::File::childFileNames, "Return the child file names for this File object.")
+        .def_property_readonly("child_files", &libOpenCOR::File::childFiles, "Return the child files for this File object.")
+        .def("child_file", &libOpenCOR::File::childFile, "Get the requested child file for this File object.", py::arg("file_name"));
+
+    // FileManager API.
+
+    py::class_<libOpenCOR::FileManager, std::unique_ptr<libOpenCOR::FileManager, py::nodelete>> fileManager(m, "FileManager");
+
+    fileManager.def_static("instance", &libOpenCOR::FileManager::instance, "Get the file manager instance.")
+        .def("manage", &libOpenCOR::FileManager::manage, "Manage the requested file.", py::arg("file"))
+        .def("unmanage", &libOpenCOR::FileManager::unmanage, "Unmanage the requested file.", py::arg("file"))
+        .def("reset", &libOpenCOR::FileManager::reset, "Reset the file manager.")
+        .def_property_readonly("has_files", &libOpenCOR::FileManager::hasFiles, "Return whether there are managed files.")
+        .def_property_readonly("file_count", &libOpenCOR::FileManager::fileCount, "Return the number of managed files.")
+        .def_property_readonly("files", &libOpenCOR::FileManager::files, "Return the managed files.")
+        .def("file", &libOpenCOR::FileManager::file, "Get the requested managed file.", py::arg("file_name_or_url"));
 }

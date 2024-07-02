@@ -32,7 +32,7 @@ TEST(SecondOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 
     simulation->setOdeSolver(solver);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }

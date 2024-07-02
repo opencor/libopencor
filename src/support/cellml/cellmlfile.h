@@ -47,6 +47,8 @@ public:
 
     static CellmlFilePtr create(const FilePtr &pFile);
 
+    void populateDocument(const SedDocumentPtr &pDocument);
+
     libcellml::AnalyserModel::Type type() const;
 
     libcellml::AnalyserPtr analyser() const;

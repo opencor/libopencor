@@ -24,6 +24,16 @@ Solver::Impl::Impl(const std::string &pId, const std::string &pName)
 {
 }
 
+std::string Solver::Impl::id() const
+{
+    return mId;
+}
+
+std::string Solver::Impl::name() const
+{
+    return mName;
+}
+
 void Solver::Impl::serialise(xmlNodePtr pNode, bool pNlaAlgorithm) const
 {
     // Solver information.
@@ -71,12 +81,12 @@ const Solver::Impl *Solver::pimpl() const
 
 std::string Solver::id() const
 {
-    return pimpl()->mId;
+    return pimpl()->id();
 }
 
 std::string Solver::name() const
 {
-    return pimpl()->mName;
+    return pimpl()->name();
 }
 
 } // namespace libOpenCOR

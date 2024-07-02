@@ -44,24 +44,28 @@ void sedApi()
         .function("serialise", emscripten::select_overload<std::string() const>(&libOpenCOR::SedDocument::serialise))
         .function("serialise", emscripten::select_overload<std::string(const std::string &) const>(&libOpenCOR::SedDocument::serialise))
         .function("hasModels", &libOpenCOR::SedDocument::hasModels)
+        .function("modelCount", &libOpenCOR::SedDocument::modelCount)
         .function("models", &libOpenCOR::SedDocument::models)
         .function("addModel", &libOpenCOR::SedDocument::addModel)
         .function("removeModel", &libOpenCOR::SedDocument::removeModel)
         .function("hasSimulations", &libOpenCOR::SedDocument::hasSimulations)
+        .function("simulationCount", &libOpenCOR::SedDocument::simulationCount)
         .function("simulations", &libOpenCOR::SedDocument::simulations)
         .function("addSimulation", &libOpenCOR::SedDocument::addSimulation)
         .function("removeSimulation", &libOpenCOR::SedDocument::removeSimulation)
         .function("hasTasks", &libOpenCOR::SedDocument::hasTasks)
+        .function("taskCount", &libOpenCOR::SedDocument::taskCount)
         .function("tasks", &libOpenCOR::SedDocument::tasks)
         .function("addTask", &libOpenCOR::SedDocument::addTask)
         .function("removeTask", &libOpenCOR::SedDocument::removeTask)
-        .function("createInstance", &libOpenCOR::SedDocument::createInstance);
+        .function("instantiate", &libOpenCOR::SedDocument::instantiate);
 
     // SedInstance API.
 
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
         .function("run", &libOpenCOR::SedInstance::run)
+        .function("addInitialCondition", &libOpenCOR::SedInstance::addInitialCondition) //---ISAN---
         .function("tasks", &libOpenCOR::SedInstance::tasks);
 
     // SedInstanceTask API.
@@ -91,7 +95,8 @@ void sedApi()
     // SedModel API.
 
     emscripten::class_<libOpenCOR::SedModel, emscripten::base<libOpenCOR::SedBase>>("SedModel")
-        .smart_ptr_constructor("SedModel", &libOpenCOR::SedModel::create);
+        .smart_ptr_constructor("SedModel", &libOpenCOR::SedModel::create)
+        .function("file", &libOpenCOR::SedModel::file);
 
     // SedOutput API.
 
@@ -112,6 +117,11 @@ void sedApi()
         .function("setOdeSolver", &libOpenCOR::SedSimulation::setOdeSolver)
         .function("nlaSolver", &libOpenCOR::SedSimulation::nlaSolver)
         .function("setNlaSolver", &libOpenCOR::SedSimulation::setNlaSolver);
+
+    // SedAnalysis API.
+
+    emscripten::class_<libOpenCOR::SedAnalysis, emscripten::base<libOpenCOR::SedSimulation>>("SedAnalysis")
+        .smart_ptr_constructor("SedAnalysis", &libOpenCOR::SedAnalysis::create);
 
     // SedOneStep API.
 

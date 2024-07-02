@@ -81,9 +81,11 @@ endif()
 
 set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/file.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/issue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedabstracttask.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedanalysis.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatadescription.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatagenerator.h
@@ -149,9 +151,11 @@ endif()
 
 set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedabstracttask.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedanalysis.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatadescription.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatagenerator.cpp
@@ -172,6 +176,7 @@ set(GIT_API_SOURCE_FILES
 
 set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/file_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedabstracttask_p.h
@@ -200,8 +205,6 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode_p.h

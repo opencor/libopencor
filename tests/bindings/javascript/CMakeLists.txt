@@ -17,6 +17,7 @@
 configure_file(utils.js.in utils.js)
 configure_file(res/package.json.in package.json)
 
+configure_file(res/favicon.ico favicon.ico COPYONLY)
 configure_file(res/index.html index.html COPYONLY)
 
 file(GLOB RESOURCE_FILES "res/res/*")

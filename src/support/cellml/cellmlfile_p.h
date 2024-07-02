@@ -24,16 +24,27 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+using FileWeakPtr = std::weak_ptr<File>;
+
 class CellmlFile::Impl: public Logger::Impl
 {
 public:
-    libcellml::AnalyserPtr mAnalyser = libcellml::Analyser::create();
-
+    FileWeakPtr mFile;
     libcellml::ModelPtr mModel;
+    libcellml::AnalyserPtr mAnalyser = libcellml::Analyser::create();
     libcellml::AnalyserModelPtr mAnalyserModel;
 
     explicit Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict);
     ~Impl() = default;
+
+    void populateDocument(const SedDocumentPtr &pDocument) const;
+
+    libcellml::AnalyserModel::Type type() const;
+    libcellml::AnalyserPtr analyser() const;
+    libcellml::AnalyserModelPtr analyserModel() const;
+
+    static CellmlFileRuntimePtr runtime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
+                                        bool pCompiled);
 };
 
 } // namespace libOpenCOR
