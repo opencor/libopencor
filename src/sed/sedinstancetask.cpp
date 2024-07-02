@@ -153,6 +153,46 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     }
 }
 
+namespace {
+
+std::string name(const libcellml::VariablePtr &pVariable) //---ISAN---
+{
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
+
+    return component->name() + "/" + pVariable->name();
+}
+
+} // namespace
+
+#ifdef __EMSCRIPTEN__
+void SedInstanceTask::Impl::applyInitialConditions() //---ISAN---
+{
+    for (const auto &[parameter, value] : mInitialConditions) {
+        bool isParameterSet = false;
+
+        for (const auto &state : mAnalyserModel->states()) {
+            if (name(state->variable()) == parameter) {
+                mStates[state->index()] = value;
+
+                isParameterSet = true;
+
+                break;
+            }
+        }
+
+        if (!isParameterSet) {
+            for (const auto &variable : mAnalyserModel->variables()) {
+                if (name(variable->variable()) == parameter) {
+                    mVariables[variable->index()] = value;
+
+                    break;
+                }
+            }
+        }
+    }
+}
+#endif
+
 void SedInstanceTask::Impl::initialise()
 {
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -177,6 +217,11 @@ void SedInstanceTask::Impl::initialise()
         } else {
 #endif
             mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mVariables);
+
+#ifdef __EMSCRIPTEN__
+            applyInitialConditions(); //---ISAN---
+#endif
+
             mRuntime->computeInterpretedComputedConstants()(mVariables);
             mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mVariables);
             mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
@@ -292,6 +337,18 @@ void SedInstanceTask::Impl::run()
     }
 }
 
+#ifdef __EMSCRIPTEN__
+void SedInstanceTask::Impl::removeAllInitialConditions() //---ISAN---
+{
+    mInitialConditions.clear();
+}
+
+void SedInstanceTask::Impl::addInitialCondition(const std::string &pParameter, double pValue) //---ISAN---
+{
+    mInitialConditions[pParameter] = pValue;
+}
+#endif
+
 Doubles SedInstanceTask::Impl::state(size_t pIndex) const
 {
     if (pIndex >= mAnalyserModel->stateCount()) {
@@ -319,6 +376,7 @@ Doubles SedInstanceTask::Impl::variable(size_t pIndex) const
     return mResults.variables[pIndex];
 }
 
+/*---ISAN---
 namespace {
 
 std::string name(const libcellml::VariablePtr &pVariable)
@@ -329,6 +387,7 @@ std::string name(const libcellml::VariablePtr &pVariable)
 }
 
 } // namespace
+*/
 
 Doubles SedInstanceTask::Impl::voi() const
 {

@@ -33,6 +33,11 @@ public:
 
     void run();
 
+#ifdef __EMSCRIPTEN__
+    void removeAllInitialConditions(); //---ISAN---
+    void addInitialCondition(const std::string &pParameter, double pValue); //---ISAN---
+#endif
+
     SedInstanceTaskPtrs tasks() const;
 };
 
