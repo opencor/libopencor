@@ -88,6 +88,15 @@ void SedInstance::Impl::run()
     }
 }
 
+#ifdef __EMSCRIPTEN__
+void SedInstance::Impl::addInitialCondition(const std::string &pParameter, double pValue) //---ISAN---
+{
+    for (const auto &task : mTasks) {
+        task->pimpl()->addInitialCondition(pParameter, pValue);
+    }
+}
+#endif
+
 SedInstanceTaskPtrs SedInstance::Impl::tasks() const
 {
     return mTasks;
@@ -117,6 +126,13 @@ void SedInstance::run()
 {
     pimpl()->run();
 }
+
+#ifdef __EMSCRIPTEN__
+void SedInstance::addInitialCondition(const std::string &pParameter, double pValue) //---ISAN---
+{
+    pimpl()->addInitialCondition(pParameter, pValue);
+}
+#endif
 
 SedInstanceTaskPtrs SedInstance::tasks() const
 {

@@ -65,6 +65,7 @@ void sedApi()
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
         .function("run", &libOpenCOR::SedInstance::run)
+        .function("addInitialCondition", &libOpenCOR::SedInstance::addInitialCondition) //---ISAN---
         .function("tasks", &libOpenCOR::SedInstance::tasks);
 
     // SedInstanceTask API.
