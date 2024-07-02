@@ -325,7 +325,7 @@ std::string name(const libcellml::VariablePtr &pVariable)
 {
     auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
 
-    return component->name() + "." + pVariable->name();
+    return component->name() + "/" + pVariable->name();
 }
 
 } // namespace

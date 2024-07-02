@@ -279,13 +279,13 @@ def test_sed_instance_and_sed_isntance_task():
     instance_task = instance.tasks[0]
 
     assert instance_task.voi == []
-    assert instance_task.voi_name == "main.t"
+    assert instance_task.voi_name == "main/t"
     assert instance_task.voi_unit == "dimensionless"
 
     assert instance_task.state_count == 3
     assert instance_task.state(0) == []
     assert instance_task.state(3) == []
-    assert instance_task.state_name(0) == "main.x"
+    assert instance_task.state_name(0) == "main/x"
     assert instance_task.state_name(3) == ""
     assert instance_task.state_unit(0) == "dimensionless"
     assert instance_task.state_unit(3) == ""
@@ -293,7 +293,7 @@ def test_sed_instance_and_sed_isntance_task():
     assert instance_task.rate_count == 3
     assert instance_task.rate(0) == []
     assert instance_task.rate(3) == []
-    assert instance_task.rate_name(0) == "main.x'"
+    assert instance_task.rate_name(0) == "main/x'"
     assert instance_task.rate_name(3) == ""
     assert instance_task.rate_unit(0) == "dimensionless/dimensionless"
     assert instance_task.rate_unit(3) == ""
@@ -301,7 +301,7 @@ def test_sed_instance_and_sed_isntance_task():
     assert instance_task.variable_count == 3
     assert instance_task.variable(0) == []
     assert instance_task.variable(3) == []
-    assert instance_task.variable_name(0) == "main.sigma"
+    assert instance_task.variable_name(0) == "main/sigma"
     assert instance_task.variable_name(3) == ""
     assert instance_task.variable_unit(0) == "dimensionless"
     assert instance_task.variable_unit(3) == ""

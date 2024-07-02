@@ -293,7 +293,7 @@ describe("Sed coverage tests", () => {
 
     expect(instanceTask.voi().size()).toBe(0);
     expect(instanceTask.voiAsArray()).toStrictEqual([]);
-    expect(instanceTask.voiName()).toBe("main.t");
+    expect(instanceTask.voiName()).toBe("main/t");
     expect(instanceTask.voiUnit()).toBe("dimensionless");
 
     expect(instanceTask.stateCount()).toBe(3);
@@ -301,7 +301,7 @@ describe("Sed coverage tests", () => {
     expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
     expect(instanceTask.state(3).size()).toBe(0);
     expect(instanceTask.stateAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.stateName(0)).toBe("main.x");
+    expect(instanceTask.stateName(0)).toBe("main/x");
     expect(instanceTask.stateName(3)).toBe("");
     expect(instanceTask.stateUnit(0)).toBe("dimensionless");
     expect(instanceTask.stateUnit(3)).toBe("");
@@ -311,7 +311,7 @@ describe("Sed coverage tests", () => {
     expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
     expect(instanceTask.rate(3).size()).toBe(0);
     expect(instanceTask.rateAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.rateName(0)).toBe("main.x'");
+    expect(instanceTask.rateName(0)).toBe("main/x'");
     expect(instanceTask.rateName(3)).toBe("");
     expect(instanceTask.rateUnit(0)).toBe("dimensionless/dimensionless");
     expect(instanceTask.rateUnit(3)).toBe("");
@@ -321,7 +321,7 @@ describe("Sed coverage tests", () => {
     expect(instanceTask.variableAsArray(0)).toStrictEqual([]);
     expect(instanceTask.variable(3).size()).toBe(0);
     expect(instanceTask.variableAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.variableName(0)).toBe("main.sigma");
+    expect(instanceTask.variableName(0)).toBe("main/sigma");
     expect(instanceTask.variableName(3)).toBe("");
     expect(instanceTask.variableUnit(0)).toBe("dimensionless");
     expect(instanceTask.variableUnit(3)).toBe("");
