@@ -86,16 +86,23 @@ std::string canonicalFileName(const std::string &pFileName)
 #endif
 {
     // Determine the canonical version of the file name.
-    // Note: when building using Emscripten, std::filesystem::weakly_canonical() doesn't work as expected. For instance,
-    //       if pFileName is equal to "/some/path/../.." then the call to std::filesystem::weakly_canonical() will
-    //       generate an exception rather than return "/". So, we prepend a dummy folder to pFileName and then remove it
-    //       from the result of std::filesystem::weakly_canonical().
+    // Note #1: if the file exists then we want to use std::filesystem::canonical() since this will resolve any symbolic
+    //          links, etc. However, if the file doesn't exist then we want to use std::filesystem::weakly_canonical()
+    //          since this will return a file name that is as close to the canonical version as possible without
+    //          actually checking whether the file exists.
+    // Note #2: when building using Emscripten, std::filesystem::weakly_canonical() doesn't work as expected. For
+    //          instance, if pFileName is equal to "/some/path/../.." then it will generate an exception rather than
+    //          return "/". So, we prepend a dummy folder to pFileName and then remove it from the result of
+    //          std::filesystem::weakly_canonical().
 
     static constexpr auto FORWARD_SLASH = "/";
 
+    auto fileExists = std::filesystem::exists(pFileName);
     auto currentPath = std::filesystem::current_path();
 
-    std::filesystem::current_path(FORWARD_SLASH);
+    if (!fileExists) {
+        std::filesystem::current_path(FORWARD_SLASH);
+    }
 
 #ifdef __EMSCRIPTEN__
     static constexpr auto DUMMY_FOLDER = "/dummy";
@@ -107,7 +114,10 @@ std::string canonicalFileName(const std::string &pFileName)
 
     res.erase(0, strlen(DUMMY_FOLDER));
 #else
-    auto res = pathToString(std::filesystem::weakly_canonical(stringToPath(pFileName)));
+    auto filePath = stringToPath(pFileName);
+    auto res = pathToString(fileExists ?
+                                std::filesystem::canonical(filePath) :
+                                std::filesystem::weakly_canonical(filePath));
 #endif
 
 #if defined(BUILDING_USING_MSVC)
@@ -127,7 +137,9 @@ std::string canonicalFileName(const std::string &pFileName)
     }
 #endif
 
-    std::filesystem::current_path(currentPath);
+    if (!fileExists) {
+        std::filesystem::current_path(currentPath);
+    }
 
     // Return the canonical version of the file name.
 
