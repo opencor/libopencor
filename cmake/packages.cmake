@@ -195,7 +195,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         if("${PACKAGE_NAME}" STREQUAL "libCellML")
             #---GRY--- THIS IS TEMPORARY UNTIL libCellML HAS AN OFFICIAL RELEASE WITH THE INTERPRETER.
 
-            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/584ebb5/${PACKAGE_FILE}")
+            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/4966bad1/${PACKAGE_FILE}")
         endif()
 
         file(DOWNLOAD ${PACKAGE_URL} ${REAL_PACKAGE_FILE} STATUS STATUS)
