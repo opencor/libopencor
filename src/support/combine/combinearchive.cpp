@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "combinearchive_p.h"
 
+#include "utils.h"
+
 #include "libopencor/file.h"
 
 #include <combine/combinearchive.h>
@@ -26,15 +28,15 @@ namespace libOpenCOR {
 
 CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive)
     : mArchive(pArchive)
+    , mArchiveLocation(libOpenCOR::pathToString(libOpenCOR::stringToPath(pFile->fileName() + ".contents/")))
+    , mArchiveLocationSize(mArchiveLocation.size())
 {
     // Extract all the files contained in the COMBINE archive.
-
-    auto archiveLocation = pFile->fileName() + ".contents/";
 
     for (int i = 0; i < mArchive->getNumEntries(); ++i) {
         const auto *entry = mArchive->getEntry(i);
         auto location = entry->getLocation();
-        auto file = File::create(archiveLocation + location);
+        auto file = File::create(mArchiveLocation + location);
 
         file->setContents(mArchive->extractEntryToBuffer(location));
 
@@ -72,7 +74,7 @@ Strings CombineArchive::Impl::fileNames() const
     Strings res;
 
     for (const auto &file : mFiles) {
-        res.push_back(file->fileName());
+        res.push_back(file->fileName().substr(mArchiveLocationSize));
     }
 
     return res;
@@ -86,7 +88,7 @@ FilePtrs CombineArchive::Impl::files() const
 FilePtr CombineArchive::Impl::file(const std::string &pFileName) const
 {
     for (const auto &file : mFiles) {
-        if (file->fileName() == pFileName) {
+        if (file->fileName() == mArchiveLocation + pFileName) {
             return file;
         }
     }

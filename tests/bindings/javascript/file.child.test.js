@@ -63,30 +63,19 @@ describe("File type tests", () => {
 
     expect(file.hasChildFiles()).toBe(true);
     expect(file.childFileCount()).toBe(specificChildFileNames.length + 1);
-
-    const childFileNames = file.childFileNames();
-
-    expect(childFileNames.size()).toBe(specificChildFileNames.length + 1);
-
-    const childFileNameDir = file.fileName() + ".contents/";
-
-    for (let i = 0; i < childFileNames.size(); ++i) {
-      const childFileName = childFileNames.get(i);
-
-      expect(childFileName.startsWith(childFileNameDir)).toBe(true);
-    }
-
+    expect(file.childFileNames().size()).toBe(
+      specificChildFileNames.length + 1,
+    );
     expect(file.childFiles().size()).toBe(specificChildFileNames.length + 1);
 
-    const simulationFile = file.childFile(childFileNameDir + "simulation.json");
-
-    for (let i = 0; i < specificChildFileNames.length; ++i) {
-      expect(
-        file.childFile(childFileNameDir + specificChildFileNames[i]),
-      ).not.toBeNull();
-    }
+    const simulationFile = file.childFile("simulation.json");
 
     expect(simulationFile).not.toBeNull();
+
+    for (let i = 0; i < specificChildFileNames.length; ++i) {
+      expect(file.childFile(specificChildFileNames[i])).not.toBeNull();
+    }
+
     expect(file.childFile(utils.UNKNOWN_FILE)).toBeNull();
 
     expect(simulationFile.contents()).toStrictEqual(jsonContents);

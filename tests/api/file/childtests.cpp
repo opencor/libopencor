@@ -28,26 +28,17 @@ void doTestDataset(const std::string &pNumber, const std::vector<std::string> &p
 
     EXPECT_TRUE(file->hasChildFiles());
     EXPECT_EQ(file->childFileCount(), pSpecificChildFileNames.size() + 1);
-
-    auto childFileNames = file->childFileNames();
-
-    EXPECT_EQ(childFileNames.size(), pSpecificChildFileNames.size() + 1);
-
-    auto childFileNameDir = libOpenCOR::pathToString(libOpenCOR::stringToPath(file->fileName() + ".contents/"));
-
-    for (const auto &childFileName : childFileNames) {
-        EXPECT_TRUE(childFileName.starts_with(childFileNameDir));
-    }
-
+    EXPECT_EQ(file->childFileNames().size(), pSpecificChildFileNames.size() + 1);
     EXPECT_EQ(file->childFiles().size(), pSpecificChildFileNames.size() + 1);
 
-    auto simulationFile = file->childFile(childFileNameDir + "simulation.json");
-
-    for (const auto &specificChildFileName : pSpecificChildFileNames) {
-        EXPECT_NE(file->childFile(childFileNameDir + specificChildFileName), nullptr);
-    }
+    auto simulationFile = file->childFile("simulation.json");
 
     EXPECT_NE(simulationFile, nullptr);
+
+    for (const auto &specificChildFileName : pSpecificChildFileNames) {
+        EXPECT_NE(file->childFile(specificChildFileName), nullptr);
+    }
+
     EXPECT_EQ(file->childFile(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE)), nullptr);
 
     EXPECT_EQ(libOpenCOR::toString(simulationFile->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_" + pNumber + ".json")));

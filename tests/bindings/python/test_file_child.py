@@ -23,29 +23,16 @@ def do_test_dataset(number, specific_child_file_names):
 
     assert file.has_child_files == True
     assert file.child_file_count == len(specific_child_file_names) + 1
-
-    child_file_names = file.child_file_names
-
-    assert len(child_file_names) == len(specific_child_file_names) + 1
-
-    child_file_name_dir = (
-        utils.path_to_string(utils.string_to_path(file.file_name + ".contents"))
-        + os.sep
-    )
-
-    for child_file_name in child_file_names:
-        assert child_file_name.startswith(child_file_name_dir)
-
+    assert len(file.child_file_names) == len(specific_child_file_names) + 1
     assert len(file.child_files) == len(specific_child_file_names) + 1
 
-    simulation_file = file.child_file(child_file_name_dir + "simulation.json")
-
-    for specific_child_file_name in specific_child_file_names:
-        assert (
-            file.child_file(child_file_name_dir + specific_child_file_name) is not None
-        )
+    simulation_file = file.child_file("simulation.json")
 
     assert simulation_file is not None
+
+    for specific_child_file_name in specific_child_file_names:
+        assert file.child_file(specific_child_file_name) is not None
+
     assert file.child_file(utils.resource_path(utils.UnknownFile)) is None
 
     assert utils.to_string(simulation_file.contents) == utils.text_file_contents(

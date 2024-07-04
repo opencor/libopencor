@@ -26,6 +26,8 @@ class CombineArchive::Impl: public Logger::Impl
 {
 public:
     libcombine::CombineArchive *mArchive;
+    std::string mArchiveLocation;
+    size_t mArchiveLocationSize;
     std::vector<FilePtr> mFiles;
     FilePtr mMasterFile;
 
