@@ -65,9 +65,11 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
 
     if (userData->computeCompiledRates != nullptr) {
-        userData->computeCompiledRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
+        userData->computeCompiledRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
+                                       userData->constants, userData->computedConstants, userData->algebraic);
     } else {
-        userData->computeInterpretedRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
+        userData->computeInterpretedRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
+                                          userData->constants, userData->computedConstants, userData->algebraic);
     }
 
     return 0;
@@ -243,7 +245,8 @@ StringStringMap SolverCvode::Impl::properties() const
     return res;
 }
 
-bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                   double *pConstants, double *pComputedConstants, double *pAlgebraic,
                                    CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                                    CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
@@ -252,7 +255,9 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Initialise the ODE solver itself.
 
-    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates, pComputeInterpretedRates);
+    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates,
+                                pConstants, pComputedConstants, pAlgebraic,
+                                pComputeCompiledRates, pComputeInterpretedRates);
 
     // Check the solver's properties.
 
@@ -334,7 +339,9 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Set our user data.
 
-    mUserData.variables = pVariables;
+    mUserData.constants = pConstants;
+    mUserData.computedConstants = pComputedConstants;
+    mUserData.algebraic = pAlgebraic;
     mUserData.computeCompiledRates = pComputeCompiledRates;
     mUserData.computeInterpretedRates = pComputeInterpretedRates;
 

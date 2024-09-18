@@ -24,8 +24,12 @@ def run(
     state_abs_tols,
     rate_values,
     rate_abs_tols,
-    variable_values,
-    variable_abs_tols,
+    constant_values,
+    constant_abs_tols,
+    computed_constant_values,
+    computed_constant_abs_tols,
+    algebraic_values,
+    algebraic_abs_tols,
     compiled=True,
 ):
     simulation = document.simulations[0]
@@ -46,6 +50,10 @@ def run(
         state_abs_tols,
         rate_values,
         rate_abs_tols,
-        variable_values,
-        variable_abs_tols,
+        constant_values,
+        constant_abs_tols,
+        computed_constant_values,
+        computed_constant_abs_tols,
+        algebraic_values,
+        algebraic_abs_tols,
     )

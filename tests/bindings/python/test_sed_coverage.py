@@ -260,15 +260,15 @@ def test_sed_uniform_time_course():
     assert simulation.number_of_steps == 10
 
 
-def test_sed_instance_and_sed_isntance_task():
+def test_sed_instance_and_sed_instance_task():
     expected_issues = [
         [
             Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
+            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = File(utils.resource_path("api/solver/ode.cellml"))
     document = SedDocument(file)
     solver = document.simulations[0].ode_solver
 
@@ -279,32 +279,48 @@ def test_sed_instance_and_sed_isntance_task():
     instance_task = instance.tasks[0]
 
     assert instance_task.voi == []
-    assert instance_task.voi_name == "main/t"
-    assert instance_task.voi_unit == "dimensionless"
+    assert instance_task.voi_name == "environment/time"
+    assert instance_task.voi_unit == "millisecond"
 
-    assert instance_task.state_count == 3
+    assert instance_task.state_count == 4
     assert instance_task.state(0) == []
-    assert instance_task.state(3) == []
-    assert instance_task.state_name(0) == "main/x"
-    assert instance_task.state_name(3) == ""
-    assert instance_task.state_unit(0) == "dimensionless"
-    assert instance_task.state_unit(3) == ""
+    assert instance_task.state(4) == []
+    assert instance_task.state_name(0) == "membrane/V"
+    assert instance_task.state_name(4) == ""
+    assert instance_task.state_unit(0) == "millivolt"
+    assert instance_task.state_unit(4) == ""
 
-    assert instance_task.rate_count == 3
+    assert instance_task.rate_count == 4
     assert instance_task.rate(0) == []
-    assert instance_task.rate(3) == []
-    assert instance_task.rate_name(0) == "main/x'"
-    assert instance_task.rate_name(3) == ""
-    assert instance_task.rate_unit(0) == "dimensionless/dimensionless"
-    assert instance_task.rate_unit(3) == ""
+    assert instance_task.rate(4) == []
+    assert instance_task.rate_name(0) == "membrane/V'"
+    assert instance_task.rate_name(4) == ""
+    assert instance_task.rate_unit(0) == "millivolt/millisecond"
+    assert instance_task.rate_unit(4) == ""
 
-    assert instance_task.variable_count == 3
-    assert instance_task.variable(0) == []
-    assert instance_task.variable(3) == []
-    assert instance_task.variable_name(0) == "main/sigma"
-    assert instance_task.variable_name(3) == ""
-    assert instance_task.variable_unit(0) == "dimensionless"
-    assert instance_task.variable_unit(3) == ""
+    assert instance_task.constant_count == 5
+    assert instance_task.constant(0) == []
+    assert instance_task.constant(5) == []
+    assert instance_task.constant_name(0) == "membrane/Cm"
+    assert instance_task.constant_name(5) == ""
+    assert instance_task.constant_unit(0) == "microF_per_cm2"
+    assert instance_task.constant_unit(5) == ""
+
+    assert instance_task.computed_constant_count == 3
+    assert instance_task.computed_constant(0) == []
+    assert instance_task.computed_constant(3) == []
+    assert instance_task.computed_constant_name(0) == "leakage_current/E_L"
+    assert instance_task.computed_constant_name(3) == ""
+    assert instance_task.computed_constant_unit(0) == "millivolt"
+    assert instance_task.computed_constant_unit(3) == ""
+
+    assert instance_task.algebraic_count == 10
+    assert instance_task.algebraic(0) == []
+    assert instance_task.algebraic(10) == []
+    assert instance_task.algebraic_name(0) == "membrane/i_Stim"
+    assert instance_task.algebraic_name(10) == ""
+    assert instance_task.algebraic_unit(0) == "microA_per_cm2"
+    assert instance_task.algebraic_unit(10) == ""
 
     instance.run()
 

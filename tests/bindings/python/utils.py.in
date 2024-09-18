@@ -88,8 +88,12 @@ def assert_values(
     state_abs_tols,
     rate_values,
     rate_abs_tols,
-    variable_values,
-    variable_abs_tols,
+    constant_values,
+    constant_abs_tols,
+    computed_constant_values,
+    computed_constant_abs_tols,
+    algebraic_values,
+    algebraic_abs_tols,
 ):
     for i in range(instance_task.state_count):
         assert instance_task.state(i)[index] == pytest.approx(
@@ -101,9 +105,19 @@ def assert_values(
             rate_values[i], abs=rate_abs_tols[i]
         )
 
-    for i in range(instance_task.variable_count):
-        assert instance_task.variable(i)[index] == pytest.approx(
-            variable_values[i], abs=variable_abs_tols[i]
+    for i in range(instance_task.constant_count):
+        assert instance_task.constant(i)[index] == pytest.approx(
+            constant_values[i], abs=constant_abs_tols[i]
+        )
+
+    for i in range(instance_task.computed_constant_count):
+        assert instance_task.computed_constant(i)[index] == pytest.approx(
+            computed_constant_values[i], abs=computed_constant_abs_tols[i]
+        )
+
+    for i in range(instance_task.algebraic_count):
+        assert instance_task.algebraic(i)[index] == pytest.approx(
+            algebraic_values[i], abs=algebraic_abs_tols[i]
         )
 
 

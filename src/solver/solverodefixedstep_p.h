@@ -39,7 +39,8 @@ public:
 
     StringStringMap properties() const override;
 
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                    double *pConstants, double *pComputedConstants, double *pAlgebraic,
                     CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                     CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
 

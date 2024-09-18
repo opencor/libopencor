@@ -24,9 +24,12 @@ limitations under the License.
 
 namespace OdeModel {
 
-void run(const libOpenCOR::SedDocumentPtr &pDocument, const libOpenCOR::Doubles &pStateValues,
-         const libOpenCOR::Doubles &pStateAbsTols, const libOpenCOR::Doubles &pRateValues,
-         const libOpenCOR::Doubles &pRateAbsTols, const libOpenCOR::Doubles &pVariableValues,
-         const libOpenCOR::Doubles &pVariableAbsTols, bool pCompiled = true);
+void run(const libOpenCOR::SedDocumentPtr &pDocument,
+         const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pStateAbsTols,
+         const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
+         const libOpenCOR::Doubles &pConstantValues, const libOpenCOR::Doubles &pConstantAbsTols,
+         const libOpenCOR::Doubles &pComputedConstantValues, const libOpenCOR::Doubles &pComputedConstantAbsTols,
+         const libOpenCOR::Doubles &pAlgebraicValues, const libOpenCOR::Doubles &pAlgebraicAbsTols,
+         bool pCompiled);
 
 } // namespace OdeModel

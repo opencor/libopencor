@@ -268,11 +268,11 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
 TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
+        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     };
     static const auto UPPER_HALF_BANDWIDTH = -1;
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(document->simulations()[0]->odeSolver());
 
@@ -285,32 +285,48 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     static const auto NoDoubles = std::vector<double> {};
 
     EXPECT_EQ(instanceTask->voi(), NoDoubles);
-    EXPECT_EQ(instanceTask->voiName(), "main/t");
-    EXPECT_EQ(instanceTask->voiUnit(), "dimensionless");
+    EXPECT_EQ(instanceTask->voiName(), "environment/time");
+    EXPECT_EQ(instanceTask->voiUnit(), "millisecond");
 
-    EXPECT_EQ(instanceTask->stateCount(), 3);
+    EXPECT_EQ(instanceTask->stateCount(), 4);
     EXPECT_EQ(instanceTask->state(0), NoDoubles);
-    EXPECT_EQ(instanceTask->state(3), NoDoubles);
-    EXPECT_EQ(instanceTask->stateName(0), "main/x");
-    EXPECT_EQ(instanceTask->stateName(3), "");
-    EXPECT_EQ(instanceTask->stateUnit(0), "dimensionless");
-    EXPECT_EQ(instanceTask->stateUnit(3), "");
+    EXPECT_EQ(instanceTask->state(4), NoDoubles);
+    EXPECT_EQ(instanceTask->stateName(0), "membrane/V");
+    EXPECT_EQ(instanceTask->stateName(4), "");
+    EXPECT_EQ(instanceTask->stateUnit(0), "millivolt");
+    EXPECT_EQ(instanceTask->stateUnit(4), "");
 
-    EXPECT_EQ(instanceTask->rateCount(), 3);
+    EXPECT_EQ(instanceTask->rateCount(), 4);
     EXPECT_EQ(instanceTask->rate(0), NoDoubles);
-    EXPECT_EQ(instanceTask->rate(3), NoDoubles);
-    EXPECT_EQ(instanceTask->rateName(0), "main/x'");
-    EXPECT_EQ(instanceTask->rateName(3), "");
-    EXPECT_EQ(instanceTask->rateUnit(0), "dimensionless/dimensionless");
-    EXPECT_EQ(instanceTask->rateUnit(3), "");
+    EXPECT_EQ(instanceTask->rate(4), NoDoubles);
+    EXPECT_EQ(instanceTask->rateName(0), "membrane/V'");
+    EXPECT_EQ(instanceTask->rateName(4), "");
+    EXPECT_EQ(instanceTask->rateUnit(0), "millivolt/millisecond");
+    EXPECT_EQ(instanceTask->rateUnit(4), "");
 
-    EXPECT_EQ(instanceTask->variableCount(), 3);
-    EXPECT_EQ(instanceTask->variable(0), NoDoubles);
-    EXPECT_EQ(instanceTask->variable(3), NoDoubles);
-    EXPECT_EQ(instanceTask->variableName(0), "main/sigma");
-    EXPECT_EQ(instanceTask->variableName(3), "");
-    EXPECT_EQ(instanceTask->variableUnit(0), "dimensionless");
-    EXPECT_EQ(instanceTask->variableUnit(3), "");
+    EXPECT_EQ(instanceTask->constantCount(), 5);
+    EXPECT_EQ(instanceTask->constant(0), NoDoubles);
+    EXPECT_EQ(instanceTask->constant(5), NoDoubles);
+    EXPECT_EQ(instanceTask->constantName(0), "membrane/Cm");
+    EXPECT_EQ(instanceTask->constantName(5), "");
+    EXPECT_EQ(instanceTask->constantUnit(0), "microF_per_cm2");
+    EXPECT_EQ(instanceTask->constantUnit(5), "");
+
+    EXPECT_EQ(instanceTask->computedConstantCount(), 3);
+    EXPECT_EQ(instanceTask->computedConstant(0), NoDoubles);
+    EXPECT_EQ(instanceTask->computedConstant(3), NoDoubles);
+    EXPECT_EQ(instanceTask->computedConstantName(0), "leakage_current/E_L");
+    EXPECT_EQ(instanceTask->computedConstantName(3), "");
+    EXPECT_EQ(instanceTask->computedConstantUnit(0), "millivolt");
+    EXPECT_EQ(instanceTask->computedConstantUnit(3), "");
+
+    EXPECT_EQ(instanceTask->algebraicCount(), 10);
+    EXPECT_EQ(instanceTask->algebraic(0), NoDoubles);
+    EXPECT_EQ(instanceTask->algebraic(10), NoDoubles);
+    EXPECT_EQ(instanceTask->algebraicName(0), "membrane/i_Stim");
+    EXPECT_EQ(instanceTask->algebraicName(10), "");
+    EXPECT_EQ(instanceTask->algebraicUnit(0), "microA_per_cm2");
+    EXPECT_EQ(instanceTask->algebraicUnit(10), "");
 
     instance->run();
 

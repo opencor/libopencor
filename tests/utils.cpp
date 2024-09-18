@@ -62,10 +62,12 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
     }
 }
 
-void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex, const libOpenCOR::Doubles &pStateValues,
-                       const libOpenCOR::Doubles &pStateAbsTols, const libOpenCOR::Doubles &pRateValues,
-                       const libOpenCOR::Doubles &pRateAbsTols, const libOpenCOR::Doubles &pVariableValues,
-                       const libOpenCOR::Doubles &pVariableAbsTols)
+void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex,
+                       const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pStateAbsTols,
+                       const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
+                       const libOpenCOR::Doubles &pConstantValues, const libOpenCOR::Doubles &pConstantAbsTols,
+                       const libOpenCOR::Doubles &pComputedConstantValues, const libOpenCOR::Doubles &pComputedConstantAbsTols,
+                       const libOpenCOR::Doubles &pAlgebraicValues, const libOpenCOR::Doubles &pAlgebraicAbsTols)
 {
     for (size_t i = 0; i < pInstanceTask->stateCount(); ++i) {
         EXPECT_NEAR(pInstanceTask->state(i)[pIndex], pStateValues[i], pStateAbsTols[i]);
@@ -75,8 +77,16 @@ void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex, c
         EXPECT_NEAR(pInstanceTask->rate(i)[pIndex], pRateValues[i], pRateAbsTols[i]);
     }
 
-    for (size_t i = 0; i < pInstanceTask->variableCount(); ++i) {
-        EXPECT_NEAR(pInstanceTask->variable(i)[pIndex], pVariableValues[i], pVariableAbsTols[i]);
+    for (size_t i = 0; i < pInstanceTask->constantCount(); ++i) {
+        EXPECT_NEAR(pInstanceTask->constant(i)[pIndex], pConstantValues[i], pConstantAbsTols[i]);
+    }
+
+    for (size_t i = 0; i < pInstanceTask->computedConstantCount(); ++i) {
+        EXPECT_NEAR(pInstanceTask->computedConstant(i)[pIndex], pComputedConstantValues[i], pComputedConstantAbsTols[i]);
+    }
+
+    for (size_t i = 0; i < pInstanceTask->algebraicCount(); ++i) {
+        EXPECT_NEAR(pInstanceTask->algebraic(i)[pIndex], pAlgebraicValues[i], pAlgebraicAbsTols[i]);
     }
 }
 

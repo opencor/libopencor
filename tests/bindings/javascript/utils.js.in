@@ -146,22 +146,50 @@ export function expectValues(
   index,
   stateValues,
   rateValues,
-  variableValues,
+  constantValues,
+  computedConstantValues,
+  algebraicValues,
 ) {
+  // console.log("---[VALUES]---[BEGIN]");
+  // console.log("Number of states: " + instanceTask.stateCount());
   for (let i = 0; i < instanceTask.stateCount(); ++i) {
+    // console.log(instanceTask.stateAsArray(i)[index]);
     expect(instanceTask.stateAsArray(i)[index]).toBeCloseTo(stateValues[i], 6);
   }
 
+  // console.log("Number of rates: " + instanceTask.stateCount());
   for (let i = 0; i < instanceTask.rateCount(); ++i) {
+    // console.log(instanceTask.rateAsArray(i)[index]);
     expect(instanceTask.rateAsArray(i)[index]).toBeCloseTo(rateValues[i], 6);
   }
 
-  for (let i = 0; i < instanceTask.variableCount(); ++i) {
-    expect(instanceTask.variableAsArray(i)[index]).toBeCloseTo(
-      variableValues[i],
+  // console.log("Number of constants: " + instanceTask.constantCount());
+  for (let i = 0; i < instanceTask.constantCount(); ++i) {
+    // console.log(instanceTask.constantAsArray(i)[index]);
+    expect(instanceTask.constantAsArray(i)[index]).toBeCloseTo(
+      constantValues[i],
       6,
     );
   }
+
+  // console.log("Number of computed constants: " + instanceTask.computedConstantCount());
+  for (let i = 0; i < instanceTask.computedConstantCount(); ++i) {
+    // console.log(instanceTask.computedConstantAsArray(i)[index]);
+    expect(instanceTask.computedConstantAsArray(i)[index]).toBeCloseTo(
+      computedConstantValues[i],
+      6,
+    );
+  }
+
+  // console.log("Number of algebraic variables: " + instanceTask.algebraicCount());
+  for (let i = 0; i < instanceTask.algebraicCount(); ++i) {
+    // console.log(instanceTask.algebraicAsArray(i)[index]);
+    expect(instanceTask.algebraicAsArray(i)[index]).toBeCloseTo(
+      algebraicValues[i],
+      6,
+    );
+  }
+  // console.log("---[VALUES]---[END]");
 }
 
 export function allocateMemory(module, arrayBuffer) {

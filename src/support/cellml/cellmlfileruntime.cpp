@@ -54,13 +54,22 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
             generatorProfile->setImplementationHeaderString("");
             generatorProfile->setImplementationVersionString("");
             generatorProfile->setImplementationStateCountString("");
-            generatorProfile->setImplementationVariableCountString("");
+            generatorProfile->setImplementationConstantCountString("");
+            generatorProfile->setImplementationComputedConstantCountString("");
+            generatorProfile->setImplementationAlgebraicCountString("");
+            generatorProfile->setImplementationExternalCountString("");
             generatorProfile->setImplementationLibcellmlVersionString("");
             generatorProfile->setImplementationVoiInfoString("");
             generatorProfile->setImplementationStateInfoString("");
-            generatorProfile->setImplementationVariableInfoString("");
+            generatorProfile->setImplementationConstantInfoString("");
+            generatorProfile->setImplementationComputedConstantInfoString("");
+            generatorProfile->setImplementationAlgebraicInfoString("");
+            generatorProfile->setImplementationExternalInfoString("");
             generatorProfile->setImplementationCreateStatesArrayMethodString("");
-            generatorProfile->setImplementationCreateVariablesArrayMethodString("");
+            generatorProfile->setImplementationCreateConstantsArrayMethodString("");
+            generatorProfile->setImplementationCreateComputedConstantsArrayMethodString("");
+            generatorProfile->setImplementationCreateAlgebraicArrayMethodString("");
+            generatorProfile->setImplementationCreateExternalsArrayMethodString("");
             generatorProfile->setImplementationDeleteArrayMethodString("");
 
             if (pNlaSolver != nullptr) {
@@ -68,7 +77,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
                                                                 "\n"
                                                                 "extern void nlaSolve(const char *, void (*objectiveFunction)(double *, double *, void *),\n"
                                                                 "                     double *u, size_t n, void *data);\n");
-                generatorProfile->setNlaSolveCallString(differentialModel,
+                generatorProfile->setNlaSolveCallString(differentialModel, false,
                                                         std::string("nlaSolve(\"") + mNlaSolverAddress + "\", objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
             }
 
@@ -152,23 +161,23 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
             interpreter->setModel(pCellmlFile->analyserModel());
 
-            mInitialiseInterpretedVariablesForAlgebraicModel = std::function<void(double *pVariables)>([interpreter](double *pVariables) {
-                interpreter->initialiseVariablesForAlgebraicModel(pVariables);
+            mInitialiseInterpretedVariablesForAlgebraicModel = std::function<void(double *pConstants, double *pComputedConstants, double *pAlgebraic)>([interpreter](double *pConstants, double *pComputedConstants, double *pAlgebraic) {
+                interpreter->initialiseVariables(pConstants, pComputedConstants, pAlgebraic);
             });
-            mInitialiseInterpretedVariablesForDifferentialModel = std::function<void(double *pStates, double *pRates, double *pVariables)>([interpreter](double *pStates, double *pRates, double *pVariables) {
-                interpreter->initialiseVariablesForDifferentialModel(pStates, pRates, pVariables);
+            mInitialiseInterpretedVariablesForDifferentialModel = std::function<void(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic)>([interpreter](double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) {
+                interpreter->initialiseVariables(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
             });
-            mComputeInterpretedComputedConstants = std::function<void(double *pVariables)>([interpreter](double *pVariables) {
-                interpreter->computeComputedConstants(pVariables);
+            mComputeInterpretedComputedConstants = std::function<void(double *pConstants, double *pComputedConstants)>([interpreter](double *pConstants, double *pComputedConstants) {
+                interpreter->computeComputedConstants(pConstants, pComputedConstants);
             });
-            mComputeInterpretedRates = std::function<void(double pVoi, double *pStates, double *pRates, double *pVariables)>([interpreter](double pVoi, double *pStates, double *pRates, double *pVariables) {
-                interpreter->computeRates(pVoi, pStates, pRates, pVariables);
+            mComputeInterpretedRates = std::function<void(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic)>([interpreter](double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) {
+                interpreter->computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
             });
-            mComputeInterpretedVariablesForAlgebraicModel = std::function<void(double *pVariables)>([interpreter](double *pVariables) {
-                interpreter->computeVariablesForAlgebraicModel(pVariables);
+            mComputeInterpretedVariablesForAlgebraicModel = std::function<void(double *pConstants, double *pComputedConstants, double *pAlgebraic)>([interpreter](double *pConstants, double *pComputedConstants, double *pAlgebraic) {
+                interpreter->computeVariables(pConstants, pComputedConstants, pAlgebraic);
             });
-            mComputeInterpretedVariablesForDifferentialModel = std::function<void(double pVoi, double *pStates, double *pRates, double *pVariables)>([interpreter](double pVoi, double *pStates, double *pRates, double *pVariables) {
-                interpreter->computeVariablesForDifferentialModel(pVoi, pStates, pRates, pVariables);
+            mComputeInterpretedVariablesForDifferentialModel = std::function<void(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic)>([interpreter](double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) {
+                interpreter->computeVariables(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
             });
 #ifndef __EMSCRIPTEN__
         }

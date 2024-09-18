@@ -21,17 +21,17 @@ import { expectIssues } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("Sed coverage tests", () => {
-  let someCellmlContentsPtr;
+  let someSolverOdeContents;
 
   beforeAll(() => {
-    someCellmlContentsPtr = utils.allocateMemory(
+    someSolverOdeContents = utils.allocateMemory(
       libopencor,
-      utils.SOME_CELLML_CONTENTS,
+      utils.SOME_SOLVER_ODE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someSolverOdeContents);
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
@@ -280,7 +280,10 @@ describe("Sed coverage tests", () => {
   test("SedInstanceAndSedInstanceTask", () => {
     const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(
+      someSolverOdeContents,
+      utils.SOME_SOLVER_ODE_CONTENTS.length,
+    );
 
     const document = new libopencor.SedDocument(file);
     const solver = document.simulations().get(0).odeSolver();
@@ -293,45 +296,65 @@ describe("Sed coverage tests", () => {
 
     expect(instanceTask.voi().size()).toBe(0);
     expect(instanceTask.voiAsArray()).toStrictEqual([]);
-    expect(instanceTask.voiName()).toBe("main/t");
-    expect(instanceTask.voiUnit()).toBe("dimensionless");
+    expect(instanceTask.voiName()).toBe("environment/time");
+    expect(instanceTask.voiUnit()).toBe("millisecond");
 
-    expect(instanceTask.stateCount()).toBe(3);
+    expect(instanceTask.stateCount()).toBe(4);
     expect(instanceTask.state(0).size()).toBe(0);
     expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.state(3).size()).toBe(0);
-    expect(instanceTask.stateAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.stateName(0)).toBe("main/x");
-    expect(instanceTask.stateName(3)).toBe("");
-    expect(instanceTask.stateUnit(0)).toBe("dimensionless");
-    expect(instanceTask.stateUnit(3)).toBe("");
+    expect(instanceTask.state(4).size()).toBe(0);
+    expect(instanceTask.stateAsArray(4)).toStrictEqual([]);
+    expect(instanceTask.stateName(0)).toBe("membrane/V");
+    expect(instanceTask.stateName(4)).toBe("");
+    expect(instanceTask.stateUnit(0)).toBe("millivolt");
+    expect(instanceTask.stateUnit(4)).toBe("");
 
-    expect(instanceTask.rateCount()).toBe(3);
+    expect(instanceTask.rateCount()).toBe(4);
     expect(instanceTask.rate(0).size()).toBe(0);
     expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.rate(3).size()).toBe(0);
-    expect(instanceTask.rateAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.rateName(0)).toBe("main/x'");
-    expect(instanceTask.rateName(3)).toBe("");
-    expect(instanceTask.rateUnit(0)).toBe("dimensionless/dimensionless");
-    expect(instanceTask.rateUnit(3)).toBe("");
+    expect(instanceTask.rate(4).size()).toBe(0);
+    expect(instanceTask.rateAsArray(4)).toStrictEqual([]);
+    expect(instanceTask.rateName(0)).toBe("membrane/V'");
+    expect(instanceTask.rateName(4)).toBe("");
+    expect(instanceTask.rateUnit(0)).toBe("millivolt/millisecond");
+    expect(instanceTask.rateUnit(4)).toBe("");
 
-    expect(instanceTask.variableCount()).toBe(3);
-    expect(instanceTask.variable(0).size()).toBe(0);
-    expect(instanceTask.variableAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.variable(3).size()).toBe(0);
-    expect(instanceTask.variableAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.variableName(0)).toBe("main/sigma");
-    expect(instanceTask.variableName(3)).toBe("");
-    expect(instanceTask.variableUnit(0)).toBe("dimensionless");
-    expect(instanceTask.variableUnit(3)).toBe("");
+    expect(instanceTask.constantCount()).toBe(5);
+    expect(instanceTask.constant(0).size()).toBe(0);
+    expect(instanceTask.constantAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.constant(5).size()).toBe(0);
+    expect(instanceTask.constantAsArray(5)).toStrictEqual([]);
+    expect(instanceTask.constantName(0)).toBe("membrane/Cm");
+    expect(instanceTask.constantName(5)).toBe("");
+    expect(instanceTask.constantUnit(0)).toBe("microF_per_cm2");
+    expect(instanceTask.constantUnit(5)).toBe("");
+
+    expect(instanceTask.computedConstantCount()).toBe(3);
+    expect(instanceTask.computedConstant(0).size()).toBe(0);
+    expect(instanceTask.computedConstantAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.computedConstant(3).size()).toBe(0);
+    expect(instanceTask.computedConstantAsArray(3)).toStrictEqual([]);
+    expect(instanceTask.computedConstantName(0)).toBe("leakage_current/E_L");
+    expect(instanceTask.computedConstantName(3)).toBe("");
+    expect(instanceTask.computedConstantUnit(0)).toBe("millivolt");
+    expect(instanceTask.computedConstantUnit(3)).toBe("");
+
+    expect(instanceTask.algebraicCount()).toBe(10);
+    expect(instanceTask.algebraic(0).size()).toBe(0);
+    expect(instanceTask.algebraicAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.algebraic(10).size()).toBe(0);
+    expect(instanceTask.algebraicAsArray(10)).toStrictEqual([]);
+    expect(instanceTask.algebraicName(0)).toBe("membrane/i_Stim");
+    expect(instanceTask.algebraicName(10)).toBe("");
+    expect(instanceTask.algebraicUnit(0)).toBe("microA_per_cm2");
+    expect(instanceTask.algebraicUnit(10)).toBe("");
 
     instance.run();
 
     expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
+        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
       ],
     ]);
 
@@ -371,7 +394,10 @@ describe("Sed coverage tests", () => {
 
     const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(
+      someSolverOdeContents,
+      utils.SOME_SOLVER_ODE_CONTENTS.length,
+    );
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);

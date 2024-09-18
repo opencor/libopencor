@@ -87,11 +87,21 @@ void sedApi()
         .function("rateAsArray", &libOpenCOR::SedInstanceTask::rateAsArray)
         .function("rateName", &libOpenCOR::SedInstanceTask::rateName)
         .function("rateUnit", &libOpenCOR::SedInstanceTask::rateUnit)
-        .function("variableCount", &libOpenCOR::SedInstanceTask::variableCount)
-        .function("variable", &libOpenCOR::SedInstanceTask::variable)
-        .function("variableAsArray", &libOpenCOR::SedInstanceTask::variableAsArray)
-        .function("variableName", &libOpenCOR::SedInstanceTask::variableName)
-        .function("variableUnit", &libOpenCOR::SedInstanceTask::variableUnit);
+        .function("constantCount", &libOpenCOR::SedInstanceTask::constantCount)
+        .function("constant", &libOpenCOR::SedInstanceTask::constant)
+        .function("constantAsArray", &libOpenCOR::SedInstanceTask::constantAsArray)
+        .function("constantName", &libOpenCOR::SedInstanceTask::constantName)
+        .function("constantUnit", &libOpenCOR::SedInstanceTask::constantUnit)
+        .function("computedConstantCount", &libOpenCOR::SedInstanceTask::computedConstantCount)
+        .function("computedConstant", &libOpenCOR::SedInstanceTask::computedConstant)
+        .function("computedConstantAsArray", &libOpenCOR::SedInstanceTask::computedConstantAsArray)
+        .function("computedConstantName", &libOpenCOR::SedInstanceTask::computedConstantName)
+        .function("computedConstantUnit", &libOpenCOR::SedInstanceTask::computedConstantUnit)
+        .function("algebraicCount", &libOpenCOR::SedInstanceTask::algebraicCount)
+        .function("algebraic", &libOpenCOR::SedInstanceTask::algebraic)
+        .function("algebraicAsArray", &libOpenCOR::SedInstanceTask::algebraicAsArray)
+        .function("algebraicName", &libOpenCOR::SedInstanceTask::algebraicName)
+        .function("algebraicUnit", &libOpenCOR::SedInstanceTask::algebraicUnit);
 
     // SedModel API.
 

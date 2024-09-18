@@ -21,7 +21,9 @@ export function run(
   document,
   stateValues,
   rateValues,
-  variableValues,
+  constantValues,
+  computedConstantValues,
+  algebraicValues,
 ) {
   const simulation = document.simulations().get(0);
 
@@ -40,6 +42,8 @@ export function run(
     13000,
     stateValues,
     rateValues,
-    variableValues,
+    constantValues,
+    computedConstantValues,
+    algebraicValues,
   );
 }

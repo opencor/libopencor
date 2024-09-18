@@ -30,7 +30,9 @@ namespace libOpenCOR {
 
 struct SolverCvodeUserData
 {
-    double *variables = nullptr;
+    double *constants = nullptr;
+    double *computedConstants = nullptr;
+    double *algebraic = nullptr;
 
     CellmlFileRuntime::ComputeCompiledRates computeCompiledRates = nullptr;
     CellmlFileRuntime::ComputeInterpretedRates computeInterpretedRates = nullptr;
@@ -88,7 +90,8 @@ public:
 
     StringStringMap properties() const override;
 
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                    double *pConstants, double *pComputedConstants, double *pAlgebraic,
                     CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                     CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
     /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
