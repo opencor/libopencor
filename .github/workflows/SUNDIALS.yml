@@ -5,7 +5,7 @@ on:
 
 jobs:
   sundials:
-  name: SUNDIALS
+    name: SUNDIALS
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: SUNDIALS
