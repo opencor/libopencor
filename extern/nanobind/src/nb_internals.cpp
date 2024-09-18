@@ -72,9 +72,15 @@
 #  define NB_STABLE_ABI ""
 #endif
 
+#if NB_VERSION_DEV > 0
+  #define NB_VERSION_DEV_STR "_dev" NB_TOSTRING(NB_VERSION_DEV)
+#else
+  #define NB_VERSION_DEV_STR ""
+#endif
+
 #define NB_INTERNALS_ID                                                        \
     "v" NB_TOSTRING(NB_INTERNALS_VERSION)                                      \
-        NB_COMPILER_TYPE NB_STDLIB NB_BUILD_ABI NB_BUILD_TYPE NB_STABLE_ABI
+        NB_COMPILER_TYPE NB_STDLIB NB_VERSION_DEV_STR NB_BUILD_ABI NB_BUILD_TYPE NB_STABLE_ABI
 
 NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)
@@ -243,9 +249,19 @@ static void internals_cleanup() {
             fprintf(stderr, "nanobind: leaked %zu instances!\n",
                     internals->inst_c2p.size());
             #if !defined(Py_LIMITED_API)
-                for (auto [k, v]: internals->inst_c2p) {
+                auto print_leak = [](void* k, PyObject* v) {
                     PyTypeObject *tp = Py_TYPE(v);
                     fprintf(stderr, " - leaked instance %p of type \"%s\"\n", k, tp->tp_name);
+                };
+
+                for (auto [k, v]: internals->inst_c2p) {
+                    if (NB_UNLIKELY(nb_is_seq(v))) {
+                        nb_inst_seq* seq = nb_get_seq(v);
+                        for(; seq != nullptr; seq = seq->next)
+                            print_leak(k, seq->inst);
+                    } else {
+                        print_leak(k, (PyObject*)v);
+                    }
                 }
             #endif
         }

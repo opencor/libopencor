@@ -254,10 +254,16 @@ PyObject *nb_func_new(const void *in_) noexcept {
                          strncmp(f->descr, "({%}", 4) == 0;
 
         // Don't use implicit conversions in copy constructors (causes infinite recursion)
+        // Notes:
+        //   f->nargs = C++ argument count.
+        //   f->descr_types = zero-terminated array of bound types among them.
+        //     Hence of size >= 2 for constructors, where f->descr_types[1] my be null.
+        //   f->args = array of Python arguments (nb::arg). Non-empty if has_args.
+        //   By contrast, fc->args below has size f->nargs.
         if (is_constructor && f->nargs == 2 && f->descr_types[0] &&
             f->descr_types[0] == f->descr_types[1]) {
             if (has_args) {
-                f->args[1].convert = false;
+                f->args[0].convert = false;
             } else {
                 args_in = method_args + 1;
                 has_args = true;
@@ -536,7 +542,7 @@ static PyObject *nb_func_vectorcall_complex(PyObject *self,
         PyObject *key = NB_TUPLE_GET_ITEM(kwargs_in, i);
         kwnames_interned &= ((PyASCIIObject *) key)->state.interned != 0;
     }
-    if (NB_LIKELY(kwnames_interned)) {
+    if (kwargs_in && NB_LIKELY(kwnames_interned)) {
         kwnames = ((PyTupleObject *) kwargs_in)->ob_item;
         goto traverse_overloads;
     }

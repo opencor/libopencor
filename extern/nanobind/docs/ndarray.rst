@@ -8,7 +8,7 @@ The ``nb::ndarray<..>`` class
 nanobind can exchange n-dimensional arrays (henceforth "**ndarrays**") with
 popular array programming frameworks including `NumPy
 <https://numpy.org>`__, `PyTorch <https://pytorch.org>`__, `TensorFlow
-<https://www.tensorflow.org>`__, and `JAX <https://jax.readthedocs.io>`__.
+<https://www.tensorflow.org>`__, `JAX <https://jax.readthedocs.io>`__, and `CuPy <https://cupy.dev>`_.
 It supports *zero-copy* exchange using two protocols:
 
 -  The classic `buffer
@@ -33,14 +33,14 @@ Binding functions that take arrays as input
 -------------------------------------------
 
 A function that accepts a :cpp:class:`nb::ndarray\<\> <ndarray>`-typed parameter
-(i.e., *without* template parameters) can be called with *any* array
+(i.e., *without* template parameters) can be called with *any* writable array
 from any framework regardless of the device on which it is stored. The
 following example binding declaration uses this functionality to inspect the
 properties of an arbitrary input array:
 
 .. code-block:: cpp
 
-   m.def("inspect", [](nb::ndarray<> a) {
+   m.def("inspect", [](const nb::ndarray<>& a) {
        printf("Array data pointer : %p\n", a.data());
        printf("Array dimension : %zu\n", a.ndim());
        for (size_t i = 0; i < a.ndim(); ++i) {
@@ -342,6 +342,7 @@ values:
    ``tensorflow.python.framework.ops.EagerTensor``.
 -  :cpp:class:`nb::jax <jax>`. Returns the ndarray as a
    ``jaxlib.xla_extension.DeviceArray``.
+-  :cpp:class:`nb::cupy <cupy>`. Returns the ndarray as a ``cupy.ndarray``.
 -  No framework annotation. In this case, nanobind will return a raw
    Python ``dltensor``
    `capsule <https://docs.python.org/3/c-api/capsule.html>`__

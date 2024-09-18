@@ -416,12 +416,18 @@ struct new_<Func, Return(Args...)> {
         // We can't do this if the user-provided __new__ takes no
         // arguments, because it would make an ambiguous overload set.
         detail::wrap_base_new(cl, sizeof...(Args) != 0);
-        cl.def_static(
-            "__new__",
-            [func = (detail::forward_t<Func>) func](handle, Args... args) {
-                return func((detail::forward_t<Args>) args...);
-            },
-            extra...);
+
+        auto wrapper = [func = (detail::forward_t<Func>) func](handle, Args... args) {
+            return func((detail::forward_t<Args>) args...);
+        };
+        if constexpr ((std::is_base_of_v<arg, Extra> || ...)) {
+            // If any argument annotations are specified, add another for the
+            // extra class argument that we don't forward to Func, so visible
+            // arg() annotations stay aligned with visible function arguments.
+            cl.def_static("__new__", std::move(wrapper), arg("cls"), extra...);
+        } else {
+            cl.def_static("__new__", std::move(wrapper), extra...);
+        }
         cl.def("__init__", [](handle, Args...) {}, extra...);
     }
 };
@@ -453,7 +459,7 @@ namespace detail {
 template <typename T, typename... Ts>
 class class_ : public object {
 public:
-    NB_OBJECT_DEFAULT(class_, object, "type", PyType_Check);
+    NB_OBJECT_DEFAULT(class_, object, "type", PyType_Check)
     using Type = T;
     using Base  = typename detail::extract<T, detail::is_base,  Ts...>::type;
     using Alias = typename detail::extract<T, detail::is_alias, Ts...>::type;
@@ -727,6 +733,17 @@ public:
     NB_INLINE enum_ &def(const char *name_, Func &&f, const Extra &... extra) {
         cpp_function_def<T>((detail::forward_t<Func>) f, scope(*this),
                             name(name_), is_method(), extra...);
+        return *this;
+    }
+
+    template <typename Func, typename... Extra>
+    NB_INLINE enum_ &def_static(const char *name_, Func &&f,
+                                 const Extra &... extra) {
+        static_assert(
+            !std::is_member_function_pointer_v<Func>,
+            "def_static(...) called with a non-static member function pointer");
+        cpp_function_def((detail::forward_t<Func>) f, scope(*this), name(name_),
+                         extra...);
         return *this;
     }
 

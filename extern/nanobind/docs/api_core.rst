@@ -12,7 +12,7 @@ Macros
 
    This macro creates the entry point that will be invoked when the Python
    interpreter imports an extension module. The module name is given as the
-   fist argument and it should not be in quotes. It **must** match the module
+   first argument and it should not be in quotes. It **must** match the module
    name given to the :cmake:command:`nanobind_add_module()` function in the
    CMake build system.
 
@@ -1494,6 +1494,15 @@ Casting
 
    The function raises a :cpp:type:`cast_error` when the conversion fails.
 
+.. cpp:function:: template <typename T> object cast(T &&value, rv_policy policy, handle parent)
+
+   Convert the C++ object ``value`` into a Python object. The return value
+   policy `policy` is used to handle ownership-related questions when a new
+   Python object must be created. A valid `parent` object is required when 
+   specifying a `reference_internal` return value policy.
+
+   The function raises a :cpp:type:`cast_error` when the conversion fails.
+
 .. cpp:function:: template <typename T> object find(const T &value) noexcept
 
    Return the Python object associated with the C++ instance `value`. When no
@@ -2743,6 +2752,12 @@ Miscellaneous
 .. cpp:function:: dict globals()
 
    Return the ``globals()`` dictionary.
+
+.. cpp:function:: Py_hash_t hash(handle h)
+
+   Hash the given argument like ``hash()`` in pure Python. The type of the
+   return value (``Py_hash_t``) is an implementation-specific signed integer
+   type.
 
 .. cpp:function:: template <typename Source, typename Target> void implicitly_convertible()
 
