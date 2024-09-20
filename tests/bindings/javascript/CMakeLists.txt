@@ -20,13 +20,7 @@ configure_file(res/package.json.in package.json)
 configure_file(res/favicon.ico favicon.ico COPYONLY)
 configure_file(res/index.html index.html COPYONLY)
 
-file(GLOB RESOURCE_FILES "res/res/*")
-
-foreach(RESOURCE_FILE ${RESOURCE_FILES})
-    get_filename_component(RESOURCE_FILE_NAME ${RESOURCE_FILE} NAME)
-
-    configure_file(${RESOURCE_FILE} res/${RESOURCE_FILE_NAME} COPYONLY)
-endforeach()
+execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/res/res" "${CMAKE_CURRENT_BINARY_DIR}/res")
 
 # Copy our JavaScript tests over.
 
