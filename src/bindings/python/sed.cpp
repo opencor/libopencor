@@ -16,7 +16,6 @@ limitations under the License.
 
 #include <libopencor>
 
-#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
@@ -47,18 +46,21 @@ void sedApi(py::module_ &m)
         .def("serialise", py::overload_cast<>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.")
         .def("serialise", py::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, py::const_), "Get the serialised version of this SedDocument object.", py::arg("base_path"))
         .def_property_readonly("has_models", &libOpenCOR::SedDocument::hasModels, "Return whether there are some models.")
+        .def_property_readonly("model_count", &libOpenCOR::SedDocument::modelCount, "Return the number of models.")
         .def_property_readonly("models", &libOpenCOR::SedDocument::models, "Return the models.")
         .def("add_model", &libOpenCOR::SedDocument::addModel, "Add a model.")
         .def("remove_model", &libOpenCOR::SedDocument::removeModel, "Remove a model.")
         .def_property_readonly("has_simulations", &libOpenCOR::SedDocument::hasSimulations, "Return whether there are some simulations.")
+        .def_property_readonly("simulation_count", &libOpenCOR::SedDocument::simulationCount, "Return the number of simulations.")
         .def_property_readonly("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
         .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add a simulation.")
         .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.")
         .def_property_readonly("has_tasks", &libOpenCOR::SedDocument::hasTasks, "Return whether there are some tasks.")
+        .def_property_readonly("task_count", &libOpenCOR::SedDocument::taskCount, "Return the number of tasks.")
         .def_property_readonly("tasks", &libOpenCOR::SedDocument::tasks, "Return the tasks.")
         .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.")
         .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.")
-        .def("create_instance", &libOpenCOR::SedDocument::createInstance, "Create an instance of this SedDocument object.", py::arg("compiled") = true);
+        .def("instantiate", &libOpenCOR::SedDocument::instantiate, "Create an instance of this SedDocument object.", py::arg("compiled") = true);
 
     // SedInstance API.
 
@@ -82,16 +84,25 @@ void sedApi(py::module_ &m)
         .def("rate", &libOpenCOR::SedInstanceTask::rate, "Return the values of a rate.")
         .def("rate_name", &libOpenCOR::SedInstanceTask::rateName, "Return the name of a rate.")
         .def("rate_unit", &libOpenCOR::SedInstanceTask::rateUnit, "Return the unit of a rate.")
-        .def_property_readonly("variable_count", &libOpenCOR::SedInstanceTask::variableCount, "Return the number of variables.")
-        .def("variable", &libOpenCOR::SedInstanceTask::variable, "Return the values of a variable.")
-        .def("variable_name", &libOpenCOR::SedInstanceTask::variableName, "Return the name of a variable.")
-        .def("variable_unit", &libOpenCOR::SedInstanceTask::variableUnit, "Return the unit of a variable.");
+        .def_property_readonly("constant_count", &libOpenCOR::SedInstanceTask::constantCount, "Return the number of constants.")
+        .def("constant", &libOpenCOR::SedInstanceTask::constant, "Return the values of a constant.")
+        .def("constant_name", &libOpenCOR::SedInstanceTask::constantName, "Return the name of a constant.")
+        .def("constant_unit", &libOpenCOR::SedInstanceTask::constantUnit, "Return the unit of a constant.")
+        .def_property_readonly("computed_constant_count", &libOpenCOR::SedInstanceTask::computedConstantCount, "Return the number of computed constants.")
+        .def("computed_constant", &libOpenCOR::SedInstanceTask::computedConstant, "Return the values of a computed constant.")
+        .def("computed_constant_name", &libOpenCOR::SedInstanceTask::computedConstantName, "Return the name of a computed constant.")
+        .def("computed_constant_unit", &libOpenCOR::SedInstanceTask::computedConstantUnit, "Return the unit of a computed constant.")
+        .def_property_readonly("algebraic_count", &libOpenCOR::SedInstanceTask::algebraicCount, "Return the number of algebraic variables.")
+        .def("algebraic", &libOpenCOR::SedInstanceTask::algebraic, "Return the values of an algebraic variable.")
+        .def("algebraic_name", &libOpenCOR::SedInstanceTask::algebraicName, "Return the name of an algebraic variable.")
+        .def("algebraic_unit", &libOpenCOR::SedInstanceTask::algebraicUnit, "Return the unit of an algebraic variable.");
 
     // SedModel API.
 
     py::class_<libOpenCOR::SedModel, libOpenCOR::SedBase, libOpenCOR::SedModelPtr> sedModel(m, "SedModel");
 
-    sedModel.def(py::init(&libOpenCOR::SedModel::create), "Create a SedModel object.", py::arg("document"), py::arg("file"));
+    sedModel.def(py::init(&libOpenCOR::SedModel::create), "Create a SedModel object.", py::arg("document"), py::arg("file"))
+        .def_property_readonly("file", &libOpenCOR::SedModel::file, "Return the file.");
 
     // SedOutput API.
 
@@ -111,6 +122,12 @@ void sedApi(py::module_ &m)
 
     sedSimulation.def_property("ode_solver", &libOpenCOR::SedSimulation::odeSolver, &libOpenCOR::SedSimulation::setOdeSolver, "The ODE solver for the SedSimulation object.")
         .def_property("nla_solver", &libOpenCOR::SedSimulation::nlaSolver, &libOpenCOR::SedSimulation::setNlaSolver, "The NLA solver for the SedSimulation object.");
+
+    // SedAnalysis API.
+
+    py::class_<libOpenCOR::SedAnalysis, libOpenCOR::SedSimulation, libOpenCOR::SedAnalysisPtr> sedAnalysis(m, "SedAnalysis");
+
+    sedAnalysis.def(py::init(&libOpenCOR::SedAnalysis::create), "Create a SedAnalysis object.", py::arg("document"));
 
     // SedOneStep API.
 

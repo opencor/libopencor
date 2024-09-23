@@ -32,19 +32,19 @@ using CellmlFileRuntimePtr = std::shared_ptr<CellmlFileRuntime>;
 class CellmlFileRuntime: public Logger
 {
 public:
-    using InitialiseCompiledVariablesForAlgebraicModel = void (*)(double *pVariables);
-    using InitialiseCompiledVariablesForDifferentialModel = void (*)(double *pStates, double *pRates, double *pVariables);
-    using ComputeCompiledComputedConstants = void (*)(double *pVariables);
-    using ComputeCompiledRates = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
-    using ComputeCompiledVariablesForAlgebraicModel = void (*)(double *pVariables);
-    using ComputeCompiledVariablesForDifferentialModel = void (*)(double pVoi, double *pStates, double *pRates, double *pVariables);
+    using InitialiseCompiledVariablesForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
+    using InitialiseCompiledVariablesForDifferentialModel = void (*)(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
+    using ComputeCompiledComputedConstants = void (*)(double *pConstants, double *pComputedConstants);
+    using ComputeCompiledRates = void (*)(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
+    using ComputeCompiledVariablesForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
+    using ComputeCompiledVariablesForDifferentialModel = void (*)(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
 
-    using InitialiseInterpretedVariablesForAlgebraicModel = std::function<void(double *pVariables)>;
-    using InitialiseInterpretedVariablesForDifferentialModel = std::function<void(double *pStates, double *pRates, double *pVariables)>;
-    using ComputeInterpretedComputedConstants = std::function<void(double *pVariables)>;
-    using ComputeInterpretedRates = std::function<void(double pVoi, double *pStates, double *pRates, double *pVariables)>;
-    using ComputeInterpretedVariablesForAlgebraicModel = std::function<void(double *pVariables)>;
-    using ComputeInterpretedVariablesForDifferentialModel = std::function<void(double pVoi, double *pStates, double *pRates, double *pVariables)>;
+    using InitialiseInterpretedVariablesForAlgebraicModel = std::function<void(double *pConstants, double *pComputedConstants, double *pAlgebraic)>;
+    using InitialiseInterpretedVariablesForDifferentialModel = std::function<void(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic)>;
+    using ComputeInterpretedComputedConstants = std::function<void(double *pConstants, double *pComputedConstants)>;
+    using ComputeInterpretedRates = std::function<void(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic)>;
+    using ComputeInterpretedVariablesForAlgebraicModel = std::function<void(double *pConstants, double *pComputedConstants, double *pAlgebraic)>;
+    using ComputeInterpretedVariablesForDifferentialModel = std::function<void(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic)>;
 
     CellmlFileRuntime() = delete;
     ~CellmlFileRuntime() override;

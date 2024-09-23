@@ -45,16 +45,6 @@ public:
     SedSimulation &operator=(SedSimulation &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Set the ODE solver for this simulation.
-     *
-     * Set the ODE solver for this simulation.
-     *
-     * @param pOdeSolver The ODE solver, as a @ref SolverOdePtr, for this simulation.
-     */
-
-    void setOdeSolver(const SolverOdePtr &pOdeSolver);
-
-    /**
      * @brief Get the ODE solver for this simulation.
      *
      * Return the ODE Solver for this simulation.
@@ -65,14 +55,14 @@ public:
     SolverOdePtr odeSolver() const;
 
     /**
-     * @brief Set the NLA solver for this simulation.
+     * @brief Set the ODE solver for this simulation.
      *
-     * Set the NLA solver for this simulation.
+     * Set the ODE solver for this simulation.
      *
-     * @param pNlaSolver The NLA solver, as a @ref SolverNlaPtr, for this simulation.
+     * @param pOdeSolver The ODE solver, as a @ref SolverOdePtr, for this simulation.
      */
 
-    void setNlaSolver(const SolverNlaPtr &pNlaSolver);
+    void setOdeSolver(const SolverOdePtr &pOdeSolver);
 
     /**
      * @brief Get the NLA solver for this simulation.
@@ -83,6 +73,16 @@ public:
      */
 
     SolverNlaPtr nlaSolver() const;
+
+    /**
+     * @brief Set the NLA solver for this simulation.
+     *
+     * Set the NLA solver for this simulation.
+     *
+     * @param pNlaSolver The NLA solver, as a @ref SolverNlaPtr, for this simulation.
+     */
+
+    void setNlaSolver(const SolverNlaPtr &pNlaSolver);
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

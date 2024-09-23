@@ -16,7 +16,11 @@ limitations under the License.
 
 #include "filemanager_p.h"
 
+#include "utils.h"
+
 #include <algorithm>
+
+// #define PRINT_MANAGED_FILES
 
 namespace libOpenCOR {
 
@@ -27,14 +31,92 @@ FileManager::Impl &FileManager::Impl::instance()
     return instance;
 }
 
+#ifdef PRINT_MANAGED_FILES
+namespace {
+
+void printListOfFiles(const std::string &pInfo, const Files &pFiles)
+{
+    size_t i = 0;
+
+    printf("---[MANAGED FILES]-[%s]---[BEGIN]\n", pInfo.c_str()); // NOLINT
+
+    for (const auto &file : pFiles) {
+        auto type = file->type();
+        const auto *typeAsString = [&]() {
+            switch (type) {
+            case File::Type::UNKNOWN_FILE:
+                return "Unknown file";
+            case File::Type::CELLML_FILE:
+                return "CellML file";
+            case File::Type::SEDML_FILE:
+                return "SED-ML file";
+#    ifdef __EMSCRIPTEN__
+            default: // File::Type::COMBINE_ARCHIVE.
+                return "COMBINE archive";
+#    else
+            case File::Type::COMBINE_ARCHIVE:
+                return "COMBINE archive";
+            default: // File::Type::IRRETRIEVABLE_FILE.
+                return "Irretrievable file";
+#    endif
+            }
+        }();
+
+        printf("[%03zu] %s [%s]\n", ++i, file->fileName().c_str(), typeAsString); // NOLINT
+    }
+
+    printf("---[MANAGED FILES]-[%s]---[END]\n", pInfo.c_str()); // NOLINT
+}
+
+} // namespace
+#endif
+
 void FileManager::Impl::manage(File *pFile)
 {
     mFiles.push_back(pFile);
+
+#ifdef PRINT_MANAGED_FILES
+    printListOfFiles(std::string("Manage ") + pFile->fileName(), mFiles);
+#endif
 }
 
 void FileManager::Impl::unmanage(File *pFile)
 {
-    mFiles.erase(std::find(mFiles.cbegin(), mFiles.cend(), pFile));
+    auto iter = std::find(mFiles.cbegin(), mFiles.cend(), pFile);
+
+    if (iter != mFiles.cend()) {
+        mFiles.erase(iter);
+    }
+
+#ifdef PRINT_MANAGED_FILES
+    printListOfFiles(std::string("Unmanage ") + pFile->fileName(), mFiles);
+#endif
+}
+
+void FileManager::Impl::reset()
+{
+    mFiles.clear();
+}
+
+bool FileManager::Impl::hasFiles() const
+{
+    return !mFiles.empty();
+}
+
+size_t FileManager::Impl::fileCount() const
+{
+    return mFiles.size();
+}
+
+FilePtrs FileManager::Impl::files() const
+{
+    FilePtrs res;
+
+    for (const auto &file : mFiles) {
+        res.push_back(file->shared_from_this());
+    }
+
+    return res;
 }
 
 FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
@@ -71,14 +153,34 @@ FileManager::FileManager()
 {
 }
 
-void FileManager::manage(File *pFile)
+void FileManager::manage(const FilePtr &pFile)
 {
-    mPimpl.manage(pFile);
+    mPimpl.manage(pFile.get());
 }
 
-void FileManager::unmanage(File *pFile)
+void FileManager::unmanage(const FilePtr &pFile)
 {
-    mPimpl.unmanage(pFile);
+    mPimpl.unmanage(pFile.get());
+}
+
+void FileManager::reset()
+{
+    mPimpl.reset();
+}
+
+bool FileManager::hasFiles() const
+{
+    return mPimpl.hasFiles();
+}
+
+size_t FileManager::fileCount() const
+{
+    return mPimpl.fileCount();
+}
+
+FilePtrs FileManager::files() const
+{
+    return mPimpl.files();
 }
 
 FilePtr FileManager::file(const std::string &pFileNameOrUrl) const

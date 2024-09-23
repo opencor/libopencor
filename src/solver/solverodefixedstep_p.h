@@ -27,17 +27,25 @@ class SolverOdeFixedStep::Impl: public SolverOde::Impl
 public:
     using SolverOde::Impl::duplicate;
 
-    double mStep = 1.0;
+    static constexpr auto DEFAULT_STEP = 1.0;
+
+    double mStep = DEFAULT_STEP;
 
     explicit Impl(const std::string &pId, const std::string &pName);
+
+    void populate(libsedml::SedAlgorithm *pAlgorithm) override;
 
     SolverPtr duplicate(const SolverOdeFixedStepPtr &pSolver) const;
 
     StringStringMap properties() const override;
 
-    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+    bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                    double *pConstants, double *pComputedConstants, double *pAlgebraic,
                     CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                     CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
+
+    double step() const;
+    void setStep(double pStep);
 };
 
 } // namespace libOpenCOR

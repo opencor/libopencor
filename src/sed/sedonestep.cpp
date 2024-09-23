@@ -27,6 +27,16 @@ SedOneStep::Impl::Impl(const SedDocumentPtr &pDocument)
 {
 }
 
+double SedOneStep::Impl::step() const
+{
+    return mStep;
+}
+
+void SedOneStep::Impl::setStep(double pStep)
+{
+    mStep = pStep;
+}
+
 void SedOneStep::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("oneStep"));
@@ -65,12 +75,12 @@ SedOneStepPtr SedOneStep::create(const SedDocumentPtr &pDocument)
 
 double SedOneStep::step() const
 {
-    return pimpl()->mStep;
+    return pimpl()->step();
 }
 
 void SedOneStep::setStep(double pStep)
 {
-    pimpl()->mStep = pStep;
+    pimpl()->setStep(pStep);
 }
 
 } // namespace libOpenCOR

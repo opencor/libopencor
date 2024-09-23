@@ -52,7 +52,8 @@ void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
 }
 
 void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
-                 double pVoi, double *pStates, double *pRates, double *pVariables)
+                 double pVoi, double *pStates, double *pRates,
+                 double *pConstants, double *pComputedConstants, double *pAlgebraic)
 {
     printf("%f", pVoi); // NOLINT
 
@@ -61,8 +62,16 @@ void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
         printf(",%f", pRates[i]); // NOLINT
     }
 
-    for (size_t i = 0; i < pAnalyserModel->variables().size(); ++i) {
-        printf(",%f", pVariables[i]); // NOLINT
+    for (size_t i = 0; i < pAnalyserModel->constants().size(); ++i) {
+        printf(",%f", pConstants[i]); // NOLINT
+    }
+
+    for (size_t i = 0; i < pAnalyserModel->computedConstants().size(); ++i) {
+        printf(",%f", pComputedConstants[i]); // NOLINT
+    }
+
+    for (size_t i = 0; i < pAnalyserModel->algebraic().size(); ++i) {
+        printf(",%f", pAlgebraic[i]); // NOLINT
     }
 
     printf("\n"); // NOLINT
@@ -117,22 +126,25 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     if (mDifferentialModel) {
         mStateDoubles.resize(mAnalyserModel->stateCount(), NAN);
         mRateDoubles.resize(mAnalyserModel->stateCount(), NAN);
-        mVariableDoubles.resize(mAnalyserModel->variableCount(), NAN);
 
         mStates = mStateDoubles.data();
         mRates = mRateDoubles.data();
-        mVariables = mVariableDoubles.data();
 
         mResults.states.resize(mAnalyserModel->stateCount(), {});
         mResults.rates.resize(mAnalyserModel->stateCount(), {});
-        mResults.variables.resize(mAnalyserModel->variableCount(), {});
-    } else {
-        mVariableDoubles.resize(mAnalyserModel->variableCount(), NAN);
-
-        mVariables = mVariableDoubles.data();
-
-        mResults.variables.resize(mAnalyserModel->variableCount(), {});
     }
+
+    mConstantDoubles.resize(mAnalyserModel->constantCount(), NAN);
+    mComputedConstantDoubles.resize(mAnalyserModel->computedConstantCount(), NAN);
+    mAlgebraicDoubles.resize(mAnalyserModel->algebraicCount(), NAN);
+
+    mConstants = mConstantDoubles.data();
+    mComputedConstants = mComputedConstantDoubles.data();
+    mAlgebraic = mAlgebraicDoubles.data();
+
+    mResults.constants.resize(mAnalyserModel->constantCount(), {});
+    mResults.computedConstants.resize(mAnalyserModel->computedConstantCount(), {});
+    mResults.algebraic.resize(mAnalyserModel->algebraicCount(), {});
 
     // Initialise our model.
 
@@ -148,10 +160,82 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
         mResults.rates[i][pIndex] = mRates[i]; // NOLINT
     }
 
-    for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
-        mResults.variables[i][pIndex] = mVariables[i]; // NOLINT
+    for (size_t i = 0; i < mAnalyserModel->constantCount(); ++i) {
+        mResults.constants[i][pIndex] = mConstants[i]; // NOLINT
+    }
+
+    for (size_t i = 0; i < mAnalyserModel->computedConstantCount(); ++i) {
+        mResults.computedConstants[i][pIndex] = mComputedConstants[i]; // NOLINT
+    }
+
+    for (size_t i = 0; i < mAnalyserModel->algebraicCount(); ++i) {
+        mResults.algebraic[i][pIndex] = mAlgebraic[i]; // NOLINT
     }
 }
+
+namespace {
+
+std::string name(const libcellml::VariablePtr &pVariable) //---ISAN---
+{
+    auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
+
+    return component->name() + "/" + pVariable->name();
+}
+
+} // namespace
+
+#ifdef __EMSCRIPTEN__
+void SedInstanceTask::Impl::applyInitialConditions() //---ISAN---
+{
+    for (const auto &[parameter, value] : mInitialConditions) {
+        bool isParameterSet = false;
+
+        for (const auto &state : mAnalyserModel->states()) {
+            if (name(state->variable()) == parameter) {
+                mStates[state->index()] = value;
+
+                isParameterSet = true;
+
+                break;
+            }
+        }
+
+        if (!isParameterSet) {
+            for (const auto &constant : mAnalyserModel->constants()) {
+                if (name(constant->variable()) == parameter) {
+                    mConstants[constant->index()] = value;
+
+                    isParameterSet = true;
+
+                    break;
+                }
+            }
+        }
+
+        if (!isParameterSet) {
+            for (const auto &computedConstant : mAnalyserModel->computedConstants()) {
+                if (name(computedConstant->variable()) == parameter) {
+                    mComputedConstants[computedConstant->index()] = value;
+
+                    isParameterSet = true;
+
+                    break;
+                }
+            }
+        }
+
+        if (!isParameterSet) {
+            for (const auto &algebraic : mAnalyserModel->algebraic()) {
+                if (name(algebraic->variable()) == parameter) {
+                    mAlgebraic[algebraic->index()] = value;
+
+                    break;
+                }
+            }
+        }
+    }
+}
+#endif
 
 void SedInstanceTask::Impl::initialise()
 {
@@ -170,27 +254,32 @@ void SedInstanceTask::Impl::initialise()
 
 #ifndef __EMSCRIPTEN__
         if (mCompiled) {
-            mRuntime->initialiseCompiledVariablesForDifferentialModel()(mStates, mRates, mVariables);
-            mRuntime->computeCompiledComputedConstants()(mVariables);
-            mRuntime->computeCompiledRates()(mVoi, mStates, mRates, mVariables);
-            mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+            mRuntime->initialiseCompiledVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+            mRuntime->computeCompiledComputedConstants()(mConstants, mComputedConstants);
+            mRuntime->computeCompiledRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+            mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
         } else {
 #endif
-            mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mVariables);
-            mRuntime->computeInterpretedComputedConstants()(mVariables);
-            mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mVariables);
-            mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+            mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+
+#ifdef __EMSCRIPTEN__
+            applyInitialConditions(); //---ISAN---
+#endif
+
+            mRuntime->computeInterpretedComputedConstants()(mConstants, mComputedConstants);
+            mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+            mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 #ifndef __EMSCRIPTEN__
         }
     } else if (mCompiled) {
-        mRuntime->initialiseCompiledVariablesForAlgebraicModel()(mVariables);
-        mRuntime->computeCompiledComputedConstants()(mVariables);
-        mRuntime->computeCompiledVariablesForAlgebraicModel()(mVariables);
+        mRuntime->initialiseCompiledVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeCompiledComputedConstants()(mConstants, mComputedConstants);
+        mRuntime->computeCompiledVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
 #endif
     } else {
-        mRuntime->initialiseInterpretedVariablesForAlgebraicModel()(mVariables);
-        mRuntime->computeInterpretedComputedConstants()(mVariables);
-        mRuntime->computeInterpretedVariablesForAlgebraicModel()(mVariables);
+        mRuntime->initialiseInterpretedVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeInterpretedComputedConstants()(mConstants, mComputedConstants);
+        mRuntime->computeInterpretedVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
     }
 
     // Make sure that the NLA solver, should it have been used, didn't report any issues.
@@ -204,7 +293,9 @@ void SedInstanceTask::Impl::initialise()
     // Initialise the ODE solver, if needed.
 
     if (mDifferentialModel) {
-        if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates, mVariables, mRuntime->computeCompiledRates(), mRuntime->computeInterpretedRates())) {
+        if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates,
+                                             mConstants, mComputedConstants, mAlgebraic,
+                                             mRuntime->computeCompiledRates(), mRuntime->computeInterpretedRates())) {
             addIssues(mOdeSolver);
 
             return;
@@ -212,7 +303,7 @@ void SedInstanceTask::Impl::initialise()
     }
 
 #ifdef PRINT_VALUES
-    printValues(mAnalyserModel, mVoi, mStates, mRates, mVariables);
+    printValues(mAnalyserModel, mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 #endif
 }
 
@@ -237,8 +328,16 @@ void SedInstanceTask::Impl::run()
             mResults.rates[i].resize(resultsSize, NAN);
         }
 
-        for (size_t i = 0; i < mAnalyserModel->variableCount(); ++i) {
-            mResults.variables[i].resize(resultsSize, NAN);
+        for (size_t i = 0; i < mAnalyserModel->constantCount(); ++i) {
+            mResults.constants[i].resize(resultsSize, NAN);
+        }
+
+        for (size_t i = 0; i < mAnalyserModel->computedConstantCount(); ++i) {
+            mResults.computedConstants[i].resize(resultsSize, NAN);
+        }
+
+        for (size_t i = 0; i < mAnalyserModel->algebraicCount(); ++i) {
+            mResults.algebraic[i].resize(resultsSize, NAN);
         }
 
         // Track our initial results.
@@ -263,10 +362,12 @@ void SedInstanceTask::Impl::run()
 
 #ifndef __EMSCRIPTEN__
             if (mCompiled) {
-                mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+                mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates,
+                                                                         mConstants, mComputedConstants, mAlgebraic);
             } else {
 #endif
-                mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mVariables);
+                mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates,
+                                                                            mConstants, mComputedConstants, mAlgebraic);
 #ifndef __EMSCRIPTEN__
             }
 #endif
@@ -286,11 +387,23 @@ void SedInstanceTask::Impl::run()
             trackResults(++index);
 
 #ifdef PRINT_VALUES
-            printValues(mAnalyserModel, mVoi, mStates, mRates, mVariables);
+            printValues(mAnalyserModel, mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 #endif
         }
     }
 }
+
+#ifdef __EMSCRIPTEN__
+void SedInstanceTask::Impl::removeAllInitialConditions() //---ISAN---
+{
+    mInitialConditions.clear();
+}
+
+void SedInstanceTask::Impl::addInitialCondition(const std::string &pParameter, double pValue) //---ISAN---
+{
+    mInitialConditions[pParameter] = pValue;
+}
+#endif
 
 Doubles SedInstanceTask::Impl::state(size_t pIndex) const
 {
@@ -310,25 +423,50 @@ Doubles SedInstanceTask::Impl::rate(size_t pIndex) const
     return mResults.rates[pIndex];
 }
 
-Doubles SedInstanceTask::Impl::variable(size_t pIndex) const
+Doubles SedInstanceTask::Impl::constant(size_t pIndex) const
 {
-    if (pIndex >= mAnalyserModel->variableCount()) {
+    if (pIndex >= mAnalyserModel->constantCount()) {
         return {};
     }
 
-    return mResults.variables[pIndex];
+    return mResults.constants[pIndex];
 }
 
+Doubles SedInstanceTask::Impl::computedConstant(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->computedConstantCount()) {
+        return {};
+    }
+
+    return mResults.computedConstants[pIndex];
+}
+
+Doubles SedInstanceTask::Impl::algebraic(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->algebraicCount()) {
+        return {};
+    }
+
+    return mResults.algebraic[pIndex];
+}
+
+/*---ISAN---
 namespace {
 
 std::string name(const libcellml::VariablePtr &pVariable)
 {
     auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
 
-    return component->name() + "." + pVariable->name();
+    return component->name() + "/" + pVariable->name();
 }
 
 } // namespace
+*/
+
+Doubles SedInstanceTask::Impl::voi() const
+{
+    return mResults.voi;
+}
 
 std::string SedInstanceTask::Impl::voiName() const
 {
@@ -338,6 +476,11 @@ std::string SedInstanceTask::Impl::voiName() const
 std::string SedInstanceTask::Impl::voiUnit() const
 {
     return mAnalyserModel->voi()->variable()->units()->name();
+}
+
+size_t SedInstanceTask::Impl::stateCount() const
+{
+    return mAnalyserModel->stateCount();
 }
 
 std::string SedInstanceTask::Impl::stateName(size_t pIndex) const
@@ -358,6 +501,11 @@ std::string SedInstanceTask::Impl::stateUnit(size_t pIndex) const
     return mAnalyserModel->states()[pIndex]->variable()->units()->name();
 }
 
+size_t SedInstanceTask::Impl::rateCount() const
+{
+    return stateCount();
+}
+
 std::string SedInstanceTask::Impl::rateName(size_t pIndex) const
 {
     if (pIndex >= mAnalyserModel->stateCount()) {
@@ -376,22 +524,73 @@ std::string SedInstanceTask::Impl::rateUnit(size_t pIndex) const
     return mAnalyserModel->states()[pIndex]->variable()->units()->name() + "/" + voiUnit();
 }
 
-std::string SedInstanceTask::Impl::variableName(size_t pIndex) const
+size_t SedInstanceTask::Impl::constantCount() const
 {
-    if (pIndex >= mAnalyserModel->variableCount()) {
-        return {};
-    }
-
-    return name(mAnalyserModel->variables()[pIndex]->variable());
+    return mAnalyserModel->constantCount();
 }
 
-std::string SedInstanceTask::Impl::variableUnit(size_t pIndex) const
+std::string SedInstanceTask::Impl::constantName(size_t pIndex) const
 {
-    if (pIndex >= mAnalyserModel->variableCount()) {
+    if (pIndex >= mAnalyserModel->constantCount()) {
         return {};
     }
 
-    return mAnalyserModel->variables()[pIndex]->variable()->units()->name();
+    return name(mAnalyserModel->constants()[pIndex]->variable());
+}
+
+std::string SedInstanceTask::Impl::constantUnit(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->constantCount()) {
+        return {};
+    }
+
+    return mAnalyserModel->constants()[pIndex]->variable()->units()->name();
+}
+
+size_t SedInstanceTask::Impl::computedConstantCount() const
+{
+    return mAnalyserModel->computedConstantCount();
+}
+
+std::string SedInstanceTask::Impl::computedConstantName(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->computedConstantCount()) {
+        return {};
+    }
+
+    return name(mAnalyserModel->computedConstants()[pIndex]->variable());
+}
+
+std::string SedInstanceTask::Impl::computedConstantUnit(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->computedConstantCount()) {
+        return {};
+    }
+
+    return mAnalyserModel->computedConstants()[pIndex]->variable()->units()->name();
+}
+
+size_t SedInstanceTask::Impl::algebraicCount() const
+{
+    return mAnalyserModel->algebraicCount();
+}
+
+std::string SedInstanceTask::Impl::algebraicName(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->algebraicCount()) {
+        return {};
+    }
+
+    return name(mAnalyserModel->algebraic()[pIndex]->variable());
+}
+
+std::string SedInstanceTask::Impl::algebraicUnit(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->algebraicCount()) {
+        return {};
+    }
+
+    return mAnalyserModel->algebraic()[pIndex]->variable()->units()->name();
 }
 
 SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask, bool pCompiled)
@@ -416,7 +615,7 @@ const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 
 Doubles SedInstanceTask::voi() const
 {
-    return pimpl()->mResults.voi;
+    return pimpl()->voi();
 }
 
 #ifdef __EMSCRIPTEN__
@@ -438,7 +637,7 @@ std::string SedInstanceTask::voiUnit() const
 
 size_t SedInstanceTask::stateCount() const
 {
-    return pimpl()->mAnalyserModel->stateCount();
+    return pimpl()->stateCount();
 }
 
 Doubles SedInstanceTask::state(size_t pIndex) const
@@ -465,7 +664,7 @@ std::string SedInstanceTask::stateUnit(size_t pIndex) const
 
 size_t SedInstanceTask::rateCount() const
 {
-    return stateCount();
+    return pimpl()->rateCount();
 }
 
 Doubles SedInstanceTask::rate(size_t pIndex) const
@@ -490,31 +689,85 @@ std::string SedInstanceTask::rateUnit(size_t pIndex) const
     return pimpl()->rateUnit(pIndex);
 }
 
-size_t SedInstanceTask::variableCount() const
+size_t SedInstanceTask::constantCount() const
 {
-    return pimpl()->mAnalyserModel->variableCount();
+    return pimpl()->constantCount();
 }
 
-Doubles SedInstanceTask::variable(size_t pIndex) const
+Doubles SedInstanceTask::constant(size_t pIndex) const
 {
-    return pimpl()->variable(pIndex);
+    return pimpl()->constant(pIndex);
 }
 
 #ifdef __EMSCRIPTEN__
-emscripten::val SedInstanceTask::variableAsArray(size_t pIndex) const
+emscripten::val SedInstanceTask::constantAsArray(size_t pIndex) const
 {
-    return emscripten::val::array(variable(pIndex));
+    return emscripten::val::array(constant(pIndex));
 }
 #endif
 
-std::string SedInstanceTask::variableName(size_t pIndex) const
+std::string SedInstanceTask::constantName(size_t pIndex) const
 {
-    return pimpl()->variableName(pIndex);
+    return pimpl()->constantName(pIndex);
 }
 
-std::string SedInstanceTask::variableUnit(size_t pIndex) const
+std::string SedInstanceTask::constantUnit(size_t pIndex) const
 {
-    return pimpl()->variableUnit(pIndex);
+    return pimpl()->constantUnit(pIndex);
+}
+
+size_t SedInstanceTask::computedConstantCount() const
+{
+    return pimpl()->computedConstantCount();
+}
+
+Doubles SedInstanceTask::computedConstant(size_t pIndex) const
+{
+    return pimpl()->computedConstant(pIndex);
+}
+
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::computedConstantAsArray(size_t pIndex) const
+{
+    return emscripten::val::array(computedConstant(pIndex));
+}
+#endif
+
+std::string SedInstanceTask::computedConstantName(size_t pIndex) const
+{
+    return pimpl()->computedConstantName(pIndex);
+}
+
+std::string SedInstanceTask::computedConstantUnit(size_t pIndex) const
+{
+    return pimpl()->computedConstantUnit(pIndex);
+}
+
+size_t SedInstanceTask::algebraicCount() const
+{
+    return pimpl()->algebraicCount();
+}
+
+Doubles SedInstanceTask::algebraic(size_t pIndex) const
+{
+    return pimpl()->algebraic(pIndex);
+}
+
+#ifdef __EMSCRIPTEN__
+emscripten::val SedInstanceTask::algebraicAsArray(size_t pIndex) const
+{
+    return emscripten::val::array(algebraic(pIndex));
+}
+#endif
+
+std::string SedInstanceTask::algebraicName(size_t pIndex) const
+{
+    return pimpl()->algebraicName(pIndex);
+}
+
+std::string SedInstanceTask::algebraicUnit(size_t pIndex) const
+{
+    return pimpl()->algebraicUnit(pIndex);
 }
 
 } // namespace libOpenCOR

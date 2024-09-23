@@ -36,7 +36,7 @@ describe("Solver Second-Order Runge-Kutta", () => {
   });
 
   test("Step value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -51,7 +51,7 @@ describe("Solver Second-Order Runge-Kutta", () => {
 
     simulation.setOdeSolver(solver);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -59,10 +59,15 @@ describe("Solver Second-Order Runge-Kutta", () => {
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
+
+    instance.delete();
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Solve", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -82,11 +87,16 @@ describe("Solver Second-Order Runge-Kutta", () => {
       document,
       [-63.886525, 0.135009, 0.984334, 0.740971],
       [49.725722, -0.128194, -0.050903, 0.098651],
+      [1.0, 0.0, 0.3, 120.0, 36.0],
+      [-10.613, -115.0, 12.0],
       [
-        0.0, -15.982058, -823.516942, 789.779614, 1.0, 0.0, -10.613, 0.3,
-        -115.0, 120.0, 3.969929, 0.114985, 0.00287, 0.967348, 12.0, 36.0,
-        0.541338, 0.056246,
+        0.0, -15.982058, -823.516942, 789.779614, 3.969929, 0.114985, 0.00287,
+        0.967348, 0.541338, 0.056246,
       ],
     );
+
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 });

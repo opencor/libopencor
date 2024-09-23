@@ -33,51 +33,123 @@ describe("Issue coverage tests", () => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
   });
 
+  test("hasIssues()", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.hasIssues()).toBe(false);
+
+    file.delete();
+  });
+
+  test("issueCount()", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.issueCount()).toBe(0);
+
+    file.delete();
+  });
+
+  test("issues()", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.issues().size()).toBe(0);
+
+    file.delete();
+  });
+
   test("hasErrors()", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.hasErrors()).toBe(false);
+
+    file.delete();
+  });
+
+  test("errorCount()", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.errorCount()).toBe(0);
+
+    file.delete();
   });
 
   test("errors()", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.errors().size()).toBe(0);
+
+    file.delete();
   });
 
   test("hasWarnings()", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.hasWarnings()).toBe(false);
+
+    file.delete();
+  });
+
+  test("warningCount()", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.warningCount()).toBe(0);
+
+    file.delete();
   });
 
   test("warnings()", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.warnings().size()).toBe(0);
+
+    file.delete();
   });
 
   test("hasMessages()", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.hasMessages()).toBe(false);
+
+    file.delete();
+  });
+
+  test("messageCount()", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+
+    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+
+    expect(file.messageCount()).toBe(0);
+
+    file.delete();
   });
 
   test("messages()", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.messages().size()).toBe(0);
+
+    file.delete();
   });
 });

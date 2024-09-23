@@ -16,17 +16,20 @@ limitations under the License.
 
 #include "file_p.h"
 
+#include "filemanager_p.h"
+
 #include "cellmlfile.h"
 #include "combinearchive.h"
-#include "filemanager.h"
 #include "sedmlfile.h"
+#include "utils.h"
 
 #include <filesystem>
 
 namespace libOpenCOR {
 
-File::Impl::Impl(const std::string &pFileNameOrUrl)
+File::Impl::Impl(const std::string &pFileNameOrUrl, bool pManaged)
     : Logger::Impl()
+    , mManaged(pManaged)
 {
     // Check whether we are dealing with a local file or a URL.
 
@@ -55,6 +58,10 @@ File::Impl::Impl(const std::string &pFileNameOrUrl)
         mType = Type::IRRETRIEVABLE_FILE;
 
         addError("The file does not exist.");
+    }
+#else
+    if (mFilePath.empty()) {
+        mFilePath = stringToPath("/some/path/file");
     }
 #endif
 }
@@ -111,9 +118,19 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
     }
 }
 
+File::Type File::Impl::type() const
+{
+    return mType;
+}
+
 std::string File::Impl::fileName() const
 {
     return pathToString(mFilePath);
+}
+
+std::string File::Impl::url() const
+{
+    return mUrl;
 }
 
 std::string File::Impl::path() const
@@ -148,16 +165,63 @@ UnsignedChars File::Impl::contents()
     return mContents;
 }
 
-File::File(const std::string &pFileNameOrUrl)
-    : Logger(new Impl {pFileNameOrUrl})
+bool File::Impl::hasChildFiles() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->hasFiles();
+    }
+
+    return false;
+}
+
+size_t File::Impl::childFileCount() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->fileCount();
+    }
+
+    return 0;
+}
+
+Strings File::Impl::childFileNames() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->fileNames();
+    }
+
+    return {};
+}
+
+FilePtrs File::Impl::childFiles() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->files();
+    }
+
+    return {};
+}
+
+FilePtr File::Impl::childFile(const std::string &pFileName) const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->file(pFileName);
+    }
+
+    return {};
+}
+
+File::File(const std::string &pFileNameOrUrl, bool pManaged)
+    : Logger(new Impl {pFileNameOrUrl, pManaged})
 {
 }
 
 File::~File()
 {
-    // Have ourselves unmanaged.
+    // Have ourselves unmanaged, if needed.
 
-    FileManager::instance().unmanage(this);
+    if (pimpl()->mManaged) {
+        FileManager::instance().mPimpl.unmanage(this);
+    }
 
     delete pimpl();
 }
@@ -172,10 +236,10 @@ const File::Impl *File::pimpl() const
     return static_cast<const Impl *>(Logger::pimpl());
 }
 
-FilePtr File::create(const std::string &pFileNameOrUrl)
+FilePtr File::create(const std::string &pFileNameOrUrl, bool pManaged)
 {
-    // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage,
-    // and return a new file object.
+    // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage (if
+    // requested), and return a new file object.
 
     auto fileManager = FileManager::instance();
     auto file = fileManager.file(pFileNameOrUrl);
@@ -184,18 +248,27 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
         return file;
     }
 
-    auto res = FilePtr {new File {pFileNameOrUrl}};
+    auto res = FilePtr {new File {pFileNameOrUrl, pManaged}};
 
     res->pimpl()->checkType(res);
 
-    fileManager.manage(res.get());
+    if (pManaged) {
+        fileManager.mPimpl.manage(res.get());
+    }
 
     return res;
 }
 
+#ifdef __EMSCRIPTEN__
+FilePtr File::defaultCreate(const std::string &pFileNameOrUrl)
+{
+    return create(pFileNameOrUrl);
+}
+#endif
+
 File::Type File::type() const
 {
-    return pimpl()->mType;
+    return pimpl()->type();
 }
 
 std::string File::fileName() const
@@ -205,7 +278,7 @@ std::string File::fileName() const
 
 std::string File::url() const
 {
-    return pimpl()->mUrl;
+    return pimpl()->url();
 }
 
 std::string File::path() const
@@ -223,6 +296,31 @@ void File::setContents(const UnsignedChars &pContents)
     pimpl()->setContents(pContents);
 
     pimpl()->checkType(shared_from_this(), true);
+}
+
+bool File::hasChildFiles() const
+{
+    return pimpl()->hasChildFiles();
+}
+
+size_t File::childFileCount() const
+{
+    return pimpl()->childFileCount();
+}
+
+Strings File::childFileNames() const
+{
+    return pimpl()->childFileNames();
+}
+
+FilePtrs File::childFiles() const
+{
+    return pimpl()->childFiles();
+}
+
+FilePtr File::childFile(const std::string &pFileName) const
+{
+    return pimpl()->childFile(pFileName);
 }
 
 } // namespace libOpenCOR

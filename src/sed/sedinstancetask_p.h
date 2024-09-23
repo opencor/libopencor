@@ -30,7 +30,10 @@ struct SedInstanceTaskResults
     Doubles voi;
     std::vector<Doubles> states;
     std::vector<Doubles> rates;
-    std::vector<Doubles> variables;
+    std::vector<Doubles> constants;
+    std::vector<Doubles> computedConstants;
+    std::vector<Doubles> algebraic;
+    std::vector<Doubles> externals;
 };
 
 class SedInstanceTask::Impl: public Logger::Impl
@@ -45,14 +48,22 @@ public:
     SolverNlaPtr mNlaSolver;
     bool mCompiled = true;
 
+#ifdef __EMSCRIPTEN__
+    std::map<std::string, double> mInitialConditions; //---ISAN---
+#endif
+
     double mVoi = 0.0;
     double *mStates = nullptr;
     double *mRates = nullptr;
-    double *mVariables = nullptr;
+    double *mConstants = nullptr;
+    double *mComputedConstants = nullptr;
+    double *mAlgebraic = nullptr;
 
     Doubles mStateDoubles;
     Doubles mRateDoubles;
-    Doubles mVariableDoubles;
+    Doubles mConstantDoubles;
+    Doubles mComputedConstantDoubles;
+    Doubles mAlgebraicDoubles;
 
     SedInstanceTaskResults mResults;
 
@@ -62,24 +73,47 @@ public:
 
     void trackResults(size_t pIndex);
 
+#ifdef __EMSCRIPTEN__
+    void applyInitialConditions(); //---ISAN---
+#endif
+
     void initialise();
     void run();
 
+#ifdef __EMSCRIPTEN__
+    void removeAllInitialConditions(); //---ISAN---
+    void addInitialCondition(const std::string &pParameter, double pValue); //---ISAN---
+#endif
+
     Doubles state(size_t pIndex) const;
     Doubles rate(size_t pIndex) const;
-    Doubles variable(size_t pIndex) const;
+    Doubles constant(size_t pIndex) const;
+    Doubles computedConstant(size_t pIndex) const;
+    Doubles algebraic(size_t pIndex) const;
 
+    Doubles voi() const;
     std::string voiName() const;
     std::string voiUnit() const;
 
+    size_t stateCount() const;
     std::string stateName(size_t pIndex) const;
     std::string stateUnit(size_t pIndex) const;
 
+    size_t rateCount() const;
     std::string rateName(size_t pIndex) const;
     std::string rateUnit(size_t pIndex) const;
 
-    std::string variableName(size_t pIndex) const;
-    std::string variableUnit(size_t pIndex) const;
+    size_t constantCount() const;
+    std::string constantName(size_t pIndex) const;
+    std::string constantUnit(size_t pIndex) const;
+
+    size_t computedConstantCount() const;
+    std::string computedConstantName(size_t pIndex) const;
+    std::string computedConstantUnit(size_t pIndex) const;
+
+    size_t algebraicCount() const;
+    std::string algebraicName(size_t pIndex) const;
+    std::string algebraicUnit(size_t pIndex) const;
 };
 
 } // namespace libOpenCOR

@@ -28,6 +28,10 @@ public:
 
     explicit Impl(Type pType, const std::string &pDescription);
     ~Impl() = default;
+
+    Type type() const;
+    std::string typeAsString() const;
+    std::string description() const;
 };
 
 } // namespace libOpenCOR

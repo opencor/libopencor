@@ -24,6 +24,37 @@ Issue::Impl::Impl(Type pType, const std::string &pDescription)
 {
 }
 
+Issue::Type Issue::Impl::type() const
+{
+    return mType;
+}
+
+std::string Issue::Impl::typeAsString() const
+{
+#ifdef CODE_COVERAGE_ENABLED
+    switch (mType) {
+    case Type::ERROR:
+        return "Error";
+    default: // Type::WARNING.
+        return "Warning";
+    }
+#else
+    switch (mType) {
+    case Type::ERROR:
+        return "Error";
+    case Type::WARNING:
+        return "Warning";
+    default: // Type::MESSAGE.
+        return "Message";
+    }
+#endif
+}
+
+std::string Issue::Impl::description() const
+{
+    return mDescription;
+}
+
 Issue::Issue(Type pType, const std::string &pDescription)
     : mPimpl(new Impl {pType, pDescription})
 {
@@ -36,24 +67,17 @@ Issue::~Issue()
 
 Issue::Type Issue::type() const
 {
-    return mPimpl->mType;
+    return mPimpl->type();
 }
 
 std::string Issue::typeAsString() const
 {
-    switch (mPimpl->mType) {
-    case Type::ERROR:
-        return "Error";
-    case Type::WARNING:
-        return "Warning";
-    default: // Type::MESSAGE.
-        return "Message";
-    }
+    return mPimpl->typeAsString();
 }
 
 std::string Issue::description() const
 {
-    return mPimpl->mDescription;
+    return mPimpl->description();
 }
 
 } // namespace libOpenCOR

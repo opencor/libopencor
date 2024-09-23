@@ -30,7 +30,8 @@ SolverPtr SolverForwardEuler::Impl::duplicate()
     return SolverOdeFixedStep::Impl::duplicate(SolverForwardEuler::create());
 }
 
-bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                          double *pConstants, double *pComputedConstants, double *pAlgebraic,
                                           CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                                           CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
@@ -38,8 +39,9 @@ bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pSt
 
     // Initialise the ODE solver itself.
 
-    return SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates,
-                                                pComputeInterpretedRates);
+    return SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates,
+                                                pConstants, pComputedConstants, pAlgebraic,
+                                                pComputeCompiledRates, pComputeInterpretedRates);
 }
 
 bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
@@ -60,7 +62,7 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n, Y_n).
 
-        computeRates(pVoi, mStates, mRates, mVariables);
+        computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 
         // Compute Y_n+1.
 

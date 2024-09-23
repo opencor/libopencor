@@ -33,6 +33,11 @@ SedModel::Impl::Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile)
 {
 }
 
+FilePtr SedModel::Impl::file() const
+{
+    return mFile;
+}
+
 bool SedModel::Impl::isValid()
 {
     //---GRY--- AT THIS STAGE, WE ONLY SUPPORT CELLML FILES. THIS WILL CLEARLY CHANGE IN THE FUTURE.
@@ -103,16 +108,19 @@ SedModel::Impl *SedModel::pimpl()
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
 
-/*---GRY---
 const SedModel::Impl *SedModel::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
-*/
 
 SedModelPtr SedModel::create(const SedDocumentPtr &pDocument, const FilePtr &pFile)
 {
     return SedModelPtr {new SedModel {pDocument, pFile}};
+}
+
+FilePtr SedModel::file() const
+{
+    return pimpl()->file();
 }
 
 } // namespace libOpenCOR

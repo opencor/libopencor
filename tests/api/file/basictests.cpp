@@ -130,3 +130,57 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->contents(), someUnknownContents);
     EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 }
+
+TEST(BasicFileTest, fileManager)
+{
+    auto fileManager = libOpenCOR::FileManager::instance();
+
+    EXPECT_FALSE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 0);
+    EXPECT_TRUE(fileManager.files().empty());
+    EXPECT_EQ(fileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
+
+    auto localFile = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto sameFileManager = libOpenCOR::FileManager::instance();
+
+    EXPECT_TRUE(sameFileManager.hasFiles());
+    EXPECT_EQ(sameFileManager.fileCount(), 1);
+    EXPECT_EQ(sameFileManager.files().size(), 1);
+    EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), localFile);
+
+    auto remoteFile = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
+
+    EXPECT_TRUE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 2);
+    EXPECT_EQ(fileManager.files().size(), 2);
+    EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), remoteFile);
+
+    auto unknownFile = libOpenCOR::File::create(libOpenCOR::UNKNOWN_FILE, false);
+
+    EXPECT_TRUE(sameFileManager.hasFiles());
+    EXPECT_EQ(sameFileManager.fileCount(), 2);
+    EXPECT_EQ(sameFileManager.files().size(), 2);
+    EXPECT_EQ(sameFileManager.file(libOpenCOR::UNKNOWN_FILE), nullptr);
+
+    fileManager.manage(unknownFile);
+
+    EXPECT_TRUE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 3);
+    EXPECT_EQ(fileManager.files().size(), 3);
+    EXPECT_EQ(fileManager.file(libOpenCOR::UNKNOWN_FILE), unknownFile);
+
+    sameFileManager.unmanage(localFile);
+
+    EXPECT_TRUE(sameFileManager.hasFiles());
+    EXPECT_EQ(sameFileManager.fileCount(), 2);
+    EXPECT_EQ(sameFileManager.files().size(), 2);
+    EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
+
+    fileManager.reset();
+
+    EXPECT_FALSE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 0);
+    EXPECT_EQ(fileManager.files().size(), 0);
+    EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), nullptr);
+    EXPECT_EQ(fileManager.file(libOpenCOR::UNKNOWN_FILE), nullptr);
+}

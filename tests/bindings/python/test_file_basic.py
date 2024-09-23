@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue
+from libopencor import File, FileManager, Issue
 import platform
 import utils
 from utils import assert_issues
@@ -34,12 +34,12 @@ expected_unknown_file_issues = [
 
 
 def test_local_file():
-    file = File(utils.LOCAL_FILE)
+    file = File(utils.LocalFile)
 
     assert file.type == File.Type.IrretrievableFile
-    assert file.file_name == utils.LOCAL_FILE
+    assert file.file_name == utils.LocalFile
     assert file.url == ""
-    assert file.path == utils.LOCAL_FILE
+    assert file.path == utils.LocalFile
     assert file.contents == []
     assert_issues(file, expected_non_existing_file_issues)
 
@@ -75,34 +75,34 @@ def test_url_based_local_file():
         file = File("file:///some/path/file.txt")
 
     assert file.type == File.Type.IrretrievableFile
-    assert file.file_name == utils.LOCAL_FILE
+    assert file.file_name == utils.LocalFile
     assert file.url == ""
-    assert file.path == utils.LOCAL_FILE
+    assert file.path == utils.LocalFile
     assert file.contents == []
     assert_issues(file, expected_non_existing_file_issues)
 
 
 def test_remote_file():
-    file = File(utils.REMOTE_FILE)
+    file = File(utils.RemoteFile)
 
     assert file.type == File.Type.CellmlFile
     assert file.file_name != ""
-    assert file.url == utils.REMOTE_FILE
-    assert file.path == utils.REMOTE_FILE
+    assert file.url == utils.RemoteFile
+    assert file.path == utils.RemoteFile
     assert file.contents != []
 
 
 def test_local_virtual_file():
-    file = File(utils.LOCAL_FILE)
+    file = File(utils.LocalFile)
 
     assert file.type == File.Type.IrretrievableFile
-    assert file.file_name == utils.LOCAL_FILE
+    assert file.file_name == utils.LocalFile
     assert file.url == ""
-    assert file.path == utils.LOCAL_FILE
+    assert file.path == utils.LocalFile
     assert file.contents == []
     assert_issues(file, expected_non_existing_file_issues)
 
-    some_unknown_contents_list = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
+    some_unknown_contents_list = utils.string_to_list(utils.SomeUnknownContents)
 
     file.contents = some_unknown_contents_list
 
@@ -112,19 +112,72 @@ def test_local_virtual_file():
 
 
 def test_remote_virtual_file():
-    file = File(utils.IRRETRIEVABLE_REMOTE_FILE)
+    file = File(utils.IrretrievableRemoteFile)
 
     assert file.type == File.Type.IrretrievableFile
     assert file.file_name == ""
-    assert file.url == utils.IRRETRIEVABLE_REMOTE_FILE
-    assert file.path == utils.IRRETRIEVABLE_REMOTE_FILE
+    assert file.url == utils.IrretrievableRemoteFile
+    assert file.path == utils.IrretrievableRemoteFile
     assert file.contents == []
     assert_issues(file, expected_non_downloadable_file_issues)
 
-    some_unknown_contents_list = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
+    some_unknown_contents_list = utils.string_to_list(utils.SomeUnknownContents)
 
     file.contents = some_unknown_contents_list
 
     assert file.type == File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
     assert_issues(file, expected_unknown_file_issues)
+
+
+def test_file_manager():
+    file_manager = FileManager.instance()
+
+    assert file_manager.has_files == False
+    assert file_manager.file_count == 0
+    assert len(file_manager.files) == 0
+    assert file_manager.file(utils.LocalFile) == None
+
+    local_file = File(utils.LocalFile)
+    same_file_manager = FileManager.instance()
+
+    assert same_file_manager.has_files == True
+    assert same_file_manager.file_count == 1
+    assert len(file_manager.files) == 1
+    assert same_file_manager.file(utils.LocalFile) == local_file
+
+    remote_file = File(utils.RemoteFile)
+
+    assert file_manager.has_files == True
+    assert file_manager.file_count == 2
+    assert len(file_manager.files) == 2
+    assert file_manager.file(utils.RemoteFile) == remote_file
+
+    unknown_file = File(utils.UnknownFile, False)
+
+    assert same_file_manager.has_files == True
+    assert same_file_manager.file_count == 2
+    assert len(file_manager.files) == 2
+    assert same_file_manager.file(utils.UnknownFile) == None
+
+    file_manager.manage(unknown_file)
+
+    assert file_manager.has_files == True
+    assert file_manager.file_count == 3
+    assert len(file_manager.files) == 3
+    assert file_manager.file(utils.UnknownFile) == unknown_file
+
+    same_file_manager.unmanage(local_file)
+
+    assert same_file_manager.has_files == True
+    assert same_file_manager.file_count == 2
+    assert len(file_manager.files) == 2
+    assert same_file_manager.file(utils.LocalFile) == None
+
+    file_manager.reset()
+
+    assert file_manager.has_files == False
+    assert file_manager.file_count == 0
+    assert len(file_manager.files) == 0
+    assert file_manager.file(utils.RemoteFile) == None
+    assert file_manager.file(utils.UnknownFile) == None
