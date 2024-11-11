@@ -36,7 +36,7 @@ NB_MODULE(test_functions_ext, m) {
     m.def("test_05", [](int) -> int { return 1; }, "doc_1");
     nb::object first_overload = m.attr("test_05");
     m.def("test_05", [](float) -> int { return 2; }, "doc_2");
-#if !defined(PYPY_VERSION)
+#if !defined(PYPY_VERSION) && !defined(Py_GIL_DISABLED)
     // Make sure we don't leak the previous member of the overload chain
     // (pypy's refcounts are bogus and will not help us with this check)
     if (first_overload.ptr()->ob_refcnt != 1) {
@@ -44,6 +44,14 @@ NB_MODULE(test_functions_ext, m) {
     }
 #endif
     first_overload.reset();
+
+    // Test an overload chain that always repeats the same docstring
+    m.def("test_05b", [](int) -> int { return 1; }, "doc_1");
+    m.def("test_05b", [](float) -> int { return 2; }, "doc_1");
+
+    // Test an overload chain with an empty docstring
+    m.def("test_05c", [](int) -> int { return 1; }, "doc_1");
+    m.def("test_05c", [](float) -> int { return 2; }, "");
 
     /// Function raising an exception
     m.def("test_06", []() { throw std::runtime_error("oops!"); });
@@ -81,7 +89,7 @@ NB_MODULE(test_functions_ext, m) {
     });
 
     /// Test tuple manipulation
-    m.def("test_tuple", [](nb::tuple l) {
+    m.def("test_tuple", [](nb::typed<nb::tuple, int, nb::ellipsis> l) {
         int result = 0;
         for (size_t i = 0; i < l.size(); ++i)
             result += nb::cast<int>(l[i]);
@@ -361,4 +369,12 @@ NB_MODULE(test_functions_ext, m) {
     });
 
     m.def("hash_it", [](nb::handle h) { return nb::hash(h); });
+
+    // Test bytearray type
+    m.def("test_bytearray_new",     []() { return nb::bytearray(); });
+    m.def("test_bytearray_new",     [](const char *c, int size) { return nb::bytearray(c, size); });
+    m.def("test_bytearray_copy",    [](nb::bytearray o) { return nb::bytearray(o.c_str(), o.size()); });
+    m.def("test_bytearray_c_str",   [](nb::bytearray o) -> const char * { return o.c_str(); });
+    m.def("test_bytearray_size",    [](nb::bytearray o) { return o.size(); });
+    m.def("test_bytearray_resize",  [](nb::bytearray c, int size) { return c.resize(size); });
 }

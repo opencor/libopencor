@@ -20,9 +20,17 @@ struct name {
 };
 
 struct arg_v;
+struct arg_locked;
+struct arg_locked_v;
+
+// Basic function argument descriptor (no default value, not locked)
 struct arg {
     NB_INLINE constexpr explicit arg(const char *name = nullptr) : name_(name), signature_(nullptr) { }
+
+    // operator= can be used to provide a default value
     template <typename T> NB_INLINE arg_v operator=(T &&value) const;
+
+    // Mutators that don't change default value or locked state
     NB_INLINE arg &noconvert(bool value = true) {
         convert_ = !value;
         return *this;
@@ -31,22 +39,74 @@ struct arg {
         none_ = value;
         return *this;
     }
-
     NB_INLINE arg &sig(const char *value) {
         signature_ = value;
         return *this;
     }
+
+    // After lock(), this argument is locked
+    NB_INLINE arg_locked lock();
 
     const char *name_, *signature_;
     uint8_t convert_{ true };
     bool none_{ false };
 };
 
+// Function argument descriptor with default value (not locked)
 struct arg_v : arg {
     object value;
     NB_INLINE arg_v(const arg &base, object &&value)
         : arg(base), value(std::move(value)) {}
+
+  private:
+    // Inherited mutators would slice off the default, and are not generally needed
+    using arg::noconvert;
+    using arg::none;
+    using arg::sig;
+    using arg::lock;
 };
+
+// Function argument descriptor that is locked (no default value)
+struct arg_locked : arg {
+    NB_INLINE constexpr explicit arg_locked(const char *name = nullptr) : arg(name) { }
+    NB_INLINE constexpr explicit arg_locked(const arg &base) : arg(base) { }
+
+    // operator= can be used to provide a default value
+    template <typename T> NB_INLINE arg_locked_v operator=(T &&value) const;
+
+    // Mutators must be respecified in order to not slice off the locked status
+    NB_INLINE arg_locked &noconvert(bool value = true) {
+        convert_ = !value;
+        return *this;
+    }
+    NB_INLINE arg_locked &none(bool value = true) {
+        none_ = value;
+        return *this;
+    }
+    NB_INLINE arg_locked &sig(const char *value) {
+        signature_ = value;
+        return *this;
+    }
+
+    // Redundant extra lock() is allowed
+    NB_INLINE arg_locked &lock() { return *this; }
+};
+
+// Function argument descriptor that is potentially locked and has a default value
+struct arg_locked_v : arg_locked {
+    object value;
+    NB_INLINE arg_locked_v(const arg_locked &base, object &&value)
+        : arg_locked(base), value(std::move(value)) {}
+
+  private:
+    // Inherited mutators would slice off the default, and are not generally needed
+    using arg_locked::noconvert;
+    using arg_locked::none;
+    using arg_locked::sig;
+    using arg_locked::lock;
+};
+
+NB_INLINE arg_locked arg::lock() { return arg_locked{*this}; }
 
 template <typename... Ts> struct call_guard {
     using type = detail::tuple<Ts...>;
@@ -58,9 +118,11 @@ struct is_method {};
 struct is_implicit {};
 struct is_operator {};
 struct is_arithmetic {};
+struct is_flag {};
 struct is_final {};
 struct is_generic {};
 struct kw_only {};
+struct lock_self {};
 
 template <size_t /* Nurse */, size_t /* Patient */> struct keep_alive {};
 template <typename T> struct supplement {};
@@ -128,13 +190,30 @@ enum class func_flags : uint32_t {
     has_keep_alive = (1 << 17)
 };
 
+enum cast_flags : uint8_t {
+    // Enable implicit conversions (code assumes this has value 1, don't reorder..)
+    convert = (1 << 0),
+
+    // Passed to the 'self' argument in a constructor call (__init__)
+    construct = (1 << 1),
+
+    // Indicates that the function dispatcher should accept 'None' arguments
+    accepts_none = (1 << 2),
+
+    // Indicates that this cast is performed by nb::cast or nb::try_cast.
+    // This implies that objects added to the cleanup list may be
+    // released immediately after the caster's final output value is
+    // obtained, i.e., before it is used.
+    manual = (1 << 3)
+};
+
+
 struct arg_data {
     const char *name;
     const char *signature;
     PyObject *name_py;
     PyObject *value;
-    bool convert;
-    bool none;
+    uint8_t flag;
 };
 
 template <size_t Size> struct func_data_prelim {
@@ -265,26 +344,40 @@ NB_INLINE void func_extra_apply(F &, std::nullptr_t, size_t &) { }
 
 template <typename F>
 NB_INLINE void func_extra_apply(F &f, const arg &a, size_t &index) {
-    arg_data &arg = f.args[index++];
+    uint8_t flag = 0;
+    if (a.none_)
+        flag |= (uint8_t) cast_flags::accepts_none;
+    if (a.convert_)
+        flag |= (uint8_t) cast_flags::convert;
+
+    arg_data &arg = f.args[index];
+    arg.flag = flag;
     arg.name = a.name_;
     arg.signature = a.signature_;
     arg.value = nullptr;
-    arg.convert = a.convert_;
-    arg.none = a.none_;
+    index++;
 }
+// arg_locked will select the arg overload; the locking is added statically
+// in nb_func.h
 
 template <typename F>
 NB_INLINE void func_extra_apply(F &f, const arg_v &a, size_t &index) {
-    arg_data &arg = f.args[index++];
-    arg.name = a.name_;
-    arg.signature = a.signature_;
-    arg.value = a.value.ptr();
-    arg.convert = a.convert_;
-    arg.none = a.none_;
+    arg_data &ad = f.args[index];
+    func_extra_apply(f, (const arg &) a, index);
+    ad.value = a.value.ptr();
+}
+template <typename F>
+NB_INLINE void func_extra_apply(F &f, const arg_locked_v &a, size_t &index) {
+    arg_data &ad = f.args[index];
+    func_extra_apply(f, (const arg_locked &) a, index);
+    ad.value = a.value.ptr();
 }
 
 template <typename F>
 NB_INLINE void func_extra_apply(F &, kw_only, size_t &) {}
+
+template <typename F>
+NB_INLINE void func_extra_apply(F &, lock_self, size_t &) {}
 
 template <typename F, typename... Ts>
 NB_INLINE void func_extra_apply(F &, call_guard<Ts...>, size_t &) {}
@@ -297,6 +390,7 @@ NB_INLINE void func_extra_apply(F &f, nanobind::keep_alive<Nurse, Patient>, size
 template <typename... Ts> struct func_extra_info {
     using call_guard = void;
     static constexpr bool keep_alive = false;
+    static constexpr size_t nargs_locked = 0;
 };
 
 template <typename T, typename... Ts> struct func_extra_info<T, Ts...>
@@ -312,6 +406,16 @@ struct func_extra_info<nanobind::call_guard<Cs...>, Ts...> : func_extra_info<Ts.
 template <size_t Nurse, size_t Patient, typename... Ts>
 struct func_extra_info<nanobind::keep_alive<Nurse, Patient>, Ts...> : func_extra_info<Ts...> {
     static constexpr bool keep_alive = true;
+};
+
+template <typename... Ts>
+struct func_extra_info<nanobind::arg_locked, Ts...> : func_extra_info<Ts...> {
+    static constexpr size_t nargs_locked = 1 + func_extra_info<Ts...>::nargs_locked;
+};
+
+template <typename... Ts>
+struct func_extra_info<nanobind::lock_self, Ts...> : func_extra_info<Ts...> {
+    static constexpr size_t nargs_locked = 1 + func_extra_info<Ts...>::nargs_locked;
 };
 
 template <typename T>

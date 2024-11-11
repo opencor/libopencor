@@ -67,12 +67,15 @@ struct FuncWrapper {
 int funcwrapper_tp_traverse(PyObject *self, visitproc visit, void *arg) {
     FuncWrapper *w = nb::inst_ptr<FuncWrapper>(self);
 
-    nb::object f = nb::cast(w->f, nb::rv_policy::none);
+    nb::handle f = nb::cast(w->f, nb::rv_policy::none);
     Py_VISIT(f.ptr());
 
-    return 0;
-};
+    #if PY_VERSION_HEX >= 0x03090000
+        Py_VISIT(Py_TYPE(self));
+    #endif
 
+    return 0;
+}
 
 int FuncWrapper::alive = 0;
 

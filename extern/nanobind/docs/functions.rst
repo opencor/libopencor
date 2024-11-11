@@ -545,3 +545,58 @@ The following interactive session shows how to call them from Python.
    C++ libraries (e.g. GUI libraries, asynchronous networking libraries,
    etc.).
 
+.. _binding-overheads:
+
+Minimizing binding overheads
+----------------------------
+
+The code that dispatches function calls from Python to C++ is in general
+:ref:`highly optimized <benchmarks>`. When it is important to further reduce
+binding overheads to an absolute minimum, consider removing annotations for
+:ref:`keyword and default arguments <keyword_and_default_args>` along with
+other advanced binding annotations.
+
+In the snippet below, ``f1`` has lower binding overheads compared to ``f2``.
+
+.. code-block:: cpp
+
+   NB_MODULE(my_ext, m) {
+       m.def("f1", [](int) { /* no-op */ });
+       m.def("f2", [](int) { /* no-op */ }, "arg"_a);
+   }
+
+This is because ``f1``:
+
+1. Does *not* use any of the following advanced argument annotations features:
+
+   - **Named function arguments**, e.g., :cpp:class:`nb::arg("name") <arg>` or ``"name"_a``.
+
+   - **Default argument values**, e.g., :cpp:func:`nb::arg() = 0 <arg::operator=>` or ``"name"_a = false``.
+
+   - **Nullability** or **implicit conversion** flags, e.g.,
+     :cpp:func:`nb::arg().none() <arg::none>` or :cpp:func:`"name"_a.noconvert()
+     <arg::noconvert>`.
+
+2. Has no :cpp:class:`nb::keep_alive\<Nurse, Patient\>() <keep_alive>`
+   annotations.
+
+3. Takes no variable-length positional (:cpp:class:`nb::args <args>`) or keyword
+   (:cpp:class:`nb::kwargs <kwargs>`) arguments.
+
+4. Has a to total of **8 or fewer** function arguments.
+
+If all of the above conditions are satisfied, nanobind switches to a
+specialized dispatcher that is optimized to handle a small number of positional
+arguments. Otherwise, it uses the default dispatcher that works in any
+situation. It is also worth noting that functions with many overloads generally
+execute more slowly, since nanobind must first select a suitable one.
+
+These differences are mainly of interest when a function that does *very
+little* is called at a *very high rate*, in which case binding overheads can
+become noticeable.
+
+Regarding point 1 of the above list, note that **locking** is okay, as long as
+the annotation does not provide an argument name. In other words, a function
+binding with a :cpp:func:`nb::arg().lock() <arg::lock>` for some of its arguments stays on the fast
+path. This is mainly of interest for :ref:`free-threaded <free-threaded>`
+extensions.

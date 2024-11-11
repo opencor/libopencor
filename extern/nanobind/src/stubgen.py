@@ -90,7 +90,7 @@ SKIP_LIST = [
     "__cached__", "__path__", "__version__", "__spec__", "__loader__",
     "__package__", "__nb_signature__", "__class_getitem__", "__orig_bases__",
     "__file__", "__dict__", "__weakref__", "__format__", "__nb_enum__",
-    "__firstlineno__", "__static_attributes__"
+    "__firstlineno__", "__static_attributes__", "__annotations__", "__annotate__"
 ]
 # fmt: on
 
@@ -399,7 +399,7 @@ class StubGen:
             self.write_ln("@staticmethod")
             fn = fn.__func__
         elif isinstance(fn, classmethod):
-            self.write_ln("@staticmethod")
+            self.write_ln("@classmethod")
             fn = fn.__func__
 
         # Special handling for nanobind functions with overloads
@@ -479,7 +479,10 @@ class StubGen:
 
             if same_module:
                 # This is an alias of a type in the same module or same top-level module
-                alias_tp = self.import_object("typing", "TypeAlias")
+                if sys.version_info >= (3, 10, 0):
+                    alias_tp = self.import_object("typing", "TypeAlias")
+                else:
+                    alias_tp = self.import_object("typing_extensions", "TypeAlias")
                 self.write_ln(f"{name}: {alias_tp} = {tp.__qualname__}\n")
             elif self.include_external_imports or (same_toplevel_module and self.include_internal_imports):
                 # Import from a different module
@@ -555,6 +558,9 @@ class StubGen:
         ):
             return
 
+        if tp.__module__ == '__future__':
+            return
+
         if isinstance(parent, type) and issubclass(tp, parent):
             # This is an entry of an enumeration
             self.write_ln(f"{name} = {typing.cast(enum.Enum, value).value}")
@@ -578,7 +584,10 @@ class StubGen:
             if self.is_type_var(tp):
                 types = ""
             elif typing.get_origin(value):
-                types = ": " + self.import_object("typing", "TypeAlias")
+                if sys.version_info >= (3, 10, 0):
+                    types = ": " + self.import_object("typing", "TypeAlias")
+                else:
+                    types = ": " + self.import_object("typing_extensions", "TypeAlias")
             else:
                 types = f": {self.type_str(tp)}"
 
@@ -1051,7 +1060,9 @@ class StubGen:
         """Attempt to convert a type into a Python expression which reproduces it"""
         origin, args = typing.get_origin(tp), typing.get_args(tp)
 
-        if isinstance(tp, typing.TypeVar):
+        if isinstance(tp, str):
+            result = tp
+        elif isinstance(tp, typing.TypeVar):
             return tp.__name__
         elif isinstance(tp, typing.ForwardRef):
             return repr(tp.__forward_arg__)
@@ -1100,7 +1111,7 @@ class StubGen:
             return 1
 
         if spec:
-            if spec.origin and "site-packages" in spec.origin:
+            if spec.origin and ("site-packages" in spec.origin or "dist-packages" in spec.origin):
                 return 1
             else:
                 return 0

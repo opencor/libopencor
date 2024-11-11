@@ -32,20 +32,6 @@
 NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)
 
-enum cast_flags : uint8_t {
-    // Enable implicit conversions (impl. assumes this is 1, don't reorder..)
-    convert = (1 << 0),
-
-    // Passed to the 'self' argument in a constructor call (__init__)
-    construct = (1 << 1),
-
-    // Indicates that this cast is performed by nb::cast or nb::try_cast.
-    // This implies that objects added to the cleanup list may be
-    // released immediately after the caster's final output value is
-    // obtained, i.e., before it is used.
-    manual = (1 << 2),
-};
-
 /**
  * Type casters expose a member 'Cast<T>' which users of a type caster must
  * query to determine what the caster actually can (and prefers) to produce.
@@ -238,19 +224,21 @@ template <> struct type_caster<void> {
     }
 };
 
-template <> struct type_caster<std::nullptr_t> {
+template <typename T> struct none_caster {
     bool from_python(handle src, uint8_t, cleanup_list *) noexcept {
         if (src.is_none())
             return true;
         return false;
     }
 
-    static handle from_cpp(std::nullptr_t, rv_policy, cleanup_list *) noexcept {
+    static handle from_cpp(T, rv_policy, cleanup_list *) noexcept {
         return none().release();
     }
 
-    NB_TYPE_CASTER(std::nullptr_t, const_name("None"))
+    NB_TYPE_CASTER(T, const_name("None"))
 };
+
+template <> struct type_caster<std::nullptr_t> : none_caster<std::nullptr_t> { };
 
 template <> struct type_caster<bool> {
     bool from_python(handle src, uint8_t, cleanup_list *) noexcept {
@@ -356,8 +344,8 @@ template <typename T, typename... Ts> struct type_caster<typed<T, Ts...>> {
     using Typed = typed<T, Ts...>;
 
     NB_TYPE_CASTER(Typed, typed_name<intrinsic_t<T>>::Name + const_name("[") +
-                              concat(make_caster<Ts>::Name...) +
-                              const_name("]"))
+                   concat(const_name<std::is_same_v<Ts, ellipsis>>(const_name("..."),
+                          make_caster<Ts>::Name)...) + const_name("]"))
 
     bool from_python(handle src, uint8_t flags, cleanup_list *cleanup) noexcept {
         Caster caster;
@@ -579,6 +567,7 @@ NAMESPACE_END(detail)
 template <typename T, typename Derived>
 NB_INLINE T cast(const detail::api<Derived> &value, bool convert = true) {
     if constexpr (std::is_same_v<T, void>) {
+        (void) value; (void) convert;
         return;
     } else {
         if (convert)
@@ -644,6 +633,9 @@ tuple make_tuple(Args &&...args) {
 
 template <typename T> arg_v arg::operator=(T &&value) const {
     return arg_v(*this, cast((detail::forward_t<T>) value));
+}
+template <typename T> arg_locked_v arg_locked::operator=(T &&value) const {
+    return arg_locked_v(*this, cast((detail::forward_t<T>) value));
 }
 
 template <typename Impl> template <typename T>
