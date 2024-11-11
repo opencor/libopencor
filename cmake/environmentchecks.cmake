@@ -122,7 +122,7 @@ else()
     set(NB_PYTHON_DEV_MODULE Development.Module)
 endif()
 
-find_package(Python 3.8
+find_package(Python 3.9
              COMPONENTS Interpreter ${NB_PYTHON_DEV_MODULE}
              OPTIONAL_COMPONENTS Development.SABIModule)
 
