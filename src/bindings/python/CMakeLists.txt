@@ -56,26 +56,6 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
     target_link_libraries(${PYTHON_BINDINGS_TARGET} PRIVATE
                           $<TARGET_NAME:${CMAKE_PROJECT_NAME}>)
 
-    if($ENV{GITHUB_ACTIONS})
-        set(GITHUB_ACTIONS ON)
-    else()
-        set(GITHUB_ACTIONS OFF)
-    endif()
-
-    if(GITHUB_ACTIONS AND WIN32 AND SKBUILD)
-        # Note: this is to account for the fact that the `pip install libOpenCOR` step in our CI doesn't, on GitHub
-        #       Actions' Windows runner, generate the library in the correct place while it used to be fine before (see
-        #       https://github.com/actions/runner-images/issues/10004). Normally, we would expect the library to be
-        #       created in _skbuild/win-amd64-3.12/cmake-build/src/bindings/python/Release/libopencor but for some
-        #       reasons it is created in _skbuild/win-amd64-3.12/cmake-build/src/bindings/python/Release. So, we need to
-        #       copy it to the correct place otherwise its installation will fail (besides the fact that we want to copy
-        #       it to our test directory so that we can test things properly).
-
-        add_custom_command(TARGET ${PYTHON_BINDINGS_TARGET} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PYTHON_BINDINGS_TARGET}>/../$<TARGET_FILE_NAME:${PYTHON_BINDINGS_TARGET}>
-                                                            $<TARGET_FILE:${PYTHON_BINDINGS_TARGET}>)
-    endif()
-
     add_custom_command(TARGET ${PYTHON_BINDINGS_TARGET} POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PYTHON_BINDINGS_TARGET}>
                                                         ${PYTHON_BINDINGS_DIR}/${CMAKE_PROJECT_NAME_LC}/$<TARGET_FILE_NAME:${PYTHON_BINDINGS_TARGET}>)
