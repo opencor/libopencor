@@ -21,7 +21,6 @@ limitations under the License.
 #include <nanobind/stl/vector.h>
 
 namespace nb = nanobind;
-using namespace nb::literals;
 
 void fileApi(nb::module_ &m)
 {
