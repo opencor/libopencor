@@ -36,7 +36,7 @@ void fileApi(nb::module_ &m)
         .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE)
         .export_values();
 
-    file.def(nb::new_(&libOpenCOR::File::create), "Create a File object.")
+    file.def(nb::new_(&libOpenCOR::File::create), "Create a File object.", nb::arg("file_name_or_url"))
         .def_prop_ro("type", &libOpenCOR::File::type, "Get the type of this File object.")
         .def_prop_ro("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_prop_ro("url", &libOpenCOR::File::url, "Get the URL for this File object.")

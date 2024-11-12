@@ -21,7 +21,6 @@ limitations under the License.
 #include <nanobind/stl/vector.h>
 
 namespace nb = nanobind;
-using namespace nb::literals;
 
 void sedApi(nb::module_ &m)
 {
@@ -45,22 +44,22 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedDocument, libOpenCOR::Logger> sedDocument(m, "SedDocument");
 
-    sedDocument.def(nb::new_(&libOpenCOR::SedDocument::create), "Create a SedDocument object.")
+    sedDocument.def(nb::new_(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", nb::arg("file") = nb::none())
         .def("serialise", nb::overload_cast<>(&libOpenCOR::SedDocument::serialise, nb::const_), "Get the serialised version of this SedDocument object.")
-        .def("serialise", nb::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, nb::const_), "base_path"_a, "Get the serialised version of this SedDocument object.")
+        .def("serialise", nb::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, nb::const_), "Get the serialised version of this SedDocument object.", nb::arg("base_path"))
         .def_prop_ro("has_models", &libOpenCOR::SedDocument::hasModels, "Return whether there are some models.")
         .def_prop_ro("models", &libOpenCOR::SedDocument::models, "Return the models.")
-        .def("add_model", &libOpenCOR::SedDocument::addModel, "model"_a.none(), "Add a model.")
-        .def("remove_model", &libOpenCOR::SedDocument::removeModel, "model"_a.none(), "Remove a model.")
+        .def("add_model", &libOpenCOR::SedDocument::addModel, "Add a model.", nb::arg("model").none())
+        .def("remove_model", &libOpenCOR::SedDocument::removeModel, "Remove a model.", nb::arg("model").none())
         .def_prop_ro("has_simulations", &libOpenCOR::SedDocument::hasSimulations, "Return whether there are some simulations.")
         .def_prop_ro("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
-        .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "simulation"_a.none(), "Add a simulation.")
-        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "simulation"_a.none(), "Remove a simulation.")
+        .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add a simulation.", nb::arg("simulation").none())
+        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.", nb::arg("simulation").none())
         .def_prop_ro("has_tasks", &libOpenCOR::SedDocument::hasTasks, "Return whether there are some tasks.")
         .def_prop_ro("tasks", &libOpenCOR::SedDocument::tasks, "Return the tasks.")
-        .def("add_task", &libOpenCOR::SedDocument::addTask, "task"_a.none(), "Add a task.")
-        .def("remove_task", &libOpenCOR::SedDocument::removeTask, "task"_a.none(), "Remove a task.")
-        .def("create_instance", &libOpenCOR::SedDocument::createInstance, "compiled"_a = true, "Create an instance of this SedDocument object.");
+        .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.", nb::arg("task").none())
+        .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.", nb::arg("task").none())
+        .def("create_instance", &libOpenCOR::SedDocument::createInstance, "Create an instance of this SedDocument object.", nb::arg("compiled") = true);
 
     // SedInstance API.
 
@@ -93,7 +92,7 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedModel, libOpenCOR::SedBase> sedModel(m, "SedModel");
 
-    sedModel.def(nb::new_(&libOpenCOR::SedModel::create), "Create a SedModel object.");
+    sedModel.def(nb::new_(&libOpenCOR::SedModel::create), "Create a SedModel object.", nb::arg("document"), nb::arg("file"));
 
     // SedOutput API.
 
@@ -104,34 +103,34 @@ void sedApi(nb::module_ &m)
     /*---GRY---
         nb::class_<libOpenCOR::SedRepeatedTask, libOpenCOR::SedAbstractTask> sedRepeatedTask(m, "SedRepeatedTask");
 
-        sedRepeatedTask.def(nb::new_(&libOpenCOR::SedRepeatedTask::create), "document"_a, "Create a SedRepeatedTask object.");
+        sedRepeatedTask.def(nb::new_(&libOpenCOR::SedRepeatedTask::create), "Create a SedRepeatedTask object.", nb::arg("document"));
     */
 
     // SedSimulation API.
 
     nb::class_<libOpenCOR::SedSimulation, libOpenCOR::SedBase> sedSimulation(m, "SedSimulation");
 
-    sedSimulation.def_prop_rw("ode_solver", &libOpenCOR::SedSimulation::odeSolver, &libOpenCOR::SedSimulation::setOdeSolver, "ode_solver"_a.none(), "The ODE solver for the SedSimulation object.")
-        .def_prop_rw("nla_solver", &libOpenCOR::SedSimulation::nlaSolver, &libOpenCOR::SedSimulation::setNlaSolver, "nla_solver"_a.none(), "The NLA solver for the SedSimulation object.");
+    sedSimulation.def_prop_rw("ode_solver", &libOpenCOR::SedSimulation::odeSolver, &libOpenCOR::SedSimulation::setOdeSolver, "The ODE solver for the SedSimulation object.", nb::arg("ode_solver").none())
+        .def_prop_rw("nla_solver", &libOpenCOR::SedSimulation::nlaSolver, &libOpenCOR::SedSimulation::setNlaSolver, "The NLA solver for the SedSimulation object.", nb::arg("nla_solver").none());
 
     // SedOneStep API.
 
     nb::class_<libOpenCOR::SedOneStep, libOpenCOR::SedSimulation> sedOneStep(m, "SedOneStep");
 
-    sedOneStep.def(nb::new_(&libOpenCOR::SedOneStep::create), "Create a SedOneStep object.")
+    sedOneStep.def(nb::new_(&libOpenCOR::SedOneStep::create), "Create a SedOneStep object.", nb::arg("document"))
         .def_prop_rw("step", &libOpenCOR::SedOneStep::step, &libOpenCOR::SedOneStep::setStep, "The step of the SedOneStep object.");
 
     // SedSteadyState API.
 
     nb::class_<libOpenCOR::SedSteadyState, libOpenCOR::SedSimulation> sedSteadyState(m, "SedSteadyState");
 
-    sedSteadyState.def(nb::new_(&libOpenCOR::SedSteadyState::create), "Create a SedSteadyState object.");
+    sedSteadyState.def(nb::new_(&libOpenCOR::SedSteadyState::create), "Create a SedSteadyState object.", nb::arg("document"));
 
     // SedUniformTimeCourse API.
 
     nb::class_<libOpenCOR::SedUniformTimeCourse, libOpenCOR::SedSimulation> sedUniformTimeCourse(m, "SedUniformTimeCourse");
 
-    sedUniformTimeCourse.def(nb::new_(&libOpenCOR::SedUniformTimeCourse::create), "Create a SedUniformTimeCourse object.")
+    sedUniformTimeCourse.def(nb::new_(&libOpenCOR::SedUniformTimeCourse::create), "Create a SedUniformTimeCourse object.", nb::arg("document"))
         .def_prop_rw("initial_time", &libOpenCOR::SedUniformTimeCourse::initialTime, &libOpenCOR::SedUniformTimeCourse::setInitialTime, "The initial time of the SedUniformTimeCourse object.")
         .def_prop_rw("output_start_time", &libOpenCOR::SedUniformTimeCourse::outputStartTime, &libOpenCOR::SedUniformTimeCourse::setOutputStartTime, "The output start time of the SedUniformTimeCourse object.")
         .def_prop_rw("output_end_time", &libOpenCOR::SedUniformTimeCourse::outputEndTime, &libOpenCOR::SedUniformTimeCourse::setOutputEndTime, "The output end time of the SedUniformTimeCourse object.")
@@ -145,7 +144,7 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedTask, libOpenCOR::SedAbstractTask> sedTask(m, "SedTask");
 
-    sedTask.def(nb::new_(&libOpenCOR::SedTask::create), "Create a SedTask object.")
-        .def_prop_rw("model", &libOpenCOR::SedTask::model, &libOpenCOR::SedTask::setModel, "model"_a.none(), "The model of the SedTask object.")
-        .def_prop_rw("simulation", &libOpenCOR::SedTask::simulation, &libOpenCOR::SedTask::setSimulation, "simulation"_a.none(), "The simulation of the SedTask object.");
+    sedTask.def(nb::new_(&libOpenCOR::SedTask::create), "Create a SedTask object.", nb::arg("document"), nb::arg("model"), nb::arg("simulation"))
+        .def_prop_rw("model", &libOpenCOR::SedTask::model, &libOpenCOR::SedTask::setModel, "The model of the SedTask object.", nb::arg("model").none())
+        .def_prop_rw("simulation", &libOpenCOR::SedTask::simulation, &libOpenCOR::SedTask::setSimulation, "The simulation of the SedTask object.", nb::arg("simulation").none());
 }
