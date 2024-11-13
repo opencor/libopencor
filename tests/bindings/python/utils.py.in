@@ -13,9 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import (
-    Issue,
-)
+import libopencor as oc
 import platform
 import pytest
 
@@ -67,9 +65,9 @@ def assert_issues(logger, expected_issues):
         assert issues[i].type == expected_issues[i][0]
         assert issues[i].description == expected_issues[i][1]
 
-        if issues[i].type == Issue.Type.Error:
+        if issues[i].type == oc.Issue.Type.Error:
             assert issues[i].type_as_string == "Error"
-        elif issues[i].type == Issue.Type.Warning:
+        elif issues[i].type == oc.Issue.Type.Warning:
             assert issues[i].type_as_string == "Warning"
         else:
             assert issues[i].type_as_string == "Message"

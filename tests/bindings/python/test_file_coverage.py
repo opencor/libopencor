@@ -13,35 +13,35 @@
 # limitations under the License.
 
 
-from libopencor import File
+import libopencor as oc
 import utils
 
 
 def test_empty_file():
-    file = File(utils.LOCAL_FILE)
+    file = oc.File(utils.LOCAL_FILE)
 
     file.contents = utils.string_to_list(utils.NO_CONTENTS)
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
 
 
 def test_http_remote_file():
-    File(utils.HTTP_REMOTE_FILE)
+    oc.File(utils.HTTP_REMOTE_FILE)
 
 
 def test_irretrievable_remote_file():
-    File(utils.IRRETRIEVABLE_REMOTE_FILE)
+    oc.File(utils.IRRETRIEVABLE_REMOTE_FILE)
 
 
 def test_same_local_file():
-    file1 = File(utils.LOCAL_FILE)
-    file2 = File(utils.LOCAL_FILE)
+    file1 = oc.File(utils.LOCAL_FILE)
+    file2 = oc.File(utils.LOCAL_FILE)
 
     assert file1.__subclasshook__ == file2.__subclasshook__
 
 
 def test_same_remote_file():
-    file1 = File(utils.REMOTE_FILE)
-    file2 = File(utils.REMOTE_FILE)
+    file1 = oc.File(utils.REMOTE_FILE)
+    file2 = oc.File(utils.REMOTE_FILE)
 
     assert file1.__subclasshook__ == file2.__subclasshook__

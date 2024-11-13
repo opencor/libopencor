@@ -13,14 +13,14 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue
+import libopencor as oc
 import utils
 from utils import assert_issues
 
 
 expected_unknown_file_issues = [
     [
-        Issue.Type.Error,
+        oc.Issue.Type.Error,
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
     ],
 ]
@@ -28,91 +28,91 @@ expected_unknown_file_issues = [
 
 def test_type_irretrievable_file():
     expected_non_existing_file_issues = [
-        [Issue.Type.Error, "The file does not exist."],
+        [oc.Issue.Type.Error, "The file does not exist."],
     ]
 
-    file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
+    file = oc.File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert_issues(file, expected_non_existing_file_issues)
 
 
 def test_type_unknown_file():
-    file = File(utils.resource_path(utils.UNKNOWN_FILE))
+    file = oc.File(utils.resource_path(utils.UNKNOWN_FILE))
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_sbml_file():
-    file = File(utils.resource_path(utils.SBML_FILE))
+    file = oc.File(utils.resource_path(utils.SBML_FILE))
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_error_sedml_file():
-    file = File(utils.resource_path(utils.ERROR_SEDML_FILE))
+    file = oc.File(utils.resource_path(utils.ERROR_SEDML_FILE))
 
-    assert file.type == File.Type.SedmlFile
+    assert file.type == oc.File.Type.SedmlFile
 
 
 def test_type_cellml_1_x_file():
-    file = File(utils.resource_path(utils.CELLML_1_X_FILE))
+    file = oc.File(utils.resource_path(utils.CELLML_1_X_FILE))
 
-    assert file.type == File.Type.CellmlFile
+    assert file.type == oc.File.Type.CellmlFile
 
 
 def test_type_sedml_1_x_file():
-    file = File(utils.resource_path(utils.SEDML_1_X_FILE))
+    file = oc.File(utils.resource_path(utils.SEDML_1_X_FILE))
 
-    assert file.type == File.Type.SedmlFile
+    assert file.type == oc.File.Type.SedmlFile
 
 
 def test_type_combine_1_x_archive():
-    file = File(utils.resource_path(utils.COMBINE_1_X_ARCHIVE))
+    file = oc.File(utils.resource_path(utils.COMBINE_1_X_ARCHIVE))
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == oc.File.Type.CombineArchive
 
 
 def test_type_cellml_2_file():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
+    file = oc.File(utils.resource_path(utils.CELLML_2_FILE))
 
-    assert file.type == File.Type.CellmlFile
+    assert file.type == oc.File.Type.CellmlFile
 
 
 def test_type_sedml_2_file():
-    file = File(utils.resource_path(utils.SEDML_2_FILE))
+    file = oc.File(utils.resource_path(utils.SEDML_2_FILE))
 
-    assert file.type == File.Type.SedmlFile
+    assert file.type == oc.File.Type.SedmlFile
 
 
 def test_type_combine_2_archive():
-    file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
+    file = oc.File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
 
-    assert file.type == File.Type.CombineArchive
+    assert file.type == oc.File.Type.CombineArchive
 
 
 def test_type_unknown_virtual_file():
-    file = File(utils.LOCAL_FILE)
+    file = oc.File(utils.LOCAL_FILE)
 
     file.contents = utils.string_to_list(utils.SOME_UNKNOWN_CONTENTS)
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_cellml_virtual_file():
-    file = File(utils.LOCAL_FILE)
+    file = oc.File(utils.LOCAL_FILE)
 
     file.contents = utils.string_to_list(utils.SOME_CELLML_CONTENTS)
 
-    assert file.type == File.Type.CellmlFile
+    assert file.type == oc.File.Type.CellmlFile
 
 
 def test_type_sedml_virtual_file():
-    file = File(utils.LOCAL_FILE)
+    file = oc.File(utils.LOCAL_FILE)
 
     file.contents = utils.string_to_list(utils.SOME_SEDML_CONTENTS)
 
-    assert file.type == File.Type.SedmlFile
+    assert file.type == oc.File.Type.SedmlFile

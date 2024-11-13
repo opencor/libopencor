@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue, SedDocument, SolverCvode
+import libopencor as oc
 from math import *
 import ode_model
 import utils
@@ -23,13 +23,13 @@ from utils import assert_issues
 def test_maximum_step_value_with_invalid_number():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The maximum step cannot be equal to -1.234. It must be greater or equal to 0.",
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
@@ -43,13 +43,13 @@ def test_maximum_step_value_with_invalid_number():
 def test_maximum_number_of_steps_value_with_invalid_number():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The maximum number of steps cannot be equal to 0. It must be greater than 0.",
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
@@ -63,17 +63,17 @@ def test_maximum_number_of_steps_value_with_invalid_number():
 def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_small():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Banded
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
     solver.upper_half_bandwidth = -1
 
     instance = document.create_instance()
@@ -84,17 +84,17 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_sma
 def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_big():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Banded
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
     solver.upper_half_bandwidth = 4
 
     instance = document.create_instance()
@@ -105,17 +105,17 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_big
 def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_small():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Banded
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
     solver.lower_half_bandwidth = -1
 
     instance = document.create_instance()
@@ -126,17 +126,17 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_sma
 def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_big():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Banded
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
     solver.lower_half_bandwidth = 4
 
     instance = document.create_instance()
@@ -147,13 +147,13 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_big
 def test_relative_tolerance_value_with_invalid_number():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
@@ -167,13 +167,13 @@ def test_relative_tolerance_value_with_invalid_number():
 def test_absolute_tolerance_value_with_invalid_number():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
         ]
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
@@ -193,8 +193,8 @@ def cvode_solve(
     variable_abs_tols,
     compiled,
 ):
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
 
     ode_model.run(
         document,
@@ -368,8 +368,8 @@ def test_solve_without_interpolate_solution():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
@@ -432,12 +432,12 @@ def test_solve_with_adams_moulton_integration_method():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.integration_method = SolverCvode.IntegrationMethod.AdamsMoulton
+    solver.integration_method = oc.SolverCvode.IntegrationMethod.AdamsMoulton
 
     ode_model.run(
         document,
@@ -496,12 +496,12 @@ def test_solve_with_functional_iteration_type():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.iteration_type = SolverCvode.IterationType.Functional
+    solver.iteration_type = oc.SolverCvode.IterationType.Functional
 
     ode_model.run(
         document,
@@ -560,12 +560,12 @@ def test_solve_with_banded_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Banded
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
 
     ode_model.run(
         document,
@@ -624,12 +624,12 @@ def test_solve_with_diagonal_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Diagonal
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Diagonal
 
     ode_model.run(
         document,
@@ -688,12 +688,12 @@ def test_solve_with_gmres_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Gmres
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Gmres
 
     ode_model.run(
         document,
@@ -752,12 +752,12 @@ def test_solve_with_bicgstab_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Bicgstab
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Bicgstab
 
     ode_model.run(
         document,
@@ -816,12 +816,12 @@ def test_solve_with_tfqmr_linear_solver():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Tfqmr
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Tfqmr
 
     ode_model.run(
         document,
@@ -880,13 +880,13 @@ def test_solve_with_gmres_linear_solver_and_no_preconditioner():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Gmres
-    solver.preconditioner = SolverCvode.Preconditioner.No
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Gmres
+    solver.preconditioner = oc.SolverCvode.Preconditioner.No
 
     ode_model.run(
         document,
@@ -945,13 +945,13 @@ def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Bicgstab
-    solver.preconditioner = SolverCvode.Preconditioner.No
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Bicgstab
+    solver.preconditioner = oc.SolverCvode.Preconditioner.No
 
     ode_model.run(
         document,
@@ -1010,13 +1010,13 @@ def test_solve_with_tfqmr_linear_solver_and_no_preconditioner():
         0.000001,
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Tfqmr
-    solver.preconditioner = SolverCvode.Preconditioner.No
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Tfqmr
+    solver.preconditioner = oc.SolverCvode.Preconditioner.No
 
     ode_model.run(
         document,
