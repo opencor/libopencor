@@ -116,16 +116,24 @@ find_package(Doxygen)
 
 # Look for Python.
 
-add_subdirectory(extern/pybind11)
+if (CMAKE_VERSION VERSION_LESS 3.18)
+    set(NB_PYTHON_DEV_MODULE Development)
+else()
+    set(NB_PYTHON_DEV_MODULE Development.Module)
+endif()
 
-mark_as_advanced(PYBIND11_FINDPYTHON
-                 PYBIND11_INSTALL
-                 PYBIND11_INTERNALS_VERSION
-                 PYBIND11_NOPYTHON
-                 PYBIND11_PYTHON_VERSION
-                 PYBIND11_PYTHONLIBS_OVERWRITE
-                 PYBIND11_SIMPLE_GIL_MANAGEMENT
-                 PYBIND11_TEST)
+find_package(Python 3.9
+             COMPONENTS Interpreter ${NB_PYTHON_DEV_MODULE}
+             OPTIONAL_COMPONENTS Development.SABIModule)
+
+add_subdirectory(extern/nanobind)
+
+mark_as_advanced(NB_CREATE_INSTALL_RULES
+                 NB_TEST
+                 NB_TEST_SANITZE
+                 NB_TEST_SHARED_BUILD
+                 NB_TEST_STABLE_ABI
+                 nanobind_DIR)
 
 # Look for various programs.
 
@@ -168,8 +176,8 @@ if(DOXYGEN_EXECUTABLE)
     set(DOXYGEN_EXE ${DOXYGEN_EXECUTABLE})
 endif()
 
-if(PYTHON_EXECUTABLE)
-    set(PYTHON_EXE ${PYTHON_EXECUTABLE})
+if(Python_EXECUTABLE)
+    set(PYTHON_EXE ${Python_EXECUTABLE})
 endif()
 
 # Check some compiler flags.
@@ -296,7 +304,7 @@ if(PRETTIER_EXE)
     set(JAVASCRIPT_FORMATTING_AVAILABLE TRUE)
 endif()
 
-if(PYTHON_LIBRARIES)
+if(TARGET Python::Module AND TARGET Python::Interpreter)
     set(PYTHON_BINDINGS_AVAILABLE TRUE)
 else()
     set(PYTHON_BINDINGS_ERROR_MESSAGE "Python bindings are requested but Python libraries could not be found.")

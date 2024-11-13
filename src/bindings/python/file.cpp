@@ -16,18 +16,19 @@ limitations under the License.
 
 #include <libopencor>
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include <nanobind/stl/shared_ptr.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
-void fileApi(py::module_ &m)
+void fileApi(nb::module_ &m)
 {
     // File API.
 
-    py::class_<libOpenCOR::File, libOpenCOR::Logger, libOpenCOR::FilePtr> file(m, "File");
+    nb::class_<libOpenCOR::File, libOpenCOR::Logger> file(m, "File");
 
-    py::enum_<libOpenCOR::File::Type>(file, "Type")
+    nb::enum_<libOpenCOR::File::Type>(file, "Type")
         .value("UnknownFile", libOpenCOR::File::Type::UNKNOWN_FILE)
         .value("CellmlFile", libOpenCOR::File::Type::CELLML_FILE)
         .value("SedmlFile", libOpenCOR::File::Type::SEDML_FILE)
@@ -35,10 +36,10 @@ void fileApi(py::module_ &m)
         .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE)
         .export_values();
 
-    file.def(py::init(&libOpenCOR::File::create), "Create a File object.", py::arg("file_name_or_url"))
-        .def_property_readonly("type", &libOpenCOR::File::type, "Get the type of this File object.")
-        .def_property_readonly("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
-        .def_property_readonly("url", &libOpenCOR::File::url, "Get the URL for this File object.")
-        .def_property_readonly("path", &libOpenCOR::File::path, "Get the path for this File object.")
-        .def_property("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.");
+    file.def(nb::new_(&libOpenCOR::File::create), "Create a File object.", nb::arg("file_name_or_url"))
+        .def_prop_ro("type", &libOpenCOR::File::type, "Get the type of this File object.")
+        .def_prop_ro("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
+        .def_prop_ro("url", &libOpenCOR::File::url, "Get the URL for this File object.")
+        .def_prop_ro("path", &libOpenCOR::File::path, "Get the path for this File object.")
+        .def_prop_rw("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.");
 }
