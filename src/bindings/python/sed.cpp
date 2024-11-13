@@ -44,7 +44,11 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedDocument, libOpenCOR::Logger> sedDocument(m, "SedDocument");
 
-    sedDocument.def(nb::new_(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", nb::arg("file") = nb::none())
+    sedDocument.def(nb::new_([]() {
+                        return libOpenCOR::SedDocument::create();
+                    }),
+                    "Create a SedDocument object.")
+        .def(nb::new_(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", nb::arg("file").none())
         .def("serialise", nb::overload_cast<>(&libOpenCOR::SedDocument::serialise, nb::const_), "Get the serialised version of this SedDocument object.")
         .def("serialise", nb::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, nb::const_), "Get the serialised version of this SedDocument object.", nb::arg("base_path"))
         .def_prop_ro("has_models", &libOpenCOR::SedDocument::hasModels, "Return whether there are some models.")

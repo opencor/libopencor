@@ -23,6 +23,10 @@ def test_no_file():
 
     assert document.has_issues == False
 
+    document = oc.SedDocument(None)
+
+    assert document.has_issues == False
+
 
 def test_unknown_file():
     expected_issues = [
