@@ -16,20 +16,20 @@ limitations under the License.
 
 #include <libopencor>
 
-#include <pybind11/pybind11.h>
+#include <nanobind/nanobind.h>
 
-namespace py = pybind11;
+namespace nb = nanobind;
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
-void fileApi(py::module_ &m);
-void loggerApi(py::module_ &m);
-void sedApi(py::module_ &m);
-void solverApi(py::module_ &m);
-void versionApi(py::module_ &m);
+void fileApi(nb::module_ &m);
+void loggerApi(nb::module_ &m);
+void sedApi(nb::module_ &m);
+void solverApi(nb::module_ &m);
+void versionApi(nb::module_ &m);
 
-PYBIND11_MODULE(module, m)
+NB_MODULE(module, m)
 {
     // Version.
 
