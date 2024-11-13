@@ -13,30 +13,30 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue
+import libopencor as oc
 import platform
 import utils
 from utils import assert_issues
 
 
 expected_non_existing_file_issues = [
-    [Issue.Type.Error, "The file does not exist."],
+    [oc.Issue.Type.Error, "The file does not exist."],
 ]
 expected_non_downloadable_file_issues = [
-    [Issue.Type.Error, "The file could not be downloaded."],
+    [oc.Issue.Type.Error, "The file could not be downloaded."],
 ]
 expected_unknown_file_issues = [
     [
-        Issue.Type.Error,
+        oc.Issue.Type.Error,
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
     ],
 ]
 
 
 def test_local_file():
-    file = File(utils.LOCAL_FILE)
+    file = oc.File(utils.LOCAL_FILE)
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert file.file_name == utils.LOCAL_FILE
     assert file.url == ""
     assert file.path == utils.LOCAL_FILE
@@ -46,11 +46,11 @@ def test_local_file():
 
 def test_relative_local_file():
     if platform.system() == "Windows":
-        file = File("some\\.\\relative\\..\\..\\path\\.\\..\\dir\\file.txt")
+        file = oc.File("some\\.\\relative\\..\\..\\path\\.\\..\\dir\\file.txt")
     else:
-        file = File("some/./relative/../../path/./../dir/file.txt")
+        file = oc.File("some/./relative/../../path/./../dir/file.txt")
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
 
     if platform.system() == "Windows":
         assert file.file_name == "dir\\file.txt"
@@ -70,11 +70,11 @@ def test_relative_local_file():
 
 def test_url_based_local_file():
     if platform.system() == "Windows":
-        file = File("file:///P:/some/path/file.txt")
+        file = oc.File("file:///P:/some/path/file.txt")
     else:
-        file = File("file:///some/path/file.txt")
+        file = oc.File("file:///some/path/file.txt")
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert file.file_name == utils.LOCAL_FILE
     assert file.url == ""
     assert file.path == utils.LOCAL_FILE
@@ -83,9 +83,9 @@ def test_url_based_local_file():
 
 
 def test_remote_file():
-    file = File(utils.REMOTE_FILE)
+    file = oc.File(utils.REMOTE_FILE)
 
-    assert file.type == File.Type.CellmlFile
+    assert file.type == oc.File.Type.CellmlFile
     assert file.file_name != ""
     assert file.url == utils.REMOTE_FILE
     assert file.path == utils.REMOTE_FILE
@@ -93,9 +93,9 @@ def test_remote_file():
 
 
 def test_local_virtual_file():
-    file = File(utils.LOCAL_FILE)
+    file = oc.File(utils.LOCAL_FILE)
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert file.file_name == utils.LOCAL_FILE
     assert file.url == ""
     assert file.path == utils.LOCAL_FILE
@@ -106,15 +106,15 @@ def test_local_virtual_file():
 
     file.contents = some_unknown_contents_list
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_remote_virtual_file():
-    file = File(utils.IRRETRIEVABLE_REMOTE_FILE)
+    file = oc.File(utils.IRRETRIEVABLE_REMOTE_FILE)
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert file.file_name == ""
     assert file.url == utils.IRRETRIEVABLE_REMOTE_FILE
     assert file.path == utils.IRRETRIEVABLE_REMOTE_FILE
@@ -125,6 +125,6 @@ def test_remote_virtual_file():
 
     file.contents = some_unknown_contents_list
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
     assert_issues(file, expected_unknown_file_issues)

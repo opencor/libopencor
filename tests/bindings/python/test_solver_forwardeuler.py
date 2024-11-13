@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue, SedDocument, SolverForwardEuler
+import libopencor as oc
 import ode_model
 import utils
 from utils import assert_issues
@@ -22,15 +22,15 @@ from utils import assert_issues
 def test_step_value_with_invalid_number():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The step cannot be equal to 0. It must be greater than 0.",
         ],
     ]
 
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
-    solver = SolverForwardEuler()
+    solver = oc.SolverForwardEuler()
 
     solver.step = 0.0
 
@@ -52,10 +52,10 @@ def forward_euler_solve(
     variable_abs_tols,
     compiled,
 ):
-    file = File(utils.resource_path("api/solver/ode.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
-    solver = SolverForwardEuler()
+    solver = oc.SolverForwardEuler()
 
     solver.step = 0.0123
 
