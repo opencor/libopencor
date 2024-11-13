@@ -13,13 +13,13 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue, SedDocument
+import libopencor as oc
 import utils
 from utils import assert_issues
 
 
 def test_no_file():
-    document = SedDocument()
+    document = oc.SedDocument()
 
     assert document.has_issues == False
 
@@ -27,20 +27,20 @@ def test_no_file():
 def test_unknown_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "A simulation experiment description cannot be created using an unknown file.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.UNKNOWN_FILE))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.UNKNOWN_FILE))
+    document = oc.SedDocument(file)
 
     assert_issues(document, expected_issues)
 
 
 def test_cellml_file():
-    file = File(utils.resource_path(utils.CELLML_2_FILE))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.CELLML_2_FILE))
+    document = oc.SedDocument(file)
 
     assert document.has_issues == False
 
@@ -48,13 +48,13 @@ def test_cellml_file():
 def test_sedml_file():
     expected_issues = [
         [
-            Issue.Type.Message,
+            oc.Issue.Type.Message,
             "A simulation experiment description cannot (currently) be created using a SED-ML file.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.SEDML_2_FILE))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.SEDML_2_FILE))
+    document = oc.SedDocument(file)
 
     assert_issues(document, expected_issues)
 
@@ -62,13 +62,13 @@ def test_sedml_file():
 def test_combine_archive():
     expected_issues = [
         [
-            Issue.Type.Message,
+            oc.Issue.Type.Message,
             "A simulation experiment description cannot (currently) be created using a COMBINE archive.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.COMBINE_2_ARCHIVE))
+    document = oc.SedDocument(file)
 
     assert_issues(document, expected_issues)
 
@@ -76,12 +76,12 @@ def test_combine_archive():
 def test_irretrievable_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "A simulation experiment description cannot be created using an irretrievable file.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.IRRETRIEVABLE_FILE))
+    document = oc.SedDocument(file)
 
     assert_issues(document, expected_issues)

@@ -13,30 +13,22 @@
 # limitations under the License.
 
 
-from libopencor import (
-    Solver,
-    SolverCvode,
-    SolverForwardEuler,
-    SolverFourthOrderRungeKutta,
-    SolverHeun,
-    SolverKinsol,
-    SolverSecondOrderRungeKutta,
-)
+import libopencor as oc
 
 
 def test_cvode_solver():
-    solver = SolverCvode()
+    solver = oc.SolverCvode()
 
-    assert solver.type == Solver.Type.Ode
+    assert solver.type == oc.Solver.Type.Ode
     assert solver.id == "KISAO:0000019"
     assert solver.name == "CVODE"
 
     assert solver.maximum_step == 0.0
     assert solver.maximum_number_of_steps == 500
-    assert solver.integration_method == SolverCvode.IntegrationMethod.Bdf
-    assert solver.iteration_type == SolverCvode.IterationType.Newton
-    assert solver.linear_solver == SolverCvode.LinearSolver.Dense
-    assert solver.preconditioner == SolverCvode.Preconditioner.Banded
+    assert solver.integration_method == oc.SolverCvode.IntegrationMethod.Bdf
+    assert solver.iteration_type == oc.SolverCvode.IterationType.Newton
+    assert solver.linear_solver == oc.SolverCvode.LinearSolver.Dense
+    assert solver.preconditioner == oc.SolverCvode.Preconditioner.Banded
     assert solver.upper_half_bandwidth == 0
     assert solver.lower_half_bandwidth == 0
     assert solver.relative_tolerance == 1.0e-7
@@ -45,10 +37,10 @@ def test_cvode_solver():
 
     solver.maximum_step = 1.23
     solver.maximum_number_of_steps = 123
-    solver.integration_method = SolverCvode.IntegrationMethod.AdamsMoulton
-    solver.iteration_type = SolverCvode.IterationType.Functional
-    solver.linear_solver = SolverCvode.LinearSolver.Gmres
-    solver.preconditioner = SolverCvode.Preconditioner.No
+    solver.integration_method = oc.SolverCvode.IntegrationMethod.AdamsMoulton
+    solver.iteration_type = oc.SolverCvode.IterationType.Functional
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Gmres
+    solver.preconditioner = oc.SolverCvode.Preconditioner.No
     solver.upper_half_bandwidth = 3
     solver.lower_half_bandwidth = 5
     solver.relative_tolerance = 1.23e-5
@@ -57,10 +49,10 @@ def test_cvode_solver():
 
     assert solver.maximum_step == 1.23
     assert solver.maximum_number_of_steps == 123
-    assert solver.integration_method == SolverCvode.IntegrationMethod.AdamsMoulton
-    assert solver.iteration_type == SolverCvode.IterationType.Functional
-    assert solver.linear_solver == SolverCvode.LinearSolver.Gmres
-    assert solver.preconditioner == SolverCvode.Preconditioner.No
+    assert solver.integration_method == oc.SolverCvode.IntegrationMethod.AdamsMoulton
+    assert solver.iteration_type == oc.SolverCvode.IterationType.Functional
+    assert solver.linear_solver == oc.SolverCvode.LinearSolver.Gmres
+    assert solver.preconditioner == oc.SolverCvode.Preconditioner.No
     assert solver.upper_half_bandwidth == 3
     assert solver.lower_half_bandwidth == 5
     assert solver.relative_tolerance == 1.23e-5
@@ -69,9 +61,9 @@ def test_cvode_solver():
 
 
 def test_forward_euler_solver():
-    solver = SolverForwardEuler()
+    solver = oc.SolverForwardEuler()
 
-    assert solver.type == Solver.Type.Ode
+    assert solver.type == oc.Solver.Type.Ode
     assert solver.id == "KISAO:0000030"
     assert solver.name == "Forward Euler"
 
@@ -83,9 +75,9 @@ def test_forward_euler_solver():
 
 
 def test_fourth_order_runge_kutta_solver():
-    solver = SolverFourthOrderRungeKutta()
+    solver = oc.SolverFourthOrderRungeKutta()
 
-    assert solver.type == Solver.Type.Ode
+    assert solver.type == oc.Solver.Type.Ode
     assert solver.id == "KISAO:0000032"
     assert solver.name == "Fourth-order Runge-Kutta"
 
@@ -97,9 +89,9 @@ def test_fourth_order_runge_kutta_solver():
 
 
 def test_heun_solver():
-    solver = SolverHeun()
+    solver = oc.SolverHeun()
 
-    assert solver.type == Solver.Type.Ode
+    assert solver.type == oc.Solver.Type.Ode
     assert solver.id == "KISAO:0000301"
     assert solver.name == "Heun"
 
@@ -111,32 +103,32 @@ def test_heun_solver():
 
 
 def test_kinsol_solver():
-    solver = SolverKinsol()
+    solver = oc.SolverKinsol()
 
-    assert solver.type == Solver.Type.Nla
+    assert solver.type == oc.Solver.Type.Nla
     assert solver.id == "KISAO:0000282"
     assert solver.name == "KINSOL"
 
     assert solver.maximum_number_of_iterations == 200
-    assert solver.linear_solver == SolverKinsol.LinearSolver.Dense
+    assert solver.linear_solver == oc.SolverKinsol.LinearSolver.Dense
     assert solver.upper_half_bandwidth == 0
     assert solver.lower_half_bandwidth == 0
 
     solver.maximum_number_of_iterations = 123
-    solver.linear_solver = SolverKinsol.LinearSolver.Gmres
+    solver.linear_solver = oc.SolverKinsol.LinearSolver.Gmres
     solver.upper_half_bandwidth = 3
     solver.lower_half_bandwidth = 5
 
     assert solver.maximum_number_of_iterations == 123
-    assert solver.linear_solver == SolverKinsol.LinearSolver.Gmres
+    assert solver.linear_solver == oc.SolverKinsol.LinearSolver.Gmres
     assert solver.upper_half_bandwidth == 3
     assert solver.lower_half_bandwidth == 5
 
 
 def test_second_order_runge_kutta_solver():
-    solver = SolverSecondOrderRungeKutta()
+    solver = oc.SolverSecondOrderRungeKutta()
 
-    assert solver.type == Solver.Type.Ode
+    assert solver.type == oc.Solver.Type.Ode
     assert solver.id == "KISAO:0000381"
     assert solver.name == "Second-order Runge-Kutta"
 
