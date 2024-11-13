@@ -192,8 +192,8 @@ class_<Vector> bind_vector(handle scope, const char *name, Args &&...args) {
     }
 
     if constexpr (detail::is_equality_comparable_v<Value>) {
-        cl.def(self == self, sig("def __eq__(self, arg: object, /) -> bool"))
-          .def(self != self, sig("def __ne__(self, arg: object, /) -> bool"))
+        cl.def(self == self)
+          .def(self != self)
 
           .def("__contains__",
                [](const Vector &v, const Value &x) {

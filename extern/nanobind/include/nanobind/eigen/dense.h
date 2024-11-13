@@ -104,7 +104,7 @@ using array_for_eigen_t = ndarray<
             ndim_v<T> == 1 || T::IsRowMajor,
             c_contig,
             f_contig>,
-        unused>>;
+        any_contig>>;
 
 /// Any kind of Eigen class
 template <typename T> constexpr bool is_eigen_v = is_base_of_template_v<T, Eigen::EigenBase>;
@@ -293,7 +293,7 @@ struct type_caster<Eigen::Map<T, Options, StrideType>,
         return true;
     }
 
-    static handle from_cpp(const Map &v, rv_policy policy, cleanup_list *cleanup) noexcept {
+    static handle from_cpp(const Map &v, rv_policy, cleanup_list *cleanup) noexcept {
         size_t shape[ndim_v<T>];
         int64_t strides[ndim_v<T>];
 
@@ -309,11 +309,7 @@ struct type_caster<Eigen::Map<T, Options, StrideType>,
 
         return NDArrayCaster::from_cpp(
             NDArray((void *) v.data(), ndim_v<T>, shape, handle(), strides),
-            (policy == rv_policy::automatic ||
-             policy == rv_policy::automatic_reference)
-                ? rv_policy::reference
-                : policy,
-            cleanup);
+            rv_policy::reference, cleanup);
     }
 
     StrideType strides() const {
@@ -322,13 +318,11 @@ struct type_caster<Eigen::Map<T, Options, StrideType>,
 
         int64_t inner = caster.value.stride(0),
                 outer;
-
         if constexpr (ndim_v<T> == 1)
             outer = caster.value.shape(0);
         else
             outer = caster.value.stride(1);
 
-        (void) inner; (void) outer;
         if constexpr (ndim_v<T> == 2 && T::IsRowMajor)
             std::swap(inner, outer);
 
@@ -446,7 +440,7 @@ struct type_caster<Eigen::Ref<T, Options, StrideType>,
         return false;
     }
 
-    static handle from_cpp(const Ref &v, rv_policy policy, cleanup_list *cleanup) noexcept {
+    static handle from_cpp(const Ref &v, rv_policy, cleanup_list *cleanup) noexcept {
         // Copied from the Eigen::Map caster
 
         size_t shape[ndim_v<T>];
@@ -464,11 +458,7 @@ struct type_caster<Eigen::Ref<T, Options, StrideType>,
 
         return NDArrayCaster::from_cpp(
             NDArray((void *) v.data(), ndim_v<T>, shape, handle(), strides),
-            (policy == rv_policy::automatic ||
-             policy == rv_policy::automatic_reference)
-                ? rv_policy::reference
-                : policy,
-            cleanup);
+            rv_policy::reference, cleanup);
     }
 
     operator Ref() {

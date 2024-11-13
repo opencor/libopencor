@@ -27,16 +27,12 @@ endif()
 option(NB_CREATE_INSTALL_RULES "Create installation rules" ${NB_MASTER_PROJECT})
 option(NB_USE_SUBMODULE_DEPS   "Use the nanobind dependencies shipped as a git submodule of this repository" ON)
 
-option(NB_TEST               "Compile nanobind tests?" ${NB_MASTER_PROJECT})
-option(NB_TEST_STABLE_ABI    "Test the stable ABI interface?" OFF)
-option(NB_TEST_SHARED_BUILD  "Build a shared nanobind library for the test suite?" OFF)
-option(NB_TEST_CUDA          "Force the use of the CUDA/NVCC compiler for testing purposes" OFF)
-option(NB_TEST_FREE_THREADED "Build free-threaded extensions for the test suite?" ON)
+option(NB_TEST              "Compile nanobind tests?" ${NB_MASTER_PROJECT})
+option(NB_TEST_STABLE_ABI   "Test the stable ABI interface?" OFF)
+option(NB_TEST_SHARED_BUILD "Build a shared nanobind library for the test suite?" OFF)
 
 if (NOT MSVC)
-  option(NB_TEST_SANITIZERS_ASAN  "Build tests with the address sanitizer?" OFF)
-  option(NB_TEST_SANITIZERS_UBSAN "Build tests with the address undefined behavior sanitizer?" OFF)
-  option(NB_TEST_SANITIZERS_TSAN  "Build tests with the thread sanitizer?" OFF)
+  option(NB_TEST_SANITZE    "Build tests with address and undefined behavior sanitizers?" OFF)
 endif()
 
 # ---------------------------------------------------------------------------
@@ -128,6 +124,20 @@ if (NB_MASTER_PROJECT AND NOT NB_TEST)
   return()
 else()
   enable_language(CXX)
+endif()
+
+# ---------------------------------------------------------------------------
+# Compile with a few more compiler warnings turned on
+# ---------------------------------------------------------------------------
+
+if (MSVC)
+  if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  else()
+    add_compile_options(/W4)
+  endif()
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  add_compile_options(-Wall -Wextra -Wno-unused-local-typedefs)
 endif()
 
 # ---------------------------------------------------------------------------

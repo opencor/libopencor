@@ -133,30 +133,21 @@ struct num_item {
 };
 
 struct num_item_list {
-    #if defined(Py_GIL_DISABLED)
-          static constexpr bool cache_dec_ref = true;
-    #else
-          static constexpr bool cache_dec_ref = false;
-    #endif
-
+    static constexpr bool cache_dec_ref = false;
     using key_type = Py_ssize_t;
 
     NB_INLINE static void get(PyObject *obj, Py_ssize_t index, PyObject **cache) {
-        #if defined(Py_GIL_DISABLED)
-            *cache = PyList_GetItemRef(obj, index);
-        #else
-            *cache = NB_LIST_GET_ITEM(obj, index);
-        #endif
+        *cache = NB_LIST_GET_ITEM(obj, index);
     }
 
     NB_INLINE static void set(PyObject *obj, Py_ssize_t index, PyObject *v) {
-#if defined(Py_LIMITED_API) || defined(NB_FREE_THREADED)
-        Py_INCREF(v);
-        PyList_SetItem(obj, index, v);
-#else
+#if !defined(Py_LIMITED_API)
+        // Handle differences between PyList_SetItem and PyList_SET_ITEM
         PyObject *old = NB_LIST_GET_ITEM(obj, index);
+#endif
         Py_INCREF(v);
         NB_LIST_SET_ITEM(obj, index, v);
+#if !defined(Py_LIMITED_API)
         Py_DECREF(old);
 #endif
     }

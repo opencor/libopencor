@@ -44,7 +44,7 @@ class AClass:
         pass
 
     @classmethod
-    def class_method(cls, x):
+    def class_method(x):
         pass
 
     @typing.overload
@@ -66,3 +66,5 @@ class AClass:
 
     def overloaded_2(self, x):
         "docstr 3"
+
+del typing

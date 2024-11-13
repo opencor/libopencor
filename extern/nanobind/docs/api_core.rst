@@ -790,10 +790,6 @@ Wrapper classes
       Return an item iterator that returns ``std::pair<handle, handle>``
       key-value pairs analogous to ``iter(dict.items())`` in Python.
 
-      In free-threaded Python, the :cpp:class:``detail::dict_iterator`` class
-      acquires a lock to the underlying dictionary to enable the use of the
-      efficient but thread-unsafe ``PyDict_Next()`` Python C traversal routine.
-
    .. cpp:function:: detail::dict_iterator end() const
 
       Return a sentinel that ends the iteration.
@@ -1032,7 +1028,7 @@ Wrapper classes
 
    .. cpp:function:: bytes(handle h)
 
-      Performs a cast within Python. This is equivalent to
+      Performs a cast within Python. This is equivalent equivalent to
       the Python expression ``bytes(h)``.
 
    .. cpp:function:: bytes(const char * s)
@@ -1054,42 +1050,6 @@ Wrapper classes
    .. cpp:function:: const void * data() const
 
       Convert a Python ``bytes`` object into a byte buffer of length :cpp:func:`bytes::size()` bytes.
-
-
-.. cpp:class:: bytearray: public object
-
-   This wrapper class represents Python ``bytearray`` instances.
-
-   .. cpp:function:: bytearray()
-
-      Create an empty ``bytearray``.
-
-   .. cpp:function:: bytearray(handle h)
-
-      Performs a cast within Python. This is equivalent to
-      the Python expression ``bytearray(h)``.
-
-   .. cpp:function:: bytearray(const void * buf, size_t n)
-
-      Convert a byte buffer ``buf`` of length ``n`` bytes into a Python ``bytearray`` object.  The buffer can contain embedded null bytes.
-
-   .. cpp:function:: const char * c_str() const
-
-      Convert a Python ``bytearray`` object into a null-terminated C-style string.
-
-   .. cpp:function:: size_t size() const
-
-      Return the size in bytes.
-
-   .. cpp:function:: const void * data() const
-
-      Convert a Python ``bytearray`` object into a byte buffer of length :cpp:func:`bytearray::size()` bytes.
-
-   .. cpp:function:: void resize(size_t n)
-
-      Resize the internal buffer of a Python ``bytearray`` object to ``n``. Any
-      space added by this method, which calls `PyByteArray_Resize`, will not be
-      initialized and may contain random data.
 
 
 .. cpp:class:: type_object: public object
@@ -1538,7 +1498,7 @@ Casting
 
    Convert the C++ object ``value`` into a Python object. The return value
    policy `policy` is used to handle ownership-related questions when a new
-   Python object must be created. A valid `parent` object is required when
+   Python object must be created. A valid `parent` object is required when 
    specifying a `reference_internal` return value policy.
 
    The function raises a :cpp:type:`cast_error` when the conversion fails.
@@ -1620,9 +1580,7 @@ parameter of :cpp:func:`module_::def`, :cpp:func:`class_::def`,
 
    .. cpp:function:: template <typename T> arg_v operator=(T &&value) const
 
-      Return an argument annotation that is like this one but also assigns a
-      default value to the argument. The default will be converted into a Python
-      object immediately, so its bindings must have already been defined.
+      Assign a default value to the argument.
 
    .. cpp:function:: arg &none(bool value = true)
 
@@ -1644,12 +1602,6 @@ parameter of :cpp:func:`module_::def`, :cpp:func:`class_::def`,
       explain it in docstrings and stubs (``str(value)``) does not produce
       acceptable output.
 
-   .. cpp:function:: arg_locked lock()
-
-      Return an argument annotation that is like this one but also requests that
-      this argument be locked when dispatching a function call in free-threaded
-      Python extensions. It does nothing in regular GIL-protected extensions.
-
 .. cpp:struct:: is_method
 
    Indicate that the bound function is a method.
@@ -1667,12 +1619,6 @@ parameter of :cpp:func:`module_::def`, :cpp:func:`class_::def`,
 .. cpp:struct:: is_implicit
 
    Indicate that the bound constructor can be used to perform implicit conversions.
-
-.. cpp:struct:: lock_self
-
-   Indicate that the implicit ``self`` argument of a method should be locked
-   when dispatching a call in a free-threaded extension. This annotation does
-   nothing in regular GIL-protected extensions.
 
 .. cpp:struct:: template <typename... Ts> call_guard
 
@@ -1893,7 +1839,9 @@ parameter of :cpp:func:`module_::def`, :cpp:func:`class_::def`,
 
 .. cpp:struct:: template <typename T> for_setter
 
+
    Analogous to :cpp:struct:`for_getter`, but for setters.
+
 
 .. _class_binding_annotations:
 
@@ -1978,33 +1926,14 @@ The following annotations can be specified using the variable-length
 
 .. cpp:struct:: is_arithmetic
 
-   Indicate that the enumeration supports arithmetic operations.  This enables
-   both unary (``-``, ``~``, ``abs()``) and binary (``+``, ``-``, ``*``,
-   ``//``, ``&``, ``|``, ``^``, ``<<``, ``>>``) operations with operands of
-   either enumeration or numeric types.
-
-   The result will be as if the operands were first converted to integers. (So
-   ``Shape(2) + Shape(1) == 3`` and ``Shape(2) * 1.5 == 3.0``.) It is
-   unspecified whether operations on mixed enum types (such as ``Shape.Circle +
-   Color.Red``) are permissible.
-
-   Passing this annotation changes the Python enumeration parent class to
-   either :py:class:`enum.IntEnum` or :py:class:`enum.IntFlag`, depending on
-   whether or not the flag enumeration attribute is also specified (see
-   :cpp:class:`is_flag`).
-
-.. cpp:struct:: is_flag
-
-   Indicate that the enumeration supports bit-wise operations.  This enables the
-   operators (``|``, ``&``, ``^``, and ``~``) with two enumerators as operands.
-
-   The result has the same type as the operands, i.e., ``Shape(2) | Shape(1)``
-   will be equivalent to ``Shape(3)``.
-
-   Passing this annotation changes the Python enumeration parent class to
-   either :py:class:`enum.IntFlag` or :py:class:`enum.Flag`, depending on
-   whether or not the enumeration is also marked to support arithmetic
-   operations (see :cpp:class:`is_arithmetic`).
+   Indicate that the enumeration may be used with arithmetic
+   operations.  This enables the binary operators ``+ - * // & | ^ <<
+   >>`` and unary ``- ~ abs()``, with operands of either enumeration
+   or numeric type; the result will be as if the enumeration operands
+   were first converted to integers. (So ``Shape(2) + Shape(1) == 3`` and
+   ``Shape(2) * 1.5 == 3.0``.) It is unspecified whether operations on
+   mixed enum types (such as ``Shape.Circle + Color.Red``) are
+   permissible.
 
 Function binding
 ----------------
@@ -2568,102 +2497,9 @@ running it in parallel from multiple Python threads.
 
       Release the GIL (**must** be currently held)
 
-      In :ref:`free-threaded extensions <free-threaded>`, this operation also
-      temporarily releases all :ref:`argument locks <argument-locks>` held by
-      the current thread.
-
    .. cpp:function:: ~gil_scoped_release()
 
       Reacquire the GIL
-
-Free-threading
---------------
-
-Nanobind provides abstractions to implement *additional* locking that is
-needed to ensure the correctness of free-threaded Python extensions.
-
-.. cpp:struct:: ft_mutex
-
-   Object-oriented wrapper representing a `PyMutex
-   <https://docs.python.org/3.13/c-api/init.html#c.PyMutex>`__. It can be
-   slightly more efficient than OS/language-provided primitives (e.g.,
-   ``std::thread``, ``pthread_mutex_t``) and should generally be preferred when
-   adding critical sections to Python bindings.
-
-   In Python builds *without* free-threading, this class does nothing. It has
-   no attributes and the :cpp:func:`lock` and :cpp:func:`unlock` functions
-   return immediately.
-
-   .. cpp:function:: ft_mutex()
-
-      Create a new (unlocked) mutex.
-
-   .. cpp:function:: void lock()
-
-      Acquire the mutex.
-
-   .. cpp:function:: void unlock()
-
-      Release the mutex.
-
-.. cpp:struct:: ft_lock_guard
-
-   This class provides a RAII lock guard analogous to ``std::lock_guard`` and
-   ``std::unique_lock``.
-
-   .. cpp:function:: ft_lock_guard(ft_mutex &mutex)
-
-      Call :cpp:func:`mutex.lock() <ft_mutex::lock>` (no-op in non-free-threaded builds).
-
-   .. cpp:function:: ~ft_lock_guard()
-
-      Call :cpp:func:`mutex.unlock() <ft_mutex::unlock>` (no-op in non-free-threaded builds).
-
-.. cpp:struct:: ft_object_guard
-
-   This class provides a RAII guard that locks a single Python object within a
-   local scope (in contrast to :cpp:class:`ft_lock_guard`, which locks a
-   mutex).
-
-   It is a thin wrapper around the Python `critical section API
-   <https://docs.python.org/3.13/c-api/init.html#c.Py_BEGIN_CRITICAL_SECTION>`__.
-   Please refer to the Python documentation for details on the semantics of
-   this relaxed form of critical section (in particular, Python critical sections
-   may release previously held locks).
-
-   In Python builds *without* free-threading, this class does nothing---the
-   constructor and destructor return immediately.
-
-   .. cpp:function:: ft_object_guard(handle h)
-
-      Lock the object ``h`` (no-op in non-free-threaded builds)
-
-   .. cpp:function:: ~ft_object_guard()
-
-      Unlock the object ``h`` (no-op in non-free-threaded builds)
-
-.. cpp:struct:: ft_object2_guard
-
-   This class provides a RAII guard that locks *two* Python object within a
-   local scope (in contrast to :cpp:class:`ft_lock_guard`, which locks a
-   mutex).
-
-   It is a thin wrapper around the Python `critical section API
-   <https://docs.python.org/3.13/c-api/init.html#c.Py_BEGIN_CRITICAL_SECTION2>`__.
-   Please refer to the Python documentation for details on the semantics of
-   this relaxed form of critical section (in particular, Python critical sections
-   may release previously held locks).
-
-   In Python builds *without* free-threading, this class does nothing---the
-   constructor and destructor return immediately.
-
-   .. cpp:function:: ft_object2_guard(handle h1, handle h2)
-
-      Lock the objects ``h1`` and ``h2`` (no-op in non-free-threaded builds)
-
-   .. cpp:function:: ~ft_object2_guard()
-
-      Unlock the objects ``h1`` and ``h2`` (no-op in non-free-threaded builds)
 
 Low-level type and instance access
 ----------------------------------
@@ -2861,15 +2697,6 @@ The documentation below refers to two per-instance flags with the following mean
 
 Global flags
 ------------
-
-.. cpp:function:: bool leak_warnings() noexcept
-
-   Returns whether nanobind warns if any nanobind instances, types, or
-   functions are still alive when the Python interpreter shuts down.
-
-.. cpp:function:: bool implicit_cast_warnings() noexcept
-
-   Returns whether nanobind warns if an implicit conversion was not successful.
 
 .. cpp:function:: void set_leak_warnings(bool value) noexcept
 

@@ -22,7 +22,7 @@
 #endif
 
 #define NB_VERSION_MAJOR 2
-#define NB_VERSION_MINOR 2
+#define NB_VERSION_MINOR 1
 #define NB_VERSION_PATCH 0
 #define NB_VERSION_DEV   0 // A value > 0 indicates a development release
 
@@ -48,10 +48,10 @@
 #include "nb_error.h"
 #include "nb_attr.h"
 #include "nb_cast.h"
-#include "nb_misc.h"
 #include "nb_call.h"
 #include "nb_func.h"
 #include "nb_class.h"
+#include "nb_misc.h"
 
 #if defined(_MSC_VER)
 #  pragma warning(pop)
