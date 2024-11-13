@@ -68,26 +68,6 @@ def test05_signature():
         "doc_2"
     )
 
-    assert t.test_05b.__doc__ == (
-        "test_05b(arg: int, /) -> int\n"
-        "test_05b(arg: float, /) -> int\n"
-        "\n"
-        "doc_1"
-    )
-
-    assert t.test_05c.__doc__ == (
-        "test_05c(arg: int, /) -> int\n"
-        "test_05c(arg: float, /) -> int\n"
-        "\n"
-        "Overloaded function.\n"
-        "\n"
-        "1. ``test_05c(arg: int, /) -> int``\n"
-        "\n"
-        "doc_1\n"
-        "\n"
-        "2. ``test_05c(arg: float, /) -> int``\n"
-    )
-
     assert t.test_07.__doc__ == (
         f"test_07(arg0: int, arg1: int, /, *args, **kwargs) -> {TYPING_TUPLE}[int, int]\n"
         f"test_07(a: int, b: int, *myargs, **mykwargs) -> {TYPING_TUPLE}[int, int]"
@@ -310,6 +290,7 @@ def test28_ellipsis():
 
 def test29_traceback():
     result = t.test_30(fail_fn)
+    print(result)
     regexp = r'Traceback \(most recent call last\):\n.*\n  File "[^"]*", line [0-9]*, in fail_fn\n.*RuntimeError: Foo'
     matches = re.findall(regexp, result, re.MULTILINE | re.DOTALL)
     assert len(matches) == 1
@@ -617,36 +598,3 @@ def test43_wrappers_set():
 def test44_hash():
     value = (1, 2, 3)
     assert t.hash_it(value) == hash(value);
-
-
-def test45_new():
-    assert t.test_bytearray_new() == bytearray()
-    assert t.test_bytearray_new("\x00\x01\x02\x03", 4) == bytearray(
-        b"\x00\x01\x02\x03"
-    )
-    assert t.test_bytearray_new("", 0) == bytearray()
-
-
-def test46_copy():
-    o = bytearray(b"\x00\x01\x02\x03")
-    c = t.test_bytearray_copy(o)
-    assert c == o
-    o.clear()
-    assert c != o
-
-
-def test47_c_str():
-    o = bytearray(b"Hello, world!")
-    assert t.test_bytearray_c_str(o) == "Hello, world!"
-
-
-def test48_size():
-    o = bytearray(b"Hello, world!")
-    assert t.test_bytearray_size(o) == len(o)
-
-
-def test49_resize():
-    o = bytearray(b"\x00\x01\x02\x03")
-    assert len(o) == 4
-    t.test_bytearray_resize(o, 8)
-    assert len(o) == 8

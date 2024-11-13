@@ -147,10 +147,6 @@
 #    error "nanobind requires a newer PyPy version (>= 7.3.10)"
 #endif
 
-#if defined(NB_FREE_THREADED) && !defined(Py_GIL_DISABLED)
-#    error "Free-threaded extensions require a free-threaded version of Python"
-#endif
-
 #if defined(NB_DOMAIN)
 #  define NB_DOMAIN_STR NB_TOSTRING(NB_DOMAIN)
 #else
@@ -172,11 +168,6 @@
 #  define NB_TYPE_FROM_METACLASS_IMPL 1
 #  define NB_TYPE_GET_SLOT_IMPL 1
 #endif
-
-#define NB_NONCOPYABLE(X)                                                      \
-    X(const X &) = delete;                                                     \
-    X &operator=(const X &) = delete;
-
 
 #define NB_MODULE_IMPL(name)                                                   \
     extern "C" [[maybe_unused]] NB_EXPORT PyObject *PyInit_##name();           \

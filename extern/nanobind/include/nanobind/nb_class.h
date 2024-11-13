@@ -58,10 +58,14 @@ enum class type_flags : uint32_t {
     /// The class implements __class_getitem__ similar to typing.Generic
     is_generic               = (1 << 15),
 
-    /// Does the type implement a custom __new__ operator?
-    has_new                  = (1 << 16)
+    /// Is this an arithmetic enumeration?
+    is_arithmetic            = (1 << 16),
 
-    // Two more bits bits available without needing a larger reorganization
+    /// Is the number type underlying the enumeration signed?
+    is_signed                = (1 << 17)
+
+    // One more flag bits available (18) without needing
+    // a larger reorganization
 };
 
 /// Flags about a type that are only relevant when it is being created.
@@ -99,10 +103,6 @@ struct type_data {
     const std::type_info *type;
     PyTypeObject *type_py;
     nb_alias_chain *alias_chain;
-#if defined(Py_LIMITED_API)
-    PyObject* (*vectorcall)(PyObject *, PyObject * const*, size_t, PyObject *);
-#endif
-    void *init; // Constructor nb_func
     void (*destruct)(void *);
     void (*copy)(void *, const void *);
     void (*move)(void *, void *) noexcept;
@@ -122,8 +122,8 @@ struct type_data {
     void (*set_self_py)(void *, PyObject *) noexcept;
     bool (*keep_shared_from_this_alive)(PyObject *) noexcept;
 #if defined(Py_LIMITED_API)
-    uint32_t dictoffset;
-    uint32_t weaklistoffset;
+    size_t dictoffset;
+    size_t weaklistoffset;
 #endif
 };
 
@@ -189,17 +189,6 @@ NB_INLINE void type_extra_apply(type_init_data &t, supplement<T>) {
     t.supplement = sizeof(T);
 }
 
-enum class enum_flags : uint32_t {
-    /// Is this an arithmetic enumeration?
-    is_arithmetic            = (1 << 1),
-
-    /// Is the number type underlying the enumeration signed?
-    is_signed                = (1 << 2),
-
-    /// Is the underlying enumeration type Flag?
-    is_flag                = (1 << 3)
-};
-
 struct enum_init_data {
     const std::type_info *type;
     PyObject *scope;
@@ -209,11 +198,7 @@ struct enum_init_data {
 };
 
 NB_INLINE void enum_extra_apply(enum_init_data &e, is_arithmetic) {
-    e.flags |= (uint32_t) enum_flags::is_arithmetic;
-}
-
-NB_INLINE void enum_extra_apply(enum_init_data &e, is_flag) {
-    e.flags |= (uint32_t) enum_flags::is_flag;
+    e.flags |= (uint32_t) type_flags::is_arithmetic;
 }
 
 NB_INLINE void enum_extra_apply(enum_init_data &e, const char *doc) {
@@ -283,13 +268,13 @@ inline size_t type_align(handle h) { return detail::nb_type_align(h.ptr()); }
 inline const std::type_info& type_info(handle h) { return *detail::nb_type_info(h.ptr()); }
 template <typename T>
 inline T &type_supplement(handle h) { return *(T *) detail::nb_type_supplement(h.ptr()); }
-inline str type_name(handle h) { return steal<str>(detail::nb_type_name(h.ptr())); }
+inline str type_name(handle h) { return steal<str>(detail::nb_type_name(h.ptr())); };
 
 // Low level access to nanobind instance objects
 inline bool inst_check(handle h) { return type_check(h.type()); }
 inline str inst_name(handle h) {
     return steal<str>(detail::nb_inst_name(h.ptr()));
-}
+};
 inline object inst_alloc(handle h) {
     return steal(detail::nb_inst_alloc((PyTypeObject *) h.ptr()));
 }
@@ -435,7 +420,6 @@ struct new_<Func, Return(Args...)> {
         auto wrapper = [func = (detail::forward_t<Func>) func](handle, Args... args) {
             return func((detail::forward_t<Args>) args...);
         };
-
         if constexpr ((std::is_base_of_v<arg, Extra> || ...)) {
             // If any argument annotations are specified, add another for the
             // extra class argument that we don't forward to Func, so visible
@@ -731,7 +715,7 @@ public:
         ed.scope = scope.ptr();
         ed.name = name;
         ed.flags = std::is_signed_v<Underlying>
-                       ? (uint32_t) detail::enum_flags::is_signed
+                       ? (uint32_t) detail::type_flags::is_signed
                        : 0;
         (detail::enum_extra_apply(ed, extra), ...);
         m_ptr = detail::enum_create(&ed);
@@ -743,6 +727,7 @@ public:
     }
 
     NB_INLINE enum_ &export_values() { detail::enum_export(m_ptr); return *this; }
+
 
     template <typename Func, typename... Extra>
     NB_INLINE enum_ &def(const char *name_, Func &&f, const Extra &... extra) {

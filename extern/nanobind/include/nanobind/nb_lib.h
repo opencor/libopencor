@@ -16,7 +16,8 @@ NAMESPACE_BEGIN(detail)
 
 // Forward declarations for types in ndarray.h (2)
 struct ndarray_handle;
-struct ndarray_config;
+struct ndarray_req;
+enum class ndarray_framework : int;
 
 /**
  * Helper class to clean temporaries created by function dispatch.
@@ -130,14 +131,6 @@ NB_CORE PyObject *bytes_from_cstr(const char *c);
 
 /// Convert a memory region into a Python byte string
 NB_CORE PyObject *bytes_from_cstr_and_size(const void *c, size_t n);
-
-// ========================================================================
-
-/// Convert a Python object into a Python byte array
-NB_CORE PyObject *bytearray_from_obj(PyObject *o);
-
-/// Convert a memory region into a Python byte array
-NB_CORE PyObject *bytearray_from_cstr_and_size(const void *c, size_t n);
 
 // ========================================================================
 
@@ -460,8 +453,7 @@ NB_CORE PyObject *module_new_submodule(PyObject *base, const char *name,
 // ========================================================================
 
 // Try to import a reference-counted ndarray object via DLPack
-NB_CORE ndarray_handle *ndarray_import(PyObject *o,
-                                       const ndarray_config *c,
+NB_CORE ndarray_handle *ndarray_import(PyObject *o, const ndarray_req *req,
                                        bool convert,
                                        cleanup_list *cleanup) noexcept;
 
@@ -469,9 +461,8 @@ NB_CORE ndarray_handle *ndarray_import(PyObject *o,
 NB_CORE ndarray_handle *ndarray_create(void *value, size_t ndim,
                                        const size_t *shape, PyObject *owner,
                                        const int64_t *strides,
-                                       dlpack::dtype dtype, bool ro,
-                                       int device, int device_id,
-                                       char order);
+                                       dlpack::dtype *dtype, bool ro,
+                                       int32_t device, int32_t device_id);
 
 /// Increase the reference count of the given ndarray object; returns a pointer
 /// to the underlying DLTensor
@@ -481,8 +472,8 @@ NB_CORE dlpack::dltensor *ndarray_inc_ref(ndarray_handle *) noexcept;
 NB_CORE void ndarray_dec_ref(ndarray_handle *) noexcept;
 
 /// Wrap a ndarray_handle* into a PyCapsule
-NB_CORE PyObject *ndarray_export(ndarray_handle *, int framework,
-                                 rv_policy policy, cleanup_list *cleanup) noexcept;
+NB_CORE PyObject *ndarray_wrap(ndarray_handle *, ndarray_framework framework,
+                               rv_policy policy, cleanup_list *cleanup) noexcept;
 
 /// Check if an object represents an ndarray
 NB_CORE bool ndarray_check(PyObject *o) noexcept;
@@ -525,8 +516,6 @@ NB_CORE void decref_checked(PyObject *o) noexcept;
 
 // ========================================================================
 
-NB_CORE bool leak_warnings() noexcept;
-NB_CORE bool implicit_cast_warnings() noexcept;
 NB_CORE void set_leak_warnings(bool value) noexcept;
 NB_CORE void set_implicit_cast_warnings(bool value) noexcept;
 
@@ -554,8 +543,6 @@ NB_CORE bool is_alive() noexcept;
 #if NB_TYPE_GET_SLOT_IMPL
 NB_CORE void *type_get_slot(PyTypeObject *t, int slot_id);
 #endif
-
-NB_CORE PyObject *dict_get_item_ref_or_fail(PyObject *d, PyObject *k);
 
 NAMESPACE_END(detail)
 

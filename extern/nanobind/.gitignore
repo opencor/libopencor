@@ -1,15 +1,11 @@
 libnanobind-static.a
 libnanobind-static-abi3.a
-libnanobind-static-ft.a
-libnanobind.so
-libnanobind-abi3.so
-libnanobind-ft.so
 libnanobind.dylib
+libnanobind.so
 libnanobind-abi3.dylib
-libnanobind-ft.dylib
+libnanobind-abi3.so
 nanobind.dll
 nanobind-abi3.dll
-nanobind-ft.dll
 
 libinter_module.dylib
 libinter_module.so
@@ -31,7 +27,6 @@ compile_commands.json
 CMakeFiles
 CMakeCache.txt
 cmake_install.cmake
-nanobind-config-version.cmake
 \.DS_Store
 \.cmake
 __pycache__

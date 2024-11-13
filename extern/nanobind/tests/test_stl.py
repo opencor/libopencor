@@ -306,7 +306,6 @@ def test31_std_function_roundtrip():
 # cpyext reference cycles are not supported, see https://foss.heptapod.net/pypy/pypy/-/issues/3849
 @skip_on_pypy
 def test32_std_function_gc():
-    # Test class -> function -> class cyclic reference
     class A(t.FuncWrapper):
         pass
 
@@ -317,29 +316,18 @@ def test32_std_function_gc():
     collect()
     assert t.FuncWrapper.alive == 0
 
-    # t.FuncWrapper is a C extension type with a custom property 'f', which
-    # can store Python function objects It implements the tp_traverse
-    # callback so that reference cycles arising from this function object
-    # can be detected.
-
-    class Test(t.FuncWrapper):
+    # A class -> function -> class cyclic reference
+    class B(t.FuncWrapper):
         def __init__(self):
             super().__init__()
 
-            # The constructor creates a closure, which references 'self'
-            # and assigns it to the 'self.f' member.
-            # This creates a cycle self -> self.f -> self
             def f():
                 print(self.f)
 
             self.f = f
 
-
-    # The Test class declared above inherits from 'FuncWrapper'.
-    # This class keeps track of how many references are alive at
-    # any point to help track down leak issues.
     assert t.FuncWrapper.alive == 0
-    b = Test()
+    b = B()
     assert t.FuncWrapper.alive == 1
     del b
     collect()
@@ -487,6 +475,7 @@ def test48_std_variant_ret_var_none():
     assert t.variant_ret_var_none() is None
 
     rv_t = union("None", "test_stl_ext.Copyable", "int")
+    print(t.variant_ret_var_none.__doc__)
     assert t.variant_ret_var_none.__doc__ == (f"variant_ret_var_none() -> {rv_t}")
 
 

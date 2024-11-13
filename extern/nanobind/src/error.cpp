@@ -15,7 +15,6 @@
 NAMESPACE_BEGIN(NB_NAMESPACE)
 NAMESPACE_BEGIN(detail)
 
-// Protected by internals->mutex in free-threaded builds
 Buffer buf(128);
 
 NAMESPACE_END(detail)
@@ -117,15 +116,13 @@ void python_error::restore() noexcept {
 #endif
 
 const char *python_error::what() const noexcept {
-    using namespace nanobind::detail;
+    using detail::buf;
 
     // Return the existing error message if already computed once
     if (m_what)
         return m_what;
 
     gil_scoped_acquire acq;
-    // 'buf' is protected by internals->mutex in free-threaded builds
-    lock_internals guard(internals);
 
     // Try again with GIL held
     if (m_what)
@@ -150,7 +147,7 @@ const char *python_error::what() const noexcept {
 #if defined(Py_LIMITED_API) || defined(PYPY_VERSION)
     object mod = module_::import_("traceback"),
            result = mod.attr("format_exception")(exc_type, exc_value, exc_traceback);
-    m_what = strdup_check(borrow<str>(str("\n").attr("join")(result)).c_str());
+    m_what = detail::strdup_check(borrow<str>(str("\n").attr("join")(result)).c_str());
 #else
     buf.clear();
     if (exc_traceback.is_valid()) {
@@ -163,7 +160,7 @@ const char *python_error::what() const noexcept {
         PyFrameObject *frame = to->tb_frame;
         Py_XINCREF(frame);
 
-        std::vector<PyFrameObject *, py_allocator<PyFrameObject *>> frames;
+        std::vector<PyFrameObject *, detail::py_allocator<PyFrameObject *>> frames;
 
         while (frame) {
             frames.push_back(frame);

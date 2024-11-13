@@ -19,13 +19,7 @@
 // in order to be able to handle errors better.
 
 #if !defined(Py_LIMITED_API) && !defined(PYPY_VERSION)
-#  include <datetime.h>
-#endif
-
-#if defined(__GNUC__)
-// warning: warning: declaration of '...' with attribute 'noinline' follows inline declaration
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Wattributes"
+#include <datetime.h>
 #endif
 
 NAMESPACE_BEGIN(NB_NAMESPACE)
@@ -293,7 +287,3 @@ inline PyObject* pack_datetime(int year, int month, int day,
 }
 
 #endif // !defined(Py_LIMITED_API) && !defined(PYPY_VERSION)
-//
-#if defined(__GNUC__)
-#  pragma GCC diagnostic pop
-#endif

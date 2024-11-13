@@ -99,9 +99,9 @@ Instances expose fields and methods of both types as expected:
 Automatic downcasting
 ---------------------
 
-nanobind obeys signatures when returning regular non-polymorphic C++ objects
-from functions: building on the :ref:`previous example <inheritance>`, consider
-the following function that returns a ``Dog`` object as a ``Pet`` base pointer.
+nanobind obeys type signature when returning regular non-polymorphic C++ objects:
+building on the :ref:`previous example <inheritance>`, consider the following
+function that returns a ``Dog`` object as a ``Pet`` base pointer.
 
 .. code-block:: cpp
 
@@ -295,15 +295,8 @@ C++11-style strongly typed enumerations.
 
    When the annotation :cpp:class:`nb::is_arithmetic() <is_arithmetic>` is
    passed to :cpp:class:`nb::enum_\<T\> <enum_>`, the resulting Python type
-   will support arithmetic and bit-level operations (and, or,
-   xor, negation).  The operands of these operations may be either enumerators.
-   When the annotation :cpp:class:`nb::is_flag() <is_flag>` is passed to
-   :cpp:class:`nb::enum_\<T\> <enum_>`, the resulting Python type will be a class
-   derived from ``enum.Flag``, meaning its enumerators can be combined using bit-wise
-   operators in a type-safe way: the result will have the same enumeration type
-   as the operands, and only enumerators of the same type can be combined.
-   When passing both ``is_arithmetic`` and ``is_flag``, the resulting Python type
-   will be ``enum.IntFlag``, supporting both arithmetic and bit-wise operations.
+   will support arithmetic and bit-level operations like comparisons, and, or,
+   xor, negation, etc.
 
    .. code-block:: cpp
 

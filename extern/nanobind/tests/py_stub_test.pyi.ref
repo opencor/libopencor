@@ -3,6 +3,8 @@ from typing import TypeVar, overload
 
 
 class AClass:
+    __annotations__: dict = {'STATIC_VAR' : int}
+
     STATIC_VAR: int = 5
 
     class NestedClass:
@@ -15,8 +17,8 @@ class AClass:
     @staticmethod
     def static_method(x): ...
 
-    @classmethod
-    def class_method(cls, x): ...
+    @staticmethod
+    def class_method(x): ...
 
     @overload
     def overloaded(self, x: int) -> None:

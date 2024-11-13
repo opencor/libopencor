@@ -38,8 +38,7 @@ class_<Map> bind_map(handle scope, const char *name, Args &&...args) {
     using Key = typename Map::key_type;
     using Value = typename Map::mapped_type;
 
-    using ValueRef = typename detail::iterator_value_access<
-        typename Map::iterator>::result_type;
+    using ValueRef = typename detail::iterator_value_access<typename Map::iterator>::result_type;
 
     static_assert(
         !detail::is_base_caster_v<detail::make_caster<Value>> ||
@@ -130,8 +129,8 @@ class_<Map> bind_map(handle scope, const char *name, Args &&...args) {
     }
 
     if constexpr (detail::is_equality_comparable_v<Map>) {
-        cl.def(self == self, sig("def __eq__(self, arg: object, /) -> bool"))
-          .def(self != self, sig("def __ne__(self, arg: object, /) -> bool"));
+        cl.def(self == self)
+          .def(self != self);
     }
 
     // Item, value, and key views
