@@ -44,17 +44,29 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedDocument, libOpenCOR::Logger> sedDocument(m, "SedDocument");
 
+    sedDocument.def(nb::new_([]() {
+                        return libOpenCOR::SedDocument::create();
+                    }),
+                    "Create a SedDocument object.")
+        .def(nb::new_(&libOpenCOR::SedDocument::create), "Create a SedDocument object.", nb::arg("file").none())
+        .def("serialise", nb::overload_cast<>(&libOpenCOR::SedDocument::serialise, nb::const_), "Get the serialised version of this SedDocument object.")
+        .def("serialise", nb::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, nb::const_), "Get the serialised version of this SedDocument object.", nb::arg("base_path"))
+        .def_prop_ro("has_models", &libOpenCOR::SedDocument::hasModels, "Return whether there are some models.")
+        .def_prop_ro("model_count", &libOpenCOR::SedDocument::modelCount, "Return the number of models.")
+        .def_prop_ro("models", &libOpenCOR::SedDocument::models, "Return the models.")
+        .def("add_model", &libOpenCOR::SedDocument::addModel, "Add a model.", nb::arg("model").none())
+        .def("remove_model", &libOpenCOR::SedDocument::removeModel, "Remove a model.", nb::arg("model").none())
         .def_prop_ro("has_simulations", &libOpenCOR::SedDocument::hasSimulations, "Return whether there are some simulations.")
         .def_prop_ro("simulation_count", &libOpenCOR::SedDocument::simulationCount, "Return the number of simulations.")
         .def_prop_ro("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
-        .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add a simulation.")
-        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.")
+        .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add a simulation.", nb::arg("simulation").none())
+        .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.", nb::arg("simulation").none())
         .def_prop_ro("has_tasks", &libOpenCOR::SedDocument::hasTasks, "Return whether there are some tasks.")
         .def_prop_ro("task_count", &libOpenCOR::SedDocument::taskCount, "Return the number of tasks.")
         .def_prop_ro("tasks", &libOpenCOR::SedDocument::tasks, "Return the tasks.")
-        .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.")
-        .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.")
-        .def("create_instance", &libOpenCOR::SedDocument::createInstance, "Create an instance of this SedDocument object.", nb::arg("compiled") = true);
+        .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.", nb::arg("task").none())
+        .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.", nb::arg("task").none())
+        .def("instantiate", &libOpenCOR::SedDocument::instantiate, "Instantiate this SedDocument object.", nb::arg("compiled") = true);
 
     // SedInstance API.
 
@@ -119,7 +131,7 @@ void sedApi(nb::module_ &m)
 
     // SedAnalysis API.
 
-    nb::class_<libOpenCOR::SedAnalysis, libOpenCOR::SedSimulation, libOpenCOR::SedAnalysisPtr> sedAnalysis(m, "SedAnalysis");
+    nb::class_<libOpenCOR::SedAnalysis, libOpenCOR::SedSimulation> sedAnalysis(m, "SedAnalysis");
 
     sedAnalysis.def(nb::new_(&libOpenCOR::SedAnalysis::create), "Create a SedAnalysis object.", nb::arg("document"));
 

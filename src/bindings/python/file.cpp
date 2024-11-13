@@ -50,7 +50,7 @@ void fileApi(nb::module_ &m)
 
     // FileManager API.
 
-    nb::class_<libOpenCOR::FileManager, std::unique_ptr<libOpenCOR::FileManager, nb::nodelete>> fileManager(m, "FileManager");
+    nb::class_<libOpenCOR::FileManager> fileManager(m, "FileManager");
 
     fileManager.def_static("instance", &libOpenCOR::FileManager::instance, "Get the file manager instance.")
         .def("manage", &libOpenCOR::FileManager::manage, "Manage the requested file.", nb::arg("file"))
