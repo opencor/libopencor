@@ -184,7 +184,7 @@ endif()
 
 # Let libOpenCOR know whether unit testing is enabled.
 
-if(LIBOPENCOR_UNIT_TESTING OR LIBOPENCOR_PYTHON_UNIT_TESTING)
+if(LIBOPENCOR_UNIT_TESTING)
     target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
                                UNIT_TESTING_ENABLED)
 endif()
