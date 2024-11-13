@@ -66,6 +66,16 @@ public:
 
     static SedModelPtr create(const SedDocumentPtr &pDocument, const FilePtr &pFile);
 
+    /**
+     * @brief Get the file.
+     *
+     * Get the file for the @ref SedModel object.
+     *
+     * @return The file, as a smart pointer to a @ref File object.
+     */
+
+    FilePtr file() const;
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

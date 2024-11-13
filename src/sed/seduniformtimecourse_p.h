@@ -32,6 +32,18 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument);
 
+    double initialTime() const;
+    void setInitialTime(double pInitialTime);
+
+    double outputStartTime() const;
+    void setOutputStartTime(double pOutputStartTime);
+
+    double outputEndTime() const;
+    void setOutputEndTime(double pOutputEndTime);
+
+    int numberOfSteps() const;
+    void setNumberOfSteps(int pNumberOfSteps);
+
     void serialise(xmlNodePtr pNode) const override;
 };
 

@@ -18,30 +18,40 @@ import utils
 
 
 def test_empty_file():
-    file = oc.File(utils.LOCAL_FILE)
+    file = oc.File(utils.LocalFile)
 
-    file.contents = utils.string_to_list(utils.NO_CONTENTS)
+    file.contents = utils.string_to_list(utils.NoContents)
 
     assert file.type == oc.File.Type.UnknownFile
 
 
-def test_http_remote_file():
-    oc.File(utils.HTTP_REMOTE_FILE)
+def test_file_with_null_character():
+    file = oc.File(utils.LocalFile)
+
+    file.contents = utils.string_to_list("\0")
+
+    assert file.type == oc.File.Type.UnknownFile
+
+
+def test_sedml_file_with_no_parent():
+    file = oc.File(utils.Sedml2File)
+
+    file.contents = utils.string_to_list(utils.SomeSedmlContents)
 
 
 def test_irretrievable_remote_file():
-    oc.File(utils.IRRETRIEVABLE_REMOTE_FILE)
+    oc.File(utils.IrretrievableRemoteFile)
 
 
 def test_same_local_file():
-    file1 = oc.File(utils.LOCAL_FILE)
-    file2 = oc.File(utils.LOCAL_FILE)
+    file1 = oc.File(utils.LocalFile)
+    file2 = oc.File(utils.LocalFile)
 
     assert file1.__subclasshook__ == file2.__subclasshook__
 
 
 def test_same_remote_file():
-    file1 = oc.File(utils.REMOTE_FILE)
-    file2 = oc.File(utils.REMOTE_FILE)
+    file1 = oc.File(utils.RemoteFile)
+    file2 = oc.File(utils.RemoteFile)
 
     assert file1.__subclasshook__ == file2.__subclasshook__

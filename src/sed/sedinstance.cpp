@@ -88,6 +88,27 @@ void SedInstance::Impl::run()
     }
 }
 
+#ifdef __EMSCRIPTEN__
+void SedInstance::Impl::removeAllInitialConditions() //---ISAN---
+{
+    for (const auto &task : mTasks) {
+        task->pimpl()->removeAllInitialConditions();
+    }
+}
+
+void SedInstance::Impl::addInitialCondition(const std::string &pParameter, double pValue) //---ISAN---
+{
+    for (const auto &task : mTasks) {
+        task->pimpl()->addInitialCondition(pParameter, pValue);
+    }
+}
+#endif
+
+SedInstanceTaskPtrs SedInstance::Impl::tasks() const
+{
+    return mTasks;
+}
+
 SedInstance::SedInstance(const SedDocumentPtr &pDocument, bool pCompiled)
     : Logger(new Impl(pDocument, pCompiled))
 {
@@ -113,9 +134,21 @@ void SedInstance::run()
     pimpl()->run();
 }
 
+#ifdef __EMSCRIPTEN__
+void SedInstance::removeAllInitialConditions() //---ISAN---
+{
+    pimpl()->removeAllInitialConditions();
+}
+
+void SedInstance::addInitialCondition(const std::string &pParameter, double pValue) //---ISAN---
+{
+    pimpl()->addInitialCondition(pParameter, pValue);
+}
+#endif
+
 SedInstanceTaskPtrs SedInstance::tasks() const
 {
-    return pimpl()->mTasks;
+    return pimpl()->tasks();
 }
 
 } // namespace libOpenCOR

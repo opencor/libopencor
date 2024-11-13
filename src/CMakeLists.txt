@@ -81,9 +81,11 @@ endif()
 
 set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/file.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/issue.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/logger.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedabstracttask.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedanalysis.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedbase.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatadescription.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatagenerator.h
@@ -149,9 +151,11 @@ endif()
 
 set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedabstracttask.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedanalysis.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedbase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatadescription.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatagenerator.cpp
@@ -172,6 +176,7 @@ set(GIT_API_SOURCE_FILES
 
 set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/file_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/issue_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedabstracttask_p.h
@@ -200,8 +205,6 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager_p.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode_p.h
@@ -267,35 +270,41 @@ if(EMSCRIPTEN)
                    ${SOURCE_FILES}
                    ${HEADER_FILES})
 
-    # Set the flags for our generated .js and .wasm files.
+    # Set the flags for our generated .js file.
     # Note #1: we use -O3 to get the best performance, -sALLOW_MEMORY_GROWTH to allow the memory to grow dynamically,
     #          -sEXPORT_ES6=1 to export ES6 classes, -sEXPORTED_FUNCTIONS to export the functions we need,
-    #          -sINLINING_LIMIT to increase the inlining limit, -sSTACK_SIZE to increase the stack size, and --bind to
-    #          generate the necessary bindings.
+    #          -sINLINING_LIMIT to increase the inlining limit, -sSINGLE_FILE=1 to generate a single file, -sSTACK_SIZE
+    #          to increase the stack size, and --bind to generate the necessary bindings.
     # Note #2: by default, Emscripten uses 64KB of stack, but this is not enough for "complex" models such as the Zhang
     #          et al. model (see https://github.com/agarny/COR/blob/master/Models/zhang_SAN_model_2000_all.cellml). For
     #          that model, we need about 108KB of stack. However, Emscripten originally used to use 5MB of stack (see
     #          https://github.com/emscripten-core/emscripten/pull/18191/files). So, here, we are using 4MB of stack,
     #          which should be more than enough for any model.
+    # Note #3: we originally used to generate both a .wasm and a .js file, but this doesn't work when trying to use
+    #          libOpenCOR in a Vue project (see https://stackoverflow.com/q/73579436 for a similar issue in a React
+    #          project). The solution is to have only a .js file, which can be done using either -sSINGLE_FILE=1 or
+    #          -sWASM=0. To use -sSINGLE_FILE=1 embeds the WASM in the .js file, but it means that neither pthreads nor
+    #          WASM workers can be used (see https://emscripten.org/docs/api_reference/wasm_workers.html), which may be
+    #          an issue the day we want to run simulations in their own thread. To use -sWASM=0 results in a JavaScript
+    #          file that can be used with asm.js, which has been superseded by WASM. And, indeed, although the resulting
+    #          .js file works fine in our playground, it crashes our JavaScript tests. So, at this stage, we are going
+    #          with -sSINGLE_FILE=1, but we may have to look for another solution someday.
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                           COMPILE_FLAGS "-O3"
-                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sINLINING_LIMIT -sSTACK_SIZE=4MB --bind")
+                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sINLINING_LIMIT -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
 
-    # Create a ZIP file for our generated .js and .wasm files.
+    # Create a ZIP file for our generated .js file.
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E tar "-cfv" "${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION_MAJOR}-${PROJECT_VERSION_MINOR}-${PROJECT_VERSION_PATCH}-WebAssembly.zip" --format=zip
-                                                       "${CMAKE_PROJECT_NAME}.js"
-                                                       "${CMAKE_PROJECT_NAME}.wasm")
+                                                       "${CMAKE_PROJECT_NAME}.js")
 
-    # Copy our generated .js and .wasm files over.
+    # Copy our generated .js file over.
 
-    foreach(FILE_EXTENSION js wasm)
-        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.${FILE_EXTENSION}
-                                                            ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.${FILE_EXTENSION})
-    endforeach()
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.js
+                                                        ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.js)
 
     # Let people know how to run our test web page.
 

@@ -21,33 +21,27 @@ import { expectIssues } from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("Sed coverage tests", () => {
-  let someCellmlContentsPtr;
+  let someSolverOdeContents;
 
   beforeAll(() => {
-    someCellmlContentsPtr = utils.allocateMemory(
+    someSolverOdeContents = utils.allocateMemory(
       libopencor,
-      utils.SOME_CELLML_CONTENTS,
+      utils.SOME_SOLVER_ODE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someSolverOdeContents);
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
-    return (
-      `<?xml version="1.0" encoding="UTF-8"?>
+    return `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfTasks>
-    <task id="task1"` +
-      (withProperties
-        ? ` modelReference="model1" simulationReference="simulation1"`
-        : ``) +
-      `/>
+    <task id="task1"${withProperties ? ` modelReference="model1" simulationReference="simulation1"` : ``}/>
   </listOfTasks>
 </sedML>
-`
-    );
+`;
   }
 
   test("Initialise", () => {
@@ -57,19 +51,27 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.serialise()).toBe(expectedSerialisation);
+
+    document.delete();
   });
 
-  test("Model", () => {
+  test("Models", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.hasModels()).toBe(false);
+    expect(document.modelCount()).toBe(0);
+    expect(document.models().size()).toBe(0);
     expect(document.addModel(null)).toBe(false);
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.SEDML_FILE);
     const model = new libopencor.SedModel(document, file);
+
+    expect(model.file()).toStrictEqual(file);
 
     expect(document.addModel(model)).toBe(true);
 
+    expect(document.hasModels()).toBe(true);
+    expect(document.modelCount()).toBe(1);
     expect(document.models().size()).toBe(1);
     expect(document.models().get(0)).toStrictEqual(model);
 
@@ -77,44 +79,74 @@ describe("Sed coverage tests", () => {
     expect(document.removeModel(model)).toBe(true);
 
     expect(document.hasModels()).toBe(false);
+    expect(document.modelCount()).toBe(0);
+    expect(document.models().size()).toBe(0);
 
     expect(document.removeModel(null)).toBe(false);
+
+    model.delete();
+    file.delete();
+    document.delete();
   });
 
   test("Simulations", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.hasSimulations()).toBe(false);
+    expect(document.simulationCount()).toBe(0);
+    expect(document.simulations().size()).toBe(0);
     expect(document.addSimulation(null)).toBe(false);
 
     const uniform_time_course = new libopencor.SedUniformTimeCourse(document);
+    const one_step = new libopencor.SedOneStep(document);
     const steady_state = new libopencor.SedSteadyState(document);
+    const analysis = new libopencor.SedAnalysis(document);
 
     expect(document.addSimulation(uniform_time_course)).toBe(true);
+    expect(document.addSimulation(one_step)).toBe(true);
     expect(document.addSimulation(steady_state)).toBe(true);
+    expect(document.addSimulation(analysis)).toBe(true);
 
-    expect(document.simulations().size()).toBe(2);
+    expect(document.hasSimulations()).toBe(true);
+    expect(document.simulationCount()).toBe(4);
+    expect(document.simulations().size()).toBe(4);
     expect(document.simulations().get(0)).toStrictEqual(uniform_time_course);
-    expect(document.simulations().get(1)).toStrictEqual(steady_state);
+    expect(document.simulations().get(1)).toStrictEqual(one_step);
+    expect(document.simulations().get(2)).toStrictEqual(steady_state);
+    expect(document.simulations().get(3)).toStrictEqual(analysis);
 
     expect(document.addSimulation(uniform_time_course)).toBe(false);
     expect(document.removeSimulation(uniform_time_course)).toBe(true);
 
+    expect(document.addSimulation(one_step)).toBe(false);
+    expect(document.removeSimulation(one_step)).toBe(true);
+
     expect(document.addSimulation(steady_state)).toBe(false);
     expect(document.removeSimulation(steady_state)).toBe(true);
 
+    expect(document.addSimulation(analysis)).toBe(false);
+    expect(document.removeSimulation(analysis)).toBe(true);
+
     expect(document.hasSimulations()).toBe(false);
+    expect(document.simulationCount()).toBe(0);
+    expect(document.simulations().size()).toBe(0);
 
     expect(document.removeSimulation(null)).toBe(false);
+
+    steady_state.delete();
+    uniform_time_course.delete();
+    document.delete();
   });
 
   test("Tasks", () => {
     const document = new libopencor.SedDocument();
 
     expect(document.hasTasks()).toBe(false);
+    expect(document.taskCount()).toBe(0);
+    expect(document.tasks().size()).toBe(0);
     expect(document.addTask(null)).toBe(false);
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.SEDML_FILE);
     const model = new libopencor.SedModel(document, file);
     const simulation = new libopencor.SedUniformTimeCourse(document);
     const task = new libopencor.SedTask(document, model, simulation);
@@ -124,6 +156,8 @@ describe("Sed coverage tests", () => {
 
     expect(document.addTask(task)).toBe(true);
 
+    expect(document.hasTasks()).toBe(true);
+    expect(document.taskCount()).toBe(1);
     expect(document.tasks().size()).toBe(1);
     expect(document.tasks().get(0)).toStrictEqual(task);
 
@@ -137,7 +171,7 @@ describe("Sed coverage tests", () => {
 
     expect(document.serialise()).toBe(sedTaskExpectedSerialisation(false));
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "Task 'task1' requires a model."],
@@ -148,8 +182,16 @@ describe("Sed coverage tests", () => {
     expect(document.removeTask(task)).toBe(true);
 
     expect(document.hasTasks()).toBe(false);
+    expect(document.taskCount()).toBe(0);
+    expect(document.tasks().size()).toBe(0);
 
     expect(document.removeTask(null)).toBe(false);
+
+    task.delete();
+    simulation.delete();
+    model.delete();
+    file.delete();
+    document.delete();
   });
 
   test("ODE solver", () => {
@@ -167,6 +209,10 @@ describe("Sed coverage tests", () => {
     simulation.setOdeSolver(null);
 
     expect(simulation.odeSolver()).toBe(null);
+
+    solver.delete();
+    simulation.delete();
+    document.delete();
   });
 
   test("NLA solver", () => {
@@ -184,10 +230,14 @@ describe("Sed coverage tests", () => {
     simulation.setNlaSolver(null);
 
     expect(simulation.nlaSolver()).toBe(null);
+
+    solver.delete();
+    simulation.delete();
+    document.delete();
   });
 
   test("SedOneStep", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
     const document = new libopencor.SedDocument(file);
     const simulation = new libopencor.SedOneStep(document);
 
@@ -196,10 +246,14 @@ describe("Sed coverage tests", () => {
     simulation.setStep(1.23);
 
     expect(simulation.step()).toBe(1.23);
+
+    simulation.delete();
+    document.delete();
+    file.delete();
   });
 
   test("SedUniformTimeCourse", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
     const document = new libopencor.SedDocument(file);
     const simulation = new libopencor.SedUniformTimeCourse(document);
 
@@ -217,12 +271,19 @@ describe("Sed coverage tests", () => {
     expect(simulation.outputStartTime()).toBe(4.56);
     expect(simulation.outputEndTime()).toBe(7.89);
     expect(simulation.numberOfSteps()).toBe(10);
+
+    simulation.delete();
+    document.delete();
+    file.delete();
   });
 
   test("SedInstanceAndSedInstanceTask", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(
+      someSolverOdeContents,
+      utils.SOME_SOLVER_ODE_CONTENTS.length,
+    );
 
     const document = new libopencor.SedDocument(file);
     const solver = document.simulations().get(0).odeSolver();
@@ -230,100 +291,168 @@ describe("Sed coverage tests", () => {
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
     solver.setUpperHalfBandwidth(-1);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
     const instanceTask = instance.tasks().get(0);
 
     expect(instanceTask.voi().size()).toBe(0);
     expect(instanceTask.voiAsArray()).toStrictEqual([]);
-    expect(instanceTask.voiName()).toBe("main.t");
-    expect(instanceTask.voiUnit()).toBe("dimensionless");
+    expect(instanceTask.voiName()).toBe("environment/time");
+    expect(instanceTask.voiUnit()).toBe("millisecond");
 
-    expect(instanceTask.stateCount()).toBe(3);
+    expect(instanceTask.stateCount()).toBe(4);
     expect(instanceTask.state(0).size()).toBe(0);
     expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.state(3).size()).toBe(0);
-    expect(instanceTask.stateAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.stateName(0)).toBe("main.x");
-    expect(instanceTask.stateName(3)).toBe("");
-    expect(instanceTask.stateUnit(0)).toBe("dimensionless");
-    expect(instanceTask.stateUnit(3)).toBe("");
+    expect(instanceTask.state(4).size()).toBe(0);
+    expect(instanceTask.stateAsArray(4)).toStrictEqual([]);
+    expect(instanceTask.stateName(0)).toBe("membrane/V");
+    expect(instanceTask.stateName(4)).toBe("");
+    expect(instanceTask.stateUnit(0)).toBe("millivolt");
+    expect(instanceTask.stateUnit(4)).toBe("");
 
-    expect(instanceTask.rateCount()).toBe(3);
+    expect(instanceTask.rateCount()).toBe(4);
     expect(instanceTask.rate(0).size()).toBe(0);
     expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.rate(3).size()).toBe(0);
-    expect(instanceTask.rateAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.rateName(0)).toBe("main.x'");
-    expect(instanceTask.rateName(3)).toBe("");
-    expect(instanceTask.rateUnit(0)).toBe("dimensionless/dimensionless");
-    expect(instanceTask.rateUnit(3)).toBe("");
+    expect(instanceTask.rate(4).size()).toBe(0);
+    expect(instanceTask.rateAsArray(4)).toStrictEqual([]);
+    expect(instanceTask.rateName(0)).toBe("membrane/V'");
+    expect(instanceTask.rateName(4)).toBe("");
+    expect(instanceTask.rateUnit(0)).toBe("millivolt/millisecond");
+    expect(instanceTask.rateUnit(4)).toBe("");
 
-    expect(instanceTask.variableCount()).toBe(3);
-    expect(instanceTask.variable(0).size()).toBe(0);
-    expect(instanceTask.variableAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.variable(3).size()).toBe(0);
-    expect(instanceTask.variableAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.variableName(0)).toBe("main.sigma");
-    expect(instanceTask.variableName(3)).toBe("");
-    expect(instanceTask.variableUnit(0)).toBe("dimensionless");
-    expect(instanceTask.variableUnit(3)).toBe("");
+    expect(instanceTask.constantCount()).toBe(5);
+    expect(instanceTask.constant(0).size()).toBe(0);
+    expect(instanceTask.constantAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.constant(5).size()).toBe(0);
+    expect(instanceTask.constantAsArray(5)).toStrictEqual([]);
+    expect(instanceTask.constantName(0)).toBe("membrane/Cm");
+    expect(instanceTask.constantName(5)).toBe("");
+    expect(instanceTask.constantUnit(0)).toBe("microF_per_cm2");
+    expect(instanceTask.constantUnit(5)).toBe("");
+
+    expect(instanceTask.computedConstantCount()).toBe(3);
+    expect(instanceTask.computedConstant(0).size()).toBe(0);
+    expect(instanceTask.computedConstantAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.computedConstant(3).size()).toBe(0);
+    expect(instanceTask.computedConstantAsArray(3)).toStrictEqual([]);
+    expect(instanceTask.computedConstantName(0)).toBe("leakage_current/E_L");
+    expect(instanceTask.computedConstantName(3)).toBe("");
+    expect(instanceTask.computedConstantUnit(0)).toBe("millivolt");
+    expect(instanceTask.computedConstantUnit(3)).toBe("");
+
+    expect(instanceTask.algebraicCount()).toBe(10);
+    expect(instanceTask.algebraic(0).size()).toBe(0);
+    expect(instanceTask.algebraicAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.algebraic(10).size()).toBe(0);
+    expect(instanceTask.algebraicAsArray(10)).toStrictEqual([]);
+    expect(instanceTask.algebraicName(0)).toBe("membrane/i_Stim");
+    expect(instanceTask.algebraicName(10)).toBe("");
+    expect(instanceTask.algebraicUnit(0)).toBe("microA_per_cm2");
+    expect(instanceTask.algebraicUnit(10)).toBe("");
 
     instance.run();
 
     expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
+        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
+  });
+
+  test("SedDocument", () => {
+    let file = new libopencor.File(
+      utils.resourcePath(utils.HTTP_REMOTE_CELLML_FILE),
+    );
+    let document = new libopencor.SedDocument(file);
+
+    document.delete();
+    file.delete();
+
+    file = new libopencor.File(
+      utils.resourcePath(utils.HTTP_REMOTE_SEDML_FILE),
+    );
+    document = new libopencor.SedDocument(file);
+
+    document.delete();
+    file.delete();
+
+    file = new libopencor.File(
+      utils.resourcePath(utils.HTTP_REMOTE_COMBINE_ARCHIVE),
+    );
+    document = new libopencor.SedDocument(file);
+
+    document.delete();
+    file.delete();
   });
 
   test("Solver", () => {
     // Get the duplicate() method of different solvers to be covered.
 
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(
+      someSolverOdeContents,
+      utils.SOME_SOLVER_ODE_CONTENTS.length,
+    );
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
+    let solver = new libopencor.SolverForwardEuler();
 
-    simulation.setOdeSolver(new libopencor.SolverForwardEuler());
+    simulation.setOdeSolver(solver);
 
-    let instance = document.createInstance();
-
-    instance.run();
-
-    expect(instance.hasIssues()).toBe(false);
-
-    document
-      .simulations()
-      .get(0)
-      .setOdeSolver(new libopencor.SolverFourthOrderRungeKutta());
-
-    instance = document.createInstance();
+    let instance = document.instantiate();
 
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
 
-    document.simulations().get(0).setOdeSolver(new libopencor.SolverHeun());
+    instance.delete();
+    solver.delete();
 
-    instance = document.createInstance();
+    solver = new libopencor.SolverFourthOrderRungeKutta();
+
+    simulation.setOdeSolver(solver);
+
+    instance = document.instantiate();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    solver.delete();
+
+    solver = new libopencor.SolverHeun();
+
+    simulation.setOdeSolver(solver);
+
+    instance = document.instantiate();
 
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
 
-    document
-      .simulations()
-      .get(0)
-      .setOdeSolver(new libopencor.SolverSecondOrderRungeKutta());
+    instance.delete();
+    solver.delete();
 
-    instance = document.createInstance();
+    solver = new libopencor.SolverSecondOrderRungeKutta();
+
+    simulation.setOdeSolver(solver);
+
+    instance = document.instantiate();
 
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 });

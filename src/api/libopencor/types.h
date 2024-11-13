@@ -37,6 +37,9 @@ using LoggerPtr = std::shared_ptr<Logger>; /**< Type definition for the shared @
 class SedAbstractTask;
 using SedAbstractTaskPtr = std::shared_ptr<SedAbstractTask>; /**< Type definition for the shared @ref SedAbstractTask pointer. */
 
+class SedAnalysis;
+using SedAnalysisPtr = std::shared_ptr<SedAnalysis>; /**< Type definition for the shared @ref SedAnalysis pointer. */
+
 class SedBase;
 using SedBasePtr = std::shared_ptr<SedBase>; /**< Type definition for the shared @ref SedBase pointer. */
 
@@ -115,6 +118,7 @@ using SolverSecondOrderRungeKuttaPtr = std::shared_ptr<SolverSecondOrderRungeKut
 // Vectors.
 
 using Doubles = std::vector<double>; /**< Type definition for a vector of doubles. */
+using FilePtrs = std::vector<FilePtr>; /**< Type definition for a vector of @ref File pointers. */
 using IssuePtrs = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
 using SedAbstractTaskPtrs = std::vector<SedAbstractTaskPtr>; /**< Type definition for a vector of @ref SedAbstractTask pointers. */
 using SedDataDescriptionPtrs = std::vector<SedDataDescriptionPtr>; /**< Type definition for a vector of @ref SedDataDescription pointers. */
@@ -124,6 +128,7 @@ using SedModelPtrs = std::vector<SedModelPtr>; /**< Type definition for a vector
 using SedOutputPtrs = std::vector<SedOutputPtr>; /**< Type definition for a vector of @ref SedOutput pointers. */
 using SedSimulationPtrs = std::vector<SedSimulationPtr>; /**< Type definition for a vector of @ref SedSimulation pointers. */
 using SedStylePtrs = std::vector<SedStylePtr>; /**< Type definition for a vector of @ref SedStyle pointers. */
+using Strings = std::vector<std::string>; /**< Type definition for a vector of strings. */
 using UnsignedChars = std::vector<unsigned char>; /**< Type definition for a vector of unsigned characters. */
 
 } // namespace libOpenCOR
