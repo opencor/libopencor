@@ -13,30 +13,30 @@
 # limitations under the License.
 
 
-from libopencor import File, FileManager, Issue
+import libopencor as oc
 import platform
 import utils
 from utils import assert_issues
 
 
 expected_non_existing_file_issues = [
-    [Issue.Type.Error, "The file does not exist."],
+    [oc.Issue.Type.Error, "The file does not exist."],
 ]
 expected_non_downloadable_file_issues = [
-    [Issue.Type.Error, "The file could not be downloaded."],
+    [oc.Issue.Type.Error, "The file could not be downloaded."],
 ]
 expected_unknown_file_issues = [
     [
-        Issue.Type.Error,
+        oc.Issue.Type.Error,
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
     ],
 ]
 
 
 def test_local_file():
-    file = File(utils.LocalFile)
+    file = oc.File(utils.LocalFile)
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert file.file_name == utils.LocalFile
     assert file.url == ""
     assert file.path == utils.LocalFile
@@ -46,11 +46,11 @@ def test_local_file():
 
 def test_relative_local_file():
     if platform.system() == "Windows":
-        file = File("some\\.\\relative\\..\\..\\path\\.\\..\\dir\\file.txt")
+        file = oc.File("some\\.\\relative\\..\\..\\path\\.\\..\\dir\\file.txt")
     else:
-        file = File("some/./relative/../../path/./../dir/file.txt")
+        file = oc.File("some/./relative/../../path/./../dir/file.txt")
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
 
     if platform.system() == "Windows":
         assert file.file_name == "dir\\file.txt"
@@ -70,11 +70,11 @@ def test_relative_local_file():
 
 def test_url_based_local_file():
     if platform.system() == "Windows":
-        file = File("file:///P:/some/path/file.txt")
+        file = oc.File("file:///P:/some/path/file.txt")
     else:
-        file = File("file:///some/path/file.txt")
+        file = oc.File("file:///some/path/file.txt")
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert file.file_name == utils.LocalFile
     assert file.url == ""
     assert file.path == utils.LocalFile
@@ -83,9 +83,9 @@ def test_url_based_local_file():
 
 
 def test_remote_file():
-    file = File(utils.RemoteFile)
+    file = oc.File(utils.RemoteFile)
 
-    assert file.type == File.Type.CellmlFile
+    assert file.type == oc.File.Type.CellmlFile
     assert file.file_name != ""
     assert file.url == utils.RemoteFile
     assert file.path == utils.RemoteFile
@@ -93,9 +93,9 @@ def test_remote_file():
 
 
 def test_local_virtual_file():
-    file = File(utils.LocalFile)
+    file = oc.File(utils.LocalFile)
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert file.file_name == utils.LocalFile
     assert file.url == ""
     assert file.path == utils.LocalFile
@@ -106,15 +106,15 @@ def test_local_virtual_file():
 
     file.contents = some_unknown_contents_list
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_remote_virtual_file():
-    file = File(utils.IrretrievableRemoteFile)
+    file = oc.File(utils.IrretrievableRemoteFile)
 
-    assert file.type == File.Type.IrretrievableFile
+    assert file.type == oc.File.Type.IrretrievableFile
     assert file.file_name == ""
     assert file.url == utils.IrretrievableRemoteFile
     assert file.path == utils.IrretrievableRemoteFile
@@ -125,35 +125,35 @@ def test_remote_virtual_file():
 
     file.contents = some_unknown_contents_list
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_file_manager():
-    file_manager = FileManager.instance()
+    file_manager = oc.FileManager.instance()
 
     assert file_manager.has_files == False
     assert file_manager.file_count == 0
     assert len(file_manager.files) == 0
     assert file_manager.file(utils.LocalFile) == None
 
-    local_file = File(utils.LocalFile)
-    same_file_manager = FileManager.instance()
+    local_file = oc.File(utils.LocalFile)
+    same_file_manager = oc.FileManager.instance()
 
     assert same_file_manager.has_files == True
     assert same_file_manager.file_count == 1
     assert len(file_manager.files) == 1
     assert same_file_manager.file(utils.LocalFile) == local_file
 
-    remote_file = File(utils.RemoteFile)
+    remote_file = oc.File(utils.RemoteFile)
 
     assert file_manager.has_files == True
     assert file_manager.file_count == 2
     assert len(file_manager.files) == 2
     assert file_manager.file(utils.RemoteFile) == remote_file
 
-    unknown_file = File(utils.UnknownFile, False)
+    unknown_file = oc.File(utils.UnknownFile, False)
 
     assert same_file_manager.has_files == True
     assert same_file_manager.file_count == 2

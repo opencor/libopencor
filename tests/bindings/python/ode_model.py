@@ -13,8 +13,6 @@
 # limitations under the License.
 
 
-# from libopencor import File, Issue, SedDocument, SolverForwardEuler
-# import utils
 from utils import assert_values
 
 

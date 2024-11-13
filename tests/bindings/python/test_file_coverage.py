@@ -13,45 +13,45 @@
 # limitations under the License.
 
 
-from libopencor import File
+import libopencor as oc
 import utils
 
 
 def test_empty_file():
-    file = File(utils.LocalFile)
+    file = oc.File(utils.LocalFile)
 
     file.contents = utils.string_to_list(utils.NoContents)
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
 
 
 def test_file_with_null_character():
-    file = File(utils.LocalFile)
+    file = oc.File(utils.LocalFile)
 
     file.contents = utils.string_to_list("\0")
 
-    assert file.type == File.Type.UnknownFile
+    assert file.type == oc.File.Type.UnknownFile
 
 
 def test_sedml_file_with_no_parent():
-    file = File(utils.Sedml2File)
+    file = oc.File(utils.Sedml2File)
 
     file.contents = utils.string_to_list(utils.SomeSedmlContents)
 
 
 def test_irretrievable_remote_file():
-    File(utils.IrretrievableRemoteFile)
+    oc.File(utils.IrretrievableRemoteFile)
 
 
 def test_same_local_file():
-    file1 = File(utils.LocalFile)
-    file2 = File(utils.LocalFile)
+    file1 = oc.File(utils.LocalFile)
+    file2 = oc.File(utils.LocalFile)
 
     assert file1.__subclasshook__ == file2.__subclasshook__
 
 
 def test_same_remote_file():
-    file1 = File(utils.RemoteFile)
-    file2 = File(utils.RemoteFile)
+    file1 = oc.File(utils.RemoteFile)
+    file2 = oc.File(utils.RemoteFile)
 
     assert file1.__subclasshook__ == file2.__subclasshook__

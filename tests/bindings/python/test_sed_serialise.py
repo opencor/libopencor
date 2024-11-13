@@ -13,15 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import (
-    File,
-    Issue,
-    SedDocument,
-    SedOneStep,
-    SolverCvode,
-    SolverForwardEuler,
-    SolverKinsol,
-)
+import libopencor as oc
 import platform
 import utils
 from utils import assert_issues
@@ -117,8 +109,8 @@ def kinsol_expected_serialisation(parameters=None):
 
 
 def test_local_cellml_file_with_base_path():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml"
@@ -126,11 +118,11 @@ def test_local_cellml_file_with_base_path():
 
 
 def test_local_cellml_file_without_base_path():
-    file = File(utils.LocalFile)
+    file = oc.File(utils.LocalFile)
 
     file.contents = utils.string_to_list(utils.SomeCellmlContents)
 
-    document = SedDocument(file)
+    document = oc.SedDocument(file)
 
     if platform.system() == "Windows":
         assert document.serialise() == cvode_expected_serialisation(
@@ -143,8 +135,8 @@ def test_local_cellml_file_without_base_path():
 
 
 def test_relative_local_cellml_file_with_base_path():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
 
     assert document.serialise(
         utils.LocalBasePath + "/../.."
@@ -152,18 +144,18 @@ def test_relative_local_cellml_file_with_base_path():
 
 
 def test_relative_local_cellml_file_without_base_path():
-    file = File(utils.Cellml2File)
+    file = oc.File(utils.Cellml2File)
 
     file.contents = utils.string_to_list(utils.SomeCellmlContents)
 
-    document = SedDocument(file)
+    document = oc.SedDocument(file)
 
     assert document.serialise() == cvode_expected_serialisation("cellml_2.cellml")
 
 
 def test_remote_cellml_file_with_base_path():
-    file = File(utils.RemoteFile)
-    document = SedDocument(file)
+    file = oc.File(utils.RemoteFile)
+    document = oc.SedDocument(file)
 
     assert document.serialise(utils.RemoteBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml"
@@ -171,8 +163,8 @@ def test_remote_cellml_file_with_base_path():
 
 
 def test_remote_cellml_file_without_base_path():
-    file = File(utils.RemoteFile)
-    document = SedDocument(file)
+    file = oc.File(utils.RemoteFile)
+    document = oc.SedDocument(file)
 
     assert document.serialise() == cvode_expected_serialisation(
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
@@ -180,8 +172,8 @@ def test_remote_cellml_file_without_base_path():
 
 
 def test_relative_remote_cellml_file_with_base_path():
-    file = File(utils.RemoteFile)
-    document = SedDocument(file)
+    file = oc.File(utils.RemoteFile)
+    document = oc.SedDocument(file)
 
     assert document.serialise(
         utils.RemoteBasePath + "/../.."
@@ -227,8 +219,8 @@ def test_dae_model():
 </sedML>
 """
 
-    file = File(utils.resource_path("api/sed/dae.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/dae.cellml"))
+    document = oc.SedDocument(file)
 
     assert document.serialise(utils.LocalBasePath) == expected_serialisation
 
@@ -257,8 +249,8 @@ def test_nla_model():
 </sedML>
 """
 
-    file = File(utils.resource_path("api/sed/nla.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/nla.cellml"))
+    document = oc.SedDocument(file)
 
     assert document.serialise(utils.LocalBasePath) == expected_serialisation
 
@@ -278,8 +270,8 @@ def test_algebraic_model():
 </sedML>
 """
 
-    file = File(utils.resource_path("api/sed/algebraic.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/algebraic.cellml"))
+    document = oc.SedDocument(file)
 
     assert document.serialise(utils.LocalBasePath) == expected_serialisation
 
@@ -305,22 +297,22 @@ def test_fixed_step_ode_solver():
 </sedML>
 """
 
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
 
-    simulation.ode_solver = SolverForwardEuler()
+    simulation.ode_solver = oc.SolverForwardEuler()
 
     assert document.serialise(utils.LocalBasePath) == expected_serialisation
 
 
 def test_cvode_solver_with_adams_moulton_interation_method():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.integration_method = SolverCvode.IntegrationMethod.AdamsMoulton
+    solver.integration_method = oc.SolverCvode.IntegrationMethod.AdamsMoulton
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000475": "Adams-Moulton"}
@@ -328,12 +320,12 @@ def test_cvode_solver_with_adams_moulton_interation_method():
 
 
 def test_cvode_solver_with_functional_iteration_type():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.iteration_type = SolverCvode.IterationType.Functional
+    solver.iteration_type = oc.SolverCvode.IterationType.Functional
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000476": "Functional"}
@@ -341,12 +333,12 @@ def test_cvode_solver_with_functional_iteration_type():
 
 
 def test_cvode_solver_with_banded_linear_solver():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Banded
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "Banded"}
@@ -354,12 +346,12 @@ def test_cvode_solver_with_banded_linear_solver():
 
 
 def test_cvode_solver_with_diagonal_linear_solver():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Diagonal
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Diagonal
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "Diagonal"}
@@ -367,12 +359,12 @@ def test_cvode_solver_with_diagonal_linear_solver():
 
 
 def test_cvode_solver_with_gmres_linear_solver():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Gmres
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Gmres
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "GMRES"}
@@ -380,12 +372,12 @@ def test_cvode_solver_with_gmres_linear_solver():
 
 
 def test_cvode_solver_with_bicgstab_linear_solver():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Bicgstab
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Bicgstab
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "BiCGStab"}
@@ -393,12 +385,12 @@ def test_cvode_solver_with_bicgstab_linear_solver():
 
 
 def test_cvode_solver_with_tfqmr_linear_solver():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.linear_solver = SolverCvode.LinearSolver.Tfqmr
+    solver.linear_solver = oc.SolverCvode.LinearSolver.Tfqmr
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "TFQMR"}
@@ -406,12 +398,12 @@ def test_cvode_solver_with_tfqmr_linear_solver():
 
 
 def test_cvode_solver_with_no_preconditioner():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
-    solver.preconditioner = SolverCvode.Preconditioner.No
+    solver.preconditioner = oc.SolverCvode.Preconditioner.No
 
     assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000478": "No"}
@@ -419,8 +411,8 @@ def test_cvode_solver_with_no_preconditioner():
 
 
 def test_cvode_solver_with_no_interpolate_solution():
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
 
@@ -432,12 +424,12 @@ def test_cvode_solver_with_no_interpolate_solution():
 
 
 def test_kinsol_solver_with_banded_linear_solver():
-    file = File(utils.resource_path("api/sed/nla.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/nla.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.nla_solver
 
-    solver.linear_solver = SolverKinsol.LinearSolver.Banded
+    solver.linear_solver = oc.SolverKinsol.LinearSolver.Banded
 
     assert document.serialise(utils.LocalBasePath) == kinsol_expected_serialisation(
         {"KISAO:0000477": "Banded"}
@@ -445,12 +437,12 @@ def test_kinsol_solver_with_banded_linear_solver():
 
 
 def test_kinsol_solver_with_gmres_linear_solver():
-    file = File(utils.resource_path("api/sed/nla.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/nla.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.nla_solver
 
-    solver.linear_solver = SolverKinsol.LinearSolver.Gmres
+    solver.linear_solver = oc.SolverKinsol.LinearSolver.Gmres
 
     assert document.serialise(utils.LocalBasePath) == kinsol_expected_serialisation(
         {"KISAO:0000477": "GMRES"}
@@ -458,12 +450,12 @@ def test_kinsol_solver_with_gmres_linear_solver():
 
 
 def test_kinsol_solver_with_bicgstab_linear_solver():
-    file = File(utils.resource_path("api/sed/nla.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/nla.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.nla_solver
 
-    solver.linear_solver = SolverKinsol.LinearSolver.Bicgstab
+    solver.linear_solver = oc.SolverKinsol.LinearSolver.Bicgstab
 
     assert document.serialise(utils.LocalBasePath) == kinsol_expected_serialisation(
         {"KISAO:0000477": "BiCGStab"}
@@ -471,12 +463,12 @@ def test_kinsol_solver_with_bicgstab_linear_solver():
 
 
 def test_kinsol_solver_with_tfqmr_linear_solver():
-    file = File(utils.resource_path("api/sed/nla.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/nla.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.nla_solver
 
-    solver.linear_solver = SolverKinsol.LinearSolver.Tfqmr
+    solver.linear_solver = oc.SolverKinsol.LinearSolver.Tfqmr
 
     assert document.serialise(utils.LocalBasePath) == kinsol_expected_serialisation(
         {"KISAO:0000477": "TFQMR"}
@@ -498,12 +490,12 @@ def test_one_step_simulation():
 </sedML>
 """
 
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
 
     document.remove_simulation(document.simulations[0])
 
-    simulation = SedOneStep(document)
+    simulation = oc.SedOneStep(document)
 
     document.add_simulation(simulation)
 
@@ -513,7 +505,7 @@ def test_one_step_simulation():
 def test_sedml_file():
     expected_issues = [
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The model 'cellml_2.cellml' could not be found. It has been automatically added, but it is empty.",
         ],
     ]
@@ -547,8 +539,8 @@ def test_sedml_file():
 </sedML>
 """
 
-    file = File(utils.resource_path(utils.Sedml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Sedml2File))
+    document = oc.SedDocument(file)
 
     assert_issues(document, expected_issues)
     assert document.serialise(utils.LocalBasePath) == expected_serialisation
@@ -557,163 +549,163 @@ def test_sedml_file():
 def test_sed_simulation():
     expected_issues = [
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The step ('KISAO:0000483') cannot be equal to '-1.23'. It must be greater or equal to 0. A step of 1 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The step ('KISAO:0000483') cannot be equal to 'nan'. It must be greater or equal to 0. A step of 1 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The step ('KISAO:0000483') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A step of 1 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The relative tolerance ('KISAO:0000209') cannot be equal to '-1e-03'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The absolute tolerance ('KISAO:0000211') cannot be equal to '-1e-05'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum number of steps ('KISAO:0000415') cannot be equal to '-369'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum step ('KISAO:0000467') cannot be equal to '-0.01'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '-1'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '-2'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The relative tolerance ('KISAO:0000209') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The absolute tolerance ('KISAO:0000211') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum number of steps ('KISAO:0000415') cannot be equal to 'NotANumber'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum step ('KISAO:0000467') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The integration method ('KISAO:0000475') cannot be equal to 'Unknown'. It must be equal to 'BDF' or 'Adams-Moulton'. A BDF integration method will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The iteration type ('KISAO:0000476') cannot be equal to 'Unknown'. It must be equal to 'Functional' or 'Newton'. A Newton iteration type will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The preconditioner ('KISAO:0000478') cannot be equal to 'Unknown'. It must be equal to 'No' or 'Banded'. A Banded preconditioner will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The upper half-bandwidth ('KISAO:0000479') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The lower half-bandwidth ('KISAO:0000480') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The interpolate solution parameter ('KISAO:0000481') cannot be equal to 'True'. It must be equal to 'true' or 'false'. A value of true will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The relative tolerance ('KISAO:0000209') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The absolute tolerance ('KISAO:0000211') cannot be equal to '1.23e456789'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum number of steps ('KISAO:0000415') cannot be equal to '1234567890123'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum step ('KISAO:0000467') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum number of iterations ('KISAO:0000486') cannot be equal to '-123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '-1'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '-2'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum number of iterations ('KISAO:0000486') cannot be equal to 'NotANumber'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The upper half-bandwidth ('KISAO:0000479') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The lower half-bandwidth ('KISAO:0000480') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The maximum number of iterations ('KISAO:0000486') cannot be equal to '1234567890123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
-            Issue.Type.Warning,
+            oc.Issue.Type.Warning,
             "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
         ],
     ]
@@ -955,8 +947,8 @@ def test_sed_simulation():
 </sedML>
 """
 
-    file = File(utils.resource_path("api/sed/simulations.sedml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/simulations.sedml"))
+    document = oc.SedDocument(file)
 
     assert_issues(document, expected_issues)
     assert document.serialise(utils.LocalBasePath) == expected_serialisation

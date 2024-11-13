@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from libopencor import File, Issue, SedDocument, SolverKinsol
+import libopencor as oc
 import platform
 import utils
 from utils import assert_issues
@@ -22,12 +22,12 @@ from utils import assert_issues
 def test_no_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The simulation experiment description does not contain any tasks to run.",
         ],
     ]
 
-    document = SedDocument()
+    document = oc.SedDocument()
     instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
@@ -36,17 +36,17 @@ def test_no_file():
 def test_invalid_cellml_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The CellML file is invalid.",
         ],
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
         ],
     ]
 
-    file = File(utils.resource_path(utils.ErrorCellmlFile))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.ErrorCellmlFile))
+    document = oc.SedDocument(file)
     instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
@@ -55,17 +55,17 @@ def test_invalid_cellml_file():
 def test_overconstrained_cellml_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The CellML file is overconstrained.",
         ],
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "Variable 'x' in component 'my_component' is computed more than once.",
         ],
     ]
 
-    file = File(utils.resource_path("api/sed/overconstrained.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/overconstrained.cellml"))
+    document = oc.SedDocument(file)
     instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
@@ -74,17 +74,17 @@ def test_overconstrained_cellml_file():
 def test_underconstrained_cellml_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The CellML file is underconstrained.",
         ],
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The type of variable 'x' in component 'my_component' is unknown.",
         ],
     ]
 
-    file = File(utils.resource_path("api/sed/underconstrained.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/underconstrained.cellml"))
+    document = oc.SedDocument(file)
     instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
@@ -93,29 +93,29 @@ def test_underconstrained_cellml_file():
 def test_unsuitable_constrained_cellml_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The CellML file is unsuitably constrained.",
         ],
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "Variable 'y' in component 'my_component' is computed more than once.",
         ],
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The type of variable 'x' in component 'my_component' is unknown.",
         ],
     ]
 
-    file = File(utils.resource_path("api/sed/unsuitably_constrained.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/unsuitably_constrained.cellml"))
+    document = oc.SedDocument(file)
     instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
 
 def run_algebraic_model(compiled):
-    file = File(utils.resource_path("api/sed/algebraic.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/algebraic.cellml"))
+    document = oc.SedDocument(file)
     instance = document.instantiate(compiled)
 
     instance.run()
@@ -134,13 +134,13 @@ def test_interpreted_algebraic_model():
 def run_ode_model(compiled):
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "At t = 0.00140014, mxstep steps taken before reaching tout.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     cvode = simulation.ode_solver
 
@@ -174,13 +174,13 @@ def test_interpreted_ode_model():
 def test_ode_model_with_no_ode_solver():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
         ],
     ]
 
-    file = File(utils.resource_path(utils.Cellml2File))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Cellml2File))
+    document = oc.SedDocument(file)
 
     document.simulations[0].ode_solver = None
 
@@ -194,24 +194,24 @@ def test_nla_model():
 
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
         ],
     ]
 
-    file = File(utils.resource_path("api/sed/nla.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/nla.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     kinsol = simulation.nla_solver
 
-    kinsol.linear_solver = SolverKinsol.LinearSolver.Banded
+    kinsol.linear_solver = oc.SolverKinsol.LinearSolver.Banded
     kinsol.upper_half_bandwidth = -1
 
     instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
-    kinsol.linear_solver = SolverKinsol.LinearSolver.Dense
+    kinsol.linear_solver = oc.SolverKinsol.LinearSolver.Dense
 
     instance = document.instantiate()
 
@@ -221,13 +221,13 @@ def test_nla_model():
 def test_nla_model_with_no_nla_solver():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
         ],
     ]
 
-    file = File(utils.resource_path("api/sed/nla.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/nla.cellml"))
+    document = oc.SedDocument(file)
 
     document.simulations[0].nla_solver = None
 
@@ -241,17 +241,17 @@ def test_dae_model():
 
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
         ],
     ]
 
-    file = File(utils.resource_path("api/sed/dae.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/dae.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
     kinsol = simulation.nla_solver
 
-    kinsol.linear_solver = SolverKinsol.LinearSolver.Banded
+    kinsol.linear_solver = oc.SolverKinsol.LinearSolver.Banded
     kinsol.upper_half_bandwidth = -1
 
     instance = document.instantiate()
@@ -262,7 +262,7 @@ def test_dae_model():
 
     assert_issues(instance, expected_issues)
 
-    kinsol.linear_solver = SolverKinsol.LinearSolver.Dense
+    kinsol.linear_solver = oc.SolverKinsol.LinearSolver.Dense
 
     instance = document.instantiate()
 
@@ -274,17 +274,17 @@ def test_dae_model():
 def test_dae_model_with_no_ode_or_nla_solver():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
         ],
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
         ],
     ]
 
-    file = File(utils.resource_path("api/sed/dae.cellml"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/dae.cellml"))
+    document = oc.SedDocument(file)
     simulation = document.simulations[0]
 
     simulation.ode_solver = None
@@ -296,8 +296,8 @@ def test_dae_model_with_no_ode_or_nla_solver():
 
 
 def test_combine_archive():
-    file = File(utils.resource_path(utils.Combine2Archive))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path(utils.Combine2Archive))
+    document = oc.SedDocument(file)
     instance = document.instantiate()
 
     instance.run()
@@ -308,13 +308,13 @@ def test_combine_archive():
 def test_combine_archive_with_cellml_file_as_master_file():
     expected_issues = [
         [
-            Issue.Type.Error,
+            oc.Issue.Type.Error,
             "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
         ],
     ]
 
-    file = File(utils.resource_path("api/sed/cellml_file_as_master_file.omex"))
-    document = SedDocument(file)
+    file = oc.File(utils.resource_path("api/sed/cellml_file_as_master_file.omex"))
+    document = oc.SedDocument(file)
     instance = document.instantiate()
 
     assert instance.has_issues == False

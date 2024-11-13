@@ -13,77 +13,77 @@
 # limitations under the License.
 
 
-from libopencor import File
+import libopencor as oc
 import utils
 
 
 def test_has_issues():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert not file.has_issues
 
 
 def test_issue_count():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert file.issue_count == 0
 
 
 def test_issues():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert len(file.issues) == 0
 
 
 def test_has_errors():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert not file.has_errors
 
 
 def test_error_count():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert file.error_count == 0
 
 
 def test_errors():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert len(file.errors) == 0
 
 
 def test_has_warnings():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert not file.has_warnings
 
 
 def test_warning_count():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert file.warning_count == 0
 
 
 def test_warnings():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert len(file.warnings) == 0
 
 
 def test_has_messages():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert not file.has_messages
 
 
 def test_message_count():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert file.message_count == 0
 
 
 def test_messages():
-    file = File(utils.resource_path(utils.Cellml2File))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert len(file.messages) == 0
