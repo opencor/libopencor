@@ -22,6 +22,8 @@ def test_version():
 
 
 def test_version_string():
+    assert oc.__version__ == "0.1.0"
+
     assert isinstance(oc.version_string(), str)
     assert oc.version_string() == "0.1.0"
 
