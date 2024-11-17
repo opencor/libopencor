@@ -16,8 +16,6 @@ limitations under the License.
 
 #include "tests/utils.h"
 
-#include "gtest/gtest.h"
-
 #include <libopencor>
 
 TEST(CoverageSedTest, initialise)

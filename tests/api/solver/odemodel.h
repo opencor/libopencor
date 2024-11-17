@@ -16,8 +16,6 @@ limitations under the License.
 
 #pragma once
 
-#include "gtest/gtest.h"
-
 #include "tests/utils.h"
 
 #include <libopencor>
