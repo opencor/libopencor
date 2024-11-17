@@ -506,7 +506,7 @@ def test_sedml_file():
     expected_issues = [
         [
             oc.Issue.Type.Warning,
-            "The model 'cellml_2.cellml' could not be found. It has been automatically added, but it is empty.",
+            "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it.",
         ],
     ]
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>

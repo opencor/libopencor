@@ -463,7 +463,7 @@ TEST(SerialiseSedTest, oneStepSimulation)
 TEST(SerialiseSedTest, sedmlFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::WARNING, "The model 'cellml_2.cellml' could not be found. It has been automatically added, but it is empty."},
+        {libOpenCOR::Issue::Type::WARNING, "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it."},
     };
     static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">

@@ -715,7 +715,7 @@ describe("Sed serialise tests", () => {
     expectIssues(libopencor, document, [
       [
         libopencor.Issue.Type.WARNING,
-        "The model 'cellml_2.cellml' could not be found. It has been automatically added, but it is empty.",
+        "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it.",
       ],
     ]);
     expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(

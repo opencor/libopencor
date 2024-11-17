@@ -85,7 +85,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         if (file != nullptr) {
             model = SedModel::create(pDocument, file);
         } else {
-            addWarning(std::string("The model '").append(source).append("' could not be found. It has been automatically added, but it is empty."));
+            addWarning(std::string("The model '").append(source).append("' could not be found in the file manager. It has been automatically added to it."));
 
             model = SedModel::create(pDocument, File::create(modelSource));
         }
