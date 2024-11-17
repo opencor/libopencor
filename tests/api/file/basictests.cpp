@@ -16,8 +16,10 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <filesystem>
 #include <libopencor>
 
+static const libOpenCOR::ExpectedIssues EXPECTED_NO_ISSUES = {};
 static const libOpenCOR::ExpectedIssues EXPECTED_NON_EXISTING_FILE_ISSUES = {
     {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
 };
@@ -62,6 +64,20 @@ TEST(BasicFileTest, relativeLocalFile)
 #endif
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, EXPECTED_NON_EXISTING_FILE_ISSUES);
+}
+
+TEST(BasicSedTest, existingRelativeLocalFile)
+{
+    auto origDir = std::filesystem::current_path();
+
+    std::filesystem::current_path(libOpenCOR::resourcePath());
+
+    auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
+
+    EXPECT_FALSE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, EXPECTED_NO_ISSUES);
+
+    std::filesystem::current_path(origDir);
 }
 
 TEST(BasicFileTest, urlBasedLocalFile)

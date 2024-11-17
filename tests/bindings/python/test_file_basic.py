@@ -14,11 +14,13 @@
 
 
 import libopencor as oc
+import os
 import platform
 import utils
 from utils import assert_issues
 
 
+expected_no_issues = []
 expected_non_existing_file_issues = [
     [oc.Issue.Type.Error, "The file does not exist."],
 ]
@@ -66,6 +68,19 @@ def test_relative_local_file():
 
     assert file.contents == []
     assert_issues(file, expected_non_existing_file_issues)
+
+
+def test_existing_relative_local_file():
+    orig_dir = os.getcwd()
+
+    os.chdir(utils.resource_path())
+
+    file = oc.File(utils.Cellml2File)
+
+    assert file.contents != []
+    assert_issues(file, expected_no_issues)
+
+    os.chdir(orig_dir)
 
 
 def test_url_based_local_file():
