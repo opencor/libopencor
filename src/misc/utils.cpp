@@ -130,7 +130,7 @@ std::string canonicalFileName(const std::string &pFileName)
     // The file name may be relative rather than absolute, in which case we need to remove the forward slash that got
     // added (at the beginning of the file name) by std::filesystem::weakly_canonical().
 
-    if (!pFileName.starts_with(FORWARD_SLASH)) {
+    if (!fileExists && !pFileName.starts_with(FORWARD_SLASH)) {
         static const auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
 
         res.erase(0, FORWARD_SLASH_LENGTH);
