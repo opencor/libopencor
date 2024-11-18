@@ -94,12 +94,13 @@ void CellmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument) const
 
     // Add the required solver(s) depending on the type of our model.
 
-    if (type == libcellml::AnalyserModel::Type::ODE) {
+    if ((type == libcellml::AnalyserModel::Type::ODE)
+        || (type == libcellml::AnalyserModel::Type::DAE)) {
         simulation->setOdeSolver(SolverCvode::create());
-    } else if (type == libcellml::AnalyserModel::Type::NLA) {
-        simulation->setNlaSolver(SolverKinsol::create());
-    } else if (type == libcellml::AnalyserModel::Type::DAE) {
-        simulation->setOdeSolver(SolverCvode::create());
+    }
+
+    if ((type == libcellml::AnalyserModel::Type::NLA)
+        || (type == libcellml::AnalyserModel::Type::DAE)) {
         simulation->setNlaSolver(SolverKinsol::create());
     }
 

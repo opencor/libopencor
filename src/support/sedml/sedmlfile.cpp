@@ -171,8 +171,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
     }
 
     // Populate the tasks.
-    //---GRY--- FOR NOW, WE CREATE ONE TASK IF WE HAVE ONE MODEL AND ONE SIMULATION. THIS IS SO THAT WE CAN MEET OUR
-    //          ISAN DEADLINE.
+    //---GRY--- FOR NOW, WE ONLY CREATE A TASK IF WE HAVE ONE MODEL AND ONE SIMULATION.
 
 #ifdef CODE_COVERAGE_ENABLED
     if (mDocument->getNumModels() == 1) {
