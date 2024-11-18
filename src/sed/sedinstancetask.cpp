@@ -173,70 +173,6 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     }
 }
 
-namespace {
-
-std::string name(const libcellml::VariablePtr &pVariable) //---ISAN---
-{
-    auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
-
-    return component->name() + "/" + pVariable->name();
-}
-
-} // namespace
-
-#ifdef __EMSCRIPTEN__
-void SedInstanceTask::Impl::applyInitialConditions() //---ISAN---
-{
-    for (const auto &[parameter, value] : mInitialConditions) {
-        bool isParameterSet = false;
-
-        for (const auto &state : mAnalyserModel->states()) {
-            if (name(state->variable()) == parameter) {
-                mStates[state->index()] = value;
-
-                isParameterSet = true;
-
-                break;
-            }
-        }
-
-        if (!isParameterSet) {
-            for (const auto &constant : mAnalyserModel->constants()) {
-                if (name(constant->variable()) == parameter) {
-                    mConstants[constant->index()] = value;
-
-                    isParameterSet = true;
-
-                    break;
-                }
-            }
-        }
-
-        if (!isParameterSet) {
-            for (const auto &computedConstant : mAnalyserModel->computedConstants()) {
-                if (name(computedConstant->variable()) == parameter) {
-                    mComputedConstants[computedConstant->index()] = value;
-
-                    isParameterSet = true;
-
-                    break;
-                }
-            }
-        }
-
-        if (!isParameterSet) {
-            for (const auto &algebraic : mAnalyserModel->algebraic()) {
-                if (name(algebraic->variable()) == parameter) {
-                    mAlgebraic[algebraic->index()] = value;
-
-                    break;
-                }
-            }
-        }
-    }
-}
-#endif
-
 void SedInstanceTask::Impl::initialise()
 {
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -261,11 +197,6 @@ void SedInstanceTask::Impl::initialise()
         } else {
 #endif
             mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-
-#ifdef __EMSCRIPTEN__
-            applyInitialConditions(); //---ISAN---
-#endif
-
             mRuntime->computeInterpretedComputedConstants()(mConstants, mComputedConstants);
             mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
             mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
@@ -393,18 +324,6 @@ void SedInstanceTask::Impl::run()
     }
 }
 
-#ifdef __EMSCRIPTEN__
-void SedInstanceTask::Impl::removeAllInitialConditions() //---ISAN---
-{
-    mInitialConditions.clear();
-}
-
-void SedInstanceTask::Impl::addInitialCondition(const std::string &pParameter, double pValue) //---ISAN---
-{
-    mInitialConditions[pParameter] = pValue;
-}
-#endif
-
 Doubles SedInstanceTask::Impl::state(size_t pIndex) const
 {
     if (pIndex >= mAnalyserModel->stateCount()) {
@@ -450,7 +369,6 @@ Doubles SedInstanceTask::Impl::algebraic(size_t pIndex) const
     return mResults.algebraic[pIndex];
 }
 
-/*---ISAN---
 namespace {
 
 std::string name(const libcellml::VariablePtr &pVariable)
@@ -461,7 +379,6 @@ std::string name(const libcellml::VariablePtr &pVariable)
 }
 
 } // namespace
-*/
 
 Doubles SedInstanceTask::Impl::voi() const
 {
