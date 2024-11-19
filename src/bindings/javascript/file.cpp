@@ -27,9 +27,7 @@ void fileApi()
         .value("COMBINE_ARCHIVE", libOpenCOR::File::Type::COMBINE_ARCHIVE);
 
     emscripten::class_<libOpenCOR::File, emscripten::base<libOpenCOR::Logger>>("File")
-        .smart_ptr<libOpenCOR::FilePtr>("File")
-        .constructor(&libOpenCOR::File::create)
-        .constructor(&libOpenCOR::File::defaultCreate)
+        .smart_ptr_constructor("File", &libOpenCOR::File::create)
         .function("type", &libOpenCOR::File::type)
         .function("fileName", &libOpenCOR::File::fileName)
         .function("url", &libOpenCOR::File::url)

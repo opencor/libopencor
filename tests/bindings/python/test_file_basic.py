@@ -168,26 +168,19 @@ def test_file_manager():
     assert len(file_manager.files) == 2
     assert file_manager.file(utils.RemoteFile) == remote_file
 
-    unknown_file = oc.File(utils.UnknownFile, False)
-
-    assert same_file_manager.has_files == True
-    assert same_file_manager.file_count == 2
-    assert len(file_manager.files) == 2
-    assert same_file_manager.file(utils.UnknownFile) == None
-
-    file_manager.manage(unknown_file)
-
-    assert file_manager.has_files == True
-    assert file_manager.file_count == 3
-    assert len(file_manager.files) == 3
-    assert file_manager.file(utils.UnknownFile) == unknown_file
-
     same_file_manager.unmanage(local_file)
 
     assert same_file_manager.has_files == True
+    assert same_file_manager.file_count == 1
+    assert len(file_manager.files) == 1
+    assert same_file_manager.file(utils.LocalFile) == None
+
+    same_file_manager.manage(local_file)
+
+    assert same_file_manager.has_files == True
     assert same_file_manager.file_count == 2
     assert len(file_manager.files) == 2
-    assert same_file_manager.file(utils.LocalFile) == None
+    assert same_file_manager.file(utils.LocalFile) == local_file
 
     file_manager.reset()
 

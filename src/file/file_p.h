@@ -30,8 +30,6 @@ namespace libOpenCOR {
 class File::Impl: public Logger::Impl
 {
 public:
-    bool mManaged = false;
-
     Type mType = Type::UNKNOWN_FILE;
 
     std::filesystem::path mFilePath;
@@ -44,7 +42,7 @@ public:
     SedmlFilePtr mSedmlFile;
     CombineArchivePtr mCombineArchive;
 
-    explicit Impl(const std::string &pFileNameOrUrl, bool pManaged);
+    explicit Impl(const std::string &pFileNameOrUrl);
     ~Impl();
 
     void checkType(const FilePtr &pOwner, bool pResetType = false);
