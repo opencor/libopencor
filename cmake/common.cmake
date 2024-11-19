@@ -386,9 +386,9 @@ endfunction()
 
 function(prepare_test TARGET)
     # Prepare the given test.
-    # Note: we don't want modp_b64.cc to be subjected to Clang-Tidy, hence we compile it separately. From Cmake 3.27,,
-    #       we could use the CXX_CLANG_TIDY property to exclude it from Clang-Tidy, but for some reasons it's not
-    #       working, so we compile it separately (as suggested at https://stackoverflow.com/a/75858167).
+    # Note: we don't want modp_b64.cc to be subjected to Clang-Tidy, hence we compile it separately. From Cmake 3.27,
+    #       we could use the SKIP_LINTING property to exclude it from Clang-Tidy, but for some reasons it's not working,
+    #       so we compile it separately (as suggested at https://stackoverflow.com/a/75858167).
 
     add_executable(${TARGET}
                    ${ARGN})
