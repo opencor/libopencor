@@ -30,56 +30,6 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-// #define PRINT_VALUES
-
-#ifdef PRINT_VALUES
-namespace {
-
-void printHeader(const libcellml::AnalyserModelPtr &pAnalyserModel)
-{
-    printf("t"); // NOLINT
-
-    for (auto &state : pAnalyserModel->states()) {
-        printf(",%s", state->variable()->name().c_str()); // NOLINT
-        printf(",%s'", state->variable()->name().c_str()); // NOLINT
-    }
-
-    for (auto &variable : pAnalyserModel->variables()) {
-        printf(",%s", variable->variable()->name().c_str()); // NOLINT
-    }
-
-    printf("\n"); // NOLINT
-}
-
-void printValues(const libcellml::AnalyserModelPtr &pAnalyserModel,
-                 double pVoi, double *pStates, double *pRates,
-                 double *pConstants, double *pComputedConstants, double *pAlgebraic)
-{
-    printf("%f", pVoi); // NOLINT
-
-    for (size_t i = 0; i < pAnalyserModel->states().size(); ++i) {
-        printf(",%f", pStates[i]); // NOLINT
-        printf(",%f", pRates[i]); // NOLINT
-    }
-
-    for (size_t i = 0; i < pAnalyserModel->constants().size(); ++i) {
-        printf(",%f", pConstants[i]); // NOLINT
-    }
-
-    for (size_t i = 0; i < pAnalyserModel->computedConstants().size(); ++i) {
-        printf(",%f", pComputedConstants[i]); // NOLINT
-    }
-
-    for (size_t i = 0; i < pAnalyserModel->algebraic().size(); ++i) {
-        printf(",%f", pAlgebraic[i]); // NOLINT
-    }
-
-    printf("\n"); // NOLINT
-}
-
-} // namespace
-#endif
-
 SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask, bool pCompiled)
 {
     return SedInstanceTaskPtr {new SedInstanceTask(pTask, pCompiled)};
@@ -179,10 +129,6 @@ void SedInstanceTask::Impl::initialise()
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
 
-#ifdef PRINT_VALUES
-    printHeader(mAnalyserModel);
-#endif
-
     mSedUniformTimeCourse = mDifferentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
     if (mSedUniformTimeCourse != nullptr) {
@@ -232,10 +178,6 @@ void SedInstanceTask::Impl::initialise()
             return;
         }
     }
-
-#ifdef PRINT_VALUES
-    printValues(mAnalyserModel, mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-#endif
 }
 
 void SedInstanceTask::Impl::run()
@@ -316,10 +258,6 @@ void SedInstanceTask::Impl::run()
 #endif
 
             trackResults(++index);
-
-#ifdef PRINT_VALUES
-            printValues(mAnalyserModel, mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-#endif
         }
     }
 }
