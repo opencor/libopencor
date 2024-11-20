@@ -33,7 +33,6 @@ struct SedInstanceTaskResults
     std::vector<Doubles> constants;
     std::vector<Doubles> computedConstants;
     std::vector<Doubles> algebraic;
-    std::vector<Doubles> externals;
 };
 
 class SedInstanceTask::Impl: public Logger::Impl
