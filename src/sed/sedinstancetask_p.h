@@ -72,33 +72,32 @@ public:
     void initialise();
     void run();
 
-    Doubles state(size_t pIndex) const;
-    Doubles rate(size_t pIndex) const;
-    Doubles constant(size_t pIndex) const;
-    Doubles computedConstant(size_t pIndex) const;
-    Doubles algebraic(size_t pIndex) const;
-
     Doubles voi() const;
     std::string voiName() const;
     std::string voiUnit() const;
 
     size_t stateCount() const;
+    Doubles state(size_t pIndex) const;
     std::string stateName(size_t pIndex) const;
     std::string stateUnit(size_t pIndex) const;
 
     size_t rateCount() const;
+    Doubles rate(size_t pIndex) const;
     std::string rateName(size_t pIndex) const;
     std::string rateUnit(size_t pIndex) const;
 
     size_t constantCount() const;
+    Doubles constant(size_t pIndex) const;
     std::string constantName(size_t pIndex) const;
     std::string constantUnit(size_t pIndex) const;
 
     size_t computedConstantCount() const;
+    Doubles computedConstant(size_t pIndex) const;
     std::string computedConstantName(size_t pIndex) const;
     std::string computedConstantUnit(size_t pIndex) const;
 
     size_t algebraicCount() const;
+    Doubles algebraic(size_t pIndex) const;
     std::string algebraicName(size_t pIndex) const;
     std::string algebraicUnit(size_t pIndex) const;
 };

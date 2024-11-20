@@ -262,51 +262,6 @@ void SedInstanceTask::Impl::run()
     }
 }
 
-Doubles SedInstanceTask::Impl::state(size_t pIndex) const
-{
-    if (pIndex >= mAnalyserModel->stateCount()) {
-        return {};
-    }
-
-    return mResults.states[pIndex];
-}
-
-Doubles SedInstanceTask::Impl::rate(size_t pIndex) const
-{
-    if (pIndex >= mAnalyserModel->stateCount()) {
-        return {};
-    }
-
-    return mResults.rates[pIndex];
-}
-
-Doubles SedInstanceTask::Impl::constant(size_t pIndex) const
-{
-    if (pIndex >= mAnalyserModel->constantCount()) {
-        return {};
-    }
-
-    return mResults.constants[pIndex];
-}
-
-Doubles SedInstanceTask::Impl::computedConstant(size_t pIndex) const
-{
-    if (pIndex >= mAnalyserModel->computedConstantCount()) {
-        return {};
-    }
-
-    return mResults.computedConstants[pIndex];
-}
-
-Doubles SedInstanceTask::Impl::algebraic(size_t pIndex) const
-{
-    if (pIndex >= mAnalyserModel->algebraicCount()) {
-        return {};
-    }
-
-    return mResults.algebraic[pIndex];
-}
-
 namespace {
 
 std::string name(const libcellml::VariablePtr &pVariable)
@@ -338,6 +293,15 @@ size_t SedInstanceTask::Impl::stateCount() const
     return mAnalyserModel->stateCount();
 }
 
+Doubles SedInstanceTask::Impl::state(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return mResults.states[pIndex];
+}
+
 std::string SedInstanceTask::Impl::stateName(size_t pIndex) const
 {
     if (pIndex >= mAnalyserModel->stateCount()) {
@@ -359,6 +323,15 @@ std::string SedInstanceTask::Impl::stateUnit(size_t pIndex) const
 size_t SedInstanceTask::Impl::rateCount() const
 {
     return stateCount();
+}
+
+Doubles SedInstanceTask::Impl::rate(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->stateCount()) {
+        return {};
+    }
+
+    return mResults.rates[pIndex];
 }
 
 std::string SedInstanceTask::Impl::rateName(size_t pIndex) const
@@ -384,6 +357,15 @@ size_t SedInstanceTask::Impl::constantCount() const
     return mAnalyserModel->constantCount();
 }
 
+Doubles SedInstanceTask::Impl::constant(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->constantCount()) {
+        return {};
+    }
+
+    return mResults.constants[pIndex];
+}
+
 std::string SedInstanceTask::Impl::constantName(size_t pIndex) const
 {
     if (pIndex >= mAnalyserModel->constantCount()) {
@@ -407,6 +389,15 @@ size_t SedInstanceTask::Impl::computedConstantCount() const
     return mAnalyserModel->computedConstantCount();
 }
 
+Doubles SedInstanceTask::Impl::computedConstant(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->computedConstantCount()) {
+        return {};
+    }
+
+    return mResults.computedConstants[pIndex];
+}
+
 std::string SedInstanceTask::Impl::computedConstantName(size_t pIndex) const
 {
     if (pIndex >= mAnalyserModel->computedConstantCount()) {
@@ -428,6 +419,15 @@ std::string SedInstanceTask::Impl::computedConstantUnit(size_t pIndex) const
 size_t SedInstanceTask::Impl::algebraicCount() const
 {
     return mAnalyserModel->algebraicCount();
+}
+
+Doubles SedInstanceTask::Impl::algebraic(size_t pIndex) const
+{
+    if (pIndex >= mAnalyserModel->algebraicCount()) {
+        return {};
+    }
+
+    return mResults.algebraic[pIndex];
 }
 
 std::string SedInstanceTask::Impl::algebraicName(size_t pIndex) const
