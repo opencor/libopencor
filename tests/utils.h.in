@@ -30,7 +30,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-static constexpr auto LOCAL_BASE_PATH = "@RESOURCE_LOCATION@";
+static constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
 
 static constexpr auto UNKNOWN_FILE = "unknown_file.txt";
 static constexpr auto SBML_FILE = "sbml.sbml";

@@ -136,7 +136,7 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
 
@@ -166,7 +166,7 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH + "/../..")).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION + "/../..")).toBe(
       cvodeExpectedSerialisation("some/path/cellml_2.cellml"),
     );
 
@@ -281,7 +281,7 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
     );
 
@@ -296,7 +296,7 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation(),
     );
 
@@ -328,7 +328,7 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
     );
 
@@ -366,7 +366,7 @@ describe("Sed serialise tests", () => {
 
     simulation.setOdeSolver(new libopencor.SolverForwardEuler());
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
     );
 
@@ -387,7 +387,7 @@ describe("Sed serialise tests", () => {
       libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
     );
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000475": "Adams-Moulton",
       }),
@@ -408,7 +408,7 @@ describe("Sed serialise tests", () => {
 
     solver.setIterationType(libopencor.SolverCvode.IterationType.FUNCTIONAL);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000476": "Functional",
       }),
@@ -429,7 +429,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "Banded",
       }),
@@ -450,7 +450,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.DIAGONAL);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "Diagonal",
       }),
@@ -471,7 +471,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.GMRES);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "GMRES",
       }),
@@ -492,7 +492,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BICGSTAB);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "BiCGStab",
       }),
@@ -513,7 +513,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.TFQMR);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "TFQMR",
       }),
@@ -534,7 +534,7 @@ describe("Sed serialise tests", () => {
 
     solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", { "KISAO:0000478": "No" }),
     );
 
@@ -553,7 +553,7 @@ describe("Sed serialise tests", () => {
 
     solver.setInterpolateSolution(false);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000481": "false",
       }),
@@ -574,7 +574,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "Banded" }),
     );
 
@@ -593,7 +593,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.GMRES);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "GMRES" }),
     );
 
@@ -612,7 +612,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BICGSTAB);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "BiCGStab" }),
     );
 
@@ -631,7 +631,7 @@ describe("Sed serialise tests", () => {
 
     solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.TFQMR);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),
     );
 
@@ -666,7 +666,7 @@ describe("Sed serialise tests", () => {
 
     document.addSimulation(simulation);
 
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
     );
 
@@ -718,7 +718,7 @@ describe("Sed serialise tests", () => {
         "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it.",
       ],
     ]);
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
     );
 
@@ -1136,7 +1136,7 @@ describe("Sed serialise tests", () => {
         "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
       ],
     ]);
-    expect(document.serialise(utils.LOCAL_BASE_PATH)).toBe(
+    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
     );
 

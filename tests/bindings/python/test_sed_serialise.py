@@ -112,7 +112,7 @@ def test_local_cellml_file_with_base_path():
     file = oc.File(utils.resource_path(utils.Cellml2File))
     document = oc.SedDocument(file)
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml"
     )
 
@@ -139,7 +139,7 @@ def test_relative_local_cellml_file_with_base_path():
     document = oc.SedDocument(file)
 
     assert document.serialise(
-        utils.LocalBasePath + "/../.."
+        utils.ResourceLocation + "/../.."
     ) == cvode_expected_serialisation("tests/res/cellml_2.cellml")
 
 
@@ -222,7 +222,7 @@ def test_dae_model():
     file = oc.File(utils.resource_path("api/sed/dae.cellml"))
     document = oc.SedDocument(file)
 
-    assert document.serialise(utils.LocalBasePath) == expected_serialisation
+    assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
 def test_nla_model():
@@ -252,7 +252,7 @@ def test_nla_model():
     file = oc.File(utils.resource_path("api/sed/nla.cellml"))
     document = oc.SedDocument(file)
 
-    assert document.serialise(utils.LocalBasePath) == expected_serialisation
+    assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
 def test_algebraic_model():
@@ -273,7 +273,7 @@ def test_algebraic_model():
     file = oc.File(utils.resource_path("api/sed/algebraic.cellml"))
     document = oc.SedDocument(file)
 
-    assert document.serialise(utils.LocalBasePath) == expected_serialisation
+    assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
 def test_fixed_step_ode_solver():
@@ -303,7 +303,7 @@ def test_fixed_step_ode_solver():
 
     simulation.ode_solver = oc.SolverForwardEuler()
 
-    assert document.serialise(utils.LocalBasePath) == expected_serialisation
+    assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
 def test_cvode_solver_with_adams_moulton_interation_method():
@@ -314,7 +314,7 @@ def test_cvode_solver_with_adams_moulton_interation_method():
 
     solver.integration_method = oc.SolverCvode.IntegrationMethod.AdamsMoulton
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000475": "Adams-Moulton"}
     )
 
@@ -327,7 +327,7 @@ def test_cvode_solver_with_functional_iteration_type():
 
     solver.iteration_type = oc.SolverCvode.IterationType.Functional
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000476": "Functional"}
     )
 
@@ -340,7 +340,7 @@ def test_cvode_solver_with_banded_linear_solver():
 
     solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "Banded"}
     )
 
@@ -353,7 +353,7 @@ def test_cvode_solver_with_diagonal_linear_solver():
 
     solver.linear_solver = oc.SolverCvode.LinearSolver.Diagonal
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "Diagonal"}
     )
 
@@ -366,7 +366,7 @@ def test_cvode_solver_with_gmres_linear_solver():
 
     solver.linear_solver = oc.SolverCvode.LinearSolver.Gmres
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "GMRES"}
     )
 
@@ -379,7 +379,7 @@ def test_cvode_solver_with_bicgstab_linear_solver():
 
     solver.linear_solver = oc.SolverCvode.LinearSolver.Bicgstab
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "BiCGStab"}
     )
 
@@ -392,7 +392,7 @@ def test_cvode_solver_with_tfqmr_linear_solver():
 
     solver.linear_solver = oc.SolverCvode.LinearSolver.Tfqmr
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000477": "TFQMR"}
     )
 
@@ -405,7 +405,7 @@ def test_cvode_solver_with_no_preconditioner():
 
     solver.preconditioner = oc.SolverCvode.Preconditioner.No
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000478": "No"}
     )
 
@@ -418,7 +418,7 @@ def test_cvode_solver_with_no_interpolate_solution():
 
     solver.interpolate_solution = False
 
-    assert document.serialise(utils.LocalBasePath) == cvode_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
         "cellml_2.cellml", {"KISAO:0000481": "false"}
     )
 
@@ -431,7 +431,7 @@ def test_kinsol_solver_with_banded_linear_solver():
 
     solver.linear_solver = oc.SolverKinsol.LinearSolver.Banded
 
-    assert document.serialise(utils.LocalBasePath) == kinsol_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == kinsol_expected_serialisation(
         {"KISAO:0000477": "Banded"}
     )
 
@@ -444,7 +444,7 @@ def test_kinsol_solver_with_gmres_linear_solver():
 
     solver.linear_solver = oc.SolverKinsol.LinearSolver.Gmres
 
-    assert document.serialise(utils.LocalBasePath) == kinsol_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == kinsol_expected_serialisation(
         {"KISAO:0000477": "GMRES"}
     )
 
@@ -457,7 +457,7 @@ def test_kinsol_solver_with_bicgstab_linear_solver():
 
     solver.linear_solver = oc.SolverKinsol.LinearSolver.Bicgstab
 
-    assert document.serialise(utils.LocalBasePath) == kinsol_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == kinsol_expected_serialisation(
         {"KISAO:0000477": "BiCGStab"}
     )
 
@@ -470,7 +470,7 @@ def test_kinsol_solver_with_tfqmr_linear_solver():
 
     solver.linear_solver = oc.SolverKinsol.LinearSolver.Tfqmr
 
-    assert document.serialise(utils.LocalBasePath) == kinsol_expected_serialisation(
+    assert document.serialise(utils.ResourceLocation) == kinsol_expected_serialisation(
         {"KISAO:0000477": "TFQMR"}
     )
 
@@ -499,7 +499,7 @@ def test_one_step_simulation():
 
     document.add_simulation(simulation)
 
-    assert document.serialise(utils.LocalBasePath) == expected_serialisation
+    assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
 def test_sedml_file():
@@ -543,7 +543,7 @@ def test_sedml_file():
     document = oc.SedDocument(file)
 
     assert_issues(document, expected_issues)
-    assert document.serialise(utils.LocalBasePath) == expected_serialisation
+    assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
 def test_sed_simulation():
@@ -951,4 +951,4 @@ def test_sed_simulation():
     document = oc.SedDocument(file)
 
     assert_issues(document, expected_issues)
-    assert document.serialise(utils.LocalBasePath) == expected_serialisation
+    assert document.serialise(utils.ResourceLocation) == expected_serialisation

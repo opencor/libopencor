@@ -108,7 +108,7 @@ TEST(SerialiseSedTest, localCellmlFileWithBasePath)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml"));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
 
 TEST(SerialiseSedTest, localCellmlFileWithoutBasePath)
@@ -131,7 +131,7 @@ TEST(SerialiseSedTest, relativeLocalCellmlFileWithBasePath)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ(document->serialise(std::string(libOpenCOR::LOCAL_BASE_PATH).append("/../..")), cvodeExpectedSerialisation("tests/res/cellml_2.cellml"));
+    EXPECT_EQ(document->serialise(std::string(libOpenCOR::RESOURCE_LOCATION).append("/../..")), cvodeExpectedSerialisation("tests/res/cellml_2.cellml"));
 }
 
 TEST(SerialiseSedTest, relativeLocalCellmlFileWithoutBasePath)
@@ -212,7 +212,7 @@ TEST(SerialiseSedTest, daeModel)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
 TEST(SerialiseSedTest, nlaModel)
@@ -220,7 +220,7 @@ TEST(SerialiseSedTest, nlaModel)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation());
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation());
 }
 
 TEST(SerialiseSedTest, algebraicModel)
@@ -242,7 +242,7 @@ TEST(SerialiseSedTest, algebraicModel)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
 TEST(SerialiseSedTest, fixedStepOdeSolver)
@@ -273,7 +273,7 @@ TEST(SerialiseSedTest, fixedStepOdeSolver)
 
     simulation->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonInterationMethod)
@@ -285,7 +285,7 @@ TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonInterationMethod)
 
     solver->setIntegrationMethod(libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000475", "Adams-Moulton"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000475", "Adams-Moulton"}}));
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithFunctionalIterationType)
@@ -297,7 +297,7 @@ TEST(SerialiseSedTest, cvodeSolverWithFunctionalIterationType)
 
     solver->setIterationType(libOpenCOR::SolverCvode::IterationType::FUNCTIONAL);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000476", "Functional"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000476", "Functional"}}));
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithBandedLinearSolver)
@@ -309,7 +309,7 @@ TEST(SerialiseSedTest, cvodeSolverWithBandedLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "Banded"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "Banded"}}));
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithDiagonalLinearSolver)
@@ -321,7 +321,7 @@ TEST(SerialiseSedTest, cvodeSolverWithDiagonalLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::DIAGONAL);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "Diagonal"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "Diagonal"}}));
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithGmresLinearSolver)
@@ -333,7 +333,7 @@ TEST(SerialiseSedTest, cvodeSolverWithGmresLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "GMRES"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "GMRES"}}));
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithBicgstabLinearSolver)
@@ -345,7 +345,7 @@ TEST(SerialiseSedTest, cvodeSolverWithBicgstabLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "BiCGStab"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "BiCGStab"}}));
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithTfqmrLinearSolver)
@@ -357,7 +357,7 @@ TEST(SerialiseSedTest, cvodeSolverWithTfqmrLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "TFQMR"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000477", "TFQMR"}}));
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithNoPreconditioner)
@@ -369,7 +369,7 @@ TEST(SerialiseSedTest, cvodeSolverWithNoPreconditioner)
 
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000478", "No"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000478", "No"}}));
 }
 
 TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
@@ -381,7 +381,7 @@ TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
 
     solver->setInterpolateSolution(false);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000481", "false"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml", {{"KISAO:0000481", "false"}}));
 }
 
 TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
@@ -393,7 +393,7 @@ TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation({{"KISAO:0000477", "Banded"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "Banded"}}));
 }
 
 TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
@@ -405,7 +405,7 @@ TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::GMRES);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation({{"KISAO:0000477", "GMRES"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "GMRES"}}));
 }
 
 TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
@@ -417,7 +417,7 @@ TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation({{"KISAO:0000477", "BiCGStab"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "BiCGStab"}}));
 }
 
 TEST(SerialiseSedTest, kinsolWithTfmqrLinearSolver)
@@ -429,7 +429,7 @@ TEST(SerialiseSedTest, kinsolWithTfmqrLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), kinsolExpectedSerialisation({{"KISAO:0000477", "TFQMR"}}));
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation({{"KISAO:0000477", "TFQMR"}}));
 }
 
 TEST(SerialiseSedTest, oneStepSimulation)
@@ -457,7 +457,7 @@ TEST(SerialiseSedTest, oneStepSimulation)
 
     document->addSimulation(simulation);
 
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
 TEST(SerialiseSedTest, sedmlFile)
@@ -499,7 +499,7 @@ TEST(SerialiseSedTest, sedmlFile)
     auto document = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(document, expectedIssues);
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
 TEST(SerialiseSedTest, sedSimulation)
@@ -788,5 +788,5 @@ TEST(SerialiseSedTest, sedSimulation)
     auto document = libOpenCOR::SedDocument::create(file);
 
     // EXPECT_EQ_ISSUES(document, expectedIssues);
-    EXPECT_EQ(document->serialise(libOpenCOR::LOCAL_BASE_PATH), expectedSerialisation);
+    EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }

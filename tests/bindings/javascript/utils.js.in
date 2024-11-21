@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export const LOCAL_BASE_PATH = "/some/path";
+export const RESOURCE_LOCATION = "/some/path";
 
 export const UNKNOWN_FILE = "unknown_file.txt";
 export const ERROR_CELLML_FILE = "error.cellml";
@@ -210,5 +210,5 @@ function stringToArrayBuffer(string) {
 }
 
 export function resourcePath(resourceRelativePath) {
-  return LOCAL_BASE_PATH + "/" + resourceRelativePath;
+  return RESOURCE_LOCATION + "/" + resourceRelativePath;
 }

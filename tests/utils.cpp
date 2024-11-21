@@ -92,7 +92,7 @@ void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex,
 
 std::string resourcePath(const std::string &pResourceRelativePath)
 {
-    return std::string(LOCAL_BASE_PATH) + "/" + pResourceRelativePath;
+    return std::string(RESOURCE_LOCATION) + "/" + pResourceRelativePath;
 }
 
 std::string textFileContents(const std::string &pFileName)
