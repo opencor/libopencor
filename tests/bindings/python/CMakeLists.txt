@@ -52,3 +52,15 @@ if(PYTHON_UNIT_TESTING_REPORT_AVAILABLE)
                WORKING_DIRECTORY ${PYTHON_BINDINGS_DIR}
                COMMENT "Running Python unit testing report...")
 endif()
+
+# Run our Python code coverage.
+
+if(LIBOPENCOR_PYTHON_CODE_COVERAGE)
+    add_target(python_code_coveraage
+               ${COMMANDS}
+               COMMAND ${PYTEST_EXE} --cov=libopencor
+               DEPENDS ${PYTHON_BINDINGS_TARGET}
+               USES_TERMINAL
+               WORKING_DIRECTORY ${PYTHON_BINDINGS_DIR}
+               COMMENT "Running Python code coverage...")
+endif()

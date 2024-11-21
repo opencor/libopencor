@@ -3,6 +3,7 @@
         "jest": "^29.5.0"
     },
     "scripts": {
+        "coverage": "@NODE_EXE@ --experimental-vm-modules ./node_modules/.bin/jest --coverage",
         "test": "@NODE_EXE@ --experimental-vm-modules ./node_modules/.bin/jest"
     },
     "type": "module"

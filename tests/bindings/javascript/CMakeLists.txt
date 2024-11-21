@@ -40,3 +40,14 @@ add_target(javascript_unit_testing
            DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
            USES_TERMINAL
            COMMENT "Running JavaScript unit testing...")
+
+# Run our JavaScript code coverage.
+
+if(LIBOPENCOR_JAVASCRIPT_CODE_COVERAGE)
+    add_target(javascript_code_coveraage
+               COMMAND ${NPM_EXE} install
+               COMMAND ${NPM_EXE} run coverage
+               DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
+               USES_TERMINAL
+               COMMENT "Running JavaScript code coverage...")
+endif()
