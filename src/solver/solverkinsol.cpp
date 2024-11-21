@@ -16,10 +16,8 @@ limitations under the License.
 
 #include "solverkinsol_p.h"
 
-#include <algorithm>
-
 #include "libsedmlbegin.h"
-#include <sedml/SedAlgorithm.h>
+#include "sedml/SedAlgorithm.h"
 #include "libsedmlend.h"
 
 #include "sundialsbegin.h"

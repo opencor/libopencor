@@ -16,8 +16,6 @@ limitations under the License.
 
 #include "sedanalysis_p.h"
 
-#include "seddocument_p.h"
-
 #include "utils.h"
 
 namespace libOpenCOR {

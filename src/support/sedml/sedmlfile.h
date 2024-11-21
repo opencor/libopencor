@@ -16,10 +16,6 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/logger.h"
-
-#include <memory>
-
 namespace libsedml {
 class SedDocument;
 } // namespace libsedml

@@ -18,8 +18,6 @@ limitations under the License.
 
 #include "libopencor/file.h"
 
-#include <vector>
-
 namespace libOpenCOR {
 
 /**

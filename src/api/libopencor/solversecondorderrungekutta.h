@@ -16,7 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "solverodefixedstep.h"
+#include "libopencor/solverodefixedstep.h"
 
 namespace libOpenCOR {
 

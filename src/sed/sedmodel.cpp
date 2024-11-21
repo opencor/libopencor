@@ -14,14 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedmodel_p.h"
-
 #include "file_p.h"
 #include "seddocument_p.h"
+#include "sedmodel_p.h"
 
 #include "utils.h"
-
-#include <filesystem>
 
 namespace libOpenCOR {
 

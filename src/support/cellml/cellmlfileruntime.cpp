@@ -15,10 +15,9 @@ limitations under the License.
 */
 
 #include "cellmlfileruntime_p.h"
-
 #include "solvernla_p.h"
 
-#include "compiler.h"
+#include "cellmlfile.h"
 
 namespace libOpenCOR {
 

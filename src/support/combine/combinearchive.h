@@ -18,8 +18,6 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
-#include <memory>
-
 namespace libcombine {
 class CombineArchive;
 }

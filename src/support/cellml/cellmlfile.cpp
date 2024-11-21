@@ -24,8 +24,6 @@ limitations under the License.
 #include "libopencor/sedsteadystate.h"
 #include "libopencor/sedtask.h"
 #include "libopencor/seduniformtimecourse.h"
-#include "libopencor/solvercvode.h"
-#include "libopencor/solverkinsol.h"
 
 namespace libOpenCOR {
 

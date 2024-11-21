@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "libopencor/sedbase.h"
 
-#include <libxml/tree.h>
+#include "libxml/tree.h"
 
 namespace libOpenCOR {
 

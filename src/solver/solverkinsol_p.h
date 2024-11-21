@@ -20,11 +20,6 @@ limitations under the License.
 
 #include "libopencor/solverkinsol.h"
 
-#include "sundialsbegin.h"
-#include "sundials/sundials_linearsolver.h"
-#include "sundials/sundials_matrix.h"
-#include "sundialsend.h"
-
 namespace libOpenCOR {
 
 class SolverKinsol::Impl: public SolverNla::Impl

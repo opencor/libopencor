@@ -22,7 +22,6 @@ limitations under the License.
 
 #include "sundialsbegin.h"
 #include "sundials/sundials_linearsolver.h"
-#include "sundials/sundials_matrix.h"
 #include "sundials/sundials_nonlinearsolver.h"
 #include "sundialsend.h"
 

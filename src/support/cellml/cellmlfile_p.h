@@ -20,8 +20,6 @@ limitations under the License.
 
 #include "cellmlfile.h"
 
-#include <libcellml>
-
 namespace libOpenCOR {
 
 using FileWeakPtr = std::weak_ptr<File>;

@@ -15,10 +15,10 @@ limitations under the License.
 */
 
 #include "sedmlfile_p.h"
-
 #include "solvernla_p.h"
 #include "solverode_p.h"
 
+#include "cellmlfile.h"
 #include "utils.h"
 
 #include "libopencor/file.h"
@@ -38,10 +38,10 @@ limitations under the License.
 #include "libopencor/solversecondorderrungekutta.h"
 
 #include "libsedmlbegin.h"
-#include <sedml/SedDocument.h>
-#include <sedml/SedReader.h>
-#include <sedml/SedOneStep.h>
-#include <sedml/SedUniformTimeCourse.h>
+#include "sedml/SedDocument.h"
+#include "sedml/SedReader.h"
+#include "sedml/SedOneStep.h"
+#include "sedml/SedUniformTimeCourse.h"
 #include "libsedmlend.h"
 
 #include <ranges>

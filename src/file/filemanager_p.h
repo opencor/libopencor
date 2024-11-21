@@ -18,8 +18,6 @@ limitations under the License.
 
 #include "libopencor/filemanager.h"
 
-#include <vector>
-
 namespace libOpenCOR {
 
 using Files = std::vector<File *>;

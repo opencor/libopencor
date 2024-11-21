@@ -16,8 +16,6 @@ limitations under the License.
 
 #include "logger_p.h"
 
-#include "issue_p.h"
-
 namespace libOpenCOR {
 
 bool Logger::Impl::hasIssues() const

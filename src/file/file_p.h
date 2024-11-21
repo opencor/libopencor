@@ -16,9 +16,10 @@ limitations under the License.
 
 #pragma once
 
+#include "logger_p.h"
+
 #include "cellmlfile.h"
 #include "combinearchive.h"
-#include "logger_p.h"
 #include "sedmlfile.h"
 
 #include "libopencor/file.h"

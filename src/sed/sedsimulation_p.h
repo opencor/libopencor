@@ -19,8 +19,6 @@ limitations under the License.
 #include "sedbase_p.h"
 
 #include "libopencor/sedsimulation.h"
-#include "libopencor/solvernla.h"
-#include "libopencor/solverode.h"
 
 namespace libOpenCOR {
 

@@ -14,19 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedinstancetask_p.h"
-
 #include "file_p.h"
+#include "sedinstancetask_p.h"
 #include "sedmodel_p.h"
 #include "sedtask_p.h"
 #include "seduniformtimecourse_p.h"
 #include "solvernla_p.h"
 #include "solverode_p.h"
-
-#include "utils.h"
-
-#include "libopencor/sedsimulation.h"
-#include "libopencor/sedsteadystate.h"
 
 namespace libOpenCOR {
 

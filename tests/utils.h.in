@@ -28,9 +28,6 @@ limitations under the License.
 #include "libopencor/issue.h"
 #include "libopencor/types.h"
 
-#include <string>
-#include <vector>
-
 namespace libOpenCOR {
 
 static constexpr auto LOCAL_BASE_PATH = "@RESOURCE_LOCATION@";

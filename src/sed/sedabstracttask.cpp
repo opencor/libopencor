@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 #include "sedabstracttask_p.h"
-
 #include "seddocument_p.h"
 
 namespace libOpenCOR {

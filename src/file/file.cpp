@@ -15,15 +15,9 @@ limitations under the License.
 */
 
 #include "file_p.h"
-
 #include "filemanager_p.h"
 
-#include "cellmlfile.h"
-#include "combinearchive.h"
-#include "sedmlfile.h"
 #include "utils.h"
-
-#include <filesystem>
 
 namespace libOpenCOR {
 

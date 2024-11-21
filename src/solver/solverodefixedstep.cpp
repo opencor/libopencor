@@ -16,10 +16,8 @@ limitations under the License.
 
 #include "solverodefixedstep_p.h"
 
-#include "utils.h"
-
 #include "libsedmlbegin.h"
-#include <sedml/SedAlgorithm.h>
+#include "sedml/SedAlgorithm.h"
 #include "libsedmlend.h"
 
 namespace libOpenCOR {

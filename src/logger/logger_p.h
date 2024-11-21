@@ -16,11 +16,11 @@ limitations under the License.
 
 #pragma once
 
+#include "libcellml/issue.h"
+#include "libcellml/logger.h"
+
 #include "libopencor/issue.h"
 #include "libopencor/logger.h"
-
-#include <libcellml>
-#include <vector>
 
 namespace libOpenCOR {
 

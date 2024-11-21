@@ -22,7 +22,7 @@ limitations under the License.
 
 #include "libopencor/solver.h"
 
-#include <libxml/tree.h>
+#include "libxml/tree.h"
 
 namespace libsedml {
 

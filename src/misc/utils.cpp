@@ -16,12 +16,9 @@ limitations under the License.
 
 #include "utils.h"
 
-#include <cmath>
-#include <cstring>
-#include <filesystem>
-#include <fstream>
-#include <regex>
-#include <sstream>
+#ifndef __EMSCRIPTEN__
+#    include "curl/curl.h"
+#endif
 
 #ifdef BUILDING_USING_MSVC
 #    include <process.h>
@@ -29,9 +26,11 @@ limitations under the License.
 #    include <unistd.h>
 #endif
 
-#ifndef __EMSCRIPTEN__
-#    include <curl/curl.h>
-#endif
+#include <cmath>
+#include <cstring>
+#include <fstream>
+#include <regex>
+#include <sstream>
 
 #ifdef BUILDING_USING_MSVC
 #    include <codecvt>
@@ -47,7 +46,7 @@ bool fuzzyCompare(double pNb1, double pNb2)
 {
     static constexpr double ONE_TRILLION = 1000000000000.0;
 
-    return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
+    return std::fabs(pNb1 - pNb2) * ONE_TRILLION <= std::fmin(std::fabs(pNb1), std::fabs(pNb2));
 }
 
 #ifdef BUILDING_USING_MSVC

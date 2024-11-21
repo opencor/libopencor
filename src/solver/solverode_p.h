@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "solver_p.h"
 
+#include "cellmlfileruntime.h"
+
 #include "libopencor/solverode.h"
 
 namespace libOpenCOR {

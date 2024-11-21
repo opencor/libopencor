@@ -19,7 +19,6 @@ limitations under the License.
 #include "libopencor/logger.h"
 
 #include <functional>
-#include <libcellml>
 
 namespace libOpenCOR {
 

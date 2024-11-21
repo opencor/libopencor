@@ -16,22 +16,18 @@ limitations under the License.
 
 #pragma once
 
-#include "cellmlfile.h"
 #include "unittestingexport.h"
 
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverkinsol.h"
 #include "libopencor/types.h"
 
+#include "libxml/xmlstring.h"
+
 #ifndef NDEBUG
 #    include <cassert>
 #endif
 #include <filesystem>
-#include <map>
-#include <string>
-#include <vector>
-
-#include <libxml/xmlstring.h>
 
 #ifdef NAN
 #    undef NAN
