@@ -215,8 +215,8 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 
         // A non-SED-ML file results in our SED-ML document having at least one error, the first of which being of id
         // libsedml::SedNotSchemaConformant (e.g., a CellML file, i.e. an XML file, but not a SED-ML one) or
-        // XMLContentEmpty (e.g., a COMBINE archive, i.e. not an XML file). So, we use these facts to determine whether
-        // our current SED-ML document is indeed a SED-ML file.
+        // libsbml::XMLContentEmpty (e.g., a COMBINE archive, i.e. not an XML file). So, we use these facts to determine
+        // whether our current SED-ML document is indeed a SED-ML file.
 
         if ((document->getNumErrors() == 0)
             || ((document->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
