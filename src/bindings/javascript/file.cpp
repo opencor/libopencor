@@ -45,11 +45,28 @@ void fileApi()
                       auto contents = reinterpret_cast<unsigned char *>(pContents);
 
                       pThis->setContents(libOpenCOR::UnsignedChars(contents, contents + pSize));
-                  }));
+                  }))
+        .function("hasChildFiles", &libOpenCOR::File::hasChildFiles)
+        .function("childFileCount", &libOpenCOR::File::childFileCount)
+        .function("childFileNames", &libOpenCOR::File::childFileNames)
+        .function("childFiles", &libOpenCOR::File::childFiles)
+        .function("childFile", &libOpenCOR::File::childFile);
 
     EM_ASM({
         Module["File"]["Type"] = Module["File.Type"];
 
         delete Module["File.Type"];
     });
+
+    // FileManager API.
+
+    emscripten::class_<libOpenCOR::FileManager>("FileManager")
+        .class_function("instance", &libOpenCOR::FileManager::instance)
+        .function("manage", &libOpenCOR::FileManager::manage)
+        .function("unmanage", &libOpenCOR::FileManager::unmanage)
+        .function("reset", &libOpenCOR::FileManager::reset)
+        .function("hasFiles", &libOpenCOR::FileManager::hasFiles)
+        .function("fileCount", &libOpenCOR::FileManager::fileCount)
+        .function("files", &libOpenCOR::FileManager::files)
+        .function("file", &libOpenCOR::FileManager::file);
 }

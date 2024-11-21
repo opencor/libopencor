@@ -30,7 +30,8 @@ SolverPtr SolverHeun::Impl::duplicate()
     return SolverOdeFixedStep::Impl::duplicate(SolverHeun::create());
 }
 
-bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                  double *pConstants, double *pComputedConstants, double *pAlgebraic,
                                   CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                                   CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
@@ -38,8 +39,9 @@ bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, do
 
     // Initialise the ODE solver itself.
 
-    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates,
-                                              pComputeInterpretedRates)) {
+    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates,
+                                              pConstants, pComputedConstants, pAlgebraic,
+                                              pComputeCompiledRates, pComputeInterpretedRates)) {
         return false;
     }
 
@@ -77,7 +79,7 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n, Y_n).
 
-        computeRates(pVoi, mStates, mRates, mVariables);
+        computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 
         // Compute k and Y_n + h * k.
 
@@ -88,7 +90,7 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n + h, Y_n + h * k).
 
-        computeRates(pVoi + realStep, mYk, mRates, mVariables);
+        computeRates(pVoi + realStep, mYk, mRates, mConstants, mComputedConstants, mAlgebraic);
 
         // Compute Y_n+1.
 

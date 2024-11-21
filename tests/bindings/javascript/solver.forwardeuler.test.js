@@ -36,7 +36,7 @@ describe("Solver Forward Euler", () => {
   });
 
   test("Step value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -51,7 +51,7 @@ describe("Solver Forward Euler", () => {
 
     simulation.setOdeSolver(solver);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -59,10 +59,15 @@ describe("Solver Forward Euler", () => {
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
+
+    instance.delete();
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Solve", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -82,11 +87,16 @@ describe("Solver Forward Euler", () => {
       document,
       [-63.787727, 0.134748, 0.984255, 0.741178],
       [49.73577, -0.127963, -0.051257, 0.098331],
+      [1.0, 0.0, 0.3, 120.0, 36.0],
+      [-10.613, -115.0, 12.0],
       [
-        0.0, -15.952418, -823.361177, 789.590304, 1.0, 0.0, -10.613, 0.3,
-        -115.0, 120.0, 3.960664, 0.115617, 0.002884, 0.967035, 12.0, 36.0,
-        0.54037, 0.056315,
+        0.0, -15.952418, -823.361177, 789.590304, 3.960664, 0.115617, 0.002884,
+        0.967035, 0.54037, 0.056315,
       ],
     );
+
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 });

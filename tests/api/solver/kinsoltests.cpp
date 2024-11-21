@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
-
 #include "tests/utils.h"
 
 #include <libopencor>
@@ -33,7 +31,7 @@ TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
 
     solver->setMaximumNumberOfIterations(0);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -52,7 +50,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(-1);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -71,7 +69,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(1);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -90,7 +88,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(-1);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -109,7 +107,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(1);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -121,7 +119,7 @@ TEST(KinsolSolverTest, solve)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     instance->run();
 
@@ -139,7 +137,7 @@ TEST(KinsolSolverTest, solveWithBandedLinearSolver)
     solver->setUpperHalfBandwidth(2);
     solver->setLowerHalfBandwidth(2);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     instance->run();
 
@@ -155,7 +153,7 @@ TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::GMRES);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     instance->run();
 
@@ -171,7 +169,7 @@ TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     instance->run();
 
@@ -187,7 +185,7 @@ TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
 
-    auto instance = document->createInstance();
+    auto instance = document->instantiate();
 
     instance->run();
 

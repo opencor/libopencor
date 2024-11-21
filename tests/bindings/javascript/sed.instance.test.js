@@ -20,7 +20,7 @@ import { expectIssues } from "./utils.js";
 
 const libopencor = await libOpenCOR();
 
-describe("Sed run tests", () => {
+describe("Sed instance tests", () => {
   let someCellmlContentsPtr;
   let someErrorCellmlContentsPtr;
   let someOverconstrainedContentsPtr;
@@ -29,6 +29,8 @@ describe("Sed run tests", () => {
   let someAlgebraicContentsPtr;
   let someNlaContentsPtr;
   let someDaeContentsPtr;
+  let someCombineArchiveContentsPtr;
+  let someCombineArchiveWithCellmlFileAsMasterFileContentsPtr;
 
   beforeAll(() => {
     someCellmlContentsPtr = utils.allocateMemory(
@@ -63,6 +65,15 @@ describe("Sed run tests", () => {
       libopencor,
       utils.SOME_DAE_CONTENTS,
     );
+    someCombineArchiveContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+    );
+    someCombineArchiveWithCellmlFileAsMasterFileContentsPtr =
+      utils.allocateMemory(
+        libopencor,
+        utils.SOME_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS,
+      );
   });
 
   afterAll(() => {
@@ -74,11 +85,16 @@ describe("Sed run tests", () => {
     utils.freeMemory(libopencor, someAlgebraicContentsPtr);
     utils.freeMemory(libopencor, someNlaContentsPtr);
     utils.freeMemory(libopencor, someDaeContentsPtr);
+    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
+    utils.freeMemory(
+      libopencor,
+      someCombineArchiveWithCellmlFileAsMasterFileContentsPtr,
+    );
   });
 
   test("No file", () => {
     const document = new libopencor.SedDocument();
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -86,10 +102,15 @@ describe("Sed run tests", () => {
         "The simulation experiment description does not contain any tasks to run.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
   });
 
   test("Invalid CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(
+      utils.resourcePath(utils.ERROR_CELLML_FILE),
+    );
 
     file.setContents(
       someErrorCellmlContentsPtr,
@@ -97,7 +118,7 @@ describe("Sed run tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
@@ -106,10 +127,14 @@ describe("Sed run tests", () => {
         "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Overconstrained CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someOverconstrainedContentsPtr,
@@ -117,7 +142,7 @@ describe("Sed run tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
@@ -126,10 +151,14 @@ describe("Sed run tests", () => {
         "Variable 'x' in component 'my_component' is computed more than once.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Underconstrained CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someUnderconstrainedContentsPtr,
@@ -137,7 +166,7 @@ describe("Sed run tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
@@ -146,10 +175,14 @@ describe("Sed run tests", () => {
         "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
-  test("UnsuitablyConstrained CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+  test("Unsuitably constrained CellML file", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someUnsuitablyConstrainedContentsPtr,
@@ -157,7 +190,7 @@ describe("Sed run tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -173,10 +206,14 @@ describe("Sed run tests", () => {
         "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Algebraic model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someAlgebraicContentsPtr,
@@ -184,15 +221,19 @@ describe("Sed run tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("ODE model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -202,7 +243,7 @@ describe("Sed run tests", () => {
 
     cvode.setMaximumNumberOfSteps(10);
 
-    let instance = document.createInstance();
+    let instance = document.instantiate();
 
     expect(instance.hasIssues()).toBe(false);
 
@@ -215,17 +256,23 @@ describe("Sed run tests", () => {
       ],
     ]);
 
+    instance.delete();
+
     cvode.setMaximumNumberOfSteps(500);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("ODE model with no ODE solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -233,7 +280,7 @@ describe("Sed run tests", () => {
 
     document.simulations().get(0).setOdeSolver(null);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -241,11 +288,15 @@ describe("Sed run tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("NLA model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -256,7 +307,7 @@ describe("Sed run tests", () => {
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
     kinsol.setUpperHalfBandwidth(-1);
 
-    let instance = document.createInstance();
+    let instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -265,15 +316,21 @@ describe("Sed run tests", () => {
       ],
     ]);
 
+    instance.delete();
+
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 
   test("NLA model with no NLA solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -281,7 +338,7 @@ describe("Sed run tests", () => {
 
     document.simulations().get(0).setNlaSolver(null);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -289,12 +346,16 @@ describe("Sed run tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
   */
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("DAE model", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
@@ -305,7 +366,7 @@ describe("Sed run tests", () => {
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
     kinsol.setUpperHalfBandwidth(-1);
 
-    let instance = document.createInstance();
+    let instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -323,18 +384,24 @@ describe("Sed run tests", () => {
       ],
     ]);
 
+    instance.delete();
+
     kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
 
-    instance = document.createInstance();
+    instance = document.instantiate();
 
     instance.run();
 
     expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
   */
 
   test("DAE model with no ODE or NLA solver", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
@@ -344,7 +411,7 @@ describe("Sed run tests", () => {
     simulation.setOdeSolver(null);
     simulation.setNlaSolver(null);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
     expectIssues(libopencor, instance, [
@@ -358,5 +425,48 @@ describe("Sed run tests", () => {
       ],
     ]);
     */
+
+    instance.delete();
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+
+    file.setContents(
+      someCombineArchiveContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+    );
+
+    const document = new libopencor.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.run();
+
+    expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with CellML file as master file", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+
+    file.setContents(
+      someCombineArchiveWithCellmlFileAsMasterFileContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS
+        .length,
+    );
+
+    const document = new libopencor.SedDocument(file);
+    const instance = document.instantiate();
+
+    expect(instance.hasIssues()).toBe(false);
+
+    instance.delete();
+    document.delete();
+    file.delete();
   });
 });

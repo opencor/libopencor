@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "solver_p.h"
 
+#include "cellmlfileruntime.h"
+
 #include "libopencor/solverode.h"
 
 namespace libOpenCOR {
@@ -29,14 +31,17 @@ public:
 
     double *mStates = nullptr;
     double *mRates = nullptr;
-    double *mVariables = nullptr;
+    double *mConstants = nullptr;
+    double *mComputedConstants = nullptr;
+    double *mAlgebraic = nullptr;
 
     CellmlFileRuntime::ComputeCompiledRates mComputeCompiledRates = nullptr;
     CellmlFileRuntime::ComputeInterpretedRates mComputeInterpretedRates = nullptr;
 
     explicit Impl(const std::string &pId, const std::string &pName);
 
-    virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+    virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                            double *pConstants, double *pComputedConstants, double *pAlgebraic,
                             CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                             CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) = 0;
     /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
@@ -45,7 +50,8 @@ public:
 
     virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 
-    void computeRates(double pVoi, double *pStates, double *pRates, double *pVariables) const;
+    void computeRates(double pVoi, double *pStates, double *pRates,
+                      double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
 };
 
 } // namespace libOpenCOR

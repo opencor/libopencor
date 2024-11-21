@@ -52,18 +52,21 @@ void sedApi(nb::module_ &m)
         .def("serialise", nb::overload_cast<>(&libOpenCOR::SedDocument::serialise, nb::const_), "Get the serialised version of this SedDocument object.")
         .def("serialise", nb::overload_cast<const std::string &>(&libOpenCOR::SedDocument::serialise, nb::const_), "Get the serialised version of this SedDocument object.", nb::arg("base_path"))
         .def_prop_ro("has_models", &libOpenCOR::SedDocument::hasModels, "Return whether there are some models.")
+        .def_prop_ro("model_count", &libOpenCOR::SedDocument::modelCount, "Return the number of models.")
         .def_prop_ro("models", &libOpenCOR::SedDocument::models, "Return the models.")
         .def("add_model", &libOpenCOR::SedDocument::addModel, "Add a model.", nb::arg("model").none())
         .def("remove_model", &libOpenCOR::SedDocument::removeModel, "Remove a model.", nb::arg("model").none())
         .def_prop_ro("has_simulations", &libOpenCOR::SedDocument::hasSimulations, "Return whether there are some simulations.")
+        .def_prop_ro("simulation_count", &libOpenCOR::SedDocument::simulationCount, "Return the number of simulations.")
         .def_prop_ro("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
         .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add a simulation.", nb::arg("simulation").none())
         .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.", nb::arg("simulation").none())
         .def_prop_ro("has_tasks", &libOpenCOR::SedDocument::hasTasks, "Return whether there are some tasks.")
+        .def_prop_ro("task_count", &libOpenCOR::SedDocument::taskCount, "Return the number of tasks.")
         .def_prop_ro("tasks", &libOpenCOR::SedDocument::tasks, "Return the tasks.")
         .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.", nb::arg("task").none())
         .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.", nb::arg("task").none())
-        .def("create_instance", &libOpenCOR::SedDocument::createInstance, "Create an instance of this SedDocument object.", nb::arg("compiled") = true);
+        .def("instantiate", &libOpenCOR::SedDocument::instantiate, "Instantiate this SedDocument object.", nb::arg("compiled") = true);
 
     // SedInstance API.
 
@@ -87,16 +90,25 @@ void sedApi(nb::module_ &m)
         .def("rate", &libOpenCOR::SedInstanceTask::rate, "Return the values of a rate.")
         .def("rate_name", &libOpenCOR::SedInstanceTask::rateName, "Return the name of a rate.")
         .def("rate_unit", &libOpenCOR::SedInstanceTask::rateUnit, "Return the unit of a rate.")
-        .def_prop_ro("variable_count", &libOpenCOR::SedInstanceTask::variableCount, "Return the number of variables.")
-        .def("variable", &libOpenCOR::SedInstanceTask::variable, "Return the values of a variable.")
-        .def("variable_name", &libOpenCOR::SedInstanceTask::variableName, "Return the name of a variable.")
-        .def("variable_unit", &libOpenCOR::SedInstanceTask::variableUnit, "Return the unit of a variable.");
+        .def_prop_ro("constant_count", &libOpenCOR::SedInstanceTask::constantCount, "Return the number of constants.")
+        .def("constant", &libOpenCOR::SedInstanceTask::constant, "Return the values of a constant.")
+        .def("constant_name", &libOpenCOR::SedInstanceTask::constantName, "Return the name of a constant.")
+        .def("constant_unit", &libOpenCOR::SedInstanceTask::constantUnit, "Return the unit of a constant.")
+        .def_prop_ro("computed_constant_count", &libOpenCOR::SedInstanceTask::computedConstantCount, "Return the number of computed constants.")
+        .def("computed_constant", &libOpenCOR::SedInstanceTask::computedConstant, "Return the values of a computed constant.")
+        .def("computed_constant_name", &libOpenCOR::SedInstanceTask::computedConstantName, "Return the name of a computed constant.")
+        .def("computed_constant_unit", &libOpenCOR::SedInstanceTask::computedConstantUnit, "Return the unit of a computed constant.")
+        .def_prop_ro("algebraic_count", &libOpenCOR::SedInstanceTask::algebraicCount, "Return the number of algebraic variables.")
+        .def("algebraic", &libOpenCOR::SedInstanceTask::algebraic, "Return the values of an algebraic variable.")
+        .def("algebraic_name", &libOpenCOR::SedInstanceTask::algebraicName, "Return the name of an algebraic variable.")
+        .def("algebraic_unit", &libOpenCOR::SedInstanceTask::algebraicUnit, "Return the unit of an algebraic variable.");
 
     // SedModel API.
 
     nb::class_<libOpenCOR::SedModel, libOpenCOR::SedBase> sedModel(m, "SedModel");
 
-    sedModel.def(nb::new_(&libOpenCOR::SedModel::create), "Create a SedModel object.", nb::arg("document"), nb::arg("file"));
+    sedModel.def(nb::new_(&libOpenCOR::SedModel::create), "Create a SedModel object.", nb::arg("document"), nb::arg("file"))
+        .def_prop_ro("file", &libOpenCOR::SedModel::file, "Return the file.");
 
     // SedOutput API.
 
@@ -116,6 +128,12 @@ void sedApi(nb::module_ &m)
 
     sedSimulation.def_prop_rw("ode_solver", &libOpenCOR::SedSimulation::odeSolver, &libOpenCOR::SedSimulation::setOdeSolver, "The ODE solver for the SedSimulation object.", nb::arg("ode_solver").none())
         .def_prop_rw("nla_solver", &libOpenCOR::SedSimulation::nlaSolver, &libOpenCOR::SedSimulation::setNlaSolver, "The NLA solver for the SedSimulation object.", nb::arg("nla_solver").none());
+
+    // SedAnalysis API.
+
+    nb::class_<libOpenCOR::SedAnalysis, libOpenCOR::SedSimulation> sedAnalysis(m, "SedAnalysis");
+
+    sedAnalysis.def(nb::new_(&libOpenCOR::SedAnalysis::create), "Create a SedAnalysis object.", nb::arg("document"));
 
     // SedOneStep API.
 

@@ -36,7 +36,7 @@ def test_step_value_with_invalid_number():
 
     simulation.ode_solver = solver
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -48,8 +48,12 @@ def heun_solve(
     state_abs_tols,
     rate_values,
     rate_abs_tols,
-    variable_values,
-    variable_abs_tols,
+    constant_values,
+    constant_abs_tols,
+    computed_constant_values,
+    computed_constant_abs_tols,
+    algebraic_values,
+    algebraic_abs_tols,
     compiled,
 ):
     file = oc.File(utils.resource_path("api/solver/ode.cellml"))
@@ -67,8 +71,12 @@ def heun_solve(
         state_abs_tols,
         rate_values,
         rate_abs_tols,
-        variable_values,
-        variable_abs_tols,
+        constant_values,
+        constant_abs_tols,
+        computed_constant_values,
+        computed_constant_abs_tols,
+        algebraic_values,
+        algebraic_abs_tols,
         compiled,
     )
 
@@ -77,35 +85,23 @@ state_values = [-63.691259, 0.134516, 0.984133, 0.741370]
 state_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 rate_values = [49.66942, -0.127532, -0.051693, 0.097711]
 rate_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
-variable_values = [
+constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
+constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
+computed_constant_values = [-10.613, -115.0, 12.0]
+computed_constant_abs_tols = [0.0, 0.0, 0.0]
+algebraic_values = [
     0.0,
     -15.923478,
     -823.166811,
     789.421406,
-    1.0,
-    0.0,
-    -10.613,
-    0.3,
-    -115.0,
-    120.0,
     3.951622,
     0.116239,
     0.002898,
     0.966726,
-    12.0,
-    36.0,
     0.539425,
     0.056383,
 ]
-variable_abs_tols = [
-    0.000001,
-    0.000001,
-    0.000001,
-    0.000001,
-    0.000001,
-    0.000001,
-    0.000001,
-    0.000001,
+algebraic_abs_tols = [
     0.000001,
     0.000001,
     0.000001,
@@ -125,8 +121,12 @@ def test_compiled_solve():
         state_abs_tols,
         rate_values,
         rate_abs_tols,
-        variable_values,
-        variable_abs_tols,
+        constant_values,
+        constant_abs_tols,
+        computed_constant_values,
+        computed_constant_abs_tols,
+        algebraic_values,
+        algebraic_abs_tols,
         True,
     )
 
@@ -137,7 +137,11 @@ def test_interpreted_solve():
         state_abs_tols,
         rate_values,
         rate_abs_tols,
-        variable_values,
-        variable_abs_tols,
+        constant_values,
+        constant_abs_tols,
+        computed_constant_values,
+        computed_constant_abs_tols,
+        algebraic_values,
+        algebraic_abs_tols,
         False,
     )

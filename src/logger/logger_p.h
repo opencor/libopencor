@@ -16,11 +16,11 @@ limitations under the License.
 
 #pragma once
 
+#include "libcellml/issue.h"
+#include "libcellml/logger.h"
+
 #include "libopencor/issue.h"
 #include "libopencor/logger.h"
-
-#include <libcellml>
-#include <vector>
 
 namespace libOpenCOR {
 
@@ -34,9 +34,20 @@ public:
     IssuePtrs mMessages;
 
     bool hasIssues() const;
+    size_t issueCount() const;
+    IssuePtrs issues() const;
+
     bool hasErrors() const;
+    size_t errorCount() const;
+    IssuePtrs errors() const;
+
     bool hasWarnings() const;
+    size_t warningCount() const;
+    IssuePtrs warnings() const;
+
     bool hasMessages() const;
+    size_t messageCount() const;
+    IssuePtrs messages() const;
 
     void addIssues(const LoggerPtr &pLogger);
     void addIssues(const libcellml::LoggerPtr &pLogger);

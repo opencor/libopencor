@@ -16,6 +16,10 @@ limitations under the License.
 
 #include "solverodefixedstep_p.h"
 
+#include "libsedmlbegin.h"
+#include "sedml/SedAlgorithm.h"
+#include "libsedmlend.h"
+
 namespace libOpenCOR {
 
 // Solver.
@@ -23,6 +27,27 @@ namespace libOpenCOR {
 SolverOdeFixedStep::Impl::Impl(const std::string &pId, const std::string &pName)
     : SolverOde::Impl(pId, pName)
 {
+}
+
+void SolverOdeFixedStep::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
+{
+    for (unsigned int i = 0; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
+        auto *algorithmParameter = pAlgorithm->getAlgorithmParameter(i);
+        auto kisaoId = algorithmParameter->getKisaoID();
+        auto value = algorithmParameter->getValue();
+
+        if (kisaoId == "KISAO:0000483") {
+            mStep = toDouble(value);
+
+            if ((mStep <= 0.0) || std::isnan(mStep)) {
+                addWarning(std::string("The step ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A step of ").append(toString(DEFAULT_STEP)).append(" will be used instead."));
+
+                mStep = DEFAULT_STEP;
+            }
+        } else {
+            addWarning(std::string("The parameter '").append(kisaoId).append("' is not recognised. It will be ignored."));
+        }
+    }
 }
 
 SolverPtr SolverOdeFixedStep::Impl::duplicate(const SolverOdeFixedStepPtr &pSolver) const
@@ -44,24 +69,35 @@ StringStringMap SolverOdeFixedStep::Impl::properties() const
 }
 
 bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                          double *pVariables,
+                                          double *pConstants, double *pComputedConstants, double *pAlgebraic,
                                           CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                                           CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
     // Initialise the ODE solver itself.
 
-    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates,
-                                pComputeInterpretedRates);
+    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates,
+                                pConstants, pComputedConstants, pAlgebraic,
+                                pComputeCompiledRates, pComputeInterpretedRates);
 
     // Check the solver's properties.
 
     if (mStep <= 0.0) {
-        addError("The step cannot be equal to " + toString(mStep) + ". It must be greater than 0.");
+        addError(std::string("The step cannot be equal to ").append(toString(mStep)).append(". It must be greater than 0."));
 
         return false;
     }
 
     return true;
+}
+
+double SolverOdeFixedStep::Impl::step() const
+{
+    return mStep;
+}
+
+void SolverOdeFixedStep::Impl::setStep(double pStep)
+{
+    mStep = pStep;
 }
 
 SolverOdeFixedStep::SolverOdeFixedStep(Impl *pPimpl)
@@ -81,12 +117,12 @@ const SolverOdeFixedStep::Impl *SolverOdeFixedStep::pimpl() const
 
 double SolverOdeFixedStep::step() const
 {
-    return pimpl()->mStep;
+    return pimpl()->step();
 }
 
 void SolverOdeFixedStep::setStep(double pStep)
 {
-    pimpl()->mStep = pStep;
+    pimpl()->setStep(pStep);
 }
 
 } // namespace libOpenCOR

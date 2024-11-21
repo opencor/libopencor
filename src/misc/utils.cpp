@@ -16,12 +16,9 @@ limitations under the License.
 
 #include "utils.h"
 
-#include <cmath>
-#include <cstring>
-#include <filesystem>
-#include <fstream>
-#include <regex>
-#include <sstream>
+#ifndef __EMSCRIPTEN__
+#    include "curl/curl.h"
+#endif
 
 #ifdef BUILDING_USING_MSVC
 #    include <process.h>
@@ -29,12 +26,18 @@ limitations under the License.
 #    include <unistd.h>
 #endif
 
-#ifndef __EMSCRIPTEN__
-#    include <curl/curl.h>
-#endif
+#include <cmath>
+#include <cstring>
+#include <fstream>
+#include <regex>
+#include <sstream>
 
 #ifdef BUILDING_USING_MSVC
 #    include <codecvt>
+#endif
+
+#ifdef NAN
+#    undef NAN
 #endif
 
 namespace libOpenCOR {
@@ -43,7 +46,7 @@ bool fuzzyCompare(double pNb1, double pNb2)
 {
     static constexpr double ONE_TRILLION = 1000000000000.0;
 
-    return fabs(pNb1 - pNb2) * ONE_TRILLION <= fmin(fabs(pNb1), fabs(pNb2));
+    return std::fabs(pNb1 - pNb2) * ONE_TRILLION <= std::fmin(std::fabs(pNb1), std::fabs(pNb2));
 }
 
 #ifdef BUILDING_USING_MSVC
@@ -64,10 +67,12 @@ std::filesystem::path stringToPath(const std::string &pString)
 
 std::string pathToString(const std::filesystem::path &pPath)
 {
+    auto path = pPath;
+
 #if defined(BUILDING_USING_MSVC)
-    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(pPath.wstring());
+    return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path.make_preferred().wstring());
 #else
-    return pPath.string();
+    return path.make_preferred().string();
 #endif
 }
 
@@ -80,16 +85,23 @@ std::string canonicalFileName(const std::string &pFileName)
 #endif
 {
     // Determine the canonical version of the file name.
-    // Note: when building using Emscripten, std::filesystem::weakly_canonical() doesn't work as expected. For instance,
-    //       if pFileName is equal to "/some/path/../.." then the call to std::filesystem::weakly_canonical() will
-    //       generate an exception rather than return "/". So, we prepend a dummy folder to pFileName and then remove it
-    //       from the result of std::filesystem::weakly_canonical().
+    // Note #1: if the file exists then we want to use std::filesystem::canonical() since this will resolve any symbolic
+    //          links, etc. However, if the file doesn't exist then we want to use std::filesystem::weakly_canonical()
+    //          since this will return a file name that is as close to the canonical version as possible without
+    //          actually checking whether the file exists.
+    // Note #2: when building using Emscripten, std::filesystem::weakly_canonical() doesn't work as expected. For
+    //          instance, if pFileName is equal to "/some/path/../.." then it will generate an exception rather than
+    //          return "/". So, we prepend a dummy folder to pFileName and then remove it from the result of
+    //          std::filesystem::weakly_canonical().
 
     static constexpr auto FORWARD_SLASH = "/";
 
+    auto fileExists = std::filesystem::exists(pFileName);
     auto currentPath = std::filesystem::current_path();
 
-    std::filesystem::current_path(FORWARD_SLASH);
+    if (!fileExists) {
+        std::filesystem::current_path(FORWARD_SLASH);
+    }
 
 #ifdef __EMSCRIPTEN__
     static constexpr auto DUMMY_FOLDER = "/dummy";
@@ -101,7 +113,10 @@ std::string canonicalFileName(const std::string &pFileName)
 
     res.erase(0, strlen(DUMMY_FOLDER));
 #else
-    auto res = pathToString(std::filesystem::weakly_canonical(stringToPath(pFileName)));
+    auto filePath = stringToPath(pFileName);
+    auto res = pathToString(fileExists ?
+                                std::filesystem::canonical(filePath) :
+                                std::filesystem::weakly_canonical(filePath));
 #endif
 
 #if defined(BUILDING_USING_MSVC)
@@ -114,14 +129,16 @@ std::string canonicalFileName(const std::string &pFileName)
     // The file name may be relative rather than absolute, in which case we need to remove the forward slash that got
     // added (at the beginning of the file name) by std::filesystem::weakly_canonical().
 
-    if (!pFileName.starts_with(FORWARD_SLASH)) {
+    if (!fileExists && !pFileName.starts_with(FORWARD_SLASH)) {
         static const auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
 
         res.erase(0, FORWARD_SLASH_LENGTH);
     }
 #endif
 
-    std::filesystem::current_path(currentPath);
+    if (!fileExists) {
+        std::filesystem::current_path(currentPath);
+    }
 
     // Return the canonical version of the file name.
 
@@ -327,6 +344,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     auto res = false;
     auto *curl = curl_easy_init();
 
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(curl, CURLOPT_URL, pUrl.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void *>(&file));
@@ -392,6 +410,42 @@ char *nlaSolverAddress(SolverNla *pNlaSolver)
     return res;
 }
 
+bool toBool(const std::string &pString)
+{
+    return pString == "true";
+}
+
+std::string toString(bool pBoolean)
+{
+    return pBoolean ? "true" : "false";
+}
+
+bool isInt(const std::string &pString)
+{
+    static const auto INT_REGEX = std::regex("^([-+]?[1-9][0-9]*([eE][+]?[0-9]+)?|0)$");
+
+    if (std::regex_match(pString, INT_REGEX)) {
+        std::istringstream iss(pString);
+        int res = 0;
+
+        iss >> res;
+
+        return !iss.fail();
+    }
+
+    return false;
+}
+
+int toInt(const std::string &pString)
+{
+    std::istringstream iss(pString);
+    int res = 0;
+
+    iss >> res;
+
+    return res;
+}
+
 std::string toString(int pNumber)
 {
     std::ostringstream res;
@@ -410,6 +464,27 @@ std::string toString(size_t pNumber)
     return res.str();
 }
 
+bool isDouble(const std::string &pString)
+{
+    static const auto DOUBLE_REGEX = std::regex("^[+-]?[0-9]*\\.?[0-9]+([eE][+-]?[0-9]+)?$");
+
+    return std::regex_match(pString, DOUBLE_REGEX);
+}
+
+double toDouble(const std::string &pString)
+{
+    if (!isDouble(pString)) {
+        return NAN;
+    }
+
+    std::istringstream iss(pString);
+    double res = NAN;
+
+    iss >> res;
+
+    return iss.fail() ? NAN : res;
+}
+
 std::string toString(double pNumber)
 {
     std::ostringstream res;
@@ -422,6 +497,104 @@ std::string toString(double pNumber)
 std::string toString(const UnsignedChars &pBytes)
 {
     return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
+}
+
+SolverCvode::IntegrationMethod toCvodeIntegrationMethod(const std::string &pIntegrationMethod)
+{
+    return (pIntegrationMethod == "BDF") ?
+               SolverCvode::IntegrationMethod::BDF :
+               SolverCvode::IntegrationMethod::ADAMS_MOULTON;
+}
+
+std::string toString(SolverCvode::IntegrationMethod pIntegrationMethod)
+{
+    return (pIntegrationMethod == SolverCvode::IntegrationMethod::BDF) ?
+               "BDF" :
+               "Adams-Moulton";
+}
+
+SolverCvode::IterationType toCvodeIterationType(const std::string &pIterationType)
+{
+    return (pIterationType == "Functional") ?
+               SolverCvode::IterationType::FUNCTIONAL :
+               SolverCvode::IterationType::NEWTON;
+}
+
+std::string toString(SolverCvode::IterationType pIterationType)
+{
+    return (pIterationType == SolverCvode::IterationType::FUNCTIONAL) ?
+               "Functional" :
+               "Newton";
+}
+
+SolverCvode::LinearSolver toCvodeLinearSolver(const std::string &pLinearSolver)
+{
+    return (pLinearSolver == "Dense") ?
+               SolverCvode::LinearSolver::DENSE :
+           (pLinearSolver == "Banded") ?
+               SolverCvode::LinearSolver::BANDED :
+           (pLinearSolver == "Diagonal") ?
+               SolverCvode::LinearSolver::DIAGONAL :
+           (pLinearSolver == "GMRES") ?
+               SolverCvode::LinearSolver::GMRES :
+           (pLinearSolver == "BiCGStab") ?
+               SolverCvode::LinearSolver::BICGSTAB :
+               SolverCvode::LinearSolver::TFQMR;
+}
+
+std::string toString(SolverCvode::LinearSolver pLinearSolver)
+{
+    return (pLinearSolver == SolverCvode::LinearSolver::DENSE) ?
+               "Dense" :
+           (pLinearSolver == SolverCvode::LinearSolver::BANDED) ?
+               "Banded" :
+           (pLinearSolver == SolverCvode::LinearSolver::DIAGONAL) ?
+               "Diagonal" :
+           (pLinearSolver == SolverCvode::LinearSolver::GMRES) ?
+               "GMRES" :
+           (pLinearSolver == SolverCvode::LinearSolver::BICGSTAB) ?
+               "BiCGStab" :
+               "TFQMR";
+}
+
+SolverCvode::Preconditioner toCvodePreconditioner(const std::string &pPreconditioner)
+{
+    return (pPreconditioner == "No") ?
+               SolverCvode::Preconditioner::NO :
+               SolverCvode::Preconditioner::BANDED;
+}
+
+std::string toString(SolverCvode::Preconditioner pPreconditioner)
+{
+    return (pPreconditioner == SolverCvode::Preconditioner::NO) ?
+               "No" :
+               "Banded";
+}
+
+SolverKinsol::LinearSolver toKinsolLinearSolver(const std::string &pLinearSolver)
+{
+    return (pLinearSolver == "Dense") ?
+               SolverKinsol::LinearSolver::DENSE :
+           (pLinearSolver == "Banded") ?
+               SolverKinsol::LinearSolver::BANDED :
+           (pLinearSolver == "GMRES") ?
+               SolverKinsol::LinearSolver::GMRES :
+           (pLinearSolver == "BiCGStab") ?
+               SolverKinsol::LinearSolver::BICGSTAB :
+               SolverKinsol::LinearSolver::TFQMR;
+}
+
+std::string toString(SolverKinsol::LinearSolver pLinearSolver)
+{
+    return (pLinearSolver == SolverKinsol::LinearSolver::DENSE) ?
+               "Dense" :
+           (pLinearSolver == SolverKinsol::LinearSolver::BANDED) ?
+               "Banded" :
+           (pLinearSolver == SolverKinsol::LinearSolver::GMRES) ?
+               "GMRES" :
+           (pLinearSolver == SolverKinsol::LinearSolver::BICGSTAB) ?
+               "BiCGStab" :
+               "TFQMR";
 }
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString)

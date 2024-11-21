@@ -18,8 +18,6 @@ limitations under the License.
 
 #include "libopencor/export.h"
 
-#include <string>
-
 /**
  * Some functions to retrieve the version of libOpenCOR.
  */

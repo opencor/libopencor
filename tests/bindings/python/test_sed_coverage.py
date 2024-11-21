@@ -32,13 +32,19 @@ def test_models():
     document = oc.SedDocument()
 
     assert document.has_models == False
+    assert document.model_count == 0
+    assert len(document.models) == 0
     assert document.add_model(None) == False
 
-    file = oc.File(utils.LOCAL_FILE)
+    file = oc.File(utils.LocalFile)
     model = oc.SedModel(document, file)
+
+    assert model.file == file
 
     assert document.add_model(model) == True
 
+    assert document.has_models == True
+    assert document.model_count == 1
     assert len(document.models) == 1
     assert document.models[0] == model
 
@@ -46,6 +52,8 @@ def test_models():
     assert document.remove_model(model) == True
 
     assert document.has_models == False
+    assert document.model_count == 0
+    assert len(document.models) == 0
 
     assert document.remove_model(None) == False
 
@@ -54,25 +62,43 @@ def test_simulations():
     document = oc.SedDocument()
 
     assert document.has_simulations == False
+    assert document.simulation_count == 0
+    assert len(document.simulations) == 0
     assert document.add_simulation(None) == False
 
     uniformTimeCourse = oc.SedUniformTimeCourse(document)
+    oneStep = oc.SedOneStep(document)
     steadyState = oc.SedSteadyState(document)
+    analysis = oc.SedAnalysis(document)
 
     assert document.add_simulation(uniformTimeCourse) == True
+    assert document.add_simulation(oneStep) == True
     assert document.add_simulation(steadyState) == True
+    assert document.add_simulation(analysis) == True
 
-    assert len(document.simulations) == 2
+    assert document.has_simulations == True
+    assert document.simulation_count == 4
+    assert len(document.simulations) == 4
     assert document.simulations[0] == uniformTimeCourse
-    assert document.simulations[1] == steadyState
+    assert document.simulations[1] == oneStep
+    assert document.simulations[2] == steadyState
+    assert document.simulations[3] == analysis
 
     assert document.add_simulation(uniformTimeCourse) == False
     assert document.remove_simulation(uniformTimeCourse) == True
 
+    assert document.add_simulation(oneStep) == False
+    assert document.remove_simulation(oneStep) == True
+
     assert document.add_simulation(steadyState) == False
     assert document.remove_simulation(steadyState) == True
 
+    assert document.add_simulation(analysis) == False
+    assert document.remove_simulation(analysis) == True
+
     assert document.has_simulations == False
+    assert document.simulation_count == 0
+    assert len(document.simulations) == 0
 
     assert document.remove_simulation(None) == False
 
@@ -97,9 +123,11 @@ def test_tasks():
     document = oc.SedDocument()
 
     assert document.has_tasks == False
+    assert document.task_count == 0
+    assert len(document.tasks) == 0
     assert document.add_task(None) == False
 
-    file = oc.File(utils.LOCAL_FILE)
+    file = oc.File(utils.LocalFile)
     model = oc.SedModel(document, file)
     simulation = oc.SedUniformTimeCourse(document)
     task = oc.SedTask(document, model, simulation)
@@ -109,6 +137,8 @@ def test_tasks():
 
     assert document.add_task(task) == True
 
+    assert document.has_tasks == True
+    assert document.task_count == 1
     assert len(document.tasks) == 1
     assert document.tasks[0] == task
 
@@ -133,7 +163,7 @@ def test_tasks():
         ],
     ]
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
 
@@ -141,6 +171,8 @@ def test_tasks():
     assert document.remove_task(task) == True
 
     assert document.has_tasks == False
+    assert document.task_count == 0
+    assert len(document.tasks) == 0
 
     assert document.remove_task(None) == False
 
@@ -179,8 +211,8 @@ def test_nla_solver():
     assert simulation.nla_solver == None
 
 
-def test_sed_simulation_one_step():
-    file = oc.File(utils.resource_path(utils.CELLML_2_FILE))
+def test_sed_one_step():
+    file = oc.File(utils.resource_path(utils.Cellml2File))
     document = oc.SedDocument(file)
     simulation = oc.SedOneStep(document)
 
@@ -191,8 +223,8 @@ def test_sed_simulation_one_step():
     assert simulation.step == 1.23
 
 
-def test_sed_simulation_uniform_time_course():
-    file = oc.File(utils.resource_path(utils.CELLML_2_FILE))
+def test_sed_uniform_time_course():
+    file = oc.File(utils.resource_path(utils.Cellml2File))
     document = oc.SedDocument(file)
     simulation = oc.SedUniformTimeCourse(document)
 
@@ -212,66 +244,93 @@ def test_sed_simulation_uniform_time_course():
     assert simulation.number_of_steps == 10
 
 
-def test_sed_instance_and_sed_isntance_task():
+def test_sed_instance_and_sed_instance_task():
     expected_issues = [
         [
             oc.Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
+            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ],
     ]
 
-    file = oc.File(utils.resource_path(utils.CELLML_2_FILE))
+    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
     document = oc.SedDocument(file)
     solver = document.simulations[0].ode_solver
 
     solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
     solver.upper_half_bandwidth = -1
 
-    instance = document.create_instance()
+    instance = document.instantiate()
     instance_task = instance.tasks[0]
 
     assert instance_task.voi == []
-    assert instance_task.voi_name == "main.t"
-    assert instance_task.voi_unit == "dimensionless"
+    assert instance_task.voi_name == "environment/time"
+    assert instance_task.voi_unit == "millisecond"
 
-    assert instance_task.state_count == 3
+    assert instance_task.state_count == 4
     assert instance_task.state(0) == []
-    assert instance_task.state(3) == []
-    assert instance_task.state_name(0) == "main.x"
-    assert instance_task.state_name(3) == ""
-    assert instance_task.state_unit(0) == "dimensionless"
-    assert instance_task.state_unit(3) == ""
+    assert instance_task.state(4) == []
+    assert instance_task.state_name(0) == "membrane/V"
+    assert instance_task.state_name(4) == ""
+    assert instance_task.state_unit(0) == "millivolt"
+    assert instance_task.state_unit(4) == ""
 
-    assert instance_task.rate_count == 3
+    assert instance_task.rate_count == 4
     assert instance_task.rate(0) == []
-    assert instance_task.rate(3) == []
-    assert instance_task.rate_name(0) == "main.x'"
-    assert instance_task.rate_name(3) == ""
-    assert instance_task.rate_unit(0) == "dimensionless/dimensionless"
-    assert instance_task.rate_unit(3) == ""
+    assert instance_task.rate(4) == []
+    assert instance_task.rate_name(0) == "membrane/V'"
+    assert instance_task.rate_name(4) == ""
+    assert instance_task.rate_unit(0) == "millivolt/millisecond"
+    assert instance_task.rate_unit(4) == ""
 
-    assert instance_task.variable_count == 3
-    assert instance_task.variable(0) == []
-    assert instance_task.variable(3) == []
-    assert instance_task.variable_name(0) == "main.sigma"
-    assert instance_task.variable_name(3) == ""
-    assert instance_task.variable_unit(0) == "dimensionless"
-    assert instance_task.variable_unit(3) == ""
+    assert instance_task.constant_count == 5
+    assert instance_task.constant(0) == []
+    assert instance_task.constant(5) == []
+    assert instance_task.constant_name(0) == "membrane/Cm"
+    assert instance_task.constant_name(5) == ""
+    assert instance_task.constant_unit(0) == "microF_per_cm2"
+    assert instance_task.constant_unit(5) == ""
+
+    assert instance_task.computed_constant_count == 3
+    assert instance_task.computed_constant(0) == []
+    assert instance_task.computed_constant(3) == []
+    assert instance_task.computed_constant_name(0) == "leakage_current/E_L"
+    assert instance_task.computed_constant_name(3) == ""
+    assert instance_task.computed_constant_unit(0) == "millivolt"
+    assert instance_task.computed_constant_unit(3) == ""
+
+    assert instance_task.algebraic_count == 10
+    assert instance_task.algebraic(0) == []
+    assert instance_task.algebraic(10) == []
+    assert instance_task.algebraic_name(0) == "membrane/i_Stim"
+    assert instance_task.algebraic_name(10) == ""
+    assert instance_task.algebraic_unit(0) == "microA_per_cm2"
+    assert instance_task.algebraic_unit(10) == ""
 
     instance.run()
 
     assert_issues(instance, expected_issues)
 
 
+def test_sed_document():
+    file = oc.File(utils.resource_path(utils.HttpRemoteCellmlFile))
+    oc.SedDocument(file)
+
+    file = oc.File(utils.resource_path(utils.HttpRemoteSedmlFile))
+    oc.SedDocument(file)
+
+    file = oc.File(utils.resource_path(utils.HttpRemoteCombineArchive))
+    oc.SedDocument(file)
+
+
 def test_solver():
     # Get the duplicate() method of different solvers to be covered.
 
-    file = oc.File(utils.resource_path(utils.CELLML_2_FILE))
+    file = oc.File(utils.resource_path(utils.Cellml2File))
     document = oc.SedDocument(file)
 
     document.simulations[0].ode_solver = oc.SolverForwardEuler()
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -279,7 +338,7 @@ def test_solver():
 
     document.simulations[0].ode_solver = oc.SolverFourthOrderRungeKutta()
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -287,7 +346,7 @@ def test_solver():
 
     document.simulations[0].ode_solver = oc.SolverHeun()
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 
@@ -295,7 +354,7 @@ def test_solver():
 
     document.simulations[0].ode_solver = oc.SolverSecondOrderRungeKutta()
 
-    instance = document.create_instance()
+    instance = document.instantiate()
 
     instance.run()
 

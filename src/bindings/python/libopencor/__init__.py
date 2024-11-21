@@ -16,12 +16,14 @@ from .module import __doc__, __version__
 from .module import (
     # File API.
     File,
+    FileManager,
     # Issue API.
     Issue,
     # Logger API.
     Logger,
     # Sed API.
     SedAbstractTask,
+    SedAnalysis,
     SedBase,
     SedDataDescription,
     SedDataGenerator,
@@ -68,12 +70,14 @@ from .module import (
 __all__ = (
     # File API.
     "File",
+    "FileManager",
     # Issue API.
     "Issue",
     # Logger API.
     "Logger",
     # Sed API.
     "SedAbstractTask",
+    "SedAnalysis",
     "SedBase",
     "SedDataDescription",
     "SedDataGenerator",

@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedinstance_p.h"
-
 #include "sedabstracttask_p.h"
+#include "sedinstance_p.h"
 #include "sedinstancetask_p.h"
 
 #include "libopencor/seddocument.h"
@@ -88,6 +87,11 @@ void SedInstance::Impl::run()
     }
 }
 
+SedInstanceTaskPtrs SedInstance::Impl::tasks() const
+{
+    return mTasks;
+}
+
 SedInstance::SedInstance(const SedDocumentPtr &pDocument, bool pCompiled)
     : Logger(new Impl(pDocument, pCompiled))
 {
@@ -115,7 +119,7 @@ void SedInstance::run()
 
 SedInstanceTaskPtrs SedInstance::tasks() const
 {
-    return pimpl()->mTasks;
+    return pimpl()->tasks();
 }
 
 } // namespace libOpenCOR

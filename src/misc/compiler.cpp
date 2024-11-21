@@ -16,11 +16,6 @@ limitations under the License.
 
 #include "compiler_p.h"
 
-#include "utils.h"
-
-#include <iostream>
-#include <sstream>
-
 #include "clangbegin.h"
 #include "clang/CodeGen/CodeGenAction.h"
 #include "clang/Driver/Compilation.h"
@@ -36,6 +31,8 @@ limitations under the License.
 #include "llvm/TargetParser/Host.h"
 #include "llvm-c/Core.h"
 #include "llvmend.h"
+
+#include <sstream>
 
 namespace libOpenCOR {
 
@@ -107,7 +104,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
     static constexpr auto CLANG = "clang";
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
-        addError(std::string("The command name must be 'clang' while it is '") + command.getCreator().getName() + "'.");
+        addError(std::string("The command name must be 'clang' while it is '").append(command.getCreator().getName()).append("'."));
 
         return false;
     }
@@ -328,7 +325,7 @@ bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
 
 #ifndef CODE_COVERAGE_ENABLED
     if (!res) {
-        addError("The " + pName + "() function could not be added to the compiler.");
+        addError(std::string("The ").append(pName).append("() function could not be added to the compiler."));
     }
 #endif
 

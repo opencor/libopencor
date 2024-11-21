@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Do memory checks using Memcheck from Valgrind.
+# Do memory checks using Memcheck from Valgrind (on Linux) or Leaks (on macOS).
 # Note: this script is based on the runMemcheck.py script that used to be part
 #       of KDevelop (see
 #       https://invent.kde.org/kdevelop/kdevelop/-/blob/3973/veritas/tests/runMemcheck.py).

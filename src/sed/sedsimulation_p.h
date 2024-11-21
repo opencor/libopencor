@@ -19,8 +19,6 @@ limitations under the License.
 #include "sedbase_p.h"
 
 #include "libopencor/sedsimulation.h"
-#include "libopencor/solvernla.h"
-#include "libopencor/solverode.h"
 
 namespace libOpenCOR {
 
@@ -33,6 +31,12 @@ public:
     explicit Impl(const SedDocumentPtr &pDocument);
 
     bool isValid(const SedModelPtr &pModel);
+
+    SolverOdePtr odeSolver() const;
+    void setOdeSolver(const SolverOdePtr &pOdeSolver);
+
+    SolverNlaPtr nlaSolver() const;
+    void setNlaSolver(const SolverNlaPtr &pNlaSolver);
 
     void serialise(xmlNodePtr pNode) const override;
 };

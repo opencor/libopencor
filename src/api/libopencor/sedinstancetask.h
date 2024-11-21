@@ -179,54 +179,154 @@ public:
     std::string rateUnit(size_t pIndex) const;
 
     /**
-     * @brief Get the number of variables.
+     * @brief Get the number of constants.
      *
-     * Get the number of variables.
+     * Get the number of constants.
      *
-     * @return The number of variables.
+     * @return The number of constants.
      */
 
-    size_t variableCount() const;
+    size_t constantCount() const;
 
     /**
-     * @brief Get the values of the variable at the given index.
+     * @brief Get the values of the constant at the given index.
      *
-     * Get the values of the variable at the given index.
+     * Get the values of the constant at the given index.
      *
-     * @param pIndex The index of the variable.
+     * @param pIndex The index of the constant.
      *
-     * @return The values of the variable.
+     * @return The values of the constant.
      */
 
-    Doubles variable(size_t pIndex) const;
+    Doubles constant(size_t pIndex) const;
 
 #ifdef __EMSCRIPTEN__
-    emscripten::val variableAsArray(size_t pIndex) const;
+    emscripten::val constantAsArray(size_t pIndex) const;
 #endif
 
     /**
-     * @brief Get the name of the variable.
+     * @brief Get the name of the constant.
      *
-     * Get the name of the variable at the given index.
+     * Get the name of the constant at the given index.
      *
-     * @param pIndex The index of the variable.
+     * @param pIndex The index of the constant.
      *
-     * @return The name of the variable.
+     * @return The name of the constant.
      */
 
-    std::string variableName(size_t pIndex) const;
+    std::string constantName(size_t pIndex) const;
 
     /**
-     * @brief Get the unit of the variable.
+     * @brief Get the unit of the constant.
      *
-     * Get the unit of the variable at the given index.
+     * Get the unit of the constant at the given index.
      *
-     * @param pIndex The index of the variable.
+     * @param pIndex The index of the constant.
      *
-     * @return The unit of the variable.
+     * @return The unit of the constant.
      */
 
-    std::string variableUnit(size_t pIndex) const;
+    std::string constantUnit(size_t pIndex) const;
+
+    /**
+     * @brief Get the number of computed constants.
+     *
+     * Get the number of computed constants.
+     *
+     * @return The number of computed constants.
+     */
+
+    size_t computedConstantCount() const;
+
+    /**
+     * @brief Get the values of the computed constant at the given index.
+     *
+     * Get the values of the computed constant at the given index.
+     *
+     * @param pIndex The index of the computed constant.
+     *
+     * @return The values of the computed constant.
+     */
+
+    Doubles computedConstant(size_t pIndex) const;
+
+#ifdef __EMSCRIPTEN__
+    emscripten::val computedConstantAsArray(size_t pIndex) const;
+#endif
+
+    /**
+     * @brief Get the name of the computed constant.
+     *
+     * Get the name of the computed constant at the given index.
+     *
+     * @param pIndex The index of the computed constant.
+     *
+     * @return The name of the computed constant.
+     */
+
+    std::string computedConstantName(size_t pIndex) const;
+
+    /**
+     * @brief Get the unit of the computed constant.
+     *
+     * Get the unit of the computed constant at the given index.
+     *
+     * @param pIndex The index of the computed constant.
+     *
+     * @return The unit of the computed constant.
+     */
+
+    std::string computedConstantUnit(size_t pIndex) const;
+
+    /**
+     * @brief Get the number of algebraic variables.
+     *
+     * Get the number of algebraic variables.
+     *
+     * @return The number of algebraic variables.
+     */
+
+    size_t algebraicCount() const;
+
+    /**
+     * @brief Get the values of the algebraic variable at the given index.
+     *
+     * Get the values of the algebraic variable at the given index.
+     *
+     * @param pIndex The index of the algebraic variable.
+     *
+     * @return The values of the algebraic variable.
+     */
+
+    Doubles algebraic(size_t pIndex) const;
+
+#ifdef __EMSCRIPTEN__
+    emscripten::val algebraicAsArray(size_t pIndex) const;
+#endif
+
+    /**
+     * @brief Get the name of the algebraic variable.
+     *
+     * Get the name of the algebraic variable at the given index.
+     *
+     * @param pIndex The index of the algebraic variable.
+     *
+     * @return The name of the algebraic variable.
+     */
+
+    std::string algebraicName(size_t pIndex) const;
+
+    /**
+     * @brief Get the unit of the algebraic variable.
+     *
+     * Get the unit of the algebraic variable at the given index.
+     *
+     * @param pIndex The index of the algebraic variable.
+     *
+     * @return The unit of the algebraic variable.
+     */
+
+    std::string algebraicUnit(size_t pIndex) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

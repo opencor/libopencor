@@ -14,11 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedtask_p.h"
-
-#include "seddocument_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
+#include "sedtask_p.h"
 
 #include "utils.h"
 
@@ -37,11 +35,11 @@ bool SedTask::Impl::isValid()
     // Make sure that we have both a model and a simulation.
 
     if (mModel == nullptr) {
-        addError("Task '" + mId + "' requires a model.");
+        addError(std::string("Task '").append(mId).append("' requires a model."));
     }
 
     if (mSimulation == nullptr) {
-        addError("Task '" + mId + "' requires a simulation.");
+        addError(std::string("Task '").append(mId).append("' requires a simulation."));
     }
 
     if (hasIssues()) {
@@ -61,6 +59,26 @@ bool SedTask::Impl::isValid()
     }
 
     return !hasIssues();
+}
+
+SedModelPtr SedTask::Impl::model() const
+{
+    return mModel;
+}
+
+void SedTask::Impl::setModel(const SedModelPtr &pModel)
+{
+    mModel = pModel;
+}
+
+SedSimulationPtr SedTask::Impl::simulation() const
+{
+    return mSimulation;
+}
+
+void SedTask::Impl::setSimulation(const SedSimulationPtr &pSimulation)
+{
+    mSimulation = pSimulation;
 }
 
 void SedTask::Impl::serialise(xmlNodePtr pNode) const
@@ -108,22 +126,22 @@ SedTaskPtr SedTask::create(const SedDocumentPtr &pDocument, const SedModelPtr &p
 
 SedModelPtr SedTask::model() const
 {
-    return pimpl()->mModel;
+    return pimpl()->model();
 }
 
 void SedTask::setModel(const SedModelPtr &pModel)
 {
-    pimpl()->mModel = pModel;
+    pimpl()->setModel(pModel);
 }
 
 SedSimulationPtr SedTask::simulation() const
 {
-    return pimpl()->mSimulation;
+    return pimpl()->simulation();
 }
 
 void SedTask::setSimulation(const SedSimulationPtr &pSimulation)
 {
-    pimpl()->mSimulation = pSimulation;
+    pimpl()->setSimulation(pSimulation);
 }
 
 } // namespace libOpenCOR

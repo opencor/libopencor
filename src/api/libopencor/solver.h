@@ -18,9 +18,7 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
-#include <map>
 #include <string>
-#include <vector>
 
 namespace libOpenCOR {
 

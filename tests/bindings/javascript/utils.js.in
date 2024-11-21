@@ -14,19 +14,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+export const RESOURCE_LOCATION = "/some/path";
+
 export const UNKNOWN_FILE = "unknown_file.txt";
+export const ERROR_CELLML_FILE = "error.cellml";
+export const CELLML_FILE = "cellml_2.cellml";
+export const SEDML_FILE = "cellml_2.sedml";
+export const COMBINE_ARCHIVE = "cellml_2.omex";
 
-export const LOCAL_BASE_PATH = "/some/path";
-export const LOCAL_FILE = "/some/path/file.txt";
+export const LOCAL_FILE = resourcePath("file.txt");
 
-export const HTTP_REMOTE_FILE =
+// Note: the three following URLs use http rather than https to help with coverage testing.
+export const HTTP_REMOTE_CELLML_FILE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+export const HTTP_REMOTE_SEDML_FILE =
+  "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml";
+export const HTTP_REMOTE_COMBINE_ARCHIVE =
+  "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex";
 export const REMOTE_BASE_PATH =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
 export const REMOTE_FILE =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 
 export const NO_CONTENTS = stringToArrayBuffer("");
+export const SOME_NULL_CHARACTER_CONTENTS = stringToArrayBuffer("\0");
 export const SOME_UNKNOWN_CONTENTS = stringToArrayBuffer(
   "Some unknown contents...",
 );
@@ -40,6 +51,49 @@ export const SOME_WARNING_CELLML_CONTENTS = stringToArrayBuffer(
   `@SOME_WARNING_CELLML_CONTENTS@`,
 );
 export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
+export const SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS =
+  stringToArrayBuffer(`@SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS@`);
+export const SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS = stringToArrayBuffer(
+  `@SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS@`,
+);
+export const SOME_SEDML_WITH_SIMULATIONS_CONTENTS = stringToArrayBuffer(
+  `@SOME_SEDML_WITH_SIMULATIONS_CONTENTS@`,
+);
+export const SOME_COMBINE_ARCHIVE_CONTENTS = stringToArrayBuffer(
+  atob("@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@"),
+);
+export const SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS =
+  stringToArrayBuffer(
+    atob("@SOME_BASE64_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS@"),
+  );
+export const SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS =
+  stringToArrayBuffer(
+    atob("@SOME_BASE64_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS@"),
+  );
+export const SOME_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS =
+  stringToArrayBuffer(
+    atob(
+      "@SOME_BASE64_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS@",
+    ),
+  );
+export const SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS =
+  stringToArrayBuffer(
+    atob(
+      "@SOME_BASE64_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS@",
+    ),
+  );
+export const DATASET_135_OMEX_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_DATASET_135_OMEX_CONTENTS@"),
+);
+export const DATASET_135_JSON_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_DATASET_135_JSON_CONTENTS@"),
+);
+export const DATASET_157_OMEX_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_DATASET_157_OMEX_CONTENTS@"),
+);
+export const DATASET_157_JSON_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_DATASET_157_JSON_CONTENTS@"),
+);
 
 export const SOME_SOLVER_ODE_CONTENTS = stringToArrayBuffer(
   `@SOME_SOLVER_ODE_CONTENTS@`,
@@ -92,22 +146,50 @@ export function expectValues(
   index,
   stateValues,
   rateValues,
-  variableValues,
+  constantValues,
+  computedConstantValues,
+  algebraicValues,
 ) {
+  // console.log("---[VALUES]---[BEGIN]");
+  // console.log("Number of states: " + instanceTask.stateCount());
   for (let i = 0; i < instanceTask.stateCount(); ++i) {
+    // console.log(instanceTask.stateAsArray(i)[index]);
     expect(instanceTask.stateAsArray(i)[index]).toBeCloseTo(stateValues[i], 6);
   }
 
+  // console.log("Number of rates: " + instanceTask.stateCount());
   for (let i = 0; i < instanceTask.rateCount(); ++i) {
+    // console.log(instanceTask.rateAsArray(i)[index]);
     expect(instanceTask.rateAsArray(i)[index]).toBeCloseTo(rateValues[i], 6);
   }
 
-  for (let i = 0; i < instanceTask.variableCount(); ++i) {
-    expect(instanceTask.variableAsArray(i)[index]).toBeCloseTo(
-      variableValues[i],
+  // console.log("Number of constants: " + instanceTask.constantCount());
+  for (let i = 0; i < instanceTask.constantCount(); ++i) {
+    // console.log(instanceTask.constantAsArray(i)[index]);
+    expect(instanceTask.constantAsArray(i)[index]).toBeCloseTo(
+      constantValues[i],
       6,
     );
   }
+
+  // console.log("Number of computed constants: " + instanceTask.computedConstantCount());
+  for (let i = 0; i < instanceTask.computedConstantCount(); ++i) {
+    // console.log(instanceTask.computedConstantAsArray(i)[index]);
+    expect(instanceTask.computedConstantAsArray(i)[index]).toBeCloseTo(
+      computedConstantValues[i],
+      6,
+    );
+  }
+
+  // console.log("Number of algebraic variables: " + instanceTask.algebraicCount());
+  for (let i = 0; i < instanceTask.algebraicCount(); ++i) {
+    // console.log(instanceTask.algebraicAsArray(i)[index]);
+    expect(instanceTask.algebraicAsArray(i)[index]).toBeCloseTo(
+      algebraicValues[i],
+      6,
+    );
+  }
+  // console.log("---[VALUES]---[END]");
 }
 
 export function allocateMemory(module, arrayBuffer) {
@@ -124,7 +206,9 @@ export function freeMemory(module, memPtr) {
 }
 
 function stringToArrayBuffer(string) {
-  const encoder = new TextEncoder();
+  return Uint8Array.from(string, (c) => c.charCodeAt(0));
+}
 
-  return encoder.encode(string);
+export function resourcePath(resourceRelativePath) {
+  return RESOURCE_LOCATION + "/" + resourceRelativePath;
 }

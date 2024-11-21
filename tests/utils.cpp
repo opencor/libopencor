@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include "../extern/modp_b64/modp_b64.h"
+
 #include <libopencor>
 #include <regex>
 
@@ -60,10 +62,12 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
     }
 }
 
-void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex, const libOpenCOR::Doubles &pStateValues,
-                       const libOpenCOR::Doubles &pStateAbsTols, const libOpenCOR::Doubles &pRateValues,
-                       const libOpenCOR::Doubles &pRateAbsTols, const libOpenCOR::Doubles &pVariableValues,
-                       const libOpenCOR::Doubles &pVariableAbsTols)
+void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex,
+                       const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pStateAbsTols,
+                       const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
+                       const libOpenCOR::Doubles &pConstantValues, const libOpenCOR::Doubles &pConstantAbsTols,
+                       const libOpenCOR::Doubles &pComputedConstantValues, const libOpenCOR::Doubles &pComputedConstantAbsTols,
+                       const libOpenCOR::Doubles &pAlgebraicValues, const libOpenCOR::Doubles &pAlgebraicAbsTols)
 {
     for (size_t i = 0; i < pInstanceTask->stateCount(); ++i) {
         EXPECT_NEAR(pInstanceTask->state(i)[pIndex], pStateValues[i], pStateAbsTols[i]);
@@ -73,8 +77,16 @@ void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex, c
         EXPECT_NEAR(pInstanceTask->rate(i)[pIndex], pRateValues[i], pRateAbsTols[i]);
     }
 
-    for (size_t i = 0; i < pInstanceTask->variableCount(); ++i) {
-        EXPECT_NEAR(pInstanceTask->variable(i)[pIndex], pVariableValues[i], pVariableAbsTols[i]);
+    for (size_t i = 0; i < pInstanceTask->constantCount(); ++i) {
+        EXPECT_NEAR(pInstanceTask->constant(i)[pIndex], pConstantValues[i], pConstantAbsTols[i]);
+    }
+
+    for (size_t i = 0; i < pInstanceTask->computedConstantCount(); ++i) {
+        EXPECT_NEAR(pInstanceTask->computedConstant(i)[pIndex], pComputedConstantValues[i], pComputedConstantAbsTols[i]);
+    }
+
+    for (size_t i = 0; i < pInstanceTask->algebraicCount(); ++i) {
+        EXPECT_NEAR(pInstanceTask->algebraic(i)[pIndex], pAlgebraicValues[i], pAlgebraicAbsTols[i]);
     }
 }
 
@@ -85,19 +97,30 @@ std::string resourcePath(const std::string &pResourceRelativePath)
 
 std::string textFileContents(const std::string &pFileName)
 {
-    static const std::regex CR_LF("\\r\\n");
+    static const auto CRLF_REGEX = std::regex("\\r\\n");
 
-    auto res = libOpenCOR::toString(libOpenCOR::fileContents(libOpenCOR::resourcePath(pFileName)));
+    auto res = libOpenCOR::toString(libOpenCOR::fileContents(pFileName));
 
     // To retrieve a file contents as bytes will, on Windows, result in LF characters being converted to CR+LF, so
     // convert them back since we expect LF.
 
-    return regex_replace(res, CR_LF, "\n");
+    return regex_replace(res, CRLF_REGEX, "\n");
 }
 
 UnsignedChars charArrayToUnsignedChars(const char *pContents)
 {
     return {pContents, pContents + strlen(pContents)}; // NOLINT
+}
+
+UnsignedChars base64Decode(const char *pContents)
+{
+    char *buffer = new char[modp_b64_decode_len(strlen(pContents))];
+    const size_t length = modp_b64_decode(buffer, pContents, strlen(pContents));
+    UnsignedChars res(buffer, buffer + length); // NOLINT
+
+    delete[] buffer;
+
+    return res;
 }
 
 } // namespace libOpenCOR

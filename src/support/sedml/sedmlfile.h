@@ -16,10 +16,6 @@ limitations under the License.
 
 #pragma once
 
-#include "libopencor/logger.h"
-
-#include <memory>
-
 namespace libsedml {
 class SedDocument;
 } // namespace libsedml
@@ -43,10 +39,12 @@ public:
 
     static SedmlFilePtr create(const FilePtr &pFile);
 
+    void populateDocument(const SedDocumentPtr &pDocument);
+
 private:
     class Impl;
 
-    explicit SedmlFile(libsedml::SedDocument *pDocument);
+    explicit SedmlFile(const FilePtr &pFile, libsedml::SedDocument *pDocument);
 
     Impl *pimpl();
     const Impl *pimpl() const;

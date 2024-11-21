@@ -93,7 +93,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *mPimpl;
+    Impl *mPimpl; /**< The private implementation, @private. */
 
     explicit Issue(Type pType, const std::string &pDescription); /**< Constructor, @private. */
 };

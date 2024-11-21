@@ -20,16 +20,49 @@ import * as utils from "./utils.js";
 const libopencor = await libOpenCOR();
 
 describe("File coverage tests", () => {
+  let someNullCharacterContentsPtr;
+
+  beforeAll(() => {
+    someNullCharacterContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_NULL_CHARACTER_CONTENTS,
+    );
+  });
+
+  afterAll(() => {
+    utils.freeMemory(libopencor, someNullCharacterContentsPtr);
+  });
+
   test("Empty file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.UNKNOWN_FILE);
 
     file.setContents(null, 0);
 
     expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+
+    file.delete();
   });
 
-  test("http remote file", () => {
-    new libopencor.File(utils.HTTP_REMOTE_FILE);
+  test("File with null character", () => {
+    const file = new libopencor.File(utils.UNKNOWN_FILE);
+
+    file.setContents(
+      someNullCharacterContentsPtr,
+      utils.SOME_NULL_CHARACTER_CONTENTS.length,
+    );
+
+    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+
+    file.delete();
+  });
+
+  test("SED-ML file with no parent", () => {
+    const file = new libopencor.File(utils.SEDML_FILE);
+
+    file.setContents(
+      utils.SOME_SEDML_CONTENTS,
+      utils.SOME_SEDML_CONTENTS.length,
+    );
   });
 
   test("Same local file", () => {
@@ -37,6 +70,9 @@ describe("File coverage tests", () => {
     const file2 = new libopencor.File(utils.LOCAL_FILE);
 
     expect(file1).toStrictEqual(file2);
+
+    file1.delete();
+    file2.delete();
   });
 
   test("Same remote file", () => {
@@ -44,5 +80,8 @@ describe("File coverage tests", () => {
     const file2 = new libopencor.File(utils.REMOTE_FILE);
 
     expect(file1).toStrictEqual(file2);
+
+    file1.delete();
+    file2.delete();
   });
 });

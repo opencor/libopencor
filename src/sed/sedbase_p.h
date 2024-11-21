@@ -20,7 +20,7 @@ limitations under the License.
 
 #include "libopencor/sedbase.h"
 
-#include <libxml/tree.h>
+#include "libxml/tree.h"
 
 namespace libOpenCOR {
 
@@ -33,6 +33,9 @@ public:
 
     explicit Impl(const std::string &pId = {});
     virtual ~Impl() = default;
+
+    std::string id() const;
+    void setId(const std::string &pId);
 
     virtual void serialise(xmlNodePtr pNode) const;
 };

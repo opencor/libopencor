@@ -29,6 +29,8 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile);
 
+    FilePtr file() const;
+
     bool isValid();
 
 #ifdef BUILDING_USING_CLANG

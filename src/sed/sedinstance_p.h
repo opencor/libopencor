@@ -32,6 +32,8 @@ public:
     explicit Impl(const SedDocumentPtr &pDocument, bool pCompiled);
 
     void run();
+
+    SedInstanceTaskPtrs tasks() const;
 };
 
 } // namespace libOpenCOR

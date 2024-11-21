@@ -16,15 +16,20 @@ limitations under the License.
 
 #include "cellmlfile_p.h"
 
-#include "cellmlfileruntime.h"
 #include "utils.h"
 
 #include "libopencor/file.h"
+#include "libopencor/seddocument.h"
+#include "libopencor/sedmodel.h"
+#include "libopencor/sedsteadystate.h"
+#include "libopencor/sedtask.h"
+#include "libopencor/seduniformtimecourse.h"
 
 namespace libOpenCOR {
 
 CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
-    : mModel(pModel)
+    : mFile(pFile)
+    , mModel(pModel)
 {
     // Resolve imports and flatten the model, if needed and possible.
 
@@ -62,6 +67,67 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
 #endif
 }
 
+void CellmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument) const
+{
+    // Add a model.
+
+    auto model = SedModel::create(pDocument, mFile.lock());
+
+    pDocument->addModel(model);
+
+    // Add a uniform time course simulation in the case of an ODE/DAE model while a steady state simulation in the case
+    // of an algebraic or NLA model.
+
+    SedSimulationPtr simulation;
+    auto type = mAnalyserModel->type();
+
+    if ((type == libcellml::AnalyserModel::Type::ODE)
+        || (type == libcellml::AnalyserModel::Type::DAE)) {
+        simulation = SedUniformTimeCourse::create(pDocument);
+    } else {
+        simulation = SedSteadyState::create(pDocument);
+    }
+
+    pDocument->addSimulation(simulation);
+
+    // Add the required solver(s) depending on the type of our model.
+
+    if ((type == libcellml::AnalyserModel::Type::ODE)
+        || (type == libcellml::AnalyserModel::Type::DAE)) {
+        simulation->setOdeSolver(SolverCvode::create());
+    }
+
+    if ((type == libcellml::AnalyserModel::Type::NLA)
+        || (type == libcellml::AnalyserModel::Type::DAE)) {
+        simulation->setNlaSolver(SolverKinsol::create());
+    }
+
+    // Add a task.
+
+    pDocument->addTask(SedTask::create(pDocument, model, simulation));
+}
+
+libcellml::AnalyserModel::Type CellmlFile::Impl::type() const
+{
+    return mAnalyserModel->type();
+}
+
+libcellml::AnalyserPtr CellmlFile::Impl::analyser() const
+{
+    return mAnalyser;
+}
+
+libcellml::AnalyserModelPtr CellmlFile::Impl::analyserModel() const
+{
+    return mAnalyserModel;
+}
+
+CellmlFileRuntimePtr CellmlFile::Impl::runtime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
+                                               bool pCompiled)
+{
+    return CellmlFileRuntime::create(pCellmlFile, pNlaSolver, pCompiled);
+}
+
 CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
     : Logger(new Impl {pFile, pModel, pStrict})
 {
@@ -87,11 +153,12 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     // Try to parse the file contents as a CellML 2.0 file.
 
     auto isCellmlFile = false;
+    auto fileContents = pFile->contents();
 
-    if (!pFile->contents().empty()) {
+    if (!fileContents.empty() && (fileContents[0] != '\0')) {
         auto strict = true;
         auto parser = libcellml::Parser::create(strict);
-        auto contents = toString(pFile->contents());
+        auto contents = toString(fileContents);
         auto model = parser->parseModel(contents);
 
         if (parser->errorCount() != 0) {
@@ -114,24 +181,29 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     return nullptr;
 }
 
+void CellmlFile::populateDocument(const SedDocumentPtr &pDocument)
+{
+    pimpl()->populateDocument(pDocument);
+}
+
 libcellml::AnalyserModel::Type CellmlFile::type() const
 {
-    return pimpl()->mAnalyserModel->type();
+    return pimpl()->type();
 }
 
 libcellml::AnalyserPtr CellmlFile::analyser() const
 {
-    return pimpl()->mAnalyser;
+    return pimpl()->analyser();
 }
 
 libcellml::AnalyserModelPtr CellmlFile::analyserModel() const
 {
-    return pimpl()->mAnalyserModel;
+    return pimpl()->analyserModel();
 }
 
 CellmlFileRuntimePtr CellmlFile::runtime(const SolverNlaPtr &pNlaSolver, bool pCompiled)
 {
-    return CellmlFileRuntime::create(shared_from_this(), pNlaSolver, pCompiled);
+    return CellmlFile::Impl::runtime(shared_from_this(), pNlaSolver, pCompiled);
 }
 
 } // namespace libOpenCOR

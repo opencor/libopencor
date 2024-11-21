@@ -13,47 +13,53 @@
 # limitations under the License.
 
 
+import base64
 import libopencor as oc
+import pathlib
 import platform
 import pytest
 
 
-RESOURCE_LOCATION = "@RESOURCE_LOCATION@"
+ResourceLocation = "@RESOURCE_LOCATION@"
 
 
-UNKNOWN_FILE = "unknown_file.txt"
-SBML_FILE = "sbml.sbml"
-ERROR_CELLML_FILE = "error.cellml"
-ERROR_SEDML_FILE = "error.sedml"
-CELLML_1_X_FILE = "cellml_1_x.cellml"
-SEDML_1_X_FILE = "cellml_1_x.sedml"
-COMBINE_1_X_ARCHIVE = "cellml_1_x.omex"
-CELLML_2_FILE = "cellml_2.cellml"
-SEDML_2_FILE = "cellml_2.sedml"
-COMBINE_2_ARCHIVE = "cellml_2.omex"
-IRRETRIEVABLE_FILE = "irretrievable_file.txt"
+UnknownFile = "unknown_file.txt"
+SbmlFile = "sbml.sbml"
+ErrorCellmlFile = "error.cellml"
+ErrorSedmlFile = "error.sedml"
+Cellml1xFile = "cellml_1_x.cellml"
+Sedml1xFile = "cellml_1_x.sedml"
+Combine1xArchive = "cellml_1_x.omex"
+Cellml2File = "cellml_2.cellml"
+Sedml2File = "cellml_2.sedml"
+Combine2Archive = "cellml_2.omex"
+IrretrievableFile = "irretrievable_file.txt"
 
 
 if platform.system() == "Windows":
-    LOCAL_FILE = "P:\\some\\path\\file.txt"
+    LocalFile = "P:\\some\\path\\file.txt"
 else:
-    LOCAL_FILE = "/some/path/file.txt"
+    LocalFile = "/some/path/file.txt"
 
 
-HTTP_REMOTE_FILE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-REMOTE_BASE_PATH = (
-    "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
+# Note: the three following URLs use http rather than https to help with coverage testing.
+HttpRemoteCellmlFile = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+HttpRemoteSedmlFile = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"
+HttpRemoteCombineArchive = (
+    "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
 )
-REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt"
+RemoteBasePath = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
+RemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+IrretrievableRemoteFile = "https://some.domain.com/irretrievable_file.txt"
 
 
-NO_CONTENTS = ""
-SOME_UNKNOWN_CONTENTS = "Some unknown contents..."
-SOME_CELLML_CONTENTS = """@SOME_CELLML_CONTENTS@"""
-SOME_ERROR_CELLML_CONTENTS = """@SOME_ERROR_CELLML_CONTENTS@"""
-SOME_WARNING_CELLML_CONTENTS = """@SOME_WARNING_CELLML_CONTENTS@"""
-SOME_SEDML_CONTENTS = """@SOME_SEDML_CONTENTS@"""
+NoContents = ""
+SomeUnknownContents = "Some unknown contents..."
+SomeCellmlContents = """@SOME_CELLML_CONTENTS@"""
+SomeErrorCellmlContents = """@SOME_ERROR_CELLML_CONTENTS@"""
+SomeWarningCellmlContents = """@SOME_WARNING_CELLML_CONTENTS@"""
+SomeSedmlContents = """@SOME_SEDML_CONTENTS@"""
+SomeCombineArchiveContents = base64.b64decode(b"@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@")
 
 
 def assert_issues(logger, expected_issues):
@@ -80,8 +86,12 @@ def assert_values(
     state_abs_tols,
     rate_values,
     rate_abs_tols,
-    variable_values,
-    variable_abs_tols,
+    constant_values,
+    constant_abs_tols,
+    computed_constant_values,
+    computed_constant_abs_tols,
+    algebraic_values,
+    algebraic_abs_tols,
 ):
     for i in range(instance_task.state_count):
         assert instance_task.state(i)[index] == pytest.approx(
@@ -93,15 +103,46 @@ def assert_values(
             rate_values[i], abs=rate_abs_tols[i]
         )
 
-    for i in range(instance_task.variable_count):
-        assert instance_task.variable(i)[index] == pytest.approx(
-            variable_values[i], abs=variable_abs_tols[i]
+    for i in range(instance_task.constant_count):
+        assert instance_task.constant(i)[index] == pytest.approx(
+            constant_values[i], abs=constant_abs_tols[i]
+        )
+
+    for i in range(instance_task.computed_constant_count):
+        assert instance_task.computed_constant(i)[index] == pytest.approx(
+            computed_constant_values[i], abs=computed_constant_abs_tols[i]
+        )
+
+    for i in range(instance_task.algebraic_count):
+        assert instance_task.algebraic(i)[index] == pytest.approx(
+            algebraic_values[i], abs=algebraic_abs_tols[i]
         )
 
 
 def resource_path(relative_path=""):
-    return RESOURCE_LOCATION + "/" + relative_path
+    return ResourceLocation + "/" + relative_path
 
 
 def string_to_list(string):
     return [ord(x) for x in string]
+
+
+def binary_to_list(string):
+    return [x for x in string]
+
+
+def string_to_path(string):
+    return pathlib.Path(string)
+
+
+def path_to_string(path):
+    return str(path)
+
+
+def to_string(array):
+    return "".join([chr(x) for x in array])
+
+
+def text_file_contents(file_name):
+    with open(file_name, "r") as file:
+        return file.read()

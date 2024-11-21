@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "gtest/gtest.h"
-
 #include "tests/utils.h"
 
 #include <libopencor>
@@ -49,23 +47,85 @@ TEST(BasicSedTest, cellmlFile)
 
 TEST(BasicSedTest, sedmlFile)
 {
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(document->hasIssues());
+
+    auto neededFile = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+}
+
+TEST(BasicSedTest, sedmlFileWithAbsoluteCellmlFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/absolute_cellml_file.sedml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(document->hasIssues());
+
+    auto neededFile = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+}
+
+TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/remote_cellml_file.sedml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_TRUE(document->hasIssues());
+
+    auto neededFile = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
+
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+}
+
+TEST(BasicSedTest, combineArchive)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+}
+
+TEST(BasicSedTest, combineArchiveWithNoManifestFile)
+{
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::MESSAGE, "A simulation experiment description cannot (currently) be created using a SED-ML file."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with no master file."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_manifest_file.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(document, expectedIssues);
 }
 
-TEST(BasicSedTest, combineArchive)
+TEST(BasicSedTest, combineArchiveWithNoMasterFile)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues = {
-        {libOpenCOR::Issue::Type::MESSAGE, "A simulation experiment description cannot (currently) be created using a COMBINE archive."},
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with no master file."},
     };
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file.omex"));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ_ISSUES(document, expectedIssues);
+}
+
+TEST(BasicSedTest, combineArchiveWithSbmlFileAsMasterFile)
+{
+    static const libOpenCOR::ExpectedIssues expectedIssues = {
+        {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
+    };
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/sbml_file_as_master_file.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(document, expectedIssues);

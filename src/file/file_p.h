@@ -16,9 +16,10 @@ limitations under the License.
 
 #pragma once
 
+#include "logger_p.h"
+
 #include "cellmlfile.h"
 #include "combinearchive.h"
-#include "logger_p.h"
 #include "sedmlfile.h"
 
 #include "libopencor/file.h"
@@ -47,7 +48,9 @@ public:
 
     void checkType(const FilePtr &pOwner, bool pResetType = false);
 
+    Type type() const;
     std::string fileName() const;
+    std::string url() const;
     std::string path() const;
 
 #ifndef __EMSCRIPTEN__
@@ -56,6 +59,12 @@ public:
 
     UnsignedChars contents();
     void setContents(const UnsignedChars &pContents);
+
+    bool hasChildFiles() const;
+    size_t childFileCount() const;
+    Strings childFileNames() const;
+    FilePtrs childFiles() const;
+    FilePtr childFile(const std::string &pFileName) const;
 };
 
 } // namespace libOpenCOR

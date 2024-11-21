@@ -19,7 +19,6 @@ limitations under the License.
 #include "libopencor/logger.h"
 
 #include <string>
-#include <vector>
 
 namespace libOpenCOR {
 
@@ -106,8 +105,8 @@ public:
      *
      * Return the file name of this file. If the file is remote then we return the file name of its local copy.
      *
-     * @sa url
-     * @sa path
+     * @sa url()
+     * @sa path()
      *
      * @return The file name, as a @c std::string, of this file.
      */
@@ -119,8 +118,8 @@ public:
      *
      * Return the URL of this file. If the file is local then we return an empty string.
      *
-     * @sa fileName
-     * @sa path
+     * @sa fileName()
+     * @sa path()
      *
      * @return The URL, as a @c std::string, of this file.
      */
@@ -132,8 +131,8 @@ public:
      *
      * Return the path of this file. If the file is local then we return its file name otherwise its URL.
      *
-     * @sa fileName
-     * @sa url
+     * @sa fileName()
+     * @sa url()
      *
      * @return The path, as a @c std::string, of this file.
      */
@@ -159,6 +158,58 @@ public:
      */
 
     void setContents(const UnsignedChars &pContents);
+
+    /**
+     * @brief Return whether this file has child files.
+     *
+     * Return whether this file has child files. This method is only relevant for COMBINE archives.
+     *
+     * @return @c true if this file has child files, @c false otherwise.
+     */
+
+    bool hasChildFiles() const;
+
+    /**
+     * @brief Return the number of child files.
+     *
+     * Return the number of child files. This method is only relevant for COMBINE archives.
+     *
+     * @return The number of child files.
+     */
+
+    size_t childFileCount() const;
+
+    /**
+     * @brief Return the child file names.
+     *
+     * Return the child file names. This method is only relevant for COMBINE archives.
+     *
+     * @return The child file names, as a @c std::vector of @c std::string.
+     */
+
+    Strings childFileNames() const;
+
+    /**
+     * @brief Return the child files.
+     *
+     * Return the child files. This method is only relevant for COMBINE archives.
+     *
+     * @return The child files, as a @c std::vector of @ref FilePtr.
+     */
+
+    FilePtrs childFiles() const;
+
+    /**
+     * @brief Return a child file.
+     *
+     * Return a child file. This method is only relevant for COMBINE archives.
+     *
+     * @param pFileName The name of the child file.
+     *
+     * @return The file, as a @ref FilePtr, if it is a child file of this file, @c nullptr otherwise.
+     */
+
+    FilePtr childFile(const std::string &pFileName) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

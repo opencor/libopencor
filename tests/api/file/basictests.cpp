@@ -16,8 +16,10 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <filesystem>
 #include <libopencor>
 
+static const libOpenCOR::ExpectedIssues EXPECTED_NO_ISSUES = {};
 static const libOpenCOR::ExpectedIssues EXPECTED_NON_EXISTING_FILE_ISSUES = {
     {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
 };
@@ -62,6 +64,20 @@ TEST(BasicFileTest, relativeLocalFile)
 #endif
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, EXPECTED_NON_EXISTING_FILE_ISSUES);
+}
+
+TEST(BasicSedTest, existingRelativeLocalFile)
+{
+    auto origDir = std::filesystem::current_path();
+
+    std::filesystem::current_path(libOpenCOR::resourcePath());
+
+    auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
+
+    EXPECT_FALSE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, EXPECTED_NO_ISSUES);
+
+    std::filesystem::current_path(origDir);
 }
 
 TEST(BasicFileTest, urlBasedLocalFile)
@@ -129,4 +145,51 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), someUnknownContents);
     EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
+}
+
+TEST(BasicFileTest, fileManager)
+{
+    auto fileManager = libOpenCOR::FileManager::instance();
+
+    EXPECT_FALSE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 0);
+    EXPECT_TRUE(fileManager.files().empty());
+    EXPECT_EQ(fileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
+
+    auto localFile = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto sameFileManager = libOpenCOR::FileManager::instance();
+
+    EXPECT_TRUE(sameFileManager.hasFiles());
+    EXPECT_EQ(sameFileManager.fileCount(), 1);
+    EXPECT_EQ(sameFileManager.files().size(), 1);
+    EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), localFile);
+
+    auto remoteFile = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
+
+    EXPECT_TRUE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 2);
+    EXPECT_EQ(fileManager.files().size(), 2);
+    EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), remoteFile);
+
+    sameFileManager.unmanage(localFile);
+
+    EXPECT_TRUE(sameFileManager.hasFiles());
+    EXPECT_EQ(sameFileManager.fileCount(), 1);
+    EXPECT_EQ(sameFileManager.files().size(), 1);
+    EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
+
+    sameFileManager.manage(localFile);
+
+    EXPECT_TRUE(sameFileManager.hasFiles());
+    EXPECT_EQ(sameFileManager.fileCount(), 2);
+    EXPECT_EQ(sameFileManager.files().size(), 2);
+    EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), localFile);
+
+    fileManager.reset();
+
+    EXPECT_FALSE(fileManager.hasFiles());
+    EXPECT_EQ(fileManager.fileCount(), 0);
+    EXPECT_EQ(fileManager.files().size(), 0);
+    EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), nullptr);
+    EXPECT_EQ(fileManager.file(libOpenCOR::UNKNOWN_FILE), nullptr);
 }

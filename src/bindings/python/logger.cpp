@@ -29,12 +29,16 @@ void loggerApi(nb::module_ &m)
     nb::class_<libOpenCOR::Logger> logger(m, "Logger");
 
     logger.def_prop_ro("has_issues", &libOpenCOR::Logger::hasIssues, "Return whether there are some issues.")
+        .def_prop_ro("issue_count", &libOpenCOR::Logger::issueCount, "Return the number of issues.")
         .def_prop_ro("issues", &libOpenCOR::Logger::issues, "Return the issues.")
         .def_prop_ro("has_errors", &libOpenCOR::Logger::hasErrors, "Return whether there are some errors.")
+        .def_prop_ro("error_count", &libOpenCOR::Logger::errorCount, "Return the number of errors.")
         .def_prop_ro("errors", &libOpenCOR::Logger::errors, "Return the errors.")
         .def_prop_ro("has_warnings", &libOpenCOR::Logger::hasWarnings, "Return whether there are some warnings.")
+        .def_prop_ro("warning_count", &libOpenCOR::Logger::warningCount, "Return the number of warnings.")
         .def_prop_ro("warnings", &libOpenCOR::Logger::warnings, "Return the warnings.")
         .def_prop_ro("has_messages", &libOpenCOR::Logger::hasMessages, "Return whether there are some messages.")
+        .def_prop_ro("message_count", &libOpenCOR::Logger::messageCount, "Return the number of messages.")
         .def_prop_ro("messages", &libOpenCOR::Logger::messages, "Return the messages.");
 
     // Issue API.

@@ -41,5 +41,23 @@ void fileApi(nb::module_ &m)
         .def_prop_ro("file_name", &libOpenCOR::File::fileName, "Get the file name for this File object.")
         .def_prop_ro("url", &libOpenCOR::File::url, "Get the URL for this File object.")
         .def_prop_ro("path", &libOpenCOR::File::path, "Get the path for this File object.")
-        .def_prop_rw("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.");
+        .def_prop_rw("contents", &libOpenCOR::File::contents, &libOpenCOR::File::setContents, "The contents of this File object.")
+        .def_prop_ro("has_child_files", &libOpenCOR::File::hasChildFiles, "Return whether this File object has some child files.")
+        .def_prop_ro("child_file_count", &libOpenCOR::File::childFileCount, "Return the number of child files for this File object.")
+        .def_prop_ro("child_file_names", &libOpenCOR::File::childFileNames, "Return the child file names for this File object.")
+        .def_prop_ro("child_files", &libOpenCOR::File::childFiles, "Return the child files for this File object.")
+        .def("child_file", &libOpenCOR::File::childFile, "Get the requested child file for this File object.", nb::arg("file_name"));
+
+    // FileManager API.
+
+    nb::class_<libOpenCOR::FileManager> fileManager(m, "FileManager");
+
+    fileManager.def_static("instance", &libOpenCOR::FileManager::instance, "Get the file manager instance.")
+        .def("manage", &libOpenCOR::FileManager::manage, "Manage the requested file.", nb::arg("file"))
+        .def("unmanage", &libOpenCOR::FileManager::unmanage, "Unmanage the requested file.", nb::arg("file"))
+        .def("reset", &libOpenCOR::FileManager::reset, "Reset the file manager.")
+        .def_prop_ro("has_files", &libOpenCOR::FileManager::hasFiles, "Return whether there are managed files.")
+        .def_prop_ro("file_count", &libOpenCOR::FileManager::fileCount, "Return the number of managed files.")
+        .def_prop_ro("files", &libOpenCOR::FileManager::files, "Return the managed files.")
+        .def("file", &libOpenCOR::FileManager::file, "Get the requested managed file.", nb::arg("file_name_or_url"));
 }

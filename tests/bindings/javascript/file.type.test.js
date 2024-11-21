@@ -24,6 +24,7 @@ describe("File type tests", () => {
   let someUnknownContentsPtr;
   let someCellmlContentsPtr;
   let someSedmlContentsPtr;
+  let someCombineArchiveContentsPtr;
 
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
@@ -38,16 +39,21 @@ describe("File type tests", () => {
       libopencor,
       utils.SOME_SEDML_CONTENTS,
     );
+    someCombineArchiveContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someUnknownContentsPtr);
     utils.freeMemory(libopencor, someCellmlContentsPtr);
     utils.freeMemory(libopencor, someSedmlContentsPtr);
+    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
   });
 
   test("Unknown file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.UNKNOWN_FILE));
 
     file.setContents(
       someUnknownContentsPtr,
@@ -61,21 +67,40 @@ describe("File type tests", () => {
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
       ],
     ]);
+
+    file.delete();
   });
 
   test("CellML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.type().value).toBe(libopencor.File.Type.CELLML_FILE.value);
+
+    file.delete();
   });
 
   test("SED-ML file", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
     expect(file.type().value).toBe(libopencor.File.Type.SEDML_FILE.value);
+
+    file.delete();
+  });
+
+  test("COMBINE archive", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+
+    file.setContents(
+      someCombineArchiveContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+    );
+
+    expect(file.type().value).toBe(libopencor.File.Type.COMBINE_ARCHIVE.value);
+
+    file.delete();
   });
 });

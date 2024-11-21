@@ -14,11 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedsimulation_p.h"
-
 #include "file_p.h"
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
+#include "sedsimulation_p.h"
 #include "solvernla_p.h"
 #include "solverode_p.h"
 
@@ -36,20 +35,40 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
     auto modelType = pModel->pimpl()->mFile->pimpl()->mCellmlFile->type();
 
     if ((modelType == libcellml::AnalyserModel::Type::ODE) && (mOdeSolver == nullptr)) {
-        addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an ODE solver but none is provided.");
+        addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an ODE solver but none is provided."));
     } else if ((modelType == libcellml::AnalyserModel::Type::NLA) && (mNlaSolver == nullptr)) {
-        addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an NLA solver but none is provided.");
+        addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an NLA solver but none is provided."));
     } else if (modelType == libcellml::AnalyserModel::Type::DAE) {
         if (mOdeSolver == nullptr) {
-            addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an ODE solver but none is provided.");
+            addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an ODE solver but none is provided."));
         }
 
         if (mNlaSolver == nullptr) {
-            addError("Simulation '" + mId + "' is to be used with model '" + pModel->pimpl()->mId + "' which requires an NLA solver but none is provided.");
+            addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an NLA solver but none is provided."));
         }
     }
 
     return !hasErrors();
+}
+
+SolverOdePtr SedSimulation::Impl::odeSolver() const
+{
+    return mOdeSolver;
+}
+
+void SedSimulation::Impl::setOdeSolver(const SolverOdePtr &pOdeSolver)
+{
+    mOdeSolver = pOdeSolver;
+}
+
+SolverNlaPtr SedSimulation::Impl::nlaSolver() const
+{
+    return mNlaSolver;
+}
+
+void SedSimulation::Impl::setNlaSolver(const SolverNlaPtr &pNlaSolver)
+{
+    mNlaSolver = pNlaSolver;
 }
 
 void SedSimulation::Impl::serialise(xmlNodePtr pNode) const
@@ -82,24 +101,24 @@ const SedSimulation::Impl *SedSimulation::pimpl() const
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
 
-void SedSimulation::setOdeSolver(const SolverOdePtr &pOdeSolver)
-{
-    pimpl()->mOdeSolver = pOdeSolver;
-}
-
 SolverOdePtr SedSimulation::odeSolver() const
 {
-    return pimpl()->mOdeSolver;
+    return pimpl()->odeSolver();
 }
 
-void SedSimulation::setNlaSolver(const SolverNlaPtr &pNlaSolver)
+void SedSimulation::setOdeSolver(const SolverOdePtr &pOdeSolver)
 {
-    pimpl()->mNlaSolver = pNlaSolver;
+    pimpl()->setOdeSolver(pOdeSolver);
 }
 
 SolverNlaPtr SedSimulation::nlaSolver() const
 {
-    return pimpl()->mNlaSolver;
+    return pimpl()->nlaSolver();
+}
+
+void SedSimulation::setNlaSolver(const SolverNlaPtr &pNlaSolver)
+{
+    pimpl()->setNlaSolver(pNlaSolver);
 }
 
 } // namespace libOpenCOR

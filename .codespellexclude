@@ -1,7 +1,7 @@
   afterAll(() => {
     IssuePtrs mErrors;
     return !mErrors.empty();
-    mErrors.push_back(issue);
+    return mErrors.size();
+    return mErrors;
         mErrors.push_back(issue);
     mErrors.clear();
-    return pimpl()->mErrors;

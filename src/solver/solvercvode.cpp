@@ -16,7 +16,9 @@ limitations under the License.
 
 #include "solvercvode_p.h"
 
-#include <algorithm>
+#include "libsedmlbegin.h"
+#include "sedml/SedAlgorithm.h"
+#include "libsedmlend.h"
 
 #include "sundialsbegin.h"
 #include "cvodes/cvodes.h"
@@ -61,9 +63,11 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
 
     if (userData->computeCompiledRates != nullptr) {
-        userData->computeCompiledRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
+        userData->computeCompiledRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
+                                       userData->constants, userData->computedConstants, userData->algebraic);
     } else {
-        userData->computeInterpretedRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates), userData->variables);
+        userData->computeInterpretedRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
+                                          userData->constants, userData->computedConstants, userData->algebraic);
     }
 
     return 0;
@@ -81,6 +85,107 @@ SolverCvode::Impl::Impl()
 SolverCvode::Impl::~Impl()
 {
     resetInternals();
+}
+
+void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
+{
+    for (unsigned int i = 0; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
+        auto *algorithmParameter = pAlgorithm->getAlgorithmParameter(i);
+        auto kisaoId = algorithmParameter->getKisaoID();
+        auto value = algorithmParameter->getValue();
+
+        if (kisaoId == "KISAO:0000467") {
+            mMaximumStep = toDouble(value);
+
+            if ((mMaximumStep < 0.0) || std::isnan(mMaximumStep)) {
+                addWarning(std::string("The maximum step ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A maximum step of ").append(toString(DEFAULT_MAXIMUM_STEP)).append(" will be used instead."));
+
+                mMaximumStep = DEFAULT_MAXIMUM_STEP;
+            }
+        } else if (kisaoId == "KISAO:0000415") {
+            mMaximumNumberOfSteps = toInt(value);
+
+            if (!isInt(value) || (mMaximumNumberOfSteps <= 0)) {
+                addWarning(std::string("The maximum number of steps ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater than 0. A maximum number of steps of ").append(toString(DEFAULT_MAXIMUM_NUMBER_OF_STEPS)).append(" will be used instead."));
+
+                mMaximumNumberOfSteps = DEFAULT_MAXIMUM_NUMBER_OF_STEPS;
+            }
+        } else if (kisaoId == "KISAO:0000475") {
+            if ((value != "BDF") && (value != "Adams-Moulton")) {
+                addWarning(std::string("The integration method ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'BDF' or 'Adams-Moulton'. A ").append(toString(DEFAULT_INTEGRATION_METHOD)).append(" integration method will be used instead."));
+
+                value = toString(DEFAULT_INTEGRATION_METHOD);
+            }
+
+            mIntegrationMethod = toCvodeIntegrationMethod(value);
+        } else if (kisaoId == "KISAO:0000476") {
+            if ((value != "Functional") && (value != "Newton")) {
+                addWarning(std::string("The iteration type ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'Functional' or 'Newton'. A ").append(toString(DEFAULT_ITERATION_TYPE)).append(" iteration type will be used instead."));
+
+                value = toString(DEFAULT_ITERATION_TYPE);
+            }
+
+            mIterationType = toCvodeIterationType(value);
+        } else if (kisaoId == "KISAO:0000477") {
+            if ((value != "Dense") && (value != "Banded") && (value != "Diagonal") && (value != "GMRES") && (value != "BiCGStab") && (value != "TFQMR")) {
+                addWarning(std::string("The linear solver ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A ").append(toString(DEFAULT_LINEAR_SOLVER)).append(" linear solver will be used instead."));
+
+                value = toString(DEFAULT_LINEAR_SOLVER);
+            }
+
+            mLinearSolver = toCvodeLinearSolver(value);
+        } else if (kisaoId == "KISAO:0000478") {
+            if ((value != "No") && (value != "Banded")) {
+                addWarning(std::string("The preconditioner ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'No' or 'Banded'. A ").append(toString(DEFAULT_PRECONDITIONER)).append(" preconditioner will be used instead."));
+
+                value = toString(DEFAULT_PRECONDITIONER);
+            }
+
+            mPreconditioner = toCvodePreconditioner(value);
+        } else if (kisaoId == "KISAO:0000479") {
+            mUpperHalfBandwidth = toInt(value);
+
+            if (!isInt(value) || (mUpperHalfBandwidth < 0)) {
+                addWarning(std::string("The upper half-bandwidth ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. An upper half-bandwidth of ").append(toString(DEFAULT_UPPER_HALF_BANDWIDTH)).append(" will be used instead."));
+
+                mUpperHalfBandwidth = DEFAULT_UPPER_HALF_BANDWIDTH;
+            }
+        } else if (kisaoId == "KISAO:0000480") {
+            mLowerHalfBandwidth = toInt(value);
+
+            if (!isInt(value) || (mLowerHalfBandwidth < 0)) {
+                addWarning(std::string("The lower half-bandwidth ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A lower half-bandwidth of ").append(toString(DEFAULT_LOWER_HALF_BANDWIDTH)).append(" will be used instead."));
+
+                mLowerHalfBandwidth = DEFAULT_LOWER_HALF_BANDWIDTH;
+            }
+        } else if (kisaoId == "KISAO:0000209") {
+            mRelativeTolerance = toDouble(value);
+
+            if ((mRelativeTolerance < 0.0) || std::isnan(mRelativeTolerance)) {
+                addWarning(std::string("The relative tolerance ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A relative tolerance of ").append(toString(DEFAULT_RELATIVE_TOLERANCE)).append(" will be used instead."));
+
+                mRelativeTolerance = DEFAULT_RELATIVE_TOLERANCE;
+            }
+        } else if (kisaoId == "KISAO:0000211") {
+            mAbsoluteTolerance = toDouble(value);
+
+            if ((mAbsoluteTolerance < 0.0) || std::isnan(mAbsoluteTolerance)) {
+                addWarning(std::string("The absolute tolerance ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. An absolute tolerance of ").append(toString(DEFAULT_ABSOLUTE_TOLERANCE)).append(" will be used instead."));
+
+                mAbsoluteTolerance = DEFAULT_ABSOLUTE_TOLERANCE;
+            }
+        } else if (kisaoId == "KISAO:0000481") {
+            if ((value != "true") && (value != "false")) {
+                addWarning(std::string("The interpolate solution parameter ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'true' or 'false'. A value of ").append(toString(DEFAULT_INTERPOLATE_SOLUTION)).append(" will be used instead."));
+
+                value = toString(DEFAULT_INTERPOLATE_SOLUTION);
+            }
+
+            mInterpolateSolution = toBool(value);
+        } else {
+            addWarning(std::string("The parameter '").append(kisaoId).append("' is not recognised. It will be ignored."));
+        }
+    }
 }
 
 SolverPtr SolverCvode::Impl::duplicate()
@@ -125,25 +230,21 @@ StringStringMap SolverCvode::Impl::properties() const
 
     res["KISAO:0000467"] = toString(mMaximumStep);
     res["KISAO:0000415"] = toString(mMaximumNumberOfSteps);
-    res["KISAO:0000475"] = (mIntegrationMethod == IntegrationMethod::BDF) ? "BDF" : "Adams-Moulton";
-    res["KISAO:0000476"] = (mIterationType == IterationType::FUNCTIONAL) ? "Functional" : "Newton";
-    res["KISAO:0000477"] = (mLinearSolver == LinearSolver::DENSE)    ? "Dense" :
-                           (mLinearSolver == LinearSolver::BANDED)   ? "Banded" :
-                           (mLinearSolver == LinearSolver::DIAGONAL) ? "Diagonal" :
-                           (mLinearSolver == LinearSolver::GMRES)    ? "GMRES" :
-                           (mLinearSolver == LinearSolver::BICGSTAB) ? "BiCGStab" :
-                                                                       "TFQMR";
-    res["KISAO:0000478"] = (mPreconditioner == Preconditioner::NO) ? "No" : "Banded";
+    res["KISAO:0000475"] = toString(mIntegrationMethod);
+    res["KISAO:0000476"] = toString(mIterationType);
+    res["KISAO:0000477"] = toString(mLinearSolver);
+    res["KISAO:0000478"] = toString(mPreconditioner);
     res["KISAO:0000479"] = toString(mUpperHalfBandwidth);
     res["KISAO:0000480"] = toString(mLowerHalfBandwidth);
     res["KISAO:0000209"] = toString(mRelativeTolerance);
     res["KISAO:0000211"] = toString(mAbsoluteTolerance);
-    res["KISAO:0000481"] = mInterpolateSolution ? "true" : "false";
+    res["KISAO:0000481"] = toString(mInterpolateSolution);
 
     return res;
 }
 
-bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates, double *pVariables,
+bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
+                                   double *pConstants, double *pComputedConstants, double *pAlgebraic,
                                    CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                                    CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
@@ -152,16 +253,18 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Initialise the ODE solver itself.
 
-    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates, pComputeInterpretedRates);
+    SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates,
+                                pConstants, pComputedConstants, pAlgebraic,
+                                pComputeCompiledRates, pComputeInterpretedRates);
 
     // Check the solver's properties.
 
     if (mMaximumStep < 0.0) {
-        addError("The maximum step cannot be equal to " + toString(mMaximumStep) + ". It must be greater or equal to 0.");
+        addError(std::string("The maximum step cannot be equal to ").append(toString(mMaximumStep)).append(". It must be greater or equal to 0."));
     }
 
     if (mMaximumNumberOfSteps <= 0) {
-        addError("The maximum number of steps cannot be equal to " + toString(mMaximumNumberOfSteps) + ". It must be greater than 0.");
+        addError(std::string("The maximum number of steps cannot be equal to ").append(toString(mMaximumNumberOfSteps)).append(". It must be greater than 0."));
     }
 
     if (mIterationType == IterationType::NEWTON) {
@@ -187,21 +290,21 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
         if (needUpperAndLowerHalfBandwidths) {
             if ((mUpperHalfBandwidth < 0) || (mUpperHalfBandwidth >= static_cast<int>(pSize))) {
-                addError("The upper half-bandwidth cannot be equal to " + toString(mUpperHalfBandwidth) + ". It must be between 0 and " + toString(pSize - 1) + ".");
+                addError(std::string("The upper half-bandwidth cannot be equal to ").append(toString(mUpperHalfBandwidth)).append(". It must be between 0 and ").append(toString(pSize - 1)).append("."));
             }
 
             if ((mLowerHalfBandwidth < 0) || (mLowerHalfBandwidth >= static_cast<int>(pSize))) {
-                addError("The lower half-bandwidth cannot be equal to " + toString(mLowerHalfBandwidth) + ". It must be between 0 and " + toString(pSize - 1) + ".");
+                addError(std::string("The lower half-bandwidth cannot be equal to ").append(toString(mLowerHalfBandwidth)).append(". It must be between 0 and ").append(toString(pSize - 1)).append("."));
             }
         }
     }
 
     if (mRelativeTolerance < 0.0) {
-        addError("The relative tolerance cannot be equal to " + toString(mRelativeTolerance) + ". It must be greater or equal to 0.");
+        addError(std::string("The relative tolerance cannot be equal to ").append(toString(mRelativeTolerance)).append(". It must be greater or equal to 0."));
     }
 
     if (mAbsoluteTolerance < 0.0) {
-        addError("The absolute tolerance cannot be equal to " + toString(mAbsoluteTolerance) + ". It must be greater or equal to 0.");
+        addError(std::string("The absolute tolerance cannot be equal to ").append(toString(mAbsoluteTolerance)).append(". It must be greater or equal to 0."));
     }
 
     // Check whether we got some errors.
@@ -234,7 +337,9 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     // Set our user data.
 
-    mUserData.variables = pVariables;
+    mUserData.constants = pConstants;
+    mUserData.computedConstants = pComputedConstants;
+    mUserData.algebraic = pAlgebraic;
     mUserData.computeCompiledRates = pComputeCompiledRates;
     mUserData.computeInterpretedRates = pComputeInterpretedRates;
 
@@ -338,6 +443,116 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 }
 */
 
+double SolverCvode::Impl::maximumStep() const
+{
+    return mMaximumStep;
+}
+
+void SolverCvode::Impl::setMaximumStep(double pMaximumStep)
+{
+    mMaximumStep = pMaximumStep;
+}
+
+int SolverCvode::Impl::maximumNumberOfSteps() const
+{
+    return mMaximumNumberOfSteps;
+}
+
+void SolverCvode::Impl::setMaximumNumberOfSteps(int pMaximumNumberOfSteps)
+{
+    mMaximumNumberOfSteps = pMaximumNumberOfSteps;
+}
+
+SolverCvode::IntegrationMethod SolverCvode::Impl::integrationMethod() const
+{
+    return mIntegrationMethod;
+}
+
+void SolverCvode::Impl::setIntegrationMethod(SolverCvode::IntegrationMethod pIntegrationMethod)
+{
+    mIntegrationMethod = pIntegrationMethod;
+}
+
+SolverCvode::IterationType SolverCvode::Impl::iterationType() const
+{
+    return mIterationType;
+}
+
+void SolverCvode::Impl::setIterationType(SolverCvode::IterationType pIterationType)
+{
+    mIterationType = pIterationType;
+}
+
+SolverCvode::LinearSolver SolverCvode::Impl::linearSolver() const
+{
+    return mLinearSolver;
+}
+
+void SolverCvode::Impl::setLinearSolver(SolverCvode::LinearSolver pLinearSolver)
+{
+    mLinearSolver = pLinearSolver;
+}
+
+SolverCvode::Preconditioner SolverCvode::Impl::preconditioner() const
+{
+    return mPreconditioner;
+}
+
+void SolverCvode::Impl::setPreconditioner(SolverCvode::Preconditioner pPreconditioner)
+{
+    mPreconditioner = pPreconditioner;
+}
+
+int SolverCvode::Impl::upperHalfBandwidth() const
+{
+    return mUpperHalfBandwidth;
+}
+
+void SolverCvode::Impl::setUpperHalfBandwidth(int pUpperHalfBandwidth)
+{
+    mUpperHalfBandwidth = pUpperHalfBandwidth;
+}
+
+int SolverCvode::Impl::lowerHalfBandwidth() const
+{
+    return mLowerHalfBandwidth;
+}
+
+void SolverCvode::Impl::setLowerHalfBandwidth(int pLowerHalfBandwidth)
+{
+    mLowerHalfBandwidth = pLowerHalfBandwidth;
+}
+
+double SolverCvode::Impl::relativeTolerance() const
+{
+    return mRelativeTolerance;
+}
+
+void SolverCvode::Impl::setRelativeTolerance(double pRelativeTolerance)
+{
+    mRelativeTolerance = pRelativeTolerance;
+}
+
+double SolverCvode::Impl::absoluteTolerance() const
+{
+    return mAbsoluteTolerance;
+}
+
+void SolverCvode::Impl::setAbsoluteTolerance(double pAbsoluteTolerance)
+{
+    mAbsoluteTolerance = pAbsoluteTolerance;
+}
+
+bool SolverCvode::Impl::interpolateSolution() const
+{
+    return mInterpolateSolution;
+}
+
+void SolverCvode::Impl::setInterpolateSolution(bool pInterpolateSolution)
+{
+    mInterpolateSolution = pInterpolateSolution;
+}
+
 bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 {
     // Note: rate values are computed and handled internally by CVODE, so we can't access them and therefore need to
@@ -407,112 +622,112 @@ SolverCvodePtr SolverCvode::create()
 
 double SolverCvode::maximumStep() const
 {
-    return pimpl()->mMaximumStep;
+    return pimpl()->maximumStep();
 }
 
 void SolverCvode::setMaximumStep(double pMaximumStep)
 {
-    pimpl()->mMaximumStep = pMaximumStep;
+    pimpl()->setMaximumStep(pMaximumStep);
 }
 
 int SolverCvode::maximumNumberOfSteps() const
 {
-    return pimpl()->mMaximumNumberOfSteps;
+    return pimpl()->maximumNumberOfSteps();
 }
 
 void SolverCvode::setMaximumNumberOfSteps(int pMaximumNumberOfSteps)
 {
-    pimpl()->mMaximumNumberOfSteps = pMaximumNumberOfSteps;
+    pimpl()->setMaximumNumberOfSteps(pMaximumNumberOfSteps);
 }
 
 SolverCvode::IntegrationMethod SolverCvode::integrationMethod() const
 {
-    return pimpl()->mIntegrationMethod;
+    return pimpl()->integrationMethod();
 }
 
 void SolverCvode::setIntegrationMethod(SolverCvode::IntegrationMethod pIntegrationMethod)
 {
-    pimpl()->mIntegrationMethod = pIntegrationMethod;
+    pimpl()->setIntegrationMethod(pIntegrationMethod);
 }
 
 SolverCvode::IterationType SolverCvode::iterationType() const
 {
-    return pimpl()->mIterationType;
+    return pimpl()->iterationType();
 }
 
 void SolverCvode::setIterationType(SolverCvode::IterationType pIterationType)
 {
-    pimpl()->mIterationType = pIterationType;
+    pimpl()->setIterationType(pIterationType);
 }
 
 SolverCvode::LinearSolver SolverCvode::linearSolver() const
 {
-    return pimpl()->mLinearSolver;
+    return pimpl()->linearSolver();
 }
 
 void SolverCvode::setLinearSolver(SolverCvode::LinearSolver pLinearSolver)
 {
-    pimpl()->mLinearSolver = pLinearSolver;
+    pimpl()->setLinearSolver(pLinearSolver);
 }
 
 SolverCvode::Preconditioner SolverCvode::preconditioner() const
 {
-    return pimpl()->mPreconditioner;
+    return pimpl()->preconditioner();
 }
 
 void SolverCvode::setPreconditioner(SolverCvode::Preconditioner pPreconditioner)
 {
-    pimpl()->mPreconditioner = pPreconditioner;
+    pimpl()->setPreconditioner(pPreconditioner);
 }
 
 int SolverCvode::upperHalfBandwidth() const
 {
-    return pimpl()->mUpperHalfBandwidth;
+    return pimpl()->upperHalfBandwidth();
 }
 
 void SolverCvode::setUpperHalfBandwidth(int pUpperHalfBandwidth)
 {
-    pimpl()->mUpperHalfBandwidth = pUpperHalfBandwidth;
+    pimpl()->setUpperHalfBandwidth(pUpperHalfBandwidth);
 }
 
 int SolverCvode::lowerHalfBandwidth() const
 {
-    return pimpl()->mLowerHalfBandwidth;
+    return pimpl()->lowerHalfBandwidth();
 }
 
 void SolverCvode::setLowerHalfBandwidth(int pLowerHalfBandwidth)
 {
-    pimpl()->mLowerHalfBandwidth = pLowerHalfBandwidth;
+    pimpl()->setLowerHalfBandwidth(pLowerHalfBandwidth);
 }
 
 double SolverCvode::relativeTolerance() const
 {
-    return pimpl()->mRelativeTolerance;
+    return pimpl()->relativeTolerance();
 }
 
 void SolverCvode::setRelativeTolerance(double pRelativeTolerance)
 {
-    pimpl()->mRelativeTolerance = pRelativeTolerance;
+    pimpl()->setRelativeTolerance(pRelativeTolerance);
 }
 
 double SolverCvode::absoluteTolerance() const
 {
-    return pimpl()->mAbsoluteTolerance;
+    return pimpl()->absoluteTolerance();
 }
 
 void SolverCvode::setAbsoluteTolerance(double pAbsoluteTolerance)
 {
-    pimpl()->mAbsoluteTolerance = pAbsoluteTolerance;
+    pimpl()->setAbsoluteTolerance(pAbsoluteTolerance);
 }
 
 bool SolverCvode::interpolateSolution() const
 {
-    return pimpl()->mInterpolateSolution;
+    return pimpl()->interpolateSolution();
 }
 
 void SolverCvode::setInterpolateSolution(bool pInterpolateSolution)
 {
-    pimpl()->mInterpolateSolution = pInterpolateSolution;
+    pimpl()->setInterpolateSolution(pInterpolateSolution);
 }
 
 } // namespace libOpenCOR

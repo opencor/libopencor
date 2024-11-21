@@ -16,10 +16,6 @@ limitations under the License.
 
 #include "sedrepeatedtask_p.h"
 
-#include "seddocument_p.h"
-
-#include "utils.h"
-
 namespace libOpenCOR {
 
 /*---GRY---

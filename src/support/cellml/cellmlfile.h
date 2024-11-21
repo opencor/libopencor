@@ -19,9 +19,21 @@ limitations under the License.
 #include "cellmlfileruntime.h"
 #include "unittestingexport.h"
 
+#include "libcellml/analyser.h"
+#include "libcellml/analysermodel.h"
+#include "libcellml/analyservariable.h"
+#include "libcellml/component.h"
+#include "libcellml/generator.h"
+#include "libcellml/generatorprofile.h"
+#include "libcellml/importer.h"
+#include "libcellml/interpreter.h"
+#include "libcellml/model.h"
+#include "libcellml/parser.h"
+#include "libcellml/units.h"
+#include "libcellml/variable.h"
+
 #include "libopencor/logger.h"
 
-#include <libcellml>
 #include <memory>
 
 namespace libOpenCOR {
@@ -46,6 +58,8 @@ public:
     CellmlFile &operator=(CellmlFile &&pRhs) noexcept = delete;
 
     static CellmlFilePtr create(const FilePtr &pFile);
+
+    void populateDocument(const SedDocumentPtr &pDocument);
 
     libcellml::AnalyserModel::Type type() const;
 

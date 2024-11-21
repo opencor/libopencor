@@ -1,3 +1,5 @@
+let fileManager = null;
+let file = null;
 let document = null;
 let simulation = null;
 let instance = null;
@@ -32,7 +34,23 @@ function showError(error) {
 
   $("#errorMessage").html(error);
 
-  updateFileUi(false, false, true, true);
+  updateFileUi(false, false, true, true, false);
+}
+
+function listFiles() {
+  console.log("-------------------");
+
+  if (fileManager.hasFiles()) {
+    console.log("Files:");
+
+    const files = fileManager.files();
+
+    for (let i = 0; i < files.size(); ++i) {
+      console.log(" - " + files.get(i).fileName());
+    }
+  } else {
+    console.log("No files.");
+  }
 }
 
 function updateFileUi(
@@ -40,21 +58,43 @@ function updateFileUi(
   fileIssuesDisplay,
   fileErrorDisplay,
   resetButtonDisplay,
+  simulationDisplay,
 ) {
   $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
   $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
   $("#fileError").css("display", fileErrorDisplay ? "block" : "none");
-  $("#resetFile").css("display", resetButtonDisplay ? "block" : "none");
-  $("#simulation").css(
-    "display",
-    fileInfoDisplay && !fileIssuesDisplay ? "block" : "none",
-  );
+  $("#reset").css("display", resetButtonDisplay ? "block" : "none");
+  $("#simulation").css("display", simulationDisplay ? "block" : "none");
+
+  listFiles();
 }
 
-export function resetFile() {
-  $("#dropAreaInput").value = "";
+function resetObjects() {
+  if (document) {
+    document.delete();
 
-  updateFileUi(false, false, false, false);
+    document = null;
+  }
+
+  if (instance) {
+    instance.delete();
+
+    instance = null;
+  }
+}
+
+export function reset() {
+  const files = fileManager.files();
+
+  for (let i = 0; i < fileManager.fileCount(); ++i) {
+    files.get(i).delete();
+  }
+
+  fileManager.reset();
+
+  resetObjects();
+
+  updateFileUi(false, false, false, false, false);
 }
 
 function addAxisElement(axis, name) {
@@ -73,8 +113,16 @@ function populateAxis(axisId) {
     addAxisElement(axis, instanceTask.rateName(i));
   }
 
-  for (let i = 0; i < instanceTask.variableCount(); ++i) {
-    addAxisElement(axis, instanceTask.variableName(i));
+  for (let i = 0; i < instanceTask.constantCount(); ++i) {
+    addAxisElement(axis, instanceTask.constantName(i));
+  }
+
+  for (let i = 0; i < instanceTask.computedConstantCount(); ++i) {
+    addAxisElement(axis, instanceTask.computedConstantName(i));
+  }
+
+  for (let i = 0; i < instanceTask.algebraicCount(); ++i) {
+    addAxisElement(axis, instanceTask.algebraicName(i));
   }
 }
 
@@ -92,6 +140,7 @@ export function run() {
 
   // Run the simulation.
 
+  console.log("-------------------");
   console.time("Computing time");
   instance.run();
   console.timeEnd("Computing time");
@@ -150,6 +199,10 @@ $(() => {
   // Make sure that libOpenCOR is loaded before we do anything else.
 
   libOpenCOR().then((libopencor) => {
+    // Keep track of the file manager.
+
+    fileManager = libopencor.FileManager.instance();
+
     // Simulation page.
 
     const input = $("#dropAreaInput")[0];
@@ -169,6 +222,8 @@ $(() => {
           try {
             // Retrieve the contents of the file.
 
+            resetObjects();
+
             const fileArrayBuffer = await inputFile.arrayBuffer();
             const memPtr = libopencor._malloc(inputFile.size);
             const mem = new Uint8Array(
@@ -179,18 +234,23 @@ $(() => {
 
             mem.set(new Uint8Array(fileArrayBuffer));
 
-            const file = new libopencor.File(inputFile.name);
+            file = new libopencor.File(inputFile.name);
 
             file.setContents(memPtr, inputFile.size);
 
             // Determine the type of the file.
 
-            let fileType = "unknown";
+            let fileType = "some unknown file";
+            let knownFile = true;
 
             if (file.type() === libopencor.File.Type.CELLML_FILE) {
-              fileType = "CellML";
+              fileType = "a CellML file";
             } else if (file.type() === libopencor.File.Type.SEDML_FILE) {
-              fileType = "SED-ML";
+              fileType = "a SED-ML file";
+            } else if (file.type() === libopencor.File.Type.COMBINE_ARCHIVE) {
+              fileType = "a COMBINE archive";
+            } else {
+              knownFile = false;
             }
 
             $("#fileName").html(inputFile.name);
@@ -198,9 +258,9 @@ $(() => {
 
             // Display any issues with the file or run it.
 
-            let showIssues = false;
+            let hasIssues = false;
 
-            if (file.type() === libopencor.File.Type.CELLML_FILE) {
+            if (knownFile) {
               if (file.hasIssues()) {
                 const issuesElement = $("#issues");
                 const fileIssues = file.issues();
@@ -219,13 +279,13 @@ $(() => {
                   );
                 }
 
-                showIssues = true;
+                hasIssues = true;
               } else {
                 // Retrieve some information about the simulation.
 
                 document = new libopencor.SedDocument(file);
                 simulation = document.simulations().get(0);
-                instance = document.createInstance();
+                instance = document.instantiate();
                 instanceTask = instance.tasks().get(0);
 
                 $("#endingPoint").val(simulation.outputEndTime());
@@ -253,7 +313,7 @@ $(() => {
               }
             }
 
-            updateFileUi(true, showIssues, false, true);
+            updateFileUi(true, hasIssues, false, true, knownFile && !hasIssues);
           } catch (exception) {
             showError(exception.message);
           }
@@ -263,7 +323,7 @@ $(() => {
           showError(fileReader.error.message);
         };
       } else {
-        resetFile();
+        updateFileUi(false, false, false, false, false);
       }
     };
 

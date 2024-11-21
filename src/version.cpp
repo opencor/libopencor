@@ -16,9 +16,6 @@ limitations under the License.
 
 #include "version.h"
 
-#include <array>
-#include <cmath>
-
 #ifndef __EMSCRIPTEN__
 #    include "clangbegin.h"
 #    include "clang/Basic/Version.h"
@@ -31,15 +28,7 @@ limitations under the License.
 
 #include "libcellml/version.h"
 
-#include "libcombinebegin.h"
-#include "omex/common/libcombine-version.h"
-#include "libcombineend.h"
-
 #include "libopencor/version.h"
-
-#include "libsedmlbegin.h"
-#include "sedml/common/libsedml-version.h"
-#include "libsedmlend.h"
 
 #ifndef __EMSCRIPTEN__
 #    include "llvmbegin.h"
@@ -47,9 +36,20 @@ limitations under the License.
 #    include "llvmend.h"
 #endif
 
+#include "libcombinebegin.h"
+#include "omex/common/libcombine-version.h"
+#include "libcombineend.h"
+
+#include "libsedmlbegin.h"
+#include "sedml/common/libsedml-version.h"
+#include "libsedmlend.h"
+
 #include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
 #include "sundialsend.h"
+
+#include <array>
+#include <cmath>
 
 namespace libOpenCOR {
 
@@ -64,7 +64,7 @@ unsigned int firstDigit(unsigned int pTwoDigitNumber)
 {
     static constexpr double ONE_TENTH = 0.1;
 
-    return static_cast<unsigned int>(floor(ONE_TENTH * pTwoDigitNumber));
+    return static_cast<unsigned int>(std::floor(ONE_TENTH * pTwoDigitNumber));
 }
 
 unsigned int secondDigit(unsigned int pTwoDigitNumber)

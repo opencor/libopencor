@@ -16,9 +16,7 @@ limitations under the License.
 
 #pragma once
 
-#include "filemanager.h"
-
-#include <vector>
+#include "libopencor/filemanager.h"
 
 namespace libOpenCOR {
 
@@ -34,6 +32,11 @@ public:
     void manage(File *pFile);
     void unmanage(File *pFile);
 
+    void reset();
+
+    bool hasFiles() const;
+    size_t fileCount() const;
+    FilePtrs files() const;
     FilePtr file(const std::string &pFileNameOrUrl) const;
 };
 

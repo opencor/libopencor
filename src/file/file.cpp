@@ -15,13 +15,9 @@ limitations under the License.
 */
 
 #include "file_p.h"
+#include "filemanager_p.h"
 
-#include "cellmlfile.h"
-#include "combinearchive.h"
-#include "filemanager.h"
-#include "sedmlfile.h"
-
-#include <filesystem>
+#include "utils.h"
 
 namespace libOpenCOR {
 
@@ -55,6 +51,10 @@ File::Impl::Impl(const std::string &pFileNameOrUrl)
         mType = Type::IRRETRIEVABLE_FILE;
 
         addError("The file does not exist.");
+    }
+#else
+    if (mFilePath.empty()) {
+        mFilePath = stringToPath("/some/path/file");
     }
 #endif
 }
@@ -111,9 +111,19 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
     }
 }
 
+File::Type File::Impl::type() const
+{
+    return mType;
+}
+
 std::string File::Impl::fileName() const
 {
     return pathToString(mFilePath);
+}
+
+std::string File::Impl::url() const
+{
+    return mUrl;
 }
 
 std::string File::Impl::path() const
@@ -148,6 +158,51 @@ UnsignedChars File::Impl::contents()
     return mContents;
 }
 
+bool File::Impl::hasChildFiles() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->hasFiles();
+    }
+
+    return false;
+}
+
+size_t File::Impl::childFileCount() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->fileCount();
+    }
+
+    return 0;
+}
+
+Strings File::Impl::childFileNames() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->fileNames();
+    }
+
+    return {};
+}
+
+FilePtrs File::Impl::childFiles() const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->files();
+    }
+
+    return {};
+}
+
+FilePtr File::Impl::childFile(const std::string &pFileName) const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        return mCombineArchive->file(pFileName);
+    }
+
+    return {};
+}
+
 File::File(const std::string &pFileNameOrUrl)
     : Logger(new Impl {pFileNameOrUrl})
 {
@@ -157,7 +212,7 @@ File::~File()
 {
     // Have ourselves unmanaged.
 
-    FileManager::instance().unmanage(this);
+    FileManager::instance().mPimpl.unmanage(this);
 
     delete pimpl();
 }
@@ -188,14 +243,14 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
 
     res->pimpl()->checkType(res);
 
-    fileManager.manage(res.get());
+    fileManager.mPimpl.manage(res.get());
 
     return res;
 }
 
 File::Type File::type() const
 {
-    return pimpl()->mType;
+    return pimpl()->type();
 }
 
 std::string File::fileName() const
@@ -205,7 +260,7 @@ std::string File::fileName() const
 
 std::string File::url() const
 {
-    return pimpl()->mUrl;
+    return pimpl()->url();
 }
 
 std::string File::path() const
@@ -223,6 +278,31 @@ void File::setContents(const UnsignedChars &pContents)
     pimpl()->setContents(pContents);
 
     pimpl()->checkType(shared_from_this(), true);
+}
+
+bool File::hasChildFiles() const
+{
+    return pimpl()->hasChildFiles();
+}
+
+size_t File::childFileCount() const
+{
+    return pimpl()->childFileCount();
+}
+
+Strings File::childFileNames() const
+{
+    return pimpl()->childFileNames();
+}
+
+FilePtrs File::childFiles() const
+{
+    return pimpl()->childFiles();
+}
+
+FilePtr File::childFile(const std::string &pFileName) const
+{
+    return pimpl()->childFile(pFileName);
 }
 
 } // namespace libOpenCOR

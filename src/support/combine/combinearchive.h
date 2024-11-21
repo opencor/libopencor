@@ -18,8 +18,6 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
-#include <memory>
-
 namespace libcombine {
 class CombineArchive;
 }
@@ -43,10 +41,18 @@ public:
 
     static CombineArchivePtr create(const FilePtr &pFile);
 
+    FilePtr masterFile() const;
+
+    bool hasFiles() const;
+    size_t fileCount() const;
+    Strings fileNames() const;
+    FilePtrs files() const;
+    FilePtr file(const std::string &pFileName) const;
+
 private:
     class Impl;
 
-    explicit CombineArchive(libcombine::CombineArchive *pArchive);
+    explicit CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive);
 
     Impl *pimpl();
     const Impl *pimpl() const;

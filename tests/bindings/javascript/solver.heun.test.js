@@ -36,7 +36,7 @@ describe("Solver Heun", () => {
   });
 
   test("Step value with invalid number", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -51,7 +51,7 @@ describe("Solver Heun", () => {
 
     simulation.setOdeSolver(solver);
 
-    const instance = document.createInstance();
+    const instance = document.instantiate();
 
     expectIssues(libopencor, instance, [
       [
@@ -59,10 +59,15 @@ describe("Solver Heun", () => {
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
+
+    instance.delete();
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 
   test("Solve", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -82,11 +87,16 @@ describe("Solver Heun", () => {
       document,
       [-63.691259, 0.134516, 0.984133, 0.74137],
       [49.66942, -0.127532, -0.051693, 0.097711],
+      [1.0, 0.0, 0.3, 120.0, 36.0],
+      [-10.613, -115.0, 12.0],
       [
-        0.0, -15.923478, -823.166811, 789.421406, 1.0, 0.0, -10.613, 0.3,
-        -115.0, 120.0, 3.951622, 0.116239, 0.002898, 0.966726, 12.0, 36.0,
-        0.539425, 0.056383,
+        0.0, -15.923478, -823.166811, 789.421406, 3.951622, 0.116239, 0.002898,
+        0.966726, 0.539425, 0.056383,
       ],
     );
+
+    solver.delete();
+    document.delete();
+    file.delete();
   });
 });

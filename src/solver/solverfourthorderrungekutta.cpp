@@ -31,7 +31,7 @@ SolverPtr SolverFourthOrderRungeKutta::Impl::duplicate()
 }
 
 bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                                   double *pVariables,
+                                                   double *pConstants, double *pComputedConstants, double *pAlgebraic,
                                                    CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
                                                    CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
 {
@@ -39,8 +39,9 @@ bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
 
     // Initialise the ODE solver itself.
 
-    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates, pVariables, pComputeCompiledRates,
-                                              pComputeInterpretedRates)) {
+    if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates,
+                                              pConstants, pComputedConstants, pAlgebraic,
+                                              pComputeCompiledRates, pComputeInterpretedRates)) {
         return false;
     }
 
@@ -90,7 +91,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n, Y_n).
 
-        computeRates(pVoi, mStates, mRates, mVariables);
+        computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 
         // Compute k1 and Y_n + h / 2 * k1.
 
@@ -101,7 +102,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n + h / 2, Y_n + h / 2 * k1).
 
-        computeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
+        computeRates(pVoi + realHalfStep, mYk, mRates, mConstants, mComputedConstants, mAlgebraic);
 
         // Compute k2 and Y_n + h / 2 * k2.
 
@@ -112,7 +113,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n + h / 2, Y_n + h / 2 * k2).
 
-        computeRates(pVoi + realHalfStep, mYk, mRates, mVariables);
+        computeRates(pVoi + realHalfStep, mYk, mRates, mConstants, mComputedConstants, mAlgebraic);
 
         // Compute k3 and Y_n + h * k3.
 
@@ -123,7 +124,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute f(t_n + h, Y_n + h * k3).
 
-        computeRates(pVoi + realStep, mYk, mRates, mVariables);
+        computeRates(pVoi + realStep, mYk, mRates, mConstants, mComputedConstants, mAlgebraic);
 
         // Compute Y_n+1.
 

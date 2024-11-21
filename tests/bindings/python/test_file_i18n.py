@@ -26,10 +26,14 @@ def test_arabic_files():
         oc.File(utils.resource_path("i18n/ملف/file.sedml")).type
         == oc.File.Type.SedmlFile
     )
-    # ---GRY--- TO BE UNCOMMENTED ONCE WE HAVE SUPPORT FOR COMBINE ARCHIVES (see https://github.com/opencor/libopencor/issues/214).
-    # assert (
-    #     oc.File(utils.resource_path("i18n/ملف/file.omex")).type == oc.File.Type.CombineArchive
-    # )
+    assert (
+        oc.File(utils.resource_path("i18n/ملف/file.sedml")).type
+        == oc.File.Type.SedmlFile
+    )
+    assert (
+        oc.File(utils.resource_path("i18n/ملف/file.omex")).type
+        == oc.File.Type.CombineArchive
+    )
 
 
 def test_chinese_files():
@@ -41,10 +45,10 @@ def test_chinese_files():
         oc.File(utils.resource_path("i18n/文件夹/file.sedml")).type
         == oc.File.Type.SedmlFile
     )
-    # ---GRY--- TO BE UNCOMMENTED ONCE WE HAVE SUPPORT FOR COMBINE ARCHIVES (see https://github.com/opencor/libopencor/issues/214).
-    # assert (
-    #     oc.File(utils.resource_path("i18n/文件夹/file.omex")).type == oc.File.Type.CombineArchive
-    # )
+    assert (
+        oc.File(utils.resource_path("i18n/文件夹/file.omex")).type
+        == oc.File.Type.CombineArchive
+    )
 
 
 def test_hindi_files():
@@ -56,11 +60,10 @@ def test_hindi_files():
         oc.File(utils.resource_path("i18n/फोल्डर/file.sedml")).type
         == oc.File.Type.SedmlFile
     )
-    # ---GRY--- TO BE UNCOMMENTED ONCE WE HAVE SUPPORT FOR COMBINE ARCHIVES (see https://github.com/opencor/libopencor/issues/214).
-    # assert (
-    #     oc.File(utils.resource_path("i18n/फोल्डर/file.omex")).type
-    #     == oc.File.Type.CombineArchive
-    # )
+    assert (
+        oc.File(utils.resource_path("i18n/फोल्डर/file.omex")).type
+        == oc.File.Type.CombineArchive
+    )
 
 
 def test_japanese_files():
@@ -75,11 +78,10 @@ def test_japanese_files():
             oc.File(utils.resource_path("i18n/フォルダ/file.sedml")).type
             == oc.File.Type.SedmlFile
         )
-        # ---GRY--- TO BE UNCOMMENTED ONCE WE HAVE SUPPORT FOR COMBINE ARCHIVES (see https://github.com/opencor/libopencor/issues/214).
-        # assert (
-        #     oc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
-        #     == oc.File.Type.CombineArchive
-        # )
+        assert (
+            oc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
+            == oc.File.Type.CombineArchive
+        )
     else:
         pass
 
@@ -93,8 +95,7 @@ def test_russian_files():
         oc.File(utils.resource_path("i18n/папка/file.sedml")).type
         == oc.File.Type.SedmlFile
     )
-    # ---GRY--- TO BE UNCOMMENTED ONCE WE HAVE SUPPORT FOR COMBINE ARCHIVES (see https://github.com/opencor/libopencor/issues/214).
-    # assert (
-    #     oc.File(utils.resource_path("i18n/папка/file.omex")).type
-    #     == oc.File.Type.CombineArchive
-    # )
+    assert (
+        oc.File(utils.resource_path("i18n/папка/file.omex")).type
+        == oc.File.Type.CombineArchive
+    )

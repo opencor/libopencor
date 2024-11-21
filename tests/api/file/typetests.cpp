@@ -126,3 +126,12 @@ TEST(TypeFileTest, sedmlVirtualFile)
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
+
+TEST(TypeFileTest, combineVirtualArchive)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    file->setContents(libOpenCOR::base64Decode(libOpenCOR::SOME_BASE64_COMBINE_ARCHIVE_CONTENTS));
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+}

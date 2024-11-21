@@ -27,9 +27,20 @@ TEST(CoverageFileTest, emptyFile)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
 }
 
-TEST(CoverageFileTest, httpRemoteFile)
+TEST(CoverageFileTest, fileWithNullCharacter)
 {
-    libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+
+    file->setContents({0});
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+}
+
+TEST(CoverageFileTest, sedmlFileWithNoParent)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::SEDML_2_FILE);
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_SEDML_CONTENTS));
 }
 
 TEST(CoverageFileTest, irretrievableRemoteFile)

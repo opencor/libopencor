@@ -14,14 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "sedmodel_p.h"
-
 #include "file_p.h"
 #include "seddocument_p.h"
+#include "sedmodel_p.h"
 
 #include "utils.h"
-
-#include <filesystem>
 
 namespace libOpenCOR {
 
@@ -31,6 +28,11 @@ SedModel::Impl::Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile)
     : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
     , mFile(pFile)
 {
+}
+
+FilePtr SedModel::Impl::file() const
+{
+    return mFile;
 }
 
 bool SedModel::Impl::isValid()
@@ -103,16 +105,19 @@ SedModel::Impl *SedModel::pimpl()
     return reinterpret_cast<Impl *>(SedBase::pimpl());
 }
 
-/*---GRY---
 const SedModel::Impl *SedModel::pimpl() const
 {
     return reinterpret_cast<const Impl *>(SedBase::pimpl());
 }
-*/
 
 SedModelPtr SedModel::create(const SedDocumentPtr &pDocument, const FilePtr &pFile)
 {
     return SedModelPtr {new SedModel {pDocument, pFile}};
+}
+
+FilePtr SedModel::file() const
+{
+    return pimpl()->file();
 }
 
 } // namespace libOpenCOR

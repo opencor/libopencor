@@ -14,9 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "seddocument_p.h"
-
 #include "file_p.h"
+#include "seddocument_p.h"
 #include "sedinstance_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
@@ -24,12 +23,6 @@ limitations under the License.
 
 #include "utils.h"
 
-#include "libopencor/sedsteadystate.h"
-#include "libopencor/seduniformtimecourse.h"
-#include "libopencor/solvercvode.h"
-#include "libopencor/solverkinsol.h"
-
-#include <algorithm>
 #include <sstream>
 
 namespace libOpenCOR {
@@ -74,9 +67,9 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
     if (fileType == File::Type::CELLML_FILE) {
         initialiseFromCellmlFile(pOwner, pFile);
     } else if (fileType == File::Type::SEDML_FILE) {
-        addMessage("A simulation experiment description cannot (currently) be created using a SED-ML file.");
+        initialiseFromSedmlFile(pOwner, pFile);
     } else if (fileType == File::Type::COMBINE_ARCHIVE) {
-        addMessage("A simulation experiment description cannot (currently) be created using a COMBINE archive.");
+        initialiseFromCombineArchive(pOwner, pFile);
 #ifndef __EMSCRIPTEN__
     } else if (fileType == File::Type::IRRETRIEVABLE_FILE) {
         addError("A simulation experiment description cannot be created using an irretrievable file.");
@@ -88,41 +81,35 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
 
 void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    // Add a model for the given CellML file.
+    pFile->pimpl()->mCellmlFile->populateDocument(pOwner);
+}
 
-    auto model = SedModel::create(pOwner, pFile);
+void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
+{
+    auto sedmlFile = pFile->pimpl()->mSedmlFile;
 
-    addModel(model);
+    sedmlFile->populateDocument(pOwner);
 
-    // Add a uniform time course simulation in the case of an ODE/DAE model while a steady state simulation in the case
-    // of an algebraic or NLA model.
+    addIssues(sedmlFile);
+}
 
-    SedSimulationPtr simulation;
-    auto cellmlFileType = pFile->pimpl()->mCellmlFile->type();
+void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)
+{
+    auto masterFile = pFile->pimpl()->mCombineArchive->masterFile();
 
-    if ((cellmlFileType == libcellml::AnalyserModel::Type::ODE)
-        || (cellmlFileType == libcellml::AnalyserModel::Type::DAE)) {
-        simulation = SedUniformTimeCourse::create(pOwner);
+    if (masterFile == nullptr) {
+        addError("A simulation experiment description cannot be created using a COMBINE archive with no master file.");
     } else {
-        simulation = SedSteadyState::create(pOwner);
+        auto masterFileType = masterFile->type();
+
+        if (masterFileType == File::Type::CELLML_FILE) {
+            initialiseFromCellmlFile(pOwner, masterFile);
+        } else if (masterFileType == File::Type::SEDML_FILE) {
+            initialiseFromSedmlFile(pOwner, masterFile);
+        } else {
+            addError("A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).");
+        }
     }
-
-    addSimulation(simulation);
-
-    // Add the required solver(s) depending on the type of our model.
-
-    if (cellmlFileType == libcellml::AnalyserModel::Type::ODE) {
-        simulation->setOdeSolver(SolverCvode::create());
-    } else if (cellmlFileType == libcellml::AnalyserModel::Type::NLA) {
-        simulation->setNlaSolver(SolverKinsol::create());
-    } else if (cellmlFileType == libcellml::AnalyserModel::Type::DAE) {
-        simulation->setOdeSolver(SolverCvode::create());
-        simulation->setNlaSolver(SolverKinsol::create());
-    }
-
-    // Add a task.
-
-    addTask(SedTask::create(pOwner, model, simulation));
 }
 
 void SedDocument::Impl::serialise(xmlNodePtr pNode) const
@@ -134,7 +121,7 @@ void SedDocument::Impl::serialise(xmlNodePtr pNode) const
 
 std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 {
-    // Serialise our SED-ML document using libxml2.
+    // Serialise our SED-ML document.
 
     auto *doc = xmlNewDoc(toConstXmlCharPtr("1.0"));
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("sedML"));
@@ -257,6 +244,16 @@ bool SedDocument::Impl::hasModels() const
     return !mModels.empty();
 }
 
+size_t SedDocument::Impl::modelCount() const
+{
+    return mModels.size();
+}
+
+SedModelPtrs SedDocument::Impl::models() const
+{
+    return mModels;
+}
+
 bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
 {
     if (pModel == nullptr) {
@@ -297,6 +294,16 @@ bool SedDocument::Impl::hasSimulations() const
     return !mSimulations.empty();
 }
 
+size_t SedDocument::Impl::simulationCount() const
+{
+    return mSimulations.size();
+}
+
+SedSimulationPtrs SedDocument::Impl::simulations() const
+{
+    return mSimulations;
+}
+
 bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
 {
     if (pSimulation == nullptr) {
@@ -335,6 +342,16 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
 bool SedDocument::Impl::hasTasks() const
 {
     return !mTasks.empty();
+}
+
+size_t SedDocument::Impl::taskCount() const
+{
+    return mTasks.size();
+}
+
+SedAbstractTaskPtrs SedDocument::Impl::tasks() const
+{
+    return mTasks;
 }
 
 bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
@@ -423,9 +440,14 @@ bool SedDocument::hasModels() const
     return pimpl()->hasModels();
 }
 
+size_t SedDocument::modelCount() const
+{
+    return pimpl()->modelCount();
+}
+
 SedModelPtrs SedDocument::models() const
 {
-    return pimpl()->mModels;
+    return pimpl()->models();
 }
 
 bool SedDocument::addModel(const SedModelPtr &pModel)
@@ -443,9 +465,14 @@ bool SedDocument::hasSimulations() const
     return pimpl()->hasSimulations();
 }
 
+size_t SedDocument::simulationCount() const
+{
+    return pimpl()->simulationCount();
+}
+
 SedSimulationPtrs SedDocument::simulations() const
 {
-    return pimpl()->mSimulations;
+    return pimpl()->simulations();
 }
 
 bool SedDocument::addSimulation(const SedSimulationPtr &pSimulation)
@@ -463,9 +490,14 @@ bool SedDocument::hasTasks() const
     return pimpl()->hasTasks();
 }
 
+size_t SedDocument::taskCount() const
+{
+    return pimpl()->taskCount();
+}
+
 SedAbstractTaskPtrs SedDocument::tasks() const
 {
-    return pimpl()->mTasks;
+    return pimpl()->tasks();
 }
 
 bool SedDocument::addTask(const SedAbstractTaskPtr &pTask)
@@ -479,12 +511,12 @@ bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
 }
 
 #ifdef __EMSCRIPTEN__
-SedInstancePtr SedDocument::createInstance()
+SedInstancePtr SedDocument::instantiate()
 {
     return SedInstance::Impl::create(shared_from_this(), false);
 }
 #else
-SedInstancePtr SedDocument::createInstance(bool pCompiled)
+SedInstancePtr SedDocument::instantiate(bool pCompiled)
 {
     return SedInstance::Impl::create(shared_from_this(), pCompiled);
 }

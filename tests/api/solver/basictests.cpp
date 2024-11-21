@@ -16,7 +16,6 @@ limitations under the License.
 
 #include "tests/utils.h"
 
-#include <libcellml>
 #include <libopencor>
 
 TEST(BasicSolverTest, SolverCvode)
