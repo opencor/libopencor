@@ -178,7 +178,7 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
         }
     }
 
-    return nullptr;
+    return {};
 }
 
 void CellmlFile::populateDocument(const SedDocumentPtr &pDocument)

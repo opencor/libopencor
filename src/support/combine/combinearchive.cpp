@@ -93,13 +93,13 @@ FilePtr CombineArchive::Impl::file(const std::string &pFileName) const
         }
     }
 
-    return nullptr;
+    return {};
 }
 
 FilePtr CombineArchive::Impl::file(size_t pIndex) const
 {
     if (pIndex >= mFiles.size()) {
-        return nullptr;
+        return {};
     }
 
     return mFiles[pIndex];
@@ -148,7 +148,7 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
         return CombineArchivePtr {new CombineArchive {pFile, archive}};
     }
 
-    return nullptr;
+    return {};
 }
 
 FilePtr CombineArchive::masterFile() const

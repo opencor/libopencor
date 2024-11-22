@@ -257,7 +257,7 @@ SedModelPtrs SedDocument::Impl::models() const
 SedModelPtr SedDocument::Impl::model(size_t pIndex) const
 {
     if (pIndex >= mModels.size()) {
-        return nullptr;
+        return {};
     }
 
     return mModels[pIndex];

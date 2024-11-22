@@ -231,7 +231,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
         delete document;
     }
 
-    return nullptr;
+    return {};
 }
 
 void SedmlFile::populateDocument(const SedDocumentPtr &pDocument)
