@@ -194,7 +194,24 @@ FilePtrs File::Impl::childFiles() const
     return {};
 }
 
+FilePtr File::Impl::childFile(size_t pIndex) const
+{
+    if (mType == Type::COMBINE_ARCHIVE) {
+        if (pIndex >= mCombineArchive->fileCount()) {
+            return {};
+        }
+
+        return mCombineArchive->file(pIndex);
+    }
+
+    return {};
+}
+
+#ifdef __EMSCRIPTEN__
+FilePtr File::Impl::childFileFromFileName(const std::string &pFileName) const
+#else
 FilePtr File::Impl::childFile(const std::string &pFileName) const
+#endif
 {
     if (mType == Type::COMBINE_ARCHIVE) {
         return mCombineArchive->file(pFileName);
@@ -233,7 +250,11 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
     // and return a new file object.
 
     auto fileManager = FileManager::instance();
+#ifdef __EMSCRIPTEN__
+    auto file = fileManager.fileFromFileNameOrUrl(pFileNameOrUrl);
+#else
     auto file = fileManager.file(pFileNameOrUrl);
+#endif
 
     if (file != nullptr) {
         return file;
@@ -300,9 +321,22 @@ FilePtrs File::childFiles() const
     return pimpl()->childFiles();
 }
 
-FilePtr File::childFile(const std::string &pFileName) const
+FilePtr File::childFile(size_t pIndex) const
 {
+    return pimpl()->childFile(pIndex);
+}
+
+#ifdef __EMSCRIPTEN__
+FilePtr File::childFileFromFileName(const std::string &pFileName) const
+#else
+FilePtr File::childFile(const std::string &pFileName) const
+#endif
+{
+#ifdef __EMSCRIPTEN__
+    return pimpl()->childFileFromFileName(pFileName);
+#else
     return pimpl()->childFile(pFileName);
+#endif
 }
 
 } // namespace libOpenCOR

@@ -24,15 +24,19 @@ void loggerApi()
         .function("hasIssues", &libOpenCOR::Logger::hasIssues)
         .function("issueCount", &libOpenCOR::Logger::issueCount)
         .function("issues", &libOpenCOR::Logger::issues)
+        .function("issue", &libOpenCOR::Logger::issue)
         .function("hasErrors", &libOpenCOR::Logger::hasErrors)
         .function("errorCount", &libOpenCOR::Logger::errorCount)
         .function("errors", &libOpenCOR::Logger::errors)
+        .function("error", &libOpenCOR::Logger::error)
         .function("hasWarnings", &libOpenCOR::Logger::hasWarnings)
         .function("warningCount", &libOpenCOR::Logger::warningCount)
         .function("warnings", &libOpenCOR::Logger::warnings)
+        .function("warning", &libOpenCOR::Logger::warning)
         .function("hasMessages", &libOpenCOR::Logger::hasMessages)
         .function("messageCount", &libOpenCOR::Logger::messageCount)
-        .function("messages", &libOpenCOR::Logger::messages);
+        .function("messages", &libOpenCOR::Logger::messages)
+        .function("message", &libOpenCOR::Logger::message);
 
     // Issue API.
 

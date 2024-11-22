@@ -121,6 +121,18 @@ public:
     SedModelPtrs models() const;
 
     /**
+     * @brief Return the model at the given index.
+     *
+     * Return the model at the given index.
+     *
+     * @param pIndex The index of the model to return.
+     *
+     * @return The model as a @ref SedModelPtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    SedModelPtr model(size_t pIndex) const;
+
+    /**
      * @brief Add the model to this simulation experiment description.
      *
      * Add the model to this simulation experiment description.
@@ -175,6 +187,18 @@ public:
     SedSimulationPtrs simulations() const;
 
     /**
+     * @brief Return the simulation at the given index.
+     *
+     * Return the simulation at the given index.
+     *
+     * @param pIndex The index of the simulation to return.
+     *
+     * @return The simulation as a @ref SedSimulationPtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    SedSimulationPtr simulation(size_t pIndex) const;
+
+    /**
      * @brief Add the simulation to this simulation experiment description.
      *
      * Add the simulation to this simulation experiment description.
@@ -227,6 +251,18 @@ public:
      */
 
     SedAbstractTaskPtrs tasks() const;
+
+    /**
+     * @brief Return the task at the given index.
+     *
+     * Return the task at the given index.
+     *
+     * @param pIndex The index of the task to return.
+     *
+     * @return The task as a @ref SedAbstractTaskPtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    SedAbstractTaskPtr task(size_t pIndex) const;
 
     /**
      * @brief Add the task to this simulation experiment description.

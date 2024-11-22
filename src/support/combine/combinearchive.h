@@ -48,6 +48,7 @@ public:
     Strings fileNames() const;
     FilePtrs files() const;
     FilePtr file(const std::string &pFileName) const;
+    FilePtr file(size_t pIndex) const;
 
 private:
     class Impl;

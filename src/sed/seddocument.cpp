@@ -254,6 +254,15 @@ SedModelPtrs SedDocument::Impl::models() const
     return mModels;
 }
 
+SedModelPtr SedDocument::Impl::model(size_t pIndex) const
+{
+    if (pIndex >= mModels.size()) {
+        return nullptr;
+    }
+
+    return mModels[pIndex];
+}
+
 bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
 {
     if (pModel == nullptr) {
@@ -304,6 +313,15 @@ SedSimulationPtrs SedDocument::Impl::simulations() const
     return mSimulations;
 }
 
+SedSimulationPtr SedDocument::Impl::simulation(size_t pIndex) const
+{
+    if (pIndex >= mSimulations.size()) {
+        return {};
+    }
+
+    return mSimulations[pIndex];
+}
+
 bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
 {
     if (pSimulation == nullptr) {
@@ -352,6 +370,15 @@ size_t SedDocument::Impl::taskCount() const
 SedAbstractTaskPtrs SedDocument::Impl::tasks() const
 {
     return mTasks;
+}
+
+SedAbstractTaskPtr SedDocument::Impl::task(size_t pIndex) const
+{
+    if (pIndex >= mTasks.size()) {
+        return {};
+    }
+
+    return mTasks[pIndex];
 }
 
 bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
@@ -450,6 +477,11 @@ SedModelPtrs SedDocument::models() const
     return pimpl()->models();
 }
 
+SedModelPtr SedDocument::model(size_t pIndex) const
+{
+    return pimpl()->model(pIndex);
+}
+
 bool SedDocument::addModel(const SedModelPtr &pModel)
 {
     return pimpl()->addModel(pModel);
@@ -475,6 +507,11 @@ SedSimulationPtrs SedDocument::simulations() const
     return pimpl()->simulations();
 }
 
+SedSimulationPtr SedDocument::simulation(size_t pIndex) const
+{
+    return pimpl()->simulation(pIndex);
+}
+
 bool SedDocument::addSimulation(const SedSimulationPtr &pSimulation)
 {
     return pimpl()->addSimulation(pSimulation);
@@ -498,6 +535,11 @@ size_t SedDocument::taskCount() const
 SedAbstractTaskPtrs SedDocument::tasks() const
 {
     return pimpl()->tasks();
+}
+
+SedAbstractTaskPtr SedDocument::task(size_t pIndex) const
+{
+    return pimpl()->task(pIndex);
 }
 
 bool SedDocument::addTask(const SedAbstractTaskPtr &pTask)

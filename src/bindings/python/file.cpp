@@ -46,7 +46,8 @@ void fileApi(nb::module_ &m)
         .def_prop_ro("child_file_count", &libOpenCOR::File::childFileCount, "Return the number of child files for this File object.")
         .def_prop_ro("child_file_names", &libOpenCOR::File::childFileNames, "Return the child file names for this File object.")
         .def_prop_ro("child_files", &libOpenCOR::File::childFiles, "Return the child files for this File object.")
-        .def("child_file", &libOpenCOR::File::childFile, "Get the requested child file for this File object.", nb::arg("file_name"));
+        .def("child_file", nb::overload_cast<size_t>(&libOpenCOR::File::childFile, nb::const_), "Get the requested child file for this File object.", nb::arg("index"))
+        .def("child_file", nb::overload_cast<const std::string &>(&libOpenCOR::File::childFile, nb::const_), "Get the requested child file for this File object.", nb::arg("file_name"));
 
     // FileManager API.
 
@@ -59,5 +60,6 @@ void fileApi(nb::module_ &m)
         .def_prop_ro("has_files", &libOpenCOR::FileManager::hasFiles, "Return whether there are managed files.")
         .def_prop_ro("file_count", &libOpenCOR::FileManager::fileCount, "Return the number of managed files.")
         .def_prop_ro("files", &libOpenCOR::FileManager::files, "Return the managed files.")
-        .def("file", &libOpenCOR::FileManager::file, "Get the requested managed file.", nb::arg("file_name_or_url"));
+        .def("file", nb::overload_cast<size_t>(&libOpenCOR::FileManager::file, nb::const_), "Get the requested managed file.", nb::arg("index"))
+        .def("file", nb::overload_cast<const std::string &>(&libOpenCOR::FileManager::file, nb::const_), "Get the requested managed file.", nb::arg("file_name_or_url"));
 }

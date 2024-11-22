@@ -110,12 +110,28 @@ public:
      *
      * Get a given managed file.
      *
+     * @param pIndex The index of the managed file.
+     *
+     * @return The managed file, as a @ref FilePtr, if it is managed by the file manager, @c nullptr otherwise.
+     */
+
+    FilePtr file(size_t pIndex) const;
+
+    /**
+     * @brief Get a given managed file.
+     *
+     * Get a given managed file.
+     *
      * @param pFileNameOrUrl The name of the managed file or its URL.
      *
      * @return The managed file, as a @ref FilePtr, if it is managed by the file manager, @c nullptr otherwise.
      */
 
+#ifdef __EMSCRIPTEN__
+    FilePtr fileFromFileNameOrUrl(const std::string &pFileNameOrUrl) const;
+#else
     FilePtr file(const std::string &pFileNameOrUrl) const;
+#endif
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

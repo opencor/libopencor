@@ -50,7 +50,8 @@ void fileApi()
         .function("childFileCount", &libOpenCOR::File::childFileCount)
         .function("childFileNames", &libOpenCOR::File::childFileNames)
         .function("childFiles", &libOpenCOR::File::childFiles)
-        .function("childFile", &libOpenCOR::File::childFile);
+        .function("childFile", &libOpenCOR::File::childFile)
+        .function("childFileFromFileName", &libOpenCOR::File::childFileFromFileName);
 
     EM_ASM({
         Module["File"]["Type"] = Module["File.Type"];
@@ -68,5 +69,6 @@ void fileApi()
         .function("hasFiles", &libOpenCOR::FileManager::hasFiles)
         .function("fileCount", &libOpenCOR::FileManager::fileCount)
         .function("files", &libOpenCOR::FileManager::files)
-        .function("file", &libOpenCOR::FileManager::file);
+        .function("file", &libOpenCOR::FileManager::file)
+        .function("fileFromFileNameOrUrl", &libOpenCOR::FileManager::fileFromFileNameOrUrl);
 }

@@ -76,6 +76,18 @@ public:
     IssuePtrs issues() const;
 
     /**
+     * @brief Return an issue.
+     *
+     * Return an issue.
+     *
+     * @param pIndex The index of the issue.
+     *
+     * @return The issue, as an @ref IssuePtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    IssuePtr issue(size_t pIndex) const;
+
+    /**
      * @brief Return whether there are some errors.
      *
      * Return whether there are some errors.
@@ -104,6 +116,18 @@ public:
      */
 
     IssuePtrs errors() const;
+
+    /**
+     * @brief Return an error.
+     *
+     * Return an error.
+     *
+     * @param pIndex The index of the error.
+     *
+     * @return The error, as an @ref IssuePtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    IssuePtr error(size_t pIndex) const;
 
     /**
      * @brief Return whether there are some warnings.
@@ -136,6 +160,18 @@ public:
     IssuePtrs warnings() const;
 
     /**
+     * @brief Return a warning.
+     *
+     * Return a warning.
+     *
+     * @param pIndex The index of the warning.
+     *
+     * @return The warning, as an @ref IssuePtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    IssuePtr warning(size_t pIndex) const;
+
+    /**
      * @brief Return whether there are some messages.
      *
      * Return whether there are some messages.
@@ -164,6 +200,18 @@ public:
      */
 
     IssuePtrs messages() const;
+
+    /**
+     * @brief Return a message.
+     *
+     * Return a message.
+     *
+     * @param pIndex The index of the message.
+     *
+     * @return The message, as an @ref IssuePtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    IssuePtr message(size_t pIndex) const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

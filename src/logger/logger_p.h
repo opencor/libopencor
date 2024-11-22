@@ -36,18 +36,22 @@ public:
     bool hasIssues() const;
     size_t issueCount() const;
     IssuePtrs issues() const;
+    IssuePtr issue(size_t pIndex) const;
 
     bool hasErrors() const;
     size_t errorCount() const;
     IssuePtrs errors() const;
+    IssuePtr error(size_t pIndex) const;
 
     bool hasWarnings() const;
     size_t warningCount() const;
     IssuePtrs warnings() const;
+    IssuePtr warning(size_t pIndex) const;
 
     bool hasMessages() const;
     size_t messageCount() const;
     IssuePtrs messages() const;
+    IssuePtr message(size_t pIndex) const;
 
     void addIssues(const LoggerPtr &pLogger);
     void addIssues(const libcellml::LoggerPtr &pLogger);
