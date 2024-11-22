@@ -95,7 +95,7 @@ public:
      *
      * @param pIndex The index of the state.
      *
-     * @return The values of the state.
+     * @return The values of the state, as a @c std::vector of @c double, if the index is valid, an empty vector otherwise.
      */
 
     Doubles state(size_t pIndex) const;
@@ -111,7 +111,7 @@ public:
      *
      * @param pIndex The index of the state.
      *
-     * @return The name of the state.
+     * @return The name of the state, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
     std::string stateName(size_t pIndex) const;
@@ -123,7 +123,7 @@ public:
      *
      * @param pIndex The index of the state.
      *
-     * @return The unit of the state.
+     * @return The unit of the state, as a @c std::string, if the index is valid, an empty vector otherwise.
      */
 
     std::string stateUnit(size_t pIndex) const;
@@ -145,7 +145,7 @@ public:
      *
      * @param pIndex The index of the rate.
      *
-     * @return The values of the rate.
+     * @return The values of the rate, as a @c std::vector of @c double, if the index is valid, an empty vector otherwise.
      */
 
     Doubles rate(size_t pIndex) const;
@@ -161,7 +161,7 @@ public:
      *
      * @param pIndex The index of the rate.
      *
-     * @return The name of the rate.
+     * @return The name of the rate, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
     std::string rateName(size_t pIndex) const;
@@ -173,7 +173,7 @@ public:
      *
      * @param pIndex The index of the rate.
      *
-     * @return The unit of the rate.
+     * @return The unit of the rate, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
     std::string rateUnit(size_t pIndex) const;
@@ -195,7 +195,7 @@ public:
      *
      * @param pIndex The index of the constant.
      *
-     * @return The values of the constant.
+     * @return The values of the constant, as a @c std::vector of @c double, if the index is valid, an empty vector otherwise.
      */
 
     Doubles constant(size_t pIndex) const;
@@ -211,7 +211,7 @@ public:
      *
      * @param pIndex The index of the constant.
      *
-     * @return The name of the constant.
+     * @return The name of the constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
     std::string constantName(size_t pIndex) const;
@@ -223,7 +223,7 @@ public:
      *
      * @param pIndex The index of the constant.
      *
-     * @return The unit of the constant.
+     * @return The unit of the constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
     std::string constantUnit(size_t pIndex) const;
@@ -245,7 +245,8 @@ public:
      *
      * @param pIndex The index of the computed constant.
      *
-     * @return The values of the computed constant.
+     * @return The values of the computed constant, as a @c std::vector of @c double, if the index is valid, an empty
+     * vector otherwise.
      */
 
     Doubles computedConstant(size_t pIndex) const;
@@ -261,7 +262,7 @@ public:
      *
      * @param pIndex The index of the computed constant.
      *
-     * @return The name of the computed constant.
+     * @return The name of the computed constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
     std::string computedConstantName(size_t pIndex) const;
@@ -273,7 +274,7 @@ public:
      *
      * @param pIndex The index of the computed constant.
      *
-     * @return The unit of the computed constant.
+     * @return The unit of the computed constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
     std::string computedConstantUnit(size_t pIndex) const;
@@ -295,7 +296,8 @@ public:
      *
      * @param pIndex The index of the algebraic variable.
      *
-     * @return The values of the algebraic variable.
+     * @return The values of the algebraic variable, as a @c std::vector of @c double, if the index is valid, an empty
+     * vector otherwise.
      */
 
     Doubles algebraic(size_t pIndex) const;
@@ -311,7 +313,8 @@ public:
      *
      * @param pIndex The index of the algebraic variable.
      *
-     * @return The name of the algebraic variable.
+     * @return The name of the algebraic variable, as a @c std::string, if the index is valid, an empty string
+     * otherwise.
      */
 
     std::string algebraicName(size_t pIndex) const;
@@ -323,7 +326,8 @@ public:
      *
      * @param pIndex The index of the algebraic variable.
      *
-     * @return The unit of the algebraic variable.
+     * @return The unit of the algebraic variable, as a @c std::string, if the index is valid, an empty string
+     * otherwise.
      */
 
     std::string algebraicUnit(size_t pIndex) const;
