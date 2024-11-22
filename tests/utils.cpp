@@ -54,10 +54,8 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
 
         if (issues[i]->type() == Issue::Type::ERROR) {
             EXPECT_EQ(issues[i]->typeAsString(), "Error");
-        } else if (issues[i]->type() == Issue::Type::WARNING) {
-            EXPECT_EQ(issues[i]->typeAsString(), "Warning");
         } else {
-            EXPECT_EQ(issues[i]->typeAsString(), "Message");
+            EXPECT_EQ(issues[i]->typeAsString(), "Warning");
         }
     }
 }
