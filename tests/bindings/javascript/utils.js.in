@@ -132,10 +132,8 @@ export function expectIssues(libopencor, logger, expectedIssues) {
 
     if (issues.get(i).type() === libopencor.Issue.Type.ERROR) {
       expect(issues.get(i).typeAsString()).toBe("Error");
-    } else if (issues.get(i).type() === libopencor.Issue.Type.WARNING) {
-      expect(issues.get(i).typeAsString()).toBe("Warning");
     } else {
-      expect(issues.get(i).typeAsString()).toBe("Message");
+      expect(issues.get(i).typeAsString()).toBe("Warning");
     }
   }
 }
