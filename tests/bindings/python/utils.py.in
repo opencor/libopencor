@@ -73,10 +73,8 @@ def assert_issues(logger, expected_issues):
 
         if issues[i].type == oc.Issue.Type.Error:
             assert issues[i].type_as_string == "Error"
-        elif issues[i].type == oc.Issue.Type.Warning:
-            assert issues[i].type_as_string == "Warning"
         else:
-            assert issues[i].type_as_string == "Message"
+            assert issues[i].type_as_string == "Warning"
 
 
 def assert_values(
