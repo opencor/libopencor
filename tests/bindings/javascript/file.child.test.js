@@ -73,7 +73,9 @@ describe("File type tests", () => {
     expect(simulationFile).not.toBeNull();
 
     for (let i = 0; i < specificChildFileNames.length; ++i) {
-      expect(file.childFileFromFileName(specificChildFileNames[i])).not.toBeNull();
+      expect(
+        file.childFileFromFileName(specificChildFileNames[i]),
+      ).not.toBeNull();
     }
 
     expect(file.childFileFromFileName(utils.UNKNOWN_FILE)).toBeNull();
