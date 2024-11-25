@@ -74,6 +74,8 @@ describe("Sed coverage tests", () => {
     expect(document.modelCount()).toBe(1);
     expect(document.models().size()).toBe(1);
     expect(document.models().get(0)).toStrictEqual(model);
+    expect(document.model(0)).toStrictEqual(model);
+    expect(document.model(1)).toBeNull();
 
     expect(document.addModel(model)).toBe(false);
     expect(document.removeModel(model)).toBe(true);
@@ -114,6 +116,11 @@ describe("Sed coverage tests", () => {
     expect(document.simulations().get(1)).toStrictEqual(one_step);
     expect(document.simulations().get(2)).toStrictEqual(steady_state);
     expect(document.simulations().get(3)).toStrictEqual(analysis);
+    expect(document.simulation(0)).toStrictEqual(uniform_time_course);
+    expect(document.simulation(1)).toStrictEqual(one_step);
+    expect(document.simulation(2)).toStrictEqual(steady_state);
+    expect(document.simulation(3)).toStrictEqual(analysis);
+    expect(document.simulation(4)).toBeNull();
 
     expect(document.addSimulation(uniform_time_course)).toBe(false);
     expect(document.removeSimulation(uniform_time_course)).toBe(true);
@@ -160,6 +167,8 @@ describe("Sed coverage tests", () => {
     expect(document.taskCount()).toBe(1);
     expect(document.tasks().size()).toBe(1);
     expect(document.tasks().get(0)).toStrictEqual(task);
+    expect(document.task(0)).toStrictEqual(task);
+    expect(document.task(1)).toBeNull();
 
     expect(document.serialise()).toBe(sedTaskExpectedSerialisation(true));
 
