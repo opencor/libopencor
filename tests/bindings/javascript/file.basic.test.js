@@ -91,6 +91,7 @@ describe("File basic tests", () => {
     expect(fileManager.hasFiles()).toBe(false);
     expect(fileManager.fileCount()).toBe(0);
     expect(fileManager.files().size()).toBe(0);
+    expect(fileManager.file(0)).toStrictEqual(null);
     expect(fileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE)).toStrictEqual(
       null,
     );
@@ -101,6 +102,7 @@ describe("File basic tests", () => {
     expect(sameFileManager.hasFiles()).toBe(true);
     expect(sameFileManager.fileCount()).toBe(1);
     expect(sameFileManager.files().size()).toBe(1);
+    expect(fileManager.file(0)).toStrictEqual(localFile);
     expect(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
     ).toStrictEqual(localFile);
@@ -110,6 +112,7 @@ describe("File basic tests", () => {
     expect(fileManager.hasFiles()).toBe(true);
     expect(fileManager.fileCount()).toBe(2);
     expect(fileManager.files().size()).toBe(2);
+    expect(fileManager.file(1)).toStrictEqual(remoteFile);
     expect(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE)).toStrictEqual(
       remoteFile,
     );
@@ -119,6 +122,7 @@ describe("File basic tests", () => {
     expect(sameFileManager.hasFiles()).toBe(true);
     expect(sameFileManager.fileCount()).toBe(1);
     expect(sameFileManager.files().size()).toBe(1);
+    expect(fileManager.file(1)).toStrictEqual(null);
     expect(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
     ).toStrictEqual(null);
@@ -128,6 +132,7 @@ describe("File basic tests", () => {
     expect(sameFileManager.hasFiles()).toBe(true);
     expect(sameFileManager.fileCount()).toBe(2);
     expect(sameFileManager.files().size()).toBe(2);
+    expect(fileManager.file(1)).toStrictEqual(localFile);
     expect(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
     ).toStrictEqual(localFile);
@@ -137,6 +142,8 @@ describe("File basic tests", () => {
     expect(fileManager.hasFiles()).toBe(false);
     expect(fileManager.fileCount()).toBe(0);
     expect(fileManager.files().size()).toBe(0);
+    expect(fileManager.file(0)).toStrictEqual(null);
+    expect(fileManager.file(1)).toStrictEqual(null);
     expect(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE)).toStrictEqual(
       null,
     );
