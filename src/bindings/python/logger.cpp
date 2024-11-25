@@ -31,15 +31,15 @@ void loggerApi(nb::module_ &m)
     logger.def_prop_ro("has_issues", &libOpenCOR::Logger::hasIssues, "Return whether there are some issues.")
         .def_prop_ro("issue_count", &libOpenCOR::Logger::issueCount, "Return the number of issues.")
         .def_prop_ro("issues", &libOpenCOR::Logger::issues, "Return the issues.")
-        .def_prop_ro("issue", &libOpenCOR::Logger::issue, "Return the issue.")
+        .def("issue", &libOpenCOR::Logger::issue, "Return the issue.")
         .def_prop_ro("has_errors", &libOpenCOR::Logger::hasErrors, "Return whether there are some errors.")
         .def_prop_ro("error_count", &libOpenCOR::Logger::errorCount, "Return the number of errors.")
         .def_prop_ro("errors", &libOpenCOR::Logger::errors, "Return the errors.")
-        .def_prop_ro("error", &libOpenCOR::Logger::error, "Return the error.")
+        .def("error", &libOpenCOR::Logger::error, "Return the error.")
         .def_prop_ro("has_warnings", &libOpenCOR::Logger::hasWarnings, "Return whether there are some warnings.")
         .def_prop_ro("warning_count", &libOpenCOR::Logger::warningCount, "Return the number of warnings.")
         .def_prop_ro("warnings", &libOpenCOR::Logger::warnings, "Return the warnings.")
-        .def_prop_ro("warning", &libOpenCOR::Logger::warning, "Return the warning.");
+        .def("warning", &libOpenCOR::Logger::warning, "Return the warning.");
 
     // Issue API.
 
