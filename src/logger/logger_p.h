@@ -31,7 +31,6 @@ public:
 
     IssuePtrs mErrors;
     IssuePtrs mWarnings;
-    IssuePtrs mMessages;
 
     bool hasIssues() const;
     size_t issueCount() const;
@@ -48,11 +47,6 @@ public:
     IssuePtrs warnings() const;
     IssuePtr warning(size_t pIndex) const;
 
-    bool hasMessages() const;
-    size_t messageCount() const;
-    IssuePtrs messages() const;
-    IssuePtr message(size_t pIndex) const;
-
     void addIssues(const LoggerPtr &pLogger);
     void addIssues(const libcellml::LoggerPtr &pLogger);
 
@@ -60,7 +54,6 @@ public:
 
     void addError(const std::string &pDescription);
     void addWarning(const std::string &pDescription);
-    void addMessage(const std::string &pDescription);
 
     void removeAllIssues();
 };

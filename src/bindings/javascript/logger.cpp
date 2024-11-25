@@ -32,18 +32,13 @@ void loggerApi()
         .function("hasWarnings", &libOpenCOR::Logger::hasWarnings)
         .function("warningCount", &libOpenCOR::Logger::warningCount)
         .function("warnings", &libOpenCOR::Logger::warnings)
-        .function("warning", &libOpenCOR::Logger::warning)
-        .function("hasMessages", &libOpenCOR::Logger::hasMessages)
-        .function("messageCount", &libOpenCOR::Logger::messageCount)
-        .function("messages", &libOpenCOR::Logger::messages)
-        .function("message", &libOpenCOR::Logger::message);
+        .function("warning", &libOpenCOR::Logger::warning);
 
     // Issue API.
 
     emscripten::enum_<libOpenCOR::Issue::Type>("Issue.Type")
         .value("ERROR", libOpenCOR::Issue::Type::ERROR)
-        .value("WARNING", libOpenCOR::Issue::Type::WARNING)
-        .value("MESSAGE", libOpenCOR::Issue::Type::MESSAGE);
+        .value("WARNING", libOpenCOR::Issue::Type::WARNING);
 
     emscripten::class_<libOpenCOR::Issue>("Issue")
         .smart_ptr<libOpenCOR::IssuePtr>("Issue")

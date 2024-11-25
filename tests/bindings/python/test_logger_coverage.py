@@ -69,21 +69,3 @@ def test_warnings():
     file = oc.File(utils.resource_path(utils.Cellml2File))
 
     assert len(file.warnings) == 0
-
-
-def test_has_messages():
-    file = oc.File(utils.resource_path(utils.Cellml2File))
-
-    assert not file.has_messages
-
-
-def test_message_count():
-    file = oc.File(utils.resource_path(utils.Cellml2File))
-
-    assert file.message_count == 0
-
-
-def test_messages():
-    file = oc.File(utils.resource_path(utils.Cellml2File))
-
-    assert len(file.messages) == 0

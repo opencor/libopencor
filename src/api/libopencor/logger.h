@@ -171,48 +171,6 @@ public:
 
     IssuePtr warning(size_t pIndex) const;
 
-    /**
-     * @brief Return whether there are some messages.
-     *
-     * Return whether there are some messages.
-     *
-     * @return @c true if there are some messages, @c false otherwise.
-     */
-
-    bool hasMessages() const;
-
-    /**
-     * @brief Return the number of messages.
-     *
-     * Return the number of messages.
-     *
-     * @return The number of messages.
-     */
-
-    size_t messageCount() const;
-
-    /**
-     * @brief Return the messages.
-     *
-     * Return the messages.
-     *
-     * @return The messages, as a @ref IssuePtrs of type @ref Issue::Type::MESSAGE.
-     */
-
-    IssuePtrs messages() const;
-
-    /**
-     * @brief Return a message.
-     *
-     * Return a message.
-     *
-     * @param pIndex The index of the message.
-     *
-     * @return The message, as an @ref IssuePtr, if the index is valid, @c nullptr otherwise.
-     */
-
-    IssuePtr message(size_t pIndex) const;
-
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

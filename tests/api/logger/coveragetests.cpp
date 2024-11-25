@@ -80,24 +80,3 @@ TEST(CoverageLoggerTest, warnings)
 
     EXPECT_TRUE(file->warnings().empty());
 }
-
-TEST(CoverageLoggerTest, hasMessages)
-{
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-
-    EXPECT_FALSE(file->hasMessages());
-}
-
-TEST(CoverageLoggerTest, messageCount)
-{
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-
-    EXPECT_EQ(file->messageCount(), 0);
-}
-
-TEST(CoverageLoggerTest, messages)
-{
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-
-    EXPECT_TRUE(file->messages().empty());
-}

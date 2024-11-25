@@ -31,23 +31,7 @@ Issue::Type Issue::Impl::type() const
 
 std::string Issue::Impl::typeAsString() const
 {
-#ifdef CODE_COVERAGE_ENABLED
-    switch (mType) {
-    case Type::ERROR:
-        return "Error";
-    default: // Type::WARNING.
-        return "Warning";
-    }
-#else
-    switch (mType) {
-    case Type::ERROR:
-        return "Error";
-    case Type::WARNING:
-        return "Warning";
-    default: // Type::MESSAGE.
-        return "Message";
-    }
-#endif
+    return (mType == Type::ERROR) ? "Error" : "Warning";
 }
 
 std::string Issue::Impl::description() const
