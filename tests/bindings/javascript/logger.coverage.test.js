@@ -76,9 +76,14 @@ describe("Issue coverage tests", () => {
   });
 
   test("issue()", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.ERROR_CELLML_FILE));
+    const file = new libopencor.File(
+      utils.resourcePath(utils.ERROR_CELLML_FILE),
+    );
 
-    file.setContents(someErrorCellmlContentsPtr, utils.SOME_ERROR_CELLML_CONTENTS.length);
+    file.setContents(
+      someErrorCellmlContentsPtr,
+      utils.SOME_ERROR_CELLML_CONTENTS.length,
+    );
 
     expect(file.issue(0)).not.toBeNull();
     expect(file.issue(file.issueCount())).toBeNull();
@@ -117,9 +122,14 @@ describe("Issue coverage tests", () => {
   });
 
   test("error()", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.ERROR_CELLML_FILE));
+    const file = new libopencor.File(
+      utils.resourcePath(utils.ERROR_CELLML_FILE),
+    );
 
-    file.setContents(someErrorCellmlContentsPtr, utils.SOME_ERROR_CELLML_CONTENTS.length);
+    file.setContents(
+      someErrorCellmlContentsPtr,
+      utils.SOME_ERROR_CELLML_CONTENTS.length,
+    );
 
     expect(file.error(0)).not.toBeNull();
     expect(file.error(file.errorCount())).toBeNull();
