@@ -5,3 +5,5 @@
     return mErrors;
         mErrors.push_back(issue);
     mErrors.clear();
+    if (pIndex >= mErrors.size()) {
+    return mErrors[pIndex];

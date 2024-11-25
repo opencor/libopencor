@@ -21,16 +21,28 @@ const libopencor = await libOpenCOR();
 
 describe("Issue coverage tests", () => {
   let someCellmlContentsPtr;
+  let someErrorCellmlContentsPtr;
+  let someSedmlContentsPtr;
 
   beforeAll(() => {
     someCellmlContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_CELLML_CONTENTS,
     );
+    someErrorCellmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_ERROR_CELLML_CONTENTS,
+    );
+    someSedmlContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SEDML_CONTENTS,
+    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someCellmlContentsPtr);
+    utils.freeMemory(libopencor, someErrorCellmlContentsPtr);
+    utils.freeMemory(libopencor, someSedmlContentsPtr);
   });
 
   test("hasIssues()", () => {
@@ -59,6 +71,22 @@ describe("Issue coverage tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     expect(file.issues().size()).toBe(0);
+
+    file.delete();
+  });
+
+  test("issue()", () => {
+    const file = new libopencor.File(
+      utils.resourcePath(utils.ERROR_CELLML_FILE),
+    );
+
+    file.setContents(
+      someErrorCellmlContentsPtr,
+      utils.SOME_ERROR_CELLML_CONTENTS.length,
+    );
+
+    expect(file.issue(0)).not.toBeNull();
+    expect(file.issue(file.issueCount())).toBeNull();
 
     file.delete();
   });
@@ -93,6 +121,22 @@ describe("Issue coverage tests", () => {
     file.delete();
   });
 
+  test("error()", () => {
+    const file = new libopencor.File(
+      utils.resourcePath(utils.ERROR_CELLML_FILE),
+    );
+
+    file.setContents(
+      someErrorCellmlContentsPtr,
+      utils.SOME_ERROR_CELLML_CONTENTS.length,
+    );
+
+    expect(file.error(0)).not.toBeNull();
+    expect(file.error(file.errorCount())).toBeNull();
+
+    file.delete();
+  });
+
   test("hasWarnings()", () => {
     const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
@@ -123,33 +167,17 @@ describe("Issue coverage tests", () => {
     file.delete();
   });
 
-  test("hasMessages()", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+  test("warning()", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
-    expect(file.hasMessages()).toBe(false);
+    const document = new libopencor.SedDocument(file);
 
-    file.delete();
-  });
+    expect(document.warning(0)).not.toBeNull();
+    expect(document.warning(document.warningCount())).toBeNull();
 
-  test("messageCount()", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
-
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-
-    expect(file.messageCount()).toBe(0);
-
-    file.delete();
-  });
-
-  test("messages()", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
-
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
-
-    expect(file.messages().size()).toBe(0);
-
+    document.delete();
     file.delete();
   });
 });

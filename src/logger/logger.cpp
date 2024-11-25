@@ -33,6 +33,15 @@ IssuePtrs Logger::Impl::issues() const
     return mIssues;
 }
 
+IssuePtr Logger::Impl::issue(size_t pIndex) const
+{
+    if (pIndex >= mIssues.size()) {
+        return {};
+    }
+
+    return mIssues[pIndex];
+}
+
 bool Logger::Impl::hasErrors() const
 {
     return !mErrors.empty();
@@ -46,6 +55,15 @@ size_t Logger::Impl::errorCount() const
 IssuePtrs Logger::Impl::errors() const
 {
     return mErrors;
+}
+
+IssuePtr Logger::Impl::error(size_t pIndex) const
+{
+    if (pIndex >= mErrors.size()) {
+        return {};
+    }
+
+    return mErrors[pIndex];
 }
 
 bool Logger::Impl::hasWarnings() const
@@ -63,19 +81,13 @@ IssuePtrs Logger::Impl::warnings() const
     return mWarnings;
 }
 
-bool Logger::Impl::hasMessages() const
+IssuePtr Logger::Impl::warning(size_t pIndex) const
 {
-    return !mMessages.empty();
-}
+    if (pIndex >= mWarnings.size()) {
+        return {};
+    }
 
-size_t Logger::Impl::messageCount() const
-{
-    return mMessages.size();
-}
-
-IssuePtrs Logger::Impl::messages() const
-{
-    return mMessages;
+    return mWarnings[pIndex];
 }
 
 void Logger::Impl::addIssues(const LoggerPtr &pLogger)
@@ -90,16 +102,9 @@ void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger)
     for (size_t i = 0; i < pLogger->issueCount(); ++i) {
         auto issue = pLogger->issue(i);
 
-#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
         addIssue((issue->level() == libcellml::Issue::Level::ERROR) ? Issue::Type::ERROR :
                                                                       Issue::Type::WARNING,
                  issue->description());
-#else
-        addIssue((issue->level() == libcellml::Issue::Level::ERROR)   ? Issue::Type::ERROR :
-                 (issue->level() == libcellml::Issue::Level::WARNING) ? Issue::Type::WARNING :
-                                                                        Issue::Type::MESSAGE,
-                 issue->description());
-#endif
     }
 }
 
@@ -108,29 +113,11 @@ void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription)
     auto issue = IssuePtr {new Issue {pType, pDescription}};
     mIssues.push_back(issue);
 
-#ifdef CODE_COVERAGE_ENABLED //---GRY--- SHOULD BE REMOVED AT SOME POINT.
     if (pType == Issue::Type::ERROR) {
         mErrors.push_back(issue);
     } else {
         mWarnings.push_back(issue);
     }
-#else
-    switch (pType) {
-    case libOpenCOR::Issue::Type::ERROR:
-        mErrors.push_back(issue);
-
-        break;
-
-    case libOpenCOR::Issue::Type::WARNING:
-        mWarnings.push_back(issue);
-
-        break;
-    default: // libOpenCOR::Issue::Type::MESSAGE:
-        mMessages.push_back(issue);
-
-        break;
-    }
-#endif
 }
 
 void Logger::Impl::addError(const std::string &pDescription)
@@ -143,20 +130,12 @@ void Logger::Impl::addWarning(const std::string &pDescription)
     addIssue(Issue::Type::WARNING, pDescription);
 }
 
-/*---GRY---
-void Logger::Impl::addMessage(const std::string &pDescription)
-{
-    addIssue(Issue::Type::MESSAGE, pDescription);
-}
-*/
-
 void Logger::Impl::removeAllIssues()
 {
     mIssues.clear();
 
     mErrors.clear();
     mWarnings.clear();
-    mMessages.clear();
 }
 
 Logger::Logger(Impl *pPimpl)
@@ -189,6 +168,11 @@ IssuePtrs Logger::issues() const
     return pimpl()->issues();
 }
 
+IssuePtr Logger::issue(size_t pIndex) const
+{
+    return pimpl()->issue(pIndex);
+}
+
 bool Logger::hasErrors() const
 {
     return pimpl()->hasErrors();
@@ -202,6 +186,11 @@ size_t Logger::errorCount() const
 IssuePtrs Logger::errors() const
 {
     return pimpl()->errors();
+}
+
+IssuePtr Logger::error(size_t pIndex) const
+{
+    return pimpl()->error(pIndex);
 }
 
 bool Logger::hasWarnings() const
@@ -219,19 +208,9 @@ IssuePtrs Logger::warnings() const
     return pimpl()->warnings();
 }
 
-bool Logger::hasMessages() const
+IssuePtr Logger::warning(size_t pIndex) const
 {
-    return pimpl()->hasMessages();
-}
-
-size_t Logger::messageCount() const
-{
-    return pimpl()->messageCount();
-}
-
-IssuePtrs Logger::messages() const
-{
-    return pimpl()->messages();
+    return pimpl()->warning(pIndex);
 }
 
 } // namespace libOpenCOR

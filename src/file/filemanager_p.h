@@ -37,7 +37,12 @@ public:
     bool hasFiles() const;
     size_t fileCount() const;
     FilePtrs files() const;
+    FilePtr file(size_t pIndex) const;
+#ifdef __EMSCRIPTEN__
+    FilePtr fileFromFileNameOrUrl(const std::string &pFileNameOrUrl) const;
+#else
     FilePtr file(const std::string &pFileNameOrUrl) const;
+#endif
 };
 
 } // namespace libOpenCOR

@@ -25,8 +25,7 @@ namespace libOpenCOR {
 /**
  * @brief The Issue class.
  *
- * The Issue class is used to represent an error, a warning, or a message that has been generated as a result of using
- * libOpenCOR.
+ * The Issue class is used to represent an error or a warning that has been generated as a result of using libOpenCOR.
  */
 
 class LIBOPENCOR_EXPORT Issue
@@ -37,14 +36,13 @@ public:
     /**
      * @brief The type of an issue.
      *
-     * The type of an issue, i.e. whether it is an error, a warning, or a message.
+     * The type of an issue, i.e. whether it is an error or a warning.
      */
 
     enum class Type
     {
         ERROR, /**< The issue is an error. */
-        WARNING, /**< The issue is a warning. */
-        MESSAGE /**< The issue is a message. */
+        WARNING /**< The issue is a warning. */
     };
 
     /**

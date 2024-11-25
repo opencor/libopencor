@@ -79,7 +79,11 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         auto modelSource = (isLocalFile && stringToPath(fileNameOrUrl).is_relative()) ?
                                mLocation + fileNameOrUrl :
                                fileNameOrUrl;
+#ifdef __EMSCRIPTEN__
+        auto file = fileManager.fileFromFileNameOrUrl(modelSource);
+#else
         auto file = fileManager.file(modelSource);
+#endif
         SedModelPtr model;
 
         if (file != nullptr) {
@@ -227,7 +231,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
         delete document;
     }
 
-    return nullptr;
+    return {};
 }
 
 void SedmlFile::populateDocument(const SedDocumentPtr &pDocument)

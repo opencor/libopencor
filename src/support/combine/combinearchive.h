@@ -16,6 +16,8 @@ limitations under the License.
 
 #pragma once
 
+#include "unittestingexport.h"
+
 #include "libopencor/logger.h"
 
 namespace libcombine {
@@ -27,7 +29,7 @@ namespace libOpenCOR {
 class CombineArchive;
 using CombineArchivePtr = std::shared_ptr<CombineArchive>;
 
-class CombineArchive: public Logger
+class LIBOPENCOR_UNIT_TESTING_EXPORT CombineArchive: public Logger
 {
 public:
     CombineArchive() = delete;
@@ -47,6 +49,7 @@ public:
     size_t fileCount() const;
     Strings fileNames() const;
     FilePtrs files() const;
+    FilePtr file(size_t pIndex) const;
     FilePtr file(const std::string &pFileName) const;
 
 private:

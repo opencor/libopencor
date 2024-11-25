@@ -69,7 +69,20 @@ FilePtrs FileManager::Impl::files() const
     return res;
 }
 
+FilePtr FileManager::Impl::file(size_t pIndex) const
+{
+    if (pIndex >= mFiles.size()) {
+        return {};
+    }
+
+    return mFiles[pIndex]->shared_from_this();
+}
+
+#ifdef __EMSCRIPTEN__
+FilePtr FileManager::Impl::fileFromFileNameOrUrl(const std::string &pFileNameOrUrl) const
+#else
 FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
+#endif
 {
 #if __clang_major__ < 16
     auto [tIsLocalFile, tFileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
@@ -133,9 +146,22 @@ FilePtrs FileManager::files() const
     return mPimpl.files();
 }
 
-FilePtr FileManager::file(const std::string &pFileNameOrUrl) const
+FilePtr FileManager::file(size_t pIndex) const
 {
+    return mPimpl.file(pIndex);
+}
+
+#ifdef __EMSCRIPTEN__
+FilePtr FileManager::fileFromFileNameOrUrl(const std::string &pFileNameOrUrl) const
+#else
+FilePtr FileManager::file(const std::string &pFileNameOrUrl) const
+#endif
+{
+#ifdef __EMSCRIPTEN__
+    return mPimpl.fileFromFileNameOrUrl(pFileNameOrUrl);
+#else
     return mPimpl.file(pFileNameOrUrl);
+#endif
 }
 
 } // namespace libOpenCOR

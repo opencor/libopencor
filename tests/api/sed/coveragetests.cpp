@@ -49,6 +49,8 @@ TEST(CoverageSedTest, models)
     EXPECT_EQ(document->modelCount(), 1);
     EXPECT_EQ(document->models().size(), 1);
     EXPECT_EQ(document->models()[0], model);
+    EXPECT_EQ(document->model(0), model);
+    EXPECT_EQ(document->model(1), nullptr);
 
     EXPECT_FALSE(document->addModel(model));
     EXPECT_TRUE(document->removeModel(model));
@@ -86,6 +88,11 @@ TEST(CoverageSedTest, simulations)
     EXPECT_EQ(document->simulations()[1], oneStep);
     EXPECT_EQ(document->simulations()[2], steadyState);
     EXPECT_EQ(document->simulations()[3], analysis);
+    EXPECT_EQ(document->simulation(0), uniformTimeCourse);
+    EXPECT_EQ(document->simulation(1), oneStep);
+    EXPECT_EQ(document->simulation(2), steadyState);
+    EXPECT_EQ(document->simulation(3), analysis);
+    EXPECT_EQ(document->simulation(4), nullptr);
 
     EXPECT_FALSE(document->addSimulation(uniformTimeCourse));
     EXPECT_TRUE(document->removeSimulation(uniformTimeCourse));
@@ -146,6 +153,8 @@ TEST(CoverageSedTest, tasks)
     EXPECT_EQ(document->taskCount(), 1);
     EXPECT_EQ(document->tasks().size(), 1);
     EXPECT_EQ(document->tasks()[0], task);
+    EXPECT_EQ(document->task(0), task);
+    EXPECT_EQ(document->task(1), nullptr);
 
     EXPECT_EQ(document->serialise(), sedTaskExpectedSerialisation(true));
 

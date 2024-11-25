@@ -151,6 +151,7 @@ def test_file_manager():
     assert file_manager.has_files == False
     assert file_manager.file_count == 0
     assert len(file_manager.files) == 0
+    assert file_manager.file(0) == None
     assert file_manager.file(utils.LocalFile) == None
 
     local_file = oc.File(utils.LocalFile)
@@ -159,6 +160,7 @@ def test_file_manager():
     assert same_file_manager.has_files == True
     assert same_file_manager.file_count == 1
     assert len(file_manager.files) == 1
+    assert file_manager.file(0) == local_file
     assert same_file_manager.file(utils.LocalFile) == local_file
 
     remote_file = oc.File(utils.RemoteFile)
@@ -166,6 +168,7 @@ def test_file_manager():
     assert file_manager.has_files == True
     assert file_manager.file_count == 2
     assert len(file_manager.files) == 2
+    assert file_manager.file(1) == remote_file
     assert file_manager.file(utils.RemoteFile) == remote_file
 
     same_file_manager.unmanage(local_file)
@@ -173,6 +176,7 @@ def test_file_manager():
     assert same_file_manager.has_files == True
     assert same_file_manager.file_count == 1
     assert len(file_manager.files) == 1
+    assert file_manager.file(1) == None
     assert same_file_manager.file(utils.LocalFile) == None
 
     same_file_manager.manage(local_file)
@@ -180,6 +184,7 @@ def test_file_manager():
     assert same_file_manager.has_files == True
     assert same_file_manager.file_count == 2
     assert len(file_manager.files) == 2
+    assert file_manager.file(1) == local_file
     assert same_file_manager.file(utils.LocalFile) == local_file
 
     file_manager.reset()
@@ -187,5 +192,7 @@ def test_file_manager():
     assert file_manager.has_files == False
     assert file_manager.file_count == 0
     assert len(file_manager.files) == 0
+    assert file_manager.file(0) == None
+    assert file_manager.file(1) == None
     assert file_manager.file(utils.RemoteFile) == None
     assert file_manager.file(utils.UnknownFile) == None

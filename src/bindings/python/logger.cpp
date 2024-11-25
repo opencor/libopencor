@@ -31,15 +31,15 @@ void loggerApi(nb::module_ &m)
     logger.def_prop_ro("has_issues", &libOpenCOR::Logger::hasIssues, "Return whether there are some issues.")
         .def_prop_ro("issue_count", &libOpenCOR::Logger::issueCount, "Return the number of issues.")
         .def_prop_ro("issues", &libOpenCOR::Logger::issues, "Return the issues.")
+        .def("issue", &libOpenCOR::Logger::issue, "Return the issue.")
         .def_prop_ro("has_errors", &libOpenCOR::Logger::hasErrors, "Return whether there are some errors.")
         .def_prop_ro("error_count", &libOpenCOR::Logger::errorCount, "Return the number of errors.")
         .def_prop_ro("errors", &libOpenCOR::Logger::errors, "Return the errors.")
+        .def("error", &libOpenCOR::Logger::error, "Return the error.")
         .def_prop_ro("has_warnings", &libOpenCOR::Logger::hasWarnings, "Return whether there are some warnings.")
         .def_prop_ro("warning_count", &libOpenCOR::Logger::warningCount, "Return the number of warnings.")
         .def_prop_ro("warnings", &libOpenCOR::Logger::warnings, "Return the warnings.")
-        .def_prop_ro("has_messages", &libOpenCOR::Logger::hasMessages, "Return whether there are some messages.")
-        .def_prop_ro("message_count", &libOpenCOR::Logger::messageCount, "Return the number of messages.")
-        .def_prop_ro("messages", &libOpenCOR::Logger::messages, "Return the messages.");
+        .def("warning", &libOpenCOR::Logger::warning, "Return the warning.");
 
     // Issue API.
 
@@ -48,7 +48,6 @@ void loggerApi(nb::module_ &m)
     nb::enum_<libOpenCOR::Issue::Type>(issue, "Type")
         .value("Error", libOpenCOR::Issue::Type::ERROR)
         .value("Warning", libOpenCOR::Issue::Type::WARNING)
-        .value("Message", libOpenCOR::Issue::Type::MESSAGE)
         .export_values();
 
     issue.def_prop_ro("type", &libOpenCOR::Issue::type, "Get the type of this Issue object.")

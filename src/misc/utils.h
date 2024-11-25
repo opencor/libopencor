@@ -41,25 +41,25 @@ static const auto NAN = std::numeric_limits<double>::quiet_NaN();
 
 using StringStringMap = std::map<std::string, std::string>;
 
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(CODE_COVERAGE_ENABLED)
 #    define ASSERT_EQ(x, y) \
-        (void)x; \
-        (void)y
+        ((void)x); \
+        ((void)y)
 #    define ASSERT_NE(x, y) \
-        (void)x; \
-        (void)y
+        ((void)x); \
+        ((void)y)
 #    define ASSERT_GT(x, y) \
-        (void)x; \
-        (void)y
+        ((void)x); \
+        ((void)y)
 #    define ASSERT_GE(x, y) \
-        (void)x; \
-        (void)y
+        ((void)x); \
+        ((void)y)
 #    define ASSERT_LT(x, y) \
-        (void)x; \
-        (void)y
+        ((void)x); \
+        ((void)y)
 #    define ASSERT_LE(x, y) \
-        (void)x; \
-        (void)y
+        ((void)x); \
+        ((void)y)
 #else
 #    define ASSERT_EQ(x, y) assert(x == y)
 #    define ASSERT_NE(x, y) assert(x != y)

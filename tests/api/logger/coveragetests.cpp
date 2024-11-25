@@ -39,6 +39,14 @@ TEST(CoverageLoggerTest, issues)
     EXPECT_TRUE(file->issues().empty());
 }
 
+TEST(CoverageLoggerTest, issue)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
+
+    EXPECT_NE(file->issue(0), nullptr);
+    EXPECT_EQ(file->issue(file->issueCount()), nullptr);
+}
+
 TEST(CoverageLoggerTest, hasErrors)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
@@ -58,6 +66,14 @@ TEST(CoverageLoggerTest, errors)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
 
     EXPECT_TRUE(file->errors().empty());
+}
+
+TEST(CoverageLoggerTest, error)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
+
+    EXPECT_NE(file->error(0), nullptr);
+    EXPECT_EQ(file->error(file->errorCount()), nullptr);
 }
 
 TEST(CoverageLoggerTest, hasWarnings)
@@ -81,23 +97,11 @@ TEST(CoverageLoggerTest, warnings)
     EXPECT_TRUE(file->warnings().empty());
 }
 
-TEST(CoverageLoggerTest, hasMessages)
+TEST(CoverageLoggerTest, warning)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
+    auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_FALSE(file->hasMessages());
-}
-
-TEST(CoverageLoggerTest, messageCount)
-{
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-
-    EXPECT_EQ(file->messageCount(), 0);
-}
-
-TEST(CoverageLoggerTest, messages)
-{
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-
-    EXPECT_TRUE(file->messages().empty());
+    EXPECT_NE(document->warning(0), nullptr);
+    EXPECT_EQ(document->warning(document->warningCount()), nullptr);
 }

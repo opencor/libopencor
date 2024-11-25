@@ -47,6 +47,8 @@ def test_models():
     assert document.model_count == 1
     assert len(document.models) == 1
     assert document.models[0] == model
+    assert document.model(0) == model
+    assert document.model(1) == None
 
     assert document.add_model(model) == False
     assert document.remove_model(model) == True
@@ -83,6 +85,11 @@ def test_simulations():
     assert document.simulations[1] == oneStep
     assert document.simulations[2] == steadyState
     assert document.simulations[3] == analysis
+    assert document.simulation(0) == uniformTimeCourse
+    assert document.simulation(1) == oneStep
+    assert document.simulation(2) == steadyState
+    assert document.simulation(3) == analysis
+    assert document.simulation(4) == None
 
     assert document.add_simulation(uniformTimeCourse) == False
     assert document.remove_simulation(uniformTimeCourse) == True
@@ -141,6 +148,8 @@ def test_tasks():
     assert document.task_count == 1
     assert len(document.tasks) == 1
     assert document.tasks[0] == task
+    assert document.task(0) == task
+    assert document.task(1) == None
 
     assert document.serialise() == sed_task_expected_serialisation(True)
 

@@ -32,9 +32,7 @@ void printIssues(const LoggerPtr &pLogger)
     for (auto &issue : pLogger->issues()) {
         const auto *type = (issue->type() == Issue::Type::ERROR) ?
                                "ERROR" :
-                           (issue->type() == Issue::Type::WARNING) ?
-                               "WARNING" :
-                               "MESSAGE";
+                               "WARNING";
 
         printf("%s: %s\n", type, issue->description().c_str()); // NOLINT
     }

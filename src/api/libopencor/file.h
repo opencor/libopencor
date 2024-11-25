@@ -204,12 +204,28 @@ public:
      *
      * Return a child file. This method is only relevant for COMBINE archives.
      *
+     * @param pIndex The index of the child file.
+     *
+     * @return The file, as a @ref FilePtr, if it is a child file of this file, @c nullptr otherwise.
+     */
+
+    FilePtr childFile(size_t pIndex) const;
+
+    /**
+     * @brief Return a child file.
+     *
+     * Return a child file. This method is only relevant for COMBINE archives.
+     *
      * @param pFileName The name of the child file.
      *
      * @return The file, as a @ref FilePtr, if it is a child file of this file, @c nullptr otherwise.
      */
 
+#ifdef __EMSCRIPTEN__
+    FilePtr childFileFromFileName(const std::string &pFileName) const;
+#else
     FilePtr childFile(const std::string &pFileName) const;
+#endif
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

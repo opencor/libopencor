@@ -64,7 +64,12 @@ public:
     size_t childFileCount() const;
     Strings childFileNames() const;
     FilePtrs childFiles() const;
+    FilePtr childFile(size_t pIndex) const;
+#ifdef __EMSCRIPTEN__
+    FilePtr childFileFromFileName(const std::string &pFileName) const;
+#else
     FilePtr childFile(const std::string &pFileName) const;
+#endif
 };
 
 } // namespace libOpenCOR
