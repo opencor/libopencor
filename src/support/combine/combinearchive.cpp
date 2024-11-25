@@ -85,6 +85,15 @@ FilePtrs CombineArchive::Impl::files() const
     return mFiles;
 }
 
+FilePtr CombineArchive::Impl::file(size_t pIndex) const
+{
+    if (pIndex >= mFiles.size()) {
+        return {};
+    }
+
+    return mFiles[pIndex];
+}
+
 FilePtr CombineArchive::Impl::file(const std::string &pFileName) const
 {
     for (const auto &file : mFiles) {
@@ -94,15 +103,6 @@ FilePtr CombineArchive::Impl::file(const std::string &pFileName) const
     }
 
     return {};
-}
-
-FilePtr CombineArchive::Impl::file(size_t pIndex) const
-{
-    if (pIndex >= mFiles.size()) {
-        return {};
-    }
-
-    return mFiles[pIndex];
 }
 
 CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive)
@@ -176,14 +176,14 @@ FilePtrs CombineArchive::files() const
     return pimpl()->files();
 }
 
-FilePtr CombineArchive::file(const std::string &pFileName) const
-{
-    return pimpl()->file(pFileName);
-}
-
 FilePtr CombineArchive::file(size_t pIndex) const
 {
     return pimpl()->file(pIndex);
+}
+
+FilePtr CombineArchive::file(const std::string &pFileName) const
+{
+    return pimpl()->file(pFileName);
 }
 
 } // namespace libOpenCOR

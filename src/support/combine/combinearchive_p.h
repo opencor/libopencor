@@ -39,8 +39,8 @@ public:
     size_t fileCount() const;
     Strings fileNames() const;
     FilePtrs files() const;
-    FilePtr file(const std::string &pFileName) const;
     FilePtr file(size_t pIndex) const;
+    FilePtr file(const std::string &pFileName) const;
 };
 
 } // namespace libOpenCOR
