@@ -39,20 +39,12 @@ TEST(I18nFileTest, hindiFiles)
     EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/फोल्डर/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
 
-#ifdef BUILDING_ON_MACOS
 TEST(I18nFileTest, japaneseFiles)
 {
-    // Note: the フォルダ folder was created on macOS and although it can be accessed on Windows, Linux, and macOS using
-    //       their respective file manager, it can only be accessed programmatically on macOS. On Windows, for instance,
-    //       a dakuten (and, most likely, a handakuten) is handled in a special way. So, this test will always fail on
-    //       Windows. Something similar happens on Linux. So, in the end, we keep the macOS version of the folder name
-    //       and only run this test on macOS.
-
-    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.cellml"))->type(), libOpenCOR::File::Type::CELLML_FILE);
-    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.sedml"))->type(), libOpenCOR::File::Type::SEDML_FILE);
-    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
+    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.cellml"))->type(), libOpenCOR::File::Type::CELLML_FILE);
+    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.sedml"))->type(), libOpenCOR::File::Type::SEDML_FILE);
+    EXPECT_EQ(libOpenCOR::File::create(libOpenCOR::resourcePath("i18n/フォルダ/file.omex"))->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
-#endif
 
 TEST(I18nFileTest, russianFiles)
 {

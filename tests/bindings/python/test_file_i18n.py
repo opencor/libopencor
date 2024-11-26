@@ -71,15 +71,15 @@ def test_japanese_files():
 
     if platform.system() == "Darwin":
         assert (
-            oc.File(utils.resource_path("i18n/フォルダ/file.cellml")).type
+            oc.File(utils.resource_path("i18n/フォルダ/file.cellml")).type
             == oc.File.Type.CellmlFile
         )
         assert (
-            oc.File(utils.resource_path("i18n/フォルダ/file.sedml")).type
+            oc.File(utils.resource_path("i18n/フォルダ/file.sedml")).type
             == oc.File.Type.SedmlFile
         )
         assert (
-            oc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
+            oc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
             == oc.File.Type.CombineArchive
         )
     else:
