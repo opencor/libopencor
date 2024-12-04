@@ -1,0 +1,26 @@
+{
+  "author": {
+    "name": "Alan Garny",
+    "email": "a.garny@auckland.ac.nz"
+  },
+  "bugs": {
+    "url": "https://github.com/opencor/libopencor/issues"
+  },
+  "description": "libOpenCOR is the backend library to OpenCOR, a cross-platform modelling environment, which can be used to organise, edit, simulate and analyse CellML files.",
+  "homepage": "https://opencor.ws/libopencor/",
+  "license": "Apache-2.0",
+  "name": "libopencor",
+  "productName": "libOpenCOR",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opencor/libopencor.git"
+  },
+  "type": "module",
+  "version": "@PROJECT_VERSION@",
+  "main": "libopencor.js",
+  "files": [
+    "libopencor.js"
+  ],
+  "dependencies": {},
+  "devDependencies": {}
+}

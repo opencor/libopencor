@@ -20,8 +20,8 @@ const libopencor = await libOpenCOR();
 
 describe("Version tests", () => {
   test("libOpenCOR", () => {
-    expect(libopencor.version()).toBe(0x000100);
-    expect(libopencor.versionString()).toBe("0.1.0");
+    expect(libopencor.version()).toBe(0x000000);
+    expect(libopencor.versionString()).toBe("0.0.0");
   });
 
   test("libCellML", () => {

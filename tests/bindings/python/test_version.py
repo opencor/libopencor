@@ -18,14 +18,14 @@ import libopencor as oc
 
 def test_version():
     assert isinstance(oc.version(), int)
-    assert oc.version() == 0x000100
+    assert oc.version() == 0x000000
 
 
 def test_version_string():
-    assert oc.__version__ == "0.1.0"
+    assert oc.__version__ == "0.0.0"
 
     assert isinstance(oc.version_string(), str)
-    assert oc.version_string() == "0.1.0"
+    assert oc.version_string() == "0.0.0"
 
 
 def test_clang_version():

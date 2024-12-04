@@ -17,7 +17,7 @@ from skbuild import setup
 
 setup(
     name="libopencor",
-    version="0.1.0",
+    version="0.0.0",
     description="libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.",
     author="libOpenCOR contributors",
     url="https://opencor.ws/libopencor",
