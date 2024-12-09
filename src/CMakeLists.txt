@@ -456,7 +456,7 @@ configure_package_config_file(${CONFIG_CMAKE_IN_FILE} ${CONFIG_CMAKE_FILE}
 set(CONFIG_VERSION_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake)
 
 write_basic_package_version_file(${CONFIG_VERSION_CMAKE_FILE}
-                                 COMPATIBILITY SameMajorVersion)
+                                 COMPATIBILITY AnyNewerVersion)
 
 install(FILES ${CONFIG_CMAKE_FILE}
               ${CONFIG_VERSION_CMAKE_FILE}
