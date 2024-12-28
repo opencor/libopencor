@@ -393,7 +393,7 @@ jobs:
           cd build
           ninja
       - name: Unit testing
-        if: ${{ (matrix.unit_testing == 'ON') || (matrix.code_analysis == 'OFF') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
+        if: ${{ ((matrix.unit_testing == 'ON') && (matrix.code_analysis == 'OFF')) || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
         run: |
           cd build
           ninja ${{ matrix.target }}
