@@ -79,7 +79,7 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                                                                   -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
                                                                   -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
                                                                   -DONLY_BUILD_THIRD_PARTY_LIBRARIES=${ONLY_BUILD_THIRD_PARTY_LIBRARIES}
-                                                                  -DREAL_CMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
+                                                                  -DREAL_CMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME_LC}
                           COMMAND ${CMAKE_COMMAND} --build build)
 
         add_dependencies(${CMAKE_PROJECT_NAME} ${JAVASCRIPT_BINDINGS_TARGET})

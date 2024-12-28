@@ -295,23 +295,27 @@ if(EMSCRIPTEN)
                           COMPILE_FLAGS "-O3"
                           LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sINLINING_LIMIT -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
 
-    # Create a ZIP file for our generated .js file.
+    # Create a .tgz file for our generated .js file that can be used to distribute our JavaScript bindings.
+
+    set(TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.tgz)
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E tar "-cfv" "${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION_MAJOR}-${PROJECT_VERSION_MINOR}-${PROJECT_VERSION_PATCH}-WebAssembly.zip" --format=zip
-                                                       "${CMAKE_PROJECT_NAME}.js")
+                       COMMAND ${CMAKE_COMMAND} -E make_directory package
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js package
+                       COMMAND ${CMAKE_COMMAND} -E copy package.json package
+                       COMMAND ${CMAKE_COMMAND} -E tar czf ${TGZ_FILE} package)
 
-    # Copy our generated .js file over.
+    # Copy our generated .js file over so that it can be used by our test Web page.
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}.js
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js
                                                         ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.js)
 
-    # Let people know how to run our test web page.
+    # Let people know how to run our test Web page.
 
     if(LIBOPENCOR_JAVASCRIPT_UNIT_TESTING)
         add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript test web page has been copied to: ${JAVASCRIPT_BINDINGS_DIR}/index.html"
+                           COMMAND ${CMAKE_COMMAND} -E echo "-- JavaScript test Web page has been copied to: ${JAVASCRIPT_BINDINGS_DIR}/index.html"
                            COMMAND ${CMAKE_COMMAND} -E echo "                          and can be run using: emrun --browser chrome ${JAVASCRIPT_BINDINGS_DIR}/index.html")
     endif()
 else()
