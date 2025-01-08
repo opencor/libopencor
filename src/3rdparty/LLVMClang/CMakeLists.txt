@@ -23,13 +23,25 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 if(LIBOPENCOR_PREBUILT_LLVMCLANG)
     if(WIN32)
         if(RELEASE_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             843e3caf60ed5dffab9bd55326da195b6b850553)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 843e3caf60ed5dffab9bd55326da195b6b850553)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 665eeefd2e331034e5962b9ec9114f5dd6826ed1)
+            endif()
         else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             bbdc5f37a97cdfb78748ee1f75d25f44ef24f707)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 bbdc5f37a97cdfb78748ee1f75d25f44ef24f707)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 24febbe8391b8c7dea406261c8b520671b3c38a6)
+            endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
@@ -42,9 +54,15 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
                              519fee44fc83145bbbe7c027e5e78aa32a8bdbfa)
         endif()
     else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         5e8c850c5272cfb95b743a8c1141f71dcd15c7f9)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             5e8c850c5272cfb95b743a8c1141f71dcd15c7f9)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             25fe0235182221c14a897c0fe8e1d43041479ac8)
+        endif()
     endif()
 else()
     # Build our package.
@@ -53,6 +71,14 @@ else()
         set(LLVM_TARGETS_TO_BUILD X86)
     else()
         set(LLVM_TARGETS_TO_BUILD AArch64)
+    endif()
+
+    if(LLVMCLANG_LLVM_TABLEGEN)
+        set(LLVM_TABLEGEN -DLLVM_TABLEGEN=${LLVMCLANG_LLVM_TABLEGEN})
+    endif()
+
+    if(LLVMCLANG_CLANG_TABLEGEN)
+        set(CLANG_TABLEGEN -DCLANG_TABLEGEN=${LLVMCLANG_CLANG_TABLEGEN})
     endif()
 
     build_package(${PACKAGE_NAME}
@@ -68,6 +94,7 @@ else()
             -DCLANG_INCLUDE_DOCS=OFF
             -DCLANG_INCLUDE_TESTS=OFF
             -DCLANG_PLUGIN_SUPPORT=OFF
+            ${CLANG_TABLEGEN}
             -DCLANG_TOOLING_BUILD_AST_INTROSPECTION=OFF
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
@@ -106,6 +133,7 @@ else()
             -DLLVM_INCLUDE_TESTS=OFF
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
+            ${LLVM_TABLEGEN}
             -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
     )
 
