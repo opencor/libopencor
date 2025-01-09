@@ -420,19 +420,24 @@ else()
     # Note: this is only relevant if we build libOpenCOR using Clang since on Windows the target architecture is always
     #       going to be the same as that of the version of MSVC we are using (i.e. x64 or arm64) while on Linux we have
     #       no choice but to target the same architecture as that of the system.
+message(">>> 00")
 
     if(BUILDING_USING_CLANG)
+message(">>> 01")
         set(LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING "Specify the target architecture (Intel or ARM).")
         set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE} CACHE STRING "${LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING}")
 
         if(NOT "${TARGET_ARCHITECTURE}" STREQUAL "")
+message(">>> 02 [${TARGET_ARCHITECTURE}]")
             set(LIBOPENCOR_TARGET_ARCHITECTURE ${TARGET_ARCHITECTURE} CACHE STRING "${LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING}" FORCE)
         endif()
+message(">>> 03")
 
         unset(TARGET_ARCHITECTURE CACHE)
     endif()
+message(">>> 04")
 
-    message(FATAL_ERROR ">>> LIBOPENCOR_TARGET_ARCHITECTURE: >${LIBOPENCOR_TARGET_ARCHITECTURE}<")
+message(FATAL_ERROR ">>> LIBOPENCOR_TARGET_ARCHITECTURE: >${LIBOPENCOR_TARGET_ARCHITECTURE}<")
 
     # UNIT_TESTING ==> LIBOPENCOR_UNIT_TESTING.
 
