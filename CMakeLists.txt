@@ -524,25 +524,29 @@ else()
     if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
         set(INTEL_MODE TRUE)
 
+        set(LLVMCLANG_TARGET_ARCHITECTURE x86_64)
+
         if(WIN32)
-            set(LLVMCLANG_TARGET_ARCHITECTURE x86_64-pc-windows-msvc)
+            set(LLVMCLANG_TARGET_TRIPLE ${LLVMCLANG_TARGET_ARCHITECTURE}-pc-windows-msvc)
         elseif(APPLE)
-            set(LLVMCLANG_TARGET_ARCHITECTURE x86_64-apple-darwin)
+            set(LLVMCLANG_TARGET_TRIPLE ${LLVMCLANG_TARGET_ARCHITECTURE}-apple-darwin)
         else()
-            set(LLVMCLANG_TARGET_ARCHITECTURE x86_64-pc-linux-gnu)
+            set(LLVMCLANG_TARGET_TRIPLE ${LLVMCLANG_TARGET_ARCHITECTURE}-pc-linux-gnu)
         endif()
     else()
+        set(LLVMCLANG_TARGET_ARCHITECTURE aarch64)
+
         if(WIN32)
-            set(LLVMCLANG_TARGET_ARCHITECTURE aarch64-pc-windows-msvc)
+            set(LLVMCLANG_TARGET_TRIPLE ${LLVMCLANG_TARGET_ARCHITECTURE}-pc-windows-msvc)
         elseif(APPLE)
-            set(LLVMCLANG_TARGET_ARCHITECTURE aarch64-apple-darwin)
+            set(LLVMCLANG_TARGET_TRIPLE ${LLVMCLANG_TARGET_ARCHITECTURE}-apple-darwin)
         else()
-            set(LLVMCLANG_TARGET_ARCHITECTURE aarch64-pc-linux-gnu)
+            set(LLVMCLANG_TARGET_TRIPLE ${LLVMCLANG_TARGET_ARCHITECTURE}-pc-linux-gnu)
         endif()
     endif()
 
-    set(CMAKE_C_COMPILER_TARGET ${LLVMCLANG_TARGET_ARCHITECTURE})
-    set(CMAKE_CXX_COMPILER_TARGET ${LLVMCLANG_TARGET_ARCHITECTURE})
+    set(CMAKE_C_COMPILER_TARGET ${LLVMCLANG_TARGET_TRIPLE})
+    set(CMAKE_CXX_COMPILER_TARGET ${LLVMCLANG_TARGET_TRIPLE})
 
     # Build libOpenCOR.
 
