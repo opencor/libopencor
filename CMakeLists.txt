@@ -525,39 +525,24 @@ else()
         set(INTEL_MODE TRUE)
 
         if(WIN32)
-            set(LLVM_DEFAULT_TARGET_TRIPLE x86_64-pc-windows-msvc)
-
-            set(CMAKE_C_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
-            set(CMAKE_CXX_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
+            set(LLVMCLANG_TARGET_ARCHITECTURE x86_64-pc-windows-msvc)
         elseif(APPLE)
-            set(LLVM_DEFAULT_TARGET_TRIPLE x86_64-apple-darwin)
-
-            set(CMAKE_C_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
-            set(CMAKE_CXX_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
+            set(LLVMCLANG_TARGET_ARCHITECTURE x86_64-apple-darwin)
         else()
-            set(LLVM_DEFAULT_TARGET_TRIPLE x86_64-pc-linux-gnu)
-
-            set(CMAKE_C_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
-            set(CMAKE_CXX_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
+            set(LLVMCLANG_TARGET_ARCHITECTURE x86_64-pc-linux-gnu)
         endif()
     else()
         if(WIN32)
-            set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-pc-windows-msvc)
-
-            set(CMAKE_C_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
-            set(CMAKE_CXX_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
+            set(LLVMCLANG_TARGET_ARCHITECTURE aarch64-pc-windows-msvc)
         elseif(APPLE)
-            set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-apple-darwin)
-
-            set(CMAKE_C_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
-            set(CMAKE_CXX_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
+            set(LLVMCLANG_TARGET_ARCHITECTURE aarch64-apple-darwin)
         else()
-            set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-pc-linux-gnu)
-
-            set(CMAKE_C_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
-            set(CMAKE_CXX_COMPILER_TARGET ${LLVM_DEFAULT_TARGET_TRIPLE})
+            set(LLVMCLANG_TARGET_ARCHITECTURE aarch64-pc-linux-gnu)
         endif()
     endif()
+
+    set(CMAKE_C_COMPILER_TARGET ${LLVMCLANG_TARGET_ARCHITECTURE})
+    set(CMAKE_CXX_COMPILER_TARGET ${LLVMCLANG_TARGET_ARCHITECTURE})
 
     # Build libOpenCOR.
 
