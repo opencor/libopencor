@@ -63,11 +63,25 @@ endif()
 if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "AMD64"
    OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
     set(DEFAULT_TARGET_ARCHITECTURE Intel)
-    set(LLVMCLANG_HOST_TRIPLE x86_64)
+
+    if(WIN32)
+        set(LLVMCLANG_HOST_TRIPLE x86_64-pc-windows-msvc)
+    elseif(APPLE)
+        set(LLVMCLANG_HOST_TRIPLE x86_64-apple-darwin)
+    else()
+        set(LLVMCLANG_HOST_TRIPLE x86_64-unknown-linux-gnu)
+    endif()
 elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "ARM64"
        OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "arm64")
     set(DEFAULT_TARGET_ARCHITECTURE ARM)
-    set(LLVMCLANG_HOST_TRIPLE aarch64)
+
+    if(WIN32)
+        set(LLVMCLANG_HOST_TRIPLE aarch64-pc-windows-msvc)
+    elseif(APPLE)
+        set(LLVMCLANG_HOST_TRIPLE aarch64-apple-darwin)
+    else()
+        set(LLVMCLANG_HOST_TRIPLE aarch64-unknown-linux-gnu)
+    endif()
 endif()
 
 if("${DEFAULT_TARGET_ARCHITECTURE}" STREQUAL "")
