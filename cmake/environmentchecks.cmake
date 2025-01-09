@@ -19,8 +19,11 @@ if(WIN32)
        AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"
        AND MSVC_TOOLSET_VERSION EQUAL 143)
         set(BUILDING_USING_MSVC TRUE)
+    elseif(    "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
+           AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(BUILDING_USING_CLANG TRUE)
     else()
-        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using MSVC 2022 on Windows.")
+        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using MSVC 2022 or Clang on Windows.")
     endif()
 elseif(APPLE)
     if(   (    "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
@@ -56,50 +59,17 @@ if(APPLE AND NOT "${CMAKE_OSX_DEPLOYMENT_TARGET}" VERSION_GREATER_EQUAL "${MACOS
 endif()
 
 # Determine our default target architecture.
-# Note: on Windows, the target architecture depends on the version of MSVC we are using (i.e. x64 or arm64), so we look
-#       for /x64/ and /arm64/ in CMAKE_CXX_COMPILER rather than just rely on the value of CMAKE_SYSTEM_PROCESSOR since
-#       there is no guarantee that it corresponds to the target architecture (see
-#       https://cmake.org/cmake/help/latest/variable/CMAKE_SYSTEM_PROCESSOR.html).
 
-if(WIN32)
-    string(FIND "${CMAKE_CXX_COMPILER}" "/x64/" INDEX)
-
-    if(NOT INDEX EQUAL -1)
-        set(DEFAULT_TARGET_ARCHITECTURE Intel)
-    else()
-        set(DEFAULT_TARGET_ARCHITECTURE ARM)
-    endif()
-elseif(APPLE)
-    if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-        set(DEFAULT_TARGET_ARCHITECTURE Intel)
-    else()
-        set(DEFAULT_TARGET_ARCHITECTURE ARM)
-    endif()
-else()
-    if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-        # On an Intel-based system, we can cross-compile for ARM, so we need to check which compiler is actually being
-        # used.
-
-        string(FIND "${CMAKE_CXX_COMPILER}" "aarch64-linux-gnu" INDEX)
-
-        if(NOT INDEX EQUAL -1)
-            set(DEFAULT_TARGET_ARCHITECTURE ARM)
-        else()
-            set(DEFAULT_TARGET_ARCHITECTURE Intel)
-        endif()
-    else()
-        set(DEFAULT_TARGET_ARCHITECTURE ARM)
-    endif()
+if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "AMD64"
+   OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
+    set(DEFAULT_TARGET_ARCHITECTURE Intel)
+elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "ARM64"
+       OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "arm64")
+    set(DEFAULT_TARGET_ARCHITECTURE ARM)
 endif()
 
 if("${DEFAULT_TARGET_ARCHITECTURE}" STREQUAL "")
     message(FATAL_ERROR "No supported target architecture could be determined for ${CMAKE_PROJECT_NAME}.")
-endif()
-
-# On Windows and Linux, our actual target architecture is always our default target architecture.
-
-if(NOT APPLE)
-    set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE})
 endif()
 
 # Check whether we are dealing with a single or multiple configuration.

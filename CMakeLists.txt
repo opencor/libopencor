@@ -399,11 +399,11 @@ else()
     unset(SHARED_LIBS CACHE)
 
     # TARGET_ARCHITECTURE ==> LIBOPENCOR_TARGET_ARCHITECTURE.
-    # Note: this is only relevant on macOS since on Windows the target architecture is always going to be the same as
-    #       that of the version of MSVC we are using (i.e. x64 or arm64) while on Linux we have no choice but to target
-    #       the same architecture as that of the system.
+    # Note: this is only relevant if we build libOpenCOR using Clang since on Windows the target architecture is always
+    #       going to be the same as that of the version of MSVC we are using (i.e. x64 or arm64) while on Linux we have
+    #       no choice but to target the same architecture as that of the system.
 
-    if(APPLE)
+    if(BUILDING_USING_CLANG)
         set(LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING "Specify the target architecture (Intel or ARM).")
         set(LIBOPENCOR_TARGET_ARCHITECTURE ${DEFAULT_TARGET_ARCHITECTURE} CACHE STRING "${LIBOPENCOR_TARGET_ARCHITECTURE_DOCSTRING}")
 
@@ -470,11 +470,9 @@ else()
         endif()
     endif()
 
-    if(APPLE)
-        if(    NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel"
-           AND NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "ARM")
-            message(SEND_ERROR "Configuration error: unsupported target architecture (${LIBOPENCOR_TARGET_ARCHITECTURE}). Supported target architectures are Intel and ARM.")
-        endif()
+    if(    NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel"
+       AND NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "ARM")
+        message(SEND_ERROR "Configuration error: unsupported target architecture (${LIBOPENCOR_TARGET_ARCHITECTURE}). Supported target architectures are Intel and ARM.")
     endif()
 
     # Determine whether we are building in release mode.
@@ -490,11 +488,27 @@ else()
     if("${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel")
         set(INTEL_MODE TRUE)
 
-        if(APPLE)
-            set(CMAKE_OSX_ARCHITECTURES x86_64)
+        if(WIN32)
+            set(CMAKE_C_COMPILER_TARGET x86_64-pc-windows-msvc)
+            set(CMAKE_CXX_COMPILER_TARGET x86_64-pc-windows-msvc)
+        elseif(APPLE)
+            set(CMAKE_C_COMPILER_TARGET x86_64-apple-darwin)
+            set(CMAKE_CXX_COMPILER_TARGET x86_64-apple-darwin)
+        else()
+            set(CMAKE_C_COMPILER_TARGET x86_64-unknown-linux-gnu)
+            set(CMAKE_CXX_COMPILER_TARGET x86_64-unknown-linux-gnu)
         endif()
-    elseif(APPLE)
-        set(CMAKE_OSX_ARCHITECTURES arm64)
+    else()
+        if(WIN32)
+            set(CMAKE_C_COMPILER_TARGET aarch64-pc-windows-msvc)
+            set(CMAKE_CXX_COMPILER_TARGET aarch64-pc-windows-msvc)
+        elseif(APPLE)
+            set(CMAKE_C_COMPILER_TARGET arm64-apple-darwin)
+            set(CMAKE_CXX_COMPILER_TARGET arm64-apple-darwin)
+        else()
+            set(CMAKE_C_COMPILER_TARGET aarch64-unknown-linux-gnu)
+            set(CMAKE_CXX_COMPILER_TARGET aarch64-unknown-linux-gnu)
+        endif()
     endif()
 
     # Build libOpenCOR.
