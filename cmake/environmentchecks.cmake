@@ -69,7 +69,7 @@ if("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "AMD64"
     elseif(APPLE)
         set(LLVMCLANG_HOST_TRIPLE x86_64-apple-darwin)
     else()
-        set(LLVMCLANG_HOST_TRIPLE x86_64-unknown-linux-gnu)
+        set(LLVMCLANG_HOST_TRIPLE x86_64-pc-linux-gnu)
     endif()
 elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "ARM64"
        OR "${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "arm64")
@@ -80,7 +80,7 @@ elseif("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "ARM64"
     elseif(APPLE)
         set(LLVMCLANG_HOST_TRIPLE aarch64-apple-darwin)
     else()
-        set(LLVMCLANG_HOST_TRIPLE aarch64-unknown-linux-gnu)
+        set(LLVMCLANG_HOST_TRIPLE aarch64-pc-linux-gnu)
     endif()
 endif()
 

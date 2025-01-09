@@ -71,6 +71,11 @@ jobs:
         uses: KyleMayes/install-llvm-action@v2
         with:
           version: 18
+      - name: Install libncurses5 (Linux only)
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt update
+          sudo apt install libncurses5
       - name: Check the version of Clang
         run: clang --version
       # - name: Configure libOpenCOR
