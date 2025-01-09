@@ -78,18 +78,17 @@ jobs:
           sudo apt install libncurses5
       - name: Check the version of Clang
         run: clang --version
-      # - name: Configure libOpenCOR
-      #   shell: bash
-      #   run: |
-      #     mkdir build
-      #     cd build
-      #     cmake -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DTARGET_ARCHITECTURE=${{ matrix.target_architecture }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF ${{ env.DLLVMCLANG_LLVM_TABLEGEN }} ${{ env.DLLVMCLANG_CLANG_TABLEGEN }} ..
-      # - name: Upload library artifact
-      #   if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ${{ matrix.name }}
-      #     path: ./build/*.tar.gz
+      - name: Configure libOpenCOR
+        run: |
+          mkdir build
+          cd build
+          cmake -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DTARGET_ARCHITECTURE=${{ matrix.target_architecture }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF ${{ env.DLLVMCLANG_LLVM_TABLEGEN }} ${{ env.DLLVMCLANG_CLANG_TABLEGEN }} ..
+      - name: Upload library artifact
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: ./build/*.tar.gz
   webassembly:
     name: WebAssembly
     if: ${{ inputs.wasm_support }}
