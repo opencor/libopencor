@@ -13,8 +13,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows static library'
+          - name: 'Windows static library (Intel)'
             os: windows-latest
+            arch: amd64
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -28,8 +29,9 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Windows shared library'
+          - name: 'Windows shared library (Intel)'
             os: windows-latest
+            arch: amd64
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -43,7 +45,39 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Linux static library'
+          - name: 'Windows static library (ARM)'
+            os: windows-latest
+            arch: amd64_arm64
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+          - name: 'Windows shared library (ARM)'
+            os: windows-latest
+            arch: amd64_arm64
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+          - name: 'Linux static library (Intel)'
             os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
@@ -58,7 +92,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Linux shared library'
+          - name: 'Linux shared library (Intel)'
             os: ubuntu-latest
             build_type: Release
             code_analysis: OFF
@@ -73,6 +107,40 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+          - name: 'Linux static library (ARM)'
+            os: ubuntu-latest
+            arch: arm
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: OFF
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
+          - name: 'Linux shared library (ARM)'
+            os: ubuntu-latest
+            arch: arm
+            build_type: Release
+            code_analysis: OFF
+            code_coverage: OFF
+            documentation: OFF
+            javascript_bindings: OFF
+            javascript_unit_testing: OFF
+            memory_checks: OFF
+            python_bindings: OFF
+            python_unit_testing: OFF
+            shared_libs: ON
+            unit_testing: ON
+            target: unit_testing
+            install_uninstall_and_package: ON
+            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'macOS static library (Intel)'
             os: macos-13
             build_type: Release
@@ -321,6 +389,11 @@ jobs:
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
+      - name: Install ARM compiler
+        if: ${{ matrix.arch == 'arm' }}
+        run: |
+          sudo apt update
+          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Install Python
         uses: actions/setup-python@v5
         with:
@@ -334,6 +407,8 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
       - name: Install LLVM
         if: ${{ matrix.code_coverage == 'ON' }}
         run: |

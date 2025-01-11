@@ -28,13 +28,25 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
     else()
         if(WIN32)
             if(RELEASE_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 519fd7c2133ed7efb666193028b50ac4f788f416)
+                if(INTEL_MODE)
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     519fd7c2133ed7efb666193028b50ac4f788f416)
+                else()
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     59647bc79af40a528802941f6dce584fd1cbe50e)
+                endif()
             else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1bcd8ca9cea9b0d03f35b66058b53e1f06791d03)
+                if(INTEL_MODE)
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     1bcd8ca9cea9b0d03f35b66058b53e1f06791d03)
+                else()
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     d9367c7fa4f33d8e2f9b1b1654a1766d26abaa60)
+                endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
@@ -47,9 +59,15 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
                                  c54fd6934c2a72f99ba21dcb88e4d07f9b3e4d00)
             endif()
         else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             3af6ee478c72261af012eb400fc1bd0e114c1727)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 3af6ee478c72261af012eb400fc1bd0e114c1727)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 bcaaad18087d6e4a002b3eda5f5c49eca7e255cc)
+            endif()
         endif()
     endif()
 else()
@@ -86,9 +104,9 @@ set(SUNDIALS_CMAKE_PACKAGE_NAME ${PACKAGE_NAME} CACHE INTERNAL "${PACKAGE_NAME}'
 set(SUNDIALS_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(SUNDIALS_LIBRARIES
     SUNDIALS::arkode_static
-    SUNDIALS::core_static
     SUNDIALS::cvode_static
     SUNDIALS::cvodes_static
+    SUNDIALS::generic_static
     SUNDIALS::ida_static
     SUNDIALS::idas_static
     SUNDIALS::kinsol_static
