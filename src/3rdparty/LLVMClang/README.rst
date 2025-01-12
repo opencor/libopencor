@@ -1,0 +1,1 @@
+Our copy of LLVM+Clang 18.1.8 requires the changes mentioned at https://github.com/opencor/llvm-project/compare/llvmorg-18.1.8...opencor:llvm-project:llvmorg-18.1.8-libopencor to build and work correctly with libOpenCOR.
