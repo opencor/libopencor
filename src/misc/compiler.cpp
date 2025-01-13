@@ -27,8 +27,8 @@ limitations under the License.
 #include "clangend.h"
 
 #include "llvmbegin.h"
+#include "llvm/Support/Host.h"
 #include "llvm/Support/TargetSelect.h"
-#include "llvm/TargetParser/Host.h"
 #include "llvm-c/Core.h"
 #include "llvmend.h"
 
@@ -320,7 +320,7 @@ bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
     // name, and function.
 
     const bool res = !mLljit->getMainJITDylib().define(llvm::orc::absoluteSymbols({
-        {mLljit->mangleAndIntern(pName), {llvm::orc::ExecutorAddr::fromPtr(pFunction), llvm::JITSymbolFlags::Exported}},
+        {mLljit->mangleAndIntern(pName), llvm::JITEvaluatedSymbol(llvm::pointerToJITTargetAddress(pFunction), llvm::JITSymbolFlags::Exported)},
     }));
 
 #ifndef CODE_COVERAGE_ENABLED
@@ -340,7 +340,7 @@ void *Compiler::Impl::function(const std::string &pName) const
     auto symbol = mLljit->lookup(pName);
 
     if (symbol) {
-        return reinterpret_cast<void *>(symbol->getValue()); // NOLINT
+        return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
     }
 
     return {};
