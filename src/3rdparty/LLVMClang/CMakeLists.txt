@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME LLVMClang)
-set(PACKAGE_VERSION 18.1.8)
+set(PACKAGE_VERSION 19.1.6)
 set(PACKAGE_REPOSITORY llvm-project)
-set(RELEASE_TAG llvmorg-18.1.8-libopencor)
+set(RELEASE_TAG llvmorg-19.1.6-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
