@@ -20,6 +20,12 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
+if(INTEL_MODE)
+    set(LLVM_TARGETS_TO_BUILD X86)
+else()
+    set(LLVM_TARGETS_TO_BUILD AArch64)
+endif()
+
 if(LIBOPENCOR_PREBUILT_LLVMCLANG)
     if(WIN32)
         if(RELEASE_MODE)
@@ -67,12 +73,6 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
 else()
     # Build our package.
 
-    if(INTEL_MODE)
-        set(LLVM_TARGETS_TO_BUILD X86)
-    else()
-        set(LLVM_TARGETS_TO_BUILD AArch64)
-    endif()
-
     if(LLVMCLANG_LLVM_TABLEGEN)
         set(LLVM_TABLEGEN -DLLVM_TABLEGEN=${LLVMCLANG_LLVM_TABLEGEN})
     endif()
@@ -91,17 +91,18 @@ else()
             -DCLANG_BUILD_TOOLS=OFF
             -DCLANG_ENABLE_ARCMT=OFF
             -DCLANG_ENABLE_STATIC_ANALYZER=OFF
-            -DCLANG_INCLUDE_DOCS=OFF
-            -DCLANG_INCLUDE_TESTS=OFF
+            -DCLANG_FORCE_MATCHING_LIBCLANG_SOVERSION=OFF
             -DCLANG_PLUGIN_SUPPORT=OFF
             ${CLANG_TABLEGEN}
             -DCLANG_TOOLING_BUILD_AST_INTROSPECTION=OFF
+            -DCLANG_TOOL_DICTIONARY_BUILD=OFF
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DLIBCLANG_BUILD_STATIC=ON
             -DLIBOPENCOR=ON
+            -DLLVM_BUILD_LLVM_C_DYLIB=OFF
             -DLLVM_BUILD_RUNTIME=OFF
             -DLLVM_BUILD_RUNTIMES=OFF
             -DLLVM_BUILD_TOOLS=OFF
@@ -109,26 +110,25 @@ else()
             -DLLVM_ENABLE_ASSERTIONS=OFF
             -DLLVM_ENABLE_BACKTRACES=OFF
             -DLLVM_ENABLE_BINDINGS=OFF
+            -DLLVM_ENABLE_WARNINGS=OFF
             -DLLVM_ENABLE_CRASH_OVERRIDES=OFF
             -DLLVM_ENABLE_DIA_SDK=OFF
             -DLLVM_ENABLE_LIBEDIT=OFF
             -DLLVM_ENABLE_LIBPFM=OFF
             -DLLVM_ENABLE_LIBXML2=OFF
+            -DLLVM_ENABLE_LOCAL_SUBMODULE_VISIBILITY=OFF
             -DLLVM_ENABLE_MODULE_DEBUGGING=OFF
             -DLLVM_ENABLE_OCAMLDOC=OFF
             -DLLVM_ENABLE_PEDANTIC=OFF
-            -DLLVM_ENABLE_PIC=ON
             -DLLVM_ENABLE_PLUGINS=OFF
             -DLLVM_ENABLE_PROJECTS=clang
-            -DLLVM_ENABLE_RTTI=ON
             -DLLVM_ENABLE_TERMINFO=OFF
-            -DLLVM_ENABLE_WARNINGS=OFF
+            -DLLVM_ENABLE_UNWIND_TABLES=OFF
             -DLLVM_ENABLE_ZLIB=OFF
             -DLLVM_ENABLE_ZSTD=OFF
             -DLLVM_INCLUDE_BENCHMARKS=OFF
             -DLLVM_INCLUDE_DOCS=OFF
             -DLLVM_INCLUDE_EXAMPLES=OFF
-            -DLLVM_INCLUDE_GO_TESTS=OFF
             -DLLVM_INCLUDE_RUNTIMES=OFF
             -DLLVM_INCLUDE_TESTS=OFF
             -DLLVM_INCLUDE_TOOLS=ON
@@ -159,28 +159,6 @@ else()
     set(LIBCLANG libclang)
 endif()
 
-if(INTEL_MODE)
-    set(EXTRA_LLVMCLANG_LIBRARIES
-        LLVMExegesisX86
-        LLVMX86AsmParser
-        LLVMX86CodeGen
-        LLVMX86Desc
-        LLVMX86Disassembler
-        LLVMX86Info
-        LLVMX86TargetMCA
-    )
-else()
-    set(EXTRA_LLVMCLANG_LIBRARIES
-        LLVMAArch64AsmParser
-        LLVMAArch64CodeGen
-        LLVMAArch64Desc
-        LLVMAArch64Disassembler
-        LLVMAArch64Info
-        LLVMAArch64Utils
-        LLVMExegesisAArch64
-    )
-endif()
-
 set(LLVMCLANG_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LLVMCLANG_CMAKE_DIR ${INSTALL_DIR}/lib/cmake/clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
 set(LLVMCLANG_CMAKE_DIRS ${INSTALL_DIR}/lib/cmake/llvm ${INSTALL_DIR}/lib/cmake/clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake directories.")
@@ -190,6 +168,7 @@ set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}
 set(LLVMCLANG_LIBRARIES
     clangAnalysis
     clangAnalysisFlowSensitive
+    clangAnalysisFlowSensitiveModels
     clangAPINotes
     clangAST
     clangASTMatchers
@@ -201,6 +180,7 @@ set(LLVMCLANG_LIBRARIES
     clangDriver
     clangDynamicASTMatchers
     clangEdit
+    clangExtractAPI
     clangFormat
     clangFrontend
     clangFrontendTool
@@ -216,15 +196,23 @@ set(LLVMCLANG_LIBRARIES
     clangStaticAnalyzerCheckers
     clangStaticAnalyzerCore
     clangStaticAnalyzerFrontend
-    clangTesting
+    clangSupport
     clangTooling
     clangToolingASTDiff
     clangToolingCore
     clangToolingInclusions
+    clangToolingInclusionsStdlib
     clangToolingRefactoring
     clangToolingSyntax
     clangTransformer
+    libclang_static
     ${LIBCLANG}
+    LLVM${LLVM_TARGETS_TO_BUILD}AsmParser
+    LLVM${LLVM_TARGETS_TO_BUILD}CodeGen
+    LLVM${LLVM_TARGETS_TO_BUILD}Desc
+    LLVM${LLVM_TARGETS_TO_BUILD}Disassembler
+    LLVM${LLVM_TARGETS_TO_BUILD}Info
+    LLVM${LLVM_TARGETS_TO_BUILD}Utils
     LLVMAggressiveInstCombine
     LLVMAnalysis
     LLVMAsmParser
@@ -236,33 +224,45 @@ set(LLVMCLANG_LIBRARIES
     LLVMCFGuard
     LLVMCFIVerify
     LLVMCodeGen
+    LLVMCodeGenTypes
     LLVMCore
     LLVMCoroutines
     LLVMCoverage
+    LLVMDebugInfoBTF
     LLVMDebugInfoCodeView
     LLVMDebuginfod
     LLVMDebugInfoDWARF
     LLVMDebugInfoGSYM
+    LLVMDebugInfoLogicalView
     LLVMDebugInfoMSF
     LLVMDebugInfoPDB
     LLVMDemangle
     LLVMDiff
     LLVMDlltoolDriver
     LLVMDWARFLinker
+    LLVMDWARFLinkerClassic
+    LLVMDWARFLinkerParallel
     LLVMDWP
     LLVMExecutionEngine
     LLVMExegesis
+    LLVMExegesis${LLVM_TARGETS_TO_BUILD}
     LLVMExtensions
     LLVMFileCheck
+    LLVMFrontendDriver
+    LLVMFrontendHLSL
+    LLVMFrontendOffloading
     LLVMFrontendOpenACC
     LLVMFrontendOpenMP
+    LLVMFuzzerCLI
     LLVMFuzzMutate
     LLVMGlobalISel
+    LLVMHipStdPar
     LLVMInstCombine
     LLVMInstrumentation
     LLVMInterfaceStub
     LLVMInterpreter
     LLVMipo
+    LLVMIRPrinter
     LLVMIRReader
     LLVMJITLink
     LLVMLibDriver
@@ -276,9 +276,11 @@ set(LLVMCLANG_LIBRARIES
     LLVMMCParser
     LLVMMIRParser
     LLVMObjCARCOpts
+    LLVMObjCopy
     LLVMObject
     LLVMObjectYAML
     LLVMOption
+    LLVMOrcDebugging
     LLVMOrcJIT
     LLVMOrcShared
     LLVMOrcTargetProcess
@@ -291,13 +293,16 @@ set(LLVMCLANG_LIBRARIES
     LLVMSupport
     LLVMSymbolize
     LLVMTableGen
+    LLVMTableGenCommon
     LLVMTableGenGlobalISel
     LLVMTarget
+    LLVMTargetParser
     LLVMTextAPI
+    LLVMTextAPIBinaryReader
     LLVMTransformUtils
     LLVMVectorize
+    LLVMWindowsDriver
     LLVMWindowsManifest
     LLVMXRay
-    ${EXTRA_LLVMCLANG_LIBRARIES}
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )
