@@ -1,12 +1,12 @@
 #!/bin/sh
 
-LLVMCLANG_VERSION=18.1.8-libopencor
+RELEASE_TAG=llvmorg-18.1.8-libopencor
 
-curl -Ls https://github.com/opencor/llvm-project/archive/refs/tags/llvmorg-$LLVMCLANG_VERSION.zip -o llvm-project-llvmorg-$LLVMCLANG_VERSION.zip
-unzip -qq llvm-project-llvmorg-$LLVMCLANG_VERSION.zip
-\rm llvm-project-llvmorg-$LLVMCLANG_VERSION.zip
+curl -Ls https://github.com/opencor/llvm-project/archive/refs/tags/$RELEASE_TAG.zip -o llvm-project-$RELEASE_TAG.zip
+unzip -qq llvm-project-$RELEASE_TAG.zip
+\rm llvm-project-$RELEASE_TAG.zip
 
-cd llvm-project-llvmorg-$LLVMCLANG_VERSION
+cd llvm-project-$RELEASE_TAG
 
 cmake -G Ninja -S ./llvm -B build -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS=clang
 cmake --build build -t llvm-tblgen clang-tblgen
