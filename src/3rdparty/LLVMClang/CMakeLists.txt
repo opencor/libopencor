@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME LLVMClang)
-set(PACKAGE_VERSION 15.0.7)
+set(PACKAGE_VERSION 16.0.6)
 set(PACKAGE_REPOSITORY llvm-project)
-set(RELEASE_TAG llvmorg-15.0.7-libopencor)
+set(RELEASE_TAG llvmorg-16.0.6-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.

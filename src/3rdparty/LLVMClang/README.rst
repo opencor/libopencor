@@ -1,1 +1,1 @@
-Our copy of LLVM+Clang 15.0.7 requires the changes mentioned at https://github.com/opencor/llvm-project/compare/llvmorg-15.0.7...opencor:llvm-project:llvmorg-15.0.7-libopencor to build and work correctly with libOpenCOR.
+Our copy of LLVM+Clang 16.0.6 requires the changes mentioned at https://github.com/opencor/llvm-project/compare/llvmorg-16.0.6...opencor:llvm-project:llvmorg-16.0.6-libopencor to build and work correctly with libOpenCOR.
