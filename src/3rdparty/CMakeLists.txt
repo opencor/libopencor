@@ -106,11 +106,11 @@ list(SORT PACKAGES_TO_ADD)
 
 # add_package(libxml2)
 
-if(NOT EMSCRIPTEN)
-    add_package(OpenSSL)
-endif()
+# if(NOT EMSCRIPTEN)
+#     add_package(OpenSSL)
+# endif()
 
-# add_package(zlib)
+add_package(zlib)
 
 # add_package(libSBML) # Requires libxml2.
 # add_package(libNuML) # Requires libSBML.
