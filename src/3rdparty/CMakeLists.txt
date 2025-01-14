@@ -106,34 +106,34 @@ list(SORT PACKAGES_TO_ADD)
 
 add_package(libxml2)
 
-if(NOT EMSCRIPTEN)
-    add_package(OpenSSL)
-endif()
+# if(NOT EMSCRIPTEN)
+#     add_package(OpenSSL)
+# endif()
 
-add_package(zlib)
+# add_package(zlib)
 
-add_package(libSBML) # Requires libxml2.
-add_package(libNuML) # Requires libSBML.
+# add_package(libSBML) # Requires libxml2.
+# add_package(libNuML) # Requires libSBML.
 
-if(NOT EMSCRIPTEN)
-    add_package(libssh2) # Requires OpenSSL.
-endif()
+# if(NOT EMSCRIPTEN)
+#     add_package(libssh2) # Requires OpenSSL.
+# endif()
 
-add_package(zipper) # Requires zlib.
+# add_package(zipper) # Requires zlib.
 
 # Required third-party libraries.
 
-add_package(libCellML) # Requires libxml2 and zlib.
-add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
+# add_package(libCellML) # Requires libxml2 and zlib.
+# add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
 
-if(NOT EMSCRIPTEN)
-    add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.
-endif()
+# if(NOT EMSCRIPTEN)
+#     add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.
+# endif()
 
-add_package(libSEDML) # Requires libNuML and libSBML.
+# add_package(libSEDML) # Requires libNuML and libSBML.
 
-if(NOT EMSCRIPTEN)
-    add_package(LLVMClang)
-endif()
+# if(NOT EMSCRIPTEN)
+#     add_package(LLVMClang)
+# endif()
 
-add_package(SUNDIALS)
+# add_package(SUNDIALS)
