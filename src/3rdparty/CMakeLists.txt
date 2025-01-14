@@ -104,11 +104,11 @@ set(PACKAGES_TO_ADD ${REQUIRED_PACKAGES_TO_ADD} ${PACKAGES_TO_BUILD} ${DEPENDENT
 list(REMOVE_DUPLICATES PACKAGES_TO_ADD)
 list(SORT PACKAGES_TO_ADD)
 
-add_package(libxml2)
+# add_package(libxml2)
 
-# if(NOT EMSCRIPTEN)
-#     add_package(OpenSSL)
-# endif()
+if(NOT EMSCRIPTEN)
+    add_package(OpenSSL)
+endif()
 
 # add_package(zlib)
 
