@@ -87,18 +87,6 @@ else()
                 set(PLATFORM debug-VC-WIN64-ARM)
             endif()
         endif()
-
-        # Patch the generated makefile since it contains non-escaped paths that result in our build to fail. (Not sure
-        # why this is the case, but that's the situation!)
-
-        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
-
-        set(PATCH_COMMANDS
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
-        )
     elseif(APPLE)
         if(INTEL_MODE)
             set(PLATFORM darwin64-x86_64-cc)
