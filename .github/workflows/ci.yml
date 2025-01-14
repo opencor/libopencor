@@ -316,8 +316,6 @@ jobs:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_LOG_FILE: ""
-      DOXYGEN_VERSION: 1.9.3
-      LLVMCLANG_VERSION: 18.1.8
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
@@ -342,20 +340,20 @@ jobs:
       - name: Install Clang
         if: ${{ matrix.code_analysis == 'ON' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/gha/clang.${LLVMCLANG_VERSION}.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/gha/clang.tar.gz -O - | tar -xz
           sudo mv clang /usr/local/bin
           sudo cp /usr/local/bin/clang /usr/local/bin/clang++
-          wget https://github.com/opencor/gha/releases/download/gha/clang-include.${LLVMCLANG_VERSION}.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/gha/clang-include.tar.gz -O - | tar -xz
           sudo mv include/* /usr/local/include
       - name: Install ClangFormat
         if: ${{ matrix.target == 'check_code_formatting' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/gha/clang-format.${LLVMCLANG_VERSION}.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/gha/clang-format.tar.gz -O - | tar -xz
           sudo mv clang-format /usr/local/bin
       - name: Install Clang-Tidy
         if: ${{ matrix.name == 'Code analysis' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/gha/clang-tidy.${LLVMCLANG_VERSION}.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/gha/clang-tidy.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Emscripten
         if: ${{ matrix.javascript_unit_testing == 'ON' }}
@@ -380,7 +378,7 @@ jobs:
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |
-          wget https://github.com/opencor/gha/releases/download/gha/doxygen.${DOXYGEN_VERSION}.linux.tar.gz -O - | tar -xz
+          wget https://github.com/opencor/gha/releases/download/gha/doxygen.tar.gz -O - | tar -xz
           sudo mv doxygen /usr/local/bin
       - name: Configure libOpenCOR
         run: |
