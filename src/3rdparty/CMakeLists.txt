@@ -124,7 +124,7 @@ add_package(zipper) # Requires zlib.
 # Required third-party libraries.
 
 add_package(libCellML) # Requires libxml2 and zlib.
-# add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
+add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
 
 # if(NOT EMSCRIPTEN)
 #     add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.
