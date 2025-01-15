@@ -132,8 +132,8 @@ endif()
 
 add_package(libSEDML) # Requires libNuML and libSBML.
 
-# if(NOT EMSCRIPTEN)
-#     add_package(LLVMClang)
-# endif()
+if(NOT EMSCRIPTEN)
+    add_package(LLVMClang)
+endif()
 
-# add_package(SUNDIALS)
+add_package(SUNDIALS)
