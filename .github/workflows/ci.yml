@@ -45,7 +45,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Windows static library (ARM)'
+          - name: 'Windows static library (ARM) (no tests)'
             os: windows-latest
             arch: amd64_arm64
             build_type: Release
@@ -58,10 +58,10 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: OFF
-            unit_testing: ON
+            unit_testing: OFF
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Windows shared library (ARM)'
+          - name: 'Windows shared library (ARM) (no tests)'
             os: windows-latest
             arch: amd64_arm64
             build_type: Release
@@ -74,7 +74,7 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: ON
-            unit_testing: ON
+            unit_testing: OFF
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux static library (Intel)'
@@ -107,7 +107,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Linux static library (ARM)'
+          - name: 'Linux static library (ARM) (no tests)'
             os: ubuntu-latest
             arch: arm
             build_type: Release
@@ -120,11 +120,11 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: OFF
-            unit_testing: ON
+            unit_testing: OFF
             target: unit_testing
             install_uninstall_and_package: ON
             context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
-          - name: 'Linux shared library (ARM)'
+          - name: 'Linux shared library (ARM) (no tests)'
             os: ubuntu-latest
             arch: arm
             build_type: Release
@@ -137,7 +137,7 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: ON
-            unit_testing: ON
+            unit_testing: OFF
             target: unit_testing
             install_uninstall_and_package: ON
             context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
