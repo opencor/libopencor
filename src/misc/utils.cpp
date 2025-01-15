@@ -403,7 +403,7 @@ char *nlaSolverAddress(SolverNla *pNlaSolver)
     auto len = str.size();
     auto *res = new char[len + 1];
 
-    std::copy(str.begin(), str.end(), res);
+    std::ranges::copy(str, res);
 
     res[len] = '\0'; // NOLINT
 

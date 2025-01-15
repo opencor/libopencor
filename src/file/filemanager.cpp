@@ -36,7 +36,7 @@ void FileManager::Impl::manage(File *pFile)
 
 void FileManager::Impl::unmanage(File *pFile)
 {
-    auto iter = std::find(mFiles.cbegin(), mFiles.cend(), pFile);
+    auto iter = std::ranges::find(mFiles, pFile);
 
     if (iter != mFiles.cend()) {
         mFiles.erase(iter);
@@ -91,7 +91,7 @@ FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #else
     auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
 #endif
-    auto res = std::find_if(mFiles.cbegin(), mFiles.cend(), [&](const auto &file) {
+    auto res = std::ranges::find_if(mFiles, [&](const auto &file) {
         return isLocalFile ?
                    file->fileName() == fileNameOrUrl :
                    file->url() == fileNameOrUrl;

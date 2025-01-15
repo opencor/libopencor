@@ -143,12 +143,14 @@ function(configure_target TARGET)
                 ${MISC_CHECKS}
                 modernize-*
                 -modernize-pass-by-value
+                -modernize-use-designated-initializers
                 -modernize-use-trailing-return-type
                 performance-*
                 readability-*
                 -readability-avoid-nested-conditional-operator
                 -readability-function-cognitive-complexity
                 -readability-identifier-length
+                -readability-math-missing-parentheses
                 ${READABILITY_CHECKS}
             )
 
