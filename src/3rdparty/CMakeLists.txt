@@ -119,7 +119,7 @@ if(NOT EMSCRIPTEN)
     add_package(libssh2) # Requires OpenSSL.
 endif()
 
-# add_package(zipper) # Requires zlib.
+add_package(zipper) # Requires zlib.
 
 # Required third-party libraries.
 
