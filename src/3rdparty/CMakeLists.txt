@@ -115,9 +115,9 @@ add_package(zlib)
 add_package(libSBML) # Requires libxml2.
 add_package(libNuML) # Requires libSBML.
 
-# if(NOT EMSCRIPTEN)
-#     add_package(libssh2) # Requires OpenSSL.
-# endif()
+if(NOT EMSCRIPTEN)
+    add_package(libssh2) # Requires OpenSSL.
+endif()
 
 # add_package(zipper) # Requires zlib.
 
