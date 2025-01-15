@@ -23,28 +23,46 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 if(LIBOPENCOR_PREBUILT_OPENSSL)
     if(WIN32)
         if(RELEASE_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             117fc350696f830cb82aafb95a47588f6434c177)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 c46f9ca66d99d452698f9309927d63219972a089)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 b8b2de7684995a8c02c272e06031b70513793d6b)
+            endif()
         else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7293afb0786724e349cbc14d81b36b3bc15201e5)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 b51022bad09ebc69618eb03f5c80a590564eb2c5)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 369d4639814f3e76357e190e55dc0cb106dc535f)
+            endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             5388837e3702b904b4d7b1a9891eda360537ec51)
+                             7660430004c42f49aa94905a4fd1fe22d51a10c8)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             22f22109d28cea6ea55681e48bdfd040cc1352db)
+                             c3b59ffbbb56ce818b249a94f6efd72228e1aa40)
         endif()
     else()
-        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         85dc755b012accd22114b42ddaabb22ea246dd2a)
+        if(INTEL_MODE)
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             d5eaa89b18a7e7adce8b641488a6958827fba261)
+        else()
+            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                             af12c894dc1767cae060d925893e777ecf1e439a)
+        endif()
     endif()
 else()
     # Build our package.
@@ -57,22 +75,18 @@ else()
         list(APPEND CONFIG_OPTIONS no-asm)
 
         if(RELEASE_MODE)
-            set(PLATFORM VC-WIN64A)
+            if(INTEL_MODE)
+                set(PLATFORM VC-WIN64A)
+            else()
+                set(PLATFORM VC-WIN64-ARM)
+            endif()
         else()
-            set(PLATFORM debug-VC-WIN64A)
+            if(INTEL_MODE)
+                set(PLATFORM debug-VC-WIN64A)
+            else()
+                set(PLATFORM debug-VC-WIN64-ARM)
+            endif()
         endif()
-
-        # Patch the generated makefile since it contains non-escaped paths that result in our build to fail. (Not sure
-        # why this is the case, but that's the situation!)
-
-        set(MAKEFILE ${CMAKE_CURRENT_BINARY_DIR}/build/${PACKAGE_NAME}-prefix/src/${PACKAGE_NAME}-build/makefile)
-
-        set(PATCH_COMMANDS
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/CC=[^\\\\n]*\\\\n/CC=cl\\\\n/" ${MAKEFILE}
-            COMMAND
-                ${PERL_EXECUTABLE} -pi -e "s/RC=[^\\\\n]*\\\\n/RC=rc\\\\n/" ${MAKEFILE}
-        )
     elseif(APPLE)
         if(INTEL_MODE)
             set(PLATFORM darwin64-x86_64-cc)
@@ -82,7 +96,11 @@ else()
 
         list(APPEND CONFIG_OPTIONS "-mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET}")
     else()
-        set(PLATFORM linux-x86_64)
+        if(INTEL_MODE)
+            set(PLATFORM linux-x86_64)
+        else()
+            set(PLATFORM linux-aarch64)
+        endif()
 
         list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
     endif()

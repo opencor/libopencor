@@ -95,6 +95,8 @@ else()
         set(LIBOPENCOR_CODE_ANALYSIS ${CODE_ANALYSIS} CACHE BOOL "${LIBOPENCOR_CODE_ANALYSIS_DOCSTRING}" FORCE)
     elseif(CODE_ANALYSIS)
         message(SEND_ERROR "${CODE_ANALYSIS_ERROR_MESSAGE}")
+
+        set(SENT_ERRORS TRUE)
     endif()
 
     unset(CODE_ANALYSIS CACHE)
@@ -110,6 +112,8 @@ else()
         set(LIBOPENCOR_CODE_COVERAGE ${CODE_COVERAGE} CACHE BOOL "${LIBOPENCOR_CODE_COVERAGE_DOCSTRING}" FORCE)
     elseif(CODE_COVERAGE)
         message(SEND_ERROR "${CODE_COVERAGE_ERROR_MESSAGE}")
+
+        set(SENT_ERRORS TRUE)
     endif()
 
     unset(CODE_COVERAGE CACHE)
@@ -125,6 +129,8 @@ else()
         set(LIBOPENCOR_COMPILER_CACHING ${COMPILER_CACHING} CACHE BOOL "${LIBOPENCOR_COMPILER_CACHING_DOCSTRING}" FORCE)
     elseif(COMPILER_CACHING)
         message(SEND_ERROR "${COMPILER_CACHING_ERROR_MESSAGE}")
+
+        set(SENT_ERRORS TRUE)
     endif()
 
     unset(COMPILER_CACHING CACHE)
@@ -140,6 +146,8 @@ else()
         set(LIBOPENCOR_DOCUMENTATION ${DOCUMENTATION} CACHE BOOL "${LIBOPENCOR_DOCUMENTATION_DOCSTRING}" FORCE)
     elseif(DOCUMENTATION)
         message(SEND_ERROR "${DOCUMENTATION_AVAILABLE_ERROR_MESSAGE}")
+
+        set(SENT_ERRORS TRUE)
     endif()
 
     unset(DOCUMENTATION CACHE)
@@ -173,6 +181,8 @@ else()
         set(LIBOPENCOR_JAVASCRIPT_BINDINGS ${JAVASCRIPT_BINDINGS} CACHE BOOL "${LIBOPENCOR_JAVASCRIPT_BINDINGS_DOCSTRING}" FORCE)
     elseif(JAVASCRIPT_BINDINGS)
         message(SEND_ERROR "${JAVASCRIPT_BINDINGS_ERROR_MESSAGE}")
+
+        set(SENT_ERRORS TRUE)
     endif()
 
     unset(JAVASCRIPT_BINDINGS CACHE)
@@ -189,6 +199,8 @@ else()
             set(LIBOPENCOR_JAVASCRIPT_UNIT_TESTING ${JAVASCRIPT_UNIT_TESTING} CACHE BOOL "${LIBOPENCOR_JAVASCRIPT_UNIT_TESTING_DOCSTRING}" FORCE)
         elseif(JAVASCRIPT_UNIT_TESTING)
             message(SEND_ERROR "${JAVASCRIPT_UNIT_TESTING_ERROR_MESSAGE}")
+
+            set(SENT_ERRORS TRUE)
         endif()
 
         unset(JAVASCRIPT_UNIT_TESTING CACHE)
@@ -205,6 +217,8 @@ else()
         set(LIBOPENCOR_MEMORY_CHECKS ${MEMORY_CHECKS} CACHE BOOL "${LIBOPENCOR_MEMORY_CHECKS_DOCSTRING}" FORCE)
     elseif(MEMORY_CHECKS)
         message(SEND_ERROR "${MEMORY_CHECKS_ERROR_MESSAGE}")
+
+        set(SENT_ERRORS TRUE)
     endif()
 
     unset(MEMORY_CHECKS CACHE)
@@ -363,6 +377,8 @@ else()
         set(LIBOPENCOR_PYTHON_BINDINGS ${PYTHON_BINDINGS} CACHE BOOL "${LIBOPENCOR_PYTHON_BINDINGS_DOCSTRING}" FORCE)
     elseif(PYTHON_BINDINGS)
         message(SEND_ERROR "${PYTHON_BINDINGS_ERROR_MESSAGE}")
+
+        set(SENT_ERRORS TRUE)
     endif()
 
     unset(PYTHON_BINDINGS CACHE)
@@ -379,6 +395,8 @@ else()
             set(LIBOPENCOR_PYTHON_UNIT_TESTING ${PYTHON_UNIT_TESTING} CACHE BOOL "${LIBOPENCOR_PYTHON_UNIT_TESTING_DOCSTRING}" FORCE)
         elseif(PYTHON_UNIT_TESTING)
             message(SEND_ERROR "${PYTHON_UNIT_TESTING_ERROR_MESSAGE}")
+
+            set(SENT_ERRORS TRUE)
         endif()
 
         unset(PYTHON_UNIT_TESTING CACHE)
@@ -441,32 +459,44 @@ else()
     if(LIBOPENCOR_CODE_COVERAGE)
         if(NOT LIBOPENCOR_SHARED_LIBS)
             message(SEND_ERROR "Configuration confusion: code coverage is requested which means that a static library cannot be requested.")
+
+            set(SENT_ERRORS TRUE)
         endif()
 
         if(NOT LIBOPENCOR_UNIT_TESTING)
             message(SEND_ERROR "Configuration confusion: code coverage is requested which means that unit testing should also be requested.")
+
+            set(SENT_ERRORS TRUE)
         endif()
     endif()
 
     if(LIBOPENCOR_MEMORY_CHECKS)
         if("${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Release")
             message(SEND_ERROR "Configuration confusion: memory checks are requested which means that a release build cannot also be requested.")
+
+            set(SENT_ERRORS TRUE)
         endif()
 
         if(NOT LIBOPENCOR_UNIT_TESTING)
             message(SEND_ERROR "Configuration confusion: memory checks are requested which means that unit testing should also be requested.")
+
+            set(SENT_ERRORS TRUE)
         endif()
     endif()
 
     if(LIBOPENCOR_PYTHON_BINDINGS)
         if(LIBOPENCOR_SHARED_LIBS)
             message(SEND_ERROR "Configuration confusion: Python bindings are requested which means that a shared library cannot be requested.")
+
+            set(SENT_ERRORS TRUE)
         endif()
     endif()
 
     if(LIBOPENCOR_PYTHON_UNIT_TESTING)
         if(NOT LIBOPENCOR_PYTHON_BINDINGS)
             message(SEND_ERROR "Configuration confusion: Python unit testing is requested which means that Python bindings should also be requested.")
+
+            set(SENT_ERRORS TRUE)
         endif()
     endif()
 
@@ -474,7 +504,13 @@ else()
         if(    NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "Intel"
            AND NOT "${LIBOPENCOR_TARGET_ARCHITECTURE}" STREQUAL "ARM")
             message(SEND_ERROR "Configuration error: unsupported target architecture (${LIBOPENCOR_TARGET_ARCHITECTURE}). Supported target architectures are Intel and ARM.")
+
+            set(SENT_ERRORS TRUE)
         endif()
+    endif()
+
+    if(SENT_ERRORS)
+        return()
     endif()
 
     # Determine whether we are building in release mode.

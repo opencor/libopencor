@@ -1,0 +1,19 @@
+#!/bin/sh
+
+RELEASE_TAG=llvmorg-14.0.6-libopencor
+
+curl -Ls https://github.com/opencor/llvm-project/archive/refs/tags/$RELEASE_TAG.zip -o llvm-project-$RELEASE_TAG.zip
+unzip -qq llvm-project-$RELEASE_TAG.zip
+\rm llvm-project-$RELEASE_TAG.zip
+
+cd llvm-project-$RELEASE_TAG
+
+cmake -G Ninja -S ./llvm -B build -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS=clang
+cmake --build build -t llvm-tblgen clang-tblgen
+
+if [ "$1" = "true" ]; then
+    EXTENSION=.exe
+fi
+
+export DLLVMCLANG_LLVM_TABLEGEN=-DLLVMCLANG_LLVM_TABLEGEN=$PWD/build/bin/llvm-tblgen$EXTENSION
+export DLLVMCLANG_CLANG_TABLEGEN=-DLLVMCLANG_CLANG_TABLEGEN=$PWD/build/bin/clang-tblgen$EXTENSION

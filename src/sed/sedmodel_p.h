@@ -25,6 +25,7 @@ namespace libOpenCOR {
 class SedModel::Impl: public SedBase::Impl
 {
 public:
+    std::string mBasePath;
     FilePtr mFile;
 
     explicit Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile);
@@ -33,13 +34,8 @@ public:
 
     bool isValid();
 
-#ifdef BUILDING_USING_CLANG
-    // Prevent Clang from complaining about SedModel::Impl::serialise() hiding SedBase::Impl::serialise().
-
-    using SedBase::Impl::serialise;
-#endif
-
-    void serialise(xmlNodePtr pNode, const std::string &pBasePath) const;
+    void setBasePath(const std::string &pBasePath);
+    void serialise(xmlNodePtr pNode) const override;
 };
 
 } // namespace libOpenCOR
