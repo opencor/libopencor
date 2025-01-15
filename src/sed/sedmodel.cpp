@@ -69,7 +69,12 @@ bool SedModel::Impl::isValid()
     return !hasErrors();
 }
 
-void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) const
+void SedModel::Impl::setBasePath(const std::string &pBasePath)
+{
+    mBasePath = pBasePath;
+}
+
+void SedModel::Impl::serialise(xmlNodePtr pNode) const
 {
     auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("model"));
 
@@ -77,12 +82,12 @@ void SedModel::Impl::serialise(xmlNodePtr pNode, const std::string &pBasePath) c
 
     xmlNewProp(node, toConstXmlCharPtr("language"), toConstXmlCharPtr("urn:sedml:language:cellml"));
 
-    auto source = pBasePath.empty() ?
+    auto source = mBasePath.empty() ?
                       urlPath(mFile->path()) :
 #ifdef BUILDING_USING_MSVC
-                      forwardSlashPath(relativePath(mFile->path(), pBasePath));
+                      forwardSlashPath(relativePath(mFile->path(), mBasePath));
 #else
-                      relativePath(mFile->path(), pBasePath);
+                      relativePath(mFile->path(), mBasePath);
 #endif
 
     xmlNewProp(node, toConstXmlCharPtr("source"), toConstXmlCharPtr(source));

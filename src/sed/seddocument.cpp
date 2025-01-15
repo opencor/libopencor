@@ -153,7 +153,8 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
         xmlAddChild(node, sedListOfModels);
 
         for (const auto &model : mModels) {
-            model->pimpl()->serialise(sedListOfModels, pBasePath);
+            model->pimpl()->setBasePath(pBasePath);
+            model->pimpl()->serialise(sedListOfModels);
         }
     }
 
