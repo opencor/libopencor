@@ -130,7 +130,7 @@ if(NOT EMSCRIPTEN)
     add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.
 endif()
 
-# add_package(libSEDML) # Requires libNuML and libSBML.
+add_package(libSEDML) # Requires libNuML and libSBML.
 
 # if(NOT EMSCRIPTEN)
 #     add_package(LLVMClang)
