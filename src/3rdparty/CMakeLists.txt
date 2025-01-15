@@ -113,7 +113,7 @@ endif()
 add_package(zlib)
 
 add_package(libSBML) # Requires libxml2.
-# add_package(libNuML) # Requires libSBML.
+add_package(libNuML) # Requires libSBML.
 
 # if(NOT EMSCRIPTEN)
 #     add_package(libssh2) # Requires OpenSSL.
