@@ -217,6 +217,7 @@ jobs:
             target: javascript_unit_testing
           - name: 'Windows Python bindings'
             os: windows-latest
+            arch: amd64
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
