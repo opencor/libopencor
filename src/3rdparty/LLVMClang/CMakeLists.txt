@@ -153,16 +153,9 @@ else()
 
     # Create our package.
 
-    file(GLOB STATIC_AND_IMPORT_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    string(REPLACE "${INSTALL_DIR}/" "" STATIC_AND_IMPORT_LIBRARIES "${STATIC_AND_IMPORT_LIBRARIES}")
-
-    file(GLOB SHARED_LIBRARIES "${INSTALL_DIR}/bin/*${CMAKE_SHARED_LIBRARY_SUFFIX}"
-                               "${INSTALL_DIR}/lib/*${CMAKE_SHARED_LIBRARY_SUFFIX}*")
-    string(REPLACE "${INSTALL_DIR}/" "" SHARED_LIBRARIES "${SHARED_LIBRARIES}")
-
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   include lib/cmake ${TABLEGEN_EXES} ${STATIC_AND_IMPORT_LIBRARIES} ${SHARED_LIBRARIES})
+                   bin include lib)
 endif()
 
 # Make our package accessible.
