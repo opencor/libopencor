@@ -36,6 +36,19 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+std::string Compiler::Impl::llvmClangError(llvm::Error pError) const
+{
+    std::string res;
+
+    llvm::handleAllErrors(std::move(pError), [&res](const llvm::ErrorInfoBase &errorInfo) {
+        res = errorInfo.message();
+    });
+
+    res[0] = tolower(res[0]);
+
+    return res.insert(0, " (").append(")");
+}
+
 bool Compiler::Impl::compile(const std::string &pCode)
 {
     // Reset ourselves.
@@ -271,7 +284,7 @@ extern double atanh(double);
 
 #ifndef CODE_COVERAGE_ENABLED
     if (!lljit) {
-        addError("An ORC-based JIT could not be created.");
+        addError(std::string("An ORC-based JIT could not be created").append(llvmClangError(lljit.takeError())).append("."));
 
         return false;
     }
@@ -285,7 +298,7 @@ extern double atanh(double);
 
 #ifndef CODE_COVERAGE_ENABLED
     if (!dynamicLibrarySearchGenerator) {
-        addError("The dynamic library search generator could not be created.");
+        addError(std::string("The dynamic library search generator could not be created").append(llvmClangError(dynamicLibrarySearchGenerator.takeError())).append("."));
 
         return false;
     }
