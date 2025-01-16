@@ -160,12 +160,6 @@ endif()
 
 # Make our package accessible.
 
-if(NOT WIN32)
-    set(LIBCLANG libclang_static)
-else()
-    set(LIBCLANG libclang)
-endif()
-
 if(INTEL_MODE)
     set(EXTRA_LLVMCLANG_LIBRARIES
         LLVMExegesisX86
@@ -231,7 +225,7 @@ set(LLVMCLANG_LIBRARIES
     clangToolingRefactoring
     clangToolingSyntax
     clangTransformer
-    ${LIBCLANG}
+    libclang
     LLVMAggressiveInstCombine
     LLVMAnalysis
     LLVMAsmParser
