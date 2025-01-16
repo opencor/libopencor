@@ -16,34 +16,34 @@ jobs:
       matrix:
         include:
           - name: 'Windows static library (Intel)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64
             shared_libs: OFF
           - name: 'Windows shared library (Intel)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64
             shared_libs: ON
           - name: 'Windows static library (ARM)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64_arm64
             shared_libs: OFF
           - name: 'Windows shared library (ARM)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64_arm64
             shared_libs: ON
           - name: 'Linux static library (Intel)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             shared_libs: OFF
           - name: 'Linux shared library (Intel)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             shared_libs: ON
           - name: 'Linux static library (ARM)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             arch: arm
             shared_libs: OFF
             context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'Linux shared library (ARM)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             arch: arm
             shared_libs: ON
             context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
@@ -54,10 +54,10 @@ jobs:
             os: macos-13
             shared_libs: ON
           - name: 'macOS static library (ARM)'
-            os: macos-latest
+            os: macos-14
             shared_libs: OFF
           - name: 'macOS shared library (ARM)'
-            os: macos-latest
+            os: macos-14
             shared_libs: ON
     env:
       BUILDCACHE_ACCURACY: STRICT
@@ -115,13 +115,13 @@ jobs:
       matrix:
         include:
           - name: 'Windows Python wheels'
-            os: windows-latest
+            os: windows-2022
           - name: 'Linux Python wheels'
-            os: ubuntu-latest
+            os: ubuntu-22.04
           - name: 'macOS Python wheels (Intel)'
             os: macos-13
           - name: 'macOS Python wheels (ARM)'
-            os: macos-latest
+            os: macos-14
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
@@ -149,7 +149,7 @@ jobs:
           files: ./wheelhouse/*.whl
   webassembly:
     name: WebAssembly
-    runs-on: macos-latest
+    runs-on: macos-14
     env:
       BUILDCACHE_ACCURACY: STRICT
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
