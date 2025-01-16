@@ -68,10 +68,28 @@ else()
     # Build our package.
 
     if(INTEL_MODE)
-        set(LLVM_TARGETS_TO_BUILD X86)
+        set(LLVM_TARGET_ARCH X86)
+
+        if(WIN32)
+            set(LLVM_DEFAULT_TARGET_TRIPLE x86_64-pc-windows-msvc)
+        elseif(APPLE)
+            set(LLVM_DEFAULT_TARGET_TRIPLE x86_64-apple-darwin)
+        else()
+            set(LLVM_DEFAULT_TARGET_TRIPLE x86_64-pc-linux-gnu)
+        endif()
     else()
-        set(LLVM_TARGETS_TO_BUILD AArch64)
+        set(LLVM_TARGET_ARCH AArch64)
+
+        if(WIN32)
+            set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-pc-windows-msvc)
+        elseif(APPLE)
+            set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-apple-darwin)
+        else()
+            set(LLVM_DEFAULT_TARGET_TRIPLE aarch64-pc-linux-gnu)
+        endif()
     endif()
+
+    set(LLVM_TARGETS_TO_BUILD ${LLVM_TARGET_ARCH})
 
     if(LLVMCLANG_LLVM_TABLEGEN)
         set(LLVM_TABLEGEN -DLLVM_TABLEGEN=${LLVMCLANG_LLVM_TABLEGEN})
@@ -105,6 +123,7 @@ else()
             -DLLVM_BUILD_RUNTIMES=OFF
             -DLLVM_BUILD_TOOLS=OFF
             -DLLVM_BUILD_UTILS=OFF
+            -DLLVM_DEFAULT_TARGET_TRIPLE=${LLVM_DEFAULT_TARGET_TRIPLE}
             -DLLVM_ENABLE_ASSERTIONS=OFF
             -DLLVM_ENABLE_BACKTRACES=OFF
             -DLLVM_ENABLE_BINDINGS=OFF
@@ -131,6 +150,7 @@ else()
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
             ${LLVM_TABLEGEN}
+            -DLLVM_TARGET_ARCH=${LLVM_TARGET_ARCH}
             -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
     )
 
