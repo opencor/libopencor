@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ed27236c72d868f8b1ce8182875d9a79781359ae)
+                                 e80f205e32a806546f5443016e9df1d911ebb32b)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 02c47edadc01c2eba45fb59b265c5b0b29e34b82)
+                                 19380580ec6a77734b3e6b93f26fca8125c380b1)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ca628a5552253fa1c2761c2e63da2943af34657a)
+                                 3f3d8ac5317300e9c1562542a73b362b0c0ffe7d)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a26fb6965b4fea70e7766e37e169a7d2dfd0445f)
+                                 8d7ba579f803161db821e6a8338b9fd3b5e37061)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             ebe4b27f8c22b04e1d928e0aa939adb23d00e86d)
+                             a76a7e36d574acbd85267d6fcb8589029d8d05af)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d8dd7fa7c63f7598123825e5d6c64a08a0fa02e7)
+                             90ce6acfa403897b4f09db38bd4278b204a2cfba)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             0d6dee02589df7e0861904be4d27869d678ee297)
+                             5bdce7e5d8f06ce8d47ee383cd7a384199dd7b76)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d0b16e05b880ab10117301eac942ba0399ebe8aa)
+                             38bfd28757f6ee157b42c2d106dd2046a862095f)
         endif()
     endif()
 else()
@@ -109,6 +109,7 @@ else()
             -DLLVM_ENABLE_BACKTRACES=OFF
             -DLLVM_ENABLE_BINDINGS=OFF
             -DLLVM_ENABLE_CRASH_OVERRIDES=OFF
+            -DLLVM_ENABLE_DIA_SDK=OFF
             -DLLVM_ENABLE_LIBEDIT=OFF
             -DLLVM_ENABLE_LIBPFM=OFF
             -DLLVM_ENABLE_LIBXML2=OFF
@@ -117,6 +118,7 @@ else()
             -DLLVM_ENABLE_PEDANTIC=OFF
             -DLLVM_ENABLE_PLUGINS=OFF
             -DLLVM_ENABLE_PROJECTS=clang
+            -DLLVM_ENABLE_RTTI=ON
             -DLLVM_ENABLE_TERMINFO=OFF
             -DLLVM_ENABLE_UNWIND_TABLES=OFF
             -DLLVM_ENABLE_WARNINGS=OFF
