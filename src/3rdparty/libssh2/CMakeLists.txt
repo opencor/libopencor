@@ -47,11 +47,11 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a929aa63b53bb84313efcb018cfa9477e2f1044b)
+                             48f7ce906760b7b84e8687aae93f8cd38522737d)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f5cae05d61c19d6649d30692bd9e9642473c5f26)
+                             c405224fe0f754765286ceeabb2e237bcee010e3)
         endif()
     else()
         if(INTEL_MODE)

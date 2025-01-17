@@ -52,11 +52,11 @@ if(LIBOPENCOR_PREBUILT_LIBXML2)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8fe7f1506c8f8b97dafbf362c6cce76015d44414)
+                                 c3d1140afb1e737f2774b1f0e7efd8029bf89a44)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 77ad06e36d08f38d155c1336d514149cf01dd59c)
+                                 1004d818b0d771d04625ed0f18f07cfc3290d609)
             endif()
         else()
             if(INTEL_MODE)

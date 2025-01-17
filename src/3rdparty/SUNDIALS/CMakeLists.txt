@@ -52,11 +52,11 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 00de19609d78353ad590b6560071dec699edcc34)
+                                 6523ab1ab7c8c53b7ae79221e433175db37b24ae)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 be0f52b5aeeb7e938896ae3934bd16d5adfbf5fb)
+                                 ecf881d34c3358997dd0fbb11b67bcb69e5b5a70)
             endif()
         else()
             if(INTEL_MODE)
