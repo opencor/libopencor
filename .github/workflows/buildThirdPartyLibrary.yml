@@ -20,26 +20,26 @@ jobs:
       matrix:
         include:
           - name: 'Windows release (Intel)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64
             build_type: Release
           - name: 'Windows debug (Intel)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64
             build_type: Debug
           - name: 'Windows release (ARM)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64_arm64
             build_type: Release
           - name: 'Windows debug (ARM)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64_arm64
             build_type: Debug
           - name: 'Linux (Intel)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Release
           - name: 'Linux (ARM)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             arch: arm
             context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
             build_type: Release
@@ -47,7 +47,7 @@ jobs:
             os: macos-13
             build_type: Release
           - name: 'macOS (ARM)'
-            os: macos-latest
+            os: macos-14
             build_type: Release
     env:
       BUILDCACHE_ACCURACY: STRICT
@@ -107,7 +107,7 @@ jobs:
   webassembly:
     name: WebAssembly
     if: ${{ inputs.wasm_support }}
-    runs-on: macos-latest
+    runs-on: macos-14
     env:
       BUILDCACHE_ACCURACY: STRICT
       BUILDCACHE_COMPRESS_FORMAT: ZSTD

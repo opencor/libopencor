@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 e80f205e32a806546f5443016e9df1d911ebb32b)
+                                 5bd0c82b3015a170ac2e53942872fc9bb1e4e250)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 19380580ec6a77734b3e6b93f26fca8125c380b1)
+                                 8979f92eb44c9612082efc619c58609f391a06e6)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 3f3d8ac5317300e9c1562542a73b362b0c0ffe7d)
+                                 c9dddc138d6dc9ea90554152f5274fb4820a52c5)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8d7ba579f803161db821e6a8338b9fd3b5e37061)
+                                 5ff417c2906c15dee2155116fb8882df5ec0b762)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a76a7e36d574acbd85267d6fcb8589029d8d05af)
+                             d75ac2c3e920f055a9215d9727df6db9fb45cc47)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             90ce6acfa403897b4f09db38bd4278b204a2cfba)
+                             9b7bd8151cc47e4b8dbcc0bf60b4aef50cfd95e7)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             5bdce7e5d8f06ce8d47ee383cd7a384199dd7b76)
+                             965d782bcc86872230315c0915fadb0219cfe9b5)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             38bfd28757f6ee157b42c2d106dd2046a862095f)
+                             582fc94cd57deed6674454eb94a24e759797b5bc)
         endif()
     endif()
 else()
@@ -69,8 +69,24 @@ else()
 
     if(INTEL_MODE)
         set(LLVM_TARGETS_TO_BUILD X86)
+
+        if(WIN32)
+            set(LLVM_HOST_TRIPLE x86_64-pc-windows-msvc)
+        elseif(APPLE)
+            set(LLVM_HOST_TRIPLE x86_64-apple-darwin)
+        else()
+            set(LLVM_HOST_TRIPLE x86_64-pc-linux-gnu)
+        endif()
     else()
         set(LLVM_TARGETS_TO_BUILD AArch64)
+
+        if(WIN32)
+            set(LLVM_HOST_TRIPLE aarch64-pc-windows-msvc)
+        elseif(APPLE)
+            set(LLVM_HOST_TRIPLE aarch64-apple-darwin)
+        else()
+            set(LLVM_HOST_TRIPLE aarch64-pc-linux-gnu)
+        endif()
     endif()
 
     if(LLVMCLANG_LLVM_TABLEGEN)
@@ -123,6 +139,7 @@ else()
             -DLLVM_ENABLE_UNWIND_TABLES=OFF
             -DLLVM_ENABLE_WARNINGS=OFF
             -DLLVM_ENABLE_ZLIB=OFF
+            -DLLVM_HOST_TRIPLE=${LLVM_HOST_TRIPLE}
             -DLLVM_INCLUDE_BENCHMARKS=OFF
             -DLLVM_INCLUDE_DOCS=OFF
             -DLLVM_INCLUDE_EXAMPLES=OFF
@@ -136,25 +153,12 @@ else()
 
     # Create our package.
 
-    file(GLOB STATIC_AND_IMPORT_LIBRARIES "${INSTALL_DIR}/lib/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    string(REPLACE "${INSTALL_DIR}/" "" STATIC_AND_IMPORT_LIBRARIES "${STATIC_AND_IMPORT_LIBRARIES}")
-
-    file(GLOB SHARED_LIBRARIES "${INSTALL_DIR}/bin/*${CMAKE_SHARED_LIBRARY_SUFFIX}"
-                               "${INSTALL_DIR}/lib/*${CMAKE_SHARED_LIBRARY_SUFFIX}*")
-    string(REPLACE "${INSTALL_DIR}/" "" SHARED_LIBRARIES "${SHARED_LIBRARIES}")
-
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                   include lib/cmake ${TABLEGEN_EXES} ${STATIC_AND_IMPORT_LIBRARIES} ${SHARED_LIBRARIES})
+                   bin include lib)
 endif()
 
 # Make our package accessible.
-
-if(NOT WIN32)
-    set(LIBCLANG libclang_static)
-else()
-    set(LIBCLANG libclang)
-endif()
 
 if(INTEL_MODE)
     set(EXTRA_LLVMCLANG_LIBRARIES
@@ -221,7 +225,7 @@ set(LLVMCLANG_LIBRARIES
     clangToolingRefactoring
     clangToolingSyntax
     clangTransformer
-    ${LIBCLANG}
+    libclang
     LLVMAggressiveInstCombine
     LLVMAnalysis
     LLVMAsmParser

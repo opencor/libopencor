@@ -14,7 +14,7 @@ jobs:
       matrix:
         include:
           - name: 'Windows static library (Intel)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64
             build_type: Release
             code_analysis: OFF
@@ -30,7 +30,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Windows shared library (Intel)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64
             build_type: Release
             code_analysis: OFF
@@ -46,7 +46,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Windows static library (ARM) (no tests)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64_arm64
             build_type: Release
             code_analysis: OFF
@@ -62,7 +62,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Windows shared library (ARM) (no tests)'
-            os: windows-latest
+            os: windows-2022
             arch: amd64_arm64
             build_type: Release
             code_analysis: OFF
@@ -78,7 +78,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux static library (Intel)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -93,7 +93,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux shared library (Intel)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -108,7 +108,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux static library (ARM) (no tests)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             arch: arm
             build_type: Release
             code_analysis: OFF
@@ -125,7 +125,7 @@ jobs:
             install_uninstall_and_package: ON
             context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'Linux shared library (ARM) (no tests)'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             arch: arm
             build_type: Release
             code_analysis: OFF
@@ -172,7 +172,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'macOS static library (ARM)'
-            os: macos-latest
+            os: macos-14
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -187,7 +187,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'macOS shared library (ARM)'
-            os: macos-latest
+            os: macos-14
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -202,7 +202,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'JavaScript bindings'
-            os: macos-latest
+            os: macos-14
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -216,7 +216,7 @@ jobs:
             unit_testing: OFF
             target: javascript_unit_testing
           - name: 'Windows Python bindings'
-            os: windows-latest
+            os: windows-2022
             arch: amd64
             build_type: Release
             code_analysis: OFF
@@ -232,7 +232,7 @@ jobs:
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
           - name: 'Linux Python bindings'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -264,7 +264,7 @@ jobs:
             pip_install_prerequisites: sudo pip3 install cmake scikit-build
             pip_install_test_and_uninstall: ON
           - name: 'macOS Python bindings (ARM)'
-            os: macos-latest
+            os: macos-14
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -281,7 +281,7 @@ jobs:
             pip_install_prerequisites: sudo pip3 install cmake scikit-build
             pip_install_test_and_uninstall: ON
           - name: 'Code formatting'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -296,7 +296,7 @@ jobs:
             context: PATH=$GITHUB_WORKSPACE:$PATH
             target: check_code_formatting
           - name: 'JavaScript code formatting'
-            os: macos-latest
+            os: macos-14
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -310,7 +310,7 @@ jobs:
             unit_testing: OFF
             target: javascript_check_code_formatting
           - name: 'Python code formatting'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -324,7 +324,7 @@ jobs:
             unit_testing: OFF
             target: python_check_code_formatting
           - name: 'Code analysis'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: ON
             code_coverage: OFF
@@ -338,7 +338,7 @@ jobs:
             unit_testing: ON
             context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang++
           - name: 'Code coverage'
-            os: macos-latest
+            os: macos-14
             build_type: Release
             code_analysis: OFF
             code_coverage: ON
@@ -353,7 +353,7 @@ jobs:
             context: PATH=/opt/homebrew/opt/llvm/bin:$PATH CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++
             target: code_coverage
           - name: 'Memory checks'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Debug
             code_analysis: OFF
             code_coverage: OFF
@@ -367,7 +367,7 @@ jobs:
             unit_testing: ON
             target: memory_checks
           - name: 'Documentation'
-            os: ubuntu-latest
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -555,7 +555,7 @@ jobs:
         run: pip3 uninstall -y libopencor
   spell_check:
     name: Spell check
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
