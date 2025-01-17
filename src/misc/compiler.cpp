@@ -36,7 +36,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-std::string Compiler::Impl::llvmClangError(llvm::Error pError) const
+namespace {
+
+std::string llvmClangError(llvm::Error pError)
 {
     std::string res;
 
@@ -44,10 +46,12 @@ std::string Compiler::Impl::llvmClangError(llvm::Error pError) const
         res = errorInfo.message();
     });
 
-    res[0] = tolower(res[0]);
+    res[0] = static_cast<char>(toupper(res[0]));
 
     return res.insert(0, " (").append(")");
 }
+
+} // namespace
 
 bool Compiler::Impl::compile(const std::string &pCode)
 {

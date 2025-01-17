@@ -31,8 +31,6 @@ class Compiler::Impl: public Logger::Impl
 public:
     std::unique_ptr<llvm::orc::LLJIT> mLljit;
 
-    std::string llvmClangError(llvm::Error pError) const;
-
     bool compile(const std::string &pCode);
 
     bool addFunction(const std::string &pName, void *pFunction);
