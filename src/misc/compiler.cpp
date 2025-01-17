@@ -38,6 +38,7 @@ namespace libOpenCOR {
 
 namespace {
 
+#ifndef CODE_COVERAGE_ENABLED
 std::string llvmClangError(llvm::Error pError)
 {
     std::string res;
@@ -50,6 +51,7 @@ std::string llvmClangError(llvm::Error pError)
 
     return res.insert(0, " (").append(")");
 }
+#endif
 
 } // namespace
 
