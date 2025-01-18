@@ -47,11 +47,11 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7660430004c42f49aa94905a4fd1fe22d51a10c8)
+                             61e6dfe3d85f4ce899e07d7c8f998221190f4fb9)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c3b59ffbbb56ce818b249a94f6efd72228e1aa40)
+                             71f49e49ce8e2612ca0ee1792be3863807f47e86)
         endif()
     else()
         if(INTEL_MODE)

@@ -47,11 +47,11 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d75ac2c3e920f055a9215d9727df6db9fb45cc47)
+                             d0738ed7481fcae143c1f8b52a1ea82ad765d09e)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             9b7bd8151cc47e4b8dbcc0bf60b4aef50cfd95e7)
+                             868de8ec69bb19f2bc229a8a256d5ba3bdd59f54)
         endif()
     else()
         if(INTEL_MODE)

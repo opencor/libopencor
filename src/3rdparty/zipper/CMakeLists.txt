@@ -52,11 +52,11 @@ if(LIBOPENCOR_PREBUILT_ZIPPER)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5286a5dc4f7b39ce0de4d5a4281895f26a2bf1a7)
+                                 3975ba9ad6eb073fdb086779d78043bc3b207535)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 7e5f68b711642fc485002eeebc81421c23ae4013)
+                                 24c4e46cf73e353968fa33e3f1a0cc845c8d8625)
             endif()
         else()
             if(INTEL_MODE)

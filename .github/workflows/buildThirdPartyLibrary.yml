@@ -44,8 +44,9 @@ jobs:
             context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
             build_type: Release
           - name: 'macOS (Intel)'
-            os: macos-13
+            os: macos-14
             build_type: Release
+            target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS (ARM)'
             os: macos-14
             build_type: Release
@@ -91,13 +92,13 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVMCLANG=OFF ${{ env.DLLVMCLANG_LLVM_TABLEGEN }} ${{ env.DLLVMCLANG_CLANG_TABLEGEN }} ..
+          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVMCLANG=OFF ${{ env.DLLVMCLANG_LLVM_TABLEGEN }} ${{ env.DLLVMCLANG_CLANG_TABLEGEN }} ..
       - name: Configure libOpenCOR (only when NOT building LLVM+Clang)
         if: ${{ inputs.third_party_library_name != 'LLVMClang' }}
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF ..
+          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF ..
       - name: Upload library artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4

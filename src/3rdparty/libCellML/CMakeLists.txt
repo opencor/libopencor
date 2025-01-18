@@ -62,11 +62,11 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 d94dbd51fdc4904144b50d039f509635efae6c5f)
+                                 f6efb2be7f39b59d10ac0094a0fb7af901aced24)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 d33f0b95475084cb728493a3e9c452b96b43d14c)
+                                 4f3d127518a3c856a61f68b117c89c1b127a652d)
             endif()
         else()
             if(INTEL_MODE)

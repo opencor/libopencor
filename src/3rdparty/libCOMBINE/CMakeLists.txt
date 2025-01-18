@@ -56,11 +56,11 @@ if(LIBOPENCOR_PREBUILT_LIBCOMBINE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1e71439b3b4dadd54b74f35446e2436a79bf6334)
+                                 182deb702b4f43f897fd9697d262d6bffdd12596)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 741679e4167de3410bc6aeaeeebea59da76768db)
+                                 933d48fc63b1b8d306c0cff819f823ea0ab3493b)
             endif()
         else()
             if(INTEL_MODE)

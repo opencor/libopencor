@@ -48,11 +48,13 @@ jobs:
             shared_libs: ON
             context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'macOS static library (Intel)'
-            os: macos-13
+            os: macos-14
             shared_libs: OFF
+            target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS shared library (Intel)'
-            os: macos-13
+            os: macos-14
             shared_libs: ON
+            target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS static library (ARM)'
             os: macos-14
             shared_libs: OFF
@@ -87,7 +89,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
+          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
       - name: Build libOpenCOR
         run: |
           cd build
@@ -114,10 +116,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows Python wheels'
+          - name: 'Windows Python wheels (Intel)'
             os: windows-2022
+            arch: amd64
+          - name: 'Windows Python wheels (ARM)'
+            os: windows-2022
+            arch: amd64_arm64
           - name: 'Linux Python wheels'
             os: ubuntu-22.04
+            # Note: ideally, we would be able to build our Python wheels for both Intel and ARM, but although there
+            #       is a manylinux_2_34 image for ARM (see
+            #       https://quay.io/repository/pypa/manylinux_2_34_aarch64?tab=tags), it is not supported by
+            #       cibuildwheel. The only way to build Python wheels for ARM is currently through emulation (see
+            #       https://cibuildwheel.pypa.io/en/stable/faq/#emulation), but this doesn't work for us because it
+            #       relies on an old version of Linux while we want one with at least glibc version 2.34. So, for now,
+            #       we are only building our Python wheels for Intel.
           - name: 'macOS Python wheels (Intel)'
             os: macos-13
           - name: 'macOS Python wheels (ARM)'
@@ -128,12 +141,17 @@ jobs:
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
       - name: Build Python wheels
         uses: pypa/cibuildwheel@9c75ea15c2f31a77e6043b80b1b7081372319d85
         env:
           CIBW_ARCHS: auto64
           CIBW_BUILD: 'cp*'
           CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=13.0
+          # Note #1: the value of CIBW_ENVIRONMENT_MACOS must be in sync with that of MACOS_DEPLOYMENT_TARGET in
+          #          CMakelists.txt.
+          # Note #2: for some reasons, we need to specify the minor version, hence using 13.0 instead of 13.
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
           CIBW_SKIP: 'cp36* cp37* cp38* *musllinux*'
       - name: Upload Python wheel artifacts
