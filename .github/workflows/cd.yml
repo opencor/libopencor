@@ -38,15 +38,11 @@ jobs:
             os: ubuntu-22.04
             shared_libs: ON
           - name: 'Linux static library (ARM)'
-            os: ubuntu-22.04
-            arch: arm
+            os: ubuntu-22.04-arm
             shared_libs: OFF
-            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'Linux shared library (ARM)'
-            os: ubuntu-22.04
-            arch: arm
+            os: ubuntu-22.04-arm
             shared_libs: ON
-            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'macOS static library (Intel)'
             os: macos-14
             shared_libs: OFF
@@ -69,11 +65,6 @@ jobs:
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
-      - name: Install ARM compiler
-        if: ${{ matrix.arch == 'arm' }}
-        run: |
-          sudo apt update
-          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
@@ -89,7 +80,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
+          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
       - name: Build libOpenCOR
         run: |
           cd build

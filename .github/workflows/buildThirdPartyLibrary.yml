@@ -39,9 +39,7 @@ jobs:
             os: ubuntu-22.04
             build_type: Release
           - name: 'Linux (ARM)'
-            os: ubuntu-22.04
-            arch: arm
-            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
+            os: ubuntu-22.04-arm
             build_type: Release
           - name: 'macOS (Intel)'
             os: macos-14
@@ -58,11 +56,6 @@ jobs:
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
-      - name: Install ARM compiler
-        if: ${{ matrix.arch == 'arm' }}
-        run: |
-          sudo apt update
-          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
@@ -92,13 +85,13 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVMCLANG=OFF ${{ env.DLLVMCLANG_LLVM_TABLEGEN }} ${{ env.DLLVMCLANG_CLANG_TABLEGEN }} ..
+          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVMCLANG=OFF ${{ env.DLLVMCLANG_LLVM_TABLEGEN }} ${{ env.DLLVMCLANG_CLANG_TABLEGEN }} ..
       - name: Configure libOpenCOR (only when NOT building LLVM+Clang)
         if: ${{ inputs.third_party_library_name != 'LLVMClang' }}
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF ..
+          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF ..
       - name: Upload library artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
