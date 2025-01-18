@@ -49,11 +49,10 @@ if(EMSCRIPTEN)
     add_subdirectory(src)
 else()
     # On macOS, deploy on macOS 13 and later.
-    # Note #1: for some reasons, this gets ignored when building LLVM+Clang on GitHub Actions with macos-13 (Intel)
-    #          (even when setting the MACOSX_DEPLOYMENT_TARGET environment variable), which is why we now always use
-    #          macos-14 (ARM) and pass -DTARGET_ARCHITECTURE=Intel to CMake if we want to build for Intel (!!) on GHA.
-    #          That is, unless we want to build our Python wheels, in which case we leave cibuildwheel do its thing on
-    #          either macos-13 (Intel) or macos-14 (ARM).
+    # Note #1: for some reasons, this gets ignored by LLVM+Clang when we try to build it on GitHub Actions using
+    #          macos-13 (Intel) (even when setting the MACOSX_DEPLOYMENT_TARGET environment variable), which is why we
+    #          now always use macos-14 (ARM) (not to mention that it is faster!) and pass -DTARGET_ARCHITECTURE=Intel to
+    #          CMake if we want to build for macOS Intel on GHA.
     # Note #2: the value of MACOS_DEPLOYMENT_TARGET must be in sync with that of CIBW_ENVIRONMENT_MACOS in
     #          .github/workflows/cd.yml.
 
