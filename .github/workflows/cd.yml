@@ -122,15 +122,10 @@ jobs:
           - name: 'Windows Python wheels (ARM)'
             os: windows-2022
             arch: amd64_arm64
-          - name: 'Linux Python wheels'
+          - name: 'Linux Python wheels (Intel)'
             os: ubuntu-22.04
-            # Note: ideally, we would be able to build our Python wheels for both Intel and ARM, but although there
-            #       is a manylinux_2_34 image for ARM (see
-            #       https://quay.io/repository/pypa/manylinux_2_34_aarch64?tab=tags), it is not supported by
-            #       cibuildwheel. The only way to build Python wheels for ARM is currently through emulation (see
-            #       https://cibuildwheel.pypa.io/en/stable/faq/#emulation), but this doesn't work for us because it
-            #       relies on an old version of Linux while we want one with at least glibc version 2.34. So, for now,
-            #       we are only building our Python wheels for Intel.
+          - name: 'Linux Python wheels (ARM)'
+            os: ubuntu-22.04-arm
           - name: 'macOS Python wheels (Intel)'
             os: macos-13
           - name: 'macOS Python wheels (ARM)'
@@ -153,6 +148,7 @@ jobs:
           #          CMakelists.txt.
           # Note #2: for some reasons, we need to specify the minor version, hence using 13.0 instead of 13.
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
           CIBW_SKIP: 'cp36* cp37* cp38* *musllinux*'
       - name: Upload Python wheel artifacts
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
