@@ -38,28 +38,28 @@ jobs:
             os: ubuntu-22.04
             shared_libs: ON
           - name: 'Linux static library (ARM)'
-            os: ubuntu-22.04
-            arch: arm
+            os: ubuntu-22.04-arm
             shared_libs: OFF
-            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'Linux shared library (ARM)'
-            os: ubuntu-22.04
-            arch: arm
+            os: ubuntu-22.04-arm
             shared_libs: ON
-            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'macOS static library (Intel)'
             os: macos-14
+            arch: Intel # Only used for buildcache's cache key.
             shared_libs: OFF
             target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS shared library (Intel)'
             os: macos-14
+            arch: Intel # Only used for buildcache's cache key.
             shared_libs: ON
             target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS static library (ARM)'
             os: macos-14
+            arch: ARM # Only used for buildcache's cache key.
             shared_libs: OFF
           - name: 'macOS shared library (ARM)'
             os: macos-14
+            arch: ARM # Only used for buildcache's cache key.
             shared_libs: ON
     env:
       BUILDCACHE_ACCURACY: STRICT
@@ -69,17 +69,12 @@ jobs:
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
-      - name: Install ARM compiler
-        if: ${{ matrix.arch == 'arm' }}
-        run: |
-          sudo apt update
-          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: cscouto/buildcache-action@v1
+        uses: opencor/buildcache-action@v1
         with:
-          cache_key: libraries-${{ matrix.os }}-${{ matrix.shared_libs }}
+          cache_key: cd-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.shared_libs }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -89,7 +84,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
+          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
       - name: Build libOpenCOR
         run: |
           cd build
@@ -175,9 +170,9 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: cscouto/buildcache-action@v1
+        uses: opencor/buildcache-action@v1
         with:
-          cache_key: webassembly
+          cache_key: cd-webassembly
       - name: Install Emscripten
         run: brew install emscripten
       - name: Configure libOpenCOR

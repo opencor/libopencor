@@ -107,9 +107,8 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Linux static library (ARM) (no tests)'
-            os: ubuntu-22.04
-            arch: arm
+          - name: 'Linux static library (ARM)'
+            os: ubuntu-22.04-arm
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -120,13 +119,11 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: OFF
-            unit_testing: OFF
+            unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
-          - name: 'Linux shared library (ARM) (no tests)'
-            os: ubuntu-22.04
-            arch: arm
+          - name: 'Linux shared library (ARM)'
+            os: ubuntu-22.04-arm
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -137,10 +134,9 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: ON
-            unit_testing: OFF
+            unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-            context: CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++
           - name: 'macOS static library (Intel)'
             os: macos-14
             build_type: Release
@@ -373,11 +369,6 @@ jobs:
     steps:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
-      - name: Install ARM compiler
-        if: ${{ matrix.arch == 'arm' }}
-        run: |
-          sudo apt update
-          sudo apt install gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
       - name: Install Python
         uses: actions/setup-python@v5
         with:
@@ -385,9 +376,9 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: cscouto/buildcache-action@v1
+        uses: opencor/buildcache-action@v1
         with:
-          cache_key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage }}-${{ matrix.documentation }}-${{ matrix.javascript_bindings }}-${{ matrix.javascript_unit_testing }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
+          cache_key: ci-${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage }}-${{ matrix.documentation }}-${{ matrix.javascript_bindings }}-${{ matrix.javascript_unit_testing }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
