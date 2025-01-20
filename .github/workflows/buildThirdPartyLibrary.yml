@@ -59,9 +59,9 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: cscouto/buildcache-action@v1
+        uses: opencor/buildcache-action@v1
         with:
-          cache_key: libraries-${{ matrix.os }}-${{ matrix.shared_libs }}
+          cache_key: ${{ inputs.third_party_library_name }}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.build_type }}
       - name: Configure MSVC (to build an Intel-based version of llvm-tblgen and clang-tblgen; only when building LLVM+Clang on Windows ARM)
         if: ${{ (inputs.third_party_library_name == 'LLVMClang') && (runner.os == 'Windows') && (matrix.arch == 'amd64_arm64') }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -113,7 +113,7 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: cscouto/buildcache-action@v1
+        uses: opencor/buildcache-action@v1
         with:
           cache_key: webassembly
       - name: Install Emscripten

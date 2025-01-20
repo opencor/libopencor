@@ -376,9 +376,9 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: cscouto/buildcache-action@v1
+        uses: opencor/buildcache-action@v1
         with:
-          cache_key: ${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage }}-${{ matrix.documentation }}-${{ matrix.javascript_bindings }}-${{ matrix.javascript_unit_testing }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
+          cache_key: ci-${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage }}-${{ matrix.documentation }}-${{ matrix.javascript_bindings }}-${{ matrix.javascript_unit_testing }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1

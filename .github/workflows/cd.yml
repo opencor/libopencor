@@ -45,17 +45,21 @@ jobs:
             shared_libs: ON
           - name: 'macOS static library (Intel)'
             os: macos-14
+            arch: Intel # Only used for buildcache's cache key.
             shared_libs: OFF
             target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS shared library (Intel)'
             os: macos-14
+            arch: Intel # Only used for buildcache's cache key.
             shared_libs: ON
             target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS static library (ARM)'
             os: macos-14
+            arch: ARM # Only used for buildcache's cache key.
             shared_libs: OFF
           - name: 'macOS shared library (ARM)'
             os: macos-14
+            arch: ARM # Only used for buildcache's cache key.
             shared_libs: ON
     env:
       BUILDCACHE_ACCURACY: STRICT
@@ -68,9 +72,9 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: cscouto/buildcache-action@v1
+        uses: opencor/buildcache-action@v1
         with:
-          cache_key: libraries-${{ matrix.os }}-${{ matrix.shared_libs }}
+          cache_key: cd-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.shared_libs }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -166,9 +170,9 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: cscouto/buildcache-action@v1
+        uses: opencor/buildcache-action@v1
         with:
-          cache_key: webassembly
+          cache_key: cd-webassembly
       - name: Install Emscripten
         run: brew install emscripten
       - name: Configure libOpenCOR
