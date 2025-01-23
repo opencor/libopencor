@@ -225,7 +225,6 @@ set(LLVMCLANG_LIBRARIES
     clangToolingRefactoring
     clangToolingSyntax
     clangTransformer
-    libclang
     LLVMAggressiveInstCombine
     LLVMAnalysis
     LLVMAsmParser
