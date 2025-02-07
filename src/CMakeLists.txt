@@ -415,6 +415,31 @@ list(APPEND GIT_SOURCE_FILES
     ${PYTHON_SOURCE_FILES}
 )
 
+# Merge libOpenCOR's dependencies into our static library.
+# Note: indeed, a static library doesn't, by default, include its dependencies. So, we need to merge them into our
+#       static library and, sadly, there is no easy way to do this using CMake, so we must do it ourselves. If we were
+#       not to do this, then anyone using the static version of libOpenCOR would also need to link against all of its
+#       dependencies, which wouldn't be practical.
+
+if(    NOT EMSCRIPTEN
+   AND NOT LIBOPENCOR_JAVASCRIPT_BINDINGS
+   AND NOT LIBOPENCOR_PYTHON_BINDINGS
+   AND NOT LIBOPENCOR_SHARED_LIBS)
+    ExternalProject_Add(StaticLibrary
+        SOURCE_DIR
+            ${CMAKE_SOURCE_DIR}/cmake/staticlibrary
+        CMAKE_GENERATOR
+            ${CMAKE_GENERATOR}
+        CMAKE_ARGS
+            -DPREBUILT_DIR=${PREBUILT_DIR}
+            -DLIBOPENCOR_STATIC_LIBRARY=$<TARGET_FILE:${CMAKE_PROJECT_NAME}>
+        INSTALL_COMMAND
+            ""
+        DEPENDS
+            ${CMAKE_PROJECT_NAME}
+    )
+endif()
+
 # Install libOpenCOR itself.
 
 if(APPLE)
