@@ -438,7 +438,7 @@ jobs:
           cd build
           ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_bindings }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_unit_testing }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
       - name: Build libOpenCOR
-        if: ${{ (matrix.unit_testing == 'ON') || (matrix.javascript_unit_testing == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
+        if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.javascript_unit_testing == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
         run: |
           cd build
           ninja
