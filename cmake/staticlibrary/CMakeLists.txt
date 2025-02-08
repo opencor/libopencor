@@ -42,6 +42,16 @@ foreach(LIBRARY ${LIBRARIES})
     list(APPEND OBJECT_FILES ${OBJ_FILES})
 endforeach()
 
+# Specify the target architecture.
+
+if(APPLE)
+    if("${TARGET_ARCHITECTURE}" STREQUAL "Intel")
+        set(CMAKE_OSX_ARCHITECTURES x86_64)
+    else()
+        set(CMAKE_OSX_ARCHITECTURES arm64)
+    endif()
+endif()
+
 # Create a new static library for libOpenCOR.
 
 add_library(${CMAKE_PROJECT_NAME} STATIC
