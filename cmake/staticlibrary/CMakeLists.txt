@@ -1,12 +1,16 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(StaticLibrary)
+project(libOpenCOR)
+
+# Retrieve the path to the prebuilt libraries and that of libOpenCOR.
 
 set(LIBRARIES_DIR ${CMAKE_BINARY_DIR}/libraries)
 
 file(GLOB_RECURSE LIBRARIES "${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
 list(APPEND LIBRARIES ${LIBOPENCOR_STATIC_LIBRARY})
+
+# Extract the object files from our various libraries.
 
 set(OBJECT_FILES)
 
@@ -38,8 +42,13 @@ foreach(LIBRARY ${LIBRARIES})
     list(APPEND OBJECT_FILES ${OBJ_FILES})
 endforeach()
 
-if(WIN32)
-    execute_process(COMMAND ${CMAKE_AR} /NOLOGO /OUT:${LIBOPENCOR_STATIC_LIBRARY} ${OBJECT_FILES})
-else()
-    execute_process(COMMAND ${CMAKE_AR} -r ${LIBOPENCOR_STATIC_LIBRARY} ${OBJECT_FILES})
-endif()
+# Create a new static library for libOpenCOR.
+
+add_library(${CMAKE_PROJECT_NAME} STATIC
+            src/dummy.cpp
+            ${OBJECT_FILES})
+
+# Rename our new static library.
+
+add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:${CMAKE_PROJECT_NAME}> ${LIBOPENCOR_STATIC_LIBRARY})
