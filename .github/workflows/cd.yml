@@ -20,11 +20,6 @@ jobs:
             arch: amd64
             build_type: Release
             shared_libs: OFF
-          - name: 'Windows static library (Intel) (Debug)'
-            os: windows-2022
-            arch: amd64
-            build_type: Debug
-            shared_libs: OFF
           - name: 'Windows shared library (Intel) (Release)'
             os: windows-2022
             arch: amd64
@@ -39,11 +34,6 @@ jobs:
             os: windows-2022
             arch: amd64_arm64
             build_type: Release
-            shared_libs: OFF
-          - name: 'Windows static library (ARM) (Debug)'
-            os: windows-2022
-            arch: amd64_arm64
-            build_type: Debug
             shared_libs: OFF
           - name: 'Windows shared library (ARM) (Release)'
             os: windows-2022
