@@ -23,14 +23,22 @@ foreach(LIBRARY ${LIBRARIES})
 
     if(WIN32)
         execute_process(COMMAND ${CMAKE_AR} /NOLOGO /LIST ${LIBRARY}
-                        OUTPUT_VARIABLE OBJ_FILES
+                        OUTPUT_VARIABLE EXTRACTED_FILES
                         OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-        string(REPLACE "\n" ";" OBJ_FILES ${OBJ_FILES})
+        string(REPLACE "\n" ";" EXTRACTED_FILES ${EXTRACTED_FILES})
 
-        foreach(OBJ_FILE ${OBJ_FILES})
-            execute_process(COMMAND ${CMAKE_AR} /NOLOGO /EXTRACT:${OBJ_FILE} ${LIBRARY}
-                            WORKING_DIRECTORY ${LIBRARY_DIR})
+        foreach(EXTRACTED_FILE ${EXTRACTED_FILES})
+            # Check the extracted file name has an extension of .obj.
+
+            string(REGEX MATCH ".*\\${CMAKE_CXX_OUTPUT_EXTENSION}$" IS_OBJECT_FILE ${EXTRACTED_FILE})
+
+            if(IS_OBJECT_FILE)
+                execute_process(COMMAND ${CMAKE_AR} /NOLOGO /EXTRACT:${EXTRACTED_FILE} ${LIBRARY}
+                                WORKING_DIRECTORY ${LIBRARY_DIR})
+            else()
+                message(WARNING "The extracted file '${EXTRACTED_FILE}' from the library '${LIBRARY}' is not an object file.")
+            endif()
         endforeach()
     else()
         execute_process(COMMAND ${CMAKE_AR} -x ${LIBRARY}
