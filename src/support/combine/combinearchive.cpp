@@ -18,11 +18,12 @@ limitations under the License.
 
 #include "utils.h"
 
+#include "libcombinebegin.h"
 #include "combine/combinearchive.h"
+#include "omex/CaContent.h"
+#include "libcombineend.h"
 
 #include "libopencor/file.h"
-
-#include "omex/CaContent.h"
 
 namespace libOpenCOR {
 
