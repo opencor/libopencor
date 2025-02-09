@@ -30,7 +30,7 @@ if(WIN32)
     endif()
 
     set(CPACK_GENERATOR ${NSIS_GENERATOR} ZIP)
-    set(CPACK_SYSTEM_NAME "Windows")
+    set(CPACK_SYSTEM_NAME "-Windows")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
 
     # Specify the default installation directory.
@@ -44,7 +44,7 @@ elseif(APPLE)
     set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME ${CMAKE_PROJECT_NAME})
 
     set(CPACK_GENERATOR productbuild ZIP)
-    set(CPACK_SYSTEM_NAME "macOS")
+    set(CPACK_SYSTEM_NAME "-macOS")
     set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_CURRENT_SOURCE_DIR}/distrib/package.cmake)
 
     set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/distrib/welcome.txt")
@@ -56,24 +56,32 @@ else()
     # Select TGZ as the packager on Linux.
 
     set(CPACK_GENERATOR TGZ)
-    set(CPACK_SYSTEM_NAME "Linux")
+    set(CPACK_SYSTEM_NAME "-Linux")
 endif()
 
 # Specify the package file name.
 
 if(${LIBOPENCOR_TARGET_ARCHITECTURE} STREQUAL "Intel")
-    set(LIBRARY_ARCHITECTURE "Intel")
+    set(LIBRARY_ARCHITECTURE "-Intel")
 else()
-    set(LIBRARY_ARCHITECTURE "ARM")
+    set(LIBRARY_ARCHITECTURE "-ARM")
 endif()
 
 if(LIBOPENCOR_SHARED_LIBS)
-    set(LIBRARY_TYPE "Shared")
+    set(LIBRARY_TYPE "-Shared")
 else()
-    set(LIBRARY_TYPE "Static")
+    set(LIBRARY_TYPE "-Static")
 endif()
 
-set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}-${CPACK_SYSTEM_NAME}-${LIBRARY_ARCHITECTURE}-${LIBRARY_TYPE})
+if(WIN32)
+    if(RELEASE_MODE)
+        set(LIBRARY_MODE "-Release")
+    else()
+        set(LIBRARY_MODE "-Debug")
+    endif()
+endif()
+
+set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}${CPACK_SYSTEM_NAME}${LIBRARY_ARCHITECTURE}${LIBRARY_TYPE}${LIBRARY_MODE})
 
 # Package libOpenCOR.
 
