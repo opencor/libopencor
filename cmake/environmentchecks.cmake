@@ -122,14 +122,16 @@ find_package(Python 3.9
              COMPONENTS Interpreter ${NB_PYTHON_DEV_MODULE}
              OPTIONAL_COMPONENTS Development.SABIModule)
 
-add_subdirectory(extern/nanobind)
+if(Python_EXECUTABLE)
+    add_subdirectory(extern/nanobind)
 
-mark_as_advanced(NB_CREATE_INSTALL_RULES
-                 NB_TEST
-                 NB_TEST_SANITZE
-                 NB_TEST_SHARED_BUILD
-                 NB_TEST_STABLE_ABI
-                 nanobind_DIR)
+    mark_as_advanced(NB_CREATE_INSTALL_RULES
+                     NB_TEST
+                     NB_TEST_SANITZE
+                     NB_TEST_SHARED_BUILD
+                     NB_TEST_STABLE_ABI
+                     nanobind_DIR)
+endif()
 
 # Look for various programs.
 

@@ -319,10 +319,65 @@ if(EMSCRIPTEN)
                            COMMAND ${CMAKE_COMMAND} -E echo "                          and can be run using: emrun --browser chrome ${JAVASCRIPT_BINDINGS_DIR}/index.html")
     endif()
 else()
+    # If we are building a static version of libOpenCOR then we want to extract the object files from our various
+    # packages and merge them into libOpenCOR. Indeed, a static library doesn't include its dependencies (it "only"
+    # references them). So, we need to merge those dependencies into libOpenCOR and, sadly, there is no (easy?) way to
+    # do this using CMake, so we must do it ourselves. Now, one (big!) downside of this approach is that it blows up the
+    # size of libOpenCOR since it also merges parts of our dependencies that we don't actually need. So much so that we
+    # cannot generate a debug version of libOpenCOR on Windows since it would result in a static library that is more
+    # than 4GB in size (and MSVC's linker cannot create static libraries that big). This is clearly far from ideal, but
+    # this is the only way to have a static version of libOpenCOR that can be used without having to "manually" link
+    # against all of its dependencies.
+
+    if(NOT LIBOPENCOR_SHARED_LIBS)
+        # Retrieve the path to our various packages.
+
+        set(PACKAGES_DIR ${CMAKE_BINARY_DIR}/packages)
+
+        file(GLOB_RECURSE PACKAGES "${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+        # Extract the object files from our various packages.
+
+        set(PACKAGES_OBJECT_FILES)
+
+        foreach(PACKAGE ${PACKAGES})
+            get_filename_component(PACKAGE_NAME ${PACKAGE} NAME_WE)
+
+            set(PACKAGE_DIR ${PACKAGES_DIR}/${PACKAGE_NAME})
+
+            file(MAKE_DIRECTORY ${PACKAGE_DIR})
+
+            if(WIN32)
+                execute_process(COMMAND ${CMAKE_AR} /NOLOGO /LIST ${PACKAGE}
+                                OUTPUT_VARIABLE PACKAGE_FILES
+                                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+                string(REPLACE "\n" ";" PACKAGE_FILES ${PACKAGE_FILES})
+
+                foreach(PACKAGE_FILE ${PACKAGE_FILES})
+                    string(REGEX MATCH ".*\\${CMAKE_CXX_OUTPUT_EXTENSION}$" IS_OBJECT_FILE ${PACKAGE_FILE})
+
+                    if(IS_OBJECT_FILE)
+                        execute_process(COMMAND ${CMAKE_AR} /NOLOGO /EXTRACT:${PACKAGE_FILE} ${PACKAGE}
+                                        WORKING_DIRECTORY ${PACKAGE_DIR})
+                    endif()
+                endforeach()
+            else()
+                execute_process(COMMAND ${CMAKE_AR} -x ${PACKAGE}
+                                WORKING_DIRECTORY ${PACKAGE_DIR})
+            endif()
+
+            file(GLOB_RECURSE PACKAGE_OBJECT_FILES ${PACKAGE_DIR}/*${CMAKE_CXX_OUTPUT_EXTENSION})
+
+            list(APPEND PACKAGES_OBJECT_FILES ${PACKAGE_OBJECT_FILES})
+        endforeach()
+    endif()
+
     add_library(${CMAKE_PROJECT_NAME}
                 ${API_HEADER_FILES}
                 ${SOURCE_FILES}
-                ${HEADER_FILES})
+                ${HEADER_FILES}
+                ${PACKAGES_OBJECT_FILES})
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                           CXX_VISIBILITY_PRESET hidden

@@ -15,51 +15,73 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: 'Windows static library (Intel)'
+          - name: 'Windows static library (Intel) (Release)'
             os: windows-2022
             arch: amd64
+            build_type: Release
             shared_libs: OFF
-          - name: 'Windows shared library (Intel)'
+          - name: 'Windows shared library (Intel) (Release)'
             os: windows-2022
             arch: amd64
+            build_type: Release
             shared_libs: ON
-          - name: 'Windows static library (ARM)'
+          - name: 'Windows shared library (Intel) (Debug)'
+            os: windows-2022
+            arch: amd64
+            build_type: Debug
+            shared_libs: ON
+          - name: 'Windows static library (ARM) (Release)'
             os: windows-2022
             arch: amd64_arm64
+            build_type: Release
             shared_libs: OFF
-          - name: 'Windows shared library (ARM)'
+          - name: 'Windows shared library (ARM) (Release)'
             os: windows-2022
             arch: amd64_arm64
+            build_type: Release
+            shared_libs: ON
+          - name: 'Windows shared library (ARM) (Debug)'
+            os: windows-2022
+            arch: amd64_arm64
+            build_type: Debug
             shared_libs: ON
           - name: 'Linux static library (Intel)'
             os: ubuntu-22.04
+            build_type: Release
             shared_libs: OFF
           - name: 'Linux shared library (Intel)'
             os: ubuntu-22.04
+            build_type: Release
             shared_libs: ON
           - name: 'Linux static library (ARM)'
             os: ubuntu-22.04-arm
+            build_type: Release
             shared_libs: OFF
           - name: 'Linux shared library (ARM)'
             os: ubuntu-22.04-arm
+            build_type: Release
             shared_libs: ON
           - name: 'macOS static library (Intel)'
             os: macos-14
             arch: Intel # Only used for buildcache's cache key.
+            build_type: Release
             shared_libs: OFF
             target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS shared library (Intel)'
             os: macos-14
             arch: Intel # Only used for buildcache's cache key.
+            build_type: Release
             shared_libs: ON
             target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS static library (ARM)'
             os: macos-14
             arch: ARM # Only used for buildcache's cache key.
+            build_type: Release
             shared_libs: OFF
           - name: 'macOS shared library (ARM)'
             os: macos-14
             arch: ARM # Only used for buildcache's cache key.
+            build_type: Release
             shared_libs: ON
     env:
       BUILDCACHE_ACCURACY: STRICT
@@ -74,7 +96,7 @@ jobs:
       - name: Install buildcache
         uses: opencor/buildcache-action@v1
         with:
-          cache_key: cd-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.shared_libs }}
+          cache_key: cd-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.build_type }}-${{ matrix.shared_libs }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -84,7 +106,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
+          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
       - name: Build libOpenCOR
         run: |
           cd build
