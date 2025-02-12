@@ -13,19 +13,34 @@
 # limitations under the License.
 
 
+import datetime
 import libopencor as oc
 
 
+now = datetime.datetime.now()
+
+
 def test_version():
+    version = 0
+    number = 10000 * now.year + 100 * now.month + now.day
+    i = 0
+
+    while number != 0:
+        version |= (number % 10) << i
+        number //= 10
+        i += 4
+
     assert isinstance(oc.version(), int)
-    assert oc.version() == 0x000000
+    assert oc.version() == version
 
 
 def test_version_string():
-    assert oc.__version__ == "0.0.0"
+    version = f"{now.year}.{now.month:02}.{now.day:02}"
+
+    assert oc.__version__ == version
 
     assert isinstance(oc.version_string(), str)
-    assert oc.version_string() == "0.0.0"
+    assert oc.version_string() == version
 
 
 def test_clang_version():

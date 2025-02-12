@@ -14,8 +14,22 @@
 
 cmake_minimum_required(VERSION 3.15)
 
+# Some CMake policies.
+
+foreach(POLICY CMP0096 CMP0144)
+    if(POLICY ${POLICY})
+        cmake_policy(SET ${POLICY} NEW)
+    endif()
+endforeach()
+
+# Project details.
+
+string(TIMESTAMP CURRENT_YEAR "%Y")
+string(TIMESTAMP CURRENT_MONTH "%m")
+string(TIMESTAMP CURRENT_DAY "%d")
+
 project(libOpenCOR
-        VERSION 0.0.0)
+        VERSION "${CURRENT_YEAR}.${CURRENT_MONTH}.${CURRENT_DAY}")
 
 string(TOLOWER "${CMAKE_PROJECT_NAME}" CMAKE_PROJECT_NAME_LC)
 
@@ -25,13 +39,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Some common CMake policies, functions, and macros.
-
-foreach(POLICY CMP0144)
-    if(POLICY ${POLICY})
-        cmake_policy(SET ${POLICY} NEW)
-    endif()
-endforeach()
+# Some common functions and macros.
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 

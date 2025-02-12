@@ -16,12 +16,37 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <array>
+#include <chrono>
 #include <libopencor>
 
 TEST(VersionTest, libOpenCOR)
 {
-    EXPECT_EQ(0x000000U, libOpenCOR::version());
-    EXPECT_EQ("0.0.0", libOpenCOR::versionString());
+    static const int TEN_THOUSAND = 10000;
+    static const int HUNDRED = 100;
+    static const int TEN = 10;
+
+    auto now = std::chrono::year_month_day {std::chrono::time_point_cast<std::chrono::days>(std::chrono::system_clock::now())};
+    auto year = static_cast<int>(now.year());
+    auto month = static_cast<int>(static_cast<unsigned>(now.month()));
+    auto day = static_cast<int>(static_cast<unsigned>(now.day()));
+    int version = 0;
+    int number = TEN_THOUSAND * year + HUNDRED * month + day;
+
+    for (int i = 0; number != 0; i += 4) {
+        version |= (number % TEN) << i; // NOLINT
+        number /= TEN;
+    }
+
+    static const size_t VERSION_STRING_SIZE = 11;
+
+    std::array<char, VERSION_STRING_SIZE> versionString {};
+
+    EXPECT_EQ(std::snprintf(versionString.data(), VERSION_STRING_SIZE, "%d.%02d.%02d", year, month, day), VERSION_STRING_SIZE - 1); // NOLINT
+    // Note: ideally, we would be using std::format(), but it is not available on some of the CI systems we are using.
+
+    EXPECT_EQ(version, libOpenCOR::version());
+    EXPECT_EQ(versionString.data(), libOpenCOR::versionString());
 }
 
 TEST(VersionTest, Clang)

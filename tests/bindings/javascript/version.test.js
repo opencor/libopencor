@@ -20,8 +20,25 @@ const libopencor = await libOpenCOR();
 
 describe("Version tests", () => {
   test("libOpenCOR", () => {
-    expect(libopencor.version()).toBe(0x000000);
-    expect(libopencor.versionString()).toBe("0.0.0");
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+
+    let version = 0;
+    let number = 10000 * year + 100 * month + day;
+    let i = 0;
+
+    while (number != 0) {
+      version |= number % 10 << i;
+      number = Math.floor(number / 10);
+      i += 4;
+    }
+
+    expect(libopencor.version()).toBe(version);
+    expect(libopencor.versionString()).toBe(
+      `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")}`,
+    );
   });
 
   test("libCellML", () => {
