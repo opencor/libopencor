@@ -371,10 +371,12 @@ class int_ : public object {
         : object(detail::int_from_obj(h.ptr()), detail::steal_t{}) { }
 
     template <typename T, detail::enable_if_t<std::is_arithmetic_v<T>> = 0>
-    explicit int_(T value)
-        : object(
-              detail::type_caster<T>::from_cpp(value, rv_policy::copy, nullptr),
-              detail::steal_t{}) {
+    explicit int_(T value) {
+        if constexpr (std::is_floating_point_v<T>)
+            m_ptr = PyLong_FromDouble((double) value);
+        else
+            m_ptr = detail::type_caster<T>::from_cpp(value, rv_policy::copy, nullptr).ptr();
+
         if (!m_ptr)
             raise_python_error();
     }
@@ -441,6 +443,36 @@ class bytes : public object {
     const void *data() const { return (const void *) PyBytes_AsString(m_ptr); }
 
     size_t size() const { return (size_t) PyBytes_Size(m_ptr); }
+};
+
+class bytearray : public object {
+    NB_OBJECT(bytearray, object, "bytearray", PyByteArray_Check)
+
+#if PY_VERSION_HEX >= 0x03090000
+    bytearray()
+        : object(PyObject_CallNoArgs((PyObject *)&PyByteArray_Type), detail::steal_t{}) { }
+#else
+    bytearray()
+        : object(PyObject_CallObject((PyObject *)&PyByteArray_Type, NULL), detail::steal_t{}) { }
+#endif
+
+    explicit bytearray(handle h)
+        : object(detail::bytearray_from_obj(h.ptr()), detail::steal_t{}) { }
+
+    explicit bytearray(const void *s, size_t n)
+        : object(detail::bytearray_from_cstr_and_size(s, n), detail::steal_t{}) { }
+
+    const char *c_str() const { return PyByteArray_AsString(m_ptr); }
+
+    const void *data() const { return PyByteArray_AsString(m_ptr); }
+    void *data() { return PyByteArray_AsString(m_ptr); }
+
+    size_t size() const { return (size_t) PyByteArray_Size(m_ptr); }
+
+    void resize(size_t n) {
+        if (PyByteArray_Resize(m_ptr, (Py_ssize_t) n) != 0)
+            detail::raise_python_error();
+    }
 };
 
 class tuple : public object {
@@ -790,24 +822,29 @@ struct fast_iterator {
 
 class dict_iterator {
 public:
+    NB_NONCOPYABLE(dict_iterator)
+
     using value_type = std::pair<handle, handle>;
     using reference = const value_type;
 
-    dict_iterator() : h(), pos(-1) { }
-
+    dict_iterator() = default;
     dict_iterator(handle h) : h(h), pos(0) {
+#if defined(NB_FREE_THREADED)
+        PyCriticalSection_Begin(&cs, h.ptr());
+#endif
         increment();
     }
+
+#if defined(NB_FREE_THREADED)
+    ~dict_iterator() {
+        if (h.ptr())
+            PyCriticalSection_End(&cs);
+    }
+#endif
 
     dict_iterator& operator++() {
         increment();
         return *this;
-    }
-
-    dict_iterator operator++(int) {
-        dict_iterator rv = *this;
-        increment();
-        return rv;
     }
 
     void increment() {
@@ -822,8 +859,12 @@ public:
 
 private:
     handle h;
-    Py_ssize_t pos;
-    PyObject *key = nullptr, *value = nullptr;
+    Py_ssize_t pos = -1;
+    PyObject *key = nullptr;
+    PyObject *value = nullptr;
+#if defined(NB_FREE_THREADED)
+    PyCriticalSection cs { };
+#endif
 };
 
 NB_IMPL_COMP(equal,      Py_EQ)

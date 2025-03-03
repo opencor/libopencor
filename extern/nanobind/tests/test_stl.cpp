@@ -67,12 +67,15 @@ struct FuncWrapper {
 int funcwrapper_tp_traverse(PyObject *self, visitproc visit, void *arg) {
     FuncWrapper *w = nb::inst_ptr<FuncWrapper>(self);
 
-    nb::object f = nb::cast(w->f, nb::rv_policy::none);
+    nb::handle f = nb::cast(w->f, nb::rv_policy::none);
     Py_VISIT(f.ptr());
 
-    return 0;
-};
+    #if PY_VERSION_HEX >= 0x03090000
+        Py_VISIT(Py_TYPE(self));
+    #endif
 
+    return 0;
+}
 
 int FuncWrapper::alive = 0;
 
@@ -440,17 +443,23 @@ NB_MODULE(test_stl_ext, m) {
     });
 
 
-    m.def("complex_value_float", [](const std::complex<float>& x){
+    m.def("complex_value_float", [](const std::complex<float>& x) {
         return x;
     });
-    m.def("complex_value_double", [](const std::complex<double>& x){
+    m.def("complex_value_float_nc", [](const std::complex<float>& x) {
+        return x;
+    }, nb::arg().noconvert());
+    m.def("complex_value_double", [](const std::complex<double>& x) {
         return x;
     });
+    m.def("complex_value_double_nc", [](const std::complex<double>& x) {
+        return x;
+    }, nb::arg().noconvert());
 
-    m.def("complex_array_float", [](const std::vector<std::complex<float>>& x){
+    m.def("complex_array_float", [](const std::vector<std::complex<float>>& x) {
         return x;
     });
-    m.def("complex_array_double", [](const std::vector<std::complex<double>>& x){
+    m.def("complex_array_double", [](const std::vector<std::complex<double>>& x) {
         return x;
     });
 
@@ -461,6 +470,10 @@ NB_MODULE(test_stl_ext, m) {
         return x;
     });
 
+    m.def("vector_optional_str", [](const std::vector<std::optional<std::string>>& x) {
+        return x;
+    });
+
     m.def("pass_wstr", [](std::wstring ws) { return ws; });
 
     // uncomment to see compiler error:
@@ -468,4 +481,35 @@ NB_MODULE(test_stl_ext, m) {
     m.def("optional_cstr", [](std::optional<const char*> arg) {
         return arg.value_or("none");
     }, nb::arg().none());
+
+
+    // test74
+    struct BasicID1 {
+        uint64_t id;
+        BasicID1(uint64_t id) : id(id) {}
+    };
+
+    struct BasicID2 {
+        uint64_t id;
+        BasicID2(uint64_t id) : id(id) {}
+    };
+
+    nb::class_<BasicID1>(m, "BasicID1")
+        .def(nb::init<uint64_t>())
+        .def("__int__", [](const BasicID1& x) { return x.id; })
+        ;
+
+    nb::class_<BasicID2>(m, "BasicID2")
+        .def(nb::init_implicit<uint64_t>());
+
+    using IDVariants = std::variant<std::monostate, BasicID2, BasicID1>;
+
+    struct IDHavingEvent {
+        IDVariants id;
+        IDHavingEvent() = default;
+    };
+
+    nb::class_<IDHavingEvent>(m, "IDHavingEvent")
+        .def(nb::init<>())
+        .def_rw("id", &IDHavingEvent::id);
 }

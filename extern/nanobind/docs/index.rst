@@ -8,7 +8,7 @@ Introduction
      :align: center
      :alt: nanobind logo
      :class: only-light
-   
+
    .. image:: https://rgl.s3.eu-central-1.amazonaws.com/media/uploads/wjakob/2023/03/28/nanobind_logo_dark.png
      :width: 800
      :align: center
@@ -21,7 +21,7 @@ Introduction
      :width: 800
      :align: center
      :alt: nanobind logo
-   
+
 *nanobind* is a small binding library that exposes C++ types in Python and vice
 versa. It is reminiscent of `Boost.Python
 <https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html>`_ and `pybind11
@@ -57,9 +57,9 @@ nanobinds depends on
 - **Python 3.8+** or **PyPy 7.3.10+** (the *3.8* and *3.9* PyPy flavors are
   supported, though there are :ref:`some limitations <pypy_issues>`).
 - **CMake 3.15+**.
-- **A C++17 compiler**: Clang 7+, GCC 8+, and MSVC2019+ are officially
-  supported. Others (MinGW, Intel, NVIDIA, ..) may work as well but will not
-  receive support.
+- **A C++17 compiler**: Clang 8+, GCC 8+, MSVC2019+, and the CUDA NVCC compiler
+  are officially supported. Others (MinGW, Cygwin, Intel, ..) may work as well
+  but will not receive support.
 
 .. only:: not latex
 
@@ -112,6 +112,7 @@ The nanobind logo was designed by `AndoTwin Studio
    building
    basics
    bazel
+   meson
 
 .. toctree::
    :caption: Intermediate
@@ -131,6 +132,7 @@ The nanobind logo was designed by `AndoTwin Studio
    :caption: Advanced
    :maxdepth: 1
 
+   free_threaded
    ownership_adv
    lowlevel
    typeslots

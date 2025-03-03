@@ -6,6 +6,7 @@
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/tuple.h>
+#include <nanobind/stl/unique_ptr.h>
 #include <map>
 #include <memory>
 #include <cstring>
@@ -122,7 +123,7 @@ int wrapper_tp_traverse(PyObject *self, visitproc visit, void *arg) {
     Wrapper *w = nb::inst_ptr<Wrapper>(self);
 
     // If c->value corresponds to an associated CPython object, return it
-    nb::object value = nb::find(w->value);
+    nb::handle value = nb::find(w->value);
 
     // Inform the Python GC about it
     Py_VISIT(value.ptr());
@@ -260,6 +261,8 @@ NB_MODULE(test_classes_ext, m) {
         std::string s;
     };
 
+    struct SiameseCat : Cat { };
+
     struct Foo { };
 
     auto animal = nb::class_<Animal, PyAnimal>(m, "Animal")
@@ -272,6 +275,9 @@ NB_MODULE(test_classes_ext, m) {
 
     nb::class_<Cat>(m, "Cat", animal)
         .def(nb::init<const std::string &>());
+
+    nb::class_<SiameseCat, Cat> sc(m, "SiameseCat");
+    (void) sc;
 
     m.def("go", [](Animal *a) {
         return a->name() + " says " + a->what();
@@ -504,7 +510,7 @@ NB_MODULE(test_classes_ext, m) {
     m.def("test_handle_t", [](nb::handle_t<Struct> h) { return borrow(h); });
 
     // test23_type_object_t
-    m.def("test_type_object_t", [](nb::type_object_t<Struct> h) -> nb::object { return std::move(h); });
+    m.def("test_type_object_t", [](nb::type_object_t<Struct> h) -> nb::object { return h; });
 
     // test24_none_arg
     m.def("none_0", [](Struct *s) { return s == nullptr; });
@@ -657,4 +663,59 @@ NB_MODULE(test_classes_ext, m) {
         }), "s"_a)
         .def("value", &UniqueInt::value)
         .def("lookups", &UniqueInt::lookups);
+
+    // issue #786
+    struct NewNone {};
+    struct NewDflt { int value; };
+    struct NewStar { size_t value; };
+    nb::class_<NewNone>(m, "NewNone")
+        .def(nb::new_([]() { return NewNone(); }));
+    nb::class_<NewDflt>(m, "NewDflt")
+        .def(nb::new_([](int value) { return NewDflt{value}; }),
+             "value"_a = 42)
+        .def_ro("value", &NewDflt::value);
+    nb::class_<NewStar>(m, "NewStar")
+        .def(nb::new_([](nb::args a, int value, nb::kwargs k) {
+            return NewStar{nb::len(a) + value + 10 * nb::len(k)};
+        }),
+            "args"_a, "value"_a = 42, "kwargs"_a)
+        .def_ro("value", &NewStar::value);
+
+    // issue #750
+    PyCFunctionWithKeywords dummy_init = [](PyObject *, PyObject *,
+                                            PyObject *) -> PyObject * {
+        PyErr_SetString(PyExc_RuntimeError, "This should never be called!");
+        return nullptr;
+    };
+
+    PyType_Slot init_slots[] {
+        // the presence of this slot enables normal object construction via __init__ and __new__
+        // instead of an optimized codepath within nanobind that skips these. That in turn
+        // makes it possible to intercept calls and implement custom logic.
+        { Py_tp_init, (void *) dummy_init },
+        { 0, nullptr }
+    };
+
+    struct MonkeyPatchable {
+        int value = 123;
+    };
+
+    nb::class_<MonkeyPatchable>(m, "MonkeyPatchable", nb::type_slots(init_slots))
+        .def(nb::init<>())
+        .def_static("custom_init", [](nb::handle_t<MonkeyPatchable> h) {
+            if (nb::inst_ready(h))
+                nb::raise_type_error("Input is already initialized!");
+            MonkeyPatchable *p = nb::inst_ptr<MonkeyPatchable>(h);
+            new (p) MonkeyPatchable{456};
+            nb::inst_mark_ready(h);
+        })
+        .def_rw("value", &MonkeyPatchable::value);
+
+    struct StaticPropertyOverride {};
+    struct StaticPropertyOverride2 : public StaticPropertyOverride {};
+
+    nb::class_<StaticPropertyOverride>(m, "StaticPropertyOverride")
+        .def_prop_ro_static("x", [](nb::handle /*unused*/) { return 42; });
+    nb::class_<StaticPropertyOverride2, StaticPropertyOverride>(m, "StaticPropertyOverride2")
+        .def_prop_ro_static("x", [](nb::handle /*unused*/) { return 43; });
 }

@@ -58,14 +58,14 @@ enum class type_flags : uint32_t {
     /// The class implements __class_getitem__ similar to typing.Generic
     is_generic               = (1 << 15),
 
-    /// Is this an arithmetic enumeration?
-    is_arithmetic            = (1 << 16),
+    /// Does the type implement a custom __new__ operator?
+    has_new                  = (1 << 16),
 
-    /// Is the number type underlying the enumeration signed?
-    is_signed                = (1 << 17)
+    /// Does the type implement a custom __new__ operator that can take no args
+    /// (except the type object)?
+    has_nullary_new          = (1 << 17)
 
-    // One more flag bits available (18) without needing
-    // a larger reorganization
+    // One more bit available without needing a larger reorganization
 };
 
 /// Flags about a type that are only relevant when it is being created.
@@ -103,6 +103,10 @@ struct type_data {
     const std::type_info *type;
     PyTypeObject *type_py;
     nb_alias_chain *alias_chain;
+#if defined(Py_LIMITED_API)
+    PyObject* (*vectorcall)(PyObject *, PyObject * const*, size_t, PyObject *);
+#endif
+    void *init; // Constructor nb_func
     void (*destruct)(void *);
     void (*copy)(void *, const void *);
     void (*move)(void *, void *) noexcept;
@@ -122,8 +126,8 @@ struct type_data {
     void (*set_self_py)(void *, PyObject *) noexcept;
     bool (*keep_shared_from_this_alive)(PyObject *) noexcept;
 #if defined(Py_LIMITED_API)
-    size_t dictoffset;
-    size_t weaklistoffset;
+    uint32_t dictoffset;
+    uint32_t weaklistoffset;
 #endif
 };
 
@@ -189,6 +193,17 @@ NB_INLINE void type_extra_apply(type_init_data &t, supplement<T>) {
     t.supplement = sizeof(T);
 }
 
+enum class enum_flags : uint32_t {
+    /// Is this an arithmetic enumeration?
+    is_arithmetic            = (1 << 1),
+
+    /// Is the number type underlying the enumeration signed?
+    is_signed                = (1 << 2),
+
+    /// Is the underlying enumeration type Flag?
+    is_flag                = (1 << 3)
+};
+
 struct enum_init_data {
     const std::type_info *type;
     PyObject *scope;
@@ -198,7 +213,11 @@ struct enum_init_data {
 };
 
 NB_INLINE void enum_extra_apply(enum_init_data &e, is_arithmetic) {
-    e.flags |= (uint32_t) type_flags::is_arithmetic;
+    e.flags |= (uint32_t) enum_flags::is_arithmetic;
+}
+
+NB_INLINE void enum_extra_apply(enum_init_data &e, is_flag) {
+    e.flags |= (uint32_t) enum_flags::is_flag;
 }
 
 NB_INLINE void enum_extra_apply(enum_init_data &e, const char *doc) {
@@ -268,13 +287,13 @@ inline size_t type_align(handle h) { return detail::nb_type_align(h.ptr()); }
 inline const std::type_info& type_info(handle h) { return *detail::nb_type_info(h.ptr()); }
 template <typename T>
 inline T &type_supplement(handle h) { return *(T *) detail::nb_type_supplement(h.ptr()); }
-inline str type_name(handle h) { return steal<str>(detail::nb_type_name(h.ptr())); };
+inline str type_name(handle h) { return steal<str>(detail::nb_type_name(h.ptr())); }
 
 // Low level access to nanobind instance objects
 inline bool inst_check(handle h) { return type_check(h.type()); }
 inline str inst_name(handle h) {
     return steal<str>(detail::nb_inst_name(h.ptr()));
-};
+}
 inline object inst_alloc(handle h) {
     return steal(detail::nb_inst_alloc((PyTypeObject *) h.ptr()));
 }
@@ -310,8 +329,18 @@ inline void *type_get_slot(handle h, int slot_id) {
 #endif
 }
 
+template <typename Visitor> struct def_visitor {
+  protected:
+    // Ensure def_visitor<T> can only be derived from, not constructed
+    // directly
+    def_visitor() {
+        static_assert(std::is_base_of_v<def_visitor, Visitor>,
+                      "def_visitor uses CRTP: def_visitor<T> should be "
+                      "a base of T");
+    }
+};
 
-template <typename... Args> struct init {
+template <typename... Args> struct init : def_visitor<init<Args...>> {
     template <typename T, typename... Ts> friend class class_;
     NB_INLINE init() {}
 
@@ -336,7 +365,7 @@ private:
     }
 };
 
-template <typename Arg> struct init_implicit {
+template <typename Arg> struct init_implicit : def_visitor<init_implicit<Arg>> {
     template <typename T, typename... Ts> friend class class_;
     NB_INLINE init_implicit() { }
 
@@ -397,13 +426,46 @@ namespace detail {
             }
         }
     }
+
+    // Call policy that ensures __new__ returns an instance of the correct
+    // Python type, even when deriving from the C++ class in Python
+    struct new_returntype_fixup_policy {
+        static inline void precall(PyObject **, size_t,
+                                   detail::cleanup_list *) {}
+        NB_NOINLINE static inline void postcall(PyObject **args, size_t,
+                                                PyObject *&ret) {
+            handle type_requested = args[0];
+            if (ret == nullptr || !type_requested.is_type())
+                return; // somethign strange about this call; don't meddle
+            handle type_created = Py_TYPE(ret);
+            if (type_created.is(type_requested))
+                return; // already created the requested type so no fixup needed
+
+            if (type_check(type_created) &&
+                PyType_IsSubtype((PyTypeObject *) type_requested.ptr(),
+                                 (PyTypeObject *) type_created.ptr()) &&
+                type_info(type_created) == type_info(type_requested)) {
+                // The new_ constructor returned an instance of a bound type T.
+                // The user wanted an instance of some python subclass S of T.
+                // Since both wrap the same C++ type, we can satisfy the request
+                // by returning a pyobject of type S that wraps a C++ T*, and
+                // handling the lifetimes by having that pyobject keep the
+                // already-created T pyobject alive.
+                object wrapper = inst_reference(type_requested,
+                                                inst_ptr<void>(ret),
+                                                /* parent = */ ret);
+                handle(ret).dec_ref();
+                ret = wrapper.release().ptr();
+            }
+        }
+    };
 }
 
 template <typename Func, typename Sig = detail::function_signature_t<Func>>
 struct new_;
 
 template <typename Func, typename Return, typename... Args>
-struct new_<Func, Return(Args...)> {
+struct new_<Func, Return(Args...)> : def_visitor<new_<Func, Return(Args...)>> {
     std::remove_reference_t<Func> func;
 
     new_(Func &&f) : func((detail::forward_t<Func>) f) {}
@@ -415,18 +477,27 @@ struct new_<Func, Return(Args...)> {
         // replacing it; this is important for pickle support.
         // We can't do this if the user-provided __new__ takes no
         // arguments, because it would make an ambiguous overload set.
-        detail::wrap_base_new(cl, sizeof...(Args) != 0);
+        constexpr size_t num_defaults =
+            ((std::is_same_v<Extra, arg_v> ||
+              std::is_same_v<Extra, arg_locked_v>) + ... + 0);
+        constexpr size_t num_varargs =
+            ((std::is_same_v<detail::intrinsic_t<Args>, args> ||
+              std::is_same_v<detail::intrinsic_t<Args>, kwargs>) + ... + 0);
+        detail::wrap_base_new(cl, sizeof...(Args) > num_defaults + num_varargs);
 
-        auto wrapper = [func = (detail::forward_t<Func>) func](handle, Args... args) {
-            return func((detail::forward_t<Args>) args...);
+        auto wrapper = [func_ = (detail::forward_t<Func>) func](handle, Args... args) {
+            return func_((detail::forward_t<Args>) args...);
         };
+
+        auto policy = call_policy<detail::new_returntype_fixup_policy>();
         if constexpr ((std::is_base_of_v<arg, Extra> || ...)) {
             // If any argument annotations are specified, add another for the
             // extra class argument that we don't forward to Func, so visible
             // arg() annotations stay aligned with visible function arguments.
-            cl.def_static("__new__", std::move(wrapper), arg("cls"), extra...);
+            cl.def_static("__new__", std::move(wrapper), arg("cls"), extra...,
+                          policy);
         } else {
-            cl.def_static("__new__", std::move(wrapper), extra...);
+            cl.def_static("__new__", std::move(wrapper), extra..., policy);
         }
         cl.def("__init__", [](handle, Args...) {}, extra...);
     }
@@ -464,7 +535,7 @@ public:
     using Base  = typename detail::extract<T, detail::is_base,  Ts...>::type;
     using Alias = typename detail::extract<T, detail::is_alias, Ts...>::type;
 
-    static_assert(sizeof(Alias) < (1 << 24), "Instance size is too big!");
+    static_assert(sizeof(Alias) < (((uint64_t) 1) << 32), "Instance size is too big!");
     static_assert(alignof(Alias) < (1 << 8), "Instance alignment is too big!");
     static_assert(
         sizeof...(Ts) == !std::is_same_v<Base, T> + !std::is_same_v<Alias, T>,
@@ -553,21 +624,9 @@ public:
         return *this;
     }
 
-    template <typename... Args, typename... Extra>
-    NB_INLINE class_ &def(init<Args...> &&arg, const Extra &... extra) {
-        arg.execute(*this, extra...);
-        return *this;
-    }
-
-    template <typename Arg, typename... Extra>
-    NB_INLINE class_ &def(init_implicit<Arg> &&arg, const Extra &... extra) {
-        arg.execute(*this, extra...);
-        return *this;
-    }
-
-    template <typename Func, typename... Extra>
-    NB_INLINE class_ &def(new_<Func> &&arg, const Extra &... extra) {
-        arg.execute(*this, extra...);
+    template <typename Visitor, typename... Extra>
+    NB_INLINE class_ &def(def_visitor<Visitor> &&arg, const Extra &... extra) {
+        static_cast<Visitor&&>(arg).execute(*this, extra...);
         return *this;
     }
 
@@ -715,7 +774,7 @@ public:
         ed.scope = scope.ptr();
         ed.name = name;
         ed.flags = std::is_signed_v<Underlying>
-                       ? (uint32_t) detail::type_flags::is_signed
+                       ? (uint32_t) detail::enum_flags::is_signed
                        : 0;
         (detail::enum_extra_apply(ed, extra), ...);
         m_ptr = detail::enum_create(&ed);
@@ -727,7 +786,6 @@ public:
     }
 
     NB_INLINE enum_ &export_values() { detail::enum_export(m_ptr); return *this; }
-
 
     template <typename Func, typename... Extra>
     NB_INLINE enum_ &def(const char *name_, Func &&f, const Extra &... extra) {
@@ -776,6 +834,7 @@ public:
 
 template <typename Source, typename Target> void implicitly_convertible() {
     using Caster = detail::make_caster<Source>;
+    static_assert(!std::is_enum_v<Target>, "implicitly_convertible(): 'Target' cannot be an enumeration.");
 
     if constexpr (detail::is_base_caster_v<Caster>) {
         detail::implicitly_convertible(&typeid(Source), &typeid(Target));
