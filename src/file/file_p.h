@@ -43,7 +43,7 @@ public:
     SedmlFilePtr mSedmlFile;
     CombineArchivePtr mCombineArchive;
 
-    explicit Impl(const std::string &pFileNameOrUrl);
+    explicit Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents);
     ~Impl();
 
     void checkType(const FilePtr &pOwner, bool pResetType = false);

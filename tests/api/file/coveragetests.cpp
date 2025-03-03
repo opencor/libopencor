@@ -63,3 +63,11 @@ TEST(CoverageFileTest, sameRemoteFile)
 
     EXPECT_EQ(file1, file2);
 }
+
+TEST(CoverageFileTest, doNotRetrieveContents)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE, false);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
+}

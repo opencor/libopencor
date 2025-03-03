@@ -55,3 +55,10 @@ def test_same_remote_file():
     file2 = oc.File(utils.RemoteFile)
 
     assert file1.__subclasshook__ == file2.__subclasshook__
+
+
+def test_do_not_retrieve_contents():
+    file = oc.File(utils.RemoteFile, False)
+
+    assert file.type == oc.File.Type.UnknownFile
+    assert file.contents == []
