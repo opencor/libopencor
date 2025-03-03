@@ -1,6 +1,10 @@
+#include <string.h>
+
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/function.h>
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/string.h>
+#include <nanobind/stl/vector.h>
 
 namespace nb = nanobind;
 using namespace nb::literals;
@@ -10,6 +14,74 @@ int call_guard_value = 0;
 struct my_call_guard {
     my_call_guard() { call_guard_value = 1; }
     ~my_call_guard() { call_guard_value = 2; }
+};
+
+// Example call policy for use with nb::call_policy<>. Each call will add
+// an entry to `calls` containing the arguments tuple and return value.
+// The return value will be recorded as "<unfinished>" if the function
+// did not return (still executing or threw an exception) and as
+// "<return conversion failed>" if the function returned something that we
+// couldn't convert to a Python object.
+// Additional features to test particular interactions:
+// - the precall hook will throw if any arguments are not strings
+// - any argument equal to "swapfrom" will be replaced by a temporary
+//   string object equal to "swapto", which will be destroyed at end of call
+// - the postcall hook will throw if any argument equals "postthrow"
+struct example_policy {
+    static inline std::vector<std::pair<nb::tuple, nb::object>> calls;
+    static void precall(PyObject **args, size_t nargs,
+                        nb::detail::cleanup_list *cleanup) {
+        PyObject* tup = PyTuple_New(nargs);
+        for (size_t i = 0; i < nargs; ++i) {
+            if (!PyUnicode_CheckExact(args[i])) {
+                Py_DECREF(tup);
+                throw std::runtime_error("expected only strings");
+            }
+            if (0 == PyUnicode_CompareWithASCIIString(args[i], "swapfrom")) {
+                nb::object replacement = nb::cast("swapto");
+                args[i] = replacement.ptr();
+                cleanup->append(replacement.release().ptr());
+            }
+            Py_INCREF(args[i]);
+            PyTuple_SetItem(tup, i, args[i]);
+        }
+        calls.emplace_back(nb::steal<nb::tuple>(tup), nb::cast("<unfinished>"));
+    }
+    static void postcall(PyObject **args, size_t nargs, nb::handle ret) {
+        if (!ret.is_valid()) {
+            calls.back().second = nb::cast("<return conversion failed>");
+        } else {
+            calls.back().second = nb::borrow(ret);
+        }
+        for (size_t i = 0; i < nargs; ++i) {
+            if (0 == PyUnicode_CompareWithASCIIString(args[i], "postthrow")) {
+                throw std::runtime_error("postcall exception");
+            }
+        }
+    }
+};
+
+struct numeric_string {
+    unsigned long number;
+};
+
+template <> struct nb::detail::type_caster<numeric_string> {
+    NB_TYPE_CASTER(numeric_string, const_name("str"))
+
+    bool from_python(handle h, uint8_t flags, cleanup_list* cleanup) noexcept {
+        make_caster<const char*> str_caster;
+        if (!str_caster.from_python(h, flags, cleanup))
+            return false;
+        const char* str = str_caster.operator cast_t<const char*>();
+        if (!str)
+            return false;
+        char* endp;
+        value.number = strtoul(str, &endp, 10);
+        return *str && !*endp;
+    }
+    static handle from_cpp(numeric_string, rv_policy, handle) noexcept {
+        return nullptr;
+    }
 };
 
 int test_31(int i) noexcept { return i; }
@@ -36,7 +108,7 @@ NB_MODULE(test_functions_ext, m) {
     m.def("test_05", [](int) -> int { return 1; }, "doc_1");
     nb::object first_overload = m.attr("test_05");
     m.def("test_05", [](float) -> int { return 2; }, "doc_2");
-#if !defined(PYPY_VERSION)
+#if !defined(PYPY_VERSION) && !defined(Py_GIL_DISABLED)
     // Make sure we don't leak the previous member of the overload chain
     // (pypy's refcounts are bogus and will not help us with this check)
     if (first_overload.ptr()->ob_refcnt != 1) {
@@ -44,6 +116,14 @@ NB_MODULE(test_functions_ext, m) {
     }
 #endif
     first_overload.reset();
+
+    // Test an overload chain that always repeats the same docstring
+    m.def("test_05b", [](int) -> int { return 1; }, "doc_1");
+    m.def("test_05b", [](float) -> int { return 2; }, "doc_1");
+
+    // Test an overload chain with an empty docstring
+    m.def("test_05c", [](int) -> int { return 1; }, "doc_1");
+    m.def("test_05c", [](float) -> int { return 2; }, "");
 
     /// Function raising an exception
     m.def("test_06", []() { throw std::runtime_error("oops!"); });
@@ -63,11 +143,16 @@ NB_MODULE(test_functions_ext, m) {
     m.def("test_bad_tuple", []() { struct Foo{}; return nb::make_tuple("Hello", Foo()); });
 
     /// Perform a Python function call from C++
-    m.def("test_call_1", [](nb::object o) { return o(1); });
-    m.def("test_call_2", [](nb::object o) { return o(1, 2); });
+    m.def("test_call_1", [](nb::typed<nb::object, std::function<int(int)>> o) {
+        return o(1);
+    });
+    m.def("test_call_2", [](nb::typed<nb::callable, void(int, int)> o) {
+        return o(1, 2);
+    });
 
     /// Test expansion of args/kwargs-style arguments
-    m.def("test_call_extra", [](nb::object o, nb::args args, nb::kwargs kwargs) {
+    m.def("test_call_extra", [](nb::typed<nb::callable, void(...)> o,
+                                nb::args args, nb::kwargs kwargs) {
         return o(1, 2, *args, **kwargs, "extra"_a = 5);
     });
 
@@ -81,7 +166,7 @@ NB_MODULE(test_functions_ext, m) {
     });
 
     /// Test tuple manipulation
-    m.def("test_tuple", [](nb::tuple l) {
+    m.def("test_tuple", [](nb::typed<nb::tuple, int, nb::ellipsis> l) {
         int result = 0;
         for (size_t i = 0; i < l.size(); ++i)
             result += nb::cast<int>(l[i]);
@@ -175,6 +260,13 @@ NB_MODULE(test_functions_ext, m) {
     m.def("test_19", [](nb::int_ i) { return i + nb::int_(123); });
     m.def("test_20", [](nb::str s) { return nb::int_(s) + nb::int_(123); });
     m.def("test_21", [](nb::int_ i) { return (int) i; });
+    m.def("test_21_f", [](nb::float_ f) { return nb::int_(f); });
+    m.def("test_21_g", []() { return nb::int_(1.5); });
+    m.def("test_21_h", []() { return nb::int_(1e50); });
+
+    // Test floating-point
+    m.def("test_21_dnc", [](double d) { return d + 1.0; }, nb::arg().noconvert());
+    m.def("test_21_fnc", [](float f) { return f + 1.0f; }, nb::arg().noconvert());
 
     // Test capsule wrapper
     m.def("test_22", []() -> void * { return (void*) 1; });
@@ -361,4 +453,34 @@ NB_MODULE(test_functions_ext, m) {
     });
 
     m.def("hash_it", [](nb::handle h) { return nb::hash(h); });
+    m.def("isinstance_", [](nb::handle inst, nb::handle cls) {
+        return nb::isinstance(inst, cls);
+    });
+
+    // Test bytearray type
+    m.def("test_bytearray_new",     []() { return nb::bytearray(); });
+    m.def("test_bytearray_new",     [](const char *c, int size) { return nb::bytearray(c, size); });
+    m.def("test_bytearray_copy",    [](nb::bytearray o) { return nb::bytearray(o.c_str(), o.size()); });
+    m.def("test_bytearray_c_str",   [](nb::bytearray o) -> const char * { return o.c_str(); });
+    m.def("test_bytearray_size",    [](nb::bytearray o) { return o.size(); });
+    m.def("test_bytearray_resize",  [](nb::bytearray c, int size) { return c.resize(size); });
+
+    // Test call_policy feature
+    m.def("test_call_policy",
+          [](const char* s, numeric_string n) -> const char* {
+              if (0 == strcmp(s, "returnfail")) {
+                  return "not utf8 \xff";
+              }
+              if (n.number > strlen(s)) {
+                  throw std::runtime_error("offset too large");
+              }
+              return s + n.number;
+          },
+          nb::call_policy<example_policy>());
+
+    m.def("call_policy_record",
+          []() {
+              auto ret = std::move(example_policy::calls);
+              return ret;
+          });
 }

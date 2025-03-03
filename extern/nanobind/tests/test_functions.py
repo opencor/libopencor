@@ -68,6 +68,26 @@ def test05_signature():
         "doc_2"
     )
 
+    assert t.test_05b.__doc__ == (
+        "test_05b(arg: int, /) -> int\n"
+        "test_05b(arg: float, /) -> int\n"
+        "\n"
+        "doc_1"
+    )
+
+    assert t.test_05c.__doc__ == (
+        "test_05c(arg: int, /) -> int\n"
+        "test_05c(arg: float, /) -> int\n"
+        "\n"
+        "Overloaded function.\n"
+        "\n"
+        "1. ``test_05c(arg: int, /) -> int``\n"
+        "\n"
+        "doc_1\n"
+        "\n"
+        "2. ``test_05c(arg: float, /) -> int``\n"
+    )
+
     assert t.test_07.__doc__ == (
         f"test_07(arg0: int, arg1: int, /, *args, **kwargs) -> {TYPING_TUPLE}[int, int]\n"
         f"test_07(a: int, b: int, *myargs, **mykwargs) -> {TYPING_TUPLE}[int, int]"
@@ -233,6 +253,18 @@ def test21_numpy_overloads():
     assert t.test_11_sll(np.int32(5)) == 5
     assert t.test_11_ull(np.int32(5)) == 5
 
+    with pytest.raises(TypeError) as excinfo:
+        t.test_21_dnc(np.float64(21.0))  # Python type is not exactly float
+    assert "incompatible function arguments" in str(excinfo.value)
+    assert t.test_21_dnc(float(np.float64(21.0))) == 22.0
+    assert t.test_21_dnc(float(np.float32(21.0))) == 22.0
+
+    assert t.test_21_fnc(float(np.float32(21.0))) == 22.0
+    with pytest.raises(TypeError) as excinfo:
+        t.test_21_fnc(float(np.float64(21.1)))  # Inexact narrowing to float32
+    assert "incompatible function arguments" in str(excinfo.value)
+    assert t.test_21_fnc(float(np.float32(21.1))) == np.float32(22.1)
+
 
 def test22_string_return():
     assert t.test_12("hello") == "hello"
@@ -260,6 +292,13 @@ def test25_int():
     assert t.test_19(5) == 128
     assert t.test_20("5") == 128
     assert t.test_21(5) == 5
+    assert t.test_21_f(5.1) == int(5.1)
+    assert t.test_21_f(1e50) == int(1e50)
+    assert type(t.test_21_f(0.5)) is int
+    assert t.test_21_g() == int(1.5)
+    assert type(t.test_21_g()) is int
+    assert t.test_21_h() == int(1e50)
+    assert type(t.test_21_h()) is int
     assert t.test_19.__doc__ == "test_19(arg: int, /) -> object"
 
 
@@ -290,7 +329,6 @@ def test28_ellipsis():
 
 def test29_traceback():
     result = t.test_30(fail_fn)
-    print(result)
     regexp = r'Traceback \(most recent call last\):\n.*\n  File "[^"]*", line [0-9]*, in fail_fn\n.*RuntimeError: Foo'
     matches = re.findall(regexp, result, re.MULTILINE | re.DOTALL)
     assert len(matches) == 1
@@ -598,3 +636,117 @@ def test43_wrappers_set():
 def test44_hash():
     value = (1, 2, 3)
     assert t.hash_it(value) == hash(value);
+
+
+def test45_new():
+    assert t.test_bytearray_new() == bytearray()
+    assert t.test_bytearray_new("\x00\x01\x02\x03", 4) == bytearray(
+        b"\x00\x01\x02\x03"
+    )
+    assert t.test_bytearray_new("", 0) == bytearray()
+
+
+def test46_copy():
+    o = bytearray(b"\x00\x01\x02\x03")
+    c = t.test_bytearray_copy(o)
+    assert c == o
+    o.clear()
+    assert c != o
+
+
+def test47_c_str():
+    o = bytearray(b"Hello, world!")
+    assert t.test_bytearray_c_str(o) == "Hello, world!"
+
+
+def test48_size():
+    o = bytearray(b"Hello, world!")
+    assert t.test_bytearray_size(o) == len(o)
+
+
+def test49_resize():
+    o = bytearray(b"\x00\x01\x02\x03")
+    assert len(o) == 4
+    t.test_bytearray_resize(o, 8)
+    assert len(o) == 8
+
+
+def test50_call_policy():
+    def case(arg1, arg2, expect_ret):  # type: (str, str, str | None) -> str
+        if hasattr(sys, "getrefcount"):
+            refs_before = (sys.getrefcount(arg1), sys.getrefcount(arg2))
+
+        ret = None
+        try:
+            ret = t.test_call_policy(arg1, arg2)
+            assert ret == expect_ret
+            return ret
+        finally:
+            if expect_ret is None:
+                assert t.call_policy_record() == []
+            else:
+                (((arg1r, arg2r), recorded_ret),) = t.call_policy_record()
+                assert recorded_ret == expect_ret
+                assert ret is None or ret is recorded_ret
+                assert recorded_ret is not expect_ret
+
+                if hasattr(sys, "getrefcount"):
+                    # Make sure no reference leak occurred: should be
+                    # one in getrefcount args, one or two in locals,
+                    # zero or one in the pending-return-value slot.
+                    # We have to decompose this to avoid getting confused
+                    # by transient additional references added by pytest's
+                    # assertion rewriting.
+                    ret_refs = sys.getrefcount(recorded_ret)
+                    assert ret_refs == 2 + 2 * (ret is not None)
+
+                for (passed, recorded) in ((arg1, arg1r), (arg2, arg2r)):
+                    if passed == "swapfrom":
+                        assert recorded == "swapto"
+                        if hasattr(sys, "getrefcount"):
+                            recorded_refs = sys.getrefcount(recorded)
+                            # recorded, arg1r, unnamed tuple, getrefcount arg
+                            assert recorded_refs == 4
+                    else:
+                        assert passed is recorded
+
+                del passed, recorded, arg1r, arg2r
+                if hasattr(sys, "getrefcount"):
+                    refs_after = (sys.getrefcount(arg1), sys.getrefcount(arg2))
+                    assert refs_before == refs_after
+
+    # precall throws exception
+    with pytest.raises(RuntimeError, match="expected only strings"):
+        case(12345, "0", None)
+
+    # conversion of args fails
+    with pytest.raises(TypeError):
+        case("string", "xxx", "<unfinished>")
+
+    # function throws exception
+    with pytest.raises(RuntimeError, match="offset too large"):
+        case("abc", "4", "<unfinished>")
+
+    # conversion of return value fails
+    with pytest.raises(UnicodeDecodeError):
+        case("returnfail", "4", "<return conversion failed>")
+
+    # postcall throws exception
+    with pytest.raises(RuntimeError, match="postcall exception"):
+        case("postthrow", "4", "throw")
+
+    # normal call
+    case("example", "1", "xample")
+
+    # precall modifies args
+    case("swapfrom", "0", "swapto")
+    with pytest.raises(TypeError):
+        case("swapfrom", "xxx", "<unfinished>")
+    with pytest.raises(RuntimeError, match="offset too large"):
+        case("swapfrom", "10", "<unfinished>")
+
+def test51_isinstance():
+    assert t.isinstance_(3, int)
+    assert not t.isinstance_(3, bool)
+    with pytest.raises(TypeError):
+        t.isinstance_(3, 7)

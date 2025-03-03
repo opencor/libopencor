@@ -10,15 +10,305 @@ It also has a separate ABI version that is *not* subject to semantic
 versioning.
 
 The ABI version is relevant whenever a type binding from one extension module
-should be visible in another (also nanobind-based) extension module. In this
+should be visible in another nanobind-based extension module. In this
 case, both modules must use the same nanobind ABI version, or they will be
 isolated from each other. Releases that don't explicitly mention an ABI version
 below inherit that of the preceding release.
 
+Version 2.5.0 (Feb 2, 2025)
+---------------------------
+
+- Added :cpp:class:`nb::def_visitor\<..\> <def_visitor>`, which can be used to
+  define your own binding logic that operates on a :cpp:class:`nb::class_\<..\>
+  <class_>` when an instance of the visitor object is passed to
+  :cpp:func:`class_::def()`. This generalizes the mechanism used by
+  :cpp:class:`init`, :cpp:class:`new_`, etc, so that you can create binding
+  abstractions that "feel like" the built-in ones. (PR `#884
+  <https://github.com/wjakob/nanobind/pull/884>`__)
+
+- Added some special forms for :cpp:class:`nb::typed\<T, Ts...\> <typed>`
+  (PR `#835 <https://github.com/wjakob/nanobind/pull/835>`__):
+
+  - ``nb::typed<nb::object, T>`` or ``nb::typed<nb::handle, T>`` produces
+    a parameter or return value that will be described like ``T`` in function
+    signatures but accepts any Python object at runtime.
+
+  - ``nb::typed<nb::callable, R(Args...)>`` produces a Python callable signature
+    ``Callable[[Args...], R]``; similarly, ``nb::typed<nb::callable, R(...)>``
+    (with a literal ellipsis) produces the Python ``Callable[..., R]``.
+
+- It is now possible to create Python subclasses of C++ classes that define
+  their constructor bindings using :cpp:struct:`nb::new_() <new_>`. Previously,
+  attempting to instantiate such a Python subclass would instead produce an
+  instance of the base C++ type. Note that it is still not possible to override
+  virtual methods in such a Python subclass, because the object returned by the
+  :cpp:struct:`new_() <new_>` constructor will generally not be an instance of
+  the alias/trampoline type. (PR `#859
+  <https://github.com/wjakob/nanobind/pull/859>`__)
+
+- Fixed the :cpp:class:`nb::int_ <int_>` constructor so that it casts to
+  an integer when invoked with a floating point argument.
+
+- Multi-level inheritance (e.g., `A → B → C`) previously did not work on Python
+  3.12+ when a base class (e.g., ``A``) provided a trampoline implementation.
+  This is now fixed. (commit `92d9cb
+  <https://github.com/wjakob/nanobind/commit/92d9cb3d62b743a9eca2d9d9d8e5fb14a1e00a2a>`__).
+
+- Fixed (benign) reference leads that could occur when ``std::shared_ptr<T>``
+  instances were still alive at interpreter shutdown time. (commit `fb8157
+  <https://github.com/wjakob/nanobind/commit/fb815762fdb8476cfd293e3717ca41c8bb890437>`__).
+
+- The floating-point type caster now only performs value-changing narrowing
+  conversions during the implicit conversion phase. They can be entirely
+  avoided by passing the :cpp:func:`.noconvert() <arg::noconvert>` argument
+  annotation (PR `#829 <https://github.com/wjakob/nanobind/pull/829>`__).
+
+- The ``std::complex`` type caster now only performs value-changing narrowing
+  conversions during the implicit conversion phase.  They can be entirely
+  avoided by passing the :cpp:func:`.noconvert() <arg::noconvert>` argument
+  annotation.  Also, during the implicit conversion phase, if the Python object
+  is not a complex number object but has a ``__complex__()`` method, it will be
+  called (PR `#854 <https://github.com/wjakob/nanobind/pull/854>`__).
+
+- Fixed an overly strict check that could cause a function taking an
+  :cpp:class:`nb::ndarray\<...\> <ndarray>` to refuse specific types of
+  column-major input without implicit conversion. (PR `#847
+  <https://github.com/wjakob/nanobind/pull/847>`__, commit `b95eb7
+  <https://github.com/wjakob/nanobind/commit/b95eb755b5a651a40562002be9ca8a4c6bf0acb9>`__).
+
+Fixes for free-threaded builds
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fixed a race condition in free-threaded extensions that could occur when
+  :cpp:func:`nb::make_iterator <make_iterator>` was concurrently used by
+  multiple threads (PR `#832 <https://github.com/wjakob/nanobind/pull/832>`__).
+
+- Fixed a race condition in free-threaded extensions that could occur when
+  multiple threads access the Python object associated with the same C++
+  instance, which does not exist yet and therefore must be created. (issue
+  `#867 <https://github.com/wjakob/nanobind/issues/867>`__, PR `#887
+  <https://github.com/wjakob/nanobind/pull/887>`__).
+
+- Removed double-checked locking patterns in accesses to internal data
+  structures to ensure correct free-threaded behavior on architectures with
+  weak memory ordering such as ARM (PR `#819
+  <https://github.com/wjakob/nanobind/pull/819>`__).
+
+Version 2.4.0 (Dec 6, 2024)
+---------------------------
+
+- Added a function annotation :cpp:class:`nb::call_policy\<Policy\>()
+  <call_policy>` which supports custom function wrapping logic,
+  calling ``Policy::precall()`` before the bound function and
+  ``Policy::postcall()`` after. This is a low-level interface intended
+  for advanced users. The precall and postcall hooks are able to
+  observe the Python objects forming the function arguments and return
+  value, and the precall hook can change the arguments.  See the linked
+  documentation for more details, important caveats, and an example policy.
+  (PR `#767 <https://github.com/wjakob/nanobind/pull/767>`__)
+
+- :cpp:func:`nb::make_iterator <make_iterator>` now accepts its iterator
+  arguments by value, rather than by forwarding reference, in order to
+  eliminate the hazard of storing a dangling C++ iterator reference in the
+  returned Python iterator object. (PR `#788
+  <https://github.com/wjakob/nanobind/pull/788>`__)
+
+- The ``std::variant`` type_caster now does two passes when converting from Python.
+  The first pass is done without implicit conversions. This fixes an issue where
+  ``std::variant<U, T>`` might cast a Python object wrapping a ``T`` to a ``U`` if
+  there is an implicit conversion available from ``T`` to ``U``.
+  (issue `#769 <https://github.com/wjakob/nanobind/issues/769>`__)
+
+- Restored support for constructing types with an overloaded ``__new__`` that
+  takes no arguments, which regressed with the constructor vector call
+  acceleration that was added in nanobind 2.2.0.
+  (issue `#786 <https://github.com/wjakob/nanobind/issues/786>`__)
+
+- Bindings for augmented assignment operators (as generated, for example, by
+  ``.def(nb::self += nb::self)``) now return the same object in Python in the
+  typical case where the C++ operator returns a reference to ``*this``.
+  Previously, after ``a += b``, ``a`` would be replaced with a copy.
+  (PR `#803 <https://github.com/wjakob/nanobind/pull/803>`__)
+
+- Added an overload to :cpp:func:`nb::isinstance <isinstance>` which tests if a
+  Python object is an instance of a Python class. This is in addition to the
+  existing overload, which tests if a Python object is an instance of a bound
+  C++ class. (PR `#805 <https://github.com/wjakob/nanobind/pull/805>`__).
+
+- Added support for overriding static properties, such as those defined using
+  ``def_prop_ro_static``, in subclasses. Previously this would fail with an
+  error. (PR `#806 <https://github.com/wjakob/nanobind/pull/806>`__).
+
+- Other minor fixes and improvements. (PRs `#771
+  <https://github.com/wjakob/nanobind/pull/771>`__, `#772
+  <https://github.com/wjakob/nanobind/pull/772>`__, `#748
+  <https://github.com/wjakob/nanobind/pull/748>`__, and `#753
+  <https://github.com/wjakob/nanobind/pull/753>`__)
+
+Version 2.3.0
+-------------
+
+There is no version 2.3.0 due to a deployment mishap.
+
+Version 2.2.0 (October 3, 2024)
+-------------------------------
+
+- nanobind can now target `free-threaded Python
+  <https://py-free-threading.github.io>`__, which replaces the `Global
+  Interpreter Lock (GIL)
+  <https://en.wikipedia.org/wiki/Global_interpreter_lock>`__ with a
+  fine-grained locking scheme (see `PEP 703
+  <https://peps.python.org/pep-0703/>`__) to better leverage multi-core
+  parallelism. A :ref:`separate documentation page <free-threaded>` explains this in
+  detail (PRs `#695 <https://github.com/wjakob/nanobind/pull/695>`__, `#720
+  <https://github.com/wjakob/nanobind/pull/720>`__)
+
+- nanobind has always used `PEP 590 vector calls
+  <https://www.python.org/dev/peps/pep-0590>`__ to efficiently dispatch calls
+  to function and method bindings, but it lacked the ability to do so for
+  constructors (e.g., ``MyType(arg1, arg2, ...)``).
+
+  Version 2.2.0 adds this missing part, which accelerates object
+  construction by up to a factor of 2×. The difference is
+  especially pronounced when passing keyword arguments to
+  constructors. Note that this improvement only applies to
+  Python version 3.9 and newer (PR
+  `#706 <https://github.com/wjakob/nanobind/pull/706>`__, commits
+  `#e24d7f <https://github.com/wjakob/nanobind/commit/e24d7f3434a6bbcc33cd8965632dc47f943fb2f8>`__,
+  `#0acecb <https://github.com/wjakob/nanobind/commit/0acecb474874f286119dce2b97b84142b6ada1a8>`__,
+  `#77f910 <https://github.com/wjakob/nanobind/commit/77f910f2a92c88f2c5512f3c375b4fe94369558e>`__,
+  `#2c96d5 <https://github.com/wjakob/nanobind/commit/2c96d5ae2fdbca030dccb1d01c457c7c5df29a0d>`__).
+
+* A new :cpp:class:`nb::is_flag() <is_flag>` annotation in
+  :cpp:class:`nb::enum_\<T\>() <enum_>` produces enumeration
+  bindings deriving from :py:class:`enum.Flag`, which enables
+  bit-wise combination using compatible operators (``&``, ``|``,
+  ``^``, and ``~``). Further combining the annotation with
+  :cpp:class:`nb::is_arithmetic() <is_flag>` creates
+  enumerations deriving from :py:class:`enum.IntFlag`. (PRs
+  `#599 <https://github.com/wjakob/nanobind/pull/599>`__,
+  `#688 <https://github.com/wjakob/nanobind/pull/688>`__,
+  `#688 <https://github.com/wjakob/nanobind/pull/688>`__,
+  `#727 <https://github.com/wjakob/nanobind/pull/727>`__,
+  `#732 <https://github.com/wjakob/nanobind/pull/732>`__)
+
+* A refactor of :cpp:class:`nb::ndarray\<...\> <ndarray>` was an opportunity to
+  realize three usability improvements:
+
+  1. The constructor used to return new nd-arrays from C++ now considers
+     all template arguments:
+
+     - **Memory order**: :cpp:class:`c_contig`, :cpp:class:`f_contig`.
+     - **Shape**: :cpp:class:`nb::shape\<3, 4, 5\> <shape>`, etc.
+     - **Device type**: :cpp:class:`nb::device::cpu <device::cpu>`,
+       :cpp:class:`nb::device::cuda <device::cuda>`, etc.
+     - **Framework**: :cpp:class:`nb::numpy <numpy>`,
+       :cpp:class:`nb::pytorch <pytorch>`, etc.
+     - **Data type**: ``uint64_t``, ``std::complex<double>``, etc.
+
+     Previously, only the **framework** and **data type** annotations were
+     taken into account when returning nd-arrays, while all of them were
+     examined when *accepting* arrays during overload resolution. This
+     inconsistency was a repeated source of confusion among users.
+
+     To give an example, the following now works out of the box without the
+     need to redundantly specify the shape and strides to the ``Array``
+     constructor below:
+
+     .. code-block:: cpp
+
+        using Array = nb::ndarray<float, nb::numpy, nb::shape<4, 4>, nb::f_contig>;
+
+        struct Matrix4f {
+            float m[4][4];
+            Array data() { return Array(m); }
+        };
+
+        nb::class_<Matrix4f>(m, "Matrix4f")
+            .def("data", &Matrix4f::data, nb::rv_policy::reference_internal);
+
+  2. A new nd-array :cpp:func:`.cast() <ndarray::cast>` method forces the
+     immediate creation of a Python object with the specified target framework
+     and return value policy, while preserving the type signature in return
+     values. This is useful to :ref:`return temporaries (e.g. stack-allocated
+     memory) <ndarray-temporaries>` from functions.
+
+  3. Added a new and more general mechanism ``nanobind::detail::dtype_traits<T>``
+     to declare custom ndarray data types like ``float16`` or ``bfloat16``. The old
+     interface (``nanobind::ndarray_traits<T>``) still exists but is deprecated
+     and will be removed in the next major release. See the :ref:`documentation
+     <ndarray-nonstandard>` for details.
+
+  There are two minor but potentially breaking changes:
+
+  1. The nd-array type caster now interprets the
+     :cpp:enumerator:`nb::rv_policy::automatic_reference
+     <rv_policy::automatic_reference>` return value policy analogously to the
+     :cpp:enumerator:`nb::rv_policy::automatic <rv_policy::automatic>`, which
+     means that it references a memory region when the user specifies an
+     ``owner``, and it otherwise copies. This makes it safe to use the
+     :cpp:func:`nb::cast() <cast>` and :cpp:func:`nb::ndarray::cast()
+     <ndarray::cast>` functions that use this policy as a default.
+
+  2. The :cpp:class:`nb::any_contig <any_contig>` memory order annotation,
+     which previously did nothing, now accepts C- or F-contiguous arrays and
+     rejects non-contiguous ones.
+
+  For further details on the nd-array changes, see PR `#721
+  <https://github.com/wjakob/nanobind/pull/721>`__, For further details on the
+  nd-array changes, see PR `#742
+  <https://github.com/wjakob/nanobind/pull/742>`__, and commit `4647ef
+  <https://github.com/wjakob/nanobind/commit/4647efcc45d96e530d41a3461cd9727656bc2ca3>`__.
+
+- The NVIDIA CUDA compiler (``nvcc``) is now explicitly supported and included
+  in nanobind's CI test suite (PR `#710
+  <https://github.com/wjakob/nanobind/pull/710>`__).
+
+* Added support for return value policy customization to the type casters of
+  ``Eigen::Ref<...>`` and ``Eigen::Map<...>`` (commit `67316e
+  <https://github.com/wjakob/nanobind/commit/67316eb88955a15e8e89a57ce9a53d8d66263287>`__).
+
+* Added the :cpp:class:`bytearray` wrapper type. (PR `#654
+  <https://github.com/wjakob/nanobind/pull/654>`__)
+
+* The :cpp:class:`nb::ellipsis <ellipsis>` type now renders as ``...`` when
+  used in :cpp:class:`nb::typed\<...\> <typed>` (PR `#705
+  <https://github.com/wjakob/nanobind/pull/705>`__).
+
+* The :cpp:class:`nb::sig("...") <sig>` annotation now supports `inline type
+  parameter lists
+  <https://docs.python.org/3/reference/compound_stmts.html#type-params>`__ such
+  as ``def first[T](l: Sequence[T]) -> T`` (PR `#704
+  <https://github.com/wjakob/nanobind/pull/704>`__).
+
+* Fixed implicit conversion of complex nd-arrays. (issue `#709
+  <https://github.com/wjakob/nanobind/issues/709>`__)
+
+* Casting via :cpp:func:`nb::cast <cast>` can now specify an owner object for
+  use with the :cpp:enumerator:`nb::rv_policy::reference_internal
+  <rv_policy::reference_internal>` return value policy (PR `#667
+  <https://github.com/wjakob/nanobind/pull/667>`__).
+
+* The ``std::optional<T>`` type caster is now implemented in such a way that it
+  can also accommodate non-STL frameworks, such as Boost, Abseil, etc. (PR
+  `#675 <https://github.com/wjakob/nanobind/pull/675>`__)
+
+* ABI version 15.
+
+* Minor fixes and improvements (PRs
+  `#703 <https://github.com/wjakob/nanobind/pull/703>`__,
+  `#724 <https://github.com/wjakob/nanobind/pull/724>`__,
+  `#723 <https://github.com/wjakob/nanobind/pull/723>`__,
+  `#722 <https://github.com/wjakob/nanobind/pull/722>`__,
+  `#715 <https://github.com/wjakob/nanobind/pull/715>`__,
+  `#696 <https://github.com/wjakob/nanobind/pull/696>`__,
+  `#693 <https://github.com/wjakob/nanobind/pull/693>`__,
+  commit `75d259 <https://github.com/wjakob/nanobind/commit/75d259c7c16db9586e5cd3aa4715e09a25e76d83>`__).
+
 Version 2.1.0 (Aug 11, 2024)
 ----------------------------
 
-* Temporary workaround for a internal compiler error in version 17.10 the MSVC
+* Temporary workaround for a internal compiler error in version 17.10 of the MSVC
   compiler. This workaround will be removed once fixed versions are deployed on
   GitHub actions. (issue `#613
   <https://github.com/wjakob/nanobind/issues/613>`__, commit `f2438b
@@ -30,12 +320,12 @@ Version 2.1.0 (Aug 11, 2024)
   This change was prompted by discussion `#605
   <https://github.com/wjakob/nanobind/discussions/605>`__.
 
-* Switch nanobind wheel generation from `setuptools
+* Switched nanobind wheel generation from `setuptools
   <https://github.com/pypa/setuptools>`__ to `scikit-build-core
   <https://github.com/scikit-build/scikit-build-core>`__ (PR `#618
   <https://github.com/wjakob/nanobind/discussions/618>`__).
 
-* Improved handling of ``const`-ness in :cpp:class:`nb::ndarray <ndarray>` (PR
+* Improved handling of ``const``-ness in :cpp:class:`nb::ndarray <ndarray>` (PR
   `#491 <https://github.com/wjakob/nanobind/discussions/491>`__).
 
 * Keyword argument annotations are now properly supported with
@@ -60,14 +350,14 @@ Version 2.1.0 (Aug 11, 2024)
   `#595 <https://github.com/wjakob/nanobind/pull/595>`__,
   `#647 <https://github.com/wjakob/nanobind/pull/647>`__).
 
-* The nd-array wrapper :cpp::class:`nb::ndarray <ndarray>` now properly handles
+* The nd-array wrapper :cpp:class:`nb::ndarray <ndarray>` now properly handles
   CuPy arrays (`#594 <https://github.com/wjakob/nanobind/pull/594>`__).
 
 * Added :cpp:func:`nb::hash() <hash>`, a wrapper for the Python ``hash()``
   function (commit `91fafa5
   <https://github.com/wjakob/nanobind/commit/01fafa5b9e1de0f1ab2a9d108cd0fce20ab9568f>`__).
 
-* Various minor ``stubgen`` fixes (PR
+* Various minor ``stubgen`` fixes (PRs
   `#667 <https://github.com/wjakob/nanobind/pull/667>`__,
   `#658 <https://github.com/wjakob/nanobind/pull/658>`__,
   `#632 <https://github.com/wjakob/nanobind/pull/632>`__,
@@ -188,12 +478,12 @@ according to `SemVer <http://semver.org>`__. The following changes are
 noteworthy:
 
 * The :cpp:class:`nb::enum_\<T\>() <enum_>` binding declaration is now a
-  wrapper that creates either a ``enum.Enum`` or ``enum.IntEnum``-derived type.
+  wrapper that creates either a :py:class:`enum.Enum` or :py:class:`enum.IntEnum`-derived type.
   Previously, nanobind relied on a custom enumeration base class that was a
   frequent source of friction for users.
 
   This change may break code that casts entries to integers, which now only
-  works for arithmetic (``enum.IntEnum``-derived) enumerations. Replace
+  works for arithmetic (:py:class:`enum.IntEnum`-derived) enumerations. Replace
   ``int(my_enum_entry)`` with ``my_enum_entry.value`` to work around the issue.
 
 * The :cpp:func:`nb::bind_vector\<T\>() <bind_vector>` and
@@ -259,7 +549,7 @@ noteworthy:
   generally do have interned keyword arguments) should be unaffected. (PR `#469
   <https://github.com/wjakob/nanobind/pull/469>`__).
 
-* The ``owner=nb::handle()`` default value of the :cpp:func:`nb::ndarray
+* The ``owner=nb::handle()`` default value of the :cpp:class:`nb::ndarray
   <ndarray>` constructor was removed since it was bug-prone. You now have to
   specify the owner explicitly. The previous default (``nb::handle()``)
   continues to be a valid argument.
@@ -506,7 +796,7 @@ New features
 
 * Several :cpp:class:`nb::ndarray\<..\> <ndarray>` improvements:
 
-  1. CPU loops involving nanobind ndarrays weren't getting properly vectorized.
+  1. CPU loops involving nanobind nd-arrays weren't getting properly vectorized.
      This release of nanobind adds *views*, which provide an efficient
      abstraction that enables better code generation. See the documentation
      section on :ref:`array views <ndarray-views>` for details.
@@ -514,7 +804,7 @@ New features
      <https://github.com/wjakob/nanobind/commit/8f602e187b0634e1df13ba370352cf092e9042c0>`__).
 
   2. Added support for nonstandard arithmetic types (e.g., ``__int128`` or
-     ``__fp16``) in ndarrays. See the :ref:`documentation section
+     ``__fp16``) in nd-arrays. See the :ref:`documentation section
      <ndarray-nonstandard>` for details. (commit `49eab2
      <https://github.com/wjakob/nanobind/commit/49eab2845530f84a1f029c5c1c5541ab3c1f9adc>`__).
 
@@ -523,7 +813,7 @@ New features
      :cpp:class:`nb::ndim\<3\> <ndim>`. (commit `1350a5
      <https://github.com/wjakob/nanobind/commit/1350a5e15b28e80ffc2130a779f3b8c559ddb620>`__).
 
-  4. Added an explicit constructor that can be used to add or remove ndarray
+  4. Added an explicit constructor that can be used to add or remove nd-array
      constraints. (commit `a1ac207
      <https://github.com/wjakob/nanobind/commit/a1ac207ab82206b8e50fe456f577c02270014fb3>`__).
 

@@ -110,6 +110,18 @@ class Int:
 
     def __repr__(self) -> str: ...
 
+class MonkeyPatchable:
+    def __init__(self) -> None: ...
+
+    @staticmethod
+    def custom_init(arg: MonkeyPatchable, /) -> None: ...
+
+    @property
+    def value(self) -> int: ...
+
+    @value.setter
+    def value(self, arg: int, /) -> None: ...
+
 class MyClass:
     def __init__(self) -> None: ...
 
@@ -117,6 +129,21 @@ class MyClass:
         def f(self) -> None: ...
 
     def f(self) -> None: ...
+
+class NewDflt:
+    def __init__(self, value: int = 42) -> None: ...
+
+    @property
+    def value(self) -> int: ...
+
+class NewNone:
+    def __init__(self) -> None: ...
+
+class NewStar:
+    def __init__(self, *args, value: int = 42, **kwargs) -> None: ...
+
+    @property
+    def value(self) -> int: ...
 
 class NonCopyableVec:
     pass
@@ -143,6 +170,9 @@ class PolymorphicBase:
 class PolymorphicSubclass:
     pass
 
+class SiameseCat(Cat):
+    pass
+
 class StaticProperties:
     value: int = ...
     """Static property docstring"""
@@ -152,6 +182,14 @@ class StaticProperties:
 
 class StaticProperties2(StaticProperties):
     pass
+
+class StaticPropertyOverride:
+    x: int = ...
+    """(arg: object, /) -> int"""
+
+class StaticPropertyOverride2(StaticPropertyOverride):
+    x: int = ...
+    """(arg: object, /) -> int"""
 
 class Struct:
     """Some documentation"""

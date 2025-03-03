@@ -84,11 +84,16 @@ public:
      *       its contents and type.
      *
      * @param pFileNameOrUrl The @c std::string file name or URL.
+     * @param pRetrieveContents Whether the contents of the file should be retrieved.
      *
      * @return A smart pointer to a @ref File object.
      */
 
+#ifdef __EMSCRIPTEN__
     static FilePtr create(const std::string &pFileNameOrUrl);
+#else
+    static FilePtr create(const std::string &pFileNameOrUrl, bool pRetrieveContents = true);
+#endif
 
     /**
      * @brief Get the type of this file.
@@ -233,7 +238,7 @@ private:
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
 
-    explicit File(const std::string &pFileNameOrUrl); /**< Constructor, @private. */
+    explicit File(const std::string &pFileNameOrUrl, bool pRetrieveContents); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

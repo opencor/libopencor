@@ -21,7 +21,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-File::Impl::Impl(const std::string &pFileNameOrUrl)
+File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     : Logger::Impl()
 {
     // Check whether we are dealing with a local file or a URL.
@@ -35,17 +35,21 @@ File::Impl::Impl(const std::string &pFileNameOrUrl)
     }
 
 #ifndef __EMSCRIPTEN__
-    // Download a local copy of the remote file, if needed.
+    // Download a local copy of the remote file, if needed and requested.
 
     if (mFilePath.empty()) {
-        auto [res, filePath] = downloadFile(mUrl);
+        if (pRetrieveContents) {
+            auto [res, filePath] = downloadFile(mUrl);
 
-        if (res) {
-            mFilePath = filePath;
+            if (res) {
+                mFilePath = filePath;
+            } else {
+                mType = Type::IRRETRIEVABLE_FILE;
+
+                addError("The file could not be downloaded.");
+            }
         } else {
-            mType = Type::IRRETRIEVABLE_FILE;
-
-            addError("The file could not be downloaded.");
+            mFilePath = stringToPath("/some/path/file");
         }
     } else if (!std::filesystem::exists(mFilePath)) {
         mType = Type::IRRETRIEVABLE_FILE;
@@ -213,8 +217,8 @@ FilePtr File::Impl::childFile(const std::string &pFileName) const
     return {};
 }
 
-File::File(const std::string &pFileNameOrUrl)
-    : Logger(new Impl {pFileNameOrUrl})
+File::File(const std::string &pFileNameOrUrl, bool pRetrieveContents)
+    : Logger(new Impl {pFileNameOrUrl, pRetrieveContents})
 {
 }
 
@@ -237,7 +241,11 @@ const File::Impl *File::pimpl() const
     return static_cast<const Impl *>(Logger::pimpl());
 }
 
+#ifdef __EMSCRIPTEN__
 FilePtr File::create(const std::string &pFileNameOrUrl)
+#else
+FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
+#endif
 {
     // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage,
     // and return a new file object.
@@ -253,7 +261,11 @@ FilePtr File::create(const std::string &pFileNameOrUrl)
         return file;
     }
 
-    auto res = FilePtr {new File {pFileNameOrUrl}};
+#ifdef __EMSCRIPTEN__
+    auto res = FilePtr {new File {pFileNameOrUrl, false}};
+#else
+    auto res = FilePtr {new File {pFileNameOrUrl, pRetrieveContents}};
+#endif
 
     res->pimpl()->checkType(res);
 
