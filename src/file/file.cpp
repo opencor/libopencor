@@ -131,31 +131,24 @@ std::string File::Impl::path() const
     return mUrl.empty() ? fileName() : mUrl;
 }
 
-#ifndef __EMSCRIPTEN__
-void File::Impl::retrieveContents()
+UnsignedChars File::Impl::contents()
 {
+#ifndef __EMSCRIPTEN__
     // Retrieve the contents of the file, if needed.
 
     if (!mContentsRetrieved) {
         setContents(fileContents(mFilePath));
     }
-}
 #endif
+
+    return mContents;
+}
 
 void File::Impl::setContents(const UnsignedChars &pContents)
 {
     mContents = pContents;
 
     mContentsRetrieved = true;
-}
-
-UnsignedChars File::Impl::contents()
-{
-#ifndef __EMSCRIPTEN__
-    retrieveContents();
-#endif
-
-    return mContents;
 }
 
 bool File::Impl::hasChildFiles() const
