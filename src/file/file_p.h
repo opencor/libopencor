@@ -53,10 +53,6 @@ public:
     std::string url() const;
     std::string path() const;
 
-#ifndef __EMSCRIPTEN__
-    void retrieveContents();
-#endif
-
     UnsignedChars contents();
     void setContents(const UnsignedChars &pContents);
 
