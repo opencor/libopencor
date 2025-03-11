@@ -21,16 +21,22 @@ const libopencor = await libOpenCOR();
 
 describe("File coverage tests", () => {
   let someNullCharacterContentsPtr;
+  let someCombineArchiveContentsPtr;
 
   beforeAll(() => {
     someNullCharacterContentsPtr = utils.allocateMemory(
       libopencor,
       utils.SOME_NULL_CHARACTER_CONTENTS,
     );
+    someCombineArchiveContentsPtr = utils.allocateMemory(
+      libopencor,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someNullCharacterContentsPtr);
+    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
   });
 
   test("Empty file", () => {
@@ -83,5 +89,21 @@ describe("File coverage tests", () => {
 
     file1.delete();
     file2.delete();
+  });
+
+  test("Unmanage file with children", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const fileManager = libopencor.FileManager.instance();
+
+    file.setContents(
+      someCombineArchiveContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+    );
+
+    expect(fileManager.fileCount()).toBe(4);
+
+    fileManager.unmanage(file);
+
+    expect(fileManager.fileCount()).toBe(1);
   });
 });

@@ -19,6 +19,7 @@ limitations under the License.
 #include "utils.h"
 
 #include <algorithm>
+#include <stack>
 
 namespace libOpenCOR {
 
@@ -36,10 +37,33 @@ void FileManager::Impl::manage(File *pFile)
 
 void FileManager::Impl::unmanage(File *pFile)
 {
-    auto iter = std::ranges::find(mFiles, pFile);
+    // Iteratively unmanage the file and all its child files.
+    // Note: it would be much simpler to use recursion, but Clang-Tidy does not like it.
 
-    if (iter != mFiles.cend()) {
-        mFiles.erase(iter);
+    std::stack<File *> files;
+
+    files.push(pFile);
+
+    while (!files.empty()) {
+        // Retrieve the file at the top of the stack.
+
+        File *file = files.top();
+
+        files.pop();
+
+        // Add the child files to the stack.
+
+        for (const auto &childFile : file->childFiles()) {
+            files.push(childFile.get());
+        }
+
+        // Unmanage the current file.
+
+        auto iter = std::ranges::find(mFiles, file);
+
+        if (iter != mFiles.cend()) {
+            mFiles.erase(iter);
+        }
     }
 }
 
