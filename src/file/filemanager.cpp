@@ -36,6 +36,14 @@ void FileManager::Impl::manage(File *pFile)
 
 void FileManager::Impl::unmanage(File *pFile)
 {
+    // First, unmanage all the child files.
+
+    for (const auto &childFile : pFile->childFiles()) {
+        unmanage(childFile.get());
+    }
+
+    // Then, unmanage the file itself.
+
     auto iter = std::ranges::find(mFiles, pFile);
 
     if (iter != mFiles.cend()) {
