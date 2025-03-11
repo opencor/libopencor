@@ -62,3 +62,14 @@ def test_do_not_retrieve_contents():
 
     assert file.type == oc.File.Type.UnknownFile
     assert file.contents == []
+
+
+def test_unmanage_file_with_children():
+    file = oc.File(utils.resource_path(utils.Combine2Archive))
+    file_manager = oc.FileManager.instance()
+
+    assert file_manager.file_count == 3
+
+    file_manager.unmanage(file)
+
+    assert file_manager.file_count == 0

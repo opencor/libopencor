@@ -71,3 +71,15 @@ TEST(CoverageFileTest, doNotRetrieveContents)
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 }
+
+TEST(CoverageFileTest, unmanageFileWithChildren)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
+    auto fileManager = libOpenCOR::FileManager::instance();
+
+    EXPECT_EQ(fileManager.fileCount(), 3);
+
+    fileManager.unmanage(file);
+
+    EXPECT_EQ(fileManager.fileCount(), 0);
+}
