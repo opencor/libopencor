@@ -217,14 +217,15 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
     if (!fileContents.empty() && (fileContents[0] != '\0')) {
         auto *document = libsedml::readSedMLFromString(toString(fileContents).c_str());
 
-        // A non-SED-ML file results in our SED-ML document having at least one error, the first of which being of id
-        // libsedml::SedNotSchemaConformant (e.g., a CellML file, i.e. an XML file, but not a SED-ML one) or
-        // libsbml::XMLContentEmpty (e.g., a COMBINE archive, i.e. not an XML file). So, we use these facts to determine
-        // whether our current SED-ML document is indeed a SED-ML file.
+        // A non-SED-ML file results in our SED-ML document having at least one error. That error may be the result of a
+        // malformed XML file (e.g., an HTML file is an XML-like file but not actually an XML file or a COMBINE archive
+        // which is just not an XML file) or a valid XML file but not a SED-ML file (e.g., a CellML file is an XML file
+        // but not a SED-ML file). So, we use these facts to determine whether our current SED-ML document is indeed a
+        // SED-ML file.
 
         if ((document->getNumErrors() == 0)
-            || ((document->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant)
-                && (document->getError(0)->getErrorId() != libsbml::XMLContentEmpty))) {
+            || ((document->getError(0)->getErrorId() > libsbml::XMLErrorCodesUpperBound)
+                && (document->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant))) {
             return SedmlFilePtr {new SedmlFile {pFile, document}};
         }
 
