@@ -92,7 +92,7 @@ describe("Sed basic tests", () => {
   test("No file", () => {
     const document = new libopencor.SedDocument();
 
-    expect(document.hasIssues()).toBe(false);
+    expect(document.hasIssues).toBe(false);
 
     document.delete();
   });
@@ -125,7 +125,7 @@ describe("Sed basic tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    expect(document.hasIssues()).toBe(false);
+    expect(document.hasIssues).toBe(false);
 
     document.delete();
     file.delete();
@@ -138,7 +138,7 @@ describe("Sed basic tests", () => {
 
     let document = new libopencor.SedDocument(file);
 
-    expect(document.hasIssues()).toBe(true);
+    expect(document.hasIssues).toBe(true);
 
     document.delete();
 
@@ -148,7 +148,7 @@ describe("Sed basic tests", () => {
 
     document = new libopencor.SedDocument(file);
 
-    expect(document.hasIssues()).toBe(false);
+    expect(document.hasIssues).toBe(false);
 
     document.delete();
     neededFile.delete();
@@ -165,7 +165,7 @@ describe("Sed basic tests", () => {
 
     let document = new libopencor.SedDocument(file);
 
-    expect(document.hasIssues()).toBe(true);
+    expect(document.hasIssues).toBe(true);
 
     document.delete();
 
@@ -173,7 +173,7 @@ describe("Sed basic tests", () => {
 
     document = new libopencor.SedDocument(file);
 
-    expect(document.hasIssues()).toBe(false);
+    expect(document.hasIssues).toBe(false);
 
     document.delete();
     neededFile.delete();
@@ -190,7 +190,7 @@ describe("Sed basic tests", () => {
 
     let document = new libopencor.SedDocument(file);
 
-    expect(document.hasIssues()).toBe(true);
+    expect(document.hasIssues).toBe(true);
 
     document.delete();
 
@@ -198,7 +198,7 @@ describe("Sed basic tests", () => {
 
     document = new libopencor.SedDocument(file);
 
-    expect(document.hasIssues()).toBe(false);
+    expect(document.hasIssues).toBe(false);
 
     document.delete();
     neededFile.delete();
@@ -215,7 +215,7 @@ describe("Sed basic tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    expect(document.hasIssues()).toBe(false);
+    expect(document.hasIssues).toBe(false);
 
     document.delete();
     file.delete();

@@ -122,18 +122,18 @@ export const SOME_UNSUITABLY_CONSTRAINED_CONTENTS = stringToArrayBuffer(
 );
 
 export function expectIssues(libopencor, logger, expectedIssues) {
-  const issues = logger.issues();
+  const issues = logger.issues;
 
   expect(issues.size()).toBe(expectedIssues.length);
 
   for (let i = 0; i < issues.size(); ++i) {
-    expect(issues.get(i).type().value).toBe(expectedIssues[i][0].value);
-    expect(issues.get(i).description()).toBe(expectedIssues[i][1]);
+    expect(issues.get(i).type.value).toBe(expectedIssues[i][0].value);
+    expect(issues.get(i).description).toBe(expectedIssues[i][1]);
 
-    if (issues.get(i).type() === libopencor.Issue.Type.ERROR) {
-      expect(issues.get(i).typeAsString()).toBe("Error");
+    if (issues.get(i).type === libopencor.Issue.Type.ERROR) {
+      expect(issues.get(i).typeAsString).toBe("Error");
     } else {
-      expect(issues.get(i).typeAsString()).toBe("Warning");
+      expect(issues.get(i).typeAsString).toBe("Warning");
     }
   }
 }
@@ -148,29 +148,29 @@ export function expectValues(
   computedConstantValues,
   algebraicValues,
 ) {
-  for (let i = 0; i < instanceTask.stateCount(); ++i) {
+  for (let i = 0; i < instanceTask.stateCount; ++i) {
     expect(instanceTask.stateAsArray(i)[index]).toBeCloseTo(stateValues[i], 6);
   }
 
-  for (let i = 0; i < instanceTask.rateCount(); ++i) {
+  for (let i = 0; i < instanceTask.rateCount; ++i) {
     expect(instanceTask.rateAsArray(i)[index]).toBeCloseTo(rateValues[i], 6);
   }
 
-  for (let i = 0; i < instanceTask.constantCount(); ++i) {
+  for (let i = 0; i < instanceTask.constantCount; ++i) {
     expect(instanceTask.constantAsArray(i)[index]).toBeCloseTo(
       constantValues[i],
       6,
     );
   }
 
-  for (let i = 0; i < instanceTask.computedConstantCount(); ++i) {
+  for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
     expect(instanceTask.computedConstantAsArray(i)[index]).toBeCloseTo(
       computedConstantValues[i],
       6,
     );
   }
 
-  for (let i = 0; i < instanceTask.algebraicCount(); ++i) {
+  for (let i = 0; i < instanceTask.algebraicCount; ++i) {
     expect(instanceTask.algebraicAsArray(i)[index]).toBeCloseTo(
       algebraicValues[i],
       6,

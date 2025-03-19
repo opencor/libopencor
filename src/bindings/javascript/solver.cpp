@@ -25,9 +25,9 @@ void solverApi()
         .value("NLA", libOpenCOR::Solver::Type::NLA);
 
     emscripten::class_<libOpenCOR::Solver, emscripten::base<libOpenCOR::Logger>>("Solver")
-        .function("type", &libOpenCOR::Solver::type)
-        .function("id", &libOpenCOR::Solver::id)
-        .function("name", &libOpenCOR::Solver::name);
+        .property("type", &libOpenCOR::Solver::type)
+        .property("id", &libOpenCOR::Solver::id)
+        .property("name", &libOpenCOR::Solver::name);
 
     EM_ASM({
         Module["Solver"]["Type"] = Module["Solver.Type"];

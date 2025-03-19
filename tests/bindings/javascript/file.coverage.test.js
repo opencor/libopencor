@@ -44,7 +44,7 @@ describe("File coverage tests", () => {
 
     file.setContents(null, 0);
 
-    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
 
     file.delete();
   });
@@ -57,7 +57,7 @@ describe("File coverage tests", () => {
       utils.SOME_NULL_CHARACTER_CONTENTS.length,
     );
 
-    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
 
     file.delete();
   });
@@ -100,10 +100,10 @@ describe("File coverage tests", () => {
       utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    expect(fileManager.fileCount()).toBe(4);
+    expect(fileManager.fileCount).toBe(4);
 
     fileManager.unmanage(file);
 
-    expect(fileManager.fileCount()).toBe(1);
+    expect(fileManager.fileCount).toBe(1);
   });
 });

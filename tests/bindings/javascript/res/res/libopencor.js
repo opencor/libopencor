@@ -40,13 +40,13 @@ function showError(error) {
 function listFiles() {
   console.log("-------------------");
 
-  if (fileManager.hasFiles()) {
+  if (fileManager.hasFiles) {
     console.log("Files:");
 
-    const files = fileManager.files();
+    const files = fileManager.files;
 
     for (let i = 0; i < files.size(); ++i) {
-      console.log(" - " + files.get(i).fileName());
+      console.log(" - " + files.get(i).fileName);
     }
   } else {
     console.log("No files.");
@@ -84,9 +84,9 @@ function resetObjects() {
 }
 
 export function reset() {
-  const files = fileManager.files();
+  const files = fileManager.files;
 
-  for (let i = 0; i < fileManager.fileCount(); ++i) {
+  for (let i = 0; i < fileManager.fileCount; ++i) {
     files.get(i).delete();
   }
 
@@ -106,9 +106,9 @@ function populateAxis(axisId) {
 
   axis.empty();
 
-  addAxisElement(axis, instanceTask.voiName());
+  addAxisElement(axis, instanceTask.voiName);
 
-  for (let i = 0; i < instanceTask.stateCount(); ++i) {
+  for (let i = 0; i < instanceTask.stateCount; ++i) {
     addAxisElement(axis, instanceTask.stateName(i));
     addAxisElement(axis, instanceTask.rateName(i));
   }
@@ -153,8 +153,8 @@ export function run() {
 
 function axisInfo(index) {
   if (index === 0) {
-    return [instanceTask.voiAsArray(), instanceTask.voiUnit()];
-  } else if (index <= 2 * instanceTask.stateCount()) {
+    return [instanceTask.voiAsArray, instanceTask.voiUnit];
+  } else if (index <= 2 * instanceTask.stateCount) {
     if (index % 2 !== 0) {
       const ndx = (index - 1) / 2;
 
@@ -165,7 +165,7 @@ function axisInfo(index) {
       return [instanceTask.rateAsArray(ndx), instanceTask.rateUnit(ndx)];
     }
   } else {
-    const ndx = index - 1 - 2 * instanceTask.stateCount();
+    const ndx = index - 1 - 2 * instanceTask.stateCount;
 
     return [instanceTask.variableAsArray(ndx), instanceTask.variableUnit(ndx)];
   }
@@ -242,11 +242,11 @@ $(() => {
             let fileType = "some unknown file";
             let knownFile = true;
 
-            if (file.type() === libopencor.File.Type.CELLML_FILE) {
+            if (file.type === libopencor.File.Type.CELLML_FILE) {
               fileType = "a CellML file";
-            } else if (file.type() === libopencor.File.Type.SEDML_FILE) {
+            } else if (file.type === libopencor.File.Type.SEDML_FILE) {
               fileType = "a SED-ML file";
-            } else if (file.type() === libopencor.File.Type.COMBINE_ARCHIVE) {
+            } else if (file.type === libopencor.File.Type.COMBINE_ARCHIVE) {
               fileType = "a COMBINE archive";
             } else {
               knownFile = false;
@@ -260,9 +260,9 @@ $(() => {
             let hasIssues = false;
 
             if (knownFile) {
-              if (file.hasIssues()) {
+              if (file.hasIssues) {
                 const issuesElement = $("#issues");
-                const fileIssues = file.issues();
+                const fileIssues = file.issues;
 
                 issuesElement.empty();
 
@@ -271,9 +271,9 @@ $(() => {
 
                   issuesElement.append(
                     '<li><span class="bold">' +
-                      issue.typeAsString() +
-                      ":</span>" +
-                      formattedIssueDescription(issue.description()) +
+                      issue.typeAsString +
+                      ":</span> " +
+                      formattedIssueDescription(issue.description) +
                       "</li>",
                   );
                 }
@@ -283,17 +283,17 @@ $(() => {
                 // Retrieve some information about the simulation.
 
                 document = new libopencor.SedDocument(file);
-                simulation = document.simulations().get(0);
+                simulation = document.simulations.get(0);
                 instance = document.instantiate();
-                instanceTask = instance.tasks().get(0);
+                instanceTask = instance.tasks.get(0);
 
                 $("#endingPoint").val(simulation.outputEndTime);
-                $("#endingPointUnit").text(instanceTask.voiUnit());
+                $("#endingPointUnit").text(instanceTask.voiUnit);
 
                 $("#pointInterval").val(
                   simulation.outputEndTime / simulation.numberOfSteps,
                 );
-                $("#pointIntervalUnit").text(instanceTask.voiUnit());
+                $("#pointIntervalUnit").text(instanceTask.voiUnit);
 
                 // Populate the X and Y axis dropdown lists.
 
@@ -302,7 +302,7 @@ $(() => {
 
                 // By default we plot the first state variable against the VOI.
 
-                $("#xAxis").val(instanceTask.voiName());
+                $("#xAxis").val(instanceTask.voiName);
                 $("#yAxis").val(instanceTask.stateName(0));
 
                 // Update the plotting area (in case we have some simulation results and we drop a new file) and the

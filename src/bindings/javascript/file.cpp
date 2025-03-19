@@ -28,10 +28,10 @@ void fileApi()
 
     emscripten::class_<libOpenCOR::File, emscripten::base<libOpenCOR::Logger>>("File")
         .smart_ptr_constructor("File", &libOpenCOR::File::create)
-        .function("type", &libOpenCOR::File::type)
-        .function("fileName", &libOpenCOR::File::fileName)
-        .function("url", &libOpenCOR::File::url)
-        .function("path", &libOpenCOR::File::path)
+        .property("type", &libOpenCOR::File::type)
+        .property("fileName", &libOpenCOR::File::fileName)
+        .property("url", &libOpenCOR::File::url)
+        .property("path", &libOpenCOR::File::path)
         .function("contents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis) {
                       auto contents = pThis->contents();
                       auto view = emscripten::typed_memory_view(contents.size(), contents.data());
@@ -46,10 +46,10 @@ void fileApi()
 
                       pThis->setContents(libOpenCOR::UnsignedChars(contents, contents + pSize));
                   }))
-        .function("hasChildFiles", &libOpenCOR::File::hasChildFiles)
-        .function("childFileCount", &libOpenCOR::File::childFileCount)
-        .function("childFileNames", &libOpenCOR::File::childFileNames)
-        .function("childFiles", &libOpenCOR::File::childFiles)
+        .property("hasChildFiles", &libOpenCOR::File::hasChildFiles)
+        .property("childFileCount", &libOpenCOR::File::childFileCount)
+        .property("childFileNames", &libOpenCOR::File::childFileNames)
+        .property("childFiles", &libOpenCOR::File::childFiles)
         .function("childFile", &libOpenCOR::File::childFile)
         .function("childFileFromFileName", &libOpenCOR::File::childFileFromFileName);
 
@@ -66,9 +66,9 @@ void fileApi()
         .function("manage", &libOpenCOR::FileManager::manage)
         .function("unmanage", &libOpenCOR::FileManager::unmanage)
         .function("reset", &libOpenCOR::FileManager::reset)
-        .function("hasFiles", &libOpenCOR::FileManager::hasFiles)
-        .function("fileCount", &libOpenCOR::FileManager::fileCount)
-        .function("files", &libOpenCOR::FileManager::files)
+        .property("hasFiles", &libOpenCOR::FileManager::hasFiles)
+        .property("fileCount", &libOpenCOR::FileManager::fileCount)
+        .property("files", &libOpenCOR::FileManager::files)
         .function("file", &libOpenCOR::FileManager::file)
         .function("fileFromFileNameOrUrl", &libOpenCOR::FileManager::fileFromFileNameOrUrl);
 }

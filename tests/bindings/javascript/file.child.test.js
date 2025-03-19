@@ -61,12 +61,10 @@ describe("File type tests", () => {
 
     file.setContents(omexContentsPtr, omexContents.length);
 
-    expect(file.hasChildFiles()).toBe(true);
-    expect(file.childFileCount()).toBe(specificChildFileNames.length + 1);
-    expect(file.childFileNames().size()).toBe(
-      specificChildFileNames.length + 1,
-    );
-    expect(file.childFiles().size()).toBe(specificChildFileNames.length + 1);
+    expect(file.hasChildFiles).toBe(true);
+    expect(file.childFileCount).toBe(specificChildFileNames.length + 1);
+    expect(file.childFileNames.size()).toBe(specificChildFileNames.length + 1);
+    expect(file.childFiles.size()).toBe(specificChildFileNames.length + 1);
 
     let index = -1;
     const simulationFile = file.childFileFromFileName("simulation.json");
@@ -92,10 +90,10 @@ describe("File type tests", () => {
   test("No child files", () => {
     const file = new libopencor.File(utils.resourcePath(utils.UNKNOWN_FILE));
 
-    expect(file.hasChildFiles()).toBe(false);
-    expect(file.childFileCount()).toBe(0);
-    expect(file.childFileNames().size()).toBe(0);
-    expect(file.childFiles().size()).toBe(0);
+    expect(file.hasChildFiles).toBe(false);
+    expect(file.childFileCount).toBe(0);
+    expect(file.childFileNames.size()).toBe(0);
+    expect(file.childFiles.size()).toBe(0);
     expect(file.childFile(0)).toBeNull();
     expect(file.childFileFromFileName(utils.UNKNOWN_FILE)).toBeNull();
 

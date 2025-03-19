@@ -21,17 +21,17 @@ void loggerApi()
     // Logger API.
 
     emscripten::class_<libOpenCOR::Logger>("Logger")
-        .function("hasIssues", &libOpenCOR::Logger::hasIssues)
-        .function("issueCount", &libOpenCOR::Logger::issueCount)
-        .function("issues", &libOpenCOR::Logger::issues)
+        .property("hasIssues", &libOpenCOR::Logger::hasIssues)
+        .property("issueCount", &libOpenCOR::Logger::issueCount)
+        .property("issues", &libOpenCOR::Logger::issues)
         .function("issue", &libOpenCOR::Logger::issue)
-        .function("hasErrors", &libOpenCOR::Logger::hasErrors)
-        .function("errorCount", &libOpenCOR::Logger::errorCount)
-        .function("errors", &libOpenCOR::Logger::errors)
+        .property("hasErrors", &libOpenCOR::Logger::hasErrors)
+        .property("errorCount", &libOpenCOR::Logger::errorCount)
+        .property("errors", &libOpenCOR::Logger::errors)
         .function("error", &libOpenCOR::Logger::error)
-        .function("hasWarnings", &libOpenCOR::Logger::hasWarnings)
-        .function("warningCount", &libOpenCOR::Logger::warningCount)
-        .function("warnings", &libOpenCOR::Logger::warnings)
+        .property("hasWarnings", &libOpenCOR::Logger::hasWarnings)
+        .property("warningCount", &libOpenCOR::Logger::warningCount)
+        .property("warnings", &libOpenCOR::Logger::warnings)
         .function("warning", &libOpenCOR::Logger::warning);
 
     // Issue API.
@@ -42,9 +42,9 @@ void loggerApi()
 
     emscripten::class_<libOpenCOR::Issue>("Issue")
         .smart_ptr<libOpenCOR::IssuePtr>("Issue")
-        .function("type", &libOpenCOR::Issue::type)
-        .function("typeAsString", &libOpenCOR::Issue::typeAsString)
-        .function("description", &libOpenCOR::Issue::description);
+        .property("type", &libOpenCOR::Issue::type)
+        .property("typeAsString", &libOpenCOR::Issue::typeAsString)
+        .property("description", &libOpenCOR::Issue::description);
 
     EM_ASM({
         Module["Issue"]["Type"] = Module["Issue.Type"];

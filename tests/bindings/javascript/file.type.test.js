@@ -60,7 +60,7 @@ describe("File type tests", () => {
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
-    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expectIssues(libopencor, file, [
       [
         libopencor.Issue.Type.ERROR,
@@ -76,7 +76,7 @@ describe("File type tests", () => {
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    expect(file.type().value).toBe(libopencor.File.Type.CELLML_FILE.value);
+    expect(file.type.value).toBe(libopencor.File.Type.CELLML_FILE.value);
 
     file.delete();
   });
@@ -86,7 +86,7 @@ describe("File type tests", () => {
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
-    expect(file.type().value).toBe(libopencor.File.Type.SEDML_FILE.value);
+    expect(file.type.value).toBe(libopencor.File.Type.SEDML_FILE.value);
 
     file.delete();
   });
@@ -99,7 +99,7 @@ describe("File type tests", () => {
       utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    expect(file.type().value).toBe(libopencor.File.Type.COMBINE_ARCHIVE.value);
+    expect(file.type.value).toBe(libopencor.File.Type.COMBINE_ARCHIVE.value);
 
     file.delete();
   });
