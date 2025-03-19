@@ -225,7 +225,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     document.delete();
@@ -238,14 +238,14 @@ describe("Sed instance tests", () => {
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
-    const simulation = document.simulations().get(0);
+    const simulation = document.simulations.get(0);
     const cvode = simulation.odeSolver;
 
     cvode.maximumNumberOfSteps = 10;
 
     let instance = document.instantiate();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.run();
 
@@ -264,7 +264,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     document.delete();
@@ -278,7 +278,7 @@ describe("Sed instance tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    document.simulations().get(0).odeSolver = null;
+    document.simulations.get(0).odeSolver = null;
 
     const instance = document.instantiate();
 
@@ -301,7 +301,7 @@ describe("Sed instance tests", () => {
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
-    const simulation = document.simulations().get(0);
+    const simulation = document.simulations.get(0);
     const kinsol = simulation.nlaSolver;
 
     kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.BANDED;
@@ -322,7 +322,7 @@ describe("Sed instance tests", () => {
 
     instance = document.instantiate();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     document.delete();
@@ -336,7 +336,7 @@ describe("Sed instance tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    document.simulations().get(0).nlaSolver = null;
+    document.simulations.get(0).nlaSolver = null;
 
     const instance = document.instantiate();
 
@@ -360,7 +360,7 @@ describe("Sed instance tests", () => {
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
-    const simulation = document.simulations().get(0);
+    const simulation = document.simulations.get(0);
     const kinsol = simulation.nlaSolver;
 
     kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.BANDED;
@@ -392,7 +392,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     document.delete();
@@ -406,7 +406,7 @@ describe("Sed instance tests", () => {
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
     const document = new libopencor.SedDocument(file);
-    const simulation = document.simulations().get(0);
+    const simulation = document.simulations.get(0);
 
     simulation.odeSolver = null;
     simulation.nlaSolver = null;
@@ -444,7 +444,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     document.delete();
@@ -463,7 +463,7 @@ describe("Sed instance tests", () => {
     const document = new libopencor.SedDocument(file);
     const instance = document.instantiate();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     document.delete();

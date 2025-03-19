@@ -22,9 +22,9 @@ describe("Solver basic tests", () => {
   test("CVODE solver", () => {
     const solver = new libopencor.SolverCvode();
 
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000019");
-    expect(solver.name()).toBe("CVODE");
+    expect(solver.type.value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solver.id).toBe("KISAO:0000019");
+    expect(solver.name).toBe("CVODE");
 
     expect(solver.maximumStep).toBe(0.0);
     expect(solver.maximumNumberOfSteps).toBe(500);
@@ -81,9 +81,9 @@ describe("Solver basic tests", () => {
   test("Forward Euler solver", () => {
     const solver = new libopencor.SolverForwardEuler();
 
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000030");
-    expect(solver.name()).toBe("Forward Euler");
+    expect(solver.type.value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solver.id).toBe("KISAO:0000030");
+    expect(solver.name).toBe("Forward Euler");
 
     expect(solver.step).toBe(1.0);
 
@@ -97,9 +97,9 @@ describe("Solver basic tests", () => {
   test("Fourth-order Runge-Kutta solver", () => {
     const solver = new libopencor.SolverFourthOrderRungeKutta();
 
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000032");
-    expect(solver.name()).toBe("Fourth-order Runge-Kutta");
+    expect(solver.type.value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solver.id).toBe("KISAO:0000032");
+    expect(solver.name).toBe("Fourth-order Runge-Kutta");
 
     expect(solver.step).toBe(1.0);
 
@@ -113,9 +113,9 @@ describe("Solver basic tests", () => {
   test("Heun solver", () => {
     const solver = new libopencor.SolverHeun();
 
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000301");
-    expect(solver.name()).toBe("Heun");
+    expect(solver.type.value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solver.id).toBe("KISAO:0000301");
+    expect(solver.name).toBe("Heun");
 
     expect(solver.step).toBe(1.0);
 
@@ -129,9 +129,9 @@ describe("Solver basic tests", () => {
   test("KINSOL solver", () => {
     const solver = new libopencor.SolverKinsol();
 
-    expect(solver.type().value).toBe(libopencor.Solver.Type.NLA.value);
-    expect(solver.id()).toBe("KISAO:0000282");
-    expect(solver.name()).toBe("KINSOL");
+    expect(solver.type.value).toBe(libopencor.Solver.Type.NLA.value);
+    expect(solver.id).toBe("KISAO:0000282");
+    expect(solver.name).toBe("KINSOL");
 
     expect(solver.maximumNumberOfIterations).toBe(200);
     expect(solver.linearSolver).toBe(
@@ -158,9 +158,9 @@ describe("Solver basic tests", () => {
   test("Second-order Runge-Kutta solver", () => {
     const solver = new libopencor.SolverSecondOrderRungeKutta();
 
-    expect(solver.type().value).toBe(libopencor.Solver.Type.ODE.value);
-    expect(solver.id()).toBe("KISAO:0000381");
-    expect(solver.name()).toBe("Second-order Runge-Kutta");
+    expect(solver.type.value).toBe(libopencor.Solver.Type.ODE.value);
+    expect(solver.id).toBe("KISAO:0000381");
+    expect(solver.name).toBe("Second-order Runge-Kutta");
 
     expect(solver.step).toBe(1.0);
 

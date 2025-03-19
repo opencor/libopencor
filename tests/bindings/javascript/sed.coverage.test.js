@@ -58,31 +58,31 @@ describe("Sed coverage tests", () => {
   test("Models", () => {
     const document = new libopencor.SedDocument();
 
-    expect(document.hasModels()).toBe(false);
-    expect(document.modelCount()).toBe(0);
-    expect(document.models().size()).toBe(0);
+    expect(document.hasModels).toBe(false);
+    expect(document.modelCount).toBe(0);
+    expect(document.models.size()).toBe(0);
     expect(document.addModel(null)).toBe(false);
 
     const file = new libopencor.File(utils.SEDML_FILE);
     const model = new libopencor.SedModel(document, file);
 
-    expect(model.file()).toStrictEqual(file);
+    expect(model.file).toStrictEqual(file);
 
     expect(document.addModel(model)).toBe(true);
 
-    expect(document.hasModels()).toBe(true);
-    expect(document.modelCount()).toBe(1);
-    expect(document.models().size()).toBe(1);
-    expect(document.models().get(0)).toStrictEqual(model);
+    expect(document.hasModels).toBe(true);
+    expect(document.modelCount).toBe(1);
+    expect(document.models.size()).toBe(1);
+    expect(document.models.get(0)).toStrictEqual(model);
     expect(document.model(0)).toStrictEqual(model);
     expect(document.model(1)).toBeNull();
 
     expect(document.addModel(model)).toBe(false);
     expect(document.removeModel(model)).toBe(true);
 
-    expect(document.hasModels()).toBe(false);
-    expect(document.modelCount()).toBe(0);
-    expect(document.models().size()).toBe(0);
+    expect(document.hasModels).toBe(false);
+    expect(document.modelCount).toBe(0);
+    expect(document.models.size()).toBe(0);
 
     expect(document.removeModel(null)).toBe(false);
 
@@ -94,9 +94,9 @@ describe("Sed coverage tests", () => {
   test("Simulations", () => {
     const document = new libopencor.SedDocument();
 
-    expect(document.hasSimulations()).toBe(false);
-    expect(document.simulationCount()).toBe(0);
-    expect(document.simulations().size()).toBe(0);
+    expect(document.hasSimulations).toBe(false);
+    expect(document.simulationCount).toBe(0);
+    expect(document.simulations.size()).toBe(0);
     expect(document.addSimulation(null)).toBe(false);
 
     const uniform_time_course = new libopencor.SedUniformTimeCourse(document);
@@ -109,13 +109,13 @@ describe("Sed coverage tests", () => {
     expect(document.addSimulation(steady_state)).toBe(true);
     expect(document.addSimulation(analysis)).toBe(true);
 
-    expect(document.hasSimulations()).toBe(true);
-    expect(document.simulationCount()).toBe(4);
-    expect(document.simulations().size()).toBe(4);
-    expect(document.simulations().get(0)).toStrictEqual(uniform_time_course);
-    expect(document.simulations().get(1)).toStrictEqual(one_step);
-    expect(document.simulations().get(2)).toStrictEqual(steady_state);
-    expect(document.simulations().get(3)).toStrictEqual(analysis);
+    expect(document.hasSimulations).toBe(true);
+    expect(document.simulationCount).toBe(4);
+    expect(document.simulations.size()).toBe(4);
+    expect(document.simulations.get(0)).toStrictEqual(uniform_time_course);
+    expect(document.simulations.get(1)).toStrictEqual(one_step);
+    expect(document.simulations.get(2)).toStrictEqual(steady_state);
+    expect(document.simulations.get(3)).toStrictEqual(analysis);
     expect(document.simulation(0)).toStrictEqual(uniform_time_course);
     expect(document.simulation(1)).toStrictEqual(one_step);
     expect(document.simulation(2)).toStrictEqual(steady_state);
@@ -134,9 +134,9 @@ describe("Sed coverage tests", () => {
     expect(document.addSimulation(analysis)).toBe(false);
     expect(document.removeSimulation(analysis)).toBe(true);
 
-    expect(document.hasSimulations()).toBe(false);
-    expect(document.simulationCount()).toBe(0);
-    expect(document.simulations().size()).toBe(0);
+    expect(document.hasSimulations).toBe(false);
+    expect(document.simulationCount).toBe(0);
+    expect(document.simulations.size()).toBe(0);
 
     expect(document.removeSimulation(null)).toBe(false);
 
@@ -148,9 +148,9 @@ describe("Sed coverage tests", () => {
   test("Tasks", () => {
     const document = new libopencor.SedDocument();
 
-    expect(document.hasTasks()).toBe(false);
-    expect(document.taskCount()).toBe(0);
-    expect(document.tasks().size()).toBe(0);
+    expect(document.hasTasks).toBe(false);
+    expect(document.taskCount).toBe(0);
+    expect(document.tasks.size()).toBe(0);
     expect(document.addTask(null)).toBe(false);
 
     const file = new libopencor.File(utils.SEDML_FILE);
@@ -163,10 +163,10 @@ describe("Sed coverage tests", () => {
 
     expect(document.addTask(task)).toBe(true);
 
-    expect(document.hasTasks()).toBe(true);
-    expect(document.taskCount()).toBe(1);
-    expect(document.tasks().size()).toBe(1);
-    expect(document.tasks().get(0)).toStrictEqual(task);
+    expect(document.hasTasks).toBe(true);
+    expect(document.taskCount).toBe(1);
+    expect(document.tasks.size()).toBe(1);
+    expect(document.tasks.get(0)).toStrictEqual(task);
     expect(document.task(0)).toStrictEqual(task);
     expect(document.task(1)).toBeNull();
 
@@ -190,9 +190,9 @@ describe("Sed coverage tests", () => {
     expect(document.addTask(task)).toBe(false);
     expect(document.removeTask(task)).toBe(true);
 
-    expect(document.hasTasks()).toBe(false);
-    expect(document.taskCount()).toBe(0);
-    expect(document.tasks().size()).toBe(0);
+    expect(document.hasTasks).toBe(false);
+    expect(document.taskCount).toBe(0);
+    expect(document.tasks.size()).toBe(0);
 
     expect(document.removeTask(null)).toBe(false);
 
@@ -295,20 +295,20 @@ describe("Sed coverage tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const solver = document.simulations().get(0).odeSolver;
+    const solver = document.simulations.get(0).odeSolver;
 
     solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
     solver.upperHalfBandwidth = -1;
 
     const instance = document.instantiate();
-    const instanceTask = instance.tasks().get(0);
+    const instanceTask = instance.tasks.get(0);
 
-    expect(instanceTask.voi().size()).toBe(0);
-    expect(instanceTask.voiAsArray()).toStrictEqual([]);
-    expect(instanceTask.voiName()).toBe("environment/time");
-    expect(instanceTask.voiUnit()).toBe("millisecond");
+    expect(instanceTask.voi.size()).toBe(0);
+    expect(instanceTask.voiAsArray).toStrictEqual([]);
+    expect(instanceTask.voiName).toBe("environment/time");
+    expect(instanceTask.voiUnit).toBe("millisecond");
 
-    expect(instanceTask.stateCount()).toBe(4);
+    expect(instanceTask.stateCount).toBe(4);
     expect(instanceTask.state(0).size()).toBe(0);
     expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
     expect(instanceTask.state(4).size()).toBe(0);
@@ -318,7 +318,7 @@ describe("Sed coverage tests", () => {
     expect(instanceTask.stateUnit(0)).toBe("millivolt");
     expect(instanceTask.stateUnit(4)).toBe("");
 
-    expect(instanceTask.rateCount()).toBe(4);
+    expect(instanceTask.rateCount).toBe(4);
     expect(instanceTask.rate(0).size()).toBe(0);
     expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
     expect(instanceTask.rate(4).size()).toBe(0);
@@ -328,7 +328,7 @@ describe("Sed coverage tests", () => {
     expect(instanceTask.rateUnit(0)).toBe("millivolt/millisecond");
     expect(instanceTask.rateUnit(4)).toBe("");
 
-    expect(instanceTask.constantCount()).toBe(5);
+    expect(instanceTask.constantCount).toBe(5);
     expect(instanceTask.constant(0).size()).toBe(0);
     expect(instanceTask.constantAsArray(0)).toStrictEqual([]);
     expect(instanceTask.constant(5).size()).toBe(0);
@@ -338,7 +338,7 @@ describe("Sed coverage tests", () => {
     expect(instanceTask.constantUnit(0)).toBe("microF_per_cm2");
     expect(instanceTask.constantUnit(5)).toBe("");
 
-    expect(instanceTask.computedConstantCount()).toBe(3);
+    expect(instanceTask.computedConstantCount).toBe(3);
     expect(instanceTask.computedConstant(0).size()).toBe(0);
     expect(instanceTask.computedConstantAsArray(0)).toStrictEqual([]);
     expect(instanceTask.computedConstant(3).size()).toBe(0);
@@ -348,7 +348,7 @@ describe("Sed coverage tests", () => {
     expect(instanceTask.computedConstantUnit(0)).toBe("millivolt");
     expect(instanceTask.computedConstantUnit(3)).toBe("");
 
-    expect(instanceTask.algebraicCount()).toBe(10);
+    expect(instanceTask.algebraicCount).toBe(10);
     expect(instanceTask.algebraic(0).size()).toBe(0);
     expect(instanceTask.algebraicAsArray(0)).toStrictEqual([]);
     expect(instanceTask.algebraic(10).size()).toBe(0);
@@ -409,7 +409,7 @@ describe("Sed coverage tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const simulation = document.simulations().get(0);
+    const simulation = document.simulations.get(0);
     let solver = new libopencor.SolverForwardEuler();
 
     simulation.odeSolver = solver;
@@ -418,7 +418,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     solver.delete();
@@ -431,7 +431,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     solver.delete();
@@ -444,7 +444,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     solver.delete();
@@ -457,7 +457,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues()).toBe(false);
+    expect(instance.hasIssues).toBe(false);
 
     instance.delete();
     solver.delete();

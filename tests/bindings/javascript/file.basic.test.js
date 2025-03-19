@@ -44,10 +44,10 @@ describe("File basic tests", () => {
   test("Local file", () => {
     const file = new libopencor.File(utils.LOCAL_FILE);
 
-    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
-    expect(file.fileName()).toBe(utils.LOCAL_FILE);
-    expect(file.url()).toBe("");
-    expect(file.path()).toBe(utils.LOCAL_FILE);
+    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.fileName).toBe(utils.LOCAL_FILE);
+    expect(file.url).toBe("");
+    expect(file.path).toBe(utils.LOCAL_FILE);
     expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
     expectIssues(libopencor, file, expectedUnknownFileIssues);
 
@@ -56,7 +56,7 @@ describe("File basic tests", () => {
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
-    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(libopencor, file, expectedUnknownFileIssues);
 
@@ -66,10 +66,10 @@ describe("File basic tests", () => {
   test("Remote file", () => {
     const file = new libopencor.File(utils.REMOTE_FILE);
 
-    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
-    expect(file.fileName()).toBe("/some/path/file");
-    expect(file.url()).toBe(utils.REMOTE_FILE);
-    expect(file.path()).toBe(utils.REMOTE_FILE);
+    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.fileName).toBe("/some/path/file");
+    expect(file.url).toBe(utils.REMOTE_FILE);
+    expect(file.path).toBe(utils.REMOTE_FILE);
     expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
     expectIssues(libopencor, file, expectedUnknownFileIssues);
 
@@ -78,7 +78,7 @@ describe("File basic tests", () => {
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
-    expect(file.type().value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
     expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
     expectIssues(libopencor, file, expectedUnknownFileIssues);
 
@@ -88,9 +88,9 @@ describe("File basic tests", () => {
   test("File manager", () => {
     const fileManager = libopencor.FileManager.instance();
 
-    expect(fileManager.hasFiles()).toBe(false);
-    expect(fileManager.fileCount()).toBe(0);
-    expect(fileManager.files().size()).toBe(0);
+    expect(fileManager.hasFiles).toBe(false);
+    expect(fileManager.fileCount).toBe(0);
+    expect(fileManager.files.size()).toBe(0);
     expect(fileManager.file(0)).toStrictEqual(null);
     expect(fileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE)).toStrictEqual(
       null,
@@ -99,9 +99,9 @@ describe("File basic tests", () => {
     const localFile = new libopencor.File(utils.LOCAL_FILE);
     const sameFileManager = libopencor.FileManager.instance();
 
-    expect(sameFileManager.hasFiles()).toBe(true);
-    expect(sameFileManager.fileCount()).toBe(1);
-    expect(sameFileManager.files().size()).toBe(1);
+    expect(sameFileManager.hasFiles).toBe(true);
+    expect(sameFileManager.fileCount).toBe(1);
+    expect(sameFileManager.files.size()).toBe(1);
     expect(fileManager.file(0)).toStrictEqual(localFile);
     expect(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
@@ -109,9 +109,9 @@ describe("File basic tests", () => {
 
     const remoteFile = new libopencor.File(utils.REMOTE_FILE);
 
-    expect(fileManager.hasFiles()).toBe(true);
-    expect(fileManager.fileCount()).toBe(2);
-    expect(fileManager.files().size()).toBe(2);
+    expect(fileManager.hasFiles).toBe(true);
+    expect(fileManager.fileCount).toBe(2);
+    expect(fileManager.files.size()).toBe(2);
     expect(fileManager.file(1)).toStrictEqual(remoteFile);
     expect(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE)).toStrictEqual(
       remoteFile,
@@ -119,9 +119,9 @@ describe("File basic tests", () => {
 
     sameFileManager.unmanage(localFile);
 
-    expect(sameFileManager.hasFiles()).toBe(true);
-    expect(sameFileManager.fileCount()).toBe(1);
-    expect(sameFileManager.files().size()).toBe(1);
+    expect(sameFileManager.hasFiles).toBe(true);
+    expect(sameFileManager.fileCount).toBe(1);
+    expect(sameFileManager.files.size()).toBe(1);
     expect(fileManager.file(1)).toStrictEqual(null);
     expect(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
@@ -129,9 +129,9 @@ describe("File basic tests", () => {
 
     sameFileManager.manage(localFile);
 
-    expect(sameFileManager.hasFiles()).toBe(true);
-    expect(sameFileManager.fileCount()).toBe(2);
-    expect(sameFileManager.files().size()).toBe(2);
+    expect(sameFileManager.hasFiles).toBe(true);
+    expect(sameFileManager.fileCount).toBe(2);
+    expect(sameFileManager.files.size()).toBe(2);
     expect(fileManager.file(1)).toStrictEqual(localFile);
     expect(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
@@ -139,9 +139,9 @@ describe("File basic tests", () => {
 
     fileManager.reset();
 
-    expect(fileManager.hasFiles()).toBe(false);
-    expect(fileManager.fileCount()).toBe(0);
-    expect(fileManager.files().size()).toBe(0);
+    expect(fileManager.hasFiles).toBe(false);
+    expect(fileManager.fileCount).toBe(0);
+    expect(fileManager.files.size()).toBe(0);
     expect(fileManager.file(0)).toStrictEqual(null);
     expect(fileManager.file(1)).toStrictEqual(null);
     expect(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE)).toStrictEqual(

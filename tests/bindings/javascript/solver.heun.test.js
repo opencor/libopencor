@@ -44,7 +44,7 @@ describe("Solver Heun", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const simulation = document.simulations().get(0);
+    const simulation = document.simulations.get(0);
     const solver = new libopencor.SolverHeun();
 
     solver.step = 0.0;
@@ -75,7 +75,7 @@ describe("Solver Heun", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const simulation = document.simulations().get(0);
+    const simulation = document.simulations.get(0);
     const solver = new libopencor.SolverHeun();
 
     solver.step = 0.0123;
