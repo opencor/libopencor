@@ -158,8 +158,8 @@ describe("Sed coverage tests", () => {
     const simulation = new libopencor.SedUniformTimeCourse(document);
     const task = new libopencor.SedTask(document, model, simulation);
 
-    expect(task.model()).not.toBe(null);
-    expect(task.simulation()).not.toBe(null);
+    expect(task.model).not.toBe(null);
+    expect(task.simulation).not.toBe(null);
 
     expect(document.addTask(task)).toBe(true);
 
@@ -172,11 +172,11 @@ describe("Sed coverage tests", () => {
 
     expect(document.serialise()).toBe(sedTaskExpectedSerialisation(true));
 
-    task.setModel(null);
-    task.setSimulation(null);
+    task.model = null;
+    task.simulation = null;
 
-    expect(task.model()).toBe(null);
-    expect(task.simulation()).toBe(null);
+    expect(task.model).toBe(null);
+    expect(task.simulation).toBe(null);
 
     expect(document.serialise()).toBe(sedTaskExpectedSerialisation(false));
 
@@ -207,17 +207,17 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument();
     const simulation = new libopencor.SedUniformTimeCourse(document);
 
-    expect(simulation.odeSolver()).toBe(null);
+    expect(simulation.odeSolver).toBe(null);
 
     const solver = new libopencor.SolverCvode();
 
-    simulation.setOdeSolver(solver);
+    simulation.odeSolver = solver;
 
-    expect(simulation.odeSolver()).toStrictEqual(solver);
+    expect(simulation.odeSolver).toStrictEqual(solver);
 
-    simulation.setOdeSolver(null);
+    simulation.odeSolver = null;
 
-    expect(simulation.odeSolver()).toBe(null);
+    expect(simulation.odeSolver).toBe(null);
 
     solver.delete();
     simulation.delete();
@@ -228,17 +228,17 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument();
     const simulation = new libopencor.SedUniformTimeCourse(document);
 
-    expect(simulation.nlaSolver()).toBe(null);
+    expect(simulation.nlaSolver).toBe(null);
 
     const solver = new libopencor.SolverKinsol();
 
-    simulation.setNlaSolver(solver);
+    simulation.nlaSolver = solver;
 
-    expect(simulation.nlaSolver()).toStrictEqual(solver);
+    expect(simulation.nlaSolver).toStrictEqual(solver);
 
-    simulation.setNlaSolver(null);
+    simulation.nlaSolver = null;
 
-    expect(simulation.nlaSolver()).toBe(null);
+    expect(simulation.nlaSolver).toBe(null);
 
     solver.delete();
     simulation.delete();
@@ -250,11 +250,11 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument(file);
     const simulation = new libopencor.SedOneStep(document);
 
-    expect(simulation.step()).toBe(1.0);
+    expect(simulation.step).toBe(1.0);
 
-    simulation.setStep(1.23);
+    simulation.step = 1.23;
 
-    expect(simulation.step()).toBe(1.23);
+    expect(simulation.step).toBe(1.23);
 
     simulation.delete();
     document.delete();
@@ -266,20 +266,20 @@ describe("Sed coverage tests", () => {
     const document = new libopencor.SedDocument(file);
     const simulation = new libopencor.SedUniformTimeCourse(document);
 
-    expect(simulation.initialTime()).toBe(0.0);
-    expect(simulation.outputStartTime()).toBe(0.0);
-    expect(simulation.outputEndTime()).toBe(1000.0);
-    expect(simulation.numberOfSteps()).toBe(1000);
+    expect(simulation.initialTime).toBe(0.0);
+    expect(simulation.outputStartTime).toBe(0.0);
+    expect(simulation.outputEndTime).toBe(1000.0);
+    expect(simulation.numberOfSteps).toBe(1000);
 
-    simulation.setInitialTime(1.23);
-    simulation.setOutputStartTime(4.56);
-    simulation.setOutputEndTime(7.89);
-    simulation.setNumberOfSteps(10);
+    simulation.initialTime = 1.23;
+    simulation.outputStartTime = 4.56;
+    simulation.outputEndTime = 7.89;
+    simulation.numberOfSteps = 10;
 
-    expect(simulation.initialTime()).toBe(1.23);
-    expect(simulation.outputStartTime()).toBe(4.56);
-    expect(simulation.outputEndTime()).toBe(7.89);
-    expect(simulation.numberOfSteps()).toBe(10);
+    expect(simulation.initialTime).toBe(1.23);
+    expect(simulation.outputStartTime).toBe(4.56);
+    expect(simulation.outputEndTime).toBe(7.89);
+    expect(simulation.numberOfSteps).toBe(10);
 
     simulation.delete();
     document.delete();
@@ -295,10 +295,10 @@ describe("Sed coverage tests", () => {
     );
 
     const document = new libopencor.SedDocument(file);
-    const solver = document.simulations().get(0).odeSolver();
+    const solver = document.simulations().get(0).odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
-    solver.setUpperHalfBandwidth(-1);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
+    solver.upperHalfBandwidth = -1;
 
     const instance = document.instantiate();
     const instanceTask = instance.tasks().get(0);
@@ -412,7 +412,7 @@ describe("Sed coverage tests", () => {
     const simulation = document.simulations().get(0);
     let solver = new libopencor.SolverForwardEuler();
 
-    simulation.setOdeSolver(solver);
+    simulation.odeSolver = solver;
 
     let instance = document.instantiate();
 
@@ -425,7 +425,7 @@ describe("Sed coverage tests", () => {
 
     solver = new libopencor.SolverFourthOrderRungeKutta();
 
-    simulation.setOdeSolver(solver);
+    simulation.odeSolver = solver;
 
     instance = document.instantiate();
 
@@ -438,7 +438,7 @@ describe("Sed coverage tests", () => {
 
     solver = new libopencor.SolverHeun();
 
-    simulation.setOdeSolver(solver);
+    simulation.odeSolver = solver;
 
     instance = document.instantiate();
 
@@ -451,7 +451,7 @@ describe("Sed coverage tests", () => {
 
     solver = new libopencor.SolverSecondOrderRungeKutta();
 
-    simulation.setOdeSolver(solver);
+    simulation.odeSolver = solver;
 
     instance = document.instantiate();
 

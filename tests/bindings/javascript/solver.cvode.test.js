@@ -45,9 +45,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setMaximumStep(-1.234);
+    solver.maximumStep = -1.234;
 
     const instance = document.instantiate();
 
@@ -73,9 +73,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setMaximumNumberOfSteps(0);
+    solver.maximumNumberOfSteps = 0;
 
     const instance = document.instantiate();
 
@@ -101,10 +101,10 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
-    solver.setUpperHalfBandwidth(-1);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
+    solver.upperHalfBandwidth = -1;
 
     const instance = document.instantiate();
 
@@ -130,10 +130,10 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
-    solver.setUpperHalfBandwidth(4);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
+    solver.upperHalfBandwidth = 4;
 
     const instance = document.instantiate();
 
@@ -159,10 +159,10 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
-    solver.setLowerHalfBandwidth(-1);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
+    solver.lowerHalfBandwidth = -1;
 
     const instance = document.instantiate();
 
@@ -188,10 +188,10 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
-    solver.setLowerHalfBandwidth(4);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
+    solver.lowerHalfBandwidth = 4;
 
     const instance = document.instantiate();
 
@@ -217,9 +217,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setRelativeTolerance(-1.234);
+    solver.relativeTolerance = -1.234;
 
     const instance = document.instantiate();
 
@@ -245,9 +245,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setAbsoluteTolerance(-1.234);
+    solver.absoluteTolerance = -1.234;
 
     const instance = document.instantiate();
 
@@ -300,9 +300,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setInterpolateSolution(false);
+    solver.interpolateSolution = false;
 
     odeModel.run(
       libopencor,
@@ -331,11 +331,10 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setIntegrationMethod(
-      libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
-    );
+    solver.integrationMethod =
+      libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
 
     odeModel.run(
       libopencor,
@@ -364,9 +363,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setIterationType(libopencor.SolverCvode.IterationType.FUNCTIONAL);
+    solver.iterationType = libopencor.SolverCvode.IterationType.FUNCTIONAL;
 
     odeModel.run(
       libopencor,
@@ -395,9 +394,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
 
     odeModel.run(
       libopencor,
@@ -426,9 +425,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.DIAGONAL);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.DIAGONAL;
 
     odeModel.run(
       libopencor,
@@ -457,9 +456,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.GMRES);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.GMRES;
 
     odeModel.run(
       libopencor,
@@ -488,9 +487,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BICGSTAB);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BICGSTAB;
 
     odeModel.run(
       libopencor,
@@ -519,9 +518,9 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.TFQMR);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.TFQMR;
 
     odeModel.run(
       libopencor,
@@ -550,10 +549,10 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.GMRES);
-    solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.GMRES;
+    solver.preconditioner = libopencor.SolverCvode.Preconditioner.NO;
 
     odeModel.run(
       libopencor,
@@ -582,10 +581,10 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BICGSTAB);
-    solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BICGSTAB;
+    solver.preconditioner = libopencor.SolverCvode.Preconditioner.NO;
 
     odeModel.run(
       libopencor,
@@ -614,10 +613,10 @@ describe("Solver CVODE", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.TFQMR);
-    solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.TFQMR;
+    solver.preconditioner = libopencor.SolverCvode.Preconditioner.NO;
 
     odeModel.run(
       libopencor,

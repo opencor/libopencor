@@ -364,7 +364,7 @@ describe("Sed serialise tests", () => {
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
 
-    simulation.setOdeSolver(new libopencor.SolverForwardEuler());
+    simulation.odeSolver = new libopencor.SolverForwardEuler();
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
@@ -381,11 +381,10 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setIntegrationMethod(
-      libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
-    );
+    solver.integrationMethod =
+      libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -404,9 +403,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setIterationType(libopencor.SolverCvode.IterationType.FUNCTIONAL);
+    solver.iterationType = libopencor.SolverCvode.IterationType.FUNCTIONAL;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -425,9 +424,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BANDED);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -446,9 +445,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.DIAGONAL);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.DIAGONAL;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -467,9 +466,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.GMRES);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.GMRES;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -488,9 +487,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.BICGSTAB);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BICGSTAB;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -509,9 +508,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setLinearSolver(libopencor.SolverCvode.LinearSolver.TFQMR);
+    solver.linearSolver = libopencor.SolverCvode.LinearSolver.TFQMR;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -530,9 +529,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setPreconditioner(libopencor.SolverCvode.Preconditioner.NO);
+    solver.preconditioner = libopencor.SolverCvode.Preconditioner.NO;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", { "KISAO:0000478": "No" }),
@@ -549,9 +548,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.odeSolver();
+    const solver = simulation.odeSolver;
 
-    solver.setInterpolateSolution(false);
+    solver.interpolateSolution = false;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -570,9 +569,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.nlaSolver();
+    const solver = simulation.nlaSolver;
 
-    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
+    solver.linearSolver = libopencor.SolverKinsol.LinearSolver.BANDED;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "Banded" }),
@@ -589,9 +588,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.nlaSolver();
+    const solver = simulation.nlaSolver;
 
-    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.GMRES);
+    solver.linearSolver = libopencor.SolverKinsol.LinearSolver.GMRES;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "GMRES" }),
@@ -608,9 +607,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.nlaSolver();
+    const solver = simulation.nlaSolver;
 
-    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BICGSTAB);
+    solver.linearSolver = libopencor.SolverKinsol.LinearSolver.BICGSTAB;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "BiCGStab" }),
@@ -627,9 +626,9 @@ describe("Sed serialise tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const solver = simulation.nlaSolver();
+    const solver = simulation.nlaSolver;
 
-    solver.setLinearSolver(libopencor.SolverKinsol.LinearSolver.TFQMR);
+    solver.linearSolver = libopencor.SolverKinsol.LinearSolver.TFQMR;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),

@@ -239,9 +239,9 @@ describe("Sed instance tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const cvode = simulation.odeSolver();
+    const cvode = simulation.odeSolver;
 
-    cvode.setMaximumNumberOfSteps(10);
+    cvode.maximumNumberOfSteps = 10;
 
     let instance = document.instantiate();
 
@@ -258,7 +258,7 @@ describe("Sed instance tests", () => {
 
     instance.delete();
 
-    cvode.setMaximumNumberOfSteps(500);
+    cvode.maximumNumberOfSteps = 500;
 
     instance = document.instantiate();
 
@@ -278,7 +278,7 @@ describe("Sed instance tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    document.simulations().get(0).setOdeSolver(null);
+    document.simulations().get(0).odeSolver = null;
 
     const instance = document.instantiate();
 
@@ -302,10 +302,10 @@ describe("Sed instance tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const kinsol = simulation.nlaSolver();
+    const kinsol = simulation.nlaSolver;
 
-    kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
-    kinsol.setUpperHalfBandwidth(-1);
+    kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.BANDED;
+    kinsol.upperHalfBandwidth = -1;
 
     let instance = document.instantiate();
 
@@ -318,7 +318,7 @@ describe("Sed instance tests", () => {
 
     instance.delete();
 
-    kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
+    kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.DENSE;
 
     instance = document.instantiate();
 
@@ -336,7 +336,7 @@ describe("Sed instance tests", () => {
 
     const document = new libopencor.SedDocument(file);
 
-    document.simulations().get(0).setNlaSolver(null);
+    document.simulations().get(0).nlaSolver = null;
 
     const instance = document.instantiate();
 
@@ -361,10 +361,10 @@ describe("Sed instance tests", () => {
 
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
-    const kinsol = simulation.nlaSolver();
+    const kinsol = simulation.nlaSolver;
 
-    kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.BANDED);
-    kinsol.setUpperHalfBandwidth(-1);
+    kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.BANDED;
+    kinsol.upperHalfBandwidth = -1;
 
     let instance = document.instantiate();
 
@@ -386,7 +386,7 @@ describe("Sed instance tests", () => {
 
     instance.delete();
 
-    kinsol.setLinearSolver(libopencor.SolverKinsol.LinearSolver.DENSE);
+    kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.DENSE;
 
     instance = document.instantiate();
 
@@ -408,8 +408,8 @@ describe("Sed instance tests", () => {
     const document = new libopencor.SedDocument(file);
     const simulation = document.simulations().get(0);
 
-    simulation.setOdeSolver(null);
-    simulation.setNlaSolver(null);
+    simulation.odeSolver = null;
+    simulation.nlaSolver = null;
 
     const instance = document.instantiate();
 

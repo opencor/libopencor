@@ -27,8 +27,8 @@ export function run(
 ) {
   const simulation = document.simulations().get(0);
 
-  simulation.setOutputEndTime(50.0);
-  simulation.setNumberOfSteps(50000);
+  simulation.outputEndTime = 50.0;
+  simulation.numberOfSteps = 50000;
 
   const instance = document.instantiate();
 
