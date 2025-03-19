@@ -133,10 +133,9 @@ export function run() {
 
   // Retrieve the duration of the simulation and the number of steps.
 
-  simulation.setOutputEndTime($("#endingPoint").val());
-  simulation.setNumberOfSteps(
-    $("#endingPoint").val() / $("#pointInterval").val(),
-  );
+  simulation.outputEndTime = $("#endingPoint").val();
+  simulation.numberOfSteps =
+    $("#endingPoint").val() / $("#pointInterval").val();
 
   // Run the simulation.
 
@@ -288,11 +287,11 @@ $(() => {
                 instance = document.instantiate();
                 instanceTask = instance.tasks().get(0);
 
-                $("#endingPoint").val(simulation.outputEndTime());
+                $("#endingPoint").val(simulation.outputEndTime);
                 $("#endingPointUnit").text(instanceTask.voiUnit());
 
                 $("#pointInterval").val(
-                  simulation.outputEndTime() / simulation.numberOfSteps(),
+                  simulation.outputEndTime / simulation.numberOfSteps,
                 );
                 $("#pointIntervalUnit").text(instanceTask.voiUnit());
 

@@ -47,9 +47,9 @@ describe("Solver Heun", () => {
     const simulation = document.simulations().get(0);
     const solver = new libopencor.SolverHeun();
 
-    solver.setStep(0.0);
+    solver.step = 0.0;
 
-    simulation.setOdeSolver(solver);
+    simulation.odeSolver = solver;
 
     const instance = document.instantiate();
 
@@ -78,9 +78,9 @@ describe("Solver Heun", () => {
     const simulation = document.simulations().get(0);
     const solver = new libopencor.SolverHeun();
 
-    solver.setStep(0.0123);
+    solver.step = 0.0123;
 
-    simulation.setOdeSolver(solver);
+    simulation.odeSolver = solver;
 
     odeModel.run(
       libopencor,

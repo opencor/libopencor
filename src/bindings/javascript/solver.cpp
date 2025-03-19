@@ -43,8 +43,7 @@ void solverApi()
     // SolverOdeFixedStep API.
 
     emscripten::class_<libOpenCOR::SolverOdeFixedStep, emscripten::base<libOpenCOR::SolverOde>>("SolverOdeFixedStep")
-        .function("step", &libOpenCOR::SolverOdeFixedStep::step)
-        .function("setStep", &libOpenCOR::SolverOdeFixedStep::setStep);
+        .property("step", &libOpenCOR::SolverOdeFixedStep::step, &libOpenCOR::SolverOdeFixedStep::setStep);
 
     // SolverNla API.
 
@@ -75,28 +74,17 @@ void solverApi()
 
     emscripten::class_<libOpenCOR::SolverCvode, emscripten::base<libOpenCOR::SolverOde>>("SolverCvode")
         .smart_ptr_constructor("SolverCvode", &libOpenCOR::SolverCvode::create)
-        .function("maximumStep", &libOpenCOR::SolverCvode::maximumStep)
-        .function("setMaximumStep", &libOpenCOR::SolverCvode::setMaximumStep)
-        .function("maximumNumberOfSteps", &libOpenCOR::SolverCvode::maximumNumberOfSteps)
-        .function("setMaximumNumberOfSteps", &libOpenCOR::SolverCvode::setMaximumNumberOfSteps)
-        .function("integrationMethod", &libOpenCOR::SolverCvode::integrationMethod)
-        .function("setIntegrationMethod", &libOpenCOR::SolverCvode::setIntegrationMethod)
-        .function("iterationType", &libOpenCOR::SolverCvode::iterationType)
-        .function("setIterationType", &libOpenCOR::SolverCvode::setIterationType)
-        .function("linearSolver", &libOpenCOR::SolverCvode::linearSolver)
-        .function("setLinearSolver", &libOpenCOR::SolverCvode::setLinearSolver)
-        .function("preconditioner", &libOpenCOR::SolverCvode::preconditioner)
-        .function("setPreconditioner", &libOpenCOR::SolverCvode::setPreconditioner)
-        .function("upperHalfBandwidth", &libOpenCOR::SolverCvode::upperHalfBandwidth)
-        .function("setUpperHalfBandwidth", &libOpenCOR::SolverCvode::setUpperHalfBandwidth)
-        .function("lowerHalfBandwidth", &libOpenCOR::SolverCvode::lowerHalfBandwidth)
-        .function("setLowerHalfBandwidth", &libOpenCOR::SolverCvode::setLowerHalfBandwidth)
-        .function("relativeTolerance", &libOpenCOR::SolverCvode::relativeTolerance)
-        .function("setRelativeTolerance", &libOpenCOR::SolverCvode::setRelativeTolerance)
-        .function("absoluteTolerance", &libOpenCOR::SolverCvode::absoluteTolerance)
-        .function("setAbsoluteTolerance", &libOpenCOR::SolverCvode::setAbsoluteTolerance)
-        .function("interpolateSolution", &libOpenCOR::SolverCvode::interpolateSolution)
-        .function("setInterpolateSolution", &libOpenCOR::SolverCvode::setInterpolateSolution);
+        .property("maximumStep", &libOpenCOR::SolverCvode::maximumStep, &libOpenCOR::SolverCvode::setMaximumStep)
+        .property("maximumNumberOfSteps", &libOpenCOR::SolverCvode::maximumNumberOfSteps, &libOpenCOR::SolverCvode::setMaximumNumberOfSteps)
+        .property("integrationMethod", &libOpenCOR::SolverCvode::integrationMethod, &libOpenCOR::SolverCvode::setIntegrationMethod)
+        .property("iterationType", &libOpenCOR::SolverCvode::iterationType, &libOpenCOR::SolverCvode::setIterationType)
+        .property("linearSolver", &libOpenCOR::SolverCvode::linearSolver, &libOpenCOR::SolverCvode::setLinearSolver)
+        .property("preconditioner", &libOpenCOR::SolverCvode::preconditioner, &libOpenCOR::SolverCvode::setPreconditioner)
+        .property("upperHalfBandwidth", &libOpenCOR::SolverCvode::upperHalfBandwidth, &libOpenCOR::SolverCvode::setUpperHalfBandwidth)
+        .property("lowerHalfBandwidth", &libOpenCOR::SolverCvode::lowerHalfBandwidth, &libOpenCOR::SolverCvode::setLowerHalfBandwidth)
+        .property("relativeTolerance", &libOpenCOR::SolverCvode::relativeTolerance, &libOpenCOR::SolverCvode::setRelativeTolerance)
+        .property("absoluteTolerance", &libOpenCOR::SolverCvode::absoluteTolerance, &libOpenCOR::SolverCvode::setAbsoluteTolerance)
+        .property("interpolateSolution", &libOpenCOR::SolverCvode::interpolateSolution, &libOpenCOR::SolverCvode::setInterpolateSolution);
 
     EM_ASM({
         Module["SolverCvode"]["IntegrationMethod"] = Module["SolverCvode.IntegrationMethod"];
@@ -136,14 +124,10 @@ void solverApi()
 
     emscripten::class_<libOpenCOR::SolverKinsol, emscripten::base<libOpenCOR::SolverNla>>("SolverKinsol")
         .smart_ptr_constructor("SolverKinsol", &libOpenCOR::SolverKinsol::create)
-        .function("maximumNumberOfIterations", &libOpenCOR::SolverKinsol::maximumNumberOfIterations)
-        .function("setMaximumNumberOfIterations", &libOpenCOR::SolverKinsol::setMaximumNumberOfIterations)
-        .function("linearSolver", &libOpenCOR::SolverKinsol::linearSolver)
-        .function("setLinearSolver", &libOpenCOR::SolverKinsol::setLinearSolver)
-        .function("upperHalfBandwidth", &libOpenCOR::SolverKinsol::upperHalfBandwidth)
-        .function("setUpperHalfBandwidth", &libOpenCOR::SolverKinsol::setUpperHalfBandwidth)
-        .function("lowerHalfBandwidth", &libOpenCOR::SolverKinsol::lowerHalfBandwidth)
-        .function("setLowerHalfBandwidth", &libOpenCOR::SolverKinsol::setLowerHalfBandwidth);
+        .property("maximumNumberOfIterations", &libOpenCOR::SolverKinsol::maximumNumberOfIterations, &libOpenCOR::SolverKinsol::setMaximumNumberOfIterations)
+        .property("linearSolver", &libOpenCOR::SolverKinsol::linearSolver, &libOpenCOR::SolverKinsol::setLinearSolver)
+        .property("upperHalfBandwidth", &libOpenCOR::SolverKinsol::upperHalfBandwidth, &libOpenCOR::SolverKinsol::setUpperHalfBandwidth)
+        .property("lowerHalfBandwidth", &libOpenCOR::SolverKinsol::lowerHalfBandwidth, &libOpenCOR::SolverKinsol::setLowerHalfBandwidth);
 
     EM_ASM({
         Module["SolverKinsol"]["LinearSolver"] = Module["SolverKinsol.LinearSolver"];
