@@ -113,15 +113,15 @@ function populateAxis(axisId) {
     addAxisElement(axis, instanceTask.rateName(i));
   }
 
-  for (let i = 0; i < instanceTask.constantCount(); ++i) {
+  for (let i = 0; i < instanceTask.constantCount; ++i) {
     addAxisElement(axis, instanceTask.constantName(i));
   }
 
-  for (let i = 0; i < instanceTask.computedConstantCount(); ++i) {
+  for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
     addAxisElement(axis, instanceTask.computedConstantName(i));
   }
 
-  for (let i = 0; i < instanceTask.algebraicCount(); ++i) {
+  for (let i = 0; i < instanceTask.algebraicCount; ++i) {
     addAxisElement(axis, instanceTask.algebraicName(i));
   }
 }
