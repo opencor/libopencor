@@ -22,14 +22,27 @@ limitations under the License.
 
 TEST(VersionTest, libOpenCOR)
 {
+    static const int NINETEEN_HUNDRED = 1900;
+    static const int ONE = 1;
+
+    auto now = std::chrono::system_clock::now();
+    auto now_time_t = std::chrono::system_clock::to_time_t(now);
+    std::tm local_tm {};
+
+#ifdef _WIN32
+    localtime_s(&local_tm, &now_time_t); // NOLINT
+#else
+    localtime_r(&now_time_t, &local_tm); // NOLINT
+#endif
+
+    auto year = NINETEEN_HUNDRED + local_tm.tm_year;
+    auto month = ONE + local_tm.tm_mon;
+    auto day = local_tm.tm_mday;
+
     static const int TEN_THOUSAND = 10000;
     static const int HUNDRED = 100;
     static const int TEN = 10;
 
-    auto now = std::chrono::year_month_day {std::chrono::time_point_cast<std::chrono::days>(std::chrono::system_clock::now())};
-    auto year = static_cast<int>(now.year());
-    auto month = static_cast<int>(static_cast<unsigned>(now.month()));
-    auto day = static_cast<int>(static_cast<unsigned>(now.day()));
     int version = 0;
     int number = TEN_THOUSAND * year + HUNDRED * month + day;
 
