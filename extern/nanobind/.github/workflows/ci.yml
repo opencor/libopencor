@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         os: ['ubuntu-latest', 'windows-2022', 'macos-13']
-        python: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13.0-rc.2', 'pypy3.9-v7.3.16', 'pypy3.10-v7.3.17']
+        python: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13', '3.14.0-alpha.5', 'pypy3.9-v7.3.16', 'pypy3.10-v7.3.17']
 
     name: "Python ${{ matrix.python }} / ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
@@ -49,16 +49,28 @@ jobs:
         python -m pip install pytest pytest-github-actions-annotate-failures typing_extensions
 
     - name: Install NumPy
-      if: ${{ !startsWith(matrix.python, 'pypy') && !contains(matrix.python, 'rc.2') }}
+      if: ${{ !startsWith(matrix.python, 'pypy') && !contains(matrix.python, 'alpha') }}
       run: |
         python -m pip install numpy scipy
 
     - name: Configure
       run: >
-        cmake -S . -B build -DNB_TEST_STABLE_ABI=ON -DNB_TEST_SHARED_BUILD="$(python3 -c 'import sys; print(int(sys.version_info.minor>=11))')"
+        cmake -S . -B build -DNB_TEST_STABLE_ABI=ON -DNB_TEST_SHARED_BUILD="$(python -c 'import sys; print(int(sys.version_info.minor>=11))')"
 
     - name: Build C++
       run: cmake --build build -j 2
+
+    - name: Check ABI tag
+      if: ${{ !startsWith(matrix.os, 'windows')  }}
+      run: >
+        cd build/tests;
+        python -c 'import test_functions_ext as t; print(f"ABI tag is \"{ t.abi_tag() }\"")'
+
+    - name: Check ABI tag
+      if: ${{ startsWith(matrix.os, 'windows')  }}
+      run: >
+        cd build/tests/Debug;
+        python -c 'import test_functions_ext as t; print(f"ABI tag is \"{ t.abi_tag() }\"")'
 
     - name: Run tests
       run: >
@@ -84,6 +96,11 @@ jobs:
 
     - name: Build C++
       run: cmake --build build -j 2
+
+    - name: Check ABI tag
+      run: >
+        cd build/tests;
+        python3 -c 'import test_functions_ext as t; print(f"ABI tag is \"{ t.abi_tag() }\"")'
 
     - name: Run tests
       run: >
@@ -134,6 +151,11 @@ jobs:
     - name: Build C++
       run: cmake --build build -j 2
 
+    - name: Check ABI tag
+      run: >
+        cd build/tests;
+        python -c 'import test_functions_ext as t; print(f"ABI tag is \"{ t.abi_tag() }\"")'
+
     - name: Run tests
       run: >
         cd build;
@@ -165,7 +187,13 @@ jobs:
         cmake -S . -B build -DNB_TEST_FREE_THREADED=ON
 
     - name: Build C++
-      run: cmake --build build -j 2
+      run: >
+        cmake --build build -j 2
+
+    - name: Check ABI tag
+      run: >
+        cd build/tests;
+        python -c 'import test_functions_ext as t; print(f"ABI tag is \"{ t.abi_tag() }\"")'
 
     - name: Run tests
       run: >

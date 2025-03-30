@@ -15,6 +15,40 @@ case, both modules must use the same nanobind ABI version, or they will be
 isolated from each other. Releases that don't explicitly mention an ABI version
 below inherit that of the preceding release.
 
+Version 2.6.1 (Mar 28, 2025)
+----------------------------
+
+- nanobind assigns an ABI tag to compiled extensions and uses it to isolate
+  incompatible extensions from each other. This tag was unnecessarily
+  fine-grained, often causing isolation where an actual ABI compatibility was
+  not present. This release updates the tagging scheme to address this
+  long-standing inconvenience. (PR `#778
+  <https://github.com/wjakob/nanobind/pull/778>`__).
+
+- Added specialized function dispatchers to accelerate calls to 0 and
+  1-argument functions. (PR `#944
+  <https://github.com/wjakob/nanobind/pull/944>`__).
+
+- Improved the efficiency of :cpp:func:`nb::getattr(obj, key,
+  default) <getattr>` in cases where ``obj[key]`` does exist. (commit
+  `bb05f5
+  <https://github.com/wjakob/nanobind/commit/bb05f5503aef9b70498302bf30bf958e8cc605c7>`__).
+
+* ABI version 16.
+
+* Miscellaneous fixes and improvements (PRs `#913
+  <https://github.com/wjakob/nanobind/pull/913>`__, `#914
+  <https://github.com/wjakob/nanobind/pull/914>`__, `#916
+  <https://github.com/wjakob/nanobind/pull/916>`__, `#931
+  <https://github.com/wjakob/nanobind/pull/931>`__, `#978
+  <https://github.com/wjakob/nanobind/pull/978>`__, commit `1595d2
+  <https://github.com/wjakob/nanobind/commit/1595d2d40717d65835ed984b06cfc2b4da0e4858>`__).
+
+Version 2.6.0 (Mar 28, 2025)
+----------------------------
+
+- This release was yanked due to a regression.
+
 Version 2.5.0 (Feb 2, 2025)
 ---------------------------
 
@@ -49,26 +83,36 @@ Version 2.5.0 (Feb 2, 2025)
 - Fixed the :cpp:class:`nb::int_ <int_>` constructor so that it casts to
   an integer when invoked with a floating point argument.
 
-- Multi-level inheritance (e.g., `A → B → C`) previously did not work on Python
+- Multi-level inheritance (e.g., ``A → B → C``) previously did not work on Python
   3.12+ when a base class (e.g., ``A``) provided a trampoline implementation.
   This is now fixed. (commit `92d9cb
   <https://github.com/wjakob/nanobind/commit/92d9cb3d62b743a9eca2d9d9d8e5fb14a1e00a2a>`__).
 
-- Fixed (benign) reference leads that could occur when ``std::shared_ptr<T>``
+- A new ``NB_SUPPRESS_WARNINGS`` parameter of
+  :cmake:command:`nanobind_add_module` that marks the nanobind and Python
+  include directories as
+  `SYSTEM <https://cmake.org/cmake/help/latest/command/include_directories.html>`__
+  include directories, which suppresses any potential warning messages
+  originating there. This is mainly of relevance for projects that artificially
+  raise the warning level using flags like ``-pedantic``, ``-Wcast-qual``,
+  ``-Wsign-conversion``. (PR `#868
+  <https://github.com/wjakob/nanobind/pull/868>`__).
+
+- Fixed (benign) reference leaks that could occur when ``std::shared_ptr<T>``
   instances were still alive at interpreter shutdown time. (commit `fb8157
   <https://github.com/wjakob/nanobind/commit/fb815762fdb8476cfd293e3717ca41c8bb890437>`__).
 
 - The floating-point type caster now only performs value-changing narrowing
   conversions during the implicit conversion phase. They can be entirely
   avoided by passing the :cpp:func:`.noconvert() <arg::noconvert>` argument
-  annotation (PR `#829 <https://github.com/wjakob/nanobind/pull/829>`__).
+  annotation. (PR `#829 <https://github.com/wjakob/nanobind/pull/829>`__)
 
 - The ``std::complex`` type caster now only performs value-changing narrowing
   conversions during the implicit conversion phase.  They can be entirely
   avoided by passing the :cpp:func:`.noconvert() <arg::noconvert>` argument
   annotation.  Also, during the implicit conversion phase, if the Python object
   is not a complex number object but has a ``__complex__()`` method, it will be
-  called (PR `#854 <https://github.com/wjakob/nanobind/pull/854>`__).
+  called. (PR `#854 <https://github.com/wjakob/nanobind/pull/854>`__)
 
 - Fixed an overly strict check that could cause a function taking an
   :cpp:class:`nb::ndarray\<...\> <ndarray>` to refuse specific types of
@@ -81,7 +125,7 @@ Fixes for free-threaded builds
 
 - Fixed a race condition in free-threaded extensions that could occur when
   :cpp:func:`nb::make_iterator <make_iterator>` was concurrently used by
-  multiple threads (PR `#832 <https://github.com/wjakob/nanobind/pull/832>`__).
+  multiple threads. (PR `#832 <https://github.com/wjakob/nanobind/pull/832>`__).
 
 - Fixed a race condition in free-threaded extensions that could occur when
   multiple threads access the Python object associated with the same C++
@@ -1410,7 +1454,7 @@ Version 0.0.5 (May 13, 2022)
 ----------------------------
 
 * Enumeration export.
-* Implicit number conversion for numpy scalars.
+* Implicit number conversion for NumPy scalars.
 * Various minor fixes and improvements.
 
 Version 0.0.4 (May 13, 2022)
