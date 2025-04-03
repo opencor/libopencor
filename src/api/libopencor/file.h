@@ -189,7 +189,7 @@ public:
      *
      * Return the child file names. This method is only relevant for COMBINE archives.
      *
-     * @return The child file names, as a @c std::vector of @c std::string.
+     * @return The child file names, as a @ref Strings.
      */
 
     Strings childFileNames() const;
@@ -199,7 +199,7 @@ public:
      *
      * Return the child files. This method is only relevant for COMBINE archives.
      *
-     * @return The child files, as a @c std::vector of @ref FilePtr.
+     * @return The child files, as a @ref FilePtrs.
      */
 
     FilePtrs childFiles() const;

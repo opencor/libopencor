@@ -115,7 +115,7 @@ public:
      *
      * Return the models.
      *
-     * @return The models, as a @c std::vector of @ref SedModelPtr.
+     * @return The models, as a @ref SedModelPtrs.
      */
 
     SedModelPtrs models() const;
@@ -181,7 +181,7 @@ public:
      *
      * Return the simulations.
      *
-     * @return The simulations, as a @c std::vector of @ref SedSimulationPtr.
+     * @return The simulations, as a @ref SedSimulationPtrs.
      */
 
     SedSimulationPtrs simulations() const;
@@ -247,7 +247,7 @@ public:
      *
      * Return the tasks.
      *
-     * @return The tasks, as a @c std::vector of @ref SedAbstractTaskPtr.
+     * @return The tasks, as a @ref SedAbstractTaskPtrs.
      */
 
     SedAbstractTaskPtrs tasks() const;

@@ -95,7 +95,7 @@ public:
      *
      * @param pIndex The index of the state.
      *
-     * @return The values of the state, as a @c std::vector of @c double, if the index is valid, an empty vector otherwise.
+     * @return The values of the state, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
     Doubles state(size_t pIndex) const;
@@ -145,7 +145,7 @@ public:
      *
      * @param pIndex The index of the rate.
      *
-     * @return The values of the rate, as a @c std::vector of @c double, if the index is valid, an empty vector otherwise.
+     * @return The values of the rate, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
     Doubles rate(size_t pIndex) const;
@@ -195,7 +195,7 @@ public:
      *
      * @param pIndex The index of the constant.
      *
-     * @return The values of the constant, as a @c std::vector of @c double, if the index is valid, an empty vector otherwise.
+     * @return The values of the constant, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
     Doubles constant(size_t pIndex) const;
@@ -245,8 +245,7 @@ public:
      *
      * @param pIndex The index of the computed constant.
      *
-     * @return The values of the computed constant, as a @c std::vector of @c double, if the index is valid, an empty
-     * vector otherwise.
+     * @return The values of the computed constant, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
     Doubles computedConstant(size_t pIndex) const;
@@ -296,8 +295,7 @@ public:
      *
      * @param pIndex The index of the algebraic variable.
      *
-     * @return The values of the algebraic variable, as a @c std::vector of @c double, if the index is valid, an empty
-     * vector otherwise.
+     * @return The values of the algebraic variable, as a @c Doubles, if the index is valid, an empty vector otherwise.
      */
 
     Doubles algebraic(size_t pIndex) const;
