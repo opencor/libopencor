@@ -271,6 +271,11 @@ def test_sed_instance_and_sed_instance_task():
     instance = document.instantiate()
     instance_task = instance.tasks[0]
 
+    assert instance.has_tasks == True
+    assert instance.task_count == 1
+    assert instance.task(0) == instance_task
+    assert instance.task(1) == None
+
     assert instance_task.voi == []
     assert instance_task.voi_name == "environment/time"
     assert instance_task.voi_unit == "millisecond"

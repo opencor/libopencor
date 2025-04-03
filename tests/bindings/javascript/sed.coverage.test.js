@@ -303,6 +303,11 @@ describe("Sed coverage tests", () => {
     const instance = document.instantiate();
     const instanceTask = instance.tasks.get(0);
 
+    expect(instance.hasTasks).toBe(true);
+    expect(instance.taskCount).toBe(1);
+    expect(instance.task(0)).toStrictEqual(instanceTask);
+    expect(instance.task(1)).toStrictEqual(null);
+
     expect(instanceTask.voi.size()).toBe(0);
     expect(instanceTask.voiAsArray).toStrictEqual([]);
     expect(instanceTask.voiName).toBe("environment/time");

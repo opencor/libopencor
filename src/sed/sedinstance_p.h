@@ -33,7 +33,10 @@ public:
 
     void run();
 
+    bool hasTasks() const;
+    size_t taskCount() const;
     SedInstanceTaskPtrs tasks() const;
+    SedInstanceTaskPtr task(size_t pIndex) const;
 };
 
 } // namespace libOpenCOR

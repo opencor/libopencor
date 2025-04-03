@@ -87,9 +87,28 @@ void SedInstance::Impl::run()
     }
 }
 
+bool SedInstance::Impl::hasTasks() const
+{
+    return !mTasks.empty();
+}
+
+size_t SedInstance::Impl::taskCount() const
+{
+    return mTasks.size();
+}
+
 SedInstanceTaskPtrs SedInstance::Impl::tasks() const
 {
     return mTasks;
+}
+
+SedInstanceTaskPtr SedInstance::Impl::task(size_t pIndex) const
+{
+    if (pIndex >= mTasks.size()) {
+        return {};
+    }
+
+    return mTasks[pIndex];
 }
 
 SedInstance::SedInstance(const SedDocumentPtr &pDocument, bool pCompiled)
@@ -117,9 +136,24 @@ void SedInstance::run()
     pimpl()->run();
 }
 
+bool SedInstance::hasTasks() const
+{
+    return pimpl()->hasTasks();
+}
+
+size_t SedInstance::taskCount() const
+{
+    return pimpl()->taskCount();
+}
+
 SedInstanceTaskPtrs SedInstance::tasks() const
 {
     return pimpl()->tasks();
+}
+
+SedInstanceTaskPtr SedInstance::task(size_t pIndex) const
+{
+    return pimpl()->task(pIndex);
 }
 
 } // namespace libOpenCOR
