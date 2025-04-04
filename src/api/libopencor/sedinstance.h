@@ -52,6 +52,26 @@ public:
     void run();
 
     /**
+     * @brief Return whether there are some tasks.
+     *
+     * Return whether there are some tasks.
+     *
+     * @return @c true if there are some tasks, @c false otherwise.
+     */
+
+    bool hasTasks() const;
+
+    /**
+     * @brief Return the number of tasks.
+     *
+     * Return the number of tasks.
+     *
+     * @return The number of tasks.
+     */
+
+    size_t taskCount() const;
+
+    /**
      * @brief Return the tasks.
      *
      * Return the tasks.
@@ -60,6 +80,18 @@ public:
      */
 
     SedInstanceTaskPtrs tasks() const;
+
+    /**
+     * @brief Return the task at the given index.
+     *
+     * Return the task at the given index.
+     *
+     * @param pIndex The index of the task to return.
+     *
+     * @return The task as a @ref SedInstanceTaskPtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    SedInstanceTaskPtr task(size_t pIndex) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

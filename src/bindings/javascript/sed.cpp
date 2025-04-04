@@ -68,7 +68,10 @@ void sedApi()
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
         .function("run", &libOpenCOR::SedInstance::run)
-        .property("tasks", &libOpenCOR::SedInstance::tasks);
+        .property("hasTasks", &libOpenCOR::SedInstance::hasTasks)
+        .property("taskCount", &libOpenCOR::SedInstance::taskCount)
+        .property("tasks", &libOpenCOR::SedInstance::tasks)
+        .function("task", &libOpenCOR::SedInstance::task);
 
     // SedInstanceTask API.
 

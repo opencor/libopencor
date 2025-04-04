@@ -76,7 +76,10 @@ void sedApi(nb::module_ &m)
     nb::class_<libOpenCOR::SedInstance, libOpenCOR::Logger> sedInstance(m, "SedInstance");
 
     sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run the tasks associated with this SedInstance object.")
-        .def_prop_ro("tasks", &libOpenCOR::SedInstance::tasks, "Return the tasks.");
+        .def_prop_ro("has_tasks", &libOpenCOR::SedInstance::hasTasks, "Return whether there are some tasks.")
+        .def_prop_ro("task_count", &libOpenCOR::SedInstance::taskCount, "Return the number of tasks.")
+        .def_prop_ro("tasks", &libOpenCOR::SedInstance::tasks, "Return the tasks.")
+        .def("task", &libOpenCOR::SedInstance::task, "Return the task.");
 
     // SedInstanceTask API.
 

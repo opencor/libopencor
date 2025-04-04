@@ -289,6 +289,11 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     auto instance = document->instantiate();
     auto instanceTask = instance->tasks()[0];
 
+    EXPECT_EQ(instance->hasTasks(), true);
+    EXPECT_EQ(instance->taskCount(), 1);
+    EXPECT_EQ(instance->task(0), instanceTask);
+    EXPECT_EQ(instance->task(1), nullptr);
+
     static const auto NoDoubles = std::vector<double> {};
 
     EXPECT_EQ(instanceTask->voi(), NoDoubles);
