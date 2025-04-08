@@ -72,19 +72,23 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument, bool pCompiled)
     }
 }
 
-void SedInstance::Impl::run()
+double SedInstance::Impl::run()
 {
     // Run all the tasks associated with this instance unless they have some issues.
 
+    auto res = 0.0;
+
     for (const auto &task : mTasks) {
         if (!task->hasIssues()) {
-            task->pimpl()->run();
+            res += task->pimpl()->run();
 
             if (task->hasIssues()) {
                 addIssues(task);
             }
         }
     }
+
+    return res;
 }
 
 bool SedInstance::Impl::hasTasks() const
@@ -131,9 +135,9 @@ const SedInstance::Impl *SedInstance::pimpl() const
     return reinterpret_cast<const Impl *>(Logger::pimpl());
 }
 
-void SedInstance::run()
+double SedInstance::run()
 {
-    pimpl()->run();
+    return pimpl()->run();
 }
 
 bool SedInstance::hasTasks() const

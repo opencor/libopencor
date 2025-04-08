@@ -69,7 +69,7 @@ public:
     void trackResults(size_t pIndex);
 
     void initialise();
-    void run();
+    double run();
 
     Doubles voi() const;
     std::string voiName() const;
