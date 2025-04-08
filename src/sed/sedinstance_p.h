@@ -31,7 +31,7 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument, bool pCompiled);
 
-    void run();
+    double run();
 
     bool hasTasks() const;
     size_t taskCount() const;

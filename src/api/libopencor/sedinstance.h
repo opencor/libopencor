@@ -47,9 +47,11 @@ public:
      * @brief Run all the tasks associated with this instance.
      *
      * Run all the tasks associated with this instance.
+     *
+     * @return The elapsed time in milliseconds.
      */
 
-    void run();
+    double run();
 
     /**
      * @brief Return whether there are some tasks.

@@ -174,8 +174,12 @@ void SedInstanceTask::Impl::initialise()
     }
 }
 
-void SedInstanceTask::Impl::run()
+double SedInstanceTask::Impl::run()
 {
+    // Start our timer.
+
+    auto startTime = std::chrono::high_resolution_clock::now();
+
     // (Re)initialise our model.
     // Note: reinitialise our model in case we are running our model multiple times.
 
@@ -224,7 +228,7 @@ void SedInstanceTask::Impl::run()
             if (!mOdeSolver->pimpl()->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
                 addIssues(mOdeSolver);
 
-                return;
+                return 0.0;
             }
 
 #ifndef __EMSCRIPTEN__
@@ -247,13 +251,17 @@ void SedInstanceTask::Impl::run()
             if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
                 addIssues(mNlaSolver);
 
-                return;
+                return 0.0;
             }
 #endif
 
             trackResults(++index);
         }
     }
+
+    // Stop our timer and return the elapsed time in milliseconds.
+
+    return std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - startTime).count();
 }
 
 namespace {
