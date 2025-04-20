@@ -25,13 +25,13 @@ if(FORMAT_CODE_AVAILABLE)
         ${GIT_TESTS_HEADER_FILES}
     )
 
-    set(CODE_FORMATTING_SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/codeformatting.cmake)
+    set(CODE_FORMATTING_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/codeformatting.cmake)
 
-    configure_file(codeformatting.cmake.in ${CODE_FORMATTING_SCRIPT} @ONLY)
+    configure_file(codeformatting.cmake.in ${CODE_FORMATTING_CMAKE_FILE} @ONLY)
 
     if(CHECK_CODE_FORMATTING_AVAILABLE)
         add_target(check_code_formatting
-                   COMMAND ${CMAKE_COMMAND} -P ${CODE_FORMATTING_SCRIPT}
+                   COMMAND ${CMAKE_COMMAND} -P ${CODE_FORMATTING_CMAKE_FILE}
                    COMMENT "Checking code formatting...")
     endif()
 

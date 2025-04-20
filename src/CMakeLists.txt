@@ -328,7 +328,7 @@ else()
 
         set(PACKAGES_DIR ${CMAKE_BINARY_DIR}/packages)
 
-        file(GLOB_RECURSE PACKAGES "${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+        file(GLOB_RECURSE PACKAGES ${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX})
 
         # Extract the object files from our various packages.
 
