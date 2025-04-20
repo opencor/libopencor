@@ -497,6 +497,13 @@ else()
     set(CMAKE_PACKAGE_DIR lib/cmake/${CMAKE_PROJECT_NAME})
 endif()
 
+set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES "")
+# Note: when building a shared version of libOpenCOR, INTERFACE_LINK_LIBRARIES is empty, but when building a static
+#       version, it lists all the third-party libraries used by libOpenCOR. However, the way we build the static version
+#       of libOpenCOR (i.e. all its dependencies are embedded in the static version) means that we don't need and don't
+#       want to list those libraries in INTERFACE_LINK_LIBRARIES. (Don't want because otherwise CMake might complain
+#       that it cannot find libOpenCOR's "dependencies".)
+
 install(EXPORT ${CMAKE_PROJECT_NAME}Targets
         FILE ${CMAKE_PROJECT_NAME}Targets.cmake
         DESTINATION ${CMAKE_PACKAGE_DIR})
