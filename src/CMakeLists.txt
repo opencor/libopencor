@@ -510,7 +510,8 @@ if(NOT LIBOPENCOR_SHARED_LIBS)
 
     configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/patch.cmake.in ${PATCH_CMAKE_FILE} @ONLY)
 
-    install(SCRIPT ${PATCH_CMAKE_FILE})
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} PRE_BUILD
+                       COMMAND ${CMAKE_COMMAND} -P ${PATCH_CMAKE_FILE})
 endif()
 
 install(EXPORT ${CMAKE_PROJECT_NAME}Targets
