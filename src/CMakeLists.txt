@@ -328,7 +328,7 @@ else()
 
         set(PACKAGES_DIR ${CMAKE_BINARY_DIR}/packages)
 
-        file(GLOB_RECURSE PACKAGES "${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX}")
+        file(GLOB_RECURSE PACKAGES ${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX})
 
         # Extract the object files from our various packages.
 
@@ -495,6 +495,23 @@ if(WIN32)
     set(CMAKE_PACKAGE_DIR cmake/${CMAKE_PROJECT_NAME})
 else()
     set(CMAKE_PACKAGE_DIR lib/cmake/${CMAKE_PROJECT_NAME})
+endif()
+
+if(NOT LIBOPENCOR_SHARED_LIBS)
+    # Patch the generated libOpenCORTargets.cmake file by removing the INTERFACE_LINK_LIBRARIES line. Indeed, it lists
+    # all the third-party libraries used by libOpenCOR. However, the way we build the static version of libOpenCOR (so
+    # that it embeds all of its dependencies) means that we don't need and, in fact, don't want to list them. (Don't
+    # want because otherwise CMake might complain that it cannot find libOpenCOR's "dependencies".)
+    # Note: rather than patching libOpenCORTargets.cmake, we could use
+    #         set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES INTERFACE_LINK_LIBRARIES "")
+    #       but this will fail our Python bindings. So, we patch libOpenCORTargets.cmake instead.
+
+    set(PATCH_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/patch.cmake)
+
+    configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/patch.cmake.in ${PATCH_CMAKE_FILE} @ONLY)
+
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} PRE_BUILD
+                       COMMAND ${CMAKE_COMMAND} -P ${PATCH_CMAKE_FILE})
 endif()
 
 install(EXPORT ${CMAKE_PROJECT_NAME}Targets
