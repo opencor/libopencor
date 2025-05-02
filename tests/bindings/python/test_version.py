@@ -75,12 +75,12 @@ def test_libcombine_version_string():
 
 def test_libcurl_version():
     assert isinstance(oc.libcurl_version(), int)
-    assert oc.libcurl_version() == 0x080800
+    assert oc.libcurl_version() == 0x080D00
 
 
 def test_libcurl_version_string():
     assert isinstance(oc.libcurl_version_string(), str)
-    assert oc.libcurl_version_string() == "8.8.0-DEV"
+    assert oc.libcurl_version_string() == "8.13.0-DEV"
 
 
 def test_libsedml_version():
