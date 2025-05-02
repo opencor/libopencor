@@ -46,7 +46,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Windows static library (ARM) (no tests)'
-            os: windows-2022
+            os: windows-11-arm
             arch: amd64_arm64
             build_type: Release
             code_analysis: OFF
@@ -62,7 +62,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Windows shared library (ARM) (no tests)'
-            os: windows-2022
+            os: windows-11-arm
             arch: amd64_arm64
             build_type: Release
             code_analysis: OFF

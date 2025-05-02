@@ -31,17 +31,17 @@ jobs:
             build_type: Debug
             shared_libs: ON
           - name: 'Windows static library (ARM) (Release)'
-            os: windows-2022
+            os: windows-11-arm
             arch: amd64_arm64
             build_type: Release
             shared_libs: OFF
           - name: 'Windows shared library (ARM) (Release)'
-            os: windows-2022
+            os: windows-11-arm
             arch: amd64_arm64
             build_type: Release
             shared_libs: ON
           - name: 'Windows shared library (ARM) (Debug)'
-            os: windows-2022
+            os: windows-11-arm
             arch: amd64_arm64
             build_type: Debug
             shared_libs: ON
@@ -143,7 +143,7 @@ jobs:
             os: windows-2022
             arch: amd64
           - name: 'Windows Python wheels (ARM)'
-            os: windows-2022
+            os: windows-11-arm
             arch: amd64_arm64
           - name: 'Linux Python wheels (Intel)'
             os: ubuntu-22.04
