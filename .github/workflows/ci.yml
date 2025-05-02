@@ -414,7 +414,7 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/gha/clang-tidy.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Emscripten
-        if: ${{ matrix.javascript_unit_testing == 'ON' }}
+        if: ${{ matrix.javascript_bindings == 'ON' }}
         run: brew install --overwrite emscripten
       - name: Install Prettier
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
