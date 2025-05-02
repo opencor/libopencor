@@ -317,11 +317,11 @@ std::filesystem::path uniqueFilePath()
     return res;
 }
 
-size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUserData)
+size_t curlWriteFunction(char *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
-    const auto realDataSize = pSize * pDataSize;
+    const auto realDataSize = static_cast<std::streamsize>(pSize * pDataSize);
 
-    static_cast<std::ofstream *>(pUserData)->write(static_cast<char *>(pData), static_cast<std::streamsize>(realDataSize));
+    static_cast<std::ofstream *>(pUserData)->write(pData, realDataSize);
 
     return realDataSize;
 }
