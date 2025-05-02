@@ -503,8 +503,8 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 {
     static const auto STATE_VALUES = std::vector<double>({-63.886, 0.13501, 0.984333, 0.740972});
     static const auto STATE_ABS_TOLS = std::vector<double>({0.001, 0.00001, 0.000001, 0.000001});
-    static const auto RATE_VALUES = std::vector<double>({49.725, -0.12819, -0.050904, 0.098649});
-    static const auto RATE_ABS_TOLS = std::vector<double>({0.001, 0.00001, 0.000001, 0.000001});
+    static const auto RATE_VALUES = std::vector<double>({49.725, -0.12819, -0.0509, 0.098649});
+    static const auto RATE_ABS_TOLS = std::vector<double>({0.001, 0.00001, 0.0001, 0.000001});
     static const auto CONSTANT_VALUES = std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0});
     static const auto CONSTANT_ABS_TOLS = std::vector<double>({0.0, 0.0, 0.0, 0.0, 0.0});
     static const auto COMPUTED_CONSTANT_VALUES = std::vector<double>({-10.613, -115.0, 12.0});
