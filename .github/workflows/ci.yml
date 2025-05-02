@@ -45,7 +45,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Windows static library (ARM) (no tests)'
+          - name: 'Windows static library (ARM)'
             os: windows-11-arm
             arch: amd64_arm64
             build_type: Release
@@ -58,10 +58,10 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: OFF
-            unit_testing: OFF
+            unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
-          - name: 'Windows shared library (ARM) (no tests)'
+          - name: 'Windows shared library (ARM)'
             os: windows-11-arm
             arch: amd64_arm64
             build_type: Release
@@ -74,7 +74,7 @@ jobs:
             python_bindings: OFF
             python_unit_testing: OFF
             shared_libs: ON
-            unit_testing: OFF
+            unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'Linux static library (Intel)'
