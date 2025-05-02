@@ -20,11 +20,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: ON
             target: unit_testing
@@ -36,11 +34,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
@@ -52,11 +48,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: ON
             target: unit_testing
@@ -68,11 +62,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
@@ -83,11 +75,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: ON
             target: unit_testing
@@ -98,11 +88,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
@@ -113,11 +101,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: ON
             target: unit_testing
@@ -128,11 +114,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
@@ -143,11 +127,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: ON
             target: unit_testing
@@ -159,11 +141,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
@@ -175,11 +155,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: ON
             target: unit_testing
@@ -190,11 +168,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
@@ -205,11 +181,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: ON
-            javascript_unit_testing: ON
+            javascript_support: ON
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: OFF
             target: javascript_unit_testing
@@ -220,11 +194,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: ON
-            python_unit_testing: ON
+            python_support: ON
             shared_libs: OFF
             unit_testing: OFF
             target: python_unit_testing
@@ -235,11 +207,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: ON
-            python_unit_testing: ON
+            python_support: ON
             shared_libs: OFF
             unit_testing: OFF
             target: python_unit_testing
@@ -250,11 +220,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: ON
-            python_unit_testing: ON
+            python_support: ON
             shared_libs: OFF
             unit_testing: OFF
             context: PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
@@ -267,11 +235,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: OFF
             context: PATH=$GITHUB_WORKSPACE:$PATH
@@ -282,11 +248,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: OFF
             target: javascript_check_code_formatting
@@ -296,11 +260,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: OFF
             target: python_check_code_formatting
@@ -310,11 +272,9 @@ jobs:
             code_analysis: ON
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: ON
             context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang++
@@ -324,11 +284,9 @@ jobs:
             code_analysis: OFF
             code_coverage: ON
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: ON
             unit_testing: ON
             context: PATH=/opt/homebrew/opt/llvm/bin:$PATH CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++
@@ -339,11 +297,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: OFF
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: ON
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: ON
             unit_testing: ON
             target: memory_checks
@@ -353,11 +309,9 @@ jobs:
             code_analysis: OFF
             code_coverage: OFF
             documentation: ON
-            javascript_bindings: OFF
-            javascript_unit_testing: OFF
+            javascript_support: OFF
             memory_checks: OFF
-            python_bindings: OFF
-            python_unit_testing: OFF
+            python_support: OFF
             shared_libs: OFF
             unit_testing: OFF
             target: documentation
@@ -376,7 +330,7 @@ jobs:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
       - name: Install Python
-        if: ${{ matrix.python_bindings == 'ON' }}
+        if: ${{ matrix.python_support == 'ON' }}
         uses: actions/setup-python@v5
         with:
           python-version: '3.13'
@@ -385,7 +339,7 @@ jobs:
       - name: Install buildcache
         uses: opencor/buildcache-action@v1
         with:
-          cache_key: ci-${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage }}-${{ matrix.documentation }}-${{ matrix.javascript_bindings }}-${{ matrix.javascript_unit_testing }}-${{ matrix.memory_checks }}-${{ matrix.python_bindings }}-${{ matrix.python_unit_testing }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
+          cache_key: ci-${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.code_analysis }}-${{ matrix.code_coverage }}-${{ matrix.documentation }}-${{ matrix.javascript_support }}-${{ matrix.memory_checks }}-${{ matrix.python_support }}-${{ matrix.shared_libs }}-${{ matrix.unit_testing }}-${{ matrix.target }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -415,7 +369,7 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/gha/clang-tidy.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Emscripten
-        if: ${{ matrix.javascript_bindings == 'ON' }}
+        if: ${{ matrix.javascript_support == 'ON' }}
         run: brew install --overwrite emscripten
       - name: Install Prettier
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
@@ -429,7 +383,7 @@ jobs:
           sudo apt update
           sudo apt install valgrind
       - name: Install pytest and pytest-html
-        if: ${{ matrix.python_unit_testing == 'ON' }}
+        if: ${{ matrix.python_support == 'ON' }}
         run: pip3 install pytest pytest-html
       - name: Install Sphinx and some Sphinx packages
         if: ${{ matrix.documentation == 'ON' }}
@@ -443,9 +397,9 @@ jobs:
         run: |
           mkdir build
           cd build
-          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_bindings }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_unit_testing }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_bindings }} -DPYTHON_UNIT_TESTING=${{ matrix.python_unit_testing }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_support }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_support }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_support }} -DPYTHON_UNIT_TESTING=${{ matrix.python_support }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
       - name: Build libOpenCOR
-        if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.javascript_unit_testing == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
+        if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.javascript_support == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
         run: |
           cd build
           ninja
@@ -455,17 +409,17 @@ jobs:
           cd build
           ninja ${{ matrix.target }}
       - name: JavaScript unit testing
-        if: ${{ matrix.javascript_unit_testing == 'ON' }}
+        if: ${{ matrix.javascript_support == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
       - name: Python unit testing
-        if: ${{ matrix.python_unit_testing == 'ON' }}
+        if: ${{ matrix.python_support == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}
       - name: Python unit testing report
-        if: ${{ matrix.python_unit_testing == 'ON' }}
+        if: ${{ matrix.python_support == 'ON' }}
         run: |
           cd build
           ninja ${{ matrix.target }}_report
