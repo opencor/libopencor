@@ -319,9 +319,9 @@ std::filesystem::path uniqueFilePath()
 
 size_t curlWriteFunction(char *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
-    const auto realDataSize = static_cast<std::streamsize>(pSize * pDataSize);
+    const auto realDataSize = pSize * pDataSize;
 
-    static_cast<std::ofstream *>(pUserData)->write(pData, realDataSize);
+    static_cast<std::ofstream *>(pUserData)->write(pData, static_cast<std::streamsize>(realDataSize));
 
     return realDataSize;
 }
