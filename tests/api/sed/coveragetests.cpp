@@ -345,6 +345,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(CoverageSedTest, sedDocument)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_CELLML_FILE);
@@ -356,6 +357,7 @@ TEST(CoverageSedTest, sedDocument)
     file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_COMBINE_ARCHIVE);
     libOpenCOR::SedDocument::create(file);
 }
+#endif
 
 TEST(CoverageSedTest, solver)
 {

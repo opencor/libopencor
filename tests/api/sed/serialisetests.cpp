@@ -145,6 +145,7 @@ TEST(SerialiseSedTest, relativeLocalCellmlFileWithoutBasePath)
     EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
 
+#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(SerialiseSedTest, remoteCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
@@ -152,7 +153,9 @@ TEST(SerialiseSedTest, remoteCellmlFileWithBasePath)
 
     EXPECT_EQ(document->serialise(libOpenCOR::REMOTE_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
+#endif
 
+#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(SerialiseSedTest, remoteCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
@@ -160,7 +163,9 @@ TEST(SerialiseSedTest, remoteCellmlFileWithoutBasePath)
 
     EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation("https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"));
 }
+#endif
 
+#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(SerialiseSedTest, relativeRemoteCellmlFileWithBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
@@ -168,6 +173,7 @@ TEST(SerialiseSedTest, relativeRemoteCellmlFileWithBasePath)
 
     EXPECT_EQ(document->serialise(std::string(libOpenCOR::REMOTE_BASE_PATH).append("/../..")), cvodeExpectedSerialisation("tests/res/cellml_2.cellml"));
 }
+#endif
 
 TEST(SerialiseSedTest, daeModel)
 {
