@@ -152,7 +152,7 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
     // Check whether the given file name or URL is a local file name or a URL.
     // Note: a URL represents a local file when used with the "file" scheme.
 
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     static constexpr auto FILE_SCHEME = "file:///";
 #else
     static constexpr auto FILE_SCHEME = "file://";

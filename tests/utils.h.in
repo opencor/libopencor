@@ -44,7 +44,7 @@ static constexpr auto SEDML_2_FILE = "cellml_2.sedml";
 static constexpr auto COMBINE_2_ARCHIVE = "cellml_2.omex";
 static constexpr auto IRRETRIEVABLE_FILE = "irretrievable_file.txt";
 
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
 static constexpr auto LOCAL_FILE = R"(P:\some\path\file.txt)";
 #else
 static constexpr auto LOCAL_FILE = "/some/path/file.txt";

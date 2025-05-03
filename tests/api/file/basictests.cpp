@@ -44,20 +44,20 @@ TEST(BasicFileTest, localFile)
 
 TEST(BasicFileTest, relativeLocalFile)
 {
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     auto file = libOpenCOR::File::create(R"(some\.\relative\..\..\path\.\..\dir\file.txt)");
 #else
     auto file = libOpenCOR::File::create("some/relative/../../path/../dir/file.txt");
 #endif
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     EXPECT_EQ(file->fileName(), R"(dir\file.txt)");
 #else
     EXPECT_EQ(file->fileName(), "dir/file.txt");
 #endif
     EXPECT_EQ(file->url(), "");
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     EXPECT_EQ(file->path(), R"(dir\file.txt)");
 #else
     EXPECT_EQ(file->path(), "dir/file.txt");
@@ -82,7 +82,7 @@ TEST(BasicSedTest, existingRelativeLocalFile)
 
 TEST(BasicFileTest, urlBasedLocalFile)
 {
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     auto file = libOpenCOR::File::create("file:///P:/some/path/file.txt");
 #else
     auto file = libOpenCOR::File::create("file:///some/path/file.txt");
