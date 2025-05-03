@@ -26,8 +26,8 @@ TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setMaximumNumberOfIterations(0);
 
@@ -44,8 +44,8 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(-1);
@@ -63,8 +63,8 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(1);
@@ -82,8 +82,8 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(-1);
@@ -101,8 +101,8 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(1);
@@ -130,8 +130,8 @@ TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(2);
@@ -148,8 +148,8 @@ TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::GMRES);
 
@@ -164,8 +164,8 @@ TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB);
 
@@ -180,8 +180,8 @@ TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
 

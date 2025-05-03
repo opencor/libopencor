@@ -281,7 +281,7 @@ TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonInterationMethod)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setIntegrationMethod(libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON);
 
@@ -293,7 +293,7 @@ TEST(SerialiseSedTest, cvodeSolverWithFunctionalIterationType)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setIterationType(libOpenCOR::SolverCvode::IterationType::FUNCTIONAL);
 
@@ -305,7 +305,7 @@ TEST(SerialiseSedTest, cvodeSolverWithBandedLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
 
@@ -317,7 +317,7 @@ TEST(SerialiseSedTest, cvodeSolverWithDiagonalLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::DIAGONAL);
 
@@ -329,7 +329,7 @@ TEST(SerialiseSedTest, cvodeSolverWithGmresLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
 
@@ -341,7 +341,7 @@ TEST(SerialiseSedTest, cvodeSolverWithBicgstabLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
 
@@ -353,7 +353,7 @@ TEST(SerialiseSedTest, cvodeSolverWithTfqmrLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
 
@@ -365,7 +365,7 @@ TEST(SerialiseSedTest, cvodeSolverWithNoPreconditioner)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
@@ -377,7 +377,7 @@ TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     solver->setInterpolateSolution(false);
 
@@ -389,7 +389,7 @@ TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
 
@@ -401,7 +401,7 @@ TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::GMRES);
 
@@ -413,7 +413,7 @@ TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB);
 
@@ -425,7 +425,7 @@ TEST(SerialiseSedTest, kinsolWithTfmqrLinearSolver)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto simulation = document->simulations()[0];
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
 

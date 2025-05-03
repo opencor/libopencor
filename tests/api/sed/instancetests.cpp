@@ -122,11 +122,11 @@ void runOdeModel(bool pCompiled)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
 
     static const auto NOK_MAXIMUM_NUMBER_OF_STEPS = 10;
 
-    auto cvode = dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto cvode = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
@@ -187,8 +187,8 @@ TEST(InstanceSedTest, nlaModel)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto kinsol = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
+    auto kinsol = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
@@ -230,8 +230,8 @@ TEST(InstanceSedTest, daeModel)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
-    auto kinsol = dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
+    auto kinsol = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);

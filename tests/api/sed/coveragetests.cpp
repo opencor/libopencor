@@ -281,7 +281,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto solver = dynamic_pointer_cast<libOpenCOR::SolverCvode>(document->simulations()[0]->odeSolver());
+    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(document->simulations()[0]->odeSolver());
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);

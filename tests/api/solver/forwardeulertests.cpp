@@ -25,7 +25,7 @@ TEST(ForwardEulerSolverTest, stepValueWithInvalidNumber)
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = libOpenCOR::SolverForwardEuler::create();
 
     solver->setStep(STEP);
@@ -50,7 +50,7 @@ void forwardEulerSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
+    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
     auto solver = libOpenCOR::SolverForwardEuler::create();
 
     solver->setStep(STEP);
