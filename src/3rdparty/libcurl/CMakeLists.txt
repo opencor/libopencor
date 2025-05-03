@@ -30,42 +30,42 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 46230cb6a0184d7ce330cb408ffbdbfc79688ef5)
+                                 94a5ec2c7408394912d22ed3158e8028a0e7c6fa)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 beed0ea9c571f5a03ad57a31a34ed7974be53fcc)
+                                 846ae150be48bec7cb7eae9bfd85d8f5474da679)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 3910c4ed8634fb3ec8585efc8984014ecec509bc)
+                                 32959013dcce559b7bde7bb218f0edff4c988d83)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1ac445be6bd0e99308b96af7875634a127699d96)
+                                 57894bc86b6de2767e0e609299d089d5e73d336b)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c63dcec743e8090fbea733d6254202186b5b2fb2)
+                             abd029ace29920a7153c32bea37fafdf2a142372)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             a03c90a5e0f89acdd0a462ba3096f7d9bd0451d3)
+                             67ce6e973303e6abba2f8cb843901df6cec02947)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             19611e0c02d2e999387da55dc99405c6aa56f0b3)
+                             e703b4df8434b8ba3eba9a645389baadb3002d99)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             56748765651638863c53efad665771310464e60b)
+                             53a694774281231039b9e7d8b5141b69410155bc)
         endif()
     endif()
 else()
@@ -112,6 +112,11 @@ else()
     string(REPLACE "OpenSSL::Crypto" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "OpenSSL::SSL" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "ZLIB::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+
+    if(APPLE)
+        string(REGEX REPLACE "/Applications/Xcode.*\.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/lib" "$<LINK_ONLY:" FILE_CONTENTS "${FILE_CONTENTS}")
+        string(REPLACE ".tbd" ">" FILE_CONTENTS "${FILE_CONTENTS}")
+    endif()
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
