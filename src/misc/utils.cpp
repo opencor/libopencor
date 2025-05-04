@@ -152,7 +152,7 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
     // Check whether the given file name or URL is a local file name or a URL.
     // Note: a URL represents a local file when used with the "file" scheme.
 
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     static constexpr auto FILE_SCHEME = "file:///";
 #else
     static constexpr auto FILE_SCHEME = "file://";
@@ -317,11 +317,11 @@ std::filesystem::path uniqueFilePath()
     return res;
 }
 
-size_t curlWriteFunction(void *pData, size_t pSize, size_t pDataSize, void *pUserData)
+size_t curlWriteFunction(char *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
     const auto realDataSize = pSize * pDataSize;
 
-    static_cast<std::ofstream *>(pUserData)->write(static_cast<char *>(pData), static_cast<std::streamsize>(realDataSize));
+    static_cast<std::ofstream *>(pUserData)->write(pData, static_cast<std::streamsize>(realDataSize));
 
     return realDataSize;
 }

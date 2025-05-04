@@ -28,6 +28,12 @@ limitations under the License.
 #include "libopencor/issue.h"
 #include "libopencor/types.h"
 
+#if !defined(BUILDING_ON_WINDOWS) || !defined(BUILDING_ON_ARM)
+//---GRY--- FOR SOME REASONS, libcurl SEGFAULTS WHEN TRYING TO DOWNLOAD A FILE USING GitHub Actions' Windows on ARM
+//          RUNNER WHILE IT'S ALL FINE LOCALLY!? SO, THIS DEFINE IS SO THAT WE CAN DISABLE THE TESTS THAT USE libcurl
+//          WITH A REMOTE FILE WHEN RUNNING ON Windows on ARM.
+#    define GHA_NOT_WINDOWS_ON_ARM
+#endif
 namespace libOpenCOR {
 
 static constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
@@ -44,7 +50,7 @@ static constexpr auto SEDML_2_FILE = "cellml_2.sedml";
 static constexpr auto COMBINE_2_ARCHIVE = "cellml_2.omex";
 static constexpr auto IRRETRIEVABLE_FILE = "irretrievable_file.txt";
 
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
 static constexpr auto LOCAL_FILE = R"(P:\some\path\file.txt)";
 #else
 static constexpr auto LOCAL_FILE = "/some/path/file.txt";

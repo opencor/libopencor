@@ -35,7 +35,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT (FOR NOW) THAT pTask IS INDEED A SedTask
     //          OBJECT.
 
-    auto task = dynamic_pointer_cast<SedTask>(pTask);
+    auto task = std::dynamic_pointer_cast<SedTask>(pTask);
 
     ASSERT_NE(task, nullptr);
 
@@ -51,8 +51,8 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     auto odeSolver = mSimulation->odeSolver();
     auto nlaSolver = mSimulation->nlaSolver();
 
-    mOdeSolver = (odeSolver != nullptr) ? dynamic_pointer_cast<SolverOde>(odeSolver->pimpl()->duplicate()) : nullptr;
-    mNlaSolver = (nlaSolver != nullptr) ? dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
+    mOdeSolver = (odeSolver != nullptr) ? std::dynamic_pointer_cast<SolverOde>(odeSolver->pimpl()->duplicate()) : nullptr;
+    mNlaSolver = (nlaSolver != nullptr) ? std::dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
     mRuntime = cellmlFile->runtime(mNlaSolver, mCompiled);
 
 #ifndef CODE_COVERAGE_ENABLED
@@ -123,7 +123,7 @@ void SedInstanceTask::Impl::initialise()
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
 
-    mSedUniformTimeCourse = mDifferentialModel ? dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
+    mSedUniformTimeCourse = mDifferentialModel ? std::dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
     if (mSedUniformTimeCourse != nullptr) {
         mVoi = mSedUniformTimeCourse->pimpl()->mOutputStartTime;

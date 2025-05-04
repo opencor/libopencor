@@ -44,20 +44,20 @@ TEST(BasicFileTest, localFile)
 
 TEST(BasicFileTest, relativeLocalFile)
 {
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     auto file = libOpenCOR::File::create(R"(some\.\relative\..\..\path\.\..\dir\file.txt)");
 #else
     auto file = libOpenCOR::File::create("some/relative/../../path/../dir/file.txt");
 #endif
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     EXPECT_EQ(file->fileName(), R"(dir\file.txt)");
 #else
     EXPECT_EQ(file->fileName(), "dir/file.txt");
 #endif
     EXPECT_EQ(file->url(), "");
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     EXPECT_EQ(file->path(), R"(dir\file.txt)");
 #else
     EXPECT_EQ(file->path(), "dir/file.txt");
@@ -82,7 +82,7 @@ TEST(BasicSedTest, existingRelativeLocalFile)
 
 TEST(BasicFileTest, urlBasedLocalFile)
 {
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     auto file = libOpenCOR::File::create("file:///P:/some/path/file.txt");
 #else
     auto file = libOpenCOR::File::create("file:///some/path/file.txt");
@@ -96,6 +96,7 @@ TEST(BasicFileTest, urlBasedLocalFile)
     EXPECT_EQ_ISSUES(file, EXPECTED_NON_EXISTING_FILE_ISSUES);
 }
 
+#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(BasicFileTest, remoteFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
@@ -106,6 +107,7 @@ TEST(BasicFileTest, remoteFile)
     EXPECT_EQ(file->path(), libOpenCOR::REMOTE_FILE);
     EXPECT_FALSE(file->contents().empty());
 }
+#endif
 
 TEST(BasicFileTest, localVirtualFile)
 {
@@ -127,6 +129,7 @@ TEST(BasicFileTest, localVirtualFile)
     EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 }
 
+#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(BasicFileTest, remoteVirtualFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
@@ -146,7 +149,9 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->contents(), someUnknownContents);
     EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 }
+#endif
 
+#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(BasicFileTest, fileManager)
 {
     auto fileManager = libOpenCOR::FileManager::instance();
@@ -200,3 +205,4 @@ TEST(BasicFileTest, fileManager)
     EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), nullptr);
     EXPECT_EQ(fileManager.file(libOpenCOR::UNKNOWN_FILE), nullptr);
 }
+#endif

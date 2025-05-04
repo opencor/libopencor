@@ -28,11 +28,11 @@ jobs:
             arch: amd64
             build_type: Debug
           - name: 'Windows release (ARM)'
-            os: windows-2022
+            os: windows-11-arm
             arch: amd64_arm64
             build_type: Release
           - name: 'Windows debug (ARM)'
-            os: windows-2022
+            os: windows-11-arm
             arch: amd64_arm64
             build_type: Debug
           - name: 'Linux (Intel)'
@@ -68,18 +68,6 @@ jobs:
         uses: opencor/buildcache-action@v1
         with:
           cache_key: ${{ inputs.third_party_library_name }}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.build_type }}
-      - name: Configure MSVC (to build an Intel-based version of llvm-tblgen and clang-tblgen; only when building LLVM+Clang on Windows ARM)
-        if: ${{ (inputs.third_party_library_name == 'LLVMClang') && (runner.os == 'Windows') && (matrix.arch == 'amd64_arm64') }}
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: amd64
-      - name: Build llvm-tblgen and clang-tblgen (only when building LLVM+Clang on ARM)
-        if: ${{ (inputs.third_party_library_name == 'LLVMClang') && (((runner.os == 'Windows') && (matrix.arch == 'amd64_arm64')) || ((runner.os == 'Linux') && (matrix.arch == 'arm'))) }}
-        shell: bash
-        run: |
-          source src/3rdparty/LLVMClang/scripts/buildllvmclangtblgen ${{ runner.os == 'Windows' }}
-          echo "DLLVMCLANG_LLVM_TABLEGEN=$DLLVMCLANG_LLVM_TABLEGEN" >> $GITHUB_ENV
-          echo "DLLVMCLANG_CLANG_TABLEGEN=$DLLVMCLANG_CLANG_TABLEGEN" >> $GITHUB_ENV
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -91,7 +79,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVMCLANG=OFF ${{ env.DLLVMCLANG_LLVM_TABLEGEN }} ${{ env.DLLVMCLANG_CLANG_TABLEGEN }} ..
+          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVMCLANG=OFF ..
       - name: Configure libOpenCOR (only when NOT building LLVM+Clang)
         if: ${{ inputs.third_party_library_name != 'LLVMClang' }}
         run: |

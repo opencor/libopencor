@@ -29,7 +29,7 @@ TEST(VersionTest, libOpenCOR)
     auto now_time_t = std::chrono::system_clock::to_time_t(now);
     std::tm local_tm {};
 
-#ifdef _WIN32
+#ifdef BUILDING_ON_WINDOWS
     localtime_s(&local_tm, &now_time_t); // NOLINT
 #else
     localtime_r(&now_time_t, &local_tm); // NOLINT
