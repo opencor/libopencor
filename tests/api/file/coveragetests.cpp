@@ -43,12 +43,10 @@ TEST(CoverageFileTest, sedmlFileWithNoParent)
     file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_SEDML_CONTENTS));
 }
 
-#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(CoverageFileTest, irretrievableRemoteFile)
 {
     libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
 }
-#endif
 
 TEST(CoverageFileTest, sameLocalFile)
 {
@@ -58,7 +56,6 @@ TEST(CoverageFileTest, sameLocalFile)
     EXPECT_EQ(file1, file2);
 }
 
-#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(CoverageFileTest, sameRemoteFile)
 {
     auto file1 = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
@@ -66,7 +63,6 @@ TEST(CoverageFileTest, sameRemoteFile)
 
     EXPECT_EQ(file1, file2);
 }
-#endif
 
 TEST(CoverageFileTest, doNotRetrieveContents)
 {

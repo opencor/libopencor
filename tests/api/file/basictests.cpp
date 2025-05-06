@@ -96,7 +96,6 @@ TEST(BasicFileTest, urlBasedLocalFile)
     EXPECT_EQ_ISSUES(file, EXPECTED_NON_EXISTING_FILE_ISSUES);
 }
 
-#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(BasicFileTest, remoteFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
@@ -107,7 +106,6 @@ TEST(BasicFileTest, remoteFile)
     EXPECT_EQ(file->path(), libOpenCOR::REMOTE_FILE);
     EXPECT_FALSE(file->contents().empty());
 }
-#endif
 
 TEST(BasicFileTest, localVirtualFile)
 {
@@ -129,7 +127,6 @@ TEST(BasicFileTest, localVirtualFile)
     EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 }
 
-#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(BasicFileTest, remoteVirtualFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
@@ -149,9 +146,7 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->contents(), someUnknownContents);
     EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 }
-#endif
 
-#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(BasicFileTest, fileManager)
 {
     auto fileManager = libOpenCOR::FileManager::instance();
@@ -205,4 +200,3 @@ TEST(BasicFileTest, fileManager)
     EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), nullptr);
     EXPECT_EQ(fileManager.file(libOpenCOR::UNKNOWN_FILE), nullptr);
 }
-#endif
