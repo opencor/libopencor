@@ -168,7 +168,7 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
       - name: Build Python wheels
-        uses: pypa/cibuildwheel@9c75ea15c2f31a77e6043b80b1b7081372319d85
+        uses: pypa/cibuildwheel@v2.23.3
         env:
           CIBW_ARCHS: auto64
           CIBW_BUILD: 'cp*'
