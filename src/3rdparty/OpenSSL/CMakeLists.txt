@@ -105,12 +105,29 @@ else()
         list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
     endif()
 
+    if(WIN32 AND NOT INTEL_MODE)
+        #---GRY--- THE BELOW SHOULD BE REMOVED ONCE THE OpenSSL ISSUE ON WoA HAS BEEN FIXED.
+
+        # There is currently an issue with building OpenSSL on Windows on ARM, which results in libcurl segfaulting
+        # whenever we try to use it. A temporary fix is to build OpenSSL without optiomisation. We can do this by
+        # setting the CFLAGS environment variable. By default, the flags passed to the C compiler are
+        # "/W3 /wd4090 /nologo /O2", so here we set CFLAGS to "/W3 /wd4090 /nologo". See
+        # https://github.com/openssl/openssl/issues/26239 and
+        # https://developercommunity.visualstudio.com/t/Openssl-crashes-on-arm64-when-built-with/10896571 for more
+        # details.
+
+        string(REPLACE " " "\\ " ESCAPED_CMAKE_COMMAND ${CMAKE_COMMAND})
+        string(REPLACE " " "\\ " ESCAPED_CFLAGS "/W3 /wd4090 /nologo")
+
+        set(PRE_CONFIGURE_COMMAND ${ESCAPED_CMAKE_COMMAND} -E env CFLAGS=${ESCAPED_CFLAGS})
+    endif()
+
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CONFIGURE_COMMAND
-            ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
+            ${PRE_CONFIGURE_COMMAND} ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
         BUILD_COMMAND
             ${MAKE_NMAKE_COMMAND}
         INSTALL_COMMAND
