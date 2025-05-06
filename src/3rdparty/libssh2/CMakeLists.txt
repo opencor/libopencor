@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libssh2)
-set(PACKAGE_VERSION 1.11.0)
+set(PACKAGE_VERSION 1.11.1)
 set(PACKAGE_REPOSITORY libssh2)
-set(RELEASE_TAG libssh2-1.11.0)
+set(RELEASE_TAG libssh2-1.11.1)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 6d2bea2af8f41d79853b8b1f6776365c999a5911)
+                                 88ea03697534be46a83a5e5e8341c712ae4552db)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 661f1e4fc15f67b2c6341eb655bfa586bea8375c)
+                                 069cc72dc18316c1471fcc02188e2ca2eeedcac5)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 31d672e4df88d94c4beab6cea0edc8b35c73b13a)
+                                 9e6b04d193b9acaaa5f1b966b48ca5efd93f7157)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9541855997a724e90e26976454b1db09ab03fd2e)
+                                 b009196f8eee49fc10202e018fb8efbb15ffa736)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             48f7ce906760b7b84e8687aae93f8cd38522737d)
+                             bbc92f3e041f37550da1c4ab9485a0b97325e9a2)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c405224fe0f754765286ceeabb2e237bcee010e3)
+                             b07761278c9eed1575aaa110eee9fe39896dd2ad)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             8639b3d3df7ce83f2104a599a1507e28288cabc5)
+                             e750ebdaf1fe26b84097cc65ad45a287df189776)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             22e787ca84fc018c9dc3582e15c0d14d924684e8)
+                             32bf276760631c274c690e3df0e0671536aa39c0)
         endif()
     endif()
 else()
@@ -85,17 +85,14 @@ else()
 
     # Patch some of our CMake configuration files.
 
-    if(RELEASE_MODE)
-        set(PACKAGE_MODE release)
-    else()
-        set(PACKAGE_MODE debug)
-    endif()
-
-    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/Libssh2Config.cmake)
+    set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/libssh2-targets.cmake)
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REGEX REPLACE "INTERFACE_LINK_LIBRARIES \"[^\"]*\"" "INTERFACE_LINK_LIBRARIES \"OpenSSL::libssl;OpenSSL::libcrypto\"" FILE_CONTENTS "${FILE_CONTENTS}")
+    if(APPLE)
+        string(REGEX REPLACE "/Applications/Xcode.*\.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/lib" "$<LINK_ONLY:" FILE_CONTENTS "${FILE_CONTENTS}")
+        string(REPLACE ".tbd" ">" FILE_CONTENTS "${FILE_CONTENTS}")
+    endif()
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 
@@ -113,7 +110,7 @@ endif()
 
 set(LIBSSH2_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
 set(LIBSSH2_CMAKE_DIR ${INSTALL_DIR}/lib/cmake/libssh2 CACHE INTERNAL "${PACKAGE_NAME}'s CMake directory.")
-set(LIBSSH2_CMAKE_PACKAGE_NAME Libssh2 CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
+set(LIBSSH2_CMAKE_PACKAGE_NAME libssh2 CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LIBSSH2_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
-set(LIBSSH2_LIBRARY Libssh2::libssh2_static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
+set(LIBSSH2_LIBRARY libssh2::libssh2_static CACHE INTERNAL "${PACKAGE_NAME}'s library.")
 set(LIBSSH2_LIBRARY_FILE ${INSTALL_DIR}/lib/${PACKAGE_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX} CACHE INTERNAL "${PACKAGE_NAME}'s library.")

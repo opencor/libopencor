@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME OpenSSL)
-set(PACKAGE_VERSION 3.0.14)
+set(PACKAGE_VERSION 3.5.0)
 set(PACKAGE_REPOSITORY openssl)
-set(RELEASE_TAG openssl-3.0.14)
+set(RELEASE_TAG openssl-3.5.0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 c46f9ca66d99d452698f9309927d63219972a089)
+                                 ac4440ae3dba3415322fc833bef87b8b4d1b082b)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b8b2de7684995a8c02c272e06031b70513793d6b)
+                                 cd571c829ce744dbfc82bb1998f4d566b289cf93)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b51022bad09ebc69618eb03f5c80a590564eb2c5)
+                                 ed9489d5ed226ed79ac2d1042a4a22bcdc899a8c)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 369d4639814f3e76357e190e55dc0cb106dc535f)
+                                 dec6518c275c9f72aeeea068328ac86f0b87fb82)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             61e6dfe3d85f4ce899e07d7c8f998221190f4fb9)
+                             67f37a19f38abf06220619074ee880ca63b4a804)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             71f49e49ce8e2612ca0ee1792be3863807f47e86)
+                             8c5d0afbbd2dfe2120502b728e8e5e9ff8f69ecc)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d5eaa89b18a7e7adce8b641488a6958827fba261)
+                             934a9c39cd923b2466f83066952b17295b8dadf5)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             af12c894dc1767cae060d925893e777ecf1e439a)
+                             cc6a2de4b58b0b717e0684534c17ba5c90e6e7ab)
         endif()
     endif()
 else()
@@ -105,13 +105,29 @@ else()
         list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
     endif()
 
+    if(WIN32 AND NOT INTEL_MODE)
+        #---GRY--- THE BELOW SHOULD BE REMOVED ONCE THE OpenSSL ISSUE ON WoA HAS BEEN FIXED.
+
+        # There is currently an issue with building OpenSSL on Windows on ARM, which results in libcurl segfaulting
+        # whenever we try to use it. A temporary fix is to build OpenSSL without optiomisation. We can do this by
+        # setting the CFLAGS environment variable. By default, the flags passed to the C compiler are
+        # "/W3 /wd4090 /nologo /O2", so here we set CFLAGS to "/W3 /wd4090 /nologo". See
+        # https://github.com/openssl/openssl/issues/26239 and
+        # https://developercommunity.visualstudio.com/t/Openssl-crashes-on-arm64-when-built-with/10896571 for more
+        # details.
+
+        string(REPLACE " " "\\ " ESCAPED_CMAKE_COMMAND ${CMAKE_COMMAND})
+        string(REPLACE " " "\\ " ESCAPED_CFLAGS "/W3 /wd4090 /nologo")
+
+        set(PRE_CONFIGURE_COMMAND ${ESCAPED_CMAKE_COMMAND} -E env CFLAGS=${ESCAPED_CFLAGS})
+    endif()
+
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CONFIGURE_COMMAND
-            ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
-        ${PATCH_COMMANDS}
+            ${PRE_CONFIGURE_COMMAND} ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
         BUILD_COMMAND
             ${MAKE_NMAKE_COMMAND}
         INSTALL_COMMAND

@@ -73,7 +73,6 @@ TEST(BasicSedTest, sedmlFileWithAbsoluteCellmlFile)
     EXPECT_FALSE(document->hasIssues());
 }
 
-#ifdef GHA_NOT_WINDOWS_ON_ARM
 TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/remote_cellml_file.sedml"));
@@ -87,7 +86,6 @@ TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
 
     EXPECT_FALSE(document->hasIssues());
 }
-#endif
 
 TEST(BasicSedTest, combineArchive)
 {
