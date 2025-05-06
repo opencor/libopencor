@@ -34,6 +34,7 @@ limitations under the License.
 //          WITH A REMOTE FILE WHEN RUNNING ON Windows on ARM.
 #    define GHA_NOT_WINDOWS_ON_ARM
 #endif
+
 namespace libOpenCOR {
 
 static constexpr auto RESOURCE_LOCATION = "@RESOURCE_LOCATION@";
