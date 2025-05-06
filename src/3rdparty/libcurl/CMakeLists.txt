@@ -30,42 +30,42 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1a4dac12be56cc76bf6a8cca5164aae84b321b49)
+                                 305e24bcead97613af21ce7d4a918ada7bd1d3d4)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 94794fa0d700f2a6956cc5fd8c078f1fbbd4383e)
+                                 aca3a811d1f7da2af1a5824837ffff4ef464b7df)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 17c73519bb0d26e044c24f23564f9fbe9e2103f0)
+                                 860c55ddf58677120c1529029df2285bfaa42703)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 4019e7cb2ffd8b48b8bf64aa01af5089918bae32)
+                                 d703b9a75a8784102d7709a89de1b24efc7f7484)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7b919a6395c708515d13529f3b3fc1727aea5811)
+                             ff199eca4533c8cb4df389d4210173e13a39e001)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             2b397985f476be4095515a0b7ce20549342f2c47)
+                             daacb41a209b84b6cb55f10a462d8abe68ee20df)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             63e3713ca2b882bf8acbd5eea4baafac965e2d7f)
+                             9b007722dfd1359c939b3639e1ef404ded925728)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             c9d42bb0debb3ba4fbf6674b2c63bffd48cc088d)
+                             078a3fbb2aa417c3100fbacba6a76354cff92494)
         endif()
     endif()
 else()

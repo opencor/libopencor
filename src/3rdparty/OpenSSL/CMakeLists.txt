@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 14cfbd7462e67547681ae2aa541c43942b550f40)
+                                 ac4440ae3dba3415322fc833bef87b8b4d1b082b)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 58a58fbb31ea4c3df0988081e04142d2b7e94116)
+                                 cd571c829ce744dbfc82bb1998f4d566b289cf93)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 3dc66349cd5e9d0e98a375b646644196c646effb)
+                                 ed9489d5ed226ed79ac2d1042a4a22bcdc899a8c)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 4fe185f053abc7aa4eceb9fe5bde1c292aee7f4c)
+                                 dec6518c275c9f72aeeea068328ac86f0b87fb82)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             dc50c2a300b6b72d63559af6994f46d7897cb8ad)
+                             67f37a19f38abf06220619074ee880ca63b4a804)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             57506aeacc82ef50f2acf4723da1fecc3e6e9b3f)
+                             8c5d0afbbd2dfe2120502b728e8e5e9ff8f69ecc)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             8b85efd5977077fafa194ae29fd6d9c6ca15c9b5)
+                             934a9c39cd923b2466f83066952b17295b8dadf5)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b4b0b49976ca19f04310fbdee5474daf928833a1)
+                             cc6a2de4b58b0b717e0684534c17ba5c90e6e7ab)
         endif()
     endif()
 else()
@@ -105,13 +105,29 @@ else()
         list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
     endif()
 
+    if(WIN32 AND NOT INTEL_MODE)
+        #---GRY--- THE BELOW SHOULD BE REMOVED ONCE THE OpenSSL ISSUE ON WoA HAS BEEN FIXED.
+
+        # There is currently an issue with building OpenSSL on Windows on ARM, which results in libcurl segfaulting
+        # whenever we try to use it. A temporary fix is to build OpenSSL without optiomisation. We can do this by
+        # setting the CFLAGS environment variable. By default, the flags passed to the C compiler are
+        # "/W3 /wd4090 /nologo /O2", so here we set CFLAGS to "/W3 /wd4090 /nologo". See
+        # https://github.com/openssl/openssl/issues/26239 and
+        # https://developercommunity.visualstudio.com/t/Openssl-crashes-on-arm64-when-built-with/10896571 for more
+        # details.
+
+        string(REPLACE " " "\\ " ESCAPED_CMAKE_COMMAND ${CMAKE_COMMAND})
+        string(REPLACE " " "\\ " ESCAPED_CFLAGS "/W3 /wd4090 /nologo")
+
+        set(PRE_CONFIGURE_COMMAND ${ESCAPED_CMAKE_COMMAND} -E env CFLAGS=${ESCAPED_CFLAGS})
+    endif()
+
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CONFIGURE_COMMAND
-            ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
-        ${PATCH_COMMANDS}
+            ${PRE_CONFIGURE_COMMAND} ${PERL_EXECUTABLE} <SOURCE_DIR>/Configure ${PLATFORM} ${CONFIG_OPTIONS}
         BUILD_COMMAND
             ${MAKE_NMAKE_COMMAND}
         INSTALL_COMMAND
