@@ -394,86 +394,54 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/gha/doxygen.tar.gz -O - | tar -xz
           sudo mv doxygen /usr/local/bin
       - name: Configure libOpenCOR
-        run: |
-          mkdir build
-          cd build
-          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_support }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_support }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_support }} -DPYTHON_UNIT_TESTING=${{ matrix.python_support }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+        run: ${{ matrix.context }} cmake -G Ninja -S . -B build ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_support }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_support }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_support }} -DPYTHON_UNIT_TESTING=${{ matrix.python_support }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }}
       - name: Build libOpenCOR
         if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.javascript_support == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
-        run: |
-          cd build
-          ninja
+        run: cmake --build build
       - name: Unit testing
         if: ${{ ((matrix.unit_testing == 'ON') && (matrix.code_analysis == 'OFF')) || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: JavaScript unit testing
         if: ${{ matrix.javascript_support == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Python unit testing
         if: ${{ matrix.python_support == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Python unit testing report
         if: ${{ matrix.python_support == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}_report
+        run: cmake --build build --target ${{ matrix.target }}_report
       - name: Code formatting
         if: ${{ matrix.target == 'check_code_formatting' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: JavaScript code formatting
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Python code formatting
         if: ${{ matrix.target == 'python_check_code_formatting' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Code analysis
         if: ${{ matrix.name == 'Code analysis' }}
-        run: |
-          cd build
-          ninja
+        run: cmake --build build
       - name: Code coverage
         if: ${{ matrix.code_coverage == 'ON' }}
         run: |
-          cd build
-          ninja ${{ matrix.target }}
+          cmake --build build --target ${{ matrix.target }}
           if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
       - name: Code coverage report
         if: ${{ matrix.code_coverage == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}_report
+        run: cmake --build build --target ${{ matrix.target }}_report
       - name: Memory checks
         if: ${{ matrix.memory_checks == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Documentation
         if: ${{ matrix.documentation == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Install libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
-        run: |
-          cd build
-          ninja install
+        run: cmake --build build --target install
       - name: Uninstall libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
-        run: |
-          cd build
-          ninja uninstall
+        run: cmake --build build --target uninstall
       - name: Package libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
         run: |
