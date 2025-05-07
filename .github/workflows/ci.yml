@@ -435,9 +435,7 @@ jobs:
         run: cmake --build build
       - name: Code coverage
         if: ${{ matrix.code_coverage == 'ON' }}
-        run: |
-          cmake --build build --target ${{ matrix.target }}
-          if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
+        run: if [ `cmake --build build --target ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
       - name: Code coverage report
         if: ${{ matrix.code_coverage == 'ON' }}
         run: cmake --build build --target ${{ matrix.target }}_report
