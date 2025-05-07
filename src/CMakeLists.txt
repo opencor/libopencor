@@ -413,7 +413,7 @@ configure_file(unittestingexport.h unittestingexport.h COPYONLY)
 # Note: MSVC doesn't allow unresolved symbols, so we only need to look for them if we are building using GNU or Clang.
 
 if(BUILDING_USING_GNU)
-    SET(CMAKE_SHARED_LINKER_FLAGS -Wl,--no-undefined)
+    add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,--no-undefined)
 elseif(BUILDING_USING_CLANG)
     # On macOS, only use the -Wl,--no-undefined option if we are not using Xcode 15.0 or later since otherwise the
     # linker is going to generate some warnings about -undefined error being deprecated.
@@ -445,15 +445,15 @@ elseif(BUILDING_USING_CLANG)
     endif()
 
     if(XCODE_VERSION VERSION_LESS 15.0)
-        SET(CMAKE_SHARED_LINKER_FLAGS -Wl,-undefined,error)
+        add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,-undefined,error)
     endif()
 endif()
 
 # Get ready for code coverage.
 
 if(LIBOPENCOR_CODE_COVERAGE)
-    add_target_property(${CMAKE_PROJECT_NAME} COMPILE_FLAGS ${CODE_COVERAGE_COMPILER_FLAGS})
-    add_target_property(${CMAKE_PROJECT_NAME} LINK_FLAGS ${CODE_COVERAGE_LINKER_FLAGS})
+    add_compiler_flags(${CMAKE_PROJECT_NAME} ${CODE_COVERAGE_COMPILER_FLAGS})
+    add_linker_flags(${CMAKE_PROJECT_NAME} ${CODE_COVERAGE_LINKER_FLAGS})
 endif()
 
 # Build our different bindings.

@@ -325,14 +325,12 @@ function(configure_target TARGET)
 
     if(NOT EMSCRIPTEN AND NOT LIBOPENCOR_CODE_ANALYSIS)
         if(BUILDING_USING_MSVC)
-            set(LINK_FLAGS "/ignore:4006")
+            add_linker_flags(${TARGET} /ignore:4006)
         elseif(BUILDING_USING_GNU)
-            set(LINK_FLAGS "-Wl,--allow-multiple-definition")
+            add_linker_flags(${TARGET} -Wl,--allow-multiple-definition)
         else()
-            set(LINK_FLAGS "-Wl,-no_warn_duplicate_libraries")
+            add_linker_flags(${TARGET} -Wl,-no_warn_duplicate_libraries)
         endif()
-
-        add_target_property(${TARGET} LINK_FLAGS ${LINK_FLAGS})
     endif()
 
     # Mark as advanced the CMake variables set by our various packages.
@@ -392,6 +390,18 @@ function(add_target_property TARGET PROPERTY VALUE)
     set_target_properties(${TARGET} PROPERTIES
                           ${PROPERTY} "${NEW_VALUE}")
 endfunction()
+
+macro(add_compiler_flags TARGET)
+    foreach(FLAG ${ARGN})
+        add_target_property(${TARGET} COMPILE_FLAGS ${FLAG})
+    endforeach()
+endmacro()
+
+macro(add_linker_flags TARGET)
+    foreach(FLAG ${ARGN})
+        add_target_property(${TARGET} LINK_FLAGS ${FLAG})
+    endforeach()
+endmacro()
 
 function(prepare_test TARGET)
     # Prepare the given test.
