@@ -377,7 +377,6 @@ else()
                           CXX_VISIBILITY_PRESET hidden
                           DEBUG_POSTFIX d
                           PREFIX ""
-                          VERSION ${PROJECT_VERSION}
                           VISIBILITY_INLINES_HIDDEN ON)
 endif()
 
