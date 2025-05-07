@@ -37,7 +37,7 @@ describe("Version tests", () => {
 
     expect(libopencor.version()).toBe(version);
     expect(libopencor.versionString()).toBe(
-      `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")}`,
+      `${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}`,
     );
   });
 

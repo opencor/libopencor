@@ -59,7 +59,7 @@ endif()
 
 # Configure the version file.
 
-set(LIBOPENCOR_VERSION 0x${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH})
+set(LIBOPENCOR_VERSION 0x${PROJECT_VERSION})
 set(LIBOPENCOR_VERSION_STRING ${PROJECT_VERSION})
 
 set(VERSION_HEADER_FILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in)
@@ -291,7 +291,7 @@ if(EMSCRIPTEN)
 
     # Create a .tgz file for our generated .js file that can be used to distribute our JavaScript bindings.
 
-    set(TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.tgz)
+    set(TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION}.tgz)
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E make_directory package
