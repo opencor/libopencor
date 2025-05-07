@@ -430,7 +430,9 @@ elseif(BUILDING_USING_CLANG)
                         RESULT_VARIABLE RESULT
                         ERROR_QUIET)
 
-        if(NOT RESULT EQUAL 0)
+        if(RESULT EQUAL 0)
+            string(REPLACE "Xcode " "" XCODE_VERSION ${XCODE_VERSION})
+        else()
             execute_process(COMMAND softwareupdate --history
                             COMMAND awk "/Command Line Tools for Xcode/ {print \$6}"
                             COMMAND tail -1
