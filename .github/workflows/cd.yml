@@ -62,25 +62,19 @@ jobs:
             build_type: Release
             shared_libs: ON
           - name: 'macOS static library (Intel)'
-            os: macos-14
-            arch: Intel # Only used for buildcache's cache key.
+            os: macos-13
             build_type: Release
             shared_libs: OFF
-            target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS shared library (Intel)'
-            os: macos-14
-            arch: Intel # Only used for buildcache's cache key.
+            os: macos-13
             build_type: Release
             shared_libs: ON
-            target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS static library (ARM)'
             os: macos-14
-            arch: ARM # Only used for buildcache's cache key.
             build_type: Release
             shared_libs: OFF
           - name: 'macOS shared library (ARM)'
             os: macos-14
-            arch: ARM # Only used for buildcache's cache key.
             build_type: Release
             shared_libs: ON
     env:
@@ -102,21 +96,16 @@ jobs:
       - name: Install buildcache
         uses: opencor/buildcache-action@v1
         with:
-          cache_key: cd-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.build_type }}-${{ matrix.shared_libs }}
+          cache_key: cd-${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.shared_libs }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
       - name: Configure libOpenCOR
-        run: |
-          mkdir build
-          cd build
-          cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF ..
+        run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF
       - name: Build libOpenCOR
-        run: |
-          cd build
-          ninja
+        run: cmake --build build
       - name: Package libOpenCOR
         run: |
           cd build
@@ -168,16 +157,21 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
       - name: Build Python wheels
-        uses: pypa/cibuildwheel@9c75ea15c2f31a77e6043b80b1b7081372319d85
+        uses: pypa/cibuildwheel@v2.23.3
         env:
           CIBW_ARCHS: auto64
+          CIBW_BEFORE_ALL_LINUX: >
+            export USR_LIB_PATH=/usr/lib/`uname -m`-linux-gnu &&
+            mkdir -p $USR_LIB_PATH &&
+            cd $USR_LIB_PATH &&
+            ln -s /usr/lib64/libz.so
           CIBW_BUILD: 'cp*'
           CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=13.0
           # Note #1: the value of CIBW_ENVIRONMENT_MACOS must be in sync with that of MACOS_DEPLOYMENT_TARGET in
           #          CMakelists.txt.
           # Note #2: for some reasons, we need to specify the minor version, hence using 13.0 instead of 13.
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
-          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
+          CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux_2_34_x86_64
+          CIBW_MANYLINUX_AARCH64_IMAGE: quay.io/pypa/manylinux_2_34_aarch64
           CIBW_SKIP: 'cp36* cp37* cp38* *musllinux*'
       - name: Upload Python wheel artifacts
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
@@ -214,14 +208,9 @@ jobs:
       - name: Install Emscripten
         run: brew install emscripten
       - name: Configure libOpenCOR
-        run: |
-          mkdir build
-          cd build
-          cmake -G Ninja -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DJAVASCRIPT_UNIT_TESTING=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=OFF -DUNIT_TESTING=OFF ..
+        run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DJAVASCRIPT_UNIT_TESTING=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=OFF -DUNIT_TESTING=OFF
       - name: Build WebAssembly
-        run: |
-          cd build
-          ninja
+        run: cmake --build build
       - name: Upload WebAssembly artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4

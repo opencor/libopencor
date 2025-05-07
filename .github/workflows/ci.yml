@@ -41,6 +41,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+            copy_dll: ON
           - name: 'Windows static library (ARM)'
             os: windows-11-arm
             arch: amd64_arm64
@@ -69,6 +70,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+            copy_dll: ON
           - name: 'Linux static library (Intel)'
             os: ubuntu-22.04
             build_type: Release
@@ -82,6 +84,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+            use_install_prefix: ON
           - name: 'Linux shared library (Intel)'
             os: ubuntu-22.04
             build_type: Release
@@ -95,6 +98,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+            use_install_prefix: ON
           - name: 'Linux static library (ARM)'
             os: ubuntu-22.04-arm
             build_type: Release
@@ -108,6 +112,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+            use_install_prefix: ON
           - name: 'Linux shared library (ARM)'
             os: ubuntu-22.04-arm
             build_type: Release
@@ -121,8 +126,9 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+            use_install_prefix: ON
           - name: 'macOS static library (Intel)'
-            os: macos-14
+            os: macos-13
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -133,10 +139,10 @@ jobs:
             shared_libs: OFF
             unit_testing: ON
             target: unit_testing
-            target_arch: " -DTARGET_ARCHITECTURE=Intel"
             install_uninstall_and_package: ON
+            use_install_prefix: ON
           - name: 'macOS shared library (Intel)'
-            os: macos-14
+            os: macos-13
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -147,8 +153,8 @@ jobs:
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
-            target_arch: " -DTARGET_ARCHITECTURE=Intel"
             install_uninstall_and_package: ON
+            use_install_prefix: ON
           - name: 'macOS static library (ARM)'
             os: macos-14
             build_type: Release
@@ -162,6 +168,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+            use_install_prefix: ON
           - name: 'macOS shared library (ARM)'
             os: macos-14
             build_type: Release
@@ -175,6 +182,7 @@ jobs:
             unit_testing: ON
             target: unit_testing
             install_uninstall_and_package: ON
+            use_install_prefix: ON
           - name: 'JavaScript bindings'
             os: macos-14
             build_type: Release
@@ -394,86 +402,65 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/gha/doxygen.tar.gz -O - | tar -xz
           sudo mv doxygen /usr/local/bin
       - name: Configure libOpenCOR
+        shell: bash
         run: |
-          mkdir build
-          cd build
-          ${{ matrix.context }} cmake -G Ninja ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_support }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_support }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_support }} -DPYTHON_UNIT_TESTING=${{ matrix.python_support }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }} ..
+          if [ '${{ matrix.use_install_prefix }}' == 'ON' ]; then export D_INSTALL_PREFIX='-DINSTALL_PREFIX=${{ github.workspace }}/install'; fi
+          ${{ matrix.context }} cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} $D_INSTALL_PREFIX -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_support }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_support }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_support }} -DPYTHON_UNIT_TESTING=${{ matrix.python_support }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }}
       - name: Build libOpenCOR
-        if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.javascript_support == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
-        run: |
-          cd build
-          ninja
+        if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
+        run: cmake --build build
       - name: Unit testing
         if: ${{ ((matrix.unit_testing == 'ON') && (matrix.code_analysis == 'OFF')) || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: JavaScript unit testing
         if: ${{ matrix.javascript_support == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Python unit testing
         if: ${{ matrix.python_support == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Python unit testing report
         if: ${{ matrix.python_support == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}_report
+        run: cmake --build build --target ${{ matrix.target }}_report
       - name: Code formatting
         if: ${{ matrix.target == 'check_code_formatting' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: JavaScript code formatting
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Python code formatting
         if: ${{ matrix.target == 'python_check_code_formatting' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Code analysis
         if: ${{ matrix.name == 'Code analysis' }}
-        run: |
-          cd build
-          ninja
+        run: cmake --build build
       - name: Code coverage
         if: ${{ matrix.code_coverage == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
-          if [ `ninja ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
+        run: if [ `cmake --build build --target ${{ matrix.target }} | grep TOTAL | sed 's/ /\n/g' | grep "100.00%" | wc -l | sed 's/ //g'` -eq 4 ]; then exit 0; else exit 1; fi
       - name: Code coverage report
         if: ${{ matrix.code_coverage == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}_report
+        run: cmake --build build --target ${{ matrix.target }}_report
       - name: Memory checks
         if: ${{ matrix.memory_checks == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Documentation
         if: ${{ matrix.documentation == 'ON' }}
-        run: |
-          cd build
-          ninja ${{ matrix.target }}
+        run: cmake --build build --target ${{ matrix.target }}
       - name: Install libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
+        run: cmake --build build --target install
+      - name: Test libOpenCOR
+        if: ${{ matrix.install_uninstall_and_package == 'ON' }}
+        shell: bash
         run: |
-          cd build
-          ninja install
+          cd tests/install
+          if [ '${{ matrix.use_install_prefix }}' == 'ON' ]; then export D_CMAKE_PREFIX_PATH='-DCMAKE_PREFIX_PATH=${{ github.workspace }}/install'; fi
+          cmake -G Ninja -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} $D_CMAKE_PREFIX_PATH
+          cmake --build build
+          if [ '${{ matrix.copy_dll }}' == 'ON' ]; then cp "C:/Program Files (x86)/libOpenCOR/bin/libOpenCOR.dll" build; fi
+          build/testInstall
       - name: Uninstall libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
-        run: |
-          cd build
-          ninja uninstall
+        run: cmake --build build --target uninstall
       - name: Package libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
         run: |
@@ -486,7 +473,9 @@ jobs:
           pip3 install .
       - name: Test libOpenCOR Python
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
-        run: python3 -c "import libopencor as oc; print(f'This is libOpenCOR version {oc.version_string()}.')"
+        run: |
+          cd tests/install/bindings/python
+          python3 test_install.py
       - name: pip uninstall libOpenCOR
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: pip3 uninstall -y libopencor
