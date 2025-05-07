@@ -321,6 +321,20 @@ function(configure_target TARGET)
                               ${LIBNUML_LIBRARY_FILE})
     endif()
 
+    # Ignore duplicate objects when linking the target.
+
+    if(NOT EMSCRIPTEN AND NOT LIBOPENCOR_CODE_ANALYSIS)
+        if(BUILDING_USING_MSVC)
+            set(LINK_FLAGS "/ignore:4006")
+        elseif(BUILDING_USING_GNU)
+            set(LINK_FLAGS "-Wl,--allow-multiple-definition")
+        else()
+            set(LINK_FLAGS "-Wl,-no_warn_duplicate_libraries")
+        endif()
+
+        add_target_property(${TARGET} LINK_FLAGS ${LINK_FLAGS})
+    endif()
+
     # Mark as advanced the CMake variables set by our various packages.
 
     mark_as_advanced(CURL_DIR
