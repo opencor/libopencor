@@ -62,25 +62,19 @@ jobs:
             build_type: Release
             shared_libs: ON
           - name: 'macOS static library (Intel)'
-            os: macos-14
-            arch: Intel # Only used for buildcache's cache key.
+            os: macos-13
             build_type: Release
             shared_libs: OFF
-            target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS shared library (Intel)'
-            os: macos-14
-            arch: Intel # Only used for buildcache's cache key.
+            os: macos-13
             build_type: Release
             shared_libs: ON
-            target_arch: " -DTARGET_ARCHITECTURE=Intel"
           - name: 'macOS static library (ARM)'
             os: macos-14
-            arch: ARM # Only used for buildcache's cache key.
             build_type: Release
             shared_libs: OFF
           - name: 'macOS shared library (ARM)'
             os: macos-14
-            arch: ARM # Only used for buildcache's cache key.
             build_type: Release
             shared_libs: ON
     env:
@@ -102,14 +96,14 @@ jobs:
       - name: Install buildcache
         uses: opencor/buildcache-action@v1
         with:
-          cache_key: cd-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.build_type }}-${{ matrix.shared_libs }}
+          cache_key: cd-${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.shared_libs }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
       - name: Configure libOpenCOR
-        run: cmake -G Ninja -S . -B build ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF
+        run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=OFF
       - name: Build libOpenCOR
         run: cmake --build build
       - name: Package libOpenCOR
