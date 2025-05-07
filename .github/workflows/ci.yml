@@ -122,7 +122,7 @@ jobs:
             target: unit_testing
             install_uninstall_and_package: ON
           - name: 'macOS static library (Intel)'
-            os: macos-14
+            os: macos-13
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -133,10 +133,9 @@ jobs:
             shared_libs: OFF
             unit_testing: ON
             target: unit_testing
-            target_arch: " -DTARGET_ARCHITECTURE=Intel"
             install_uninstall_and_package: ON
           - name: 'macOS shared library (Intel)'
-            os: macos-14
+            os: macos-13
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -147,7 +146,6 @@ jobs:
             shared_libs: ON
             unit_testing: ON
             target: unit_testing
-            target_arch: " -DTARGET_ARCHITECTURE=Intel"
             install_uninstall_and_package: ON
           - name: 'macOS static library (ARM)'
             os: macos-14
@@ -394,7 +392,7 @@ jobs:
           wget https://github.com/opencor/gha/releases/download/gha/doxygen.tar.gz -O - | tar -xz
           sudo mv doxygen /usr/local/bin
       - name: Configure libOpenCOR
-        run: ${{ matrix.context }} cmake -G Ninja -S . -B build ${{ matrix.target_arch }} -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_support }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_support }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_support }} -DPYTHON_UNIT_TESTING=${{ matrix.python_support }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }}
+        run: ${{ matrix.context }} cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} -DINSTALL_PREFIX=${{ github.workspace }}/install -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_support }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_support }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_support }} -DPYTHON_UNIT_TESTING=${{ matrix.python_support }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }}
       - name: Build libOpenCOR
         if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.javascript_support == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
         run: cmake --build build
