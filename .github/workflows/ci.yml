@@ -407,7 +407,7 @@ jobs:
           if [ '${{ matrix.use_install_prefix }}' == 'ON' ]; then export D_INSTALL_PREFIX='-DINSTALL_PREFIX=${{ github.workspace }}/install'; fi
           ${{ matrix.context }} cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DCODE_ANALYSIS=${{ matrix.code_analysis }} -DCODE_COVERAGE=${{ matrix.code_coverage }} -DDOCUMENTATION=${{ matrix.documentation }} $D_INSTALL_PREFIX -DJAVASCRIPT_BINDINGS=${{ matrix.javascript_support }} -DJAVASCRIPT_UNIT_TESTING=${{ matrix.javascript_support }} -DMEMORY_CHECKS=${{ matrix.memory_checks }} -DPYTHON_BINDINGS=${{ matrix.python_support }} -DPYTHON_UNIT_TESTING=${{ matrix.python_support }} -DSHARED_LIBS=${{ matrix.shared_libs }} -DUNIT_TESTING=${{ matrix.unit_testing }}
       - name: Build libOpenCOR
-        if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.javascript_support == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
+        if: ${{ (matrix.install_uninstall_and_package == 'ON') || (matrix.code_analysis == 'ON') || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
         run: cmake --build build
       - name: Unit testing
         if: ${{ ((matrix.unit_testing == 'ON') && (matrix.code_analysis == 'OFF')) || (matrix.code_coverage == 'ON') || (matrix.memory_checks == 'ON') }}
