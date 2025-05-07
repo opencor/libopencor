@@ -439,6 +439,13 @@ jobs:
       - name: Install libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
         run: cmake --build build --target install
+      - name: Test libOpenCOR
+        if: ${{ matrix.install_uninstall_and_package == 'ON' }}
+        run: |
+          cd tests/install
+          cmake -G Ninja -S . -B build
+          cmake --build build
+          build/testInstall
       - name: Uninstall libOpenCOR
         if: ${{ matrix.install_uninstall_and_package == 'ON' }}
         run: cmake --build build --target uninstall
@@ -454,7 +461,9 @@ jobs:
           pip3 install .
       - name: Test libOpenCOR Python
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
-        run: python3 -c "import libopencor as oc; print(f'This is libOpenCOR version {oc.version_string()}.')"
+        run: |
+          cd tests/install/bindings/python
+          python3 test_install.py
       - name: pip uninstall libOpenCOR
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: pip3 uninstall -y libopencor
