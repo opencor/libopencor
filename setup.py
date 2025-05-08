@@ -23,9 +23,9 @@ day = datetime.datetime.now().day
 setup(
     name="libopencor",
     version=f"{year}{month:02}{day:02}",
-    description="libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.",
+    description="libOpenCOR is the backend library to OpenCOR, a cross-platform modelling environment, which can be used to organise, edit, simulate and analyse CellML files.",
     author="libOpenCOR contributors",
-    url="https://opencor.ws/libopencor",
+    url="https://opencor.ws/libopencor/",
     license="Apache 2.0",
     packages=["libopencor"],
     package_dir={"": "src/bindings/python"},
