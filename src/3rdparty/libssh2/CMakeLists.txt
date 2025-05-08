@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_LIBSSH2)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 88ea03697534be46a83a5e5e8341c712ae4552db)
+                                 25f2d940a79f8fbe03cc0ae07062c673bcd2f606)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 069cc72dc18316c1471fcc02188e2ca2eeedcac5)
+                                 0f735daadcb69c8e6433b97941cd2d92d8b8af21)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9e6b04d193b9acaaa5f1b966b48ca5efd93f7157)
+                                 c4518bc5c088a4a0fe7759a346e54a2c204645f8)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b009196f8eee49fc10202e018fb8efbb15ffa736)
+                                 a7e0984a3900512638807138b6c3bc0537f5e420)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             bbc92f3e041f37550da1c4ab9485a0b97325e9a2)
+                             f87739f5ed57f9ff820e2f5df68d9983d0029d0e)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b07761278c9eed1575aaa110eee9fe39896dd2ad)
+                             9b15a45e6f10ec5cb8061d431a356b622e1968bd)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e750ebdaf1fe26b84097cc65ad45a287df189776)
+                             19a1a3960b77815b93eeb53f3d04e8ae72dee35a)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             32bf276760631c274c690e3df0e0671536aa39c0)
+                             4b4603099b6e843a700edc19229119cc3378b79e)
         endif()
     endif()
 else()
@@ -79,8 +79,9 @@ else()
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DCRYPTO_BACKEND=OpenSSL
-            -DENABLE_ZLIB_COMPRESSION=OFF
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
+            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
+            -DZLIB_LIBRARY=${ZLIB_LIBRARY_FILE}
     )
 
     # Patch some of our CMake configuration files.
@@ -88,6 +89,10 @@ else()
     set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/libssh2-targets.cmake)
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    foreach(LIBRARY zlib)
+        string(REPLACE "${PREBUILT_DIR}/${LIBRARY}" "\${_IMPORT_PREFIX}/../${LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    endforeach()
 
     if(APPLE)
         string(REGEX REPLACE "/Applications/Xcode.*\.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/lib" "$<LINK_ONLY:" FILE_CONTENTS "${FILE_CONTENTS}")
