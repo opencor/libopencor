@@ -59,7 +59,7 @@ endif()
 
 # Configure the version file.
 
-set(LIBOPENCOR_VERSION 0x${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH})
+set(LIBOPENCOR_VERSION 0x${PROJECT_VERSION})
 set(LIBOPENCOR_VERSION_STRING ${PROJECT_VERSION})
 
 set(VERSION_HEADER_FILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in)
@@ -291,7 +291,7 @@ if(EMSCRIPTEN)
 
     # Create a .tgz file for our generated .js file that can be used to distribute our JavaScript bindings.
 
-    set(TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}.tgz)
+    set(TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION}.tgz)
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E make_directory package
@@ -377,7 +377,6 @@ else()
                           CXX_VISIBILITY_PRESET hidden
                           DEBUG_POSTFIX d
                           PREFIX ""
-                          VERSION ${PROJECT_VERSION}
                           VISIBILITY_INLINES_HIDDEN ON)
 endif()
 
@@ -414,7 +413,7 @@ configure_file(unittestingexport.h unittestingexport.h COPYONLY)
 # Note: MSVC doesn't allow unresolved symbols, so we only need to look for them if we are building using GNU or Clang.
 
 if(BUILDING_USING_GNU)
-    SET(CMAKE_SHARED_LINKER_FLAGS -Wl,--no-undefined)
+    add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,--no-undefined)
 elseif(BUILDING_USING_CLANG)
     # On macOS, only use the -Wl,--no-undefined option if we are not using Xcode 15.0 or later since otherwise the
     # linker is going to generate some warnings about -undefined error being deprecated.
@@ -431,7 +430,9 @@ elseif(BUILDING_USING_CLANG)
                         RESULT_VARIABLE RESULT
                         ERROR_QUIET)
 
-        if(NOT RESULT EQUAL 0)
+        if(RESULT EQUAL 0)
+            string(REPLACE "Xcode " "" XCODE_VERSION ${XCODE_VERSION})
+        else()
             execute_process(COMMAND softwareupdate --history
                             COMMAND awk "/Command Line Tools for Xcode/ {print \$6}"
                             COMMAND tail -1
@@ -444,15 +445,15 @@ elseif(BUILDING_USING_CLANG)
     endif()
 
     if(XCODE_VERSION VERSION_LESS 15.0)
-        SET(CMAKE_SHARED_LINKER_FLAGS -Wl,-undefined,error)
+        add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,-undefined,error)
     endif()
 endif()
 
 # Get ready for code coverage.
 
 if(LIBOPENCOR_CODE_COVERAGE)
-    add_target_property(${CMAKE_PROJECT_NAME} COMPILE_FLAGS ${CODE_COVERAGE_COMPILER_FLAGS})
-    add_target_property(${CMAKE_PROJECT_NAME} LINK_FLAGS ${CODE_COVERAGE_LINKER_FLAGS})
+    add_compiler_flags(${CMAKE_PROJECT_NAME} ${CODE_COVERAGE_COMPILER_FLAGS})
+    add_linker_flags(${CMAKE_PROJECT_NAME} ${CODE_COVERAGE_LINKER_FLAGS})
 endif()
 
 # Build our different bindings.

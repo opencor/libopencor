@@ -22,7 +22,7 @@ day = datetime.datetime.now().day
 
 setup(
     name="libopencor",
-    version=f"{year}.{month:02}.{day:02}",
+    version=f"{year}{month:02}{day:02}",
     description="libOpenCOR is the backend library to OpenCOR, an open source cross-platform modelling environment.",
     author="libOpenCOR contributors",
     url="https://opencor.ws/libopencor",

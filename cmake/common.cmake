@@ -321,6 +321,14 @@ function(configure_target TARGET)
                               ${LIBNUML_LIBRARY_FILE})
     endif()
 
+    # Ignore duplicate objects when linking the target on macOS.
+    # Note: we also get duplicate objects when linking the target on Windows, but for some reasons to use /ignore:4006
+    #       doesn't work...!?
+
+    if(BUILDING_USING_CLANG AND NOT LIBOPENCOR_CODE_ANALYSIS)
+        add_linker_flags(${TARGET} -Wl,-no_warn_duplicate_libraries)
+    endif()
+
     # Mark as advanced the CMake variables set by our various packages.
 
     mark_as_advanced(CURL_DIR
@@ -378,6 +386,18 @@ function(add_target_property TARGET PROPERTY VALUE)
     set_target_properties(${TARGET} PROPERTIES
                           ${PROPERTY} "${NEW_VALUE}")
 endfunction()
+
+macro(add_compiler_flags TARGET)
+    foreach(FLAG ${ARGN})
+        add_target_property(${TARGET} COMPILE_FLAGS ${FLAG})
+    endforeach()
+endmacro()
+
+macro(add_linker_flags TARGET)
+    foreach(FLAG ${ARGN})
+        add_target_property(${TARGET} LINK_FLAGS ${FLAG})
+    endforeach()
+endmacro()
 
 function(prepare_test TARGET)
     # Prepare the given test.
