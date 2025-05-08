@@ -160,11 +160,6 @@ jobs:
         uses: pypa/cibuildwheel@v2.23.3
         env:
           CIBW_ARCHS: auto64
-          CIBW_BEFORE_ALL_LINUX: >
-            export USR_LIB_PATH=/usr/lib/`uname -m`-linux-gnu &&
-            mkdir -p $USR_LIB_PATH &&
-            cd $USR_LIB_PATH &&
-            ln -s /usr/lib64/libz.so
           CIBW_BUILD: 'cp*'
           CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=13.0
           # Note #1: the value of CIBW_ENVIRONMENT_MACOS must be in sync with that of MACOS_DEPLOYMENT_TARGET in
