@@ -51,11 +51,11 @@ TEST(VersionTest, libOpenCOR)
         number /= TEN;
     }
 
-    static const size_t VERSION_STRING_SIZE = 9;
+    static const size_t VERSION_STRING_SIZE = 11;
 
     std::array<char, VERSION_STRING_SIZE> versionString {};
 
-    EXPECT_EQ(std::snprintf(versionString.data(), VERSION_STRING_SIZE, "%d%02d%02d", year, month, day), VERSION_STRING_SIZE - 1); // NOLINT
+    EXPECT_EQ(std::snprintf(versionString.data(), VERSION_STRING_SIZE, "%d.%02d.%02d", year, month, day), VERSION_STRING_SIZE - 1); // NOLINT
     // Note: ideally, we would be using std::format(), but it is not available on some of the CI systems we are using.
 
     EXPECT_EQ(version, libOpenCOR::version());

@@ -35,7 +35,7 @@ def test_version():
 
 
 def test_version_string():
-    version = f"{now.year}{now.month:02}{now.day:02}"
+    version = f"{now.year}.{now.month:02}.{now.day:02}"
 
     assert oc.__version__ == version
 
