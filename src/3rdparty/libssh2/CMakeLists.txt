@@ -79,8 +79,9 @@ else()
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DCRYPTO_BACKEND=OpenSSL
-            -DENABLE_ZLIB_COMPRESSION=OFF
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
+            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
+            -DZLIB_LIBRARY=${ZLIB_LIBRARY_FILE}
     )
 
     # Patch some of our CMake configuration files.
@@ -88,6 +89,10 @@ else()
     set(CONFIG_FILE ${INSTALL_DIR}/lib/cmake/${PACKAGE}/libssh2-targets.cmake)
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
+
+    foreach(LIBRARY zlib)
+        string(REPLACE "${PREBUILT_DIR}/${LIBRARY}" "\${_IMPORT_PREFIX}/../${LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    endforeach()
 
     if(APPLE)
         string(REGEX REPLACE "/Applications/Xcode.*\.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/lib" "$<LINK_ONLY:" FILE_CONTENTS "${FILE_CONTENTS}")
