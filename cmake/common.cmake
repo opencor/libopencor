@@ -321,16 +321,12 @@ function(configure_target TARGET)
                               ${LIBNUML_LIBRARY_FILE})
     endif()
 
-    # Ignore duplicate objects when linking the target.
+    # Ignore duplicate objects when linking the target on macOS.
+    # Note: we also get duplicate objects when linking the target on Windows, but for some reasons to use /ignore:4006
+    #       doesn't work...!?
 
-    if(NOT EMSCRIPTEN AND NOT LIBOPENCOR_CODE_ANALYSIS)
-        if(BUILDING_USING_MSVC)
-            add_linker_flags(${TARGET} /ignore:4006)
-        elseif(BUILDING_USING_GNU)
-            add_linker_flags(${TARGET} -Wl,--allow-multiple-definition)
-        else()
-            add_linker_flags(${TARGET} -Wl,-no_warn_duplicate_libraries)
-        endif()
+    if(BUILDING_USING_CLANG AND NOT LIBOPENCOR_CODE_ANALYSIS)
+        add_linker_flags(${TARGET} -Wl,-no_warn_duplicate_libraries)
     endif()
 
     # Mark as advanced the CMake variables set by our various packages.
