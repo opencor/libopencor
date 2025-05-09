@@ -1,0 +1,20 @@
+#!/bin/sh
+
+for i in `ls wheelhouse`; do
+    if [ -f wheelhouse/$i ]; then
+        version=`echo $i | sed 's/libopencor-//g' | sed 's/-cp.*//g'`
+        year=`echo $version | cut -d '.' -f 1`
+        month=`echo $version | cut -d '.' -f 2`
+        day=`echo $version | cut -d '.' -f 3`
+
+        if [ $month -lt 10 ]; then
+            month="0$month"
+        fi
+
+        if [ $day -lt 10 ]; then
+            day="0$day"
+        fi
+
+        mv wheelhouse/$i wheelhouse/`sed "s/$version/$year.$month.$day/g" <<< $i`
+    fi
+done

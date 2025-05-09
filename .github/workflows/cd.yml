@@ -168,6 +168,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux_2_34_x86_64
           CIBW_MANYLINUX_AARCH64_IMAGE: quay.io/pypa/manylinux_2_34_aarch64
           CIBW_SKIP: 'cp36* cp37* cp38* *musllinux*'
+      - name: Fix Python wheels
+        run: scripts/fixpythonwheels
       - name: Upload Python wheel artifacts
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
