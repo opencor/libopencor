@@ -16,9 +16,10 @@
 import datetime
 from skbuild import setup
 
-year = datetime.datetime.now().year
-month = datetime.datetime.now().month
-day = datetime.datetime.now().day
+now = datetime.datetime.now()
+year = now.year
+month = now.month
+day = now.day
 
 setup(
     name="libopencor",
