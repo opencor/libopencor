@@ -23,7 +23,7 @@ day = now.day
 
 setup(
     name="libopencor",
-    version=f"{year}.{month:02}.{day:02}",
+    version=f"0.{year}{month:02}{day:02}.0",
     description="libOpenCOR is the backend library to OpenCOR, a cross-platform modelling environment, which can be used to organise, edit, simulate and analyse CellML files.",
     author="libOpenCOR contributors",
     url="https://opencor.ws/libopencor/",

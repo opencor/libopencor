@@ -24,12 +24,12 @@ endforeach()
 
 # Project details.
 
-string(TIMESTAMP CURRENT_YEAR "%Y")
-string(TIMESTAMP CURRENT_MONTH "%m")
-string(TIMESTAMP CURRENT_DAY "%d")
+string(TIMESTAMP YEAR "%Y")
+string(TIMESTAMP MONTH "%m")
+string(TIMESTAMP DAY "%d")
 
 project(libOpenCOR
-        VERSION "${CURRENT_YEAR}.${CURRENT_MONTH}.${CURRENT_DAY}")
+        VERSION "0.${YEAR}${MONTH}${DAY}.0")
 
 string(TOLOWER "${CMAKE_PROJECT_NAME}" CMAKE_PROJECT_NAME_LC)
 

@@ -74,7 +74,7 @@ unsigned int secondDigit(unsigned int pTwoDigitNumber)
     return pTwoDigitNumber % TEN;
 }
 
-unsigned int version()
+uint64_t version()
 {
     return LIBOPENCOR_VERSION;
 }

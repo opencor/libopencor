@@ -33,6 +33,8 @@ limitations under the License.
 #include "sunnonlinsol/sunnonlinsol_fixedpoint.h"
 #include "sundialsend.h"
 
+#include <utility>
+
 namespace libOpenCOR {
 
 // Right-hand side function.
@@ -289,11 +291,11 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
         }
 
         if (needUpperAndLowerHalfBandwidths) {
-            if ((mUpperHalfBandwidth < 0) || (mUpperHalfBandwidth >= static_cast<int>(pSize))) {
+            if ((mUpperHalfBandwidth < 0) || std::cmp_greater_equal(mUpperHalfBandwidth, pSize)) {
                 addError(std::string("The upper half-bandwidth cannot be equal to ").append(toString(mUpperHalfBandwidth)).append(". It must be between 0 and ").append(toString(pSize - 1)).append("."));
             }
 
-            if ((mLowerHalfBandwidth < 0) || (mLowerHalfBandwidth >= static_cast<int>(pSize))) {
+            if ((mLowerHalfBandwidth < 0) || std::cmp_greater_equal(mLowerHalfBandwidth, pSize)) {
                 addError(std::string("The lower half-bandwidth cannot be equal to ").append(toString(mLowerHalfBandwidth)).append(". It must be between 0 and ").append(toString(pSize - 1)).append("."));
             }
         }
