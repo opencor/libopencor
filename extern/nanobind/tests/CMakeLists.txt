@@ -72,6 +72,8 @@ set(TEST_NAMES
   enum
   eval
   ndarray
+  jax
+  tensorflow
   exception
   make_iterator
   typing
@@ -90,14 +92,22 @@ endforeach()
 
 target_sources(test_intrusive_ext PRIVATE test_intrusive_impl.cpp)
 
-foreach (NAME functions classes ndarray stl enum typing make_iterator)
+if (CMAKE_CONFIGURATION_TYPES)
+  set(OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>)
+else()
+  set(OUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+endif()
+
+foreach (NAME functions classes ndarray jax tensorflow stl enum typing make_iterator)
   if (NAME STREQUAL typing)
     set(EXTRA
       MARKER_FILE py.typed
       PATTERN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/pattern_file.nb"
     )
+    set(EXTRA_DEPENDS "${OUT_DIR}/py_stub_test.py")
   else()
     set(EXTRA "")
+    set(EXTRA_DEPENDS "")
   endif()
 
   if (CMAKE_CONFIGURATION_TYPES)
@@ -110,7 +120,7 @@ foreach (NAME functions classes ndarray stl enum typing make_iterator)
     MODULE test_${NAME}_ext
     OUTPUT ${PYI_PREFIX}test_${NAME}_ext.pyi
     PYTHON_PATH $<TARGET_FILE_DIR:test_${NAME}_ext>
-    DEPENDS test_${NAME}_ext
+    DEPENDS test_${NAME}_ext ${EXTRA_DEPENDS}
     ${EXTRA})
 endforeach()
 
@@ -138,6 +148,7 @@ target_link_libraries(test_inter_module_2_ext PRIVATE inter_module)
 
 set(TEST_FILES
   common.py
+  conftest.py
   test_callbacks.py
   test_classes.py
   test_eigen.py
@@ -154,6 +165,8 @@ set(TEST_FILES
   test_stl_bind_vector.py
   test_chrono.py
   test_ndarray.py
+  test_jax.py
+  test_tensorflow.py
   test_stubs.py
   test_typing.py
   test_thread.py
@@ -163,6 +176,8 @@ set(TEST_FILES
   test_functions_ext.pyi.ref
   test_make_iterator_ext.pyi.ref
   test_ndarray_ext.pyi.ref
+  test_jax_ext.pyi.ref
+  test_tensorflow_ext.pyi.ref
   test_stl_ext.pyi.ref
   test_enum_ext.pyi.ref
   test_typing_ext.pyi.ref
@@ -172,12 +187,6 @@ set(TEST_FILES
 
 set (PY_STUB_TEST py_stub_test.py)
 if (NOT (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR) OR MSVC)
-  if (CMAKE_CONFIGURATION_TYPES)
-    set(OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/$<CONFIG>)
-  else()
-    set(OUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
-  endif()
-
   foreach(TEST_FILE IN LISTS TEST_FILES)
     set(IN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_FILE})
     set(OUT_FILE ${OUT_DIR}/${TEST_FILE})
