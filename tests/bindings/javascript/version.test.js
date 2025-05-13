@@ -20,24 +20,34 @@ const libopencor = await libOpenCOR();
 
 describe("Version tests", () => {
   test("libOpenCOR", () => {
+    const version_major = 0;
+    const version_patch = 0;
+
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
     const day = now.getDate();
 
-    let version = 0;
-    let number = 10000 * year + 100 * month + day;
-    let i = 0;
+    let version = BigInt(0);
+    let number = BigInt(
+      10000000000 * version_major +
+        100 * (10000 * year + 100 * month + day) +
+        version_patch,
+    );
+    let i = BigInt(0);
+
+    const ten = BigInt(10);
+    const four = BigInt(4);
 
     while (number != 0) {
-      version |= number % 10 << i;
-      number = Math.floor(number / 10);
-      i += 4;
+      version |= number % ten << i;
+      number /= ten;
+      i += four;
     }
 
     expect(libopencor.version()).toBe(version);
     expect(libopencor.versionString()).toBe(
-      `${year}.${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")}`,
+      `${version_major}.${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}.${version_patch}`,
     );
   });
 

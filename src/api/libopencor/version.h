@@ -30,7 +30,7 @@ namespace libOpenCOR {
  * @return A number that represents the version of libOpenCOR.
  */
 
-unsigned int LIBOPENCOR_EXPORT version();
+uint64_t LIBOPENCOR_EXPORT version();
 
 /**
  * Return the version of libOpenCOR as a string. The version string is in the format x.y.z, where the "."s are literal,

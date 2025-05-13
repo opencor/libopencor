@@ -22,41 +22,51 @@ limitations under the License.
 
 TEST(VersionTest, libOpenCOR)
 {
-    static const int NINETEEN_HUNDRED = 1900;
-    static const int ONE = 1;
+    static const auto VERSION_MAJOR = 0;
+    static const auto VERSION_PATCH = 0;
 
-    auto now = std::chrono::system_clock::now();
-    auto now_time_t = std::chrono::system_clock::to_time_t(now);
-    std::tm local_tm {};
+    auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::tm tm {};
 
 #ifdef BUILDING_ON_WINDOWS
-    localtime_s(&local_tm, &now_time_t); // NOLINT
+    localtime_s(&tm, &now); // NOLINT
 #else
-    localtime_r(&now_time_t, &local_tm); // NOLINT
+    localtime_r(&now, &tm); // NOLINT
 #endif
 
-    auto year = NINETEEN_HUNDRED + local_tm.tm_year;
-    auto month = ONE + local_tm.tm_mon;
-    auto day = local_tm.tm_mday;
+    static const auto NINETEEN_HUNDRED = 1900;
+    static const auto ONE = 1;
 
-    static const int TEN_THOUSAND = 10000;
-    static const int HUNDRED = 100;
-    static const int TEN = 10;
+    const auto year = NINETEEN_HUNDRED + tm.tm_year;
+    const auto month = ONE + tm.tm_mon;
+    const auto day = tm.tm_mday;
 
-    int version = 0;
-    int number = TEN_THOUSAND * year + HUNDRED * month + day;
+    static const uint64_t TEN_BILLION = 10000000000;
+    static const uint64_t TEN_THOUSAND = 10000;
+    static const uint64_t HUNDRED = 100;
+    static const uint64_t TEN = 10;
+
+    uint64_t version = 0;
+    auto number = TEN_BILLION * VERSION_MAJOR + HUNDRED * (TEN_THOUSAND * static_cast<uint64_t>(year) + HUNDRED * static_cast<uint64_t>(month) + static_cast<uint64_t>(day)) + VERSION_PATCH;
 
     for (int i = 0; number != 0; i += 4) {
         version |= (number % TEN) << i; // NOLINT
         number /= TEN;
     }
 
-    static const size_t VERSION_STRING_SIZE = 11;
+    static const size_t VERSION_STRING_SIZE = 15;
 
     std::array<char, VERSION_STRING_SIZE> versionString {};
 
-    EXPECT_EQ(std::snprintf(versionString.data(), VERSION_STRING_SIZE, "%d.%02d.%02d", year, month, day), VERSION_STRING_SIZE - 1); // NOLINT
+#ifdef BUILDING_USING_GNU
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
+    std::snprintf(versionString.data(), VERSION_STRING_SIZE, "%d.%d%02d%02d.%d", VERSION_MAJOR, year, month, day, VERSION_PATCH); // NOLINT
     // Note: ideally, we would be using std::format(), but it is not available on some of the CI systems we are using.
+#ifdef BUILDING_USING_GNU
+#    pragma GCC diagnostic pop
+#endif
 
     EXPECT_EQ(version, libOpenCOR::version());
     EXPECT_EQ(versionString.data(), libOpenCOR::versionString());
