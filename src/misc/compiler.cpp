@@ -359,7 +359,7 @@ void *Compiler::Impl::function(const std::string &pName) const
     auto symbol = mLljit->lookup(pName);
 
     if (symbol) {
-        return reinterpret_cast<void *>(symbol->getAddress()); // NOLINT
+        return reinterpret_cast<void *>(symbol->getValue()); // NOLINT
     }
 
     return {};
