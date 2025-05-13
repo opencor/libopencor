@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME LLVMClang)
-set(PACKAGE_VERSION 14.0.6)
+set(PACKAGE_VERSION 16.0.6)
 set(PACKAGE_REPOSITORY llvm-project)
-set(RELEASE_TAG llvmorg-14.0.6-libopencor)
+set(RELEASE_TAG llvmorg-16.0.6-libopencor)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5bd0c82b3015a170ac2e53942872fc9bb1e4e250)
+                                 1182a7df3c015a06e19e75bb6f8972ceefaa2cba)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8979f92eb44c9612082efc619c58609f391a06e6)
+                                 bd28dbf00f1c200936012815dfc990bd3b5e11bd)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 c9dddc138d6dc9ea90554152f5274fb4820a52c5)
+                                 b56abbc32573a46207de270819f146b798187c14)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5ff417c2906c15dee2155116fb8882df5ec0b762)
+                                 71004b425b4efc2b62f0e77e48a8a3c594fad95f)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             d0738ed7481fcae143c1f8b52a1ea82ad765d09e)
+                             6ff1215e6506f369ba080d441d659c1732ac1c6e)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             868de8ec69bb19f2bc229a8a256d5ba3bdd59f54)
+                             50bee9afce1e06430ec0227ca89980115e8f7467)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             965d782bcc86872230315c0915fadb0219cfe9b5)
+                             cea9d122196d5a69067086dd46393db2f9c1d341)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             582fc94cd57deed6674454eb94a24e759797b5bc)
+                             3ec70c1cd21f15b461eefa769079254669d797d3)
         endif()
     endif()
 else()
@@ -106,6 +106,7 @@ else()
         CMAKE_ARGS
             -DCLANG_BUILD_TOOLS=OFF
             -DCLANG_ENABLE_ARCMT=OFF
+            -DCLANG_ENABLE_LIBXML2=OFF
             -DCLANG_ENABLE_STATIC_ANALYZER=OFF
             -DCLANG_PLUGIN_SUPPORT=OFF
             ${CLANG_TABLEGEN}
@@ -139,6 +140,7 @@ else()
             -DLLVM_ENABLE_UNWIND_TABLES=OFF
             -DLLVM_ENABLE_WARNINGS=OFF
             -DLLVM_ENABLE_ZLIB=OFF
+            -DLLVM_ENABLE_ZSTD=OFF
             -DLLVM_HOST_TRIPLE=${LLVM_HOST_TRIPLE}
             -DLLVM_INCLUDE_BENCHMARKS=OFF
             -DLLVM_INCLUDE_DOCS=OFF
@@ -189,8 +191,10 @@ set(LLVMCLANG_CMAKE_PACKAGE_NAME Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake p
 set(LLVMCLANG_CMAKE_PACKAGE_NAMES LLVM Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake package names.")
 set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LLVMCLANG_LIBRARIES
+    # clang
     clangAnalysis
     clangAnalysisFlowSensitive
+    clangAnalysisFlowSensitiveModels
     clangAPINotes
     clangAST
     clangASTMatchers
@@ -202,6 +206,7 @@ set(LLVMCLANG_LIBRARIES
     clangDriver
     clangDynamicASTMatchers
     clangEdit
+    clangExtractAPI
     clangFormat
     clangFrontend
     clangFrontendTool
@@ -217,11 +222,12 @@ set(LLVMCLANG_LIBRARIES
     clangStaticAnalyzerCheckers
     clangStaticAnalyzerCore
     clangStaticAnalyzerFrontend
-    clangTesting
+    clangSupport
     clangTooling
     clangToolingASTDiff
     clangToolingCore
     clangToolingInclusions
+    clangToolingInclusionsStdlib
     clangToolingRefactoring
     clangToolingSyntax
     clangTransformer
@@ -243,19 +249,23 @@ set(LLVMCLANG_LIBRARIES
     LLVMDebuginfod
     LLVMDebugInfoDWARF
     LLVMDebugInfoGSYM
+    LLVMDebugInfoLogicalView
     LLVMDebugInfoMSF
     LLVMDebugInfoPDB
     LLVMDemangle
     LLVMDiff
     LLVMDlltoolDriver
     LLVMDWARFLinker
+    LLVMDWARFLinkerParallel
     LLVMDWP
     LLVMExecutionEngine
     LLVMExegesis
     LLVMExtensions
     LLVMFileCheck
+    LLVMFrontendHLSL
     LLVMFrontendOpenACC
     LLVMFrontendOpenMP
+    LLVMFuzzerCLI
     LLVMFuzzMutate
     LLVMGlobalISel
     LLVMInstCombine
@@ -263,6 +273,7 @@ set(LLVMCLANG_LIBRARIES
     LLVMInterfaceStub
     LLVMInterpreter
     LLVMipo
+    LLVMIRPrinter
     LLVMIRReader
     LLVMJITLink
     LLVMLibDriver
@@ -276,6 +287,7 @@ set(LLVMCLANG_LIBRARIES
     LLVMMCParser
     LLVMMIRParser
     LLVMObjCARCOpts
+    LLVMObjCopy
     LLVMObject
     LLVMObjectYAML
     LLVMOption
@@ -293,9 +305,11 @@ set(LLVMCLANG_LIBRARIES
     LLVMTableGen
     LLVMTableGenGlobalISel
     LLVMTarget
+    LLVMTargetParser
     LLVMTextAPI
     LLVMTransformUtils
     LLVMVectorize
+    LLVMWindowsDriver
     LLVMWindowsManifest
     LLVMXRay
     ${EXTRA_LLVMCLANG_LIBRARIES}

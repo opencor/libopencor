@@ -252,7 +252,7 @@ describe("Sed instance tests", () => {
     expectIssues(libopencor, instance, [
       [
         libopencor.Issue.Type.ERROR,
-        "At t = 0.00140014, mxstep steps taken before reaching tout.",
+        "At t = 0.00140013827899996, mxstep steps taken before reaching tout.",
       ],
     ]);
 

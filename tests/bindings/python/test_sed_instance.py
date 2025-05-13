@@ -135,7 +135,15 @@ def run_ode_model(compiled):
     expected_issues = [
         [
             oc.Issue.Type.Error,
-            "At t = 0.00140014, mxstep steps taken before reaching tout.",
+            (
+                (
+                    "At t = 0.00140013827899707, mxstep steps taken before reaching tout."
+                    if compiled
+                    else "At t = 0.00140013827900052, mxstep steps taken before reaching tout."
+                )
+                if platform.system() == "Darwin"
+                else "At t = 0.00140013827899996, mxstep steps taken before reaching tout."
+            ),
         ],
     ]
 
