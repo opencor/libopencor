@@ -30,6 +30,8 @@ limitations under the License.
 #include "sunlinsol/sunlinsol_sptfqmr.h"
 #include "sundialsend.h"
 
+#include <utility>
+
 namespace libOpenCOR {
 
 // Compute system.
@@ -206,11 +208,11 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
     }
 
     if (needUpperAndLowerHalfBandwidths) {
-        if ((mUpperHalfBandwidth < 0) || (mUpperHalfBandwidth >= static_cast<int>(pN))) {
+        if ((mUpperHalfBandwidth < 0) || std::cmp_greater_equal(mUpperHalfBandwidth, pN)) {
             addError(std::string("The upper half-bandwidth cannot be equal to ").append(toString(mUpperHalfBandwidth)).append(". It must be between 0 and ").append(toString(pN - 1)).append("."));
         }
 
-        if ((mLowerHalfBandwidth < 0) || (mLowerHalfBandwidth >= static_cast<int>(pN))) {
+        if ((mLowerHalfBandwidth < 0) || std::cmp_greater_equal(mLowerHalfBandwidth, pN)) {
             addError(std::string("The lower half-bandwidth cannot be equal to ").append(toString(mLowerHalfBandwidth)).append(". It must be between 0 and ").append(toString(pN - 1)).append("."));
         }
     }
