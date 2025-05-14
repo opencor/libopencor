@@ -62,8 +62,8 @@ describe("Version tests", () => {
   });
 
   test("libSEDML", () => {
-    expect(libopencor.libsedmlVersion()).toBe(20032);
-    expect(libopencor.libsedmlVersionString()).toBe("2.0.32");
+    expect(libopencor.libsedmlVersion()).toBe(20033);
+    expect(libopencor.libsedmlVersionString()).toBe("2.0.33");
   });
 
   test("SUNDIALS", () => {

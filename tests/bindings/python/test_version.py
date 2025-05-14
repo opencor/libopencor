@@ -95,12 +95,12 @@ def test_libcurl_version_string():
 
 def test_libsedml_version():
     assert isinstance(oc.libsedml_version(), int)
-    assert oc.libsedml_version() == 20032
+    assert oc.libsedml_version() == 20033
 
 
 def test_libsedml_version_string():
     assert isinstance(oc.libsedml_version_string(), str)
-    assert oc.libsedml_version_string() == "2.0.32"
+    assert oc.libsedml_version_string() == "2.0.33"
 
 
 def test_llvm_version():
