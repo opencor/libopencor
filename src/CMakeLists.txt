@@ -350,20 +350,25 @@ else()
             file(MAKE_DIRECTORY ${PACKAGE_DIR})
 
             if(WIN32)
-                execute_process(COMMAND ${CMAKE_AR} /NOLOGO /LIST ${PACKAGE}
-                                OUTPUT_VARIABLE PACKAGE_FILES
-                                OUTPUT_STRIP_TRAILING_WHITESPACE)
+                if(7Z_EXE)
+                    execute_process(COMMAND ${7Z_EXE} e ${PACKAGE} -bso0
+                                    WORKING_DIRECTORY ${PACKAGE_DIR})
+                else()
+                    execute_process(COMMAND ${CMAKE_AR} /NOLOGO /LIST ${PACKAGE}
+                                    OUTPUT_VARIABLE PACKAGE_FILES
+                                    OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-                string(REPLACE "\n" ";" PACKAGE_FILES ${PACKAGE_FILES})
+                    string(REPLACE "\n" ";" PACKAGE_FILES ${PACKAGE_FILES})
 
-                foreach(PACKAGE_FILE ${PACKAGE_FILES})
-                    string(REGEX MATCH ".*\\${CMAKE_CXX_OUTPUT_EXTENSION}$" IS_OBJECT_FILE ${PACKAGE_FILE})
+                    foreach(PACKAGE_FILE ${PACKAGE_FILES})
+                        string(REGEX MATCH ".*\\${CMAKE_CXX_OUTPUT_EXTENSION}$" IS_OBJECT_FILE ${PACKAGE_FILE})
 
-                    if(IS_OBJECT_FILE)
-                        execute_process(COMMAND ${CMAKE_AR} /NOLOGO /EXTRACT:${PACKAGE_FILE} ${PACKAGE}
-                                        WORKING_DIRECTORY ${PACKAGE_DIR})
-                    endif()
-                endforeach()
+                        if(IS_OBJECT_FILE)
+                            execute_process(COMMAND ${CMAKE_AR} /NOLOGO /EXTRACT:${PACKAGE_FILE} ${PACKAGE}
+                                            WORKING_DIRECTORY ${PACKAGE_DIR})
+                        endif()
+                    endforeach()
+                endif()
             else()
                 execute_process(COMMAND ${CMAKE_AR} -x ${PACKAGE}
                                 WORKING_DIRECTORY ${PACKAGE_DIR})
