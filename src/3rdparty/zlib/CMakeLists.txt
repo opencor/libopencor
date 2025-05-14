@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME zlib)
-set(PACKAGE_VERSION 2.1.6)
+set(PACKAGE_VERSION 2.2.4)
 set(PACKAGE_REPOSITORY zlib-ng)
-set(RELEASE_TAG 2.1.6)
+set(RELEASE_TAG 2.2.4)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -24,49 +24,49 @@ if(LIBOPENCOR_PREBUILT_ZLIB)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ee5c6e75b001a7527f5ba56934244eb8c255dfb3)
+                         a2ce80c7f1eea451d1e57e351a52a9d11b5a4a6c)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     216fd1466cbad56cd29c4d552f150c8faa206c04)
+                                     1f45147bceeded545d2ecc5a5e0234c50aa122f9)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     b3cb8c7cdd9821be6bf12e409abce88ca5a19380)
+                                     dd158fb86ac14e2423128c2a5ada55e620ef4e10)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     37846b8137bb7ec5d49f19667aa084795ba099ab)
+                                     a090b05e817a8e3d1137d2d272641a68eaf2111f)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     f7d9810c1d9060954d54753c633f723b592281af)
+                                     989b17fd78df61608efb365b083957fd3230e26f)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 cd7e33ccbfcae378c6fc4be1372a77ebb645e80a)
+                                 2225a43db4b45fa707f894cba12b615678909330)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 637818076b3144913bdf8ba35fd425ff616bdd2e)
+                                 93efe39a0bb32bed4c7a4bf8d25f82472aced7a7)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 866bd9e440f13a598d25a68f91afed3629cf05a5)
+                                 f2b41dcc4fbefa3c347e8a86d85f40b0ca802b2e)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 198cb2c7b007002218baffeae3c6c5d7d8b31138)
+                                 396fac845ae196fb3619341c78f787b65c382105)
             endif()
         endif()
     endif()
