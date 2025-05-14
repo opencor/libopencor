@@ -145,6 +145,7 @@ if(NOT BUILDCACHE_EXE)
     endif()
 endif()
 
+find_program(7Z_EXE NAMES ${PREFERRED_7Z_NAMES} 7z)
 find_program(BLACK_EXE NAMES ${PREFERRED_BLACK_NAMES} black)
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
