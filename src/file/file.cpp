@@ -23,6 +23,7 @@ namespace libOpenCOR {
 
 File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     : Logger::Impl()
+    , mRetrieveContents(pRetrieveContents)
 {
     // Check whether we are dealing with a local file or a URL.
 
@@ -140,7 +141,7 @@ UnsignedChars File::Impl::contents()
 #ifndef __EMSCRIPTEN__
     // Retrieve the contents of the file, if needed.
 
-    if (!mContentsRetrieved) {
+    if (mRetrieveContents && !mContentsRetrieved) {
         setContents(fileContents(mFilePath));
     }
 #endif

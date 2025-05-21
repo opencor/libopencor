@@ -24,9 +24,6 @@ expected_no_issues = []
 expected_non_existing_file_issues = [
     [oc.Issue.Type.Error, "The file does not exist."],
 ]
-expected_non_downloadable_file_issues = [
-    [oc.Issue.Type.Error, "The file could not be downloaded."],
-]
 expected_unknown_file_issues = [
     [
         oc.Issue.Type.Error,
@@ -108,14 +105,14 @@ def test_remote_file():
 
 
 def test_local_virtual_file():
-    file = oc.File(utils.LocalFile)
+    file = oc.File(utils.resource_path(utils.UnknownFile), False)
 
-    assert file.type == oc.File.Type.IrretrievableFile
-    assert file.file_name == utils.LocalFile
+    assert file.type == oc.File.Type.UnknownFile
+    assert file.file_name == utils.resource_path(utils.UnknownFile)
     assert file.url == ""
-    assert file.path == utils.LocalFile
+    assert file.path == utils.resource_path(utils.UnknownFile)
     assert file.contents == []
-    assert_issues(file, expected_non_existing_file_issues)
+    assert_issues(file, expected_unknown_file_issues)
 
     some_unknown_contents_list = utils.string_to_list(utils.SomeUnknownContents)
 
@@ -127,14 +124,19 @@ def test_local_virtual_file():
 
 
 def test_remote_virtual_file():
-    file = oc.File(utils.IrretrievableRemoteFile)
+    file = oc.File(utils.UnknownRemoteFile, False)
 
-    assert file.type == oc.File.Type.IrretrievableFile
-    assert file.file_name == ""
-    assert file.url == utils.IrretrievableRemoteFile
-    assert file.path == utils.IrretrievableRemoteFile
+    assert file.type == oc.File.Type.UnknownFile
+
+    if platform.system() == "Windows":
+        assert file.file_name == "\\some\\path\\file"
+    else:
+        assert file.file_name == "/some/path/file"
+
+    assert file.url == utils.UnknownRemoteFile
+    assert file.path == utils.UnknownRemoteFile
     assert file.contents == []
-    assert_issues(file, expected_non_downloadable_file_issues)
+    assert_issues(file, expected_unknown_file_issues)
 
     some_unknown_contents_list = utils.string_to_list(utils.SomeUnknownContents)
 

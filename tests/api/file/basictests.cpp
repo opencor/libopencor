@@ -23,9 +23,6 @@ static const libOpenCOR::ExpectedIssues EXPECTED_NO_ISSUES = {};
 static const libOpenCOR::ExpectedIssues EXPECTED_NON_EXISTING_FILE_ISSUES = {
     {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
 };
-static const libOpenCOR::ExpectedIssues EXPECTED_NON_DOWNLOADABLE_FILE_ISSUES = {
-    {libOpenCOR::Issue::Type::ERROR, "The file could not be downloaded."},
-};
 static const libOpenCOR::ExpectedIssues EXPECTED_UNKNOWN_FILE_ISSUES = {
     {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
 };
@@ -109,14 +106,14 @@ TEST(BasicFileTest, remoteFile)
 
 TEST(BasicFileTest, localVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE), false);
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::LOCAL_FILE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ(file->fileName(), libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
     EXPECT_EQ(file->url(), "");
-    EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
+    EXPECT_EQ(file->path(), libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_NON_EXISTING_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 
     auto someUnknownContents = libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_UNKNOWN_CONTENTS);
 
@@ -129,14 +126,18 @@ TEST(BasicFileTest, localVirtualFile)
 
 TEST(BasicFileTest, remoteVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::UNKNOWN_REMOTE_FILE, false);
 
-    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ(file->fileName(), "");
-    EXPECT_EQ(file->url(), libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
-    EXPECT_EQ(file->path(), libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+#ifdef BUILDING_USING_MSVC
+    EXPECT_EQ(file->fileName(), "\\some\\path\\file");
+#else
+    EXPECT_EQ(file->fileName(), "/some/path/file");
+#endif
+    EXPECT_EQ(file->url(), libOpenCOR::UNKNOWN_REMOTE_FILE);
+    EXPECT_EQ(file->path(), libOpenCOR::UNKNOWN_REMOTE_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_NON_DOWNLOADABLE_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 
     auto someUnknownContents = libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_UNKNOWN_CONTENTS);
 

@@ -56,6 +56,7 @@ static constexpr auto HTTP_REMOTE_SEDML_FILE = "http://raw.githubusercontent.com
 static constexpr auto HTTP_REMOTE_COMBINE_ARCHIVE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex";
 static constexpr auto REMOTE_BASE_PATH = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
 static constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+static constexpr auto UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt";
 static constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt";
 
 static constexpr auto SOME_UNKNOWN_CONTENTS = "Some unknown contents...";

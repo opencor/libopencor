@@ -76,8 +76,6 @@ std::string pathToString(const std::filesystem::path &pPath)
 #endif
 }
 
-namespace {
-
 #ifdef BUILDING_USING_MSVC
 std::string canonicalFileName(const std::string &pFileName, bool pIsRemoteFile)
 #else
@@ -144,8 +142,6 @@ std::string canonicalFileName(const std::string &pFileName)
 
     return res;
 }
-
-} // namespace
 
 std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl)
 {
