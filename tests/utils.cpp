@@ -59,11 +59,11 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
 }
 
 void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex,
-                       const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pStateAbsTols,
-                       const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
-                       const libOpenCOR::Doubles &pConstantValues, const libOpenCOR::Doubles &pConstantAbsTols,
-                       const libOpenCOR::Doubles &pComputedConstantValues, const libOpenCOR::Doubles &pComputedConstantAbsTols,
-                       const libOpenCOR::Doubles &pAlgebraicValues, const libOpenCOR::Doubles &pAlgebraicAbsTols)
+                       const Doubles &pStateValues, const Doubles &pStateAbsTols,
+                       const Doubles &pRateValues, const Doubles &pRateAbsTols,
+                       const Doubles &pConstantValues, const Doubles &pConstantAbsTols,
+                       const Doubles &pComputedConstantValues, const Doubles &pComputedConstantAbsTols,
+                       const Doubles &pAlgebraicValues, const Doubles &pAlgebraicAbsTols)
 {
     for (size_t i = 0; i < pInstanceTask->stateCount(); ++i) {
         EXPECT_NEAR(pInstanceTask->state(i)[pIndex], pStateValues[i], pStateAbsTols[i]);
@@ -95,7 +95,7 @@ std::string textFileContents(const std::string &pFileName)
 {
     static const auto CRLF_REGEX = std::regex("\\r\\n");
 
-    auto res = libOpenCOR::toString(libOpenCOR::fileContents(pFileName));
+    auto res = toString(fileContents(pFileName));
 
     // To retrieve a file contents as bytes will, on Windows, result in LF characters being converted to CR+LF, so
     // convert them back since we expect LF.
