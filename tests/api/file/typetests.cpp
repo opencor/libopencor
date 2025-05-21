@@ -101,7 +101,10 @@ TEST(TypeFileTest, combine2Archive)
 
 TEST(TypeFileTest, unknownVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE), false);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 
     file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_UNKNOWN_CONTENTS));
 
@@ -111,7 +114,10 @@ TEST(TypeFileTest, unknownVirtualFile)
 
 TEST(TypeFileTest, cellmlVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE), false);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 
     file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_CELLML_CONTENTS));
 
@@ -120,7 +126,10 @@ TEST(TypeFileTest, cellmlVirtualFile)
 
 TEST(TypeFileTest, sedmlVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE), false);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 
     file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_SEDML_CONTENTS));
 
@@ -129,7 +138,10 @@ TEST(TypeFileTest, sedmlVirtualFile)
 
 TEST(TypeFileTest, combineVirtualArchive)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE), false);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 
     file->setContents(libOpenCOR::base64Decode(libOpenCOR::SOME_BASE64_COMBINE_ARCHIVE_CONTENTS));
 

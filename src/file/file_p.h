@@ -36,6 +36,7 @@ public:
     std::filesystem::path mFilePath;
     std::string mUrl;
 
+    bool mRetrieveContents = true;
     bool mContentsRetrieved = false;
     UnsignedChars mContents;
 

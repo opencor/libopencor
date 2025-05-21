@@ -94,7 +94,10 @@ def test_type_combine_2_archive():
 
 
 def test_type_unknown_virtual_file():
-    file = oc.File(utils.LocalFile)
+    file = oc.File(utils.resource_path(utils.UnknownFile), False)
+
+    assert file.type == oc.File.Type.UnknownFile
+    assert file.contents == []
 
     file.contents = utils.string_to_list(utils.SomeUnknownContents)
 
@@ -103,7 +106,10 @@ def test_type_unknown_virtual_file():
 
 
 def test_type_cellml_virtual_file():
-    file = oc.File(utils.LocalFile)
+    file = oc.File(utils.resource_path(utils.Cellml2File), False)
+
+    assert file.type == oc.File.Type.UnknownFile
+    assert file.contents == []
 
     file.contents = utils.string_to_list(utils.SomeCellmlContents)
 
@@ -111,7 +117,10 @@ def test_type_cellml_virtual_file():
 
 
 def test_type_sedml_virtual_file():
-    file = oc.File(utils.LocalFile)
+    file = oc.File(utils.resource_path(utils.Sedml2File), False)
+
+    assert file.type == oc.File.Type.UnknownFile
+    assert file.contents == []
 
     file.contents = utils.string_to_list(utils.SomeSedmlContents)
 
@@ -119,7 +128,10 @@ def test_type_sedml_virtual_file():
 
 
 def test_type_combine_virtual_archive():
-    file = oc.File(utils.LocalFile)
+    file = oc.File(utils.resource_path(utils.Combine2Archive), False)
+
+    assert file.type == oc.File.Type.UnknownFile
+    assert file.contents == []
 
     file.contents = utils.binary_to_list(utils.SomeCombineArchiveContents)
 
