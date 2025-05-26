@@ -14,7 +14,7 @@
 
 
 import datetime
-import libopencor as oc
+import libopencor as loc
 
 
 version_major = 0
@@ -40,84 +40,84 @@ def test_version():
         number //= 10
         i += 4
 
-    assert isinstance(oc.version(), int)
-    assert oc.version() == version
+    assert isinstance(loc.version(), int)
+    assert loc.version() == version
 
 
 def test_version_string():
     version = f"{version_major}.{year}{month:02}{day:02}.{version_patch}"
 
-    assert oc.__version__ == version
+    assert loc.__version__ == version
 
-    assert isinstance(oc.version_string(), str)
-    assert oc.version_string() == version
+    assert isinstance(loc.version_string(), str)
+    assert loc.version_string() == version
 
 
 def test_clang_version():
-    assert isinstance(oc.clang_version(), int)
-    assert oc.clang_version() == 0x160006
+    assert isinstance(loc.clang_version(), int)
+    assert loc.clang_version() == 0x160006
 
 
 def test_clang_version_string():
-    assert isinstance(oc.clang_version_string(), str)
-    assert oc.clang_version_string() == "16.0.6"
+    assert isinstance(loc.clang_version_string(), str)
+    assert loc.clang_version_string() == "16.0.6"
 
 
 def test_libcellml_version():
-    assert isinstance(oc.libcellml_version(), int)
-    assert oc.libcellml_version() == 0x000500
+    assert isinstance(loc.libcellml_version(), int)
+    assert loc.libcellml_version() == 0x000500
 
 
 def test_libcellml_version_string():
-    assert isinstance(oc.libcellml_version_string(), str)
-    assert oc.libcellml_version_string() == "0.5.0"
+    assert isinstance(loc.libcellml_version_string(), str)
+    assert loc.libcellml_version_string() == "0.5.0"
 
 
 def test_libcombine_version():
-    assert isinstance(oc.libcombine_version(), int)
-    assert oc.libcombine_version() == 220
+    assert isinstance(loc.libcombine_version(), int)
+    assert loc.libcombine_version() == 220
 
 
 def test_libcombine_version_string():
-    assert isinstance(oc.libcombine_version_string(), str)
-    assert oc.libcombine_version_string() == "0.2.20"
+    assert isinstance(loc.libcombine_version_string(), str)
+    assert loc.libcombine_version_string() == "0.2.20"
 
 
 def test_libcurl_version():
-    assert isinstance(oc.libcurl_version(), int)
-    assert oc.libcurl_version() == 0x080D00
+    assert isinstance(loc.libcurl_version(), int)
+    assert loc.libcurl_version() == 0x080D00
 
 
 def test_libcurl_version_string():
-    assert isinstance(oc.libcurl_version_string(), str)
-    assert oc.libcurl_version_string() == "8.13.0-DEV"
+    assert isinstance(loc.libcurl_version_string(), str)
+    assert loc.libcurl_version_string() == "8.13.0-DEV"
 
 
 def test_libsedml_version():
-    assert isinstance(oc.libsedml_version(), int)
-    assert oc.libsedml_version() == 20033
+    assert isinstance(loc.libsedml_version(), int)
+    assert loc.libsedml_version() == 20033
 
 
 def test_libsedml_version_string():
-    assert isinstance(oc.libsedml_version_string(), str)
-    assert oc.libsedml_version_string() == "2.0.33"
+    assert isinstance(loc.libsedml_version_string(), str)
+    assert loc.libsedml_version_string() == "2.0.33"
 
 
 def test_llvm_version():
-    assert isinstance(oc.llvm_version(), int)
-    assert oc.llvm_version() == 0x160006
+    assert isinstance(loc.llvm_version(), int)
+    assert loc.llvm_version() == 0x160006
 
 
 def test_llvm_version_string():
-    assert isinstance(oc.llvm_version_string(), str)
-    assert oc.llvm_version_string() == "16.0.6"
+    assert isinstance(loc.llvm_version_string(), str)
+    assert loc.llvm_version_string() == "16.0.6"
 
 
 def test_sundials_version():
-    assert isinstance(oc.sundials_version(), int)
-    assert oc.sundials_version() == 0x070300
+    assert isinstance(loc.sundials_version(), int)
+    assert loc.sundials_version() == 0x070300
 
 
 def test_sundials_version_string():
-    assert isinstance(oc.sundials_version_string(), str)
-    assert oc.sundials_version_string() == "7.3.0"
+    assert isinstance(loc.sundials_version_string(), str)
+    assert loc.sundials_version_string() == "7.3.0"

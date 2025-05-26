@@ -1,19 +1,19 @@
-import libopencor as oc
+import libopencor as loc
 
 if __name__ == "__main__":
     # Output the version of libOpenCOR.
 
     print("---[ libOpenCOR version information ]---")
     print("")
-    print(f"Version:        {oc.version()}")
-    print(f"Version string: {oc.version_string()}")
+    print(f"Version:        {loc.version()}")
+    print(f"Version string: {loc.version_string()}")
 
     # Load a COMBINE archive from GitHub and output some information about it.
 
-    file = oc.File(
+    file = loc.File(
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
     )
-    document = oc.SedDocument(file)
+    document = loc.SedDocument(file)
     simulation = document.simulations[0]
 
     simulation.output_end_time = 5.0
