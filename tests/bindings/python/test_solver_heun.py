@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-import libopencor as oc
+import libopencor as loc
 import ode_model
 import utils
 from utils import assert_issues
@@ -22,15 +22,15 @@ from utils import assert_issues
 def test_step_value_with_invalid_number():
     expected_issues = [
         [
-            oc.Issue.Type.Error,
+            loc.Issue.Type.Error,
             "The step cannot be equal to 0. It must be greater than 0.",
         ],
     ]
 
-    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
-    document = oc.SedDocument(file)
+    file = loc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = loc.SedDocument(file)
     simulation = document.simulations[0]
-    solver = oc.SolverHeun()
+    solver = loc.SolverHeun()
 
     solver.step = 0.0
 
@@ -56,10 +56,10 @@ def heun_solve(
     algebraic_abs_tols,
     compiled,
 ):
-    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
-    document = oc.SedDocument(file)
+    file = loc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = loc.SedDocument(file)
     simulation = document.simulations[0]
-    solver = oc.SolverHeun()
+    solver = loc.SolverHeun()
 
     solver.step = 0.0123
 

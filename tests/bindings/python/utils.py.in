@@ -14,7 +14,7 @@
 
 
 import base64
-import libopencor as oc
+import libopencor as loc
 import os
 import pathlib
 import platform
@@ -73,7 +73,7 @@ def assert_issues(logger, expected_issues):
         assert issues[i].type == expected_issues[i][0]
         assert issues[i].description == expected_issues[i][1]
 
-        if issues[i].type == oc.Issue.Type.Error:
+        if issues[i].type == loc.Issue.Type.Error:
             assert issues[i].type_as_string == "Error"
         else:
             assert issues[i].type_as_string == "Warning"

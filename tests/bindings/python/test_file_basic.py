@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-import libopencor as oc
+import libopencor as loc
 import os
 import platform
 import utils
@@ -22,20 +22,20 @@ from utils import assert_issues
 
 expected_no_issues = []
 expected_non_existing_file_issues = [
-    [oc.Issue.Type.Error, "The file does not exist."],
+    [loc.Issue.Type.Error, "The file does not exist."],
 ]
 expected_unknown_file_issues = [
     [
-        oc.Issue.Type.Error,
+        loc.Issue.Type.Error,
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
     ],
 ]
 
 
 def test_local_file():
-    file = oc.File(utils.LocalFile)
+    file = loc.File(utils.LocalFile)
 
-    assert file.type == oc.File.Type.IrretrievableFile
+    assert file.type == loc.File.Type.IrretrievableFile
     assert file.file_name == utils.LocalFile
     assert file.url == ""
     assert file.path == utils.LocalFile
@@ -48,7 +48,7 @@ def test_existing_relative_local_file():
 
     os.chdir(utils.resource_path())
 
-    file = oc.File(utils.Cellml2File)
+    file = loc.File(utils.Cellml2File)
 
     assert file.contents != []
     assert_issues(file, expected_no_issues)
@@ -58,11 +58,11 @@ def test_existing_relative_local_file():
 
 def test_non_existing_relative_local_file():
     if platform.system() == "Windows":
-        file = oc.File("some\\.\\relative\\..\\..\\path\\.\\..\\dir\\file.txt")
+        file = loc.File("some\\.\\relative\\..\\..\\path\\.\\..\\dir\\file.txt")
     else:
-        file = oc.File("some/./relative/../../path/./../dir/file.txt")
+        file = loc.File("some/./relative/../../path/./../dir/file.txt")
 
-    assert file.type == oc.File.Type.IrretrievableFile
+    assert file.type == loc.File.Type.IrretrievableFile
 
     if platform.system() == "Windows":
         assert file.file_name == "dir\\file.txt"
@@ -82,11 +82,11 @@ def test_non_existing_relative_local_file():
 
 def test_url_based_local_file():
     if platform.system() == "Windows":
-        file = oc.File("file:///P:/some/path/file.txt")
+        file = loc.File("file:///P:/some/path/file.txt")
     else:
-        file = oc.File("file:///some/path/file.txt")
+        file = loc.File("file:///some/path/file.txt")
 
-    assert file.type == oc.File.Type.IrretrievableFile
+    assert file.type == loc.File.Type.IrretrievableFile
     assert file.file_name == utils.LocalFile
     assert file.url == ""
     assert file.path == utils.LocalFile
@@ -95,9 +95,9 @@ def test_url_based_local_file():
 
 
 def test_remote_file():
-    file = oc.File(utils.RemoteFile)
+    file = loc.File(utils.RemoteFile)
 
-    assert file.type == oc.File.Type.CellmlFile
+    assert file.type == loc.File.Type.CellmlFile
     assert file.file_name != ""
     assert file.url == utils.RemoteFile
     assert file.path == utils.RemoteFile
@@ -105,9 +105,9 @@ def test_remote_file():
 
 
 def test_local_virtual_file():
-    file = oc.File(utils.resource_path(utils.UnknownFile), False)
+    file = loc.File(utils.resource_path(utils.UnknownFile), False)
 
-    assert file.type == oc.File.Type.UnknownFile
+    assert file.type == loc.File.Type.UnknownFile
     assert file.file_name == utils.resource_path(utils.UnknownFile)
     assert file.url == ""
     assert file.path == utils.resource_path(utils.UnknownFile)
@@ -118,15 +118,15 @@ def test_local_virtual_file():
 
     file.contents = some_unknown_contents_list
 
-    assert file.type == oc.File.Type.UnknownFile
+    assert file.type == loc.File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_remote_virtual_file():
-    file = oc.File(utils.UnknownRemoteFile, False)
+    file = loc.File(utils.UnknownRemoteFile, False)
 
-    assert file.type == oc.File.Type.UnknownFile
+    assert file.type == loc.File.Type.UnknownFile
 
     if platform.system() == "Windows":
         assert file.file_name == "\\some\\path\\file"
@@ -142,13 +142,13 @@ def test_remote_virtual_file():
 
     file.contents = some_unknown_contents_list
 
-    assert file.type == oc.File.Type.UnknownFile
+    assert file.type == loc.File.Type.UnknownFile
     assert file.contents == some_unknown_contents_list
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_file_manager():
-    file_manager = oc.FileManager.instance()
+    file_manager = loc.FileManager.instance()
 
     assert file_manager.has_files == False
     assert file_manager.file_count == 0
@@ -156,8 +156,8 @@ def test_file_manager():
     assert file_manager.file(0) == None
     assert file_manager.file(utils.LocalFile) == None
 
-    local_file = oc.File(utils.LocalFile)
-    same_file_manager = oc.FileManager.instance()
+    local_file = loc.File(utils.LocalFile)
+    same_file_manager = loc.FileManager.instance()
 
     assert same_file_manager.has_files == True
     assert same_file_manager.file_count == 1
@@ -165,7 +165,7 @@ def test_file_manager():
     assert file_manager.file(0) == local_file
     assert same_file_manager.file(utils.LocalFile) == local_file
 
-    remote_file = oc.File(utils.RemoteFile)
+    remote_file = loc.File(utils.RemoteFile)
 
     assert file_manager.has_files == True
     assert file_manager.file_count == 2

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-import libopencor as oc
+import libopencor as loc
 import utils
 from utils import assert_issues
 
@@ -23,21 +23,21 @@ def test_initialise():
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
 """
 
-    document = oc.SedDocument()
+    document = loc.SedDocument()
 
     assert document.serialise() == expected_serialisation
 
 
 def test_models():
-    document = oc.SedDocument()
+    document = loc.SedDocument()
 
     assert document.has_models == False
     assert document.model_count == 0
     assert len(document.models) == 0
     assert document.add_model(None) == False
 
-    file = oc.File(utils.LocalFile)
-    model = oc.SedModel(document, file)
+    file = loc.File(utils.LocalFile)
+    model = loc.SedModel(document, file)
 
     assert model.file == file
 
@@ -61,17 +61,17 @@ def test_models():
 
 
 def test_simulations():
-    document = oc.SedDocument()
+    document = loc.SedDocument()
 
     assert document.has_simulations == False
     assert document.simulation_count == 0
     assert len(document.simulations) == 0
     assert document.add_simulation(None) == False
 
-    uniformTimeCourse = oc.SedUniformTimeCourse(document)
-    oneStep = oc.SedOneStep(document)
-    steadyState = oc.SedSteadyState(document)
-    analysis = oc.SedAnalysis(document)
+    uniformTimeCourse = loc.SedUniformTimeCourse(document)
+    oneStep = loc.SedOneStep(document)
+    steadyState = loc.SedSteadyState(document)
+    analysis = loc.SedAnalysis(document)
 
     assert document.add_simulation(uniformTimeCourse) == True
     assert document.add_simulation(oneStep) == True
@@ -127,17 +127,17 @@ def sed_task_expected_serialisation(with_properties):
 
 
 def test_tasks():
-    document = oc.SedDocument()
+    document = loc.SedDocument()
 
     assert document.has_tasks == False
     assert document.task_count == 0
     assert len(document.tasks) == 0
     assert document.add_task(None) == False
 
-    file = oc.File(utils.LocalFile)
-    model = oc.SedModel(document, file)
-    simulation = oc.SedUniformTimeCourse(document)
-    task = oc.SedTask(document, model, simulation)
+    file = loc.File(utils.LocalFile)
+    model = loc.SedModel(document, file)
+    simulation = loc.SedUniformTimeCourse(document)
+    task = loc.SedTask(document, model, simulation)
 
     assert task.model != None
     assert task.simulation != None
@@ -163,11 +163,11 @@ def test_tasks():
 
     expected_issues = [
         [
-            oc.Issue.Type.Error,
+            loc.Issue.Type.Error,
             "Task 'task1' requires a model.",
         ],
         [
-            oc.Issue.Type.Error,
+            loc.Issue.Type.Error,
             "Task 'task1' requires a simulation.",
         ],
     ]
@@ -187,12 +187,12 @@ def test_tasks():
 
 
 def test_ode_solver():
-    document = oc.SedDocument()
-    simulation = oc.SedUniformTimeCourse(document)
+    document = loc.SedDocument()
+    simulation = loc.SedUniformTimeCourse(document)
 
     assert simulation.ode_solver == None
 
-    solver = oc.SolverCvode()
+    solver = loc.SolverCvode()
 
     simulation.ode_solver = solver
 
@@ -204,12 +204,12 @@ def test_ode_solver():
 
 
 def test_nla_solver():
-    document = oc.SedDocument()
-    simulation = oc.SedUniformTimeCourse(document)
+    document = loc.SedDocument()
+    simulation = loc.SedUniformTimeCourse(document)
 
     assert simulation.nla_solver == None
 
-    solver = oc.SolverKinsol()
+    solver = loc.SolverKinsol()
 
     simulation.nla_solver = solver
 
@@ -221,9 +221,9 @@ def test_nla_solver():
 
 
 def test_sed_one_step():
-    file = oc.File(utils.resource_path(utils.Cellml2File))
-    document = oc.SedDocument(file)
-    simulation = oc.SedOneStep(document)
+    file = loc.File(utils.resource_path(utils.Cellml2File))
+    document = loc.SedDocument(file)
+    simulation = loc.SedOneStep(document)
 
     assert simulation.step == 1.0
 
@@ -233,9 +233,9 @@ def test_sed_one_step():
 
 
 def test_sed_uniform_time_course():
-    file = oc.File(utils.resource_path(utils.Cellml2File))
-    document = oc.SedDocument(file)
-    simulation = oc.SedUniformTimeCourse(document)
+    file = loc.File(utils.resource_path(utils.Cellml2File))
+    document = loc.SedDocument(file)
+    simulation = loc.SedUniformTimeCourse(document)
 
     assert simulation.initial_time == 0.0
     assert simulation.output_start_time == 0.0
@@ -256,16 +256,16 @@ def test_sed_uniform_time_course():
 def test_sed_instance_and_sed_instance_task():
     expected_issues = [
         [
-            oc.Issue.Type.Error,
+            loc.Issue.Type.Error,
             "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ],
     ]
 
-    file = oc.File(utils.resource_path("api/solver/ode.cellml"))
-    document = oc.SedDocument(file)
+    file = loc.File(utils.resource_path("api/solver/ode.cellml"))
+    document = loc.SedDocument(file)
     solver = document.simulations[0].ode_solver
 
-    solver.linear_solver = oc.SolverCvode.LinearSolver.Banded
+    solver.linear_solver = loc.SolverCvode.LinearSolver.Banded
     solver.upper_half_bandwidth = -1
 
     instance = document.instantiate()
@@ -326,31 +326,23 @@ def test_sed_instance_and_sed_instance_task():
 
 
 def test_sed_document():
-    file = oc.File(utils.resource_path(utils.HttpRemoteCellmlFile))
-    oc.SedDocument(file)
+    file = loc.File(utils.resource_path(utils.HttpRemoteCellmlFile))
+    loc.SedDocument(file)
 
-    file = oc.File(utils.resource_path(utils.HttpRemoteSedmlFile))
-    oc.SedDocument(file)
+    file = loc.File(utils.resource_path(utils.HttpRemoteSedmlFile))
+    loc.SedDocument(file)
 
-    file = oc.File(utils.resource_path(utils.HttpRemoteCombineArchive))
-    oc.SedDocument(file)
+    file = loc.File(utils.resource_path(utils.HttpRemoteCombineArchive))
+    loc.SedDocument(file)
 
 
 def test_solver():
     # Get the duplicate() method of different solvers to be covered.
 
-    file = oc.File(utils.resource_path(utils.Cellml2File))
-    document = oc.SedDocument(file)
+    file = loc.File(utils.resource_path(utils.Cellml2File))
+    document = loc.SedDocument(file)
 
-    document.simulations[0].ode_solver = oc.SolverForwardEuler()
-
-    instance = document.instantiate()
-
-    instance.run()
-
-    assert instance.has_issues == False
-
-    document.simulations[0].ode_solver = oc.SolverFourthOrderRungeKutta()
+    document.simulations[0].ode_solver = loc.SolverForwardEuler()
 
     instance = document.instantiate()
 
@@ -358,7 +350,7 @@ def test_solver():
 
     assert instance.has_issues == False
 
-    document.simulations[0].ode_solver = oc.SolverHeun()
+    document.simulations[0].ode_solver = loc.SolverFourthOrderRungeKutta()
 
     instance = document.instantiate()
 
@@ -366,7 +358,15 @@ def test_solver():
 
     assert instance.has_issues == False
 
-    document.simulations[0].ode_solver = oc.SolverSecondOrderRungeKutta()
+    document.simulations[0].ode_solver = loc.SolverHeun()
+
+    instance = document.instantiate()
+
+    instance.run()
+
+    assert instance.has_issues == False
+
+    document.simulations[0].ode_solver = loc.SolverSecondOrderRungeKutta()
 
     instance = document.instantiate()
 

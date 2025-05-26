@@ -12,57 +12,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import libopencor as oc
+import libopencor as loc
 import platform
 import utils
 
 
 def test_arabic_files():
     assert (
-        oc.File(utils.resource_path("i18n/ملف/file.cellml")).type
-        == oc.File.Type.CellmlFile
+        loc.File(utils.resource_path("i18n/ملف/file.cellml")).type
+        == loc.File.Type.CellmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/ملف/file.sedml")).type
-        == oc.File.Type.SedmlFile
+        loc.File(utils.resource_path("i18n/ملف/file.sedml")).type
+        == loc.File.Type.SedmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/ملف/file.sedml")).type
-        == oc.File.Type.SedmlFile
+        loc.File(utils.resource_path("i18n/ملف/file.sedml")).type
+        == loc.File.Type.SedmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/ملف/file.omex")).type
-        == oc.File.Type.CombineArchive
+        loc.File(utils.resource_path("i18n/ملف/file.omex")).type
+        == loc.File.Type.CombineArchive
     )
 
 
 def test_chinese_files():
     assert (
-        oc.File(utils.resource_path("i18n/文件夹/file.cellml")).type
-        == oc.File.Type.CellmlFile
+        loc.File(utils.resource_path("i18n/文件夹/file.cellml")).type
+        == loc.File.Type.CellmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/文件夹/file.sedml")).type
-        == oc.File.Type.SedmlFile
+        loc.File(utils.resource_path("i18n/文件夹/file.sedml")).type
+        == loc.File.Type.SedmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/文件夹/file.omex")).type
-        == oc.File.Type.CombineArchive
+        loc.File(utils.resource_path("i18n/文件夹/file.omex")).type
+        == loc.File.Type.CombineArchive
     )
 
 
 def test_hindi_files():
     assert (
-        oc.File(utils.resource_path("i18n/फोल्डर/file.cellml")).type
-        == oc.File.Type.CellmlFile
+        loc.File(utils.resource_path("i18n/फोल्डर/file.cellml")).type
+        == loc.File.Type.CellmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/फोल्डर/file.sedml")).type
-        == oc.File.Type.SedmlFile
+        loc.File(utils.resource_path("i18n/फोल्डर/file.sedml")).type
+        == loc.File.Type.SedmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/फोल्डर/file.omex")).type
-        == oc.File.Type.CombineArchive
+        loc.File(utils.resource_path("i18n/फोल्डर/file.omex")).type
+        == loc.File.Type.CombineArchive
     )
 
 
@@ -71,16 +71,16 @@ def test_japanese_files():
 
     if platform.system() == "Darwin":
         assert (
-            oc.File(utils.resource_path("i18n/フォルダ/file.cellml")).type
-            == oc.File.Type.CellmlFile
+            loc.File(utils.resource_path("i18n/フォルダ/file.cellml")).type
+            == loc.File.Type.CellmlFile
         )
         assert (
-            oc.File(utils.resource_path("i18n/フォルダ/file.sedml")).type
-            == oc.File.Type.SedmlFile
+            loc.File(utils.resource_path("i18n/フォルダ/file.sedml")).type
+            == loc.File.Type.SedmlFile
         )
         assert (
-            oc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
-            == oc.File.Type.CombineArchive
+            loc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
+            == loc.File.Type.CombineArchive
         )
     else:
         pass
@@ -88,14 +88,14 @@ def test_japanese_files():
 
 def test_russian_files():
     assert (
-        oc.File(utils.resource_path("i18n/папка/file.cellml")).type
-        == oc.File.Type.CellmlFile
+        loc.File(utils.resource_path("i18n/папка/file.cellml")).type
+        == loc.File.Type.CellmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/папка/file.sedml")).type
-        == oc.File.Type.SedmlFile
+        loc.File(utils.resource_path("i18n/папка/file.sedml")).type
+        == loc.File.Type.SedmlFile
     )
     assert (
-        oc.File(utils.resource_path("i18n/папка/file.omex")).type
-        == oc.File.Type.CombineArchive
+        loc.File(utils.resource_path("i18n/папка/file.omex")).type
+        == loc.File.Type.CombineArchive
     )
