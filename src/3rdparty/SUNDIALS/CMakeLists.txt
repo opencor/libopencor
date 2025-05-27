@@ -82,7 +82,6 @@ else()
         CMAKE_CACHE_ARGS
             -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         CMAKE_ARGS
-            -DBUILD_SHARED_LIBS=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DEXAMPLES_ENABLE_C=OFF
