@@ -89,14 +89,6 @@ else()
         endif()
     endif()
 
-    if(LLVMCLANG_LLVM_TABLEGEN)
-        set(LLVM_TABLEGEN -DLLVM_TABLEGEN=${LLVMCLANG_LLVM_TABLEGEN})
-    endif()
-
-    if(LLVMCLANG_CLANG_TABLEGEN)
-        set(CLANG_TABLEGEN -DCLANG_TABLEGEN=${LLVMCLANG_CLANG_TABLEGEN})
-    endif()
-
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
@@ -109,7 +101,6 @@ else()
             -DCLANG_ENABLE_LIBXML2=OFF
             -DCLANG_ENABLE_STATIC_ANALYZER=OFF
             -DCLANG_PLUGIN_SUPPORT=OFF
-            ${CLANG_TABLEGEN}
             -DCLANG_TOOLING_BUILD_AST_INTROSPECTION=OFF
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
@@ -149,7 +140,6 @@ else()
             -DLLVM_INCLUDE_TESTS=OFF
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
-            ${LLVM_TABLEGEN}
             -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
     )
 
