@@ -73,7 +73,6 @@ else()
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBUILD_EXAMPLES=OFF
-            -DBUILD_SHARED_LIBS=OFF
             -DBUILD_STATIC_LIBS=ON
             -DBUILD_TESTING=OFF
             ${CMAKE_ARGS}

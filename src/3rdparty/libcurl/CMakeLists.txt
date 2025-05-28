@@ -79,7 +79,6 @@ else()
             -DCURL_BROTLI=OFF
             -DCURL_ZSTD=OFF
             -DBUILD_CURL_EXE=OFF
-            -DBUILD_SHARED_LIBS=OFF
             -DBUILD_TESTING=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
