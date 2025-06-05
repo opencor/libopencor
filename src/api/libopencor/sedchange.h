@@ -61,7 +61,7 @@ public:
 
     void setTarget(const std::string &pTarget);
 
-private:
+protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     explicit SedChange(Impl *pPimpl); /**< Constructor @private. */

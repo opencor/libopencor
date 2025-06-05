@@ -40,6 +40,13 @@ void sedApi(nb::module_ &m)
 
     sedChange.def_prop_rw("target", &libOpenCOR::SedChange::target, &libOpenCOR::SedChange::setTarget, "The target of the SedChange object.");
 
+    // SedChangeAttribute API.
+
+    nb::class_<libOpenCOR::SedChangeAttribute, libOpenCOR::SedChange> sedChangeAttribute(m, "SedChangeAttribute");
+
+    sedChangeAttribute.def(nb::new_(&libOpenCOR::SedChangeAttribute::create), "Create a SedChangeAttribute object.", nb::arg("target"), nb::arg("new_value"))
+        .def_prop_rw("new_value", &libOpenCOR::SedChangeAttribute::newValue, &libOpenCOR::SedChangeAttribute::setNewValue, "The new value of the SedChangeAttribute object.");
+
     // SedDataDescription API.
 
     nb::class_<libOpenCOR::SedDataDescription, libOpenCOR::SedBase> sedDataDescription(m, "SedDataDescription");
