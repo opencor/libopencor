@@ -107,12 +107,12 @@ SedModel::~SedModel()
 
 SedModel::Impl *SedModel::pimpl()
 {
-    return reinterpret_cast<Impl *>(SedBase::pimpl());
+    return static_cast<Impl *>(SedBase::pimpl());
 }
 
 const SedModel::Impl *SedModel::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+    return static_cast<const Impl *>(SedBase::pimpl());
 }
 
 SedModelPtr SedModel::create(const SedDocumentPtr &pDocument, const FilePtr &pFile)

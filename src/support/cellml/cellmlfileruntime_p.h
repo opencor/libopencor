@@ -47,7 +47,7 @@ public:
     ComputeInterpretedVariablesForDifferentialModel mComputeInterpretedVariablesForDifferentialModel = nullptr;
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled);
-    ~Impl();
+    ~Impl() override;
 
     CellmlFileRuntime::InitialiseCompiledVariablesForAlgebraicModel initialiseCompiledVariablesForAlgebraicModel() const;
     CellmlFileRuntime::InitialiseCompiledVariablesForDifferentialModel initialiseCompiledVariablesForDifferentialModel() const;
