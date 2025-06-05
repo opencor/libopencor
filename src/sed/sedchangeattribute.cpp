@@ -20,10 +20,47 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SedChangeAttribute::Impl::Impl(const std::string &pTarget, const std::string &pNewValue)
-    : SedChange::Impl(pTarget)
+SedChangeAttribute::Impl::Impl(const std::string &pComponent, const std::string &pVariable,
+                               const std::string &pNewValue)
+    : mComponent(pComponent)
+    , mVariable(pVariable)
     , mNewValue(pNewValue)
 {
+    updateTarget();
+}
+
+void SedChangeAttribute::Impl::setTarget(const std::string &pTarget)
+{
+    mTarget = pTarget;
+}
+
+void SedChangeAttribute::Impl::updateTarget()
+{
+    setTarget("/cellml:model/cellml:component[@name='" + mComponent + "']/cellml:variable[@name='" + mVariable + "']");
+}
+
+std::string SedChangeAttribute::Impl::component() const
+{
+    return mComponent;
+}
+
+void SedChangeAttribute::Impl::setComponent(const std::string &pComponent)
+{
+    mComponent = pComponent;
+
+    updateTarget();
+}
+
+std::string SedChangeAttribute::Impl::variable() const
+{
+    return mVariable;
+}
+
+void SedChangeAttribute::Impl::setVariable(const std::string &pVariable)
+{
+    mVariable = pVariable;
+
+    updateTarget();
 }
 
 std::string SedChangeAttribute::Impl::newValue() const
@@ -62,9 +99,35 @@ const SedChangeAttribute::Impl *SedChangeAttribute::pimpl() const
     return static_cast<const Impl *>(SedChange::pimpl());
 }
 
-SedChangeAttributePtr SedChangeAttribute::create(const std::string &pTarget, const std::string &pNewValue)
+SedChangeAttributePtr SedChangeAttribute::create(const std::string &pComponent, const std::string &pVariable,
+                                                 const std::string &pNewValue)
 {
-    return SedChangeAttributePtr {new SedChangeAttribute {pTarget, pNewValue}};
+    return SedChangeAttributePtr(new SedChangeAttribute(pComponent, pVariable, pNewValue));
+}
+
+void SedChangeAttribute::setTarget(const std::string &pTarget)
+{
+    pimpl()->setTarget(pTarget);
+}
+
+std::string SedChangeAttribute::component() const
+{
+    return pimpl()->component();
+}
+
+void SedChangeAttribute::setComponent(const std::string &pComponent)
+{
+    pimpl()->setComponent(pComponent);
+}
+
+std::string SedChangeAttribute::variable() const
+{
+    return pimpl()->variable();
+}
+
+void SedChangeAttribute::setVariable(const std::string &pVariable)
+{
+    pimpl()->setVariable(pVariable);
 }
 
 std::string SedChangeAttribute::newValue() const

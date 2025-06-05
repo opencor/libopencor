@@ -33,12 +33,14 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedChange, emscripten::base<libOpenCOR::SedBase>>("SedChange")
         .smart_ptr<libOpenCOR::SedChangePtr>("SedChange")
-        .property("target", &libOpenCOR::SedChange::target, &libOpenCOR::SedChange::setTarget);
+        .property("target", &libOpenCOR::SedChange::target);
 
     // SedChangeAttribute API.
 
     emscripten::class_<libOpenCOR::SedChangeAttribute, emscripten::base<libOpenCOR::SedChange>>("SedChangeAttribute")
         .smart_ptr_constructor("SedChangeAttribute", &libOpenCOR::SedChangeAttribute::create)
+        .property("component", &libOpenCOR::SedChangeAttribute::component, &libOpenCOR::SedChangeAttribute::setComponent)
+        .property("variable", &libOpenCOR::SedChangeAttribute::variable, &libOpenCOR::SedChangeAttribute::setVariable)
         .property("newValue", &libOpenCOR::SedChangeAttribute::newValue, &libOpenCOR::SedChangeAttribute::setNewValue);
 
     // SedDataDescription API.

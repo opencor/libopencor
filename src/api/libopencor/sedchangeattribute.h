@@ -48,16 +48,58 @@ public:
      * Factory method to create a @ref SedChangeAttribute object:
      *
      * ```
-     * auto simulation = libOpenCOR::SedChangeAttribute::create(target, newValue);
+     * auto simulation = libOpenCOR::SedChangeAttribute::create(component, variable, newValue);
      * ```
      *
-     * @param pTarget The target as a @c std::string.
-     * @param pNewValue The new value as a @c std::string.
+     * @param pComponent The component, as a @c std::string, where the target is located.
+     * @param pVariable The variable, as a @c std::string, corresponding to the target.
+     * @param pNewValue The new value, as a @c std::string, for the target.
      *
      * @return A smart pointer to a @ref SedChangeAttribute object.
      */
 
-    static SedChangeAttributePtr create(const std::string &pTarget, const std::string &pNewValue);
+    static SedChangeAttributePtr create(const std::string &pComponent, const std::string &pVariable,
+                                        const std::string &pNewValue);
+
+    /**
+     * @brief Get the component.
+     *
+     * Get the component.
+     *
+     * @return The component as a @c std::string.
+     */
+
+    std::string component() const;
+
+    /**
+     * @brief Set the component.
+     *
+     * Set the component.
+     *
+     * @param pComponent The component as a @c std::string.
+     */
+
+    void setComponent(const std::string &pComponent);
+
+    /**
+     * @brief Get the variable.
+     *
+     * Get the variable.
+     *
+     * @return The variable as a @c std::string.
+     */
+
+    std::string variable() const;
+
+    /**
+     * @brief Set the variable.
+     *
+     * Set the variable.
+     *
+     * @param pVariable The variable as a @c std::string.
+     */
+
+    void setVariable(const std::string &pVariable);
 
     /**
      * @brief Get the new value.
@@ -80,9 +122,20 @@ public:
     void setNewValue(const std::string &pNewValue);
 
 private:
+    /**
+     * @brief Set the target.
+     *
+     * Set the target.
+     *
+     * @param pTarget The target as a @c std::string.
+     */
+
+    void setTarget(const std::string &pTarget) override;
+
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedChangeAttribute(const std::string &pTarget, const std::string &pNewValue); /**< Constructor @private. */
+    explicit SedChangeAttribute(const std::string &pComponent, const std::string &pVariable,
+                                const std::string &pNewValue); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

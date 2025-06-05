@@ -51,6 +51,7 @@ public:
 
     std::string target() const;
 
+protected:
     /**
      * @brief Set the target.
      *
@@ -59,9 +60,8 @@ public:
      * @param pTarget The target as a @c std::string.
      */
 
-    void setTarget(const std::string &pTarget);
+    virtual void setTarget(const std::string &pTarget) = 0;
 
-protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     explicit SedChange(Impl *pPimpl); /**< Constructor @private. */

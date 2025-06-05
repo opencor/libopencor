@@ -38,13 +38,15 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedChange, libOpenCOR::SedBase> sedChange(m, "SedChange");
 
-    sedChange.def_prop_rw("target", &libOpenCOR::SedChange::target, &libOpenCOR::SedChange::setTarget, "The target of the SedChange object.");
+    sedChange.def_prop_ro("target", &libOpenCOR::SedChange::target, "Return the target of the SedChange object.");
 
     // SedChangeAttribute API.
 
     nb::class_<libOpenCOR::SedChangeAttribute, libOpenCOR::SedChange> sedChangeAttribute(m, "SedChangeAttribute");
 
-    sedChangeAttribute.def(nb::new_(&libOpenCOR::SedChangeAttribute::create), "Create a SedChangeAttribute object.", nb::arg("target"), nb::arg("new_value"))
+    sedChangeAttribute.def(nb::new_(&libOpenCOR::SedChangeAttribute::create), "Create a SedChangeAttribute object.", nb::arg("component"), nb::arg("variable"), nb::arg("new_value"))
+        .def_prop_rw("component", &libOpenCOR::SedChangeAttribute::component, &libOpenCOR::SedChangeAttribute::setComponent, "The component of the SedChangeAttribute object.")
+        .def_prop_rw("variable", &libOpenCOR::SedChangeAttribute::variable, &libOpenCOR::SedChangeAttribute::setVariable, "The variable of the SedChangeAttribute object.")
         .def_prop_rw("new_value", &libOpenCOR::SedChangeAttribute::newValue, &libOpenCOR::SedChangeAttribute::setNewValue, "The new value of the SedChangeAttribute object.");
 
     // SedDataDescription API.

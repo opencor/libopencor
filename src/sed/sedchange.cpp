@@ -30,11 +30,6 @@ std::string SedChange::Impl::target() const
     return mTarget;
 }
 
-void SedChange::Impl::setTarget(const std::string &pTarget)
-{
-    mTarget = pTarget;
-}
-
 void SedChange::Impl::serialise(xmlNodePtr pNode) const
 {
     if (!mTarget.empty()) {
@@ -60,11 +55,6 @@ const SedChange::Impl *SedChange::pimpl() const
 std::string SedChange::target() const
 {
     return pimpl()->target();
-}
-
-void SedChange::setTarget(const std::string &pTarget)
-{
-    pimpl()->setTarget(pTarget);
 }
 
 } // namespace libOpenCOR

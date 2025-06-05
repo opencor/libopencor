@@ -25,9 +25,20 @@ namespace libOpenCOR {
 class SedChangeAttribute::Impl: public SedChange::Impl
 {
 public:
+    std::string mComponent;
+    std::string mVariable;
     std::string mNewValue;
 
-    explicit Impl(const std::string &pTarget, const std::string &pNewValue);
+    explicit Impl(const std::string &pComponent, const std::string &pVariable, const std::string &pNewValue);
+
+    void setTarget(const std::string &pTarget) override;
+    void updateTarget();
+
+    std::string component() const;
+    void setComponent(const std::string &pComponent);
+
+    std::string variable() const;
+    void setVariable(const std::string &pVariable);
 
     std::string newValue() const;
     void setNewValue(const std::string &pNewValue);
