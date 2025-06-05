@@ -29,6 +29,12 @@ void sedApi()
     emscripten::class_<libOpenCOR::SedAbstractTask, emscripten::base<libOpenCOR::SedBase>>("SedAbstractTask")
         .smart_ptr<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTask");
 
+    // SedChange API.
+
+    emscripten::class_<libOpenCOR::SedChange, emscripten::base<libOpenCOR::SedBase>>("SedChange")
+        .smart_ptr<libOpenCOR::SedChangePtr>("SedChange")
+        .property("target", &libOpenCOR::SedChange::target, &libOpenCOR::SedChange::setTarget);
+
     // SedDataDescription API.
 
     emscripten::class_<libOpenCOR::SedDataDescription, emscripten::base<libOpenCOR::SedBase>>("SedDataDescription");

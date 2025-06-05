@@ -23,6 +23,7 @@ limitations under the License.
 #include "libopencor/sedabstracttask.h"
 #include "libopencor/sedanalysis.h"
 #include "libopencor/sedbase.h"
+#include "libopencor/sedchange.h"
 #include "libopencor/seddatadescription.h"
 #include "libopencor/seddatagenerator.h"
 #include "libopencor/seddocument.h"

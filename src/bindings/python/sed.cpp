@@ -34,6 +34,12 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedAbstractTask, libOpenCOR::SedBase> sedAbstractTask(m, "SedAbstractTask");
 
+    // SedChange API.
+
+    nb::class_<libOpenCOR::SedChange, libOpenCOR::SedBase> sedChange(m, "SedChange");
+
+    sedChange.def_prop_rw("target", &libOpenCOR::SedChange::target, &libOpenCOR::SedChange::setTarget, "The target of the SedChange object.");
+
     // SedDataDescription API.
 
     nb::class_<libOpenCOR::SedDataDescription, libOpenCOR::SedBase> sedDataDescription(m, "SedDataDescription");
