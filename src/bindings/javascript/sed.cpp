@@ -20,7 +20,9 @@ void sedApi()
 {
     // SedBase API.
 
-    emscripten::class_<libOpenCOR::SedBase, emscripten::base<libOpenCOR::Logger>>("SedBase");
+    emscripten::class_<libOpenCOR::SedBase, emscripten::base<libOpenCOR::Logger>>("SedBase")
+        .smart_ptr<libOpenCOR::SedBasePtr>("SedBase")
+        .property("id", &libOpenCOR::SedBase::id, &libOpenCOR::SedBase::setId);
 
     // SedAbstractTask API.
 

@@ -28,6 +28,8 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedBase, libOpenCOR::Logger> sedBase(m, "SedBase");
 
+    sedBase.def_prop_rw("id", &libOpenCOR::SedBase::id, &libOpenCOR::SedBase::setId, "The id of the SedBase object.");
+
     // SedAbstractTask API.
 
     nb::class_<libOpenCOR::SedAbstractTask, libOpenCOR::SedBase> sedAbstractTask(m, "SedAbstractTask");
