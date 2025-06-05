@@ -52,7 +52,7 @@ SedSteadyState::Impl *SedSteadyState::pimpl()
 /*---GRY---
 const SedSteadyState::Impl *SedSteadyState::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
+    return static_cast<const Impl *>(SedSimulation::pimpl());
 }
 */
 

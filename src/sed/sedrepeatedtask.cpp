@@ -67,7 +67,7 @@ SedRepeatedTask::Impl *SedRepeatedTask::pimpl()
 /*---GRY---
 const SedRepeatedTask::Impl *SedRepeatedTask::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedAbstractTask::pimpl());
+    return static_cast<const Impl *>(SedAbstractTask::pimpl());
 }
 */
 

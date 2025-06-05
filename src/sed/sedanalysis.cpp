@@ -52,7 +52,7 @@ SedAnalysis::Impl *SedAnalysis::pimpl()
 /*---GRY---
 const SedAnalysis::Impl *SedAnalysis::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
+    return static_cast<const Impl *>(SedSimulation::pimpl());
 }
 */
 

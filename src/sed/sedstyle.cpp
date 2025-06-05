@@ -35,14 +35,14 @@ SedStyle::~SedStyle()
 /*---GRY---
 SedStyle::Impl *SedStyle::pimpl()
 {
-    return reinterpret_cast<Impl *>(SedBase::pimpl());
+    return static_cast<Impl *>(SedBase::pimpl());
 }
 */
 
 /*---GRY---
 const SedStyle::Impl *SedStyle::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+    return static_cast<const Impl *>(SedBase::pimpl());
 }
 */
 
