@@ -15,10 +15,13 @@ limitations under the License.
 */
 
 #include "file_p.h"
+#include "sedchange_p.h"
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 
 #include "utils.h"
+
+#include <algorithm>
 
 namespace libOpenCOR {
 
@@ -69,6 +72,64 @@ bool SedModel::Impl::isValid()
     return !hasErrors();
 }
 
+bool SedModel::Impl::hasChanges() const
+{
+    return !mChanges.empty();
+}
+
+size_t SedModel::Impl::changeCount() const
+{
+    return mChanges.size();
+}
+
+SedChangePtrs SedModel::Impl::changes() const
+{
+    return mChanges;
+}
+
+SedChangePtr SedModel::Impl::change(size_t pIndex) const
+{
+    if (pIndex >= mChanges.size()) {
+        return {};
+    }
+
+    return mChanges[pIndex];
+}
+
+bool SedModel::Impl::addChange(const SedChangePtr &pChange)
+{
+    if (pChange == nullptr) {
+        return false;
+    }
+
+    auto change = std::ranges::find_if(mChanges, [&](const auto &c) {
+        return c == pChange;
+    });
+
+    if (change != mChanges.end()) {
+        return false;
+    }
+
+    mChanges.push_back(pChange);
+
+    return true;
+}
+
+bool SedModel::Impl::removeChange(const SedChangePtr &pChange)
+{
+    auto change = std::ranges::find_if(mChanges, [&](const auto &c) {
+        return c == pChange;
+    });
+
+    if (change != mChanges.end()) {
+        mChanges.erase(change);
+
+        return true;
+    }
+
+    return false;
+}
+
 void SedModel::Impl::setBasePath(const std::string &pBasePath)
 {
     mBasePath = pBasePath;
@@ -93,6 +154,18 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
     xmlNewProp(node, toConstXmlCharPtr("source"), toConstXmlCharPtr(source));
 
     xmlAddChild(pNode, node);
+
+    // Add the changes, if any, to our SED-ML model.
+
+    if (!mChanges.empty()) {
+        auto *sedListOfChangeNodes = xmlNewNode(nullptr, toConstXmlCharPtr("listOfChanges"));
+
+        xmlAddChild(node, sedListOfChangeNodes);
+
+        for (const auto &change : mChanges) {
+            change->pimpl()->serialise(sedListOfChangeNodes);
+        }
+    }
 }
 
 SedModel::SedModel(const SedDocumentPtr &pDocument, const FilePtr &pFile)
@@ -123,6 +196,36 @@ SedModelPtr SedModel::create(const SedDocumentPtr &pDocument, const FilePtr &pFi
 FilePtr SedModel::file() const
 {
     return pimpl()->file();
+}
+
+bool SedModel::hasChanges() const
+{
+    return pimpl()->hasChanges();
+}
+
+size_t SedModel::changeCount() const
+{
+    return pimpl()->changeCount();
+}
+
+SedChangePtrs SedModel::changes() const
+{
+    return pimpl()->changes();
+}
+
+SedChangePtr SedModel::change(size_t pIndex) const
+{
+    return pimpl()->change(pIndex);
+}
+
+bool SedModel::addChange(const SedChangePtr &pChange)
+{
+    return pimpl()->addChange(pChange);
+}
+
+bool SedModel::removeChange(const SedChangePtr &pChange)
+{
+    return pimpl()->removeChange(pChange);
 }
 
 } // namespace libOpenCOR

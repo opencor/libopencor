@@ -28,11 +28,20 @@ public:
     std::string mBasePath;
     FilePtr mFile;
 
+    SedChangePtrs mChanges;
+
     explicit Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile);
 
     FilePtr file() const;
 
     bool isValid();
+
+    bool hasChanges() const;
+    size_t changeCount() const;
+    SedChangePtrs changes() const;
+    SedChangePtr change(size_t pIndex) const;
+    bool addChange(const SedChangePtr &pChange);
+    bool removeChange(const SedChangePtr &pChange);
 
     void setBasePath(const std::string &pBasePath);
     void serialise(xmlNodePtr pNode) const override;

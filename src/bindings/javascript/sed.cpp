@@ -127,7 +127,13 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedModel, emscripten::base<libOpenCOR::SedBase>>("SedModel")
         .smart_ptr_constructor("SedModel", &libOpenCOR::SedModel::create)
-        .property("file", &libOpenCOR::SedModel::file);
+        .property("file", &libOpenCOR::SedModel::file)
+        .property("hasChanges", &libOpenCOR::SedModel::hasChanges)
+        .property("changeCount", &libOpenCOR::SedModel::changeCount)
+        .property("changes", &libOpenCOR::SedModel::changes)
+        .function("change", &libOpenCOR::SedModel::change)
+        .function("addChange", &libOpenCOR::SedModel::addChange)
+        .function("removeChange", &libOpenCOR::SedModel::removeChange);
 
     // SedOutput API.
 

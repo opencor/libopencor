@@ -76,6 +76,72 @@ public:
 
     FilePtr file() const;
 
+    /**
+     * @brief Return whether there are some changes.
+     *
+     * Return whether there are some changes.
+     *
+     * @return @c true if there are some changes, @c false otherwise.
+     */
+
+    bool hasChanges() const;
+
+    /**
+     * @brief Return the number of changes.
+     *
+     * Return the number of changes.
+     *
+     * @return The number of changes.
+     */
+
+    size_t changeCount() const;
+
+    /**
+     * @brief Return the changes.
+     *
+     * Return the changes.
+     *
+     * @return The changes, as a @ref SedChangePtrs.
+     */
+
+    SedChangePtrs changes() const;
+
+    /**
+     * @brief Return the change at the given index.
+     *
+     * Return the change at the given index.
+     *
+     * @param pIndex The index of the change to return.
+     *
+     * @return The change as a @ref SedChangePtr, if the index is valid, @c nullptr otherwise.
+     */
+
+    SedChangePtr change(size_t pIndex) const;
+
+    /**
+     * @brief Add the change to this model.
+     *
+     * Add the change to this model.
+     *
+     * @param pChange The @ref SedChange object to be added.
+     *
+     * @return @c true if the change was added, @c false otherwise.
+     */
+
+    bool addChange(const SedChangePtr &pChange);
+
+    /**
+     * @brief Remove the change from this model.
+     *
+     * Remove the change from this model.
+     *
+     * @param pChange The @ref SedChange object to be removed.
+     *
+     * @return @c true if the change was removed, @c false otherwise.
+     */
+
+    bool removeChange(const SedChangePtr &pChange);
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 

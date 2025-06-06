@@ -131,11 +131,18 @@ void sedApi(nb::module_ &m)
     nb::class_<libOpenCOR::SedModel, libOpenCOR::SedBase> sedModel(m, "SedModel");
 
     sedModel.def(nb::new_(&libOpenCOR::SedModel::create), "Create a SedModel object.", nb::arg("document"), nb::arg("file"))
-        .def_prop_ro("file", &libOpenCOR::SedModel::file, "Return the file.");
+        .def_prop_ro("file", &libOpenCOR::SedModel::file, "Return the file.")
+        .def_prop_ro("has_changes", &libOpenCOR::SedModel::hasChanges, "Return whether there are some changes.")
+        .def_prop_ro("change_count", &libOpenCOR::SedModel::changeCount, "Return the number of changes.")
+        .def_prop_ro("changes", &libOpenCOR::SedModel::changes, "Return the changes.")
+        .def("change", &libOpenCOR::SedModel::change, "Return the change.")
+        .def("add_change", &libOpenCOR::SedModel::addChange, "Add a change.", nb::arg("change").none())
+        .def("remove_change", &libOpenCOR::SedModel::removeChange, "Remove a change.", nb::arg("change").none());
 
     // SedOutput API.
 
-    nb::class_<libOpenCOR::SedOutput, libOpenCOR::SedBase> sedOutput(m, "SedOutput");
+    nb::class_<libOpenCOR::SedOutput, libOpenCOR::SedBase>
+        sedOutput(m, "SedOutput");
 
     // SedRepeatedTask API.
 

@@ -86,9 +86,97 @@ describe("Sed coverage tests", () => {
 
     expect(document.removeModel(null)).toBe(false);
 
+    expect(model.hasChanges).toBe(false);
+    expect(model.changeCount).toBe(0);
+    expect(model.changes.size()).toBe(0);
+    expect(model.addChange(null)).toBe(false);
+
+    const changeAttribute = new libopencor.SedChangeAttribute(
+      "component",
+      "variable",
+      "newValue",
+    );
+
+    expect(model.addChange(changeAttribute)).toBe(true);
+
+    expect(model.hasChanges).toBe(true);
+    expect(model.changeCount).toBe(1);
+    expect(model.changes.size()).toBe(1);
+    expect(model.changes.get(0)).toStrictEqual(changeAttribute);
+    expect(model.change(0)).toStrictEqual(changeAttribute);
+    expect(model.change(1)).toBeNull();
+
+    expect(model.addChange(changeAttribute)).toBe(false);
+    expect(model.removeChange(changeAttribute)).toBe(true);
+
+    expect(model.hasChanges).toBe(false);
+    expect(model.changeCount).toBe(0);
+    expect(model.changes.size()).toBe(0);
+
+    expect(model.removeChange(null)).toBe(false);
+
     model.delete();
     file.delete();
     document.delete();
+  });
+
+  function sedChangeExpectedSerialisation(component, variable, newValue) {
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.sedml">
+      <listOfChanges>
+        <changeAttribute target="/cellml:model/cellml:component[@name='${component}']/cellml:variable[@name='${variable}']" newValue="${newValue}"/>
+      </listOfChanges>
+    </model>
+  </listOfModels>
+</sedML>
+`;
+  }
+
+  test("Changes", () => {
+    const changeAttribute = new libopencor.SedChangeAttribute(
+      "component",
+      "variable",
+      "123.456789",
+    );
+
+    expect(changeAttribute.target).toBe(
+      "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']",
+    );
+    expect(changeAttribute.component).toBe("component");
+    expect(changeAttribute.variable).toBe("variable");
+    expect(changeAttribute.newValue).toBe("123.456789");
+
+    const document = new libopencor.SedDocument();
+    const file = new libopencor.File(utils.SEDML_FILE);
+    const model = new libopencor.SedModel(document, file);
+
+    expect(model.addChange(changeAttribute)).toBe(true);
+    expect(document.addModel(model)).toBe(true);
+
+    expect(document.serialise()).toBe(
+      sedChangeExpectedSerialisation("component", "variable", "123.456789"),
+    );
+
+    changeAttribute.component = "new_component";
+    changeAttribute.variable = "new_variable";
+    changeAttribute.newValue = "987.654321";
+
+    expect(changeAttribute.target).toBe(
+      "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']",
+    );
+    expect(changeAttribute.component).toBe("new_component");
+    expect(changeAttribute.variable).toBe("new_variable");
+    expect(changeAttribute.newValue).toBe("987.654321");
+
+    expect(document.serialise()).toBe(
+      sedChangeExpectedSerialisation(
+        "new_component",
+        "new_variable",
+        "987.654321",
+      ),
+    );
   });
 
   test("Simulations", () => {

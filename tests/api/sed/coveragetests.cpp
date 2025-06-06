@@ -60,6 +60,92 @@ TEST(CoverageSedTest, models)
     EXPECT_EQ(document->models().size(), 0);
 
     EXPECT_FALSE(document->removeModel(nullptr));
+
+    EXPECT_FALSE(model->hasChanges());
+    EXPECT_EQ(model->changeCount(), 0);
+    EXPECT_EQ(model->changes().size(), 0);
+    EXPECT_FALSE(model->addChange(nullptr));
+
+    auto changeAttribute = libOpenCOR::SedChangeAttribute::create("component", "variable", "newValue");
+
+    EXPECT_TRUE(model->addChange(changeAttribute));
+
+    EXPECT_TRUE(model->hasChanges());
+    EXPECT_EQ(model->changeCount(), 1);
+    EXPECT_EQ(model->changes().size(), 1);
+    EXPECT_EQ(model->changes()[0], changeAttribute);
+    EXPECT_EQ(model->change(0), changeAttribute);
+    EXPECT_EQ(model->change(1), nullptr);
+
+    EXPECT_FALSE(model->addChange(changeAttribute));
+    EXPECT_TRUE(model->removeChange(changeAttribute));
+
+    EXPECT_FALSE(model->hasChanges());
+    EXPECT_EQ(model->changeCount(), 0);
+    EXPECT_EQ(model->changes().size(), 0);
+
+    EXPECT_FALSE(model->removeChange(nullptr));
+}
+
+namespace {
+
+std::string sedChangeExpectedSerialisation(const std::string &pComponent, const std::string &pVariable,
+                                           const std::string &pNewValue)
+{
+    return std::string(R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source=")"
+                       +
+#ifdef BUILDING_USING_MSVC
+                       std::string("file:///P:/some/path/file.txt")
+#else
+                       std::string("file:///some/path/file.txt")
+#endif
+                       +
+                       R"(">
+      <listOfChanges>
+        <changeAttribute target="/cellml:model/cellml:component[@name=')"
+                       + pComponent + R"(']/cellml:variable[@name=')"
+                       + pVariable + R"(']" newValue=")"
+                       + pNewValue + R"("/>
+      </listOfChanges>
+    </model>
+  </listOfModels>
+</sedML>
+)");
+}
+
+} // namespace
+
+TEST(CoverageSedTest, changes)
+{
+    auto changeAttribute = libOpenCOR::SedChangeAttribute::create("component", "variable", "123.456789");
+
+    EXPECT_EQ(changeAttribute->target(), "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']");
+    EXPECT_EQ(changeAttribute->component(), "component");
+    EXPECT_EQ(changeAttribute->variable(), "variable");
+    EXPECT_EQ(changeAttribute->newValue(), "123.456789");
+
+    auto document = libOpenCOR::SedDocument::create();
+    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto model = libOpenCOR::SedModel::create(document, file);
+
+    EXPECT_TRUE(model->addChange(changeAttribute));
+    EXPECT_TRUE(document->addModel(model));
+
+    EXPECT_EQ(document->serialise(), sedChangeExpectedSerialisation("component", "variable", "123.456789"));
+
+    changeAttribute->setComponent("new_component");
+    changeAttribute->setVariable("new_variable");
+    changeAttribute->setNewValue("987.654321");
+
+    EXPECT_EQ(changeAttribute->target(), "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']");
+    EXPECT_EQ(changeAttribute->component(), "new_component");
+    EXPECT_EQ(changeAttribute->variable(), "new_variable");
+    EXPECT_EQ(changeAttribute->newValue(), "987.654321");
+
+    EXPECT_EQ(document->serialise(), sedChangeExpectedSerialisation("new_component", "new_variable", "987.654321"));
 }
 
 TEST(CoverageSedTest, simulations)
