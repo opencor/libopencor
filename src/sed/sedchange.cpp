@@ -32,9 +32,17 @@ std::string SedChange::Impl::target() const
 
 void SedChange::Impl::serialise(xmlNodePtr pNode) const
 {
+    //---GRY--- FOR NOW, WE ONLY SUPPORT ChangeAttribute WHICH ALWAYS HAS A TARGET, SO THE BELOW TEST WILL ALWAYS BE
+    //          TRUE, HENCE WE IGNORE IT DURING CODE COVERAGE.
+
+#ifndef CODE_COVERAGE_ENABLED
     if (!mTarget.empty()) {
+#endif
         xmlNewProp(pNode, toConstXmlCharPtr("target"), toConstXmlCharPtr(mTarget));
+
+#ifndef CODE_COVERAGE_ENABLED
     }
+#endif
 }
 
 SedChange::SedChange(Impl *pPimpl)

@@ -75,7 +75,13 @@ void SedChangeAttribute::Impl::setNewValue(const std::string &pNewValue)
 
 void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
 {
-    xmlNewProp(pNode, toConstXmlCharPtr("newValue"), toConstXmlCharPtr(mNewValue));
+    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("changeAttribute"));
+
+    SedChange::Impl::serialise(node);
+
+    xmlNewProp(node, toConstXmlCharPtr("newValue"), toConstXmlCharPtr(mNewValue));
+
+    xmlAddChild(pNode, node);
 }
 
 SedChangeAttribute::SedChangeAttribute(const std::string &pComponent, const std::string &pVariable,
@@ -103,11 +109,6 @@ SedChangeAttributePtr SedChangeAttribute::create(const std::string &pComponent, 
                                                  const std::string &pNewValue)
 {
     return SedChangeAttributePtr(new SedChangeAttribute(pComponent, pVariable, pNewValue));
-}
-
-void SedChangeAttribute::setTarget(const std::string &pTarget)
-{
-    pimpl()->setTarget(pTarget);
 }
 
 std::string SedChangeAttribute::component() const

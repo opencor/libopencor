@@ -122,16 +122,6 @@ public:
     void setNewValue(const std::string &pNewValue);
 
 private:
-    /**
-     * @brief Set the target.
-     *
-     * Set the target.
-     *
-     * @param pTarget The target as a @c std::string.
-     */
-
-    void setTarget(const std::string &pTarget) override;
-
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     explicit SedChangeAttribute(const std::string &pComponent, const std::string &pVariable,

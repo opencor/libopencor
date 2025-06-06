@@ -28,6 +28,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedChange: public SedBase
 {
+    friend class SedModel;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.
@@ -52,16 +54,6 @@ public:
     std::string target() const;
 
 protected:
-    /**
-     * @brief Set the target.
-     *
-     * Set the target.
-     *
-     * @param pTarget The target as a @c std::string.
-     */
-
-    virtual void setTarget(const std::string &pTarget) = 0;
-
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
     explicit SedChange(Impl *pPimpl); /**< Constructor @private. */
