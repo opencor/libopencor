@@ -96,7 +96,7 @@ SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl()
 
 const SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
+    return static_cast<const Impl *>(SedSimulation::pimpl());
 }
 
 SedUniformTimeCoursePtr SedUniformTimeCourse::create(const SedDocumentPtr &pDocument)

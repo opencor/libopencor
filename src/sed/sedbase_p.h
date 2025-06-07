@@ -32,7 +32,6 @@ public:
     std::string mMetaId;
 
     explicit Impl(const std::string &pId = {});
-    virtual ~Impl() = default;
 
     std::string id() const;
     void setId(const std::string &pId);

@@ -54,19 +54,13 @@ TEST(VersionTest, libOpenCOR)
         number /= TEN;
     }
 
-    static const size_t VERSION_STRING_SIZE = 15;
+    static const int INT_TEN = 10;
 
-    std::array<char, VERSION_STRING_SIZE> versionString {};
-
-#ifdef BUILDING_USING_GNU
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wformat-truncation"
-#endif
-    std::snprintf(versionString.data(), VERSION_STRING_SIZE, "%d.%d%02d%02d.%d", VERSION_MAJOR, year, month, day, VERSION_PATCH); // NOLINT
-    // Note: ideally, we would be using std::format(), but it is not available on some of the CI systems we are using.
-#ifdef BUILDING_USING_GNU
-#    pragma GCC diagnostic pop
-#endif
+    auto versionString = std::to_string(VERSION_MAJOR)
+                         + "."
+                         + std::to_string(year) + ((month < INT_TEN) ? "0" : "") + std::to_string(month) + ((day < INT_TEN) ? "0" : "") + std::to_string(day)
+                         + "."
+                         + std::to_string(VERSION_PATCH);
 
     EXPECT_EQ(version, libOpenCOR::version());
     EXPECT_EQ(versionString.data(), libOpenCOR::versionString());

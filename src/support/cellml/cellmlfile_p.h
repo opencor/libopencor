@@ -33,7 +33,6 @@ public:
     libcellml::AnalyserModelPtr mAnalyserModel;
 
     explicit Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict);
-    ~Impl() = default;
 
     void populateDocument(const SedDocumentPtr &pDocument) const;
 

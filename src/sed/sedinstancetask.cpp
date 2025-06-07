@@ -462,12 +462,12 @@ SedInstanceTask::~SedInstanceTask()
 
 SedInstanceTask::Impl *SedInstanceTask::pimpl()
 {
-    return reinterpret_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::pimpl());
 }
 
 const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::pimpl());
 }
 
 Doubles SedInstanceTask::voi() const

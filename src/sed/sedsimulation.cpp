@@ -93,12 +93,12 @@ SedSimulation::SedSimulation(Impl *pPimpl)
 
 SedSimulation::Impl *SedSimulation::pimpl()
 {
-    return reinterpret_cast<Impl *>(SedBase::pimpl());
+    return static_cast<Impl *>(SedBase::pimpl());
 }
 
 const SedSimulation::Impl *SedSimulation::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+    return static_cast<const Impl *>(SedBase::pimpl());
 }
 
 SolverOdePtr SedSimulation::odeSolver() const

@@ -63,7 +63,7 @@ SedOneStep::Impl *SedOneStep::pimpl()
 
 const SedOneStep::Impl *SedOneStep::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedSimulation::pimpl());
+    return static_cast<const Impl *>(SedSimulation::pimpl());
 }
 
 SedOneStepPtr SedOneStep::create(const SedDocumentPtr &pDocument)

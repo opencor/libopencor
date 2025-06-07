@@ -32,6 +32,8 @@ public:
     IssuePtrs mErrors;
     IssuePtrs mWarnings;
 
+    virtual ~Impl() = default;
+
     bool hasIssues() const;
     size_t issueCount() const;
     IssuePtrs issues() const;

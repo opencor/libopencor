@@ -16,23 +16,23 @@ limitations under the License.
 
 #pragma once
 
-#include "logger_p.h"
+#include "sedbase_p.h"
 
-#include "sedmlfile.h"
-#include "utils.h"
+#include "libopencor/sedchange.h"
 
 namespace libOpenCOR {
 
-class SedmlFile::Impl: public Logger::Impl
+class SedChange::Impl: public SedBase::Impl
 {
 public:
-    std::string mLocation;
-    libsedml::SedDocument *mDocument;
+    std::string mTarget;
 
-    explicit Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument);
-    ~Impl() override;
+    explicit Impl(const std::string &pTarget = {});
 
-    void populateDocument(const SedDocumentPtr &pDocument);
+    std::string target() const;
+    virtual void setTarget(const std::string &pTarget) = 0;
+
+    void serialise(xmlNodePtr pNode) const override;
 };
 
 } // namespace libOpenCOR

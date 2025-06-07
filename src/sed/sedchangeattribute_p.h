@@ -16,34 +16,33 @@ limitations under the License.
 
 #pragma once
 
-#include "sedbase_p.h"
+#include "sedchange_p.h"
 
-#include "libopencor/sedmodel.h"
+#include "libopencor/sedchangeattribute.h"
 
 namespace libOpenCOR {
 
-class SedModel::Impl: public SedBase::Impl
+class SedChangeAttribute::Impl: public SedChange::Impl
 {
 public:
-    std::string mBasePath;
-    FilePtr mFile;
+    std::string mComponent;
+    std::string mVariable;
+    std::string mNewValue;
 
-    SedChangePtrs mChanges;
+    explicit Impl(const std::string &pComponent, const std::string &pVariable, const std::string &pNewValue);
 
-    explicit Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile);
+    void setTarget(const std::string &pTarget) override;
+    void updateTarget();
 
-    FilePtr file() const;
+    std::string component() const;
+    void setComponent(const std::string &pComponent);
 
-    bool isValid();
+    std::string variable() const;
+    void setVariable(const std::string &pVariable);
 
-    bool hasChanges() const;
-    size_t changeCount() const;
-    SedChangePtrs changes() const;
-    SedChangePtr change(size_t pIndex) const;
-    bool addChange(const SedChangePtr &pChange);
-    bool removeChange(const SedChangePtr &pChange);
+    std::string newValue() const;
+    void setNewValue(const std::string &pNewValue);
 
-    void setBasePath(const std::string &pBasePath);
     void serialise(xmlNodePtr pNode) const override;
 };
 

@@ -89,6 +89,8 @@ set(GIT_API_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedabstracttask.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedanalysis.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedbase.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedchange.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/sedchangeattribute.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatadescription.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddatagenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/api/${CMAKE_PROJECT_NAME_LC}/seddocument.h
@@ -160,6 +162,8 @@ set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedabstracttask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedanalysis.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedbase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedchange.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedchangeattribute.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatadescription.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatagenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddocument.cpp
@@ -184,6 +188,8 @@ set(GIT_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/logger/logger_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedabstracttask_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedbase_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedchange_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/sed/sedchangeattribute_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatadescription_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddatagenerator_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/sed/seddocument_p.h

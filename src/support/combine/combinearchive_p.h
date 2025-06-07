@@ -32,7 +32,7 @@ public:
     FilePtr mMasterFile;
 
     explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive);
-    ~Impl();
+    ~Impl() override;
 
     FilePtr masterFile() const;
     bool hasFiles() const;

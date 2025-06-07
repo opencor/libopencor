@@ -45,7 +45,7 @@ public:
     CombineArchivePtr mCombineArchive;
 
     explicit Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents);
-    ~Impl();
+    ~Impl() override;
 
     void checkType(const FilePtr &pOwner, bool pResetType = false);
 

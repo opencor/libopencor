@@ -20,12 +20,28 @@ void sedApi()
 {
     // SedBase API.
 
-    emscripten::class_<libOpenCOR::SedBase, emscripten::base<libOpenCOR::Logger>>("SedBase");
+    emscripten::class_<libOpenCOR::SedBase, emscripten::base<libOpenCOR::Logger>>("SedBase")
+        .smart_ptr<libOpenCOR::SedBasePtr>("SedBase")
+        .property("id", &libOpenCOR::SedBase::id, &libOpenCOR::SedBase::setId);
 
     // SedAbstractTask API.
 
     emscripten::class_<libOpenCOR::SedAbstractTask, emscripten::base<libOpenCOR::SedBase>>("SedAbstractTask")
         .smart_ptr<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTask");
+
+    // SedChange API.
+
+    emscripten::class_<libOpenCOR::SedChange, emscripten::base<libOpenCOR::SedBase>>("SedChange")
+        .smart_ptr<libOpenCOR::SedChangePtr>("SedChange")
+        .property("target", &libOpenCOR::SedChange::target);
+
+    // SedChangeAttribute API.
+
+    emscripten::class_<libOpenCOR::SedChangeAttribute, emscripten::base<libOpenCOR::SedChange>>("SedChangeAttribute")
+        .smart_ptr_constructor("SedChangeAttribute", &libOpenCOR::SedChangeAttribute::create)
+        .property("component", &libOpenCOR::SedChangeAttribute::component, &libOpenCOR::SedChangeAttribute::setComponent)
+        .property("variable", &libOpenCOR::SedChangeAttribute::variable, &libOpenCOR::SedChangeAttribute::setVariable)
+        .property("newValue", &libOpenCOR::SedChangeAttribute::newValue, &libOpenCOR::SedChangeAttribute::setNewValue);
 
     // SedDataDescription API.
 
@@ -111,7 +127,13 @@ void sedApi()
 
     emscripten::class_<libOpenCOR::SedModel, emscripten::base<libOpenCOR::SedBase>>("SedModel")
         .smart_ptr_constructor("SedModel", &libOpenCOR::SedModel::create)
-        .property("file", &libOpenCOR::SedModel::file);
+        .property("file", &libOpenCOR::SedModel::file)
+        .property("hasChanges", &libOpenCOR::SedModel::hasChanges)
+        .property("changeCount", &libOpenCOR::SedModel::changeCount)
+        .property("changes", &libOpenCOR::SedModel::changes)
+        .function("change", &libOpenCOR::SedModel::change)
+        .function("addChange", &libOpenCOR::SedModel::addChange)
+        .function("removeChange", &libOpenCOR::SedModel::removeChange);
 
     // SedOutput API.
 

@@ -39,7 +39,6 @@ public:
     std::string mName;
 
     explicit Impl(const std::string &pId, const std::string &pName);
-    virtual ~Impl() = default;
 
     virtual SolverPtr duplicate() = 0;
 
