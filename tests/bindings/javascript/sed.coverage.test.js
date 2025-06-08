@@ -22,16 +22,22 @@ const libopencor = await libOpenCOR();
 
 describe("Sed coverage tests", () => {
   let someSolverOdeContents;
+  let someSolverNla1Contents;
 
   beforeAll(() => {
     someSolverOdeContents = utils.allocateMemory(
       libopencor,
       utils.SOME_SOLVER_ODE_CONTENTS,
     );
+    someSolverNla1Contents = utils.allocateMemory(
+      libopencor,
+      utils.SOME_SOLVER_NLA1_CONTENTS,
+    );
   });
 
   afterAll(() => {
     utils.freeMemory(libopencor, someSolverOdeContents);
+    utils.freeMemory(libopencor, someSolverNla1Contents);
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
@@ -286,7 +292,7 @@ describe("Sed coverage tests", () => {
     file.delete();
   });
 
-  test("SedInstanceAndSedInstanceTask", () => {
+  test("SedInstanceAndSedInstanceTaskDifferentialModel", () => {
     const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
@@ -376,6 +382,43 @@ describe("Sed coverage tests", () => {
     document.delete();
     file.delete();
   });
+
+  /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
+  test("SedInstanceAndSedInstanceTaskNonDifferentialModel", () => {
+    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+
+    file.setContents(
+      someSolverNla1Contents,
+      utils.SOME_SOLVER_NLA1_CONTENTS.length,
+    );
+
+    const document = new libopencor.SedDocument(file);
+
+    const instance = document.instantiate();
+    const instanceTask = instance.tasks.get(0);
+
+    expect(instanceTask.voi.size()).toBe(0);
+    expect(instanceTask.voiAsArray).toStrictEqual([]);
+    expect(instanceTask.voiName).toBe("");
+    expect(instanceTask.voiUnit).toBe("");
+
+    expect(instanceTask.stateCount).toBe(0);
+    expect(instanceTask.state(0).size()).toBe(0);
+    expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.stateName(0)).toBe("");
+    expect(instanceTask.stateUnit(0)).toBe("");
+
+    expect(instanceTask.rateCount).toBe(0);
+    expect(instanceTask.rate(0).size()).toBe(0);
+    expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
+    expect(instanceTask.rateName(0)).toBe("");
+    expect(instanceTask.rateUnit(0)).toBe("");
+
+    instance.delete();
+    document.delete();
+    file.delete();
+  });
+  */
 
   test("SedDocument", () => {
     let file = new libopencor.File(

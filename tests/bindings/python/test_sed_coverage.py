@@ -253,7 +253,7 @@ def test_sed_uniform_time_course():
     assert simulation.number_of_steps == 10
 
 
-def test_sed_instance_and_sed_instance_task():
+def test_sed_instance_and_sed_instance_task_differential_model():
     expected_issues = [
         [
             loc.Issue.Type.Error,
@@ -323,6 +323,28 @@ def test_sed_instance_and_sed_instance_task():
     instance.run()
 
     assert_issues(instance, expected_issues)
+
+
+def test_sed_instance_and_sed_instance_task_non_differential_model():
+    file = loc.File(utils.resource_path("api/solver/nla1.cellml"))
+    document = loc.SedDocument(file)
+
+    instance = document.instantiate()
+    instance_task = instance.tasks[0]
+
+    assert instance_task.voi == []
+    assert instance_task.voi_name == ""
+    assert instance_task.voi_unit == ""
+
+    assert instance_task.state_count == 0
+    assert instance_task.state(0) == []
+    assert instance_task.state_name(0) == ""
+    assert instance_task.state_unit(0) == ""
+
+    assert instance_task.rate_count == 0
+    assert instance_task.rate(0) == []
+    assert instance_task.rate_name(0) == ""
+    assert instance_task.rate_unit(0) == ""
 
 
 def test_sed_document():

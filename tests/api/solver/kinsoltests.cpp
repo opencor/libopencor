@@ -115,6 +115,37 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
 //---GRY--- RENAME THIS TEST compiledSolve AND CREATE ONE CALLED interpretedSolve ONCE WE CAN INTERPRET NLA-BASED
 //          MODELS.
 
+static const auto ABS_TOL = 1e-05;
+
+namespace {
+
+void expectNla1Solution(const libOpenCOR::SedInstanceTaskPtr &pInstanceTask)
+{
+    EXPECT_EQ(pInstanceTask->stateCount(), 0);
+    EXPECT_EQ(pInstanceTask->rateCount(), 0);
+    EXPECT_EQ(pInstanceTask->constantCount(), 0);
+    EXPECT_EQ(pInstanceTask->computedConstantCount(), 0);
+    EXPECT_EQ(pInstanceTask->algebraicCount(), 2);
+
+    EXPECT_NEAR(pInstanceTask->algebraic(0)[0], 3.0, ABS_TOL);
+    EXPECT_NEAR(pInstanceTask->algebraic(1)[0], 7.0, ABS_TOL);
+}
+
+void expectNla2Solution(const libOpenCOR::SedInstanceTaskPtr &pInstanceTask)
+{
+    EXPECT_EQ(pInstanceTask->stateCount(), 0);
+    EXPECT_EQ(pInstanceTask->rateCount(), 0);
+    EXPECT_EQ(pInstanceTask->constantCount(), 0);
+    EXPECT_EQ(pInstanceTask->computedConstantCount(), 0);
+    EXPECT_EQ(pInstanceTask->algebraicCount(), 3);
+
+    EXPECT_NEAR(pInstanceTask->algebraic(0)[0], 3.0, ABS_TOL);
+    EXPECT_NEAR(pInstanceTask->algebraic(1)[0], 7.0, ABS_TOL);
+    EXPECT_NEAR(pInstanceTask->algebraic(2)[0], -5.0, ABS_TOL);
+}
+
+} // namespace
+
 TEST(KinsolSolverTest, solve)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
@@ -123,7 +154,7 @@ TEST(KinsolSolverTest, solve)
 
     instance->run();
 
-    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+    expectNla1Solution(instance->tasks()[0]);
 }
 
 TEST(KinsolSolverTest, solveWithBandedLinearSolver)
@@ -141,7 +172,7 @@ TEST(KinsolSolverTest, solveWithBandedLinearSolver)
 
     instance->run();
 
-    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+    expectNla2Solution(instance->tasks()[0]);
 }
 
 TEST(KinsolSolverTest, solveWithGmresLinearSolver)
@@ -157,7 +188,7 @@ TEST(KinsolSolverTest, solveWithGmresLinearSolver)
 
     instance->run();
 
-    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+    expectNla1Solution(instance->tasks()[0]);
 }
 
 TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
@@ -173,7 +204,7 @@ TEST(KinsolSolverTest, solveWithBicgstabLinearSolver)
 
     instance->run();
 
-    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+    expectNla2Solution(instance->tasks()[0]);
 }
 
 TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
@@ -189,5 +220,5 @@ TEST(KinsolSolverTest, solveWithTfqmrLinearSolver)
 
     instance->run();
 
-    //---GRY--- CHECK THE FINAL VALUE OF THE STATES, RATES, AND VARIABLES.
+    expectNla1Solution(instance->tasks()[0]);
 }

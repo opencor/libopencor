@@ -272,7 +272,9 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
     EXPECT_EQ(simulation->numberOfSteps(), NUMBER_OF_STEPS);
 }
 
-TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
+static const auto NoDoubles = std::vector<double> {};
+
+TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
@@ -293,8 +295,6 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     EXPECT_EQ(instance->taskCount(), 1);
     EXPECT_EQ(instance->task(0), instanceTask);
     EXPECT_EQ(instance->task(1), nullptr);
-
-    static const auto NoDoubles = std::vector<double> {};
 
     EXPECT_EQ(instanceTask->voi(), NoDoubles);
     EXPECT_EQ(instanceTask->voiName(), "environment/time");
@@ -343,6 +343,29 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTask)
     instance->run();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskNonDifferentialModel)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    auto instance = document->instantiate();
+    auto instanceTask = instance->tasks()[0];
+
+    EXPECT_EQ(instanceTask->voi(), NoDoubles);
+    EXPECT_EQ(instanceTask->voiName(), "");
+    EXPECT_EQ(instanceTask->voiUnit(), "");
+
+    EXPECT_EQ(instanceTask->stateCount(), 0);
+    EXPECT_EQ(instanceTask->state(0), NoDoubles);
+    EXPECT_EQ(instanceTask->stateName(0), "");
+    EXPECT_EQ(instanceTask->stateUnit(0), "");
+
+    EXPECT_EQ(instanceTask->rateCount(), 0);
+    EXPECT_EQ(instanceTask->rate(0), NoDoubles);
+    EXPECT_EQ(instanceTask->rateName(0), "");
+    EXPECT_EQ(instanceTask->rateUnit(0), "");
 }
 
 TEST(CoverageSedTest, sedDocument)
