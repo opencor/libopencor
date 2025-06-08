@@ -35,14 +35,14 @@ SedOutput::~SedOutput()
 /*---GRY---
 SedOutput::Impl *SedOutput::pimpl()
 {
-    return reinterpret_cast<Impl *>(SedBase::pimpl());
+    return static_cast<Impl *>(SedBase::pimpl());
 }
 */
 
 /*---GRY---
 const SedOutput::Impl *SedOutput::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedBase::pimpl());
+    return static_cast<const Impl *>(SedBase::pimpl());
 }
 */
 

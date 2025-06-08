@@ -115,7 +115,7 @@ SedTask::Impl *SedTask::pimpl()
 
 const SedTask::Impl *SedTask::pimpl() const
 {
-    return reinterpret_cast<const Impl *>(SedAbstractTask::pimpl());
+    return static_cast<const Impl *>(SedAbstractTask::pimpl());
 }
 
 SedTaskPtr SedTask::create(const SedDocumentPtr &pDocument, const SedModelPtr &pModel,

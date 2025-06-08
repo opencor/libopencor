@@ -30,7 +30,7 @@ public:
     libsedml::SedDocument *mDocument;
 
     explicit Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument);
-    ~Impl();
+    ~Impl() override;
 
     void populateDocument(const SedDocumentPtr &pDocument);
 };

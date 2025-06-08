@@ -27,7 +27,6 @@ public:
     std::string mDescription;
 
     explicit Impl(Type pType, const std::string &pDescription);
-    ~Impl() = default;
 
     Type type() const;
     std::string typeAsString() const;
