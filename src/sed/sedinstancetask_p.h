@@ -41,6 +41,7 @@ public:
     CellmlFileRuntimePtr mRuntime;
     SedSimulationPtr mSimulation;
     SedUniformTimeCoursePtr mSedUniformTimeCourse;
+    SedModelPtr mModel;
     bool mDifferentialModel;
     libcellml::AnalyserModelPtr mAnalyserModel;
     SolverOdePtr mOdeSolver;
@@ -68,6 +69,7 @@ public:
 
     void trackResults(size_t pIndex);
 
+    void applyChanges();
     void initialise();
     double run();
 
