@@ -350,6 +350,20 @@ double SedInstanceTask::Impl::run()
 
             trackResults(++index);
         }
+    } else {
+        // Track our results.
+
+        for (size_t i = 0; i < mAnalyserModel->constantCount(); ++i) {
+            mResults.constants[i].resize(1, mConstants[i]); // NOLINT
+        }
+
+        for (size_t i = 0; i < mAnalyserModel->computedConstantCount(); ++i) {
+            mResults.computedConstants[i].resize(1, mComputedConstants[i]); // NOLINT
+        }
+
+        for (size_t i = 0; i < mAnalyserModel->algebraicCount(); ++i) {
+            mResults.algebraic[i].resize(1, mAlgebraic[i]); // NOLINT
+        }
     }
 
     // Stop our timer and return the elapsed time in milliseconds.
@@ -359,17 +373,29 @@ double SedInstanceTask::Impl::run()
 
 Doubles SedInstanceTask::Impl::voi() const
 {
-    return mResults.voi;
+    if (mDifferentialModel) {
+        return mResults.voi;
+    }
+
+    return {};
 }
 
 std::string SedInstanceTask::Impl::voiName() const
 {
-    return name(mAnalyserModel->voi()->variable());
+    if (mDifferentialModel) {
+        return name(mAnalyserModel->voi()->variable());
+    }
+
+    return {};
 }
 
 std::string SedInstanceTask::Impl::voiUnit() const
 {
-    return mAnalyserModel->voi()->variable()->units()->name();
+    if (mDifferentialModel) {
+        return mAnalyserModel->voi()->variable()->units()->name();
+    }
+
+    return {};
 }
 
 size_t SedInstanceTask::Impl::stateCount() const
@@ -379,7 +405,7 @@ size_t SedInstanceTask::Impl::stateCount() const
 
 Doubles SedInstanceTask::Impl::state(size_t pIndex) const
 {
-    if (pIndex >= mAnalyserModel->stateCount()) {
+    if (!mDifferentialModel || (pIndex >= mAnalyserModel->stateCount())) {
         return {};
     }
 
@@ -388,7 +414,7 @@ Doubles SedInstanceTask::Impl::state(size_t pIndex) const
 
 std::string SedInstanceTask::Impl::stateName(size_t pIndex) const
 {
-    if (pIndex >= mAnalyserModel->stateCount()) {
+    if (!mDifferentialModel || (pIndex >= mAnalyserModel->stateCount())) {
         return {};
     }
 
@@ -397,7 +423,7 @@ std::string SedInstanceTask::Impl::stateName(size_t pIndex) const
 
 std::string SedInstanceTask::Impl::stateUnit(size_t pIndex) const
 {
-    if (pIndex >= mAnalyserModel->stateCount()) {
+    if (!mDifferentialModel || (pIndex >= mAnalyserModel->stateCount())) {
         return {};
     }
 
@@ -411,7 +437,7 @@ size_t SedInstanceTask::Impl::rateCount() const
 
 Doubles SedInstanceTask::Impl::rate(size_t pIndex) const
 {
-    if (pIndex >= mAnalyserModel->stateCount()) {
+    if (!mDifferentialModel || (pIndex >= mAnalyserModel->stateCount())) {
         return {};
     }
 
@@ -420,7 +446,7 @@ Doubles SedInstanceTask::Impl::rate(size_t pIndex) const
 
 std::string SedInstanceTask::Impl::rateName(size_t pIndex) const
 {
-    if (pIndex >= mAnalyserModel->stateCount()) {
+    if (!mDifferentialModel || (pIndex >= mAnalyserModel->stateCount())) {
         return {};
     }
 
@@ -429,7 +455,7 @@ std::string SedInstanceTask::Impl::rateName(size_t pIndex) const
 
 std::string SedInstanceTask::Impl::rateUnit(size_t pIndex) const
 {
-    if (pIndex >= mAnalyserModel->stateCount()) {
+    if (!mDifferentialModel || (pIndex >= mAnalyserModel->stateCount())) {
         return {};
     }
 
