@@ -34,7 +34,6 @@ public:
      */
 
     SedBase() = delete; /**< No default constructor allowed, @private. */
-    ~SedBase() override = default; /**< Destructor, @private. */
 
     SedBase(const SedBase &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedBase(SedBase &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */

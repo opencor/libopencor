@@ -38,7 +38,6 @@ public:
      */
 
     SolverOde() = delete; /**< No default constructor allowed, @private. */
-    ~SolverOde() override = default; /**< Destructor, @private. */
 
     SolverOde(const SolverOde &pOther) = delete; /**< No copy constructor allowed, @private. */
     SolverOde(SolverOde &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */

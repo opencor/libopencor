@@ -48,7 +48,6 @@ public:
      */
 
     Solver() = delete; /**< No default constructor allowed, @private. */
-    ~Solver() override = default; /**< Destructor, @private. */
 
     Solver(const Solver &pOther) = delete; /**< No copy constructor allowed, @private. */
     Solver(Solver &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */

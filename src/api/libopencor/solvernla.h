@@ -40,7 +40,6 @@ public:
      */
 
     SolverNla() = delete; /**< No default constructor allowed, @private. */
-    ~SolverNla() override = default; /**< Destructor, @private. */
 
     SolverNla(const SolverNla &pOther) = delete; /**< No copy constructor allowed, @private. */
     SolverNla(SolverNla &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */

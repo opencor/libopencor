@@ -35,8 +35,6 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SedChange() override = default; /**< Destructor, @private. */
-
     SedChange(const SedChange &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedChange(SedChange &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 
