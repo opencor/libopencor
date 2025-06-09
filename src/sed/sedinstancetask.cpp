@@ -122,7 +122,7 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
 
 namespace {
 
-std::string name(const std::string pComponentName, const std::string pVariableName)
+std::string name(const std::string &pComponentName, const std::string &pVariableName)
 {
     return pComponentName + "/" + pVariableName;
 }
