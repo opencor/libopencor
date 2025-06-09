@@ -31,13 +31,9 @@ describe("Solver basic tests", () => {
     expect(solver.integrationMethod).toBe(
       loc.SolverCvode.IntegrationMethod.BDF,
     );
-    expect(solver.iterationType).toBe(
-      loc.SolverCvode.IterationType.NEWTON,
-    );
+    expect(solver.iterationType).toBe(loc.SolverCvode.IterationType.NEWTON);
     expect(solver.linearSolver).toBe(loc.SolverCvode.LinearSolver.DENSE);
-    expect(solver.preconditioner).toBe(
-      loc.SolverCvode.Preconditioner.BANDED,
-    );
+    expect(solver.preconditioner).toBe(loc.SolverCvode.Preconditioner.BANDED);
     expect(solver.upperHalfBandwidth).toBe(0);
     expect(solver.lowerHalfBandwidth).toBe(0);
     expect(solver.relativeTolerance).toBe(1.0e-7);
@@ -46,8 +42,7 @@ describe("Solver basic tests", () => {
 
     solver.maximumStep = 1.23;
     solver.maximumNumberOfSteps = 123;
-    solver.integrationMethod =
-      loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
+    solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
     solver.iterationType = loc.SolverCvode.IterationType.FUNCTIONAL;
     solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
     solver.preconditioner = loc.SolverCvode.Preconditioner.NO;
@@ -62,13 +57,9 @@ describe("Solver basic tests", () => {
     expect(solver.integrationMethod).toBe(
       loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
     );
-    expect(solver.iterationType).toBe(
-      loc.SolverCvode.IterationType.FUNCTIONAL,
-    );
+    expect(solver.iterationType).toBe(loc.SolverCvode.IterationType.FUNCTIONAL);
     expect(solver.linearSolver).toBe(loc.SolverCvode.LinearSolver.GMRES);
-    expect(solver.preconditioner).toBe(
-      loc.SolverCvode.Preconditioner.NO,
-    );
+    expect(solver.preconditioner).toBe(loc.SolverCvode.Preconditioner.NO);
     expect(solver.upperHalfBandwidth).toBe(3);
     expect(solver.lowerHalfBandwidth).toBe(5);
     expect(solver.relativeTolerance).toBe(1.23e-5);
@@ -134,9 +125,7 @@ describe("Solver basic tests", () => {
     expect(solver.name).toBe("KINSOL");
 
     expect(solver.maximumNumberOfIterations).toBe(200);
-    expect(solver.linearSolver).toBe(
-      loc.SolverKinsol.LinearSolver.DENSE,
-    );
+    expect(solver.linearSolver).toBe(loc.SolverKinsol.LinearSolver.DENSE);
     expect(solver.upperHalfBandwidth).toBe(0);
     expect(solver.lowerHalfBandwidth).toBe(0);
 
@@ -146,9 +135,7 @@ describe("Solver basic tests", () => {
     solver.lowerHalfBandwidth = 5;
 
     expect(solver.maximumNumberOfIterations).toBe(123);
-    expect(solver.linearSolver).toBe(
-      loc.SolverKinsol.LinearSolver.GMRES,
-    );
+    expect(solver.linearSolver).toBe(loc.SolverKinsol.LinearSolver.GMRES);
     expect(solver.upperHalfBandwidth).toBe(3);
     expect(solver.lowerHalfBandwidth).toBe(5);
 

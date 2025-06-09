@@ -525,25 +525,19 @@ describe("Sed coverage tests", () => {
   */
 
   test("SedDocument", () => {
-    let file = new loc.File(
-      utils.resourcePath(utils.HTTP_REMOTE_CELLML_FILE),
-    );
+    let file = new loc.File(utils.resourcePath(utils.HTTP_REMOTE_CELLML_FILE));
     let document = new loc.SedDocument(file);
 
     document.delete();
     file.delete();
 
-    file = new loc.File(
-      utils.resourcePath(utils.HTTP_REMOTE_SEDML_FILE),
-    );
+    file = new loc.File(utils.resourcePath(utils.HTTP_REMOTE_SEDML_FILE));
     document = new loc.SedDocument(file);
 
     document.delete();
     file.delete();
 
-    file = new loc.File(
-      utils.resourcePath(utils.HTTP_REMOTE_COMBINE_ARCHIVE),
-    );
+    file = new loc.File(utils.resourcePath(utils.HTTP_REMOTE_COMBINE_ARCHIVE));
     document = new loc.SedDocument(file);
 
     document.delete();

@@ -33,22 +33,13 @@ describe("Sed serialise tests", () => {
       loc,
       utils.SOME_CELLML_CONTENTS,
     );
-    someSedmlContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_SEDML_CONTENTS,
-    );
+    someSedmlContentsPtr = utils.allocateMemory(loc, utils.SOME_SEDML_CONTENTS);
     someAlgebraicContentsPtr = utils.allocateMemory(
       loc,
       utils.SOME_ALGEBRAIC_CONTENTS,
     );
-    someDaeContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_DAE_CONTENTS,
-    );
-    someNlaContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_NLA_CONTENTS,
-    );
+    someDaeContentsPtr = utils.allocateMemory(loc, utils.SOME_DAE_CONTENTS);
+    someNlaContentsPtr = utils.allocateMemory(loc, utils.SOME_NLA_CONTENTS);
     someSedmlWithSimulationsContentsPtr = utils.allocateMemory(
       loc,
       utils.SOME_SEDML_WITH_SIMULATIONS_CONTENTS,
@@ -383,8 +374,7 @@ describe("Sed serialise tests", () => {
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.integrationMethod =
-      loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
+    solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {

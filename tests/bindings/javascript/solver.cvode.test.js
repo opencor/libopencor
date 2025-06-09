@@ -331,8 +331,7 @@ describe("Solver CVODE", () => {
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.integrationMethod =
-      loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
+    solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
 
     odeModel.run(
       document,

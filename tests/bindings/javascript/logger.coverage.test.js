@@ -33,10 +33,7 @@ describe("Issue coverage tests", () => {
       loc,
       utils.SOME_ERROR_CELLML_CONTENTS,
     );
-    someSedmlContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_SEDML_CONTENTS,
-    );
+    someSedmlContentsPtr = utils.allocateMemory(loc, utils.SOME_SEDML_CONTENTS);
   });
 
   afterAll(() => {
@@ -76,9 +73,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("issue()", () => {
-    const file = new loc.File(
-      utils.resourcePath(utils.ERROR_CELLML_FILE),
-    );
+    const file = new loc.File(utils.resourcePath(utils.ERROR_CELLML_FILE));
 
     file.setContents(
       someErrorCellmlContentsPtr,
@@ -122,9 +117,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("error()", () => {
-    const file = new loc.File(
-      utils.resourcePath(utils.ERROR_CELLML_FILE),
-    );
+    const file = new loc.File(utils.resourcePath(utils.ERROR_CELLML_FILE));
 
     file.setContents(
       someErrorCellmlContentsPtr,

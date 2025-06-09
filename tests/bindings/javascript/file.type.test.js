@@ -35,10 +35,7 @@ describe("File type tests", () => {
       loc,
       utils.SOME_CELLML_CONTENTS,
     );
-    someSedmlContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_SEDML_CONTENTS,
-    );
+    someSedmlContentsPtr = utils.allocateMemory(loc, utils.SOME_SEDML_CONTENTS);
     someCombineArchiveContentsPtr = utils.allocateMemory(
       loc,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS,

@@ -57,14 +57,8 @@ describe("Sed instance tests", () => {
       loc,
       utils.SOME_ALGEBRAIC_CONTENTS,
     );
-    someNlaContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_NLA_CONTENTS,
-    );
-    someDaeContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_DAE_CONTENTS,
-    );
+    someNlaContentsPtr = utils.allocateMemory(loc, utils.SOME_NLA_CONTENTS);
+    someDaeContentsPtr = utils.allocateMemory(loc, utils.SOME_DAE_CONTENTS);
     someCombineArchiveContentsPtr = utils.allocateMemory(
       loc,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS,
@@ -108,9 +102,7 @@ describe("Sed instance tests", () => {
   });
 
   test("Invalid CellML file", () => {
-    const file = new loc.File(
-      utils.resourcePath(utils.ERROR_CELLML_FILE),
-    );
+    const file = new loc.File(utils.resourcePath(utils.ERROR_CELLML_FILE));
 
     file.setContents(
       someErrorCellmlContentsPtr,
@@ -193,10 +185,7 @@ describe("Sed instance tests", () => {
     const instance = document.instantiate();
 
     expectIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The CellML file is unsuitably constrained.",
-      ],
+      [loc.Issue.Type.ERROR, "The CellML file is unsuitably constrained."],
       [
         loc.Issue.Type.ERROR,
         "Variable 'y' in component 'my_component' is computed more than once.",

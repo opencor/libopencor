@@ -40,10 +40,7 @@ describe("Sed basic tests", () => {
       loc,
       utils.SOME_CELLML_CONTENTS,
     );
-    someSedmlContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_SEDML_CONTENTS,
-    );
+    someSedmlContentsPtr = utils.allocateMemory(loc, utils.SOME_SEDML_CONTENTS);
     someSedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(
       loc,
       utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS,
@@ -78,10 +75,7 @@ describe("Sed basic tests", () => {
     utils.freeMemory(loc, someSedmlWithAbsoluteCellmlFileContentsPtr);
     utils.freeMemory(loc, someSedmlWithRemoteCellmlFileContentsPtr);
     utils.freeMemory(loc, someCombineArchiveContentsPtr);
-    utils.freeMemory(
-      loc,
-      someCombineArchiveWithNoManifestFileContentsPtr,
-    );
+    utils.freeMemory(loc, someCombineArchiveWithNoManifestFileContentsPtr);
     utils.freeMemory(loc, someCombineArchiveWithNoMasterFileContentsPtr);
     utils.freeMemory(
       loc,
@@ -142,9 +136,7 @@ describe("Sed basic tests", () => {
 
     document.delete();
 
-    const neededFile = new loc.File(
-      utils.resourcePath(utils.CELLML_FILE),
-    );
+    const neededFile = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     document = new loc.SedDocument(file);
 
