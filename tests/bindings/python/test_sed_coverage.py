@@ -93,6 +93,73 @@ def test_models():
     assert model.remove_change(None) == False
 
 
+def test_changes():
+    file = loc.File(utils.resource_path("api/sed/sed_changes.omex"))
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+
+    expected_issues_1 = [
+        [
+            loc.Issue.Type.Error,
+            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/invalid_sed_changes.omex"))
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues_1)
+
+    expected_issues_2 = [
+        [
+            loc.Issue.Type.Warning,
+            "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored.",
+        ],
+        [
+            loc.Issue.Type.Warning,
+            "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/unsupported_sed_changes.omex"))
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues_2)
+
+
 def test_simulations():
     document = loc.SedDocument()
 

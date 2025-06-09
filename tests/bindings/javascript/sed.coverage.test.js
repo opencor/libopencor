@@ -21,10 +21,25 @@ import { expectIssues } from "./utils.js";
 const loc = await libOpenCOR();
 
 describe("Sed coverage tests", () => {
+  let sedChangesContentsPtr;
+  let invalidSedChangesContentsPtr;
+  let unsupportedSedChangesContentsPtr;
   let someSolverOdeContentsPtr;
   let someSolverNla1ContentsPtr;
 
   beforeAll(() => {
+    sedChangesContentsPtr = utils.allocateMemory(
+      loc,
+      utils.SED_CHANGES_CONTENTS,
+    );
+    invalidSedChangesContentsPtr = utils.allocateMemory(
+      loc,
+      utils.INVALID_SED_CHANGES_CONTENTS,
+    );
+    unsupportedSedChangesContentsPtr = utils.allocateMemory(
+      loc,
+      utils.UNSUPPORTED_SED_CHANGES_CONTENTS,
+    );
     someSolverOdeContentsPtr = utils.allocateMemory(
       loc,
       utils.SOME_SOLVER_ODE_CONTENTS,
@@ -36,6 +51,9 @@ describe("Sed coverage tests", () => {
   });
 
   afterAll(() => {
+    utils.freeMemory(loc, sedChangesContentsPtr);
+    utils.freeMemory(loc, invalidSedChangesContentsPtr);
+    utils.freeMemory(loc, unsupportedSedChangesContentsPtr);
     utils.freeMemory(loc, someSolverOdeContentsPtr);
     utils.freeMemory(loc, someSolverNla1ContentsPtr);
   });
@@ -132,6 +150,80 @@ describe("Sed coverage tests", () => {
     model.delete();
     file.delete();
     document.delete();
+  });
+
+  test("Changes", () => {
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(sedChangesContentsPtr, utils.SED_CHANGES_CONTENTS.length);
+
+    let document = new loc.SedDocument(file);
+
+    expect(document.hasIssues).toBe(false);
+
+    file.setContents(
+      invalidSedChangesContentsPtr,
+      utils.INVALID_SED_CHANGES_CONTENTS.length,
+    );
+
+    document = new loc.SedDocument(file);
+
+    expectIssues(loc, document, [
+      [
+        loc.Issue.Type.ERROR,
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'.",
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value.",
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''.",
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'.",
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''.",
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'.",
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'.",
+      ],
+    ]);
+
+    file.setContents(
+      unsupportedSedChangesContentsPtr,
+      utils.UNSUPPORTED_SED_CHANGES_CONTENTS.length,
+    );
+
+    document = new loc.SedDocument(file);
+
+    expectIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored.",
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored.",
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored.",
+      ],
+      [
+        loc.Issue.Type.WARNING,
+        "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored.",
+      ],
+    ]);
   });
 
   test("Simulations", () => {

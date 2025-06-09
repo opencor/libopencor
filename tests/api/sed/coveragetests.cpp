@@ -95,6 +95,41 @@ TEST(CoverageSedTest, models)
     EXPECT_FALSE(model->removeChange(nullptr));
 }
 
+TEST(CoverageSedTest, changes)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/sed_changes.omex"));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_1 = {
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'."},
+        {libOpenCOR::Issue::Type::ERROR, "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."},
+    };
+
+    file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/invalid_sed_changes.omex"));
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES_1);
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_2 = {
+        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."},
+    };
+
+    file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsupported_sed_changes.omex"));
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES_2);
+}
+
 TEST(CoverageSedTest, simulations)
 {
     auto document = libOpenCOR::SedDocument::create();
