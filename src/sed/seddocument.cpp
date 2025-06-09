@@ -300,6 +300,19 @@ bool SedDocument::Impl::removeModel(const SedModelPtr &pModel)
     return false;
 }
 
+bool SedDocument::Impl::removeAllModels()
+{
+    if (!hasModels()) {
+        return false;
+    }
+
+    while (!mModels.empty()) {
+        removeModel(mModels.front());
+    }
+
+    return true;
+}
+
 bool SedDocument::Impl::hasSimulations() const
 {
     return !mSimulations.empty();
@@ -359,6 +372,19 @@ bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
     return false;
 }
 
+bool SedDocument::Impl::removeAllSimulations()
+{
+    if (!hasSimulations()) {
+        return false;
+    }
+
+    while (!mSimulations.empty()) {
+        removeSimulation(mSimulations.front());
+    }
+
+    return true;
+}
+
 bool SedDocument::Impl::hasTasks() const
 {
     return !mTasks.empty();
@@ -416,6 +442,19 @@ bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
     }
 
     return false;
+}
+
+bool SedDocument::Impl::removeAllTasks()
+{
+    if (!hasTasks()) {
+        return false;
+    }
+
+    while (!mTasks.empty()) {
+        removeTask(mTasks.front());
+    }
+
+    return true;
 }
 
 SedDocument::SedDocument()
@@ -494,6 +533,11 @@ bool SedDocument::removeModel(const SedModelPtr &pModel)
     return pimpl()->removeModel(pModel);
 }
 
+bool SedDocument::removeAllModels()
+{
+    return pimpl()->removeAllModels();
+}
+
 bool SedDocument::hasSimulations() const
 {
     return pimpl()->hasSimulations();
@@ -524,6 +568,11 @@ bool SedDocument::removeSimulation(const SedSimulationPtr &pSimulation)
     return pimpl()->removeSimulation(pSimulation);
 }
 
+bool SedDocument::removeAllSimulations()
+{
+    return pimpl()->removeAllSimulations();
+}
+
 bool SedDocument::hasTasks() const
 {
     return pimpl()->hasTasks();
@@ -552,6 +601,11 @@ bool SedDocument::addTask(const SedAbstractTaskPtr &pTask)
 bool SedDocument::removeTask(const SedAbstractTaskPtr &pTask)
 {
     return pimpl()->removeTask(pTask);
+}
+
+bool SedDocument::removeAllTasks()
+{
+    return pimpl()->removeAllTasks();
 }
 
 #ifdef __EMSCRIPTEN__

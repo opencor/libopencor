@@ -130,6 +130,19 @@ bool SedModel::Impl::removeChange(const SedChangePtr &pChange)
     return false;
 }
 
+bool SedModel::Impl::removeAllChanges()
+{
+    if (!hasChanges()) {
+        return false;
+    }
+
+    while (!mChanges.empty()) {
+        removeChange(mChanges.front());
+    }
+
+    return true;
+}
+
 void SedModel::Impl::setBasePath(const std::string &pBasePath)
 {
     mBasePath = pBasePath;
@@ -226,6 +239,11 @@ bool SedModel::addChange(const SedChangePtr &pChange)
 bool SedModel::removeChange(const SedChangePtr &pChange)
 {
     return pimpl()->removeChange(pChange);
+}
+
+bool SedModel::removeAllChanges()
+{
+    return pimpl()->removeAllChanges();
 }
 
 } // namespace libOpenCOR

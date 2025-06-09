@@ -60,11 +60,16 @@ TEST(CoverageSedTest, models)
     EXPECT_EQ(document->models().size(), 0);
 
     EXPECT_FALSE(document->removeModel(nullptr));
+    EXPECT_FALSE(document->removeAllModels());
+
+    EXPECT_TRUE(document->addModel(model));
+    EXPECT_TRUE(document->removeAllModels());
 
     EXPECT_FALSE(model->hasChanges());
     EXPECT_EQ(model->changeCount(), 0);
     EXPECT_EQ(model->changes().size(), 0);
     EXPECT_FALSE(model->addChange(nullptr));
+    EXPECT_FALSE(model->removeAllChanges());
 
     auto changeAttribute = libOpenCOR::SedChangeAttribute::create("component", "variable", "newValue");
 
@@ -79,6 +84,9 @@ TEST(CoverageSedTest, models)
 
     EXPECT_FALSE(model->addChange(changeAttribute));
     EXPECT_TRUE(model->removeChange(changeAttribute));
+
+    EXPECT_TRUE(model->addChange(changeAttribute));
+    EXPECT_TRUE(model->removeAllChanges());
 
     EXPECT_FALSE(model->hasChanges());
     EXPECT_EQ(model->changeCount(), 0);
@@ -197,6 +205,10 @@ TEST(CoverageSedTest, simulations)
     EXPECT_EQ(document->simulations().size(), 0);
 
     EXPECT_FALSE(document->removeSimulation(nullptr));
+    EXPECT_FALSE(document->removeAllSimulations());
+
+    EXPECT_TRUE(document->addSimulation(uniformTimeCourse));
+    EXPECT_TRUE(document->removeAllSimulations());
 }
 
 namespace {
@@ -269,6 +281,10 @@ TEST(CoverageSedTest, tasks)
     EXPECT_EQ(document->tasks().size(), 0);
 
     EXPECT_FALSE(document->removeTask(nullptr));
+    EXPECT_FALSE(document->removeAllTasks());
+
+    EXPECT_TRUE(document->addTask(task));
+    EXPECT_TRUE(document->removeAllTasks());
 }
 
 TEST(CoverageSedTest, odeSolver)

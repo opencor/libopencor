@@ -85,11 +85,16 @@ describe("Sed coverage tests", () => {
     expect(document.models.size()).toBe(0);
 
     expect(document.removeModel(null)).toBe(false);
+    expect(document.removeAllModels()).toBe(false);
+
+    expect(document.addModel(model)).toBe(true);
+    expect(document.removeAllModels()).toBe(true);
 
     expect(model.hasChanges).toBe(false);
     expect(model.changeCount).toBe(0);
     expect(model.changes.size()).toBe(0);
     expect(model.addChange(null)).toBe(false);
+    expect(model.removeAllChanges()).toBe(false);
 
     const changeAttribute = new libopencor.SedChangeAttribute(
       "component",
@@ -108,6 +113,9 @@ describe("Sed coverage tests", () => {
 
     expect(model.addChange(changeAttribute)).toBe(false);
     expect(model.removeChange(changeAttribute)).toBe(true);
+
+    expect(model.addChange(changeAttribute)).toBe(true);
+    expect(model.removeAllChanges()).toBe(true);
 
     expect(model.hasChanges).toBe(false);
     expect(model.changeCount).toBe(0);
@@ -227,6 +235,10 @@ describe("Sed coverage tests", () => {
     expect(document.simulations.size()).toBe(0);
 
     expect(document.removeSimulation(null)).toBe(false);
+    expect(document.removeAllSimulations()).toBe(false);
+
+    expect(document.addSimulation(uniform_time_course)).toBe(true);
+    expect(document.removeAllSimulations()).toBe(true);
 
     steady_state.delete();
     uniform_time_course.delete();
@@ -283,6 +295,10 @@ describe("Sed coverage tests", () => {
     expect(document.tasks.size()).toBe(0);
 
     expect(document.removeTask(null)).toBe(false);
+    expect(document.removeAllTasks()).toBe(false);
+
+    expect(document.addTask(task)).toBe(true);
+    expect(document.removeAllTasks()).toBe(true);
 
     task.delete();
     simulation.delete();

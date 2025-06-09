@@ -42,6 +42,7 @@ public:
     SedChangePtr change(size_t pIndex) const;
     bool addChange(const SedChangePtr &pChange);
     bool removeChange(const SedChangePtr &pChange);
+    bool removeAllChanges();
 
     void setBasePath(const std::string &pBasePath);
     void serialise(xmlNodePtr pNode) const override;

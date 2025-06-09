@@ -65,18 +65,21 @@ void sedApi()
         .function("model", &libOpenCOR::SedDocument::model)
         .function("addModel", &libOpenCOR::SedDocument::addModel)
         .function("removeModel", &libOpenCOR::SedDocument::removeModel)
+        .function("removeAllModels", &libOpenCOR::SedDocument::removeAllModels)
         .property("hasSimulations", &libOpenCOR::SedDocument::hasSimulations)
         .property("simulationCount", &libOpenCOR::SedDocument::simulationCount)
         .property("simulations", &libOpenCOR::SedDocument::simulations)
         .function("simulation", &libOpenCOR::SedDocument::simulation)
         .function("addSimulation", &libOpenCOR::SedDocument::addSimulation)
         .function("removeSimulation", &libOpenCOR::SedDocument::removeSimulation)
+        .function("removeAllSimulations", &libOpenCOR::SedDocument::removeAllSimulations)
         .property("hasTasks", &libOpenCOR::SedDocument::hasTasks)
         .property("taskCount", &libOpenCOR::SedDocument::taskCount)
         .property("tasks", &libOpenCOR::SedDocument::tasks)
         .function("task", &libOpenCOR::SedDocument::task)
         .function("addTask", &libOpenCOR::SedDocument::addTask)
         .function("removeTask", &libOpenCOR::SedDocument::removeTask)
+        .function("removeAllTasks", &libOpenCOR::SedDocument::removeAllTasks)
         .function("instantiate", &libOpenCOR::SedDocument::instantiate);
 
     // SedInstance API.
@@ -133,7 +136,8 @@ void sedApi()
         .property("changes", &libOpenCOR::SedModel::changes)
         .function("change", &libOpenCOR::SedModel::change)
         .function("addChange", &libOpenCOR::SedModel::addChange)
-        .function("removeChange", &libOpenCOR::SedModel::removeChange);
+        .function("removeChange", &libOpenCOR::SedModel::removeChange)
+        .function("removeAllChanges", &libOpenCOR::SedModel::removeAllChanges);
 
     // SedOutput API.
 

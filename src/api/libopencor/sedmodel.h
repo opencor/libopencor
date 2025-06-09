@@ -142,6 +142,15 @@ public:
 
     bool removeChange(const SedChangePtr &pChange);
 
+    /**
+     * @brief Remove all changes from this model.
+     *
+     * Remove all changes from this model.
+     *
+     * @return @c true if all changes were removed, @c false otherwise.
+     */
+    bool removeAllChanges();
+
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
