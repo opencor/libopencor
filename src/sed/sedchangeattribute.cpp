@@ -20,10 +20,10 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SedChangeAttribute::Impl::Impl(const std::string &pComponent, const std::string &pVariable,
+SedChangeAttribute::Impl::Impl(const std::string &pComponentName, const std::string &pVariableName,
                                const std::string &pNewValue)
-    : mComponent(pComponent)
-    , mVariable(pVariable)
+    : mComponentName(pComponentName)
+    , mVariableName(pVariableName)
     , mNewValue(pNewValue)
 {
     updateTarget();
@@ -36,29 +36,29 @@ void SedChangeAttribute::Impl::setTarget(const std::string &pTarget)
 
 void SedChangeAttribute::Impl::updateTarget()
 {
-    setTarget("/cellml:model/cellml:component[@name='" + mComponent + "']/cellml:variable[@name='" + mVariable + "']");
+    setTarget("/cellml:model/cellml:component[@name='" + mComponentName + "']/cellml:variable[@name='" + mVariableName + "']");
 }
 
-std::string SedChangeAttribute::Impl::component() const
+std::string SedChangeAttribute::Impl::componentName() const
 {
-    return mComponent;
+    return mComponentName;
 }
 
-void SedChangeAttribute::Impl::setComponent(const std::string &pComponent)
+void SedChangeAttribute::Impl::setComponentName(const std::string &pComponentName)
 {
-    mComponent = pComponent;
+    mComponentName = pComponentName;
 
     updateTarget();
 }
 
-std::string SedChangeAttribute::Impl::variable() const
+std::string SedChangeAttribute::Impl::variableName() const
 {
-    return mVariable;
+    return mVariableName;
 }
 
-void SedChangeAttribute::Impl::setVariable(const std::string &pVariable)
+void SedChangeAttribute::Impl::setVariableName(const std::string &pVariableName)
 {
-    mVariable = pVariable;
+    mVariableName = pVariableName;
 
     updateTarget();
 }
@@ -84,9 +84,9 @@ void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
     xmlAddChild(pNode, node);
 }
 
-SedChangeAttribute::SedChangeAttribute(const std::string &pComponent, const std::string &pVariable,
+SedChangeAttribute::SedChangeAttribute(const std::string &pComponentName, const std::string &pVariableName,
                                        const std::string &pNewValue)
-    : SedChange(new Impl(pComponent, pVariable, pNewValue))
+    : SedChange(new Impl(pComponentName, pVariableName, pNewValue))
 {
 }
 
@@ -111,24 +111,24 @@ SedChangeAttributePtr SedChangeAttribute::create(const std::string &pComponent, 
     return SedChangeAttributePtr(new SedChangeAttribute(pComponent, pVariable, pNewValue));
 }
 
-std::string SedChangeAttribute::component() const
+std::string SedChangeAttribute::componentName() const
 {
-    return pimpl()->component();
+    return pimpl()->componentName();
 }
 
-void SedChangeAttribute::setComponent(const std::string &pComponent)
+void SedChangeAttribute::setComponentName(const std::string &pComponentName)
 {
-    pimpl()->setComponent(pComponent);
+    pimpl()->setComponentName(pComponentName);
 }
 
-std::string SedChangeAttribute::variable() const
+std::string SedChangeAttribute::variableName() const
 {
-    return pimpl()->variable();
+    return pimpl()->variableName();
 }
 
-void SedChangeAttribute::setVariable(const std::string &pVariable)
+void SedChangeAttribute::setVariableName(const std::string &pVariableName)
 {
-    pimpl()->setVariable(pVariable);
+    pimpl()->setVariableName(pVariableName);
 }
 
 std::string SedChangeAttribute::newValue() const

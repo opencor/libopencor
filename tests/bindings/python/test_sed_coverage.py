@@ -120,8 +120,8 @@ def test_changes():
         change_attribute.target
         == "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']"
     )
-    assert change_attribute.component == "component"
-    assert change_attribute.variable == "variable"
+    assert change_attribute.component_name == "component"
+    assert change_attribute.variable_name == "variable"
     assert change_attribute.new_value == "123.456789"
 
     document = loc.SedDocument()
@@ -135,16 +135,16 @@ def test_changes():
         "component", "variable", "123.456789"
     )
 
-    change_attribute.component = "new_component"
-    change_attribute.variable = "new_variable"
+    change_attribute.component_name = "new_component"
+    change_attribute.variable_name = "new_variable"
     change_attribute.new_value = "987.654321"
 
     assert (
         change_attribute.target
         == "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']"
     )
-    assert change_attribute.component == "new_component"
-    assert change_attribute.variable == "new_variable"
+    assert change_attribute.component_name == "new_component"
+    assert change_attribute.variable_name == "new_variable"
     assert change_attribute.new_value == "987.654321"
 
     assert document.serialise() == sed_change_expected_serialisation(

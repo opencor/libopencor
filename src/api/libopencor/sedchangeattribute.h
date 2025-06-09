@@ -51,55 +51,55 @@ public:
      * auto simulation = libOpenCOR::SedChangeAttribute::create(component, variable, newValue);
      * ```
      *
-     * @param pComponent The component, as a @c std::string, where the target is located.
-     * @param pVariable The variable, as a @c std::string, corresponding to the target.
+     * @param pComponentName The name of the component, as a @c std::string, where the target is located.
+     * @param pVariableName The name of the variable, as a @c std::string, corresponding to the target.
      * @param pNewValue The new value, as a @c std::string, for the target.
      *
      * @return A smart pointer to a @ref SedChangeAttribute object.
      */
 
-    static SedChangeAttributePtr create(const std::string &pComponent, const std::string &pVariable,
+    static SedChangeAttributePtr create(const std::string &pComponentName, const std::string &pVariableName,
                                         const std::string &pNewValue);
 
     /**
-     * @brief Get the component.
+     * @brief Get the name of the component.
      *
-     * Get the component.
+     * Get the name of the component.
      *
-     * @return The component as a @c std::string.
+     * @return The name of the component as a @c std::string.
      */
 
-    std::string component() const;
+    std::string componentName() const;
 
     /**
-     * @brief Set the component.
+     * @brief Set the name of the component.
      *
-     * Set the component.
+     * Set the name of the component.
      *
-     * @param pComponent The component as a @c std::string.
+     * @param pComponentName The name of the component as a @c std::string.
      */
 
-    void setComponent(const std::string &pComponent);
+    void setComponentName(const std::string &pComponentName);
 
     /**
-     * @brief Get the variable.
+     * @brief Get the name of the variable.
      *
-     * Get the variable.
+     * Get the name of the variable.
      *
-     * @return The variable as a @c std::string.
+     * @return The name of the variable as a @c std::string.
      */
 
-    std::string variable() const;
+    std::string variableName() const;
 
     /**
-     * @brief Set the variable.
+     * @brief Set the name of the variable.
      *
-     * Set the variable.
+     * Set the name of the variable.
      *
-     * @param pVariable The variable as a @c std::string.
+     * @param pVariableName The name of the variable as a @c std::string.
      */
 
-    void setVariable(const std::string &pVariable);
+    void setVariableName(const std::string &pVariableName);
 
     /**
      * @brief Get the new value.
@@ -124,7 +124,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedChangeAttribute(const std::string &pComponent, const std::string &pVariable,
+    explicit SedChangeAttribute(const std::string &pComponentName, const std::string &pVariableName,
                                 const std::string &pNewValue); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */

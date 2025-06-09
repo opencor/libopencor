@@ -131,8 +131,8 @@ TEST(CoverageSedTest, changes)
     auto changeAttribute = libOpenCOR::SedChangeAttribute::create("component", "variable", "123.456789");
 
     EXPECT_EQ(changeAttribute->target(), "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']");
-    EXPECT_EQ(changeAttribute->component(), "component");
-    EXPECT_EQ(changeAttribute->variable(), "variable");
+    EXPECT_EQ(changeAttribute->componentName(), "component");
+    EXPECT_EQ(changeAttribute->variableName(), "variable");
     EXPECT_EQ(changeAttribute->newValue(), "123.456789");
 
     auto document = libOpenCOR::SedDocument::create();
@@ -144,13 +144,13 @@ TEST(CoverageSedTest, changes)
 
     EXPECT_EQ(document->serialise(), sedChangeExpectedSerialisation("component", "variable", "123.456789"));
 
-    changeAttribute->setComponent("new_component");
-    changeAttribute->setVariable("new_variable");
+    changeAttribute->setComponentName("new_component");
+    changeAttribute->setVariableName("new_variable");
     changeAttribute->setNewValue("987.654321");
 
     EXPECT_EQ(changeAttribute->target(), "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']");
-    EXPECT_EQ(changeAttribute->component(), "new_component");
-    EXPECT_EQ(changeAttribute->variable(), "new_variable");
+    EXPECT_EQ(changeAttribute->componentName(), "new_component");
+    EXPECT_EQ(changeAttribute->variableName(), "new_variable");
     EXPECT_EQ(changeAttribute->newValue(), "987.654321");
 
     EXPECT_EQ(document->serialise(), sedChangeExpectedSerialisation("new_component", "new_variable", "987.654321"));
