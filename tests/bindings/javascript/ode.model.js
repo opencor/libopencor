@@ -17,7 +17,6 @@ limitations under the License.
 import { expectValues } from "./utils.js";
 
 export function run(
-  libopencor,
   document,
   stateValues,
   rateValues,
@@ -37,7 +36,6 @@ export function run(
   const instanceTask = instance.tasks.get(0);
 
   expectValues(
-    libopencor,
     instanceTask,
     13000,
     stateValues,

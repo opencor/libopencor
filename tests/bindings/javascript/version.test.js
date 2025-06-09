@@ -16,7 +16,7 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("Version tests", () => {
   test("libOpenCOR", () => {
@@ -45,29 +45,29 @@ describe("Version tests", () => {
       i += four;
     }
 
-    expect(libopencor.version()).toBe(version);
-    expect(libopencor.versionString()).toBe(
+    expect(loc.version()).toBe(version);
+    expect(loc.versionString()).toBe(
       `${versionMajor}.${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}.${versionPatch}`,
     );
   });
 
   test("libCellML", () => {
-    expect(libopencor.libcellmlVersion()).toBe(0x000500);
-    expect(libopencor.libcellmlVersionString()).toBe("0.5.0");
+    expect(loc.libcellmlVersion()).toBe(0x000500);
+    expect(loc.libcellmlVersionString()).toBe("0.5.0");
   });
 
   test("libCOMBINE", () => {
-    expect(libopencor.libcombineVersion()).toBe(220);
-    expect(libopencor.libcombineVersionString()).toBe("0.2.20");
+    expect(loc.libcombineVersion()).toBe(220);
+    expect(loc.libcombineVersionString()).toBe("0.2.20");
   });
 
   test("libSEDML", () => {
-    expect(libopencor.libsedmlVersion()).toBe(20033);
-    expect(libopencor.libsedmlVersionString()).toBe("2.0.33");
+    expect(loc.libsedmlVersion()).toBe(20033);
+    expect(loc.libsedmlVersionString()).toBe("2.0.33");
   });
 
   test("SUNDIALS", () => {
-    expect(libopencor.sundialsVersion()).toBe(0x070300);
-    expect(libopencor.sundialsVersionString()).toBe("7.3.0");
+    expect(loc.sundialsVersion()).toBe(0x070300);
+    expect(loc.sundialsVersionString()).toBe("7.3.0");
   });
 });

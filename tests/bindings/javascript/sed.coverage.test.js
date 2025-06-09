@@ -18,20 +18,20 @@ import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 import { expectIssues } from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("Sed coverage tests", () => {
   let someSolverOdeContents;
 
   beforeAll(() => {
     someSolverOdeContents = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_SOLVER_ODE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someSolverOdeContents);
+    utils.freeMemory(loc, someSolverOdeContents);
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
@@ -48,7 +48,7 @@ describe("Sed coverage tests", () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
 `;
-    const document = new libopencor.SedDocument();
+    const document = new loc.SedDocument();
 
     expect(document.serialise()).toBe(expectedSerialisation);
 
@@ -56,15 +56,15 @@ describe("Sed coverage tests", () => {
   });
 
   test("Models", () => {
-    const document = new libopencor.SedDocument();
+    const document = new loc.SedDocument();
 
     expect(document.hasModels).toBe(false);
     expect(document.modelCount).toBe(0);
     expect(document.models.size()).toBe(0);
     expect(document.addModel(null)).toBe(false);
 
-    const file = new libopencor.File(utils.SEDML_FILE);
-    const model = new libopencor.SedModel(document, file);
+    const file = new loc.File(utils.SEDML_FILE);
+    const model = new loc.SedModel(document, file);
 
     expect(model.file).toStrictEqual(file);
 
@@ -96,7 +96,7 @@ describe("Sed coverage tests", () => {
     expect(model.addChange(null)).toBe(false);
     expect(model.removeAllChanges()).toBe(false);
 
-    const changeAttribute = new libopencor.SedChangeAttribute(
+    const changeAttribute = new loc.SedChangeAttribute(
       "component",
       "variable",
       "newValue",
@@ -143,7 +143,7 @@ describe("Sed coverage tests", () => {
   }
 
   test("Changes", () => {
-    const changeAttribute = new libopencor.SedChangeAttribute(
+    const changeAttribute = new loc.SedChangeAttribute(
       "component",
       "variable",
       "123.456789",
@@ -156,9 +156,9 @@ describe("Sed coverage tests", () => {
     expect(changeAttribute.variableName).toBe("variable");
     expect(changeAttribute.newValue).toBe("123.456789");
 
-    const document = new libopencor.SedDocument();
-    const file = new libopencor.File(utils.SEDML_FILE);
-    const model = new libopencor.SedModel(document, file);
+    const document = new loc.SedDocument();
+    const file = new loc.File(utils.SEDML_FILE);
+    const model = new loc.SedModel(document, file);
 
     expect(model.addChange(changeAttribute)).toBe(true);
     expect(document.addModel(model)).toBe(true);
@@ -188,17 +188,17 @@ describe("Sed coverage tests", () => {
   });
 
   test("Simulations", () => {
-    const document = new libopencor.SedDocument();
+    const document = new loc.SedDocument();
 
     expect(document.hasSimulations).toBe(false);
     expect(document.simulationCount).toBe(0);
     expect(document.simulations.size()).toBe(0);
     expect(document.addSimulation(null)).toBe(false);
 
-    const uniform_time_course = new libopencor.SedUniformTimeCourse(document);
-    const one_step = new libopencor.SedOneStep(document);
-    const steady_state = new libopencor.SedSteadyState(document);
-    const analysis = new libopencor.SedAnalysis(document);
+    const uniform_time_course = new loc.SedUniformTimeCourse(document);
+    const one_step = new loc.SedOneStep(document);
+    const steady_state = new loc.SedSteadyState(document);
+    const analysis = new loc.SedAnalysis(document);
 
     expect(document.addSimulation(uniform_time_course)).toBe(true);
     expect(document.addSimulation(one_step)).toBe(true);
@@ -246,17 +246,17 @@ describe("Sed coverage tests", () => {
   });
 
   test("Tasks", () => {
-    const document = new libopencor.SedDocument();
+    const document = new loc.SedDocument();
 
     expect(document.hasTasks).toBe(false);
     expect(document.taskCount).toBe(0);
     expect(document.tasks.size()).toBe(0);
     expect(document.addTask(null)).toBe(false);
 
-    const file = new libopencor.File(utils.SEDML_FILE);
-    const model = new libopencor.SedModel(document, file);
-    const simulation = new libopencor.SedUniformTimeCourse(document);
-    const task = new libopencor.SedTask(document, model, simulation);
+    const file = new loc.File(utils.SEDML_FILE);
+    const model = new loc.SedModel(document, file);
+    const simulation = new loc.SedUniformTimeCourse(document);
+    const task = new loc.SedTask(document, model, simulation);
 
     expect(task.model).not.toBe(null);
     expect(task.simulation).not.toBe(null);
@@ -282,9 +282,9 @@ describe("Sed coverage tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
-      [libopencor.Issue.Type.ERROR, "Task 'task1' requires a model."],
-      [libopencor.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
+    expectIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, "Task 'task1' requires a model."],
+      [loc.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
     ]);
 
     expect(document.addTask(task)).toBe(false);
@@ -308,12 +308,12 @@ describe("Sed coverage tests", () => {
   });
 
   test("ODE solver", () => {
-    const document = new libopencor.SedDocument();
-    const simulation = new libopencor.SedUniformTimeCourse(document);
+    const document = new loc.SedDocument();
+    const simulation = new loc.SedUniformTimeCourse(document);
 
     expect(simulation.odeSolver).toBe(null);
 
-    const solver = new libopencor.SolverCvode();
+    const solver = new loc.SolverCvode();
 
     simulation.odeSolver = solver;
 
@@ -329,12 +329,12 @@ describe("Sed coverage tests", () => {
   });
 
   test("NLA solver", () => {
-    const document = new libopencor.SedDocument();
-    const simulation = new libopencor.SedUniformTimeCourse(document);
+    const document = new loc.SedDocument();
+    const simulation = new loc.SedUniformTimeCourse(document);
 
     expect(simulation.nlaSolver).toBe(null);
 
-    const solver = new libopencor.SolverKinsol();
+    const solver = new loc.SolverKinsol();
 
     simulation.nlaSolver = solver;
 
@@ -350,9 +350,9 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedOneStep", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
-    const document = new libopencor.SedDocument(file);
-    const simulation = new libopencor.SedOneStep(document);
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const document = new loc.SedDocument(file);
+    const simulation = new loc.SedOneStep(document);
 
     expect(simulation.step).toBe(1.0);
 
@@ -366,9 +366,9 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedUniformTimeCourse", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
-    const document = new libopencor.SedDocument(file);
-    const simulation = new libopencor.SedUniformTimeCourse(document);
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const document = new loc.SedDocument(file);
+    const simulation = new loc.SedUniformTimeCourse(document);
 
     expect(simulation.initialTime).toBe(0.0);
     expect(simulation.outputStartTime).toBe(0.0);
@@ -391,17 +391,17 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedInstanceAndSedInstanceTask", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContents,
       utils.SOME_SOLVER_ODE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const solver = document.simulations.get(0).odeSolver;
 
-    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
     solver.upperHalfBandwidth = -1;
 
     const instance = document.instantiate();
@@ -469,9 +469,9 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
       ],
     ]);
@@ -482,26 +482,26 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedDocument", () => {
-    let file = new libopencor.File(
+    let file = new loc.File(
       utils.resourcePath(utils.HTTP_REMOTE_CELLML_FILE),
     );
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
     document.delete();
     file.delete();
 
-    file = new libopencor.File(
+    file = new loc.File(
       utils.resourcePath(utils.HTTP_REMOTE_SEDML_FILE),
     );
-    document = new libopencor.SedDocument(file);
+    document = new loc.SedDocument(file);
 
     document.delete();
     file.delete();
 
-    file = new libopencor.File(
+    file = new loc.File(
       utils.resourcePath(utils.HTTP_REMOTE_COMBINE_ARCHIVE),
     );
-    document = new libopencor.SedDocument(file);
+    document = new loc.SedDocument(file);
 
     document.delete();
     file.delete();
@@ -510,16 +510,16 @@ describe("Sed coverage tests", () => {
   test("Solver", () => {
     // Get the duplicate() method of different solvers to be covered.
 
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(
       someSolverOdeContents,
       utils.SOME_SOLVER_ODE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
-    let solver = new libopencor.SolverForwardEuler();
+    let solver = new loc.SolverForwardEuler();
 
     simulation.odeSolver = solver;
 
@@ -532,7 +532,7 @@ describe("Sed coverage tests", () => {
     instance.delete();
     solver.delete();
 
-    solver = new libopencor.SolverFourthOrderRungeKutta();
+    solver = new loc.SolverFourthOrderRungeKutta();
 
     simulation.odeSolver = solver;
 
@@ -545,7 +545,7 @@ describe("Sed coverage tests", () => {
     instance.delete();
     solver.delete();
 
-    solver = new libopencor.SolverHeun();
+    solver = new loc.SolverHeun();
 
     simulation.odeSolver = solver;
 
@@ -558,7 +558,7 @@ describe("Sed coverage tests", () => {
     instance.delete();
     solver.delete();
 
-    solver = new libopencor.SolverSecondOrderRungeKutta();
+    solver = new loc.SolverSecondOrderRungeKutta();
 
     simulation.odeSolver = solver;
 

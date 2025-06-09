@@ -17,7 +17,7 @@ limitations under the License.
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("Issue coverage tests", () => {
   let someCellmlContentsPtr;
@@ -26,27 +26,27 @@ describe("Issue coverage tests", () => {
 
   beforeAll(() => {
     someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_CELLML_CONTENTS,
     );
     someErrorCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_ERROR_CELLML_CONTENTS,
     );
     someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_SEDML_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someErrorCellmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
+    utils.freeMemory(loc, someCellmlContentsPtr);
+    utils.freeMemory(loc, someErrorCellmlContentsPtr);
+    utils.freeMemory(loc, someSedmlContentsPtr);
   });
 
   test("hasIssues", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -56,7 +56,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("issueCount", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -66,7 +66,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("issues", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -76,7 +76,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("issue()", () => {
-    const file = new libopencor.File(
+    const file = new loc.File(
       utils.resourcePath(utils.ERROR_CELLML_FILE),
     );
 
@@ -92,7 +92,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("hasErrors", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -102,7 +102,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("errorCount", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -112,7 +112,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("errors", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -122,7 +122,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("error()", () => {
-    const file = new libopencor.File(
+    const file = new loc.File(
       utils.resourcePath(utils.ERROR_CELLML_FILE),
     );
 
@@ -138,7 +138,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("hasWarnings", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -148,7 +148,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("warningCount", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -158,7 +158,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("warnings", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -168,11 +168,11 @@ describe("Issue coverage tests", () => {
   });
 
   test("warning()", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.warning(0)).not.toBeNull();
     expect(document.warning(document.warningCount)).toBeNull();

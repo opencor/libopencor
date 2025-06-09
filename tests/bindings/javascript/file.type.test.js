@@ -18,7 +18,7 @@ import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 import { expectIssues } from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("File type tests", () => {
   let someUnknownContentsPtr;
@@ -28,42 +28,42 @@ describe("File type tests", () => {
 
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_UNKNOWN_CONTENTS,
     );
     someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_CELLML_CONTENTS,
     );
     someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_SEDML_CONTENTS,
     );
     someCombineArchiveContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
-    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
+    utils.freeMemory(loc, someUnknownContentsPtr);
+    utils.freeMemory(loc, someCellmlContentsPtr);
+    utils.freeMemory(loc, someSedmlContentsPtr);
+    utils.freeMemory(loc, someCombineArchiveContentsPtr);
   });
 
   test("Unknown file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.UNKNOWN_FILE));
+    const file = new loc.File(utils.resourcePath(utils.UNKNOWN_FILE));
 
     file.setContents(
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
-    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
-    expectIssues(libopencor, file, [
+    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
+    expectIssues(loc, file, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
       ],
     ]);
@@ -72,34 +72,34 @@ describe("File type tests", () => {
   });
 
   test("CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    expect(file.type.value).toBe(libopencor.File.Type.CELLML_FILE.value);
+    expect(file.type.value).toBe(loc.File.Type.CELLML_FILE.value);
 
     file.delete();
   });
 
   test("SED-ML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
-    expect(file.type.value).toBe(libopencor.File.Type.SEDML_FILE.value);
+    expect(file.type.value).toBe(loc.File.Type.SEDML_FILE.value);
 
     file.delete();
   });
 
   test("COMBINE archive", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
 
     file.setContents(
       someCombineArchiveContentsPtr,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    expect(file.type.value).toBe(libopencor.File.Type.COMBINE_ARCHIVE.value);
+    expect(file.type.value).toBe(loc.File.Type.COMBINE_ARCHIVE.value);
 
     file.delete();
   });

@@ -121,7 +121,7 @@ export const SOME_UNSUITABLY_CONSTRAINED_CONTENTS = stringToArrayBuffer(
   `@SOME_UNSUITABLY_CONSTRAINED_CONTENTS@`,
 );
 
-export function expectIssues(libopencor, logger, expectedIssues) {
+export function expectIssues(loc, logger, expectedIssues) {
   const issues = logger.issues;
 
   expect(issues.size()).toBe(expectedIssues.length);
@@ -130,7 +130,7 @@ export function expectIssues(libopencor, logger, expectedIssues) {
     expect(issues.get(i).type.value).toBe(expectedIssues[i][0].value);
     expect(issues.get(i).description).toBe(expectedIssues[i][1]);
 
-    if (issues.get(i).type === libopencor.Issue.Type.ERROR) {
+    if (issues.get(i).type === loc.Issue.Type.ERROR) {
       expect(issues.get(i).typeAsString).toBe("Error");
     } else {
       expect(issues.get(i).typeAsString).toBe("Warning");
@@ -139,7 +139,6 @@ export function expectIssues(libopencor, logger, expectedIssues) {
 }
 
 export function expectValues(
-  libopencor,
   instanceTask,
   index,
   stateValues,

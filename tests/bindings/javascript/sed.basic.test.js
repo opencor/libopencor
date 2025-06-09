@@ -18,7 +18,7 @@ import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 import { expectIssues } from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("Sed basic tests", () => {
   let someUnknownContentsPtr;
@@ -33,64 +33,64 @@ describe("Sed basic tests", () => {
 
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_UNKNOWN_CONTENTS,
     );
     someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_CELLML_CONTENTS,
     );
     someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_SEDML_CONTENTS,
     );
     someSedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS,
     );
     someSedmlWithRemoteCellmlFileContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS,
     );
     someCombineArchiveContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS,
     );
     someCombineArchiveWithNoManifestFileContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS,
     );
     someCombineArchiveWithNoMasterFileContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS,
     );
     someCombineArchiveWithSbmlFileAsMasterFileContentsPtr =
       utils.allocateMemory(
-        libopencor,
+        loc,
         utils.SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS,
       );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlWithAbsoluteCellmlFileContentsPtr);
-    utils.freeMemory(libopencor, someSedmlWithRemoteCellmlFileContentsPtr);
-    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
+    utils.freeMemory(loc, someUnknownContentsPtr);
+    utils.freeMemory(loc, someCellmlContentsPtr);
+    utils.freeMemory(loc, someSedmlContentsPtr);
+    utils.freeMemory(loc, someSedmlWithAbsoluteCellmlFileContentsPtr);
+    utils.freeMemory(loc, someSedmlWithRemoteCellmlFileContentsPtr);
+    utils.freeMemory(loc, someCombineArchiveContentsPtr);
     utils.freeMemory(
-      libopencor,
+      loc,
       someCombineArchiveWithNoManifestFileContentsPtr,
     );
-    utils.freeMemory(libopencor, someCombineArchiveWithNoMasterFileContentsPtr);
+    utils.freeMemory(loc, someCombineArchiveWithNoMasterFileContentsPtr);
     utils.freeMemory(
-      libopencor,
+      loc,
       someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,
     );
   });
 
   test("No file", () => {
-    const document = new libopencor.SedDocument();
+    const document = new loc.SedDocument();
 
     expect(document.hasIssues).toBe(false);
 
@@ -98,18 +98,18 @@ describe("Sed basic tests", () => {
   });
 
   test("Unknown file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.UNKNOWN_FILE));
+    const file = new loc.File(utils.resourcePath(utils.UNKNOWN_FILE));
 
     file.setContents(
       someUnknownContentsPtr,
       utils.SOME_UNKNOWN_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using an unknown file.",
       ],
     ]);
@@ -119,11 +119,11 @@ describe("Sed basic tests", () => {
   });
 
   test("CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -132,21 +132,21 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(true);
 
     document.delete();
 
-    const neededFile = new libopencor.File(
+    const neededFile = new loc.File(
       utils.resourcePath(utils.CELLML_FILE),
     );
 
-    document = new libopencor.SedDocument(file);
+    document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -156,22 +156,22 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file with absolute CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(
       someSedmlWithAbsoluteCellmlFileContentsPtr,
       utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS.length,
     );
 
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(true);
 
     document.delete();
 
-    const neededFile = new libopencor.File(utils.LOCAL_FILE);
+    const neededFile = new loc.File(utils.LOCAL_FILE);
 
-    document = new libopencor.SedDocument(file);
+    document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -181,22 +181,22 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file with remote CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(
       someSedmlWithRemoteCellmlFileContentsPtr,
       utils.SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS.length,
     );
 
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(true);
 
     document.delete();
 
-    const neededFile = new libopencor.File(utils.REMOTE_FILE);
+    const neededFile = new loc.File(utils.REMOTE_FILE);
 
-    document = new libopencor.SedDocument(file);
+    document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -206,14 +206,14 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
 
     file.setContents(
       someCombineArchiveContentsPtr,
       utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -222,18 +222,18 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive with no manifest file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
 
     file.setContents(
       someCombineArchiveWithNoManifestFileContentsPtr,
       utils.SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
       ],
     ]);
@@ -243,18 +243,18 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive with no master file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
 
     file.setContents(
       someCombineArchiveWithNoMasterFileContentsPtr,
       utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
       ],
     ]);
@@ -264,18 +264,18 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive with SBML file as master file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
 
     file.setContents(
       someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,
       utils.SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
       ],
     ]);

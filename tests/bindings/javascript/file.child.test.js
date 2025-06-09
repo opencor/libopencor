@@ -17,7 +17,7 @@ limitations under the License.
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("File type tests", () => {
   let dataset135OmexContentsPtr;
@@ -27,28 +27,28 @@ describe("File type tests", () => {
 
   beforeAll(() => {
     dataset135OmexContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.DATASET_135_OMEX_CONTENTS,
     );
     dataset135JsonContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.DATASET_135_JSON_CONTENTS,
     );
     dataset157OmexContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.DATASET_157_OMEX_CONTENTS,
     );
     dataset157JsonContentsPtr = utils.allocateMemory(
-      libopencor,
+      loc,
       utils.DATASET_157_JSON_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, dataset135OmexContentsPtr);
-    utils.freeMemory(libopencor, dataset135JsonContentsPtr);
-    utils.freeMemory(libopencor, dataset157OmexContentsPtr);
-    utils.freeMemory(libopencor, dataset157JsonContentsPtr);
+    utils.freeMemory(loc, dataset135OmexContentsPtr);
+    utils.freeMemory(loc, dataset135JsonContentsPtr);
+    utils.freeMemory(loc, dataset157OmexContentsPtr);
+    utils.freeMemory(loc, dataset157JsonContentsPtr);
   });
 
   function doTestDataset(
@@ -57,7 +57,7 @@ describe("File type tests", () => {
     jsonContents,
     specificChildFileNames,
   ) {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
 
     file.setContents(omexContentsPtr, omexContents.length);
 
@@ -88,7 +88,7 @@ describe("File type tests", () => {
   }
 
   test("No child files", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.UNKNOWN_FILE));
+    const file = new loc.File(utils.resourcePath(utils.UNKNOWN_FILE));
 
     expect(file.hasChildFiles).toBe(false);
     expect(file.childFileCount).toBe(0);
