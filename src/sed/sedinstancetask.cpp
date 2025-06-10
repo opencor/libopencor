@@ -134,6 +134,11 @@ std::string name(const libcellml::VariablePtr &pVariable)
     return name(component->name(), pVariable->name());
 }
 
+libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable)
+{
+    return std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
+}
+
 } // namespace
 
 void SedInstanceTask::Impl::applyChanges()
@@ -150,6 +155,16 @@ void SedInstanceTask::Impl::applyChanges()
         // Note: a change cannot be for a variable of integration or a rate, so we don't check for those.
 
         auto changeName = name(changeAttribute->componentName(), changeAttribute->variableName());
+
+        if (voiName() == changeName) {
+            auto voiVariable = mAnalyserModel->voi()->variable();
+            auto voiComponent = owningComponent(voiVariable);
+
+            addWarning(std::string("The variable of integration '").append(voiVariable->name()).append("' in component '").append(voiComponent->name()).append("'cannot be changed. Only state variables and constants can be changed."));
+
+            continue;
+        }
+
         auto isParameterSet = false;
 
         for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
@@ -177,7 +192,10 @@ void SedInstanceTask::Impl::applyChanges()
         if (!isParameterSet) {
             for (size_t i = 0; i < mAnalyserModel->computedConstantCount(); ++i) {
                 if (computedConstantName(i) == changeName) {
-                    mComputedConstants[i] = toDouble(changeAttribute->newValue()); // NOLINT
+                    auto computedConstantVariable = mAnalyserModel->computedConstants()[i]->variable();
+                    auto computedConstantComponent = owningComponent(computedConstantVariable);
+
+                    addWarning(std::string("The computed constant '").append(computedConstantVariable->name()).append("' in component '").append(computedConstantComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
 
                     isParameterSet = true;
 
@@ -189,7 +207,10 @@ void SedInstanceTask::Impl::applyChanges()
         if (!isParameterSet) {
             for (size_t i = 0; i < mAnalyserModel->algebraicCount(); ++i) {
                 if (algebraicName(i) == changeName) {
-                    mAlgebraic[i] = toDouble(changeAttribute->newValue()); // NOLINT
+                    auto algebraicVariable = mAnalyserModel->algebraic()[i]->variable();
+                    auto algebraicComponent = owningComponent(algebraicVariable);
+
+                    addWarning(std::string("The algebraic variable '").append(algebraicVariable->name()).append("' in component '").append(algebraicComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
 
                     break;
                 }
