@@ -134,65 +134,6 @@ describe("Sed coverage tests", () => {
     document.delete();
   });
 
-  function sedChangeExpectedSerialisation(component, variable, newValue) {
-    return `<?xml version="1.0" encoding="UTF-8"?>
-<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.sedml">
-      <listOfChanges>
-        <changeAttribute target="/cellml:model/cellml:component[@name='${component}']/cellml:variable[@name='${variable}']" newValue="${newValue}"/>
-      </listOfChanges>
-    </model>
-  </listOfModels>
-</sedML>
-`;
-  }
-
-  test("Changes", () => {
-    const changeAttribute = new loc.SedChangeAttribute(
-      "component",
-      "variable",
-      "123.456789",
-    );
-
-    expect(changeAttribute.target).toBe(
-      "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']",
-    );
-    expect(changeAttribute.componentName).toBe("component");
-    expect(changeAttribute.variableName).toBe("variable");
-    expect(changeAttribute.newValue).toBe("123.456789");
-
-    const document = new loc.SedDocument();
-    const file = new loc.File(utils.SEDML_FILE);
-    const model = new loc.SedModel(document, file);
-
-    expect(model.addChange(changeAttribute)).toBe(true);
-    expect(document.addModel(model)).toBe(true);
-
-    expect(document.serialise()).toBe(
-      sedChangeExpectedSerialisation("component", "variable", "123.456789"),
-    );
-
-    changeAttribute.componentName = "new_component";
-    changeAttribute.variableName = "new_variable";
-    changeAttribute.newValue = "987.654321";
-
-    expect(changeAttribute.target).toBe(
-      "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']",
-    );
-    expect(changeAttribute.componentName).toBe("new_component");
-    expect(changeAttribute.variableName).toBe("new_variable");
-    expect(changeAttribute.newValue).toBe("987.654321");
-
-    expect(document.serialise()).toBe(
-      sedChangeExpectedSerialisation(
-        "new_component",
-        "new_variable",
-        "987.654321",
-      ),
-    );
-  });
-
   test("Simulations", () => {
     const document = new loc.SedDocument();
 

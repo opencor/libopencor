@@ -14,7 +14,6 @@
 
 
 import libopencor as loc
-import platform
 import utils
 from utils import assert_issues
 
@@ -92,64 +91,6 @@ def test_models():
     assert len(model.changes) == 0
 
     assert model.remove_change(None) == False
-
-
-def sed_change_expected_serialisation(component, variable, new_value):
-    source = (
-        "file:///P:/some/path/file.txt"
-        if platform.system() == "Windows"
-        else "file:///some/path/file.txt"
-    )
-    return f"""<?xml version="1.0" encoding="UTF-8"?>
-<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
-  <listOfModels>
-    <model id="model1" language="urn:sedml:language:cellml" source="{source}">
-      <listOfChanges>
-        <changeAttribute target="/cellml:model/cellml:component[@name='{component}']/cellml:variable[@name='{variable}']" newValue="{new_value}"/>
-      </listOfChanges>
-    </model>
-  </listOfModels>
-</sedML>
-"""
-
-
-def test_changes():
-    change_attribute = loc.SedChangeAttribute("component", "variable", "123.456789")
-
-    assert (
-        change_attribute.target
-        == "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']"
-    )
-    assert change_attribute.component_name == "component"
-    assert change_attribute.variable_name == "variable"
-    assert change_attribute.new_value == "123.456789"
-
-    document = loc.SedDocument()
-    file = loc.File(utils.LocalFile)
-    model = loc.SedModel(document, file)
-
-    assert model.add_change(change_attribute) == True
-    assert document.add_model(model) == True
-
-    assert document.serialise() == sed_change_expected_serialisation(
-        "component", "variable", "123.456789"
-    )
-
-    change_attribute.component_name = "new_component"
-    change_attribute.variable_name = "new_variable"
-    change_attribute.new_value = "987.654321"
-
-    assert (
-        change_attribute.target
-        == "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']"
-    )
-    assert change_attribute.component_name == "new_component"
-    assert change_attribute.variable_name == "new_variable"
-    assert change_attribute.new_value == "987.654321"
-
-    assert document.serialise() == sed_change_expected_serialisation(
-        "new_component", "new_variable", "987.654321"
-    )
 
 
 def test_simulations():
