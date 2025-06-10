@@ -143,74 +143,64 @@ Logger::Logger(Impl *pPimpl)
 {
 }
 
-Logger::Impl *Logger::pimpl()
-{
-    return mPimpl;
-}
-
-const Logger::Impl *Logger::pimpl() const
-{
-    return mPimpl;
-}
-
 bool Logger::hasIssues() const
 {
-    return pimpl()->hasIssues();
+    return mPimpl->hasIssues();
 }
 
 size_t Logger::issueCount() const
 {
-    return pimpl()->issueCount();
+    return mPimpl->issueCount();
 }
 
 IssuePtrs Logger::issues() const
 {
-    return pimpl()->issues();
+    return mPimpl->issues();
 }
 
 IssuePtr Logger::issue(size_t pIndex) const
 {
-    return pimpl()->issue(pIndex);
+    return mPimpl->issue(pIndex);
 }
 
 bool Logger::hasErrors() const
 {
-    return pimpl()->hasErrors();
+    return mPimpl->hasErrors();
 }
 
 size_t Logger::errorCount() const
 {
-    return pimpl()->errorCount();
+    return mPimpl->errorCount();
 }
 
 IssuePtrs Logger::errors() const
 {
-    return pimpl()->errors();
+    return mPimpl->errors();
 }
 
 IssuePtr Logger::error(size_t pIndex) const
 {
-    return pimpl()->error(pIndex);
+    return mPimpl->error(pIndex);
 }
 
 bool Logger::hasWarnings() const
 {
-    return pimpl()->hasWarnings();
+    return mPimpl->hasWarnings();
 }
 
 size_t Logger::warningCount() const
 {
-    return pimpl()->warningCount();
+    return mPimpl->warningCount();
 }
 
 IssuePtrs Logger::warnings() const
 {
-    return pimpl()->warnings();
+    return mPimpl->warnings();
 }
 
 IssuePtr Logger::warning(size_t pIndex) const
 {
-    return pimpl()->warning(pIndex);
+    return mPimpl->warning(pIndex);
 }
 
 } // namespace libOpenCOR

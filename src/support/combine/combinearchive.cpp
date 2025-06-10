@@ -118,12 +118,12 @@ CombineArchive::~CombineArchive()
 
 CombineArchive::Impl *CombineArchive::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const CombineArchive::Impl *CombineArchive::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 CombineArchivePtr CombineArchive::create(const FilePtr &pFile)

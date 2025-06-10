@@ -462,7 +462,7 @@ TEST(SerialiseSedTest, oneStepSimulation)
 
 TEST(SerialiseSedTest, sedmlFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::WARNING, "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it."},
     };
     static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
@@ -498,13 +498,13 @@ TEST(SerialiseSedTest, sedmlFile)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(document, expectedIssues);
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
 TEST(SerialiseSedTest, sedSimulation)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::WARNING, "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead."},
         {libOpenCOR::Issue::Type::WARNING, "The parameter 'KISAO:1234567' is not recognised. It will be ignored."},
         {libOpenCOR::Issue::Type::WARNING, "The step ('KISAO:0000483') cannot be equal to '-1.23'. It must be greater or equal to 0. A step of 1 will be used instead."},
@@ -787,6 +787,6 @@ TEST(SerialiseSedTest, sedSimulation)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/simulations.sedml"));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    // EXPECT_EQ_ISSUES(document, expectedIssues);
+    // EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }

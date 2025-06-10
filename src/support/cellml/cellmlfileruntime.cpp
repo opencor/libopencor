@@ -261,12 +261,12 @@ CellmlFileRuntime::~CellmlFileRuntime()
 
 CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,

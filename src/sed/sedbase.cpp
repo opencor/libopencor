@@ -47,12 +47,12 @@ SedBase::SedBase(Impl *pPimpl)
 
 SedBase::Impl *SedBase::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const SedBase::Impl *SedBase::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 std::string SedBase::id() const

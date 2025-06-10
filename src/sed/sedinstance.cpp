@@ -127,12 +127,12 @@ SedInstance::~SedInstance()
 
 SedInstance::Impl *SedInstance::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const SedInstance::Impl *SedInstance::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 double SedInstance::run()

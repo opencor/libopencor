@@ -71,12 +71,12 @@ Solver::Solver(Impl *pPimpl)
 
 Solver::Impl *Solver::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const Solver::Impl *Solver::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 std::string Solver::id() const

@@ -469,12 +469,12 @@ SedDocument::~SedDocument()
 
 SedDocument::Impl *SedDocument::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const SedDocument::Impl *SedDocument::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 SedDocumentPtr SedDocument::create(const FilePtr &pFile)

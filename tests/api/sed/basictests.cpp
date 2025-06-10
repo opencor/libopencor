@@ -27,14 +27,14 @@ TEST(BasicSedTest, noFile)
 
 TEST(BasicSedTest, unknownFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an unknown file."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(document, expectedIssues);
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
 TEST(BasicSedTest, cellmlFile)
@@ -97,48 +97,48 @@ TEST(BasicSedTest, combineArchive)
 
 TEST(BasicSedTest, combineArchiveWithNoManifestFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with no master file."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_manifest_file.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(document, expectedIssues);
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
 TEST(BasicSedTest, combineArchiveWithNoMasterFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with no master file."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/no_master_file.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(document, expectedIssues);
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
 TEST(BasicSedTest, combineArchiveWithSbmlFileAsMasterFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported)."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/sbml_file_as_master_file.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(document, expectedIssues);
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
 
 TEST(BasicSedTest, irretrievableFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an irretrievable file."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE));
     auto document = libOpenCOR::SedDocument::create(file);
 
-    EXPECT_EQ_ISSUES(document, expectedIssues);
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
 }
