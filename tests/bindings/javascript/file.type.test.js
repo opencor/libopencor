@@ -50,7 +50,7 @@ describe("File type tests", () => {
   });
 
   test("Unknown file", () => {
-    const file = new loc.File(utils.resourcePath(utils.UNKNOWN_FILE));
+    const file = new loc.File(utils.UNKNOWN_FILE);
 
     file.setContents(
       someUnknownContentsPtr,
@@ -69,7 +69,7 @@ describe("File type tests", () => {
   });
 
   test("CellML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -79,7 +79,7 @@ describe("File type tests", () => {
   });
 
   test("SED-ML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
@@ -89,7 +89,7 @@ describe("File type tests", () => {
   });
 
   test("COMBINE archive", () => {
-    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       someCombineArchiveContentsPtr,

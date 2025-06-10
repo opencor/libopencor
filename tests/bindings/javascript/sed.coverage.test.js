@@ -21,23 +21,23 @@ import { expectIssues } from "./utils.js";
 const loc = await libOpenCOR();
 
 describe("Sed coverage tests", () => {
-  let someSolverOdeContents;
-  let someSolverNla1Contents;
+  let someSolverOdeContentsPtr;
+  let someSolverNla1ContentsPtr;
 
   beforeAll(() => {
-    someSolverOdeContents = utils.allocateMemory(
+    someSolverOdeContentsPtr = utils.allocateMemory(
       loc,
       utils.SOME_SOLVER_ODE_CONTENTS,
     );
-    someSolverNla1Contents = utils.allocateMemory(
+    someSolverNla1ContentsPtr = utils.allocateMemory(
       loc,
       utils.SOME_SOLVER_NLA1_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(loc, someSolverOdeContents);
-    utils.freeMemory(loc, someSolverNla1Contents);
+    utils.freeMemory(loc, someSolverOdeContentsPtr);
+    utils.freeMemory(loc, someSolverNla1ContentsPtr);
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
@@ -356,7 +356,7 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedOneStep", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedOneStep(document);
 
@@ -372,7 +372,7 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedUniformTimeCourse", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedUniformTimeCourse(document);
 
@@ -397,10 +397,10 @@ describe("Sed coverage tests", () => {
   });
 
   test("SedInstanceAndSedInstanceTaskDifferentialModel", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverOdeContents,
+      someSolverOdeContentsPtr,
       utils.SOME_SOLVER_ODE_CONTENTS.length,
     );
 
@@ -489,10 +489,10 @@ describe("Sed coverage tests", () => {
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("SedInstanceAndSedInstanceTaskNonDifferentialModel", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla1Contents,
+      someSolverNla1ContentsPtr,
       utils.SOME_SOLVER_NLA1_CONTENTS.length,
     );
 
@@ -525,19 +525,19 @@ describe("Sed coverage tests", () => {
   */
 
   test("SedDocument", () => {
-    let file = new loc.File(utils.resourcePath(utils.HTTP_REMOTE_CELLML_FILE));
+    let file = new loc.File(utils.HTTP_REMOTE_CELLML_FILE);
     let document = new loc.SedDocument(file);
 
     document.delete();
     file.delete();
 
-    file = new loc.File(utils.resourcePath(utils.HTTP_REMOTE_SEDML_FILE));
+    file = new loc.File(utils.HTTP_REMOTE_SEDML_FILE);
     document = new loc.SedDocument(file);
 
     document.delete();
     file.delete();
 
-    file = new loc.File(utils.resourcePath(utils.HTTP_REMOTE_COMBINE_ARCHIVE));
+    file = new loc.File(utils.HTTP_REMOTE_COMBINE_ARCHIVE);
     document = new loc.SedDocument(file);
 
     document.delete();
@@ -547,10 +547,10 @@ describe("Sed coverage tests", () => {
   test("Solver", () => {
     // Get the duplicate() method of different solvers to be covered.
 
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverOdeContents,
+      someSolverOdeContentsPtr,
       utils.SOME_SOLVER_ODE_CONTENTS.length,
     );
 

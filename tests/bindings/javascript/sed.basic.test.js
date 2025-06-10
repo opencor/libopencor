@@ -92,7 +92,7 @@ describe("Sed basic tests", () => {
   });
 
   test("Unknown file", () => {
-    const file = new loc.File(utils.resourcePath(utils.UNKNOWN_FILE));
+    const file = new loc.File(utils.UNKNOWN_FILE);
 
     file.setContents(
       someUnknownContentsPtr,
@@ -113,7 +113,7 @@ describe("Sed basic tests", () => {
   });
 
   test("CellML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -126,7 +126,7 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 
@@ -136,7 +136,7 @@ describe("Sed basic tests", () => {
 
     document.delete();
 
-    const neededFile = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const neededFile = new loc.File(utils.CELLML_FILE);
 
     document = new loc.SedDocument(file);
 
@@ -148,7 +148,7 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file with absolute CellML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(
       someSedmlWithAbsoluteCellmlFileContentsPtr,
@@ -173,7 +173,7 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file with remote CellML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(
       someSedmlWithRemoteCellmlFileContentsPtr,
@@ -198,7 +198,7 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive", () => {
-    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       someCombineArchiveContentsPtr,
@@ -214,7 +214,7 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive with no manifest file", () => {
-    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       someCombineArchiveWithNoManifestFileContentsPtr,
@@ -235,7 +235,7 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive with no master file", () => {
-    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       someCombineArchiveWithNoMasterFileContentsPtr,
@@ -256,7 +256,7 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive with SBML file as master file", () => {
-    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,

@@ -102,7 +102,7 @@ describe("Sed instance tests", () => {
   });
 
   test("Invalid CellML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.ERROR_CELLML_FILE));
+    const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(
       someErrorCellmlContentsPtr,
@@ -126,7 +126,7 @@ describe("Sed instance tests", () => {
   });
 
   test("Overconstrained CellML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
       someOverconstrainedContentsPtr,
@@ -150,7 +150,7 @@ describe("Sed instance tests", () => {
   });
 
   test("Underconstrained CellML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
       someUnderconstrainedContentsPtr,
@@ -174,7 +174,7 @@ describe("Sed instance tests", () => {
   });
 
   test("Unsuitably constrained CellML file", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
       someUnsuitablyConstrainedContentsPtr,
@@ -202,7 +202,7 @@ describe("Sed instance tests", () => {
   });
 
   test("Algebraic model", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
       someAlgebraicContentsPtr,
@@ -222,7 +222,7 @@ describe("Sed instance tests", () => {
   });
 
   test("ODE model", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -261,7 +261,7 @@ describe("Sed instance tests", () => {
   });
 
   test("ODE model with no ODE solver", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -285,7 +285,7 @@ describe("Sed instance tests", () => {
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("NLA model", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -319,7 +319,7 @@ describe("Sed instance tests", () => {
   });
 
   test("NLA model with no NLA solver", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
 
@@ -344,7 +344,7 @@ describe("Sed instance tests", () => {
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("DAE model", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
@@ -390,7 +390,7 @@ describe("Sed instance tests", () => {
   */
 
   test("DAE model with no ODE or NLA solver", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
 
@@ -421,7 +421,7 @@ describe("Sed instance tests", () => {
   });
 
   test("COMBINE archive", () => {
-    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       someCombineArchiveContentsPtr,
@@ -441,7 +441,7 @@ describe("Sed instance tests", () => {
   });
 
   test("COMBINE archive with CellML file as master file", () => {
-    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       someCombineArchiveWithCellmlFileAsMasterFileContentsPtr,

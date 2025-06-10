@@ -92,7 +92,7 @@ describe("File coverage tests", () => {
   });
 
   test("Unmanage file with children", () => {
-    const file = new loc.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
     const fileManager = loc.FileManager.instance();
 
     file.setContents(

@@ -43,7 +43,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("hasIssues", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -53,7 +53,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("issueCount", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -63,7 +63,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("issues", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -73,7 +73,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("issue()", () => {
-    const file = new loc.File(utils.resourcePath(utils.ERROR_CELLML_FILE));
+    const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(
       someErrorCellmlContentsPtr,
@@ -87,7 +87,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("hasErrors", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -97,7 +97,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("errorCount", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -107,7 +107,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("errors", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -117,7 +117,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("error()", () => {
-    const file = new loc.File(utils.resourcePath(utils.ERROR_CELLML_FILE));
+    const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(
       someErrorCellmlContentsPtr,
@@ -131,7 +131,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("hasWarnings", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -141,7 +141,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("warningCount", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -151,7 +151,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("warnings", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
 
@@ -161,7 +161,7 @@ describe("Issue coverage tests", () => {
   });
 
   test("warning()", () => {
-    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
 

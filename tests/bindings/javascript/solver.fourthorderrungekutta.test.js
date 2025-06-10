@@ -36,7 +36,7 @@ describe("Solver Fourth-Order Runge-Kutta", () => {
   });
 
   test("Step value with invalid number", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
@@ -67,7 +67,7 @@ describe("Solver Fourth-Order Runge-Kutta", () => {
   });
 
   test("Solve", () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
       someSolverOdeContentsPtr,
