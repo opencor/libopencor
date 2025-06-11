@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
+
 #include "tests/utils.h"
 
 #include <libopencor>
@@ -95,12 +97,67 @@ TEST(CoverageSedTest, models)
     EXPECT_FALSE(model->removeChange(nullptr));
 }
 
+namespace {
+
+std::string sedChangesExpectedSerialisation(const std::string &pSource, const std::string &pChanges)
+{
+    return std::string(R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model" language="urn:sedml:language:cellml" source="file://)")
+        .append(
+#ifdef BUILDING_USING_MSVC
+            std::string("/").append(libOpenCOR::forwardSlashPath(pSource))
+#else
+            pSource
+#endif
+                )
+        .append(pChanges.empty() ? R"("/>)" : std::string(R"(">
+      <listOfChanges>)")
+                                                  .append(pChanges)
+                                                  .append(R"(      </listOfChanges>
+    </model>)"))
+        .append(R"(
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+  <listOfTasks>
+    <task id="task1" modelReference="model" simulationReference="simulation1"/>
+  </listOfTasks>
+</sedML>
+)");
+}
+
+} // namespace
+
 TEST(CoverageSedTest, changes)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/sed_changes.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
 
     EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->serialise(), sedChangesExpectedSerialisation(file->childFile(1)->path(), R"(
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='beta']" newValue="3.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='rho']" newValue="13.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='sigma']" newValue="9.0"/>
+)"));
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_1 = {
         {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'."},
@@ -116,6 +173,9 @@ TEST(CoverageSedTest, changes)
     document = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES_1);
+    EXPECT_EQ(document->serialise(), sedChangesExpectedSerialisation(file->childFile(1)->path(), R"(
+        <changeAttribute target="/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']" newValue="1.23"/>
+)"));
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_2 = {
         {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored."},
@@ -128,6 +188,7 @@ TEST(CoverageSedTest, changes)
     document = libOpenCOR::SedDocument::create(file);
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES_2);
+    EXPECT_EQ(document->serialise(), sedChangesExpectedSerialisation(file->childFile(1)->path(), {}));
 }
 
 TEST(CoverageSedTest, simulations)

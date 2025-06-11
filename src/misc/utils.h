@@ -73,7 +73,7 @@ using StringStringMap = std::map<std::string, std::string>;
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 #ifdef BUILDING_USING_MSVC
-std::string forwardSlashPath(const std::string &pPath);
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT forwardSlashPath(const std::string &pPath);
 #endif
 
 std::filesystem::path LIBOPENCOR_UNIT_TESTING_EXPORT stringToPath(const std::string &pString);
