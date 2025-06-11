@@ -35,9 +35,12 @@ struct SedInstanceTaskResults
     std::vector<Doubles> algebraic;
 };
 
+using SedInstanceTaskWeakPtr = std::weak_ptr<SedInstanceTask>;
+
 class SedInstanceTask::Impl: public Logger::Impl
 {
 public:
+    SedInstanceTaskWeakPtr mOwner;
     CellmlFileRuntimePtr mRuntime;
     SedSimulationPtr mSimulation;
     SedUniformTimeCoursePtr mSedUniformTimeCourse;

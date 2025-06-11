@@ -19,6 +19,7 @@ limitations under the License.
 #include "sedchange_p.h"
 
 #include "libopencor/sedchangeattribute.h"
+#include "libopencor/sedinstancetask.h"
 
 namespace libOpenCOR {
 
@@ -44,6 +45,8 @@ public:
     void setNewValue(const std::string &pNewValue);
 
     void serialise(xmlNodePtr pNode) const override;
+
+    void apply(const SedInstanceTaskPtr &pInstanceTask, const libcellml::AnalyserModelPtr &pAnalyserModel);
 };
 
 } // namespace libOpenCOR

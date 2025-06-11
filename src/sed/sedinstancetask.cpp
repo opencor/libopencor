@@ -27,7 +27,13 @@ namespace libOpenCOR {
 
 SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask, bool pCompiled)
 {
-    return SedInstanceTaskPtr {new SedInstanceTask(pTask, pCompiled)};
+    auto res = SedInstanceTaskPtr {new SedInstanceTask {pTask, pCompiled}};
+
+    res->pimpl()->mOwner = res;
+
+    res->pimpl()->initialise();
+
+    return res;
 }
 
 SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
@@ -92,10 +98,6 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     mResults.constants.resize(mAnalyserModel->constantCount(), {});
     mResults.computedConstants.resize(mAnalyserModel->computedConstantCount(), {});
     mResults.algebraic.resize(mAnalyserModel->algebraicCount(), {});
-
-    // Initialise our model.
-
-    initialise();
 }
 
 void SedInstanceTask::Impl::trackResults(size_t pIndex)
@@ -130,71 +132,9 @@ void SedInstanceTask::Impl::applyChanges()
 
         ASSERT_NE(changeAttribute, nullptr);
 
-        // Check whether the change is for a state, a constant, a computed constant, or an algebraic variable.
-        // Note: a change cannot be for a variable of integration or a rate, so we don't check for those.
+        changeAttribute->pimpl()->apply(mOwner.lock(), mAnalyserModel);
 
-        auto changeName = name(changeAttribute->componentName(), changeAttribute->variableName());
-
-        if (voiName() == changeName) {
-            auto voiVariable = mAnalyserModel->voi()->variable();
-            auto voiComponent = owningComponent(voiVariable);
-
-            addWarning(std::string("The variable of integration '").append(voiVariable->name()).append("' in component '").append(voiComponent->name()).append("'cannot be changed. Only state variables and constants can be changed."));
-
-            continue;
-        }
-
-        auto isParameterSet = false;
-
-        for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
-            if (stateName(i) == changeName) {
-                mStates[i] = toDouble(changeAttribute->newValue()); // NOLINT
-
-                isParameterSet = true;
-
-                break;
-            }
-        }
-
-        if (!isParameterSet) {
-            for (size_t i = 0; i < mAnalyserModel->constantCount(); ++i) {
-                if (constantName(i) == changeName) {
-                    mConstants[i] = toDouble(changeAttribute->newValue()); // NOLINT
-
-                    isParameterSet = true;
-
-                    break;
-                }
-            }
-        }
-
-        if (!isParameterSet) {
-            for (size_t i = 0; i < mAnalyserModel->computedConstantCount(); ++i) {
-                if (computedConstantName(i) == changeName) {
-                    auto computedConstantVariable = mAnalyserModel->computedConstants()[i]->variable();
-                    auto computedConstantComponent = owningComponent(computedConstantVariable);
-
-                    addWarning(std::string("The computed constant '").append(computedConstantVariable->name()).append("' in component '").append(computedConstantComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
-
-                    isParameterSet = true;
-
-                    break;
-                }
-            }
-        }
-
-        if (!isParameterSet) {
-            for (size_t i = 0; i < mAnalyserModel->algebraicCount(); ++i) {
-                if (algebraicName(i) == changeName) {
-                    auto algebraicVariable = mAnalyserModel->algebraic()[i]->variable();
-                    auto algebraicComponent = owningComponent(algebraicVariable);
-
-                    addWarning(std::string("The algebraic variable '").append(algebraicVariable->name()).append("' in component '").append(algebraicComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
-
-                    break;
-                }
-            }
-        }
+        addIssues(changeAttribute);
     }
 }
 

@@ -29,6 +29,8 @@ namespace libOpenCOR {
 
 class LIBOPENCOR_EXPORT SedChangeAttribute: public SedChange
 {
+    friend class SedInstanceTask;
+
 public:
     /**
      * Constructors, destructor, and assignment operators.

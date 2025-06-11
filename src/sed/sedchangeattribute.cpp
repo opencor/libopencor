@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "sedchangeattribute_p.h"
+#include "sedinstancetask_p.h"
 
 #include "utils.h"
 
@@ -82,6 +83,74 @@ void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
     xmlNewProp(node, toConstXmlCharPtr("newValue"), toConstXmlCharPtr(mNewValue));
 
     xmlAddChild(pNode, node);
+}
+
+void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
+                                     const libcellml::AnalyserModelPtr &pAnalyserModel)
+{
+    auto *instanceTaskPimpl = pInstanceTask->pimpl();
+    auto changeName = name(componentName(), variableName());
+
+    if (instanceTaskPimpl->voiName() == changeName) {
+        auto voiVariable = pAnalyserModel->voi()->variable();
+        auto voiComponent = owningComponent(voiVariable);
+
+        addWarning(std::string("The variable of integration '").append(voiVariable->name()).append("' in component '").append(voiComponent->name()).append("'cannot be changed. Only state variables and constants can be changed."));
+
+        return;
+    }
+
+    auto isParameterSet = false;
+
+    for (size_t i = 0; i < pAnalyserModel->stateCount(); ++i) {
+        if (instanceTaskPimpl->stateName(i) == changeName) {
+            instanceTaskPimpl->mStates[i] = toDouble(newValue()); // NOLINT
+
+            isParameterSet = true;
+
+            break;
+        }
+    }
+
+    if (!isParameterSet) {
+        for (size_t i = 0; i < pAnalyserModel->constantCount(); ++i) {
+            if (instanceTaskPimpl->constantName(i) == changeName) {
+                instanceTaskPimpl->mConstants[i] = toDouble(newValue()); // NOLINT
+
+                isParameterSet = true;
+
+                break;
+            }
+        }
+    }
+
+    if (!isParameterSet) {
+        for (size_t i = 0; i < pAnalyserModel->computedConstantCount(); ++i) {
+            if (instanceTaskPimpl->computedConstantName(i) == changeName) {
+                auto computedConstantVariable = pAnalyserModel->computedConstants()[i]->variable();
+                auto computedConstantComponent = owningComponent(computedConstantVariable);
+
+                addWarning(std::string("The computed constant '").append(computedConstantVariable->name()).append("' in component '").append(computedConstantComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
+
+                isParameterSet = true;
+
+                break;
+            }
+        }
+    }
+
+    if (!isParameterSet) {
+        for (size_t i = 0; i < pAnalyserModel->algebraicCount(); ++i) {
+            if (instanceTaskPimpl->algebraicName(i) == changeName) {
+                auto algebraicVariable = pAnalyserModel->algebraic()[i]->variable();
+                auto algebraicComponent = owningComponent(algebraicVariable);
+
+                addWarning(std::string("The algebraic variable '").append(algebraicVariable->name()).append("' in component '").append(algebraicComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
+
+                break;
+            }
+        }
+    }
 }
 
 SedChangeAttribute::SedChangeAttribute(const std::string &pComponentName, const std::string &pVariableName,

@@ -28,7 +28,9 @@ namespace libOpenCOR {
  */
 
 class LIBOPENCOR_EXPORT SedInstanceTask: public Logger
+    , public std::enable_shared_from_this<SedInstanceTask>
 {
+    friend class SedChangeAttribute;
     friend class SedInstance;
 
 public:
