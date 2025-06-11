@@ -28,6 +28,7 @@ limitations under the License.
 #    include <cassert>
 #endif
 #include <filesystem>
+#include <libcellml>
 
 #ifdef NAN
 #    undef NAN
@@ -126,5 +127,10 @@ SolverKinsol::LinearSolver toKinsolLinearSolver(const std::string &pLinearSolver
 std::string toString(SolverKinsol::LinearSolver pLinearSolver);
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
+
+libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable);
+
+std::string name(const std::string &pComponentName, const std::string &pVariableName);
+std::string name(const libcellml::VariablePtr &pVariable);
 
 } // namespace libOpenCOR

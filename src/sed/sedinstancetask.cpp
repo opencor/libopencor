@@ -120,25 +120,6 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     }
 }
 
-namespace {
-
-libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable)
-{
-    return std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
-}
-
-std::string name(const std::string &pComponentName, const std::string &pVariableName)
-{
-    return pComponentName + "/" + pVariableName;
-}
-
-std::string name(const libcellml::VariablePtr &pVariable)
-{
-    return name(owningComponent(pVariable)->name(), pVariable->name());
-}
-
-} // namespace
-
 void SedInstanceTask::Impl::applyChanges()
 {
     for (const auto &change : mModel->changes()) {
