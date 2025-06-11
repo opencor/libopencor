@@ -198,43 +198,64 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
             set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/707e211/${PACKAGE_FILE}")
         endif()
 
-        file(DOWNLOAD ${PACKAGE_URL} ${REAL_PACKAGE_FILE} STATUS STATUS)
+        set(ATTEMPT 1)
+        set(MAX_ATTEMPTS 3)
+        set(FAILED_DOWNLOAD TRUE)
 
-        # Uncompress the package, should we have managed to retrieve it.
+        while(FAILED_DOWNLOAD AND ATTEMPT LESS_EQUAL MAX_ATTEMPTS)
+            if(ATTEMPT GREATER 1)
+                # The previous attempt failed, so we wait a bit before trying again.
 
-        list(GET STATUS 0 STATUS_CODE)
-
-        if(${STATUS_CODE} EQUAL 0)
-            file(SHA1 ${REAL_PACKAGE_FILE} REAL_SHA1_VALUE)
-
-            if(NOT "${REAL_SHA1_VALUE}" STREQUAL "${SHA1_VALUE}")
-                file(REMOVE_RECURSE ${INSTALL_DIR})
-
-                message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
-                message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) does not have the expected SHA-1 value.")
+                execute_process(COMMAND ${CMAKE_COMMAND} -E sleep 3)
             endif()
 
-            execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xf ${REAL_PACKAGE_FILE}
-                            WORKING_DIRECTORY ${INSTALL_DIR}
-                            RESULT_VARIABLE RESULT
-                            ERROR_VARIABLE ERROR
-                            OUTPUT_QUIET)
+            set(FAILED_DOWNLOAD FALSE)
 
-            if(NOT RESULT EQUAL 0)
+            file(DOWNLOAD ${PACKAGE_URL} ${REAL_PACKAGE_FILE} STATUS STATUS)
+
+            list(GET STATUS 0 STATUS_CODE)
+
+            if(${STATUS_CODE} EQUAL 0)
+                file(SHA1 ${REAL_PACKAGE_FILE} REAL_SHA1_VALUE)
+
+                if(NOT "${REAL_SHA1_VALUE}" STREQUAL "${SHA1_VALUE}")
+                    file(REMOVE_RECURSE ${INSTALL_DIR})
+
+                    message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
+                    message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) does not have the expected SHA-1 value.")
+                endif()
+
+                execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xf ${REAL_PACKAGE_FILE}
+                                WORKING_DIRECTORY ${INSTALL_DIR}
+                                RESULT_VARIABLE RESULT
+                                ERROR_VARIABLE ERROR
+                                OUTPUT_QUIET)
+
+                if(NOT RESULT EQUAL 0)
+                    file(REMOVE_RECURSE ${INSTALL_DIR})
+
+                    message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
+                    message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) could not be uncompressed (${ERROR}).")
+                endif()
+
+                file(REMOVE ${REAL_PACKAGE_FILE})
+
+                message(STATUS "Retrieving Package ${PACKAGE_NAME} - Success")
+            else()
+                set(FAILED_DOWNLOAD TRUE)
+
                 file(REMOVE_RECURSE ${INSTALL_DIR})
 
-                message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
-                message(FATAL_ERROR "The ${PACKAGE_NAME} package (downloaded from ${PACKAGE_URL}) could not be uncompressed (${ERROR}).")
+                message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed (attempt #${ATTEMPT}/${MAX_ATTEMPTS})")
             endif()
 
-            file(REMOVE ${REAL_PACKAGE_FILE})
+            if(FAILED_DOWNLOAD)
+                math(EXPR ATTEMPT "${ATTEMPT}+1")
+            endif()
+        endwhile()
 
-            message(STATUS "Retrieving Package ${PACKAGE_NAME} - Success")
-        else()
-            file(REMOVE_RECURSE ${INSTALL_DIR})
-
-            message(STATUS "Retrieving Package ${PACKAGE_NAME} - Failed")
-            message(FATAL_ERROR "The ${PACKAGE_NAME} package could not be retrieved from ${PACKAGE_URL}.")
+        if(FAILED_DOWNLOAD)
+            message(FATAL_ERROR "The ${PACKAGE_NAME} package could not be retrieved from ${PACKAGE_URL} after ${MAX_ATTEMPTS} attempts.")
         endif()
     endif()
 
