@@ -89,7 +89,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
                                      const libcellml::AnalyserModelPtr &pAnalyserModel)
 {
     auto *instanceTaskPimpl = pInstanceTask->pimpl();
-    auto changeName = name(componentName(), variableName());
+    auto changeName = name(mComponentName, mVariableName);
 
     if (instanceTaskPimpl->voiName() == changeName) {
         auto voiVariable = pAnalyserModel->voi()->variable();
@@ -147,9 +147,15 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
 
                 addWarning(std::string("The algebraic variable '").append(algebraicVariable->name()).append("' in component '").append(algebraicComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
 
+                isParameterSet = true;
+
                 break;
             }
         }
+    }
+
+    if (!isParameterSet) {
+        addWarning(std::string("The variable '").append(mComponentName).append("' in component '").append(mVariableName).append("'could not be found and therefore could not be changed."));
     }
 }
 

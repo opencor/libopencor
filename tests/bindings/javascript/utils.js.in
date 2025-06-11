@@ -127,6 +127,13 @@ export const UNSUPPORTED_SED_CHANGES_CONTENTS = stringToArrayBuffer(
   atob("@BASE64_UNSUPPORTED_SED_CHANGES_CONTENTS@"),
 );
 
+export const ALGEBRAIC_SED_CHANGES_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_ALGEBRAIC_SED_CHANGES_CONTENTS@"),
+);
+export const ODE_SED_CHANGES_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_ODE_SED_CHANGES_CONTENTS@"),
+);
+
 export function expectIssues(loc, logger, expectedIssues) {
   const issues = logger.issues;
 

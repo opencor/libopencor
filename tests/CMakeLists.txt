@@ -144,6 +144,13 @@ execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/se
                 OUTPUT_VARIABLE BASE64_UNSUPPORTED_SED_CHANGES_CONTENTS
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/solver/algebraic_sed_changes.omex"
+                OUTPUT_VARIABLE BASE64_ALGEBRAIC_SED_CHANGES_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+execute_process(COMMAND ${BASE64ENCODER} "${CMAKE_CURRENT_SOURCE_DIR}/res/api/solver/ode_sed_changes.omex"
+                OUTPUT_VARIABLE BASE64_ODE_SED_CHANGES_CONTENTS
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 configure_file(${UTILS_HEADER_FILE_IN} ${UTILS_HEADER_FILE})
 
 include_directories(${CMAKE_SOURCE_DIR}/src/misc
