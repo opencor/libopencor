@@ -62,10 +62,10 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
+    explicit SolverOdeFixedStep(Impl *pPimpl); /**< Constructor, @private. */
+
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
-
-    explicit SolverOdeFixedStep(Impl *pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

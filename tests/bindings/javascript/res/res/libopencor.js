@@ -197,10 +197,10 @@ import libOpenCOR from "../libopencor.js";
 $(() => {
   // Make sure that libOpenCOR is loaded before we do anything else.
 
-  libOpenCOR().then((libopencor) => {
+  libOpenCOR().then((loc) => {
     // Keep track of the file manager.
 
-    fileManager = libopencor.FileManager.instance();
+    fileManager = loc.FileManager.instance();
 
     // Simulation page.
 
@@ -224,16 +224,16 @@ $(() => {
             resetObjects();
 
             const fileArrayBuffer = await inputFile.arrayBuffer();
-            const memPtr = libopencor._malloc(inputFile.size);
+            const memPtr = loc._malloc(inputFile.size);
             const mem = new Uint8Array(
-              libopencor.HEAPU8.buffer,
+              loc.HEAPU8.buffer,
               memPtr,
               inputFile.size,
             );
 
             mem.set(new Uint8Array(fileArrayBuffer));
 
-            file = new libopencor.File(inputFile.name);
+            file = new loc.File(inputFile.name);
 
             file.setContents(memPtr, inputFile.size);
 
@@ -242,11 +242,11 @@ $(() => {
             let fileType = "some unknown file";
             let knownFile = true;
 
-            if (file.type === libopencor.File.Type.CELLML_FILE) {
+            if (file.type === loc.File.Type.CELLML_FILE) {
               fileType = "a CellML file";
-            } else if (file.type === libopencor.File.Type.SEDML_FILE) {
+            } else if (file.type === loc.File.Type.SEDML_FILE) {
               fileType = "a SED-ML file";
-            } else if (file.type === libopencor.File.Type.COMBINE_ARCHIVE) {
+            } else if (file.type === loc.File.Type.COMBINE_ARCHIVE) {
               fileType = "a COMBINE archive";
             } else {
               knownFile = false;
@@ -282,7 +282,7 @@ $(() => {
               } else {
                 // Retrieve some information about the simulation.
 
-                document = new libopencor.SedDocument(file);
+                document = new loc.SedDocument(file);
                 simulation = document.simulations.get(0);
                 instance = document.instantiate();
                 instanceTask = instance.tasks.get(0);
@@ -349,16 +349,16 @@ $(() => {
 
     // Versions page.
 
-    $("#version").html(libopencor.version());
-    $("#versionString").html(libopencor.versionString());
-    $("#libcellmlVersion").html(libopencor.libcellmlVersion());
-    $("#libcellmlVersionString").html(libopencor.libcellmlVersionString());
-    $("#libcombineVersion").html(libopencor.libcombineVersion());
-    $("#libcombineVersionString").html(libopencor.libcombineVersionString());
-    $("#libsedmlVersion").html(libopencor.libsedmlVersion());
-    $("#libsedmlVersionString").html(libopencor.libsedmlVersionString());
-    $("#sundialsVersion").html(libopencor.sundialsVersion());
-    $("#sundialsVersionString").html(libopencor.sundialsVersionString());
+    $("#version").html(loc.version());
+    $("#versionString").html(loc.versionString());
+    $("#libcellmlVersion").html(loc.libcellmlVersion());
+    $("#libcellmlVersionString").html(loc.libcellmlVersionString());
+    $("#libcombineVersion").html(loc.libcombineVersion());
+    $("#libcombineVersionString").html(loc.libcombineVersionString());
+    $("#libsedmlVersion").html(loc.libsedmlVersion());
+    $("#libsedmlVersionString").html(loc.libsedmlVersionString());
+    $("#sundialsVersion").html(loc.sundialsVersion());
+    $("#sundialsVersionString").html(loc.sundialsVersionString());
 
     // Start with our simulation page.
 

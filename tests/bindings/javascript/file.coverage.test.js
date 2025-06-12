@@ -17,63 +17,60 @@ limitations under the License.
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("File coverage tests", () => {
-  let someNullCharacterContentsPtr;
-  let someCombineArchiveContentsPtr;
+  let nullCharacterContentsPtr;
+  let combineArchiveContentsPtr;
 
   beforeAll(() => {
-    someNullCharacterContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_NULL_CHARACTER_CONTENTS,
+    nullCharacterContentsPtr = utils.allocateMemory(
+      loc,
+      utils.NULL_CHARACTER_CONTENTS,
     );
-    someCombineArchiveContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+    combineArchiveContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someNullCharacterContentsPtr);
-    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
+    utils.freeMemory(loc, nullCharacterContentsPtr);
+    utils.freeMemory(loc, combineArchiveContentsPtr);
   });
 
   test("Empty file", () => {
-    const file = new libopencor.File(utils.UNKNOWN_FILE);
+    const file = new loc.File(utils.UNKNOWN_FILE);
 
     file.setContents(null, 0);
 
-    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
 
     file.delete();
   });
 
   test("File with null character", () => {
-    const file = new libopencor.File(utils.UNKNOWN_FILE);
+    const file = new loc.File(utils.UNKNOWN_FILE);
 
     file.setContents(
-      someNullCharacterContentsPtr,
-      utils.SOME_NULL_CHARACTER_CONTENTS.length,
+      nullCharacterContentsPtr,
+      utils.NULL_CHARACTER_CONTENTS.length,
     );
 
-    expect(file.type.value).toBe(libopencor.File.Type.UNKNOWN_FILE.value);
+    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
 
     file.delete();
   });
 
   test("SED-ML file with no parent", () => {
-    const file = new libopencor.File(utils.SEDML_FILE);
+    const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(
-      utils.SOME_SEDML_CONTENTS,
-      utils.SOME_SEDML_CONTENTS.length,
-    );
+    file.setContents(utils.SEDML_CONTENTS, utils.SEDML_CONTENTS.length);
   });
 
   test("Same local file", () => {
-    const file1 = new libopencor.File(utils.LOCAL_FILE);
-    const file2 = new libopencor.File(utils.LOCAL_FILE);
+    const file1 = new loc.File(utils.LOCAL_FILE);
+    const file2 = new loc.File(utils.LOCAL_FILE);
 
     expect(file1).toStrictEqual(file2);
 
@@ -82,8 +79,8 @@ describe("File coverage tests", () => {
   });
 
   test("Same remote file", () => {
-    const file1 = new libopencor.File(utils.REMOTE_FILE);
-    const file2 = new libopencor.File(utils.REMOTE_FILE);
+    const file1 = new loc.File(utils.REMOTE_FILE);
+    const file2 = new loc.File(utils.REMOTE_FILE);
 
     expect(file1).toStrictEqual(file2);
 
@@ -92,12 +89,12 @@ describe("File coverage tests", () => {
   });
 
   test("Unmanage file with children", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
-    const fileManager = libopencor.FileManager.instance();
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const fileManager = loc.FileManager.instance();
 
     file.setContents(
-      someCombineArchiveContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+      combineArchiveContentsPtr,
+      utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
     expect(fileManager.fileCount).toBe(4);

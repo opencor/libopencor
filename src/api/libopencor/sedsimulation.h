@@ -36,8 +36,6 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SedSimulation() override = default; /**< Destructor, @private. */
-
     SedSimulation(const SedSimulation &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedSimulation(SedSimulation &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 

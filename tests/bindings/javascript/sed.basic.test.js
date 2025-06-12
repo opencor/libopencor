@@ -18,79 +18,79 @@ import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 import { expectIssues } from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("Sed basic tests", () => {
-  let someUnknownContentsPtr;
-  let someCellmlContentsPtr;
-  let someSedmlContentsPtr;
-  let someSedmlWithAbsoluteCellmlFileContentsPtr;
-  let someSedmlWithRemoteCellmlFileContentsPtr;
-  let someCombineArchiveContentsPtr;
-  let someCombineArchiveWithNoManifestFileContentsPtr;
-  let someCombineArchiveWithNoMasterFileContentsPtr;
-  let someCombineArchiveWithSbmlFileAsMasterFileContentsPtr;
+  let unknownContentsPtr;
+  let cellmlContentsPtr;
+  let sedmlContentsPtr;
+  let sedmlWithAbsoluteCellmlFileContentsPtr;
+  let sedmlWithRemoteCellmlFileContentsPtr;
+  let combineArchiveContentsPtr;
+  let combineArchiveWithNoManifestFileContentsPtr;
+  let combineArchiveWithNoMasterFileContentsPtr;
+  let combineArchiveWithUnknownDirectCellmlFileContentsPtr;
+  let combineArchiveWithUnknownIndirectCellmlFileContentsPtr;
+  let combineArchiveWithUnknownSedmlFileContentsPtr;
 
   beforeAll(() => {
-    someUnknownContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNKNOWN_CONTENTS,
+    unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
+    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
+    sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
+    sedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS,
     );
-    someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS,
+    sedmlWithRemoteCellmlFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS,
     );
-    someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_CONTENTS,
+    combineArchiveContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_CONTENTS,
     );
-    someSedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS,
+    combineArchiveWithNoManifestFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS,
     );
-    someSedmlWithRemoteCellmlFileContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS,
+    combineArchiveWithNoMasterFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS,
     );
-    someCombineArchiveContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+    combineArchiveWithUnknownDirectCellmlFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS,
     );
-    someCombineArchiveWithNoManifestFileContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS,
-    );
-    someCombineArchiveWithNoMasterFileContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS,
-    );
-    someCombineArchiveWithSbmlFileAsMasterFileContentsPtr =
+    combineArchiveWithUnknownIndirectCellmlFileContentsPtr =
       utils.allocateMemory(
-        libopencor,
-        utils.SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS,
+        loc,
+        utils.COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS,
       );
+    combineArchiveWithUnknownSedmlFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS,
+    );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someUnknownContentsPtr);
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlWithAbsoluteCellmlFileContentsPtr);
-    utils.freeMemory(libopencor, someSedmlWithRemoteCellmlFileContentsPtr);
-    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
+    utils.freeMemory(loc, unknownContentsPtr);
+    utils.freeMemory(loc, cellmlContentsPtr);
+    utils.freeMemory(loc, sedmlContentsPtr);
+    utils.freeMemory(loc, sedmlWithAbsoluteCellmlFileContentsPtr);
+    utils.freeMemory(loc, sedmlWithRemoteCellmlFileContentsPtr);
+    utils.freeMemory(loc, combineArchiveContentsPtr);
+    utils.freeMemory(loc, combineArchiveWithNoManifestFileContentsPtr);
+    utils.freeMemory(loc, combineArchiveWithNoMasterFileContentsPtr);
+    utils.freeMemory(loc, combineArchiveWithUnknownDirectCellmlFileContentsPtr);
     utils.freeMemory(
-      libopencor,
-      someCombineArchiveWithNoManifestFileContentsPtr,
+      loc,
+      combineArchiveWithUnknownIndirectCellmlFileContentsPtr,
     );
-    utils.freeMemory(libopencor, someCombineArchiveWithNoMasterFileContentsPtr);
-    utils.freeMemory(
-      libopencor,
-      someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,
-    );
+    utils.freeMemory(loc, combineArchiveWithUnknownSedmlFileContentsPtr);
   });
 
   test("No file", () => {
-    const document = new libopencor.SedDocument();
+    const document = new loc.SedDocument();
 
     expect(document.hasIssues).toBe(false);
 
@@ -98,18 +98,15 @@ describe("Sed basic tests", () => {
   });
 
   test("Unknown file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.UNKNOWN_FILE));
+    const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using an unknown file.",
       ],
     ]);
@@ -119,11 +116,11 @@ describe("Sed basic tests", () => {
   });
 
   test("CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -132,21 +129,19 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
+    file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
 
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(true);
 
     document.delete();
 
-    const neededFile = new libopencor.File(
-      utils.resourcePath(utils.CELLML_FILE),
-    );
+    const neededFile = new loc.File(utils.CELLML_FILE);
 
-    document = new libopencor.SedDocument(file);
+    document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -156,22 +151,22 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file with absolute CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(
-      someSedmlWithAbsoluteCellmlFileContentsPtr,
-      utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS.length,
+      sedmlWithAbsoluteCellmlFileContentsPtr,
+      utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS.length,
     );
 
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(true);
 
     document.delete();
 
-    const neededFile = new libopencor.File(utils.LOCAL_FILE);
+    const neededFile = new loc.File(utils.LOCAL_FILE);
 
-    document = new libopencor.SedDocument(file);
+    document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -181,22 +176,22 @@ describe("Sed basic tests", () => {
   });
 
   test("SED-ML file with remote CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(
-      someSedmlWithRemoteCellmlFileContentsPtr,
-      utils.SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS.length,
+      sedmlWithRemoteCellmlFileContentsPtr,
+      utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS.length,
     );
 
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(true);
 
     document.delete();
 
-    const neededFile = new libopencor.File(utils.REMOTE_FILE);
+    const neededFile = new loc.File(utils.REMOTE_FILE);
 
-    document = new libopencor.SedDocument(file);
+    document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -206,14 +201,14 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+      combineArchiveContentsPtr,
+      utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.hasIssues).toBe(false);
 
@@ -222,18 +217,18 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive with no manifest file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithNoManifestFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS.length,
+      combineArchiveWithNoManifestFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
       ],
     ]);
@@ -243,18 +238,18 @@ describe("Sed basic tests", () => {
   });
 
   test("COMBINE archive with no master file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithNoMasterFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS.length,
+      combineArchiveWithNoMasterFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
       ],
     ]);
@@ -263,19 +258,62 @@ describe("Sed basic tests", () => {
     file.delete();
   });
 
-  test("COMBINE archive with SBML file as master file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+  test("COMBINE archive with unknown direct CellML file", () => {
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS.length,
+      combineArchiveWithUnknownDirectCellmlFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
+        "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+      ],
+    ]);
+
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with unknown indirect CellML file", () => {
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      combineArchiveWithUnknownIndirectCellmlFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS.length,
+    );
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.run();
+
+    expectIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, "Task 'task1' requires a model of CellML type."],
+    ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with unknown SED-ML file", () => {
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      combineArchiveWithUnknownSedmlFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS.length,
+    );
+
+    const document = new loc.SedDocument(file);
+
+    expectIssues(loc, document, [
+      [
+        loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
       ],
     ]);

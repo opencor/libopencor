@@ -16,14 +16,14 @@
 
 configure_file(utils.py.in ${PYTHON_BINDINGS_DIR}/utils.py)
 
-# Copy our Python tests over.
+# Copy our Python files over.
 
-file(GLOB PYTHON_TESTS "*.py")
+file(GLOB PYTHON_FILES "*.py")
 
-foreach(PYTHON_TEST ${PYTHON_TESTS})
-    get_filename_component(PYTHON_TEST_FILE ${PYTHON_TEST} NAME)
+foreach(PYTHON_FILE ${PYTHON_FILES})
+    get_filename_component(PYTHON_FILENAME ${PYTHON_FILE} NAME)
 
-    configure_file(${PYTHON_TEST_FILE} ${PYTHON_BINDINGS_DIR}/${PYTHON_TEST_FILE} COPYONLY)
+    configure_file(${PYTHON_FILENAME} ${PYTHON_BINDINGS_DIR}/${PYTHON_FILENAME} COPYONLY)
 endforeach()
 
 # Run our Python tests.

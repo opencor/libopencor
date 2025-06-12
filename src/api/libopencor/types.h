@@ -43,6 +43,12 @@ using SedAnalysisPtr = std::shared_ptr<SedAnalysis>; /**< Type definition for th
 class SedBase;
 using SedBasePtr = std::shared_ptr<SedBase>; /**< Type definition for the shared @ref SedBase pointer. */
 
+class SedChange;
+using SedChangePtr = std::shared_ptr<SedChange>; /**< Type definition for the shared @ref SedChange pointer. */
+
+class SedChangeAttribute;
+using SedChangeAttributePtr = std::shared_ptr<SedChangeAttribute>; /**< Type definition for the shared @ref SedChangeAttribute pointer. */
+
 class SedDataDescription;
 using SedDataDescriptionPtr = std::shared_ptr<SedDataDescription>; /**< Type definition for the shared @ref SedDataDescription pointer. */
 
@@ -121,6 +127,8 @@ using Doubles = std::vector<double>; /**< Type definition for a vector of double
 using FilePtrs = std::vector<FilePtr>; /**< Type definition for a vector of @ref File pointers. */
 using IssuePtrs = std::vector<IssuePtr>; /**< Type definition for a vector of @ref Issue pointers. */
 using SedAbstractTaskPtrs = std::vector<SedAbstractTaskPtr>; /**< Type definition for a vector of @ref SedAbstractTask pointers. */
+using SedChangePtrs = std::vector<SedChangePtr>; /**< Type definition for a vector of @ref SedChange pointers. */
+using SedChangeAttributePtrs = std::vector<SedChangeAttributePtr>; /**< Type definition for a vector of @ref SedChangeAttribute pointers. */
 using SedDataDescriptionPtrs = std::vector<SedDataDescriptionPtr>; /**< Type definition for a vector of @ref SedDataDescription pointers. */
 using SedDataGeneratorPtrs = std::vector<SedDataGeneratorPtr>; /**< Type definition for a vector of @ref SedDataGenerator pointers. */
 using SedInstanceTaskPtrs = std::vector<SedInstanceTaskPtr>; /**< Type definition for a vector of @ref SedInstanceTask pointers. */

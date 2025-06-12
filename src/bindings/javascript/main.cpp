@@ -30,6 +30,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     emscripten::register_vector<libOpenCOR::FilePtr>("FilePtrs");
     emscripten::register_vector<libOpenCOR::IssuePtr>("IssuePtrs");
     emscripten::register_vector<libOpenCOR::SedAbstractTaskPtr>("SedAbstractTaskPtrs");
+    emscripten::register_vector<libOpenCOR::SedChangePtr>("SedChangePtrs");
     emscripten::register_vector<libOpenCOR::SedDataDescriptionPtr>("SedDataDescriptionPtrs");
     emscripten::register_vector<libOpenCOR::SedDataGeneratorPtr>("SedDataGeneratorPtrs");
     emscripten::register_vector<libOpenCOR::SedInstanceTaskPtr>("SedInstanceTaskPtrs");

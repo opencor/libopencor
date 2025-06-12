@@ -58,10 +58,10 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
+    explicit SolverForwardEuler(); /**< Constructor, @private. */
+
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
-
-    explicit SolverForwardEuler(); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

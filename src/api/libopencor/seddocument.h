@@ -157,6 +157,15 @@ public:
     bool removeModel(const SedModelPtr &pModel);
 
     /**
+     * @brief Remove all models from this simulation experiment description.
+     *
+     * Remove all models from this simulation experiment description.
+     *
+     * @return @c true if all models were removed, @c false otherwise.
+     */
+    bool removeAllModels();
+
+    /**
      * @brief Return whether there are some simulations.
      *
      * Return whether there are some simulations.
@@ -223,6 +232,15 @@ public:
     bool removeSimulation(const SedSimulationPtr &pSimulation);
 
     /**
+     * @brief Remove all simulations from this simulation experiment description.
+     *
+     * Remove all simulations from this simulation experiment description.
+     *
+     * @return @c true if all simulations were removed, @c false otherwise.
+     */
+    bool removeAllSimulations();
+
+    /**
      * @brief Return whether there are some tasks.
      *
      * Return whether there are some tasks.
@@ -287,6 +305,15 @@ public:
      */
 
     bool removeTask(const SedAbstractTaskPtr &pTask);
+
+    /**
+     * @brief Remove all tasks from this simulation experiment description.
+     *
+     * Remove all tasks from this simulation experiment description.
+     *
+     * @return @c true if all tasks were removed, @c false otherwise.
+     */
+    bool removeAllTasks();
 
     /**
      * @brief Create an instance of this simulation experiment description.

@@ -19,33 +19,27 @@ import * as odeModel from "./ode.model.js";
 import * as utils from "./utils.js";
 import { expectIssues } from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
-describe("Solver Forward Euler", () => {
-  let someSolverOdeContentsPtr;
+describe("Solver Forward Euler tests", () => {
+  let solverOdeContentsPtr;
 
   beforeAll(() => {
-    someSolverOdeContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SOLVER_ODE_CONTENTS,
-    );
+    solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someSolverOdeContentsPtr);
+    utils.freeMemory(loc, solverOdeContentsPtr);
   });
 
   test("Step value with invalid number", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      someSolverOdeContentsPtr,
-      utils.SOME_SOLVER_ODE_CONTENTS.length,
-    );
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
-    const solver = new libopencor.SolverForwardEuler();
+    const solver = new loc.SolverForwardEuler();
 
     solver.step = 0.0;
 
@@ -53,9 +47,9 @@ describe("Solver Forward Euler", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
@@ -67,23 +61,19 @@ describe("Solver Forward Euler", () => {
   });
 
   test("Solve", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      someSolverOdeContentsPtr,
-      utils.SOME_SOLVER_ODE_CONTENTS.length,
-    );
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
-    const solver = new libopencor.SolverForwardEuler();
+    const solver = new loc.SolverForwardEuler();
 
     solver.step = 0.0123;
 
     simulation.odeSolver = solver;
 
     odeModel.run(
-      libopencor,
       document,
       [-63.787727, 0.134748, 0.984255, 0.741178],
       [49.73577, -0.127963, -0.051257, 0.098331],

@@ -598,4 +598,19 @@ const xmlChar *toConstXmlCharPtr(const std::string &pString)
     return reinterpret_cast<const xmlChar *>(pString.c_str());
 }
 
+libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable)
+{
+    return std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
+}
+
+std::string name(const std::string &pComponentName, const std::string &pVariableName)
+{
+    return pComponentName + "/" + pVariableName;
+}
+
+std::string name(const libcellml::VariablePtr &pVariable)
+{
+    return name(owningComponent(pVariable)->name(), pVariable->name());
+}
+
 } // namespace libOpenCOR

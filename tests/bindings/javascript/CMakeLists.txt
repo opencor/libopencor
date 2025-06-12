@@ -22,14 +22,14 @@ configure_file(res/index.html index.html COPYONLY)
 
 execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/res/res" "${CMAKE_CURRENT_BINARY_DIR}/res")
 
-# Copy our JavaScript tests over.
+# Copy our JavaScript files over.
 
-file(GLOB JAVASCRIPT_TESTS "*.js")
+file(GLOB JAVASCRIPT_FILES "*.js")
 
-foreach(JAVASCRIPT_TEST ${JAVASCRIPT_TESTS})
-    get_filename_component(JAVASCRIPT_TEST_FILE ${JAVASCRIPT_TEST} NAME)
+foreach(JAVASCRIPT_FILE ${JAVASCRIPT_FILES})
+    get_filename_component(JAVASCRIPT_FILENAME ${JAVASCRIPT_FILE} NAME)
 
-    configure_file(${JAVASCRIPT_TEST_FILE} ${JAVASCRIPT_TEST_FILE} COPYONLY)
+    configure_file(${JAVASCRIPT_FILENAME} ${JAVASCRIPT_FILENAME} COPYONLY)
 endforeach()
 
 # Run our JavaScript tests.

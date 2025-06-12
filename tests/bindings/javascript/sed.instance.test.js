@@ -18,87 +18,71 @@ import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 import { expectIssues } from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("Sed instance tests", () => {
-  let someCellmlContentsPtr;
-  let someErrorCellmlContentsPtr;
-  let someOverconstrainedContentsPtr;
-  let someUnderconstrainedContentsPtr;
-  let someUnsuitablyConstrainedContentsPtr;
-  let someAlgebraicContentsPtr;
-  let someNlaContentsPtr;
-  let someDaeContentsPtr;
-  let someCombineArchiveContentsPtr;
-  let someCombineArchiveWithCellmlFileAsMasterFileContentsPtr;
+  let cellmlContentsPtr;
+  let errorCellmlContentsPtr;
+  let overconstrainedContentsPtr;
+  let underconstrainedContentsPtr;
+  let unsuitablyConstrainedContentsPtr;
+  let algebraicContentsPtr;
+  let nlaContentsPtr;
+  let daeContentsPtr;
+  let combineArchiveContentsPtr;
+  let combineArchiveWithCellmlFileAsMasterFileContentsPtr;
 
   beforeAll(() => {
-    someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS,
+    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
+    errorCellmlContentsPtr = utils.allocateMemory(
+      loc,
+      utils.ERROR_CELLML_CONTENTS,
     );
-    someErrorCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_ERROR_CELLML_CONTENTS,
+    overconstrainedContentsPtr = utils.allocateMemory(
+      loc,
+      utils.OVERCONSTRAINED_CONTENTS,
     );
-    someOverconstrainedContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_OVERCONSTRAINED_CONTENTS,
+    underconstrainedContentsPtr = utils.allocateMemory(
+      loc,
+      utils.UNDERCONSTRAINED_CONTENTS,
     );
-    someUnderconstrainedContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNDERCONSTRAINED_CONTENTS,
+    unsuitablyConstrainedContentsPtr = utils.allocateMemory(
+      loc,
+      utils.UNSUITABLY_CONSTRAINED_CONTENTS,
     );
-    someUnsuitablyConstrainedContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_UNSUITABLY_CONSTRAINED_CONTENTS,
+    algebraicContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_CONTENTS);
+    nlaContentsPtr = utils.allocateMemory(loc, utils.NLA_CONTENTS);
+    daeContentsPtr = utils.allocateMemory(loc, utils.DAE_CONTENTS);
+    combineArchiveContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_CONTENTS,
     );
-    someAlgebraicContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_ALGEBRAIC_CONTENTS,
+    combineArchiveWithCellmlFileAsMasterFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS,
     );
-    someNlaContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_NLA_CONTENTS,
-    );
-    someDaeContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_DAE_CONTENTS,
-    );
-    someCombineArchiveContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
-    );
-    someCombineArchiveWithCellmlFileAsMasterFileContentsPtr =
-      utils.allocateMemory(
-        libopencor,
-        utils.SOME_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS,
-      );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someErrorCellmlContentsPtr);
-    utils.freeMemory(libopencor, someOverconstrainedContentsPtr);
-    utils.freeMemory(libopencor, someUnderconstrainedContentsPtr);
-    utils.freeMemory(libopencor, someUnsuitablyConstrainedContentsPtr);
-    utils.freeMemory(libopencor, someAlgebraicContentsPtr);
-    utils.freeMemory(libopencor, someNlaContentsPtr);
-    utils.freeMemory(libopencor, someDaeContentsPtr);
-    utils.freeMemory(libopencor, someCombineArchiveContentsPtr);
-    utils.freeMemory(
-      libopencor,
-      someCombineArchiveWithCellmlFileAsMasterFileContentsPtr,
-    );
+    utils.freeMemory(loc, cellmlContentsPtr);
+    utils.freeMemory(loc, errorCellmlContentsPtr);
+    utils.freeMemory(loc, overconstrainedContentsPtr);
+    utils.freeMemory(loc, underconstrainedContentsPtr);
+    utils.freeMemory(loc, unsuitablyConstrainedContentsPtr);
+    utils.freeMemory(loc, algebraicContentsPtr);
+    utils.freeMemory(loc, nlaContentsPtr);
+    utils.freeMemory(loc, daeContentsPtr);
+    utils.freeMemory(loc, combineArchiveContentsPtr);
+    utils.freeMemory(loc, combineArchiveWithCellmlFileAsMasterFileContentsPtr);
   });
 
   test("No file", () => {
-    const document = new libopencor.SedDocument();
+    const document = new loc.SedDocument();
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The simulation experiment description does not contain any tasks to run.",
       ],
     ]);
@@ -108,22 +92,20 @@ describe("Sed instance tests", () => {
   });
 
   test("Invalid CellML file", () => {
-    const file = new libopencor.File(
-      utils.resourcePath(utils.ERROR_CELLML_FILE),
-    );
+    const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(
-      someErrorCellmlContentsPtr,
-      utils.SOME_ERROR_CELLML_CONTENTS.length,
+      errorCellmlContentsPtr,
+      utils.ERROR_CELLML_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
-      [libopencor.Issue.Type.ERROR, "The CellML file is invalid."],
+    expectIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, "The CellML file is invalid."],
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
       ],
     ]);
@@ -134,20 +116,20 @@ describe("Sed instance tests", () => {
   });
 
   test("Overconstrained CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someOverconstrainedContentsPtr,
-      utils.SOME_OVERCONSTRAINED_CONTENTS.length,
+      overconstrainedContentsPtr,
+      utils.OVERCONSTRAINED_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
-      [libopencor.Issue.Type.ERROR, "The CellML file is overconstrained."],
+    expectIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, "The CellML file is overconstrained."],
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "Variable 'x' in component 'my_component' is computed more than once.",
       ],
     ]);
@@ -158,20 +140,20 @@ describe("Sed instance tests", () => {
   });
 
   test("Underconstrained CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someUnderconstrainedContentsPtr,
-      utils.SOME_UNDERCONSTRAINED_CONTENTS.length,
+      underconstrainedContentsPtr,
+      utils.UNDERCONSTRAINED_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
-      [libopencor.Issue.Type.ERROR, "The CellML file is underconstrained."],
+    expectIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, "The CellML file is underconstrained."],
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
@@ -182,27 +164,24 @@ describe("Sed instance tests", () => {
   });
 
   test("Unsuitably constrained CellML file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someUnsuitablyConstrainedContentsPtr,
-      utils.SOME_UNSUITABLY_CONSTRAINED_CONTENTS.length,
+      unsuitablyConstrainedContentsPtr,
+      utils.UNSUITABLY_CONSTRAINED_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, "The CellML file is unsuitably constrained."],
       [
-        libopencor.Issue.Type.ERROR,
-        "The CellML file is unsuitably constrained.",
-      ],
-      [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "Variable 'y' in component 'my_component' is computed more than once.",
       ],
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
@@ -213,14 +192,11 @@ describe("Sed instance tests", () => {
   });
 
   test("Algebraic model", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      someAlgebraicContentsPtr,
-      utils.SOME_ALGEBRAIC_CONTENTS.length,
-    );
+    file.setContents(algebraicContentsPtr, utils.ALGEBRAIC_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
     instance.run();
@@ -233,11 +209,11 @@ describe("Sed instance tests", () => {
   });
 
   test("ODE model", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const cvode = simulation.odeSolver;
 
@@ -249,9 +225,9 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "At t = 0.00140013827899996, mxstep steps taken before reaching tout.",
       ],
     ]);
@@ -272,19 +248,19 @@ describe("Sed instance tests", () => {
   });
 
   test("ODE model with no ODE solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     document.simulations.get(0).odeSolver = null;
 
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
       ],
     ]);
@@ -296,29 +272,29 @@ describe("Sed instance tests", () => {
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("NLA model", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const kinsol = simulation.nlaSolver;
 
-    kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.BANDED;
+    kinsol.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
     kinsol.upperHalfBandwidth = -1;
 
     let instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
 
     instance.delete();
 
-    kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.DENSE;
+    kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
 
     instance = document.instantiate();
 
@@ -330,19 +306,19 @@ describe("Sed instance tests", () => {
   });
 
   test("NLA model with no NLA solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     document.simulations.get(0).nlaSolver = null;
 
     const instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
@@ -355,38 +331,38 @@ describe("Sed instance tests", () => {
 
   /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("DAE model", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
+    file.setContents(daeContentsPtr, utils.DAE_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const kinsol = simulation.nlaSolver;
 
-    kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.BANDED;
+    kinsol.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
     kinsol.upperHalfBandwidth = -1;
 
     let instance = document.instantiate();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
 
     instance.run();
 
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
       ],
     ]);
 
     instance.delete();
 
-    kinsol.linearSolver = libopencor.SolverKinsol.LinearSolver.DENSE;
+    kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
 
     instance = document.instantiate();
 
@@ -401,11 +377,11 @@ describe("Sed instance tests", () => {
   */
 
   test("DAE model with no ODE or NLA solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
+    file.setContents(daeContentsPtr, utils.DAE_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
 
     simulation.odeSolver = null;
@@ -414,13 +390,13 @@ describe("Sed instance tests", () => {
     const instance = document.instantiate();
 
     /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
-    expectIssues(libopencor, instance, [
+    expectIssues(loc, instance, [
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
       ],
       [
-        libopencor.Issue.Type.ERROR,
+        loc.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
@@ -432,14 +408,14 @@ describe("Sed instance tests", () => {
   });
 
   test("COMBINE archive", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+      combineArchiveContentsPtr,
+      utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
     instance.run();
@@ -452,15 +428,14 @@ describe("Sed instance tests", () => {
   });
 
   test("COMBINE archive with CellML file as master file", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.COMBINE_ARCHIVE));
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithCellmlFileAsMasterFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS
-        .length,
+      combineArchiveWithCellmlFileAsMasterFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS.length,
     );
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
     expect(instance.hasIssues).toBe(false);

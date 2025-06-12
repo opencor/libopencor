@@ -20,19 +20,19 @@ limitations under the License.
 
 TEST(InstanceSedTest, noFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The simulation experiment description does not contain any tasks to run."},
     };
 
     auto document = libOpenCOR::SedDocument::create();
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, invalidCellmlFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is invalid."},
         {libOpenCOR::Issue::Type::ERROR, "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."},
     };
@@ -41,12 +41,12 @@ TEST(InstanceSedTest, invalidCellmlFile)
     auto document = libOpenCOR::SedDocument::create(file);
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, overconstrainedCellmlFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is overconstrained."},
         {libOpenCOR::Issue::Type::ERROR, "Variable 'x' in component 'my_component' is computed more than once."},
     };
@@ -55,12 +55,12 @@ TEST(InstanceSedTest, overconstrainedCellmlFile)
     auto document = libOpenCOR::SedDocument::create(file);
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, underconstrainedCellmlFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is underconstrained."},
         {libOpenCOR::Issue::Type::ERROR, "The type of variable 'x' in component 'my_component' is unknown."},
     };
@@ -69,12 +69,12 @@ TEST(InstanceSedTest, underconstrainedCellmlFile)
     auto document = libOpenCOR::SedDocument::create(file);
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, unsuitablyConstrainedCellmlFile)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is unsuitably constrained."},
         {libOpenCOR::Issue::Type::ERROR, "Variable 'y' in component 'my_component' is computed more than once."},
         {libOpenCOR::Issue::Type::ERROR, "The type of variable 'x' in component 'my_component' is unknown."},
@@ -84,7 +84,7 @@ TEST(InstanceSedTest, unsuitablyConstrainedCellmlFile)
     auto document = libOpenCOR::SedDocument::create(file);
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 namespace {
@@ -116,7 +116,7 @@ namespace {
 
 void runOdeModel(bool pCompiled)
 {
-    const libOpenCOR::ExpectedIssues expectedIssues = {
+    const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
 #ifdef BUILDING_ON_INTEL
         {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140013827899996, mxstep steps taken before reaching tout."},
 #else
@@ -151,7 +151,7 @@ void runOdeModel(bool pCompiled)
 
     instance->run();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 
     static const auto OK_MAXIMUM_NUMBER_OF_STEPS = 500;
 
@@ -178,7 +178,7 @@ TEST(InstanceSedTest, interpretedOdeModel)
 
 TEST(InstanceSedTest, odeModelWithNoOdeSolver)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
     };
 
@@ -189,14 +189,14 @@ TEST(InstanceSedTest, odeModelWithNoOdeSolver)
 
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, nlaModel)
 {
     //---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     };
 
@@ -210,7 +210,7 @@ TEST(InstanceSedTest, nlaModel)
 
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
@@ -221,7 +221,7 @@ TEST(InstanceSedTest, nlaModel)
 
 TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
     };
 
@@ -232,14 +232,14 @@ TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, daeModel)
 {
     //---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
 
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     };
 
@@ -253,11 +253,11 @@ TEST(InstanceSedTest, daeModel)
 
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 
     instance->run();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::DENSE);
 
@@ -270,7 +270,7 @@ TEST(InstanceSedTest, daeModel)
 
 TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
     };
@@ -284,7 +284,7 @@ TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
 
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, combineArchive)

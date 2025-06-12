@@ -36,8 +36,6 @@ public:
      * Constructors, destructor, and assignment operators.
      */
 
-    ~SedAbstractTask() override = default; /**< Destructor, @private. */
-
     SedAbstractTask(const SedAbstractTask &pOther) = delete; /**< No copy constructor allowed, @private. */
     SedAbstractTask(SedAbstractTask &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
 

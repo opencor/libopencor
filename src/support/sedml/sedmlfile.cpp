@@ -24,6 +24,7 @@ limitations under the License.
 #include "libopencor/file.h"
 #include "libopencor/filemanager.h"
 #include "libopencor/sedanalysis.h"
+#include "libopencor/sedchangeattribute.h"
 #include "libopencor/seddocument.h"
 #include "libopencor/sedmodel.h"
 #include "libopencor/sedonestep.h"
@@ -38,6 +39,7 @@ limitations under the License.
 #include "libopencor/solversecondorderrungekutta.h"
 
 #include "libsedmlbegin.h"
+#include "sedml/SedChangeAttribute.h"
 #include "sedml/SedDocument.h"
 #include "sedml/SedReader.h"
 #include "sedml/SedOneStep.h"
@@ -95,6 +97,68 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         }
 
         model->setId(mDocument->getModel(i)->getId());
+
+        for (unsigned int j = 0; j < mDocument->getModel(i)->getNumChanges(); ++j) {
+            auto *change = mDocument->getModel(i)->getChange(j);
+
+            if (change->isSedChangeAttribute()) {
+                static const std::string TARGET_START = "/cellml:model/cellml:component[@name='";
+                static const std::string TARGET_MIDDLE = "']/cellml:variable[@name='";
+                static const std::string TARGET_END = "']";
+
+                auto *changeAttribute = reinterpret_cast<libsedml::SedChangeAttribute *>(change);
+                auto target = changeAttribute->getTarget();
+                std::string componentName;
+                std::string variableName;
+                auto newValue = changeAttribute->getNewValue();
+
+                if (target.starts_with(TARGET_START)) {
+                    target.erase(0, TARGET_START.length());
+
+                    auto targetMiddlePos = target.find(TARGET_MIDDLE);
+
+                    if (targetMiddlePos != std::string::npos) {
+                        componentName = target.substr(0, targetMiddlePos);
+
+                        target.erase(0, targetMiddlePos + TARGET_MIDDLE.length());
+
+                        auto targetEndPos = target.find(TARGET_END);
+
+                        if (targetEndPos != std::string::npos) {
+                            variableName = target.substr(0, targetEndPos);
+                        }
+
+                        target.erase(0, targetEndPos + TARGET_END.length());
+
+                        if (!target.empty()) {
+                            componentName.clear();
+                            variableName.clear();
+                        }
+                    }
+                }
+
+                auto canAddChange = true;
+
+                if (componentName.empty() || variableName.empty()) {
+                    canAddChange = false;
+
+                    addError(std::string("The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '").append(changeAttribute->getTarget()).append("'."));
+                }
+
+                if (!isDouble(newValue)) {
+                    canAddChange = false;
+
+                    addError(std::string("The new value '").append(newValue).append("' for the change of type 'changeAttribute' is not a valid double value."));
+                }
+
+                if (canAddChange) {
+                    model->addChange(SedChangeAttribute::create(componentName, variableName,
+                                                                changeAttribute->getNewValue()));
+                }
+            } else {
+                addWarning(std::string("Only changes of type 'changeAttribute' are currently supported. The change of type '").append(change->getElementName()).append("' has been ignored."));
+            }
+        }
 
         pDocument->addModel(model);
     }
@@ -198,13 +262,13 @@ SedmlFile::~SedmlFile()
 
 SedmlFile::Impl *SedmlFile::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 /*---GRY---
 const SedmlFile::Impl *SedmlFile::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 */
 

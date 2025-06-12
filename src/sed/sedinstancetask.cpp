@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "file_p.h"
+#include "sedchangeattribute_p.h"
 #include "sedinstancetask_p.h"
 #include "sedmodel_p.h"
 #include "sedtask_p.h"
@@ -26,7 +27,13 @@ namespace libOpenCOR {
 
 SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask, bool pCompiled)
 {
-    return SedInstanceTaskPtr {new SedInstanceTask(pTask, pCompiled)};
+    auto res = SedInstanceTaskPtr {new SedInstanceTask {pTask, pCompiled}};
+
+    res->pimpl()->mOwner = res;
+
+    res->pimpl()->initialise();
+
+    return res;
 }
 
 SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
@@ -41,7 +48,9 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 
     // Get a runtime for the model.
 
-    auto cellmlFile = task->pimpl()->mModel->pimpl()->mFile->pimpl()->mCellmlFile;
+    mModel = task->pimpl()->mModel;
+
+    auto cellmlFile = mModel->pimpl()->mFile->pimpl()->mCellmlFile;
     auto cellmlFileType = cellmlFile->type();
 
     mDifferentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
@@ -89,10 +98,6 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
     mResults.constants.resize(mAnalyserModel->constantCount(), {});
     mResults.computedConstants.resize(mAnalyserModel->computedConstantCount(), {});
     mResults.algebraic.resize(mAnalyserModel->algebraicCount(), {});
-
-    // Initialise our model.
-
-    initialise();
 }
 
 void SedInstanceTask::Impl::trackResults(size_t pIndex)
@@ -117,6 +122,22 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     }
 }
 
+void SedInstanceTask::Impl::applyChanges()
+{
+    for (const auto &change : mModel->changes()) {
+        //---GRY--- AT THIS STAGE, WE ONLY SUPPORT ChangeAttribute CHANGES, HENCE WE ASSERT (FOR NOW) THAT change IS
+        //          INDEED A SedChnageAttribute OBJECT.
+
+        auto changeAttribute = std::dynamic_pointer_cast<SedChangeAttribute>(change);
+
+        ASSERT_NE(changeAttribute, nullptr);
+
+        changeAttribute->pimpl()->apply(mOwner.lock(), mAnalyserModel);
+
+        addIssues(changeAttribute);
+    }
+}
+
 void SedInstanceTask::Impl::initialise()
 {
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -131,12 +152,18 @@ void SedInstanceTask::Impl::initialise()
 #ifndef __EMSCRIPTEN__
         if (mCompiled) {
             mRuntime->initialiseCompiledVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+
+            applyChanges();
+
             mRuntime->computeCompiledComputedConstants()(mConstants, mComputedConstants);
             mRuntime->computeCompiledRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
             mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
         } else {
 #endif
             mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+
+            applyChanges();
+
             mRuntime->computeInterpretedComputedConstants()(mConstants, mComputedConstants);
             mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
             mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
@@ -144,11 +171,17 @@ void SedInstanceTask::Impl::initialise()
         }
     } else if (mCompiled) {
         mRuntime->initialiseCompiledVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+
+        applyChanges();
+
         mRuntime->computeCompiledComputedConstants()(mConstants, mComputedConstants);
         mRuntime->computeCompiledVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
 #endif
     } else {
         mRuntime->initialiseInterpretedVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+
+        applyChanges();
+
         mRuntime->computeInterpretedComputedConstants()(mConstants, mComputedConstants);
         mRuntime->computeInterpretedVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
     }
@@ -277,17 +310,6 @@ double SedInstanceTask::Impl::run()
 
     return std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - startTime).count();
 }
-
-namespace {
-
-std::string name(const libcellml::VariablePtr &pVariable)
-{
-    auto component = std::dynamic_pointer_cast<libcellml::Component>(pVariable->parent());
-
-    return component->name() + "/" + pVariable->name();
-}
-
-} // namespace
 
 Doubles SedInstanceTask::Impl::voi() const
 {
@@ -488,12 +510,12 @@ SedInstanceTask::~SedInstanceTask()
 
 SedInstanceTask::Impl *SedInstanceTask::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 Doubles SedInstanceTask::voi() const

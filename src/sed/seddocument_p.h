@@ -58,6 +58,7 @@ public:
     SedModelPtr model(size_t pIndex) const;
     bool addModel(const SedModelPtr &pModel);
     bool removeModel(const SedModelPtr &pModel);
+    bool removeAllModels();
 
     bool hasSimulations() const;
     size_t simulationCount() const;
@@ -65,6 +66,7 @@ public:
     SedSimulationPtr simulation(size_t pIndex) const;
     bool addSimulation(const SedSimulationPtr &pSimulation);
     bool removeSimulation(const SedSimulationPtr &pSimulation);
+    bool removeAllSimulations();
 
     bool hasTasks() const;
     size_t taskCount() const;
@@ -72,6 +74,7 @@ public:
     SedAbstractTaskPtr task(size_t pIndex) const;
     bool addTask(const SedAbstractTaskPtr &pTask);
     bool removeTask(const SedAbstractTaskPtr &pTask);
+    bool removeAllTasks();
 };
 
 } // namespace libOpenCOR

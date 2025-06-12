@@ -153,10 +153,10 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
+    explicit SolverKinsol(); /**< Constructor, @private. */
+
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
-
-    explicit SolverKinsol(); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

@@ -57,11 +57,11 @@ IrretrievableRemoteFile = "https://some.domain.com/irretrievable_file.txt"
 
 NoContents = ""
 SomeUnknownContents = "Some unknown contents..."
-SomeCellmlContents = """@SOME_CELLML_CONTENTS@"""
-SomeErrorCellmlContents = """@SOME_ERROR_CELLML_CONTENTS@"""
-SomeWarningCellmlContents = """@SOME_WARNING_CELLML_CONTENTS@"""
-SomeSedmlContents = """@SOME_SEDML_CONTENTS@"""
-SomeCombineArchiveContents = base64.b64decode(b"@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@")
+SomeCellmlContents = """@CELLML_CONTENTS@"""
+SomeErrorCellmlContents = """@ERROR_CELLML_CONTENTS@"""
+SomeWarningCellmlContents = """@WARNING_CELLML_CONTENTS@"""
+SomeSedmlContents = """@SEDML_CONTENTS@"""
+SomeCombineArchiveContents = base64.b64decode(b"@BASE64_COMBINE_ARCHIVE_CONTENTS@")
 
 
 def assert_issues(logger, expected_issues):

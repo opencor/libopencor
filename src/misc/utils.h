@@ -28,6 +28,7 @@ limitations under the License.
 #    include <cassert>
 #endif
 #include <filesystem>
+#include <libcellml>
 
 #ifdef NAN
 #    undef NAN
@@ -72,7 +73,7 @@ using StringStringMap = std::map<std::string, std::string>;
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 #ifdef BUILDING_USING_MSVC
-std::string forwardSlashPath(const std::string &pPath);
+std::string LIBOPENCOR_UNIT_TESTING_EXPORT forwardSlashPath(const std::string &pPath);
 #endif
 
 std::filesystem::path LIBOPENCOR_UNIT_TESTING_EXPORT stringToPath(const std::string &pString);
@@ -126,5 +127,10 @@ SolverKinsol::LinearSolver toKinsolLinearSolver(const std::string &pLinearSolver
 std::string toString(SolverKinsol::LinearSolver pLinearSolver);
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
+
+libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable);
+
+std::string name(const std::string &pComponentName, const std::string &pVariableName);
+std::string name(const libcellml::VariablePtr &pVariable);
 
 } // namespace libOpenCOR

@@ -377,12 +377,12 @@ Compiler::~Compiler()
 
 Compiler::Impl *Compiler::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const Compiler::Impl *Compiler::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 CompilerPtr Compiler::create()

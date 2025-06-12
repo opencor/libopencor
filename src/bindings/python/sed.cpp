@@ -28,9 +28,26 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedBase, libOpenCOR::Logger> sedBase(m, "SedBase");
 
+    sedBase.def_prop_rw("id", &libOpenCOR::SedBase::id, &libOpenCOR::SedBase::setId, "The id of the SedBase object.");
+
     // SedAbstractTask API.
 
     nb::class_<libOpenCOR::SedAbstractTask, libOpenCOR::SedBase> sedAbstractTask(m, "SedAbstractTask");
+
+    // SedChange API.
+
+    nb::class_<libOpenCOR::SedChange, libOpenCOR::SedBase> sedChange(m, "SedChange");
+
+    sedChange.def_prop_ro("target", &libOpenCOR::SedChange::target, "Return the target of the SedChange object.");
+
+    // SedChangeAttribute API.
+
+    nb::class_<libOpenCOR::SedChangeAttribute, libOpenCOR::SedChange> sedChangeAttribute(m, "SedChangeAttribute");
+
+    sedChangeAttribute.def(nb::new_(&libOpenCOR::SedChangeAttribute::create), "Create a SedChangeAttribute object.", nb::arg("component"), nb::arg("variable"), nb::arg("new_value"))
+        .def_prop_rw("component_name", &libOpenCOR::SedChangeAttribute::componentName, &libOpenCOR::SedChangeAttribute::setComponentName, "The name of the component of the SedChangeAttribute object.")
+        .def_prop_rw("variable_name", &libOpenCOR::SedChangeAttribute::variableName, &libOpenCOR::SedChangeAttribute::setVariableName, "The name of the variable of the SedChangeAttribute object.")
+        .def_prop_rw("new_value", &libOpenCOR::SedChangeAttribute::newValue, &libOpenCOR::SedChangeAttribute::setNewValue, "The new value of the SedChangeAttribute object.");
 
     // SedDataDescription API.
 
@@ -57,18 +74,21 @@ void sedApi(nb::module_ &m)
         .def("model", &libOpenCOR::SedDocument::model, "Return the model.")
         .def("add_model", &libOpenCOR::SedDocument::addModel, "Add a model.", nb::arg("model").none())
         .def("remove_model", &libOpenCOR::SedDocument::removeModel, "Remove a model.", nb::arg("model").none())
+        .def("remove_all_models", &libOpenCOR::SedDocument::removeAllModels, "Remove all models.")
         .def_prop_ro("has_simulations", &libOpenCOR::SedDocument::hasSimulations, "Return whether there are some simulations.")
         .def_prop_ro("simulation_count", &libOpenCOR::SedDocument::simulationCount, "Return the number of simulations.")
         .def_prop_ro("simulations", &libOpenCOR::SedDocument::simulations, "Return the simulations.")
         .def("simulation", &libOpenCOR::SedDocument::simulation, "Return the simulation.")
         .def("add_simulation", &libOpenCOR::SedDocument::addSimulation, "Add a simulation.", nb::arg("simulation").none())
         .def("remove_simulation", &libOpenCOR::SedDocument::removeSimulation, "Remove a simulation.", nb::arg("simulation").none())
+        .def("remove_all_simulations", &libOpenCOR::SedDocument::removeAllSimulations, "Remove all simulations.")
         .def_prop_ro("has_tasks", &libOpenCOR::SedDocument::hasTasks, "Return whether there are some tasks.")
         .def_prop_ro("task_count", &libOpenCOR::SedDocument::taskCount, "Return the number of tasks.")
         .def_prop_ro("tasks", &libOpenCOR::SedDocument::tasks, "Return the tasks.")
         .def("task", &libOpenCOR::SedDocument::task, "Return the task.")
         .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.", nb::arg("task").none())
         .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.", nb::arg("task").none())
+        .def("remove_all_tasks", &libOpenCOR::SedDocument::removeAllTasks, "Remove all tasks.")
         .def("instantiate", &libOpenCOR::SedDocument::instantiate, "Instantiate this SedDocument object.", nb::arg("compiled") = true);
 
     // SedInstance API.
@@ -114,11 +134,19 @@ void sedApi(nb::module_ &m)
     nb::class_<libOpenCOR::SedModel, libOpenCOR::SedBase> sedModel(m, "SedModel");
 
     sedModel.def(nb::new_(&libOpenCOR::SedModel::create), "Create a SedModel object.", nb::arg("document"), nb::arg("file"))
-        .def_prop_ro("file", &libOpenCOR::SedModel::file, "Return the file.");
+        .def_prop_ro("file", &libOpenCOR::SedModel::file, "Return the file.")
+        .def_prop_ro("has_changes", &libOpenCOR::SedModel::hasChanges, "Return whether there are some changes.")
+        .def_prop_ro("change_count", &libOpenCOR::SedModel::changeCount, "Return the number of changes.")
+        .def_prop_ro("changes", &libOpenCOR::SedModel::changes, "Return the changes.")
+        .def("change", &libOpenCOR::SedModel::change, "Return the change.")
+        .def("add_change", &libOpenCOR::SedModel::addChange, "Add a change.", nb::arg("change").none())
+        .def("remove_change", &libOpenCOR::SedModel::removeChange, "Remove a change.", nb::arg("change").none())
+        .def("remove_all_changes", &libOpenCOR::SedModel::removeAllChanges, "Remove all changes.");
 
     // SedOutput API.
 
-    nb::class_<libOpenCOR::SedOutput, libOpenCOR::SedBase> sedOutput(m, "SedOutput");
+    nb::class_<libOpenCOR::SedOutput, libOpenCOR::SedBase>
+        sedOutput(m, "SedOutput");
 
     // SedRepeatedTask API.
 

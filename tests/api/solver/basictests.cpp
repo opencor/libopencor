@@ -46,8 +46,8 @@ TEST(BasicSolverTest, SolverCvode)
     EXPECT_EQ(solver->preconditioner(), libOpenCOR::SolverCvode::Preconditioner::BANDED);
     EXPECT_EQ(solver->upperHalfBandwidth(), 0);
     EXPECT_EQ(solver->lowerHalfBandwidth(), 0);
-    EXPECT_EQ(solver->relativeTolerance(), 1.0e-7);
-    EXPECT_EQ(solver->absoluteTolerance(), 1.0e-7);
+    EXPECT_EQ(solver->relativeTolerance(), 1e-07);
+    EXPECT_EQ(solver->absoluteTolerance(), 1e-07);
     EXPECT_EQ(solver->interpolateSolution(), true);
 
     solver->setMaximumStep(MAXIMUM_STEP);

@@ -18,50 +18,35 @@ import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 import { expectIssues } from "./utils.js";
 
-const libopencor = await libOpenCOR();
+const loc = await libOpenCOR();
 
 describe("Sed serialise tests", () => {
-  let someCellmlContentsPtr;
-  let someSedmlContentsPtr;
-  let someAlgebraicContentsPtr;
-  let someDaeContentsPtr;
-  let someNlaContentsPtr;
-  let someSedmlWithSimulationsContentsPtr;
+  let cellmlContentsPtr;
+  let sedmlContentsPtr;
+  let algebraicContentsPtr;
+  let daeContentsPtr;
+  let nlaContentsPtr;
+  let sedmlWithSimulationsContentsPtr;
 
   beforeAll(() => {
-    someCellmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_CELLML_CONTENTS,
-    );
-    someSedmlContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_CONTENTS,
-    );
-    someAlgebraicContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_ALGEBRAIC_CONTENTS,
-    );
-    someDaeContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_DAE_CONTENTS,
-    );
-    someNlaContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_NLA_CONTENTS,
-    );
-    someSedmlWithSimulationsContentsPtr = utils.allocateMemory(
-      libopencor,
-      utils.SOME_SEDML_WITH_SIMULATIONS_CONTENTS,
+    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
+    sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
+    algebraicContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_CONTENTS);
+    daeContentsPtr = utils.allocateMemory(loc, utils.DAE_CONTENTS);
+    nlaContentsPtr = utils.allocateMemory(loc, utils.NLA_CONTENTS);
+    sedmlWithSimulationsContentsPtr = utils.allocateMemory(
+      loc,
+      utils.SEDML_WITH_SIMULATIONS_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(libopencor, someCellmlContentsPtr);
-    utils.freeMemory(libopencor, someSedmlContentsPtr);
-    utils.freeMemory(libopencor, someAlgebraicContentsPtr);
-    utils.freeMemory(libopencor, someDaeContentsPtr);
-    utils.freeMemory(libopencor, someNlaContentsPtr);
-    utils.freeMemory(libopencor, someSedmlWithSimulationsContentsPtr);
+    utils.freeMemory(loc, cellmlContentsPtr);
+    utils.freeMemory(loc, sedmlContentsPtr);
+    utils.freeMemory(loc, algebraicContentsPtr);
+    utils.freeMemory(loc, daeContentsPtr);
+    utils.freeMemory(loc, nlaContentsPtr);
+    utils.freeMemory(loc, sedmlWithSimulationsContentsPtr);
   });
 
   function cvodeExpectedSerialisation(source, parameters = {}) {
@@ -130,11 +115,11 @@ describe("Sed serialise tests", () => {
   }
 
   test("Local CellML file with base path", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml"),
@@ -145,11 +130,11 @@ describe("Sed serialise tests", () => {
   });
 
   test("Local CellML file without base path", () => {
-    const file = new libopencor.File(utils.LOCAL_FILE);
+    const file = new loc.File(utils.LOCAL_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise()).toBe(
       cvodeExpectedSerialisation("file:///some/path/file.txt"),
@@ -160,11 +145,11 @@ describe("Sed serialise tests", () => {
   });
 
   test("Relative local CellML file with base path", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise(utils.RESOURCE_LOCATION + "/../..")).toBe(
       cvodeExpectedSerialisation("some/path/cellml_2.cellml"),
@@ -175,11 +160,11 @@ describe("Sed serialise tests", () => {
   });
 
   test("Relative local CellML file without base path", () => {
-    const file = new libopencor.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise()).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml"),
@@ -190,11 +175,11 @@ describe("Sed serialise tests", () => {
   });
 
   test("Remote CellML file with base path", () => {
-    const file = new libopencor.File(utils.REMOTE_FILE);
+    const file = new loc.File(utils.REMOTE_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise(utils.REMOTE_BASE_PATH)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml"),
@@ -205,11 +190,11 @@ describe("Sed serialise tests", () => {
   });
 
   test("Remote CellML file without base path", () => {
-    const file = new libopencor.File(utils.REMOTE_FILE);
+    const file = new loc.File(utils.REMOTE_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise()).toBe(
       cvodeExpectedSerialisation(
@@ -222,11 +207,11 @@ describe("Sed serialise tests", () => {
   });
 
   test("Relative remote CellML file with base path", () => {
-    const file = new libopencor.File(utils.REMOTE_FILE);
+    const file = new loc.File(utils.REMOTE_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
       cvodeExpectedSerialisation("tests/res/cellml_2.cellml"),
@@ -275,11 +260,11 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someDaeContentsPtr, utils.SOME_DAE_CONTENTS.length);
+    file.setContents(daeContentsPtr, utils.DAE_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
@@ -290,11 +275,11 @@ describe("Sed serialise tests", () => {
   });
 
   test("NLA model", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation(),
@@ -319,14 +304,11 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(
-      someAlgebraicContentsPtr,
-      utils.SOME_ALGEBRAIC_CONTENTS.length,
-    );
+    file.setContents(algebraicContentsPtr, utils.ALGEBRAIC_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
@@ -334,6 +316,65 @@ describe("Sed serialise tests", () => {
 
     document.delete();
     file.delete();
+  });
+
+  function sedChangeExpectedSerialisation(component, variable, newValue) {
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.sedml">
+      <listOfChanges>
+        <changeAttribute target="/cellml:model/cellml:component[@name='${component}']/cellml:variable[@name='${variable}']" newValue="${newValue}"/>
+      </listOfChanges>
+    </model>
+  </listOfModels>
+</sedML>
+`;
+  }
+
+  test("Model with changes", () => {
+    const changeAttribute = new loc.SedChangeAttribute(
+      "component",
+      "variable",
+      "123.456789",
+    );
+
+    expect(changeAttribute.target).toBe(
+      "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']",
+    );
+    expect(changeAttribute.componentName).toBe("component");
+    expect(changeAttribute.variableName).toBe("variable");
+    expect(changeAttribute.newValue).toBe("123.456789");
+
+    const document = new loc.SedDocument();
+    const file = new loc.File(utils.SEDML_FILE);
+    const model = new loc.SedModel(document, file);
+
+    expect(model.addChange(changeAttribute)).toBe(true);
+    expect(document.addModel(model)).toBe(true);
+
+    expect(document.serialise()).toBe(
+      sedChangeExpectedSerialisation("component", "variable", "123.456789"),
+    );
+
+    changeAttribute.componentName = "new_component";
+    changeAttribute.variableName = "new_variable";
+    changeAttribute.newValue = "987.654321";
+
+    expect(changeAttribute.target).toBe(
+      "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']",
+    );
+    expect(changeAttribute.componentName).toBe("new_component");
+    expect(changeAttribute.variableName).toBe("new_variable");
+    expect(changeAttribute.newValue).toBe("987.654321");
+
+    expect(document.serialise()).toBe(
+      sedChangeExpectedSerialisation(
+        "new_component",
+        "new_variable",
+        "987.654321",
+      ),
+    );
   });
 
   test("Fixed-step ODE solver", () => {
@@ -357,14 +398,14 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
 
-    simulation.odeSolver = new libopencor.SolverForwardEuler();
+    simulation.odeSolver = new loc.SolverForwardEuler();
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       expectedSerialisation,
@@ -375,16 +416,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with the Adams-Moulton integration method", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.integrationMethod =
-      libopencor.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
+    solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -397,15 +437,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a functional iteration type", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.iterationType = libopencor.SolverCvode.IterationType.FUNCTIONAL;
+    solver.iterationType = loc.SolverCvode.IterationType.FUNCTIONAL;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -418,15 +458,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a banded linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BANDED;
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -439,15 +479,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a diagonal linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.linearSolver = libopencor.SolverCvode.LinearSolver.DIAGONAL;
+    solver.linearSolver = loc.SolverCvode.LinearSolver.DIAGONAL;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -460,15 +500,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a GMRES linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.linearSolver = libopencor.SolverCvode.LinearSolver.GMRES;
+    solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -481,15 +521,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a BiCGStab linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.linearSolver = libopencor.SolverCvode.LinearSolver.BICGSTAB;
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -502,15 +542,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with a TFQMR linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.linearSolver = libopencor.SolverCvode.LinearSolver.TFQMR;
+    solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", {
@@ -523,15 +563,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with no preconditioner", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
-    solver.preconditioner = libopencor.SolverCvode.Preconditioner.NO;
+    solver.preconditioner = loc.SolverCvode.Preconditioner.NO;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       cvodeExpectedSerialisation("cellml_2.cellml", { "KISAO:0000478": "No" }),
@@ -542,11 +582,11 @@ describe("Sed serialise tests", () => {
   });
 
   test("CVODE solver with no interpolate solution", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.odeSolver;
 
@@ -563,15 +603,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a banded linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.nlaSolver;
 
-    solver.linearSolver = libopencor.SolverKinsol.LinearSolver.BANDED;
+    solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "Banded" }),
@@ -582,15 +622,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a GMRES linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.nlaSolver;
 
-    solver.linearSolver = libopencor.SolverKinsol.LinearSolver.GMRES;
+    solver.linearSolver = loc.SolverKinsol.LinearSolver.GMRES;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "GMRES" }),
@@ -601,15 +641,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a BiCGStab linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.nlaSolver;
 
-    solver.linearSolver = libopencor.SolverKinsol.LinearSolver.BICGSTAB;
+    solver.linearSolver = loc.SolverKinsol.LinearSolver.BICGSTAB;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "BiCGStab" }),
@@ -620,15 +660,15 @@ describe("Sed serialise tests", () => {
   });
 
   test("KINSOL solver with a TFQMR linear solver", () => {
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someNlaContentsPtr, utils.SOME_NLA_CONTENTS.length);
+    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
     const solver = simulation.nlaSolver;
 
-    solver.linearSolver = libopencor.SolverKinsol.LinearSolver.TFQMR;
+    solver.linearSolver = loc.SolverKinsol.LinearSolver.TFQMR;
 
     expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
       kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),
@@ -653,15 +693,15 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    const document = new libopencor.SedDocument(file);
+    const document = new loc.SedDocument(file);
 
     document.removeSimulation(document.simulations.get(0));
 
-    const simulation = new libopencor.SedOneStep(document);
+    const simulation = new loc.SedOneStep(document);
 
     document.addSimulation(simulation);
 
@@ -705,15 +745,15 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
-    file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
+    file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
 
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it.",
       ],
     ]);
@@ -964,174 +1004,174 @@ describe("Sed serialise tests", () => {
 </sedML>
 `;
 
-    const file = new libopencor.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
     file.setContents(
-      someSedmlWithSimulationsContentsPtr,
-      utils.SOME_SEDML_WITH_SIMULATIONS_CONTENTS.length,
+      sedmlWithSimulationsContentsPtr,
+      utils.SEDML_WITH_SIMULATIONS_CONTENTS.length,
     );
 
-    let document = new libopencor.SedDocument(file);
+    let document = new loc.SedDocument(file);
 
-    expectIssues(libopencor, document, [
+    expectIssues(loc, document, [
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The step ('KISAO:0000483') cannot be equal to '-1.23'. It must be greater or equal to 0. A step of 1 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The step ('KISAO:0000483') cannot be equal to 'nan'. It must be greater or equal to 0. A step of 1 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The step ('KISAO:0000483') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A step of 1 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The relative tolerance ('KISAO:0000209') cannot be equal to '-1e-03'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The absolute tolerance ('KISAO:0000211') cannot be equal to '-1e-05'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum number of steps ('KISAO:0000415') cannot be equal to '-369'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum step ('KISAO:0000467') cannot be equal to '-0.01'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '-1'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '-2'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The relative tolerance ('KISAO:0000209') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The absolute tolerance ('KISAO:0000211') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum number of steps ('KISAO:0000415') cannot be equal to 'NotANumber'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum step ('KISAO:0000467') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The integration method ('KISAO:0000475') cannot be equal to 'Unknown'. It must be equal to 'BDF' or 'Adams-Moulton'. A BDF integration method will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The iteration type ('KISAO:0000476') cannot be equal to 'Unknown'. It must be equal to 'Functional' or 'Newton'. A Newton iteration type will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The preconditioner ('KISAO:0000478') cannot be equal to 'Unknown'. It must be equal to 'No' or 'Banded'. A Banded preconditioner will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The upper half-bandwidth ('KISAO:0000479') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The lower half-bandwidth ('KISAO:0000480') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The interpolate solution parameter ('KISAO:0000481') cannot be equal to 'True'. It must be equal to 'true' or 'false'. A value of true will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The relative tolerance ('KISAO:0000209') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The absolute tolerance ('KISAO:0000211') cannot be equal to '1.23e456789'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum number of steps ('KISAO:0000415') cannot be equal to '1234567890123'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum step ('KISAO:0000467') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum number of iterations ('KISAO:0000486') cannot be equal to '-123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '-1'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '-2'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum number of iterations ('KISAO:0000486') cannot be equal to 'NotANumber'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The upper half-bandwidth ('KISAO:0000479') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The lower half-bandwidth ('KISAO:0000480') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The maximum number of iterations ('KISAO:0000486') cannot be equal to '1234567890123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
       ],
       [
-        libopencor.Issue.Type.WARNING,
+        loc.Issue.Type.WARNING,
         "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
       ],
     ]);

@@ -123,7 +123,7 @@ def test_combine_archive_with_no_master_file():
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_sbml_file_as_master_file():
+def test_combine_archive_with_unknown_direct_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
@@ -131,7 +131,38 @@ def test_combine_archive_with_sbml_file_as_master_file():
         ],
     ]
 
-    file = loc.File(utils.resource_path("api/sed/sbml_file_as_master_file.omex"))
+    file = loc.File(utils.resource_path("api/sed/unknown_direct_cellml_file.omex"))
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_unknown_indirect_cellml_file():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task 'task1' requires a model of CellML type.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/unknown_indirect_cellml_file.omex"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.run()
+
+    assert_issues(instance, expected_issues)
+
+
+def test_combine_archive_with_unknown_sedml_file():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/unknown_sedml_file.omex"))
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues)

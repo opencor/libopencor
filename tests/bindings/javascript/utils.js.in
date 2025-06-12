@@ -37,50 +37,50 @@ export const REMOTE_FILE =
   "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 
 export const NO_CONTENTS = stringToArrayBuffer("");
-export const SOME_NULL_CHARACTER_CONTENTS = stringToArrayBuffer("\0");
-export const SOME_UNKNOWN_CONTENTS = stringToArrayBuffer(
-  "Some unknown contents...",
+export const NULL_CHARACTER_CONTENTS = stringToArrayBuffer("\0");
+export const UNKNOWN_CONTENTS = stringToArrayBuffer("Some unknown contents...");
+export const CELLML_CONTENTS = stringToArrayBuffer(`@CELLML_CONTENTS@`);
+export const ERROR_CELLML_CONTENTS = stringToArrayBuffer(
+  `@ERROR_CELLML_CONTENTS@`,
 );
-export const SOME_CELLML_CONTENTS = stringToArrayBuffer(
-  `@SOME_CELLML_CONTENTS@`,
+export const WARNING_CELLML_CONTENTS = stringToArrayBuffer(
+  `@WARNING_CELLML_CONTENTS@`,
 );
-export const SOME_ERROR_CELLML_CONTENTS = stringToArrayBuffer(
-  `@SOME_ERROR_CELLML_CONTENTS@`,
+export const SEDML_CONTENTS = stringToArrayBuffer(`@SEDML_CONTENTS@`);
+export const SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS = stringToArrayBuffer(
+  `@SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS@`,
 );
-export const SOME_WARNING_CELLML_CONTENTS = stringToArrayBuffer(
-  `@SOME_WARNING_CELLML_CONTENTS@`,
+export const SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS = stringToArrayBuffer(
+  `@SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS@`,
 );
-export const SOME_SEDML_CONTENTS = stringToArrayBuffer(`@SOME_SEDML_CONTENTS@`);
-export const SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS =
-  stringToArrayBuffer(`@SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS@`);
-export const SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS = stringToArrayBuffer(
-  `@SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS@`,
+export const SEDML_WITH_SIMULATIONS_CONTENTS = stringToArrayBuffer(
+  `@SEDML_WITH_SIMULATIONS_CONTENTS@`,
 );
-export const SOME_SEDML_WITH_SIMULATIONS_CONTENTS = stringToArrayBuffer(
-  `@SOME_SEDML_WITH_SIMULATIONS_CONTENTS@`,
+export const COMBINE_ARCHIVE_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_COMBINE_ARCHIVE_CONTENTS@"),
 );
-export const SOME_COMBINE_ARCHIVE_CONTENTS = stringToArrayBuffer(
-  atob("@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@"),
-);
-export const SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS =
+export const COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS =
   stringToArrayBuffer(
-    atob("@SOME_BASE64_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS@"),
+    atob("@BASE64_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS@"),
   );
-export const SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS =
+export const COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS@"),
+);
+export const COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS =
   stringToArrayBuffer(
-    atob("@SOME_BASE64_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS@"),
+    atob("@BASE64_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS@"),
   );
-export const SOME_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS =
+export const COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS =
   stringToArrayBuffer(
-    atob(
-      "@SOME_BASE64_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS@",
-    ),
+    atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS@"),
   );
-export const SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS =
+export const COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS =
   stringToArrayBuffer(
-    atob(
-      "@SOME_BASE64_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS@",
-    ),
+    atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS@"),
+  );
+export const COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS =
+  stringToArrayBuffer(
+    atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS@"),
   );
 export const DATASET_135_OMEX_CONTENTS = stringToArrayBuffer(
   atob("@BASE64_DATASET_135_OMEX_CONTENTS@"),
@@ -95,33 +95,46 @@ export const DATASET_157_JSON_CONTENTS = stringToArrayBuffer(
   atob("@BASE64_DATASET_157_JSON_CONTENTS@"),
 );
 
-export const SOME_SOLVER_ODE_CONTENTS = stringToArrayBuffer(
-  `@SOME_SOLVER_ODE_CONTENTS@`,
+export const SOLVER_ODE_CONTENTS = stringToArrayBuffer(`@SOLVER_ODE_CONTENTS@`);
+export const SOLVER_NLA1_CONTENTS = stringToArrayBuffer(
+  `@SOLVER_NLA1_CONTENTS@`,
 );
-export const SOME_SOLVER_NLA1_CONTENTS = stringToArrayBuffer(
-  `@SOME_SOLVER_NLA1_CONTENTS@`,
-);
-export const SOME_SOLVER_NLA2_CONTENTS = stringToArrayBuffer(
-  `@SOME_SOLVER_NLA2_CONTENTS@`,
+export const SOLVER_NLA2_CONTENTS = stringToArrayBuffer(
+  `@SOLVER_NLA2_CONTENTS@`,
 );
 
-export const SOME_ALGEBRAIC_CONTENTS = stringToArrayBuffer(
-  `@SOME_ALGEBRAIC_CONTENTS@`,
-);
-export const SOME_DAE_CONTENTS = stringToArrayBuffer(`@SOME_DAE_CONTENTS@`);
-export const SOME_NLA_CONTENTS = stringToArrayBuffer(`@SOME_NLA_CONTENTS@`);
+export const ALGEBRAIC_CONTENTS = stringToArrayBuffer(`@ALGEBRAIC_CONTENTS@`);
+export const DAE_CONTENTS = stringToArrayBuffer(`@DAE_CONTENTS@`);
+export const NLA_CONTENTS = stringToArrayBuffer(`@NLA_CONTENTS@`);
 
-export const SOME_OVERCONSTRAINED_CONTENTS = stringToArrayBuffer(
-  `@SOME_OVERCONSTRAINED_CONTENTS@`,
+export const OVERCONSTRAINED_CONTENTS = stringToArrayBuffer(
+  `@OVERCONSTRAINED_CONTENTS@`,
 );
-export const SOME_UNDERCONSTRAINED_CONTENTS = stringToArrayBuffer(
-  `@SOME_UNDERCONSTRAINED_CONTENTS@`,
+export const UNDERCONSTRAINED_CONTENTS = stringToArrayBuffer(
+  `@UNDERCONSTRAINED_CONTENTS@`,
 );
-export const SOME_UNSUITABLY_CONSTRAINED_CONTENTS = stringToArrayBuffer(
-  `@SOME_UNSUITABLY_CONSTRAINED_CONTENTS@`,
+export const UNSUITABLY_CONSTRAINED_CONTENTS = stringToArrayBuffer(
+  `@UNSUITABLY_CONSTRAINED_CONTENTS@`,
 );
 
-export function expectIssues(libopencor, logger, expectedIssues) {
+export const SED_CHANGES_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_SED_CHANGES_CONTENTS@"),
+);
+export const INVALID_SED_CHANGES_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_INVALID_SED_CHANGES_CONTENTS@"),
+);
+export const UNSUPPORTED_SED_CHANGES_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_UNSUPPORTED_SED_CHANGES_CONTENTS@"),
+);
+
+export const ALGEBRAIC_SED_CHANGES_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_ALGEBRAIC_SED_CHANGES_CONTENTS@"),
+);
+export const ODE_SED_CHANGES_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_ODE_SED_CHANGES_CONTENTS@"),
+);
+
+export function expectIssues(loc, logger, expectedIssues) {
   const issues = logger.issues;
 
   expect(issues.size()).toBe(expectedIssues.length);
@@ -130,7 +143,7 @@ export function expectIssues(libopencor, logger, expectedIssues) {
     expect(issues.get(i).type.value).toBe(expectedIssues[i][0].value);
     expect(issues.get(i).description).toBe(expectedIssues[i][1]);
 
-    if (issues.get(i).type === libopencor.Issue.Type.ERROR) {
+    if (issues.get(i).type === loc.Issue.Type.ERROR) {
       expect(issues.get(i).typeAsString).toBe("Error");
     } else {
       expect(issues.get(i).typeAsString).toBe("Warning");
@@ -139,7 +152,6 @@ export function expectIssues(libopencor, logger, expectedIssues) {
 }
 
 export function expectValues(
-  libopencor,
   instanceTask,
   index,
   stateValues,

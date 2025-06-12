@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
+
 #include "tests/utils.h"
 
 #include <libopencor>
@@ -60,6 +62,133 @@ TEST(CoverageSedTest, models)
     EXPECT_EQ(document->models().size(), 0);
 
     EXPECT_FALSE(document->removeModel(nullptr));
+    EXPECT_FALSE(document->removeAllModels());
+
+    EXPECT_TRUE(document->addModel(model));
+    EXPECT_TRUE(document->removeAllModels());
+
+    EXPECT_FALSE(model->hasChanges());
+    EXPECT_EQ(model->changeCount(), 0);
+    EXPECT_EQ(model->changes().size(), 0);
+    EXPECT_FALSE(model->addChange(nullptr));
+    EXPECT_FALSE(model->removeAllChanges());
+
+    auto changeAttribute = libOpenCOR::SedChangeAttribute::create("component", "variable", "newValue");
+
+    EXPECT_TRUE(model->addChange(changeAttribute));
+
+    EXPECT_TRUE(model->hasChanges());
+    EXPECT_EQ(model->changeCount(), 1);
+    EXPECT_EQ(model->changes().size(), 1);
+    EXPECT_EQ(model->changes()[0], changeAttribute);
+    EXPECT_EQ(model->change(0), changeAttribute);
+    EXPECT_EQ(model->change(1), nullptr);
+
+    EXPECT_FALSE(model->addChange(changeAttribute));
+    EXPECT_TRUE(model->removeChange(changeAttribute));
+
+    EXPECT_TRUE(model->addChange(changeAttribute));
+    EXPECT_TRUE(model->removeAllChanges());
+
+    EXPECT_FALSE(model->hasChanges());
+    EXPECT_EQ(model->changeCount(), 0);
+    EXPECT_EQ(model->changes().size(), 0);
+
+    EXPECT_FALSE(model->removeChange(nullptr));
+}
+
+namespace {
+
+std::string sedChangesExpectedSerialisation(const std::string &pSource, const std::string &pChanges)
+{
+    return std::string(R"(<?xml version="1.0" encoding="UTF-8"?>
+<sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
+  <listOfModels>
+    <model id="model" language="urn:sedml:language:cellml" source="file://)")
+        .append(
+#ifdef BUILDING_USING_MSVC
+            std::string("/").append(libOpenCOR::forwardSlashPath(pSource))
+#else
+            pSource
+#endif
+                )
+        .append(pChanges.empty() ? R"("/>)" : std::string(R"(">
+      <listOfChanges>)")
+                                                  .append(pChanges)
+                                                  .append(R"(      </listOfChanges>
+    </model>)"))
+        .append(R"(
+  </listOfModels>
+  <listOfSimulations>
+    <uniformTimeCourse id="simulation1" initialTime="0" outputStartTime="0" outputEndTime="50" numberOfSteps="50000">
+      <algorithm kisaoID="KISAO:0000019">
+        <listOfAlgorithmParameters>
+          <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+          <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+          <algorithmParameter kisaoID="KISAO:0000467" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+          <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+          <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+          <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+          <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+          <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+        </listOfAlgorithmParameters>
+      </algorithm>
+    </uniformTimeCourse>
+  </listOfSimulations>
+  <listOfTasks>
+    <task id="task1" modelReference="model" simulationReference="simulation1"/>
+  </listOfTasks>
+</sedML>
+)");
+}
+
+} // namespace
+
+TEST(CoverageSedTest, changes)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/sed_changes.omex"));
+    auto document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->serialise(), sedChangesExpectedSerialisation(file->childFile(1)->path(), R"(
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='beta']" newValue="3.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='rho']" newValue="13.0"/>
+        <changeAttribute target="/cellml:model/cellml:component[@name='main']/cellml:variable[@name='sigma']" newValue="9.0"/>
+)"));
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_1 = {
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'."},
+        {libOpenCOR::Issue::Type::ERROR, "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'."},
+        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."},
+    };
+
+    file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/invalid_sed_changes.omex"));
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES_1);
+    EXPECT_EQ(document->serialise(), sedChangesExpectedSerialisation(file->childFile(1)->path(), R"(
+        <changeAttribute target="/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']" newValue="1.23"/>
+)"));
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_2 = {
+        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."},
+    };
+
+    file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsupported_sed_changes.omex"));
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES_2);
+    EXPECT_EQ(document->serialise(), sedChangesExpectedSerialisation(file->childFile(1)->path(), {}));
 }
 
 TEST(CoverageSedTest, simulations)
@@ -111,6 +240,10 @@ TEST(CoverageSedTest, simulations)
     EXPECT_EQ(document->simulations().size(), 0);
 
     EXPECT_FALSE(document->removeSimulation(nullptr));
+    EXPECT_FALSE(document->removeAllSimulations());
+
+    EXPECT_TRUE(document->addSimulation(uniformTimeCourse));
+    EXPECT_TRUE(document->removeAllSimulations());
 }
 
 namespace {
@@ -166,14 +299,14 @@ TEST(CoverageSedTest, tasks)
 
     EXPECT_EQ(document->serialise(), sedTaskExpectedSerialisation(false));
 
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a model."},
         {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a simulation."},
     };
 
     auto instance = document->instantiate();
 
-    EXPECT_EQ_ISSUES(instance, expectedIssues);
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 
     EXPECT_FALSE(document->addTask(task));
     EXPECT_TRUE(document->removeTask(task));
@@ -183,6 +316,10 @@ TEST(CoverageSedTest, tasks)
     EXPECT_EQ(document->tasks().size(), 0);
 
     EXPECT_FALSE(document->removeTask(nullptr));
+    EXPECT_FALSE(document->removeAllTasks());
+
+    EXPECT_TRUE(document->addTask(task));
+    EXPECT_TRUE(document->removeAllTasks());
 }
 
 TEST(CoverageSedTest, odeSolver)

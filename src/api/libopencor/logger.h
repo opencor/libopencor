@@ -174,13 +174,9 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *pimpl(); /**< Private implementation pointer, @private. */
-    const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
+    Impl *mPimpl; /**< The private implementation, @private. */
 
     explicit Logger(Impl *pPimpl); /**< Constructor, @private. */
-
-private:
-    Impl *mPimpl; /**< The private implementation, @private. */
 };
 
 } // namespace libOpenCOR

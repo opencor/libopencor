@@ -40,7 +40,6 @@ public:
      */
 
     SolverNla() = delete; /**< No default constructor allowed, @private. */
-    ~SolverNla() override = default; /**< Destructor, @private. */
 
     SolverNla(const SolverNla &pOther) = delete; /**< No copy constructor allowed, @private. */
     SolverNla(SolverNla &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -68,10 +67,10 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
+    explicit SolverNla(Impl *pPimpl); /**< Constructor, @private. */
+
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */
-
-    explicit SolverNla(Impl *pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

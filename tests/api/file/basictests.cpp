@@ -115,7 +115,7 @@ TEST(BasicFileTest, localVirtualFile)
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 
-    auto someUnknownContents = libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_UNKNOWN_CONTENTS);
+    auto someUnknownContents = libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS);
 
     file->setContents(someUnknownContents);
 
@@ -139,7 +139,7 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
 
-    auto someUnknownContents = libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_UNKNOWN_CONTENTS);
+    auto someUnknownContents = libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS);
 
     file->setContents(someUnknownContents);
 

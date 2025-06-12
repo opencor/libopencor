@@ -140,12 +140,12 @@ CellmlFile::~CellmlFile()
 
 CellmlFile::Impl *CellmlFile::pimpl()
 {
-    return static_cast<Impl *>(Logger::pimpl());
+    return static_cast<Impl *>(Logger::mPimpl);
 }
 
 const CellmlFile::Impl *CellmlFile::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::pimpl());
+    return static_cast<const Impl *>(Logger::mPimpl);
 }
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
