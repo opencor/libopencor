@@ -36,8 +36,8 @@ describe("Solver basic tests", () => {
     expect(solver.preconditioner).toBe(loc.SolverCvode.Preconditioner.BANDED);
     expect(solver.upperHalfBandwidth).toBe(0);
     expect(solver.lowerHalfBandwidth).toBe(0);
-    expect(solver.relativeTolerance).toBe(1e-07);
-    expect(solver.absoluteTolerance).toBe(1e-07);
+    expect(solver.relativeTolerance).toBe(1e-7);
+    expect(solver.absoluteTolerance).toBe(1e-7);
     expect(solver.interpolateSolution).toBe(true);
 
     solver.maximumStep = 1.23;
