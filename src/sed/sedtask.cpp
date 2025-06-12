@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "file_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
 #include "sedtask_p.h"
@@ -43,6 +44,14 @@ bool SedTask::Impl::isValid()
     }
 
     if (hasIssues()) {
+        return false;
+    }
+
+    // Make sure that the model is of CellML type.
+
+    if (mModel->pimpl()->mFile->type() != File::Type::CELLML_FILE) {
+        addError(std::string("Task '").append(mId).append("' requires a model of CellML type."));
+
         return false;
     }
 

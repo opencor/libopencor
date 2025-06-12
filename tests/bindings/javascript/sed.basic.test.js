@@ -29,7 +29,9 @@ describe("Sed basic tests", () => {
   let someCombineArchiveContentsPtr;
   let someCombineArchiveWithNoManifestFileContentsPtr;
   let someCombineArchiveWithNoMasterFileContentsPtr;
-  let someCombineArchiveWithSbmlFileAsMasterFileContentsPtr;
+  let someCombineArchiveWithUnknownDirectCellmlFileContentsPtr;
+  let someCombineArchiveWithUnknownIndirectCellmlFileContentsPtr;
+  let someCombineArchiveWithUnknownSedmlFileContentsPtr;
 
   beforeAll(() => {
     someUnknownContentsPtr = utils.allocateMemory(
@@ -61,11 +63,20 @@ describe("Sed basic tests", () => {
       loc,
       utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS,
     );
-    someCombineArchiveWithSbmlFileAsMasterFileContentsPtr =
+    someCombineArchiveWithUnknownDirectCellmlFileContentsPtr =
       utils.allocateMemory(
         loc,
-        utils.SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS,
+        utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS,
       );
+    someCombineArchiveWithUnknownIndirectCellmlFileContentsPtr =
+      utils.allocateMemory(
+        loc,
+        utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS,
+      );
+    someCombineArchiveWithUnknownSedmlFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS,
+    );
   });
 
   afterAll(() => {
@@ -79,8 +90,13 @@ describe("Sed basic tests", () => {
     utils.freeMemory(loc, someCombineArchiveWithNoMasterFileContentsPtr);
     utils.freeMemory(
       loc,
-      someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,
+      someCombineArchiveWithUnknownDirectCellmlFileContentsPtr,
     );
+    utils.freeMemory(
+      loc,
+      someCombineArchiveWithUnknownIndirectCellmlFileContentsPtr,
+    );
+    utils.freeMemory(loc, someCombineArchiveWithUnknownSedmlFileContentsPtr);
   });
 
   test("No file", () => {
@@ -255,12 +271,57 @@ describe("Sed basic tests", () => {
     file.delete();
   });
 
-  test("COMBINE archive with SBML file as master file", () => {
+  test("COMBINE archive with unknown direct CellML file", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithSbmlFileAsMasterFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_SBML_FILE_AS_MASTER_FILE_CONTENTS.length,
+      someCombineArchiveWithUnknownDirectCellmlFileContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS
+        .length,
+    );
+
+    const document = new loc.SedDocument(file);
+
+    expectIssues(loc, document, [
+      [
+        loc.Issue.Type.ERROR,
+        "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+      ],
+    ]);
+
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with unknown indirect CellML file", () => {
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      someCombineArchiveWithUnknownIndirectCellmlFileContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS
+        .length,
+    );
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.run();
+
+    expectIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, "Task 'task1' requires a model of CellML type."],
+    ]);
+
+    instance.delete();
+    document.delete();
+    file.delete();
+  });
+
+  test("COMBINE archive with unknown SED-ML file", () => {
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(
+      someCombineArchiveWithUnknownSedmlFileContentsPtr,
+      utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
