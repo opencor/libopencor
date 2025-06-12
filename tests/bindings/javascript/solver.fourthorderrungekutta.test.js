@@ -21,7 +21,7 @@ import { expectIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Solver Fourth-Order Runge-Kutta", () => {
+describe("Solver Fourth-Order Runge-Kutta tests", () => {
   let someSolverOdeContentsPtr;
 
   beforeAll(() => {

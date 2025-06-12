@@ -21,7 +21,7 @@ import { expectIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Solver Heun", () => {
+describe("Solver Heun tests", () => {
   let someSolverOdeContentsPtr;
 
   beforeAll(() => {

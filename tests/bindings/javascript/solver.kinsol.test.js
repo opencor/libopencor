@@ -21,7 +21,7 @@ import * as utils from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Solver KINSOL", () => {
+describe("Solver KINSOL tests", () => {
   let someSolverNla1ContentsPtr;
   let someSolverNla2ContentsPtr;
 

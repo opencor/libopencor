@@ -21,7 +21,7 @@ import { expectIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Solver Forward Euler", () => {
+describe("Solver Forward Euler tests", () => {
   let someSolverOdeContentsPtr;
 
   beforeAll(() => {
