@@ -128,7 +128,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_big
 #           NLA-BASED MODELS.
 
 
-ABS_TOL = 1.0e-5
+ABS_TOL = 1e-05
 
 
 def expect_nla1_solution(instance_task):

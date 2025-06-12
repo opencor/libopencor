@@ -31,8 +31,8 @@ def test_cvode_solver():
     assert solver.preconditioner == loc.SolverCvode.Preconditioner.Banded
     assert solver.upper_half_bandwidth == 0
     assert solver.lower_half_bandwidth == 0
-    assert solver.relative_tolerance == 1.0e-7
-    assert solver.absolute_tolerance == 1.0e-7
+    assert solver.relative_tolerance == 1e-07
+    assert solver.absolute_tolerance == 1e-07
     assert solver.interpolate_solution == True
 
     solver.maximum_step = 1.23

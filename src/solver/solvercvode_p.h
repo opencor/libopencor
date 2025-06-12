@@ -50,8 +50,8 @@ public:
     static constexpr auto DEFAULT_PRECONDITIONER = Preconditioner::BANDED;
     static constexpr auto DEFAULT_UPPER_HALF_BANDWIDTH = 0;
     static constexpr auto DEFAULT_LOWER_HALF_BANDWIDTH = 0;
-    static constexpr auto DEFAULT_RELATIVE_TOLERANCE = 1.0e-7;
-    static constexpr auto DEFAULT_ABSOLUTE_TOLERANCE = 1.0e-7;
+    static constexpr auto DEFAULT_RELATIVE_TOLERANCE = 1e-07;
+    static constexpr auto DEFAULT_ABSOLUTE_TOLERANCE = 1e-07;
     static constexpr auto DEFAULT_INTERPOLATE_SOLUTION = true;
 
     double mMaximumStep = DEFAULT_MAXIMUM_STEP;
