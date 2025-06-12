@@ -40,7 +40,7 @@ TEST(CoverageFileTest, sedmlFileWithNoParent)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::SEDML_2_FILE);
 
-    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_SEDML_CONTENTS));
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SEDML_CONTENTS));
 }
 
 TEST(CoverageFileTest, irretrievableRemoteFile)

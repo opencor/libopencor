@@ -20,32 +20,29 @@ import * as utils from "./utils.js";
 const loc = await libOpenCOR();
 
 describe("Issue coverage tests", () => {
-  let someCellmlContentsPtr;
-  let someErrorCellmlContentsPtr;
-  let someSedmlContentsPtr;
+  let cellmlContentsPtr;
+  let errorCellmlContentsPtr;
+  let sedmlContentsPtr;
 
   beforeAll(() => {
-    someCellmlContentsPtr = utils.allocateMemory(
+    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
+    errorCellmlContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_CELLML_CONTENTS,
+      utils.ERROR_CELLML_CONTENTS,
     );
-    someErrorCellmlContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_ERROR_CELLML_CONTENTS,
-    );
-    someSedmlContentsPtr = utils.allocateMemory(loc, utils.SOME_SEDML_CONTENTS);
+    sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
   });
 
   afterAll(() => {
-    utils.freeMemory(loc, someCellmlContentsPtr);
-    utils.freeMemory(loc, someErrorCellmlContentsPtr);
-    utils.freeMemory(loc, someSedmlContentsPtr);
+    utils.freeMemory(loc, cellmlContentsPtr);
+    utils.freeMemory(loc, errorCellmlContentsPtr);
+    utils.freeMemory(loc, sedmlContentsPtr);
   });
 
   test("hasIssues", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.hasIssues).toBe(false);
 
@@ -55,7 +52,7 @@ describe("Issue coverage tests", () => {
   test("issueCount", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.issueCount).toBe(0);
 
@@ -65,7 +62,7 @@ describe("Issue coverage tests", () => {
   test("issues", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.issues.size()).toBe(0);
 
@@ -76,8 +73,8 @@ describe("Issue coverage tests", () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(
-      someErrorCellmlContentsPtr,
-      utils.SOME_ERROR_CELLML_CONTENTS.length,
+      errorCellmlContentsPtr,
+      utils.ERROR_CELLML_CONTENTS.length,
     );
 
     expect(file.issue(0)).not.toBeNull();
@@ -89,7 +86,7 @@ describe("Issue coverage tests", () => {
   test("hasErrors", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.hasErrors).toBe(false);
 
@@ -99,7 +96,7 @@ describe("Issue coverage tests", () => {
   test("errorCount", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.errorCount).toBe(0);
 
@@ -109,7 +106,7 @@ describe("Issue coverage tests", () => {
   test("errors", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.errors.size()).toBe(0);
 
@@ -120,8 +117,8 @@ describe("Issue coverage tests", () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(
-      someErrorCellmlContentsPtr,
-      utils.SOME_ERROR_CELLML_CONTENTS.length,
+      errorCellmlContentsPtr,
+      utils.ERROR_CELLML_CONTENTS.length,
     );
 
     expect(file.error(0)).not.toBeNull();
@@ -133,7 +130,7 @@ describe("Issue coverage tests", () => {
   test("hasWarnings", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.hasWarnings).toBe(false);
 
@@ -143,7 +140,7 @@ describe("Issue coverage tests", () => {
   test("warningCount", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.warningCount).toBe(0);
 
@@ -153,7 +150,7 @@ describe("Issue coverage tests", () => {
   test("warnings", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.warnings.size()).toBe(0);
 
@@ -163,7 +160,7 @@ describe("Issue coverage tests", () => {
   test("warning()", () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
+    file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
 

@@ -22,23 +22,23 @@ import * as utils from "./utils.js";
 const loc = await libOpenCOR();
 
 describe("Solver KINSOL tests", () => {
-  let someSolverNla1ContentsPtr;
-  let someSolverNla2ContentsPtr;
+  let solverNla1ContentsPtr;
+  let solverNla2ContentsPtr;
 
   beforeAll(() => {
-    someSolverNla1ContentsPtr = utils.allocateMemory(
+    solverNla1ContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_SOLVER_NLA1_CONTENTS,
+      utils.SOLVER_NLA1_CONTENTS,
     );
-    someSolverNla2ContentsPtr = utils.allocateMemory(
+    solverNla2ContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_SOLVER_NLA2_CONTENTS,
+      utils.SOLVER_NLA2_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(loc, someSolverNla1ContentsPtr);
-    utils.freeMemory(loc, someSolverNla2ContentsPtr);
+    utils.freeMemory(loc, solverNla1ContentsPtr);
+    utils.freeMemory(loc, solverNla2ContentsPtr);
   });
 
   test("Dummy", () => {});
@@ -48,8 +48,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla1ContentsPtr,
-      utils.SOME_SOLVER_NLA1_CONTENTS.length,
+      solverNla1ContentsPtr,
+      utils.SOLVER_NLA1_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -76,8 +76,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla2ContentsPtr,
-      utils.SOME_SOLVER_NLA2_CONTENTS.length,
+      solverNla2ContentsPtr,
+      utils.SOLVER_NLA2_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -105,8 +105,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla1ContentsPtr,
-      utils.SOME_SOLVER_NLA1_CONTENTS.length,
+      solverNla1ContentsPtr,
+      utils.SOLVER_NLA1_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -134,8 +134,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla2ContentsPtr,
-      utils.SOME_SOLVER_NLA2_CONTENTS.length,
+      solverNla2ContentsPtr,
+      utils.SOLVER_NLA2_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -163,8 +163,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla1ContentsPtr,
-      utils.SOME_SOLVER_NLA1_CONTENTS.length,
+      solverNla1ContentsPtr,
+      utils.SOLVER_NLA1_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -216,8 +216,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla1ContentsPtr,
-      utils.SOME_SOLVER_NLA1_CONTENTS.length,
+      solverNla1ContentsPtr,
+      utils.SOLVER_NLA1_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -236,8 +236,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla2ContentsPtr,
-      utils.SOME_SOLVER_NLA2_CONTENTS.length,
+      solverNla2ContentsPtr,
+      utils.SOLVER_NLA2_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -263,8 +263,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla1ContentsPtr,
-      utils.SOME_SOLVER_NLA1_CONTENTS.length,
+      solverNla1ContentsPtr,
+      utils.SOLVER_NLA1_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -288,8 +288,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla2ContentsPtr,
-      utils.SOME_SOLVER_NLA2_CONTENTS.length,
+      solverNla2ContentsPtr,
+      utils.SOLVER_NLA2_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -313,8 +313,8 @@ describe("Solver KINSOL tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla1ContentsPtr,
-      utils.SOME_SOLVER_NLA1_CONTENTS.length,
+      solverNla1ContentsPtr,
+      utils.SOLVER_NLA1_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);

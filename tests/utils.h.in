@@ -59,12 +59,12 @@ static constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/l
 static constexpr auto UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt";
 static constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt";
 
-static constexpr auto SOME_UNKNOWN_CONTENTS = "Some unknown contents...";
-static constexpr auto SOME_CELLML_CONTENTS = "@SOME_CELLML_CONTENTS_C@";
-static constexpr auto SOME_ERROR_CELLML_CONTENTS = "@SOME_ERROR_CELLML_CONTENTS_C@";
-static constexpr auto SOME_WARNING_CELLML_CONTENTS = "@SOME_WARNING_CELLML_CONTENTS_C@";
-static constexpr auto SOME_SEDML_CONTENTS = "@SOME_SEDML_CONTENTS_C@";
-static constexpr auto SOME_BASE64_COMBINE_ARCHIVE_CONTENTS = "@SOME_BASE64_COMBINE_ARCHIVE_CONTENTS@";
+static constexpr auto UNKNOWN_CONTENTS = "Some unknown contents...";
+static constexpr auto CELLML_CONTENTS = "@CELLML_CONTENTS_C@";
+static constexpr auto ERROR_CELLML_CONTENTS = "@ERROR_CELLML_CONTENTS_C@";
+static constexpr auto WARNING_CELLML_CONTENTS = "@WARNING_CELLML_CONTENTS_C@";
+static constexpr auto SEDML_CONTENTS = "@SEDML_CONTENTS_C@";
+static constexpr auto BASE64_COMBINE_ARCHIVE_CONTENTS = "@BASE64_COMBINE_ARCHIVE_CONTENTS@";
 
 void printIssues(const LoggerPtr &pLogger);
 

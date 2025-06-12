@@ -24,8 +24,8 @@ describe("Sed coverage tests", () => {
   let sedChangesContentsPtr;
   let invalidSedChangesContentsPtr;
   let unsupportedSedChangesContentsPtr;
-  let someSolverOdeContentsPtr;
-  let someSolverNla1ContentsPtr;
+  let solverOdeContentsPtr;
+  let solverNla1ContentsPtr;
 
   beforeAll(() => {
     sedChangesContentsPtr = utils.allocateMemory(
@@ -40,13 +40,10 @@ describe("Sed coverage tests", () => {
       loc,
       utils.UNSUPPORTED_SED_CHANGES_CONTENTS,
     );
-    someSolverOdeContentsPtr = utils.allocateMemory(
+    solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
+    solverNla1ContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_SOLVER_ODE_CONTENTS,
-    );
-    someSolverNla1ContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_SOLVER_NLA1_CONTENTS,
+      utils.SOLVER_NLA1_CONTENTS,
     );
   });
 
@@ -54,8 +51,8 @@ describe("Sed coverage tests", () => {
     utils.freeMemory(loc, sedChangesContentsPtr);
     utils.freeMemory(loc, invalidSedChangesContentsPtr);
     utils.freeMemory(loc, unsupportedSedChangesContentsPtr);
-    utils.freeMemory(loc, someSolverOdeContentsPtr);
-    utils.freeMemory(loc, someSolverNla1ContentsPtr);
+    utils.freeMemory(loc, solverOdeContentsPtr);
+    utils.freeMemory(loc, solverNla1ContentsPtr);
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
@@ -432,10 +429,7 @@ describe("Sed coverage tests", () => {
   test("SedInstanceAndSedInstanceTaskDifferentialModel", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      someSolverOdeContentsPtr,
-      utils.SOME_SOLVER_ODE_CONTENTS.length,
-    );
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const solver = document.simulations.get(0).odeSolver;
@@ -525,8 +519,8 @@ describe("Sed coverage tests", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(
-      someSolverNla1ContentsPtr,
-      utils.SOME_SOLVER_NLA1_CONTENTS.length,
+      solverNla1ContentsPtr,
+      utils.SOLVER_NLA1_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -582,10 +576,7 @@ describe("Sed coverage tests", () => {
 
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      someSolverOdeContentsPtr,
-      utils.SOME_SOLVER_ODE_CONTENTS.length,
-    );
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);

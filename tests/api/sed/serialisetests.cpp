@@ -115,7 +115,7 @@ TEST(SerialiseSedTest, localCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
 
-    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_CELLML_CONTENTS));
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::CELLML_CONTENTS));
 
     auto document = libOpenCOR::SedDocument::create(file);
 
@@ -138,7 +138,7 @@ TEST(SerialiseSedTest, relativeLocalCellmlFileWithoutBasePath)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
 
-    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SOME_CELLML_CONTENTS));
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::CELLML_CONTENTS));
 
     auto document = libOpenCOR::SedDocument::create(file);
 

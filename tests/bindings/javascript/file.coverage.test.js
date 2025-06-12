@@ -20,23 +20,23 @@ import * as utils from "./utils.js";
 const loc = await libOpenCOR();
 
 describe("File coverage tests", () => {
-  let someNullCharacterContentsPtr;
-  let someCombineArchiveContentsPtr;
+  let nullCharacterContentsPtr;
+  let combineArchiveContentsPtr;
 
   beforeAll(() => {
-    someNullCharacterContentsPtr = utils.allocateMemory(
+    nullCharacterContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_NULL_CHARACTER_CONTENTS,
+      utils.NULL_CHARACTER_CONTENTS,
     );
-    someCombineArchiveContentsPtr = utils.allocateMemory(
+    combineArchiveContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+      utils.COMBINE_ARCHIVE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(loc, someNullCharacterContentsPtr);
-    utils.freeMemory(loc, someCombineArchiveContentsPtr);
+    utils.freeMemory(loc, nullCharacterContentsPtr);
+    utils.freeMemory(loc, combineArchiveContentsPtr);
   });
 
   test("Empty file", () => {
@@ -53,8 +53,8 @@ describe("File coverage tests", () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
     file.setContents(
-      someNullCharacterContentsPtr,
-      utils.SOME_NULL_CHARACTER_CONTENTS.length,
+      nullCharacterContentsPtr,
+      utils.NULL_CHARACTER_CONTENTS.length,
     );
 
     expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
@@ -65,10 +65,7 @@ describe("File coverage tests", () => {
   test("SED-ML file with no parent", () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(
-      utils.SOME_SEDML_CONTENTS,
-      utils.SOME_SEDML_CONTENTS.length,
-    );
+    file.setContents(utils.SEDML_CONTENTS, utils.SEDML_CONTENTS.length);
   });
 
   test("Same local file", () => {
@@ -96,8 +93,8 @@ describe("File coverage tests", () => {
     const fileManager = loc.FileManager.instance();
 
     file.setContents(
-      someCombineArchiveContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+      combineArchiveContentsPtr,
+      utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
     expect(fileManager.fileCount).toBe(4);

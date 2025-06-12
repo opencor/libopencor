@@ -21,82 +21,72 @@ import { expectIssues } from "./utils.js";
 const loc = await libOpenCOR();
 
 describe("Sed basic tests", () => {
-  let someUnknownContentsPtr;
-  let someCellmlContentsPtr;
-  let someSedmlContentsPtr;
-  let someSedmlWithAbsoluteCellmlFileContentsPtr;
-  let someSedmlWithRemoteCellmlFileContentsPtr;
-  let someCombineArchiveContentsPtr;
-  let someCombineArchiveWithNoManifestFileContentsPtr;
-  let someCombineArchiveWithNoMasterFileContentsPtr;
-  let someCombineArchiveWithUnknownDirectCellmlFileContentsPtr;
-  let someCombineArchiveWithUnknownIndirectCellmlFileContentsPtr;
-  let someCombineArchiveWithUnknownSedmlFileContentsPtr;
+  let unknownContentsPtr;
+  let cellmlContentsPtr;
+  let sedmlContentsPtr;
+  let sedmlWithAbsoluteCellmlFileContentsPtr;
+  let sedmlWithRemoteCellmlFileContentsPtr;
+  let combineArchiveContentsPtr;
+  let combineArchiveWithNoManifestFileContentsPtr;
+  let combineArchiveWithNoMasterFileContentsPtr;
+  let combineArchiveWithUnknownDirectCellmlFileContentsPtr;
+  let combineArchiveWithUnknownIndirectCellmlFileContentsPtr;
+  let combineArchiveWithUnknownSedmlFileContentsPtr;
 
   beforeAll(() => {
-    someUnknownContentsPtr = utils.allocateMemory(
+    unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
+    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
+    sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
+    sedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_UNKNOWN_CONTENTS,
+      utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS,
     );
-    someCellmlContentsPtr = utils.allocateMemory(
+    sedmlWithRemoteCellmlFileContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_CELLML_CONTENTS,
+      utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS,
     );
-    someSedmlContentsPtr = utils.allocateMemory(loc, utils.SOME_SEDML_CONTENTS);
-    someSedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(
+    combineArchiveContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS,
+      utils.COMBINE_ARCHIVE_CONTENTS,
     );
-    someSedmlWithRemoteCellmlFileContentsPtr = utils.allocateMemory(
+    combineArchiveWithNoManifestFileContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS,
+      utils.COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS,
     );
-    someCombineArchiveContentsPtr = utils.allocateMemory(
+    combineArchiveWithNoMasterFileContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+      utils.COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS,
     );
-    someCombineArchiveWithNoManifestFileContentsPtr = utils.allocateMemory(
+    combineArchiveWithUnknownDirectCellmlFileContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS,
     );
-    someCombineArchiveWithNoMasterFileContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS,
-    );
-    someCombineArchiveWithUnknownDirectCellmlFileContentsPtr =
+    combineArchiveWithUnknownIndirectCellmlFileContentsPtr =
       utils.allocateMemory(
         loc,
-        utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS,
+        utils.COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS,
       );
-    someCombineArchiveWithUnknownIndirectCellmlFileContentsPtr =
-      utils.allocateMemory(
-        loc,
-        utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS,
-      );
-    someCombineArchiveWithUnknownSedmlFileContentsPtr = utils.allocateMemory(
+    combineArchiveWithUnknownSedmlFileContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(loc, someUnknownContentsPtr);
-    utils.freeMemory(loc, someCellmlContentsPtr);
-    utils.freeMemory(loc, someSedmlContentsPtr);
-    utils.freeMemory(loc, someSedmlWithAbsoluteCellmlFileContentsPtr);
-    utils.freeMemory(loc, someSedmlWithRemoteCellmlFileContentsPtr);
-    utils.freeMemory(loc, someCombineArchiveContentsPtr);
-    utils.freeMemory(loc, someCombineArchiveWithNoManifestFileContentsPtr);
-    utils.freeMemory(loc, someCombineArchiveWithNoMasterFileContentsPtr);
+    utils.freeMemory(loc, unknownContentsPtr);
+    utils.freeMemory(loc, cellmlContentsPtr);
+    utils.freeMemory(loc, sedmlContentsPtr);
+    utils.freeMemory(loc, sedmlWithAbsoluteCellmlFileContentsPtr);
+    utils.freeMemory(loc, sedmlWithRemoteCellmlFileContentsPtr);
+    utils.freeMemory(loc, combineArchiveContentsPtr);
+    utils.freeMemory(loc, combineArchiveWithNoManifestFileContentsPtr);
+    utils.freeMemory(loc, combineArchiveWithNoMasterFileContentsPtr);
+    utils.freeMemory(loc, combineArchiveWithUnknownDirectCellmlFileContentsPtr);
     utils.freeMemory(
       loc,
-      someCombineArchiveWithUnknownDirectCellmlFileContentsPtr,
+      combineArchiveWithUnknownIndirectCellmlFileContentsPtr,
     );
-    utils.freeMemory(
-      loc,
-      someCombineArchiveWithUnknownIndirectCellmlFileContentsPtr,
-    );
-    utils.freeMemory(loc, someCombineArchiveWithUnknownSedmlFileContentsPtr);
+    utils.freeMemory(loc, combineArchiveWithUnknownSedmlFileContentsPtr);
   });
 
   test("No file", () => {
@@ -110,10 +100,7 @@ describe("Sed basic tests", () => {
   test("Unknown file", () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
 
@@ -131,7 +118,7 @@ describe("Sed basic tests", () => {
   test("CellML file", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
 
@@ -144,7 +131,7 @@ describe("Sed basic tests", () => {
   test("SED-ML file", () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
+    file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
 
     let document = new loc.SedDocument(file);
 
@@ -167,8 +154,8 @@ describe("Sed basic tests", () => {
     const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(
-      someSedmlWithAbsoluteCellmlFileContentsPtr,
-      utils.SOME_SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS.length,
+      sedmlWithAbsoluteCellmlFileContentsPtr,
+      utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS.length,
     );
 
     let document = new loc.SedDocument(file);
@@ -192,8 +179,8 @@ describe("Sed basic tests", () => {
     const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(
-      someSedmlWithRemoteCellmlFileContentsPtr,
-      utils.SOME_SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS.length,
+      sedmlWithRemoteCellmlFileContentsPtr,
+      utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS.length,
     );
 
     let document = new loc.SedDocument(file);
@@ -217,8 +204,8 @@ describe("Sed basic tests", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+      combineArchiveContentsPtr,
+      utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -233,8 +220,8 @@ describe("Sed basic tests", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithNoManifestFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS.length,
+      combineArchiveWithNoManifestFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -254,8 +241,8 @@ describe("Sed basic tests", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithNoMasterFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS.length,
+      combineArchiveWithNoMasterFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -275,9 +262,8 @@ describe("Sed basic tests", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithUnknownDirectCellmlFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS
-        .length,
+      combineArchiveWithUnknownDirectCellmlFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -297,9 +283,8 @@ describe("Sed basic tests", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithUnknownIndirectCellmlFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS
-        .length,
+      combineArchiveWithUnknownIndirectCellmlFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);
@@ -320,8 +305,8 @@ describe("Sed basic tests", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveWithUnknownSedmlFileContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS.length,
+      combineArchiveWithUnknownSedmlFileContentsPtr,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS.length,
     );
 
     const document = new loc.SedDocument(file);

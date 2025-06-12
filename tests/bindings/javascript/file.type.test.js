@@ -21,41 +21,32 @@ import { expectIssues } from "./utils.js";
 const loc = await libOpenCOR();
 
 describe("File type tests", () => {
-  let someUnknownContentsPtr;
-  let someCellmlContentsPtr;
-  let someSedmlContentsPtr;
-  let someCombineArchiveContentsPtr;
+  let unknownContentsPtr;
+  let cellmlContentsPtr;
+  let sedmlContentsPtr;
+  let combineArchiveContentsPtr;
 
   beforeAll(() => {
-    someUnknownContentsPtr = utils.allocateMemory(
+    unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
+    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
+    sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
+    combineArchiveContentsPtr = utils.allocateMemory(
       loc,
-      utils.SOME_UNKNOWN_CONTENTS,
-    );
-    someCellmlContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_CELLML_CONTENTS,
-    );
-    someSedmlContentsPtr = utils.allocateMemory(loc, utils.SOME_SEDML_CONTENTS);
-    someCombineArchiveContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS,
+      utils.COMBINE_ARCHIVE_CONTENTS,
     );
   });
 
   afterAll(() => {
-    utils.freeMemory(loc, someUnknownContentsPtr);
-    utils.freeMemory(loc, someCellmlContentsPtr);
-    utils.freeMemory(loc, someSedmlContentsPtr);
-    utils.freeMemory(loc, someCombineArchiveContentsPtr);
+    utils.freeMemory(loc, unknownContentsPtr);
+    utils.freeMemory(loc, cellmlContentsPtr);
+    utils.freeMemory(loc, sedmlContentsPtr);
+    utils.freeMemory(loc, combineArchiveContentsPtr);
   });
 
   test("Unknown file", () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
     expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
     expectIssues(loc, file, [
@@ -71,7 +62,7 @@ describe("File type tests", () => {
   test("CellML file", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(someCellmlContentsPtr, utils.SOME_CELLML_CONTENTS.length);
+    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     expect(file.type.value).toBe(loc.File.Type.CELLML_FILE.value);
 
@@ -81,7 +72,7 @@ describe("File type tests", () => {
   test("SED-ML file", () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(someSedmlContentsPtr, utils.SOME_SEDML_CONTENTS.length);
+    file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
 
     expect(file.type.value).toBe(loc.File.Type.SEDML_FILE.value);
 
@@ -92,8 +83,8 @@ describe("File type tests", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
-      someCombineArchiveContentsPtr,
-      utils.SOME_COMBINE_ARCHIVE_CONTENTS.length,
+      combineArchiveContentsPtr,
+      utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
     expect(file.type.value).toBe(loc.File.Type.COMBINE_ARCHIVE.value);

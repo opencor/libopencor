@@ -28,17 +28,14 @@ const expectedUnknownFileIssues = [
 ];
 
 describe("File basic tests", () => {
-  let someUnknownContentsPtr;
+  let unknownContentsPtr;
 
   beforeAll(() => {
-    someUnknownContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOME_UNKNOWN_CONTENTS,
-    );
+    unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
   });
 
   afterAll(() => {
-    utils.freeMemory(loc, someUnknownContentsPtr);
+    utils.freeMemory(loc, unknownContentsPtr);
   });
 
   test("Local file", () => {
@@ -51,13 +48,10 @@ describe("File basic tests", () => {
     expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
     expectIssues(loc, file, expectedUnknownFileIssues);
 
-    file.setContents(
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
     expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
-    expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
+    expect(file.contents()).toStrictEqual(utils.UNKNOWN_CONTENTS);
     expectIssues(loc, file, expectedUnknownFileIssues);
 
     file.delete();
@@ -73,13 +67,10 @@ describe("File basic tests", () => {
     expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
     expectIssues(loc, file, expectedUnknownFileIssues);
 
-    file.setContents(
-      someUnknownContentsPtr,
-      utils.SOME_UNKNOWN_CONTENTS.length,
-    );
+    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
     expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
-    expect(file.contents()).toStrictEqual(utils.SOME_UNKNOWN_CONTENTS);
+    expect(file.contents()).toStrictEqual(utils.UNKNOWN_CONTENTS);
     expectIssues(loc, file, expectedUnknownFileIssues);
 
     file.delete();
