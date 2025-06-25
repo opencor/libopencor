@@ -344,6 +344,10 @@ jobs:
           python-version: '3.11'
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
+        with:
+          ninjaVersion: 1.12.1
+          # Note: use version 1.12.1 since version 1.13+ results in an error message on Ubuntu 22.04 LTS ARM:
+          #       ninja: /lib/aarch64-linux-gnu/libc.so.6: version `GLIBC_2.38' not found (required by ninja)
       - name: Install buildcache
         uses: opencor/buildcache-action@v1
         with:

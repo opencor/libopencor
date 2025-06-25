@@ -93,6 +93,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
+        with:
+          ninjaVersion: 1.12.1
+          # Note: use version 1.12.1 since version 1.13+ results in an error message on Ubuntu 22.04 LTS ARM:
+          #       ninja: /lib/aarch64-linux-gnu/libc.so.6: version `GLIBC_2.38' not found (required by ninja)
       - name: Install buildcache
         uses: opencor/buildcache-action@v1
         with:
@@ -157,7 +161,7 @@ jobs:
         with:
           arch: ${{ matrix.arch }}
       - name: Build Python wheels
-        uses: pypa/cibuildwheel@v2.23.3
+        uses: pypa/cibuildwheel@v3.0.0
         env:
           CIBW_ARCHS: auto64
           CIBW_BUILD: 'cp*'
@@ -165,9 +169,9 @@ jobs:
           # Note #1: the value of CIBW_ENVIRONMENT_MACOS must be in sync with that of MACOS_DEPLOYMENT_TARGET in
           #          CMakelists.txt.
           # Note #2: for some reasons, we need to specify the minor version, hence using 13.0 instead of 13.
-          CIBW_MANYLINUX_X86_64_IMAGE: quay.io/pypa/manylinux_2_34_x86_64
-          CIBW_MANYLINUX_AARCH64_IMAGE: quay.io/pypa/manylinux_2_34_aarch64
-          CIBW_SKIP: 'cp36* cp37* cp38* *musllinux*'
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
+          CIBW_SKIP: 'cp38* *musllinux*'
       - name: Upload Python wheel artifacts
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
