@@ -150,31 +150,17 @@ const CellmlFile::Impl *CellmlFile::pimpl() const
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 {
-    // Try to parse the file contents as a CellML 2.0 file.
+    // Try to parse the file contents as a CellML file, be it a CellML 1.x or a CellML 2.0 file.
 
-    auto isCellmlFile = false;
     auto fileContents = pFile->contents();
 
     if (!fileContents.empty() && (fileContents[0] != '\0')) {
-        auto strict = true;
-        auto parser = libcellml::Parser::create(strict);
         auto contents = toString(fileContents);
+        auto parser = libcellml::Parser::create(false);
         auto model = parser->parseModel(contents);
 
-        if (parser->errorCount() != 0) {
-            // We couldn't parse the file contents as a CellML 2.0 file, so maybe it is a CellML 1.x file?
-
-            strict = false;
-            parser = libcellml::Parser::create(strict);
-            model = parser->parseModel(contents);
-
-            isCellmlFile = parser->errorCount() == 0;
-        } else {
-            isCellmlFile = true;
-        }
-
-        if (isCellmlFile) {
-            return CellmlFilePtr {new CellmlFile {pFile, model, strict}};
+        if (parser->errorCount() == 0) {
+            return CellmlFilePtr {new CellmlFile {pFile, model, false}};
         }
     }
 
