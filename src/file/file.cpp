@@ -114,6 +114,10 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
             }
         }
     }
+
+    // Keep track of the fact that we have checked the type of the file.
+
+    mTypeChecked = true;
 }
 
 File::Type File::Impl::type() const
@@ -153,6 +157,7 @@ void File::Impl::setContents(const UnsignedChars &pContents)
 {
     mContents = pContents;
 
+    mTypeChecked = false;
     mContentsRetrieved = true;
 }
 

@@ -51,3 +51,11 @@ TEST(BasicCellmlTest, modelWithInvalidImports)
 
     EXPECT_EQ(cellmlFile->type(), libcellml::AnalyserModel::Type::UNKNOWN);
 }
+
+TEST(BasicCellmlTest, createCellmlFileWithNonCellmlFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
+    auto cellmlFile = libOpenCOR::CellmlFile::create(file);
+
+    EXPECT_EQ(cellmlFile, nullptr);
+}

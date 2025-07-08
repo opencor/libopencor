@@ -12,12 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(TEST combine)
+set(TEST sedml)
 
 list(APPEND TESTS ${TEST})
 
 set(${TEST}_CATEGORY support)
 set(${TEST}_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/coveragetests.cpp
 )
