@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 #include "combinearchive_p.h"
+#include "file_p.h"
 
 #include "utils.h"
 
@@ -22,8 +23,6 @@ limitations under the License.
 #include "combine/combinearchive.h"
 #include "omex/CaContent.h"
 #include "libcombineend.h"
-
-#include "libopencor/file.h"
 
 namespace libOpenCOR {
 
@@ -128,6 +127,19 @@ const CombineArchive::Impl *CombineArchive::pimpl() const
 
 CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 {
+    // Check whether the file is a COMBINE archive and if so then return its CombineArchive object.
+
+    if (pFile->pimpl()->type() == File::Type::COMBINE_ARCHIVE) {
+        return pFile->pimpl()->mCombineArchive;
+    }
+
+    // Check whether the type of the file is already known and if so then return since there is no need to parse the
+    // file contents again.
+
+    if (pFile->pimpl()->mTypeChecked) {
+        return {};
+    }
+
     // Try to retrieve a COMBINE archive.
     // Note: a COMBINE archive is a ZIP file, so we make sure that it starts with 0x04034b50, which is the magic number
     //       used by a ZIP file (we ignore empty and spanned ZIP files). Indeed, libCOMBINE may crash depending on the
