@@ -34,6 +34,7 @@ class LIBOPENCOR_EXPORT File: public Logger
     friend class CellmlFile;
     friend class SedDocument;
     friend class SedInstanceTask;
+    friend class SedmlFile;
     friend class SedModel;
     friend class SedSimulation;
 

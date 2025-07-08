@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "file_p.h"
 #include "sedmlfile_p.h"
 #include "solvernla_p.h"
 #include "solverode_p.h"
@@ -21,7 +22,6 @@ limitations under the License.
 #include "cellmlfile.h"
 #include "utils.h"
 
-#include "libopencor/file.h"
 #include "libopencor/filemanager.h"
 #include "libopencor/sedanalysis.h"
 #include "libopencor/sedchangeattribute.h"
@@ -274,6 +274,19 @@ const SedmlFile::Impl *SedmlFile::pimpl() const
 
 SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 {
+    // Check whether the file is a SED-ML file and if so then return its SedmlFile object.
+
+    if (pFile->pimpl()->type() == File::Type::SEDML_FILE) {
+        return pFile->pimpl()->mSedmlFile;
+    }
+
+    // Check whether the type of the file is already known and if so then return since there is no need to parse the
+    // file contents again.
+
+    if (pFile->pimpl()->mTypeChecked) {
+        return {};
+    }
+
     // Try to retrieve a SED-ML document.
 
     auto fileContents = pFile->contents();
