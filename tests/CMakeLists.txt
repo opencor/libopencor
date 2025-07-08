@@ -37,6 +37,7 @@ include(misc/compiler/tests.cmake)
 
 include(support/cellml/tests.cmake)
 include(support/combine/tests.cmake)
+include(support/sedml/tests.cmake)
 
 # Prepare our different tests.
 
@@ -157,6 +158,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/misc
                     ${CMAKE_SOURCE_DIR}/src/solver
                     ${CMAKE_SOURCE_DIR}/src/support/cellml
                     ${CMAKE_SOURCE_DIR}/src/support/combine
+                    ${CMAKE_SOURCE_DIR}/src/support/sedml
                     ${CMAKE_BINARY_DIR})
 
 foreach(TEST ${TESTS})
