@@ -15,10 +15,10 @@ limitations under the License.
 */
 
 #include "cellmlfile_p.h"
+#include "file_p.h"
 
 #include "utils.h"
 
-#include "libopencor/file.h"
 #include "libopencor/seddocument.h"
 #include "libopencor/sedmodel.h"
 #include "libopencor/sedsteadystate.h"
@@ -150,6 +150,19 @@ const CellmlFile::Impl *CellmlFile::pimpl() const
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 {
+    // Check whether the file is a CellML file and if so then return its CellmlFile object.
+
+    if (pFile->pimpl()->type() == File::Type::CELLML_FILE) {
+        return pFile->pimpl()->mCellmlFile;
+    }
+
+    // Check whether the type of the file is already known and if so then return since there is no need to parse the
+    // file contents again.
+
+    if (pFile->pimpl()->mTypeChecked) {
+        return {};
+    }
+
     // Try to parse the file contents as a CellML file, be it a CellML 1.x or a CellML 2.0 file.
 
     auto fileContents = pFile->contents();
