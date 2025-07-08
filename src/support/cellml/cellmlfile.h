@@ -34,8 +34,6 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
-#include <memory>
-
 namespace libOpenCOR {
 
 class CellmlFile;
