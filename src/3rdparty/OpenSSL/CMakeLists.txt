@@ -109,7 +109,7 @@ else()
         #---GRY--- THE BELOW SHOULD BE REMOVED ONCE THE OpenSSL ISSUE ON WoA HAS BEEN FIXED.
 
         # There is currently an issue with building OpenSSL on Windows on ARM, which results in libcurl segfaulting
-        # whenever we try to use it. A temporary fix is to build OpenSSL without optiomisation. We can do this by
+        # whenever we try to use it. A temporary fix is to build OpenSSL without optimisation. We can do this by
         # setting the CFLAGS environment variable. By default, the flags passed to the C compiler are
         # "/W3 /wd4090 /nologo /O2", so here we set CFLAGS to "/W3 /wd4090 /nologo". See
         # https://github.com/openssl/openssl/issues/26239 and

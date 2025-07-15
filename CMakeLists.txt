@@ -528,8 +528,8 @@ else()
     endif()
 
     # Determine whether we are building in release mode.
-    # Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE, which
-    #       is likely to be the case when building a third-party library.
+    # Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE,
+    #       which is likely to be the case when building a third-party library.
 
     if(NOT "${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
         set(RELEASE_MODE TRUE)

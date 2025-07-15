@@ -181,7 +181,6 @@ set(LLVMCLANG_CMAKE_PACKAGE_NAME Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake p
 set(LLVMCLANG_CMAKE_PACKAGE_NAMES LLVM Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake package names.")
 set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LLVMCLANG_LIBRARIES
-    # clang
     clangAnalysis
     clangAnalysisFlowSensitive
     clangAnalysisFlowSensitiveModels
