@@ -8,9 +8,11 @@ fi
 
 appDir=$(cd $(dirname $0); pwd)/..
 
-for i in _skbuild build src/bindings/python/libopencor.egg-info; do
+for i in _skbuild build src/bindings/python/libopencor.egg-info tests/install/build; do
     rm -fr $appDir/$i
 done
+
+find $appDir -name .DS_Store -exec rm -f {} \;
 
 if [ "$1" = "all" ]; then
     rm -fr $appDir/prebuilt/* > /dev/null 2>&1
