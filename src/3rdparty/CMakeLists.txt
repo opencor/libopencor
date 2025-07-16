@@ -34,7 +34,7 @@ foreach(PACKAGE ${PACKAGES})
     endif()
 endforeach()
 
-if(NOT "${PACKAGES_TO_BUILD}" STREQUAL "")
+if(NOT "${PACKAGES_TO_BUILD}" STREQUAL "" AND NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     message(STATUS "The following packages are to be built:")
 
     foreach(PACKAGE_TO_BUILD ${PACKAGES_TO_BUILD})
