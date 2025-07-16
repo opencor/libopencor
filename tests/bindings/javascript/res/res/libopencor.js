@@ -349,20 +349,13 @@ $(() => {
 
     // Versions page.
 
-    $("#version").html(loc.version());
-    $("#versionString").html(loc.versionString());
-    $("#clangVersion").html(loc.clangVersion());
-    $("#clangVersionString").html(loc.clangVersionString());
-    $("#libcellmlVersion").html(loc.libcellmlVersion());
-    $("#libcellmlVersionString").html(loc.libcellmlVersionString());
-    $("#libcombineVersion").html(loc.libcombineVersion());
-    $("#libcombineVersionString").html(loc.libcombineVersionString());
-    $("#libsedmlVersion").html(loc.libsedmlVersion());
-    $("#libsedmlVersionString").html(loc.libsedmlVersionString());
-    $("#llvmVersion").html(loc.llvmVersion());
-    $("#llvmVersionString").html(loc.llvmVersionString());
-    $("#sundialsVersion").html(loc.sundialsVersion());
-    $("#sundialsVersionString").html(loc.sundialsVersionString());
+    $("#OpenCOR").html(loc.versionString());
+    $("#Clang").html(loc.clangVersionString());
+    $("#libCellML").html(loc.libcellmlVersionString());
+    $("#libCOMBINE").html(loc.libcombineVersionString());
+    $("#libSEDML").html(loc.libsedmlVersionString());
+    $("#LLVM").html(loc.llvmVersionString());
+    $("#SUNDIALS").html(loc.sundialsVersionString());
 
     // Start with our simulation page.
 
