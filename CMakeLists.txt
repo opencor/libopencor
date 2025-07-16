@@ -528,8 +528,8 @@ else()
     endif()
 
     # Determine whether we are building in release mode.
-    # Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE, which
-    #       is likely to be the case when building a third-party library.
+    # Note: this only makes sense if we are not in a multi-configuration mode, i.e. IS_MULTI_CONFIG is equal to FALSE,
+    #       which is likely to be the case when building a third-party library.
 
     if(NOT "${LIBOPENCOR_BUILD_TYPE}" STREQUAL "Debug")
         set(RELEASE_MODE TRUE)
@@ -545,6 +545,12 @@ else()
         endif()
     elseif(APPLE)
         set(CMAKE_OSX_ARCHITECTURES arm64)
+    endif()
+
+    # Determine whether all we want is to build some third-party libraries for our JavaScript bindings.
+
+    if(LIBOPENCOR_JAVASCRIPT_BINDINGS AND ONLY_BUILD_THIRD_PARTY_LIBRARIES)
+        set(ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES TRUE)
     endif()
 
     # Build libOpenCOR.

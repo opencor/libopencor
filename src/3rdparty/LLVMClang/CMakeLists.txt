@@ -20,7 +20,7 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
-if(LIBOPENCOR_PREBUILT_LLVMCLANG)
+if(LIBOPENCOR_PREBUILT_LLVMCLANG OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     if(WIN32)
         if(RELEASE_MODE)
             if(INTEL_MODE)
@@ -181,7 +181,6 @@ set(LLVMCLANG_CMAKE_PACKAGE_NAME Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake p
 set(LLVMCLANG_CMAKE_PACKAGE_NAMES LLVM Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake package names.")
 set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(LLVMCLANG_LIBRARIES
-    # clang
     clangAnalysis
     clangAnalysisFlowSensitive
     clangAnalysisFlowSensitiveModels
