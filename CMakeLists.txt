@@ -547,6 +547,12 @@ else()
         set(CMAKE_OSX_ARCHITECTURES arm64)
     endif()
 
+    # Determine whether all we want is to build some third-party libraries for our JavaScript bindings.
+
+    if(LIBOPENCOR_JAVASCRIPT_BINDINGS AND ONLY_BUILD_THIRD_PARTY_LIBRARIES)
+        set(ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES TRUE)
+    endif()
+
     # Build libOpenCOR.
 
     add_subdirectory(src)
