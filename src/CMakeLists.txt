@@ -131,6 +131,7 @@ set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 
 set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode.cpp
@@ -147,12 +148,6 @@ set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/support/combine/combinearchive.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.cpp
 )
-
-if(NOT EMSCRIPTEN)
-    list(APPEND INTERNAL_SOURCE_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
-    )
-endif()
 
 set(GIT_API_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/file.cpp
@@ -214,6 +209,8 @@ set(SOURCE_FILES
 )
 
 set(INTERNAL_HEADER_FILES
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler_p.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode_p.h
@@ -235,13 +232,6 @@ set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/support/sedml/sedmlfile.h
     ${CMAKE_CURRENT_SOURCE_DIR}/unittestingexport.h
 )
-
-if(NOT EMSCRIPTEN)
-    list(APPEND INTERNAL_HEADER_FILES
-        ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler_p.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
-    )
-endif()
 
 set(GIT_HEADER_FILES
     ${INTERNAL_HEADER_FILES}
