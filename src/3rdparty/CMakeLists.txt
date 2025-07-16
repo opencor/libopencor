@@ -18,10 +18,10 @@ include(packages)
 
 # Keep track of which packages are to be built.
 
-set(PACKAGES libCellML libCOMBINE libNuML libSBML libSEDML libxml2 SUNDIALS zipper zlib)
+set(PACKAGES libCellML libCOMBINE libNuML libSBML libSEDML libxml2 LLVMClang SUNDIALS zipper zlib)
 
 if(NOT EMSCRIPTEN)
-    list(APPEND PACKAGES libcurl libssh2 LLVMClang OpenSSL)
+    list(APPEND PACKAGES libcurl libssh2 OpenSSL)
 endif()
 
 set(PACKAGES_TO_BUILD)
@@ -132,8 +132,5 @@ endif()
 
 add_package(libSEDML) # Requires libNuML and libSBML.
 
-if(NOT EMSCRIPTEN)
-    add_package(LLVMClang)
-endif()
-
+add_package(LLVMClang)
 add_package(SUNDIALS)

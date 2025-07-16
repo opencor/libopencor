@@ -42,7 +42,6 @@ uint64_t LIBOPENCOR_EXPORT version();
 
 std::string LIBOPENCOR_EXPORT versionString();
 
-#ifndef __EMSCRIPTEN__
 /**
  * Return the version of Clang as a number.
  *
@@ -60,7 +59,6 @@ unsigned int LIBOPENCOR_EXPORT clangVersion();
  */
 
 std::string LIBOPENCOR_EXPORT clangVersionString();
-#endif
 
 /**
  * Return the version of libCellML as a number.
@@ -136,7 +134,6 @@ unsigned int LIBOPENCOR_EXPORT libsedmlVersion();
 
 std::string LIBOPENCOR_EXPORT libsedmlVersionString();
 
-#ifndef __EMSCRIPTEN__
 /**
  * Return the version of LLVM as a number.
  *
@@ -154,7 +151,6 @@ unsigned int LIBOPENCOR_EXPORT llvmVersion();
  */
 
 std::string LIBOPENCOR_EXPORT llvmVersionString();
-#endif
 
 /**
  * Return the version of SUNDIALS as a number.

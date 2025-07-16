@@ -51,6 +51,11 @@ describe("Version tests", () => {
     );
   });
 
+  test("Clang", () => {
+    expect(loc.clangVersion()).toBe(0x160006);
+    expect(loc.clangVersionString()).toBe("16.0.6");
+  });
+
   test("libCellML", () => {
     expect(loc.libcellmlVersion()).toBe(0x000500);
     expect(loc.libcellmlVersionString()).toBe("0.5.0");
@@ -64,6 +69,11 @@ describe("Version tests", () => {
   test("libSEDML", () => {
     expect(loc.libsedmlVersion()).toBe(20033);
     expect(loc.libsedmlVersionString()).toBe("2.0.33");
+  });
+
+  test("LLVM", () => {
+    expect(loc.llvmVersion()).toBe(0x160006);
+    expect(loc.llvmVersionString()).toBe("16.0.6");
   });
 
   test("SUNDIALS", () => {

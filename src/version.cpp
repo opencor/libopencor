@@ -16,11 +16,9 @@ limitations under the License.
 
 #include "version.h"
 
-#ifndef __EMSCRIPTEN__
-#    include "clangbegin.h"
-#    include "clang/Basic/Version.h"
-#    include "clangend.h"
-#endif
+#include "clangbegin.h"
+#include "clang/Basic/Version.h"
+#include "clangend.h"
 
 #ifndef __EMSCRIPTEN__
 #    include "curl/curlver.h"
@@ -30,11 +28,9 @@ limitations under the License.
 
 #include "libopencor/version.h"
 
-#ifndef __EMSCRIPTEN__
-#    include "llvmbegin.h"
-#    include "llvm/Config/llvm-config.h"
-#    include "llvmend.h"
-#endif
+#include "llvmbegin.h"
+#include "llvm/Config/llvm-config.h"
+#include "llvmend.h"
 
 #include "libcombinebegin.h"
 #include "omex/common/libcombine-version.h"
@@ -84,7 +80,6 @@ std::string versionString()
     return LIBOPENCOR_VERSION_STRING;
 }
 
-#ifndef __EMSCRIPTEN__
 unsigned int clangVersion()
 {
     return MAJOR_10 * firstDigit(CLANG_VERSION_MAJOR) + MAJOR_01 * secondDigit(CLANG_VERSION_MAJOR)
@@ -96,7 +91,6 @@ std::string clangVersionString()
 {
     return CLANG_VERSION_STRING;
 }
-#endif
 
 unsigned int libcellmlVersion()
 {
@@ -140,7 +134,6 @@ std::string libsedmlVersionString()
     return libsedml::getLibSEDMLDottedVersion();
 }
 
-#ifndef __EMSCRIPTEN__
 unsigned int llvmVersion()
 {
     return MAJOR_10 * firstDigit(LLVM_VERSION_MAJOR) + MAJOR_01 * secondDigit(LLVM_VERSION_MAJOR)
@@ -152,7 +145,6 @@ std::string llvmVersionString()
 {
     return LLVM_VERSION_STRING;
 }
-#endif
 
 unsigned int sundialsVersion()
 {
