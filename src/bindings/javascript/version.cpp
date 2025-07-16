@@ -22,10 +22,8 @@ void versionApi()
 
     emscripten::function("version", &libOpenCOR::version);
     emscripten::function("versionString", &libOpenCOR::versionString);
-#ifndef __EMSCRIPTEN__
     emscripten::function("clangVersion", &libOpenCOR::clangVersion);
     emscripten::function("clangVersionString", &libOpenCOR::clangVersionString);
-#endif
     emscripten::function("libcellmlVersion", &libOpenCOR::libcellmlVersion);
     emscripten::function("libcellmlVersionString", &libOpenCOR::libcellmlVersionString);
     emscripten::function("libcombineVersion", &libOpenCOR::libcombineVersion);
@@ -36,10 +34,8 @@ void versionApi()
 #endif
     emscripten::function("libsedmlVersion", &libOpenCOR::libsedmlVersion);
     emscripten::function("libsedmlVersionString", &libOpenCOR::libsedmlVersionString);
-#ifndef __EMSCRIPTEN__
     emscripten::function("llvmVersion", &libOpenCOR::llvmVersion);
     emscripten::function("llvmVersionString", &libOpenCOR::llvmVersionString);
-#endif
     emscripten::function("sundialsVersion", &libOpenCOR::sundialsVersion);
     emscripten::function("sundialsVersionString", &libOpenCOR::sundialsVersionString);
 }

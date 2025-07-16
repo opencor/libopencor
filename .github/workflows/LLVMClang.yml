@@ -9,4 +9,3 @@ jobs:
     uses: ./.github/workflows/buildThirdPartyLibrary.yml
     with:
       third_party_library_name: LLVMCLANG
-      wasm_support: false

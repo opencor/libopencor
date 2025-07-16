@@ -21,71 +21,91 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 # Either retrieve or build our package.
 
 if(LIBOPENCOR_PREBUILT_LLVMCLANG OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
-    if(WIN32)
-        if(RELEASE_MODE)
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1182a7df3c015a06e19e75bb6f8972ceefaa2cba)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 bd28dbf00f1c200936012815dfc990bd3b5e11bd)
-            endif()
-        else()
-            if(INTEL_MODE)
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b56abbc32573a46207de270819f146b798187c14)
-            else()
-                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 71004b425b4efc2b62f0e77e48a8a3c594fad95f)
-            endif()
-        endif()
-    elseif(APPLE)
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             6ff1215e6506f369ba080d441d659c1732ac1c6e)
-        else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             50bee9afce1e06430ec0227ca89980115e8f7467)
-        endif()
+    if(EMSCRIPTEN)
+        retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                         ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                         9362c8554008534587df73e75e77744dd99dfed9)
     else()
-        if(INTEL_MODE)
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             cea9d122196d5a69067086dd46393db2f9c1d341)
+        if(WIN32)
+            if(RELEASE_MODE)
+                if(INTEL_MODE)
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     1182a7df3c015a06e19e75bb6f8972ceefaa2cba)
+                else()
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     bd28dbf00f1c200936012815dfc990bd3b5e11bd)
+                endif()
+            else()
+                if(INTEL_MODE)
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     b56abbc32573a46207de270819f146b798187c14)
+                else()
+                    retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                     ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                     71004b425b4efc2b62f0e77e48a8a3c594fad95f)
+                endif()
+            endif()
+        elseif(APPLE)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 6ff1215e6506f369ba080d441d659c1732ac1c6e)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 e9997b0644eaa4228c868e66ab3ee42468c64a4a)
+            endif()
         else()
-            retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
-                             ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             3ec70c1cd21f15b461eefa769079254669d797d3)
+            if(INTEL_MODE)
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 cea9d122196d5a69067086dd46393db2f9c1d341)
+            else()
+                retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
+                                 ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
+                                 3ec70c1cd21f15b461eefa769079254669d797d3)
+            endif()
         endif()
     endif()
 else()
     # Build our package.
 
-    if(INTEL_MODE)
-        set(LLVM_TARGETS_TO_BUILD X86)
+    if(EMSCRIPTEN)
+        set(LIBCLANG_BUILD_STATIC OFF)
 
-        if(WIN32)
-            set(LLVM_HOST_TRIPLE x86_64-pc-windows-msvc)
-        elseif(APPLE)
-            set(LLVM_HOST_TRIPLE x86_64-apple-darwin)
-        else()
-            set(LLVM_HOST_TRIPLE x86_64-pc-linux-gnu)
-        endif()
+        set(LLVM_TARGETS_TO_BUILD WebAssembly)
+        set(LLVM_HOST_TRIPLE wasm32-unknown-emscripten)
+
+        set(TABLEGENS
+            -DLLVM_TABLEGEN=${NATIVE_PREBUILT_DIR}/${PACKAGE_NAME}/bin/llvm-tblgen
+            -DCLANG_TABLEGEN=${NATIVE_PREBUILT_DIR}/${PACKAGE_NAME}/bin/clang-tblgen
+        )
     else()
-        set(LLVM_TARGETS_TO_BUILD AArch64)
+        set(LIBCLANG_BUILD_STATIC ON)
 
-        if(WIN32)
-            set(LLVM_HOST_TRIPLE aarch64-pc-windows-msvc)
-        elseif(APPLE)
-            set(LLVM_HOST_TRIPLE aarch64-apple-darwin)
+        if(INTEL_MODE)
+            set(LLVM_TARGETS_TO_BUILD X86)
+
+            if(WIN32)
+                set(LLVM_HOST_TRIPLE x86_64-pc-windows-msvc)
+            elseif(APPLE)
+                set(LLVM_HOST_TRIPLE x86_64-apple-darwin)
+            else()
+                set(LLVM_HOST_TRIPLE x86_64-pc-linux-gnu)
+            endif()
         else()
-            set(LLVM_HOST_TRIPLE aarch64-pc-linux-gnu)
+            set(LLVM_TARGETS_TO_BUILD AArch64)
+
+            if(WIN32)
+                set(LLVM_HOST_TRIPLE aarch64-pc-windows-msvc)
+            elseif(APPLE)
+                set(LLVM_HOST_TRIPLE aarch64-apple-darwin)
+            else()
+                set(LLVM_HOST_TRIPLE aarch64-pc-linux-gnu)
+            endif()
         endif()
     endif()
 
@@ -106,7 +126,7 @@ else()
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DLIBCLANG_BUILD_STATIC=ON
+            -DLIBCLANG_BUILD_STATIC=${LIBCLANG_BUILD_STATIC}
             -DLIBOPENCOR=ON
             -DLLVM_BUILD_LLVM_C_DYLIB=OFF
             -DLLVM_BUILD_RUNTIME=OFF
@@ -141,9 +161,23 @@ else()
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
             -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
+            ${TABLEGENS}
     )
 
     # Create our package.
+    # Note: we also package llvm-tblgen and clang-tblgen since we need them to build our JavaScript bindings.
+
+    if(NOT EMSCRIPTEN)
+        set(TABLEGEN_EXES_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/build/LLVMClang-prefix/src/LLVMClang-build)
+
+        file(GLOB TABLEGEN_EXES "${TABLEGEN_EXES_BUILD_DIR}/bin/*tblgen")
+
+        foreach(TABLEGEN_EXE ${TABLEGEN_EXES})
+            file(COPY ${TABLEGEN_EXE} DESTINATION ${INSTALL_DIR}/bin)
+        endforeach()
+
+        string(REPLACE "${TABLEGEN_EXES_BUILD_DIR}/" "" TABLEGEN_EXES "${TABLEGEN_EXES}")
+    endif()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -152,26 +186,37 @@ endif()
 
 # Make our package accessible.
 
-if(INTEL_MODE)
+if(EMSCRIPTEN)
     set(EXTRA_LLVMCLANG_LIBRARIES
-        LLVMExegesisX86
-        LLVMX86AsmParser
-        LLVMX86CodeGen
-        LLVMX86Desc
-        LLVMX86Disassembler
-        LLVMX86Info
-        LLVMX86TargetMCA
+        LLVMWebAssemblyAsmParser
+        LLVMWebAssemblyCodeGen
+        LLVMWebAssemblyDesc
+        LLVMWebAssemblyDisassembler
+        LLVMWebAssemblyInfo
+        LLVMWebAssemblyUtils
     )
 else()
-    set(EXTRA_LLVMCLANG_LIBRARIES
-        LLVMAArch64AsmParser
-        LLVMAArch64CodeGen
-        LLVMAArch64Desc
-        LLVMAArch64Disassembler
-        LLVMAArch64Info
-        LLVMAArch64Utils
-        LLVMExegesisAArch64
-    )
+    if(INTEL_MODE)
+        set(EXTRA_LLVMCLANG_LIBRARIES
+            LLVMExegesisX86
+            LLVMX86AsmParser
+            LLVMX86CodeGen
+            LLVMX86Desc
+            LLVMX86Disassembler
+            LLVMX86Info
+            LLVMX86TargetMCA
+        )
+    else()
+        set(EXTRA_LLVMCLANG_LIBRARIES
+            LLVMAArch64AsmParser
+            LLVMAArch64CodeGen
+            LLVMAArch64Desc
+            LLVMAArch64Disassembler
+            LLVMAArch64Info
+            LLVMAArch64Utils
+            LLVMExegesisAArch64
+        )
+    endif()
 endif()
 
 set(LLVMCLANG_ROOT ${INSTALL_DIR} CACHE INTERNAL "${PACKAGE_NAME}'s root directory.")
