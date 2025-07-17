@@ -252,7 +252,7 @@ using TimeVal = struct
 
 namespace {
 
-int getTimeOfDay(TimeVal &pTimeVal)
+void getTimeOfDay(TimeVal &pTimeVal)
 {
     // Based off https://stackoverflow.com/a/58162122.
 
@@ -261,8 +261,6 @@ int getTimeOfDay(TimeVal &pTimeVal)
 
     pTimeVal.seconds = static_cast<uint64_t>(seconds.count());
     pTimeVal.microeconds = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(duration - seconds).count());
-
-    return 0;
 }
 
 std::filesystem::path uniqueFilePath()
