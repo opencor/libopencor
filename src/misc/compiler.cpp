@@ -84,11 +84,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     static constexpr auto DUMMY_FILE_NAME = "dummy.c";
     static const std::vector<const char *> COMPILATION_ARGUMENTS = {"clang", "-fsyntax-only",
-#ifdef NDEBUG
                                                                     "-O3",
-#else
-                                                                    "-g", "-O0",
-#endif
                                                                     "-fno-math-errno",
                                                                     "-fno-stack-protector",
                                                                     DUMMY_FILE_NAME};
