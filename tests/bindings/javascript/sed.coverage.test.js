@@ -514,7 +514,6 @@ describe("Sed coverage tests", () => {
     file.delete();
   });
 
-  /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("SedInstanceAndSedInstanceTaskNonDifferentialModel", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
@@ -546,7 +545,6 @@ describe("Sed coverage tests", () => {
     document.delete();
     file.delete();
   });
-  */
 
   test("SedDocument", () => {
     let file = new loc.File(utils.HTTP_REMOTE_CELLML_FILE);

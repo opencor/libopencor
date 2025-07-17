@@ -16,8 +16,7 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-//---GRY--- TO BE ENABLED ONCE WE CAN INTERPRET NLA-BASED MODELS.
-// import { expectIssues } from "./utils.js";
+import { expectIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
@@ -43,7 +42,6 @@ describe("Solver KINSOL tests", () => {
 
   test("Dummy", () => {});
 
-  /*---GRY--- ENABLE THOSE TESTS ONCE WE CAN INTERPRET NLA-BASED MODELS.
   test("Maximum number of iterations value with invalid number", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
@@ -303,5 +301,4 @@ describe("Solver KINSOL tests", () => {
     document.delete();
     file.delete();
   });
-    */
 });

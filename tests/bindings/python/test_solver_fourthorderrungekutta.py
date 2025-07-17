@@ -54,7 +54,6 @@ def fourth_order_runge_kutta_solve(
     computed_constant_abs_tols,
     algebraic_values,
     algebraic_abs_tols,
-    compiled,
 ):
     file = loc.File(utils.resource_path("api/solver/ode.cellml"))
     document = loc.SedDocument(file)
@@ -77,7 +76,6 @@ def fourth_order_runge_kutta_solve(
         computed_constant_abs_tols,
         algebraic_values,
         algebraic_abs_tols,
-        compiled,
     )
 
 
@@ -115,7 +113,7 @@ algebraic_abs_tols = [
 ]
 
 
-def test_compiled_solve():
+def test_solve():
     fourth_order_runge_kutta_solve(
         state_values,
         state_abs_tols,
@@ -127,21 +125,4 @@ def test_compiled_solve():
         computed_constant_abs_tols,
         algebraic_values,
         algebraic_abs_tols,
-        True,
-    )
-
-
-def test_interpreted_solve():
-    fourth_order_runge_kutta_solve(
-        state_values,
-        state_abs_tols,
-        rate_values,
-        rate_abs_tols,
-        constant_values,
-        constant_abs_tols,
-        computed_constant_values,
-        computed_constant_abs_tols,
-        algebraic_values,
-        algebraic_abs_tols,
-        False,
     )

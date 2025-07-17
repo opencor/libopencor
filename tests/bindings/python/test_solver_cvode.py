@@ -195,7 +195,6 @@ def cvode_solve(
     computed_constant_abs_tols,
     algebraic_values,
     algebraic_abs_tols,
-    compiled,
 ):
     file = loc.File(utils.resource_path("api/solver/ode.cellml"))
     document = loc.SedDocument(file)
@@ -212,11 +211,10 @@ def cvode_solve(
         computed_constant_abs_tols,
         algebraic_values,
         algebraic_abs_tols,
-        compiled,
     )
 
 
-def test_compiled_solve():
+def test_solve():
     state_values = [-63.886, 0.135007, 0.984333, 0.740973]
     state_abs_tols = [0.001, 0.000001, 0.000001, 0.000001]
     rate_values = [49.726, -0.128192, -0.050904, 0.098649]
@@ -261,56 +259,6 @@ def test_compiled_solve():
         computed_constant_abs_tols,
         algebraic_values,
         algebraic_abs_tols,
-        True,
-    )
-
-
-def test_interpreted_solve():
-    state_values = [-63.886, 0.135008, 0.984333, 0.740972]
-    state_abs_tols = [0.001, 0.000001, 0.000001, 0.000001]
-    rate_values = [49.726, -0.128193, -0.05090, 0.09865]
-    rate_abs_tols = [0.001, 0.000001, 0.00001, 0.00001]
-    constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
-    constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
-    computed_constant_values = [-10.613, -115.0, 12.0]
-    computed_constant_abs_tols = [0.0, 0.0, 0.0]
-    algebraic_values = [
-        0.0,
-        -15.9819,
-        -823.517,
-        789.779,
-        3.9699,
-        0.11499,
-        0.002869,
-        0.967347,
-        0.54133,
-        0.056246,
-    ]
-    algebraic_abs_tols = [
-        0.0,
-        0.0001,
-        0.001,
-        0.001,
-        0.0001,
-        0.00001,
-        0.000001,
-        0.000001,
-        0.00001,
-        0.000001,
-    ]
-
-    cvode_solve(
-        state_values,
-        state_abs_tols,
-        rate_values,
-        rate_abs_tols,
-        constant_values,
-        constant_abs_tols,
-        computed_constant_values,
-        computed_constant_abs_tols,
-        algebraic_values,
-        algebraic_abs_tols,
-        False,
     )
 
 

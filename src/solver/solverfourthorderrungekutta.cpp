@@ -32,8 +32,7 @@ SolverPtr SolverFourthOrderRungeKutta::Impl::duplicate()
 
 bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                                    double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                                                   CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
-                                                   CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
+                                                   CellmlFileRuntime::ComputeRates pComputeRates)
 {
     removeAllIssues();
 
@@ -41,7 +40,7 @@ bool SolverFourthOrderRungeKutta::Impl::initialise(double pVoi, size_t pSize, do
 
     if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates,
                                               pConstants, pComputedConstants, pAlgebraic,
-                                              pComputeCompiledRates, pComputeInterpretedRates)) {
+                                              pComputeRates)) {
         return false;
     }
 

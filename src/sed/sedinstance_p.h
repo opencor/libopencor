@@ -27,9 +27,9 @@ class SedInstance::Impl: public Logger::Impl
 public:
     SedInstanceTaskPtrs mTasks;
 
-    static SedInstancePtr create(const SedDocumentPtr &pDocument, bool pCompiled);
+    static SedInstancePtr create(const SedDocumentPtr &pDocument);
 
-    explicit Impl(const SedDocumentPtr &pDocument, bool pCompiled);
+    explicit Impl(const SedDocumentPtr &pDocument);
 
     double run();
 

@@ -37,8 +37,7 @@ public:
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                     double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                    CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
-                    CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates) override;
+                    CellmlFileRuntime::ComputeRates pComputeRates) override;
 
     bool solve(double &pVoi, double pVoiEnd) override;
 };

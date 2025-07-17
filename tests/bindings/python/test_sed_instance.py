@@ -113,34 +113,26 @@ def test_unsuitable_constrained_cellml_file():
     assert_issues(instance, expected_issues)
 
 
-def run_algebraic_model(compiled):
+def run_algebraic_model():
     file = loc.File(utils.resource_path("api/sed/algebraic.cellml"))
     document = loc.SedDocument(file)
-    instance = document.instantiate(compiled)
+    instance = document.instantiate()
 
     instance.run()
 
     assert instance.has_issues == False
 
 
-def test_compiled_algebraic_model():
-    run_algebraic_model(True)
+def test_algebraic_model():
+    run_algebraic_model()
 
 
-def test_interpreted_algebraic_model():
-    run_algebraic_model(False)
-
-
-def run_ode_model(compiled):
+def run_ode_model():
     expected_issues = [
         [
             loc.Issue.Type.Error,
             (
-                (
-                    "At t = 0.00140013827899707, mxstep steps taken before reaching tout."
-                    if compiled
-                    else "At t = 0.00140013827900052, mxstep steps taken before reaching tout."
-                )
+                "At t = 0.00140013827899707, mxstep steps taken before reaching tout."
                 if platform.system() == "Darwin"
                 else "At t = 0.00140013827899996, mxstep steps taken before reaching tout."
             ),
@@ -154,7 +146,7 @@ def run_ode_model(compiled):
 
     cvode.maximum_number_of_steps = 10
 
-    instance = document.instantiate(compiled)
+    instance = document.instantiate()
 
     assert instance.has_issues == False
 
@@ -164,19 +156,15 @@ def run_ode_model(compiled):
 
     cvode.maximum_number_of_steps = 500
 
-    instance = document.instantiate(compiled)
+    instance = document.instantiate()
 
     instance.run()
 
     assert instance.has_issues == False
 
 
-def test_compiled_ode_model():
-    run_ode_model(True)
-
-
-def test_interpreted_ode_model():
-    run_ode_model(False)
+def test_ode_model():
+    run_ode_model()
 
 
 def test_ode_model_with_no_ode_solver():
@@ -198,8 +186,6 @@ def test_ode_model_with_no_ode_solver():
 
 
 def test_nla_model():
-    # ---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
-
     expected_issues = [
         [
             loc.Issue.Type.Error,
@@ -245,8 +231,6 @@ def test_nla_model_with_no_nla_solver():
 
 
 def test_dae_model():
-    # ---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
-
     expected_issues = [
         [
             loc.Issue.Type.Error,

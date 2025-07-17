@@ -26,7 +26,6 @@ limitations under the License.
 #include "libcellml/generator.h"
 #include "libcellml/generatorprofile.h"
 #include "libcellml/importer.h"
-#include "libcellml/interpreter.h"
 #include "libcellml/model.h"
 #include "libcellml/parser.h"
 #include "libcellml/units.h"
@@ -64,7 +63,7 @@ public:
     libcellml::AnalyserPtr analyser() const;
     libcellml::AnalyserModelPtr analyserModel() const;
 
-    CellmlFileRuntimePtr runtime(const SolverNlaPtr &pNlaSolver = {}, bool pCompiled = true);
+    CellmlFileRuntimePtr runtime(const SolverNlaPtr &pNlaSolver = {});
 
 private:
     class Impl;

@@ -25,8 +25,7 @@ SolverOde::Impl::Impl(const std::string &pId, const std::string &pName)
 
 bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                  double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                                 CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
-                                 CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
+                                 CellmlFileRuntime::ComputeRates pComputeRates)
 {
     (void)pVoi;
 
@@ -38,8 +37,7 @@ bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     mComputedConstants = pComputedConstants;
     mAlgebraic = pAlgebraic;
 
-    mComputeCompiledRates = pComputeCompiledRates;
-    mComputeInterpretedRates = std::move(pComputeInterpretedRates);
+    mComputeRates = pComputeRates;
 
     return true;
 }
@@ -56,11 +54,7 @@ bool SolverOde::Impl::reinitialise(double pVoi)
 void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates,
                                    double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    if (mComputeCompiledRates != nullptr) {
-        mComputeCompiledRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
-    } else {
-        mComputeInterpretedRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
-    }
+    mComputeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 
 SolverOde::SolverOde(Impl *pPimpl)

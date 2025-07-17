@@ -87,49 +87,28 @@ TEST(InstanceSedTest, unsuitablyConstrainedCellmlFile)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
-namespace {
-
-void runAlgebraicModel(bool pCompiled)
+TEST(InstanceSedTest, algebraicModel)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate(pCompiled);
+    auto instance = document->instantiate();
 
     instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
 }
 
-} // namespace
-
-TEST(InstanceSedTest, compiledAlgebraicModel)
-{
-    runAlgebraicModel(true);
-}
-
-TEST(InstanceSedTest, interpretedAlgebraicModel)
-{
-    runAlgebraicModel(false);
-}
-
-namespace {
-
-void runOdeModel(bool pCompiled)
+TEST(InstanceSedTest, odeModel)
 {
     const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
 #ifdef BUILDING_ON_INTEL
         {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140013827899996, mxstep steps taken before reaching tout."},
 #else
-        {
-            libOpenCOR::Issue::Type::ERROR,
+        {libOpenCOR::Issue::Type::ERROR,
 #    ifdef BUILDING_ON_WINDOWS
-            pCompiled ?
-                "At t = 0.00140013827899821, mxstep steps taken before reaching tout." :
-                "At t = 0.00140013827899996, mxstep steps taken before reaching tout.",
+         "At t = 0.00140013827899821, mxstep steps taken before reaching tout."
 #    else
-            pCompiled ?
-                "At t = 0.00140013827899707, mxstep steps taken before reaching tout." :
-                "At t = 0.00140013827900052, mxstep steps taken before reaching tout.",
+         "At t = 0.00140013827899707, mxstep steps taken before reaching tout."
 #    endif
         },
 #endif
@@ -145,7 +124,7 @@ void runOdeModel(bool pCompiled)
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
-    auto instance = document->instantiate(pCompiled);
+    auto instance = document->instantiate();
 
     EXPECT_FALSE(instance->hasIssues());
 
@@ -157,23 +136,11 @@ void runOdeModel(bool pCompiled)
 
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
-    instance = document->instantiate(pCompiled);
+    instance = document->instantiate();
 
     instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
-}
-
-} // namespace
-
-TEST(InstanceSedTest, compiledOdeModel)
-{
-    runOdeModel(true);
-}
-
-TEST(InstanceSedTest, interpretedOdeModel)
-{
-    runOdeModel(false);
 }
 
 TEST(InstanceSedTest, odeModelWithNoOdeSolver)
@@ -194,8 +161,6 @@ TEST(InstanceSedTest, odeModelWithNoOdeSolver)
 
 TEST(InstanceSedTest, nlaModel)
 {
-    //---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
-
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     };
@@ -237,8 +202,6 @@ TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 
 TEST(InstanceSedTest, daeModel)
 {
-    //---GRY--- AS FOR THE ALGEBRAIC AND ODE MODELS, WE WILL NEED TO ADD AN INTERPRETED VERSION OF THIS TEST.
-
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     };

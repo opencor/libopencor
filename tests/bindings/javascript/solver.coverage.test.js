@@ -77,7 +77,6 @@ describe("Solver coverage tests", () => {
     file.delete();
   });
 
-  /*---GRY--- ENABLE THIS TEST ONCE WE CAN INTERPRET NLA-BASED MODELS.
   test("Algebraic changes", () => {
     // We want to solve a system of three unknowns:
     // Variables:
@@ -128,5 +127,4 @@ describe("Solver coverage tests", () => {
     document.delete();
     file.delete();
   });
-  */
 });

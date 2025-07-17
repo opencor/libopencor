@@ -32,8 +32,7 @@ SolverPtr SolverHeun::Impl::duplicate()
 
 bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                   double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                                  CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
-                                  CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
+                                  CellmlFileRuntime::ComputeRates pComputeRates)
 {
     removeAllIssues();
 
@@ -41,7 +40,7 @@ bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, do
 
     if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates,
                                               pConstants, pComputedConstants, pAlgebraic,
-                                              pComputeCompiledRates, pComputeInterpretedRates)) {
+                                              pComputeRates)) {
         return false;
     }
 

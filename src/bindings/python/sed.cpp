@@ -89,7 +89,7 @@ void sedApi(nb::module_ &m)
         .def("add_task", &libOpenCOR::SedDocument::addTask, "Add a task.", nb::arg("task").none())
         .def("remove_task", &libOpenCOR::SedDocument::removeTask, "Remove a task.", nb::arg("task").none())
         .def("remove_all_tasks", &libOpenCOR::SedDocument::removeAllTasks, "Remove all tasks.")
-        .def("instantiate", &libOpenCOR::SedDocument::instantiate, "Instantiate this SedDocument object.", nb::arg("compiled") = true);
+        .def("instantiate", &libOpenCOR::SedDocument::instantiate, "Instantiate this SedDocument object.");
 
     // SedInstance API.
 

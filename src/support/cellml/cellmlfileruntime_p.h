@@ -32,36 +32,22 @@ public:
 
     char *mNlaSolverAddress = nullptr;
 
-    InitialiseCompiledVariablesForAlgebraicModel mInitialiseCompiledVariablesForAlgebraicModel = nullptr;
-    InitialiseCompiledVariablesForDifferentialModel mInitialiseCompiledVariablesForDifferentialModel = nullptr;
-    ComputeCompiledComputedConstants mComputeCompiledComputedConstants = nullptr;
-    ComputeCompiledRates mComputeCompiledRates = nullptr;
-    ComputeCompiledVariablesForAlgebraicModel mComputeCompiledVariablesForAlgebraicModel = nullptr;
-    ComputeCompiledVariablesForDifferentialModel mComputeCompiledVariablesForDifferentialModel = nullptr;
+    InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel = nullptr;
+    InitialiseVariablesForDifferentialModel mInitialiseVariablesForDifferentialModel = nullptr;
+    ComputeComputedConstants mComputeComputedConstants = nullptr;
+    ComputeRates mComputeRates = nullptr;
+    ComputeVariablesForAlgebraicModel mComputeVariablesForAlgebraicModel = nullptr;
+    ComputeVariablesForDifferentialModel mComputeVariablesForDifferentialModel = nullptr;
 
-    InitialiseInterpretedVariablesForAlgebraicModel mInitialiseInterpretedVariablesForAlgebraicModel = nullptr;
-    InitialiseInterpretedVariablesForDifferentialModel mInitialiseInterpretedVariablesForDifferentialModel = nullptr;
-    ComputeInterpretedComputedConstants mComputeInterpretedComputedConstants = nullptr;
-    ComputeInterpretedRates mComputeInterpretedRates = nullptr;
-    ComputeInterpretedVariablesForAlgebraicModel mComputeInterpretedVariablesForAlgebraicModel = nullptr;
-    ComputeInterpretedVariablesForDifferentialModel mComputeInterpretedVariablesForDifferentialModel = nullptr;
-
-    explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver, bool pCompiled);
+    explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
     ~Impl() override;
 
-    CellmlFileRuntime::InitialiseCompiledVariablesForAlgebraicModel initialiseCompiledVariablesForAlgebraicModel() const;
-    CellmlFileRuntime::InitialiseCompiledVariablesForDifferentialModel initialiseCompiledVariablesForDifferentialModel() const;
-    CellmlFileRuntime::ComputeCompiledComputedConstants computeCompiledComputedConstants() const;
-    CellmlFileRuntime::ComputeCompiledRates computeCompiledRates() const;
-    CellmlFileRuntime::ComputeCompiledVariablesForAlgebraicModel computeCompiledVariablesForAlgebraicModel() const;
-    CellmlFileRuntime::ComputeCompiledVariablesForDifferentialModel computeCompiledVariablesForDifferentialModel() const;
-
-    CellmlFileRuntime::InitialiseInterpretedVariablesForAlgebraicModel initialiseInterpretedVariablesForAlgebraicModel() const;
-    CellmlFileRuntime::InitialiseInterpretedVariablesForDifferentialModel initialiseInterpretedVariablesForDifferentialModel() const;
-    CellmlFileRuntime::ComputeInterpretedComputedConstants computeInterpretedComputedConstants() const;
-    CellmlFileRuntime::ComputeInterpretedRates computeInterpretedRates() const;
-    CellmlFileRuntime::ComputeInterpretedVariablesForAlgebraicModel computeInterpretedVariablesForAlgebraicModel() const;
-    CellmlFileRuntime::ComputeInterpretedVariablesForDifferentialModel computeInterpretedVariablesForDifferentialModel() const;
+    CellmlFileRuntime::InitialiseVariablesForAlgebraicModel initialiseVariablesForAlgebraicModel() const;
+    CellmlFileRuntime::InitialiseVariablesForDifferentialModel initialiseVariablesForDifferentialModel() const;
+    CellmlFileRuntime::ComputeComputedConstants computeComputedConstants() const;
+    CellmlFileRuntime::ComputeRates computeRates() const;
+    CellmlFileRuntime::ComputeVariablesForAlgebraicModel computeVariablesForAlgebraicModel() const;
+    CellmlFileRuntime::ComputeVariablesForDifferentialModel computeVariablesForDifferentialModel() const;
 };
 
 } // namespace libOpenCOR

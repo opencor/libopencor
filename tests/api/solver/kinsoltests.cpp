@@ -112,9 +112,6 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
-//---GRY--- RENAME THIS TEST compiledSolve AND CREATE ONE CALLED interpretedSolve ONCE WE CAN INTERPRET NLA-BASED
-//          MODELS.
-
 static const auto ABS_TOL = 1e-05;
 
 namespace {

@@ -172,30 +172,7 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
-namespace {
-
-void cvodeSolve(const libOpenCOR::Doubles &pStateValues, const libOpenCOR::Doubles &pStateAbsTols,
-                const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
-                const libOpenCOR::Doubles &pConstantValues, const libOpenCOR::Doubles &pConstantAbsTols,
-                const libOpenCOR::Doubles &pComputedConstantValues, const libOpenCOR::Doubles &pComputedConstantAbsTols,
-                const libOpenCOR::Doubles &pAlgebraicValues, const libOpenCOR::Doubles &pAlgebraicAbsTols,
-                bool pCompiled)
-{
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-
-    OdeModel::run(document,
-                  pStateValues, pStateAbsTols,
-                  pRateValues, pRateAbsTols,
-                  pConstantValues, pConstantAbsTols,
-                  pComputedConstantValues, pComputedConstantAbsTols,
-                  pAlgebraicValues, pAlgebraicAbsTols,
-                  pCompiled);
-}
-
-} // namespace
-
-TEST(CvodeSolverTest, compiledSolve)
+TEST(CvodeSolverTest, solve)
 {
     static const auto STATE_VALUES = std::vector<double>({-63.886, 0.135007, 0.984333, 0.740973});
     static const auto STATE_ABS_TOLS = std::vector<double>({0.001, 0.000001, 0.000001, 0.000001});
@@ -208,33 +185,15 @@ TEST(CvodeSolverTest, compiledSolve)
     static const auto ALGEBRAIC_VALUES = std::vector<double>({0.0, -15.9819, -823.517, 789.779, 3.9699, 0.11499, 0.00287, 0.96735, 0.54133, 0.056246});
     static const auto ALGEBRAIC_ABS_TOLS = std::vector<double>({0.0, 0.0001, 0.001, 0.001, 0.0001, 0.00001, 0.00001, 0.00001, 0.00001, 0.000001});
 
-    cvodeSolve(STATE_VALUES, STATE_ABS_TOLS,
-               RATE_VALUES, RATE_ABS_TOLS,
-               CONSTANT_VALUES, CONSTANT_ABS_TOLS,
-               COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-               ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-               true);
-}
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"));
+    auto document = libOpenCOR::SedDocument::create(file);
 
-TEST(CvodeSolverTest, interpretedSolve)
-{
-    static const auto STATE_VALUES = std::vector<double>({-63.886, 0.135008, 0.984333, 0.740972});
-    static const auto STATE_ABS_TOLS = std::vector<double>({0.001, 0.000001, 0.000001, 0.000001});
-    static const auto RATE_VALUES = std::vector<double>({49.725, -0.128193, -0.05090, 0.09865});
-    static const auto RATE_ABS_TOLS = std::vector<double>({0.001, 0.000001, 0.00001, 0.00001});
-    static const auto CONSTANT_VALUES = std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0});
-    static const auto CONSTANT_ABS_TOLS = std::vector<double>({0.0, 0.0, 0.0, 0.0, 0.0});
-    static const auto COMPUTED_CONSTANT_VALUES = std::vector<double>({-10.613, -115.0, 12.0});
-    static const auto COMPUTED_CONSTANT_ABS_TOLS = std::vector<double>({0.0, 0.0, 0.0});
-    static const auto ALGEBRAIC_VALUES = std::vector<double>({0.0, -15.9819, -823.517, 789.779, 3.9699, 0.11499, 0.00287, 0.967347, 0.54133, 0.056246});
-    static const auto ALGEBRAIC_ABS_TOLS = std::vector<double>({0.0, 0.0001, 0.001, 0.001, 0.0001, 0.00001, 0.00001, 0.000001, 0.00001, 0.000001});
-
-    cvodeSolve(STATE_VALUES, STATE_ABS_TOLS,
-               RATE_VALUES, RATE_ABS_TOLS,
-               CONSTANT_VALUES, CONSTANT_ABS_TOLS,
-               COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-               ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-               false);
+    OdeModel::run(document,
+                  STATE_VALUES, STATE_ABS_TOLS,
+                  RATE_VALUES, RATE_ABS_TOLS,
+                  CONSTANT_VALUES, CONSTANT_ABS_TOLS,
+                  COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
@@ -262,8 +221,7 @@ TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
@@ -291,8 +249,7 @@ TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithFunctionalIterationType)
@@ -320,8 +277,7 @@ TEST(CvodeSolverTest, solveWithFunctionalIterationType)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithBandedLinearSolver)
@@ -349,8 +305,7 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
@@ -378,8 +333,7 @@ TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolver)
@@ -407,8 +361,7 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolver)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
@@ -436,8 +389,7 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
@@ -465,8 +417,7 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
@@ -495,8 +446,7 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
@@ -525,8 +475,7 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }
 
 TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
@@ -555,6 +504,5 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
                   RATE_VALUES, RATE_ABS_TOLS,
                   CONSTANT_VALUES, CONSTANT_ABS_TOLS,
                   COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
-                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS,
-                  true);
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
 }

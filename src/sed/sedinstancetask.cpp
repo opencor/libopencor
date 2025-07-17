@@ -25,9 +25,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask, bool pCompiled)
+SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask)
 {
-    auto res = SedInstanceTaskPtr {new SedInstanceTask {pTask, pCompiled}};
+    auto res = SedInstanceTaskPtr {new SedInstanceTask {pTask}};
 
     res->pimpl()->mOwner = res;
 
@@ -36,8 +36,7 @@ SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask
     return res;
 }
 
-SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
-    : mCompiled(pCompiled)
+SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 {
     //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT (FOR NOW) THAT pTask IS INDEED A SedTask
     //          OBJECT.
@@ -62,7 +61,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask, bool pCompiled)
 
     mOdeSolver = (odeSolver != nullptr) ? std::dynamic_pointer_cast<SolverOde>(odeSolver->pimpl()->duplicate()) : nullptr;
     mNlaSolver = (nlaSolver != nullptr) ? std::dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
-    mRuntime = cellmlFile->runtime(mNlaSolver, mCompiled);
+    mRuntime = cellmlFile->runtime(mNlaSolver);
 
 #ifndef CODE_COVERAGE_ENABLED
     if (mRuntime->hasErrors()) {
@@ -146,45 +145,26 @@ void SedInstanceTask::Impl::initialise()
 
     mSedUniformTimeCourse = mDifferentialModel ? std::dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
+#ifndef __EMSCRIPTEN__
     if (mSedUniformTimeCourse != nullptr) {
         mVoi = mSedUniformTimeCourse->pimpl()->mOutputStartTime;
 
-#ifndef __EMSCRIPTEN__
-        if (mCompiled) {
-            mRuntime->initialiseCompiledVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-
-            applyChanges();
-
-            mRuntime->computeCompiledComputedConstants()(mConstants, mComputedConstants);
-            mRuntime->computeCompiledRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-            mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-        } else {
-#endif
-            mRuntime->initialiseInterpretedVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-
-            applyChanges();
-
-            mRuntime->computeInterpretedComputedConstants()(mConstants, mComputedConstants);
-            mRuntime->computeInterpretedRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-            mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-#ifndef __EMSCRIPTEN__
-        }
-    } else if (mCompiled) {
-        mRuntime->initialiseCompiledVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->initialiseVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 
         applyChanges();
 
-        mRuntime->computeCompiledComputedConstants()(mConstants, mComputedConstants);
-        mRuntime->computeCompiledVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
-#endif
+        mRuntime->computeComputedConstants()(mConstants, mComputedConstants);
+        mRuntime->computeRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
     } else {
-        mRuntime->initialiseInterpretedVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->initialiseVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
 
         applyChanges();
 
-        mRuntime->computeInterpretedComputedConstants()(mConstants, mComputedConstants);
-        mRuntime->computeInterpretedVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeComputedConstants()(mConstants, mComputedConstants);
+        mRuntime->computeVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
     }
+#endif
 
     // Make sure that the NLA solver, should it have been used, didn't report any issues.
 
@@ -199,7 +179,7 @@ void SedInstanceTask::Impl::initialise()
     if (mDifferentialModel) {
         if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates,
                                              mConstants, mComputedConstants, mAlgebraic,
-                                             mRuntime->computeCompiledRates(), mRuntime->computeInterpretedRates())) {
+                                             mRuntime->computeRates())) {
             addIssues(mOdeSolver);
 
             return;
@@ -265,15 +245,8 @@ double SedInstanceTask::Impl::run()
             }
 
 #ifndef __EMSCRIPTEN__
-            if (mCompiled) {
-                mRuntime->computeCompiledVariablesForDifferentialModel()(mVoi, mStates, mRates,
-                                                                         mConstants, mComputedConstants, mAlgebraic);
-            } else {
-#endif
-                mRuntime->computeInterpretedVariablesForDifferentialModel()(mVoi, mStates, mRates,
-                                                                            mConstants, mComputedConstants, mAlgebraic);
-#ifndef __EMSCRIPTEN__
-            }
+            mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates,
+                                                             mConstants, mComputedConstants, mAlgebraic);
 #endif
 
             //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD
@@ -498,8 +471,8 @@ std::string SedInstanceTask::Impl::algebraicUnit(size_t pIndex) const
     return mAnalyserModel->algebraic()[pIndex]->variable()->units()->name();
 }
 
-SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask, bool pCompiled)
-    : Logger(new Impl(pTask, pCompiled))
+SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask)
+    : Logger(new Impl(pTask))
 {
 }
 

@@ -28,14 +28,13 @@ def run(
     computed_constant_abs_tols,
     algebraic_values,
     algebraic_abs_tols,
-    compiled=True,
 ):
     simulation = document.simulations[0]
 
     simulation.output_end_time = 50.0
     simulation.number_of_steps = 50000
 
-    instance = document.instantiate(compiled)
+    instance = document.instantiate()
 
     instance.run()
 
