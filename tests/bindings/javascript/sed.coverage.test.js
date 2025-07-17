@@ -518,10 +518,7 @@ describe("Sed coverage tests", () => {
   test("SedInstanceAndSedInstanceTaskNonDifferentialModel", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla1ContentsPtr,
-      utils.SOLVER_NLA1_CONTENTS.length,
-    );
+    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
 
