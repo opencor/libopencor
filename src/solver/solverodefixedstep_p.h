@@ -41,7 +41,7 @@ public:
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                     double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                    CellmlFileRuntime::ComputeRates pComputeRates) override;
+                    const CellmlFileRuntimePtr &pRuntime) override;
 
     double step() const;
     void setStep(double pStep);

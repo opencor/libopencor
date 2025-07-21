@@ -40,11 +40,15 @@ public:
 
     static CompilerPtr create();
 
+#ifdef __EMSCRIPTEN__
+    bool compile(const std::string &pCode, UnsignedChars &pWasmModule);
+#else
     bool compile(const std::string &pCode);
 
     bool addFunction(const std::string &pName, void *pFunction);
 
     void *function(const std::string &pName) const;
+#endif
 
 private:
     class Impl;

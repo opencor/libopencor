@@ -72,6 +72,8 @@ using StringStringMap = std::map<std::string, std::string>;
 
 #ifndef CODE_COVERAGE_ENABLED
 void LIBOPENCOR_UNIT_TESTING_EXPORT printIssues(const LoggerPtr &pLogger);
+void LIBOPENCOR_UNIT_TESTING_EXPORT printHexDump(const UnsignedChars &pBytes);
+void LIBOPENCOR_UNIT_TESTING_EXPORT printArray(const std::string &pName, const Doubles &pDoubles);
 #endif
 
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);

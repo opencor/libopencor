@@ -60,6 +60,79 @@ void printIssues(const LoggerPtr &pLogger)
 
     std::cout << "---[ISSUES]---[END]\n";
 }
+
+void printHexDump(const UnsignedChars &pBytes)
+{
+    static constexpr auto BYTES_PER_LINE = 16;
+
+    std::cout << "---[BYTES]---[BEGIN]\n";
+
+    for (size_t i = 0; i < pBytes.size(); i += BYTES_PER_LINE) {
+        // Print the offset.
+
+        std::cout << std::hex << std::setfill('0') << std::setw(8) << i << "  ";
+
+        // Print hex bytes.
+
+        for (size_t j = 0; j < BYTES_PER_LINE; ++j) {
+            if (i + j < pBytes.size()) {
+                std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(pBytes[i + j]);
+            } else {
+                std::cout << "  ";
+            }
+
+            // Add an extra space after 8 bytes.
+
+            if (j == 7) {
+                std::cout << "  ";
+            } else {
+                std::cout << " ";
+            }
+        }
+
+        std::cout << " |";
+
+        // Print the ASCII representation.
+
+        size_t bytesOnThisLine = (pBytes.size() - i < BYTES_PER_LINE) ? (pBytes.size() - i) : BYTES_PER_LINE;
+
+        for (size_t j = 0; j < bytesOnThisLine; ++j) {
+            auto byte = pBytes[i + j];
+
+            if (byte >= 32 && byte <= 126) {
+                std::cout << static_cast<char>(byte);
+            } else {
+                std::cout << ".";
+            }
+        }
+
+        for (size_t j = bytesOnThisLine; j < BYTES_PER_LINE; ++j) {
+            std::cout << " ";
+        }
+
+        std::cout << "|\n";
+    }
+
+    std::cout << std::dec;
+
+    std::cout << "---[BYTES]---[END]\n";
+}
+
+void printArray(const std::string &pName, const Doubles &pDoubles)
+{
+    std::cout << "---[ARRAY]---[" << pName << "]---[BEGIN]\n";
+
+    if (!pDoubles.empty()) {
+        const auto arraySize = pDoubles.size();
+        const auto indexWidth = static_cast<int>(log10(arraySize - 1)) + 1;
+
+        for (size_t i = 0; i < arraySize; ++i) {
+            std::cout << "[" << std::setfill('0') << std::setw(indexWidth) << i << "] " << pDoubles[i] << "\n";
+        }
+    }
+
+    std::cout << "---[ARRAY]---[" << pName << "]---[END]\n";
+}
 #endif
 
 bool fuzzyCompare(double pNb1, double pNb2)

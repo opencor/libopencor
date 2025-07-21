@@ -106,8 +106,13 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
 
-    userData->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
-                           userData->constants, userData->computedConstants, userData->algebraic);
+#ifdef __EMSCRIPTEN__
+    userData->runtime->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
+                                    userData->constants, userData->computedConstants, userData->algebraic);
+#else
+        userData->runtime->computeRates()(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
+                                          userData->constants, userData->computedConstants, userData->algebraic);
+#endif
 
     return 0;
 }
@@ -300,7 +305,7 @@ StringStringMap SolverCvode::Impl::properties() const
 
 bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                    double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                                   CellmlFileRuntime::ComputeRates pComputeRates)
+                                   const CellmlFileRuntimePtr &pRuntime)
 {
     resetInternals();
     removeAllIssues();
@@ -309,7 +314,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates,
                                 pConstants, pComputedConstants, pAlgebraic,
-                                pComputeRates);
+                                pRuntime);
 
     // Check the solver's properties.
 
@@ -394,7 +399,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     mUserData.constants = pConstants;
     mUserData.computedConstants = pComputedConstants;
     mUserData.algebraic = pAlgebraic;
-    mUserData.computeRates = pComputeRates;
+    mUserData.runtime = pRuntime;
 
     ASSERT_EQ(CVodeSetUserData(mSolver, &mUserData), CV_SUCCESS);
 

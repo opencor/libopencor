@@ -33,7 +33,7 @@ struct SolverCvodeUserData
     double *computedConstants = nullptr;
     double *algebraic = nullptr;
 
-    CellmlFileRuntime::ComputeRates computeRates = nullptr;
+    CellmlFileRuntimePtr runtime;
 };
 
 class SolverCvode::Impl: public SolverOde::Impl
@@ -90,7 +90,7 @@ public:
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                     double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                    CellmlFileRuntime::ComputeRates pComputeRates) override;
+                    const CellmlFileRuntimePtr &pRuntime) override;
     /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     bool reinitialise(double pVoi) override;
     */

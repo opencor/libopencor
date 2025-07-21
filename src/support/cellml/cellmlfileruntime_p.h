@@ -26,10 +26,14 @@ namespace libOpenCOR {
 class CellmlFileRuntime::Impl: public Logger::Impl
 {
 public:
-#ifndef __EMSCRIPTEN__
     CompilerPtr mCompiler = nullptr;
+
+#ifdef __EMSCRIPTEN__
+    UnsignedChars mWasmModule;
 #endif
 
+//---ISSUE468--- NEED TO INVESTIGATE HOW TO HANDLE nlaSolve() FROM JavaScript.
+#ifndef __EMSCRIPTEN__
     char *mNlaSolverAddress = nullptr;
 
     InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel = nullptr;
@@ -38,16 +42,26 @@ public:
     ComputeRates mComputeRates = nullptr;
     ComputeVariablesForAlgebraicModel mComputeVariablesForAlgebraicModel = nullptr;
     ComputeVariablesForDifferentialModel mComputeVariablesForDifferentialModel = nullptr;
+#endif
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
     ~Impl() override;
 
+#ifdef __EMSCRIPTEN__
+    void initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void computeComputedConstants(double *pConstants, double *pComputedConstants) const;
+    void computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+#else
     CellmlFileRuntime::InitialiseVariablesForAlgebraicModel initialiseVariablesForAlgebraicModel() const;
     CellmlFileRuntime::InitialiseVariablesForDifferentialModel initialiseVariablesForDifferentialModel() const;
     CellmlFileRuntime::ComputeComputedConstants computeComputedConstants() const;
     CellmlFileRuntime::ComputeRates computeRates() const;
     CellmlFileRuntime::ComputeVariablesForAlgebraicModel computeVariablesForAlgebraicModel() const;
     CellmlFileRuntime::ComputeVariablesForDifferentialModel computeVariablesForDifferentialModel() const;
+#endif
 };
 
 } // namespace libOpenCOR

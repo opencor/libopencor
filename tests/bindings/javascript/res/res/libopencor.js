@@ -285,6 +285,16 @@ $(() => {
                 document = new loc.SedDocument(file);
                 simulation = document.simulations.get(0);
                 instance = document.instantiate();
+
+                if (instance.hasIssues) {
+                  //---ISSUE468--- TO BE REMOVED WHEN ISSUE #468 IS FIXED.
+                  throw new Error(
+                    formattedIssueDescription(
+                      instance.issues.get(0).description,
+                    ),
+                  );
+                }
+
                 instanceTask = instance.tasks.get(0);
 
                 $("#endingPoint").val(simulation.outputEndTime);

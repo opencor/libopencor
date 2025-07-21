@@ -35,13 +35,13 @@ public:
     double *mComputedConstants = nullptr;
     double *mAlgebraic = nullptr;
 
-    CellmlFileRuntime::ComputeRates mComputeRates = nullptr;
+    CellmlFileRuntimePtr mRuntime;
 
     explicit Impl(const std::string &pId, const std::string &pName);
 
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                             double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                            CellmlFileRuntime::ComputeRates pComputeRates) = 0;
+                            const CellmlFileRuntimePtr &pRuntime) = 0;
     /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     virtual bool reinitialise(double pVoi);
     */

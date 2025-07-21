@@ -25,7 +25,7 @@ SolverOde::Impl::Impl(const std::string &pId, const std::string &pName)
 
 bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                  double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                                 CellmlFileRuntime::ComputeRates pComputeRates)
+                                 const CellmlFileRuntimePtr &pRuntime)
 {
     (void)pVoi;
 
@@ -37,7 +37,7 @@ bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     mComputedConstants = pComputedConstants;
     mAlgebraic = pAlgebraic;
 
-    mComputeRates = pComputeRates;
+    mRuntime = pRuntime;
 
     return true;
 }
@@ -54,7 +54,11 @@ bool SolverOde::Impl::reinitialise(double pVoi)
 void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates,
                                    double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    mComputeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+#ifdef __EMSCRIPTEN__
+    mRuntime->computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+#else
+    mRuntime->computeRates()(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+#endif
 }
 
 SolverOde::SolverOde(Impl *pPimpl)

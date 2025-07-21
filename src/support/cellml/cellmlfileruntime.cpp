@@ -21,6 +21,115 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+#ifdef __EMSCRIPTEN__
+// Some utilities.
+
+namespace {
+
+std::string exportJavaScriptName(const std::string &pName)
+{
+    return std::string("__attribute__((export_name(\"").append(pName).append("\")))\n");
+}
+
+void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferentialModel, bool pIsOdeModel, bool pIsAlgebraicModel)
+{
+    // clang-format off
+    return EM_ASM_PTR({
+        try {
+            const wasmBytes = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
+            const wasmModule = new WebAssembly.Module(wasmBytes);
+            const wasmInstance = new WebAssembly.Instance(wasmModule, {
+                env: {
+                    __linear_memory: wasmMemory,
+                    __indirect_function_table: wasmTable,
+
+                    // Some standard C library functions.
+
+                    memset: function(ptr, value, size) {
+                        HEAPU8.fill(value, ptr, ptr + size);
+
+                        return ptr;
+                    },
+
+                    // Arithmetic operators.
+
+                    pow: Math.pow,
+                    sqrt: Math.sqrt,
+                    fabs: Math.abs,
+                    exp: Math.exp,
+                    log: Math.log,
+                    log10: Math.log10,
+                    ceil: Math.ceil,
+                    floor: Math.floor,
+                    fmin: Math.min,
+                    fmax: Math.max,
+                    fmod: function(x, y) { return x % y; },
+
+                    // Trigonometric operators.
+
+                    sin: Math.sin,
+                    cos: Math.cos,
+                    tan: Math.tan,
+
+                    sinh: Math.sinh,
+                    cosh: Math.cosh,
+                    tanh: Math.tanh,
+
+                    asin: Math.asin,
+                    acos: Math.acos,
+                    atan: Math.atan,
+
+                    asinh: Math.asinh,
+                    acosh: Math.acosh,
+                    atanh: Math.atanh,
+
+                    // Constants.
+
+                    INFINITY: function() { return Infinity; },
+                    NAN: function() { return NaN; }
+                }
+            });
+
+            if ($2) {
+                Module.initialiseVariables = wasmInstance.exports.initialiseVariables;
+                Module.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
+                Module.computeRates = wasmInstance.exports.computeRates;
+                Module.computeVariables = wasmInstance.exports.computeVariables;
+
+                if ((Module.initialiseVariables === undefined)
+                    || (Module.computeComputedConstants === undefined)
+                    || (Module.computeRates === undefined)
+                    || (Module.computeVariables === undefined)) {
+                    throw new Error("The functions needed to compute the " + ($3 ? "ODE" : "DAE") + " model could not be retrieved.");
+                }
+            } else {
+                Module.initialiseVariables = wasmInstance.exports.initialiseVariables;
+                Module.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
+                Module.computeVariables = wasmInstance.exports.computeVariables;
+
+                if ((Module.initialiseVariables === undefined)
+                    || (Module.computeComputedConstants === undefined)
+                    || (Module.computeVariables === undefined)) {
+                    throw new Error("The functions needed to compute the " + ($4 ? "algebraic" : "NLA") + " model could not be retrieved.");
+                }
+            }
+
+            return null;
+        } catch (error) {
+            const errorMessage = error.toString();
+            const errorMessageLength = lengthBytesUTF8(errorMessage) + 1;
+            const errorMessagePtr = _malloc(errorMessageLength);
+
+            stringToUTF8(errorMessage, errorMessagePtr, errorMessageLength);
+
+            return errorMessagePtr;
+        }
+    }, pWasmModule.data(), pWasmModule.size(), pDifferentialModel, pIsOdeModel, pIsAlgebraicModel); // clang-format on
+}
+
+} // namespace
+#endif
+
 CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
     auto cellmlFileAnalyser = pCellmlFile->analyser();
@@ -28,11 +137,14 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
     if (cellmlFileAnalyser->errorCount() != 0) {
         addIssues(cellmlFileAnalyser);
     } else {
+//---ISSUE468--- NEED TO INVESTIGATE HOW TO HANDLE nlaSolve() FROM JavaScript.
+#ifndef __EMSCRIPTEN__
         // Get an NLA solver, if needed.
 
         if (pNlaSolver != nullptr) {
             mNlaSolverAddress = nlaSolverAddress(pNlaSolver.get());
         }
+#endif
 
         // Determine the type of the model.
 
@@ -67,24 +179,65 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         generatorProfile->setImplementationCreateExternalsArrayMethodString("");
         generatorProfile->setImplementationDeleteArrayMethodString("");
 
+        static constexpr auto WITH_EXTERNAL_VARIABLES = false;
+
+#ifdef __EMSCRIPTEN__
+        // Specify the name of the functions that we want to export.
+
+        generatorProfile->setImplementationInitialiseVariablesMethodString(differentialModel,
+                                                                           exportJavaScriptName("initialiseVariables").append(generatorProfile->implementationInitialiseVariablesMethodString(differentialModel)));
+        generatorProfile->setImplementationComputeComputedConstantsMethodString(exportJavaScriptName("computeComputedConstants").append(generatorProfile->implementationComputeComputedConstantsMethodString()));
+        generatorProfile->setImplementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES,
+                                                                    exportJavaScriptName("computeRates").append(generatorProfile->implementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES)));
+        generatorProfile->setImplementationComputeVariablesMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                                        exportJavaScriptName("computeVariables").append(generatorProfile->implementationComputeVariablesMethodString(differentialModel, WITH_EXTERNAL_VARIABLES)));
+#endif
+
+//---ISSUE468--- NEED TO INVESTIGATE HOW TO HANDLE nlaSolve() FROM JavaScript.
+#ifndef __EMSCRIPTEN__
         if (pNlaSolver != nullptr) {
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long long size_t;
 
 extern void nlaSolve(const char *, void (*objectiveFunction)(double *, double *, void *),
                      double *u, size_t n, void *data);
 )");
-            generatorProfile->setNlaSolveCallString(differentialModel, false,
+            generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
                                                     std::string("nlaSolve(\"").append(mNlaSolverAddress).append("\", objectiveFunction[INDEX], u, [SIZE], &rfi);\n"));
         }
+#endif
 
         generator->setModel(pCellmlFile->analyserModel());
         generator->setProfile(generatorProfile);
 
-#ifndef __EMSCRIPTEN__
         // Compile the generated code.
 
         mCompiler = Compiler::create();
 
+#ifdef __EMSCRIPTEN__
+        if (!mCompiler->compile(generator->implementationCode(), mWasmModule)) {
+            // The compilation failed, so add the issues it generated.
+
+            addIssues(mCompiler);
+
+            return;
+        }
+
+        // Instantiate the WebAssembly module.
+
+        auto errorMessagePtr = instantiateWebAssemblyModule(mWasmModule, differentialModel,
+                                                            cellmlFileType == libcellml::AnalyserModel::Type::ODE,
+                                                            cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC);
+
+        if (errorMessagePtr != nullptr) {
+            std::string jsErrorMessage(reinterpret_cast<char *>(errorMessagePtr));
+
+            free(errorMessagePtr);
+
+            addError(std::string("The WebAssembly module could not be instantiated (").append(jsErrorMessage).append(")."));
+
+            return;
+        }
+#else
 #    ifdef CODE_COVERAGE_ENABLED
         mCompiler->compile(generator->implementationCode());
 #    else
@@ -128,11 +281,7 @@ extern void nlaSolve(const char *, void (*objectiveFunction)(double *, double *,
                 || (mComputeComputedConstants == nullptr)
                 || (mComputeRates == nullptr)
                 || (mComputeVariablesForDifferentialModel == nullptr)) {
-                if (cellmlFileType == libcellml::AnalyserModel::Type::ODE) {
-                    addError("The functions needed to compute the ODE model could not be retrieved.");
-                } else {
-                    addError("The functions needed to compute the DAE model could not be retrieved.");
-                }
+                addError(std::string("The functions needed to compute the ").append((cellmlFileType == libcellml::AnalyserModel::Type::ODE) ? "ODE" : "DAE").append(" model could not be retrieved."));
             }
 #    endif
         } else {
@@ -144,11 +293,7 @@ extern void nlaSolve(const char *, void (*objectiveFunction)(double *, double *,
             if ((mInitialiseVariablesForAlgebraicModel == nullptr)
                 || (mComputeComputedConstants == nullptr)
                 || (mComputeVariablesForAlgebraicModel == nullptr)) {
-                if (cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC) {
-                    addError("The functions needed to compute the algebraic model could not be retrieved.");
-                } else {
-                    addError("The functions needed to compute the NLA model could not be retrieved.");
-                }
+                addError(std::string("The functions needed to compute the ").append((cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC) ? "algebraic" : "NLA").append(" model could not be retrieved."));
             }
 #    endif
         }
@@ -158,9 +303,67 @@ extern void nlaSolve(const char *, void (*objectiveFunction)(double *, double *,
 
 CellmlFileRuntime::Impl::~Impl()
 {
+//---ISSUE468--- NEED TO INVESTIGATE HOW TO HANDLE nlaSolve() FROM JavaScript.
+#ifndef __EMSCRIPTEN__
     delete[] mNlaSolverAddress;
+#endif
 }
 
+#ifdef __EMSCRIPTEN__
+EM_JS(void, jsInitialiseVariablesForAlgebraicModel, (double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.initialiseVariables(pConstants, pComputedConstants, pAlgebraic);
+});
+
+void CellmlFileRuntime::Impl::initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    jsInitialiseVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+}
+
+EM_JS(void, jsInitialiseVariablesForDifferentialModel, (double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.initialiseVariables(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+});
+
+void CellmlFileRuntime::Impl::initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    jsInitialiseVariablesForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+}
+
+EM_JS(void, jsComputeComputedConstants, (double *pConstants, double *pComputedConstants), {
+    Module.computeComputedConstants(pConstants, pComputedConstants);
+});
+
+void CellmlFileRuntime::Impl::computeComputedConstants(double *pConstants, double *pComputedConstants) const
+{
+    jsComputeComputedConstants(pConstants, pComputedConstants);
+}
+
+EM_JS(void, jsComputeRates, (double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+});
+
+void CellmlFileRuntime::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    jsComputeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+}
+
+EM_JS(void, jsComputeVariablesForAlgebraicModel, (double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.computeVariables(pConstants, pComputedConstants, pAlgebraic);
+});
+
+void CellmlFileRuntime::Impl::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    jsComputeVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+}
+
+EM_JS(void, jsComputeVariablesForDifferentialModel, (double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.computeVariables(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+});
+
+void CellmlFileRuntime::Impl::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    jsComputeVariablesForDifferentialModel(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+}
+#else
 CellmlFileRuntime::InitialiseVariablesForAlgebraicModel CellmlFileRuntime::Impl::initialiseVariablesForAlgebraicModel() const
 {
     return mInitialiseVariablesForAlgebraicModel;
@@ -190,6 +393,7 @@ CellmlFileRuntime::ComputeVariablesForDifferentialModel CellmlFileRuntime::Impl:
 {
     return mComputeVariablesForDifferentialModel;
 }
+#endif
 
 CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
     : Logger(new Impl {pCellmlFile, pNlaSolver})
@@ -216,6 +420,37 @@ CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile,
     return CellmlFileRuntimePtr {new CellmlFileRuntime {pCellmlFile, pNlaSolver}};
 }
 
+#ifdef __EMSCRIPTEN__
+void CellmlFileRuntime::initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    pimpl()->initialiseVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+}
+
+void CellmlFileRuntime::initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    pimpl()->initialiseVariablesForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+}
+
+void CellmlFileRuntime::computeComputedConstants(double *pConstants, double *pComputedConstants) const
+{
+    pimpl()->computeComputedConstants(pConstants, pComputedConstants);
+}
+
+void CellmlFileRuntime::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    pimpl()->computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+}
+
+void CellmlFileRuntime::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    pimpl()->computeVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+}
+
+void CellmlFileRuntime::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+{
+    pimpl()->computeVariablesForDifferentialModel(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+}
+#else
 CellmlFileRuntime::InitialiseVariablesForAlgebraicModel CellmlFileRuntime::initialiseVariablesForAlgebraicModel() const
 {
     return pimpl()->initialiseVariablesForAlgebraicModel();
@@ -245,5 +480,6 @@ CellmlFileRuntime::ComputeVariablesForDifferentialModel CellmlFileRuntime::compu
 {
     return pimpl()->computeVariablesForDifferentialModel();
 }
+#endif
 
 } // namespace libOpenCOR

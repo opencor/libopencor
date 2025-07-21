@@ -31,7 +31,11 @@ SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask
 
     res->pimpl()->mOwner = res;
 
-    res->pimpl()->initialise();
+    // Initialise the instance task, but only if there are no issues with it.
+
+    if (!res->hasIssues()) {
+        res->pimpl()->initialise();
+    }
 
     return res;
 }
@@ -145,26 +149,43 @@ void SedInstanceTask::Impl::initialise()
 
     mSedUniformTimeCourse = mDifferentialModel ? std::dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
-#ifndef __EMSCRIPTEN__
     if (mSedUniformTimeCourse != nullptr) {
         mVoi = mSedUniformTimeCourse->pimpl()->mOutputStartTime;
 
+#ifdef __EMSCRIPTEN__
+        mRuntime->initialiseVariablesForDifferentialModel(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+#else
         mRuntime->initialiseVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+#endif
 
         applyChanges();
 
+#ifdef __EMSCRIPTEN__
+        mRuntime->computeComputedConstants(mConstants, mComputedConstants);
+        mRuntime->computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+#else
         mRuntime->computeComputedConstants()(mConstants, mComputedConstants);
         mRuntime->computeRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+#endif
     } else {
+#ifdef __EMSCRIPTEN__
+        mRuntime->initialiseVariablesForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
+#else
         mRuntime->initialiseVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+#endif
 
         applyChanges();
 
+#ifdef __EMSCRIPTEN__
+        mRuntime->computeComputedConstants(mConstants, mComputedConstants);
+        mRuntime->computeVariablesForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
+#else
         mRuntime->computeComputedConstants()(mConstants, mComputedConstants);
         mRuntime->computeVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
-    }
 #endif
+    }
 
     // Make sure that the NLA solver, should it have been used, didn't report any issues.
 
@@ -179,7 +200,7 @@ void SedInstanceTask::Impl::initialise()
     if (mDifferentialModel) {
         if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates,
                                              mConstants, mComputedConstants, mAlgebraic,
-                                             mRuntime->computeRates())) {
+                                             mRuntime)) {
             addIssues(mOdeSolver);
 
             return;
@@ -244,7 +265,10 @@ double SedInstanceTask::Impl::run()
                 return 0.0;
             }
 
-#ifndef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__
+            mRuntime->computeVariablesForDifferentialModel(mVoi, mStates, mRates,
+                                                           mConstants, mComputedConstants, mAlgebraic);
+#else
             mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates,
                                                              mConstants, mComputedConstants, mAlgebraic);
 #endif

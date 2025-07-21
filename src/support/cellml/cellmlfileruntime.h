@@ -31,12 +31,14 @@ using CellmlFileRuntimePtr = std::shared_ptr<CellmlFileRuntime>;
 class CellmlFileRuntime: public Logger
 {
 public:
+#ifndef __EMSCRIPTEN__
     using InitialiseVariablesForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using InitialiseVariablesForDifferentialModel = void (*)(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeComputedConstants = void (*)(double *pConstants, double *pComputedConstants);
     using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeVariablesForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeVariablesForDifferentialModel = void (*)(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
+#endif
 
     CellmlFileRuntime() = delete;
     ~CellmlFileRuntime() override;
@@ -49,12 +51,21 @@ public:
 
     static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 
+#ifdef __EMSCRIPTEN__
+    void initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void computeComputedConstants(double *pConstants, double *pComputedConstants) const;
+    void computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+#else
     InitialiseVariablesForAlgebraicModel initialiseVariablesForAlgebraicModel() const;
     InitialiseVariablesForDifferentialModel initialiseVariablesForDifferentialModel() const;
     ComputeComputedConstants computeComputedConstants() const;
     ComputeRates computeRates() const;
     ComputeVariablesForAlgebraicModel computeVariablesForAlgebraicModel() const;
     ComputeVariablesForDifferentialModel computeVariablesForDifferentialModel() const;
+#endif
 
 private:
     class Impl;

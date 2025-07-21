@@ -32,7 +32,7 @@ SolverPtr SolverForwardEuler::Impl::duplicate()
 
 bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                           double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                                          CellmlFileRuntime::ComputeRates pComputeRates)
+                                          const CellmlFileRuntimePtr &pRuntime)
 {
     removeAllIssues();
 
@@ -40,7 +40,7 @@ bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pSt
 
     return SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates,
                                                 pConstants, pComputedConstants, pAlgebraic,
-                                                pComputeRates);
+                                                pRuntime);
 }
 
 bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
