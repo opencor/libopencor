@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "../extern/modp_b64/modp_b64.h"
 
+#include <iostream>
 #include <libopencor>
 #include <regex>
 
@@ -27,17 +28,17 @@ namespace libOpenCOR {
 
 void printIssues(const LoggerPtr &pLogger)
 {
-    printf("---[ISSUES]---[BEGIN]\n"); // NOLINT
+    std::cout << "---[ISSUES]---[BEGIN]\n";
 
     for (auto &issue : pLogger->issues()) {
         const auto *type = (issue->type() == Issue::Type::ERROR) ?
                                "ERROR" :
                                "WARNING";
 
-        printf("%s: %s\n", type, issue->description().c_str()); // NOLINT
+        std::cout << type << ": " << issue->description() << "\n";
     }
 
-    printf("---[ISSUES]---[END]\n"); // NOLINT
+    std::cout << "---[ISSUES]---[END]\n";
 }
 
 void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues)
