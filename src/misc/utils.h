@@ -111,21 +111,6 @@ std::string toString(double pNumber);
 
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedChars &pBytes);
 
-SolverCvode::IntegrationMethod toCvodeIntegrationMethod(const std::string &pIntegrationMethod);
-std::string toString(SolverCvode::IntegrationMethod pIntegrationMethod);
-
-SolverCvode::IterationType toCvodeIterationType(const std::string &pIterationType);
-std::string toString(SolverCvode::IterationType pIterationType);
-
-SolverCvode::LinearSolver toCvodeLinearSolver(const std::string &pLinearSolver);
-std::string toString(SolverCvode::LinearSolver pLinearSolver);
-
-SolverCvode::Preconditioner toCvodePreconditioner(const std::string &pPreconditioner);
-std::string toString(SolverCvode::Preconditioner pPreconditioner);
-
-SolverKinsol::LinearSolver toKinsolLinearSolver(const std::string &pLinearSolver);
-std::string toString(SolverKinsol::LinearSolver pLinearSolver);
-
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
 
 libcellml::ComponentPtr owningComponent(const libcellml::VariablePtr &pVariable);

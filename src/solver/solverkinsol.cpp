@@ -34,6 +34,25 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+// Some utilities.
+
+namespace {
+
+std::string toString(SolverKinsol::LinearSolver pLinearSolver)
+{
+    return (pLinearSolver == SolverKinsol::LinearSolver::DENSE) ?
+               "Dense" :
+           (pLinearSolver == SolverKinsol::LinearSolver::BANDED) ?
+               "Banded" :
+           (pLinearSolver == SolverKinsol::LinearSolver::GMRES) ?
+               "GMRES" :
+           (pLinearSolver == SolverKinsol::LinearSolver::BICGSTAB) ?
+               "BiCGStab" :
+               "TFQMR";
+}
+
+} // namespace
+
 // Compute system.
 
 namespace {
@@ -100,7 +119,15 @@ void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
                 value = toString(DEFAULT_LINEAR_SOLVER);
             }
 
-            mLinearSolver = toKinsolLinearSolver(value);
+            mLinearSolver = (value == "Dense") ?
+                                SolverKinsol::LinearSolver::DENSE :
+                            (value == "Banded") ?
+                                SolverKinsol::LinearSolver::BANDED :
+                            (value == "GMRES") ?
+                                SolverKinsol::LinearSolver::GMRES :
+                            (value == "BiCGStab") ?
+                                SolverKinsol::LinearSolver::BICGSTAB :
+                                SolverKinsol::LinearSolver::TFQMR;
         } else if (kisaoId == "KISAO:0000479") {
             mUpperHalfBandwidth = toInt(value);
 
