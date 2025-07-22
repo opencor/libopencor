@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include "libopencor/issue.h"
+
 #ifndef __EMSCRIPTEN__
 #    include "curl/curl.h"
 #endif
@@ -29,6 +31,7 @@ limitations under the License.
 #include <cmath>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include <regex>
 #include <sstream>
 
@@ -36,11 +39,28 @@ limitations under the License.
 #    include <codecvt>
 #endif
 
+#ifdef ERROR
+#    undef ERROR
+#endif
+
 #ifdef NAN
 #    undef NAN
 #endif
 
 namespace libOpenCOR {
+
+#ifndef CODE_COVERAGE_ENABLED
+void printIssues(const LoggerPtr &pLogger)
+{
+    std::cout << "---[ISSUES]---[BEGIN]\n";
+
+    for (auto &issue : pLogger->issues()) {
+        std::cout << ((issue->type() == Issue::Type::ERROR) ? "ERROR" : "WARNING") << ": " << issue->description() << "\n";
+    }
+
+    std::cout << "---[ISSUES]---[END]\n";
+}
+#endif
 
 bool fuzzyCompare(double pNb1, double pNb2)
 {

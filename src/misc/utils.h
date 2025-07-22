@@ -70,6 +70,10 @@ using StringStringMap = std::map<std::string, std::string>;
 #    define ASSERT_LE(x, y) assert(x <= y)
 #endif
 
+#ifndef CODE_COVERAGE_ENABLED
+void LIBOPENCOR_UNIT_TESTING_EXPORT printIssues(const LoggerPtr &pLogger);
+#endif
+
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 #ifdef BUILDING_USING_MSVC

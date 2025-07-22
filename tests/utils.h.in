@@ -66,8 +66,6 @@ static constexpr auto WARNING_CELLML_CONTENTS = "@WARNING_CELLML_CONTENTS_C@";
 static constexpr auto SEDML_CONTENTS = "@SEDML_CONTENTS_C@";
 static constexpr auto BASE64_COMBINE_ARCHIVE_CONTENTS = "@BASE64_COMBINE_ARCHIVE_CONTENTS@";
 
-void printIssues(const LoggerPtr &pLogger);
-
 typedef struct
 {
     Issue::Type type;

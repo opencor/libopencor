@@ -20,26 +20,10 @@ limitations under the License.
 
 #include "../extern/modp_b64/modp_b64.h"
 
-#include <iostream>
 #include <libopencor>
 #include <regex>
 
 namespace libOpenCOR {
-
-void printIssues(const LoggerPtr &pLogger)
-{
-    std::cout << "---[ISSUES]---[BEGIN]\n";
-
-    for (auto &issue : pLogger->issues()) {
-        const auto *type = (issue->type() == Issue::Type::ERROR) ?
-                               "ERROR" :
-                               "WARNING";
-
-        std::cout << type << ": " << issue->description() << "\n";
-    }
-
-    std::cout << "---[ISSUES]---[END]\n";
-}
 
 void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues)
 {
