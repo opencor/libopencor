@@ -25,7 +25,7 @@ int main(int pArgC, char *pArgV[])
     // Convert the given file to a base64-encoded string.
 
     if (pArgC != 2) {
-        std::cerr << "Usage: " << pArgV[0] << " <file>" << std::endl;
+        std::cerr << "Usage: " << pArgV[0] << " <file>\n";
 
         return 1;
     }
@@ -37,7 +37,7 @@ int main(int pArgC, char *pArgV[])
     file.read(buffer, fileSize);
 
     if (!file) {
-        std::cerr << "Error: the file could not be read." << std::endl;
+        std::cerr << "Error: the file could not be read.\n";
 
         return 1;
     }
@@ -48,7 +48,7 @@ int main(int pArgC, char *pArgV[])
 
     modp_b64_encode(base64, buffer, fileSize);
 
-    std::cout << base64 << std::endl;
+    std::cout << base64 << "\n";
 
     delete[] base64;
     delete[] buffer;
