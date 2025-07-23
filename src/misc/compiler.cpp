@@ -210,7 +210,8 @@ extern double atanh(double);
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
-    auto codeGenAction = std::make_unique<clang::EmitLLVMOnlyAction>(llvm::unwrap(LLVMGetGlobalContext()));
+    auto llvmContext = std::make_unique<llvm::LLVMContext>();
+    auto codeGenAction = std::make_unique<clang::EmitLLVMOnlyAction>(llvmContext.get());
 
     if (!compilerInstance->ExecuteAction(*codeGenAction)) {
         addError("The given code could not be compiled.");
@@ -262,20 +263,19 @@ extern double atanh(double);
         return false;
     }
 
-    // Retrieve the LLVM bitcode module.
+    // Retrieve the LLVM module.
 
     auto module = codeGenAction->takeModule();
 
 #ifndef CODE_COVERAGE_ENABLED
     if (module == nullptr) {
-        addError("The LLVM bitcode module could not be retrieved.");
+        addError("The LLVM module could not be retrieved.");
 
         return false;
     }
 #endif
 
-    // Initialise the native target (and its ASM printer), so not only can we then create an execution engine, but more
-    // importantly its data layout will match that of our target platform.
+    // Initialise the native target and its ASM printer.
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
@@ -310,7 +310,6 @@ extern double atanh(double);
 
     // Add our LLVM bitcode module to our ORC-based JIT.
 
-    auto llvmContext = std::make_unique<llvm::LLVMContext>();
     auto threadSafeModule = llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext));
 
 #ifdef CODE_COVERAGE_ENABLED
