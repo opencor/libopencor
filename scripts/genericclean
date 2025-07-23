@@ -8,11 +8,8 @@ fi
 
 appDir=$(cd $(dirname $0); pwd)/..
 
-for i in _skbuild build src/bindings/python/libopencor.egg-info tests/install/build; do
-    rm -fr $appDir/$i
-done
-
-find $appDir -name .DS_Store -exec rm -f {} \;
+find $appDir -type f -name .DS_Store -exec rm -f {} \; 2> /dev/null
+find $appDir -type d \( -name .pytest_cache -o -name __pycache__ -o -name _skbuild -o -name build \) -exec rm -fr {} \; 2> /dev/null
 
 if [ "$1" = "all" ]; then
     rm -fr $appDir/prebuilt/* > /dev/null 2>&1

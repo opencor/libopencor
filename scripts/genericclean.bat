@@ -11,7 +11,9 @@ IF "%1" == "all" (
 SET AppDir=%~dp0..\
 SET OrigDir=!CD!
 
-FOR /D %%I IN (_skbuild build src\bindings\python\libopencor.egg-info tests\install\build) DO IF EXIST !AppDir!%%I RMDIR /S /Q !AppDir!%%I
+FOR /R "%AppDir%" %%d IN (.pytest_cache __pycache__ _skbuild build) DO (
+    IF EXIST "%%d" RMDIR /S /Q "%%d"
+)
 
 IF "%1" == "all" (
     IF EXIST !AppDir!prebuilt (
