@@ -65,12 +65,12 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a diagnostics engine.
 
-    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(new clang::DiagnosticOptions {});
+    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(std::make_unique<clang::DiagnosticOptions>());
     std::string diagnostics;
     llvm::raw_string_ostream outputStream(diagnostics);
-    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(new clang::DiagnosticsEngine {llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs {}),
-                                                                                                              &*diagnosticOptions,
-                                                                                                              new clang::TextDiagnosticPrinter {outputStream, &*diagnosticOptions}});
+    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(std::make_unique<clang::DiagnosticsEngine>(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(std::make_unique<clang::DiagnosticIDs>()),
+                                                                                                                           &*diagnosticOptions,
+                                                                                                                           std::make_unique<clang::TextDiagnosticPrinter>(outputStream, &*diagnosticOptions).release()));
 
     diagnosticsEngine->setWarningsAsErrors(true);
 
@@ -142,17 +142,17 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a compiler instance.
 
-    clang::CompilerInstance compilerInstance;
+    auto compilerInstance = std::make_unique<clang::CompilerInstance>();
 
-    compilerInstance.setDiagnostics(diagnosticsEngine.get());
-    compilerInstance.setVerboseOutputStream(llvm::nulls());
+    compilerInstance->setDiagnostics(diagnosticsEngine.get());
+    compilerInstance->setVerboseOutputStream(llvm::nulls());
 
     // Create a compiler invocation object.
 
 #ifndef CODE_COVERAGE_ENABLED
     bool res =
 #endif
-        clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
+        clang::CompilerInvocation::CreateFromArgs(compilerInstance->getInvocation(),
                                                   commandArguments,
                                                   *diagnosticsEngine);
 
@@ -205,14 +205,14 @@ extern double atanh(double);
 #define NAN (__builtin_nan(""))
 )" + pCode;
 
-    compilerInstance.getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
-                                                                           llvm::MemoryBuffer::getMemBuffer(code).release());
+    compilerInstance->getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
+                                                                            llvm::MemoryBuffer::getMemBuffer(code).release());
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
-    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction {llvm::unwrap(LLVMGetGlobalContext())});
+    auto codeGenAction = std::make_unique<clang::EmitLLVMOnlyAction>(llvm::unwrap(LLVMGetGlobalContext()));
 
-    if (!compilerInstance.ExecuteAction(*codeGenAction)) {
+    if (!compilerInstance->ExecuteAction(*codeGenAction)) {
         addError("The given code could not be compiled.");
 
         static constexpr auto ERROR = ": error: ";
