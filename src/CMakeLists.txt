@@ -271,9 +271,10 @@ if(EMSCRIPTEN)
 
     # Set the flags for our generated .js file.
     # Note #1: we use -O3 to get the best performance, -sALLOW_MEMORY_GROWTH to allow the memory to grow dynamically,
-    #          -sEXPORT_ES6=1 to export ES6 classes, -sEXPORTED_FUNCTIONS to export the functions we need,
-    #          -sINLINING_LIMIT to increase the inlining limit, -sSINGLE_FILE=1 to generate a single file, -sSTACK_SIZE
-    #          to increase the stack size, and --bind to generate the necessary bindings.
+    #          -sASSERTIONS=0 to disable assertions (which are not needed in production), -sEXPORT_ES6=1 to export ES6
+    #          classes, -sEXPORTED_FUNCTIONS to export the functions we need, -sINLINING_LIMIT to increase the inlining
+    #          limit, -sSINGLE_FILE=1 to generate a single file, -sSTACK_SIZE to increase the stack size, and --bind to
+    #          generate the necessary bindings.
     # Note #2: by default, Emscripten uses 64KB of stack, but this is not enough for "complex" models such as the Zhang
     #          et al. model (see https://github.com/agarny/COR/blob/master/Models/zhang_SAN_model_2000_all.cellml). For
     #          that model, we need about 108KB of stack. However, Emscripten originally used to use 5MB of stack (see
@@ -291,7 +292,7 @@ if(EMSCRIPTEN)
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                           COMPILE_FLAGS "-O3"
-                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sEXPORTED_RUNTIME_METHODS=HEAPU8,stringToUTF8,lengthBytesUTF8 -sINLINING_LIMIT -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
+                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sASSERTIONS=0 -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free] -sEXPORTED_RUNTIME_METHODS=HEAPU8,stringToUTF8,lengthBytesUTF8 -sINLINING_LIMIT -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
 
     # Create a .tgz file for our generated .js file that can be used to distribute our JavaScript bindings.
 
