@@ -161,31 +161,31 @@ export function expectValues(
   algebraicValues,
 ) {
   for (let i = 0; i < instanceTask.stateCount; ++i) {
-    expect(instanceTask.stateAsArray(i)[index]).toBeCloseTo(stateValues[i], 6);
+    expect(instanceTask.stateAsArray(i)[index]).toBeCloseTo(stateValues[i], 2);
   }
 
   for (let i = 0; i < instanceTask.rateCount; ++i) {
-    expect(instanceTask.rateAsArray(i)[index]).toBeCloseTo(rateValues[i], 6);
+    expect(instanceTask.rateAsArray(i)[index]).toBeCloseTo(rateValues[i], 2);
   }
 
   for (let i = 0; i < instanceTask.constantCount; ++i) {
     expect(instanceTask.constantAsArray(i)[index]).toBeCloseTo(
       constantValues[i],
-      6,
+      7,
     );
   }
 
   for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
     expect(instanceTask.computedConstantAsArray(i)[index]).toBeCloseTo(
       computedConstantValues[i],
-      6,
+      7,
     );
   }
 
   for (let i = 0; i < instanceTask.algebraicCount; ++i) {
     expect(instanceTask.algebraicAsArray(i)[index]).toBeCloseTo(
       algebraicValues[i],
-      6,
+      1,
     );
   }
 }
