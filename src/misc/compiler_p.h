@@ -32,12 +32,6 @@ class Compiler::Impl: public Logger::Impl
 {
 public:
 #ifdef __EMSCRIPTEN__
-    bool mVfsInitialised = false;
-
-    bool initialiseVfs(std::string &pErrorMessage);
-    bool writeToVfs(std::string &pVirtualPath, const std::string &pCode, std::string &pErrorMessage);
-    void cleanUpVfs(const std::string &pVirtualPath);
-
     bool compile(const std::string &pCode, UnsignedChars &pWasmModule);
 #else
     std::unique_ptr<llvm::orc::LLJIT> mLljit;

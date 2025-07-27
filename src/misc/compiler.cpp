@@ -62,328 +62,16 @@ std::string llvmClangError(llvm::Error pError)
 } // namespace
 
 #ifdef __EMSCRIPTEN__
-bool Compiler::Impl::initialiseVfs(std::string &pErrorMessage)
-{
-    pErrorMessage.clear();
-
-    if (!mVfsInitialised) {
-        auto errorMessagePtr = EM_ASM_PTR({
-            try {
-                if (!FS.analyzePath('/tmp').exists) {
-                    FS.mkdir('/tmp');
-                }
-
-                return null;
-            } catch (error) {
-                const errorMessage = error.toString();
-                const errorMessageLength = lengthBytesUTF8(errorMessage) + 1;
-                const errorMessagePtr = _malloc(errorMessageLength);
-
-                stringToUTF8(errorMessage, errorMessagePtr, errorMessageLength);
-
-                return errorMessagePtr;
-            }
-        });
-
-        if (errorMessagePtr != nullptr) {
-            pErrorMessage = reinterpret_cast<char *>(errorMessagePtr);
-
-            free(reinterpret_cast<void *>(errorMessagePtr));
-
-            mVfsInitialised = false;
-        } else {
-            mVfsInitialised = true;
-        }
-    }
-
-    return mVfsInitialised;
-}
-
-bool Compiler::Impl::writeToVfs(std::string &pVirtualPath, const std::string &pCode, std::string &pErrorMessage)
-{
-    // Generate a unique virtual path for the file.
-
-    static std::random_device randomDevice;
-    static std::mt19937_64 generator(randomDevice());
-    static std::uniform_int_distribution<uint64_t> uniformDistribution;
-
-    std::ostringstream oss;
-
-    oss << "/tmp/libOpenCOR_" << std::hex << uniformDistribution(generator) << ".c";
-
-    pVirtualPath = oss.str();
-
-    // Write the code to the Emscripten virtual file system.
-
-    pErrorMessage.clear();
-
-    auto errorMessagePtr = EM_ASM_PTR({
-        const virtualPath = UTF8ToString($0);
-        const code = UTF8ToString($1);
-
-        try {
-            FS.writeFile(virtualPath, code);
-
-            return null;
-        } catch (error) {
-            const errorMessage = error.toString();
-            const errorMessageLength = lengthBytesUTF8(errorMessage) + 1;
-            const errorMessagePtr = _malloc(errorMessageLength);
-
-            stringToUTF8(errorMessage, errorMessagePtr, errorMessageLength);
-
-            return errorMessagePtr;
-        } }, pVirtualPath.c_str(), pCode.c_str());
-
-    if (errorMessagePtr != nullptr) {
-        pErrorMessage = reinterpret_cast<char *>(errorMessagePtr);
-
-        free(reinterpret_cast<void *>(errorMessagePtr));
-
-        return false;
-    }
-
-    return true;
-}
-
-void Compiler::Impl::cleanUpVfs(const std::string &pVirtualPath)
-{
-    EM_ASM({
-        const virtualPath = UTF8ToString($0);
-
-        try {
-            if (FS.analyzePath(virtualPath).exists) {
-                FS.unlink(virtualPath);
-            }
-        } catch (exception) {
-            console.warn(exception);
-        } }, pVirtualPath.c_str());
-}
-
 bool Compiler::Impl::compile(const std::string &pCode, UnsignedChars &pWasmModule)
-{
-    // Reset ourselves.
-
-    removeAllIssues();
-
-    // Clear the output parameter.
-
-    pWasmModule.clear();
-
-    // Initialise the Emscripten virtual file system, if not already done.
-
-    std::string errorMessage;
-
-    if (!initialiseVfs(errorMessage)) {
-        addError(std::string("The Emscripten virtual file system could not be initialised (").append(errorMessage).append(")."));
-
-        return false;
-    }
-
-    // Write the code to a virtual file.
-
-    std::string vfsFilePath;
-    auto code = R"(// Arithmetic operators.
-
-extern double pow(double, double);
-extern double sqrt(double);
-extern double fabs(double);
-extern double exp(double);
-extern double log(double);
-extern double log10(double);
-extern double ceil(double);
-extern double floor(double);
-extern double fmin(double, double);
-extern double fmax(double, double);
-extern double fmod(double, double);
-
-// Trigonometric operators.
-
-extern double sin(double);
-extern double cos(double);
-extern double tan(double);
-
-extern double sinh(double);
-extern double cosh(double);
-extern double tanh(double);
-
-extern double asin(double);
-extern double acos(double);
-extern double atan(double);
-
-extern double asinh(double);
-extern double acosh(double);
-extern double atanh(double);
-
-// Constants.
-
-extern double INFINITY;
-extern double NAN;
-
-)" + pCode;
-
-    if (!writeToVfs(vfsFilePath, code, errorMessage)) {
-        addError(std::string("The code could not be written to the Emscripten virtual file system (").append(errorMessage).append(")."));
-
-        return false;
-    }
-
-    // Create a diagnostics engine.
-
-    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(std::make_unique<clang::DiagnosticOptions>());
-    std::string diagnostics;
-    llvm::raw_string_ostream outputStream(diagnostics);
-    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(std::make_unique<clang::DiagnosticsEngine>(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(std::make_unique<clang::DiagnosticIDs>()),
-                                                                                                                           &*diagnosticOptions,
-                                                                                                                           std::make_unique<clang::TextDiagnosticPrinter>(outputStream, &*diagnosticOptions).release()));
-
-    diagnosticsEngine->setWarningsAsErrors(true);
-
-    // Create a compiler instance.
-
-    auto compilerInstance = std::make_unique<clang::CompilerInstance>();
-
-    compilerInstance->setDiagnostics(diagnosticsEngine.get());
-    compilerInstance->setVerboseOutputStream(llvm::nulls());
-
-    // Set the target triple for WebAssembly.
-
-    auto &invocation = compilerInstance->getInvocation();
-    auto &targetOpts = invocation.getTargetOpts();
-
-    targetOpts.Triple = llvm::sys::getProcessTriple();
-
-    // Create a target info object.
-
-    auto targetInfo = clang::TargetInfo::CreateTargetInfo(compilerInstance->getDiagnostics(),
-                                                          std::make_shared<clang::TargetOptions>(targetOpts));
-
-    if (targetInfo == nullptr) {
-        addError("A target info object could not be created.");
-
-        cleanUpVfs(vfsFilePath);
-
-        return false;
-    }
-
-    compilerInstance->setTarget(targetInfo);
-
-    // Further customise our compiler instance.
-
-    compilerInstance->createFileManager();
-    compilerInstance->createSourceManager(compilerInstance->getFileManager());
-    compilerInstance->createPreprocessor(clang::TU_Complete);
-    compilerInstance->createASTContext();
-
-    // Use our virtual file.
-
-    auto &frontendOpts = invocation.getFrontendOpts();
-
-    frontendOpts.Inputs.clear();
-    frontendOpts.Inputs.emplace_back(vfsFilePath, clang::InputKind(clang::Language::C));
-
-    // We want to parse some C code.
-
-    auto &langOpts = *invocation.getLangOpts();
-
-    langOpts.C99 = true;
-
-    // Optimise the code as much as possible.
-
-    auto &codeGenOpts = invocation.getCodeGenOpts();
-
-    codeGenOpts.OptimizationLevel = 3;
-
-    // Create and execute the frontend action.
-
-    auto llvmContext = std::make_unique<llvm::LLVMContext>();
-    auto codeGenAction = std::make_unique<clang::EmitLLVMOnlyAction>(llvmContext.get());
-
-    if (!compilerInstance->ExecuteAction(*codeGenAction)) {
-        addError("The given code could not be compiled.");
-
-        cleanUpVfs(vfsFilePath);
-
-        return false;
-    }
-
-    // Retrieve the LLVM module.
-
-    auto module = codeGenAction->takeModule();
-
-    if (module == nullptr) {
-        addError("The LLVM module could not be retrieved.");
-
-        return false;
-    }
-
-    // We are done with our virtual file, so clean up Emscripten's virtual file system.
-
-    cleanUpVfs(vfsFilePath);
-
-    // Initialise the native target and its ASM printer.
-
-    llvm::InitializeNativeTarget();
-    llvm::InitializeNativeTargetAsmPrinter();
-
-    // Look up the target.
-
-    std::string error;
-    auto target = llvm::TargetRegistry::lookupTarget(module->getTargetTriple(), error);
-
-    if (target == nullptr) {
-        error[0] = static_cast<char>(tolower(error[0]));
-
-        addError(std::string("the target (").append(module->getTargetTriple()).append(") could not be found: ").append(error));
-
-        return false;
-    }
-
-    // Create a target machine.
-
-    auto targetMachine = std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module->getTargetTriple(),
-                                                                                          "generic", "",
-                                                                                          llvm::TargetOptions(),
-                                                                                          llvm::Reloc::Static));
-
-    if (targetMachine == nullptr) {
-        addError("A target machine could not be created.");
-
-        return false;
-    }
-
-    // Get the target machine to emit some WebAssembly code.
-
-    llvm::legacy::PassManager passManager;
-    llvm::SmallVector<char, 0> outputBuffer;
-    llvm::raw_svector_ostream output(outputBuffer);
-
-    if (targetMachine->addPassesToEmitFile(passManager, output, nullptr, llvm::CGFT_ObjectFile)) {
-        addError("The target machine cannot emit some WebAssembly code.");
-
-        return false;
-    }
-
-    passManager.run(*module);
-
-    // Retrieve the WebAssembly code.
-
-    pWasmModule.assign(outputBuffer.begin(), outputBuffer.end());
-
-    if (pWasmModule.empty()) {
-        addError("No WebAssembly code could be generated.");
-
-        return false;
-    }
-
-    return true;
-}
 #else
 bool Compiler::Impl::compile(const std::string &pCode)
+#endif
 {
     // Reset ourselves.
 
+#ifndef __EMSCRIPTEN__
     mLljit.reset(nullptr);
+#endif
 
     removeAllIssues();
 
@@ -415,31 +103,31 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (compilation == nullptr) {
         addError("A compilation object could not be created.");
 
         return false;
     }
-#    endif
+#endif
 
     // The compilation object should have one command, so if it doesn't then something went wrong.
 
     clang::driver::JobList &jobs = compilation->getJobs();
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
         addError("The compilation object must have one command.");
 
         return false;
     }
-#    endif
+#endif
 
     // Retrieve the command and make sure that its name is "clang".
 
     auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     static constexpr auto CLANG = "clang";
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
@@ -447,22 +135,22 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
         return false;
     }
-#    endif
+#endif
 
     // Prevent the Clang driver from asking cc1 to leak memory, this by removing -disable-free from the command
     // arguments.
 
     auto commandArguments = command.getArguments();
 
-#    ifdef CODE_COVERAGE_ENABLED
+#ifdef CODE_COVERAGE_ENABLED
     commandArguments.erase(find(commandArguments, llvm::StringRef("-disable-free")));
-#    else
+#else
     auto *commandArgument = find(commandArguments, llvm::StringRef("-disable-free"));
 
     if (commandArgument != commandArguments.end()) {
         commandArguments.erase(commandArgument);
     }
-#    endif
+#endif
 
     // Create a compiler instance.
 
@@ -473,26 +161,24 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a compiler invocation object.
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     bool res =
-#    endif
+#endif
         clang::CompilerInvocation::CreateFromArgs(compilerInstance->getInvocation(),
                                                   commandArguments,
                                                   *diagnosticsEngine);
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (!res) {
         addError("A compiler invocation object could not be created.");
 
         return false;
     }
-#    endif
+#endif
 
     // Map our code to a memory buffer.
 
-    auto code = R"(// Arithmetic operators.
-
-extern double pow(double, double);
+    auto code = R"(extern double pow(double, double);
 extern double sqrt(double);
 extern double fabs(double);
 extern double exp(double);
@@ -504,25 +190,18 @@ extern double fmin(double, double);
 extern double fmax(double, double);
 extern double fmod(double, double);
 
-// Trigonometric operators.
-
 extern double sin(double);
 extern double cos(double);
 extern double tan(double);
-
 extern double sinh(double);
 extern double cosh(double);
 extern double tanh(double);
-
 extern double asin(double);
 extern double acos(double);
 extern double atan(double);
-
 extern double asinh(double);
 extern double acosh(double);
 extern double atanh(double);
-
-// Constants.
 
 #define INFINITY (__builtin_inf())
 #define NAN (__builtin_nan(""))
@@ -591,19 +270,72 @@ extern double atanh(double);
 
     auto module = codeGenAction->takeModule();
 
-#    ifndef CODE_COVERAGE_ENABLED
+#ifndef CODE_COVERAGE_ENABLED
     if (module == nullptr) {
         addError("The LLVM module could not be retrieved.");
 
         return false;
     }
-#    endif
+#endif
 
     // Initialise the native target and its ASM printer.
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
+#ifdef __EMSCRIPTEN__
+    // Look up the target.
+
+    std::string error;
+    auto target = llvm::TargetRegistry::lookupTarget(module->getTargetTriple(), error);
+
+    if (target == nullptr) {
+        error[0] = static_cast<char>(tolower(error[0]));
+
+        addError(std::string("the target (").append(module->getTargetTriple()).append(") could not be found: ").append(error));
+
+        return false;
+    }
+
+    // Create a target machine.
+
+    auto targetMachine = std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module->getTargetTriple(),
+                                                                                          "generic", "",
+                                                                                          llvm::TargetOptions(),
+                                                                                          llvm::Reloc::Static));
+
+    if (targetMachine == nullptr) {
+        addError("A target machine could not be created.");
+
+        return false;
+    }
+
+    // Get the target machine to emit some WebAssembly code.
+
+    llvm::legacy::PassManager passManager;
+    llvm::SmallVector<char, 0> outputBuffer;
+    llvm::raw_svector_ostream output(outputBuffer);
+
+    if (targetMachine->addPassesToEmitFile(passManager, output, nullptr, llvm::CGFT_ObjectFile)) {
+        addError("The target machine cannot emit some WebAssembly code.");
+
+        return false;
+    }
+
+    passManager.run(*module);
+
+    // Retrieve the WebAssembly code.
+
+    pWasmModule.assign(outputBuffer.begin(), outputBuffer.end());
+
+    if (pWasmModule.empty()) {
+        addError("No WebAssembly code could be generated.");
+
+        return false;
+    }
+
+    return true;
+#else
     // Create an ORC-based JIT and keep track of it.
 
     auto lljit = llvm::orc::LLJITBuilder().create();
@@ -650,8 +382,10 @@ extern double atanh(double);
 #    endif
 
     return res;
+#endif
 }
 
+#ifndef __EMSCRIPTEN__
 bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
 {
     // Add the given function to our ORC-based JIT. Note that we assume that we have a valid ORC-based JIT, function
