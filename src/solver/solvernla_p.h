@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-void LIBOPENCOR_UNIT_TESTING_EXPORT nlaSolve(const char *pNlaSolverAddress,
+void LIBOPENCOR_UNIT_TESTING_EXPORT nlaSolve(uintptr_t pNlaSolverAddress,
                                              void (*pObjectiveFunction)(double *, double *, void *),
                                              double *pU, size_t pN, void *pData);
 
