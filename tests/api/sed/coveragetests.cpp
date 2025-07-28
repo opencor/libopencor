@@ -20,6 +20,8 @@ limitations under the License.
 
 #include <libopencor>
 
+static const auto NoDoubles = std::vector<double> {};
+
 TEST(CoverageSedTest, initialise)
 {
     static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
@@ -408,8 +410,6 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
     EXPECT_EQ(simulation->outputEndTime(), OUTPUT_END_TIME);
     EXPECT_EQ(simulation->numberOfSteps(), NUMBER_OF_STEPS);
 }
-
-static const auto NoDoubles = std::vector<double> {};
 
 TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
 {
