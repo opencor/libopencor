@@ -64,13 +64,16 @@ void printIssues(const LoggerPtr &pLogger)
 void printHexDump(const UnsignedChars &pBytes)
 {
     static constexpr auto BYTES_PER_LINE = 16;
+    static constexpr auto ADDRESS_WIDTH = 8;
+    static constexpr auto FIRST_ASCII_CHARACTER = 32;
+    static constexpr auto LAST_ASCII_CHARACTER = 126;
 
     std::cout << "---[BYTES]---[BEGIN]\n";
 
     for (size_t i = 0; i < pBytes.size(); i += BYTES_PER_LINE) {
         // Print the offset.
 
-        std::cout << std::hex << std::setfill('0') << std::setw(8) << i << "  ";
+        std::cout << std::hex << std::setfill('0') << std::setw(ADDRESS_WIDTH) << i << "  ";
 
         // Print hex bytes.
 
@@ -83,7 +86,7 @@ void printHexDump(const UnsignedChars &pBytes)
 
             // Add an extra space after 8 bytes.
 
-            if (j == 7) {
+            if (j == ADDRESS_WIDTH - 1) {
                 std::cout << "  ";
             } else {
                 std::cout << " ";
@@ -94,12 +97,12 @@ void printHexDump(const UnsignedChars &pBytes)
 
         // Print the ASCII representation.
 
-        size_t bytesOnThisLine = (pBytes.size() - i < BYTES_PER_LINE) ? (pBytes.size() - i) : BYTES_PER_LINE;
+        const size_t bytesOnThisLine = (pBytes.size() - i < BYTES_PER_LINE) ? (pBytes.size() - i) : BYTES_PER_LINE;
 
         for (size_t j = 0; j < bytesOnThisLine; ++j) {
             auto byte = pBytes[i + j];
 
-            if (byte >= 32 && byte <= 126) {
+            if (byte >= FIRST_ASCII_CHARACTER && byte <= LAST_ASCII_CHARACTER) {
                 std::cout << static_cast<char>(byte);
             } else {
                 std::cout << ".";
@@ -124,7 +127,7 @@ void printArray(const std::string &pName, const Doubles &pDoubles)
 
     if (!pDoubles.empty()) {
         const auto arraySize = pDoubles.size();
-        const auto indexWidth = static_cast<int>(log10(arraySize - 1)) + 1;
+        const auto indexWidth = static_cast<int>(log10(static_cast<double>(arraySize - 1))) + 1;
 
         for (size_t i = 0; i < arraySize; ++i) {
             std::cout << "[" << std::setfill('0') << std::setw(indexWidth) << i << "] " << pDoubles[i] << "\n";

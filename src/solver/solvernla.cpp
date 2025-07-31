@@ -29,7 +29,7 @@ void nlaSolve(uintptr_t pNlaSolverAddress, size_t pObjectiveFunctionIndex, doubl
 void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
               double *pU, size_t pN, void *pData)
 {
-    reinterpret_cast<SolverNla *>(reinterpret_cast<void *>(pNlaSolverAddress))->solve(pObjectiveFunction, pU, pN, pData);
+    reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunction, pU, pN, pData); // NOLINT
 }
 #endif
 
