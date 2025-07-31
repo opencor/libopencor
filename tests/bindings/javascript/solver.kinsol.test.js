@@ -40,8 +40,6 @@ describe("Solver KINSOL tests", () => {
     utils.freeMemory(loc, solverNla2ContentsPtr);
   });
 
-  test("Dummy", () => {});
-
   test("Maximum number of iterations value with invalid number", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
@@ -58,7 +56,7 @@ describe("Solver KINSOL tests", () => {
     expectIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        "The maximum number of iterations cannot be equal to 0. It must be greater than 0.",
+        "The maximum number of iterations cannot be equal to -1. It must be greater than 0.",
       ],
     ]);
 

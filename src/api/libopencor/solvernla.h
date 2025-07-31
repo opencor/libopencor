@@ -33,7 +33,7 @@ class LIBOPENCOR_EXPORT SolverNla: public Solver
     friend class SedSimulation;
 
 public:
-    using ComputeSystem = void (*)(double *pU, double *pF, void *pUserData); /**< Signature of the method that computes the system of NLA equations. */
+    using ComputeObjectiveFunction = void (*)(double *pU, double *pF, void *pUserData); /**< Signature of the method that computes the objective function of the NLA system. */
 
     /**
      * Constructors, destructor, and assignment operators.
@@ -54,15 +54,19 @@ public:
      *
      * Solve the NLA system.
      *
-     * @param pComputeSystem The method that computes the system of NLA equations.
+     * @param pComputeObjectiveFunction The method that computes the objective function of the NLA system.
      * @param pU The initial guess for the solution of the NLA system.
      * @param pN The number of variables in the NLA system.
-     * @param pUserData Some user data that may be passed to @p pComputeSystem.
+     * @param pUserData Some user data that may be passed to @p pComputeObjectiveFunction.
      *
      * @return @c true if the NLA system could be solved, @c false otherwise.
      */
 
-    bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData);
+#ifdef __EMSCRIPTEN__
+    bool solve(size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData);
+#else
+    bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData);
+#endif
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

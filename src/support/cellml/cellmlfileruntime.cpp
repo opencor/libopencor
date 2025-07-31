@@ -31,24 +31,35 @@ std::string exportJavaScriptName(const std::string &pName)
     return std::string("__attribute__((export_name(\"").append(pName).append("\")))\n");
 }
 
-void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferentialModel, bool pIsOdeModel, bool pIsAlgebraicModel)
+void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferentialModel, bool pIsOdeModel, bool pIsAlgebraicModel, bool pHasObjectiveFunctions)
 {
     // clang-format off
     return EM_ASM_PTR({
         try {
+            // Instantiate the WebAssembly module.
+
             const wasmBytes = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
             const wasmModule = new WebAssembly.Module(wasmBytes);
             const wasmInstance = new WebAssembly.Instance(wasmModule, {
                 env: {
                     __linear_memory: wasmMemory,
                     __indirect_function_table: wasmTable,
+                    __stack_pointer: new WebAssembly.Global({ value: "i32", mutable: true }, 0),
 
                     // Some standard C library functions.
 
+                    free: _free,
+                    malloc: _malloc,
                     memset: function(ptr, value, size) {
                         HEAPU8.fill(value, ptr, ptr + size);
 
                         return ptr;
+                    },
+
+                    // NLA solve function.
+
+                    nlaSolve: function(nlaSolverAddress, objectiveFunctionIndex, u, n, data) {
+                        Module.nlaSolve(Number(nlaSolverAddress), Number(objectiveFunctionIndex), Number(u), Number(n), Number(data));
                     },
 
                     // Arithmetic operators.
@@ -90,6 +101,8 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
                 }
             });
 
+            // Retrieve the functions needed to compute the model.
+
             if ($2) {
                 Module.initialiseVariables = wasmInstance.exports.initialiseVariables;
                 Module.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
@@ -114,6 +127,24 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
                 }
             }
 
+            // Retrieve the objective functions, if any.
+
+            if ($5) {
+                Module.objectiveFunctions = {};
+
+                for (let name in wasmInstance.exports) {
+                    if (name.startsWith("objectiveFunction")) {
+                        const objectiveFunctionIndex = parseInt(name.replace("objectiveFunction", ""));
+
+                        Module.objectiveFunctions[objectiveFunctionIndex] = wasmInstance.exports[name];
+                    }
+                }
+
+                if (Object.keys(Module.objectiveFunctions).length === 0) {
+                    throw new Error("The objective functions could not be retrieved.");
+                }
+            }
+
             return null;
         } catch (error) {
             const errorMessage = error.toString();
@@ -124,7 +155,7 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
 
             return errorMessagePtr;
         }
-    }, pWasmModule.data(), pWasmModule.size(), pDifferentialModel, pIsOdeModel, pIsAlgebraicModel); // clang-format on
+    }, pWasmModule.data(), pWasmModule.size(), pDifferentialModel, pIsOdeModel, pIsAlgebraicModel, pHasObjectiveFunctions); // clang-format on
 }
 
 } // namespace
@@ -137,14 +168,11 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
     if (cellmlFileAnalyser->errorCount() != 0) {
         addIssues(cellmlFileAnalyser);
     } else {
-//---ISSUE468--- NEED TO INVESTIGATE HOW TO HANDLE nlaSolve() FROM JavaScript.
-#ifndef __EMSCRIPTEN__
         // Get an NLA solver, if needed.
 
         if (pNlaSolver != nullptr) {
             mNlaSolverAddress = nlaSolverAddress(pNlaSolver.get());
         }
-#endif
 
         // Determine the type of the model.
 
@@ -182,7 +210,50 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         static constexpr auto WITH_EXTERNAL_VARIABLES = false;
 
 #ifdef __EMSCRIPTEN__
-        // Specify the name of the functions that we want to export.
+        // Allocate the memory needed by our objective functions on the heap rather than on the stack.
+
+        if (pNlaSolver != nullptr) {
+            if (differentialModel) {
+                generatorProfile->setFindRootMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                          R"(void findRoot[INDEX](double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraic)
+{
+    RootFindingInfo *rfi = (RootFindingInfo *) malloc(sizeof(RootFindingInfo));
+    double *u = (double *) malloc([SIZE] * sizeof(double));
+
+    rfi->voi = voi;
+    rfi->states = states;
+    rfi->rates = rates;
+    rfi->constants = constants;
+    rfi->computedConstants = computedConstants;
+    rfi->algebraic = algebraic;
+
+[CODE]
+
+    free(u);
+    free(rfi);
+}
+)");
+            } else {
+                generatorProfile->setFindRootMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                          R"(void findRoot[INDEX](double *constants, double *computedConstants, double *algebraic)
+{
+    RootFindingInfo *rfi = (RootFindingInfo *) malloc(sizeof(RootFindingInfo));
+    double *u = (double *) malloc([SIZE] * sizeof(double));
+
+    rfi->constants = constants;
+    rfi->computedConstants = computedConstants;
+    rfi->algebraic = algebraic;
+
+[CODE]
+
+    free(u);
+    free(rfi);
+}
+)");
+            }
+        }
+
+        // Export our various methods.
 
         generatorProfile->setImplementationInitialiseVariablesMethodString(differentialModel,
                                                                            exportJavaScriptName("initialiseVariables").append(generatorProfile->implementationInitialiseVariablesMethodString(differentialModel)));
@@ -193,29 +264,80 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
                                                                         exportJavaScriptName("computeVariables").append(generatorProfile->implementationComputeVariablesMethodString(differentialModel, WITH_EXTERNAL_VARIABLES)));
 #endif
 
-//---ISSUE468--- NEED TO INVESTIGATE HOW TO HANDLE nlaSolve() FROM JavaScript.
-#ifndef __EMSCRIPTEN__
         if (pNlaSolver != nullptr) {
+            // Note: both uintptr_t and size_t are defined as follows:
+            //        - Emscripten (wasm32): unsigned int (which is the same as unsigned long on 32 bits and is what we
+            //                               need to use here since malloc() expects an unsigned long);
+            //        - Windows (64 bits): unsigned long long; and
+            //        - Linux/macOS (64 bits): unsigned long.
+
+#ifdef __EMSCRIPTEN__
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long uintptr_t;
+typedef unsigned long size_t;
+
+extern void *malloc(size_t size);
+extern void free(void *ptr);
+
+extern void nlaSolve(uintptr_t nlaSolverAddress, size_t objectiveFunctionIndex, uintptr_t u, size_t n, uintptr_t data);
+)");
+            generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                    std::string("nlaSolve(").append(mNlaSolverAddress).append(", [INDEX], (uintptr_t) u, [SIZE], (uintptr_t) rfi);\n"));
+#else
+#    ifdef BUILDING_USING_MSVC
+            generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long long uintptr_t;
 typedef unsigned long long size_t;
 
 extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(double *, double *, void *),
                      double *u, size_t n, void *data);
 )");
+#    else
+            generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long uintptr_t;
+typedef unsigned long size_t;
+
+extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(double *, double *, void *),
+                     double *u, size_t n, void *data);
+)");
+#    endif
+
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
                                                     std::string("nlaSolve(").append(mNlaSolverAddress).append(", objectiveFunction[INDEX], u, [SIZE], &rfi);\n"));
-        }
 #endif
+        }
 
         generator->setModel(pCellmlFile->analyserModel());
         generator->setProfile(generatorProfile);
+
+#ifdef __EMSCRIPTEN__
+        // Export our various objective functions.
+
+        auto implementationCode = generator->implementationCode();
+
+        if (pNlaSolver != nullptr) {
+            std::vector<size_t> handledNlaSystemIndices;
+
+            for (const auto &equation : pCellmlFile->analyserModel()->equations()) {
+                if (equation->type() == libcellml::AnalyserEquation::Type::NLA) {
+                    auto nlaSystemIndex = equation->nlaSystemIndex();
+
+                    if (std::find(handledNlaSystemIndices.begin(), handledNlaSystemIndices.end(), nlaSystemIndex) == handledNlaSystemIndices.end()) {
+                        auto objectiveFunctionName = std::string("objectiveFunction").append(std::to_string(nlaSystemIndex));
+
+                        implementationCode.insert(implementationCode.find("void " + objectiveFunctionName),
+                                                  exportJavaScriptName(objectiveFunctionName));
+
+                        handledNlaSystemIndices.push_back(nlaSystemIndex);
+                    }
+                }
+            }
+        }
+#endif
 
         // Compile the generated code.
 
         mCompiler = Compiler::create();
 
 #ifdef __EMSCRIPTEN__
-        if (!mCompiler->compile(generator->implementationCode(), mWasmModule)) {
+        if (!mCompiler->compile(implementationCode, mWasmModule)) {
             // The compilation failed, so add the issues it generated.
 
             addIssues(mCompiler);
@@ -227,7 +349,8 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
         auto errorMessagePtr = instantiateWebAssemblyModule(mWasmModule, differentialModel,
                                                             cellmlFileType == libcellml::AnalyserModel::Type::ODE,
-                                                            cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC);
+                                                            cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC,
+                                                            pNlaSolver != nullptr);
 
         if (errorMessagePtr != nullptr) {
             std::string jsErrorMessage(reinterpret_cast<char *>(errorMessagePtr));
@@ -304,10 +427,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
 CellmlFileRuntime::Impl::~Impl()
 {
-//---ISSUE468--- NEED TO INVESTIGATE HOW TO HANDLE nlaSolve() FROM JavaScript.
-#ifndef __EMSCRIPTEN__
     delete[] mNlaSolverAddress;
-#endif
 }
 
 #ifdef __EMSCRIPTEN__

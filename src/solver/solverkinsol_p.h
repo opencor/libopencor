@@ -57,7 +57,11 @@ public:
     int lowerHalfBandwidth() const;
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
 
-    bool solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData) override;
+#ifdef __EMSCRIPTEN__
+    bool solve(size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData) override;
+#else
+    bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData) override;
+#endif
 };
 
 } // namespace libOpenCOR

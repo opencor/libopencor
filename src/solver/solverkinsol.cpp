@@ -72,18 +72,33 @@ void errorHandler(int pLine, const char *pFunction, const char *pFile, const cha
 }
 #endif
 
+#ifdef __EMSCRIPTEN__
+static constexpr auto MAX_SIZE_T = std::numeric_limits<size_t>::max();
+#endif
+
 struct SolverKinsolUserData
 {
-    SolverNla::ComputeSystem computeSystem = nullptr;
+#ifdef __EMSCRIPTEN__
+    size_t computeObjectiveFunctionIndex = MAX_SIZE_T;
+#else
+    SolverNla::ComputeObjectiveFunction computeObjectiveFunction = nullptr;
+#endif
 
     void *userData = nullptr;
 };
 
-int computeSystem(N_Vector pU, N_Vector pF, void *pUserData)
+int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
 {
     auto *userData = static_cast<SolverKinsolUserData *>(pUserData);
 
-    userData->computeSystem(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
+#ifdef __EMSCRIPTEN__
+    // clang-format off
+    EM_ASM({
+        Module.objectiveFunctions[$0]($1, $2, $3);
+    }, userData->computeObjectiveFunctionIndex, N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData); // clang-format on
+#else
+    userData->computeObjectiveFunction(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
+#endif
 
     return 0;
 }
@@ -215,11 +230,15 @@ void SolverKinsol::Impl::setLowerHalfBandwidth(int pLowerHalfBandwidth)
     mLowerHalfBandwidth = pLowerHalfBandwidth;
 }
 
-bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
+#ifdef __EMSCRIPTEN__
+bool SolverKinsol::Impl::solve(size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
+#else
+bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData)
+#endif
 {
     removeAllIssues();
 
-    // We don't have any data associated with the given pComputeSystem, so get some by first making sure that the
+    // We don't have any data associated with the given objective function, so get some by first making sure that the
     // solver's properties are all valid.
 
     if (mMaximumNumberOfIterations <= 0) {
@@ -279,7 +298,7 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
     N_VConst(1.0, ones);
 
-    ASSERT_EQ(KINInit(solver, computeSystem, u), KIN_SUCCESS);
+    ASSERT_EQ(KINInit(solver, computeObjectiveFunction, u), KIN_SUCCESS);
 
     // Set our linear solver.
 
@@ -320,7 +339,11 @@ bool SolverKinsol::Impl::solve(ComputeSystem pComputeSystem, double *pU, size_t 
 
     SolverKinsolUserData userData;
 
-    userData.computeSystem = pComputeSystem;
+#ifdef __EMSCRIPTEN__
+    userData.computeObjectiveFunctionIndex = pComputeObjectiveFunctionIndex;
+#else
+    userData.computeObjectiveFunction = pComputeObjectiveFunction;
+#endif
     userData.userData = pUserData;
 
     ASSERT_EQ(KINSetUserData(solver, &userData), KIN_SUCCESS);

@@ -20,11 +20,18 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+#ifdef __EMSCRIPTEN__
+void nlaSolve(uintptr_t pNlaSolverAddress, size_t pObjectiveFunctionIndex, double *pU, size_t pN, void *pData)
+{
+    reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunctionIndex, pU, pN, pData);
+}
+#else
 void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
               double *pU, size_t pN, void *pData)
 {
-    reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunction, pU, pN, pData);
+    reinterpret_cast<SolverNla *>(reinterpret_cast<void *>(pNlaSolverAddress))->solve(pObjectiveFunction, pU, pN, pData);
 }
+#endif
 
 SolverNla::Impl::Impl(const std::string &pId, const std::string &pName)
     : Solver::Impl(pId, pName)
@@ -51,9 +58,16 @@ Solver::Type SolverNla::type() const
     return Type::NLA;
 }
 
-bool SolverNla::solve(ComputeSystem pComputeSystem, double *pU, size_t pN, void *pUserData)
+#ifdef __EMSCRIPTEN__
+bool SolverNla::solve(size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
 {
-    return pimpl()->solve(pComputeSystem, pU, pN, pUserData);
+    return pimpl()->solve(pComputeObjectiveFunctionIndex, pU, pN, pUserData);
 }
+#else
+bool SolverNla::solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData)
+{
+    return pimpl()->solve(pComputeObjectiveFunction, pU, pN, pUserData);
+}
+#endif
 
 } // namespace libOpenCOR

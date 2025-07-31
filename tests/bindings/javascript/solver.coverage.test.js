@@ -115,8 +115,8 @@ describe("Solver coverage tests", () => {
 
     expect(instanceTask.stateCount).toBe(0);
     expect(instanceTask.rateCount).toBe(0);
-    expect(instanceTask.constantCount).toBe(0);
-    expect(instanceTask.computedConstantCount).toBe(0);
+    expect(instanceTask.constantCount).toBe(1);
+    expect(instanceTask.computedConstantCount).toBe(1);
     expect(instanceTask.algebraicCount).toBe(3);
 
     expect(instanceTask.algebraic(0).get(0)).toBeCloseTo(33.33333, 5);

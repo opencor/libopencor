@@ -32,10 +32,9 @@ public:
     UnsignedChars mWasmModule;
 #endif
 
-//---ISSUE468--- NEED TO INVESTIGATE HOW TO HANDLE nlaSolve() FROM JavaScript.
-#ifndef __EMSCRIPTEN__
     char *mNlaSolverAddress = nullptr;
 
+#ifndef __EMSCRIPTEN__
     InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel = nullptr;
     InitialiseVariablesForDifferentialModel mInitialiseVariablesForDifferentialModel = nullptr;
     ComputeComputedConstants mComputeComputedConstants = nullptr;
