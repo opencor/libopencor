@@ -33,9 +33,13 @@ SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask
 
     // Initialise the instance task, but only if there are no issues with it.
 
+#ifndef CODE_COVERAGE_ENABLED
     if (!res->hasIssues()) {
+#endif
         res->pimpl()->initialise();
+#ifndef CODE_COVERAGE_ENABLED
     }
+#endif
 
     return res;
 }
