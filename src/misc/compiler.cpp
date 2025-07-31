@@ -178,7 +178,9 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Map our code to a memory buffer.
 
-    auto code = R"(extern double pow(double, double);
+    auto code = R"(// Arithmetic operators.
+
+extern double pow(double, double);
 extern double sqrt(double);
 extern double fabs(double);
 extern double exp(double);
@@ -189,6 +191,8 @@ extern double floor(double);
 extern double fmin(double, double);
 extern double fmax(double, double);
 extern double fmod(double, double);
+
+// Trigonometric operators.
 
 extern double sin(double);
 extern double cos(double);
@@ -202,6 +206,8 @@ extern double atan(double);
 extern double asinh(double);
 extern double acosh(double);
 extern double atanh(double);
+
+// Constants.
 
 #define INFINITY (__builtin_inf())
 #define NAN (__builtin_nan(""))

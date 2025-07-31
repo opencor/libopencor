@@ -31,7 +31,8 @@ std::string exportJavaScriptName(const std::string &pName)
     return std::string("__attribute__((export_name(\"").append(pName).append("\")))\n");
 }
 
-void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferentialModel, bool pIsOdeModel, bool pIsAlgebraicModel, bool pHasObjectiveFunctions)
+void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferentialModel, bool pIsOdeModel,
+                                   bool pIsAlgebraicModel, bool pHasObjectiveFunctions)
 {
     // clang-format off
     return EM_ASM_PTR({
@@ -44,17 +45,11 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
                 env: {
                     __linear_memory: wasmMemory,
                     __indirect_function_table: wasmTable,
-                    __stack_pointer: new WebAssembly.Global({ value: "i32", mutable: true }, 0),
 
                     // Some standard C library functions.
 
                     free: _free,
                     malloc: _malloc,
-                    memset: function(ptr, value, size) {
-                        HEAPU8.fill(value, ptr, ptr + size);
-
-                        return ptr;
-                    },
 
                     // NLA solve function.
 
@@ -81,15 +76,12 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
                     sin: Math.sin,
                     cos: Math.cos,
                     tan: Math.tan,
-
                     sinh: Math.sinh,
                     cosh: Math.cosh,
                     tanh: Math.tanh,
-
                     asin: Math.asin,
                     acos: Math.acos,
                     atan: Math.atan,
-
                     asinh: Math.asinh,
                     acosh: Math.acosh,
                     atanh: Math.atanh,

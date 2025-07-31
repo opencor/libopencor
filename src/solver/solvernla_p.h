@@ -25,9 +25,8 @@ namespace libOpenCOR {
 #ifdef __EMSCRIPTEN__
 void nlaSolve(uintptr_t pNlaSolverAddress, size_t pObjectiveFunctionIndex, double *pU, size_t pN, void *pData);
 #else
-void LIBOPENCOR_UNIT_TESTING_EXPORT nlaSolve(uintptr_t pNlaSolverAddress,
-                                             void (*pObjectiveFunction)(double *, double *, void *),
-                                             double *pU, size_t pN, void *pData);
+void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
+              double *pU, size_t pN, void *pData);
 #endif
 
 class SolverNla::Impl: public Solver::Impl

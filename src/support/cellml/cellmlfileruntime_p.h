@@ -27,12 +27,10 @@ class CellmlFileRuntime::Impl: public Logger::Impl
 {
 public:
     CompilerPtr mCompiler = nullptr;
-
+    std::string mNlaSolverAddress;
 #ifdef __EMSCRIPTEN__
     UnsignedChars mWasmModule;
 #endif
-
-    std::string mNlaSolverAddress;
 
 #ifndef __EMSCRIPTEN__
     InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel = nullptr;
