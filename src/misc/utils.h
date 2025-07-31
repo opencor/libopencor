@@ -82,8 +82,8 @@ bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT forwardSlashPath(const std::string &pPath);
 #endif
 
-std::filesystem::path LIBOPENCOR_UNIT_TESTING_EXPORT stringToPath(const std::string &pString);
-std::string LIBOPENCOR_UNIT_TESTING_EXPORT pathToString(const std::filesystem::path &pPath);
+std::filesystem::path stringToPath(const std::string &pString);
+std::string pathToString(const std::filesystem::path &pPath);
 
 #ifdef BUILDING_USING_MSVC
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalFileName(const std::string &pFileName, bool pIsRemoteFile = false);
