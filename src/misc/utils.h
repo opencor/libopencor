@@ -100,7 +100,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 UnsignedChars LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem::path &pFilePath);
 #endif
 
-char LIBOPENCOR_UNIT_TESTING_EXPORT *nlaSolverAddress(SolverNla *pNlaSolver);
+std::string nlaSolverAddress(SolverNla *pNlaSolver);
 
 bool toBool(const std::string &pString);
 std::string toString(bool pBoolean);

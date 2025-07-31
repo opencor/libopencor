@@ -298,7 +298,6 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
                      double *u, size_t n, void *data);
 )");
 #    endif
-
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
                                                     std::string("nlaSolve(").append(mNlaSolverAddress).append(", objectiveFunction[INDEX], u, [SIZE], &rfi);\n"));
 #endif
@@ -423,11 +422,6 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         }
 #endif
     }
-}
-
-CellmlFileRuntime::Impl::~Impl()
-{
-    delete[] mNlaSolverAddress;
 }
 
 #ifdef __EMSCRIPTEN__

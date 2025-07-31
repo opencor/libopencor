@@ -32,7 +32,7 @@ public:
     UnsignedChars mWasmModule;
 #endif
 
-    char *mNlaSolverAddress = nullptr;
+    std::string mNlaSolverAddress;
 
 #ifndef __EMSCRIPTEN__
     InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel = nullptr;
@@ -44,7 +44,6 @@ public:
 #endif
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
-    ~Impl() override;
 
 #ifdef __EMSCRIPTEN__
     void initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;

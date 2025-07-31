@@ -480,21 +480,13 @@ UnsignedChars fileContents(const std::filesystem::path &pFilePath)
 }
 #endif
 
-char *nlaSolverAddress(SolverNla *pNlaSolver)
+std::string nlaSolverAddress(SolverNla *pNlaSolver)
 {
     std::ostringstream oss;
 
-    oss << pNlaSolver;
+    oss << "0x" << std::hex << reinterpret_cast<uintptr_t>(pNlaSolver);
 
-    auto str = oss.str();
-    auto len = str.size();
-    auto *res = new char[len + 1];
-
-    std::ranges::copy(str, res);
-
-    res[len] = '\0'; // NOLINT
-
-    return res;
+    return oss.str();
 }
 
 bool toBool(const std::string &pString)
