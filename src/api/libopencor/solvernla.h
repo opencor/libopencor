@@ -57,7 +57,7 @@ public:
      * @param pComputeObjectiveFunction The method that computes the objective function of the NLA system.
      * @param pU The initial guess for the solution of the NLA system.
      * @param pN The number of variables in the NLA system.
-     * @param pUserData Some user data that may be passed to @p pComputeObjectiveFunction.
+     * @param pUserData User data, if any, that are passed to @p pComputeObjectiveFunction.
      *
      * @return @c true if the NLA system could be solved, @c false otherwise.
      */
