@@ -60,16 +60,16 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
                     // Arithmetic operators.
 
                     pow: Math.pow,
-                    sqrt: Math.sqrt,
-                    fabs: Math.abs,
+                    // sqrt() is not needed.
+                    // fabs() is not needed.
                     exp: Math.exp,
-                    log: Math.log,
-                    log10: Math.log10,
-                    ceil: Math.ceil,
-                    floor: Math.floor,
-                    fmin: Math.min,
-                    fmax: Math.max,
-                    fmod: function(x, y) { return x % y; },
+                    // log() is not needed.
+                    // log10() is not needed.
+                    // ceil() is not needed.
+                    // floor() is not needed.
+                    // fmin() is not needed.
+                    // fmax() is not needed.
+                    // fmod() is not needed.
 
                     // Trigonometric operators.
 
@@ -88,8 +88,8 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
 
                     // Constants.
 
-                    INFINITY: function() { return Infinity; },
-                    NAN: function() { return NaN; }
+                    // INFINITY is not needed.
+                    // NAN is not needed.
                 }
             });
 

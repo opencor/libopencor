@@ -105,6 +105,7 @@ export const SOLVER_NLA2_CONTENTS = stringToArrayBuffer(
 
 export const ALGEBRAIC_CONTENTS = stringToArrayBuffer(`@ALGEBRAIC_CONTENTS@`);
 export const DAE_CONTENTS = stringToArrayBuffer(`@DAE_CONTENTS@`);
+export const MATH_CONTENTS = stringToArrayBuffer(`@MATH_CONTENTS@`);
 export const NLA_CONTENTS = stringToArrayBuffer(`@NLA_CONTENTS@`);
 
 export const OVERCONSTRAINED_CONTENTS = stringToArrayBuffer(

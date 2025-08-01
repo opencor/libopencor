@@ -123,6 +123,7 @@ string(REPLACE "\"" "\\\"" SOLVER_NLA2_CONTENTS "${SOLVER_NLA2_CONTENTS}")
 
 file(READ res/api/sed/algebraic.cellml ALGEBRAIC_CONTENTS)
 file(READ res/api/sed/dae.cellml DAE_CONTENTS)
+file(READ res/api/sed/math.cellml MATH_CONTENTS)
 file(READ res/api/sed/nla.cellml NLA_CONTENTS)
 file(READ res/api/sed/overconstrained.cellml OVERCONSTRAINED_CONTENTS)
 file(READ res/api/sed/underconstrained.cellml UNDERCONSTRAINED_CONTENTS)
@@ -130,6 +131,7 @@ file(READ res/api/sed/unsuitably_constrained.cellml UNSUITABLY_CONSTRAINED_CONTE
 
 string(REPLACE "\"" "\\\"" ALGEBRAIC_CONTENTS "${ALGEBRAIC_CONTENTS}")
 string(REPLACE "\"" "\\\"" DAE_CONTENTS "${DAE_CONTENTS}")
+string(REPLACE "\"" "\\\"" MATH_CONTENTS "${MATH_CONTENTS}")
 string(REPLACE "\"" "\\\"" NLA_CONTENTS "${NLA_CONTENTS}")
 string(REPLACE "\"" "\\\"" OVERCONSTRAINED_CONTENTS "${OVERCONSTRAINED_CONTENTS}")
 string(REPLACE "\"" "\\\"" UNDERCONSTRAINED_CONTENTS "${UNDERCONSTRAINED_CONTENTS}")

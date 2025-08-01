@@ -1,0 +1,343 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="coverage" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+    <component name="my_component">
+        <variable name="power" units="dimensionless"/>
+        <variable name="sqrt" units="dimensionless"/>
+        <variable name="abs" units="dimensionless"/>
+        <variable name="exp" units="dimensionless"/>
+        <variable name="ln" units="dimensionless"/>
+        <variable name="log" units="dimensionless"/>
+        <variable name="ceiling" units="dimensionless"/>
+        <variable name="floor" units="dimensionless"/>
+        <variable name="min" units="dimensionless"/>
+        <variable name="max" units="dimensionless"/>
+        <variable name="rem" units="dimensionless"/>
+        <variable name="sin" units="dimensionless"/>
+        <variable name="cos" units="dimensionless"/>
+        <variable name="tan" units="dimensionless"/>
+        <variable name="sec" units="dimensionless"/>
+        <variable name="csc" units="dimensionless"/>
+        <variable name="cot" units="dimensionless"/>
+        <variable name="sinh" units="dimensionless"/>
+        <variable name="cosh" units="dimensionless"/>
+        <variable name="tanh" units="dimensionless"/>
+        <variable name="sech" units="dimensionless"/>
+        <variable name="csch" units="dimensionless"/>
+        <variable name="coth" units="dimensionless"/>
+        <variable name="arcsin" units="dimensionless"/>
+        <variable name="arccos" units="dimensionless"/>
+        <variable name="arctan" units="dimensionless"/>
+        <variable name="arcsec" units="dimensionless"/>
+        <variable name="arccsc" units="dimensionless"/>
+        <variable name="arccot" units="dimensionless"/>
+        <variable name="arcsinh" units="dimensionless"/>
+        <variable name="arccosh" units="dimensionless"/>
+        <variable name="arctanh" units="dimensionless"/>
+        <variable name="arcsech" units="dimensionless"/>
+        <variable name="arccsch" units="dimensionless"/>
+        <variable name="arccoth" units="dimensionless"/>
+        <variable name="infinity" units="dimensionless"/>
+        <variable name="notanumber" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>power</ci>
+                <apply>
+                    <power/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                    <cn cellml:units="dimensionless">5.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>sqrt</ci>
+                <apply>
+                    <power/>
+                    <cn cellml:units="dimensionless">9.0</cn>
+                    <cn cellml:units="dimensionless">0.5</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>abs</ci>
+                <apply>
+                    <abs/>
+                    <cn cellml:units="dimensionless">-7.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>exp</ci>
+                <apply>
+                    <exp/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>ln</ci>
+                <apply>
+                    <ln/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>log</ci>
+                <apply>
+                    <log/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>ceiling</ci>
+                <apply>
+                    <ceiling/>
+                    <cn cellml:units="dimensionless">3.5</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>floor</ci>
+                <apply>
+                    <floor/>
+                    <cn cellml:units="dimensionless">3.5</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>min</ci>
+                <apply>
+                    <min/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                    <cn cellml:units="dimensionless">5.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>max</ci>
+                <apply>
+                    <max/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                    <cn cellml:units="dimensionless">5.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>rem</ci>
+                <apply>
+                    <rem/>
+                    <cn cellml:units="dimensionless">13.0</cn>
+                    <cn cellml:units="dimensionless">5.0</cn>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>sin</ci>
+                <apply>
+                    <sin/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>cos</ci>
+                <apply>
+                    <cos/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tan</ci>
+                <apply>
+                    <tan/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>sec</ci>
+                <apply>
+                    <sec/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>csc</ci>
+                <apply>
+                    <csc/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>cot</ci>
+                <apply>
+                    <cot/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>sinh</ci>
+                <apply>
+                    <sinh/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>cosh</ci>
+                <apply>
+                    <cosh/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>tanh</ci>
+                <apply>
+                    <tanh/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>sech</ci>
+                <apply>
+                    <sech/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>csch</ci>
+                <apply>
+                    <csch/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>coth</ci>
+                <apply>
+                    <coth/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arcsin</ci>
+                <apply>
+                    <arcsin/>
+                    <cn cellml:units="dimensionless">0.3</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arccos</ci>
+                <apply>
+                    <arccos/>
+                    <cn cellml:units="dimensionless">0.3</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arctan</ci>
+                <apply>
+                    <arctan/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arcsec</ci>
+                <apply>
+                    <arcsec/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arccsc</ci>
+                <apply>
+                    <arccsc/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arccot</ci>
+                <apply>
+                    <arccot/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arcsinh</ci>
+                <apply>
+                    <arcsinh/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arccosh</ci>
+                <apply>
+                    <arccosh/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arctanh</ci>
+                <apply>
+                    <arctanh/>
+                    <cn cellml:units="dimensionless">0.3</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arcsech</ci>
+                <apply>
+                    <arcsech/>
+                    <cn cellml:units="dimensionless">0.3</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arccsch</ci>
+                <apply>
+                    <arccsch/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>arccoth</ci>
+                <apply>
+                    <arccoth/>
+                    <cn cellml:units="dimensionless">3.0</cn>
+                </apply>
+            </apply>
+        </math>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>infinity</ci>
+                <infinity/>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>notanumber</ci>
+                <notanumber/>
+            </apply>
+        </math>
+    </component>
+</model>

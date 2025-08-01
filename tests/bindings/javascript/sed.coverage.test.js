@@ -16,7 +16,7 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { expectIssues, expectValues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
@@ -26,6 +26,7 @@ describe("Sed coverage tests", () => {
   let unsupportedSedChangesContentsPtr;
   let solverOdeContentsPtr;
   let solverNla1ContentsPtr;
+  let mathContentsPtr;
 
   beforeAll(() => {
     sedChangesContentsPtr = utils.allocateMemory(
@@ -45,6 +46,7 @@ describe("Sed coverage tests", () => {
       loc,
       utils.SOLVER_NLA1_CONTENTS,
     );
+    mathContentsPtr = utils.allocateMemory(loc, utils.MATH_CONTENTS);
   });
 
   afterAll(() => {
@@ -53,6 +55,7 @@ describe("Sed coverage tests", () => {
     utils.freeMemory(loc, unsupportedSedChangesContentsPtr);
     utils.freeMemory(loc, solverOdeContentsPtr);
     utils.freeMemory(loc, solverNla1ContentsPtr);
+    utils.freeMemory(loc, mathContentsPtr);
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
@@ -628,5 +631,77 @@ describe("Sed coverage tests", () => {
     solver.delete();
     document.delete();
     file.delete();
+  });
+
+  test("Math", () => {
+    const file = new loc.File(utils.CELLML_FILE);
+
+    file.setContents(mathContentsPtr, utils.MATH_CONTENTS.length);
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+    const instanceTask = instance.tasks.get(0);
+
+    expect(instanceTask.constantCount).toBe(0);
+    expect(instanceTask.computedConstantCount).toBe(37);
+    expect(instanceTask.algebraicCount).toBe(0);
+
+    instance.run();
+
+    expectValues(
+      instanceTask,
+      0,
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [
+        243.0,
+        3.0,
+        7.0,
+        20.085536923187668,
+        1.0986122886681098,
+        0.47712125471966244,
+        4.0,
+        3.0,
+        3.0,
+        5.0,
+        3.0,
+        0.1411200080598672,
+        -0.9899924966004454,
+        -0.1425465430742778,
+        -1.0101086659079939,
+        7.086167395737187,
+        -7.015252551434534,
+        10.017874927409903,
+        10.067661995777765,
+        0.9950547536867305,
+        0.0993279274194332,
+        0.09982156966882273,
+        1.0049698233136892,
+        0.3046926540153975,
+        1.2661036727794992,
+        1.2490457723982544,
+        1.2309594173407747,
+        0.3398369094541219,
+        0.3217505543966422,
+        1.8184464592320668,
+        1.7627471740390859,
+        0.30951960420311175,
+        1.8738202425274144,
+        0.32745015023725843,
+        0.34657359027997264,
+        Infinity,
+        NaN,
+      ],
+      [
+        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+      ],
+      [],
+      [],
+    );
   });
 });
