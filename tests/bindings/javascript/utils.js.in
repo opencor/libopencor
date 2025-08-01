@@ -151,41 +151,67 @@ export function expectIssues(loc, logger, expectedIssues) {
   }
 }
 
+function expectValue(value, expectedValue, precision) {
+  if (expectedValue === Infinity) {
+    expect(value).toBe(Infinity);
+  } else if (Number.isNaN(expectedValue)) {
+    expect(Number.isNaN(value)).toBe(true);
+  } else {
+    expect(value).toBeCloseTo(expectedValue, precision);
+  }
+}
+
 export function expectValues(
   instanceTask,
   index,
   stateValues,
+  statePrecisions,
   rateValues,
+  ratePrecisions,
   constantValues,
+  constantPrecisions,
   computedConstantValues,
+  computedConstantPrecisions,
   algebraicValues,
+  algebraicPrecisions,
 ) {
   for (let i = 0; i < instanceTask.stateCount; ++i) {
-    expect(instanceTask.stateAsArray(i)[index]).toBeCloseTo(stateValues[i], 2);
+    expectValue(
+      instanceTask.stateAsArray(i)[index],
+      stateValues[i],
+      statePrecisions[i],
+    );
   }
 
   for (let i = 0; i < instanceTask.rateCount; ++i) {
-    expect(instanceTask.rateAsArray(i)[index]).toBeCloseTo(rateValues[i], 2);
+    expectValue(
+      instanceTask.rateAsArray(i)[index],
+      rateValues[i],
+      ratePrecisions[i],
+    );
   }
 
   for (let i = 0; i < instanceTask.constantCount; ++i) {
-    expect(instanceTask.constantAsArray(i)[index]).toBeCloseTo(
+    expectValue(
+      instanceTask.constantAsArray(i)[index],
       constantValues[i],
-      7,
+      constantPrecisions[i],
     );
   }
 
   for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
-    expect(instanceTask.computedConstantAsArray(i)[index]).toBeCloseTo(
+    expectValue(
+      instanceTask.computedConstantAsArray(i)[index],
       computedConstantValues[i],
-      7,
+      computedConstantPrecisions[i],
     );
   }
 
   for (let i = 0; i < instanceTask.algebraicCount; ++i) {
-    expect(instanceTask.algebraicAsArray(i)[index]).toBeCloseTo(
+    expectValue(
+      instanceTask.algebraicAsArray(i)[index],
       algebraicValues[i],
-      1,
+      algebraicPrecisions[i],
     );
   }
 }
