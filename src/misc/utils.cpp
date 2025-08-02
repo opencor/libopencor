@@ -16,6 +16,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include "libopencor/issue.h"
+
 #ifndef __EMSCRIPTEN__
 #    include "curl/curl.h"
 #endif
@@ -29,6 +31,7 @@ limitations under the License.
 #include <cmath>
 #include <cstring>
 #include <fstream>
+#include <iostream>
 #include <regex>
 #include <sstream>
 
@@ -36,11 +39,104 @@ limitations under the License.
 #    include <codecvt>
 #endif
 
+#ifdef ERROR
+#    undef ERROR
+#endif
+
 #ifdef NAN
 #    undef NAN
 #endif
 
 namespace libOpenCOR {
+
+#ifndef CODE_COVERAGE_ENABLED
+void printIssues(const LoggerPtr &pLogger)
+{
+    std::cout << "---[ISSUES]---[BEGIN]\n";
+
+    for (auto &issue : pLogger->issues()) {
+        std::cout << ((issue->type() == Issue::Type::ERROR) ? "ERROR" : "WARNING") << ": " << issue->description() << "\n";
+    }
+
+    std::cout << "---[ISSUES]---[END]\n";
+}
+
+void printHexDump(const UnsignedChars &pBytes)
+{
+    static constexpr auto BYTES_PER_LINE = 16;
+    static constexpr auto ADDRESS_WIDTH = 8;
+    static constexpr auto FIRST_ASCII_CHARACTER = 32;
+    static constexpr auto LAST_ASCII_CHARACTER = 126;
+
+    std::cout << "---[BYTES]---[BEGIN]\n";
+
+    for (size_t i = 0; i < pBytes.size(); i += BYTES_PER_LINE) {
+        // Print the offset.
+
+        std::cout << std::hex << std::setfill('0') << std::setw(ADDRESS_WIDTH) << i << "  ";
+
+        // Print hex bytes.
+
+        for (size_t j = 0; j < BYTES_PER_LINE; ++j) {
+            if (i + j < pBytes.size()) {
+                std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(pBytes[i + j]);
+            } else {
+                std::cout << "  ";
+            }
+
+            // Add an extra space after 8 bytes.
+
+            if (j == ADDRESS_WIDTH - 1) {
+                std::cout << "  ";
+            } else {
+                std::cout << " ";
+            }
+        }
+
+        std::cout << " |";
+
+        // Print the ASCII representation.
+
+        const size_t bytesOnThisLine = (pBytes.size() - i < BYTES_PER_LINE) ? (pBytes.size() - i) : BYTES_PER_LINE;
+
+        for (size_t j = 0; j < bytesOnThisLine; ++j) {
+            auto byte = pBytes[i + j];
+
+            if (byte >= FIRST_ASCII_CHARACTER && byte <= LAST_ASCII_CHARACTER) {
+                std::cout << static_cast<char>(byte);
+            } else {
+                std::cout << ".";
+            }
+        }
+
+        for (size_t j = bytesOnThisLine; j < BYTES_PER_LINE; ++j) {
+            std::cout << " ";
+        }
+
+        std::cout << "|\n";
+    }
+
+    std::cout << std::dec;
+
+    std::cout << "---[BYTES]---[END]\n";
+}
+
+void printArray(const std::string &pName, const Doubles &pDoubles)
+{
+    std::cout << "---[ARRAY]---[" << pName << "]---[BEGIN]\n";
+
+    if (!pDoubles.empty()) {
+        const auto arraySize = pDoubles.size();
+        const auto indexWidth = static_cast<int>(log10(static_cast<double>(arraySize - 1))) + 1;
+
+        for (size_t i = 0; i < arraySize; ++i) {
+            std::cout << "[" << std::setfill('0') << std::setw(indexWidth) << i << "] " << pDoubles[i] << "\n";
+        }
+    }
+
+    std::cout << "---[ARRAY]---[" << pName << "]---[END]\n";
+}
+#endif
 
 bool fuzzyCompare(double pNb1, double pNb2)
 {
@@ -232,7 +328,7 @@ using TimeVal = struct
 
 namespace {
 
-int getTimeOfDay(TimeVal &pTimeVal)
+void getTimeOfDay(TimeVal &pTimeVal)
 {
     // Based off https://stackoverflow.com/a/58162122.
 
@@ -241,8 +337,6 @@ int getTimeOfDay(TimeVal &pTimeVal)
 
     pTimeVal.seconds = static_cast<uint64_t>(seconds.count());
     pTimeVal.microeconds = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(duration - seconds).count());
-
-    return 0;
 }
 
 std::filesystem::path uniqueFilePath()
@@ -389,21 +483,13 @@ UnsignedChars fileContents(const std::filesystem::path &pFilePath)
 }
 #endif
 
-char *nlaSolverAddress(SolverNla *pNlaSolver)
+std::string nlaSolverAddress(SolverNla *pNlaSolver)
 {
     std::ostringstream oss;
 
-    oss << pNlaSolver;
+    oss << "0x" << std::hex << reinterpret_cast<uintptr_t>(pNlaSolver);
 
-    auto str = oss.str();
-    auto len = str.size();
-    auto *res = new char[len + 1];
-
-    std::ranges::copy(str, res);
-
-    res[len] = '\0'; // NOLINT
-
-    return res;
+    return oss.str();
 }
 
 bool toBool(const std::string &pString)
@@ -493,104 +579,6 @@ std::string toString(double pNumber)
 std::string toString(const UnsignedChars &pBytes)
 {
     return {reinterpret_cast<const char *>(pBytes.data()), pBytes.size()};
-}
-
-SolverCvode::IntegrationMethod toCvodeIntegrationMethod(const std::string &pIntegrationMethod)
-{
-    return (pIntegrationMethod == "BDF") ?
-               SolverCvode::IntegrationMethod::BDF :
-               SolverCvode::IntegrationMethod::ADAMS_MOULTON;
-}
-
-std::string toString(SolverCvode::IntegrationMethod pIntegrationMethod)
-{
-    return (pIntegrationMethod == SolverCvode::IntegrationMethod::BDF) ?
-               "BDF" :
-               "Adams-Moulton";
-}
-
-SolverCvode::IterationType toCvodeIterationType(const std::string &pIterationType)
-{
-    return (pIterationType == "Functional") ?
-               SolverCvode::IterationType::FUNCTIONAL :
-               SolverCvode::IterationType::NEWTON;
-}
-
-std::string toString(SolverCvode::IterationType pIterationType)
-{
-    return (pIterationType == SolverCvode::IterationType::FUNCTIONAL) ?
-               "Functional" :
-               "Newton";
-}
-
-SolverCvode::LinearSolver toCvodeLinearSolver(const std::string &pLinearSolver)
-{
-    return (pLinearSolver == "Dense") ?
-               SolverCvode::LinearSolver::DENSE :
-           (pLinearSolver == "Banded") ?
-               SolverCvode::LinearSolver::BANDED :
-           (pLinearSolver == "Diagonal") ?
-               SolverCvode::LinearSolver::DIAGONAL :
-           (pLinearSolver == "GMRES") ?
-               SolverCvode::LinearSolver::GMRES :
-           (pLinearSolver == "BiCGStab") ?
-               SolverCvode::LinearSolver::BICGSTAB :
-               SolverCvode::LinearSolver::TFQMR;
-}
-
-std::string toString(SolverCvode::LinearSolver pLinearSolver)
-{
-    return (pLinearSolver == SolverCvode::LinearSolver::DENSE) ?
-               "Dense" :
-           (pLinearSolver == SolverCvode::LinearSolver::BANDED) ?
-               "Banded" :
-           (pLinearSolver == SolverCvode::LinearSolver::DIAGONAL) ?
-               "Diagonal" :
-           (pLinearSolver == SolverCvode::LinearSolver::GMRES) ?
-               "GMRES" :
-           (pLinearSolver == SolverCvode::LinearSolver::BICGSTAB) ?
-               "BiCGStab" :
-               "TFQMR";
-}
-
-SolverCvode::Preconditioner toCvodePreconditioner(const std::string &pPreconditioner)
-{
-    return (pPreconditioner == "No") ?
-               SolverCvode::Preconditioner::NO :
-               SolverCvode::Preconditioner::BANDED;
-}
-
-std::string toString(SolverCvode::Preconditioner pPreconditioner)
-{
-    return (pPreconditioner == SolverCvode::Preconditioner::NO) ?
-               "No" :
-               "Banded";
-}
-
-SolverKinsol::LinearSolver toKinsolLinearSolver(const std::string &pLinearSolver)
-{
-    return (pLinearSolver == "Dense") ?
-               SolverKinsol::LinearSolver::DENSE :
-           (pLinearSolver == "Banded") ?
-               SolverKinsol::LinearSolver::BANDED :
-           (pLinearSolver == "GMRES") ?
-               SolverKinsol::LinearSolver::GMRES :
-           (pLinearSolver == "BiCGStab") ?
-               SolverKinsol::LinearSolver::BICGSTAB :
-               SolverKinsol::LinearSolver::TFQMR;
-}
-
-std::string toString(SolverKinsol::LinearSolver pLinearSolver)
-{
-    return (pLinearSolver == SolverKinsol::LinearSolver::DENSE) ?
-               "Dense" :
-           (pLinearSolver == SolverKinsol::LinearSolver::BANDED) ?
-               "Banded" :
-           (pLinearSolver == SolverKinsol::LinearSolver::GMRES) ?
-               "GMRES" :
-           (pLinearSolver == SolverKinsol::LinearSolver::BICGSTAB) ?
-               "BiCGStab" :
-               "TFQMR";
 }
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString)

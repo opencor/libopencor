@@ -19,10 +19,15 @@ import { expectValues } from "./utils.js";
 export function run(
   document,
   stateValues,
+  statePrecisions,
   rateValues,
+  ratePrecisions,
   constantValues,
+  constantPrecisions,
   computedConstantValues,
+  computedConstantPrecisions,
   algebraicValues,
+  algebraicPrecisions,
 ) {
   const simulation = document.simulations.get(0);
 
@@ -39,9 +44,14 @@ export function run(
     instanceTask,
     13000,
     stateValues,
+    statePrecisions,
     rateValues,
+    ratePrecisions,
     constantValues,
+    constantPrecisions,
     computedConstantValues,
+    computedConstantPrecisions,
     algebraicValues,
+    algebraicPrecisions,
   );
 }

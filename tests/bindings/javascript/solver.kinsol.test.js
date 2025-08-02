@@ -16,8 +16,7 @@ limitations under the License.
 
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-//---GRY--- TO BE ENABLED ONCE WE CAN INTERPRET NLA-BASED MODELS.
-// import { expectIssues } from "./utils.js";
+import { expectIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
@@ -41,16 +40,10 @@ describe("Solver KINSOL tests", () => {
     utils.freeMemory(loc, solverNla2ContentsPtr);
   });
 
-  test("Dummy", () => {});
-
-  /*---GRY--- ENABLE THOSE TESTS ONCE WE CAN INTERPRET NLA-BASED MODELS.
   test("Maximum number of iterations value with invalid number", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla1ContentsPtr,
-      utils.SOLVER_NLA1_CONTENTS.length,
-    );
+    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -63,7 +56,7 @@ describe("Solver KINSOL tests", () => {
     expectIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        "The maximum number of iterations cannot be equal to 0. It must be greater than 0.",
+        "The maximum number of iterations cannot be equal to -1. It must be greater than 0.",
       ],
     ]);
 
@@ -75,10 +68,7 @@ describe("Solver KINSOL tests", () => {
   test("Banded linear solver and upper half-bandwidth value with number too small", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla2ContentsPtr,
-      utils.SOLVER_NLA2_CONTENTS.length,
-    );
+    file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -104,10 +94,7 @@ describe("Solver KINSOL tests", () => {
   test("Banded linear solver and upper half-bandwidth value with number too big", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla1ContentsPtr,
-      utils.SOLVER_NLA1_CONTENTS.length,
-    );
+    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -133,10 +120,7 @@ describe("Solver KINSOL tests", () => {
   test("Banded linear solver and lower half-bandwidth value with number too small", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla2ContentsPtr,
-      utils.SOLVER_NLA2_CONTENTS.length,
-    );
+    file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -162,10 +146,7 @@ describe("Solver KINSOL tests", () => {
   test("Banded linear solver and lower half-bandwidth value with number too big", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla1ContentsPtr,
-      utils.SOLVER_NLA1_CONTENTS.length,
-    );
+    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -215,10 +196,7 @@ describe("Solver KINSOL tests", () => {
   test("Solve", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla1ContentsPtr,
-      utils.SOLVER_NLA1_CONTENTS.length,
-    );
+    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -235,10 +213,7 @@ describe("Solver KINSOL tests", () => {
   test("Solve with banded linear solver", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla2ContentsPtr,
-      utils.SOLVER_NLA2_CONTENTS.length,
-    );
+    file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -262,10 +237,7 @@ describe("Solver KINSOL tests", () => {
   test("Solve with GMRES linear solver", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla1ContentsPtr,
-      utils.SOLVER_NLA1_CONTENTS.length,
-    );
+    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -287,10 +259,7 @@ describe("Solver KINSOL tests", () => {
   test("Solve with BiCGStab linear solver", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla2ContentsPtr,
-      utils.SOLVER_NLA2_CONTENTS.length,
-    );
+    file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -312,10 +281,7 @@ describe("Solver KINSOL tests", () => {
   test("Solve with TFQMR linear solver", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      solverNla1ContentsPtr,
-      utils.SOLVER_NLA1_CONTENTS.length,
-    );
+    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -333,5 +299,4 @@ describe("Solver KINSOL tests", () => {
     document.delete();
     file.delete();
   });
-    */
 });

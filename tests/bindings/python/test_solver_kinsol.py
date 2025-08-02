@@ -124,10 +124,6 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_big
     assert_issues(instance, expected_issues)
 
 
-# ---GRY--- RENAME THIS TEST test_compiled_solve AND CREATE ONE CALLED test_interpreted_solve ONCE WE CAN INTERPRET
-#           NLA-BASED MODELS.
-
-
 ABS_TOL = 1e-05
 
 

@@ -40,8 +40,7 @@ public:
     libcellml::AnalyserPtr analyser() const;
     libcellml::AnalyserModelPtr analyserModel() const;
 
-    static CellmlFileRuntimePtr runtime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver,
-                                        bool pCompiled);
+    static CellmlFileRuntimePtr runtime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 };
 
 } // namespace libOpenCOR

@@ -49,7 +49,6 @@ public:
     libcellml::AnalyserModelPtr mAnalyserModel;
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
-    bool mCompiled = true;
 
     double mVoi = 0.0;
     double *mStates = nullptr;
@@ -66,9 +65,9 @@ public:
 
     SedInstanceTaskResults mResults;
 
-    static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask, bool pCompiled);
+    static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask);
 
-    explicit Impl(const SedAbstractTaskPtr &pTask, bool pCompiled);
+    explicit Impl(const SedAbstractTaskPtr &pTask);
 
     void trackResults(size_t pIndex);
 

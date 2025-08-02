@@ -17,6 +17,7 @@ limitations under the License.
 #include "compiler_p.h"
 
 #include "clangbegin.h"
+#include "clang/Basic/TargetInfo.h"
 #include "clang/CodeGen/CodeGenAction.h"
 #include "clang/Driver/Compilation.h"
 #include "clang/Driver/Driver.h"
@@ -27,11 +28,16 @@ limitations under the License.
 #include "clangend.h"
 
 #include "llvmbegin.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Module.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/Host.h"
 #include "llvm/Support/TargetSelect.h"
+#include "llvm/Target/TargetMachine.h"
 #include "llvm-c/Core.h"
 #include "llvmend.h"
 
+#include <random>
 #include <sstream>
 
 namespace libOpenCOR {
@@ -55,22 +61,28 @@ std::string llvmClangError(llvm::Error pError)
 
 } // namespace
 
+#ifdef __EMSCRIPTEN__
+bool Compiler::Impl::compile(const std::string &pCode, UnsignedChars &pWasmModule)
+#else
 bool Compiler::Impl::compile(const std::string &pCode)
+#endif
 {
     // Reset ourselves.
 
+#ifndef __EMSCRIPTEN__
     mLljit.reset(nullptr);
+#endif
 
     removeAllIssues();
 
     // Create a diagnostics engine.
 
-    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(new clang::DiagnosticOptions {});
+    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(std::make_unique<clang::DiagnosticOptions>());
     std::string diagnostics;
     llvm::raw_string_ostream outputStream(diagnostics);
-    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(new clang::DiagnosticsEngine {llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(new clang::DiagnosticIDs {}),
-                                                                                                              &*diagnosticOptions,
-                                                                                                              new clang::TextDiagnosticPrinter {outputStream, &*diagnosticOptions}});
+    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(std::make_unique<clang::DiagnosticsEngine>(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(std::make_unique<clang::DiagnosticIDs>()),
+                                                                                                                           &*diagnosticOptions,
+                                                                                                                           std::make_unique<clang::TextDiagnosticPrinter>(outputStream, &*diagnosticOptions).release()));
 
     diagnosticsEngine->setWarningsAsErrors(true);
 
@@ -84,11 +96,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     static constexpr auto DUMMY_FILE_NAME = "dummy.c";
     static const std::vector<const char *> COMPILATION_ARGUMENTS = {"clang", "-fsyntax-only",
-#ifdef NDEBUG
                                                                     "-O3",
-#else
-                                                                    "-g", "-O0",
-#endif
                                                                     "-fno-math-errno",
                                                                     "-fno-stack-protector",
                                                                     DUMMY_FILE_NAME};
@@ -146,17 +154,17 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a compiler instance.
 
-    clang::CompilerInstance compilerInstance;
+    auto compilerInstance = std::make_unique<clang::CompilerInstance>();
 
-    compilerInstance.setDiagnostics(diagnosticsEngine.get());
-    compilerInstance.setVerboseOutputStream(llvm::nulls());
+    compilerInstance->setDiagnostics(diagnosticsEngine.get());
+    compilerInstance->setVerboseOutputStream(llvm::nulls());
 
     // Create a compiler invocation object.
 
 #ifndef CODE_COVERAGE_ENABLED
     bool res =
 #endif
-        clang::CompilerInvocation::CreateFromArgs(compilerInstance.getInvocation(),
+        clang::CompilerInvocation::CreateFromArgs(compilerInstance->getInvocation(),
                                                   commandArguments,
                                                   *diagnosticsEngine);
 
@@ -170,8 +178,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Map our code to a memory buffer.
 
-    auto code = R"(
-// Arithmetic operators.
+    auto code = R"(// Arithmetic operators.
 
 extern double pow(double, double);
 extern double sqrt(double);
@@ -190,15 +197,12 @@ extern double fmod(double, double);
 extern double sin(double);
 extern double cos(double);
 extern double tan(double);
-
 extern double sinh(double);
 extern double cosh(double);
 extern double tanh(double);
-
 extern double asin(double);
 extern double acos(double);
 extern double atan(double);
-
 extern double asinh(double);
 extern double acosh(double);
 extern double atanh(double);
@@ -207,16 +211,18 @@ extern double atanh(double);
 
 #define INFINITY (__builtin_inf())
 #define NAN (__builtin_nan(""))
+
 )" + pCode;
 
-    compilerInstance.getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
-                                                                           llvm::MemoryBuffer::getMemBuffer(code).release());
+    compilerInstance->getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
+                                                                            llvm::MemoryBuffer::getMemBuffer(code).release());
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
-    std::unique_ptr<clang::CodeGenAction> codeGenAction(new clang::EmitLLVMOnlyAction {llvm::unwrap(LLVMGetGlobalContext())});
+    auto llvmContext = std::make_unique<llvm::LLVMContext>();
+    auto codeGenAction = std::make_unique<clang::EmitLLVMOnlyAction>(llvmContext.get());
 
-    if (!compilerInstance.ExecuteAction(*codeGenAction)) {
+    if (!compilerInstance->ExecuteAction(*codeGenAction)) {
         addError("The given code could not be compiled.");
 
         static constexpr auto ERROR = ": error: ";
@@ -266,35 +272,87 @@ extern double atanh(double);
         return false;
     }
 
-    // Retrieve the LLVM bitcode module.
+    // Retrieve the LLVM module.
 
     auto module = codeGenAction->takeModule();
 
 #ifndef CODE_COVERAGE_ENABLED
     if (module == nullptr) {
-        addError("The LLVM bitcode module could not be retrieved.");
+        addError("The LLVM module could not be retrieved.");
 
         return false;
     }
 #endif
 
-    // Initialise the native target (and its ASM printer), so not only can we then create an execution engine, but more
-    // importantly its data layout will match that of our target platform.
+    // Initialise the native target and its ASM printer.
 
     llvm::InitializeNativeTarget();
     llvm::InitializeNativeTargetAsmPrinter();
 
+#ifdef __EMSCRIPTEN__
+    // Look up the target.
+
+    std::string error;
+    auto target = llvm::TargetRegistry::lookupTarget(module->getTargetTriple(), error);
+
+    if (target == nullptr) {
+        error[0] = static_cast<char>(tolower(error[0]));
+
+        addError(std::string("the target (").append(module->getTargetTriple()).append(") could not be found: ").append(error));
+
+        return false;
+    }
+
+    // Create a target machine.
+
+    auto targetMachine = std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module->getTargetTriple(),
+                                                                                          "generic", "",
+                                                                                          llvm::TargetOptions(),
+                                                                                          llvm::Reloc::Static));
+
+    if (targetMachine == nullptr) {
+        addError("A target machine could not be created.");
+
+        return false;
+    }
+
+    // Get the target machine to emit some WebAssembly code.
+
+    llvm::legacy::PassManager passManager;
+    llvm::SmallVector<char, 0> outputBuffer;
+    llvm::raw_svector_ostream output(outputBuffer);
+
+    if (targetMachine->addPassesToEmitFile(passManager, output, nullptr, llvm::CGFT_ObjectFile)) {
+        addError("The target machine cannot emit some WebAssembly code.");
+
+        return false;
+    }
+
+    passManager.run(*module);
+
+    // Retrieve the WebAssembly code.
+
+    pWasmModule.assign(outputBuffer.begin(), outputBuffer.end());
+
+    if (pWasmModule.empty()) {
+        addError("No WebAssembly code could be generated.");
+
+        return false;
+    }
+
+    return true;
+#else
     // Create an ORC-based JIT and keep track of it.
 
     auto lljit = llvm::orc::LLJITBuilder().create();
 
-#ifndef CODE_COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     if (!lljit) {
         addError(std::string("An ORC-based JIT could not be created").append(llvmClangError(lljit.takeError())).append("."));
 
         return false;
     }
-#endif
+#    endif
 
     mLljit = std::move(*lljit);
 
@@ -302,37 +360,38 @@ extern double atanh(double);
 
     auto dynamicLibrarySearchGenerator = llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess(mLljit->getDataLayout().getGlobalPrefix());
 
-#ifndef CODE_COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     if (!dynamicLibrarySearchGenerator) {
         addError(std::string("The dynamic library search generator could not be created").append(llvmClangError(dynamicLibrarySearchGenerator.takeError())).append("."));
 
         return false;
     }
-#endif
+#    endif
 
     mLljit->getMainJITDylib().addGenerator(std::move(*dynamicLibrarySearchGenerator));
 
     // Add our LLVM bitcode module to our ORC-based JIT.
 
-    auto llvmContext = std::make_unique<llvm::LLVMContext>();
     auto threadSafeModule = llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext));
 
-#ifdef CODE_COVERAGE_ENABLED
+#    ifdef CODE_COVERAGE_ENABLED
     const bool res =
-#else
+#    else
     res =
-#endif
+#    endif
         !mLljit->addIRModule(std::move(threadSafeModule));
 
-#ifndef CODE_COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     if (!res) {
         addError("The LLVM bitcode module could not be added to the ORC-based JIT.");
     }
-#endif
+#    endif
 
     return res;
+#endif
 }
 
+#ifndef __EMSCRIPTEN__
 bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
 {
     // Add the given function to our ORC-based JIT. Note that we assume that we have a valid ORC-based JIT, function
@@ -342,11 +401,11 @@ bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
         {mLljit->mangleAndIntern(pName), llvm::JITEvaluatedSymbol(llvm::pointerToJITTargetAddress(pFunction), llvm::JITSymbolFlags::Exported)},
     }));
 
-#ifndef CODE_COVERAGE_ENABLED
+#    ifndef CODE_COVERAGE_ENABLED
     if (!res) {
         addError(std::string("The ").append(pName).append("() function could not be added to the compiler."));
     }
-#endif
+#    endif
 
     return res;
 }
@@ -364,6 +423,7 @@ void *Compiler::Impl::function(const std::string &pName) const
 
     return {};
 }
+#endif
 
 Compiler::Compiler()
     : Logger(new Impl {})
@@ -390,6 +450,12 @@ CompilerPtr Compiler::create()
     return CompilerPtr {new Compiler {}};
 }
 
+#ifdef __EMSCRIPTEN__
+bool Compiler::compile(const std::string &pCode, UnsignedChars &pWasmModule)
+{
+    return pimpl()->compile(pCode, pWasmModule);
+}
+#else
 bool Compiler::compile(const std::string &pCode)
 {
     return pimpl()->compile(pCode);
@@ -404,5 +470,6 @@ void *Compiler::function(const std::string &pName) const
 {
     return pimpl()->function(pName);
 }
+#endif
 
 } // namespace libOpenCOR

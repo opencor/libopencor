@@ -70,14 +70,13 @@ StringStringMap SolverOdeFixedStep::Impl::properties() const
 
 bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                           double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                                          CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
-                                          CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
+                                          const CellmlFileRuntimePtr &pRuntime)
 {
     // Initialise the ODE solver itself.
 
     SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates,
                                 pConstants, pComputedConstants, pAlgebraic,
-                                pComputeCompiledRates, pComputeInterpretedRates);
+                                pRuntime);
 
     // Check the solver's properties.
 

@@ -270,7 +270,6 @@ describe("Sed instance tests", () => {
     file.delete();
   });
 
-  /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("NLA model", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
@@ -327,9 +326,7 @@ describe("Sed instance tests", () => {
     document.delete();
     file.delete();
   });
-  */
 
-  /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
   test("DAE model", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
@@ -374,7 +371,6 @@ describe("Sed instance tests", () => {
     document.delete();
     file.delete();
   });
-  */
 
   test("DAE model with no ODE or NLA solver", () => {
     const file = new loc.File(utils.CELLML_FILE);
@@ -389,7 +385,6 @@ describe("Sed instance tests", () => {
 
     const instance = document.instantiate();
 
-    /*---GRY--- TO BE UNCOMMENTED ONCE WE CAN INTERPRET A MODEL WITH ONE/SEVERAL NLA SYSTEM/S.
     expectIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
@@ -400,7 +395,6 @@ describe("Sed instance tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
-    */
 
     instance.delete();
     document.delete();

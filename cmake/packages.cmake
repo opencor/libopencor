@@ -193,9 +193,9 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         set(PACKAGE_URL "https://github.com/opencor/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
 
         if("${PACKAGE_NAME}" STREQUAL "libCellML")
-            #---GRY--- THIS IS TEMPORARY UNTIL libCellML HAS AN OFFICIAL RELEASE WITH THE INTERPRETER.
+            #---GRY--- USE THIS VERSION OF libCellML WHICH CORRESPONDS TO PR #1256 UNTIL IT GETS MERGED IN.
 
-            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/707e211/${PACKAGE_FILE}")
+            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/04d8d15/${PACKAGE_FILE}")
         endif()
 
         set(ATTEMPT 1)

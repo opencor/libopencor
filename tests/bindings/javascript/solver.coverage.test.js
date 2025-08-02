@@ -77,7 +77,6 @@ describe("Solver coverage tests", () => {
     file.delete();
   });
 
-  /*---GRY--- ENABLE THIS TEST ONCE WE CAN INTERPRET NLA-BASED MODELS.
   test("Algebraic changes", () => {
     // We want to solve a system of three unknowns:
     // Variables:
@@ -116,8 +115,8 @@ describe("Solver coverage tests", () => {
 
     expect(instanceTask.stateCount).toBe(0);
     expect(instanceTask.rateCount).toBe(0);
-    expect(instanceTask.constantCount).toBe(0);
-    expect(instanceTask.computedConstantCount).toBe(0);
+    expect(instanceTask.constantCount).toBe(1);
+    expect(instanceTask.computedConstantCount).toBe(1);
     expect(instanceTask.algebraicCount).toBe(3);
 
     expect(instanceTask.algebraic(0).get(0)).toBeCloseTo(33.33333, 5);
@@ -128,5 +127,4 @@ describe("Solver coverage tests", () => {
     document.delete();
     file.delete();
   });
-  */
 });

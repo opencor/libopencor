@@ -37,6 +37,48 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+// Some utilities.
+
+namespace {
+
+std::string toString(SolverCvode::IntegrationMethod pIntegrationMethod)
+{
+    return (pIntegrationMethod == SolverCvode::IntegrationMethod::BDF) ?
+               "BDF" :
+               "Adams-Moulton";
+}
+
+std::string toString(SolverCvode::IterationType pIterationType)
+{
+    return (pIterationType == SolverCvode::IterationType::FUNCTIONAL) ?
+               "Functional" :
+               "Newton";
+}
+
+std::string toString(SolverCvode::LinearSolver pLinearSolver)
+{
+    return (pLinearSolver == SolverCvode::LinearSolver::DENSE) ?
+               "Dense" :
+           (pLinearSolver == SolverCvode::LinearSolver::BANDED) ?
+               "Banded" :
+           (pLinearSolver == SolverCvode::LinearSolver::DIAGONAL) ?
+               "Diagonal" :
+           (pLinearSolver == SolverCvode::LinearSolver::GMRES) ?
+               "GMRES" :
+           (pLinearSolver == SolverCvode::LinearSolver::BICGSTAB) ?
+               "BiCGStab" :
+               "TFQMR";
+}
+
+std::string toString(SolverCvode::Preconditioner pPreconditioner)
+{
+    return (pPreconditioner == SolverCvode::Preconditioner::NO) ?
+               "No" :
+               "Banded";
+}
+
+} // namespace
+
 // Right-hand side function.
 
 namespace {
@@ -64,13 +106,13 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
     auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
 
-    if (userData->computeCompiledRates != nullptr) {
-        userData->computeCompiledRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
-                                       userData->constants, userData->computedConstants, userData->algebraic);
-    } else {
-        userData->computeInterpretedRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
+#ifdef __EMSCRIPTEN__
+    userData->runtime->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
+                                    userData->constants, userData->computedConstants, userData->algebraic);
+#else
+        userData->runtime->computeRates()(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
                                           userData->constants, userData->computedConstants, userData->algebraic);
-    }
+#endif
 
     return 0;
 }
@@ -119,7 +161,9 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
                 value = toString(DEFAULT_INTEGRATION_METHOD);
             }
 
-            mIntegrationMethod = toCvodeIntegrationMethod(value);
+            mIntegrationMethod = (value == "BDF") ?
+                                     SolverCvode::IntegrationMethod::BDF :
+                                     SolverCvode::IntegrationMethod::ADAMS_MOULTON;
         } else if (kisaoId == "KISAO:0000476") {
             if ((value != "Functional") && (value != "Newton")) {
                 addWarning(std::string("The iteration type ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'Functional' or 'Newton'. A ").append(toString(DEFAULT_ITERATION_TYPE)).append(" iteration type will be used instead."));
@@ -127,7 +171,9 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
                 value = toString(DEFAULT_ITERATION_TYPE);
             }
 
-            mIterationType = toCvodeIterationType(value);
+            mIterationType = (value == "Functional") ?
+                                 SolverCvode::IterationType::FUNCTIONAL :
+                                 SolverCvode::IterationType::NEWTON;
         } else if (kisaoId == "KISAO:0000477") {
             if ((value != "Dense") && (value != "Banded") && (value != "Diagonal") && (value != "GMRES") && (value != "BiCGStab") && (value != "TFQMR")) {
                 addWarning(std::string("The linear solver ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A ").append(toString(DEFAULT_LINEAR_SOLVER)).append(" linear solver will be used instead."));
@@ -135,7 +181,17 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
                 value = toString(DEFAULT_LINEAR_SOLVER);
             }
 
-            mLinearSolver = toCvodeLinearSolver(value);
+            mLinearSolver = (value == "Dense") ?
+                                SolverCvode::LinearSolver::DENSE :
+                            (value == "Banded") ?
+                                SolverCvode::LinearSolver::BANDED :
+                            (value == "Diagonal") ?
+                                SolverCvode::LinearSolver::DIAGONAL :
+                            (value == "GMRES") ?
+                                SolverCvode::LinearSolver::GMRES :
+                            (value == "BiCGStab") ?
+                                SolverCvode::LinearSolver::BICGSTAB :
+                                SolverCvode::LinearSolver::TFQMR;
         } else if (kisaoId == "KISAO:0000478") {
             if ((value != "No") && (value != "Banded")) {
                 addWarning(std::string("The preconditioner ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'No' or 'Banded'. A ").append(toString(DEFAULT_PRECONDITIONER)).append(" preconditioner will be used instead."));
@@ -143,7 +199,9 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
                 value = toString(DEFAULT_PRECONDITIONER);
             }
 
-            mPreconditioner = toCvodePreconditioner(value);
+            mPreconditioner = (value == "No") ?
+                                  SolverCvode::Preconditioner::NO :
+                                  SolverCvode::Preconditioner::BANDED;
         } else if (kisaoId == "KISAO:0000479") {
             mUpperHalfBandwidth = toInt(value);
 
@@ -247,8 +305,7 @@ StringStringMap SolverCvode::Impl::properties() const
 
 bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                                    double *pConstants, double *pComputedConstants, double *pAlgebraic,
-                                   CellmlFileRuntime::ComputeCompiledRates pComputeCompiledRates,
-                                   CellmlFileRuntime::ComputeInterpretedRates pComputeInterpretedRates)
+                                   const CellmlFileRuntimePtr &pRuntime)
 {
     resetInternals();
     removeAllIssues();
@@ -257,7 +314,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates,
                                 pConstants, pComputedConstants, pAlgebraic,
-                                pComputeCompiledRates, pComputeInterpretedRates);
+                                pRuntime);
 
     // Check the solver's properties.
 
@@ -342,8 +399,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     mUserData.constants = pConstants;
     mUserData.computedConstants = pComputedConstants;
     mUserData.algebraic = pAlgebraic;
-    mUserData.computeCompiledRates = pComputeCompiledRates;
-    mUserData.computeInterpretedRates = pComputeInterpretedRates;
+    mUserData.runtime = pRuntime;
 
     ASSERT_EQ(CVodeSetUserData(mSolver, &mUserData), CV_SUCCESS);
 

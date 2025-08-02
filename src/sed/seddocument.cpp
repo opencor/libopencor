@@ -608,16 +608,9 @@ bool SedDocument::removeAllTasks()
     return pimpl()->removeAllTasks();
 }
 
-#ifdef __EMSCRIPTEN__
 SedInstancePtr SedDocument::instantiate()
 {
-    return SedInstance::Impl::create(shared_from_this(), false);
+    return SedInstance::Impl::create(shared_from_this());
 }
-#else
-SedInstancePtr SedDocument::instantiate(bool pCompiled)
-{
-    return SedInstance::Impl::create(shared_from_this(), pCompiled);
-}
-#endif
 
 } // namespace libOpenCOR

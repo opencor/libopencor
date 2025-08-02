@@ -15,6 +15,7 @@
 
 import base64
 import libopencor as loc
+import math
 import os
 import pathlib
 import platform
@@ -79,6 +80,15 @@ def assert_issues(logger, expected_issues):
             assert issues[i].type_as_string == "Warning"
 
 
+def assert_value(value, expected_value, abs_tol):
+    if math.isinf(expected_value):
+        assert math.isinf(value) is True
+    elif math.isnan(expected_value):
+        assert math.isnan(value) is True
+    else:
+        assert value == pytest.approx(expected_value, abs=abs_tol)
+
+
 def assert_values(
     instance_task,
     index,
@@ -94,28 +104,30 @@ def assert_values(
     algebraic_abs_tols,
 ):
     for i in range(instance_task.state_count):
-        assert instance_task.state(i)[index] == pytest.approx(
-            state_values[i], abs=state_abs_tols[i]
-        )
+        assert_value(instance_task.state(i)[index], state_values[i], state_abs_tols[i])
 
     for i in range(instance_task.rate_count):
-        assert instance_task.rate(i)[index] == pytest.approx(
-            rate_values[i], abs=rate_abs_tols[i]
-        )
+        assert_value(instance_task.rate(i)[index], rate_values[i], rate_abs_tols[i])
 
     for i in range(instance_task.constant_count):
-        assert instance_task.constant(i)[index] == pytest.approx(
-            constant_values[i], abs=constant_abs_tols[i]
+        assert_value(
+            instance_task.constant(i)[index],
+            constant_values[i],
+            constant_abs_tols[i],
         )
 
     for i in range(instance_task.computed_constant_count):
-        assert instance_task.computed_constant(i)[index] == pytest.approx(
-            computed_constant_values[i], abs=computed_constant_abs_tols[i]
+        assert_value(
+            instance_task.computed_constant(i)[index],
+            computed_constant_values[i],
+            computed_constant_abs_tols[i],
         )
 
     for i in range(instance_task.algebraic_count):
-        assert instance_task.algebraic(i)[index] == pytest.approx(
-            algebraic_values[i], abs=algebraic_abs_tols[i]
+        assert_value(
+            instance_task.algebraic(i)[index],
+            algebraic_values[i],
+            algebraic_abs_tols[i],
         )
 
 

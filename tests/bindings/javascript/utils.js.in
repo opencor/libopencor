@@ -105,6 +105,7 @@ export const SOLVER_NLA2_CONTENTS = stringToArrayBuffer(
 
 export const ALGEBRAIC_CONTENTS = stringToArrayBuffer(`@ALGEBRAIC_CONTENTS@`);
 export const DAE_CONTENTS = stringToArrayBuffer(`@DAE_CONTENTS@`);
+export const MATH_CONTENTS = stringToArrayBuffer(`@MATH_CONTENTS@`);
 export const NLA_CONTENTS = stringToArrayBuffer(`@NLA_CONTENTS@`);
 
 export const OVERCONSTRAINED_CONTENTS = stringToArrayBuffer(
@@ -151,41 +152,67 @@ export function expectIssues(loc, logger, expectedIssues) {
   }
 }
 
+function expectValue(value, expectedValue, precision) {
+  if (expectedValue === Infinity) {
+    expect(value).toBe(Infinity);
+  } else if (Number.isNaN(expectedValue)) {
+    expect(Number.isNaN(value)).toBe(true);
+  } else {
+    expect(value).toBeCloseTo(expectedValue, precision);
+  }
+}
+
 export function expectValues(
   instanceTask,
   index,
   stateValues,
+  statePrecisions,
   rateValues,
+  ratePrecisions,
   constantValues,
+  constantPrecisions,
   computedConstantValues,
+  computedConstantPrecisions,
   algebraicValues,
+  algebraicPrecisions,
 ) {
   for (let i = 0; i < instanceTask.stateCount; ++i) {
-    expect(instanceTask.stateAsArray(i)[index]).toBeCloseTo(stateValues[i], 6);
+    expectValue(
+      instanceTask.stateAsArray(i)[index],
+      stateValues[i],
+      statePrecisions[i],
+    );
   }
 
   for (let i = 0; i < instanceTask.rateCount; ++i) {
-    expect(instanceTask.rateAsArray(i)[index]).toBeCloseTo(rateValues[i], 6);
+    expectValue(
+      instanceTask.rateAsArray(i)[index],
+      rateValues[i],
+      ratePrecisions[i],
+    );
   }
 
   for (let i = 0; i < instanceTask.constantCount; ++i) {
-    expect(instanceTask.constantAsArray(i)[index]).toBeCloseTo(
+    expectValue(
+      instanceTask.constantAsArray(i)[index],
       constantValues[i],
-      6,
+      constantPrecisions[i],
     );
   }
 
   for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
-    expect(instanceTask.computedConstantAsArray(i)[index]).toBeCloseTo(
+    expectValue(
+      instanceTask.computedConstantAsArray(i)[index],
       computedConstantValues[i],
-      6,
+      computedConstantPrecisions[i],
     );
   }
 
   for (let i = 0; i < instanceTask.algebraicCount; ++i) {
-    expect(instanceTask.algebraicAsArray(i)[index]).toBeCloseTo(
+    expectValue(
+      instanceTask.algebraicAsArray(i)[index],
       algebraicValues[i],
-      6,
+      algebraicPrecisions[i],
     );
   }
 }

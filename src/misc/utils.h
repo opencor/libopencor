@@ -70,14 +70,20 @@ using StringStringMap = std::map<std::string, std::string>;
 #    define ASSERT_LE(x, y) assert(x <= y)
 #endif
 
+#ifndef CODE_COVERAGE_ENABLED
+void LIBOPENCOR_UNIT_TESTING_EXPORT printIssues(const LoggerPtr &pLogger);
+void LIBOPENCOR_UNIT_TESTING_EXPORT printHexDump(const UnsignedChars &pBytes);
+void LIBOPENCOR_UNIT_TESTING_EXPORT printArray(const std::string &pName, const Doubles &pDoubles);
+#endif
+
 bool LIBOPENCOR_UNIT_TESTING_EXPORT fuzzyCompare(double pNb1, double pNb2);
 
 #ifdef BUILDING_USING_MSVC
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT forwardSlashPath(const std::string &pPath);
 #endif
 
-std::filesystem::path LIBOPENCOR_UNIT_TESTING_EXPORT stringToPath(const std::string &pString);
-std::string LIBOPENCOR_UNIT_TESTING_EXPORT pathToString(const std::filesystem::path &pPath);
+std::filesystem::path stringToPath(const std::string &pString);
+std::string pathToString(const std::filesystem::path &pPath);
 
 #ifdef BUILDING_USING_MSVC
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT canonicalFileName(const std::string &pFileName, bool pIsRemoteFile = false);
@@ -94,7 +100,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 UnsignedChars LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem::path &pFilePath);
 #endif
 
-char LIBOPENCOR_UNIT_TESTING_EXPORT *nlaSolverAddress(SolverNla *pNlaSolver);
+std::string nlaSolverAddress(SolverNla *pNlaSolver);
 
 bool toBool(const std::string &pString);
 std::string toString(bool pBoolean);
@@ -110,21 +116,6 @@ double toDouble(const std::string &pString);
 std::string toString(double pNumber);
 
 std::string LIBOPENCOR_UNIT_TESTING_EXPORT toString(const UnsignedChars &pBytes);
-
-SolverCvode::IntegrationMethod toCvodeIntegrationMethod(const std::string &pIntegrationMethod);
-std::string toString(SolverCvode::IntegrationMethod pIntegrationMethod);
-
-SolverCvode::IterationType toCvodeIterationType(const std::string &pIterationType);
-std::string toString(SolverCvode::IterationType pIterationType);
-
-SolverCvode::LinearSolver toCvodeLinearSolver(const std::string &pLinearSolver);
-std::string toString(SolverCvode::LinearSolver pLinearSolver);
-
-SolverCvode::Preconditioner toCvodePreconditioner(const std::string &pPreconditioner);
-std::string toString(SolverCvode::Preconditioner pPreconditioner);
-
-SolverKinsol::LinearSolver toKinsolLinearSolver(const std::string &pLinearSolver);
-std::string toString(SolverKinsol::LinearSolver pLinearSolver);
 
 const xmlChar *toConstXmlCharPtr(const std::string &pString);
 

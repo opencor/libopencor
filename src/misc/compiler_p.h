@@ -20,15 +20,20 @@ limitations under the License.
 
 #include "compiler.h"
 
-#include "llvmbegin.h"
-#include "llvm/ExecutionEngine/Orc/LLJIT.h"
-#include "llvmend.h"
+#ifndef __EMSCRIPTEN__
+#    include "llvmbegin.h"
+#    include "llvm/ExecutionEngine/Orc/LLJIT.h"
+#    include "llvmend.h"
+#endif
 
 namespace libOpenCOR {
 
 class Compiler::Impl: public Logger::Impl
 {
 public:
+#ifdef __EMSCRIPTEN__
+    bool compile(const std::string &pCode, UnsignedChars &pWasmModule);
+#else
     std::unique_ptr<llvm::orc::LLJIT> mLljit;
 
     bool compile(const std::string &pCode);
@@ -36,6 +41,7 @@ public:
     bool addFunction(const std::string &pName, void *pFunction);
 
     void *function(const std::string &pName) const;
+#endif
 };
 
 } // namespace libOpenCOR

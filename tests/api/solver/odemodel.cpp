@@ -23,8 +23,7 @@ void run(const libOpenCOR::SedDocumentPtr &pDocument,
          const libOpenCOR::Doubles &pRateValues, const libOpenCOR::Doubles &pRateAbsTols,
          const libOpenCOR::Doubles &pConstantValues, const libOpenCOR::Doubles &pConstantAbsTols,
          const libOpenCOR::Doubles &pComputedConstantValues, const libOpenCOR::Doubles &pComputedConstantAbsTols,
-         const libOpenCOR::Doubles &pAlgebraicValues, const libOpenCOR::Doubles &pAlgebraicAbsTols,
-         bool pCompiled)
+         const libOpenCOR::Doubles &pAlgebraicValues, const libOpenCOR::Doubles &pAlgebraicAbsTols)
 {
     static const auto OUTPUT_END_TIME = 50.0;
     static const auto NUMBER_OF_STEPS = 50000;
@@ -34,7 +33,7 @@ void run(const libOpenCOR::SedDocumentPtr &pDocument,
     simulation->setOutputEndTime(OUTPUT_END_TIME);
     simulation->setNumberOfSteps(NUMBER_OF_STEPS);
 
-    auto instance = pDocument->instantiate(pCompiled);
+    auto instance = pDocument->instantiate();
 
     instance->run();
 

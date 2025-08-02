@@ -27,14 +27,34 @@ export function showPage(page) {
   });
 }
 
-function showError(error) {
-  if (!error.endsWith(".")) {
-    error += ".";
+function showIssues(issues) {
+  const issuesElement = $("#issues");
+
+  issuesElement.empty();
+
+  if (issues instanceof Array) {
+    for (let i = 0; i < issues.length; ++i) {
+      issuesElement.append(
+        '<li><span class="bold">Error:</span> ' +
+          formattedIssueDescription(issues[i]) +
+          "</li>",
+      );
+    }
+  } else {
+    for (let i = 0; i < issues.size(); ++i) {
+      const issue = issues.get(i);
+
+      issuesElement.append(
+        '<li><span class="bold">' +
+          issue.typeAsString +
+          ":</span> " +
+          formattedIssueDescription(issue.description) +
+          "</li>",
+      );
+    }
   }
 
-  $("#errorMessage").html(error);
-
-  updateFileUi(false, false, true, true, false);
+  updateFileUi(true, true, true, false);
 }
 
 function listFiles() {
@@ -56,13 +76,11 @@ function listFiles() {
 function updateFileUi(
   fileInfoDisplay,
   fileIssuesDisplay,
-  fileErrorDisplay,
   resetButtonDisplay,
   simulationDisplay,
 ) {
   $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
   $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
-  $("#fileError").css("display", fileErrorDisplay ? "block" : "none");
   $("#reset").css("display", resetButtonDisplay ? "block" : "none");
   $("#simulation").css("display", simulationDisplay ? "block" : "none");
 
@@ -94,7 +112,7 @@ export function reset() {
 
   resetObjects();
 
-  updateFileUi(false, false, false, false, false);
+  updateFileUi(false, false, false, false);
 }
 
 function addAxisElement(axis, name) {
@@ -257,35 +275,43 @@ $(() => {
 
             // Display any issues with the file or run it.
 
-            let hasIssues = false;
-
             if (knownFile) {
               if (file.hasIssues) {
-                const issuesElement = $("#issues");
-                const fileIssues = file.issues;
-
-                issuesElement.empty();
-
-                for (let i = 0; i < fileIssues.size(); ++i) {
-                  const issue = fileIssues.get(i);
-
-                  issuesElement.append(
-                    '<li><span class="bold">' +
-                      issue.typeAsString +
-                      ":</span> " +
-                      formattedIssueDescription(issue.description) +
-                      "</li>",
-                  );
-                }
-
-                hasIssues = true;
+                showIssues(file.issues);
               } else {
                 // Retrieve some information about the simulation.
 
                 document = new loc.SedDocument(file);
+
+                if (document.hasIssues) {
+                  showIssues(document.issues);
+
+                  return;
+                }
+
                 simulation = document.simulations.get(0);
+
+                if (simulation !== null && simulation.hasIssues) {
+                  showIssues(simulation.issues);
+
+                  return;
+                }
+
                 instance = document.instantiate();
+
+                if (instance !== null && instance.hasIssues) {
+                  showIssues(instance.issues);
+
+                  return;
+                }
+
                 instanceTask = instance.tasks.get(0);
+
+                if (instanceTask !== null && instanceTask.hasIssues) {
+                  showIssues(instanceTask.issues);
+
+                  return;
+                }
 
                 $("#endingPoint").val(simulation.outputEndTime);
                 $("#endingPointUnit").text(instanceTask.voiUnit);
@@ -309,20 +335,20 @@ $(() => {
                 // axes information.
 
                 updatePlottingAreaAndAxesInfo();
+
+                updateFileUi(true, false, true, true);
               }
             }
-
-            updateFileUi(true, hasIssues, false, true, knownFile && !hasIssues);
           } catch (exception) {
-            showError(exception.message);
+            showIssues([exception.message]);
           }
         };
 
         fileReader.onerror = () => {
-          showError(fileReader.error.message);
+          showIssues([fileReader.error.message]);
         };
       } else {
-        updateFileUi(false, false, false, false, false);
+        updateFileUi(false, false, false, false);
       }
     };
 
