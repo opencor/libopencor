@@ -59,39 +59,32 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
 
                     // Arithmetic operators.
 
-                    pow: Math.pow,
-                    sqrt: Math.sqrt,
-                    fabs: Math.abs,
-                    exp: Math.exp,
-                    log: Math.log,
-                    log10: Math.log10,
-                    ceil: Math.ceil,
-                    floor: Math.floor,
-                    fmin: Math.min,
-                    fmax: Math.max,
-                    fmod: function(x, y) {
-                        return x % y;
-                    },
+                    pow: _pow,
+                    sqrt: _sqrt,
+                    fabs: _fabs,
+                    exp: _exp,
+                    log: _log,
+                    log10: _log10,
+                    ceil: _ceil,
+                    floor: _floor,
+                    fmin: _fmin,
+                    fmax: _fmax,
+                    fmod: _fmod,
 
                     // Trigonometric operators.
 
-                    sin: Math.sin,
-                    cos: Math.cos,
-                    tan: Math.tan,
-                    sinh: Math.sinh,
-                    cosh: Math.cosh,
-                    tanh: Math.tanh,
-                    asin: Math.asin,
-                    acos: Math.acos,
-                    atan: Math.atan,
-                    asinh: Math.asinh,
-                    acosh: Math.acosh,
-                    atanh: Math.atanh,
-
-                    // Constants.
-
-                    INFINITY: Infinity,
-                    NAN: NaN
+                    sin: _sin,
+                    cos: _cos,
+                    tan: _tan,
+                    sinh: _sinh,
+                    cosh: _cosh,
+                    tanh: _tanh,
+                    asin: _asin,
+                    acos: _acos,
+                    atan: _atan,
+                    asinh: _asinh,
+                    acosh: _acosh,
+                    atanh: _atanh,
                 }
             });
 
