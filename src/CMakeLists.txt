@@ -292,7 +292,7 @@ if(EMSCRIPTEN)
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
                           COMPILE_FLAGS "-O3"
-                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sASSERTIONS=0 -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_malloc,_free,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh] -sEXPORTED_RUNTIME_METHODS=HEAPU8 -sINLINING_LIMIT -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
+                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sASSERTIONS=0 -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_free,_malloc,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh] -sEXPORTED_RUNTIME_METHODS=HEAPU8 -sINLINING_LIMIT -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
 
     # Create a .tgz file for our generated .js file that can be used to distribute our JavaScript bindings.
 
