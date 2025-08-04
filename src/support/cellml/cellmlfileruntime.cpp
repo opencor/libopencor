@@ -50,6 +50,7 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
 
                     free: _free,
                     malloc: _malloc,
+                    memset: _memset,
 
                     // NLA solve function.
 
