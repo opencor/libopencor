@@ -270,11 +270,12 @@ if(EMSCRIPTEN)
                    ${HEADER_FILES})
 
     # Set the flags for our generated .js file.
-    # Note #1: we use -O3 to get the best performance, -sALLOW_MEMORY_GROWTH to allow the memory to grow dynamically,
-    #          -sASSERTIONS=0 to disable assertions (which are not needed in production), -sEXPORT_ES6=1 to export ES6
-    #          classes, -sEXPORTED_FUNCTIONS to export the functions we need, -sINLINING_LIMIT to increase the inlining
-    #          limit, -sSINGLE_FILE=1 to generate a single file, -sSTACK_SIZE to increase the stack size, and --bind to
-    #          generate the necessary bindings.
+    # Note #1: we use -O3 to get the best performance, -flto to enable link-time optimization, -sALLOW_MEMORY_GROWTH to
+    #          allow the memory to grow dynamically, -sASSERTIONS=0 to disable assertions (which are not needed in
+    #          production), -sEXPORT_ES6=1 to export ES6 classes, -sEXPORTED_FUNCTIONS to export the functions we need,
+    #          -sINLINING_LIMIT to increase the inlining limit, -sMODULARIZE=1 to generate a module, -sSINGLE_FILE=1 to
+    #          generate a single file, -sSTACK_SIZE to increase the stack size, and --bind to generate the necessary
+    #          bindings.
     # Note #2: by default, Emscripten uses 64KB of stack, but this is not enough for "complex" models such as the Zhang
     #          et al. model (see https://github.com/agarny/COR/blob/master/Models/zhang_SAN_model_2000_all.cellml). For
     #          that model, we need about 108KB of stack. However, Emscripten originally used to use 5MB of stack (see
@@ -291,8 +292,8 @@ if(EMSCRIPTEN)
     #          with -sSINGLE_FILE=1, but we may have to look for another solution someday.
 
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-                          COMPILE_FLAGS "-O3"
-                          LINK_FLAGS "-O3 -sALLOW_MEMORY_GROWTH -sASSERTIONS=0 -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh] -sEXPORTED_RUNTIME_METHODS=HEAPU8 -sINLINING_LIMIT -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
+                          COMPILE_FLAGS "-O3 -DNDEBUG"
+                          LINK_FLAGS "-O3 -flto -sALLOW_MEMORY_GROWTH -sASSERTIONS=0 -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh] -sEXPORTED_RUNTIME_METHODS=HEAPU8 -sINLINING_LIMIT -sMODULARIZE=1 -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
 
     # Create a .tgz file for our generated .js file that can be used to distribute our JavaScript bindings.
 
