@@ -20,7 +20,7 @@ IF "%1" == "all" (
         CD !AppDir!prebuilt
 
         FOR /D %%I IN (*.*) DO RMDIR /S /Q %%I
-        FOR    %%I IN (*.*) DO IF NOT %%I == ".gitignore" DEL /Q %%I
+        FOR    %%I IN (*.*) DO IF NOT "%%I" == ".gitignore" DEL /Q "%%I"
     )
 )
 
