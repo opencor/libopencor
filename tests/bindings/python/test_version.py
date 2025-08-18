@@ -13,17 +13,19 @@
 # limitations under the License.
 
 
-import datetime
 import libopencor as loc
+import pathlib
 
 
-major_version = 0
-patch_version = 0
+with open(pathlib.Path(__file__).parent.parent.parent / "VERSION.txt") as file:
+    version_str = file.read().strip()
 
-now = datetime.datetime.now()
-year = now.year
-month = now.month
-day = now.day
+major_version, date_str, patch_version = version_str.split(".")
+major_version = int(major_version)
+patch_version = int(patch_version)
+year = int(date_str[:4])
+month = int(date_str[4:6])
+day = int(date_str[6:8])
 
 
 def test_version():
