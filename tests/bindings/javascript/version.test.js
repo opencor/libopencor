@@ -20,8 +20,8 @@ const loc = await libOpenCOR();
 
 describe("Version tests", () => {
   test("libOpenCOR", () => {
-    const versionMajor = 0;
-    const versionPatch = 0;
+    const majorVersion = 0;
+    const patchVersion = 0;
 
     const now = new Date();
     const year = now.getFullYear();
@@ -30,9 +30,9 @@ describe("Version tests", () => {
 
     let version = BigInt(0);
     let number = BigInt(
-      10000000000 * versionMajor +
+      10000000000 * majorVersion +
         100 * (10000 * year + 100 * month + day) +
-        versionPatch,
+        patchVersion,
     );
     let i = BigInt(0);
 
@@ -47,7 +47,7 @@ describe("Version tests", () => {
 
     expect(loc.version()).toBe(version);
     expect(loc.versionString()).toBe(
-      `${versionMajor}.${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}.${versionPatch}`,
+      `${majorVersion}.${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}.${patchVersion}`,
     );
   });
 

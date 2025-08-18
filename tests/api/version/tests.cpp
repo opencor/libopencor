@@ -22,8 +22,8 @@ limitations under the License.
 
 TEST(VersionTest, libOpenCOR)
 {
-    static const auto VERSION_MAJOR = 0;
-    static const auto VERSION_PATCH = 0;
+    static const auto MAJOR_VERSION = 0;
+    static const auto PATCH_VERSION = 0;
 
     auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::tm tm {};
@@ -47,7 +47,7 @@ TEST(VersionTest, libOpenCOR)
     static const uint64_t TEN = 10;
 
     uint64_t version = 0;
-    auto number = TEN_BILLION * VERSION_MAJOR + HUNDRED * (TEN_THOUSAND * static_cast<uint64_t>(year) + HUNDRED * static_cast<uint64_t>(month) + static_cast<uint64_t>(day)) + VERSION_PATCH;
+    auto number = TEN_BILLION * MAJOR_VERSION + HUNDRED * (TEN_THOUSAND * static_cast<uint64_t>(year) + HUNDRED * static_cast<uint64_t>(month) + static_cast<uint64_t>(day)) + PATCH_VERSION;
 
     for (int i = 0; number != 0; i += 4) {
         version |= (number % TEN) << i; // NOLINT
@@ -56,11 +56,11 @@ TEST(VersionTest, libOpenCOR)
 
     static const int INT_TEN = 10;
 
-    auto versionString = std::to_string(VERSION_MAJOR)
+    auto versionString = std::to_string(MAJOR_VERSION)
                          + "."
                          + std::to_string(year) + ((month < INT_TEN) ? "0" : "") + std::to_string(month) + ((day < INT_TEN) ? "0" : "") + std::to_string(day)
                          + "."
-                         + std::to_string(VERSION_PATCH);
+                         + std::to_string(PATCH_VERSION);
 
     EXPECT_EQ(version, libOpenCOR::version());
     EXPECT_EQ(versionString.data(), libOpenCOR::versionString());
