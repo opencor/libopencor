@@ -25,6 +25,11 @@ if(NOT BASE64ENCODER_EXE)
     message(FATAL_ERROR "base64encoder could not be built...")
 endif()
 
+# Copy of our version file over.
+
+file(COPY ${CMAKE_SOURCE_DIR}/VERSION.txt
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Include our different tests.
 
 include(api/file/tests.cmake)

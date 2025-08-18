@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# Major version.
+
+major_version=0
+
+# Minor version.
+
+now=$(date +%Y%m%d)
+minor_version=$now
+
+# Patch version.
+
+patch_version=0
+
+if latest_tag_commit=$(git rev-list --tags --max-count=1 2> /dev/null); then
+  if git_describe=$(git describe --tags "$latest_tag_commit" 2> /dev/null); then
+    if echo "$git_describe" | grep -Eo '^v?[0-9]+\.[0-9]+\.[0-9]+' > /dev/null; then
+      minor=$(echo "$git_describe" | cut -d. -f2)
+      patch=$(echo "$git_describe" | cut -d. -f3)
+      patch_version=$patch
+
+      if [ "$minor" = "$minor_version" ]; then
+        patch_version=$((patch_version + 1))
+      else
+        patch_version=0
+      fi
+    fi
+  fi
+fi
+
+# Full version.
+
+version="$major_version.$minor_version.$patch_version"
+
+# Update our version file.
+
+echo $version > $(cd $(dirname $0); pwd)/VERSION.txt

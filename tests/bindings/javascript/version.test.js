@@ -14,25 +14,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import libOpenCOR from "./libopencor.js";
 
 const loc = await libOpenCOR();
 
 describe("Version tests", () => {
   test("libOpenCOR", () => {
-    const versionMajor = 0;
-    const versionPatch = 0;
-
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1;
-    const day = now.getDate();
+    const versionStr = fs
+      .readFileSync(
+        path.resolve(
+          path.dirname(fileURLToPath(import.meta.url)),
+          "../../VERSION.txt",
+        ),
+        "utf8",
+      )
+      .trim();
+    const [majorVersionStr, dateStr, patchVersionStr] = versionStr.split(".");
+    const majorVersion = Number(majorVersionStr);
+    const patchVersion = Number(patchVersionStr);
+    const year = Number(dateStr.slice(0, 4));
+    const month = Number(dateStr.slice(4, 6));
+    const day = Number(dateStr.slice(6, 8));
 
     let version = BigInt(0);
     let number = BigInt(
-      10000000000 * versionMajor +
+      10000000000 * majorVersion +
         100 * (10000 * year + 100 * month + day) +
-        versionPatch,
+        patchVersion,
     );
     let i = BigInt(0);
 
@@ -47,7 +58,7 @@ describe("Version tests", () => {
 
     expect(loc.version()).toBe(version);
     expect(loc.versionString()).toBe(
-      `${versionMajor}.${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}.${versionPatch}`,
+      `${majorVersion}.${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}.${patchVersion}`,
     );
   });
 

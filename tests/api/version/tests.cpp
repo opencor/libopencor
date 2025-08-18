@@ -18,52 +18,45 @@ limitations under the License.
 
 #include <array>
 #include <chrono>
+#include <fstream>
+#include <regex>
 #include <libopencor>
 
 TEST(VersionTest, libOpenCOR)
 {
-    static const auto VERSION_MAJOR = 0;
-    static const auto VERSION_PATCH = 0;
-
-    auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    std::tm tm {};
-
-#ifdef BUILDING_ON_WINDOWS
-    localtime_s(&tm, &now); // NOLINT
-#else
-    localtime_r(&now, &tm); // NOLINT
-#endif
-
-    static const auto NINETEEN_HUNDRED = 1900;
-    static const auto ONE = 1;
-
-    const auto year = NINETEEN_HUNDRED + tm.tm_year;
-    const auto month = ONE + tm.tm_mon;
-    const auto day = tm.tm_mday;
-
     static const uint64_t TEN_BILLION = 10000000000;
     static const uint64_t TEN_THOUSAND = 10000;
     static const uint64_t HUNDRED = 100;
     static const uint64_t TEN = 10;
 
+    std::ifstream versionFile("../../VERSION.txt");
+    std::string versionString;
+    std::getline(versionFile, versionString);
+
+    versionFile.close();
+
+    const std::regex versionRegex(R"((\d+)\.(\d{8})\.(\d+))");
+    std::smatch match;
+
+    ASSERT_TRUE(std::regex_match(versionString, match, versionRegex));
+
+    const uint64_t majorVersion = static_cast<uint64_t>(std::stoi(match[1]));
+    const uint64_t year = static_cast<uint64_t>(std::stoi(match[2].str().substr(0, 4)));
+    const uint64_t month = static_cast<uint64_t>(std::stoi(match[2].str().substr(4, 2)));
+    const uint64_t day = static_cast<uint64_t>(std::stoi(match[2].str().substr(6, 2)));
+    const uint64_t patchVersion = static_cast<uint64_t>(std::stoi(match[3]));
     uint64_t version = 0;
-    auto number = TEN_BILLION * VERSION_MAJOR + HUNDRED * (TEN_THOUSAND * static_cast<uint64_t>(year) + HUNDRED * static_cast<uint64_t>(month) + static_cast<uint64_t>(day)) + VERSION_PATCH;
+    auto number = TEN_BILLION * majorVersion
+                  + HUNDRED * (TEN_THOUSAND * year + HUNDRED * month + day)
+                  + patchVersion;
 
     for (int i = 0; number != 0; i += 4) {
         version |= (number % TEN) << i; // NOLINT
         number /= TEN;
     }
 
-    static const int INT_TEN = 10;
-
-    auto versionString = std::to_string(VERSION_MAJOR)
-                         + "."
-                         + std::to_string(year) + ((month < INT_TEN) ? "0" : "") + std::to_string(month) + ((day < INT_TEN) ? "0" : "") + std::to_string(day)
-                         + "."
-                         + std::to_string(VERSION_PATCH);
-
     EXPECT_EQ(version, libOpenCOR::version());
-    EXPECT_EQ(versionString.data(), libOpenCOR::versionString());
+    EXPECT_EQ(versionString, libOpenCOR::versionString());
 }
 
 TEST(VersionTest, Clang)

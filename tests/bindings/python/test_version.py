@@ -13,25 +13,27 @@
 # limitations under the License.
 
 
-import datetime
 import libopencor as loc
+import pathlib
 
 
-version_major = 0
-version_patch = 0
+with open(pathlib.Path(__file__).parent.parent.parent / "VERSION.txt") as file:
+    version_str = file.read().strip()
 
-now = datetime.datetime.now()
-year = now.year
-month = now.month
-day = now.day
+major_version, date_str, patch_version = version_str.split(".")
+major_version = int(major_version)
+patch_version = int(patch_version)
+year = int(date_str[:4])
+month = int(date_str[4:6])
+day = int(date_str[6:8])
 
 
 def test_version():
     version = 0
     number = (
-        10000000000 * version_major
+        10000000000 * major_version
         + 100 * (10000 * year + 100 * month + day)
-        + version_patch
+        + patch_version
     )
     i = 0
 
@@ -45,7 +47,7 @@ def test_version():
 
 
 def test_version_string():
-    version = f"{version_major}.{year}{month:02}{day:02}.{version_patch}"
+    version = f"{major_version}.{year}{month:02}{day:02}.{patch_version}"
 
     assert loc.__version__ == version
 
