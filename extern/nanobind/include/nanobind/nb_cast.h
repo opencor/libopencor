@@ -335,6 +335,16 @@ template <typename T> struct type_caster<pointer_and_handle<T>> {
     }
 };
 
+template <> struct type_caster<fallback> {
+    NB_TYPE_CASTER(fallback, const_name("object"))
+    bool from_python(handle src, uint8_t flags, cleanup_list *) noexcept {
+        if (!(flags & (uint8_t) cast_flags::convert))
+            return false;
+        value = src;
+        return true;
+    }
+};
+
 template <typename T> struct typed_base_name {
       static constexpr auto Name = type_caster<T>::Name;
 };
@@ -731,6 +741,14 @@ template <typename T> bool set::discard(T &&value) {
     object o = nanobind::cast((detail::forward_t<T>) value);
     int rv = PySet_Discard(m_ptr, o.ptr());
     if (rv < 0)
+        raise_python_error();
+    return rv == 1;
+}
+
+template <typename T> bool frozenset::contains(T&& key) const {
+    object o = nanobind::cast((detail::forward_t<T>) key);
+    int rv = PySet_Contains(m_ptr, o.ptr());
+    if (rv == -1)
         raise_python_error();
     return rv == 1;
 }

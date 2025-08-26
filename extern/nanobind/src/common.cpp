@@ -145,10 +145,6 @@ PyObject *module_new(const char *name, PyModuleDef *def) noexcept {
     def->m_size = -1;
     PyObject *m = PyModule_Create(def);
 
-    #ifdef NB_FREE_THREADED
-        PyUnstable_Module_SetGIL(m, Py_MOD_GIL_NOT_USED);
-    #endif
-
     check(m, "nanobind::detail::module_new(): allocation failed!");
     return m;
 }
@@ -675,6 +671,13 @@ PyObject *list_from_obj(PyObject *o) {
 
 PyObject *set_from_obj(PyObject *o) {
     PyObject *result = PySet_New(o);
+    if (!result)
+        raise_python_error();
+    return result;
+}
+
+PyObject *frozenset_from_obj(PyObject *o) {
+    PyObject *result = PyFrozenSet_New(o);
     if (!result)
         raise_python_error();
     return result;
