@@ -1,0 +1,1 @@
+Our copy of LLVM+Clang 16.0.6 requires the changes listed [here](https://github.com/opencor/llvm-project/compare/llvmorg-16.0.6...opencor:llvm-project:llvmorg-16.0.6-libopencor) to build and work correctly with libOpenCOR.
