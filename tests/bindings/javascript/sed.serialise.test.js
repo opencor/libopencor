@@ -14,13 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { assertIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Sed serialise tests", () => {
+test.describe("Sed serialise tests", () => {
   let cellmlContentsPtr;
   let sedmlContentsPtr;
   let algebraicContentsPtr;
@@ -28,7 +31,7 @@ describe("Sed serialise tests", () => {
   let nlaContentsPtr;
   let sedmlWithSimulationsContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
     algebraicContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_CONTENTS);
@@ -40,7 +43,7 @@ describe("Sed serialise tests", () => {
     );
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, sedmlContentsPtr);
     utils.freeMemory(loc, algebraicContentsPtr);
@@ -121,7 +124,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
 
@@ -136,7 +140,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise()).toBe(
+    assert.strictEqual(
+      document.serialise(),
       cvodeExpectedSerialisation("file:///some/path/file.txt"),
     );
 
@@ -151,7 +156,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise(utils.RESOURCE_LOCATION + "/../..")).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION + "/../.."),
       cvodeExpectedSerialisation("some/path/cellml_2.cellml"),
     );
 
@@ -166,7 +172,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise()).toBe(
+    assert.strictEqual(
+      document.serialise(),
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
 
@@ -181,7 +188,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise(utils.REMOTE_BASE_PATH)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.REMOTE_BASE_PATH),
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
 
@@ -196,7 +204,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise()).toBe(
+    assert.strictEqual(
+      document.serialise(),
       cvodeExpectedSerialisation(
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml",
       ),
@@ -213,7 +222,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise(utils.REMOTE_BASE_PATH + "/../..")).toBe(
+    assert.strictEqual(
+      document.serialise(utils.REMOTE_BASE_PATH + "/../.."),
       cvodeExpectedSerialisation("tests/res/cellml_2.cellml"),
     );
 
@@ -266,7 +276,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
 
@@ -281,7 +292,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation(),
     );
 
@@ -310,7 +322,8 @@ describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
 
@@ -339,21 +352,23 @@ describe("Sed serialise tests", () => {
       "123.456789",
     );
 
-    expect(changeAttribute.target).toBe(
+    assert.strictEqual(
+      changeAttribute.target,
       "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']",
     );
-    expect(changeAttribute.componentName).toBe("component");
-    expect(changeAttribute.variableName).toBe("variable");
-    expect(changeAttribute.newValue).toBe("123.456789");
+    assert.strictEqual(changeAttribute.componentName, "component");
+    assert.strictEqual(changeAttribute.variableName, "variable");
+    assert.strictEqual(changeAttribute.newValue, "123.456789");
 
     const document = new loc.SedDocument();
     const file = new loc.File(utils.SEDML_FILE);
     const model = new loc.SedModel(document, file);
 
-    expect(model.addChange(changeAttribute)).toBe(true);
-    expect(document.addModel(model)).toBe(true);
+    assert.strictEqual(model.addChange(changeAttribute), true);
+    assert.strictEqual(document.addModel(model), true);
 
-    expect(document.serialise()).toBe(
+    assert.strictEqual(
+      document.serialise(),
       sedChangeExpectedSerialisation("component", "variable", "123.456789"),
     );
 
@@ -361,14 +376,16 @@ describe("Sed serialise tests", () => {
     changeAttribute.variableName = "new_variable";
     changeAttribute.newValue = "987.654321";
 
-    expect(changeAttribute.target).toBe(
+    assert.strictEqual(
+      changeAttribute.target,
       "/cellml:model/cellml:component[@name='new_component']/cellml:variable[@name='new_variable']",
     );
-    expect(changeAttribute.componentName).toBe("new_component");
-    expect(changeAttribute.variableName).toBe("new_variable");
-    expect(changeAttribute.newValue).toBe("987.654321");
+    assert.strictEqual(changeAttribute.componentName, "new_component");
+    assert.strictEqual(changeAttribute.variableName, "new_variable");
+    assert.strictEqual(changeAttribute.newValue, "987.654321");
 
-    expect(document.serialise()).toBe(
+    assert.strictEqual(
+      document.serialise(),
       sedChangeExpectedSerialisation(
         "new_component",
         "new_variable",
@@ -407,7 +424,8 @@ describe("Sed serialise tests", () => {
 
     simulation.odeSolver = new loc.SolverForwardEuler();
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
 
@@ -426,7 +444,8 @@ describe("Sed serialise tests", () => {
 
     solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000475": "Adams-Moulton",
       }),
@@ -447,7 +466,8 @@ describe("Sed serialise tests", () => {
 
     solver.iterationType = loc.SolverCvode.IterationType.FUNCTIONAL;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000476": "Functional",
       }),
@@ -468,7 +488,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "Banded",
       }),
@@ -489,7 +510,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.DIAGONAL;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "Diagonal",
       }),
@@ -510,7 +532,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "GMRES",
       }),
@@ -531,7 +554,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "BiCGStab",
       }),
@@ -552,7 +576,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000477": "TFQMR",
       }),
@@ -573,7 +598,8 @@ describe("Sed serialise tests", () => {
 
     solver.preconditioner = loc.SolverCvode.Preconditioner.NO;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", { "KISAO:0000478": "No" }),
     );
 
@@ -592,7 +618,8 @@ describe("Sed serialise tests", () => {
 
     solver.interpolateSolution = false;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", {
         "KISAO:0000481": "false",
       }),
@@ -613,7 +640,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation({ "KISAO:0000477": "Banded" }),
     );
 
@@ -632,7 +660,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.GMRES;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation({ "KISAO:0000477": "GMRES" }),
     );
 
@@ -651,7 +680,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BICGSTAB;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation({ "KISAO:0000477": "BiCGStab" }),
     );
 
@@ -670,7 +700,8 @@ describe("Sed serialise tests", () => {
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.TFQMR;
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),
     );
 
@@ -705,7 +736,8 @@ describe("Sed serialise tests", () => {
 
     document.addSimulation(simulation);
 
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
 
@@ -751,13 +783,14 @@ describe("Sed serialise tests", () => {
 
     let document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.WARNING,
         "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it.",
       ],
     ]);
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
 
@@ -1013,7 +1046,7 @@ describe("Sed serialise tests", () => {
 
     let document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.WARNING,
         "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead.",
@@ -1175,7 +1208,8 @@ describe("Sed serialise tests", () => {
         "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
       ],
     ]);
-    expect(document.serialise(utils.RESOURCE_LOCATION)).toBe(
+    assert.strictEqual(
+      document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
 

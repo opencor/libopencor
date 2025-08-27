@@ -14,31 +14,41 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 
 const loc = await libOpenCOR();
 
-describe("Solver basic tests", () => {
+test.describe("Solver basic tests", () => {
   test("CVODE solver", () => {
     const solver = new loc.SolverCvode();
 
-    expect(solver.type.value).toBe(loc.Solver.Type.ODE.value);
-    expect(solver.id).toBe("KISAO:0000019");
-    expect(solver.name).toBe("CVODE");
+    assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
+    assert.strictEqual(solver.id, "KISAO:0000019");
+    assert.strictEqual(solver.name, "CVODE");
 
-    expect(solver.maximumStep).toBe(0.0);
-    expect(solver.maximumNumberOfSteps).toBe(500);
-    expect(solver.integrationMethod).toBe(
+    assert.strictEqual(solver.maximumStep, 0.0);
+    assert.strictEqual(solver.maximumNumberOfSteps, 500);
+    assert.strictEqual(
+      solver.integrationMethod,
       loc.SolverCvode.IntegrationMethod.BDF,
     );
-    expect(solver.iterationType).toBe(loc.SolverCvode.IterationType.NEWTON);
-    expect(solver.linearSolver).toBe(loc.SolverCvode.LinearSolver.DENSE);
-    expect(solver.preconditioner).toBe(loc.SolverCvode.Preconditioner.BANDED);
-    expect(solver.upperHalfBandwidth).toBe(0);
-    expect(solver.lowerHalfBandwidth).toBe(0);
-    expect(solver.relativeTolerance).toBe(1e-7);
-    expect(solver.absoluteTolerance).toBe(1e-7);
-    expect(solver.interpolateSolution).toBe(true);
+    assert.strictEqual(
+      solver.iterationType,
+      loc.SolverCvode.IterationType.NEWTON,
+    );
+    assert.strictEqual(solver.linearSolver, loc.SolverCvode.LinearSolver.DENSE);
+    assert.strictEqual(
+      solver.preconditioner,
+      loc.SolverCvode.Preconditioner.BANDED,
+    );
+    assert.strictEqual(solver.upperHalfBandwidth, 0);
+    assert.strictEqual(solver.lowerHalfBandwidth, 0);
+    assert.strictEqual(solver.relativeTolerance, 1e-7);
+    assert.strictEqual(solver.absoluteTolerance, 1e-7);
+    assert.strictEqual(solver.interpolateSolution, true);
 
     solver.maximumStep = 1.23;
     solver.maximumNumberOfSteps = 123;
@@ -52,19 +62,26 @@ describe("Solver basic tests", () => {
     solver.absoluteTolerance = 3.45e-7;
     solver.interpolateSolution = false;
 
-    expect(solver.maximumStep).toBe(1.23);
-    expect(solver.maximumNumberOfSteps).toBe(123);
-    expect(solver.integrationMethod).toBe(
+    assert.strictEqual(solver.maximumStep, 1.23);
+    assert.strictEqual(solver.maximumNumberOfSteps, 123);
+    assert.strictEqual(
+      solver.integrationMethod,
       loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
     );
-    expect(solver.iterationType).toBe(loc.SolverCvode.IterationType.FUNCTIONAL);
-    expect(solver.linearSolver).toBe(loc.SolverCvode.LinearSolver.GMRES);
-    expect(solver.preconditioner).toBe(loc.SolverCvode.Preconditioner.NO);
-    expect(solver.upperHalfBandwidth).toBe(3);
-    expect(solver.lowerHalfBandwidth).toBe(5);
-    expect(solver.relativeTolerance).toBe(1.23e-5);
-    expect(solver.absoluteTolerance).toBe(3.45e-7);
-    expect(solver.interpolateSolution).toBe(false);
+    assert.strictEqual(
+      solver.iterationType,
+      loc.SolverCvode.IterationType.FUNCTIONAL,
+    );
+    assert.strictEqual(solver.linearSolver, loc.SolverCvode.LinearSolver.GMRES);
+    assert.strictEqual(
+      solver.preconditioner,
+      loc.SolverCvode.Preconditioner.NO,
+    );
+    assert.strictEqual(solver.upperHalfBandwidth, 3);
+    assert.strictEqual(solver.lowerHalfBandwidth, 5);
+    assert.strictEqual(solver.relativeTolerance, 1.23e-5);
+    assert.strictEqual(solver.absoluteTolerance, 3.45e-7);
+    assert.strictEqual(solver.interpolateSolution, false);
 
     solver.delete();
   });
@@ -72,15 +89,15 @@ describe("Solver basic tests", () => {
   test("Forward Euler solver", () => {
     const solver = new loc.SolverForwardEuler();
 
-    expect(solver.type.value).toBe(loc.Solver.Type.ODE.value);
-    expect(solver.id).toBe("KISAO:0000030");
-    expect(solver.name).toBe("Forward Euler");
+    assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
+    assert.strictEqual(solver.id, "KISAO:0000030");
+    assert.strictEqual(solver.name, "Forward Euler");
 
-    expect(solver.step).toBe(1.0);
+    assert.strictEqual(solver.step, 1.0);
 
     solver.step = 0.123;
 
-    expect(solver.step).toBe(0.123);
+    assert.strictEqual(solver.step, 0.123);
 
     solver.delete();
   });
@@ -88,15 +105,15 @@ describe("Solver basic tests", () => {
   test("Fourth-order Runge-Kutta solver", () => {
     const solver = new loc.SolverFourthOrderRungeKutta();
 
-    expect(solver.type.value).toBe(loc.Solver.Type.ODE.value);
-    expect(solver.id).toBe("KISAO:0000032");
-    expect(solver.name).toBe("Fourth-order Runge-Kutta");
+    assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
+    assert.strictEqual(solver.id, "KISAO:0000032");
+    assert.strictEqual(solver.name, "Fourth-order Runge-Kutta");
 
-    expect(solver.step).toBe(1.0);
+    assert.strictEqual(solver.step, 1.0);
 
     solver.step = 0.123;
 
-    expect(solver.step).toBe(0.123);
+    assert.strictEqual(solver.step, 0.123);
 
     solver.delete();
   });
@@ -104,15 +121,15 @@ describe("Solver basic tests", () => {
   test("Heun solver", () => {
     const solver = new loc.SolverHeun();
 
-    expect(solver.type.value).toBe(loc.Solver.Type.ODE.value);
-    expect(solver.id).toBe("KISAO:0000301");
-    expect(solver.name).toBe("Heun");
+    assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
+    assert.strictEqual(solver.id, "KISAO:0000301");
+    assert.strictEqual(solver.name, "Heun");
 
-    expect(solver.step).toBe(1.0);
+    assert.strictEqual(solver.step, 1.0);
 
     solver.step = 0.123;
 
-    expect(solver.step).toBe(0.123);
+    assert.strictEqual(solver.step, 0.123);
 
     solver.delete();
   });
@@ -120,24 +137,30 @@ describe("Solver basic tests", () => {
   test("KINSOL solver", () => {
     const solver = new loc.SolverKinsol();
 
-    expect(solver.type.value).toBe(loc.Solver.Type.NLA.value);
-    expect(solver.id).toBe("KISAO:0000282");
-    expect(solver.name).toBe("KINSOL");
+    assert.strictEqual(solver.type.value, loc.Solver.Type.NLA.value);
+    assert.strictEqual(solver.id, "KISAO:0000282");
+    assert.strictEqual(solver.name, "KINSOL");
 
-    expect(solver.maximumNumberOfIterations).toBe(200);
-    expect(solver.linearSolver).toBe(loc.SolverKinsol.LinearSolver.DENSE);
-    expect(solver.upperHalfBandwidth).toBe(0);
-    expect(solver.lowerHalfBandwidth).toBe(0);
+    assert.strictEqual(solver.maximumNumberOfIterations, 200);
+    assert.strictEqual(
+      solver.linearSolver,
+      loc.SolverKinsol.LinearSolver.DENSE,
+    );
+    assert.strictEqual(solver.upperHalfBandwidth, 0);
+    assert.strictEqual(solver.lowerHalfBandwidth, 0);
 
     solver.maximumNumberOfIterations = 123;
     solver.linearSolver = loc.SolverKinsol.LinearSolver.GMRES;
     solver.upperHalfBandwidth = 3;
     solver.lowerHalfBandwidth = 5;
 
-    expect(solver.maximumNumberOfIterations).toBe(123);
-    expect(solver.linearSolver).toBe(loc.SolverKinsol.LinearSolver.GMRES);
-    expect(solver.upperHalfBandwidth).toBe(3);
-    expect(solver.lowerHalfBandwidth).toBe(5);
+    assert.strictEqual(solver.maximumNumberOfIterations, 123);
+    assert.strictEqual(
+      solver.linearSolver,
+      loc.SolverKinsol.LinearSolver.GMRES,
+    );
+    assert.strictEqual(solver.upperHalfBandwidth, 3);
+    assert.strictEqual(solver.lowerHalfBandwidth, 5);
 
     solver.delete();
   });
@@ -145,15 +168,15 @@ describe("Solver basic tests", () => {
   test("Second-order Runge-Kutta solver", () => {
     const solver = new loc.SolverSecondOrderRungeKutta();
 
-    expect(solver.type.value).toBe(loc.Solver.Type.ODE.value);
-    expect(solver.id).toBe("KISAO:0000381");
-    expect(solver.name).toBe("Second-order Runge-Kutta");
+    assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
+    assert.strictEqual(solver.id, "KISAO:0000381");
+    assert.strictEqual(solver.name, "Second-order Runge-Kutta");
 
-    expect(solver.step).toBe(1.0);
+    assert.strictEqual(solver.step, 1.0);
 
     solver.step = 0.123;
 
-    expect(solver.step).toBe(0.123);
+    assert.strictEqual(solver.step, 0.123);
 
     solver.delete();
   });

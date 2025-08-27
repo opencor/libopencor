@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+
 export const RESOURCE_LOCATION = "/some/path";
 
 export const UNKNOWN_FILE = "unknown_file.txt";
@@ -135,34 +137,34 @@ export const ODE_SED_CHANGES_CONTENTS = stringToArrayBuffer(
   atob("@BASE64_ODE_SED_CHANGES_CONTENTS@"),
 );
 
-export function expectIssues(loc, logger, expectedIssues) {
+export function assertIssues(loc, logger, expectedIssues) {
   const issues = logger.issues;
 
-  expect(issues.size()).toBe(expectedIssues.length);
+  assert.strictEqual(issues.size(), expectedIssues.length);
 
   for (let i = 0; i < issues.size(); ++i) {
-    expect(issues.get(i).type.value).toBe(expectedIssues[i][0].value);
-    expect(issues.get(i).description).toBe(expectedIssues[i][1]);
+    assert.strictEqual(issues.get(i).type.value, expectedIssues[i][0].value);
+    assert.strictEqual(issues.get(i).description, expectedIssues[i][1]);
 
     if (issues.get(i).type === loc.Issue.Type.ERROR) {
-      expect(issues.get(i).typeAsString).toBe("Error");
+      assert.strictEqual(issues.get(i).typeAsString, "Error");
     } else {
-      expect(issues.get(i).typeAsString).toBe("Warning");
+      assert.strictEqual(issues.get(i).typeAsString, "Warning");
     }
   }
 }
 
-function expectValue(value, expectedValue, precision) {
+export function assertValue(value, expectedValue, precision) {
   if (expectedValue === Infinity) {
-    expect(value).toBe(Infinity);
+    assert.strictEqual(value, Infinity);
   } else if (Number.isNaN(expectedValue)) {
-    expect(Number.isNaN(value)).toBe(true);
+    assert.ok(Number.isNaN(value));
   } else {
-    expect(value).toBeCloseTo(expectedValue, precision);
+    assert.ok(Math.abs(value - expectedValue) < Math.pow(10, -precision) / 2);
   }
 }
 
-export function expectValues(
+export function assertValues(
   instanceTask,
   index,
   stateValues,
@@ -177,7 +179,7 @@ export function expectValues(
   algebraicPrecisions,
 ) {
   for (let i = 0; i < instanceTask.stateCount; ++i) {
-    expectValue(
+    assertValue(
       instanceTask.stateAsArray(i)[index],
       stateValues[i],
       statePrecisions[i],
@@ -185,7 +187,7 @@ export function expectValues(
   }
 
   for (let i = 0; i < instanceTask.rateCount; ++i) {
-    expectValue(
+    assertValue(
       instanceTask.rateAsArray(i)[index],
       rateValues[i],
       ratePrecisions[i],
@@ -193,7 +195,7 @@ export function expectValues(
   }
 
   for (let i = 0; i < instanceTask.constantCount; ++i) {
-    expectValue(
+    assertValue(
       instanceTask.constantAsArray(i)[index],
       constantValues[i],
       constantPrecisions[i],
@@ -201,7 +203,7 @@ export function expectValues(
   }
 
   for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
-    expectValue(
+    assertValue(
       instanceTask.computedConstantAsArray(i)[index],
       computedConstantValues[i],
       computedConstantPrecisions[i],
@@ -209,7 +211,7 @@ export function expectValues(
   }
 
   for (let i = 0; i < instanceTask.algebraicCount; ++i) {
-    expectValue(
+    assertValue(
       instanceTask.algebraicAsArray(i)[index],
       algebraicValues[i],
       algebraicPrecisions[i],

@@ -14,19 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { assertIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("File type tests", () => {
+test.describe("File type tests", () => {
   let unknownContentsPtr;
   let cellmlContentsPtr;
   let sedmlContentsPtr;
   let combineArchiveContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
@@ -36,7 +39,7 @@ describe("File type tests", () => {
     );
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, unknownContentsPtr);
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, sedmlContentsPtr);
@@ -48,8 +51,8 @@ describe("File type tests", () => {
 
     file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
-    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
-    expectIssues(loc, file, [
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assertIssues(loc, file, [
       [
         loc.Issue.Type.ERROR,
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
@@ -64,7 +67,7 @@ describe("File type tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.type.value).toBe(loc.File.Type.CELLML_FILE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.CELLML_FILE.value);
 
     file.delete();
   });
@@ -74,7 +77,7 @@ describe("File type tests", () => {
 
     file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
 
-    expect(file.type.value).toBe(loc.File.Type.SEDML_FILE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
 
     file.delete();
   });
@@ -87,7 +90,7 @@ describe("File type tests", () => {
       utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    expect(file.type.value).toBe(loc.File.Type.COMBINE_ARCHIVE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
 
     file.delete();
   });

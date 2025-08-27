@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { expectValues } from "./utils.js";
+import { assertValues } from "./utils.js";
 
 export function run(
   document,
@@ -40,7 +40,7 @@ export function run(
 
   const instanceTask = instance.tasks.get(0);
 
-  expectValues(
+  assertValues(
     instanceTask,
     13000,
     stateValues,

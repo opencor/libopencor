@@ -22,7 +22,7 @@
 #endif
 
 #define NB_VERSION_MAJOR 2
-#define NB_VERSION_MINOR 7
+#define NB_VERSION_MINOR 8
 #define NB_VERSION_PATCH 0
 #define NB_VERSION_DEV   0 // A value > 0 indicates a development release
 

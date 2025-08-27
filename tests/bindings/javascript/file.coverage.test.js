@@ -14,16 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("File coverage tests", () => {
+test.describe("File coverage tests", () => {
   let nullCharacterContentsPtr;
   let combineArchiveContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     nullCharacterContentsPtr = utils.allocateMemory(
       loc,
       utils.NULL_CHARACTER_CONTENTS,
@@ -34,7 +37,7 @@ describe("File coverage tests", () => {
     );
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, nullCharacterContentsPtr);
     utils.freeMemory(loc, combineArchiveContentsPtr);
   });
@@ -44,7 +47,7 @@ describe("File coverage tests", () => {
 
     file.setContents(null, 0);
 
-    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
 
     file.delete();
   });
@@ -57,7 +60,7 @@ describe("File coverage tests", () => {
       utils.NULL_CHARACTER_CONTENTS.length,
     );
 
-    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
 
     file.delete();
   });
@@ -72,7 +75,7 @@ describe("File coverage tests", () => {
     const file1 = new loc.File(utils.LOCAL_FILE);
     const file2 = new loc.File(utils.LOCAL_FILE);
 
-    expect(file1).toStrictEqual(file2);
+    assert.deepStrictEqual(file1, file2);
 
     file1.delete();
     file2.delete();
@@ -82,7 +85,7 @@ describe("File coverage tests", () => {
     const file1 = new loc.File(utils.REMOTE_FILE);
     const file2 = new loc.File(utils.REMOTE_FILE);
 
-    expect(file1).toStrictEqual(file2);
+    assert.deepStrictEqual(file1, file2);
 
     file1.delete();
     file2.delete();
@@ -97,10 +100,10 @@ describe("File coverage tests", () => {
       utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    expect(fileManager.fileCount).toBe(4);
+    assert.strictEqual(fileManager.fileCount, 4);
 
     fileManager.unmanage(file);
 
-    expect(fileManager.fileCount).toBe(1);
+    assert.strictEqual(fileManager.fileCount, 1);
   });
 });

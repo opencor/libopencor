@@ -94,6 +94,18 @@ enum class type_init_flags : uint32_t {
 // See internals.h
 struct nb_alias_chain;
 
+// Implicit conversions for C++ type bindings, used in type_data below
+struct implicit_t {
+    const std::type_info **cpp;
+    bool (**py)(PyTypeObject *, PyObject *, cleanup_list *) noexcept;
+};
+
+// Forward and reverse mappings for enumerations, used in type_data below
+struct enum_tbl_t {
+    void *fwd;
+    void *rev;
+};
+
 /// Information about a type that persists throughout its lifetime
 struct type_data {
     uint32_t size;
@@ -111,17 +123,8 @@ struct type_data {
     void (*copy)(void *, const void *);
     void (*move)(void *, void *) noexcept;
     union {
-        // Implicit conversions for C++ type bindings
-        struct {
-            const std::type_info **cpp;
-            bool (**py)(PyTypeObject *, PyObject *, cleanup_list *) noexcept;
-        } implicit;
-
-        // Forward and reverse mappings for enumerations
-        struct {
-            void *fwd;
-            void *rev;
-        } enum_tbl;
+        implicit_t implicit;  // for C++ type bindings
+        enum_tbl_t enum_tbl;  // for enumerations
     };
     void (*set_self_py)(void *, PyObject *) noexcept;
     bool (*keep_shared_from_this_alive)(PyObject *) noexcept;
@@ -833,19 +836,21 @@ public:
 };
 
 template <typename Source, typename Target> void implicitly_convertible() {
-    using Caster = detail::make_caster<Source>;
-    static_assert(!std::is_enum_v<Target>, "implicitly_convertible(): 'Target' cannot be an enumeration.");
+    if constexpr (!std::is_same_v<Source, Target>) {
+        using Caster = detail::make_caster<Source>;
+        static_assert(!std::is_enum_v<Target>, "implicitly_convertible(): 'Target' cannot be an enumeration.");
 
-    if constexpr (detail::is_base_caster_v<Caster>) {
-        detail::implicitly_convertible(&typeid(Source), &typeid(Target));
-    } else {
-        detail::implicitly_convertible(
-            [](PyTypeObject *, PyObject *src,
-               detail::cleanup_list *cleanup) noexcept -> bool {
-                return Caster().from_python(src, detail::cast_flags::convert,
-                                            cleanup);
-            },
-            &typeid(Target));
+        if constexpr (detail::is_base_caster_v<Caster>) {
+            detail::implicitly_convertible(&typeid(Source), &typeid(Target));
+        } else {
+            detail::implicitly_convertible(
+                [](PyTypeObject *, PyObject *src,
+                   detail::cleanup_list *cleanup) noexcept -> bool {
+                    return Caster().from_python(src, detail::cast_flags::convert,
+                                                cleanup);
+                },
+                &typeid(Target));
+        }
     }
 }
 

@@ -676,6 +676,10 @@ Wrapper classes
 
       Return the number of tuple elements.
 
+   .. cpp:function:: bool empty() const
+
+      Check whether the tuple is empty.
+
    .. cpp:function:: detail::fast_iterator begin() const
 
       Return a forward iterator analogous to ``iter()`` in Python. The function
@@ -718,6 +722,10 @@ Wrapper classes
    .. cpp:function:: size_t size() const
 
       Return the number of list elements.
+
+   .. cpp:function:: bool empty() const
+
+      Check whether the list is empty.
 
    .. cpp:function:: template <typename T> void append(T&& value)
 
@@ -784,6 +792,10 @@ Wrapper classes
 
       Return the number of dictionary elements.
 
+   .. cpp:function:: bool empty() const
+
+      Check whether the dictionary is empty.
+
    .. cpp:function:: template <typename T> bool contains(T&& key) const
 
       Check whether the dictionary contains a particular key. When `T` does not
@@ -822,6 +834,17 @@ Wrapper classes
 
       Analogous to the ``.update(h)`` method of ``dict`` in Python.
 
+   .. cpp:function:: object get(handle key, handle def)
+
+      Analogous to ``.get(key, def)`` method of ``dict`` in Python with a
+      fallback value ``def``. This is more efficient than checking the presence
+      of ``.contains(key)`` first, or using ``operator[]`` and catching a
+      potential exceptions.
+
+   .. cpp:function:: object get(const char * key, handle def)
+
+      Overload of the above method that takes a C-string as key.
+
 .. cpp:class:: set: public object
 
    Wrapper class representing Python ``set`` instances.
@@ -838,6 +861,10 @@ Wrapper classes
    .. cpp:function:: size_t size() const
 
       Return the number of set elements.
+
+   .. cpp:function:: bool empty() const
+
+      Check whether the set is empty.
 
    .. cpp:function:: template <typename T> void add(T&& key)
 
@@ -859,6 +886,32 @@ Wrapper classes
       Returns ``true`` if the item was deleted successfully, and ``false`` if
       the value was not present. When `T` does not already represent a wrapped
       Python object, the function performs a cast.
+
+.. cpp:class:: frozenset: public object
+
+   Wrapper class representing Python ``frozenset`` instances.
+
+   .. cpp:function:: frozenset()
+
+      Create an empty frozenset.
+
+   .. cpp:function:: frozenset(handle h)
+
+      Attempt to convert a given Python object into a ``frozenset``. Analogous
+      to the expression ``frozenset(h)`` in Python.
+
+   .. cpp:function:: size_t size() const
+
+      Return the number of set elements.
+
+   .. cpp:function:: bool empty() const
+
+      Check whether the set is empty.
+
+   .. cpp:function:: template <typename T> bool contains(T&& key) const
+
+      Check whether the set contains a particular key. When `T` does not
+      already represent a wrapped Python object, the function performs a cast.
 
 .. cpp:class:: module_: public object
 
@@ -943,6 +996,11 @@ Wrapper classes
 
       Return the pointer wrapped by the capsule.
 
+   .. cpp:function:: void * data(const char *name) const
+
+      Return the pointer wrapped by the capsule. Check that the
+      capsule name matches the specified value, or raise an exception.
+
 
 .. cpp:class:: bool_: public object
 
@@ -1015,6 +1073,12 @@ Wrapper classes
    .. cpp:function:: str(const char * s, size_t n)
 
       Convert a C-style string in UTF-8 encoding of length ``n`` bytes into a Python string.
+
+      There is a user-defined string literal ``_s`` accessible in the
+      ``nanobind::literals`` namespace::
+
+            using namespace nanobind::literals;
+            auto s = "Hello world!"_s; // equivalent to str("Hello world!")
 
    .. cpp:function:: const char * c_str() const
 
@@ -1237,6 +1301,24 @@ Wrapper classes
    end, this type is interchangeable with :py:class:`object`. The only
    difference is the type signature when used in function arguments and return
    values.
+
+.. cpp:class:: fallback : public object
+
+   Instances of this wrapper class behave just like :cpp:class:`handle`. When
+   used to pass arguments in function bindings, the associated arguments
+   *require* implicit conversion (which, however, adds no runtime cost).
+
+   The type is convenient in overload chains where a generic fallback should
+   accept any Python object, e.g.,
+
+   .. code-block:: cpp
+
+      m.def("func", [](MyClass &arg)) { ... });
+      m.def("func", [](nb::fallback arg)) { ... });
+
+   If :cpp:class:`handle` or :cpp:class:`object` were used instead on the
+   second line, they would always match and prevent potential implicit
+   conversion of arguments to `MyClass`.
 
 Parameterized wrapper classes
 -----------------------------
@@ -1702,11 +1784,11 @@ parameter of :cpp:func:`module_::def`, :cpp:func:`class_::def`,
 
    The annotation has the following runtime characteristics:
 
-    - It does nothing when the nurse or patient object are ``None``.
+   - It does nothing when the nurse or patient object are ``None``.
 
-    - It raises an exception when the nurse object is neither
-      weak-referenceable nor an instance of a binding created via
-      :cpp:class:`nb::class_\<..\> <class_>`.
+   - It raises an exception when the nurse object is neither
+     weak-referenceable nor an instance of a binding created via
+     :cpp:class:`nb::class_\<..\> <class_>`.
 
    Two additional caveats regarding :cpp:class:`keep_alive <keep_alive>` are
    noteworthy:

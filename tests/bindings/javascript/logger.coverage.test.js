@@ -14,17 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Issue coverage tests", () => {
+test.describe("Issue coverage tests", () => {
   let cellmlContentsPtr;
   let errorCellmlContentsPtr;
   let sedmlContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
     errorCellmlContentsPtr = utils.allocateMemory(
       loc,
@@ -33,7 +36,7 @@ describe("Issue coverage tests", () => {
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, errorCellmlContentsPtr);
     utils.freeMemory(loc, sedmlContentsPtr);
@@ -44,7 +47,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.hasIssues).toBe(false);
+    assert.strictEqual(file.hasIssues, false);
 
     file.delete();
   });
@@ -54,7 +57,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.issueCount).toBe(0);
+    assert.strictEqual(file.issueCount, 0);
 
     file.delete();
   });
@@ -64,7 +67,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.issues.size()).toBe(0);
+    assert.strictEqual(file.issues.size(), 0);
 
     file.delete();
   });
@@ -77,8 +80,8 @@ describe("Issue coverage tests", () => {
       utils.ERROR_CELLML_CONTENTS.length,
     );
 
-    expect(file.issue(0)).not.toBeNull();
-    expect(file.issue(file.issueCount)).toBeNull();
+    assert.notStrictEqual(file.issue(0), null);
+    assert.strictEqual(file.issue(file.issueCount), null);
 
     file.delete();
   });
@@ -88,7 +91,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.hasErrors).toBe(false);
+    assert.strictEqual(file.hasErrors, false);
 
     file.delete();
   });
@@ -98,7 +101,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.errorCount).toBe(0);
+    assert.strictEqual(file.errorCount, 0);
 
     file.delete();
   });
@@ -108,7 +111,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.errors.size()).toBe(0);
+    assert.strictEqual(file.errors.size(), 0);
 
     file.delete();
   });
@@ -121,8 +124,8 @@ describe("Issue coverage tests", () => {
       utils.ERROR_CELLML_CONTENTS.length,
     );
 
-    expect(file.error(0)).not.toBeNull();
-    expect(file.error(file.errorCount)).toBeNull();
+    assert.notStrictEqual(file.error(0), null);
+    assert.strictEqual(file.error(file.errorCount), null);
 
     file.delete();
   });
@@ -132,7 +135,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.hasWarnings).toBe(false);
+    assert.strictEqual(file.hasWarnings, false);
 
     file.delete();
   });
@@ -142,7 +145,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.warningCount).toBe(0);
+    assert.strictEqual(file.warningCount, 0);
 
     file.delete();
   });
@@ -152,7 +155,7 @@ describe("Issue coverage tests", () => {
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
-    expect(file.warnings.size()).toBe(0);
+    assert.strictEqual(file.warnings.size(), 0);
 
     file.delete();
   });
@@ -164,8 +167,8 @@ describe("Issue coverage tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.warning(0)).not.toBeNull();
-    expect(document.warning(document.warningCount)).toBeNull();
+    assert.notStrictEqual(document.warning(0), null);
+    assert.strictEqual(document.warning(document.warningCount), null);
 
     document.delete();
     file.delete();

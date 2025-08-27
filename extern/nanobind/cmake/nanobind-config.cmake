@@ -353,8 +353,12 @@ function(nanobind_add_module name)
   endif()
 
   if (NB_ABI MATCHES "t")
+    # Free-threaded Python interpreters don't support building a nanobind
+    # module that uses the stable ABI.
     set(ARG_STABLE_ABI FALSE)
-  else(ARG_STABLE_ABI)
+  else()
+    # A free-threaded Python interpreter is required to build a free-threaded
+    # nanobind module.
     set(ARG_FREE_THREADED FALSE)
   endif()
 
@@ -449,15 +453,39 @@ function(nanobind_sanitizer_preload_env env_var)
         TRANSITIVE_COMPILE_PROPERTIES
       )
     endif()
-    foreach(prop ${san_options_to_search})
-      get_target_property(options ${target} ${prop})
-      if(options)
-        foreach(opt ${options})
-          if(opt MATCHES "-fsanitize=([^ ]+)")
-            list(APPEND san_flags "${CMAKE_MATCH_1}")
-          endif()
+
+    # create a list of all dependent targets and scan those for dependencies on sanitizers
+    set(all_deps "${target}")
+    get_target_property(deps ${target} LINK_LIBRARIES)
+    if(deps AND NOT deps STREQUAL "deps-NOTFOUND")
+        foreach(dep ${deps})
+            if(NOT "${dep}" IN_LIST all_deps)
+                list(APPEND all_deps "${dep}")
+            endif()
         endforeach()
-      endif()
+    endif()
+
+    foreach(tgt ${all_deps})
+      # Check target type
+      get_target_property(target_type ${tgt} TYPE)
+
+      foreach(prop ${san_options_to_search})
+        # Skip non-interface properties for INTERFACE_LIBRARY targets
+        if(target_type STREQUAL "INTERFACE_LIBRARY")
+          if(NOT prop MATCHES "^INTERFACE_")
+            continue()
+          endif()
+        endif()
+
+        get_target_property(options ${tgt} ${prop})
+        if(options)
+          foreach(opt ${options})
+            if(opt MATCHES "-fsanitize=([^ ]+)")
+              list(APPEND san_flags "${CMAKE_MATCH_1}")
+            endif()
+          endforeach()
+        endif()
+      endforeach()
     endforeach()
 
     # Parse sanitizer flags

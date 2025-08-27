@@ -14,17 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { assertIssues, assertValue } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Solver KINSOL tests", () => {
+test.describe("Solver KINSOL tests", () => {
   let solverNla1ContentsPtr;
   let solverNla2ContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     solverNla1ContentsPtr = utils.allocateMemory(
       loc,
       utils.SOLVER_NLA1_CONTENTS,
@@ -35,7 +38,7 @@ describe("Solver KINSOL tests", () => {
     );
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, solverNla1ContentsPtr);
     utils.freeMemory(loc, solverNla2ContentsPtr);
   });
@@ -53,7 +56,7 @@ describe("Solver KINSOL tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The maximum number of iterations cannot be equal to -1. It must be greater than 0.",
@@ -79,7 +82,7 @@ describe("Solver KINSOL tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
@@ -105,7 +108,7 @@ describe("Solver KINSOL tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
@@ -131,7 +134,7 @@ describe("Solver KINSOL tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
@@ -157,7 +160,7 @@ describe("Solver KINSOL tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
@@ -169,28 +172,27 @@ describe("Solver KINSOL tests", () => {
     file.delete();
   });
 
-  function expectNla1Solution(instanceTask) {
-    expect(instanceTask.stateCount).toBe(0);
-    expect(instanceTask.stateCount).toBe(0);
-    expect(instanceTask.rateCount).toBe(0);
-    expect(instanceTask.constantCount).toBe(0);
-    expect(instanceTask.computedConstantCount).toBe(0);
-    expect(instanceTask.algebraicCount).toBe(2);
+  function assertNla1Solution(instanceTask) {
+    assert.strictEqual(instanceTask.stateCount, 0);
+    assert.strictEqual(instanceTask.rateCount, 0);
+    assert.strictEqual(instanceTask.constantCount, 0);
+    assert.strictEqual(instanceTask.computedConstantCount, 0);
+    assert.strictEqual(instanceTask.algebraicCount, 2);
 
-    expect(instanceTask.algebraic(0).get(0)).toBeCloseTo(3.0, 5);
-    expect(instanceTask.algebraic(1).get(0)).toBeCloseTo(7.0, 5);
+    assertValue(instanceTask.algebraic(0).get(0), 3.0, 5);
+    assertValue(instanceTask.algebraic(1).get(0), 7.0, 5);
   }
 
-  function expectNla2Solution(instanceTask) {
-    expect(instanceTask.stateCount).toBe(0);
-    expect(instanceTask.rateCount).toBe(0);
-    expect(instanceTask.constantCount).toBe(0);
-    expect(instanceTask.computedConstantCount).toBe(0);
-    expect(instanceTask.algebraicCount).toBe(3);
+  function assertNla2Solution(instanceTask) {
+    assert.strictEqual(instanceTask.stateCount, 0);
+    assert.strictEqual(instanceTask.rateCount, 0);
+    assert.strictEqual(instanceTask.constantCount, 0);
+    assert.strictEqual(instanceTask.computedConstantCount, 0);
+    assert.strictEqual(instanceTask.algebraicCount, 3);
 
-    expect(instanceTask.algebraic(0).get(0)).toBeCloseTo(3.0, 5);
-    expect(instanceTask.algebraic(1).get(0)).toBeCloseTo(7.0, 5);
-    expect(instanceTask.algebraic(2).get(0)).toBeCloseTo(-5.0, 5);
+    assertValue(instanceTask.algebraic(0).get(0), 3.0, 5);
+    assertValue(instanceTask.algebraic(1).get(0), 7.0, 5);
+    assertValue(instanceTask.algebraic(2).get(0), -5.0, 5);
   }
 
   test("Solve", () => {
@@ -203,7 +205,7 @@ describe("Solver KINSOL tests", () => {
 
     instance.run();
 
-    expectNla1Solution(instance.tasks.get(0));
+    assertNla1Solution(instance.tasks.get(0));
 
     instance.delete();
     document.delete();
@@ -227,7 +229,7 @@ describe("Solver KINSOL tests", () => {
 
     instance.run();
 
-    expectNla2Solution(instance.tasks.get(0));
+    assertNla2Solution(instance.tasks.get(0));
 
     instance.delete();
     document.delete();
@@ -249,7 +251,7 @@ describe("Solver KINSOL tests", () => {
 
     instance.run();
 
-    expectNla1Solution(instance.tasks.get(0));
+    assertNla1Solution(instance.tasks.get(0));
 
     instance.delete();
     document.delete();
@@ -271,7 +273,7 @@ describe("Solver KINSOL tests", () => {
 
     instance.run();
 
-    expectNla2Solution(instance.tasks.get(0));
+    assertNla2Solution(instance.tasks.get(0));
 
     instance.delete();
     document.delete();
@@ -293,7 +295,7 @@ describe("Solver KINSOL tests", () => {
 
     instance.run();
 
-    expectNla1Solution(instance.tasks.get(0));
+    assertNla1Solution(instance.tasks.get(0));
 
     instance.delete();
     document.delete();

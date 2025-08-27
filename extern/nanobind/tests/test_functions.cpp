@@ -195,7 +195,7 @@ NB_MODULE(test_functions_ext, m) {
 
     m.def("test_print", []{
         nb::print("Test 1");
-        nb::print(nb::str("Test 2"));
+        nb::print("Test 2"_s);
     });
 
     m.def("test_iter", [](nb::object in) {
@@ -237,7 +237,7 @@ NB_MODULE(test_functions_ext, m) {
     });
 
     m.def("test_10_contains", [](nb::dict d) {
-        return d.contains(nb::str("foo"));
+        return d.contains("foo"_s);
     });
 
     // Test implicit conversion of various types
@@ -320,7 +320,7 @@ NB_MODULE(test_functions_ext, m) {
         const char *name = "Foo";
 
         auto callback = [=]() {
-            return nb::str("Test {}").format(name);
+            return "Test {}"_s.format(name);
         };
 
         return nb::cpp_function(callback);
@@ -342,6 +342,15 @@ NB_MODULE(test_functions_ext, m) {
     });
 
     m.def("test_set_contains", [](nb::set s, nb::handle h) { return s.contains(h); });
+
+    m.def("test_frozenset", []() {
+        return nb::frozenset(nb::make_tuple("123", 123));
+    });
+
+    m.def("test_frozenset_contains", [](nb::frozenset s, nb::handle h) {
+        return s.contains(h);
+    });
+
 
     m.def("test_del_list", [](nb::list l) { nb::del(l[2]); });
     m.def("test_del_dict", [](nb::dict l) { nb::del(l["a"]); });
@@ -487,4 +496,12 @@ NB_MODULE(test_functions_ext, m) {
           });
 
     m.def("abi_tag", [](){ return nb::detail::abi_tag(); });
+
+    // Test the nb::fallback type
+    m.def("test_fallback_1", [](double){ return 0; });
+    m.def("test_fallback_1", [](nb::handle){ return 1; });
+    m.def("test_fallback_2", [](double) { return 0; });
+    m.def("test_fallback_2", [](nb::fallback){ return 1; });
+
+    m.def("test_get_dict_default", [](nb::dict l) { return l.get("key", nb::int_(123)); });
 }

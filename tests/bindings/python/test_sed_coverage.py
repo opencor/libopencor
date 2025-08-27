@@ -244,8 +244,8 @@ def test_tasks():
     simulation = loc.SedUniformTimeCourse(document)
     task = loc.SedTask(document, model, simulation)
 
-    assert task.model != None
-    assert task.simulation != None
+    assert task.model == model
+    assert task.simulation == simulation
 
     assert document.add_task(task) == True
 

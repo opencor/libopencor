@@ -348,6 +348,12 @@ class capsule : public object {
     const char *name() const { return PyCapsule_GetName(m_ptr); }
 
     void *data() const { return PyCapsule_GetPointer(m_ptr, name()); }
+    void *data(const char *name) const {
+        void *p = PyCapsule_GetPointer(m_ptr, name);
+        if (!p && PyErr_Occurred())
+            raise_python_error();
+        return p;
+    }
 };
 
 class bool_ : public object {
@@ -445,6 +451,12 @@ class bytes : public object {
     size_t size() const { return (size_t) PyBytes_Size(m_ptr); }
 };
 
+NAMESPACE_BEGIN(literals)
+inline str operator""_s(const char *s, size_t n) {
+    return str(s, n);
+}
+NAMESPACE_END(literals)
+
 class bytearray : public object {
     NB_OBJECT(bytearray, object, "bytearray", PyByteArray_Check)
 
@@ -488,6 +500,7 @@ class tuple : public object {
     detail::fast_iterator begin() const;
     detail::fast_iterator end() const;
 #endif
+    bool empty() const { return size() == 0; }
 };
 
 class type_object : public object {
@@ -531,6 +544,7 @@ class list : public object {
     detail::fast_iterator begin() const;
     detail::fast_iterator end() const;
 #endif
+    bool empty() const { return size() == 0; }
 };
 
 class dict : public object {
@@ -542,12 +556,25 @@ class dict : public object {
     list keys() const { return steal<list>(detail::obj_op_1(m_ptr, PyDict_Keys)); }
     list values() const { return steal<list>(detail::obj_op_1(m_ptr, PyDict_Values)); }
     list items() const { return steal<list>(detail::obj_op_1(m_ptr, PyDict_Items)); }
+    object get(handle key, handle def) const {
+        PyObject *o = PyDict_GetItem(m_ptr, key.ptr());
+        if (!o)
+            o = def.ptr();
+        return borrow(o);
+    }
+    object get(const char *key, handle def) const {
+        PyObject *o = PyDict_GetItemString(m_ptr, key);
+        if (!o)
+            o = def.ptr();
+        return borrow(o);
+    }
     template <typename T> bool contains(T&& key) const;
     void clear() { PyDict_Clear(m_ptr); }
     void update(handle h) {
         if (PyDict_Update(m_ptr, h.ptr()))
             raise_python_error();
     }
+    bool empty() const { return size() == 0; }
 };
 
 class set : public object {
@@ -563,6 +590,17 @@ class set : public object {
             raise_python_error();
     }
     template <typename T> bool discard(T &&value);
+    bool empty() const { return size() == 0; }
+};
+
+class frozenset : public object {
+    NB_OBJECT(frozenset, object, "frozenset", PyFrozenSet_Check)
+    frozenset() : object(PyFrozenSet_New(nullptr), detail::steal_t()) { }
+    explicit frozenset(handle h)
+        : object(detail::frozenset_from_obj(h.ptr()), detail::steal_t{}) { }
+    size_t size() const { return (size_t) NB_SET_GET_SIZE(m_ptr); }
+    template <typename T> bool contains(T&& key) const;
+    bool empty() const { return size() == 0; }
 };
 
 class sequence : public object {
@@ -742,6 +780,15 @@ public:
     handle_t(const handle &h) : handle(h) { }
 
     static bool check_(handle h) { return isinstance<T>(h); }
+};
+
+struct fallback : public handle {
+public:
+    static constexpr auto Name = detail::const_name("object");
+
+    using handle::handle;
+    using handle::operator=;
+    fallback(const handle &h) : handle(h) { }
 };
 
 template <typename T> class type_object_t : public type_object {

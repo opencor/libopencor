@@ -14,13 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues, expectValues } from "./utils.js";
+import { assertIssues, assertValues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Sed coverage tests", () => {
+test.describe("Sed coverage tests", () => {
   let sedChangesContentsPtr;
   let invalidSedChangesContentsPtr;
   let unsupportedSedChangesContentsPtr;
@@ -28,7 +31,7 @@ describe("Sed coverage tests", () => {
   let solverNla1ContentsPtr;
   let mathContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     sedChangesContentsPtr = utils.allocateMemory(
       loc,
       utils.SED_CHANGES_CONTENTS,
@@ -49,7 +52,7 @@ describe("Sed coverage tests", () => {
     mathContentsPtr = utils.allocateMemory(loc, utils.MATH_CONTENTS);
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, sedChangesContentsPtr);
     utils.freeMemory(loc, invalidSedChangesContentsPtr);
     utils.freeMemory(loc, unsupportedSedChangesContentsPtr);
@@ -74,7 +77,7 @@ describe("Sed coverage tests", () => {
 `;
     const document = new loc.SedDocument();
 
-    expect(document.serialise()).toBe(expectedSerialisation);
+    assert.strictEqual(document.serialise(), expectedSerialisation);
 
     document.delete();
   });
@@ -82,43 +85,43 @@ describe("Sed coverage tests", () => {
   test("Models", () => {
     const document = new loc.SedDocument();
 
-    expect(document.hasModels).toBe(false);
-    expect(document.modelCount).toBe(0);
-    expect(document.models.size()).toBe(0);
-    expect(document.addModel(null)).toBe(false);
+    assert.strictEqual(document.hasModels, false);
+    assert.strictEqual(document.modelCount, 0);
+    assert.strictEqual(document.models.size(), 0);
+    assert.strictEqual(document.addModel(null), false);
 
     const file = new loc.File(utils.SEDML_FILE);
     const model = new loc.SedModel(document, file);
 
-    expect(model.file).toStrictEqual(file);
+    assert.deepStrictEqual(model.file, file);
 
-    expect(document.addModel(model)).toBe(true);
+    assert.strictEqual(document.addModel(model), true);
 
-    expect(document.hasModels).toBe(true);
-    expect(document.modelCount).toBe(1);
-    expect(document.models.size()).toBe(1);
-    expect(document.models.get(0)).toStrictEqual(model);
-    expect(document.model(0)).toStrictEqual(model);
-    expect(document.model(1)).toBeNull();
+    assert.strictEqual(document.hasModels, true);
+    assert.strictEqual(document.modelCount, 1);
+    assert.strictEqual(document.models.size(), 1);
+    assert.deepStrictEqual(document.models.get(0), model);
+    assert.deepStrictEqual(document.model(0), model);
+    assert.deepStrictEqual(document.model(1), null);
 
-    expect(document.addModel(model)).toBe(false);
-    expect(document.removeModel(model)).toBe(true);
+    assert.strictEqual(document.addModel(model), false);
+    assert.strictEqual(document.removeModel(model), true);
 
-    expect(document.hasModels).toBe(false);
-    expect(document.modelCount).toBe(0);
-    expect(document.models.size()).toBe(0);
+    assert.strictEqual(document.hasModels, false);
+    assert.strictEqual(document.modelCount, 0);
+    assert.strictEqual(document.models.size(), 0);
 
-    expect(document.removeModel(null)).toBe(false);
-    expect(document.removeAllModels()).toBe(false);
+    assert.strictEqual(document.removeModel(null), false);
+    assert.strictEqual(document.removeAllModels(), false);
 
-    expect(document.addModel(model)).toBe(true);
-    expect(document.removeAllModels()).toBe(true);
+    assert.strictEqual(document.addModel(model), true);
+    assert.strictEqual(document.removeAllModels(), true);
 
-    expect(model.hasChanges).toBe(false);
-    expect(model.changeCount).toBe(0);
-    expect(model.changes.size()).toBe(0);
-    expect(model.addChange(null)).toBe(false);
-    expect(model.removeAllChanges()).toBe(false);
+    assert.strictEqual(model.hasChanges, false);
+    assert.strictEqual(model.changeCount, 0);
+    assert.strictEqual(model.changes.size(), 0);
+    assert.strictEqual(model.addChange(null), false);
+    assert.strictEqual(model.removeAllChanges(), false);
 
     const changeAttribute = new loc.SedChangeAttribute(
       "component",
@@ -126,26 +129,26 @@ describe("Sed coverage tests", () => {
       "newValue",
     );
 
-    expect(model.addChange(changeAttribute)).toBe(true);
+    assert.strictEqual(model.addChange(changeAttribute), true);
 
-    expect(model.hasChanges).toBe(true);
-    expect(model.changeCount).toBe(1);
-    expect(model.changes.size()).toBe(1);
-    expect(model.changes.get(0)).toStrictEqual(changeAttribute);
-    expect(model.change(0)).toStrictEqual(changeAttribute);
-    expect(model.change(1)).toBeNull();
+    assert.strictEqual(model.hasChanges, true);
+    assert.strictEqual(model.changeCount, 1);
+    assert.strictEqual(model.changes.size(), 1);
+    assert.deepStrictEqual(model.changes.get(0), changeAttribute);
+    assert.deepStrictEqual(model.change(0), changeAttribute);
+    assert.deepStrictEqual(model.change(1), null);
 
-    expect(model.addChange(changeAttribute)).toBe(false);
-    expect(model.removeChange(changeAttribute)).toBe(true);
+    assert.strictEqual(model.addChange(changeAttribute), false);
+    assert.strictEqual(model.removeChange(changeAttribute), true);
 
-    expect(model.addChange(changeAttribute)).toBe(true);
-    expect(model.removeAllChanges()).toBe(true);
+    assert.strictEqual(model.addChange(changeAttribute), true);
+    assert.strictEqual(model.removeAllChanges(), true);
 
-    expect(model.hasChanges).toBe(false);
-    expect(model.changeCount).toBe(0);
-    expect(model.changes.size()).toBe(0);
+    assert.strictEqual(model.hasChanges, false);
+    assert.strictEqual(model.changeCount, 0);
+    assert.strictEqual(model.changes.size(), 0);
 
-    expect(model.removeChange(null)).toBe(false);
+    assert.strictEqual(model.removeChange(null), false);
 
     model.delete();
     file.delete();
@@ -159,7 +162,7 @@ describe("Sed coverage tests", () => {
 
     let document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(false);
+    assert.strictEqual(document.hasIssues, false);
 
     file.setContents(
       invalidSedChangesContentsPtr,
@@ -168,7 +171,7 @@ describe("Sed coverage tests", () => {
 
     document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
         "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'.",
@@ -206,7 +209,7 @@ describe("Sed coverage tests", () => {
 
     document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.WARNING,
         "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored.",
@@ -229,55 +232,55 @@ describe("Sed coverage tests", () => {
   test("Simulations", () => {
     const document = new loc.SedDocument();
 
-    expect(document.hasSimulations).toBe(false);
-    expect(document.simulationCount).toBe(0);
-    expect(document.simulations.size()).toBe(0);
-    expect(document.addSimulation(null)).toBe(false);
+    assert.strictEqual(document.hasSimulations, false);
+    assert.strictEqual(document.simulationCount, 0);
+    assert.strictEqual(document.simulations.size(), 0);
+    assert.strictEqual(document.addSimulation(null), false);
 
     const uniform_time_course = new loc.SedUniformTimeCourse(document);
     const one_step = new loc.SedOneStep(document);
     const steady_state = new loc.SedSteadyState(document);
     const analysis = new loc.SedAnalysis(document);
 
-    expect(document.addSimulation(uniform_time_course)).toBe(true);
-    expect(document.addSimulation(one_step)).toBe(true);
-    expect(document.addSimulation(steady_state)).toBe(true);
-    expect(document.addSimulation(analysis)).toBe(true);
+    assert.strictEqual(document.addSimulation(uniform_time_course), true);
+    assert.strictEqual(document.addSimulation(one_step), true);
+    assert.strictEqual(document.addSimulation(steady_state), true);
+    assert.strictEqual(document.addSimulation(analysis), true);
 
-    expect(document.hasSimulations).toBe(true);
-    expect(document.simulationCount).toBe(4);
-    expect(document.simulations.size()).toBe(4);
-    expect(document.simulations.get(0)).toStrictEqual(uniform_time_course);
-    expect(document.simulations.get(1)).toStrictEqual(one_step);
-    expect(document.simulations.get(2)).toStrictEqual(steady_state);
-    expect(document.simulations.get(3)).toStrictEqual(analysis);
-    expect(document.simulation(0)).toStrictEqual(uniform_time_course);
-    expect(document.simulation(1)).toStrictEqual(one_step);
-    expect(document.simulation(2)).toStrictEqual(steady_state);
-    expect(document.simulation(3)).toStrictEqual(analysis);
-    expect(document.simulation(4)).toBeNull();
+    assert.strictEqual(document.hasSimulations, true);
+    assert.strictEqual(document.simulationCount, 4);
+    assert.strictEqual(document.simulations.size(), 4);
+    assert.deepStrictEqual(document.simulations.get(0), uniform_time_course);
+    assert.deepStrictEqual(document.simulations.get(1), one_step);
+    assert.deepStrictEqual(document.simulations.get(2), steady_state);
+    assert.deepStrictEqual(document.simulations.get(3), analysis);
+    assert.deepStrictEqual(document.simulation(0), uniform_time_course);
+    assert.deepStrictEqual(document.simulation(1), one_step);
+    assert.deepStrictEqual(document.simulation(2), steady_state);
+    assert.deepStrictEqual(document.simulation(3), analysis);
+    assert.deepStrictEqual(document.simulation(4), null);
 
-    expect(document.addSimulation(uniform_time_course)).toBe(false);
-    expect(document.removeSimulation(uniform_time_course)).toBe(true);
+    assert.strictEqual(document.addSimulation(uniform_time_course), false);
+    assert.strictEqual(document.removeSimulation(uniform_time_course), true);
 
-    expect(document.addSimulation(one_step)).toBe(false);
-    expect(document.removeSimulation(one_step)).toBe(true);
+    assert.strictEqual(document.addSimulation(one_step), false);
+    assert.strictEqual(document.removeSimulation(one_step), true);
 
-    expect(document.addSimulation(steady_state)).toBe(false);
-    expect(document.removeSimulation(steady_state)).toBe(true);
+    assert.strictEqual(document.addSimulation(steady_state), false);
+    assert.strictEqual(document.removeSimulation(steady_state), true);
 
-    expect(document.addSimulation(analysis)).toBe(false);
-    expect(document.removeSimulation(analysis)).toBe(true);
+    assert.strictEqual(document.addSimulation(analysis), false);
+    assert.strictEqual(document.removeSimulation(analysis), true);
 
-    expect(document.hasSimulations).toBe(false);
-    expect(document.simulationCount).toBe(0);
-    expect(document.simulations.size()).toBe(0);
+    assert.strictEqual(document.hasSimulations, false);
+    assert.strictEqual(document.simulationCount, 0);
+    assert.strictEqual(document.simulations.size(), 0);
 
-    expect(document.removeSimulation(null)).toBe(false);
-    expect(document.removeAllSimulations()).toBe(false);
+    assert.strictEqual(document.removeSimulation(null), false);
+    assert.strictEqual(document.removeAllSimulations(), false);
 
-    expect(document.addSimulation(uniform_time_course)).toBe(true);
-    expect(document.removeAllSimulations()).toBe(true);
+    assert.strictEqual(document.addSimulation(uniform_time_course), true);
+    assert.strictEqual(document.removeAllSimulations(), true);
 
     steady_state.delete();
     uniform_time_course.delete();
@@ -287,57 +290,63 @@ describe("Sed coverage tests", () => {
   test("Tasks", () => {
     const document = new loc.SedDocument();
 
-    expect(document.hasTasks).toBe(false);
-    expect(document.taskCount).toBe(0);
-    expect(document.tasks.size()).toBe(0);
-    expect(document.addTask(null)).toBe(false);
+    assert.strictEqual(document.hasTasks, false);
+    assert.strictEqual(document.taskCount, 0);
+    assert.strictEqual(document.tasks.size(), 0);
+    assert.strictEqual(document.addTask(null), false);
 
     const file = new loc.File(utils.SEDML_FILE);
     const model = new loc.SedModel(document, file);
     const simulation = new loc.SedUniformTimeCourse(document);
     const task = new loc.SedTask(document, model, simulation);
 
-    expect(task.model).not.toBe(null);
-    expect(task.simulation).not.toBe(null);
+    assert.deepStrictEqual(task.model, model);
+    assert.deepStrictEqual(task.simulation, simulation);
 
-    expect(document.addTask(task)).toBe(true);
+    assert.strictEqual(document.addTask(task), true);
 
-    expect(document.hasTasks).toBe(true);
-    expect(document.taskCount).toBe(1);
-    expect(document.tasks.size()).toBe(1);
-    expect(document.tasks.get(0)).toStrictEqual(task);
-    expect(document.task(0)).toStrictEqual(task);
-    expect(document.task(1)).toBeNull();
+    assert.strictEqual(document.hasTasks, true);
+    assert.strictEqual(document.taskCount, 1);
+    assert.strictEqual(document.tasks.size(), 1);
+    assert.deepStrictEqual(document.tasks.get(0), task);
+    assert.deepStrictEqual(document.task(0), task);
+    assert.deepStrictEqual(document.task(1), null);
 
-    expect(document.serialise()).toBe(sedTaskExpectedSerialisation(true));
+    assert.strictEqual(
+      document.serialise(),
+      sedTaskExpectedSerialisation(true),
+    );
 
     task.model = null;
     task.simulation = null;
 
-    expect(task.model).toBe(null);
-    expect(task.simulation).toBe(null);
+    assert.strictEqual(task.model, null);
+    assert.strictEqual(task.simulation, null);
 
-    expect(document.serialise()).toBe(sedTaskExpectedSerialisation(false));
+    assert.strictEqual(
+      document.serialise(),
+      sedTaskExpectedSerialisation(false),
+    );
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "Task 'task1' requires a model."],
       [loc.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
     ]);
 
-    expect(document.addTask(task)).toBe(false);
-    expect(document.removeTask(task)).toBe(true);
+    assert.strictEqual(document.addTask(task), false);
+    assert.strictEqual(document.removeTask(task), true);
 
-    expect(document.hasTasks).toBe(false);
-    expect(document.taskCount).toBe(0);
-    expect(document.tasks.size()).toBe(0);
+    assert.strictEqual(document.hasTasks, false);
+    assert.strictEqual(document.taskCount, 0);
+    assert.strictEqual(document.tasks.size(), 0);
 
-    expect(document.removeTask(null)).toBe(false);
-    expect(document.removeAllTasks()).toBe(false);
+    assert.strictEqual(document.removeTask(null), false);
+    assert.strictEqual(document.removeAllTasks(), false);
 
-    expect(document.addTask(task)).toBe(true);
-    expect(document.removeAllTasks()).toBe(true);
+    assert.strictEqual(document.addTask(task), true);
+    assert.strictEqual(document.removeAllTasks(), true);
 
     task.delete();
     simulation.delete();
@@ -350,17 +359,17 @@ describe("Sed coverage tests", () => {
     const document = new loc.SedDocument();
     const simulation = new loc.SedUniformTimeCourse(document);
 
-    expect(simulation.odeSolver).toBe(null);
+    assert.strictEqual(simulation.odeSolver, null);
 
     const solver = new loc.SolverCvode();
 
     simulation.odeSolver = solver;
 
-    expect(simulation.odeSolver).toStrictEqual(solver);
+    assert.deepStrictEqual(simulation.odeSolver, solver);
 
     simulation.odeSolver = null;
 
-    expect(simulation.odeSolver).toBe(null);
+    assert.strictEqual(simulation.odeSolver, null);
 
     solver.delete();
     simulation.delete();
@@ -371,17 +380,17 @@ describe("Sed coverage tests", () => {
     const document = new loc.SedDocument();
     const simulation = new loc.SedUniformTimeCourse(document);
 
-    expect(simulation.nlaSolver).toBe(null);
+    assert.strictEqual(simulation.nlaSolver, null);
 
     const solver = new loc.SolverKinsol();
 
     simulation.nlaSolver = solver;
 
-    expect(simulation.nlaSolver).toStrictEqual(solver);
+    assert.deepStrictEqual(simulation.nlaSolver, solver);
 
     simulation.nlaSolver = null;
 
-    expect(simulation.nlaSolver).toBe(null);
+    assert.strictEqual(simulation.nlaSolver, null);
 
     solver.delete();
     simulation.delete();
@@ -393,11 +402,11 @@ describe("Sed coverage tests", () => {
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedOneStep(document);
 
-    expect(simulation.step).toBe(1.0);
+    assert.strictEqual(simulation.step, 1.0);
 
     simulation.step = 1.23;
 
-    expect(simulation.step).toBe(1.23);
+    assert.strictEqual(simulation.step, 1.23);
 
     simulation.delete();
     document.delete();
@@ -409,20 +418,20 @@ describe("Sed coverage tests", () => {
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedUniformTimeCourse(document);
 
-    expect(simulation.initialTime).toBe(0.0);
-    expect(simulation.outputStartTime).toBe(0.0);
-    expect(simulation.outputEndTime).toBe(1000.0);
-    expect(simulation.numberOfSteps).toBe(1000);
+    assert.strictEqual(simulation.initialTime, 0.0);
+    assert.strictEqual(simulation.outputStartTime, 0.0);
+    assert.strictEqual(simulation.outputEndTime, 1000.0);
+    assert.strictEqual(simulation.numberOfSteps, 1000);
 
     simulation.initialTime = 1.23;
     simulation.outputStartTime = 4.56;
     simulation.outputEndTime = 7.89;
     simulation.numberOfSteps = 10;
 
-    expect(simulation.initialTime).toBe(1.23);
-    expect(simulation.outputStartTime).toBe(4.56);
-    expect(simulation.outputEndTime).toBe(7.89);
-    expect(simulation.numberOfSteps).toBe(10);
+    assert.strictEqual(simulation.initialTime, 1.23);
+    assert.strictEqual(simulation.outputStartTime, 4.56);
+    assert.strictEqual(simulation.outputEndTime, 7.89);
+    assert.strictEqual(simulation.numberOfSteps, 10);
 
     simulation.delete();
     document.delete();
@@ -443,69 +452,72 @@ describe("Sed coverage tests", () => {
     const instance = document.instantiate();
     const instanceTask = instance.tasks.get(0);
 
-    expect(instance.hasTasks).toBe(true);
-    expect(instance.taskCount).toBe(1);
-    expect(instance.task(0)).toStrictEqual(instanceTask);
-    expect(instance.task(1)).toStrictEqual(null);
+    assert.strictEqual(instance.hasTasks, true);
+    assert.strictEqual(instance.taskCount, 1);
+    assert.deepStrictEqual(instance.task(0), instanceTask);
+    assert.strictEqual(instance.task(1), null);
 
-    expect(instanceTask.voi.size()).toBe(0);
-    expect(instanceTask.voiAsArray).toStrictEqual([]);
-    expect(instanceTask.voiName).toBe("environment/time");
-    expect(instanceTask.voiUnit).toBe("millisecond");
+    assert.strictEqual(instanceTask.voi.size(), 0);
+    assert.deepStrictEqual(instanceTask.voiAsArray, []);
+    assert.strictEqual(instanceTask.voiName, "environment/time");
+    assert.strictEqual(instanceTask.voiUnit, "millisecond");
 
-    expect(instanceTask.stateCount).toBe(4);
-    expect(instanceTask.state(0).size()).toBe(0);
-    expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.state(4).size()).toBe(0);
-    expect(instanceTask.stateAsArray(4)).toStrictEqual([]);
-    expect(instanceTask.stateName(0)).toBe("membrane/V");
-    expect(instanceTask.stateName(4)).toBe("");
-    expect(instanceTask.stateUnit(0)).toBe("millivolt");
-    expect(instanceTask.stateUnit(4)).toBe("");
+    assert.strictEqual(instanceTask.stateCount, 4);
+    assert.strictEqual(instanceTask.state(0).size(), 0);
+    assert.deepStrictEqual(instanceTask.stateAsArray(0), []);
+    assert.strictEqual(instanceTask.state(4).size(), 0);
+    assert.deepStrictEqual(instanceTask.stateAsArray(4), []);
+    assert.strictEqual(instanceTask.stateName(0), "membrane/V");
+    assert.strictEqual(instanceTask.stateName(4), "");
+    assert.strictEqual(instanceTask.stateUnit(0), "millivolt");
+    assert.strictEqual(instanceTask.stateUnit(4), "");
 
-    expect(instanceTask.rateCount).toBe(4);
-    expect(instanceTask.rate(0).size()).toBe(0);
-    expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.rate(4).size()).toBe(0);
-    expect(instanceTask.rateAsArray(4)).toStrictEqual([]);
-    expect(instanceTask.rateName(0)).toBe("membrane/V'");
-    expect(instanceTask.rateName(4)).toBe("");
-    expect(instanceTask.rateUnit(0)).toBe("millivolt/millisecond");
-    expect(instanceTask.rateUnit(4)).toBe("");
+    assert.strictEqual(instanceTask.rateCount, 4);
+    assert.strictEqual(instanceTask.rate(0).size(), 0);
+    assert.deepStrictEqual(instanceTask.rateAsArray(0), []);
+    assert.strictEqual(instanceTask.rate(4).size(), 0);
+    assert.deepStrictEqual(instanceTask.rateAsArray(4), []);
+    assert.strictEqual(instanceTask.rateName(0), "membrane/V'");
+    assert.strictEqual(instanceTask.rateName(4), "");
+    assert.strictEqual(instanceTask.rateUnit(0), "millivolt/millisecond");
+    assert.strictEqual(instanceTask.rateUnit(4), "");
 
-    expect(instanceTask.constantCount).toBe(5);
-    expect(instanceTask.constant(0).size()).toBe(0);
-    expect(instanceTask.constantAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.constant(5).size()).toBe(0);
-    expect(instanceTask.constantAsArray(5)).toStrictEqual([]);
-    expect(instanceTask.constantName(0)).toBe("membrane/Cm");
-    expect(instanceTask.constantName(5)).toBe("");
-    expect(instanceTask.constantUnit(0)).toBe("microF_per_cm2");
-    expect(instanceTask.constantUnit(5)).toBe("");
+    assert.strictEqual(instanceTask.constantCount, 5);
+    assert.strictEqual(instanceTask.constant(0).size(), 0);
+    assert.deepStrictEqual(instanceTask.constantAsArray(0), []);
+    assert.strictEqual(instanceTask.constant(5).size(), 0);
+    assert.deepStrictEqual(instanceTask.constantAsArray(5), []);
+    assert.strictEqual(instanceTask.constantName(0), "membrane/Cm");
+    assert.strictEqual(instanceTask.constantName(5), "");
+    assert.strictEqual(instanceTask.constantUnit(0), "microF_per_cm2");
+    assert.strictEqual(instanceTask.constantUnit(5), "");
 
-    expect(instanceTask.computedConstantCount).toBe(3);
-    expect(instanceTask.computedConstant(0).size()).toBe(0);
-    expect(instanceTask.computedConstantAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.computedConstant(3).size()).toBe(0);
-    expect(instanceTask.computedConstantAsArray(3)).toStrictEqual([]);
-    expect(instanceTask.computedConstantName(0)).toBe("leakage_current/E_L");
-    expect(instanceTask.computedConstantName(3)).toBe("");
-    expect(instanceTask.computedConstantUnit(0)).toBe("millivolt");
-    expect(instanceTask.computedConstantUnit(3)).toBe("");
+    assert.strictEqual(instanceTask.computedConstantCount, 3);
+    assert.strictEqual(instanceTask.computedConstant(0).size(), 0);
+    assert.deepStrictEqual(instanceTask.computedConstantAsArray(0), []);
+    assert.strictEqual(instanceTask.computedConstant(3).size(), 0);
+    assert.deepStrictEqual(instanceTask.computedConstantAsArray(3), []);
+    assert.strictEqual(
+      instanceTask.computedConstantName(0),
+      "leakage_current/E_L",
+    );
+    assert.strictEqual(instanceTask.computedConstantName(3), "");
+    assert.strictEqual(instanceTask.computedConstantUnit(0), "millivolt");
+    assert.strictEqual(instanceTask.computedConstantUnit(3), "");
 
-    expect(instanceTask.algebraicCount).toBe(10);
-    expect(instanceTask.algebraic(0).size()).toBe(0);
-    expect(instanceTask.algebraicAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.algebraic(10).size()).toBe(0);
-    expect(instanceTask.algebraicAsArray(10)).toStrictEqual([]);
-    expect(instanceTask.algebraicName(0)).toBe("membrane/i_Stim");
-    expect(instanceTask.algebraicName(10)).toBe("");
-    expect(instanceTask.algebraicUnit(0)).toBe("microA_per_cm2");
-    expect(instanceTask.algebraicUnit(10)).toBe("");
+    assert.strictEqual(instanceTask.algebraicCount, 10);
+    assert.strictEqual(instanceTask.algebraic(0).size(), 0);
+    assert.deepStrictEqual(instanceTask.algebraicAsArray(0), []);
+    assert.strictEqual(instanceTask.algebraic(10).size(), 0);
+    assert.deepStrictEqual(instanceTask.algebraicAsArray(10), []);
+    assert.strictEqual(instanceTask.algebraicName(0), "membrane/i_Stim");
+    assert.strictEqual(instanceTask.algebraicName(10), "");
+    assert.strictEqual(instanceTask.algebraicUnit(0), "microA_per_cm2");
+    assert.strictEqual(instanceTask.algebraicUnit(10), "");
 
     instance.run();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
@@ -527,22 +539,22 @@ describe("Sed coverage tests", () => {
     const instance = document.instantiate();
     const instanceTask = instance.tasks.get(0);
 
-    expect(instanceTask.voi.size()).toBe(0);
-    expect(instanceTask.voiAsArray).toStrictEqual([]);
-    expect(instanceTask.voiName).toBe("");
-    expect(instanceTask.voiUnit).toBe("");
+    assert.strictEqual(instanceTask.voi.size(), 0);
+    assert.deepStrictEqual(instanceTask.voiAsArray, []);
+    assert.strictEqual(instanceTask.voiName, "");
+    assert.strictEqual(instanceTask.voiUnit, "");
 
-    expect(instanceTask.stateCount).toBe(0);
-    expect(instanceTask.state(0).size()).toBe(0);
-    expect(instanceTask.stateAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.stateName(0)).toBe("");
-    expect(instanceTask.stateUnit(0)).toBe("");
+    assert.strictEqual(instanceTask.stateCount, 0);
+    assert.strictEqual(instanceTask.state(0).size(), 0);
+    assert.deepStrictEqual(instanceTask.stateAsArray(0), []);
+    assert.strictEqual(instanceTask.stateName(0), "");
+    assert.strictEqual(instanceTask.stateUnit(0), "");
 
-    expect(instanceTask.rateCount).toBe(0);
-    expect(instanceTask.rate(0).size()).toBe(0);
-    expect(instanceTask.rateAsArray(0)).toStrictEqual([]);
-    expect(instanceTask.rateName(0)).toBe("");
-    expect(instanceTask.rateUnit(0)).toBe("");
+    assert.strictEqual(instanceTask.rateCount, 0);
+    assert.strictEqual(instanceTask.rate(0).size(), 0);
+    assert.deepStrictEqual(instanceTask.rateAsArray(0), []);
+    assert.strictEqual(instanceTask.rateName(0), "");
+    assert.strictEqual(instanceTask.rateUnit(0), "");
 
     instance.delete();
     document.delete();
@@ -586,7 +598,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     solver.delete();
@@ -599,7 +611,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     solver.delete();
@@ -612,7 +624,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     solver.delete();
@@ -625,7 +637,7 @@ describe("Sed coverage tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     solver.delete();
@@ -642,13 +654,13 @@ describe("Sed coverage tests", () => {
     const instance = document.instantiate();
     const instanceTask = instance.tasks.get(0);
 
-    expect(instanceTask.constantCount).toBe(0);
-    expect(instanceTask.computedConstantCount).toBe(37);
-    expect(instanceTask.algebraicCount).toBe(0);
+    assert.strictEqual(instanceTask.constantCount, 0);
+    assert.strictEqual(instanceTask.computedConstantCount, 37);
+    assert.strictEqual(instanceTask.algebraicCount, 0);
 
     instance.run();
 
-    expectValues(
+    assertValues(
       instanceTask,
       0,
       [],

@@ -279,8 +279,8 @@ TEST(CoverageSedTest, tasks)
     auto simulation = libOpenCOR::SedUniformTimeCourse::create(document);
     auto task = libOpenCOR::SedTask::create(document, model, simulation);
 
-    EXPECT_NE(task->model(), nullptr);
-    EXPECT_NE(task->simulation(), nullptr);
+    EXPECT_EQ(task->model(), model);
+    EXPECT_EQ(task->simulation(), simulation);
 
     EXPECT_TRUE(document->addTask(task));
 
