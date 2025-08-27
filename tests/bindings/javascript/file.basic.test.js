@@ -14,9 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { assertIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
@@ -27,32 +30,32 @@ const expectedUnknownFileIssues = [
   ],
 ];
 
-describe("File basic tests", () => {
+test.describe("File basic tests", () => {
   let unknownContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, unknownContentsPtr);
   });
 
   test("Local file", () => {
     const file = new loc.File(utils.LOCAL_FILE);
 
-    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
-    expect(file.fileName).toBe(utils.LOCAL_FILE);
-    expect(file.url).toBe("");
-    expect(file.path).toBe(utils.LOCAL_FILE);
-    expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
-    expectIssues(loc, file, expectedUnknownFileIssues);
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, utils.LOCAL_FILE);
+    assert.strictEqual(file.url, "");
+    assert.strictEqual(file.path, utils.LOCAL_FILE);
+    assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
+    assertIssues(loc, file, expectedUnknownFileIssues);
 
     file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
-    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
-    expect(file.contents()).toStrictEqual(utils.UNKNOWN_CONTENTS);
-    expectIssues(loc, file, expectedUnknownFileIssues);
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
+    assertIssues(loc, file, expectedUnknownFileIssues);
 
     file.delete();
   });
@@ -60,18 +63,18 @@ describe("File basic tests", () => {
   test("Remote file", () => {
     const file = new loc.File(utils.REMOTE_FILE);
 
-    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
-    expect(file.fileName).toBe("/some/path/file");
-    expect(file.url).toBe(utils.REMOTE_FILE);
-    expect(file.path).toBe(utils.REMOTE_FILE);
-    expect(file.contents()).toStrictEqual(utils.NO_CONTENTS);
-    expectIssues(loc, file, expectedUnknownFileIssues);
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, "/some/path/file");
+    assert.strictEqual(file.url, utils.REMOTE_FILE);
+    assert.strictEqual(file.path, utils.REMOTE_FILE);
+    assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
+    assertIssues(loc, file, expectedUnknownFileIssues);
 
     file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
-    expect(file.type.value).toBe(loc.File.Type.UNKNOWN_FILE.value);
-    expect(file.contents()).toStrictEqual(utils.UNKNOWN_CONTENTS);
-    expectIssues(loc, file, expectedUnknownFileIssues);
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
+    assertIssues(loc, file, expectedUnknownFileIssues);
 
     file.delete();
   });
@@ -79,66 +82,73 @@ describe("File basic tests", () => {
   test("File manager", () => {
     const fileManager = loc.FileManager.instance();
 
-    expect(fileManager.hasFiles).toBe(false);
-    expect(fileManager.fileCount).toBe(0);
-    expect(fileManager.files.size()).toBe(0);
-    expect(fileManager.file(0)).toStrictEqual(null);
-    expect(fileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE)).toStrictEqual(
+    assert.strictEqual(fileManager.hasFiles, false);
+    assert.strictEqual(fileManager.fileCount, 0);
+    assert.strictEqual(fileManager.files.size(), 0);
+    assert.strictEqual(fileManager.file(0), null);
+    assert.strictEqual(
+      fileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
       null,
     );
 
     const localFile = new loc.File(utils.LOCAL_FILE);
     const sameFileManager = loc.FileManager.instance();
 
-    expect(sameFileManager.hasFiles).toBe(true);
-    expect(sameFileManager.fileCount).toBe(1);
-    expect(sameFileManager.files.size()).toBe(1);
-    expect(fileManager.file(0)).toStrictEqual(localFile);
-    expect(
+    assert.strictEqual(sameFileManager.hasFiles, true);
+    assert.strictEqual(sameFileManager.fileCount, 1);
+    assert.strictEqual(sameFileManager.files.size(), 1);
+    assert.deepStrictEqual(fileManager.file(0), localFile);
+    assert.deepStrictEqual(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
-    ).toStrictEqual(localFile);
+      localFile,
+    );
 
     const remoteFile = new loc.File(utils.REMOTE_FILE);
 
-    expect(fileManager.hasFiles).toBe(true);
-    expect(fileManager.fileCount).toBe(2);
-    expect(fileManager.files.size()).toBe(2);
-    expect(fileManager.file(1)).toStrictEqual(remoteFile);
-    expect(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE)).toStrictEqual(
+    assert.strictEqual(fileManager.hasFiles, true);
+    assert.strictEqual(fileManager.fileCount, 2);
+    assert.strictEqual(fileManager.files.size(), 2);
+    assert.deepStrictEqual(fileManager.file(1), remoteFile);
+    assert.deepStrictEqual(
+      fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE),
       remoteFile,
     );
 
     sameFileManager.unmanage(localFile);
 
-    expect(sameFileManager.hasFiles).toBe(true);
-    expect(sameFileManager.fileCount).toBe(1);
-    expect(sameFileManager.files.size()).toBe(1);
-    expect(fileManager.file(1)).toStrictEqual(null);
-    expect(
+    assert.strictEqual(sameFileManager.hasFiles, true);
+    assert.strictEqual(sameFileManager.fileCount, 1);
+    assert.strictEqual(sameFileManager.files.size(), 1);
+    assert.deepStrictEqual(fileManager.file(1), null);
+    assert.deepStrictEqual(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
-    ).toStrictEqual(null);
+      null,
+    );
 
     sameFileManager.manage(localFile);
 
-    expect(sameFileManager.hasFiles).toBe(true);
-    expect(sameFileManager.fileCount).toBe(2);
-    expect(sameFileManager.files.size()).toBe(2);
-    expect(fileManager.file(1)).toStrictEqual(localFile);
-    expect(
+    assert.strictEqual(sameFileManager.hasFiles, true);
+    assert.strictEqual(sameFileManager.fileCount, 2);
+    assert.strictEqual(sameFileManager.files.size(), 2);
+    assert.deepStrictEqual(fileManager.file(1), localFile);
+    assert.deepStrictEqual(
       sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
-    ).toStrictEqual(localFile);
+      localFile,
+    );
 
     fileManager.reset();
 
-    expect(fileManager.hasFiles).toBe(false);
-    expect(fileManager.fileCount).toBe(0);
-    expect(fileManager.files.size()).toBe(0);
-    expect(fileManager.file(0)).toStrictEqual(null);
-    expect(fileManager.file(1)).toStrictEqual(null);
-    expect(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE)).toStrictEqual(
+    assert.strictEqual(fileManager.hasFiles, false);
+    assert.strictEqual(fileManager.fileCount, 0);
+    assert.strictEqual(fileManager.files.size(), 0);
+    assert.deepStrictEqual(fileManager.file(0), null);
+    assert.deepStrictEqual(fileManager.file(1), null);
+    assert.deepStrictEqual(
+      fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE),
       null,
     );
-    expect(fileManager.fileFromFileNameOrUrl(utils.UNKNOWN_FILE)).toStrictEqual(
+    assert.deepStrictEqual(
+      fileManager.fileFromFileNameOrUrl(utils.UNKNOWN_FILE),
       null,
     );
 

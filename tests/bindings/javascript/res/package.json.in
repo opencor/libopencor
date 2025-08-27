@@ -1,9 +1,6 @@
 {
   "type": "module",
   "scripts": {
-    "test": "@NODE_EXE@ --experimental-vm-modules ./node_modules/.bin/jest"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0"
+    "test": "@NODE_EXE@ --test"
   }
 }

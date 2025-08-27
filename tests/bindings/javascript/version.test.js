@@ -15,13 +15,16 @@ limitations under the License.
 */
 
 import fs from "fs";
+import assert from "node:assert";
+import test from "node:test";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import libOpenCOR from "./libopencor.js";
 
 const loc = await libOpenCOR();
 
-describe("Version tests", () => {
+test.describe("Version tests", () => {
   test("libOpenCOR", () => {
     const versionStr = fs
       .readFileSync(
@@ -56,39 +59,42 @@ describe("Version tests", () => {
       i += four;
     }
 
-    expect(loc.version()).toBe(version);
-    expect(loc.versionString()).toBe(
-      `${majorVersion}.${year}${String(month).padStart(2, "0")}${String(day).padStart(2, "0")}.${patchVersion}`,
+    assert.strictEqual(loc.version(), version);
+    assert.strictEqual(
+      loc.versionString(),
+      `${majorVersion}.${year}${String(month).padStart(2, "0")}${String(
+        day,
+      ).padStart(2, "0")}.${patchVersion}`,
     );
   });
 
   test("Clang", () => {
-    expect(loc.clangVersion()).toBe(0x160006);
-    expect(loc.clangVersionString()).toBe("16.0.6");
+    assert.strictEqual(loc.clangVersion(), 0x160006);
+    assert.strictEqual(loc.clangVersionString(), "16.0.6");
   });
 
   test("libCellML", () => {
-    expect(loc.libcellmlVersion()).toBe(0x000500);
-    expect(loc.libcellmlVersionString()).toBe("0.5.0");
+    assert.strictEqual(loc.libcellmlVersion(), 0x000500);
+    assert.strictEqual(loc.libcellmlVersionString(), "0.5.0");
   });
 
   test("libCOMBINE", () => {
-    expect(loc.libcombineVersion()).toBe(220);
-    expect(loc.libcombineVersionString()).toBe("0.2.20");
+    assert.strictEqual(loc.libcombineVersion(), 220);
+    assert.strictEqual(loc.libcombineVersionString(), "0.2.20");
   });
 
   test("libSEDML", () => {
-    expect(loc.libsedmlVersion()).toBe(20033);
-    expect(loc.libsedmlVersionString()).toBe("2.0.33");
+    assert.strictEqual(loc.libsedmlVersion(), 20033);
+    assert.strictEqual(loc.libsedmlVersionString(), "2.0.33");
   });
 
   test("LLVM", () => {
-    expect(loc.llvmVersion()).toBe(0x160006);
-    expect(loc.llvmVersionString()).toBe("16.0.6");
+    assert.strictEqual(loc.llvmVersion(), 0x160006);
+    assert.strictEqual(loc.llvmVersionString(), "16.0.6");
   });
 
   test("SUNDIALS", () => {
-    expect(loc.sundialsVersion()).toBe(0x070300);
-    expect(loc.sundialsVersionString()).toBe("7.3.0");
+    assert.strictEqual(loc.sundialsVersion(), 0x070300);
+    assert.strictEqual(loc.sundialsVersionString(), "7.3.0");
   });
 });

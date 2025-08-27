@@ -14,21 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as odeModel from "./ode.model.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { assertIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Solver Heun tests", () => {
+test.describe("Solver Heun tests", () => {
   let solverOdeContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, solverOdeContentsPtr);
   });
 
@@ -47,7 +49,7 @@ describe("Solver Heun tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The step cannot be equal to 0. It must be greater than 0.",

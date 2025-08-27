@@ -14,13 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { assertIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Sed basic tests", () => {
+test.describe("Sed basic tests", () => {
   let unknownContentsPtr;
   let cellmlContentsPtr;
   let sedmlContentsPtr;
@@ -33,7 +36,7 @@ describe("Sed basic tests", () => {
   let combineArchiveWithUnknownIndirectCellmlFileContentsPtr;
   let combineArchiveWithUnknownSedmlFileContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
@@ -72,7 +75,7 @@ describe("Sed basic tests", () => {
     );
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, unknownContentsPtr);
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, sedmlContentsPtr);
@@ -92,7 +95,7 @@ describe("Sed basic tests", () => {
   test("No file", () => {
     const document = new loc.SedDocument();
 
-    expect(document.hasIssues).toBe(false);
+    assert.strictEqual(document.hasIssues, false);
 
     document.delete();
   });
@@ -104,7 +107,7 @@ describe("Sed basic tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using an unknown file.",
@@ -122,7 +125,7 @@ describe("Sed basic tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(false);
+    assert.strictEqual(document.hasIssues, false);
 
     document.delete();
     file.delete();
@@ -135,7 +138,7 @@ describe("Sed basic tests", () => {
 
     let document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(true);
+    assert.strictEqual(document.hasIssues, true);
 
     document.delete();
 
@@ -143,7 +146,7 @@ describe("Sed basic tests", () => {
 
     document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(false);
+    assert.strictEqual(document.hasIssues, false);
 
     document.delete();
     neededFile.delete();
@@ -160,7 +163,7 @@ describe("Sed basic tests", () => {
 
     let document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(true);
+    assert.strictEqual(document.hasIssues, true);
 
     document.delete();
 
@@ -168,7 +171,7 @@ describe("Sed basic tests", () => {
 
     document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(false);
+    assert.strictEqual(document.hasIssues, false);
 
     document.delete();
     neededFile.delete();
@@ -185,7 +188,7 @@ describe("Sed basic tests", () => {
 
     let document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(true);
+    assert.strictEqual(document.hasIssues, true);
 
     document.delete();
 
@@ -193,7 +196,7 @@ describe("Sed basic tests", () => {
 
     document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(false);
+    assert.strictEqual(document.hasIssues, false);
 
     document.delete();
     neededFile.delete();
@@ -210,7 +213,7 @@ describe("Sed basic tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expect(document.hasIssues).toBe(false);
+    assert.strictEqual(document.hasIssues, false);
 
     document.delete();
     file.delete();
@@ -226,7 +229,7 @@ describe("Sed basic tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
@@ -247,7 +250,7 @@ describe("Sed basic tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
@@ -268,7 +271,7 @@ describe("Sed basic tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
@@ -292,7 +295,7 @@ describe("Sed basic tests", () => {
 
     instance.run();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "Task 'task1' requires a model of CellML type."],
     ]);
 
@@ -311,7 +314,7 @@ describe("Sed basic tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    expectIssues(loc, document, [
+    assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
         "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",

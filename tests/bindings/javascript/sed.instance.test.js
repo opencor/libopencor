@@ -14,13 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { assertIssues } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Sed instance tests", () => {
+test.describe("Sed instance tests", () => {
   let cellmlContentsPtr;
   let errorCellmlContentsPtr;
   let overconstrainedContentsPtr;
@@ -32,7 +35,7 @@ describe("Sed instance tests", () => {
   let combineArchiveContentsPtr;
   let combineArchiveWithCellmlFileAsMasterFileContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
     errorCellmlContentsPtr = utils.allocateMemory(
       loc,
@@ -63,7 +66,7 @@ describe("Sed instance tests", () => {
     );
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, errorCellmlContentsPtr);
     utils.freeMemory(loc, overconstrainedContentsPtr);
@@ -80,7 +83,7 @@ describe("Sed instance tests", () => {
     const document = new loc.SedDocument();
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The simulation experiment description does not contain any tasks to run.",
@@ -102,7 +105,7 @@ describe("Sed instance tests", () => {
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "The CellML file is invalid."],
       [
         loc.Issue.Type.ERROR,
@@ -126,7 +129,7 @@ describe("Sed instance tests", () => {
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "The CellML file is overconstrained."],
       [
         loc.Issue.Type.ERROR,
@@ -150,7 +153,7 @@ describe("Sed instance tests", () => {
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "The CellML file is underconstrained."],
       [
         loc.Issue.Type.ERROR,
@@ -174,7 +177,7 @@ describe("Sed instance tests", () => {
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "The CellML file is unsuitably constrained."],
       [
         loc.Issue.Type.ERROR,
@@ -201,7 +204,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     document.delete();
@@ -221,11 +224,11 @@ describe("Sed instance tests", () => {
 
     let instance = document.instantiate();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.run();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "At t = 0.00140013827899996, mxstep steps taken before reaching tout.",
@@ -240,7 +243,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     document.delete();
@@ -258,7 +261,7 @@ describe("Sed instance tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
@@ -284,7 +287,7 @@ describe("Sed instance tests", () => {
 
     let instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
@@ -297,7 +300,7 @@ describe("Sed instance tests", () => {
 
     instance = document.instantiate();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     document.delete();
@@ -315,7 +318,7 @@ describe("Sed instance tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
@@ -341,7 +344,7 @@ describe("Sed instance tests", () => {
 
     let instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
@@ -350,7 +353,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
@@ -365,7 +368,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     document.delete();
@@ -385,7 +388,7 @@ describe("Sed instance tests", () => {
 
     const instance = document.instantiate();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
@@ -414,7 +417,7 @@ describe("Sed instance tests", () => {
 
     instance.run();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     document.delete();
@@ -432,7 +435,7 @@ describe("Sed instance tests", () => {
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    expect(instance.hasIssues).toBe(false);
+    assert.strictEqual(instance.hasIssues, false);
 
     instance.delete();
     document.delete();

@@ -14,17 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
-import { expectIssues } from "./utils.js";
+import { assertIssues, assertValue } from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("Solver coverage tests", () => {
+test.describe("Solver coverage tests", () => {
   let algebraicSedChangesContentsPtr;
   let odeSedChangesContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     algebraicSedChangesContentsPtr = utils.allocateMemory(
       loc,
       utils.ALGEBRAIC_SED_CHANGES_CONTENTS,
@@ -35,7 +38,7 @@ describe("Solver coverage tests", () => {
     );
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, algebraicSedChangesContentsPtr);
     utils.freeMemory(loc, odeSedChangesContentsPtr);
   });
@@ -53,7 +56,7 @@ describe("Solver coverage tests", () => {
 
     instance.run();
 
-    expectIssues(loc, instance, [
+    assertIssues(loc, instance, [
       [
         loc.Issue.Type.WARNING,
         "The variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed.",
@@ -113,15 +116,15 @@ describe("Solver coverage tests", () => {
 
     const instanceTask = instance.tasks.get(0);
 
-    expect(instanceTask.stateCount).toBe(0);
-    expect(instanceTask.rateCount).toBe(0);
-    expect(instanceTask.constantCount).toBe(1);
-    expect(instanceTask.computedConstantCount).toBe(1);
-    expect(instanceTask.algebraicCount).toBe(3);
+    assert.strictEqual(instanceTask.stateCount, 0);
+    assert.strictEqual(instanceTask.rateCount, 0);
+    assert.strictEqual(instanceTask.constantCount, 1);
+    assert.strictEqual(instanceTask.computedConstantCount, 1);
+    assert.strictEqual(instanceTask.algebraicCount, 3);
 
-    expect(instanceTask.algebraic(0).get(0)).toBeCloseTo(33.33333, 5);
-    expect(instanceTask.algebraic(1).get(0)).toBeCloseTo(-28.14815, 5);
-    expect(instanceTask.algebraic(2).get(0)).toBeCloseTo(-13.18519, 5);
+    assertValue(instanceTask.algebraic(0).get(0), 33.33333, 5);
+    assertValue(instanceTask.algebraic(1).get(0), -28.14815, 5);
+    assertValue(instanceTask.algebraic(2).get(0), -13.18519, 5);
 
     instance.delete();
     document.delete();

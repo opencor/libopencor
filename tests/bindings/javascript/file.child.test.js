@@ -14,18 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import assert from "node:assert";
+import test from "node:test";
+
 import libOpenCOR from "./libopencor.js";
 import * as utils from "./utils.js";
 
 const loc = await libOpenCOR();
 
-describe("File type tests", () => {
+test.describe("File type tests", () => {
   let dataset135OmexContentsPtr;
   let dataset135JsonContentsPtr;
   let dataset157OmexContentsPtr;
   let dataset157JsonContentsPtr;
 
-  beforeAll(() => {
+  test.before(() => {
     dataset135OmexContentsPtr = utils.allocateMemory(
       loc,
       utils.DATASET_135_OMEX_CONTENTS,
@@ -44,7 +47,7 @@ describe("File type tests", () => {
     );
   });
 
-  afterAll(() => {
+  test.after(() => {
     utils.freeMemory(loc, dataset135OmexContentsPtr);
     utils.freeMemory(loc, dataset135JsonContentsPtr);
     utils.freeMemory(loc, dataset157OmexContentsPtr);
@@ -61,28 +64,35 @@ describe("File type tests", () => {
 
     file.setContents(omexContentsPtr, omexContents.length);
 
-    expect(file.hasChildFiles).toBe(true);
-    expect(file.childFileCount).toBe(specificChildFileNames.length + 1);
-    expect(file.childFileNames.size()).toBe(specificChildFileNames.length + 1);
-    expect(file.childFiles.size()).toBe(specificChildFileNames.length + 1);
+    assert.strictEqual(file.hasChildFiles, true);
+    assert.strictEqual(file.childFileCount, specificChildFileNames.length + 1);
+    assert.strictEqual(
+      file.childFileNames.size(),
+      specificChildFileNames.length + 1,
+    );
+    assert.strictEqual(
+      file.childFiles.size(),
+      specificChildFileNames.length + 1,
+    );
 
     let index = -1;
     const simulationFile = file.childFileFromFileName("simulation.json");
 
-    expect(file.childFile(++index)).not.toBeNull();
-    expect(simulationFile).not.toBeNull();
+    assert.notStrictEqual(file.childFile(++index), null);
+    assert.notStrictEqual(simulationFile, null);
 
     for (let i = 0; i < specificChildFileNames.length; ++i) {
-      expect(file.childFile(++index)).not.toBeNull();
-      expect(
+      assert.notStrictEqual(file.childFile(++index), null);
+      assert.notStrictEqual(
         file.childFileFromFileName(specificChildFileNames[i]),
-      ).not.toBeNull();
+        null,
+      );
     }
 
-    expect(file.childFile(++index)).toBeNull();
-    expect(file.childFileFromFileName(utils.UNKNOWN_FILE)).toBeNull();
+    assert.strictEqual(file.childFile(++index), null);
+    assert.strictEqual(file.childFileFromFileName(utils.UNKNOWN_FILE), null);
 
-    expect(simulationFile.contents()).toStrictEqual(jsonContents);
+    assert.deepStrictEqual(simulationFile.contents(), jsonContents);
 
     file.delete();
   }
@@ -90,12 +100,12 @@ describe("File type tests", () => {
   test("No child files", () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    expect(file.hasChildFiles).toBe(false);
-    expect(file.childFileCount).toBe(0);
-    expect(file.childFileNames.size()).toBe(0);
-    expect(file.childFiles.size()).toBe(0);
-    expect(file.childFile(0)).toBeNull();
-    expect(file.childFileFromFileName(utils.UNKNOWN_FILE)).toBeNull();
+    assert.strictEqual(file.hasChildFiles, false);
+    assert.strictEqual(file.childFileCount, 0);
+    assert.strictEqual(file.childFileNames.size(), 0);
+    assert.strictEqual(file.childFiles.size(), 0);
+    assert.strictEqual(file.childFile(0), null);
+    assert.strictEqual(file.childFileFromFileName(utils.UNKNOWN_FILE), null);
 
     file.delete();
   });
