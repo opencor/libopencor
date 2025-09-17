@@ -136,9 +136,9 @@ void expectNla2Solution(const libOpenCOR::SedInstanceTaskPtr &pInstanceTask)
     EXPECT_EQ(pInstanceTask->computedConstantCount(), 0);
     EXPECT_EQ(pInstanceTask->algebraicCount(), 3);
 
-    EXPECT_NEAR(pInstanceTask->algebraic(0)[0], 3.0, ABS_TOL);
-    EXPECT_NEAR(pInstanceTask->algebraic(1)[0], 7.0, ABS_TOL);
-    EXPECT_NEAR(pInstanceTask->algebraic(2)[0], -5.0, ABS_TOL);
+    EXPECT_NEAR(pInstanceTask->algebraic(0)[0], 7.0, ABS_TOL);
+    EXPECT_NEAR(pInstanceTask->algebraic(1)[0], -5.0, ABS_TOL);
+    EXPECT_NEAR(pInstanceTask->algebraic(2)[0], 3.0, ABS_TOL);
 }
 
 } // namespace
