@@ -30,7 +30,7 @@ else()
     set(CMAKE_DIR lib/cmake)
 endif()
 
-if(LIBOPENCOR_PREBUILT_LIBCELLML OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
+if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -80,7 +80,7 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             endif()
         endif()
     endif()
-else()
+elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
 
     build_package(${PACKAGE_NAME}

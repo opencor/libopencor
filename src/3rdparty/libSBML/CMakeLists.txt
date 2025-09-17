@@ -24,7 +24,7 @@ if(WIN32)
     set(LIBRARY_PREFIX lib)
 endif()
 
-if(LIBOPENCOR_PREBUILT_LIBSBML OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
+if(LIBOPENCOR_PREBUILT_LIBSBML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -74,7 +74,7 @@ if(LIBOPENCOR_PREBUILT_LIBSBML OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             endif()
         endif()
     endif()
-else()
+elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
 
     build_package(${PACKAGE_NAME}
