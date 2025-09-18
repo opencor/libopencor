@@ -190,9 +190,9 @@ test.describe("Solver KINSOL tests", () => {
     assert.strictEqual(instanceTask.computedConstantCount, 0);
     assert.strictEqual(instanceTask.algebraicCount, 3);
 
-    assertValue(instanceTask.algebraic(0).get(0), 3.0, 5);
-    assertValue(instanceTask.algebraic(1).get(0), 7.0, 5);
-    assertValue(instanceTask.algebraic(2).get(0), -5.0, 5);
+    assertValue(instanceTask.algebraic(0).get(0), 7.0, 5);
+    assertValue(instanceTask.algebraic(1).get(0), -5.0, 5);
+    assertValue(instanceTask.algebraic(2).get(0), 3.0, 5);
   }
 
   test("Solve", () => {

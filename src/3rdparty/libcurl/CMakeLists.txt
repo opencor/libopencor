@@ -24,7 +24,7 @@ endif()
 
 # Either retrieve or build our package.
 
-if(LIBOPENCOR_PREBUILT_LIBCURL OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
+if(LIBOPENCOR_PREBUILT_LIBCURL)
     if(WIN32)
         if(RELEASE_MODE)
             if(INTEL_MODE)

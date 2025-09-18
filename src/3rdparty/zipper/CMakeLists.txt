@@ -20,7 +20,7 @@ set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
 
-if(LIBOPENCOR_PREBUILT_ZIPPER OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
+if(LIBOPENCOR_PREBUILT_ZIPPER)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -70,7 +70,7 @@ if(LIBOPENCOR_PREBUILT_ZIPPER OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             endif()
         endif()
     endif()
-else()
+elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
 
     if(APPLE)
