@@ -297,7 +297,7 @@ jobs:
             python_support: OFF
             shared_libs: ON
             unit_testing: ON
-            context: PATH=/opt/homebrew/opt/llvm/bin:$PATH CC=/opt/homebrew/opt/llvm/bin/clang CXX=/opt/homebrew/opt/llvm/bin/clang++
+            context: PATH=/opt/homebrew/opt/llvm@20/bin:$PATH CC=/opt/homebrew/opt/llvm@20/bin/clang CXX=/opt/homebrew/opt/llvm@20/bin/clang++
             target: code_coverage
           - name: 'Memory checks'
             os: ubuntu-22.04
@@ -355,9 +355,7 @@ jobs:
           arch: ${{ matrix.arch }}
       - name: Install LLVM
         if: ${{ matrix.code_coverage == 'ON' }}
-        run: |
-          brew install --overwrite llvm
-          brew info llvm
+        run: brew install --overwrite llvm@20
       - name: Install Clang
         if: ${{ matrix.code_analysis == 'ON' }}
         run: |
