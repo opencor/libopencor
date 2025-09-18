@@ -67,8 +67,8 @@ TEST(VersionTest, Clang)
 
 TEST(VersionTest, libCellML)
 {
-    EXPECT_EQ(0x000500U, libOpenCOR::libcellmlVersion());
-    EXPECT_EQ("0.5.0", libOpenCOR::libcellmlVersionString());
+    EXPECT_EQ(0x000603U, libOpenCOR::libcellmlVersion());
+    EXPECT_EQ("0.6.3", libOpenCOR::libcellmlVersionString());
 }
 
 TEST(VersionTest, libCOMBINE)

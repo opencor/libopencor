@@ -165,11 +165,11 @@ void SedInstanceTask::Impl::initialise()
         applyChanges();
 
 #ifdef __EMSCRIPTEN__
-        mRuntime->computeComputedConstants(mConstants, mComputedConstants);
+        mRuntime->computeComputedConstantsForDifferentialModel(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 #else
-        mRuntime->computeComputedConstants()(mConstants, mComputedConstants);
+        mRuntime->computeComputedConstantsForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 #endif
@@ -183,10 +183,10 @@ void SedInstanceTask::Impl::initialise()
         applyChanges();
 
 #ifdef __EMSCRIPTEN__
-        mRuntime->computeComputedConstants(mConstants, mComputedConstants);
+        mRuntime->computeComputedConstantsForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeVariablesForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
 #else
-        mRuntime->computeComputedConstants()(mConstants, mComputedConstants);
+        mRuntime->computeComputedConstantsForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
 #endif
     }

@@ -35,7 +35,8 @@ public:
 #ifndef __EMSCRIPTEN__
     InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel = nullptr;
     InitialiseVariablesForDifferentialModel mInitialiseVariablesForDifferentialModel = nullptr;
-    ComputeComputedConstants mComputeComputedConstants = nullptr;
+    ComputeComputedConstantsForAlgebraicModel mComputeComputedConstantsForAlgebraicModel = nullptr;
+    ComputeComputedConstantsForDifferentialModel mComputeComputedConstantsForDifferentialModel = nullptr;
     ComputeRates mComputeRates = nullptr;
     ComputeVariablesForAlgebraicModel mComputeVariablesForAlgebraicModel = nullptr;
     ComputeVariablesForDifferentialModel mComputeVariablesForDifferentialModel = nullptr;
@@ -46,14 +47,16 @@ public:
 #ifdef __EMSCRIPTEN__
     void initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void computeComputedConstants(double *pConstants, double *pComputedConstants) const;
+    void computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void computeComputedConstantsForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
 #else
     CellmlFileRuntime::InitialiseVariablesForAlgebraicModel initialiseVariablesForAlgebraicModel() const;
     CellmlFileRuntime::InitialiseVariablesForDifferentialModel initialiseVariablesForDifferentialModel() const;
-    CellmlFileRuntime::ComputeComputedConstants computeComputedConstants() const;
+    CellmlFileRuntime::ComputeComputedConstantsForAlgebraicModel computeComputedConstantsForAlgebraicModel() const;
+    CellmlFileRuntime::ComputeComputedConstantsForDifferentialModel computeComputedConstantsForDifferentialModel() const;
     CellmlFileRuntime::ComputeRates computeRates() const;
     CellmlFileRuntime::ComputeVariablesForAlgebraicModel computeVariablesForAlgebraicModel() const;
     CellmlFileRuntime::ComputeVariablesForDifferentialModel computeVariablesForDifferentialModel() const;

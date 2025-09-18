@@ -145,9 +145,9 @@ def expect_nla2_solution(instance_task):
     assert instance_task.computed_constant_count == 0
     assert instance_task.algebraic_count == 3
 
-    assert instance_task.algebraic(0)[0] == pytest.approx(3.0, abs=ABS_TOL)
-    assert instance_task.algebraic(1)[0] == pytest.approx(7.0, abs=ABS_TOL)
-    assert instance_task.algebraic(2)[0] == pytest.approx(-5.0, abs=ABS_TOL)
+    assert instance_task.algebraic(0)[0] == pytest.approx(7.0, abs=ABS_TOL)
+    assert instance_task.algebraic(1)[0] == pytest.approx(-5.0, abs=ABS_TOL)
+    assert instance_task.algebraic(2)[0] == pytest.approx(3.0, abs=ABS_TOL)
 
 
 def test_solve():

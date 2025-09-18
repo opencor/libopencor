@@ -34,7 +34,8 @@ public:
 #ifndef __EMSCRIPTEN__
     using InitialiseVariablesForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using InitialiseVariablesForDifferentialModel = void (*)(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
-    using ComputeComputedConstants = void (*)(double *pConstants, double *pComputedConstants);
+    using ComputeComputedConstantsForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
+    using ComputeComputedConstantsForDifferentialModel = void (*)(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeVariablesForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeVariablesForDifferentialModel = void (*)(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
@@ -54,14 +55,16 @@ public:
 #ifdef __EMSCRIPTEN__
     void initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void computeComputedConstants(double *pConstants, double *pComputedConstants) const;
+    void computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void computeComputedConstantsForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
 #else
     InitialiseVariablesForAlgebraicModel initialiseVariablesForAlgebraicModel() const;
     InitialiseVariablesForDifferentialModel initialiseVariablesForDifferentialModel() const;
-    ComputeComputedConstants computeComputedConstants() const;
+    ComputeComputedConstantsForAlgebraicModel computeComputedConstantsForAlgebraicModel() const;
+    ComputeComputedConstantsForDifferentialModel computeComputedConstantsForDifferentialModel() const;
     ComputeRates computeRates() const;
     ComputeVariablesForAlgebraicModel computeVariablesForAlgebraicModel() const;
     ComputeVariablesForDifferentialModel computeVariablesForDifferentialModel() const;

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCellML)
-set(PACKAGE_VERSION 0.5.0)
+set(PACKAGE_VERSION 0.6.3)
 set(PACKAGE_REPOSITORY libcellml)
-set(RELEASE_TAG v0.5.0)
+set(RELEASE_TAG v0.6.3)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -30,63 +30,63 @@ else()
     set(CMAKE_DIR lib/cmake)
 endif()
 
-if(LIBOPENCOR_PREBUILT_LIBCELLML OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
+if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         13a93a71d210b4ec3af336180f5d386b1e6d44c9)
+                         f3087749522fb85a72d440180b9b4c3b5bf77eb4)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     25c2e2dd016a47e9fff6a81b610de7be6cdb6bbc)
+                                     b1bfb0c9d197e7b858f5f27f305bda5ae40a9ad7)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     bb4b2e898776d03abd0644e2662d97034725f8d7)
+                                     4d06110bb96f71cff8f1fb0e0e463f94920f8fa9)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     526cfc4d623af35081c37e865f37b856cd39fe0a)
+                                     214b685fbaf9c616739ad8786800b75d59a47f8b)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     770ac1735960bf4d01564fee6a09ff33a62486ab)
+                                     0d6d70f9fdf7443d82016216a78be7d2acea2e7e)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 836e28f4bce436fbee88f109a4f050b9e4dd68f6)
+                                 8ccd4a8a95a3b4b243d900746340f167d9f31075)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 555c258f6541ca7c51c54445a02386c5a619d754)
+                                 72b1e4f2e4a2b76a0d45efced9ef96cbba263d66)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 0842347a0a7abf4c6350aa44a6142ad5ba22a397)
+                                 623866e3cf071f652fe778a22868b5c6917db6f9)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 235fb4aa20bc3dde6ad28483775f2e41e9a093ef)
+                                 9742ef210ca1cc88549b802c6f0fc5d1c0670f25)
             endif()
         endif()
     endif()
-else()
+elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
 
     build_package(${PACKAGE_NAME}
         URL
             # https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
-            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/707e211.tar.gz
+            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/6d27883.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF
