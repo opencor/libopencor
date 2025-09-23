@@ -48,7 +48,6 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
             ${CCACHE_EXE}
             ${CLCACHE_EXE}
             ${EMCMAKE_EXE}
-            ${EMCONFIGURE_EXE}
             ${LIBOPENCOR_JAVASCRIPT_UNIT_TESTING}
             ${REAL_CMAKE_PROJECT_NAME}
         )
@@ -71,7 +70,6 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                                                                   -DCCACHE_EXE=${CCACHE_EXE}
                                                                   -DCLCACHE_EXE=${CLCACHE_EXE}
                                                                   -DEMCMAKE_EXE=${EMCMAKE_EXE}
-                                                                  -DEMCONFIGURE_EXE=${EMCONFIGURE_EXE}
                                                                   -DLIBOPENCOR_BUILD_TYPE=${LIBOPENCOR_BUILD_TYPE}
                                                                   -DLIBOPENCOR_COMPILER_CACHING=${LIBOPENCOR_COMPILER_CACHING}
                                                                   -DLIBOPENCOR_JAVASCRIPT_UNIT_TESTING=${LIBOPENCOR_JAVASCRIPT_UNIT_TESTING}
