@@ -180,7 +180,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./wheelhouse/*.whl
-  python_source_distribution:
+  python_sdist:
     name: Python source distribution
     runs-on: ubuntu-22.04
     steps:
@@ -199,8 +199,8 @@ jobs:
           name: Python source distribution
           path: ./dist/*.tar.gz
   python_pypi:
-    needs: [python_wheels, python_source_distribution]
-    name: Publish Python package to PyPI
+    needs: [python_wheels, python_sdist]
+    name: Publish to PyPI
     runs-on: ubuntu-22.04
     environment: pypi
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
