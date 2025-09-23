@@ -151,7 +151,6 @@ find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(EMCC_EXE NAMES ${PREFERRED_EMCC_NAMES} emcc)
 find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
-find_program(EMCONFIGURE_EXE NAMES ${PREFERRED_EMCONFIGURE_NAMES} emconfigure)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
 find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
 find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov)
@@ -249,7 +248,7 @@ else()
     set(CODE_ANALYSIS_ERROR_MESSAGE "Code analysis is requested but Clang-Tidy could not be found.")
 endif()
 
-if(EMCC_EXE AND EMCMAKE_EXE AND EMCONFIGURE_EXE)
+if(EMCC_EXE AND EMCMAKE_EXE)
     set(FORBIDDEN_EMCC_VERSION 3.1.48)
 
     execute_process(COMMAND ${EMCC_EXE} --version
@@ -265,7 +264,7 @@ if(EMCC_EXE AND EMCMAKE_EXE AND EMCONFIGURE_EXE)
         set(JAVASCRIPT_BINDINGS_AVAILABLE TRUE)
     endif()
 else()
-    set(JAVASCRIPT_BINDINGS_ERROR_MESSAGE "JavaScript bindings are requested but the emcc, emcmake and/or emconfigure tools could not be found.")
+    set(JAVASCRIPT_BINDINGS_ERROR_MESSAGE "JavaScript bindings are requested but the emcc and/or emcmake tools could not be found.")
 endif()
 
 if(JAVASCRIPT_BINDINGS_AVAILABLE AND NODE_EXE AND NPM_EXE)
@@ -355,7 +354,6 @@ mark_as_advanced(BLACK_EXE
                  CLANG_TIDY_EXE
                  EMCC_EXE
                  EMCMAKE_EXE
-                 EMCONFIGURE_EXE
                  FIND_EXE
                  GIT_EXE
                  LEAKS_EXE

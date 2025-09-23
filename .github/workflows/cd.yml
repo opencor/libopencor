@@ -1,8 +1,6 @@
 name: CD
 
 on:
-  push:
-    branches: [ main ]
   release:
     types: [ created ]
   workflow_dispatch:
@@ -124,6 +122,11 @@ jobs:
   python_wheels:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    environment:
+      name: pypi
+      url: https://pypi.org/p/libopencor
+    permissions:
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -179,6 +182,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./wheelhouse/*.whl
+      - name: Publish Python wheels
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: pypa/gh-action-pypi-publish@release/v1
   webassembly:
     name: WebAssembly
     runs-on: macos-14
@@ -187,6 +193,7 @@ jobs:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_LOG_FILE: ""
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Set the timezone to New Zealand
         uses: szenius/set-timezone@v2.0
@@ -217,3 +224,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./build/libopencor-*
+      - name: Publish libOpenCOR
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          cd build/src/bindings/javascript/build/src
+          npm publish --provenance --access public --no-git-checks

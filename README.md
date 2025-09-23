@@ -1,6 +1,4 @@
-[libOpenCOR](https://opencor.ws/libopencor/index.html) is the backend library to [OpenCOR](https://opencor.ws/), an [open source](https://opencor.ws/user/licensing.html) [cross-platform](https://opencor.ws/user/supportedPlatforms.html) modelling environment.
-
-Here are a few links, which you might find useful:
+[libOpenCOR](https://opencor.ws/libopencor/) is a library that can be used to organise, edit, simulate, and analyse [CellML](https://cellml.org/) files. Here are a few links, which you might find useful:
 
 - [What is new?](https://opencor.ws/libopencor/whatIsNew.html)
 - [API documentation](https://opencor.ws/libopencor/api/index.html)
@@ -9,7 +7,7 @@ Here are a few links, which you might find useful:
 - [Download libOpenCOR](https://opencor.ws/libopencor/downloads/index.html)
 - [libOpenCOR team](https://opencor.ws/libopencor/team.html)
 
-You might also be interested in our [users](https://groups.google.com/forum/#!forum/opencor-users) and/or [developers](https://groups.google.com/forum/#!forum/opencor-developers) mailing lists, as well as in our [published article](https://dx.doi.org/10.3389/fphys.2015.00026).
+You might also be interested in our [users](https://groups.google.com/forum/#!forum/opencor-users) and/or [developers](https://groups.google.com/forum/#!forum/opencor-developers) mailing lists.
 
 Please [contact us](https://opencor.ws/libopencor/contactUs.html) if you have any questions about libOpenCOR.
 

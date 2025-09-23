@@ -295,15 +295,23 @@ if(EMSCRIPTEN)
                           COMPILE_FLAGS "-O3 -DNDEBUG"
                           LINK_FLAGS "-O3 -flto -sALLOW_MEMORY_GROWTH -sASSERTIONS=0 -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh] -sEXPORTED_RUNTIME_METHODS=HEAPU8 -sINLINING_LIMIT -sMODULARIZE=1 -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
 
-    # Create a .tgz file for our generated .js file that can be used to distribute our JavaScript bindings.
+    # Package our JavaScript bindings, if possible.
 
-    set(TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION}.tgz)
+    find_program(NPM_EXE NAMES ${PREFERRED_NPM_NAMES} npm)
 
-    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E make_directory package
-                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js package
-                       COMMAND ${CMAKE_COMMAND} -E copy package.json package
-                       COMMAND ${CMAKE_COMMAND} -E tar czf ${TGZ_FILE} package)
+    if(NPM_EXE)
+        set(TGZ_FILENAME ${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION}.tgz)
+        set(TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${TGZ_FILENAME})
+
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E make_directory dist
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js dist
+                           COMMAND ${CMAKE_COMMAND} -E copy package.json dist
+                           COMMAND ${NPM_EXE} pack
+                           COMMAND ${CMAKE_COMMAND} -E copy opencor-${TGZ_FILENAME} ${TGZ_FILE})
+    else()
+        message(WARNING "npm could not be found, so libOpenCOR's JavaScript bindings could not be packaged.")
+    endif()
 
     # Copy our generated .js file over so that it can be used by our test Web page.
 
