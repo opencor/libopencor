@@ -13,7 +13,7 @@
   "files": [
     "dist/libopencor.js",
     "README.md",
-    "LICENSE"
+    "LICENSE.txt"
   ],
   "homepage": "https://opencor.ws/libopencor/",
   "keywords": [
