@@ -180,7 +180,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./wheelhouse/*.whl
-  python_source_distribution:
+  python_sdist:
     name: Python source distribution
     runs-on: ubuntu-22.04
     steps:
@@ -199,8 +199,8 @@ jobs:
           name: Python source distribution
           path: ./dist/*.tar.gz
   python_pypi:
-    needs: [python_wheels, python_source_distribution]
-    name: Publish Python package to PyPI
+    needs: [python_wheels, python_sdist]
+    name: Publish to PyPI
     runs-on: ubuntu-22.04
     environment: pypi
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
@@ -221,7 +221,7 @@ jobs:
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
       BUILDCACHE_DEBUG: -1
       BUILDCACHE_LOG_FILE: ""
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    environment: npm
     steps:
       - name: Set the timezone to New Zealand
         uses: szenius/set-timezone@v2.0
@@ -256,4 +256,4 @@ jobs:
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         run: |
           cd build/src/bindings/javascript/build/src
-          npm publish --provenance --access public --no-git-checks
+          npm publish --provenance --access public
