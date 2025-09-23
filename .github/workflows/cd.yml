@@ -5,6 +5,10 @@ on:
     types: [ created ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   libraries:
     name: ${{ matrix.name }}
@@ -122,11 +126,6 @@ jobs:
   python_wheels:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
-    environment:
-      name: pypi
-      url: https://pypi.org/p/libopencor
-    permissions:
-      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -172,7 +171,6 @@ jobs:
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
           CIBW_SKIP: 'cp38* *musllinux*'
       - name: Upload Python wheel artifacts
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}
@@ -182,8 +180,38 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./wheelhouse/*.whl
-      - name: Publish Python wheels
+  python_source_distribution:
+    name: Python source distribution
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Set the timezone to New Zealand
+        uses: szenius/set-timezone@v2.0
+        with:
+          timezoneLinux: 'Pacific/Auckland'
+      - name: Check out libOpenCOR
+        uses: actions/checkout@v4
+      - name: Build Python source distribution
+        run: pipx run build --sdist
+      - name: Upload Python source distribution artifact
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Python source distribution
+          path: ./dist/*.tar.gz
+  python_pypi:
+    needs: [python_wheels, python_source_distribution]
+    name: Publish Python package to PyPI
+    runs-on: ubuntu-22.04
+    environment: pypi
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    steps:
+      - name: Download Python wheels
+        uses: actions/download-artifact@v5
+        with:
+          pattern: "*Python wheels*"
+          path: ./dist
+          merge-multiple: true
+      - name: Publish Python wheels
         uses: pypa/gh-action-pypi-publish@release/v1
   webassembly:
     name: WebAssembly
