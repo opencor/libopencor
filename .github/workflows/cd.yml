@@ -180,26 +180,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./wheelhouse/*.whl
-  python_sdist:
-    name: Python source distribution
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Set the timezone to New Zealand
-        uses: szenius/set-timezone@v2.0
-        with:
-          timezoneLinux: 'Pacific/Auckland'
-      - name: Check out libOpenCOR
-        uses: actions/checkout@v4
-      - name: Build Python source distribution
-        run: pipx run build --sdist
-      - name: Upload Python source distribution artifact
-        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: Python source distribution
-          path: ./dist/*.tar.gz
   python_pypi:
-    needs: [python_wheels, python_sdist]
+    needs: [python_wheels]
     name: Publish to PyPI
     runs-on: ubuntu-22.04
     environment: pypi
