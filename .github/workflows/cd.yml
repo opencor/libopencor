@@ -166,7 +166,7 @@ jobs:
           CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=13.0
           # Note #1: the value of CIBW_ENVIRONMENT_MACOS must be in sync with that of MACOS_DEPLOYMENT_TARGET in
           #          CMakelists.txt.
-          # Note #2: for some reasons, we need to specify the minor version, hence using 13.0 instead of 13.
+          # Note #2: for some reasons, we need to specify the minor version, hence using 13.0 rather than 13.
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
           CIBW_SKIP: 'cp38* *musllinux*'
