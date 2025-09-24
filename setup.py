@@ -13,20 +13,17 @@
 # limitations under the License.
 
 
-import datetime
 from skbuild import setup
 
-now = datetime.datetime.now()
-year = now.year
-month = now.month
-day = now.day
+with open("VERSION.txt", "r", encoding="utf-8") as version_file:
+    version = version_file.read().strip()
 
 with open("README.md", "r", encoding="utf-8") as readme_file:
     long_description = readme_file.read()
 
 setup(
     name="libopencor",
-    version=f"0.{year}{month:02}{day:02}.0",
+    version=version,
     description="libOpenCOR is the backend library to OpenCOR, a cross-platform modelling environment, which can be used to organise, edit, simulate and analyse CellML files.",
     long_description=long_description,
     long_description_content_type="text/markdown",
