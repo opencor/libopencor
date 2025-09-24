@@ -35,4 +35,18 @@ setup(
     cmake_args=["-DBUILD_TYPE=Release", "-DPYTHON_BINDINGS=ON", "-DSHARED_LIBS=OFF"],
     cmake_install_dir="src/bindings/python/libopencor",
     exclude_package_data={"": ["bin/*", "cmake/*", "include/*", "lib/*"]},
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: Apache Software License"
+        "Operating System :: MacOS",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: POSIX :: Linux",
+        "Programming Language :: C++",
+        "Programming Language :: JavaScript",
+        "Programming Language :: Python",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+    ],
 )
