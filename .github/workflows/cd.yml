@@ -211,8 +211,6 @@ jobs:
           pattern: "*Python wheels*"
           path: ./dist
           merge-multiple: true
-      - name: Display the structure of the downloaded files
-        run: ls -R ./dist
       - name: Publish Python wheels
         uses: pypa/gh-action-pypi-publish@release/v1
   webassembly:
