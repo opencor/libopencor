@@ -313,6 +313,13 @@ if(EMSCRIPTEN)
         message(WARNING "npm could not be found, so libOpenCOR's JavaScript bindings could not be packaged.")
     endif()
 
+    # Copy our generated .js file over so that it can be deployed.
+
+    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                       COMMAND ${CMAKE_COMMAND} -E make_directory wasm
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js
+                                                        wasm/${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}.js)
+
     # Copy our generated .js file over so that it can be used by our test Web page.
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD

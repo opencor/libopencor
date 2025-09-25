@@ -197,7 +197,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
   webassembly:
     name: WebAssembly
-    runs-on: macos-14
+    runs-on: ubuntu-22.04
     env:
       BUILDCACHE_ACCURACY: STRICT
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
@@ -208,7 +208,7 @@ jobs:
       - name: Set the timezone to New Zealand
         uses: szenius/set-timezone@v2.0
         with:
-          timezoneMacos: 'Pacific/Auckland'
+          timezoneLinux: 'Pacific/Auckland'
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
       - name: Install CMake and Ninja
@@ -218,7 +218,7 @@ jobs:
         with:
           cache_key: cd-webassembly
       - name: Install Emscripten
-        run: brew install emscripten
+        uses: mymindstorm/setup-emsdk@v14
       - name: Configure libOpenCOR
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DJAVASCRIPT_UNIT_TESTING=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=OFF -DUNIT_TESTING=OFF
       - name: Build WebAssembly
@@ -234,6 +234,17 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ./build/libopencor-*
+      - name: Deploy to https://opencor.ws/libopencor/downloads/wasm
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        uses: milanmk/actions-file-deployer@master
+        with:
+          remote-protocol: sftp
+          remote-host: ${{ secrets.REMOTE_HOST }}
+          remote-user: ${{ secrets.REMOTE_USER }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          local-path: ./build/src/bindings/javascript/build/src/wasm
+          remote-path: /home/www/opencor.ws/libopencor/downloads/wasm
+          sync: full
       - name: Publish libOpenCOR
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         run: |
