@@ -153,6 +153,14 @@ jobs:
           timezoneMacos: 'Pacific/Auckland'
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
+      - name: Free disk space (Linux only)
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          df -h
+          sudo rm -rf /opt/hostedtoolcache
+          df -h
+          sudo docker image prune --all --force
+          df -h
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
         uses: ilammy/msvc-dev-cmd@v1
@@ -170,6 +178,9 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
           CIBW_SKIP: 'cp38* *musllinux*'
+      - name: Check disk space after build
+        if: ${{ runner.os == 'Linux' }}
+        run: df -h
       - name: Upload Python wheel artifacts
         uses: actions/upload-artifact@v4
         with:
