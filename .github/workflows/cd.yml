@@ -216,6 +216,11 @@ jobs:
           timezoneLinux: 'Pacific/Auckland'
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org'
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
