@@ -152,7 +152,7 @@ test.describe("File basic tests", () => {
       null,
     );
 
-    localFile.delete();
     remoteFile.delete();
+    localFile.delete();
   });
 });

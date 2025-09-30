@@ -1213,7 +1213,7 @@ test.describe("Sed serialise tests", () => {
       expectedSerialisation,
     );
 
-    file.delete();
     document.delete();
+    file.delete();
   });
 });
