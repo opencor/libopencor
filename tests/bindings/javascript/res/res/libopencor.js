@@ -87,30 +87,8 @@ function updateFileUi(
   listFiles();
 }
 
-function resetObjects() {
-  if (document) {
-    document.delete();
-
-    document = null;
-  }
-
-  if (instance) {
-    instance.delete();
-
-    instance = null;
-  }
-}
-
 export function reset() {
-  const files = fileManager.files;
-
-  for (let i = 0; i < fileManager.fileCount; ++i) {
-    files.get(i).delete();
-  }
-
   fileManager.reset();
-
-  resetObjects();
 
   updateFileUi(false, false, false, false);
 }
@@ -239,8 +217,6 @@ $(() => {
           try {
             // Retrieve the contents of the file.
 
-            resetObjects();
-
             const fileArrayBuffer = await inputFile.arrayBuffer();
             const memPtr = loc._malloc(inputFile.size);
             const mem = new Uint8Array(
@@ -299,7 +275,7 @@ $(() => {
 
                 instance = document.instantiate();
 
-                if (instance !== null && instance.hasIssues) {
+                if (instance.hasIssues) {
                   showIssues(instance.issues);
 
                   return;
