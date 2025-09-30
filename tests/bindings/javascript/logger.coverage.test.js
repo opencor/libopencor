@@ -36,6 +36,10 @@ test.describe("Issue coverage tests", () => {
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, errorCellmlContentsPtr);

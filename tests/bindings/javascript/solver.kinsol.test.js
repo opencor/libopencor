@@ -38,6 +38,10 @@ test.describe("Solver KINSOL tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, solverNla1ContentsPtr);
     utils.freeMemory(loc, solverNla2ContentsPtr);

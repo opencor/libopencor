@@ -47,6 +47,10 @@ test.describe("File type tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, dataset135OmexContentsPtr);
     utils.freeMemory(loc, dataset135JsonContentsPtr);

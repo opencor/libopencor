@@ -30,6 +30,10 @@ test.describe("Solver Fourth-Order Runge-Kutta tests", () => {
     solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, solverOdeContentsPtr);
   });

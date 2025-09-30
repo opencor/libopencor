@@ -52,6 +52,10 @@ test.describe("Sed coverage tests", () => {
     mathContentsPtr = utils.allocateMemory(loc, utils.MATH_CONTENTS);
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, sedChangesContentsPtr);
     utils.freeMemory(loc, invalidSedChangesContentsPtr);

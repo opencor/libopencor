@@ -38,6 +38,10 @@ test.describe("Solver coverage tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, algebraicSedChangesContentsPtr);
     utils.freeMemory(loc, odeSedChangesContentsPtr);

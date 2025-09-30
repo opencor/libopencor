@@ -39,6 +39,10 @@ test.describe("File type tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, unknownContentsPtr);
     utils.freeMemory(loc, cellmlContentsPtr);
