@@ -94,10 +94,10 @@ test.describe("File coverage tests", () => {
       utils.COMBINE_ARCHIVE_CONTENTS.length,
     );
 
-    assert.strictEqual(fileManager.fileCount, 4);
+    assert.strictEqual(fileManager.fileCount, 3);
 
     fileManager.unmanage(file);
 
-    assert.strictEqual(fileManager.fileCount, 1);
+    assert.strictEqual(fileManager.fileCount, 0);
   });
 });
