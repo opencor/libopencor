@@ -48,8 +48,6 @@ test.describe("File coverage tests", () => {
     file.setContents(null, 0);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-
-    file.delete();
   });
 
   test("File with null character", () => {
@@ -61,8 +59,6 @@ test.describe("File coverage tests", () => {
     );
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-
-    file.delete();
   });
 
   test("SED-ML file with no parent", () => {
@@ -76,9 +72,6 @@ test.describe("File coverage tests", () => {
     const file2 = new loc.File(utils.LOCAL_FILE);
 
     assert.deepStrictEqual(file1, file2);
-
-    file1.delete();
-    file2.delete();
   });
 
   test("Same remote file", () => {
@@ -86,9 +79,6 @@ test.describe("File coverage tests", () => {
     const file2 = new loc.File(utils.REMOTE_FILE);
 
     assert.deepStrictEqual(file1, file2);
-
-    file1.delete();
-    file2.delete();
   });
 
   test("Unmanage file with children", () => {

@@ -56,8 +56,6 @@ test.describe("File basic tests", () => {
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
     assertIssues(loc, file, expectedUnknownFileIssues);
-
-    file.delete();
   });
 
   test("Remote file", () => {
@@ -75,8 +73,6 @@ test.describe("File basic tests", () => {
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
     assertIssues(loc, file, expectedUnknownFileIssues);
-
-    file.delete();
   });
 
   test("File manager", () => {
@@ -151,8 +147,5 @@ test.describe("File basic tests", () => {
       fileManager.fileFromFileNameOrUrl(utils.UNKNOWN_FILE),
       null,
     );
-
-    remoteFile.delete();
-    localFile.delete();
   });
 });

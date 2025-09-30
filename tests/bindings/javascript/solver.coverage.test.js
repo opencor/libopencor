@@ -74,10 +74,6 @@ test.describe("Solver coverage tests", () => {
         "The algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Algebraic changes", () => {
@@ -125,9 +121,5 @@ test.describe("Solver coverage tests", () => {
     assertValue(instanceTask.algebraic(0).get(0), -28.14815, 5);
     assertValue(instanceTask.algebraic(1).get(0), -13.18519, 5);
     assertValue(instanceTask.algebraic(2).get(0), 33.33333, 5);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 });

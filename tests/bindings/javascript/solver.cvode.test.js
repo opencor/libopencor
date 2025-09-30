@@ -53,10 +53,6 @@ test.describe("Solver CVODE tests", () => {
         "The maximum step cannot be equal to -1.234. It must be greater or equal to 0.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Maximum number of steps value with invalid number", () => {
@@ -78,10 +74,6 @@ test.describe("Solver CVODE tests", () => {
         "The maximum number of steps cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Banded linear solver and upper half-bandwidth value with number too small", () => {
@@ -104,10 +96,6 @@ test.describe("Solver CVODE tests", () => {
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Banded linear solver and upper half-bandwidth value with number too big", () => {
@@ -130,10 +118,6 @@ test.describe("Solver CVODE tests", () => {
         "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Banded linear solver and lower half-bandwidth value with number too small", () => {
@@ -156,10 +140,6 @@ test.describe("Solver CVODE tests", () => {
         "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Banded linear solver and lower half-bandwidth value with number too big", () => {
@@ -182,10 +162,6 @@ test.describe("Solver CVODE tests", () => {
         "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Relative tolerance value with invalid number", () => {
@@ -207,10 +183,6 @@ test.describe("Solver CVODE tests", () => {
         "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Absolute tolerance value with invalid number", () => {
@@ -232,10 +204,6 @@ test.describe("Solver CVODE tests", () => {
         "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Solve", () => {
@@ -268,9 +236,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve without interpolate solution", () => {
@@ -307,9 +272,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with Adams-Moulton integration method", () => {
@@ -346,9 +308,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with functional iteration type", () => {
@@ -385,9 +344,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with banded linear solver", () => {
@@ -424,9 +380,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with diagonal linear solver", () => {
@@ -463,9 +416,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with GMRES linear solver", () => {
@@ -502,9 +452,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with Bi-CGstab linear solver", () => {
@@ -541,9 +488,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with TFQMR linear solver", () => {
@@ -580,9 +524,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with GMRES linear solver and no preconditioner", () => {
@@ -620,9 +561,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with Bi-CGstab linear solver and no preconditioner", () => {
@@ -660,9 +598,6 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Solve with TFQMR linear solver and no preconditioner", () => {
@@ -700,8 +635,5 @@ test.describe("Solver CVODE tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    document.delete();
-    file.delete();
   });
 });

@@ -55,11 +55,6 @@ test.describe("Solver Fourth-Order Runge-Kutta tests", () => {
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
-
-    instance.delete();
-    solver.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Solve", () => {
@@ -98,9 +93,5 @@ test.describe("Solver Fourth-Order Runge-Kutta tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    solver.delete();
-    document.delete();
-    file.delete();
   });
 });

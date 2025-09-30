@@ -93,8 +93,6 @@ test.describe("File type tests", () => {
     assert.strictEqual(file.childFileFromFileName(utils.UNKNOWN_FILE), null);
 
     assert.deepStrictEqual(simulationFile.contents(), jsonContents);
-
-    file.delete();
   }
 
   test("No child files", () => {
@@ -106,8 +104,6 @@ test.describe("File type tests", () => {
     assert.strictEqual(file.childFiles.size(), 0);
     assert.strictEqual(file.childFile(0), null);
     assert.strictEqual(file.childFileFromFileName(utils.UNKNOWN_FILE), null);
-
-    file.delete();
   });
 
   test("Dataset 135", () => {

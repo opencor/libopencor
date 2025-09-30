@@ -82,8 +82,6 @@ test.describe("Solver basic tests", () => {
     assert.strictEqual(solver.relativeTolerance, 1.23e-5);
     assert.strictEqual(solver.absoluteTolerance, 3.45e-7);
     assert.strictEqual(solver.interpolateSolution, false);
-
-    solver.delete();
   });
 
   test("Forward Euler solver", () => {
@@ -98,8 +96,6 @@ test.describe("Solver basic tests", () => {
     solver.step = 0.123;
 
     assert.strictEqual(solver.step, 0.123);
-
-    solver.delete();
   });
 
   test("Fourth-order Runge-Kutta solver", () => {
@@ -114,8 +110,6 @@ test.describe("Solver basic tests", () => {
     solver.step = 0.123;
 
     assert.strictEqual(solver.step, 0.123);
-
-    solver.delete();
   });
 
   test("Heun solver", () => {
@@ -130,8 +124,6 @@ test.describe("Solver basic tests", () => {
     solver.step = 0.123;
 
     assert.strictEqual(solver.step, 0.123);
-
-    solver.delete();
   });
 
   test("KINSOL solver", () => {
@@ -161,8 +153,6 @@ test.describe("Solver basic tests", () => {
     );
     assert.strictEqual(solver.upperHalfBandwidth, 3);
     assert.strictEqual(solver.lowerHalfBandwidth, 5);
-
-    solver.delete();
   });
 
   test("Second-order Runge-Kutta solver", () => {
@@ -177,7 +167,5 @@ test.describe("Solver basic tests", () => {
     solver.step = 0.123;
 
     assert.strictEqual(solver.step, 0.123);
-
-    solver.delete();
   });
 });

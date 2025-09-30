@@ -78,8 +78,6 @@ test.describe("Sed coverage tests", () => {
     const document = new loc.SedDocument();
 
     assert.strictEqual(document.serialise(), expectedSerialisation);
-
-    document.delete();
   });
 
   test("Models", () => {
@@ -149,10 +147,6 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(model.changes.size(), 0);
 
     assert.strictEqual(model.removeChange(null), false);
-
-    model.delete();
-    file.delete();
-    document.delete();
   });
 
   test("Changes", () => {
@@ -281,10 +275,6 @@ test.describe("Sed coverage tests", () => {
 
     assert.strictEqual(document.addSimulation(uniform_time_course), true);
     assert.strictEqual(document.removeAllSimulations(), true);
-
-    steady_state.delete();
-    uniform_time_course.delete();
-    document.delete();
   });
 
   test("Tasks", () => {
@@ -347,12 +337,6 @@ test.describe("Sed coverage tests", () => {
 
     assert.strictEqual(document.addTask(task), true);
     assert.strictEqual(document.removeAllTasks(), true);
-
-    task.delete();
-    simulation.delete();
-    model.delete();
-    file.delete();
-    document.delete();
   });
 
   test("ODE solver", () => {
@@ -370,10 +354,6 @@ test.describe("Sed coverage tests", () => {
     simulation.odeSolver = null;
 
     assert.strictEqual(simulation.odeSolver, null);
-
-    solver.delete();
-    simulation.delete();
-    document.delete();
   });
 
   test("NLA solver", () => {
@@ -391,10 +371,6 @@ test.describe("Sed coverage tests", () => {
     simulation.nlaSolver = null;
 
     assert.strictEqual(simulation.nlaSolver, null);
-
-    solver.delete();
-    simulation.delete();
-    document.delete();
   });
 
   test("SedOneStep", () => {
@@ -407,10 +383,6 @@ test.describe("Sed coverage tests", () => {
     simulation.step = 1.23;
 
     assert.strictEqual(simulation.step, 1.23);
-
-    simulation.delete();
-    document.delete();
-    file.delete();
   });
 
   test("SedUniformTimeCourse", () => {
@@ -432,10 +404,6 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(simulation.outputStartTime, 4.56);
     assert.strictEqual(simulation.outputEndTime, 7.89);
     assert.strictEqual(simulation.numberOfSteps, 10);
-
-    simulation.delete();
-    document.delete();
-    file.delete();
   });
 
   test("SedInstanceAndSedInstanceTaskDifferentialModel", () => {
@@ -523,10 +491,6 @@ test.describe("Sed coverage tests", () => {
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("SedInstanceAndSedInstanceTaskNonDifferentialModel", () => {
@@ -555,30 +519,17 @@ test.describe("Sed coverage tests", () => {
     assert.deepStrictEqual(instanceTask.rateAsArray(0), []);
     assert.strictEqual(instanceTask.rateName(0), "");
     assert.strictEqual(instanceTask.rateUnit(0), "");
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("SedDocument", () => {
     let file = new loc.File(utils.HTTP_REMOTE_CELLML_FILE);
     let document = new loc.SedDocument(file);
 
-    document.delete();
-    file.delete();
-
     file = new loc.File(utils.HTTP_REMOTE_SEDML_FILE);
     document = new loc.SedDocument(file);
 
-    document.delete();
-    file.delete();
-
     file = new loc.File(utils.HTTP_REMOTE_COMBINE_ARCHIVE);
     document = new loc.SedDocument(file);
-
-    document.delete();
-    file.delete();
   });
 
   test("Solver", () => {
@@ -600,9 +551,6 @@ test.describe("Sed coverage tests", () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    instance.delete();
-    solver.delete();
-
     solver = new loc.SolverFourthOrderRungeKutta();
 
     simulation.odeSolver = solver;
@@ -612,9 +560,6 @@ test.describe("Sed coverage tests", () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.delete();
-    solver.delete();
 
     solver = new loc.SolverHeun();
 
@@ -626,9 +571,6 @@ test.describe("Sed coverage tests", () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    instance.delete();
-    solver.delete();
-
     solver = new loc.SolverSecondOrderRungeKutta();
 
     simulation.odeSolver = solver;
@@ -638,11 +580,6 @@ test.describe("Sed coverage tests", () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.delete();
-    solver.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Math", () => {
