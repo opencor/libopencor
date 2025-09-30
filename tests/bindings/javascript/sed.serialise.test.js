@@ -392,6 +392,11 @@ test.describe("Sed serialise tests", () => {
         "987.654321",
       ),
     );
+
+    model.delete();
+    file.delete();
+    document.delete();
+    changeAttribute.delete();
   });
 
   test("Fixed-step ODE solver", () => {
