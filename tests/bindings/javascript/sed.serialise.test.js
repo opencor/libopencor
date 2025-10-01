@@ -43,6 +43,10 @@ test.describe("Sed serialise tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, sedmlContentsPtr);
@@ -128,9 +132,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Local CellML file without base path", () => {
@@ -144,9 +145,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(),
       cvodeExpectedSerialisation("file:///some/path/file.txt"),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Relative local CellML file with base path", () => {
@@ -160,9 +158,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION + "/../.."),
       cvodeExpectedSerialisation("some/path/cellml_2.cellml"),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Relative local CellML file without base path", () => {
@@ -176,9 +171,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(),
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Remote CellML file with base path", () => {
@@ -192,9 +184,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.REMOTE_BASE_PATH),
       cvodeExpectedSerialisation("cellml_2.cellml"),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Remote CellML file without base path", () => {
@@ -210,9 +199,6 @@ test.describe("Sed serialise tests", () => {
         "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml",
       ),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Relative remote CellML file with base path", () => {
@@ -226,9 +212,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.REMOTE_BASE_PATH + "/../.."),
       cvodeExpectedSerialisation("tests/res/cellml_2.cellml"),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("DAE model", () => {
@@ -280,9 +263,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("NLA model", () => {
@@ -296,9 +276,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation(),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("Algebraic model", () => {
@@ -326,9 +303,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
-
-    document.delete();
-    file.delete();
   });
 
   function sedChangeExpectedSerialisation(component, variable, newValue) {
@@ -428,9 +402,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with the Adams-Moulton integration method", () => {
@@ -450,9 +421,6 @@ test.describe("Sed serialise tests", () => {
         "KISAO:0000475": "Adams-Moulton",
       }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with a functional iteration type", () => {
@@ -472,9 +440,6 @@ test.describe("Sed serialise tests", () => {
         "KISAO:0000476": "Functional",
       }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with a banded linear solver", () => {
@@ -494,9 +459,6 @@ test.describe("Sed serialise tests", () => {
         "KISAO:0000477": "Banded",
       }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with a diagonal linear solver", () => {
@@ -516,9 +478,6 @@ test.describe("Sed serialise tests", () => {
         "KISAO:0000477": "Diagonal",
       }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with a GMRES linear solver", () => {
@@ -538,9 +497,6 @@ test.describe("Sed serialise tests", () => {
         "KISAO:0000477": "GMRES",
       }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with a BiCGStab linear solver", () => {
@@ -560,9 +516,6 @@ test.describe("Sed serialise tests", () => {
         "KISAO:0000477": "BiCGStab",
       }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with a TFQMR linear solver", () => {
@@ -582,9 +535,6 @@ test.describe("Sed serialise tests", () => {
         "KISAO:0000477": "TFQMR",
       }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with no preconditioner", () => {
@@ -602,9 +552,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       cvodeExpectedSerialisation("cellml_2.cellml", { "KISAO:0000478": "No" }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("CVODE solver with no interpolate solution", () => {
@@ -624,9 +571,6 @@ test.describe("Sed serialise tests", () => {
         "KISAO:0000481": "false",
       }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("KINSOL solver with a banded linear solver", () => {
@@ -644,9 +588,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation({ "KISAO:0000477": "Banded" }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("KINSOL solver with a GMRES linear solver", () => {
@@ -664,9 +605,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation({ "KISAO:0000477": "GMRES" }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("KINSOL solver with a BiCGStab linear solver", () => {
@@ -684,9 +622,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation({ "KISAO:0000477": "BiCGStab" }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("KINSOL solver with a TFQMR linear solver", () => {
@@ -704,9 +639,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       kinsolExpectedSerialisation({ "KISAO:0000477": "TFQMR" }),
     );
-
-    document.delete();
-    file.delete();
   });
 
   test("One-step simulation", () => {
@@ -740,10 +672,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
-
-    simulation.delete();
-    document.delete();
-    file.delete();
   });
 
   test("SED-ML file", () => {
@@ -793,9 +721,6 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
-
-    file.delete();
-    document.delete();
   });
 
   test("SedSimulation", () => {
@@ -1212,8 +1137,5 @@ test.describe("Sed serialise tests", () => {
       document.serialise(utils.RESOURCE_LOCATION),
       expectedSerialisation,
     );
-
-    file.delete();
-    document.delete();
   });
 });

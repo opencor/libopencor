@@ -30,6 +30,10 @@ test.describe("Solver Heun tests", () => {
     solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, solverOdeContentsPtr);
   });
@@ -55,11 +59,6 @@ test.describe("Solver Heun tests", () => {
         "The step cannot be equal to 0. It must be greater than 0.",
       ],
     ]);
-
-    instance.delete();
-    solver.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Solve", () => {
@@ -98,9 +97,5 @@ test.describe("Solver Heun tests", () => {
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
     );
-
-    solver.delete();
-    document.delete();
-    file.delete();
   });
 });

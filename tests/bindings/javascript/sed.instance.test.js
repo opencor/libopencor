@@ -66,6 +66,10 @@ test.describe("Sed instance tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, errorCellmlContentsPtr);
@@ -89,9 +93,6 @@ test.describe("Sed instance tests", () => {
         "The simulation experiment description does not contain any tasks to run.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
   });
 
   test("Invalid CellML file", () => {
@@ -112,10 +113,6 @@ test.describe("Sed instance tests", () => {
         "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Overconstrained CellML file", () => {
@@ -136,10 +133,6 @@ test.describe("Sed instance tests", () => {
         "Variable 'x' in component 'my_component' is computed more than once.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Underconstrained CellML file", () => {
@@ -160,10 +153,6 @@ test.describe("Sed instance tests", () => {
         "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Unsuitably constrained CellML file", () => {
@@ -188,10 +177,6 @@ test.describe("Sed instance tests", () => {
         "The type of variable 'x' in component 'my_component' is unknown.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Algebraic model", () => {
@@ -205,10 +190,6 @@ test.describe("Sed instance tests", () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("ODE model", () => {
@@ -235,8 +216,6 @@ test.describe("Sed instance tests", () => {
       ],
     ]);
 
-    instance.delete();
-
     cvode.maximumNumberOfSteps = 500;
 
     instance = document.instantiate();
@@ -244,10 +223,6 @@ test.describe("Sed instance tests", () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("ODE model with no ODE solver", () => {
@@ -267,10 +242,6 @@ test.describe("Sed instance tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("NLA model", () => {
@@ -294,17 +265,11 @@ test.describe("Sed instance tests", () => {
       ],
     ]);
 
-    instance.delete();
-
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
 
     instance = document.instantiate();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("NLA model with no NLA solver", () => {
@@ -324,10 +289,6 @@ test.describe("Sed instance tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("DAE model", () => {
@@ -360,8 +321,6 @@ test.describe("Sed instance tests", () => {
       ],
     ]);
 
-    instance.delete();
-
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
 
     instance = document.instantiate();
@@ -369,10 +328,6 @@ test.describe("Sed instance tests", () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("DAE model with no ODE or NLA solver", () => {
@@ -398,10 +353,6 @@ test.describe("Sed instance tests", () => {
         "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("COMBINE archive", () => {
@@ -418,10 +369,6 @@ test.describe("Sed instance tests", () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("COMBINE archive with CellML file as master file", () => {
@@ -436,9 +383,5 @@ test.describe("Sed instance tests", () => {
     const instance = document.instantiate();
 
     assert.strictEqual(instance.hasIssues, false);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 });

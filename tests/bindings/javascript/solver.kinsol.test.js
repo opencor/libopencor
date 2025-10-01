@@ -38,6 +38,10 @@ test.describe("Solver KINSOL tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, solverNla1ContentsPtr);
     utils.freeMemory(loc, solverNla2ContentsPtr);
@@ -62,10 +66,6 @@ test.describe("Solver KINSOL tests", () => {
         "The maximum number of iterations cannot be equal to -1. It must be greater than 0.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Banded linear solver and upper half-bandwidth value with number too small", () => {
@@ -88,10 +88,6 @@ test.describe("Solver KINSOL tests", () => {
         "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Banded linear solver and upper half-bandwidth value with number too big", () => {
@@ -114,10 +110,6 @@ test.describe("Solver KINSOL tests", () => {
         "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Banded linear solver and lower half-bandwidth value with number too small", () => {
@@ -140,10 +132,6 @@ test.describe("Solver KINSOL tests", () => {
         "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Banded linear solver and lower half-bandwidth value with number too big", () => {
@@ -166,10 +154,6 @@ test.describe("Solver KINSOL tests", () => {
         "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
       ],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   function assertNla1Solution(instanceTask) {
@@ -206,10 +190,6 @@ test.describe("Solver KINSOL tests", () => {
     instance.run();
 
     assertNla1Solution(instance.tasks.get(0));
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Solve with banded linear solver", () => {
@@ -230,10 +210,6 @@ test.describe("Solver KINSOL tests", () => {
     instance.run();
 
     assertNla2Solution(instance.tasks.get(0));
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Solve with GMRES linear solver", () => {
@@ -252,10 +228,6 @@ test.describe("Solver KINSOL tests", () => {
     instance.run();
 
     assertNla1Solution(instance.tasks.get(0));
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Solve with BiCGStab linear solver", () => {
@@ -274,10 +246,6 @@ test.describe("Solver KINSOL tests", () => {
     instance.run();
 
     assertNla2Solution(instance.tasks.get(0));
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("Solve with TFQMR linear solver", () => {
@@ -296,9 +264,5 @@ test.describe("Solver KINSOL tests", () => {
     instance.run();
 
     assertNla1Solution(instance.tasks.get(0));
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 });

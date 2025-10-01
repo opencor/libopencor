@@ -36,6 +36,10 @@ test.describe("Issue coverage tests", () => {
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, cellmlContentsPtr);
     utils.freeMemory(loc, errorCellmlContentsPtr);
@@ -48,8 +52,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.hasIssues, false);
-
-    file.delete();
   });
 
   test("issueCount", () => {
@@ -58,8 +60,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.issueCount, 0);
-
-    file.delete();
   });
 
   test("issues", () => {
@@ -68,8 +68,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.issues.size(), 0);
-
-    file.delete();
   });
 
   test("issue()", () => {
@@ -82,8 +80,6 @@ test.describe("Issue coverage tests", () => {
 
     assert.notStrictEqual(file.issue(0), null);
     assert.strictEqual(file.issue(file.issueCount), null);
-
-    file.delete();
   });
 
   test("hasErrors", () => {
@@ -92,8 +88,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.hasErrors, false);
-
-    file.delete();
   });
 
   test("errorCount", () => {
@@ -102,8 +96,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.errorCount, 0);
-
-    file.delete();
   });
 
   test("errors", () => {
@@ -112,8 +104,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.errors.size(), 0);
-
-    file.delete();
   });
 
   test("error()", () => {
@@ -126,8 +116,6 @@ test.describe("Issue coverage tests", () => {
 
     assert.notStrictEqual(file.error(0), null);
     assert.strictEqual(file.error(file.errorCount), null);
-
-    file.delete();
   });
 
   test("hasWarnings", () => {
@@ -136,8 +124,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.hasWarnings, false);
-
-    file.delete();
   });
 
   test("warningCount", () => {
@@ -146,8 +132,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.warningCount, 0);
-
-    file.delete();
   });
 
   test("warnings", () => {
@@ -156,8 +140,6 @@ test.describe("Issue coverage tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.warnings.size(), 0);
-
-    file.delete();
   });
 
   test("warning()", () => {
@@ -169,8 +151,5 @@ test.describe("Issue coverage tests", () => {
 
     assert.notStrictEqual(document.warning(0), null);
     assert.strictEqual(document.warning(document.warningCount), null);
-
-    document.delete();
-    file.delete();
   });
 });

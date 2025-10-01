@@ -39,6 +39,10 @@ test.describe("File type tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, unknownContentsPtr);
     utils.freeMemory(loc, cellmlContentsPtr);
@@ -58,8 +62,6 @@ test.describe("File type tests", () => {
         "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
       ],
     ]);
-
-    file.delete();
   });
 
   test("CellML file", () => {
@@ -68,8 +70,6 @@ test.describe("File type tests", () => {
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
 
     assert.strictEqual(file.type.value, loc.File.Type.CELLML_FILE.value);
-
-    file.delete();
   });
 
   test("SED-ML file", () => {
@@ -78,8 +78,6 @@ test.describe("File type tests", () => {
     file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
 
     assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
-
-    file.delete();
   });
 
   test("COMBINE archive", () => {
@@ -91,7 +89,5 @@ test.describe("File type tests", () => {
     );
 
     assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
-
-    file.delete();
   });
 });

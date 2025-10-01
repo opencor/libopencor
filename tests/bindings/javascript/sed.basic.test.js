@@ -75,6 +75,10 @@ test.describe("Sed basic tests", () => {
     );
   });
 
+  test.beforeEach(() => {
+    loc.FileManager.instance().reset();
+  });
+
   test.after(() => {
     utils.freeMemory(loc, unknownContentsPtr);
     utils.freeMemory(loc, cellmlContentsPtr);
@@ -96,8 +100,6 @@ test.describe("Sed basic tests", () => {
     const document = new loc.SedDocument();
 
     assert.strictEqual(document.hasIssues, false);
-
-    document.delete();
   });
 
   test("Unknown file", () => {
@@ -113,9 +115,6 @@ test.describe("Sed basic tests", () => {
         "A simulation experiment description cannot be created using an unknown file.",
       ],
     ]);
-
-    document.delete();
-    file.delete();
   });
 
   test("CellML file", () => {
@@ -126,9 +125,6 @@ test.describe("Sed basic tests", () => {
     const document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
-
-    document.delete();
-    file.delete();
   });
 
   test("SED-ML file", () => {
@@ -140,17 +136,11 @@ test.describe("Sed basic tests", () => {
 
     assert.strictEqual(document.hasIssues, true);
 
-    document.delete();
-
     const neededFile = new loc.File(utils.CELLML_FILE);
 
     document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
-
-    document.delete();
-    neededFile.delete();
-    file.delete();
   });
 
   test("SED-ML file with absolute CellML file", () => {
@@ -165,17 +155,11 @@ test.describe("Sed basic tests", () => {
 
     assert.strictEqual(document.hasIssues, true);
 
-    document.delete();
-
     const neededFile = new loc.File(utils.LOCAL_FILE);
 
     document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
-
-    document.delete();
-    neededFile.delete();
-    file.delete();
   });
 
   test("SED-ML file with remote CellML file", () => {
@@ -190,17 +174,11 @@ test.describe("Sed basic tests", () => {
 
     assert.strictEqual(document.hasIssues, true);
 
-    document.delete();
-
     const neededFile = new loc.File(utils.REMOTE_FILE);
 
     document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
-
-    document.delete();
-    neededFile.delete();
-    file.delete();
   });
 
   test("COMBINE archive", () => {
@@ -214,9 +192,6 @@ test.describe("Sed basic tests", () => {
     const document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
-
-    document.delete();
-    file.delete();
   });
 
   test("COMBINE archive with no manifest file", () => {
@@ -235,9 +210,6 @@ test.describe("Sed basic tests", () => {
         "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
       ],
     ]);
-
-    document.delete();
-    file.delete();
   });
 
   test("COMBINE archive with no master file", () => {
@@ -256,9 +228,6 @@ test.describe("Sed basic tests", () => {
         "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
       ],
     ]);
-
-    document.delete();
-    file.delete();
   });
 
   test("COMBINE archive with unknown direct CellML file", () => {
@@ -277,9 +246,6 @@ test.describe("Sed basic tests", () => {
         "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
       ],
     ]);
-
-    document.delete();
-    file.delete();
   });
 
   test("COMBINE archive with unknown indirect CellML file", () => {
@@ -298,10 +264,6 @@ test.describe("Sed basic tests", () => {
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "Task 'task1' requires a model of CellML type."],
     ]);
-
-    instance.delete();
-    document.delete();
-    file.delete();
   });
 
   test("COMBINE archive with unknown SED-ML file", () => {
@@ -320,8 +282,5 @@ test.describe("Sed basic tests", () => {
         "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
       ],
     ]);
-
-    document.delete();
-    file.delete();
   });
 });

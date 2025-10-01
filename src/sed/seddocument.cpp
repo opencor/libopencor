@@ -271,8 +271,8 @@ bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
         return false;
     }
 
-    auto model = std::ranges::find_if(mModels, [&](const auto &s) {
-        return s == pModel;
+    auto model = std::ranges::find_if(mModels, [&](const auto &m) {
+        return m == pModel;
     });
 
     if (model != mModels.end()) {
@@ -286,8 +286,8 @@ bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
 
 bool SedDocument::Impl::removeModel(const SedModelPtr &pModel)
 {
-    auto model = std::ranges::find_if(mModels, [&](const auto &s) {
-        return s == pModel;
+    auto model = std::ranges::find_if(mModels, [&](const auto &m) {
+        return m == pModel;
     });
 
     if (model != mModels.end()) {
