@@ -63,7 +63,7 @@ public:
      */
 
 #ifdef __EMSCRIPTEN__
-    bool solve(size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData);
+    bool solve(intptr_t pWasmInstanceFunctionsId, size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData);
 #else
     bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData);
 #endif

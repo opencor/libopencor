@@ -58,7 +58,7 @@ public:
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
 
 #ifdef __EMSCRIPTEN__
-    bool solve(size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData) override;
+    bool solve(intptr_t pWasmInstanceFunctionsId, size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData) override;
 #else
     bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData) override;
 #endif

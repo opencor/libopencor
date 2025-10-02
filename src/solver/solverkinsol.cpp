@@ -74,11 +74,13 @@ void errorHandler(int pLine, const char *pFunction, const char *pFile, const cha
 
 #ifdef __EMSCRIPTEN__
 static constexpr auto MAX_SIZE_T = std::numeric_limits<size_t>::max();
+static constexpr auto MAX_INTPTR_T = std::numeric_limits<intptr_t>::max();
 #endif
 
 struct SolverKinsolUserData
 {
 #ifdef __EMSCRIPTEN__
+    intptr_t wasmInstanceFunctionsId = MAX_INTPTR_T;
     size_t computeObjectiveFunctionIndex = MAX_SIZE_T;
 #else
     SolverNla::ComputeObjectiveFunction computeObjectiveFunction = nullptr;
@@ -94,8 +96,8 @@ int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
 #ifdef __EMSCRIPTEN__
     // clang-format off
     EM_ASM({
-        Module.objectiveFunctions[$0]($1, $2, $3);
-    }, userData->computeObjectiveFunctionIndex, N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData); // clang-format on
+        Module.wasmInstanceFunctions.get($0).objectiveFunctions[$1]($2, $3, $4);
+    }, userData->wasmInstanceFunctionsId, userData->computeObjectiveFunctionIndex, N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData); // clang-format on
 #else
     userData->computeObjectiveFunction(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
 #endif
@@ -231,7 +233,7 @@ void SolverKinsol::Impl::setLowerHalfBandwidth(int pLowerHalfBandwidth)
 }
 
 #ifdef __EMSCRIPTEN__
-bool SolverKinsol::Impl::solve(size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
+bool SolverKinsol::Impl::solve(intptr_t pWasmInstanceFunctionsId, size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
 #else
 bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData)
 #endif
@@ -340,6 +342,7 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     SolverKinsolUserData userData;
 
 #ifdef __EMSCRIPTEN__
+    userData.wasmInstanceFunctionsId = pWasmInstanceFunctionsId;
     userData.computeObjectiveFunctionIndex = pComputeObjectiveFunctionIndex;
 #else
     userData.computeObjectiveFunction = pComputeObjectiveFunction;

@@ -37,17 +37,11 @@ test.describe("Version tests", () => {
       .trim();
     const [majorVersionStr, dateStr, patchVersionStr] = versionStr.split(".");
     const majorVersion = Number(majorVersionStr);
+    const date = Number(dateStr);
     const patchVersion = Number(patchVersionStr);
-    const year = Number(dateStr.slice(0, 4));
-    const month = Number(dateStr.slice(4, 6));
-    const day = Number(dateStr.slice(6, 8));
 
     let version = BigInt(0);
-    let number = BigInt(
-      10000000000 * majorVersion +
-        100 * (10000 * year + 100 * month + day) +
-        patchVersion,
-    );
+    let number = BigInt(10000000000 * majorVersion + 100 * date + patchVersion);
     let i = BigInt(0);
 
     const ten = BigInt(10);
@@ -62,9 +56,7 @@ test.describe("Version tests", () => {
     assert.strictEqual(loc.version(), version);
     assert.strictEqual(
       loc.versionString(),
-      `${majorVersion}.${year}${String(month).padStart(2, "0")}${String(
-        day,
-      ).padStart(2, "0")}.${patchVersion}`,
+      `${majorVersion}.${date}.${patchVersion}`,
     );
   });
 
