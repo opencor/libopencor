@@ -31,16 +31,23 @@ std::string exportJavaScriptName(const std::string &pName)
     return std::string("__attribute__((export_name(\"").append(pName).append("\")))\n");
 }
 
-void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferentialModel, bool pIsOdeModel,
-                                   bool pIsAlgebraicModel, bool pHasObjectiveFunctions)
+intptr_t instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferentialModel, bool pIsOdeModel,
+                                      bool pIsAlgebraicModel, bool pHasObjectiveFunctions)
 {
     // clang-format off
-    return EM_ASM_PTR({
+    return EM_ASM_INT({
         try {
             // Instantiate the WebAssembly module.
 
             const wasmBytes = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
             const wasmModule = new WebAssembly.Module(wasmBytes);
+
+            if (Module.wasmInstanceFunctions === undefined) {
+                Module.wasmInstanceFunctions = new Map();
+                Module.wasmInstanceFunctionsId = 0;
+            }
+
+            const wasmInstanceFunctionsId = ++Module.wasmInstanceFunctionsId;
             const wasmInstance = new WebAssembly.Instance(wasmModule, {
                 env: {
                     __linear_memory: wasmMemory,
@@ -55,7 +62,7 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
                     // NLA solve function.
 
                     nlaSolve: function(nlaSolverAddress, objectiveFunctionIndex, u, n, data) {
-                        Module.nlaSolve(Number(nlaSolverAddress), Number(objectiveFunctionIndex), Number(u), Number(n), Number(data));
+                        Module.nlaSolve(Number(nlaSolverAddress), wasmInstanceFunctionsId, Number(objectiveFunctionIndex), Number(u), Number(n), Number(data));
                     },
 
                     // Arithmetic operators.
@@ -91,26 +98,28 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
 
             // Retrieve the functions needed to compute the model.
 
-            if ($2) {
-                Module.initialiseVariables = wasmInstance.exports.initialiseVariables;
-                Module.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
-                Module.computeRates = wasmInstance.exports.computeRates;
-                Module.computeVariables = wasmInstance.exports.computeVariables;
+            const wasmInstanceFunctions = {};
 
-                if ((Module.initialiseVariables === undefined)
-                    || (Module.computeComputedConstants === undefined)
-                    || (Module.computeRates === undefined)
-                    || (Module.computeVariables === undefined)) {
+            if ($2) {
+                wasmInstanceFunctions.initialiseVariables = wasmInstance.exports.initialiseVariables;
+                wasmInstanceFunctions.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
+                wasmInstanceFunctions.computeRates = wasmInstance.exports.computeRates;
+                wasmInstanceFunctions.computeVariables = wasmInstance.exports.computeVariables;
+
+                if ((wasmInstanceFunctions.initialiseVariables === undefined)
+                    || (wasmInstanceFunctions.computeComputedConstants === undefined)
+                    || (wasmInstanceFunctions.computeRates === undefined)
+                    || (wasmInstanceFunctions.computeVariables === undefined)) {
                     throw new Error("The functions needed to compute the " + ($3 ? "ODE" : "DAE") + " model could not be retrieved.");
                 }
             } else {
-                Module.initialiseVariables = wasmInstance.exports.initialiseVariables;
-                Module.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
-                Module.computeVariables = wasmInstance.exports.computeVariables;
+                wasmInstanceFunctions.initialiseVariables = wasmInstance.exports.initialiseVariables;
+                wasmInstanceFunctions.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
+                wasmInstanceFunctions.computeVariables = wasmInstance.exports.computeVariables;
 
-                if ((Module.initialiseVariables === undefined)
-                    || (Module.computeComputedConstants === undefined)
-                    || (Module.computeVariables === undefined)) {
+                if ((wasmInstanceFunctions.initialiseVariables === undefined)
+                    || (wasmInstanceFunctions.computeComputedConstants === undefined)
+                    || (wasmInstanceFunctions.computeVariables === undefined)) {
                     throw new Error("The functions needed to compute the " + ($4 ? "algebraic" : "NLA") + " model could not be retrieved.");
                 }
             }
@@ -118,22 +127,26 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
             // Retrieve the objective functions, if any.
 
             if ($5) {
-                Module.objectiveFunctions = {};
+                wasmInstanceFunctions.objectiveFunctions = {};
 
                 for (let name in wasmInstance.exports) {
                     if (name.startsWith("objectiveFunction")) {
                         const objectiveFunctionIndex = parseInt(name.replace("objectiveFunction", ""));
 
-                        Module.objectiveFunctions[objectiveFunctionIndex] = wasmInstance.exports[name];
+                        wasmInstanceFunctions.objectiveFunctions[objectiveFunctionIndex] = wasmInstance.exports[name];
                     }
                 }
 
-                if (Object.keys(Module.objectiveFunctions).length === 0) {
+                if (Object.keys(wasmInstanceFunctions.objectiveFunctions).length === 0) {
                     throw new Error("The objective functions could not be retrieved.");
                 }
             }
 
-            return null;
+            // Store the WASM instance functions.
+
+            Module.wasmInstanceFunctions.set(wasmInstanceFunctionsId, wasmInstanceFunctions);
+
+            return wasmInstanceFunctionsId;
         } catch (error) {
             const errorMessage = error.toString();
             const errorMessageLength = lengthBytesUTF8(errorMessage) + 1;
@@ -141,7 +154,9 @@ void *instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferential
 
             stringToUTF8(errorMessage, errorMessagePtr, errorMessageLength);
 
-            return errorMessagePtr;
+            // Return the error message pointer as a negative number to indicate an error.
+
+            return -errorMessagePtr;
         }
     }, pWasmModule.data(), pWasmModule.size(), pDifferentialModel, pIsOdeModel, pIsAlgebraicModel, pHasObjectiveFunctions); // clang-format on
 }
@@ -333,13 +348,16 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
         // Instantiate the WebAssembly module.
 
-        auto errorMessagePtr = instantiateWebAssemblyModule(mWasmModule, differentialModel,
-                                                            cellmlFileType == libcellml::AnalyserModel::Type::ODE,
-                                                            cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC,
-                                                            pNlaSolver != nullptr);
+        auto wasmInstanceFunctionsId = instantiateWebAssemblyModule(mWasmModule, differentialModel,
+                                                                    cellmlFileType == libcellml::AnalyserModel::Type::ODE,
+                                                                    cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC,
+                                                                    pNlaSolver != nullptr);
 
-        if (errorMessagePtr != nullptr) {
-            std::string jsErrorMessage(reinterpret_cast<char *>(errorMessagePtr));
+        if (wasmInstanceFunctionsId < 0) {
+            // An error occurred and the error message pointer is the negative of the returned value.
+
+            auto errorMessagePtr = reinterpret_cast<char *>(-wasmInstanceFunctionsId);
+            std::string jsErrorMessage(errorMessagePtr);
 
             free(errorMessagePtr);
 
@@ -347,6 +365,10 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
             return;
         }
+
+        // Keep track of the WASM instance functions ID.
+
+        mWasmInstanceFunctionsId = wasmInstanceFunctionsId;
 #else
 #    ifdef CODE_COVERAGE_ENABLED
         mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel()));
@@ -412,67 +434,67 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 }
 
 #ifdef __EMSCRIPTEN__
-EM_JS(void, jsInitialiseVariablesForAlgebraicModel, (double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.initialiseVariables(pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsInitialiseVariablesForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseVariables(pConstants, pComputedConstants, pAlgebraic);
 });
 
 void CellmlFileRuntime::Impl::initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsInitialiseVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+    jsInitialiseVariablesForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraic);
 }
 
-EM_JS(void, jsInitialiseVariablesForDifferentialModel, (double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.initialiseVariables(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsInitialiseVariablesForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseVariables(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 });
 
 void CellmlFileRuntime::Impl::initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsInitialiseVariablesForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsInitialiseVariablesForDifferentialModel(mWasmInstanceFunctionsId, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 
-EM_JS(void, jsComputeComputedConstantsForAlgebraicModel, (double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.computeComputedConstants(pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeComputedConstantsForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeComputedConstants(pConstants, pComputedConstants, pAlgebraic);
 });
 
 void CellmlFileRuntime::Impl::computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsComputeComputedConstantsForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+    jsComputeComputedConstantsForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraic);
 }
 
-EM_JS(void, jsComputeComputedConstantsForDifferentialModel, (double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.computeComputedConstants(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeComputedConstantsForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeComputedConstants(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 });
 
 void CellmlFileRuntime::Impl::computeComputedConstantsForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsComputeComputedConstantsForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsComputeComputedConstantsForDifferentialModel(mWasmInstanceFunctionsId, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 
-EM_JS(void, jsComputeRates, (double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeRates, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 });
 
 void CellmlFileRuntime::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsComputeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsComputeRates(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 
-EM_JS(void, jsComputeVariablesForAlgebraicModel, (double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.computeVariables(pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeVariablesForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeVariables(pConstants, pComputedConstants, pAlgebraic);
 });
 
 void CellmlFileRuntime::Impl::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsComputeVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+    jsComputeVariablesForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraic);
 }
 
-EM_JS(void, jsComputeVariablesForDifferentialModel, (double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.computeVariables(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeVariablesForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeVariables(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 });
 
 void CellmlFileRuntime::Impl::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsComputeVariablesForDifferentialModel(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsComputeVariablesForDifferentialModel(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 #else
 CellmlFileRuntime::InitialiseVariablesForAlgebraicModel CellmlFileRuntime::Impl::initialiseVariablesForAlgebraicModel() const

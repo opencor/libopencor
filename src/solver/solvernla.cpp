@@ -21,9 +21,9 @@ limitations under the License.
 namespace libOpenCOR {
 
 #ifdef __EMSCRIPTEN__
-void nlaSolve(uintptr_t pNlaSolverAddress, size_t pObjectiveFunctionIndex, double *pU, size_t pN, void *pData)
+void nlaSolve(uintptr_t pNlaSolverAddress, intptr_t pWasmInstanceFunctionsId, size_t pObjectiveFunctionIndex, double *pU, size_t pN, void *pData)
 {
-    reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunctionIndex, pU, pN, pData);
+    reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pWasmInstanceFunctionsId, pObjectiveFunctionIndex, pU, pN, pData);
 }
 #else
 void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
@@ -59,9 +59,9 @@ Solver::Type SolverNla::type() const
 }
 
 #ifdef __EMSCRIPTEN__
-bool SolverNla::solve(size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
+bool SolverNla::solve(intptr_t pWasmInstanceFunctionsId, size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
 {
-    return pimpl()->solve(pComputeObjectiveFunctionIndex, pU, pN, pUserData);
+    return pimpl()->solve(pWasmInstanceFunctionsId, pComputeObjectiveFunctionIndex, pU, pN, pUserData);
 }
 #else
 bool SolverNla::solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData)

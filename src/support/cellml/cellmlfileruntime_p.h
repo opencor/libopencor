@@ -30,6 +30,7 @@ public:
     std::string mNlaSolverAddress;
 #ifdef __EMSCRIPTEN__
     UnsignedChars mWasmModule;
+    intptr_t mWasmInstanceFunctionsId = 0;
 #endif
 
 #ifndef __EMSCRIPTEN__
