@@ -174,7 +174,7 @@ jobs:
           # Note #2: for some reasons, we need to specify the minor version, hence using 13.0 rather than 13.
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
-          CIBW_SKIP: 'cp38* *musllinux*'
+          CIBW_SKIP: 'cp38* cp39* cp*t-* *musllinux*'
       - name: Upload Python wheel artifacts
         uses: actions/upload-artifact@v4
         with:
