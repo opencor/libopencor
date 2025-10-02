@@ -10,3 +10,6 @@ build-backend = 'setuptools.build_meta'
 [tool.black]
 include = '.*\.py(\.in)?$'
 extend-exclude = 'extern/'
+
+[tool.cibuildwheel.linux]
+before-all = "yum install -y ninja-build"
