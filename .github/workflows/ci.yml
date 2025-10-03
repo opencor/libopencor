@@ -128,7 +128,7 @@ jobs:
             install_uninstall_and_package: ON
             use_install_prefix: ON
           - name: 'macOS static library (Intel)'
-            os: macos-13
+            os: macos-15-intel
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -142,7 +142,7 @@ jobs:
             install_uninstall_and_package: ON
             use_install_prefix: ON
           - name: 'macOS shared library (Intel)'
-            os: macos-13
+            os: macos-15-intel
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -156,7 +156,7 @@ jobs:
             install_uninstall_and_package: ON
             use_install_prefix: ON
           - name: 'macOS static library (ARM)'
-            os: macos-14
+            os: macos-15
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -170,7 +170,7 @@ jobs:
             install_uninstall_and_package: ON
             use_install_prefix: ON
           - name: 'macOS shared library (ARM)'
-            os: macos-14
+            os: macos-15
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -184,7 +184,7 @@ jobs:
             install_uninstall_and_package: ON
             use_install_prefix: ON
           - name: 'JavaScript bindings'
-            os: macos-14
+            os: macos-15
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -223,7 +223,7 @@ jobs:
             target: python_unit_testing
             pip_install_test_and_uninstall: ON
           - name: 'macOS Python bindings'
-            os: macos-14
+            os: macos-15
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -251,7 +251,7 @@ jobs:
             context: PATH=$GITHUB_WORKSPACE:$PATH
             target: check_code_formatting
           - name: 'JavaScript code formatting'
-            os: macos-14
+            os: macos-15
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -287,7 +287,7 @@ jobs:
             unit_testing: ON
             context: PATH=$GITHUB_WORKSPACE:$PATH CC=/usr/local/bin/clang CXX=/usr/local/bin/clang++
           - name: 'Code coverage'
-            os: macos-14
+            os: macos-15
             build_type: Release
             code_analysis: OFF
             code_coverage: ON
