@@ -45,7 +45,7 @@ jobs:
             os: macos-15-intel
             build_type: Release
           - name: 'macOS (ARM)'
-            os: macos-14
+            os: macos-15
             build_type: Release
     env:
       BUILDCACHE_ACCURACY: STRICT
@@ -88,7 +88,7 @@ jobs:
   webassembly:
     name: WebAssembly
     if: ${{ inputs.wasm_support }}
-    runs-on: macos-14
+    runs-on: macos-15
     env:
       BUILDCACHE_ACCURACY: STRICT
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
