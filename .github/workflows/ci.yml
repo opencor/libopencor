@@ -128,7 +128,7 @@ jobs:
             install_uninstall_and_package: ON
             use_install_prefix: ON
           - name: 'macOS static library (Intel)'
-            os: macos-13
+            os: macos-15-intel
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -142,7 +142,7 @@ jobs:
             install_uninstall_and_package: ON
             use_install_prefix: ON
           - name: 'macOS shared library (Intel)'
-            os: macos-13
+            os: macos-15-intel
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
