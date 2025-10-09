@@ -351,10 +351,10 @@ $(() => {
 
     // Versions page.
 
-    $("#OpenCOR").html(loc.versionString());
     $("#Clang").html(loc.clangVersionString());
     $("#libCellML").html(loc.libcellmlVersionString());
     $("#libCOMBINE").html(loc.libcombineVersionString());
+    $("#libOpenCOR").html(loc.versionString());
     $("#libSEDML").html(loc.libsedmlVersionString());
     $("#LLVM").html(loc.llvmVersionString());
     $("#SUNDIALS").html(loc.sundialsVersionString());
