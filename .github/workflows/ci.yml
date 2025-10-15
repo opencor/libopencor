@@ -235,7 +235,7 @@ jobs:
             unit_testing: OFF
             context: PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
             target: python_unit_testing
-            pip_install_prerequisites: sudo pip3 install cmake scikit-build
+            pip_install_prerequisites: sudo uv pip install --system cmake scikit-build
             pip_install_test_and_uninstall: ON
           - name: 'Code formatting'
             os: ubuntu-22.04
@@ -338,7 +338,7 @@ jobs:
       - name: Check out libOpenCOR
         uses: actions/checkout@v4
       - name: Install Python
-        if: ${{ matrix.python_support == 'ON' }}
+        if: ${{ matrix.documentation == 'ON' || matrix.python_support == 'ON' || matrix.target == 'python_check_code_formatting' }}
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -380,9 +380,12 @@ jobs:
       - name: Install Prettier
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
         run: brew install --overwrite prettier
+      - name: Install uv
+        if: ${{ matrix.documentation == 'ON' || matrix.python_support == 'ON' || matrix.target == 'python_check_code_formatting' }}
+        uses: astral-sh/setup-uv@v6
       - name: Install Black
         if: ${{ matrix.target == 'python_check_code_formatting' }}
-        run: pip3 install black
+        run: uv pip install --system black
       - name: Install Valgrind
         if: ${{ matrix.memory_checks == 'ON' }}
         run: |
@@ -390,10 +393,10 @@ jobs:
           sudo apt install valgrind
       - name: Install pytest and pytest-html
         if: ${{ matrix.python_support == 'ON' }}
-        run: pip3 install pytest pytest-html
+        run: uv pip install --system pytest pytest-html
       - name: Install Sphinx and some Sphinx packages
         if: ${{ matrix.documentation == 'ON' }}
-        run: pip3 install sphinx sphinx-copybutton sphinx-inline-tabs
+        run: uv pip install --system sphinx sphinx-copybutton sphinx-inline-tabs
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |
@@ -470,7 +473,7 @@ jobs:
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: |
           ${{ matrix.pip_install_prerequisites }}
-          pip3 install .
+          uv pip install --system .
       - name: Test libOpenCOR Python
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: |
@@ -478,7 +481,7 @@ jobs:
           python3 test_install.py
       - name: pip uninstall libOpenCOR
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
-        run: pip3 uninstall -y libopencor
+        run: uv pip uninstall --system libopencor
   spell_check:
     name: Spell check
     runs-on: ubuntu-22.04

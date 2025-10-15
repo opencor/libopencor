@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pkgutil
+import importlib
 import sys
 
 package = sys.argv[1].replace("-", "_")
 
-for module in pkgutil.iter_modules():
-    if module[1] == package:
-        sys.exit(0)
+try:
+    importlib.import_module(package)
 
-sys.exit(1)
+    sys.exit(0)
+except ImportError:
+    sys.exit(1)
