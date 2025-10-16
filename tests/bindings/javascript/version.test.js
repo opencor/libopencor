@@ -48,7 +48,7 @@ test.describe("Version tests", () => {
     const four = BigInt(4);
 
     while (number != 0) {
-      version |= number % ten << i;
+      version |= (number % ten) << i;
       number /= ten;
       i += four;
     }

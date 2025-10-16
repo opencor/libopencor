@@ -43,18 +43,13 @@ endif()
 # Add some custom targets to test the formatting of our JavaScript code and to format it.
 
 if(JAVASCRIPT_FORMATTING_AVAILABLE)
-    set(JAVASCRIPT_FILES
-        "\"**/*.js\""
-        "\"**/*.js.in\""
-    )
-
     add_target(javascript_check_code_formatting
-               COMMAND ${PRETTIER_EXE} --check --parser babel ${JAVASCRIPT_FILES}
+               COMMAND ${BIOME_EXE} format
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Checking JavaScript code formatting...")
 
     add_target(javascript_format_code
-               COMMAND ${PRETTIER_EXE} --write --parser babel ${JAVASCRIPT_FILES}
+               COMMAND ${BIOME_EXE} format --write
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Formatting the JavaScript code...")
 endif()

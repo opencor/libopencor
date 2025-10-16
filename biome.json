@@ -1,0 +1,6 @@
+{
+  "formatter": {
+    "includes": ["**/*.js", "**/*.js.in", "!build/**", "!prebuilt/**"],
+    "indentStyle": "space"
+  }
+}

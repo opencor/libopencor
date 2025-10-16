@@ -377,9 +377,9 @@ jobs:
       - name: Install Emscripten
         if: ${{ matrix.javascript_support == 'ON' }}
         run: brew install --overwrite emscripten
-      - name: Install Prettier
+      - name: Install Biome
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
-        run: brew install --overwrite prettier
+        run: brew install --overwrite biome
       - name: Install uv
         if: ${{ matrix.documentation == 'ON' || matrix.python_support == 'ON' || matrix.target == 'python_check_code_formatting' }}
         uses: astral-sh/setup-uv@v6
