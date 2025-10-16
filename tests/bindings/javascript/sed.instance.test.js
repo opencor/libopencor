@@ -37,29 +37,14 @@ test.describe("Sed instance tests", () => {
 
   test.before(() => {
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
-    errorCellmlContentsPtr = utils.allocateMemory(
-      loc,
-      utils.ERROR_CELLML_CONTENTS,
-    );
-    overconstrainedContentsPtr = utils.allocateMemory(
-      loc,
-      utils.OVERCONSTRAINED_CONTENTS,
-    );
-    underconstrainedContentsPtr = utils.allocateMemory(
-      loc,
-      utils.UNDERCONSTRAINED_CONTENTS,
-    );
-    unsuitablyConstrainedContentsPtr = utils.allocateMemory(
-      loc,
-      utils.UNSUITABLY_CONSTRAINED_CONTENTS,
-    );
+    errorCellmlContentsPtr = utils.allocateMemory(loc, utils.ERROR_CELLML_CONTENTS);
+    overconstrainedContentsPtr = utils.allocateMemory(loc, utils.OVERCONSTRAINED_CONTENTS);
+    underconstrainedContentsPtr = utils.allocateMemory(loc, utils.UNDERCONSTRAINED_CONTENTS);
+    unsuitablyConstrainedContentsPtr = utils.allocateMemory(loc, utils.UNSUITABLY_CONSTRAINED_CONTENTS);
     algebraicContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_CONTENTS);
     nlaContentsPtr = utils.allocateMemory(loc, utils.NLA_CONTENTS);
     daeContentsPtr = utils.allocateMemory(loc, utils.DAE_CONTENTS);
-    combineArchiveContentsPtr = utils.allocateMemory(
-      loc,
-      utils.COMBINE_ARCHIVE_CONTENTS,
-    );
+    combineArchiveContentsPtr = utils.allocateMemory(loc, utils.COMBINE_ARCHIVE_CONTENTS);
     combineArchiveWithCellmlFileAsMasterFileContentsPtr = utils.allocateMemory(
       loc,
       utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS,
@@ -88,20 +73,14 @@ test.describe("Sed instance tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The simulation experiment description does not contain any tasks to run.",
-      ],
+      [loc.Issue.Type.ERROR, "The simulation experiment description does not contain any tasks to run."],
     ]);
   });
 
   test("Invalid CellML file", () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
-    file.setContents(
-      errorCellmlContentsPtr,
-      utils.ERROR_CELLML_CONTENTS.length,
-    );
+    file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -118,64 +97,43 @@ test.describe("Sed instance tests", () => {
   test("Overconstrained CellML file", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      overconstrainedContentsPtr,
-      utils.OVERCONSTRAINED_CONTENTS.length,
-    );
+    file.setContents(overconstrainedContentsPtr, utils.OVERCONSTRAINED_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "The CellML file is overconstrained."],
-      [
-        loc.Issue.Type.ERROR,
-        "Variable 'x' in component 'my_component' is computed more than once.",
-      ],
+      [loc.Issue.Type.ERROR, "Variable 'x' in component 'my_component' is computed more than once."],
     ]);
   });
 
   test("Underconstrained CellML file", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      underconstrainedContentsPtr,
-      utils.UNDERCONSTRAINED_CONTENTS.length,
-    );
+    file.setContents(underconstrainedContentsPtr, utils.UNDERCONSTRAINED_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "The CellML file is underconstrained."],
-      [
-        loc.Issue.Type.ERROR,
-        "The type of variable 'x' in component 'my_component' is unknown.",
-      ],
+      [loc.Issue.Type.ERROR, "The type of variable 'x' in component 'my_component' is unknown."],
     ]);
   });
 
   test("Unsuitably constrained CellML file", () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(
-      unsuitablyConstrainedContentsPtr,
-      utils.UNSUITABLY_CONSTRAINED_CONTENTS.length,
-    );
+    file.setContents(unsuitablyConstrainedContentsPtr, utils.UNSUITABLY_CONSTRAINED_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "The CellML file is unsuitably constrained."],
-      [
-        loc.Issue.Type.ERROR,
-        "Variable 'y' in component 'my_component' is computed more than once.",
-      ],
-      [
-        loc.Issue.Type.ERROR,
-        "The type of variable 'x' in component 'my_component' is unknown.",
-      ],
+      [loc.Issue.Type.ERROR, "Variable 'y' in component 'my_component' is computed more than once."],
+      [loc.Issue.Type.ERROR, "The type of variable 'x' in component 'my_component' is unknown."],
     ]);
   });
 
@@ -210,10 +168,7 @@ test.describe("Sed instance tests", () => {
     instance.run();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "At t = 0.00140013827899996, mxstep steps taken before reaching tout.",
-      ],
+      [loc.Issue.Type.ERROR, "At t = 0.00140013827899996, mxstep steps taken before reaching tout."],
     ]);
 
     cvode.maximumNumberOfSteps = 500;
@@ -259,10 +214,7 @@ test.describe("Sed instance tests", () => {
     let instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
-      ],
+      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."],
     ]);
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
@@ -306,19 +258,13 @@ test.describe("Sed instance tests", () => {
     let instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
-      ],
+      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."],
     ]);
 
     instance.run();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
-      ],
+      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."],
     ]);
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
@@ -358,10 +304,7 @@ test.describe("Sed instance tests", () => {
   test("COMBINE archive", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(
-      combineArchiveContentsPtr,
-      utils.COMBINE_ARCHIVE_CONTENTS.length,
-    );
+    file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();

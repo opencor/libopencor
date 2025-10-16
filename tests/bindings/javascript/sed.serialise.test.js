@@ -37,10 +37,7 @@ test.describe("Sed serialise tests", () => {
     algebraicContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_CONTENTS);
     daeContentsPtr = utils.allocateMemory(loc, utils.DAE_CONTENTS);
     nlaContentsPtr = utils.allocateMemory(loc, utils.NLA_CONTENTS);
-    sedmlWithSimulationsContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SEDML_WITH_SIMULATIONS_CONTENTS,
-    );
+    sedmlWithSimulationsContentsPtr = utils.allocateMemory(loc, utils.SEDML_WITH_SIMULATIONS_CONTENTS);
   });
 
   test.beforeEach(() => {
@@ -128,10 +125,7 @@ test.describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      cvodeExpectedSerialisation("cellml_2.cellml"),
-    );
+    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml"));
   });
 
   test("Local CellML file without base path", () => {
@@ -141,10 +135,7 @@ test.describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(
-      document.serialise(),
-      cvodeExpectedSerialisation("file:///some/path/file.txt"),
-    );
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation("file:///some/path/file.txt"));
   });
 
   test("Relative local CellML file with base path", () => {
@@ -167,10 +158,7 @@ test.describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(
-      document.serialise(),
-      cvodeExpectedSerialisation("cellml_2.cellml"),
-    );
+    assert.strictEqual(document.serialise(), cvodeExpectedSerialisation("cellml_2.cellml"));
   });
 
   test("Remote CellML file with base path", () => {
@@ -180,10 +168,7 @@ test.describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(
-      document.serialise(utils.REMOTE_BASE_PATH),
-      cvodeExpectedSerialisation("cellml_2.cellml"),
-    );
+    assert.strictEqual(document.serialise(utils.REMOTE_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml"));
   });
 
   test("Remote CellML file without base path", () => {
@@ -259,10 +244,7 @@ test.describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      expectedSerialisation,
-    );
+    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
   });
 
   test("NLA model", () => {
@@ -272,10 +254,7 @@ test.describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      kinsolExpectedSerialisation(),
-    );
+    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), kinsolExpectedSerialisation());
   });
 
   test("Algebraic model", () => {
@@ -299,10 +278,7 @@ test.describe("Sed serialise tests", () => {
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      expectedSerialisation,
-    );
+    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
   });
 
   function sedChangeExpectedSerialisation(component, variable, newValue) {
@@ -320,11 +296,7 @@ test.describe("Sed serialise tests", () => {
   }
 
   test("Model with changes", () => {
-    const changeAttribute = new loc.SedChangeAttribute(
-      "component",
-      "variable",
-      "123.456789",
-    );
+    const changeAttribute = new loc.SedChangeAttribute("component", "variable", "123.456789");
 
     assert.strictEqual(
       changeAttribute.target,
@@ -341,10 +313,7 @@ test.describe("Sed serialise tests", () => {
     assert.strictEqual(model.addChange(changeAttribute), true);
     assert.strictEqual(document.addModel(model), true);
 
-    assert.strictEqual(
-      document.serialise(),
-      sedChangeExpectedSerialisation("component", "variable", "123.456789"),
-    );
+    assert.strictEqual(document.serialise(), sedChangeExpectedSerialisation("component", "variable", "123.456789"));
 
     changeAttribute.componentName = "new_component";
     changeAttribute.variableName = "new_variable";
@@ -360,11 +329,7 @@ test.describe("Sed serialise tests", () => {
 
     assert.strictEqual(
       document.serialise(),
-      sedChangeExpectedSerialisation(
-        "new_component",
-        "new_variable",
-        "987.654321",
-      ),
+      sedChangeExpectedSerialisation("new_component", "new_variable", "987.654321"),
     );
   });
 
@@ -398,10 +363,7 @@ test.describe("Sed serialise tests", () => {
 
     simulation.odeSolver = new loc.SolverForwardEuler();
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      expectedSerialisation,
-    );
+    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
   });
 
   test("CVODE solver with the Adams-Moulton integration method", () => {
@@ -668,10 +630,7 @@ test.describe("Sed serialise tests", () => {
 
     document.addSimulation(simulation);
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      expectedSerialisation,
-    );
+    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
   });
 
   test("SED-ML file", () => {
@@ -717,10 +676,7 @@ test.describe("Sed serialise tests", () => {
         "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it.",
       ],
     ]);
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      expectedSerialisation,
-    );
+    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
   });
 
   test("SedSimulation", () => {
@@ -964,22 +920,13 @@ test.describe("Sed serialise tests", () => {
 
     const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
-    file.setContents(
-      sedmlWithSimulationsContentsPtr,
-      utils.SEDML_WITH_SIMULATIONS_CONTENTS.length,
-    );
+    file.setContents(sedmlWithSimulationsContentsPtr, utils.SEDML_WITH_SIMULATIONS_CONTENTS.length);
 
     let document = new loc.SedDocument(file);
 
     assertIssues(loc, document, [
-      [
-        loc.Issue.Type.WARNING,
-        "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead.",
-      ],
-      [
-        loc.Issue.Type.WARNING,
-        "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
-      ],
+      [loc.Issue.Type.WARNING, "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead."],
+      [loc.Issue.Type.WARNING, "The parameter 'KISAO:1234567' is not recognised. It will be ignored."],
       [
         loc.Issue.Type.WARNING,
         "The step ('KISAO:0000483') cannot be equal to '-1.23'. It must be greater or equal to 0. A step of 1 will be used instead.",
@@ -992,10 +939,7 @@ test.describe("Sed serialise tests", () => {
         loc.Issue.Type.WARNING,
         "The step ('KISAO:0000483') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A step of 1 will be used instead.",
       ],
-      [
-        loc.Issue.Type.WARNING,
-        "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
-      ],
+      [loc.Issue.Type.WARNING, "The parameter 'KISAO:1234567' is not recognised. It will be ignored."],
       [
         loc.Issue.Type.WARNING,
         "The relative tolerance ('KISAO:0000209') cannot be equal to '-1e-03'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
@@ -1088,10 +1032,7 @@ test.describe("Sed serialise tests", () => {
         loc.Issue.Type.WARNING,
         "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
       ],
-      [
-        loc.Issue.Type.WARNING,
-        "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
-      ],
+      [loc.Issue.Type.WARNING, "The parameter 'KISAO:1234567' is not recognised. It will be ignored."],
       [
         loc.Issue.Type.WARNING,
         "The maximum number of iterations ('KISAO:0000486') cannot be equal to '-123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
@@ -1133,9 +1074,6 @@ test.describe("Sed serialise tests", () => {
         "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
       ],
     ]);
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      expectedSerialisation,
-    );
+    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
   });
 });

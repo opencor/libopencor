@@ -29,10 +29,7 @@ test.describe("Issue coverage tests", () => {
 
   test.before(() => {
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
-    errorCellmlContentsPtr = utils.allocateMemory(
-      loc,
-      utils.ERROR_CELLML_CONTENTS,
-    );
+    errorCellmlContentsPtr = utils.allocateMemory(loc, utils.ERROR_CELLML_CONTENTS);
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
   });
 
@@ -73,10 +70,7 @@ test.describe("Issue coverage tests", () => {
   test("issue()", () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
-    file.setContents(
-      errorCellmlContentsPtr,
-      utils.ERROR_CELLML_CONTENTS.length,
-    );
+    file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
 
     assert.notStrictEqual(file.issue(0), null);
     assert.strictEqual(file.issue(file.issueCount), null);
@@ -109,10 +103,7 @@ test.describe("Issue coverage tests", () => {
   test("error()", () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
-    file.setContents(
-      errorCellmlContentsPtr,
-      utils.ERROR_CELLML_CONTENTS.length,
-    );
+    file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
 
     assert.notStrictEqual(file.error(0), null);
     assert.strictEqual(file.error(file.errorCount), null);

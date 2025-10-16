@@ -28,14 +28,8 @@ test.describe("Solver KINSOL tests", () => {
   let solverNla2ContentsPtr;
 
   test.before(() => {
-    solverNla1ContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOLVER_NLA1_CONTENTS,
-    );
-    solverNla2ContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOLVER_NLA2_CONTENTS,
-    );
+    solverNla1ContentsPtr = utils.allocateMemory(loc, utils.SOLVER_NLA1_CONTENTS);
+    solverNla2ContentsPtr = utils.allocateMemory(loc, utils.SOLVER_NLA2_CONTENTS);
   });
 
   test.beforeEach(() => {
@@ -61,10 +55,7 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The maximum number of iterations cannot be equal to -1. It must be greater than 0.",
-      ],
+      [loc.Issue.Type.ERROR, "The maximum number of iterations cannot be equal to -1. It must be greater than 0."],
     ]);
   });
 
@@ -83,10 +74,7 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
-      ],
+      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."],
     ]);
   });
 
@@ -105,10 +93,7 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
-      ],
+      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0."],
     ]);
   });
 
@@ -127,10 +112,7 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
-      ],
+      [loc.Issue.Type.ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2."],
     ]);
   });
 
@@ -149,10 +131,7 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
-      ],
+      [loc.Issue.Type.ERROR, "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0."],
     ]);
   });
 

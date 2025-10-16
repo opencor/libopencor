@@ -33,109 +33,64 @@ export const HTTP_REMOTE_SEDML_FILE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml";
 export const HTTP_REMOTE_COMBINE_ARCHIVE =
   "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex";
-export const REMOTE_BASE_PATH =
-  "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
-export const REMOTE_FILE =
-  "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+export const REMOTE_BASE_PATH = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
+export const REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
 
 export const NO_CONTENTS = stringToArrayBuffer("");
 export const NULL_CHARACTER_CONTENTS = stringToArrayBuffer("\0");
 export const UNKNOWN_CONTENTS = stringToArrayBuffer("Some unknown contents...");
 export const CELLML_CONTENTS = stringToArrayBuffer(`@CELLML_CONTENTS@`);
-export const ERROR_CELLML_CONTENTS = stringToArrayBuffer(
-  `@ERROR_CELLML_CONTENTS@`,
-);
-export const WARNING_CELLML_CONTENTS = stringToArrayBuffer(
-  `@WARNING_CELLML_CONTENTS@`,
-);
+export const ERROR_CELLML_CONTENTS = stringToArrayBuffer(`@ERROR_CELLML_CONTENTS@`);
+export const WARNING_CELLML_CONTENTS = stringToArrayBuffer(`@WARNING_CELLML_CONTENTS@`);
 export const SEDML_CONTENTS = stringToArrayBuffer(`@SEDML_CONTENTS@`);
 export const SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS = stringToArrayBuffer(
   `@SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS@`,
 );
-export const SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS = stringToArrayBuffer(
-  `@SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS@`,
+export const SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS = stringToArrayBuffer(`@SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS@`);
+export const SEDML_WITH_SIMULATIONS_CONTENTS = stringToArrayBuffer(`@SEDML_WITH_SIMULATIONS_CONTENTS@`);
+export const COMBINE_ARCHIVE_CONTENTS = stringToArrayBuffer(atob("@BASE64_COMBINE_ARCHIVE_CONTENTS@"));
+export const COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS@"),
 );
-export const SEDML_WITH_SIMULATIONS_CONTENTS = stringToArrayBuffer(
-  `@SEDML_WITH_SIMULATIONS_CONTENTS@`,
-);
-export const COMBINE_ARCHIVE_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_COMBINE_ARCHIVE_CONTENTS@"),
-);
-export const COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS =
-  stringToArrayBuffer(
-    atob("@BASE64_COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS@"),
-  );
 export const COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS = stringToArrayBuffer(
   atob("@BASE64_COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS@"),
 );
-export const COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS =
-  stringToArrayBuffer(
-    atob("@BASE64_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS@"),
-  );
-export const COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS =
-  stringToArrayBuffer(
-    atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS@"),
-  );
-export const COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS =
-  stringToArrayBuffer(
-    atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS@"),
-  );
-export const COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS =
-  stringToArrayBuffer(
-    atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS@"),
-  );
-export const DATASET_135_OMEX_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_DATASET_135_OMEX_CONTENTS@"),
+export const COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS@"),
 );
-export const DATASET_135_JSON_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_DATASET_135_JSON_CONTENTS@"),
+export const COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS@"),
 );
-export const DATASET_157_OMEX_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_DATASET_157_OMEX_CONTENTS@"),
+export const COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS@"),
 );
-export const DATASET_157_JSON_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_DATASET_157_JSON_CONTENTS@"),
+export const COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS = stringToArrayBuffer(
+  atob("@BASE64_COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS@"),
 );
+export const DATASET_135_OMEX_CONTENTS = stringToArrayBuffer(atob("@BASE64_DATASET_135_OMEX_CONTENTS@"));
+export const DATASET_135_JSON_CONTENTS = stringToArrayBuffer(atob("@BASE64_DATASET_135_JSON_CONTENTS@"));
+export const DATASET_157_OMEX_CONTENTS = stringToArrayBuffer(atob("@BASE64_DATASET_157_OMEX_CONTENTS@"));
+export const DATASET_157_JSON_CONTENTS = stringToArrayBuffer(atob("@BASE64_DATASET_157_JSON_CONTENTS@"));
 
 export const SOLVER_ODE_CONTENTS = stringToArrayBuffer(`@SOLVER_ODE_CONTENTS@`);
-export const SOLVER_NLA1_CONTENTS = stringToArrayBuffer(
-  `@SOLVER_NLA1_CONTENTS@`,
-);
-export const SOLVER_NLA2_CONTENTS = stringToArrayBuffer(
-  `@SOLVER_NLA2_CONTENTS@`,
-);
+export const SOLVER_NLA1_CONTENTS = stringToArrayBuffer(`@SOLVER_NLA1_CONTENTS@`);
+export const SOLVER_NLA2_CONTENTS = stringToArrayBuffer(`@SOLVER_NLA2_CONTENTS@`);
 
 export const ALGEBRAIC_CONTENTS = stringToArrayBuffer(`@ALGEBRAIC_CONTENTS@`);
 export const DAE_CONTENTS = stringToArrayBuffer(`@DAE_CONTENTS@`);
 export const MATH_CONTENTS = stringToArrayBuffer(`@MATH_CONTENTS@`);
 export const NLA_CONTENTS = stringToArrayBuffer(`@NLA_CONTENTS@`);
 
-export const OVERCONSTRAINED_CONTENTS = stringToArrayBuffer(
-  `@OVERCONSTRAINED_CONTENTS@`,
-);
-export const UNDERCONSTRAINED_CONTENTS = stringToArrayBuffer(
-  `@UNDERCONSTRAINED_CONTENTS@`,
-);
-export const UNSUITABLY_CONSTRAINED_CONTENTS = stringToArrayBuffer(
-  `@UNSUITABLY_CONSTRAINED_CONTENTS@`,
-);
+export const OVERCONSTRAINED_CONTENTS = stringToArrayBuffer(`@OVERCONSTRAINED_CONTENTS@`);
+export const UNDERCONSTRAINED_CONTENTS = stringToArrayBuffer(`@UNDERCONSTRAINED_CONTENTS@`);
+export const UNSUITABLY_CONSTRAINED_CONTENTS = stringToArrayBuffer(`@UNSUITABLY_CONSTRAINED_CONTENTS@`);
 
-export const SED_CHANGES_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_SED_CHANGES_CONTENTS@"),
-);
-export const INVALID_SED_CHANGES_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_INVALID_SED_CHANGES_CONTENTS@"),
-);
-export const UNSUPPORTED_SED_CHANGES_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_UNSUPPORTED_SED_CHANGES_CONTENTS@"),
-);
+export const SED_CHANGES_CONTENTS = stringToArrayBuffer(atob("@BASE64_SED_CHANGES_CONTENTS@"));
+export const INVALID_SED_CHANGES_CONTENTS = stringToArrayBuffer(atob("@BASE64_INVALID_SED_CHANGES_CONTENTS@"));
+export const UNSUPPORTED_SED_CHANGES_CONTENTS = stringToArrayBuffer(atob("@BASE64_UNSUPPORTED_SED_CHANGES_CONTENTS@"));
 
-export const ALGEBRAIC_SED_CHANGES_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_ALGEBRAIC_SED_CHANGES_CONTENTS@"),
-);
-export const ODE_SED_CHANGES_CONTENTS = stringToArrayBuffer(
-  atob("@BASE64_ODE_SED_CHANGES_CONTENTS@"),
-);
+export const ALGEBRAIC_SED_CHANGES_CONTENTS = stringToArrayBuffer(atob("@BASE64_ALGEBRAIC_SED_CHANGES_CONTENTS@"));
+export const ODE_SED_CHANGES_CONTENTS = stringToArrayBuffer(atob("@BASE64_ODE_SED_CHANGES_CONTENTS@"));
 
 export function assertIssues(loc, logger, expectedIssues) {
   const issues = logger.issues;
@@ -179,27 +134,15 @@ export function assertValues(
   algebraicPrecisions,
 ) {
   for (let i = 0; i < instanceTask.stateCount; ++i) {
-    assertValue(
-      instanceTask.stateAsArray(i)[index],
-      stateValues[i],
-      statePrecisions[i],
-    );
+    assertValue(instanceTask.stateAsArray(i)[index], stateValues[i], statePrecisions[i]);
   }
 
   for (let i = 0; i < instanceTask.rateCount; ++i) {
-    assertValue(
-      instanceTask.rateAsArray(i)[index],
-      rateValues[i],
-      ratePrecisions[i],
-    );
+    assertValue(instanceTask.rateAsArray(i)[index], rateValues[i], ratePrecisions[i]);
   }
 
   for (let i = 0; i < instanceTask.constantCount; ++i) {
-    assertValue(
-      instanceTask.constantAsArray(i)[index],
-      constantValues[i],
-      constantPrecisions[i],
-    );
+    assertValue(instanceTask.constantAsArray(i)[index], constantValues[i], constantPrecisions[i]);
   }
 
   for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
@@ -211,20 +154,14 @@ export function assertValues(
   }
 
   for (let i = 0; i < instanceTask.algebraicCount; ++i) {
-    assertValue(
-      instanceTask.algebraicAsArray(i)[index],
-      algebraicValues[i],
-      algebraicPrecisions[i],
-    );
+    assertValue(instanceTask.algebraicAsArray(i)[index], algebraicValues[i], algebraicPrecisions[i]);
   }
 }
 
 export function allocateMemory(module, arrayBuffer) {
   const memPtr = module._malloc(arrayBuffer.length);
 
-  new Uint8Array(module.HEAPU8.buffer, memPtr, arrayBuffer.length).set(
-    arrayBuffer,
-  );
+  new Uint8Array(module.HEAPU8.buffer, memPtr, arrayBuffer.length).set(arrayBuffer);
 
   return memPtr;
 }

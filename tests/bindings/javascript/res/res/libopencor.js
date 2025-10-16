@@ -34,11 +34,7 @@ function showIssues(issues) {
 
   if (issues instanceof Array) {
     for (let i = 0; i < issues.length; ++i) {
-      issuesElement.append(
-        '<li><span class="bold">Error:</span> ' +
-          formattedIssueDescription(issues[i]) +
-          "</li>",
-      );
+      issuesElement.append('<li><span class="bold">Error:</span> ' + formattedIssueDescription(issues[i]) + "</li>");
     }
   } else {
     for (let i = 0; i < issues.size(); ++i) {
@@ -73,12 +69,7 @@ function listFiles() {
   }
 }
 
-function updateFileUi(
-  fileInfoDisplay,
-  fileIssuesDisplay,
-  resetButtonDisplay,
-  simulationDisplay,
-) {
+function updateFileUi(fileInfoDisplay, fileIssuesDisplay, resetButtonDisplay, simulationDisplay) {
   $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
   $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
   $("#reset").css("display", resetButtonDisplay ? "block" : "none");
@@ -130,8 +121,7 @@ export function run() {
   // Retrieve the duration of the simulation and the number of steps.
 
   simulation.outputEndTime = $("#endingPoint").val();
-  simulation.numberOfSteps =
-    $("#endingPoint").val() / $("#pointInterval").val();
+  simulation.numberOfSteps = $("#endingPoint").val() / $("#pointInterval").val();
 
   // Run the simulation.
 
@@ -219,11 +209,7 @@ $(() => {
 
             const fileArrayBuffer = await inputFile.arrayBuffer();
             const memPtr = loc._malloc(inputFile.size);
-            const mem = new Uint8Array(
-              loc.HEAPU8.buffer,
-              memPtr,
-              inputFile.size,
-            );
+            const mem = new Uint8Array(loc.HEAPU8.buffer, memPtr, inputFile.size);
 
             mem.set(new Uint8Array(fileArrayBuffer));
 
@@ -292,9 +278,7 @@ $(() => {
                 $("#endingPoint").val(simulation.outputEndTime);
                 $("#endingPointUnit").text(instanceTask.voiUnit);
 
-                $("#pointInterval").val(
-                  simulation.outputEndTime / simulation.numberOfSteps,
-                );
+                $("#pointInterval").val(simulation.outputEndTime / simulation.numberOfSteps);
                 $("#pointIntervalUnit").text(instanceTask.voiUnit);
 
                 // Populate the X and Y axis dropdown lists.

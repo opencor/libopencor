@@ -31,19 +31,10 @@ test.describe("Solver basic tests", () => {
 
     assert.strictEqual(solver.maximumStep, 0.0);
     assert.strictEqual(solver.maximumNumberOfSteps, 500);
-    assert.strictEqual(
-      solver.integrationMethod,
-      loc.SolverCvode.IntegrationMethod.BDF,
-    );
-    assert.strictEqual(
-      solver.iterationType,
-      loc.SolverCvode.IterationType.NEWTON,
-    );
+    assert.strictEqual(solver.integrationMethod, loc.SolverCvode.IntegrationMethod.BDF);
+    assert.strictEqual(solver.iterationType, loc.SolverCvode.IterationType.NEWTON);
     assert.strictEqual(solver.linearSolver, loc.SolverCvode.LinearSolver.DENSE);
-    assert.strictEqual(
-      solver.preconditioner,
-      loc.SolverCvode.Preconditioner.BANDED,
-    );
+    assert.strictEqual(solver.preconditioner, loc.SolverCvode.Preconditioner.BANDED);
     assert.strictEqual(solver.upperHalfBandwidth, 0);
     assert.strictEqual(solver.lowerHalfBandwidth, 0);
     assert.strictEqual(solver.relativeTolerance, 1e-7);
@@ -64,19 +55,10 @@ test.describe("Solver basic tests", () => {
 
     assert.strictEqual(solver.maximumStep, 1.23);
     assert.strictEqual(solver.maximumNumberOfSteps, 123);
-    assert.strictEqual(
-      solver.integrationMethod,
-      loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON,
-    );
-    assert.strictEqual(
-      solver.iterationType,
-      loc.SolverCvode.IterationType.FUNCTIONAL,
-    );
+    assert.strictEqual(solver.integrationMethod, loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON);
+    assert.strictEqual(solver.iterationType, loc.SolverCvode.IterationType.FUNCTIONAL);
     assert.strictEqual(solver.linearSolver, loc.SolverCvode.LinearSolver.GMRES);
-    assert.strictEqual(
-      solver.preconditioner,
-      loc.SolverCvode.Preconditioner.NO,
-    );
+    assert.strictEqual(solver.preconditioner, loc.SolverCvode.Preconditioner.NO);
     assert.strictEqual(solver.upperHalfBandwidth, 3);
     assert.strictEqual(solver.lowerHalfBandwidth, 5);
     assert.strictEqual(solver.relativeTolerance, 1.23e-5);
@@ -134,10 +116,7 @@ test.describe("Solver basic tests", () => {
     assert.strictEqual(solver.name, "KINSOL");
 
     assert.strictEqual(solver.maximumNumberOfIterations, 200);
-    assert.strictEqual(
-      solver.linearSolver,
-      loc.SolverKinsol.LinearSolver.DENSE,
-    );
+    assert.strictEqual(solver.linearSolver, loc.SolverKinsol.LinearSolver.DENSE);
     assert.strictEqual(solver.upperHalfBandwidth, 0);
     assert.strictEqual(solver.lowerHalfBandwidth, 0);
 
@@ -147,10 +126,7 @@ test.describe("Solver basic tests", () => {
     solver.lowerHalfBandwidth = 5;
 
     assert.strictEqual(solver.maximumNumberOfIterations, 123);
-    assert.strictEqual(
-      solver.linearSolver,
-      loc.SolverKinsol.LinearSolver.GMRES,
-    );
+    assert.strictEqual(solver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(solver.upperHalfBandwidth, 3);
     assert.strictEqual(solver.lowerHalfBandwidth, 5);
   });

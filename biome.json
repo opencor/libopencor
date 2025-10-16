@@ -1,6 +1,27 @@
 {
   "formatter": {
-    "includes": ["**/*.js", "**/*.js.in", "!build/**", "!prebuilt/**"],
-    "indentStyle": "space"
+    "includes": [
+      "**/*.css",
+      "**/*.html",
+      "**/*.js",
+      "**/*.json",
+      "!**/*.min.css",
+      "!build/**",
+      "!doc/**",
+      "!extern/**",
+      "!prebuilt/**"
+    ],
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "css": {
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "html": {
+    "formatter": {
+      "enabled": true
+    }
   }
 }
