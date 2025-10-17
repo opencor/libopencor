@@ -28,14 +28,8 @@ test.describe("Solver coverage tests", () => {
   let odeSedChangesContentsPtr;
 
   test.before(() => {
-    algebraicSedChangesContentsPtr = utils.allocateMemory(
-      loc,
-      utils.ALGEBRAIC_SED_CHANGES_CONTENTS,
-    );
-    odeSedChangesContentsPtr = utils.allocateMemory(
-      loc,
-      utils.ODE_SED_CHANGES_CONTENTS,
-    );
+    algebraicSedChangesContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_SED_CHANGES_CONTENTS);
+    odeSedChangesContentsPtr = utils.allocateMemory(loc, utils.ODE_SED_CHANGES_CONTENTS);
   });
 
   test.beforeEach(() => {
@@ -50,10 +44,7 @@ test.describe("Solver coverage tests", () => {
   test("ODE changes", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(
-      odeSedChangesContentsPtr,
-      utils.ODE_SED_CHANGES_CONTENTS.length,
-    );
+    file.setContents(odeSedChangesContentsPtr, utils.ODE_SED_CHANGES_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -104,10 +95,7 @@ test.describe("Solver coverage tests", () => {
 
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(
-      algebraicSedChangesContentsPtr,
-      utils.ALGEBRAIC_SED_CHANGES_CONTENTS.length,
-    );
+    file.setContents(algebraicSedChangesContentsPtr, utils.ALGEBRAIC_SED_CHANGES_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();

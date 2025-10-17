@@ -10,19 +10,9 @@
   "exports": {
     ".": "./dist/libopencor.js"
   },
-  "files": [
-    "dist/libopencor.js",
-    "README.md",
-    "LICENSE.txt"
-  ],
+  "files": ["dist/libopencor.js", "README.md", "LICENSE.txt"],
   "homepage": "https://opencor.ws/libopencor/",
-  "keywords": [
-    "cellml",
-    "combine",
-    "omex",
-    "opencor",
-    "sed-ml"
-  ],
+  "keywords": ["cellml", "combine", "omex", "opencor", "sed-ml"],
   "license": "Apache-2.0",
   "module": "dist/libopencor.js",
   "name": "@opencor/libopencor",

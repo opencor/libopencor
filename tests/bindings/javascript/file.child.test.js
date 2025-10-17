@@ -29,22 +29,10 @@ test.describe("File type tests", () => {
   let dataset157JsonContentsPtr;
 
   test.before(() => {
-    dataset135OmexContentsPtr = utils.allocateMemory(
-      loc,
-      utils.DATASET_135_OMEX_CONTENTS,
-    );
-    dataset135JsonContentsPtr = utils.allocateMemory(
-      loc,
-      utils.DATASET_135_JSON_CONTENTS,
-    );
-    dataset157OmexContentsPtr = utils.allocateMemory(
-      loc,
-      utils.DATASET_157_OMEX_CONTENTS,
-    );
-    dataset157JsonContentsPtr = utils.allocateMemory(
-      loc,
-      utils.DATASET_157_JSON_CONTENTS,
-    );
+    dataset135OmexContentsPtr = utils.allocateMemory(loc, utils.DATASET_135_OMEX_CONTENTS);
+    dataset135JsonContentsPtr = utils.allocateMemory(loc, utils.DATASET_135_JSON_CONTENTS);
+    dataset157OmexContentsPtr = utils.allocateMemory(loc, utils.DATASET_157_OMEX_CONTENTS);
+    dataset157JsonContentsPtr = utils.allocateMemory(loc, utils.DATASET_157_JSON_CONTENTS);
   });
 
   test.beforeEach(() => {
@@ -58,26 +46,15 @@ test.describe("File type tests", () => {
     utils.freeMemory(loc, dataset157JsonContentsPtr);
   });
 
-  function doTestDataset(
-    omexContentsPtr,
-    omexContents,
-    jsonContents,
-    specificChildFileNames,
-  ) {
+  function doTestDataset(omexContentsPtr, omexContents, jsonContents, specificChildFileNames) {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(omexContentsPtr, omexContents.length);
 
     assert.strictEqual(file.hasChildFiles, true);
     assert.strictEqual(file.childFileCount, specificChildFileNames.length + 1);
-    assert.strictEqual(
-      file.childFileNames.size(),
-      specificChildFileNames.length + 1,
-    );
-    assert.strictEqual(
-      file.childFiles.size(),
-      specificChildFileNames.length + 1,
-    );
+    assert.strictEqual(file.childFileNames.size(), specificChildFileNames.length + 1);
+    assert.strictEqual(file.childFiles.size(), specificChildFileNames.length + 1);
 
     let index = -1;
     const simulationFile = file.childFileFromFileName("simulation.json");
@@ -87,10 +64,7 @@ test.describe("File type tests", () => {
 
     for (let i = 0; i < specificChildFileNames.length; ++i) {
       assert.notStrictEqual(file.childFile(++index), null);
-      assert.notStrictEqual(
-        file.childFileFromFileName(specificChildFileNames[i]),
-        null,
-      );
+      assert.notStrictEqual(file.childFileFromFileName(specificChildFileNames[i]), null);
     }
 
     assert.strictEqual(file.childFile(++index), null);
@@ -111,23 +85,15 @@ test.describe("File type tests", () => {
   });
 
   test("Dataset 135", () => {
-    doTestDataset(
-      dataset135OmexContentsPtr,
-      utils.DATASET_135_OMEX_CONTENTS,
-      utils.DATASET_135_JSON_CONTENTS,
-      ["HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml"],
-    );
+    doTestDataset(dataset135OmexContentsPtr, utils.DATASET_135_OMEX_CONTENTS, utils.DATASET_135_JSON_CONTENTS, [
+      "HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml",
+    ]);
   });
 
   test("Dataset 157", () => {
-    doTestDataset(
-      dataset157OmexContentsPtr,
-      utils.DATASET_157_OMEX_CONTENTS,
-      utils.DATASET_157_JSON_CONTENTS,
-      [
-        "fabbri_et_al_based_composite_SAN_model.cellml",
-        "fabbri_et_al_based_composite_SAN_model.sedml",
-      ],
-    );
+    doTestDataset(dataset157OmexContentsPtr, utils.DATASET_157_OMEX_CONTENTS, utils.DATASET_157_JSON_CONTENTS, [
+      "fabbri_et_al_based_composite_SAN_model.cellml",
+      "fabbri_et_al_based_composite_SAN_model.sedml",
+    ]);
   });
 });

@@ -32,23 +32,11 @@ test.describe("Sed coverage tests", () => {
   let mathContentsPtr;
 
   test.before(() => {
-    sedChangesContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SED_CHANGES_CONTENTS,
-    );
-    invalidSedChangesContentsPtr = utils.allocateMemory(
-      loc,
-      utils.INVALID_SED_CHANGES_CONTENTS,
-    );
-    unsupportedSedChangesContentsPtr = utils.allocateMemory(
-      loc,
-      utils.UNSUPPORTED_SED_CHANGES_CONTENTS,
-    );
+    sedChangesContentsPtr = utils.allocateMemory(loc, utils.SED_CHANGES_CONTENTS);
+    invalidSedChangesContentsPtr = utils.allocateMemory(loc, utils.INVALID_SED_CHANGES_CONTENTS);
+    unsupportedSedChangesContentsPtr = utils.allocateMemory(loc, utils.UNSUPPORTED_SED_CHANGES_CONTENTS);
     solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
-    solverNla1ContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SOLVER_NLA1_CONTENTS,
-    );
+    solverNla1ContentsPtr = utils.allocateMemory(loc, utils.SOLVER_NLA1_CONTENTS);
     mathContentsPtr = utils.allocateMemory(loc, utils.MATH_CONTENTS);
   });
 
@@ -125,11 +113,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(model.addChange(null), false);
     assert.strictEqual(model.removeAllChanges(), false);
 
-    const changeAttribute = new loc.SedChangeAttribute(
-      "component",
-      "variable",
-      "newValue",
-    );
+    const changeAttribute = new loc.SedChangeAttribute("component", "variable", "newValue");
 
     assert.strictEqual(model.addChange(changeAttribute), true);
 
@@ -162,10 +146,7 @@ test.describe("Sed coverage tests", () => {
 
     assert.strictEqual(document.hasIssues, false);
 
-    file.setContents(
-      invalidSedChangesContentsPtr,
-      utils.INVALID_SED_CHANGES_CONTENTS.length,
-    );
+    file.setContents(invalidSedChangesContentsPtr, utils.INVALID_SED_CHANGES_CONTENTS.length);
 
     document = new loc.SedDocument(file);
 
@@ -200,10 +181,7 @@ test.describe("Sed coverage tests", () => {
       ],
     ]);
 
-    file.setContents(
-      unsupportedSedChangesContentsPtr,
-      utils.UNSUPPORTED_SED_CHANGES_CONTENTS.length,
-    );
+    file.setContents(unsupportedSedChangesContentsPtr, utils.UNSUPPORTED_SED_CHANGES_CONTENTS.length);
 
     document = new loc.SedDocument(file);
 
@@ -306,10 +284,7 @@ test.describe("Sed coverage tests", () => {
     assert.deepStrictEqual(document.task(0), task);
     assert.deepStrictEqual(document.task(1), null);
 
-    assert.strictEqual(
-      document.serialise(),
-      sedTaskExpectedSerialisation(true),
-    );
+    assert.strictEqual(document.serialise(), sedTaskExpectedSerialisation(true));
 
     task.model = null;
     task.simulation = null;
@@ -317,10 +292,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(task.model, null);
     assert.strictEqual(task.simulation, null);
 
-    assert.strictEqual(
-      document.serialise(),
-      sedTaskExpectedSerialisation(false),
-    );
+    assert.strictEqual(document.serialise(), sedTaskExpectedSerialisation(false));
 
     const instance = document.instantiate();
 
@@ -469,10 +441,7 @@ test.describe("Sed coverage tests", () => {
     assert.deepStrictEqual(instanceTask.computedConstantAsArray(0), []);
     assert.strictEqual(instanceTask.computedConstant(3).size(), 0);
     assert.deepStrictEqual(instanceTask.computedConstantAsArray(3), []);
-    assert.strictEqual(
-      instanceTask.computedConstantName(0),
-      "leakage_current/E_L",
-    );
+    assert.strictEqual(instanceTask.computedConstantName(0), "leakage_current/E_L");
     assert.strictEqual(instanceTask.computedConstantName(3), "");
     assert.strictEqual(instanceTask.computedConstantUnit(0), "millivolt");
     assert.strictEqual(instanceTask.computedConstantUnit(3), "");
@@ -490,10 +459,7 @@ test.describe("Sed coverage tests", () => {
     instance.run();
 
     assertIssues(loc, instance, [
-      [
-        loc.Issue.Type.ERROR,
-        "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
-      ],
+      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."],
     ]);
   });
 
@@ -649,10 +615,7 @@ test.describe("Sed coverage tests", () => {
         Infinity,
         NaN,
       ],
-      [
-        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-        7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-      ],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
       [],
       [],
     );

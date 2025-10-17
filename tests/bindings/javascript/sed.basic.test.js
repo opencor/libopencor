@@ -40,18 +40,9 @@ test.describe("Sed basic tests", () => {
     unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
-    sedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS,
-    );
-    sedmlWithRemoteCellmlFileContentsPtr = utils.allocateMemory(
-      loc,
-      utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS,
-    );
-    combineArchiveContentsPtr = utils.allocateMemory(
-      loc,
-      utils.COMBINE_ARCHIVE_CONTENTS,
-    );
+    sedmlWithAbsoluteCellmlFileContentsPtr = utils.allocateMemory(loc, utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS);
+    sedmlWithRemoteCellmlFileContentsPtr = utils.allocateMemory(loc, utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS);
+    combineArchiveContentsPtr = utils.allocateMemory(loc, utils.COMBINE_ARCHIVE_CONTENTS);
     combineArchiveWithNoManifestFileContentsPtr = utils.allocateMemory(
       loc,
       utils.COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS,
@@ -64,11 +55,10 @@ test.describe("Sed basic tests", () => {
       loc,
       utils.COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS,
     );
-    combineArchiveWithUnknownIndirectCellmlFileContentsPtr =
-      utils.allocateMemory(
-        loc,
-        utils.COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS,
-      );
+    combineArchiveWithUnknownIndirectCellmlFileContentsPtr = utils.allocateMemory(
+      loc,
+      utils.COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS,
+    );
     combineArchiveWithUnknownSedmlFileContentsPtr = utils.allocateMemory(
       loc,
       utils.COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS,
@@ -89,10 +79,7 @@ test.describe("Sed basic tests", () => {
     utils.freeMemory(loc, combineArchiveWithNoManifestFileContentsPtr);
     utils.freeMemory(loc, combineArchiveWithNoMasterFileContentsPtr);
     utils.freeMemory(loc, combineArchiveWithUnknownDirectCellmlFileContentsPtr);
-    utils.freeMemory(
-      loc,
-      combineArchiveWithUnknownIndirectCellmlFileContentsPtr,
-    );
+    utils.freeMemory(loc, combineArchiveWithUnknownIndirectCellmlFileContentsPtr);
     utils.freeMemory(loc, combineArchiveWithUnknownSedmlFileContentsPtr);
   });
 
@@ -110,10 +97,7 @@ test.describe("Sed basic tests", () => {
     const document = new loc.SedDocument(file);
 
     assertIssues(loc, document, [
-      [
-        loc.Issue.Type.ERROR,
-        "A simulation experiment description cannot be created using an unknown file.",
-      ],
+      [loc.Issue.Type.ERROR, "A simulation experiment description cannot be created using an unknown file."],
     ]);
   });
 
@@ -146,10 +130,7 @@ test.describe("Sed basic tests", () => {
   test("SED-ML file with absolute CellML file", () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(
-      sedmlWithAbsoluteCellmlFileContentsPtr,
-      utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS.length,
-    );
+    file.setContents(sedmlWithAbsoluteCellmlFileContentsPtr, utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS.length);
 
     let document = new loc.SedDocument(file);
 
@@ -165,10 +146,7 @@ test.describe("Sed basic tests", () => {
   test("SED-ML file with remote CellML file", () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(
-      sedmlWithRemoteCellmlFileContentsPtr,
-      utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS.length,
-    );
+    file.setContents(sedmlWithRemoteCellmlFileContentsPtr, utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS.length);
 
     let document = new loc.SedDocument(file);
 
@@ -184,10 +162,7 @@ test.describe("Sed basic tests", () => {
   test("COMBINE archive", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(
-      combineArchiveContentsPtr,
-      utils.COMBINE_ARCHIVE_CONTENTS.length,
-    );
+    file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);
 
     const document = new loc.SedDocument(file);
 
@@ -261,9 +236,7 @@ test.describe("Sed basic tests", () => {
 
     instance.run();
 
-    assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "Task 'task1' requires a model of CellML type."],
-    ]);
+    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, "Task 'task1' requires a model of CellML type."]]);
   });
 
   test("COMBINE archive with unknown SED-ML file", () => {

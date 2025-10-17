@@ -27,14 +27,8 @@ test.describe("File coverage tests", () => {
   let combineArchiveContentsPtr;
 
   test.before(() => {
-    nullCharacterContentsPtr = utils.allocateMemory(
-      loc,
-      utils.NULL_CHARACTER_CONTENTS,
-    );
-    combineArchiveContentsPtr = utils.allocateMemory(
-      loc,
-      utils.COMBINE_ARCHIVE_CONTENTS,
-    );
+    nullCharacterContentsPtr = utils.allocateMemory(loc, utils.NULL_CHARACTER_CONTENTS);
+    combineArchiveContentsPtr = utils.allocateMemory(loc, utils.COMBINE_ARCHIVE_CONTENTS);
   });
 
   test.beforeEach(() => {
@@ -57,10 +51,7 @@ test.describe("File coverage tests", () => {
   test("File with null character", () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(
-      nullCharacterContentsPtr,
-      utils.NULL_CHARACTER_CONTENTS.length,
-    );
+    file.setContents(nullCharacterContentsPtr, utils.NULL_CHARACTER_CONTENTS.length);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
   });
@@ -89,10 +80,7 @@ test.describe("File coverage tests", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
     const fileManager = loc.FileManager.instance();
 
-    file.setContents(
-      combineArchiveContentsPtr,
-      utils.COMBINE_ARCHIVE_CONTENTS.length,
-    );
+    file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);
 
     assert.strictEqual(fileManager.fileCount, 3);
 

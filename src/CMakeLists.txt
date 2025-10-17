@@ -70,7 +70,7 @@ endforeach()
 set(LIBOPENCOR_VERSION 0x${PROJECT_VERSION_MAJOR_PAD}${PROJECT_VERSION_MAJOR}${PROJECT_VERSION_MINOR}${PROJECT_VERSION_PATCH_PAD}${PROJECT_VERSION_PATCH})
 set(LIBOPENCOR_VERSION_STRING ${PROJECT_VERSION})
 
-set(VERSION_HEADER_FILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in)
+set(VERSION_HEADER_FILE_IN ${CMAKE_CURRENT_SOURCE_DIR}/version.in.h)
 set(VERSION_HEADER_FILE ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 configure_file(${VERSION_HEADER_FILE_IN} ${VERSION_HEADER_FILE})
@@ -535,7 +535,7 @@ if(NOT LIBOPENCOR_SHARED_LIBS)
 
     set(PATCH_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/patch.cmake)
 
-    configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/patch.cmake.in ${PATCH_CMAKE_FILE} @ONLY)
+    configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/patch.in.cmake ${PATCH_CMAKE_FILE} @ONLY)
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} PRE_BUILD
                        COMMAND ${CMAKE_COMMAND} -P ${PATCH_CMAKE_FILE})
@@ -545,7 +545,7 @@ install(EXPORT ${CMAKE_PROJECT_NAME}Targets
         FILE ${CMAKE_PROJECT_NAME}Targets.cmake
         DESTINATION ${CMAKE_PACKAGE_DIR})
 
-set(CONFIG_CMAKE_IN_FILE ${PROJECT_SOURCE_DIR}/cmake/packaging/config.cmake.in)
+set(CONFIG_CMAKE_IN_FILE ${PROJECT_SOURCE_DIR}/cmake/packaging/config.in.cmake)
 set(CONFIG_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake)
 
 configure_package_config_file(${CONFIG_CMAKE_IN_FILE} ${CONFIG_CMAKE_FILE}
@@ -564,7 +564,7 @@ install(FILES ${CONFIG_CMAKE_FILE}
 
 set(UNINSTALL_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
 
-configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/uninstall.cmake.in ${UNINSTALL_CMAKE_FILE} @ONLY)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/uninstall.in.cmake ${UNINSTALL_CMAKE_FILE} @ONLY)
 
 add_target(uninstall
            COMMAND ${CMAKE_COMMAND} -P ${UNINSTALL_CMAKE_FILE}

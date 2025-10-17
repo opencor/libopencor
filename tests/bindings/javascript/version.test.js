@@ -27,13 +27,7 @@ const loc = await libOpenCOR();
 test.describe("Version tests", () => {
   test("libOpenCOR", () => {
     const versionStr = fs
-      .readFileSync(
-        path.resolve(
-          path.dirname(fileURLToPath(import.meta.url)),
-          "../../VERSION.txt",
-        ),
-        "utf8",
-      )
+      .readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../VERSION.txt"), "utf8")
       .trim();
     const [majorVersionStr, dateStr, patchVersionStr] = versionStr.split(".");
     const majorVersion = Number(majorVersionStr);
@@ -48,16 +42,13 @@ test.describe("Version tests", () => {
     const four = BigInt(4);
 
     while (number != 0) {
-      version |= number % ten << i;
+      version |= (number % ten) << i;
       number /= ten;
       i += four;
     }
 
     assert.strictEqual(loc.version(), version);
-    assert.strictEqual(
-      loc.versionString(),
-      `${majorVersion}.${date}.${patchVersion}`,
-    );
+    assert.strictEqual(loc.versionString(), `${majorVersion}.${date}.${patchVersion}`);
   });
 
   test("Clang", () => {

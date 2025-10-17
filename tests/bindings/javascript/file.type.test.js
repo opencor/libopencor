@@ -33,10 +33,7 @@ test.describe("File type tests", () => {
     unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
     cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
     sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
-    combineArchiveContentsPtr = utils.allocateMemory(
-      loc,
-      utils.COMBINE_ARCHIVE_CONTENTS,
-    );
+    combineArchiveContentsPtr = utils.allocateMemory(loc, utils.COMBINE_ARCHIVE_CONTENTS);
   });
 
   test.beforeEach(() => {
@@ -57,10 +54,7 @@ test.describe("File type tests", () => {
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assertIssues(loc, file, [
-      [
-        loc.Issue.Type.ERROR,
-        "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
-      ],
+      [loc.Issue.Type.ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."],
     ]);
   });
 
@@ -83,10 +77,7 @@ test.describe("File type tests", () => {
   test("COMBINE archive", () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(
-      combineArchiveContentsPtr,
-      utils.COMBINE_ARCHIVE_CONTENTS.length,
-    );
+    file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);
 
     assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
   });

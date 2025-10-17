@@ -146,6 +146,7 @@ if(NOT BUILDCACHE_EXE)
 endif()
 
 find_program(7Z_EXE NAMES ${PREFERRED_7Z_NAMES} 7z)
+find_program(BIOME_EXE NAMES ${PREFERRED_BIOME_NAMES} biome)
 find_program(BLACK_EXE NAMES ${PREFERRED_BLACK_NAMES} black)
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
@@ -158,7 +159,6 @@ find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profd
 find_program(NODE_EXE NAMES ${PREFERRED_NODE_NAMES} node)
 find_program(NPM_EXE NAMES ${PREFERRED_NPM_NAMES} npm)
 find_program(PATCH_EXE NAMES ${PREFERRED_PATCH_NAMES} patch)
-find_program(PRETTIER_EXE NAMES ${PREFERRED_PRETTIER_NAMES} prettier)
 find_program(PYTEST_EXE NAMES ${PREFERRED_PYTEST_NAMES} pytest)
 find_program(SPHINX_EXE NAMES ${PREFERRED_SPHINX_NAMES} sphinx-build sphinx-build2)
 
@@ -298,7 +298,7 @@ else()
     set(DOCUMENTATION_AVAILABLE_ERROR_MESSAGE "Documentation is requested but Doxygen, the patch tool, Python and/or Sphinx could not be found.")
 endif()
 
-if(PRETTIER_EXE)
+if(BIOME_EXE)
     set(JAVASCRIPT_FORMATTING_AVAILABLE TRUE)
 endif()
 
@@ -348,7 +348,8 @@ else()
     endif()
 endif()
 
-mark_as_advanced(BLACK_EXE
+mark_as_advanced(BIOME_EXE
+                 BLACK_EXE
                  BUILDCACHE_EXE
                  CLANG_FORMAT_EXE
                  CLANG_TIDY_EXE
@@ -362,7 +363,6 @@ mark_as_advanced(BLACK_EXE
                  NODE_EXE
                  NPM_EXE
                  PATCH_EXE
-                 PRETTIER_EXE
                  PYTEST_EXE
                  SPHINX_EXE
                  VALGRIND_EXE)

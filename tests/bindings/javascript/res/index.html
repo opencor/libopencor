@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-
 <html>
-
-<head>
+  <head>
     <title>libOpenCOR - JavaScript bindings</title>
 
     <meta charset="UTF-8">
@@ -11,150 +9,155 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
     <link href="res/font-awesome/css/all.min.css" rel="stylesheet">
     <link href="res/libopencor.css" rel="stylesheet">
-</head>
+  </head>
 
-<body data-bs-theme="dark">
+  <body data-bs-theme="dark">
     <nav class="navbar bg-dark border-bottom border-bottom-dark navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
-        <div class="container-fluid">
-            <div class="navbar-brand">libOpenCOR</div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="navHome">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="navSimulation">Simulation</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" id="navVersions">Versions</a>
-                    </li>
-                </ul>
-            </div>
+      <div class="container-fluid">
+        <div class="navbar-brand">libOpenCOR</div>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="navHome">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="navSimulation">Simulation</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" id="navVersions">Versions</a>
+            </li>
+          </ul>
         </div>
+      </div>
     </nav>
 
     <div class="p-2">
-        <div class="page" id="pageHome">
-            <p>
-                Welcome to this test page for <a href="https://opencor.ws/libopencor">libOpenCOR</a>!
+      <div class="page" id="pageHome">
+        <p>
+          Welcome to this test page for <a href="https://opencor.ws/libopencor">libOpenCOR</a>!
+        </p>
+      </div>
+
+      <div class="page" id="pageSimulation">
+        <div class="drop-area" id="dropArea">
+          <input class="drop-area-input" id="dropAreaInput" type="file">
+
+          <div class="drop-area-div">
+            <i class="far fa-images"></i>
+
+            <span> Choose a CellML / SED-ML file or a COMBINE archive, </span>
+
+            <span> or drag and drop such a file here. </span>
+
+            <p class="note">
+              <small>
+                <span class="bold">Note:</span>only CellML files with no imports can (currently) be processed.
+              </small>
             </p>
+          </div>
         </div>
 
-        <div class="page" id="pageSimulation">
-            <div class="drop-area" id="dropArea">
-                <input class="drop-area-input" id="dropAreaInput" type="file">
+        <button type="button" class="btn btn-secondary reset-button" id="reset">
+          <i class="fa fa-recycle"></i>
+        </button>
 
-                <div class="drop-area-div"">
-                    <i class="far fa-images"></i>
-
-                    <span>
-                        Choose a CellML / SED-ML file or a COMBINE archive,
-                    </span>
-
-                    <span>
-                        or drag and drop such a file here.
-                    </span>
-
-                    <p class="note"><small>
-                        <span class="bold">Note:</span> only CellML files with no imports can (currently) be processed.
-                    </small></p>
-                </div>
-            </div>
-
-            <button type="button" class="btn btn-secondary reset-button" id="reset"><i class="fa fa-recycle"></i></button>
-
-            <div class="file info" id="fileInfo">
-                <p class="info">
-                    <span class="bold" id="fileName"></span> is <span class="bold" id="fileType"></span>.
-                </p>
-            </div>
-
-            <div class="file error last" id="fileIssues">
-                <p>
-                    <ul id="issues"/>
-                </p>
-            </div>
-
-            <div class="file info last row simulation" id="simulation">
-                <div id="plottingArea">
-                </div>
-                <div class="mb-3">
-                    <label>Ending point:</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="endingPoint">
-                        <span class="input-group-text" id="endingPointUnit"></span>
-                    </div>
-                    <label>Point interval:</label>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="pointInterval">
-                        <span class="input-group-text" id="pointIntervalUnit"></span>
-                    </div>
-                    </select>
-                    <label>X:</label>
-                    <div class="input-group">
-                        <select class="form-select" id="xAxis"></select>
-                        <span class="input-group-text" id="xAxisUnit"></span>
-                    </div>
-                    <label>Y:</label>
-                    <div class="input-group">
-                        <select class="form-select" id="yAxis"></select>
-                        <span class="input-group-text" id="yAxisUnit"></span>
-                    </div>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-secondary mb-3 run-button w-100" id="run">Run</button>
-                </div>
-            </div>
+        <div class="file info" id="fileInfo">
+          <p class="info">
+            <span class="bold" id="fileName"></span>is <span class="bold" id="fileType"></span>.
+          </p>
         </div>
 
-        <div class="page" id="pageVersions">
-            <div class="row justify-content-center" style="width: 100%">
-                <div class="col-md-auto">
-                    <table class="table table-bordered table-sm table-secondary table-striped">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>API</th>
-                                <th>Value</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Clang</td>
-                                <td id="Clang"></td>
-                            </tr>
-                            <tr>
-                                <td>libCellML</td>
-                                <td id="libCellML"></td>
-                            </tr>
-                            <tr>
-                                <td>libCOMBINE</td>
-                                <td id="libCOMBINE"></td>
-                            </tr>
-                            <tr>
-                                <td>libOpenCOR</td>
-                                <td id="libOpenCOR"></td>
-                            </tr>
-                            <tr>
-                                <td>libSEDML</td>
-                                <td id="libSEDML"></td>
-                            </tr>
-                            <tr>
-                                <td>LLVM</td>
-                                <td id="LLVM"></td>
-                            </tr>
-                            <tr>
-                                <td>SUNDIALS</td>
-                                <td id="SUNDIALS"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="file error last" id="fileIssues">
+          <p>
+            <ul id="issues"/>
+          </p>
         </div>
+
+        <div class="file info last row simulation" id="simulation">
+          <div id="plottingArea"></div>
+          <div class="mb-3">
+            <label>Ending point:</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="endingPoint">
+              <span class="input-group-text" id="endingPointUnit"></span>
+            </div>
+            <label>Point interval:</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="pointInterval">
+              <span class="input-group-text" id="pointIntervalUnit"></span>
+            </div>
+            <label>X:</label>
+            <div class="input-group">
+              <select class="form-select" id="xAxis"></select>
+              <span class="input-group-text" id="xAxisUnit"></span>
+            </div>
+            <label>Y:</label>
+            <div class="input-group">
+              <select class="form-select" id="yAxis"></select>
+              <span class="input-group-text" id="yAxisUnit"></span>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="btn btn-secondary mb-3 run-button w-100" id="run">Run</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page" id="pageVersions">
+        <div class="row justify-content-center" style="width: 100%">
+          <div class="col-md-auto">
+            <table class="table table-bordered table-sm table-secondary table-striped">
+              <thead class="table-dark">
+                <tr>
+                  <th>API</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Clang</td>
+                  <td id="Clang"></td>
+                </tr>
+                <tr>
+                  <td>libCellML</td>
+                  <td id="libCellML"></td>
+                </tr>
+                <tr>
+                  <td>libCOMBINE</td>
+                  <td id="libCOMBINE"></td>
+                </tr>
+                <tr>
+                  <td>libOpenCOR</td>
+                  <td id="libOpenCOR"></td>
+                </tr>
+                <tr>
+                  <td>libSEDML</td>
+                  <td id="libSEDML"></td>
+                </tr>
+                <tr>
+                  <td>LLVM</td>
+                  <td id="LLVM"></td>
+                </tr>
+                <tr>
+                  <td>SUNDIALS</td>
+                  <td id="SUNDIALS"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
@@ -190,6 +193,5 @@
             run();
         });
     </script>
-</body>
-
+  </body>
 </html>

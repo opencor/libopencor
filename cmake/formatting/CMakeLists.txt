@@ -27,7 +27,7 @@ if(FORMAT_CODE_AVAILABLE)
 
     set(CODE_FORMATTING_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/codeformatting.cmake)
 
-    configure_file(codeformatting.cmake.in ${CODE_FORMATTING_CMAKE_FILE} @ONLY)
+    configure_file(codeformatting.in.cmake ${CODE_FORMATTING_CMAKE_FILE} @ONLY)
 
     if(CHECK_CODE_FORMATTING_AVAILABLE)
         add_target(check_code_formatting
@@ -43,18 +43,13 @@ endif()
 # Add some custom targets to test the formatting of our JavaScript code and to format it.
 
 if(JAVASCRIPT_FORMATTING_AVAILABLE)
-    set(JAVASCRIPT_FILES
-        "\"**/*.js\""
-        "\"**/*.js.in\""
-    )
-
     add_target(javascript_check_code_formatting
-               COMMAND ${PRETTIER_EXE} --check --parser babel ${JAVASCRIPT_FILES}
+               COMMAND ${BIOME_EXE} format
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Checking JavaScript code formatting...")
 
     add_target(javascript_format_code
-               COMMAND ${PRETTIER_EXE} --write --parser babel ${JAVASCRIPT_FILES}
+               COMMAND ${BIOME_EXE} format --write
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Formatting the JavaScript code...")
 endif()

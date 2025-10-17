@@ -24,10 +24,7 @@ import { assertIssues } from "./utils.js";
 const loc = await libOpenCOR();
 
 const expectedUnknownFileIssues = [
-  [
-    loc.Issue.Type.ERROR,
-    "The file is not a CellML file, a SED-ML file, or a COMBINE archive.",
-  ],
+  [loc.Issue.Type.ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."],
 ];
 
 test.describe("File basic tests", () => {
@@ -86,10 +83,7 @@ test.describe("File basic tests", () => {
     assert.strictEqual(fileManager.fileCount, 0);
     assert.strictEqual(fileManager.files.size(), 0);
     assert.strictEqual(fileManager.file(0), null);
-    assert.strictEqual(
-      fileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
-      null,
-    );
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), null);
 
     const localFile = new loc.File(utils.LOCAL_FILE);
     const sameFileManager = loc.FileManager.instance();
@@ -98,10 +92,7 @@ test.describe("File basic tests", () => {
     assert.strictEqual(sameFileManager.fileCount, 1);
     assert.strictEqual(sameFileManager.files.size(), 1);
     assert.deepStrictEqual(fileManager.file(0), localFile);
-    assert.deepStrictEqual(
-      sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
-      localFile,
-    );
+    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), localFile);
 
     const remoteFile = new loc.File(utils.REMOTE_FILE);
 
@@ -109,10 +100,7 @@ test.describe("File basic tests", () => {
     assert.strictEqual(fileManager.fileCount, 2);
     assert.strictEqual(fileManager.files.size(), 2);
     assert.deepStrictEqual(fileManager.file(1), remoteFile);
-    assert.deepStrictEqual(
-      fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE),
-      remoteFile,
-    );
+    assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE), remoteFile);
 
     sameFileManager.unmanage(localFile);
 
@@ -120,10 +108,7 @@ test.describe("File basic tests", () => {
     assert.strictEqual(sameFileManager.fileCount, 1);
     assert.strictEqual(sameFileManager.files.size(), 1);
     assert.deepStrictEqual(fileManager.file(1), null);
-    assert.deepStrictEqual(
-      sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
-      null,
-    );
+    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), null);
 
     sameFileManager.manage(localFile);
 
@@ -131,10 +116,7 @@ test.describe("File basic tests", () => {
     assert.strictEqual(sameFileManager.fileCount, 2);
     assert.strictEqual(sameFileManager.files.size(), 2);
     assert.deepStrictEqual(fileManager.file(1), localFile);
-    assert.deepStrictEqual(
-      sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE),
-      localFile,
-    );
+    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), localFile);
 
     fileManager.reset();
 
@@ -143,13 +125,7 @@ test.describe("File basic tests", () => {
     assert.strictEqual(fileManager.files.size(), 0);
     assert.deepStrictEqual(fileManager.file(0), null);
     assert.deepStrictEqual(fileManager.file(1), null);
-    assert.deepStrictEqual(
-      fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE),
-      null,
-    );
-    assert.deepStrictEqual(
-      fileManager.fileFromFileNameOrUrl(utils.UNKNOWN_FILE),
-      null,
-    );
+    assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE), null);
+    assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.UNKNOWN_FILE), null);
   });
 });
