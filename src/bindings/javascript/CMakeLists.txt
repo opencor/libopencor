@@ -52,7 +52,7 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
             ${REAL_CMAKE_PROJECT_NAME}
         )
 
-        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package.json.in ${CMAKE_CURRENT_BINARY_DIR}/../../package.json @ONLY)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package.in.json ${CMAKE_CURRENT_BINARY_DIR}/../../package.json @ONLY)
         configure_file(${CMAKE_SOURCE_DIR}/README.md ${CMAKE_CURRENT_BINARY_DIR}/../../README.md)
         configure_file(${CMAKE_SOURCE_DIR}/LICENSE.txt ${CMAKE_CURRENT_BINARY_DIR}/../../LICENSE.txt)
     else()

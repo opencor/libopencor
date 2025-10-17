@@ -14,7 +14,7 @@
 
 # Configure our utilities.
 
-configure_file(utils.py.in ${PYTHON_BINDINGS_DIR}/utils.py)
+configure_file(utils.in.py ${PYTHON_BINDINGS_DIR}/utils.py)
 
 # Copy our Python files over.
 

@@ -33,7 +33,7 @@ if(LIBOPENCOR_DOCUMENTATION)
     string(TIMESTAMP CURRENT_YEAR "%Y")
 
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/footer.html.in ${CMAKE_CURRENT_BINARY_DIR}/footer.html)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/footer.in.html ${CMAKE_CURRENT_BINARY_DIR}/footer.html)
 
     add_custom_target(api_documentation
                       COMMAND ${CMAKE_COMMAND} -E make_directory html/api

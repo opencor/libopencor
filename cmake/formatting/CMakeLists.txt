@@ -27,7 +27,7 @@ if(FORMAT_CODE_AVAILABLE)
 
     set(CODE_FORMATTING_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/codeformatting.cmake)
 
-    configure_file(codeformatting.cmake.in ${CODE_FORMATTING_CMAKE_FILE} @ONLY)
+    configure_file(codeformatting.in.cmake ${CODE_FORMATTING_CMAKE_FILE} @ONLY)
 
     if(CHECK_CODE_FORMATTING_AVAILABLE)
         add_target(check_code_formatting

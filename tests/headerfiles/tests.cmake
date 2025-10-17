@@ -20,7 +20,7 @@ if(LIBOPENCOR_UNIT_TESTING)
 
         set(TEST_SOURCE_FILE ${CMAKE_CURRENT_BINARY_DIR}/headerfiles/${GIT_API_HEADER_NAME}.cpp)
 
-        configure_file(${CMAKE_CURRENT_LIST_DIR}/tests.cpp.in ${TEST_SOURCE_FILE})
+        configure_file(${CMAKE_CURRENT_LIST_DIR}/tests.in.cpp ${TEST_SOURCE_FILE})
 
         list(APPEND TEST_SOURCE_FILES ${TEST_SOURCE_FILE})
     endforeach()
@@ -31,6 +31,6 @@ endif()
 
 # Track our template for code formatting.
 
-list(APPEND GIT_TESTS_SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/tests.cpp.in)
+list(APPEND GIT_TESTS_SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/tests.in.cpp)
 
 set(GIT_TESTS_SOURCE_FILES ${GIT_TESTS_SOURCE_FILES} PARENT_SCOPE)
