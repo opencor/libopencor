@@ -221,6 +221,10 @@ jobs:
         with:
           node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
+      - name: Update npm
+        # Install the latest version of npm since we need npm 11.5.1 or later to publish to npm using OIDC (see
+        # https://docs.npmjs.com/trusted-publishers).
+        run: npm install -g npm@latest
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
@@ -256,7 +260,10 @@ jobs:
           remote-path: /home/www/opencor.ws/libopencor/downloads/wasm
           sync: full
       - name: Publish libOpenCOR
-        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        # To publish using OIDC implies automatic provenance generation, so no need to specify --provenance (see
+        # https://docs.npmjs.com/trusted-publishers). Provenance requires "repository.url" in package.json to match the
+        # repository from which we are publishing. In our case, it means that we can only publish to npm from the
+        # "opencor/libopencor" repository. (Provenance can be disabled, but we prefer to be open.)
         run: |
           cd build/src/bindings/javascript/build/src
-          npm publish --provenance --access public
+          npm publish --access public --no-git-checks
