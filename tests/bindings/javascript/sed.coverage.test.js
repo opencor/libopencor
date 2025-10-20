@@ -493,13 +493,16 @@ test.describe('Sed coverage tests', () => {
 
   test('SedDocument', () => {
     let file = new loc.File(utils.HTTP_REMOTE_CELLML_FILE)
-    let document = new loc.SedDocument(file)
+
+    new loc.SedDocument(file)
 
     file = new loc.File(utils.HTTP_REMOTE_SEDML_FILE)
-    document = new loc.SedDocument(file)
+
+    new loc.SedDocument(file)
 
     file = new loc.File(utils.HTTP_REMOTE_COMBINE_ARCHIVE)
-    document = new loc.SedDocument(file)
+
+    new loc.SedDocument(file)
   })
 
   test('Solver', () => {

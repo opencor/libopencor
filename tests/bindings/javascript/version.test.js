@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import fs from 'fs'
 import assert from 'node:assert'
+import fs from 'node:fs'
+import path from 'node:path'
 import test from 'node:test'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath } from 'node:url'
 
 import libOpenCOR from './libopencor.js'
 
@@ -41,7 +41,7 @@ test.describe('Version tests', () => {
     const ten = BigInt(10)
     const four = BigInt(4)
 
-    while (number != 0) {
+    while (number !== 0n) {
       version |= (number % ten) << i
       number /= ten
       i += four

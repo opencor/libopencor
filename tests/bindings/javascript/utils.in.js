@@ -115,7 +115,7 @@ export function assertValue(value, expectedValue, precision) {
   } else if (Number.isNaN(expectedValue)) {
     assert.ok(Number.isNaN(value))
   } else {
-    assert.ok(Math.abs(value - expectedValue) < Math.pow(10, -precision) / 2)
+    assert.ok(Math.abs(value - expectedValue) < 0.5 * 10 ** -precision)
   }
 }
 
@@ -175,5 +175,5 @@ function stringToArrayBuffer(string) {
 }
 
 export function resourcePath(resourceRelativePath) {
-  return RESOURCE_LOCATION + '/' + resourceRelativePath
+  return `${RESOURCE_LOCATION}/${resourceRelativePath}`
 }

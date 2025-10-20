@@ -120,7 +120,7 @@ test.describe('Sed basic tests', () => {
 
     assert.strictEqual(document.hasIssues, true)
 
-    const neededFile = new loc.File(utils.CELLML_FILE)
+    new loc.File(utils.CELLML_FILE)
 
     document = new loc.SedDocument(file)
 
@@ -136,7 +136,7 @@ test.describe('Sed basic tests', () => {
 
     assert.strictEqual(document.hasIssues, true)
 
-    const neededFile = new loc.File(utils.LOCAL_FILE)
+    new loc.File(utils.LOCAL_FILE)
 
     document = new loc.SedDocument(file)
 
@@ -152,7 +152,7 @@ test.describe('Sed basic tests', () => {
 
     assert.strictEqual(document.hasIssues, true)
 
-    const neededFile = new loc.File(utils.REMOTE_FILE)
+    new loc.File(utils.REMOTE_FILE)
 
     document = new loc.SedDocument(file)
 

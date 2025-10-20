@@ -15,7 +15,7 @@ const lineSeries = chart.addLineSeries().setName('')
 
 export function showPage(page) {
   $('.nav-link').each(function () {
-    if (this.id === 'nav' + page) {
+    if (this.id === `nav${page}`) {
       this.classList.add('active')
     } else {
       this.classList.remove('active')
@@ -23,7 +23,7 @@ export function showPage(page) {
   })
 
   $('.page').each(function () {
-    this.style.display = this.id === 'page' + page ? 'block' : 'none'
+    this.style.display = this.id === `page${page}` ? 'block' : 'none'
   })
 }
 
@@ -32,9 +32,9 @@ function showIssues(issues) {
 
   issuesElement.empty()
 
-  if (issues instanceof Array) {
+  if (Array.isArray(issues)) {
     for (let i = 0; i < issues.length; ++i) {
-      issuesElement.append('<li><span class="bold">Error:</span> ' + formattedIssueDescription(issues[i]) + '</li>')
+      issuesElement.append(`<li><span·class="bold">Error:</span>·${formattedIssueDescription(issues[i])}</li>`)
     }
   } else {
     for (let i = 0; i < issues.size(); ++i) {
@@ -62,7 +62,7 @@ function listFiles() {
     const files = fileManager.files
 
     for (let i = 0; i < files.size(); ++i) {
-      console.log(' - ' + files.get(i).fileName)
+      console.log(` - ${files.get(i).fileName}`)
     }
   } else {
     console.log('No files.')
@@ -85,11 +85,11 @@ export function reset() {
 }
 
 function addAxisElement(axis, name) {
-  axis.append('<option>' + name + '</option>')
+  axis.append(`<option>${name}</option>`)
 }
 
 function populateAxis(axisId) {
-  const axis = $('#' + axisId)
+  const axis = $(`#${axisId}`)
 
   axis.empty()
 
@@ -196,8 +196,8 @@ $(() => {
 
     input.onchange = () => {
       if (hasValidFile) {
-        let inputFile = input.files[0]
-        let fileReader = new FileReader()
+        const inputFile = input.files[0]
+        const fileReader = new FileReader()
 
         input.value = '' // Allow the user to select the same file again.
 
@@ -253,7 +253,7 @@ $(() => {
 
                 simulation = document.simulations.get(0)
 
-                if (simulation !== null && simulation.hasIssues) {
+                if (simulation?.hasIssues) {
                   showIssues(simulation.issues)
 
                   return
@@ -269,7 +269,7 @@ $(() => {
 
                 instanceTask = instance.tasks.get(0)
 
-                if (instanceTask !== null && instanceTask.hasIssues) {
+                if (instanceTask?.hasIssues) {
                   showIssues(instanceTask.issues)
 
                   return

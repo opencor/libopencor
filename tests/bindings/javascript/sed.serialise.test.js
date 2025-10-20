@@ -146,7 +146,7 @@ test.describe('Sed serialise tests', () => {
     const document = new loc.SedDocument(file)
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION + '/../..'),
+      document.serialise(`${utils.RESOURCE_LOCATION}/../..`),
       cvodeExpectedSerialisation('some/path/cellml_2.cellml')
     )
   })
@@ -194,7 +194,7 @@ test.describe('Sed serialise tests', () => {
     const document = new loc.SedDocument(file)
 
     assert.strictEqual(
-      document.serialise(utils.REMOTE_BASE_PATH + '/../..'),
+      document.serialise(`${utils.REMOTE_BASE_PATH}/../..`),
       cvodeExpectedSerialisation('tests/res/cellml_2.cellml')
     )
   })
@@ -668,7 +668,7 @@ test.describe('Sed serialise tests', () => {
 
     file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length)
 
-    let document = new loc.SedDocument(file)
+    const document = new loc.SedDocument(file)
 
     assertIssues(loc, document, [
       [
@@ -922,7 +922,7 @@ test.describe('Sed serialise tests', () => {
 
     file.setContents(sedmlWithSimulationsContentsPtr, utils.SEDML_WITH_SIMULATIONS_CONTENTS.length)
 
-    let document = new loc.SedDocument(file)
+    const document = new loc.SedDocument(file)
 
     assertIssues(loc, document, [
       [loc.Issue.Type.WARNING, "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead."],
