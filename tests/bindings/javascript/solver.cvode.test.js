@@ -14,184 +14,184 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import test from 'node:test'
+import test from 'node:test';
 
-import libOpenCOR from './libopencor.js'
-import * as odeModel from './ode.model.js'
-import * as utils from './utils.js'
-import { assertIssues } from './utils.js'
+import libOpenCOR from './libopencor.js';
+import * as odeModel from './ode.model.js';
+import * as utils from './utils.js';
+import { assertIssues } from './utils.js';
 
-const loc = await libOpenCOR()
+const loc = await libOpenCOR();
 
 test.describe('Solver CVODE tests', () => {
-  let solverOdeContentsPtr
+  let solverOdeContentsPtr;
 
   test.before(() => {
-    solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS)
-  })
+    solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
+  });
 
   test.beforeEach(() => {
-    loc.FileManager.instance().reset()
-  })
+    loc.FileManager.instance().reset();
+  });
 
   test.after(() => {
-    utils.freeMemory(loc, solverOdeContentsPtr)
-  })
+    utils.freeMemory(loc, solverOdeContentsPtr);
+  });
 
   test('Maximum step value with invalid number', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.maximumStep = -1.234
+    solver.maximumStep = -1.234;
 
-    const instance = document.instantiate()
+    const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The maximum step cannot be equal to -1.234. It must be greater or equal to 0.']
-    ])
-  })
+    ]);
+  });
 
   test('Maximum number of steps value with invalid number', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.maximumNumberOfSteps = 0
+    solver.maximumNumberOfSteps = 0;
 
-    const instance = document.instantiate()
+    const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The maximum number of steps cannot be equal to 0. It must be greater than 0.']
-    ])
-  })
+    ]);
+  });
 
   test('Banded linear solver and upper half-bandwidth value with number too small', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED
-    solver.upperHalfBandwidth = -1
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
+    solver.upperHalfBandwidth = -1;
 
-    const instance = document.instantiate()
+    const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.']
-    ])
-  })
+    ]);
+  });
 
   test('Banded linear solver and upper half-bandwidth value with number too big', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED
-    solver.upperHalfBandwidth = 4
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
+    solver.upperHalfBandwidth = 4;
 
-    const instance = document.instantiate()
+    const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.']
-    ])
-  })
+    ]);
+  });
 
   test('Banded linear solver and lower half-bandwidth value with number too small', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED
-    solver.lowerHalfBandwidth = -1
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
+    solver.lowerHalfBandwidth = -1;
 
-    const instance = document.instantiate()
+    const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.']
-    ])
-  })
+    ]);
+  });
 
   test('Banded linear solver and lower half-bandwidth value with number too big', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED
-    solver.lowerHalfBandwidth = 4
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
+    solver.lowerHalfBandwidth = 4;
 
-    const instance = document.instantiate()
+    const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.']
-    ])
-  })
+    ]);
+  });
 
   test('Relative tolerance value with invalid number', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.relativeTolerance = -1.234
+    solver.relativeTolerance = -1.234;
 
-    const instance = document.instantiate()
+    const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.']
-    ])
-  })
+    ]);
+  });
 
   test('Absolute tolerance value with invalid number', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.absoluteTolerance = -1.234
+    solver.absoluteTolerance = -1.234;
 
-    const instance = document.instantiate()
+    const instance = document.instantiate();
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.']
-    ])
-  })
+    ]);
+  });
 
   test('Solve', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
+    const document = new loc.SedDocument(file);
 
     odeModel.run(
       document,
@@ -208,19 +208,19 @@ test.describe('Solver CVODE tests', () => {
         0.002869649611111302, 0.9673466865046488, 0.5413340463230938, 0.056246139672740336
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve without interpolate solution', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.interpolateSolution = false
+    solver.interpolateSolution = false;
 
     odeModel.run(
       document,
@@ -237,19 +237,19 @@ test.describe('Solver CVODE tests', () => {
         0.002869608152119851, 0.967347599201465, 0.5413368773015703, 0.05624593651894338
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with Adams-Moulton integration method', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON
+    solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
 
     odeModel.run(
       document,
@@ -266,19 +266,19 @@ test.describe('Solver CVODE tests', () => {
         0.0028695699322143133, 0.9673484405814371, 0.5413394871402794, 0.056245749235087565
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with functional iteration type', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.iterationType = loc.SolverCvode.IterationType.FUNCTIONAL
+    solver.iterationType = loc.SolverCvode.IterationType.FUNCTIONAL;
 
     odeModel.run(
       document,
@@ -295,19 +295,19 @@ test.describe('Solver CVODE tests', () => {
         0.0028696556353436722, 0.9673465538835438, 0.5413336349689842, 0.056246169191984365
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with banded linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
 
     odeModel.run(
       document,
@@ -324,19 +324,19 @@ test.describe('Solver CVODE tests', () => {
         0.004484425575674626, 0.923844725011358, 0.45464907267569826, 0.06288719270767433
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with diagonal linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.DIAGONAL
+    solver.linearSolver = loc.SolverCvode.LinearSolver.DIAGONAL;
 
     odeModel.run(
       document,
@@ -353,19 +353,19 @@ test.describe('Solver CVODE tests', () => {
         0.00286961139356061, 0.9673475278433488, 0.5413366559620783, 0.056245952402452934
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with GMRES linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES
+    solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
 
     odeModel.run(
       document,
@@ -382,19 +382,19 @@ test.describe('Solver CVODE tests', () => {
         0.11266498024016741, 0.018856763702842786, 0.03230635782351839, 0.1407935434361332
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with Bi-CGstab linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB;
 
     odeModel.run(
       document,
@@ -411,19 +411,19 @@ test.describe('Solver CVODE tests', () => {
         0.11266462895059702, 0.01885687907681896, 0.032306489415568115, 0.14079343368738714
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with TFQMR linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR
+    solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR;
 
     odeModel.run(
       document,
@@ -440,20 +440,20 @@ test.describe('Solver CVODE tests', () => {
         0.11266288622076774, 0.01885745145684819, 0.03230714224978534, 0.14079288922560218
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with GMRES linear solver and no preconditioner', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES
-    solver.preconditioner = loc.SolverCvode.Preconditioner.NO
+    solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
+    solver.preconditioner = loc.SolverCvode.Preconditioner.NO;
 
     odeModel.run(
       document,
@@ -470,20 +470,20 @@ test.describe('Solver CVODE tests', () => {
         0.0028696148730459324, 0.9673474512447651, 0.5413364183681688, 0.056245969452398896
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with Bi-CGstab linear solver and no preconditioner', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB
-    solver.preconditioner = loc.SolverCvode.Preconditioner.NO
+    solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB;
+    solver.preconditioner = loc.SolverCvode.Preconditioner.NO;
 
     odeModel.run(
       document,
@@ -500,20 +500,20 @@ test.describe('Solver CVODE tests', () => {
         0.0028696519878826116, 0.9673466341809926, 0.5413338840293397, 0.05624615131912471
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
+    );
+  });
 
   test('Solve with TFQMR linear solver and no preconditioner', () => {
-    const file = new loc.File(utils.CELLML_FILE)
+    const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const simulation = document.simulations.get(0)
-    const solver = simulation.odeSolver
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+    const solver = simulation.odeSolver;
 
-    solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR
-    solver.preconditioner = loc.SolverCvode.Preconditioner.NO
+    solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR;
+    solver.preconditioner = loc.SolverCvode.Preconditioner.NO;
 
     odeModel.run(
       document,
@@ -530,6 +530,6 @@ test.describe('Solver CVODE tests', () => {
         0.0028696589300411125, 0.967346481351974, 0.5413334099967426, 0.056246185336258574
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
-    )
-  })
-})
+    );
+  });
+});

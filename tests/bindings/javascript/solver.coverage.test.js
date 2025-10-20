@@ -14,42 +14,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from 'node:assert'
-import test from 'node:test'
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from './libopencor.js'
-import * as utils from './utils.js'
-import { assertIssues, assertValue } from './utils.js'
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
+import { assertIssues, assertValue } from './utils.js';
 
-const loc = await libOpenCOR()
+const loc = await libOpenCOR();
 
 test.describe('Solver coverage tests', () => {
-  let algebraicSedChangesContentsPtr
-  let odeSedChangesContentsPtr
+  let algebraicSedChangesContentsPtr;
+  let odeSedChangesContentsPtr;
 
   test.before(() => {
-    algebraicSedChangesContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_SED_CHANGES_CONTENTS)
-    odeSedChangesContentsPtr = utils.allocateMemory(loc, utils.ODE_SED_CHANGES_CONTENTS)
-  })
+    algebraicSedChangesContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_SED_CHANGES_CONTENTS);
+    odeSedChangesContentsPtr = utils.allocateMemory(loc, utils.ODE_SED_CHANGES_CONTENTS);
+  });
 
   test.beforeEach(() => {
-    loc.FileManager.instance().reset()
-  })
+    loc.FileManager.instance().reset();
+  });
 
   test.after(() => {
-    utils.freeMemory(loc, algebraicSedChangesContentsPtr)
-    utils.freeMemory(loc, odeSedChangesContentsPtr)
-  })
+    utils.freeMemory(loc, algebraicSedChangesContentsPtr);
+    utils.freeMemory(loc, odeSedChangesContentsPtr);
+  });
 
   test('ODE changes', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE)
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(odeSedChangesContentsPtr, utils.ODE_SED_CHANGES_CONTENTS.length)
+    file.setContents(odeSedChangesContentsPtr, utils.ODE_SED_CHANGES_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const instance = document.instantiate()
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
 
-    instance.run()
+    instance.run();
 
     assertIssues(loc, instance, [
       [
@@ -68,8 +68,8 @@ test.describe('Solver coverage tests', () => {
         loc.Issue.Type.WARNING,
         "The algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."
       ]
-    ])
-  })
+    ]);
+  });
 
   test('Algebraic changes', () => {
     // We want to solve a system of three unknowns:
@@ -93,25 +93,25 @@ test.describe('Solver coverage tests', () => {
     //  • y = -356/27 = -13.185185185185185
     //  • z = -760/27 = -28.148148148148145
 
-    const file = new loc.File(utils.COMBINE_ARCHIVE)
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(algebraicSedChangesContentsPtr, utils.ALGEBRAIC_SED_CHANGES_CONTENTS.length)
+    file.setContents(algebraicSedChangesContentsPtr, utils.ALGEBRAIC_SED_CHANGES_CONTENTS.length);
 
-    const document = new loc.SedDocument(file)
-    const instance = document.instantiate()
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
 
-    instance.run()
+    instance.run();
 
-    const instanceTask = instance.tasks.get(0)
+    const instanceTask = instance.tasks.get(0);
 
-    assert.strictEqual(instanceTask.stateCount, 0)
-    assert.strictEqual(instanceTask.rateCount, 0)
-    assert.strictEqual(instanceTask.constantCount, 1)
-    assert.strictEqual(instanceTask.computedConstantCount, 1)
-    assert.strictEqual(instanceTask.algebraicCount, 3)
+    assert.strictEqual(instanceTask.stateCount, 0);
+    assert.strictEqual(instanceTask.rateCount, 0);
+    assert.strictEqual(instanceTask.constantCount, 1);
+    assert.strictEqual(instanceTask.computedConstantCount, 1);
+    assert.strictEqual(instanceTask.algebraicCount, 3);
 
-    assertValue(instanceTask.algebraic(0).get(0), -28.14815, 5)
-    assertValue(instanceTask.algebraic(1).get(0), -13.18519, 5)
-    assertValue(instanceTask.algebraic(2).get(0), 33.33333, 5)
-  })
-})
+    assertValue(instanceTask.algebraic(0).get(0), -28.14815, 5);
+    assertValue(instanceTask.algebraic(1).get(0), -13.18519, 5);
+    assertValue(instanceTask.algebraic(2).get(0), 33.33333, 5);
+  });
+});
