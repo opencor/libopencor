@@ -1,4 +1,11 @@
 {
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "off"
+      }
+    }
+  },
   "formatter": {
     "includes": [
       "**/*.css",
@@ -21,7 +28,31 @@
   },
   "html": {
     "formatter": {
-      "enabled": true
+      "bracketSameLine": true,
+      "enabled": true,
+      "selfCloseVoidElements": "always",
+      "whitespaceSensitivity": "ignore"
     }
-  }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "none"
+    }
+  },
+  "linter": {
+    "includes": ["**/*.css", "**/*.js", "!**/*.min.css"]
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.css"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          }
+        }
+      }
+    }
+  ]
 }
