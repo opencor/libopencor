@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("File type tests", () => {
+test.describe('File type tests', () => {
   let dataset135OmexContentsPtr;
   let dataset135JsonContentsPtr;
   let dataset157OmexContentsPtr;
@@ -57,7 +57,7 @@ test.describe("File type tests", () => {
     assert.strictEqual(file.childFiles.size(), specificChildFileNames.length + 1);
 
     let index = -1;
-    const simulationFile = file.childFileFromFileName("simulation.json");
+    const simulationFile = file.childFileFromFileName('simulation.json');
 
     assert.notStrictEqual(file.childFile(++index), null);
     assert.notStrictEqual(simulationFile, null);
@@ -73,7 +73,7 @@ test.describe("File type tests", () => {
     assert.deepStrictEqual(simulationFile.contents(), jsonContents);
   }
 
-  test("No child files", () => {
+  test('No child files', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
     assert.strictEqual(file.hasChildFiles, false);
@@ -84,16 +84,16 @@ test.describe("File type tests", () => {
     assert.strictEqual(file.childFileFromFileName(utils.UNKNOWN_FILE), null);
   });
 
-  test("Dataset 135", () => {
+  test('Dataset 135', () => {
     doTestDataset(dataset135OmexContentsPtr, utils.DATASET_135_OMEX_CONTENTS, utils.DATASET_135_JSON_CONTENTS, [
-      "HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml",
+      'HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml'
     ]);
   });
 
-  test("Dataset 157", () => {
+  test('Dataset 157', () => {
     doTestDataset(dataset157OmexContentsPtr, utils.DATASET_157_OMEX_CONTENTS, utils.DATASET_157_JSON_CONTENTS, [
-      "fabbri_et_al_based_composite_SAN_model.cellml",
-      "fabbri_et_al_based_composite_SAN_model.sedml",
+      'fabbri_et_al_based_composite_SAN_model.cellml',
+      'fabbri_et_al_based_composite_SAN_model.sedml'
     ]);
   });
 });

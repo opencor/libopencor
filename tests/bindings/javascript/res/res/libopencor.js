@@ -7,34 +7,34 @@ let instanceTask = null;
 const { lightningChart } = lcjs;
 const chart = lightningChart()
   .ChartXY({
-    container: $("#plottingArea")[0],
+    container: $('#plottingArea')[0]
   })
-  .setTitle("")
+  .setTitle('')
   .setAnimationsEnabled(false);
-const lineSeries = chart.addLineSeries().setName("");
+const lineSeries = chart.addLineSeries().setName('');
 
 export function showPage(page) {
-  $(".nav-link").each(function () {
-    if (this.id === "nav" + page) {
-      this.classList.add("active");
+  $('.nav-link').each(function () {
+    if (this.id === `nav${page}`) {
+      this.classList.add('active');
     } else {
-      this.classList.remove("active");
+      this.classList.remove('active');
     }
   });
 
-  $(".page").each(function () {
-    this.style.display = this.id === "page" + page ? "block" : "none";
+  $('.page').each(function () {
+    this.style.display = this.id === `page${page}` ? 'block' : 'none';
   });
 }
 
 function showIssues(issues) {
-  const issuesElement = $("#issues");
+  const issuesElement = $('#issues');
 
   issuesElement.empty();
 
-  if (issues instanceof Array) {
+  if (Array.isArray(issues)) {
     for (let i = 0; i < issues.length; ++i) {
-      issuesElement.append('<li><span class="bold">Error:</span> ' + formattedIssueDescription(issues[i]) + "</li>");
+      issuesElement.append(`<li><span·class="bold">Error:</span>·${formattedIssueDescription(issues[i])}</li>`);
     }
   } else {
     for (let i = 0; i < issues.size(); ++i) {
@@ -43,9 +43,9 @@ function showIssues(issues) {
       issuesElement.append(
         '<li><span class="bold">' +
           issue.typeAsString +
-          ":</span> " +
+          ':</span> ' +
           formattedIssueDescription(issue.description) +
-          "</li>",
+          '</li>'
       );
     }
   }
@@ -54,26 +54,26 @@ function showIssues(issues) {
 }
 
 function listFiles() {
-  console.log("-------------------");
+  console.log('-------------------');
 
   if (fileManager.hasFiles) {
-    console.log("Files:");
+    console.log('Files:');
 
     const files = fileManager.files;
 
     for (let i = 0; i < files.size(); ++i) {
-      console.log(" - " + files.get(i).fileName);
+      console.log(` - ${files.get(i).fileName}`);
     }
   } else {
-    console.log("No files.");
+    console.log('No files.');
   }
 }
 
 function updateFileUi(fileInfoDisplay, fileIssuesDisplay, resetButtonDisplay, simulationDisplay) {
-  $("#fileInfo").css("display", fileInfoDisplay ? "block" : "none");
-  $("#fileIssues").css("display", fileIssuesDisplay ? "block" : "none");
-  $("#reset").css("display", resetButtonDisplay ? "block" : "none");
-  $("#simulation").css("display", simulationDisplay ? "block" : "none");
+  $('#fileInfo').css('display', fileInfoDisplay ? 'block' : 'none');
+  $('#fileIssues').css('display', fileIssuesDisplay ? 'block' : 'none');
+  $('#reset').css('display', resetButtonDisplay ? 'block' : 'none');
+  $('#simulation').css('display', simulationDisplay ? 'block' : 'none');
 
   listFiles();
 }
@@ -85,11 +85,11 @@ export function reset() {
 }
 
 function addAxisElement(axis, name) {
-  axis.append("<option>" + name + "</option>");
+  axis.append(`<option>${name}</option>`);
 }
 
 function populateAxis(axisId) {
-  const axis = $("#" + axisId);
+  const axis = $(`#${axisId}`);
 
   axis.empty();
 
@@ -120,21 +120,21 @@ export function run() {
 
   // Retrieve the duration of the simulation and the number of steps.
 
-  simulation.outputEndTime = $("#endingPoint").val();
-  simulation.numberOfSteps = $("#endingPoint").val() / $("#pointInterval").val();
+  simulation.outputEndTime = $('#endingPoint').val();
+  simulation.numberOfSteps = $('#endingPoint').val() / $('#pointInterval').val();
 
   // Run the simulation.
 
-  console.log("-------------------");
-  console.time("Computing time");
+  console.log('-------------------');
+  console.time('Computing time');
   instance.run();
-  console.timeEnd("Computing time");
+  console.timeEnd('Computing time');
 
   // Plot the results.
 
-  console.time("Plotting time");
+  console.time('Plotting time');
   updatePlottingAreaAndAxesInfo();
-  console.timeEnd("Plotting time");
+  console.timeEnd('Plotting time');
 }
 
 function axisInfo(index) {
@@ -160,13 +160,13 @@ function axisInfo(index) {
 export function updatePlottingAreaAndAxesInfo() {
   lineSeries.clear();
 
-  const [xAxisArray, xAxisUnit] = axisInfo($("#xAxis").prop("selectedIndex"));
-  const [yAxisArray, yAxisUnit] = axisInfo($("#yAxis").prop("selectedIndex"));
+  const [xAxisArray, xAxisUnit] = axisInfo($('#xAxis').prop('selectedIndex'));
+  const [yAxisArray, yAxisUnit] = axisInfo($('#yAxis').prop('selectedIndex'));
 
   lineSeries.addArraysXY(xAxisArray, yAxisArray);
 
-  $("#xAxisUnit").text(xAxisUnit);
-  $("#yAxisUnit").text(yAxisUnit);
+  $('#xAxisUnit').text(xAxisUnit);
+  $('#yAxisUnit').text(yAxisUnit);
 
   chart.getDefaultAxisX().fit();
   chart.getDefaultAxisY().fit();
@@ -178,7 +178,7 @@ function formattedIssueDescription(issue) {
 
 // Make sure that the DOM is loaded before we do anything else.
 
-import libOpenCOR from "../libopencor.js";
+import libOpenCOR from '../libopencor.js';
 
 $(() => {
   // Make sure that libOpenCOR is loaded before we do anything else.
@@ -190,16 +190,16 @@ $(() => {
 
     // Simulation page.
 
-    const input = $("#dropAreaInput")[0];
-    const dropArea = $("#dropArea");
+    const input = $('#dropAreaInput')[0];
+    const dropArea = $('#dropArea');
     let hasValidFile = false;
 
     input.onchange = () => {
       if (hasValidFile) {
-        let inputFile = input.files[0];
-        let fileReader = new FileReader();
+        const inputFile = input.files[0];
+        const fileReader = new FileReader();
 
-        input.value = ""; // Allow the user to select the same file again.
+        input.value = ''; // Allow the user to select the same file again.
 
         fileReader.readAsArrayBuffer(inputFile);
 
@@ -219,21 +219,21 @@ $(() => {
 
             // Determine the type of the file.
 
-            let fileType = "some unknown file";
+            let fileType = 'some unknown file';
             let knownFile = true;
 
             if (file.type === loc.File.Type.CELLML_FILE) {
-              fileType = "a CellML file";
+              fileType = 'a CellML file';
             } else if (file.type === loc.File.Type.SEDML_FILE) {
-              fileType = "a SED-ML file";
+              fileType = 'a SED-ML file';
             } else if (file.type === loc.File.Type.COMBINE_ARCHIVE) {
-              fileType = "a COMBINE archive";
+              fileType = 'a COMBINE archive';
             } else {
               knownFile = false;
             }
 
-            $("#fileName").html(inputFile.name);
-            $("#fileType").html(fileType);
+            $('#fileName').html(inputFile.name);
+            $('#fileType').html(fileType);
 
             // Display any issues with the file or run it.
 
@@ -253,7 +253,7 @@ $(() => {
 
                 simulation = document.simulations.get(0);
 
-                if (simulation !== null && simulation.hasIssues) {
+                if (simulation?.hasIssues) {
                   showIssues(simulation.issues);
 
                   return;
@@ -269,27 +269,27 @@ $(() => {
 
                 instanceTask = instance.tasks.get(0);
 
-                if (instanceTask !== null && instanceTask.hasIssues) {
+                if (instanceTask?.hasIssues) {
                   showIssues(instanceTask.issues);
 
                   return;
                 }
 
-                $("#endingPoint").val(simulation.outputEndTime);
-                $("#endingPointUnit").text(instanceTask.voiUnit);
+                $('#endingPoint').val(simulation.outputEndTime);
+                $('#endingPointUnit').text(instanceTask.voiUnit);
 
-                $("#pointInterval").val(simulation.outputEndTime / simulation.numberOfSteps);
-                $("#pointIntervalUnit").text(instanceTask.voiUnit);
+                $('#pointInterval').val(simulation.outputEndTime / simulation.numberOfSteps);
+                $('#pointIntervalUnit').text(instanceTask.voiUnit);
 
                 // Populate the X and Y axis dropdown lists.
 
-                populateAxis("xAxis");
-                populateAxis("yAxis");
+                populateAxis('xAxis');
+                populateAxis('yAxis');
 
                 // By default we plot the first state variable against the VOI.
 
-                $("#xAxis").val(instanceTask.voiName);
-                $("#yAxis").val(instanceTask.stateName(0));
+                $('#xAxis').val(instanceTask.voiName);
+                $('#yAxis').val(instanceTask.stateName(0));
 
                 // Update the plotting area (in case we have some simulation results and we drop a new file) and the
                 // axes information.
@@ -312,39 +312,39 @@ $(() => {
       }
     };
 
-    ["dragenter", "dragover"].forEach((eventName) => {
+    ['dragenter', 'dragover'].forEach((eventName) => {
       dropArea[0].addEventListener(eventName, (event) => {
         if (event.dataTransfer.items.length === 1) {
           hasValidFile = true;
 
-          dropArea.addClass("drop-area-valid-file");
+          dropArea.addClass('drop-area-valid-file');
         } else {
           hasValidFile = false;
 
-          dropArea.addClass("drop-area-invalid-file-s");
+          dropArea.addClass('drop-area-invalid-file-s');
         }
       });
     });
 
-    ["dragleave", "drop"].forEach((eventName) => {
+    ['dragleave', 'drop'].forEach((eventName) => {
       dropArea.on(eventName, () => {
-        dropArea.removeClass("drop-area-valid-file");
-        dropArea.removeClass("drop-area-invalid-file-s");
+        dropArea.removeClass('drop-area-valid-file');
+        dropArea.removeClass('drop-area-invalid-file-s');
       });
     });
 
     // Versions page.
 
-    $("#Clang").html(loc.clangVersionString());
-    $("#libCellML").html(loc.libcellmlVersionString());
-    $("#libCOMBINE").html(loc.libcombineVersionString());
-    $("#libOpenCOR").html(loc.versionString());
-    $("#libSEDML").html(loc.libsedmlVersionString());
-    $("#LLVM").html(loc.llvmVersionString());
-    $("#SUNDIALS").html(loc.sundialsVersionString());
+    $('#Clang').html(loc.clangVersionString());
+    $('#libCellML').html(loc.libcellmlVersionString());
+    $('#libCOMBINE').html(loc.libcombineVersionString());
+    $('#libOpenCOR').html(loc.versionString());
+    $('#libSEDML').html(loc.libsedmlVersionString());
+    $('#LLVM').html(loc.llvmVersionString());
+    $('#SUNDIALS').html(loc.sundialsVersionString());
 
     // Start with our simulation page.
 
-    showPage("Simulation");
+    showPage('Simulation');
   });
 });

@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
-import { assertIssues, assertValues } from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
+import { assertIssues, assertValues } from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("Sed coverage tests", () => {
+test.describe('Sed coverage tests', () => {
   let sedChangesContentsPtr;
   let invalidSedChangesContentsPtr;
   let unsupportedSedChangesContentsPtr;
@@ -63,7 +63,7 @@ test.describe("Sed coverage tests", () => {
 `;
   }
 
-  test("Initialise", () => {
+  test('Initialise', () => {
     const expectedSerialisation = `<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4"/>
 `;
@@ -72,7 +72,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(document.serialise(), expectedSerialisation);
   });
 
-  test("Models", () => {
+  test('Models', () => {
     const document = new loc.SedDocument();
 
     assert.strictEqual(document.hasModels, false);
@@ -113,7 +113,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(model.addChange(null), false);
     assert.strictEqual(model.removeAllChanges(), false);
 
-    const changeAttribute = new loc.SedChangeAttribute("component", "variable", "newValue");
+    const changeAttribute = new loc.SedChangeAttribute('component', 'variable', 'newValue');
 
     assert.strictEqual(model.addChange(changeAttribute), true);
 
@@ -137,7 +137,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(model.removeChange(null), false);
   });
 
-  test("Changes", () => {
+  test('Changes', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(sedChangesContentsPtr, utils.SED_CHANGES_CONTENTS.length);
@@ -153,32 +153,32 @@ test.describe("Sed coverage tests", () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'.",
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value.",
+        "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''.",
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'.",
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''.",
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'.",
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'.",
-      ],
+        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."
+      ]
     ]);
 
     file.setContents(unsupportedSedChangesContentsPtr, utils.UNSUPPORTED_SED_CHANGES_CONTENTS.length);
@@ -188,24 +188,24 @@ test.describe("Sed coverage tests", () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.WARNING,
-        "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored.",
+        "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored.",
+        "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored.",
+        "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored.",
-      ],
+        "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."
+      ]
     ]);
   });
 
-  test("Simulations", () => {
+  test('Simulations', () => {
     const document = new loc.SedDocument();
 
     assert.strictEqual(document.hasSimulations, false);
@@ -259,7 +259,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(document.removeAllSimulations(), true);
   });
 
-  test("Tasks", () => {
+  test('Tasks', () => {
     const document = new loc.SedDocument();
 
     assert.strictEqual(document.hasTasks, false);
@@ -298,7 +298,7 @@ test.describe("Sed coverage tests", () => {
 
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, "Task 'task1' requires a model."],
-      [loc.Issue.Type.ERROR, "Task 'task1' requires a simulation."],
+      [loc.Issue.Type.ERROR, "Task 'task1' requires a simulation."]
     ]);
 
     assert.strictEqual(document.addTask(task), false);
@@ -315,7 +315,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(document.removeAllTasks(), true);
   });
 
-  test("ODE solver", () => {
+  test('ODE solver', () => {
     const document = new loc.SedDocument();
     const simulation = new loc.SedUniformTimeCourse(document);
 
@@ -332,7 +332,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(simulation.odeSolver, null);
   });
 
-  test("NLA solver", () => {
+  test('NLA solver', () => {
     const document = new loc.SedDocument();
     const simulation = new loc.SedUniformTimeCourse(document);
 
@@ -349,7 +349,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(simulation.nlaSolver, null);
   });
 
-  test("SedOneStep", () => {
+  test('SedOneStep', () => {
     const file = new loc.File(utils.CELLML_FILE);
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedOneStep(document);
@@ -361,7 +361,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(simulation.step, 1.23);
   });
 
-  test("SedUniformTimeCourse", () => {
+  test('SedUniformTimeCourse', () => {
     const file = new loc.File(utils.CELLML_FILE);
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedUniformTimeCourse(document);
@@ -382,7 +382,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(simulation.numberOfSteps, 10);
   });
 
-  test("SedInstanceAndSedInstanceTaskDifferentialModel", () => {
+  test('SedInstanceAndSedInstanceTaskDifferentialModel', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -403,18 +403,18 @@ test.describe("Sed coverage tests", () => {
 
     assert.strictEqual(instanceTask.voi.size(), 0);
     assert.deepStrictEqual(instanceTask.voiAsArray, []);
-    assert.strictEqual(instanceTask.voiName, "environment/time");
-    assert.strictEqual(instanceTask.voiUnit, "millisecond");
+    assert.strictEqual(instanceTask.voiName, 'environment/time');
+    assert.strictEqual(instanceTask.voiUnit, 'millisecond');
 
     assert.strictEqual(instanceTask.stateCount, 4);
     assert.strictEqual(instanceTask.state(0).size(), 0);
     assert.deepStrictEqual(instanceTask.stateAsArray(0), []);
     assert.strictEqual(instanceTask.state(4).size(), 0);
     assert.deepStrictEqual(instanceTask.stateAsArray(4), []);
-    assert.strictEqual(instanceTask.stateName(0), "membrane/V");
-    assert.strictEqual(instanceTask.stateName(4), "");
-    assert.strictEqual(instanceTask.stateUnit(0), "millivolt");
-    assert.strictEqual(instanceTask.stateUnit(4), "");
+    assert.strictEqual(instanceTask.stateName(0), 'membrane/V');
+    assert.strictEqual(instanceTask.stateName(4), '');
+    assert.strictEqual(instanceTask.stateUnit(0), 'millivolt');
+    assert.strictEqual(instanceTask.stateUnit(4), '');
 
     assert.strictEqual(instanceTask.rateCount, 4);
     assert.strictEqual(instanceTask.rate(0).size(), 0);
@@ -422,48 +422,48 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(instanceTask.rate(4).size(), 0);
     assert.deepStrictEqual(instanceTask.rateAsArray(4), []);
     assert.strictEqual(instanceTask.rateName(0), "membrane/V'");
-    assert.strictEqual(instanceTask.rateName(4), "");
-    assert.strictEqual(instanceTask.rateUnit(0), "millivolt/millisecond");
-    assert.strictEqual(instanceTask.rateUnit(4), "");
+    assert.strictEqual(instanceTask.rateName(4), '');
+    assert.strictEqual(instanceTask.rateUnit(0), 'millivolt/millisecond');
+    assert.strictEqual(instanceTask.rateUnit(4), '');
 
     assert.strictEqual(instanceTask.constantCount, 5);
     assert.strictEqual(instanceTask.constant(0).size(), 0);
     assert.deepStrictEqual(instanceTask.constantAsArray(0), []);
     assert.strictEqual(instanceTask.constant(5).size(), 0);
     assert.deepStrictEqual(instanceTask.constantAsArray(5), []);
-    assert.strictEqual(instanceTask.constantName(0), "membrane/Cm");
-    assert.strictEqual(instanceTask.constantName(5), "");
-    assert.strictEqual(instanceTask.constantUnit(0), "microF_per_cm2");
-    assert.strictEqual(instanceTask.constantUnit(5), "");
+    assert.strictEqual(instanceTask.constantName(0), 'membrane/Cm');
+    assert.strictEqual(instanceTask.constantName(5), '');
+    assert.strictEqual(instanceTask.constantUnit(0), 'microF_per_cm2');
+    assert.strictEqual(instanceTask.constantUnit(5), '');
 
     assert.strictEqual(instanceTask.computedConstantCount, 3);
     assert.strictEqual(instanceTask.computedConstant(0).size(), 0);
     assert.deepStrictEqual(instanceTask.computedConstantAsArray(0), []);
     assert.strictEqual(instanceTask.computedConstant(3).size(), 0);
     assert.deepStrictEqual(instanceTask.computedConstantAsArray(3), []);
-    assert.strictEqual(instanceTask.computedConstantName(0), "leakage_current/E_L");
-    assert.strictEqual(instanceTask.computedConstantName(3), "");
-    assert.strictEqual(instanceTask.computedConstantUnit(0), "millivolt");
-    assert.strictEqual(instanceTask.computedConstantUnit(3), "");
+    assert.strictEqual(instanceTask.computedConstantName(0), 'leakage_current/E_L');
+    assert.strictEqual(instanceTask.computedConstantName(3), '');
+    assert.strictEqual(instanceTask.computedConstantUnit(0), 'millivolt');
+    assert.strictEqual(instanceTask.computedConstantUnit(3), '');
 
     assert.strictEqual(instanceTask.algebraicCount, 10);
     assert.strictEqual(instanceTask.algebraic(0).size(), 0);
     assert.deepStrictEqual(instanceTask.algebraicAsArray(0), []);
     assert.strictEqual(instanceTask.algebraic(10).size(), 0);
     assert.deepStrictEqual(instanceTask.algebraicAsArray(10), []);
-    assert.strictEqual(instanceTask.algebraicName(0), "membrane/i_Stim");
-    assert.strictEqual(instanceTask.algebraicName(10), "");
-    assert.strictEqual(instanceTask.algebraicUnit(0), "microA_per_cm2");
-    assert.strictEqual(instanceTask.algebraicUnit(10), "");
+    assert.strictEqual(instanceTask.algebraicName(0), 'membrane/i_Stim');
+    assert.strictEqual(instanceTask.algebraicName(10), '');
+    assert.strictEqual(instanceTask.algebraicUnit(0), 'microA_per_cm2');
+    assert.strictEqual(instanceTask.algebraicUnit(10), '');
 
     instance.run();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."],
+      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.']
     ]);
   });
 
-  test("SedInstanceAndSedInstanceTaskNonDifferentialModel", () => {
+  test('SedInstanceAndSedInstanceTaskNonDifferentialModel', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
@@ -475,34 +475,37 @@ test.describe("Sed coverage tests", () => {
 
     assert.strictEqual(instanceTask.voi.size(), 0);
     assert.deepStrictEqual(instanceTask.voiAsArray, []);
-    assert.strictEqual(instanceTask.voiName, "");
-    assert.strictEqual(instanceTask.voiUnit, "");
+    assert.strictEqual(instanceTask.voiName, '');
+    assert.strictEqual(instanceTask.voiUnit, '');
 
     assert.strictEqual(instanceTask.stateCount, 0);
     assert.strictEqual(instanceTask.state(0).size(), 0);
     assert.deepStrictEqual(instanceTask.stateAsArray(0), []);
-    assert.strictEqual(instanceTask.stateName(0), "");
-    assert.strictEqual(instanceTask.stateUnit(0), "");
+    assert.strictEqual(instanceTask.stateName(0), '');
+    assert.strictEqual(instanceTask.stateUnit(0), '');
 
     assert.strictEqual(instanceTask.rateCount, 0);
     assert.strictEqual(instanceTask.rate(0).size(), 0);
     assert.deepStrictEqual(instanceTask.rateAsArray(0), []);
-    assert.strictEqual(instanceTask.rateName(0), "");
-    assert.strictEqual(instanceTask.rateUnit(0), "");
+    assert.strictEqual(instanceTask.rateName(0), '');
+    assert.strictEqual(instanceTask.rateUnit(0), '');
   });
 
-  test("SedDocument", () => {
+  test('SedDocument', () => {
     let file = new loc.File(utils.HTTP_REMOTE_CELLML_FILE);
-    let document = new loc.SedDocument(file);
+
+    new loc.SedDocument(file);
 
     file = new loc.File(utils.HTTP_REMOTE_SEDML_FILE);
-    document = new loc.SedDocument(file);
+
+    new loc.SedDocument(file);
 
     file = new loc.File(utils.HTTP_REMOTE_COMBINE_ARCHIVE);
-    document = new loc.SedDocument(file);
+
+    new loc.SedDocument(file);
   });
 
-  test("Solver", () => {
+  test('Solver', () => {
     // Get the duplicate() method of different solvers to be covered.
 
     const file = new loc.File(utils.CELLML_FILE);
@@ -552,7 +555,7 @@ test.describe("Sed coverage tests", () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test("Math", () => {
+  test('Math', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(mathContentsPtr, utils.MATH_CONTENTS.length);
@@ -613,11 +616,11 @@ test.describe("Sed coverage tests", () => {
         0.32745015023725843,
         0.34657359027997264,
         Infinity,
-        NaN,
+        NaN
       ],
       [7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
       [],
-      [],
+      []
     );
   });
 });

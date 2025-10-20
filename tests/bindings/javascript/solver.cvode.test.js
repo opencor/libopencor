@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import test from "node:test";
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as odeModel from "./ode.model.js";
-import * as utils from "./utils.js";
-import { assertIssues } from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as odeModel from './ode.model.js';
+import * as utils from './utils.js';
+import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("Solver CVODE tests", () => {
+test.describe('Solver CVODE tests', () => {
   let solverOdeContentsPtr;
 
   test.before(() => {
@@ -38,7 +38,7 @@ test.describe("Solver CVODE tests", () => {
     utils.freeMemory(loc, solverOdeContentsPtr);
   });
 
-  test("Maximum step value with invalid number", () => {
+  test('Maximum step value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -52,11 +52,11 @@ test.describe("Solver CVODE tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The maximum step cannot be equal to -1.234. It must be greater or equal to 0."],
+      [loc.Issue.Type.ERROR, 'The maximum step cannot be equal to -1.234. It must be greater or equal to 0.']
     ]);
   });
 
-  test("Maximum number of steps value with invalid number", () => {
+  test('Maximum number of steps value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -70,11 +70,11 @@ test.describe("Solver CVODE tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The maximum number of steps cannot be equal to 0. It must be greater than 0."],
+      [loc.Issue.Type.ERROR, 'The maximum number of steps cannot be equal to 0. It must be greater than 0.']
     ]);
   });
 
-  test("Banded linear solver and upper half-bandwidth value with number too small", () => {
+  test('Banded linear solver and upper half-bandwidth value with number too small', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -89,11 +89,11 @@ test.describe("Solver CVODE tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."],
+      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.']
     ]);
   });
 
-  test("Banded linear solver and upper half-bandwidth value with number too big", () => {
+  test('Banded linear solver and upper half-bandwidth value with number too big', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -108,11 +108,11 @@ test.describe("Solver CVODE tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3."],
+      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.']
     ]);
   });
 
-  test("Banded linear solver and lower half-bandwidth value with number too small", () => {
+  test('Banded linear solver and lower half-bandwidth value with number too small', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -127,11 +127,11 @@ test.describe("Solver CVODE tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3."],
+      [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.']
     ]);
   });
 
-  test("Banded linear solver and lower half-bandwidth value with number too big", () => {
+  test('Banded linear solver and lower half-bandwidth value with number too big', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -146,11 +146,11 @@ test.describe("Solver CVODE tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3."],
+      [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.']
     ]);
   });
 
-  test("Relative tolerance value with invalid number", () => {
+  test('Relative tolerance value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -164,11 +164,11 @@ test.describe("Solver CVODE tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0."],
+      [loc.Issue.Type.ERROR, 'The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.']
     ]);
   });
 
-  test("Absolute tolerance value with invalid number", () => {
+  test('Absolute tolerance value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -182,11 +182,11 @@ test.describe("Solver CVODE tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0."],
+      [loc.Issue.Type.ERROR, 'The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.']
     ]);
   });
 
-  test("Solve", () => {
+  test('Solve', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -205,13 +205,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -15.98193183871092, -823.5170686925285, 789.7796037360945, 3.969889220790335, 0.11498728095120034,
-        0.002869649611111302, 0.9673466865046488, 0.5413340463230938, 0.056246139672740336,
+        0.002869649611111302, 0.9673466865046488, 0.5413340463230938, 0.056246139672740336
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve without interpolate solution", () => {
+  test('Solve without interpolate solution', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -234,13 +234,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -15.982018523769852, -823.5169497839769, 789.7794600749353, 3.9699163221479288, 0.11498543509949267,
-        0.002869608152119851, 0.967347599201465, 0.5413368773015703, 0.05624593651894338,
+        0.002869608152119851, 0.967347599201465, 0.5413368773015703, 0.05624593651894338
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with Adams-Moulton integration method", () => {
+  test('Solve with Adams-Moulton integration method', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -263,13 +263,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -15.982098437454306, -823.517772548299, 789.7798205819753, 3.969941306524383, 0.11498373346212507,
-        0.0028695699322143133, 0.9673484405814371, 0.5413394871402794, 0.056245749235087565,
+        0.0028695699322143133, 0.9673484405814371, 0.5413394871402794, 0.056245749235087565
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with functional iteration type", () => {
+  test('Solve with functional iteration type', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -292,13 +292,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -15.981919242972355, -823.5165673477538, 789.7792460634204, 3.9698852828412163, 0.11498754916442601,
-        0.0028696556353436722, 0.9673465538835438, 0.5413336349689842, 0.056246169191984365,
+        0.0028696556353436722, 0.9673465538835438, 0.5413336349689842, 0.056246169191984365
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with banded linear solver", () => {
+  test('Solve with banded linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -321,13 +321,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -13.303408989082731, -791.4305773063138, 757.5438469048962, 3.1534355451295104, 0.1888294585042939,
-        0.004484425575674626, 0.923844725011358, 0.45464907267569826, 0.06288719270767433,
+        0.004484425575674626, 0.923844725011358, 0.45464907267569826, 0.06288719270767433
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with diagonal linear solver", () => {
+  test('Solve with diagonal linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -350,13 +350,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -15.982011746317133, -823.5175883208121, 789.7801354388632, 3.9699142032327877, 0.11498557941594431,
-        0.00286961139356061, 0.9673475278433488, 0.5413366559620783, 0.056245952402452934,
+        0.00286961139356061, 0.9673475278433488, 0.5413366559620783, 0.056245952402452934
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with GMRES linear solver", () => {
+  test('Solve with GMRES linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -379,13 +379,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, 6.039440378225918, -5.198280618095664, 0.022995574731048997, 0.11295819992340264, 6.787604865006558,
-        0.11266498024016741, 0.018856763702842786, 0.03230635782351839, 0.1407935434361332,
+        0.11266498024016741, 0.018856763702842786, 0.03230635782351839, 0.1407935434361332
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with Bi-CGstab linear solver", () => {
+  test('Solve with Bi-CGstab linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -408,13 +408,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, 6.039421670188124, -5.19825841970766, 0.02299638321880334, 0.11295872331711411, 6.7875813497198205,
-        0.11266462895059702, 0.01885687907681896, 0.032306489415568115, 0.14079343368738714,
+        0.11266462895059702, 0.01885687907681896, 0.032306489415568115, 0.14079343368738714
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with TFQMR linear solver", () => {
+  test('Solve with TFQMR linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -437,13 +437,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, 6.039328859694316, -5.198100630380928, 0.02300059700386618, 0.11296131990363434, 6.787464691689585,
-        0.11266288622076774, 0.01885745145684819, 0.03230714224978534, 0.14079288922560218,
+        0.11266288622076774, 0.01885745145684819, 0.03230714224978534, 0.14079288922560218
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with GMRES linear solver and no preconditioner", () => {
+  test('Solve with GMRES linear solver and no preconditioner', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -467,13 +467,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -15.982004471151122, -823.5170097263399, 789.7794133274365, 3.969911928711907, 0.11498573433071144,
-        0.0028696148730459324, 0.9673474512447651, 0.5413364183681688, 0.056245969452398896,
+        0.0028696148730459324, 0.9673474512447651, 0.5413364183681688, 0.056245969452398896
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with Bi-CGstab linear solver and no preconditioner", () => {
+  test('Solve with Bi-CGstab linear solver and no preconditioner', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -497,13 +497,13 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -15.981926869246394, -823.5165793237518, 789.7791303226917, 3.9698876671299828, 0.11498738677073309,
-        0.0028696519878826116, 0.9673466341809926, 0.5413338840293397, 0.05624615131912471,
+        0.0028696519878826116, 0.9673466341809926, 0.5413338840293397, 0.05624615131912471
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 
-  test("Solve with TFQMR linear solver and no preconditioner", () => {
+  test('Solve with TFQMR linear solver and no preconditioner', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -527,9 +527,9 @@ test.describe("Solver CVODE tests", () => {
       [7, 7, 7],
       [
         0, -15.981912354280537, -823.5164638625301, 789.7789229932755, 3.969883129151409, 0.11498769585225826,
-        0.0028696589300411125, 0.967346481351974, 0.5413334099967426, 0.056246185336258574,
+        0.0028696589300411125, 0.967346481351974, 0.5413334099967426, 0.056246185336258574
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 });

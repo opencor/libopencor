@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("File coverage tests", () => {
+test.describe('File coverage tests', () => {
   let nullCharacterContentsPtr;
   let combineArchiveContentsPtr;
 
@@ -40,7 +40,7 @@ test.describe("File coverage tests", () => {
     utils.freeMemory(loc, combineArchiveContentsPtr);
   });
 
-  test("Empty file", () => {
+  test('Empty file', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
     file.setContents(null, 0);
@@ -48,7 +48,7 @@ test.describe("File coverage tests", () => {
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
   });
 
-  test("File with null character", () => {
+  test('File with null character', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
     file.setContents(nullCharacterContentsPtr, utils.NULL_CHARACTER_CONTENTS.length);
@@ -56,27 +56,27 @@ test.describe("File coverage tests", () => {
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
   });
 
-  test("SED-ML file with no parent", () => {
+  test('SED-ML file with no parent', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(utils.SEDML_CONTENTS, utils.SEDML_CONTENTS.length);
   });
 
-  test("Same local file", () => {
+  test('Same local file', () => {
     const file1 = new loc.File(utils.LOCAL_FILE);
     const file2 = new loc.File(utils.LOCAL_FILE);
 
     assert.deepStrictEqual(file1, file2);
   });
 
-  test("Same remote file", () => {
+  test('Same remote file', () => {
     const file1 = new loc.File(utils.REMOTE_FILE);
     const file2 = new loc.File(utils.REMOTE_FILE);
 
     assert.deepStrictEqual(file1, file2);
   });
 
-  test("Unmanage file with children", () => {
+  test('Unmanage file with children', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
     const fileManager = loc.FileManager.instance();
 

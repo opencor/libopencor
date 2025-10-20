@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import test from "node:test";
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as odeModel from "./ode.model.js";
-import * as utils from "./utils.js";
-import { assertIssues } from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as odeModel from './ode.model.js';
+import * as utils from './utils.js';
+import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("Solver Second-Order Runge-Kutta tests", () => {
+test.describe('Solver Second-Order Runge-Kutta tests', () => {
   let solverOdeContentsPtr;
 
   test.before(() => {
@@ -38,7 +38,7 @@ test.describe("Solver Second-Order Runge-Kutta tests", () => {
     utils.freeMemory(loc, solverOdeContentsPtr);
   });
 
-  test("Step value with invalid number", () => {
+  test('Step value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -53,10 +53,10 @@ test.describe("Solver Second-Order Runge-Kutta tests", () => {
 
     const instance = document.instantiate();
 
-    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, "The step cannot be equal to 0. It must be greater than 0."]]);
+    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, 'The step cannot be equal to 0. It must be greater than 0.']]);
   });
 
-  test("Solve", () => {
+  test('Solve', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
@@ -81,9 +81,9 @@ test.describe("Solver Second-Order Runge-Kutta tests", () => {
       [7, 7, 7],
       [
         0, -15.982057548443994, -823.5169415955212, 789.7796140225834, 3.969928522897354, 0.11498460412672941,
-        0.0028695894879267065, 0.9673480100796346, 0.5413381517778336, 0.056245845061545056,
+        0.0028695894879267065, 0.9673480100796346, 0.5413381517778336, 0.056245845061545056
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
     );
   });
 });

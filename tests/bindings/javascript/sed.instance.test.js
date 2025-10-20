@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
-import { assertIssues } from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
+import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("Sed instance tests", () => {
+test.describe('Sed instance tests', () => {
   let cellmlContentsPtr;
   let errorCellmlContentsPtr;
   let overconstrainedContentsPtr;
@@ -47,7 +47,7 @@ test.describe("Sed instance tests", () => {
     combineArchiveContentsPtr = utils.allocateMemory(loc, utils.COMBINE_ARCHIVE_CONTENTS);
     combineArchiveWithCellmlFileAsMasterFileContentsPtr = utils.allocateMemory(
       loc,
-      utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS,
+      utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS
     );
   });
 
@@ -68,16 +68,16 @@ test.describe("Sed instance tests", () => {
     utils.freeMemory(loc, combineArchiveWithCellmlFileAsMasterFileContentsPtr);
   });
 
-  test("No file", () => {
+  test('No file', () => {
     const document = new loc.SedDocument();
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The simulation experiment description does not contain any tasks to run."],
+      [loc.Issue.Type.ERROR, 'The simulation experiment description does not contain any tasks to run.']
     ]);
   });
 
-  test("Invalid CellML file", () => {
+  test('Invalid CellML file', () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
@@ -86,15 +86,15 @@ test.describe("Sed instance tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The CellML file is invalid."],
+      [loc.Issue.Type.ERROR, 'The CellML file is invalid.'],
       [
         loc.Issue.Type.ERROR,
-        "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
-      ],
+        "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."
+      ]
     ]);
   });
 
-  test("Overconstrained CellML file", () => {
+  test('Overconstrained CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(overconstrainedContentsPtr, utils.OVERCONSTRAINED_CONTENTS.length);
@@ -103,12 +103,12 @@ test.describe("Sed instance tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The CellML file is overconstrained."],
-      [loc.Issue.Type.ERROR, "Variable 'x' in component 'my_component' is computed more than once."],
+      [loc.Issue.Type.ERROR, 'The CellML file is overconstrained.'],
+      [loc.Issue.Type.ERROR, "Variable 'x' in component 'my_component' is computed more than once."]
     ]);
   });
 
-  test("Underconstrained CellML file", () => {
+  test('Underconstrained CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(underconstrainedContentsPtr, utils.UNDERCONSTRAINED_CONTENTS.length);
@@ -117,12 +117,12 @@ test.describe("Sed instance tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The CellML file is underconstrained."],
-      [loc.Issue.Type.ERROR, "The type of variable 'x' in component 'my_component' is unknown."],
+      [loc.Issue.Type.ERROR, 'The CellML file is underconstrained.'],
+      [loc.Issue.Type.ERROR, "The type of variable 'x' in component 'my_component' is unknown."]
     ]);
   });
 
-  test("Unsuitably constrained CellML file", () => {
+  test('Unsuitably constrained CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(unsuitablyConstrainedContentsPtr, utils.UNSUITABLY_CONSTRAINED_CONTENTS.length);
@@ -131,13 +131,13 @@ test.describe("Sed instance tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The CellML file is unsuitably constrained."],
+      [loc.Issue.Type.ERROR, 'The CellML file is unsuitably constrained.'],
       [loc.Issue.Type.ERROR, "Variable 'y' in component 'my_component' is computed more than once."],
-      [loc.Issue.Type.ERROR, "The type of variable 'x' in component 'my_component' is unknown."],
+      [loc.Issue.Type.ERROR, "The type of variable 'x' in component 'my_component' is unknown."]
     ]);
   });
 
-  test("Algebraic model", () => {
+  test('Algebraic model', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(algebraicContentsPtr, utils.ALGEBRAIC_CONTENTS.length);
@@ -150,7 +150,7 @@ test.describe("Sed instance tests", () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test("ODE model", () => {
+  test('ODE model', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -168,7 +168,7 @@ test.describe("Sed instance tests", () => {
     instance.run();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "At t = 0.00140013827899996, mxstep steps taken before reaching tout."],
+      [loc.Issue.Type.ERROR, 'At t = 0.00140013827899996, mxstep steps taken before reaching tout.']
     ]);
 
     cvode.maximumNumberOfSteps = 500;
@@ -180,7 +180,7 @@ test.describe("Sed instance tests", () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test("ODE model with no ODE solver", () => {
+  test('ODE model with no ODE solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -194,12 +194,12 @@ test.describe("Sed instance tests", () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
-      ],
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."
+      ]
     ]);
   });
 
-  test("NLA model", () => {
+  test('NLA model', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
@@ -214,7 +214,7 @@ test.describe("Sed instance tests", () => {
     let instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."],
+      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.']
     ]);
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
@@ -224,7 +224,7 @@ test.describe("Sed instance tests", () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test("NLA model with no NLA solver", () => {
+  test('NLA model with no NLA solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
@@ -238,12 +238,12 @@ test.describe("Sed instance tests", () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
-      ],
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."
+      ]
     ]);
   });
 
-  test("DAE model", () => {
+  test('DAE model', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(daeContentsPtr, utils.DAE_CONTENTS.length);
@@ -258,13 +258,13 @@ test.describe("Sed instance tests", () => {
     let instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."],
+      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.']
     ]);
 
     instance.run();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."],
+      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.']
     ]);
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
@@ -276,7 +276,7 @@ test.describe("Sed instance tests", () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test("DAE model with no ODE or NLA solver", () => {
+  test('DAE model with no ODE or NLA solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(daeContentsPtr, utils.DAE_CONTENTS.length);
@@ -292,16 +292,16 @@ test.describe("Sed instance tests", () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."
       ],
       [
         loc.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
-      ],
+        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."
+      ]
     ]);
   });
 
-  test("COMBINE archive", () => {
+  test('COMBINE archive', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);
@@ -314,12 +314,12 @@ test.describe("Sed instance tests", () => {
     assert.strictEqual(instance.hasIssues, false);
   });
 
-  test("COMBINE archive with CellML file as master file", () => {
+  test('COMBINE archive with CellML file as master file', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(
       combineArchiveWithCellmlFileAsMasterFileContentsPtr,
-      utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS.length,
+      utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS.length
     );
 
     const document = new loc.SedDocument(file);

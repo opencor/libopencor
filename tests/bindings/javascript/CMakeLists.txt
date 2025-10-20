@@ -14,7 +14,7 @@
 
 # (Configure and) copy over some test-related files.
 
-configure_file(utils.in.js utils.js)
+configure_file(utils.in.js utils.js @ONLY)
 configure_file(res/package.in.json package.json)
 
 configure_file(res/favicon.ico favicon.ico COPYONLY)

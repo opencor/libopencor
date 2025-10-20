@@ -14,20 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
+import libOpenCOR from './libopencor.js';
 
 const loc = await libOpenCOR();
 
-test.describe("Solver basic tests", () => {
-  test("CVODE solver", () => {
+test.describe('Solver basic tests', () => {
+  test('CVODE solver', () => {
     const solver = new loc.SolverCvode();
 
     assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
-    assert.strictEqual(solver.id, "KISAO:0000019");
-    assert.strictEqual(solver.name, "CVODE");
+    assert.strictEqual(solver.id, 'KISAO:0000019');
+    assert.strictEqual(solver.name, 'CVODE');
 
     assert.strictEqual(solver.maximumStep, 0.0);
     assert.strictEqual(solver.maximumNumberOfSteps, 500);
@@ -66,12 +66,12 @@ test.describe("Solver basic tests", () => {
     assert.strictEqual(solver.interpolateSolution, false);
   });
 
-  test("Forward Euler solver", () => {
+  test('Forward Euler solver', () => {
     const solver = new loc.SolverForwardEuler();
 
     assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
-    assert.strictEqual(solver.id, "KISAO:0000030");
-    assert.strictEqual(solver.name, "Forward Euler");
+    assert.strictEqual(solver.id, 'KISAO:0000030');
+    assert.strictEqual(solver.name, 'Forward Euler');
 
     assert.strictEqual(solver.step, 1.0);
 
@@ -80,12 +80,12 @@ test.describe("Solver basic tests", () => {
     assert.strictEqual(solver.step, 0.123);
   });
 
-  test("Fourth-order Runge-Kutta solver", () => {
+  test('Fourth-order Runge-Kutta solver', () => {
     const solver = new loc.SolverFourthOrderRungeKutta();
 
     assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
-    assert.strictEqual(solver.id, "KISAO:0000032");
-    assert.strictEqual(solver.name, "Fourth-order Runge-Kutta");
+    assert.strictEqual(solver.id, 'KISAO:0000032');
+    assert.strictEqual(solver.name, 'Fourth-order Runge-Kutta');
 
     assert.strictEqual(solver.step, 1.0);
 
@@ -94,12 +94,12 @@ test.describe("Solver basic tests", () => {
     assert.strictEqual(solver.step, 0.123);
   });
 
-  test("Heun solver", () => {
+  test('Heun solver', () => {
     const solver = new loc.SolverHeun();
 
     assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
-    assert.strictEqual(solver.id, "KISAO:0000301");
-    assert.strictEqual(solver.name, "Heun");
+    assert.strictEqual(solver.id, 'KISAO:0000301');
+    assert.strictEqual(solver.name, 'Heun');
 
     assert.strictEqual(solver.step, 1.0);
 
@@ -108,12 +108,12 @@ test.describe("Solver basic tests", () => {
     assert.strictEqual(solver.step, 0.123);
   });
 
-  test("KINSOL solver", () => {
+  test('KINSOL solver', () => {
     const solver = new loc.SolverKinsol();
 
     assert.strictEqual(solver.type.value, loc.Solver.Type.NLA.value);
-    assert.strictEqual(solver.id, "KISAO:0000282");
-    assert.strictEqual(solver.name, "KINSOL");
+    assert.strictEqual(solver.id, 'KISAO:0000282');
+    assert.strictEqual(solver.name, 'KINSOL');
 
     assert.strictEqual(solver.maximumNumberOfIterations, 200);
     assert.strictEqual(solver.linearSolver, loc.SolverKinsol.LinearSolver.DENSE);
@@ -131,12 +131,12 @@ test.describe("Solver basic tests", () => {
     assert.strictEqual(solver.lowerHalfBandwidth, 5);
   });
 
-  test("Second-order Runge-Kutta solver", () => {
+  test('Second-order Runge-Kutta solver', () => {
     const solver = new loc.SolverSecondOrderRungeKutta();
 
     assert.strictEqual(solver.type.value, loc.Solver.Type.ODE.value);
-    assert.strictEqual(solver.id, "KISAO:0000381");
-    assert.strictEqual(solver.name, "Second-order Runge-Kutta");
+    assert.strictEqual(solver.id, 'KISAO:0000381');
+    assert.strictEqual(solver.name, 'Second-order Runge-Kutta');
 
     assert.strictEqual(solver.step, 1.0);
 

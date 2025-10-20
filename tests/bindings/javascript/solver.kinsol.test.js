@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
-import { assertIssues, assertValue } from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
+import { assertIssues, assertValue } from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("Solver KINSOL tests", () => {
+test.describe('Solver KINSOL tests', () => {
   let solverNla1ContentsPtr;
   let solverNla2ContentsPtr;
 
@@ -41,7 +41,7 @@ test.describe("Solver KINSOL tests", () => {
     utils.freeMemory(loc, solverNla2ContentsPtr);
   });
 
-  test("Maximum number of iterations value with invalid number", () => {
+  test('Maximum number of iterations value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
@@ -55,11 +55,11 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The maximum number of iterations cannot be equal to -1. It must be greater than 0."],
+      [loc.Issue.Type.ERROR, 'The maximum number of iterations cannot be equal to -1. It must be greater than 0.']
     ]);
   });
 
-  test("Banded linear solver and upper half-bandwidth value with number too small", () => {
+  test('Banded linear solver and upper half-bandwidth value with number too small', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
@@ -74,11 +74,11 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."],
+      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.']
     ]);
   });
 
-  test("Banded linear solver and upper half-bandwidth value with number too big", () => {
+  test('Banded linear solver and upper half-bandwidth value with number too big', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
@@ -93,11 +93,11 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0."],
+      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0.']
     ]);
   });
 
-  test("Banded linear solver and lower half-bandwidth value with number too small", () => {
+  test('Banded linear solver and lower half-bandwidth value with number too small', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
@@ -112,11 +112,11 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2."],
+      [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2.']
     ]);
   });
 
-  test("Banded linear solver and lower half-bandwidth value with number too big", () => {
+  test('Banded linear solver and lower half-bandwidth value with number too big', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
@@ -131,7 +131,7 @@ test.describe("Solver KINSOL tests", () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0."],
+      [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0.']
     ]);
   });
 
@@ -158,7 +158,7 @@ test.describe("Solver KINSOL tests", () => {
     assertValue(instanceTask.algebraic(2).get(0), 3.0, 5);
   }
 
-  test("Solve", () => {
+  test('Solve', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
@@ -171,7 +171,7 @@ test.describe("Solver KINSOL tests", () => {
     assertNla1Solution(instance.tasks.get(0));
   });
 
-  test("Solve with banded linear solver", () => {
+  test('Solve with banded linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
@@ -191,7 +191,7 @@ test.describe("Solver KINSOL tests", () => {
     assertNla2Solution(instance.tasks.get(0));
   });
 
-  test("Solve with GMRES linear solver", () => {
+  test('Solve with GMRES linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
@@ -209,7 +209,7 @@ test.describe("Solver KINSOL tests", () => {
     assertNla1Solution(instance.tasks.get(0));
   });
 
-  test("Solve with BiCGStab linear solver", () => {
+  test('Solve with BiCGStab linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
@@ -227,7 +227,7 @@ test.describe("Solver KINSOL tests", () => {
     assertNla2Solution(instance.tasks.get(0));
   });
 
-  test("Solve with TFQMR linear solver", () => {
+  test('Solve with TFQMR linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);

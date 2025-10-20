@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
-import { assertIssues } from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
+import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("File type tests", () => {
+test.describe('File type tests', () => {
   let unknownContentsPtr;
   let cellmlContentsPtr;
   let sedmlContentsPtr;
@@ -47,18 +47,18 @@ test.describe("File type tests", () => {
     utils.freeMemory(loc, combineArchiveContentsPtr);
   });
 
-  test("Unknown file", () => {
+  test('Unknown file', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
     file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assertIssues(loc, file, [
-      [loc.Issue.Type.ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."],
+      [loc.Issue.Type.ERROR, 'The file is not a CellML file, a SED-ML file, or a COMBINE archive.']
     ]);
   });
 
-  test("CellML file", () => {
+  test('CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -66,7 +66,7 @@ test.describe("File type tests", () => {
     assert.strictEqual(file.type.value, loc.File.Type.CELLML_FILE.value);
   });
 
-  test("SED-ML file", () => {
+  test('SED-ML file', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
@@ -74,7 +74,7 @@ test.describe("File type tests", () => {
     assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
   });
 
-  test("COMBINE archive", () => {
+  test('COMBINE archive', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);

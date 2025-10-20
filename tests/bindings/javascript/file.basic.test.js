@@ -14,20 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
-import { assertIssues } from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
+import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
 const expectedUnknownFileIssues = [
-  [loc.Issue.Type.ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."],
+  [loc.Issue.Type.ERROR, 'The file is not a CellML file, a SED-ML file, or a COMBINE archive.']
 ];
 
-test.describe("File basic tests", () => {
+test.describe('File basic tests', () => {
   let unknownContentsPtr;
 
   test.before(() => {
@@ -42,12 +42,12 @@ test.describe("File basic tests", () => {
     utils.freeMemory(loc, unknownContentsPtr);
   });
 
-  test("Local file", () => {
+  test('Local file', () => {
     const file = new loc.File(utils.LOCAL_FILE);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.strictEqual(file.fileName, utils.LOCAL_FILE);
-    assert.strictEqual(file.url, "");
+    assert.strictEqual(file.url, '');
     assert.strictEqual(file.path, utils.LOCAL_FILE);
     assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
     assertIssues(loc, file, expectedUnknownFileIssues);
@@ -59,11 +59,11 @@ test.describe("File basic tests", () => {
     assertIssues(loc, file, expectedUnknownFileIssues);
   });
 
-  test("Remote file", () => {
+  test('Remote file', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.strictEqual(file.fileName, "/some/path/file");
+    assert.strictEqual(file.fileName, '/some/path/file');
     assert.strictEqual(file.url, utils.REMOTE_FILE);
     assert.strictEqual(file.path, utils.REMOTE_FILE);
     assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
@@ -76,7 +76,7 @@ test.describe("File basic tests", () => {
     assertIssues(loc, file, expectedUnknownFileIssues);
   });
 
-  test("File manager", () => {
+  test('File manager', () => {
     const fileManager = loc.FileManager.instance();
 
     assert.strictEqual(fileManager.hasFiles, false);

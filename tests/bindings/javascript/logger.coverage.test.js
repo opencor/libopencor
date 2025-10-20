@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("Issue coverage tests", () => {
+test.describe('Issue coverage tests', () => {
   let cellmlContentsPtr;
   let errorCellmlContentsPtr;
   let sedmlContentsPtr;
@@ -43,7 +43,7 @@ test.describe("Issue coverage tests", () => {
     utils.freeMemory(loc, sedmlContentsPtr);
   });
 
-  test("hasIssues", () => {
+  test('hasIssues', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -51,7 +51,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.hasIssues, false);
   });
 
-  test("issueCount", () => {
+  test('issueCount', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -59,7 +59,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.issueCount, 0);
   });
 
-  test("issues", () => {
+  test('issues', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -67,7 +67,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.issues.size(), 0);
   });
 
-  test("issue()", () => {
+  test('issue()', () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
@@ -76,7 +76,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.issue(file.issueCount), null);
   });
 
-  test("hasErrors", () => {
+  test('hasErrors', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -84,7 +84,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.hasErrors, false);
   });
 
-  test("errorCount", () => {
+  test('errorCount', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -92,7 +92,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.errorCount, 0);
   });
 
-  test("errors", () => {
+  test('errors', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -100,7 +100,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.errors.size(), 0);
   });
 
-  test("error()", () => {
+  test('error()', () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
     file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
@@ -109,7 +109,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.error(file.errorCount), null);
   });
 
-  test("hasWarnings", () => {
+  test('hasWarnings', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -117,7 +117,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.hasWarnings, false);
   });
 
-  test("warningCount", () => {
+  test('warningCount', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -125,7 +125,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.warningCount, 0);
   });
 
-  test("warnings", () => {
+  test('warnings', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
     file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
@@ -133,7 +133,7 @@ test.describe("Issue coverage tests", () => {
     assert.strictEqual(file.warnings.size(), 0);
   });
 
-  test("warning()", () => {
+  test('warning()', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
     file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);

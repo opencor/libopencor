@@ -14,16 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import assert from "node:assert";
-import test from "node:test";
+import assert from 'node:assert';
+import test from 'node:test';
 
-import libOpenCOR from "./libopencor.js";
-import * as utils from "./utils.js";
-import { assertIssues, assertValue } from "./utils.js";
+import libOpenCOR from './libopencor.js';
+import * as utils from './utils.js';
+import { assertIssues, assertValue } from './utils.js';
 
 const loc = await libOpenCOR();
 
-test.describe("Solver coverage tests", () => {
+test.describe('Solver coverage tests', () => {
   let algebraicSedChangesContentsPtr;
   let odeSedChangesContentsPtr;
 
@@ -41,7 +41,7 @@ test.describe("Solver coverage tests", () => {
     utils.freeMemory(loc, odeSedChangesContentsPtr);
   });
 
-  test("ODE changes", () => {
+  test('ODE changes', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
     file.setContents(odeSedChangesContentsPtr, utils.ODE_SED_CHANGES_CONTENTS.length);
@@ -54,24 +54,24 @@ test.describe("Solver coverage tests", () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.WARNING,
-        "The variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed.",
+        "The variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed."
       ],
       [
         loc.Issue.Type.WARNING,
-        "The variable 'membrane' in component 'X'could not be found and therefore could not be changed.",
+        "The variable 'membrane' in component 'X'could not be found and therefore could not be changed."
       ],
       [
         loc.Issue.Type.WARNING,
-        "The computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed.",
+        "The computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."
       ],
       [
         loc.Issue.Type.WARNING,
-        "The algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed.",
-      ],
+        "The algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."
+      ]
     ]);
   });
 
-  test("Algebraic changes", () => {
+  test('Algebraic changes', () => {
     // We want to solve a system of three unknowns:
     // Variables:
     //  • a: 0
