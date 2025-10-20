@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { assertValues } from "./utils.js";
+import { assertValues } from './utils.js'
 
 export function run(
   document,
@@ -27,18 +27,18 @@ export function run(
   computedConstantValues,
   computedConstantPrecisions,
   algebraicValues,
-  algebraicPrecisions,
+  algebraicPrecisions
 ) {
-  const simulation = document.simulations.get(0);
+  const simulation = document.simulations.get(0)
 
-  simulation.outputEndTime = 50.0;
-  simulation.numberOfSteps = 50000;
+  simulation.outputEndTime = 50.0
+  simulation.numberOfSteps = 50000
 
-  const instance = document.instantiate();
+  const instance = document.instantiate()
 
-  instance.run();
+  instance.run()
 
-  const instanceTask = instance.tasks.get(0);
+  const instanceTask = instance.tasks.get(0)
 
   assertValues(
     instanceTask,
@@ -52,6 +52,6 @@ export function run(
     computedConstantValues,
     computedConstantPrecisions,
     algebraicValues,
-    algebraicPrecisions,
-  );
+    algebraicPrecisions
+  )
 }

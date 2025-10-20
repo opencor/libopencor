@@ -14,60 +14,60 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import test from "node:test";
+import test from 'node:test'
 
-import libOpenCOR from "./libopencor.js";
-import * as odeModel from "./ode.model.js";
-import * as utils from "./utils.js";
-import { assertIssues } from "./utils.js";
+import libOpenCOR from './libopencor.js'
+import * as odeModel from './ode.model.js'
+import * as utils from './utils.js'
+import { assertIssues } from './utils.js'
 
-const loc = await libOpenCOR();
+const loc = await libOpenCOR()
 
-test.describe("Solver Heun tests", () => {
-  let solverOdeContentsPtr;
+test.describe('Solver Heun tests', () => {
+  let solverOdeContentsPtr
 
   test.before(() => {
-    solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
-  });
+    solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS)
+  })
 
   test.beforeEach(() => {
-    loc.FileManager.instance().reset();
-  });
+    loc.FileManager.instance().reset()
+  })
 
   test.after(() => {
-    utils.freeMemory(loc, solverOdeContentsPtr);
-  });
+    utils.freeMemory(loc, solverOdeContentsPtr)
+  })
 
-  test("Step value with invalid number", () => {
-    const file = new loc.File(utils.CELLML_FILE);
+  test('Step value with invalid number', () => {
+    const file = new loc.File(utils.CELLML_FILE)
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
 
-    const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
-    const solver = new loc.SolverHeun();
+    const document = new loc.SedDocument(file)
+    const simulation = document.simulations.get(0)
+    const solver = new loc.SolverHeun()
 
-    solver.step = 0.0;
+    solver.step = 0.0
 
-    simulation.odeSolver = solver;
+    simulation.odeSolver = solver
 
-    const instance = document.instantiate();
+    const instance = document.instantiate()
 
-    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, "The step cannot be equal to 0. It must be greater than 0."]]);
-  });
+    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, 'The step cannot be equal to 0. It must be greater than 0.']])
+  })
 
-  test("Solve", () => {
-    const file = new loc.File(utils.CELLML_FILE);
+  test('Solve', () => {
+    const file = new loc.File(utils.CELLML_FILE)
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
+    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length)
 
-    const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
-    const solver = new loc.SolverHeun();
+    const document = new loc.SedDocument(file)
+    const simulation = document.simulations.get(0)
+    const solver = new loc.SolverHeun()
 
-    solver.step = 0.0123;
+    solver.step = 0.0123
 
-    simulation.odeSolver = solver;
+    simulation.odeSolver = solver
 
     odeModel.run(
       document,
@@ -81,9 +81,9 @@ test.describe("Solver Heun tests", () => {
       [7, 7, 7],
       [
         0, -15.923477627324644, -823.1668113969306, 789.4214057021819, 3.95162235535478, 0.11623876280854108,
-        0.002897743423202202, 0.9667255844752269, 0.539425339436885, 0.05638329929313714,
+        0.002897743423202202, 0.9667255844752269, 0.539425339436885, 0.05638329929313714
       ],
-      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
-    );
-  });
-});
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+    )
+  })
+})
