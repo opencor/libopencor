@@ -219,7 +219,7 @@ double SedInstanceTask::Impl::run()
     auto startTime = std::chrono::high_resolution_clock::now();
 
     // (Re)initialise our model.
-    // Note: reinitialise our model in case we are running our model multiple times.
+    // Note: reinitialise our model because we initialised it when we created the instance task.
 
     initialise();
 
