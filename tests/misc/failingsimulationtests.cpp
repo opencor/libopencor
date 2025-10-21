@@ -26,8 +26,7 @@ TEST(FailingSimulationTest, basic)
     auto document = libOpenCOR::SedDocument::create(file);
     auto instance = document->instantiate();
 
-    instance->run();
-
+    EXPECT_NE(instance->run(), 0.0);
     EXPECT_FALSE(instance->hasIssues());
 
     // Set the value of `membrane.test` to zero and rerun the simulation.
@@ -36,15 +35,13 @@ TEST(FailingSimulationTest, basic)
 
     model->addChange(libOpenCOR::SedChangeAttribute::create("membrane", "test", "0.0"));
 
-    instance->run();
-
+    EXPECT_EQ(instance->run(), 0.0);
     EXPECT_TRUE(instance->hasIssues());
 
     // Remove all changes and rerun the simulation.
 
     model->removeAllChanges();
 
-    instance->run();
-
+    EXPECT_NE(instance->run(), 0.0);
     EXPECT_FALSE(instance->hasIssues());
 }
