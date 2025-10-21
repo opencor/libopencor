@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set(TEST compiler)
+set(TEST misc)
 
 list(APPEND TESTS ${TEST})
 
-set(${TEST}_CATEGORY misc)
+set(${TEST}_CATEGORY)
 set(${TEST}_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/tests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/compilertests.cpp
 )

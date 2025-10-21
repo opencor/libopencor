@@ -38,7 +38,7 @@ include(api/sed/tests.cmake)
 include(api/solver/tests.cmake)
 include(api/version/tests.cmake)
 
-include(misc/compiler/tests.cmake)
+include(misc/tests.cmake)
 
 include(support/cellml/tests.cmake)
 include(support/combine/tests.cmake)
@@ -170,7 +170,9 @@ include_directories(${CMAKE_SOURCE_DIR}/src/misc
 
 foreach(TEST ${TESTS})
     if(LIBOPENCOR_UNIT_TESTING)
-        if(NOT "${${TEST}_CATEGORY}" STREQUAL "")
+        if("${${TEST}_CATEGORY}" STREQUAL "")
+            set(TEST_CATEGORY)
+        else()
             set(TEST_CATEGORY "${${TEST}_CATEGORY}_")
         endif()
 
