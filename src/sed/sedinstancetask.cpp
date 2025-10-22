@@ -161,9 +161,17 @@ void SedInstanceTask::Impl::initialise()
 #else
         mRuntime->initialiseVariablesForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 #endif
+    } else {
+#ifdef __EMSCRIPTEN__
+        mRuntime->initialiseVariablesForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
+#else
+        mRuntime->initialiseVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+#endif
+    }
 
-        applyChanges();
+    applyChanges();
 
+    if (mSedUniformTimeCourse != nullptr) {
 #ifdef __EMSCRIPTEN__
         mRuntime->computeComputedConstantsForDifferentialModel(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
@@ -174,14 +182,6 @@ void SedInstanceTask::Impl::initialise()
         mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 #endif
     } else {
-#ifdef __EMSCRIPTEN__
-        mRuntime->initialiseVariablesForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
-#else
-        mRuntime->initialiseVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
-#endif
-
-        applyChanges();
-
 #ifdef __EMSCRIPTEN__
         mRuntime->computeComputedConstantsForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
         mRuntime->computeVariablesForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
@@ -219,7 +219,7 @@ double SedInstanceTask::Impl::run()
     auto startTime = std::chrono::high_resolution_clock::now();
 
     // (Re)initialise our model.
-    // Note: reinitialise our model in case we are running our model multiple times.
+    // Note: reinitialise our model because we initialised it when we created the instance task.
 
     initialise();
 

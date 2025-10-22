@@ -67,6 +67,10 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
                 }
             }
         }
+
+        // Keep track of the issues of all the tasks.
+
+        mTasksIssues = mIssues;
     } else {
         addError("The simulation experiment description does not contain any tasks to run.");
     }
@@ -74,6 +78,12 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
 
 double SedInstance::Impl::run()
 {
+    // Reset iourselves.
+
+    removeAllIssues();
+
+    mIssues = mTasksIssues;
+
     // Run all the tasks associated with this instance unless they have some issues.
 
     auto res = 0.0;
@@ -84,6 +94,10 @@ double SedInstance::Impl::run()
 
             if (task->hasIssues()) {
                 addIssues(task);
+
+                // Reset the issues of the task so that they are not reported again should the instance be run again.
+
+                task->pimpl()->removeAllIssues();
             }
         }
     }
