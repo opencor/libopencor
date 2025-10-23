@@ -113,7 +113,7 @@ TEST(BasicFileTest, localVirtualFile)
     EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->path(), libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, EXPECTED_NO_ISSUES);
 
     auto someUnknownContents = libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS);
 
@@ -137,7 +137,7 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->url(), libOpenCOR::UNKNOWN_REMOTE_FILE);
     EXPECT_EQ(file->path(), libOpenCOR::UNKNOWN_REMOTE_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, EXPECTED_NO_ISSUES);
 
     auto someUnknownContents = libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS);
 

@@ -52,7 +52,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
         } else {
             mFilePath = stringToPath("/some/path/file");
         }
-    } else if (!std::filesystem::exists(mFilePath)) {
+    } else if (!std::filesystem::exists(mFilePath) && pRetrieveContents) {
         mType = Type::IRRETRIEVABLE_FILE;
 
         addError("The file does not exist.");
@@ -87,30 +87,32 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
 #endif
     }
 
-    // Try to get a CellML file, a SED-ML file, or a COMBINE archive.
+    // Try to get a CellML file, a SED-ML file, or a COMBINE archive, but only if we have some contents.
 
-    mCellmlFile = CellmlFile::create(pOwner);
+    if (!contents().empty()) {
+        mCellmlFile = CellmlFile::create(pOwner);
 
-    if (mCellmlFile != nullptr) {
-        mType = Type::CELLML_FILE;
+        if (mCellmlFile != nullptr) {
+            mType = Type::CELLML_FILE;
 
-        addIssues(mCellmlFile);
-    } else {
-        mSedmlFile = SedmlFile::create(pOwner);
-
-        if (mSedmlFile != nullptr) {
-            mType = Type::SEDML_FILE;
-
-            addIssues(mSedmlFile);
+            addIssues(mCellmlFile);
         } else {
-            mCombineArchive = CombineArchive::create(pOwner);
+            mSedmlFile = SedmlFile::create(pOwner);
 
-            if (mCombineArchive != nullptr) {
-                mType = Type::COMBINE_ARCHIVE;
+            if (mSedmlFile != nullptr) {
+                mType = Type::SEDML_FILE;
 
-                addIssues(mCombineArchive);
+                addIssues(mSedmlFile);
             } else {
-                addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
+                mCombineArchive = CombineArchive::create(pOwner);
+
+                if (mCombineArchive != nullptr) {
+                    mType = Type::COMBINE_ARCHIVE;
+
+                    addIssues(mCombineArchive);
+                } else {
+                    addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
+                }
             }
         }
     }

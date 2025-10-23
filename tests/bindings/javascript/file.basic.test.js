@@ -23,6 +23,7 @@ import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
+const expectedNoIssues = [];
 const expectedUnknownFileIssues = [
   [loc.Issue.Type.ERROR, 'The file is not a CellML file, a SED-ML file, or a COMBINE archive.']
 ];
@@ -50,7 +51,7 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.url, '');
     assert.strictEqual(file.path, utils.LOCAL_FILE);
     assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
-    assertIssues(loc, file, expectedUnknownFileIssues);
+    assertIssues(loc, file, expectedNoIssues);
 
     file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 
@@ -67,7 +68,7 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.url, utils.REMOTE_FILE);
     assert.strictEqual(file.path, utils.REMOTE_FILE);
     assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
-    assertIssues(loc, file, expectedUnknownFileIssues);
+    assertIssues(loc, file, expectedNoIssues);
 
     file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
 

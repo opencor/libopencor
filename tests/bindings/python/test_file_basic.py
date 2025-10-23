@@ -112,7 +112,7 @@ def test_local_virtual_file():
     assert file.url == ""
     assert file.path == utils.resource_path(utils.UnknownFile)
     assert file.contents == []
-    assert_issues(file, expected_unknown_file_issues)
+    assert_issues(file, expected_no_issues)
 
     some_unknown_contents_list = utils.string_to_list(utils.SomeUnknownContents)
 
@@ -136,7 +136,7 @@ def test_remote_virtual_file():
     assert file.url == utils.UnknownRemoteFile
     assert file.path == utils.UnknownRemoteFile
     assert file.contents == []
-    assert_issues(file, expected_unknown_file_issues)
+    assert_issues(file, expected_no_issues)
 
     some_unknown_contents_list = utils.string_to_list(utils.SomeUnknownContents)
 
