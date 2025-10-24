@@ -39,6 +39,12 @@ def test_sedml_file_with_no_parent():
     file.contents = utils.string_to_list(utils.SomeSedmlContents)
 
 
+def test_irretrievable_virtual_file():
+    file = loc.File(utils.IrretrievableFile, False)
+
+    assert not file.has_issues
+
+
 def test_irretrievable_remote_file():
     loc.File(utils.IrretrievableRemoteFile)
 

@@ -289,25 +289,21 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 
     // Try to retrieve a SED-ML document.
 
-    auto fileContents = pFile->contents();
+    auto *document = libsedml::readSedMLFromString(toString(pFile->contents()).c_str());
 
-    if (!fileContents.empty() && (fileContents[0] != '\0')) {
-        auto *document = libsedml::readSedMLFromString(toString(fileContents).c_str());
+    // A non-SED-ML file results in our SED-ML document having at least one error. That error may be the result of a
+    // malformed XML file (e.g., an HTML file is an XML-like file but not actually an XML file or a COMBINE archive
+    // which is just not an XML file) or a valid XML file but not a SED-ML file (e.g., a CellML file is an XML file but
+    // not a SED-ML file). So, we use these facts to determine whether our current SED-ML document is indeed a SED-ML
+    // file.
 
-        // A non-SED-ML file results in our SED-ML document having at least one error. That error may be the result of a
-        // malformed XML file (e.g., an HTML file is an XML-like file but not actually an XML file or a COMBINE archive
-        // which is just not an XML file) or a valid XML file but not a SED-ML file (e.g., a CellML file is an XML file
-        // but not a SED-ML file). So, we use these facts to determine whether our current SED-ML document is indeed a
-        // SED-ML file.
-
-        if ((document->getNumErrors() == 0)
-            || ((document->getError(0)->getErrorId() > libsbml::XMLErrorCodesUpperBound)
-                && (document->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant))) {
-            return SedmlFilePtr {new SedmlFile {pFile, document}};
-        }
-
-        delete document;
+    if ((document->getNumErrors() == 0)
+        || ((document->getError(0)->getErrorId() > libsbml::XMLErrorCodesUpperBound)
+            && (document->getError(0)->getErrorId() != libsedml::SedNotSchemaConformant))) {
+        return SedmlFilePtr {new SedmlFile {pFile, document}};
     }
+
+    delete document;
 
     return {};
 }
