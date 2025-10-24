@@ -56,6 +56,8 @@ static constexpr auto HTTP_REMOTE_SEDML_FILE = "http://raw.githubusercontent.com
 static constexpr auto HTTP_REMOTE_COMBINE_ARCHIVE = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex";
 static constexpr auto REMOTE_BASE_PATH = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res";
 static constexpr auto REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml";
+static constexpr auto ENCODED_REMOTE_FILE = "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml";
+static constexpr auto NON_ENCODED_REMOTE_FILE = "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml";
 static constexpr auto UNKNOWN_REMOTE_FILE = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt";
 static constexpr auto IRRETRIEVABLE_REMOTE_FILE = "https://some.domain.com/irretrievable_file.txt";
 

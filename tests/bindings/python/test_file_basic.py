@@ -104,6 +104,16 @@ def test_remote_file():
     assert file.contents != []
 
 
+def test_encoded_remote_file():
+    file = loc.File(utils.EncodedRemoteFile)
+
+    assert file.type == loc.File.Type.CellmlFile
+    assert file.file_name != ""
+    assert file.url == utils.NonEncodedRemoteFile
+    assert file.path == utils.NonEncodedRemoteFile
+    assert file.contents != []
+
+
 def test_local_virtual_file():
     file = loc.File(utils.resource_path(utils.UnknownFile), False)
 

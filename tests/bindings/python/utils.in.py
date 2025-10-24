@@ -52,6 +52,8 @@ HttpRemoteCombineArchive = (
 )
 RemoteBasePath = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
 RemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+EncodedRemoteFile = "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml"
+NonEncodedRemoteFile = "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml"
 UnknownRemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt"
 IrretrievableRemoteFile = "https://some.domain.com/irretrievable_file.txt"
 
