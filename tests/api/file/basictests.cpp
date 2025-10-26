@@ -104,6 +104,17 @@ TEST(BasicFileTest, remoteFile)
     EXPECT_FALSE(file->contents().empty());
 }
 
+TEST(BasicFileTest, encodedRemoteFile)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::ENCODED_REMOTE_FILE);
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
+    EXPECT_NE(file->fileName(), "");
+    EXPECT_EQ(file->url(), libOpenCOR::NON_ENCODED_REMOTE_FILE);
+    EXPECT_EQ(file->path(), libOpenCOR::NON_ENCODED_REMOTE_FILE);
+    EXPECT_FALSE(file->contents().empty());
+}
+
 TEST(BasicFileTest, localVirtualFile)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE), false);

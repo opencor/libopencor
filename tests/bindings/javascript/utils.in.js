@@ -35,6 +35,10 @@ export const HTTP_REMOTE_COMBINE_ARCHIVE =
   'http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex';
 export const REMOTE_BASE_PATH = 'https://raw.githubusercontent.com/opencor/libopencor/master/tests/res';
 export const REMOTE_FILE = 'https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml';
+export const ENCODED_REMOTE_FILE =
+  'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml';
+export const NON_ENCODED_REMOTE_FILE =
+  'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml';
 
 export const NO_CONTENTS = stringToArrayBuffer('');
 export const NULL_CHARACTER_CONTENTS = stringToArrayBuffer('\0');

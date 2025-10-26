@@ -20,4 +20,5 @@ set(${TEST}_CATEGORY)
 set(${TEST}_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/compilertests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/failingsimulationtests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/utils.cpp
 )

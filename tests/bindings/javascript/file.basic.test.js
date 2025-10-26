@@ -77,6 +77,23 @@ test.describe('File basic tests', () => {
     assertIssues(loc, file, expectedUnknownFileIssues);
   });
 
+  test('Encoded remote file', () => {
+    const file = new loc.File(utils.ENCODED_REMOTE_FILE);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.strictEqual(file.fileName, '/some/path/file');
+    assert.strictEqual(file.url, utils.NON_ENCODED_REMOTE_FILE);
+    assert.strictEqual(file.path, utils.NON_ENCODED_REMOTE_FILE);
+    assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
+    assertIssues(loc, file, expectedNoIssues);
+
+    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
+    assertIssues(loc, file, expectedUnknownFileIssues);
+  });
+
   test('File manager', () => {
     const fileManager = loc.FileManager.instance();
 

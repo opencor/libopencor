@@ -145,6 +145,39 @@ bool fuzzyCompare(double pNb1, double pNb2)
     return std::fabs(pNb1 - pNb2) * ONE_TRILLION <= std::fmin(std::fabs(pNb1), std::fabs(pNb2));
 }
 
+std::string encodeUrl(const std::string &pUrl)
+{
+    std::ostringstream res;
+
+    for (const char c : pUrl) {
+        if ((isalnum(c) != 0) || (std::string("!#$&'()*+,-./:;=?@_~").find(c) != std::string::npos)) {
+            res << c;
+        } else {
+            res << '%' << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(static_cast<unsigned char>(c));
+        }
+    }
+    return res.str();
+}
+
+std::string decodeUrl(const std::string &pUrl)
+{
+    static constexpr auto BASE_16 = 16;
+
+    std::string res;
+
+    for (size_t i = 0; i < pUrl.size(); ++i) {
+        if ((pUrl[i] == '%') && (i + 2 < pUrl.size()) && (std::isxdigit(pUrl[i + 1]) != 0) && (std::isxdigit(pUrl[i + 2]) != 0)) {
+            res += static_cast<char>(std::stoi(pUrl.substr(i + 1, 2), nullptr, BASE_16));
+
+            i += 2;
+        } else {
+            res += pUrl[i];
+        }
+    }
+
+    return res;
+}
+
 #ifdef BUILDING_USING_MSVC
 std::string forwardSlashPath(const std::string &pPath)
 {
@@ -436,7 +469,7 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_easy_setopt(curl, CURLOPT_URL, pUrl.c_str());
+    curl_easy_setopt(curl, CURLOPT_URL, encodeUrl(pUrl).c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, static_cast<void *>(&file));
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 

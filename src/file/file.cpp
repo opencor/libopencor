@@ -27,7 +27,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 {
     // Check whether we are dealing with a local file or a URL.
 
-    auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
+    auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(decodeUrl(pFileNameOrUrl));
 
     if (isLocalFile) {
         mFilePath = stringToPath(fileNameOrUrl);
