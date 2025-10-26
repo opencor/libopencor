@@ -22,7 +22,7 @@ TEST(FailingSimulationTest, basic)
 {
     // Default simulation.
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("../misc/res/tt04.omex"));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("misc/failablesimulation.omex"));
     auto document = libOpenCOR::SedDocument::create(file);
     auto instance = document->instantiate();
 
