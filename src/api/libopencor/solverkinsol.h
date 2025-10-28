@@ -62,7 +62,7 @@ public:
      * Factory method to create a @ref SolverKinsol object:
      *
      * ```
-     * auto solver = libOpenCOR::SolverKinsol::create();
+     * auto solver {libOpenCOR::SolverKinsol::create()};
      * ```
      *
      * @return A smart pointer to a @ref SolverKinsol object.

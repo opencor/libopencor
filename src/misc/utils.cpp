@@ -63,21 +63,21 @@ void printIssues(const LoggerPtr &pLogger)
 
 void printHexDump(const UnsignedChars &pBytes)
 {
-    static constexpr auto BYTES_PER_LINE = 16;
-    static constexpr auto ADDRESS_WIDTH = 8;
-    static constexpr auto FIRST_ASCII_CHARACTER = 32;
-    static constexpr auto LAST_ASCII_CHARACTER = 126;
+    static constexpr auto BYTES_PER_LINE {16};
+    static constexpr auto ADDRESS_WIDTH {8};
+    static constexpr auto FIRST_ASCII_CHARACTER {32};
+    static constexpr auto LAST_ASCII_CHARACTER {126};
 
     std::cout << "---[BYTES]---[BEGIN]\n";
 
-    for (size_t i = 0; i < pBytes.size(); i += BYTES_PER_LINE) {
+    for (size_t i {0}; i < pBytes.size(); i += BYTES_PER_LINE) {
         // Print the offset.
 
         std::cout << std::hex << std::setfill('0') << std::setw(ADDRESS_WIDTH) << i << "  ";
 
         // Print hex bytes.
 
-        for (size_t j = 0; j < BYTES_PER_LINE; ++j) {
+        for (size_t j {0}; j < BYTES_PER_LINE; ++j) {
             if (i + j < pBytes.size()) {
                 std::cout << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(pBytes[i + j]);
             } else {
@@ -97,10 +97,10 @@ void printHexDump(const UnsignedChars &pBytes)
 
         // Print the ASCII representation.
 
-        const size_t bytesOnThisLine = (pBytes.size() - i < BYTES_PER_LINE) ? (pBytes.size() - i) : BYTES_PER_LINE;
+        const size_t bytesOnThisLine {(pBytes.size() - i < BYTES_PER_LINE) ? (pBytes.size() - i) : BYTES_PER_LINE};
 
-        for (size_t j = 0; j < bytesOnThisLine; ++j) {
-            auto byte = pBytes[i + j];
+        for (size_t j {0}; j < bytesOnThisLine; ++j) {
+            auto byte {pBytes[i + j]};
 
             if (byte >= FIRST_ASCII_CHARACTER && byte <= LAST_ASCII_CHARACTER) {
                 std::cout << static_cast<char>(byte);
@@ -109,7 +109,7 @@ void printHexDump(const UnsignedChars &pBytes)
             }
         }
 
-        for (size_t j = bytesOnThisLine; j < BYTES_PER_LINE; ++j) {
+        for (size_t j {bytesOnThisLine}; j < BYTES_PER_LINE; ++j) {
             std::cout << " ";
         }
 
@@ -126,10 +126,10 @@ void printArray(const std::string &pName, const Doubles &pDoubles)
     std::cout << "---[ARRAY]---[" << pName << "]---[BEGIN]\n";
 
     if (!pDoubles.empty()) {
-        const auto arraySize = pDoubles.size();
-        const auto indexWidth = static_cast<int>(log10(static_cast<double>(arraySize - 1))) + 1;
+        const auto arraySize {pDoubles.size()};
+        const auto indexWidth {static_cast<int>(log10(static_cast<double>(arraySize - 1))) + 1};
 
-        for (size_t i = 0; i < arraySize; ++i) {
+        for (size_t i {0}; i < arraySize; ++i) {
             std::cout << "[" << std::setfill('0') << std::setw(indexWidth) << i << "] " << pDoubles[i] << "\n";
         }
     }
@@ -140,7 +140,7 @@ void printArray(const std::string &pName, const Doubles &pDoubles)
 
 bool fuzzyCompare(double pNb1, double pNb2)
 {
-    static constexpr double ONE_TRILLION = 1000000000000.0;
+    static constexpr double ONE_TRILLION {1000000000000.0};
 
     return std::fabs(pNb1 - pNb2) * ONE_TRILLION <= std::fmin(std::fabs(pNb1), std::fabs(pNb2));
 }
@@ -161,11 +161,11 @@ std::string encodeUrl(const std::string &pUrl)
 
 std::string decodeUrl(const std::string &pUrl)
 {
-    static constexpr auto BASE_16 = 16;
+    static constexpr auto BASE_16 {16};
 
     std::string res;
 
-    for (size_t i = 0; i < pUrl.size(); ++i) {
+    for (size_t i {0}; i < pUrl.size(); ++i) {
         if ((pUrl[i] == '%') && (i + 2 < pUrl.size()) && (std::isxdigit(pUrl[i + 1]) != 0) && (std::isxdigit(pUrl[i + 2]) != 0)) {
             res += static_cast<char>(std::stoi(pUrl.substr(i + 1, 2), nullptr, BASE_16));
 
@@ -181,9 +181,9 @@ std::string decodeUrl(const std::string &pUrl)
 #ifdef BUILDING_USING_MSVC
 std::string forwardSlashPath(const std::string &pPath)
 {
-    static constexpr auto BACKSLASH = "\\\\";
-    static const auto BACKSLASH_REGEX = std::regex(BACKSLASH);
-    static constexpr auto FORWARD_SLASH = "/";
+    static constexpr auto BACKSLASH {"\\\\"};
+    static const auto BACKSLASH_REGEX {std::regex(BACKSLASH)};
+    static constexpr auto FORWARD_SLASH {"/"};
 
     return std::regex_replace(pPath, BACKSLASH_REGEX, FORWARD_SLASH);
 }
@@ -196,7 +196,7 @@ std::filesystem::path stringToPath(const std::string &pString)
 
 std::string pathToString(const std::filesystem::path &pPath)
 {
-    auto path = pPath;
+    auto path {pPath};
 
 #if defined(BUILDING_USING_MSVC)
     return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path.make_preferred().wstring());
@@ -221,29 +221,29 @@ std::string canonicalFileName(const std::string &pFileName)
     //          return "/". So, we prepend a dummy folder to pFileName and then remove it from the result of
     //          std::filesystem::weakly_canonical().
 
-    static constexpr auto FORWARD_SLASH = "/";
+    static constexpr auto FORWARD_SLASH {"/"};
 
-    auto fileExists = std::filesystem::exists(pFileName);
-    auto currentPath = std::filesystem::current_path();
+    auto fileExists {std::filesystem::exists(pFileName)};
+    auto currentPath {std::filesystem::current_path()};
 
     if (!fileExists) {
         std::filesystem::current_path(FORWARD_SLASH);
     }
 
 #ifdef __EMSCRIPTEN__
-    static constexpr auto DUMMY_FOLDER = "/dummy";
+    static constexpr auto DUMMY_FOLDER {"/dummy"};
 
-    auto res = pFileName;
+    auto res {pFileName};
 
     res = DUMMY_FOLDER + std::string(res.starts_with(FORWARD_SLASH) ? "" : FORWARD_SLASH) + res;
     res = pathToString(std::filesystem::weakly_canonical(stringToPath(res)));
 
     res.erase(0, strlen(DUMMY_FOLDER));
 #else
-    auto filePath = stringToPath(pFileName);
-    auto res = pathToString(fileExists ?
-                                std::filesystem::canonical(filePath) :
-                                std::filesystem::weakly_canonical(filePath));
+    auto filePath {stringToPath(pFileName)};
+    auto res {pathToString(fileExists ?
+                               std::filesystem::canonical(filePath) :
+                               std::filesystem::weakly_canonical(filePath))};
 #endif
 
 #if defined(BUILDING_USING_MSVC)
@@ -257,7 +257,7 @@ std::string canonicalFileName(const std::string &pFileName)
     // added (at the beginning of the file name) by std::filesystem::weakly_canonical().
 
     if (!fileExists && !pFileName.starts_with(FORWARD_SLASH)) {
-        static const auto FORWARD_SLASH_LENGTH = strlen(FORWARD_SLASH);
+        static const auto FORWARD_SLASH_LENGTH {strlen(FORWARD_SLASH)};
 
         res.erase(0, FORWARD_SLASH_LENGTH);
     }
@@ -278,20 +278,20 @@ std::tuple<bool, std::string> retrieveFileInfo(const std::string &pFileNameOrUrl
     // Note: a URL represents a local file when used with the "file" scheme.
 
 #ifdef BUILDING_ON_WINDOWS
-    static constexpr auto FILE_SCHEME = "file:///";
+    static constexpr auto FILE_SCHEME {"file:///"};
 #else
-    static constexpr auto FILE_SCHEME = "file://";
+    static constexpr auto FILE_SCHEME {"file://"};
 #endif
-    static auto FILE_SCHEME_LENGTH = strlen(FILE_SCHEME);
-    static constexpr auto HTTP_SCHEME = "http://";
-    static auto HTTP_SCHEME_LENGTH = strlen(HTTP_SCHEME);
-    static constexpr auto HTTPS_SCHEME = "https://";
-    static auto HTTPS_SCHEME_LENGTH = strlen(HTTPS_SCHEME);
+    static auto FILE_SCHEME_LENGTH {strlen(FILE_SCHEME)};
+    static constexpr auto HTTP_SCHEME {"http://"};
+    static auto HTTP_SCHEME_LENGTH {strlen(HTTP_SCHEME)};
+    static constexpr auto HTTPS_SCHEME {"https://"};
+    static auto HTTPS_SCHEME_LENGTH {strlen(HTTPS_SCHEME)};
 
-    auto res = pFileNameOrUrl;
-    size_t schemeLength = 0;
-    auto requiresHttpScheme = false;
-    auto requiresHttpsScheme = false;
+    auto res {pFileNameOrUrl};
+    size_t schemeLength {0};
+    auto requiresHttpScheme {false};
+    auto requiresHttpsScheme {false};
 
     if (pFileNameOrUrl.starts_with(FILE_SCHEME)) {
         schemeLength = FILE_SCHEME_LENGTH;
@@ -322,7 +322,7 @@ namespace {
 
 std::filesystem::path canonicalPath(const std::string &pPath)
 {
-    auto [isLocalPath, path] = retrieveFileInfo(pPath);
+    auto [isLocalPath, path] {retrieveFileInfo(pPath)};
 
     return stringToPath(path);
 }
@@ -336,12 +336,12 @@ std::string relativePath(const std::string &pPath, const std::string &pBasePath)
 
 std::string urlPath(const std::string &pPath)
 {
-    auto [isLocalPath, path] = retrieveFileInfo(pPath);
+    auto [isLocalPath, path] {retrieveFileInfo(pPath)};
 
     if (isLocalPath && stringToPath(path).is_absolute()) {
-        static const std::string FILE_SCHEME = "file://";
+        static const std::string FILE_SCHEME {"file://"};
 #ifdef BUILDING_USING_MSVC
-        static constexpr auto FORWARD_SLASH = "/";
+        static constexpr auto FORWARD_SLASH {"/"};
 
         return FILE_SCHEME + FORWARD_SLASH + forwardSlashPath(path);
 #else
@@ -365,8 +365,8 @@ void getTimeOfDay(TimeVal &pTimeVal)
 {
     // Based off https://stackoverflow.com/a/58162122.
 
-    const auto duration = std::chrono::system_clock::now().time_since_epoch();
-    const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+    const auto duration {std::chrono::system_clock::now().time_since_epoch()};
+    const auto seconds {std::chrono::duration_cast<std::chrono::seconds>(duration)};
 
     pTimeVal.seconds = static_cast<uint64_t>(seconds.count());
     pTimeVal.microeconds = static_cast<uint64_t>(std::chrono::duration_cast<std::chrono::microseconds>(duration - seconds).count());
@@ -383,30 +383,30 @@ std::filesystem::path uniqueFilePath()
     // Note: ATTEMPTS_MIN is equal to 62x62x62 where 62 is the number of characters in LETTERS.
 
 #    ifndef CODE_COVERAGE_ENABLED
-    static constexpr uint64_t ATTEMPTS_MIN = 238328U;
-    static constexpr uint64_t MAX_ATTEMPTS = (ATTEMPTS_MIN < TMP_MAX) ? TMP_MAX : ATTEMPTS_MIN;
+    static constexpr uint64_t ATTEMPTS_MIN {238328U};
+    static constexpr uint64_t MAX_ATTEMPTS {(ATTEMPTS_MIN < TMP_MAX) ? TMP_MAX : ATTEMPTS_MIN};
 #    endif
 
     // Get some more or less random data.
 
-    static const std::string LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    static const uint64_t LETTERS_SIZE = LETTERS.size();
+    static const std::string LETTERS {"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"};
+    static const uint64_t LETTERS_SIZE {LETTERS.size()};
 
-    static auto testFile = pathToString(std::filesystem::temp_directory_path() / "libOpenCOR_XXXXXX.tmp");
+    static auto testFile {pathToString(std::filesystem::temp_directory_path() / "libOpenCOR_XXXXXX.tmp")};
 
-    static const size_t XXXXXX_POS = testFile.size() - 6 - 4;
-    static constexpr uint64_t MICROSECONDS_SHIFT = 16U;
-    static constexpr uint64_t PID_SHIFT = 32U;
+    static const size_t XXXXXX_POS {testFile.size() - 6 - 4};
+    static constexpr uint64_t MICROSECONDS_SHIFT {16U};
+    static constexpr uint64_t PID_SHIFT {32U};
 #    ifndef CODE_COVERAGE_ENABLED
-    static constexpr uint64_t VALUE_SHIFT = 7777U;
+    static constexpr uint64_t VALUE_SHIFT {7777U};
 #    endif
-    static constexpr uint64_t XXXXXX_POS_SHIFT = 6U;
+    static constexpr uint64_t XXXXXX_POS_SHIFT {6U};
 
     TimeVal timeVal;
 
     getTimeOfDay(timeVal);
 
-    auto value = (timeVal.microeconds << MICROSECONDS_SHIFT) ^ timeVal.seconds;
+    auto value {(timeVal.microeconds << MICROSECONDS_SHIFT) ^ timeVal.seconds};
 
 #    ifdef BUILDING_USING_MSVC
     value ^= static_cast<uint64_t>(_getpid()) << PID_SHIFT;
@@ -417,11 +417,11 @@ std::filesystem::path uniqueFilePath()
     std::string res;
 
 #    ifndef CODE_COVERAGE_ENABLED
-    for (uint64_t attempt = 0; attempt < MAX_ATTEMPTS; value += VALUE_SHIFT, ++attempt) {
+    for (uint64_t attempt {0}; attempt < MAX_ATTEMPTS; value += VALUE_SHIFT, ++attempt) {
 #    endif
-        uint64_t val = value;
+        uint64_t val {value};
 
-        for (uint64_t i = 0; i < XXXXXX_POS_SHIFT; ++i) {
+        for (uint64_t i {0}; i < XXXXXX_POS_SHIFT; ++i) {
             testFile[XXXXXX_POS + i] = LETTERS[val % LETTERS_SIZE];
             val /= LETTERS_SIZE;
         }
@@ -442,7 +442,7 @@ std::filesystem::path uniqueFilePath()
 
 size_t curlWriteFunction(char *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
-    const auto realDataSize = pSize * pDataSize;
+    const auto realDataSize {pSize * pDataSize};
 
     static_cast<std::ofstream *>(pUserData)->write(pData, static_cast<std::streamsize>(realDataSize));
 
@@ -453,7 +453,7 @@ size_t curlWriteFunction(char *pData, size_t pSize, size_t pDataSize, void *pUse
 
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 {
-    auto filePath = uniqueFilePath();
+    auto filePath {uniqueFilePath()};
     std::ofstream file(filePath, std::ios_base::binary);
 
 #    ifndef CODE_COVERAGE_ENABLED
@@ -464,8 +464,8 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
-    auto res = false;
-    auto *curl = curl_easy_init();
+    auto res {false};
+    auto *curl {curl_easy_init()};
 
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
@@ -474,9 +474,9 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunction);
 
     if (curl_easy_perform(curl) == CURLE_OK) {
-        static constexpr int64_t HTTP_OK = 200;
+        static constexpr int64_t HTTP_OK {200};
 
-        int64_t responseCode = 0;
+        int64_t responseCode {0};
 
         curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &responseCode);
 
@@ -507,7 +507,7 @@ UnsignedChars fileContents(const std::filesystem::path &pFilePath)
         return {};
     }
 
-    const auto fileSize = std::filesystem::file_size(pFilePath);
+    const auto fileSize {std::filesystem::file_size(pFilePath)};
     UnsignedChars contents(fileSize);
 
     file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT
@@ -537,11 +537,11 @@ std::string toString(bool pBoolean)
 
 bool isInt(const std::string &pString)
 {
-    static const auto INT_REGEX = std::regex("^([-+]?[1-9][0-9]*([eE][+]?[0-9]+)?|0)$");
+    static const auto INT_REGEX {std::regex("^([-+]?[1-9][0-9]*([eE][+]?[0-9]+)?|0)$")};
 
     if (std::regex_match(pString, INT_REGEX)) {
         std::istringstream iss(pString);
-        int res = 0;
+        int res {0};
 
         iss >> res;
 
@@ -554,7 +554,7 @@ bool isInt(const std::string &pString)
 int toInt(const std::string &pString)
 {
     std::istringstream iss(pString);
-    int res = 0;
+    int res {0};
 
     iss >> res;
 
@@ -581,7 +581,7 @@ std::string toString(size_t pNumber)
 
 bool isDouble(const std::string &pString)
 {
-    static const auto DOUBLE_REGEX = std::regex("^[+-]?[0-9]*\\.?[0-9]+([eE][+-]?[0-9]+)?$");
+    static const auto DOUBLE_REGEX {std::regex("^[+-]?[0-9]*\\.?[0-9]+([eE][+-]?[0-9]+)?$")};
 
     return std::regex_match(pString, DOUBLE_REGEX);
 }
@@ -593,7 +593,7 @@ double toDouble(const std::string &pString)
     }
 
     std::istringstream iss(pString);
-    double res = NAN;
+    double res {NAN};
 
     iss >> res;
 

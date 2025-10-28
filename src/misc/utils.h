@@ -36,9 +36,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-static const std::string LIBOPENCOR_NAMESPACE = "https://opencor.ws/libopencor";
+static const std::string LIBOPENCOR_NAMESPACE {"https://opencor.ws/libopencor"};
 
-static const auto NAN = std::numeric_limits<double>::quiet_NaN();
+static const auto NAN {std::numeric_limits<double>::quiet_NaN()};
 
 using StringStringMap = std::map<std::string, std::string>;
 

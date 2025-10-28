@@ -26,21 +26,21 @@ namespace libOpenCOR {
 class CellmlFileRuntime::Impl: public Logger::Impl
 {
 public:
-    CompilerPtr mCompiler = nullptr;
+    CompilerPtr mCompiler {nullptr};
     std::string mNlaSolverAddress;
 #ifdef __EMSCRIPTEN__
     UnsignedChars mWasmModule;
-    intptr_t mWasmInstanceFunctionsId = 0;
+    intptr_t mWasmInstanceFunctionsId {0};
 #endif
 
 #ifndef __EMSCRIPTEN__
-    InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel = nullptr;
-    InitialiseVariablesForDifferentialModel mInitialiseVariablesForDifferentialModel = nullptr;
-    ComputeComputedConstantsForAlgebraicModel mComputeComputedConstantsForAlgebraicModel = nullptr;
-    ComputeComputedConstantsForDifferentialModel mComputeComputedConstantsForDifferentialModel = nullptr;
-    ComputeRates mComputeRates = nullptr;
-    ComputeVariablesForAlgebraicModel mComputeVariablesForAlgebraicModel = nullptr;
-    ComputeVariablesForDifferentialModel mComputeVariablesForDifferentialModel = nullptr;
+    InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel {nullptr};
+    InitialiseVariablesForDifferentialModel mInitialiseVariablesForDifferentialModel {nullptr};
+    ComputeComputedConstantsForAlgebraicModel mComputeComputedConstantsForAlgebraicModel {nullptr};
+    ComputeComputedConstantsForDifferentialModel mComputeComputedConstantsForDifferentialModel {nullptr};
+    ComputeRates mComputeRates {nullptr};
+    ComputeVariablesForAlgebraicModel mComputeVariablesForAlgebraicModel {nullptr};
+    ComputeVariablesForDifferentialModel mComputeVariablesForDifferentialModel {nullptr};
 #endif
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);

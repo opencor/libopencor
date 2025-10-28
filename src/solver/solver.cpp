@@ -38,7 +38,7 @@ void Solver::Impl::serialise(xmlNodePtr pNode, bool pNlaAlgorithm) const
 {
     // Solver information.
 
-    auto *algorithmNode = xmlNewNode(nullptr, toConstXmlCharPtr(pNlaAlgorithm ? "nlaAlgorithm" : "algorithm"));
+    auto *algorithmNode {xmlNewNode(nullptr, toConstXmlCharPtr(pNlaAlgorithm ? "nlaAlgorithm" : "algorithm"))};
 
     if (pNlaAlgorithm) {
         xmlSetNs(algorithmNode, xmlNewNs(algorithmNode, toConstXmlCharPtr(LIBOPENCOR_NAMESPACE), nullptr));
@@ -50,12 +50,12 @@ void Solver::Impl::serialise(xmlNodePtr pNode, bool pNlaAlgorithm) const
 
     // Solver properties information.
 
-    auto *propertiesNode = xmlNewNode(nullptr, toConstXmlCharPtr("listOfAlgorithmParameters"));
+    auto *propertiesNode {xmlNewNode(nullptr, toConstXmlCharPtr("listOfAlgorithmParameters"))};
 
     xmlAddChild(algorithmNode, propertiesNode);
 
     for (auto const &property : properties()) {
-        auto *propertyNode = xmlNewNode(nullptr, toConstXmlCharPtr("algorithmParameter"));
+        auto *propertyNode {xmlNewNode(nullptr, toConstXmlCharPtr("algorithmParameter"))};
 
         xmlNewProp(propertyNode, toConstXmlCharPtr("kisaoID"), toConstXmlCharPtr(property.first));
         xmlNewProp(propertyNode, toConstXmlCharPtr("value"), toConstXmlCharPtr(property.second));

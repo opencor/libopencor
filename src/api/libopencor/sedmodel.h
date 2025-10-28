@@ -53,9 +53,9 @@ public:
      * Factory method to create a @ref SedModel object:
      *
      * ```
-     * auto document = libOpenCOR::SedDocument::create();
-     * auto file = libOpenCOR::File::create("/some/path/file.txt");
-     * auto model = libOpenCOR::SedModel::create(document, file);
+     * auto document {libOpenCOR::SedDocument::create()};
+     * auto file {libOpenCOR::File::create("/some/path/file.txt")};
+     * auto model {libOpenCOR::SedModel::create(document, file)};
      * ```
      *
      * @param pDocument The @ref SedDocument object to which the @ref SedModel object is to belong.

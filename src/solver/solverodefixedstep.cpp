@@ -31,10 +31,10 @@ SolverOdeFixedStep::Impl::Impl(const std::string &pId, const std::string &pName)
 
 void SolverOdeFixedStep::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
-    for (unsigned int i = 0; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
-        auto *algorithmParameter = pAlgorithm->getAlgorithmParameter(i);
-        auto kisaoId = algorithmParameter->getKisaoID();
-        auto value = algorithmParameter->getValue();
+    for (unsigned int i {0}; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
+        auto *algorithmParameter {pAlgorithm->getAlgorithmParameter(i)};
+        auto kisaoId {algorithmParameter->getKisaoID()};
+        auto value {algorithmParameter->getValue()};
 
         if (kisaoId == "KISAO:0000483") {
             mStep = toDouble(value);
@@ -52,7 +52,7 @@ void SolverOdeFixedStep::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 
 SolverPtr SolverOdeFixedStep::Impl::duplicate(const SolverOdeFixedStepPtr &pSolver) const
 {
-    auto *solverPimpl = pSolver->pimpl();
+    auto *solverPimpl {pSolver->pimpl()};
 
     solverPimpl->mStep = mStep;
 

@@ -37,11 +37,11 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
     if (pDocument->hasTasks()) {
         // Make sure that all the tasks are valid.
 
-        auto tasks = pDocument->tasks();
-        auto tasksValid = true;
+        auto tasks {pDocument->tasks()};
+        auto tasksValid {true};
 
         for (const auto &task : tasks) {
-            auto *taskPimpl = task->pimpl();
+            auto *taskPimpl {task->pimpl()};
 
             taskPimpl->removeAllIssues();
 
@@ -58,7 +58,7 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
 
         if (tasksValid) {
             for (const auto &task : tasks) {
-                auto taskInstance = SedInstanceTask::Impl::create(task);
+                auto taskInstance {SedInstanceTask::Impl::create(task)};
 
                 mTasks.push_back(taskInstance);
 
@@ -86,7 +86,7 @@ double SedInstance::Impl::run()
 
     // Run all the tasks associated with this instance unless they have some issues.
 
-    auto res = 0.0;
+    auto res {0.0};
 
     for (const auto &task : mTasks) {
         if (!task->hasIssues()) {

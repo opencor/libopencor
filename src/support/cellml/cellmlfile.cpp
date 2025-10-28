@@ -34,7 +34,7 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
     // Resolve imports and flatten the model, if needed and possible.
 
     if (mModel->hasUnresolvedImports()) {
-        auto importer = libcellml::Importer::create(pStrict);
+        auto importer {libcellml::Importer::create(pStrict)};
 
         if (importer->resolveImports(mModel, pathToString(stringToPath(pFile->path()).parent_path()))) {
             mModel = importer->flattenModel(mModel);
@@ -61,7 +61,7 @@ void CellmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument) const
 {
     // Add a model.
 
-    auto model = SedModel::create(pDocument, mFile.lock());
+    auto model {SedModel::create(pDocument, mFile.lock())};
 
     pDocument->addModel(model);
 
@@ -69,7 +69,7 @@ void CellmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument) const
     // of an algebraic or NLA model.
 
     SedSimulationPtr simulation;
-    auto type = mAnalyserModel->type();
+    auto type {mAnalyserModel->type()};
 
     if ((type == libcellml::AnalyserModel::Type::ODE)
         || (type == libcellml::AnalyserModel::Type::DAE)) {
@@ -154,8 +154,8 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 
     // Try to parse the file contents as a CellML file, be it a CellML 1.x or a CellML 2.0 file.
 
-    auto parser = libcellml::Parser::create(false);
-    auto model = parser->parseModel(toString(pFile->contents()));
+    auto parser {libcellml::Parser::create(false)};
+    auto model {parser->parseModel(toString(pFile->contents()))};
 
     if (parser->errorCount() == 0) {
         return CellmlFilePtr {new CellmlFile {pFile, model, false}};

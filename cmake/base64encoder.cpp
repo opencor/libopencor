@@ -30,8 +30,8 @@ int main(int pArgC, char *pArgV[])
         return 1;
     }
 
-    std::uintmax_t fileSize = std::filesystem::file_size(pArgV[1]);
-    char *buffer = new char[fileSize];
+    std::uintmax_t fileSize {std::filesystem::file_size(pArgV[1])};
+    char *buffer {new char[fileSize]};
     std::ifstream file(pArgV[1], std::ios::binary);
 
     file.read(buffer, fileSize);
@@ -44,7 +44,7 @@ int main(int pArgC, char *pArgV[])
 
     file.close();
 
-    char *base64 = new char[modp_b64_encode_len(fileSize)];
+    char *base64 {new char[modp_b64_encode_len(fileSize)]};
 
     modp_b64_encode(base64, buffer, fileSize);
 

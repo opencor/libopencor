@@ -25,8 +25,8 @@ namespace libOpenCOR {
 class SolverHeun::Impl: public SolverOdeFixedStep::Impl
 {
 public:
-    double *mK = nullptr;
-    double *mYk = nullptr;
+    double *mK {nullptr};
+    double *mYk {nullptr};
 
     Doubles mKDoubles;
     Doubles mYkDoubles;

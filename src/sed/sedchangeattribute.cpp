@@ -76,7 +76,7 @@ void SedChangeAttribute::Impl::setNewValue(const std::string &pNewValue)
 
 void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("changeAttribute"));
+    auto *node {xmlNewNode(nullptr, toConstXmlCharPtr("changeAttribute"))};
 
     SedChange::Impl::serialise(node);
 
@@ -88,21 +88,21 @@ void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
 void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
                                      const libcellml::AnalyserModelPtr &pAnalyserModel)
 {
-    auto *instanceTaskPimpl = pInstanceTask->pimpl();
-    auto changeName = name(mComponentName, mVariableName);
+    auto *instanceTaskPimpl {pInstanceTask->pimpl()};
+    auto changeName {name(mComponentName, mVariableName)};
 
     if (instanceTaskPimpl->voiName() == changeName) {
-        auto voiVariable = pAnalyserModel->voi()->variable();
-        auto voiComponent = owningComponent(voiVariable);
+        auto voiVariable {pAnalyserModel->voi()->variable()};
+        auto voiComponent {owningComponent(voiVariable)};
 
         addWarning(std::string("The variable of integration '").append(voiVariable->name()).append("' in component '").append(voiComponent->name()).append("'cannot be changed. Only state variables and constants can be changed."));
 
         return;
     }
 
-    auto isParameterSet = false;
+    auto isParameterSet {false};
 
-    for (size_t i = 0; i < pAnalyserModel->stateCount(); ++i) {
+    for (size_t i {0}; i < pAnalyserModel->stateCount(); ++i) {
         if (instanceTaskPimpl->stateName(i) == changeName) {
             instanceTaskPimpl->mStates[i] = toDouble(newValue()); // NOLINT
 
@@ -113,7 +113,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        for (size_t i = 0; i < pAnalyserModel->constantCount(); ++i) {
+        for (size_t i {0}; i < pAnalyserModel->constantCount(); ++i) {
             if (instanceTaskPimpl->constantName(i) == changeName) {
                 instanceTaskPimpl->mConstants[i] = toDouble(newValue()); // NOLINT
 
@@ -125,10 +125,10 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        for (size_t i = 0; i < pAnalyserModel->computedConstantCount(); ++i) {
+        for (size_t i {0}; i < pAnalyserModel->computedConstantCount(); ++i) {
             if (instanceTaskPimpl->computedConstantName(i) == changeName) {
-                auto computedConstantVariable = pAnalyserModel->computedConstants()[i]->variable();
-                auto computedConstantComponent = owningComponent(computedConstantVariable);
+                auto computedConstantVariable {pAnalyserModel->computedConstants()[i]->variable()};
+                auto computedConstantComponent {owningComponent(computedConstantVariable)};
 
                 addWarning(std::string("The computed constant '").append(computedConstantVariable->name()).append("' in component '").append(computedConstantComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
 
@@ -140,10 +140,10 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        for (size_t i = 0; i < pAnalyserModel->algebraicCount(); ++i) {
+        for (size_t i {0}; i < pAnalyserModel->algebraicCount(); ++i) {
             if (instanceTaskPimpl->algebraicName(i) == changeName) {
-                auto algebraicVariable = pAnalyserModel->algebraic()[i]->variable();
-                auto algebraicComponent = owningComponent(algebraicVariable);
+                auto algebraicVariable {pAnalyserModel->algebraic()[i]->variable()};
+                auto algebraicComponent {owningComponent(algebraicVariable)};
 
                 addWarning(std::string("The algebraic variable '").append(algebraicVariable->name()).append("' in component '").append(algebraicComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
 

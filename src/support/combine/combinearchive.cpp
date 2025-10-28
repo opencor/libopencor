@@ -33,10 +33,10 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 {
     // Extract all the files contained in the COMBINE archive.
 
-    for (int i = 0; i < mArchive->getNumEntries(); ++i) {
-        const auto *entry = mArchive->getEntry(i);
-        auto location = entry->getLocation();
-        auto file = File::create(mArchiveLocation + location);
+    for (int i {0}; i < mArchive->getNumEntries(); ++i) {
+        const auto *entry {mArchive->getEntry(i)};
+        auto location {entry->getLocation()};
+        auto file {File::create(mArchiveLocation + location)};
 
         file->setContents(mArchive->extractEntryToBuffer(location));
 
@@ -145,16 +145,16 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
     //       used by a ZIP file (we ignore empty and spanned ZIP files). Indeed, libCOMBINE may crash depending on the
     //       file contents that is given to it.
 
-    static const auto LS8 = 8U;
-    static const auto LS16 = 16U;
-    static const auto LS24 = 24U;
-    static const auto ZIP_MAGIC_NUMBER = 0x04034b50;
+    static const auto LS8 {8U};
+    static const auto LS16 {16U};
+    static const auto LS24 {24U};
+    static const auto ZIP_MAGIC_NUMBER {0x04034b50};
 
-    auto fileContents = pFile->contents();
+    auto fileContents {pFile->contents()};
 
     if ((fileContents.size() > 4)
         && (fileContents[0] + (fileContents[1] << LS8) + (fileContents[2] << LS16) + (fileContents[3] << LS24) == ZIP_MAGIC_NUMBER)) {
-        auto *archive = new libcombine::CombineArchive {};
+        auto *archive {new libcombine::CombineArchive {}};
 
         archive->initializeFromBuffer(fileContents);
 

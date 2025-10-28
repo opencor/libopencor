@@ -27,9 +27,9 @@ namespace libOpenCOR {
 class SedDocument::Impl: public Logger::Impl
 {
 public:
-    std::string mXmlns = "http://sed-ml.org/sed-ml/level1/version4";
-    size_t mLevel = 1;
-    size_t mVersion = 4;
+    std::string mXmlns {"http://sed-ml.org/sed-ml/level1/version4"};
+    size_t mLevel {1};
+    size_t mVersion {4};
 
     std::unordered_set<std::string> mIds;
 

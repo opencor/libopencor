@@ -35,7 +35,7 @@ bool SedRepeatedTask::Impl::isValid()
 /*---GRY---
 void SedRepeatedTask::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("repeatedTask"));
+    auto *node {xmlNewNode(nullptr, toConstXmlCharPtr("repeatedTask"))};
 
     SedAbstractTask::Impl::serialise(node);
 

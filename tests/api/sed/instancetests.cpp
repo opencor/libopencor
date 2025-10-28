@@ -20,78 +20,78 @@ limitations under the License.
 
 TEST(InstanceSedTest, noFile)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "The simulation experiment description does not contain any tasks to run."},
-    };
+    }};
 
-    auto document = libOpenCOR::SedDocument::create();
-    auto instance = document->instantiate();
+    auto document {libOpenCOR::SedDocument::create()};
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, invalidCellmlFile)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is invalid."},
         {libOpenCOR::Issue::Type::ERROR, "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, overconstrainedCellmlFile)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is overconstrained."},
         {libOpenCOR::Issue::Type::ERROR, "Variable 'x' in component 'my_component' is computed more than once."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, underconstrainedCellmlFile)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is underconstrained."},
         {libOpenCOR::Issue::Type::ERROR, "The type of variable 'x' in component 'my_component' is unknown."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/underconstrained.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/underconstrained.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, unsuitablyConstrainedCellmlFile)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "The CellML file is unsuitably constrained."},
         {libOpenCOR::Issue::Type::ERROR, "Variable 'y' in component 'my_component' is computed more than once."},
         {libOpenCOR::Issue::Type::ERROR, "The type of variable 'x' in component 'my_component' is unknown."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsuitably_constrained.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsuitably_constrained.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, algebraicModel)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     instance->run();
 
@@ -100,7 +100,7 @@ TEST(InstanceSedTest, algebraicModel)
 
 TEST(InstanceSedTest, odeModel)
 {
-    const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
 #ifdef BUILDING_ON_INTEL
         {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140013827899996, mxstep steps taken before reaching tout."},
 #else
@@ -112,19 +112,19 @@ TEST(InstanceSedTest, odeModel)
 #    endif
         },
 #endif
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
-    static const auto NOK_MAXIMUM_NUMBER_OF_STEPS = 10;
+    static const auto NOK_MAXIMUM_NUMBER_OF_STEPS {10};
 
-    auto cvode = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto cvode {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
-    auto instance = document->instantiate();
+    auto instance {document->instantiate()};
 
     EXPECT_FALSE(instance->hasIssues());
 
@@ -132,7 +132,7 @@ TEST(InstanceSedTest, odeModel)
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 
-    static const auto OK_MAXIMUM_NUMBER_OF_STEPS = 500;
+    static const auto OK_MAXIMUM_NUMBER_OF_STEPS {500};
 
     cvode->setMaximumNumberOfSteps(OK_MAXIMUM_NUMBER_OF_STEPS);
 
@@ -145,35 +145,35 @@ TEST(InstanceSedTest, odeModel)
 
 TEST(InstanceSedTest, odeModelWithNoOdeSolver)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     document->simulations()[0]->setOdeSolver(nullptr);
 
-    auto instance = document->instantiate();
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, nlaModel)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0]);
-    auto kinsol = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0])};
+    auto kinsol {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    auto instance = document->instantiate();
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 
@@ -186,35 +186,35 @@ TEST(InstanceSedTest, nlaModel)
 
 TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     document->simulations()[0]->setNlaSolver(nullptr);
 
-    auto instance = document->instantiate();
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, daeModel)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0]);
-    auto kinsol = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    auto kinsol {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
 
-    auto instance = document->instantiate();
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 
@@ -233,28 +233,28 @@ TEST(InstanceSedTest, daeModel)
 
 TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
         {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
 
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);
 
-    auto instance = document->instantiate();
+    auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
 TEST(InstanceSedTest, combineArchive)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     instance->run();
 
@@ -263,9 +263,9 @@ TEST(InstanceSedTest, combineArchive)
 
 TEST(InstanceSedTest, combineArchiveWithCellmlFileAsMasterFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/cellml_file_as_master_file.omex"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/cellml_file_as_master_file.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     EXPECT_FALSE(instance->hasIssues());
 }

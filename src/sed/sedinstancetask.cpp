@@ -27,7 +27,7 @@ namespace libOpenCOR {
 
 SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask)
 {
-    auto res = SedInstanceTaskPtr {new SedInstanceTask {pTask}};
+    auto res {SedInstanceTaskPtr {new SedInstanceTask {pTask}}};
 
     res->pimpl()->mOwner = res;
 
@@ -49,7 +49,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     //---GRY--- AT THIS STAGE, WE ONLY SUPPORT SedTask TASKS, HENCE WE ASSERT (FOR NOW) THAT pTask IS INDEED A SedTask
     //          OBJECT.
 
-    auto task = std::dynamic_pointer_cast<SedTask>(pTask);
+    auto task {std::dynamic_pointer_cast<SedTask>(pTask)};
 
     ASSERT_NE(task, nullptr);
 
@@ -57,15 +57,15 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     mModel = task->pimpl()->mModel;
 
-    auto cellmlFile = mModel->pimpl()->mFile->pimpl()->mCellmlFile;
-    auto cellmlFileType = cellmlFile->type();
+    auto cellmlFile {mModel->pimpl()->mFile->pimpl()->mCellmlFile};
+    auto cellmlFileType {cellmlFile->type()};
 
     mDifferentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
                          || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
     mSimulation = task->pimpl()->mSimulation;
 
-    auto odeSolver = mSimulation->odeSolver();
-    auto nlaSolver = mSimulation->nlaSolver();
+    auto odeSolver {mSimulation->odeSolver()};
+    auto nlaSolver {mSimulation->nlaSolver()};
 
     mOdeSolver = (odeSolver != nullptr) ? std::dynamic_pointer_cast<SolverOde>(odeSolver->pimpl()->duplicate()) : nullptr;
     mNlaSolver = (nlaSolver != nullptr) ? std::dynamic_pointer_cast<SolverNla>(nlaSolver->pimpl()->duplicate()) : nullptr;
@@ -111,20 +111,20 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
 {
     mResults.voi[pIndex] = mVoi;
 
-    for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
+    for (size_t i {0}; i < mAnalyserModel->stateCount(); ++i) {
         mResults.states[i][pIndex] = mStates[i]; // NOLINT
         mResults.rates[i][pIndex] = mRates[i]; // NOLINT
     }
 
-    for (size_t i = 0; i < mAnalyserModel->constantCount(); ++i) {
+    for (size_t i {0}; i < mAnalyserModel->constantCount(); ++i) {
         mResults.constants[i][pIndex] = mConstants[i]; // NOLINT
     }
 
-    for (size_t i = 0; i < mAnalyserModel->computedConstantCount(); ++i) {
+    for (size_t i {0}; i < mAnalyserModel->computedConstantCount(); ++i) {
         mResults.computedConstants[i][pIndex] = mComputedConstants[i]; // NOLINT
     }
 
-    for (size_t i = 0; i < mAnalyserModel->algebraicCount(); ++i) {
+    for (size_t i {0}; i < mAnalyserModel->algebraicCount(); ++i) {
         mResults.algebraic[i][pIndex] = mAlgebraic[i]; // NOLINT
     }
 }
@@ -133,9 +133,9 @@ void SedInstanceTask::Impl::applyChanges()
 {
     for (const auto &change : mModel->changes()) {
         //---GRY--- AT THIS STAGE, WE ONLY SUPPORT ChangeAttribute CHANGES, HENCE WE ASSERT (FOR NOW) THAT change IS
-        //          INDEED A SedChnageAttribute OBJECT.
+        //          INDEED A SedChangeAttribute OBJECT.
 
-        auto changeAttribute = std::dynamic_pointer_cast<SedChangeAttribute>(change);
+        auto changeAttribute {std::dynamic_pointer_cast<SedChangeAttribute>(change)};
 
         ASSERT_NE(changeAttribute, nullptr);
 
@@ -216,7 +216,7 @@ double SedInstanceTask::Impl::run()
 {
     // Start our timer.
 
-    auto startTime = std::chrono::high_resolution_clock::now();
+    auto startTime {std::chrono::high_resolution_clock::now()};
 
     // (Re)initialise our model.
     // Note: reinitialise our model because we initialised it when we created the instance task.
@@ -228,39 +228,39 @@ double SedInstanceTask::Impl::run()
     if (mDifferentialModel) {
         // Initialise our results structure.
 
-        auto resultsSize = static_cast<size_t>(mSedUniformTimeCourse->pimpl()->mNumberOfSteps) + 1;
+        auto resultsSize {static_cast<size_t>(mSedUniformTimeCourse->pimpl()->mNumberOfSteps) + 1};
 
         mResults.voi.resize(resultsSize, NAN);
 
-        for (size_t i = 0; i < mAnalyserModel->stateCount(); ++i) {
+        for (size_t i {0}; i < mAnalyserModel->stateCount(); ++i) {
             mResults.states[i].resize(resultsSize, NAN);
             mResults.rates[i].resize(resultsSize, NAN);
         }
 
-        for (size_t i = 0; i < mAnalyserModel->constantCount(); ++i) {
+        for (size_t i {0}; i < mAnalyserModel->constantCount(); ++i) {
             mResults.constants[i].resize(resultsSize, NAN);
         }
 
-        for (size_t i = 0; i < mAnalyserModel->computedConstantCount(); ++i) {
+        for (size_t i {0}; i < mAnalyserModel->computedConstantCount(); ++i) {
             mResults.computedConstants[i].resize(resultsSize, NAN);
         }
 
-        for (size_t i = 0; i < mAnalyserModel->algebraicCount(); ++i) {
+        for (size_t i {0}; i < mAnalyserModel->algebraicCount(); ++i) {
             mResults.algebraic[i].resize(resultsSize, NAN);
         }
 
         // Track our initial results.
 
-        size_t index = 0;
+        size_t index {0};
 
         trackResults(index);
 
         // Compute the differential model.
 
-        auto voiStart = mVoi;
-        auto voiEnd = mSedUniformTimeCourse->pimpl()->mOutputEndTime;
-        auto voiInterval = (voiEnd - mVoi) / mSedUniformTimeCourse->pimpl()->mNumberOfSteps;
-        size_t voiCounter = 0;
+        auto voiStart {mVoi};
+        auto voiEnd {mSedUniformTimeCourse->pimpl()->mOutputEndTime};
+        auto voiInterval {(voiEnd - mVoi) / mSedUniformTimeCourse->pimpl()->mNumberOfSteps};
+        size_t voiCounter {0};
 
         while (!fuzzyCompare(mVoi, voiEnd)) {
             if (!mOdeSolver->pimpl()->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
@@ -294,15 +294,15 @@ double SedInstanceTask::Impl::run()
     } else {
         // Track our results.
 
-        for (size_t i = 0; i < mAnalyserModel->constantCount(); ++i) {
+        for (size_t i {0}; i < mAnalyserModel->constantCount(); ++i) {
             mResults.constants[i].resize(1, mConstants[i]); // NOLINT
         }
 
-        for (size_t i = 0; i < mAnalyserModel->computedConstantCount(); ++i) {
+        for (size_t i {0}; i < mAnalyserModel->computedConstantCount(); ++i) {
             mResults.computedConstants[i].resize(1, mComputedConstants[i]); // NOLINT
         }
 
-        for (size_t i = 0; i < mAnalyserModel->algebraicCount(); ++i) {
+        for (size_t i {0}; i < mAnalyserModel->algebraicCount(); ++i) {
             mResults.algebraic[i].resize(1, mAlgebraic[i]); // NOLINT
         }
     }

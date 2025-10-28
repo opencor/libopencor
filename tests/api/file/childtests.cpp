@@ -24,15 +24,15 @@ namespace {
 
 void doTestDataset(const std::string &pNumber, const std::vector<std::string> &pSpecificChildFileNames)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/dataset_" + pNumber + ".omex"));
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/file/dataset_" + pNumber + ".omex"))};
 
     EXPECT_TRUE(file->hasChildFiles());
     EXPECT_EQ(file->childFileCount(), pSpecificChildFileNames.size() + 1);
     EXPECT_EQ(file->childFileNames().size(), pSpecificChildFileNames.size() + 1);
     EXPECT_EQ(file->childFiles().size(), pSpecificChildFileNames.size() + 1);
 
-    size_t index = std::numeric_limits<std::size_t>::max();
-    auto simulationFile = file->childFile("simulation.json");
+    size_t index {std::numeric_limits<std::size_t>::max()};
+    auto simulationFile {file->childFile("simulation.json")};
 
     EXPECT_NE(file->childFile(++index), nullptr);
     EXPECT_NE(simulationFile, nullptr);
@@ -52,7 +52,7 @@ void doTestDataset(const std::string &pNumber, const std::vector<std::string> &p
 
 TEST(ChildFileTest, noChildFiles)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE))};
 
     EXPECT_FALSE(file->hasChildFiles());
     EXPECT_EQ(file->childFileCount(), 0);

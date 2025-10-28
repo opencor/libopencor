@@ -22,23 +22,23 @@ limitations under the License.
 
 TEST(RuntimeCellmlTest, validRuntime)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto cellmlFile = libOpenCOR::CellmlFile::create(file);
-    auto cellmlFileRuntime = cellmlFile->runtime();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
+    auto cellmlFileRuntime {cellmlFile->runtime()};
 
     EXPECT_FALSE(cellmlFileRuntime->hasIssues());
 }
 
 TEST(RuntimeCellmlTest, invalidRuntimeBecauseOfAnalysisIssues)
 {
-    static const libOpenCOR::ExpectedIssues expectedIssues = {
+    static const libOpenCOR::ExpectedIssues expectedIssues {{
         {libOpenCOR::Issue::Type::WARNING, "The units in 'x = 1.0' in component 'my_component' are not equivalent. 'x' is in 'volt' (i.e. 'ampere^-1 x kilogram x metre^2 x second^-3') while '1.0' is 'dimensionless'."},
         {libOpenCOR::Issue::Type::ERROR, "Variable 'x' in component 'my_component' is computed more than once."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_analysis_issues.cellml"));
-    auto cellmlFile = libOpenCOR::CellmlFile::create(file);
-    auto cellmlFileRuntime = cellmlFile->runtime();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_analysis_issues.cellml"))};
+    auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
+    auto cellmlFileRuntime {cellmlFile->runtime()};
 
     EXPECT_EQ_ISSUES(cellmlFileRuntime, expectedIssues);
 }

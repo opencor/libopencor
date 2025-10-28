@@ -50,8 +50,8 @@ public:
      * Factory method to create a @ref SedAnalysis object:
      *
      * ```
-     * auto document = libOpenCOR::SedDocument::create();
-     * auto simulation = libOpenCOR::SedAnalysis::create(document);
+     * auto document {libOpenCOR::SedDocument::create()};
+     * auto simulation {libOpenCOR::SedAnalysis::create(document)};
      * ```
      *
      * @param pDocument The @ref SedDocument object to which the @ref SedAnalysis object is to belong.

@@ -27,7 +27,7 @@ SedAnalysis::Impl::Impl(const SedDocumentPtr &pDocument)
 
 void SedAnalysis::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("analysis"));
+    auto *node {xmlNewNode(nullptr, toConstXmlCharPtr("analysis"))};
 
     SedSimulation::Impl::serialise(node);
 

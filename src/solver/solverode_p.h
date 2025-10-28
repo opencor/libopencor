@@ -27,13 +27,13 @@ namespace libOpenCOR {
 class SolverOde::Impl: public Solver::Impl
 {
 public:
-    size_t mSize = 0;
+    size_t mSize {0};
 
-    double *mStates = nullptr;
-    double *mRates = nullptr;
-    double *mConstants = nullptr;
-    double *mComputedConstants = nullptr;
-    double *mAlgebraic = nullptr;
+    double *mStates {nullptr};
+    double *mRates {nullptr};
+    double *mConstants {nullptr};
+    double *mComputedConstants {nullptr};
+    double *mAlgebraic {nullptr};
 
     CellmlFileRuntimePtr mRuntime;
 

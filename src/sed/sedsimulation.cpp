@@ -23,7 +23,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-static constexpr auto ID_PREFIX = "simulation";
+static constexpr auto ID_PREFIX {"simulation"};
 
 SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
     : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
@@ -32,7 +32,7 @@ SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
 
 bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
 {
-    auto modelType = pModel->pimpl()->mFile->pimpl()->mCellmlFile->type();
+    auto modelType {pModel->pimpl()->mFile->pimpl()->mCellmlFile->type()};
 
     if ((modelType == libcellml::AnalyserModel::Type::ODE) && (mOdeSolver == nullptr)) {
         addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an ODE solver but none is provided."));

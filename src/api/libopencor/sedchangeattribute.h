@@ -50,7 +50,7 @@ public:
      * Factory method to create a @ref SedChangeAttribute object:
      *
      * ```
-     * auto simulation = libOpenCOR::SedChangeAttribute::create(component, variable, newValue);
+     * auto simulation {libOpenCOR::SedChangeAttribute::create(component, variable, newValue)};
      * ```
      *
      * @param pComponentName The name of the component, as a @c std::string, where the target is located.

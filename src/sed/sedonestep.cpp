@@ -37,7 +37,7 @@ void SedOneStep::Impl::setStep(double pStep)
 
 void SedOneStep::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("oneStep"));
+    auto *node {xmlNewNode(nullptr, toConstXmlCharPtr("oneStep"))};
 
     SedSimulation::Impl::serialise(node);
 

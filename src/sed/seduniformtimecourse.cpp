@@ -67,7 +67,7 @@ void SedUniformTimeCourse::Impl::setNumberOfSteps(int pNumberOfSteps)
 
 void SedUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("uniformTimeCourse"));
+    auto *node {xmlNewNode(nullptr, toConstXmlCharPtr("uniformTimeCourse"))};
 
     SedSimulation::Impl::serialise(node);
 

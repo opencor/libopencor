@@ -77,12 +77,12 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a diagnostics engine.
 
-    auto diagnosticOptions = llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(std::make_unique<clang::DiagnosticOptions>());
+    auto diagnosticOptions {llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(std::make_unique<clang::DiagnosticOptions>())};
     std::string diagnostics;
     llvm::raw_string_ostream outputStream(diagnostics);
-    auto diagnosticsEngine = llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(std::make_unique<clang::DiagnosticsEngine>(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(std::make_unique<clang::DiagnosticIDs>()),
-                                                                                                                           &*diagnosticOptions,
-                                                                                                                           std::make_unique<clang::TextDiagnosticPrinter>(outputStream, &*diagnosticOptions).release()));
+    auto diagnosticsEngine {llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(std::make_unique<clang::DiagnosticsEngine>(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(std::make_unique<clang::DiagnosticIDs>()),
+                                                                                                                          &*diagnosticOptions,
+                                                                                                                          std::make_unique<clang::TextDiagnosticPrinter>(outputStream, &*diagnosticOptions).release()))};
 
     diagnosticsEngine->setWarningsAsErrors(true);
 
@@ -94,12 +94,12 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Get a compilation object to which we pass some arguments.
 
-    static constexpr auto DUMMY_FILE_NAME = "dummy.c";
-    static const std::vector<const char *> COMPILATION_ARGUMENTS = {"clang", "-fsyntax-only",
-                                                                    "-O3",
-                                                                    "-fno-math-errno",
-                                                                    "-fno-stack-protector",
-                                                                    DUMMY_FILE_NAME};
+    static constexpr auto DUMMY_FILE_NAME {"dummy.c"};
+    static const std::vector<const char *> COMPILATION_ARGUMENTS {{"clang", "-fsyntax-only",
+                                                                   "-O3",
+                                                                   "-fno-math-errno",
+                                                                   "-fno-stack-protector",
+                                                                   DUMMY_FILE_NAME}};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
 
@@ -113,7 +113,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // The compilation object should have one command, so if it doesn't then something went wrong.
 
-    clang::driver::JobList &jobs = compilation->getJobs();
+    clang::driver::JobList &jobs {compilation->getJobs()};
 
 #ifndef CODE_COVERAGE_ENABLED
     if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
@@ -125,10 +125,10 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Retrieve the command and make sure that its name is "clang".
 
-    auto &command = llvm::cast<clang::driver::Command>(*jobs.begin());
+    auto &command {llvm::cast<clang::driver::Command>(*jobs.begin())};
 
 #ifndef CODE_COVERAGE_ENABLED
-    static constexpr auto CLANG = "clang";
+    static constexpr auto CLANG {"clang"};
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
         addError(std::string("The command name must be 'clang' while it is '").append(command.getCreator().getName()).append("'."));
@@ -140,12 +140,12 @@ bool Compiler::Impl::compile(const std::string &pCode)
     // Prevent the Clang driver from asking cc1 to leak memory, this by removing -disable-free from the command
     // arguments.
 
-    auto commandArguments = command.getArguments();
+    auto commandArguments {command.getArguments()};
 
 #ifdef CODE_COVERAGE_ENABLED
     commandArguments.erase(find(commandArguments, llvm::StringRef("-disable-free")));
 #else
-    auto *commandArgument = find(commandArguments, llvm::StringRef("-disable-free"));
+    auto *commandArgument {find(commandArguments, llvm::StringRef("-disable-free"))};
 
     if (commandArgument != commandArguments.end()) {
         commandArguments.erase(commandArgument);
@@ -154,7 +154,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a compiler instance.
 
-    auto compilerInstance = std::make_unique<clang::CompilerInstance>();
+    auto compilerInstance {std::make_unique<clang::CompilerInstance>()};
 
     compilerInstance->setDiagnostics(diagnosticsEngine.get());
     compilerInstance->setVerboseOutputStream(llvm::nulls());
@@ -178,7 +178,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Map our code to a memory buffer.
 
-    auto code = R"(// Arithmetic operators.
+    auto code {R"(// Arithmetic operators.
 
 extern double pow(double, double);
 extern double sqrt(double);
@@ -212,23 +212,23 @@ extern double atanh(double);
 #define INFINITY (__builtin_inf())
 #define NAN (__builtin_nan(""))
 
-)" + pCode;
+)" + pCode};
 
     compilerInstance->getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
                                                                             llvm::MemoryBuffer::getMemBuffer(code).release());
 
     // Compile the given code, resulting in an LLVM bitcode module.
 
-    auto llvmContext = std::make_unique<llvm::LLVMContext>();
-    auto codeGenAction = std::make_unique<clang::EmitLLVMOnlyAction>(llvmContext.get());
+    auto llvmContext {std::make_unique<llvm::LLVMContext>()};
+    auto codeGenAction {std::make_unique<clang::EmitLLVMOnlyAction>(llvmContext.get())};
 
     if (!compilerInstance->ExecuteAction(*codeGenAction)) {
         addError("The given code could not be compiled.");
 
-        static constexpr auto ERROR = ": error: ";
-        static auto ERROR_LENGTH = strlen(ERROR);
-        static constexpr auto NOTE = ": note: ";
-        static auto NOTE_LENGTH = strlen(NOTE);
+        static constexpr auto ERROR {": error: "};
+        static auto ERROR_LENGTH {strlen(ERROR)};
+        static constexpr auto NOTE {": note: "};
+        static auto NOTE_LENGTH {strlen(NOTE)};
 
         std::istringstream input(diagnostics);
         std::string line;
@@ -236,16 +236,16 @@ extern double atanh(double);
         std::getline(input, line);
 
         while (!input.eof()) {
-            std::string error = line.substr(line.find(ERROR) + ERROR_LENGTH) + ":";
+            std::string error {line.substr(line.find(ERROR) + ERROR_LENGTH) + ":"};
 
             error[0] = static_cast<char>(std::toupper(error[0]));
 
             std::getline(input, line);
 
-            bool hasErrorDetails = false;
+            auto hasErrorDetails {false};
 
             while (!input.eof()) {
-                const auto notePos = line.find(NOTE);
+                const auto notePos {line.find(NOTE)};
 
                 if (notePos != std::string::npos) {
                     if (hasErrorDetails) {
@@ -274,7 +274,7 @@ extern double atanh(double);
 
     // Retrieve the LLVM module.
 
-    auto module = codeGenAction->takeModule();
+    auto module {codeGenAction->takeModule()};
 
 #ifndef CODE_COVERAGE_ENABLED
     if (module == nullptr) {
@@ -293,7 +293,7 @@ extern double atanh(double);
     // Look up the target.
 
     std::string error;
-    auto target = llvm::TargetRegistry::lookupTarget(module->getTargetTriple(), error);
+    auto target {llvm::TargetRegistry::lookupTarget(module->getTargetTriple(), error)};
 
     if (target == nullptr) {
         error[0] = static_cast<char>(tolower(error[0]));
@@ -305,10 +305,10 @@ extern double atanh(double);
 
     // Create a target machine.
 
-    auto targetMachine = std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module->getTargetTriple(),
-                                                                                          "generic", "",
-                                                                                          llvm::TargetOptions(),
-                                                                                          llvm::Reloc::Static));
+    auto targetMachine {std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module->getTargetTriple(),
+                                                                                         "generic", "",
+                                                                                         llvm::TargetOptions(),
+                                                                                         llvm::Reloc::Static))};
 
     if (targetMachine == nullptr) {
         addError("A target machine could not be created.");
@@ -344,7 +344,7 @@ extern double atanh(double);
 #else
     // Create an ORC-based JIT and keep track of it.
 
-    auto lljit = llvm::orc::LLJITBuilder().create();
+    auto lljit {llvm::orc::LLJITBuilder().create()};
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!lljit) {
@@ -358,7 +358,7 @@ extern double atanh(double);
 
     // Make sure that we can find various mathematical functions in the standard C library.
 
-    auto dynamicLibrarySearchGenerator = llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess(mLljit->getDataLayout().getGlobalPrefix());
+    auto dynamicLibrarySearchGenerator {llvm::orc::DynamicLibrarySearchGenerator::GetForCurrentProcess(mLljit->getDataLayout().getGlobalPrefix())};
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!dynamicLibrarySearchGenerator) {
@@ -372,7 +372,7 @@ extern double atanh(double);
 
     // Add our LLVM bitcode module to our ORC-based JIT.
 
-    auto threadSafeModule = llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext));
+    auto threadSafeModule {llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext))};
 
 #    ifdef CODE_COVERAGE_ENABLED
     const bool res =
@@ -397,9 +397,9 @@ bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
     // Add the given function to our ORC-based JIT. Note that we assume that we have a valid ORC-based JIT, function
     // name, and function.
 
-    const bool res = !mLljit->getMainJITDylib().define(llvm::orc::absoluteSymbols({
+    const bool res {!mLljit->getMainJITDylib().define(llvm::orc::absoluteSymbols({
         {mLljit->mangleAndIntern(pName), llvm::JITEvaluatedSymbol(llvm::pointerToJITTargetAddress(pFunction), llvm::JITSymbolFlags::Exported)},
-    }));
+    }))};
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!res) {
@@ -415,7 +415,7 @@ void *Compiler::Impl::function(const std::string &pName) const
     // Return the address of the requested function. Note that we assume that we have a valid ORC-based JIT and function
     // name.
 
-    auto symbol = mLljit->lookup(pName);
+    auto symbol {mLljit->lookup(pName)};
 
     if (symbol) {
         return reinterpret_cast<void *>(symbol->getValue()); // NOLINT

@@ -27,9 +27,9 @@ class SolverOdeFixedStep::Impl: public SolverOde::Impl
 public:
     using SolverOde::Impl::duplicate;
 
-    static constexpr auto DEFAULT_STEP = 1.0;
+    static constexpr auto DEFAULT_STEP {1.0};
 
-    double mStep = DEFAULT_STEP;
+    double mStep {DEFAULT_STEP};
 
     explicit Impl(const std::string &pId, const std::string &pName);
 
