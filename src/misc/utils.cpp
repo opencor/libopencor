@@ -50,9 +50,13 @@ limitations under the License.
 namespace libOpenCOR {
 
 #ifndef CODE_COVERAGE_ENABLED
-void printIssues(const LoggerPtr &pLogger)
+void printIssues(const LoggerPtr &pLogger, const std::string &pHeader)
 {
-    std::cout << "---[ISSUES]---[BEGIN]\n";
+    std::cout << "---[ISSUES]---[BEGIN]";
+
+    if (!pHeader.empty()) {
+        std::cout << "---[" << pHeader << "]\n";
+    }
 
     for (auto &issue : pLogger->issues()) {
         std::cout << ((issue->type() == Issue::Type::ERROR) ? "ERROR" : "WARNING") << ": " << issue->description() << "\n";

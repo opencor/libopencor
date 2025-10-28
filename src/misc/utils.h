@@ -71,7 +71,7 @@ using StringStringMap = std::map<std::string, std::string>;
 #endif
 
 #ifndef CODE_COVERAGE_ENABLED
-void LIBOPENCOR_UNIT_TESTING_EXPORT printIssues(const LoggerPtr &pLogger);
+void LIBOPENCOR_UNIT_TESTING_EXPORT printIssues(const LoggerPtr &pLogger, const std::string &pHeader = "");
 void LIBOPENCOR_UNIT_TESTING_EXPORT printHexDump(const UnsignedChars &pBytes);
 void LIBOPENCOR_UNIT_TESTING_EXPORT printArray(const std::string &pName, const Doubles &pDoubles);
 #endif
