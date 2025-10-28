@@ -59,6 +59,8 @@ void printIssues(const LoggerPtr &pLogger)
     }
 
     std::cout << "---[ISSUES]---[END]\n";
+
+    std::cout.flush();
 }
 
 void printHexDump(const UnsignedChars &pBytes)
@@ -119,6 +121,8 @@ void printHexDump(const UnsignedChars &pBytes)
     std::cout << std::dec;
 
     std::cout << "---[BYTES]---[END]\n";
+
+    std::cout.flush();
 }
 
 void printArray(const std::string &pName, const Doubles &pDoubles)
@@ -135,6 +139,8 @@ void printArray(const std::string &pName, const Doubles &pDoubles)
     }
 
     std::cout << "---[ARRAY]---[" << pName << "]---[END]\n";
+
+    std::cout.flush();
 }
 #endif
 
