@@ -69,15 +69,15 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
     //   Y_n+1 = Y_n + h / 6 * (k1 + 2 * k2 + 2 * k3 + k4)
     // Note that k4 doesn't need to be tracked since it is used only once.
 
-    static const auto TWO = 2.0;
-    static const auto HALF = 0.5;
-    static const auto ONE_SIXTH = 1.0 / 6.0;
+    static const auto TWO {2.0};
+    static const auto HALF {0.5};
+    static const auto ONE_SIXTH {1.0 / 6.0};
 
-    const auto voiStart = pVoi;
-    size_t voiCounter = 0;
-    auto realStep = mStep;
-    auto realHalfStep = HALF * realStep;
-    auto realOneSixthStep = ONE_SIXTH * realStep;
+    const auto voiStart {pVoi};
+    size_t voiCounter {0};
+    auto realStep {mStep};
+    auto realHalfStep {HALF * realStep};
+    auto realOneSixthStep {ONE_SIXTH * realStep};
 
     while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
@@ -94,7 +94,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute k1 and Y_n + h / 2 * k1.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mK1[i] = mRates[i]; // NOLINT
             mYk[i] = mStates[i] + realHalfStep * mK1[i]; // NOLINT
         }
@@ -105,7 +105,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute k2 and Y_n + h / 2 * k2.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mK2[i] = mRates[i]; // NOLINT
             mYk[i] = mStates[i] + realHalfStep * mK2[i]; // NOLINT
         }
@@ -116,7 +116,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute k3 and Y_n + h * k3.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mK3[i] = mRates[i]; // NOLINT
             mYk[i] = mStates[i] + realStep * mK3[i]; // NOLINT
         }
@@ -127,7 +127,7 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute Y_n+1.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mStates[i] += realOneSixthStep * (mK1[i] + TWO * mK2[i] + TWO * mK3[i] + mRates[i]); // NOLINT
         }
 

@@ -50,12 +50,12 @@ public:
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
 
-    double mVoi = 0.0;
-    double *mStates = nullptr;
-    double *mRates = nullptr;
-    double *mConstants = nullptr;
-    double *mComputedConstants = nullptr;
-    double *mAlgebraic = nullptr;
+    double mVoi {0.0};
+    double *mStates {nullptr};
+    double *mRates {nullptr};
+    double *mConstants {nullptr};
+    double *mComputedConstants {nullptr};
+    double *mAlgebraic {nullptr};
 
     Doubles mStateDoubles;
     Doubles mRateDoubles;

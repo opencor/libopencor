@@ -25,10 +25,10 @@ namespace libOpenCOR {
 class SedUniformTimeCourse::Impl: public SedSimulation::Impl
 {
 public:
-    double mInitialTime = 0.0;
-    double mOutputStartTime = 0.0;
-    double mOutputEndTime = 1000.0;
-    int mNumberOfSteps = 1000;
+    double mInitialTime {0.0};
+    double mOutputStartTime {0.0};
+    double mOutputEndTime {1000.0};
+    int mNumberOfSteps {1000};
 
     explicit Impl(const SedDocumentPtr &pDocument);
 

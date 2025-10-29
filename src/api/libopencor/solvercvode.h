@@ -99,7 +99,7 @@ public:
      * Factory method to create a @ref SolverCvode object:
      *
      * ```
-     * auto solver = libOpenCOR::SolverCvode::create();
+     * auto solver {libOpenCOR::SolverCvode::create()};
      * ```
      *
      * @return A smart pointer to a @ref SolverCvode object.

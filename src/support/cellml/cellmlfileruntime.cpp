@@ -131,7 +131,7 @@ intptr_t instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferent
 
                 for (let name in wasmInstance.exports) {
                     if (name.startsWith("objectiveFunction")) {
-                        const objectiveFunctionIndex = parseInt(name.replace("objectiveFunction", ""));
+                        const objectiveFunctionIndex = parseInt(name.replace("objectiveFunction", ""), 10);
 
                         wasmInstanceFunctions.objectiveFunctions[objectiveFunctionIndex] = wasmInstance.exports[name];
                     }
@@ -166,7 +166,7 @@ intptr_t instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferent
 
 CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
-    auto cellmlFileAnalyser = pCellmlFile->analyser();
+    auto cellmlFileAnalyser {pCellmlFile->analyser()};
 
     if (cellmlFileAnalyser->errorCount() != 0) {
         addIssues(cellmlFileAnalyser);
@@ -179,14 +179,14 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         // Determine the type of the model.
 
-        auto cellmlFileType = pCellmlFile->type();
-        auto differentialModel = (cellmlFileType == libcellml::AnalyserModel::Type::ODE)
-                                 || (cellmlFileType == libcellml::AnalyserModel::Type::DAE);
+        auto cellmlFileType {pCellmlFile->type()};
+        auto differentialModel {(cellmlFileType == libcellml::AnalyserModel::Type::ODE)
+                                || (cellmlFileType == libcellml::AnalyserModel::Type::DAE)};
 
         // Generate some code for the given CellML file.
 
-        auto generator = libcellml::Generator::create();
-        auto generatorProfile = libcellml::GeneratorProfile::create();
+        auto generator {libcellml::Generator::create()};
+        auto generatorProfile {libcellml::GeneratorProfile::create()};
 
         generatorProfile->setOriginCommentString("");
         generatorProfile->setImplementationHeaderString("");
@@ -210,7 +210,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         generatorProfile->setImplementationCreateExternalsArrayMethodString("");
         generatorProfile->setImplementationDeleteArrayMethodString("");
 
-        static constexpr auto WITH_EXTERNAL_VARIABLES = false;
+        static constexpr auto WITH_EXTERNAL_VARIABLES {false};
 
 #ifdef __EMSCRIPTEN__
         // Allocate the memory needed by our objective functions on the heap rather than on the stack.
@@ -311,17 +311,17 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 #ifdef __EMSCRIPTEN__
         // Export our various objective functions.
 
-        auto implementationCode = generator->implementationCode(pCellmlFile->analyserModel());
+        auto implementationCode {generator->implementationCode(pCellmlFile->analyserModel())};
 
         if (pNlaSolver != nullptr) {
             std::vector<size_t> handledNlaSystemIndices;
 
             for (const auto &equation : pCellmlFile->analyserModel()->equations()) {
                 if (equation->type() == libcellml::AnalyserEquation::Type::NLA) {
-                    auto nlaSystemIndex = equation->nlaSystemIndex();
+                    auto nlaSystemIndex {equation->nlaSystemIndex()};
 
                     if (std::find(handledNlaSystemIndices.begin(), handledNlaSystemIndices.end(), nlaSystemIndex) == handledNlaSystemIndices.end()) {
-                        auto objectiveFunctionName = std::string("objectiveFunction").append(std::to_string(nlaSystemIndex));
+                        auto objectiveFunctionName {std::string("objectiveFunction").append(std::to_string(nlaSystemIndex))};
 
                         implementationCode.insert(implementationCode.find("void " + objectiveFunctionName),
                                                   exportJavaScriptName(objectiveFunctionName));
@@ -348,15 +348,15 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
         // Instantiate the WebAssembly module.
 
-        auto wasmInstanceFunctionsId = instantiateWebAssemblyModule(mWasmModule, differentialModel,
-                                                                    cellmlFileType == libcellml::AnalyserModel::Type::ODE,
-                                                                    cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC,
-                                                                    pNlaSolver != nullptr);
+        auto wasmInstanceFunctionsId {instantiateWebAssemblyModule(mWasmModule, differentialModel,
+                                                                   cellmlFileType == libcellml::AnalyserModel::Type::ODE,
+                                                                   cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC,
+                                                                   pNlaSolver != nullptr)};
 
         if (wasmInstanceFunctionsId < 0) {
             // An error occurred and the error message pointer is the negative of the returned value.
 
-            auto errorMessagePtr = reinterpret_cast<char *>(-wasmInstanceFunctionsId);
+            auto errorMessagePtr {reinterpret_cast<char *>(-wasmInstanceFunctionsId)};
             std::string jsErrorMessage(errorMessagePtr);
 
             free(errorMessagePtr);

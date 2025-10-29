@@ -31,15 +31,15 @@ namespace libOpenCOR {
 class File::Impl: public Logger::Impl
 {
 public:
-    Type mType = Type::UNKNOWN_FILE;
+    Type mType {Type::UNKNOWN_FILE};
 
     std::filesystem::path mFilePath;
     std::string mUrl;
 
-    bool mTypeChecked = false;
+    bool mTypeChecked {false};
 
-    bool mRetrieveContents = true;
-    bool mContentsRetrieved = false;
+    bool mRetrieveContents {true};
+    bool mContentsRetrieved {false};
     UnsignedChars mContents;
 
     CellmlFilePtr mCellmlFile;

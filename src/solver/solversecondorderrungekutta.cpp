@@ -61,12 +61,12 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
     //   Y_n+1 = Y_n + h * k2
     // Note that k1 and k2 don't need to be tracked since they are used only once.
 
-    static const auto HALF = 0.5;
+    static const auto HALF {0.5};
 
-    const auto voiStart = pVoi;
-    size_t voiCounter = 0;
-    auto realStep = mStep;
-    auto realHalfStep = HALF * realStep;
+    const auto voiStart {pVoi};
+    size_t voiCounter {0};
+    auto realStep {mStep};
+    auto realHalfStep {HALF * realStep};
 
     while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
@@ -82,7 +82,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute Y_n + h / 2 * k1.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mYk[i] = mStates[i] + realHalfStep * mRates[i]; // NOLINT
         }
 
@@ -92,7 +92,7 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute Y_n+1.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mStates[i] += realStep * mRates[i]; // NOLINT
         }
 

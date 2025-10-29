@@ -79,8 +79,8 @@ public:
      * Factory method to create a @ref File object:
      *
      * ```
-     * auto localFile = libOpenCOR::File::create("/some/path/file.txt");
-     * auto remoteFile = libOpenCOR::File::create("https://some.domain.com/file.txt");
+     * auto localFile {libOpenCOR::File::create("/some/path/file.txt")};
+     * auto remoteFile {libOpenCOR::File::create("https://some.domain.com/file.txt")};
      * ```
      *
      * Note: if there is already a @ref File object for the given file name or URL then we return it after having reset

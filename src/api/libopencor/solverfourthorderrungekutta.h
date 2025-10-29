@@ -47,7 +47,7 @@ public:
      * Factory method to create a @ref SolverFourthOrderRungeKutta object:
      *
      * ```
-     * auto solver = libOpenCOR::SolverFourthOrderRungeKutta::create();
+     * auto solver {libOpenCOR::SolverFourthOrderRungeKutta::create()};
      * ```
      *
      * @return A smart pointer to a @ref SolverFourthOrderRungeKutta object.

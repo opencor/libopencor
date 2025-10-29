@@ -47,7 +47,7 @@ public:
      * Factory method to create a @ref SolverSecondOrderRungeKutta object:
      *
      * ```
-     * auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();
+     * auto solver {libOpenCOR::SolverSecondOrderRungeKutta::create()};
      * ```
      *
      * @return A smart pointer to a @ref SolverSecondOrderRungeKutta object.

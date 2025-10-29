@@ -47,7 +47,7 @@ public:
      * Factory method to create a @ref SolverForwardEuler object:
      *
      * ```
-     * auto solver = libOpenCOR::SolverForwardEuler::create();
+     * auto solver {libOpenCOR::SolverForwardEuler::create()};
      * ```
      *
      * @return A smart pointer to a @ref SolverForwardEuler object.

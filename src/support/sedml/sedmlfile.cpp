@@ -73,18 +73,18 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
     removeAllIssues();
 
-    auto fileManager = FileManager::instance();
+    auto fileManager {FileManager::instance()};
 
-    for (unsigned int i = 0; i < mDocument->getNumModels(); ++i) {
-        auto source = mDocument->getModel(i)->getSource();
-        auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(source);
-        auto modelSource = (isLocalFile && stringToPath(fileNameOrUrl).is_relative()) ?
-                               mLocation + fileNameOrUrl :
-                               fileNameOrUrl;
+    for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
+        auto source {mDocument->getModel(i)->getSource()};
+        auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source)};
+        auto modelSource {(isLocalFile && stringToPath(fileNameOrUrl).is_relative()) ?
+                              mLocation + fileNameOrUrl :
+                              fileNameOrUrl};
 #ifdef __EMSCRIPTEN__
-        auto file = fileManager.fileFromFileNameOrUrl(modelSource);
+        auto file {fileManager.fileFromFileNameOrUrl(modelSource)};
 #else
-        auto file = fileManager.file(modelSource);
+        auto file {fileManager.file(modelSource)};
 #endif
         SedModelPtr model;
 
@@ -98,31 +98,31 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
         model->setId(mDocument->getModel(i)->getId());
 
-        for (unsigned int j = 0; j < mDocument->getModel(i)->getNumChanges(); ++j) {
-            auto *change = mDocument->getModel(i)->getChange(j);
+        for (unsigned int j {0}; j < mDocument->getModel(i)->getNumChanges(); ++j) {
+            auto *change {mDocument->getModel(i)->getChange(j)};
 
             if (change->isSedChangeAttribute()) {
-                static const std::string TARGET_START = "/cellml:model/cellml:component[@name='";
-                static const std::string TARGET_MIDDLE = "']/cellml:variable[@name='";
-                static const std::string TARGET_END = "']";
+                static const std::string TARGET_START {"/cellml:model/cellml:component[@name='"};
+                static const std::string TARGET_MIDDLE {"']/cellml:variable[@name='"};
+                static const std::string TARGET_END {"']"};
 
-                auto *changeAttribute = reinterpret_cast<libsedml::SedChangeAttribute *>(change);
-                auto target = changeAttribute->getTarget();
+                auto *changeAttribute {reinterpret_cast<libsedml::SedChangeAttribute *>(change)};
+                auto target {changeAttribute->getTarget()};
                 std::string componentName;
                 std::string variableName;
-                auto newValue = changeAttribute->getNewValue();
+                auto newValue {changeAttribute->getNewValue()};
 
                 if (target.starts_with(TARGET_START)) {
                     target.erase(0, TARGET_START.length());
 
-                    auto targetMiddlePos = target.find(TARGET_MIDDLE);
+                    auto targetMiddlePos {target.find(TARGET_MIDDLE)};
 
                     if (targetMiddlePos != std::string::npos) {
                         componentName = target.substr(0, targetMiddlePos);
 
                         target.erase(0, targetMiddlePos + TARGET_MIDDLE.length());
 
-                        auto targetEndPos = target.find(TARGET_END);
+                        auto targetEndPos {target.find(TARGET_END)};
 
                         if (targetEndPos != std::string::npos) {
                             variableName = target.substr(0, targetEndPos);
@@ -137,7 +137,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
                     }
                 }
 
-                auto canAddChange = true;
+                auto canAddChange {true};
 
                 if (componentName.empty() || variableName.empty()) {
                     canAddChange = false;
@@ -165,13 +165,13 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
     // Populate the simulations.
 
-    for (unsigned int i = 0; i < mDocument->getNumSimulations(); ++i) {
-        auto *sedSimulation = mDocument->getSimulation(i);
+    for (unsigned int i {0}; i < mDocument->getNumSimulations(); ++i) {
+        auto *sedSimulation {mDocument->getSimulation(i)};
         SedSimulationPtr simulation;
 
         if (sedSimulation->isSedUniformTimeCourse()) {
-            auto *sedUniformTimeCourse = reinterpret_cast<libsedml::SedUniformTimeCourse *>(sedSimulation);
-            auto uniformTimeCourse = SedUniformTimeCourse::create(pDocument);
+            auto *sedUniformTimeCourse {reinterpret_cast<libsedml::SedUniformTimeCourse *>(sedSimulation)};
+            auto uniformTimeCourse {SedUniformTimeCourse::create(pDocument)};
 
             uniformTimeCourse->setInitialTime(sedUniformTimeCourse->getInitialTime());
             uniformTimeCourse->setOutputStartTime(sedUniformTimeCourse->getOutputStartTime());
@@ -180,8 +180,8 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
             simulation = uniformTimeCourse;
         } else if (sedSimulation->isSedOneStep()) {
-            auto *sedOneStep = reinterpret_cast<libsedml::SedOneStep *>(sedSimulation);
-            auto oneStep = SedOneStep::create(pDocument);
+            auto *sedOneStep {reinterpret_cast<libsedml::SedOneStep *>(sedSimulation)};
+            auto oneStep {SedOneStep::create(pDocument)};
 
             oneStep->setStep(sedOneStep->getStep());
 
@@ -198,10 +198,10 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
         // Populate the simulation's algorithm.
 
-        auto *sedAlgorithm = sedSimulation->getAlgorithm();
-        auto kisaoId = sedAlgorithm->getKisaoID();
-        SolverOdePtr odeSolver = nullptr;
-        SolverNlaPtr nlaSolver = nullptr;
+        auto *sedAlgorithm {sedSimulation->getAlgorithm()};
+        auto kisaoId {sedAlgorithm->getKisaoID()};
+        SolverOdePtr odeSolver {nullptr};
+        SolverNlaPtr nlaSolver {nullptr};
 
         if (kisaoId == "KISAO:0000019") {
             odeSolver = SolverCvode::create();
@@ -289,7 +289,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 
     // Try to retrieve a SED-ML document.
 
-    auto *document = libsedml::readSedMLFromString(toString(pFile->contents()).c_str());
+    auto *document {libsedml::readSedMLFromString(toString(pFile->contents()).c_str())};
 
     // A non-SED-ML file results in our SED-ML document having at least one error. That error may be the result of a
     // malformed XML file (e.g., an HTML file is an XML-like file but not actually an XML file or a COMBINE archive

@@ -24,10 +24,10 @@ limitations under the License.
 
 TEST(VersionTest, libOpenCOR)
 {
-    static const uint64_t TEN_BILLION = 10000000000;
-    static const uint64_t TEN_THOUSAND = 10000;
-    static const uint64_t HUNDRED = 100;
-    static const uint64_t TEN = 10;
+    static const uint64_t TEN_BILLION {10000000000};
+    static const uint64_t TEN_THOUSAND {10000};
+    static const uint64_t HUNDRED {100};
+    static const uint64_t TEN {10};
 
     std::ifstream versionFile("../../VERSION.txt");
     std::string versionString;
@@ -40,17 +40,17 @@ TEST(VersionTest, libOpenCOR)
 
     ASSERT_TRUE(std::regex_match(versionString, match, versionRegex));
 
-    const uint64_t majorVersion = static_cast<uint64_t>(std::stoi(match[1]));
-    const uint64_t year = static_cast<uint64_t>(std::stoi(match[2].str().substr(0, 4)));
-    const uint64_t month = static_cast<uint64_t>(std::stoi(match[2].str().substr(4, 2)));
-    const uint64_t day = static_cast<uint64_t>(std::stoi(match[2].str().substr(6, 2)));
-    const uint64_t patchVersion = static_cast<uint64_t>(std::stoi(match[3]));
-    uint64_t version = 0;
-    auto number = TEN_BILLION * majorVersion
-                  + HUNDRED * (TEN_THOUSAND * year + HUNDRED * month + day)
-                  + patchVersion;
+    const auto majorVersion {static_cast<uint64_t>(std::stoi(match[1]))};
+    const auto year {static_cast<uint64_t>(std::stoi(match[2].str().substr(0, 4)))};
+    const auto month {static_cast<uint64_t>(std::stoi(match[2].str().substr(4, 2)))};
+    const auto day {static_cast<uint64_t>(std::stoi(match[2].str().substr(6, 2)))};
+    const auto patchVersion {static_cast<uint64_t>(std::stoi(match[3]))};
+    uint64_t version {0};
+    auto number {TEN_BILLION * majorVersion
+                 + HUNDRED * (TEN_THOUSAND * year + HUNDRED * month + day)
+                 + patchVersion};
 
-    for (int i = 0; number != 0; i += 4) {
+    for (int i {0}; number != 0; i += 4) {
         version |= (number % TEN) << i; // NOLINT
         number /= TEN;
     }

@@ -22,16 +22,16 @@ limitations under the License.
 
 TEST(CoverageSolverTest, odeChanges)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::WARNING, "The variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed."},
         {libOpenCOR::Issue::Type::WARNING, "The variable 'membrane' in component 'X'could not be found and therefore could not be changed."},
         {libOpenCOR::Issue::Type::WARNING, "The computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."},
         {libOpenCOR::Issue::Type::WARNING, "The algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."},
-    };
+    }};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode_sed_changes.omex"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode_sed_changes.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     instance->run();
 
@@ -61,15 +61,15 @@ TEST(CoverageSolverTest, algebraicChanges)
     //  • y = -356/27 = -13.185185185185185
     //  • z = -760/27 = -28.148148148148145
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/algebraic_sed_changes.omex"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto instance = document->instantiate();
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/algebraic_sed_changes.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
 
     instance->run();
 
-    static const auto ABS_TOL = 1e-05;
+    static const auto ABS_TOL {1e-05};
 
-    auto instanceTask = instance->tasks()[0];
+    auto instanceTask {instance->tasks()[0]};
 
     EXPECT_EQ(instanceTask->stateCount(), 0);
     EXPECT_EQ(instanceTask->rateCount(), 0);

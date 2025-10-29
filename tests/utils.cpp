@@ -28,11 +28,11 @@ namespace libOpenCOR {
 
 void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues)
 {
-    auto issues = pLogger->issues();
+    auto issues {pLogger->issues()};
 
     EXPECT_EQ(issues.size(), pExpectedIssues.size());
 
-    for (size_t i = 0; i < issues.size(); ++i) {
+    for (size_t i {0}; i < issues.size(); ++i) {
         EXPECT_EQ(issues[i]->type(), pExpectedIssues[i].type);
         EXPECT_EQ(issues[i]->description(), pExpectedIssues[i].description);
 
@@ -66,23 +66,23 @@ void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex,
                        const Doubles &pComputedConstantValues, const Doubles &pComputedConstantAbsTols,
                        const Doubles &pAlgebraicValues, const Doubles &pAlgebraicAbsTols)
 {
-    for (size_t i = 0; i < pInstanceTask->stateCount(); ++i) {
+    for (size_t i {0}; i < pInstanceTask->stateCount(); ++i) {
         expectEqualValue(pInstanceTask->state(i)[pIndex], pStateValues[i], pStateAbsTols[i]);
     }
 
-    for (size_t i = 0; i < pInstanceTask->rateCount(); ++i) {
+    for (size_t i {0}; i < pInstanceTask->rateCount(); ++i) {
         expectEqualValue(pInstanceTask->rate(i)[pIndex], pRateValues[i], pRateAbsTols[i]);
     }
 
-    for (size_t i = 0; i < pInstanceTask->constantCount(); ++i) {
+    for (size_t i {0}; i < pInstanceTask->constantCount(); ++i) {
         expectEqualValue(pInstanceTask->constant(i)[pIndex], pConstantValues[i], pConstantAbsTols[i]);
     }
 
-    for (size_t i = 0; i < pInstanceTask->computedConstantCount(); ++i) {
+    for (size_t i {0}; i < pInstanceTask->computedConstantCount(); ++i) {
         expectEqualValue(pInstanceTask->computedConstant(i)[pIndex], pComputedConstantValues[i], pComputedConstantAbsTols[i]);
     }
 
-    for (size_t i = 0; i < pInstanceTask->algebraicCount(); ++i) {
+    for (size_t i {0}; i < pInstanceTask->algebraicCount(); ++i) {
         expectEqualValue(pInstanceTask->algebraic(i)[pIndex], pAlgebraicValues[i], pAlgebraicAbsTols[i]);
     }
 }
@@ -94,9 +94,9 @@ std::string resourcePath(const std::string &pResourceRelativePath)
 
 std::string textFileContents(const std::string &pFileName)
 {
-    static const auto CRLF_REGEX = std::regex("\\r\\n");
+    static const auto CRLF_REGEX {std::regex("\\r\\n")};
 
-    auto res = toString(fileContents(pFileName));
+    auto res {toString(fileContents(pFileName))};
 
     // To retrieve a file contents as bytes will, on Windows, result in LF characters being converted to CR+LF, so
     // convert them back since we expect LF.
@@ -111,8 +111,8 @@ UnsignedChars charArrayToUnsignedChars(const char *pContents)
 
 UnsignedChars base64Decode(const char *pContents)
 {
-    char *buffer = new char[modp_b64_decode_len(strlen(pContents))];
-    const size_t length = modp_b64_decode(buffer, pContents, strlen(pContents));
+    char *buffer {new char[modp_b64_decode_len(strlen(pContents))]};
+    const size_t length {modp_b64_decode(buffer, pContents, strlen(pContents))};
     UnsignedChars res(buffer, buffer + length); // NOLINT
 
     delete[] buffer;

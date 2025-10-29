@@ -73,25 +73,36 @@ void errorHandler(int pLine, const char *pFunction, const char *pFile, const cha
 #endif
 
 #ifdef __EMSCRIPTEN__
-static constexpr auto MAX_SIZE_T = std::numeric_limits<size_t>::max();
-static constexpr auto MAX_INTPTR_T = std::numeric_limits<intptr_t>::max();
+static constexpr auto MAX_SIZE_T {std::numeric_limits<size_t>::max()};
+static constexpr auto MAX_INTPTR_T {std::numeric_limits<intptr_t>::max()};
 #endif
 
 struct SolverKinsolUserData
 {
 #ifdef __EMSCRIPTEN__
-    intptr_t wasmInstanceFunctionsId = MAX_INTPTR_T;
-    size_t computeObjectiveFunctionIndex = MAX_SIZE_T;
+    intptr_t wasmInstanceFunctionsId {MAX_INTPTR_T};
+    size_t computeObjectiveFunctionIndex {MAX_SIZE_T};
 #else
-    SolverNla::ComputeObjectiveFunction computeObjectiveFunction = nullptr;
+    SolverNla::ComputeObjectiveFunction computeObjectiveFunction {nullptr};
 #endif
 
-    void *userData = nullptr;
+    void *userData {nullptr};
+    bool infOrNanFound {false};
 };
 
 int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
 {
-    auto *userData = static_cast<SolverKinsolUserData *>(pUserData);
+    // Make sure that our input vector doesn't contain any Inf or NaN values.
+
+    auto *userData {static_cast<SolverKinsolUserData *>(pUserData)};
+
+    for (sunindextype i = 0; i < NV_LENGTH_S(pU); ++i) {
+        if (isInfOrNan(NV_Ith_S(pU, i))) {
+            userData->infOrNanFound = true;
+
+            return -1;
+        }
+    }
 
 #ifdef __EMSCRIPTEN__
     // clang-format off
@@ -116,10 +127,10 @@ SolverKinsol::Impl::Impl()
 
 void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
-    for (unsigned int i = 0; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
-        auto *algorithmParameter = pAlgorithm->getAlgorithmParameter(i);
-        auto kisaoId = algorithmParameter->getKisaoID();
-        auto value = algorithmParameter->getValue();
+    for (unsigned int i {0}; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
+        auto *algorithmParameter {pAlgorithm->getAlgorithmParameter(i)};
+        auto kisaoId {algorithmParameter->getKisaoID()};
+        auto value {algorithmParameter->getValue()};
 
         if (kisaoId == "KISAO:0000486") {
             mMaximumNumberOfIterations = toInt(value);
@@ -169,8 +180,8 @@ void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 
 SolverPtr SolverKinsol::Impl::duplicate()
 {
-    auto solver = SolverKinsol::create();
-    auto *solverPimpl = solver->pimpl();
+    auto solver {SolverKinsol::create()};
+    auto *solverPimpl {solver->pimpl()};
 
     solverPimpl->mMaximumNumberOfIterations = mMaximumNumberOfIterations;
     solverPimpl->mLinearSolver = mLinearSolver;
@@ -273,13 +284,13 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     // Create our SUNDIALS context.
 
-    SUNContext context = nullptr;
+    SUNContext context {nullptr};
 
     ASSERT_EQ(SUNContext_Create(SUN_COMM_NULL, &context), 0);
 
     // Create our KINSOL solver.
 
-    auto *solver = KINCreate(context);
+    auto *solver {KINCreate(context)};
 
     ASSERT_NE(solver, nullptr);
 
@@ -292,8 +303,8 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     // Initialise our KINSOL solver.
 
-    auto *u = N_VMake_Serial(static_cast<int64_t>(pN), pU, context);
-    auto *ones = N_VNew_Serial(static_cast<int64_t>(pN), context);
+    auto *u {N_VMake_Serial(static_cast<int64_t>(pN), pU, context)};
+    auto *ones {N_VNew_Serial(static_cast<int64_t>(pN), context)};
 
     ASSERT_NE(u, nullptr);
     ASSERT_NE(ones, nullptr);
@@ -304,8 +315,8 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     // Set our linear solver.
 
-    SUNMatrix sunMatrix = nullptr;
-    SUNLinearSolver sunLinearSolver = nullptr;
+    SUNMatrix sunMatrix {nullptr};
+    SUNLinearSolver sunLinearSolver {nullptr};
 
     if (mLinearSolver == LinearSolver::DENSE) {
         sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), context);
@@ -357,10 +368,7 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     // Solve the model.
 
-#ifndef CODE_COVERAGE_ENABLED
-    auto res =
-#endif
-        KINSol(solver, u, KIN_LINESEARCH, ones, ones);
+    auto res = KINSol(solver, u, KIN_LINESEARCH, ones, ones);
 
     // Release some memory.
 
@@ -377,13 +385,19 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     // Check whether everything went fine.
 
-#ifndef CODE_COVERAGE_ENABLED
     if (res < KIN_SUCCESS) {
-        addError(mErrorMessage);
+#ifndef CODE_COVERAGE_ENABLED
+        if (userData.infOrNanFound) {
+#endif
+            addError("The input vector contains some Inf and/or NaN values.");
+#ifndef CODE_COVERAGE_ENABLED
+        } else {
+            addError(mErrorMessage);
+        }
+#endif
 
         return false;
     }
-#endif
 
     return true;
 }

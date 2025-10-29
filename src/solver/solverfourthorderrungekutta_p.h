@@ -25,10 +25,10 @@ namespace libOpenCOR {
 class SolverFourthOrderRungeKutta::Impl: public SolverOdeFixedStep::Impl
 {
 public:
-    double *mK1 = nullptr;
-    double *mK2 = nullptr;
-    double *mK3 = nullptr;
-    double *mYk = nullptr;
+    double *mK1 {nullptr};
+    double *mK2 {nullptr};
+    double *mK3 {nullptr};
+    double *mYk {nullptr};
 
     Doubles mK1Doubles;
     Doubles mK2Doubles;

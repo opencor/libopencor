@@ -25,7 +25,7 @@ namespace libOpenCOR {
 class SedOneStep::Impl: public SedSimulation::Impl
 {
 public:
-    double mStep = 1.0;
+    double mStep {1.0};
 
     explicit Impl(const SedDocumentPtr &pDocument);
 

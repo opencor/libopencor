@@ -27,7 +27,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 {
     // Check whether we are dealing with a local file or a URL.
 
-    auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(decodeUrl(pFileNameOrUrl));
+    auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(decodeUrl(pFileNameOrUrl))};
 
     if (isLocalFile) {
         mFilePath = stringToPath(fileNameOrUrl);
@@ -40,7 +40,7 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 
     if (mFilePath.empty()) {
         if (pRetrieveContents) {
-            auto [res, filePath] = downloadFile(mUrl);
+            auto [res, filePath] {downloadFile(mUrl)};
 
             if (res) {
                 mFilePath = filePath;
@@ -258,11 +258,11 @@ FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage,
     // and return a new file object.
 
-    auto fileManager = FileManager::instance();
+    auto fileManager {FileManager::instance()};
 #ifdef __EMSCRIPTEN__
-    auto file = fileManager.fileFromFileNameOrUrl(pFileNameOrUrl);
+    auto file {fileManager.fileFromFileNameOrUrl(pFileNameOrUrl)};
 #else
-    auto file = fileManager.file(pFileNameOrUrl);
+    auto file {fileManager.file(pFileNameOrUrl)};
 #endif
 
     if (file != nullptr) {
@@ -270,9 +270,9 @@ FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     }
 
 #ifdef __EMSCRIPTEN__
-    auto res = FilePtr {new File {pFileNameOrUrl, false}};
+    auto res {FilePtr {new File {pFileNameOrUrl, false}}};
 #else
-    auto res = FilePtr {new File {pFileNameOrUrl, pRetrieveContents}};
+    auto res {FilePtr {new File {pFileNameOrUrl, pRetrieveContents}}};
 #endif
 
     res->pimpl()->checkType(res);

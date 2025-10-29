@@ -61,12 +61,12 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
     //   k = f(t_n, Y_n)
     //   Y_n+1 = Y_n + h / 2 * ( f(t_n, Y_n) + f(t_n + h, Y_n + h * k) )
 
-    static const auto HALF = 0.5;
+    static const auto HALF {0.5};
 
-    const auto voiStart = pVoi;
-    size_t voiCounter = 0;
-    auto realStep = mStep;
-    auto realHalfStep = HALF * realStep;
+    const auto voiStart {pVoi};
+    size_t voiCounter {0};
+    auto realStep {mStep};
+    auto realHalfStep {HALF * realStep};
 
     while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
@@ -82,7 +82,7 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute k and Y_n + h * k.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mK[i] = mRates[i]; // NOLINT
             mYk[i] = mStates[i] + realStep * mK[i]; // NOLINT
         }
@@ -93,7 +93,7 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute Y_n+1.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mStates[i] += realHalfStep * (mK[i] + mRates[i]); // NOLINT
         }
 

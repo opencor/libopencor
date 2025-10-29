@@ -47,7 +47,7 @@ public:
      * Factory method to create a @ref SolverHeun object:
      *
      * ```
-     * auto solver = libOpenCOR::SolverHeun::create();
+     * auto solver {libOpenCOR::SolverHeun::create()};
      * ```
      *
      * @return A smart pointer to a @ref SolverHeun object.

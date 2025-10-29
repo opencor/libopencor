@@ -20,19 +20,19 @@ limitations under the License.
 
 TEST(BasicSolverTest, SolverCvode)
 {
-    static const auto MAXIMUM_STEP = 1.23;
-    static const auto MAXIMUM_NUMBER_OF_STEPS = 123;
-    static const auto INTEGRATION_METHOD = libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON;
-    static const auto ITERATION_TYPE = libOpenCOR::SolverCvode::IterationType::FUNCTIONAL;
-    static const auto LINEAR_SOLVER = libOpenCOR::SolverCvode::LinearSolver::GMRES;
-    static const auto PRECONDITIONER = libOpenCOR::SolverCvode::Preconditioner::NO;
-    static const auto UPPER_HALF_BANDWIDTH = 3;
-    static const auto LOWER_HALF_BANDWIDTH = 5;
-    static const auto RELATIVE_TOLERANCE = 1.23e-5;
-    static const auto ABSOLUTE_TOLERANCE = 3.45e-7;
-    static const auto INTERPOLATE_SOLUTION = false;
+    static const auto MAXIMUM_STEP {1.23};
+    static const auto MAXIMUM_NUMBER_OF_STEPS {123};
+    static const auto INTEGRATION_METHOD {libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON};
+    static const auto ITERATION_TYPE {libOpenCOR::SolverCvode::IterationType::FUNCTIONAL};
+    static const auto LINEAR_SOLVER {libOpenCOR::SolverCvode::LinearSolver::GMRES};
+    static const auto PRECONDITIONER {libOpenCOR::SolverCvode::Preconditioner::NO};
+    static const auto UPPER_HALF_BANDWIDTH {3};
+    static const auto LOWER_HALF_BANDWIDTH {5};
+    static const auto RELATIVE_TOLERANCE {1.23e-5};
+    static const auto ABSOLUTE_TOLERANCE {3.45e-7};
+    static const auto INTERPOLATE_SOLUTION {false};
 
-    auto solver = libOpenCOR::SolverCvode::create();
+    auto solver {libOpenCOR::SolverCvode::create()};
 
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solver->id(), "KISAO:0000019");
@@ -77,9 +77,9 @@ TEST(BasicSolverTest, SolverCvode)
 
 TEST(BasicSolverTest, SolverForwardEuler)
 {
-    static const auto STEP = 0.123;
+    static const auto STEP {0.123};
 
-    auto solver = libOpenCOR::SolverForwardEuler::create();
+    auto solver {libOpenCOR::SolverForwardEuler::create()};
 
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solver->id(), "KISAO:0000030");
@@ -94,9 +94,9 @@ TEST(BasicSolverTest, SolverForwardEuler)
 
 TEST(BasicSolverTest, SolverFourthOrderRungeKutta)
 {
-    static const auto STEP = 0.123;
+    static const auto STEP {0.123};
 
-    auto solver = libOpenCOR::SolverFourthOrderRungeKutta::create();
+    auto solver {libOpenCOR::SolverFourthOrderRungeKutta::create()};
 
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solver->id(), "KISAO:0000032");
@@ -111,9 +111,9 @@ TEST(BasicSolverTest, SolverFourthOrderRungeKutta)
 
 TEST(BasicSolverTest, SolverHeun)
 {
-    static const auto STEP = 0.123;
+    static const auto STEP {0.123};
 
-    auto solver = libOpenCOR::SolverHeun::create();
+    auto solver {libOpenCOR::SolverHeun::create()};
 
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solver->id(), "KISAO:0000301");
@@ -128,12 +128,12 @@ TEST(BasicSolverTest, SolverHeun)
 
 TEST(BasicSolverTest, SolverKinsol)
 {
-    static const auto MAXIMUM_NUMBER_OF_ITERATIONS = 123;
-    static const auto LINEAR_SOLVER = libOpenCOR::SolverKinsol::LinearSolver::GMRES;
-    static const auto UPPER_HALF_BANDWIDTH = 3;
-    static const auto LOWER_HALF_BANDWIDTH = 5;
+    static const auto MAXIMUM_NUMBER_OF_ITERATIONS {123};
+    static const auto LINEAR_SOLVER {libOpenCOR::SolverKinsol::LinearSolver::GMRES};
+    static const auto UPPER_HALF_BANDWIDTH {3};
+    static const auto LOWER_HALF_BANDWIDTH {5};
 
-    auto solver = libOpenCOR::SolverKinsol::create();
+    auto solver {libOpenCOR::SolverKinsol::create()};
 
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::NLA);
     EXPECT_EQ(solver->id(), "KISAO:0000282");
@@ -157,9 +157,9 @@ TEST(BasicSolverTest, SolverKinsol)
 
 TEST(BasicSolverTest, SolverSecondOrderRungeKutta)
 {
-    static const auto STEP = 0.123;
+    static const auto STEP {0.123};
 
-    auto solver = libOpenCOR::SolverSecondOrderRungeKutta::create();
+    auto solver {libOpenCOR::SolverSecondOrderRungeKutta::create()};
 
     EXPECT_EQ(solver->type(), libOpenCOR::Solver::Type::ODE);
     EXPECT_EQ(solver->id(), "KISAO:0000381");

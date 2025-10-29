@@ -25,7 +25,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-static constexpr auto ID_PREFIX = "model";
+static constexpr auto ID_PREFIX {"model"};
 
 SedModel::Impl::Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile)
     : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
@@ -100,9 +100,9 @@ bool SedModel::Impl::addChange(const SedChangePtr &pChange)
         return false;
     }
 
-    auto change = std::ranges::find_if(mChanges, [&](const auto &c) {
+    auto change {std::ranges::find_if(mChanges, [&](const auto &c) {
         return c == pChange;
-    });
+    })};
 
     if (change != mChanges.end()) {
         return false;
@@ -115,9 +115,9 @@ bool SedModel::Impl::addChange(const SedChangePtr &pChange)
 
 bool SedModel::Impl::removeChange(const SedChangePtr &pChange)
 {
-    auto change = std::ranges::find_if(mChanges, [&](const auto &c) {
+    auto change {std::ranges::find_if(mChanges, [&](const auto &c) {
         return c == pChange;
-    });
+    })};
 
     if (change != mChanges.end()) {
         mChanges.erase(change);
@@ -148,18 +148,18 @@ void SedModel::Impl::setBasePath(const std::string &pBasePath)
 
 void SedModel::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("model"));
+    auto *node {xmlNewNode(nullptr, toConstXmlCharPtr("model"))};
 
     SedBase::Impl::serialise(node);
 
     xmlNewProp(node, toConstXmlCharPtr("language"), toConstXmlCharPtr("urn:sedml:language:cellml"));
 
-    auto source = mBasePath.empty() ?
-                      urlPath(mFile->path()) :
+    auto source {mBasePath.empty() ?
+                     urlPath(mFile->path()) :
 #ifdef BUILDING_USING_MSVC
-                      forwardSlashPath(relativePath(mFile->path(), mBasePath));
+                     forwardSlashPath(relativePath(mFile->path(), mBasePath))};
 #else
-                      relativePath(mFile->path(), mBasePath);
+                     relativePath(mFile->path(), mBasePath)};
 #endif
 
     xmlNewProp(node, toConstXmlCharPtr("source"), toConstXmlCharPtr(source));
@@ -169,7 +169,7 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
     // Add the changes, if any, to our SED-ML model.
 
     if (!mChanges.empty()) {
-        auto *sedListOfChangeNodes = xmlNewNode(nullptr, toConstXmlCharPtr("listOfChanges"));
+        auto *sedListOfChangeNodes {xmlNewNode(nullptr, toConstXmlCharPtr("listOfChanges"))};
 
         xmlAddChild(node, sedListOfChangeNodes);
 

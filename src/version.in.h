@@ -19,9 +19,9 @@ limitations under the License.
 namespace libOpenCOR {
 
 // clang-format off
-static constexpr auto LIBOPENCOR_VERSION = @LIBOPENCOR_VERSION@;
+static constexpr auto LIBOPENCOR_VERSION {@LIBOPENCOR_VERSION@};
 // clang-format on
-static constexpr auto LIBOPENCOR_VERSION_STRING = "@LIBOPENCOR_VERSION_STRING@";
+static constexpr auto LIBOPENCOR_VERSION_STRING {"@LIBOPENCOR_VERSION_STRING@"};
 
 unsigned int firstDigit(unsigned int pTwoDigitNumber);
 unsigned int secondDigit(unsigned int pTwoDigitNumber);

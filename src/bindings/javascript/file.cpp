@@ -32,17 +32,17 @@ void fileApi()
         .property("fileName", &libOpenCOR::File::fileName)
         .property("url", &libOpenCOR::File::url)
         .property("path", &libOpenCOR::File::path)
-        .function("contents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis) {
-                      auto contents = pThis->contents();
-                      auto view = emscripten::typed_memory_view(contents.size(), contents.data());
-                      auto res = emscripten::val::global("Uint8Array").new_(contents.size());
+        .function("contents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis) {
+                      auto contents {pThis->contents()};
+                      auto view {emscripten::typed_memory_view(contents.size(), contents.data())};
+                      auto res {emscripten::val::global("Uint8Array").new_(contents.size())};
 
                       res.call<void>("set", view);
 
                       return res;
                   }))
-        .function("setContents", emscripten::optional_override([](libOpenCOR::FilePtr &pThis, uintptr_t pContents, size_t pSize) {
-                      auto contents = reinterpret_cast<unsigned char *>(pContents);
+        .function("setContents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis, uintptr_t pContents, size_t pSize) {
+                      auto contents {reinterpret_cast<unsigned char *>(pContents)};
 
                       pThis->setContents(libOpenCOR::UnsignedChars(contents, contents + pSize));
                   }))

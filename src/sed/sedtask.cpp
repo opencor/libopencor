@@ -92,7 +92,7 @@ void SedTask::Impl::setSimulation(const SedSimulationPtr &pSimulation)
 
 void SedTask::Impl::serialise(xmlNodePtr pNode) const
 {
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("task"));
+    auto *node {xmlNewNode(nullptr, toConstXmlCharPtr("task"))};
 
     SedAbstractTask::Impl::serialise(node);
 

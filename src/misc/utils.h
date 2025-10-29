@@ -30,15 +30,20 @@ limitations under the License.
 #include <filesystem>
 #include <libcellml>
 
+#ifdef INF
+#    undef INF
+#endif
+
 #ifdef NAN
 #    undef NAN
 #endif
 
 namespace libOpenCOR {
 
-static const std::string LIBOPENCOR_NAMESPACE = "https://opencor.ws/libopencor";
+static const std::string LIBOPENCOR_NAMESPACE {"https://opencor.ws/libopencor"};
 
-static const auto NAN = std::numeric_limits<double>::quiet_NaN();
+static const auto INF {std::numeric_limits<double>::infinity()};
+static const auto NAN {std::numeric_limits<double>::quiet_NaN()};
 
 using StringStringMap = std::map<std::string, std::string>;
 
@@ -71,7 +76,7 @@ using StringStringMap = std::map<std::string, std::string>;
 #endif
 
 #ifndef CODE_COVERAGE_ENABLED
-void LIBOPENCOR_UNIT_TESTING_EXPORT printIssues(const LoggerPtr &pLogger);
+void LIBOPENCOR_UNIT_TESTING_EXPORT printIssues(const LoggerPtr &pLogger, const std::string &pHeader = "");
 void LIBOPENCOR_UNIT_TESTING_EXPORT printHexDump(const UnsignedChars &pBytes);
 void LIBOPENCOR_UNIT_TESTING_EXPORT printArray(const std::string &pName, const Doubles &pDoubles);
 #endif
@@ -104,6 +109,8 @@ UnsignedChars LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem:
 #endif
 
 std::string nlaSolverAddress(SolverNla *pNlaSolver);
+
+bool LIBOPENCOR_UNIT_TESTING_EXPORT isInfOrNan(double pNumber);
 
 bool toBool(const std::string &pString);
 std::string toString(bool pBoolean);

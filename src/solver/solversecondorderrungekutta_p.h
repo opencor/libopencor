@@ -25,7 +25,7 @@ namespace libOpenCOR {
 class SolverSecondOrderRungeKutta::Impl: public SolverOdeFixedStep::Impl
 {
 public:
-    double *mYk = nullptr;
+    double *mYk {nullptr};
 
     Doubles mYkDoubles;
 

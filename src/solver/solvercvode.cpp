@@ -104,7 +104,7 @@ void errorHandler(int pLine, const char *pFunction, const char *pFile, const cha
 
 int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
-    auto *userData = static_cast<SolverCvodeUserData *>(pUserData);
+    auto *userData {static_cast<SolverCvodeUserData *>(pUserData)};
 
 #ifdef __EMSCRIPTEN__
     userData->runtime->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
@@ -133,10 +133,10 @@ SolverCvode::Impl::~Impl()
 
 void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
-    for (unsigned int i = 0; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
-        auto *algorithmParameter = pAlgorithm->getAlgorithmParameter(i);
-        auto kisaoId = algorithmParameter->getKisaoID();
-        auto value = algorithmParameter->getValue();
+    for (unsigned int i {0}; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
+        auto *algorithmParameter {pAlgorithm->getAlgorithmParameter(i)};
+        auto kisaoId {algorithmParameter->getKisaoID()};
+        auto value {algorithmParameter->getValue()};
 
         if (kisaoId == "KISAO:0000467") {
             mMaximumStep = toDouble(value);
@@ -250,8 +250,8 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 
 SolverPtr SolverCvode::Impl::duplicate()
 {
-    auto solver = SolverCvode::create();
-    auto *solverPimpl = solver->pimpl();
+    auto solver {SolverCvode::create()};
+    auto *solverPimpl {solver->pimpl()};
 
     solverPimpl->mMaximumStep = mMaximumStep;
     solverPimpl->mMaximumNumberOfSteps = mMaximumNumberOfSteps;
@@ -329,7 +329,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     if (mIterationType == IterationType::NEWTON) {
         // We are dealing with a Newton iteration type, so we need a linear solver.
 
-        bool needUpperAndLowerHalfBandwidths = false;
+        bool needUpperAndLowerHalfBandwidths {false};
 
         if (mLinearSolver == LinearSolver::BANDED) {
             // We are dealing with a banded linear solver, so we need both an upper and a lower half-bandwidth.
@@ -617,8 +617,8 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
     //       compute them ourselves. To do so, we keep track of the old state values (in mRates, to save memory) and
     //       then update mRates once we have the new state values.
 
-    auto *oldStates = mRates;
-    auto oneOverdVoi = 1.0 / (pVoiEnd - pVoi);
+    auto *oldStates {mRates};
+    auto oneOverdVoi {1.0 / (pVoiEnd - pVoi)};
 
     std::copy(mStates, mStates + mSize, oldStates); // NOLINT
 
@@ -628,11 +628,11 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
         ASSERT_EQ(CVodeSetStopTime(mSolver, pVoiEnd), CV_SUCCESS);
     }
 
-    auto res = CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL);
+    auto res {CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL)};
 
     // Compute the rate values.
 
-    for (size_t i = 0; i < mSize; ++i) {
+    for (size_t i {0}; i < mSize; ++i) {
         mRates[i] = oneOverdVoi * (mStates[i] - oldStates[i]); // NOLINT
     }
 

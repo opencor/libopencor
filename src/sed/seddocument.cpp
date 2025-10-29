@@ -30,12 +30,12 @@ namespace libOpenCOR {
 
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 {
-    size_t counter = 0;
+    size_t counter {0};
     std::stringstream stream;
 
     stream << pPrefix << ++counter;
 
-    auto res = stream.str();
+    auto res {stream.str()};
 
     while (mIds.contains(res)) {
         stream.str({});
@@ -63,7 +63,7 @@ void SedDocument::Impl::initialise(const SedDocumentPtr &pOwner, const FilePtr &
     //       for __EMSCRIPTEN__. Could it be an issue with llvm-cov not properly handling C++ directives within a switch
     //       statement?
 
-    auto fileType = pFile->type();
+    auto fileType {pFile->type()};
 
     if (fileType == File::Type::CELLML_FILE) {
         initialiseFromCellmlFile(pOwner, pFile);
@@ -87,7 +87,7 @@ void SedDocument::Impl::initialiseFromCellmlFile(const SedDocumentPtr &pOwner, c
 
 void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    auto sedmlFile = pFile->pimpl()->mSedmlFile;
+    auto sedmlFile {pFile->pimpl()->mSedmlFile};
 
     sedmlFile->populateDocument(pOwner);
 
@@ -96,12 +96,12 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
 
 void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    auto masterFile = pFile->pimpl()->mCombineArchive->masterFile();
+    auto masterFile {pFile->pimpl()->mCombineArchive->masterFile()};
 
     if (masterFile == nullptr) {
         addError("A simulation experiment description cannot be created using a COMBINE archive with no master file.");
     } else {
-        auto masterFileType = masterFile->type();
+        auto masterFileType {masterFile->type()};
 
         if (masterFileType == File::Type::CELLML_FILE) {
             initialiseFromCellmlFile(pOwner, masterFile);
@@ -124,8 +124,8 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 {
     // Serialise our SED-ML document.
 
-    auto *doc = xmlNewDoc(toConstXmlCharPtr("1.0"));
-    auto *node = xmlNewNode(nullptr, toConstXmlCharPtr("sedML"));
+    auto *doc {xmlNewDoc(toConstXmlCharPtr("1.0"))};
+    auto *node {xmlNewNode(nullptr, toConstXmlCharPtr("sedML"))};
 
     serialise(node);
 
@@ -135,7 +135,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mDataDescriptions.empty()) {
-        auto *sedListOfDataDescriptions = xmlNewNode(nullptr, toConstXmlCharPtr("listOfDataDescriptions"));
+        auto *sedListOfDataDescriptions {xmlNewNode(nullptr, toConstXmlCharPtr("listOfDataDescriptions"))};
 
         xmlAddChild(node, sedListOfDataDescriptions);
 
@@ -148,7 +148,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     // Add the models, if any, to our SED-ML document.
 
     if (!mModels.empty()) {
-        auto *sedListOfModels = xmlNewNode(nullptr, toConstXmlCharPtr("listOfModels"));
+        auto *sedListOfModels {xmlNewNode(nullptr, toConstXmlCharPtr("listOfModels"))};
 
         xmlAddChild(node, sedListOfModels);
 
@@ -161,7 +161,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     // Add the simulations, if any, to our SED-ML document.
 
     if (!mSimulations.empty()) {
-        auto *sedListOfSimulations = xmlNewNode(nullptr, toConstXmlCharPtr("listOfSimulations"));
+        auto *sedListOfSimulations {xmlNewNode(nullptr, toConstXmlCharPtr("listOfSimulations"))};
 
         for (const auto &simulation : mSimulations) {
             simulation->pimpl()->serialise(sedListOfSimulations);
@@ -173,7 +173,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
     // Add the tasks, if any, to our SED-ML document.
 
     if (!mTasks.empty()) {
-        auto *sedListOfTasks = xmlNewNode(nullptr, toConstXmlCharPtr("listOfTasks"));
+        auto *sedListOfTasks {xmlNewNode(nullptr, toConstXmlCharPtr("listOfTasks"))};
 
         for (const auto &task : mTasks) {
             task->pimpl()->serialise(sedListOfTasks);
@@ -186,7 +186,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mDataGenerators.empty()) {
-        auto *sedListOfDataGenerators = xmlNewNode(nullptr, toConstXmlCharPtr("listOfDataGenerators"));
+        auto *sedListOfDataGenerators {xmlNewNode(nullptr, toConstXmlCharPtr("listOfDataGenerators"))};
 
         for (const auto &dataGenerator : mDataGenerators) {
             dataGenerator->pimpl()->serialise(sedListOfDataGenerators);
@@ -200,7 +200,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mOutputs.empty()) {
-        auto *sedListOfOutputs = xmlNewNode(nullptr, toConstXmlCharPtr("listOfOutputs"));
+        auto *sedListOfOutputs {xmlNewNode(nullptr, toConstXmlCharPtr("listOfOutputs"))};
 
         for (const auto &output : mOutputs) {
             output->pimpl()->serialise(sedListOfOutputs);
@@ -214,7 +214,7 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     /*---GRY---
     if (!mStyles.empty()) {
-        auto *sedListOfStyles = xmlNewNode(nullptr, toConstXmlCharPtr("listOfStyles"));
+        auto *sedListOfStyles {xmlNewNode(nullptr, toConstXmlCharPtr("listOfStyles"))};
 
         for (const auto &style : mStyles) {
             style->pimpl()->serialise(sedListOfStyles);
@@ -226,8 +226,8 @@ std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
 
     // Convert our SED-ML document to a string and return it.
 
-    xmlChar *buffer = nullptr;
-    int size = 0;
+    xmlChar *buffer {nullptr};
+    int size {0};
 
     xmlDocDumpFormatMemoryEnc(doc, &buffer, &size, "UTF-8", 1);
 
@@ -271,9 +271,9 @@ bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
         return false;
     }
 
-    auto model = std::ranges::find_if(mModels, [&](const auto &m) {
+    auto model {std::ranges::find_if(mModels, [&](const auto &m) {
         return m == pModel;
-    });
+    })};
 
     if (model != mModels.end()) {
         return false;
@@ -286,9 +286,9 @@ bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
 
 bool SedDocument::Impl::removeModel(const SedModelPtr &pModel)
 {
-    auto model = std::ranges::find_if(mModels, [&](const auto &m) {
+    auto model {std::ranges::find_if(mModels, [&](const auto &m) {
         return m == pModel;
-    });
+    })};
 
     if (model != mModels.end()) {
         mIds.erase((*model)->pimpl()->mId);
@@ -343,9 +343,9 @@ bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
         return false;
     }
 
-    auto simulation = std::ranges::find_if(mSimulations, [&](const auto &s) {
+    auto simulation {std::ranges::find_if(mSimulations, [&](const auto &s) {
         return s == pSimulation;
-    });
+    })};
 
     if (simulation != mSimulations.end()) {
         return false;
@@ -358,9 +358,9 @@ bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
 
 bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
 {
-    auto simulation = std::ranges::find_if(mSimulations, [&](const auto &s) {
+    auto simulation {std::ranges::find_if(mSimulations, [&](const auto &s) {
         return s == pSimulation;
-    });
+    })};
 
     if (simulation != mSimulations.end()) {
         mIds.erase((*simulation)->pimpl()->mId);
@@ -415,9 +415,9 @@ bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
         return false;
     }
 
-    auto task = std::ranges::find_if(mTasks, [&](const auto &t) {
+    auto task {std::ranges::find_if(mTasks, [&](const auto &t) {
         return t == pTask;
-    });
+    })};
 
     if (task != mTasks.end()) {
         return false;
@@ -430,9 +430,9 @@ bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
 
 bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
 {
-    auto task = std::ranges::find_if(mTasks, [&](const auto &t) {
+    auto task {std::ranges::find_if(mTasks, [&](const auto &t) {
         return t == pTask;
-    });
+    })};
 
     if (task != mTasks.end()) {
         mIds.erase((*task)->pimpl()->mId);
@@ -479,7 +479,7 @@ const SedDocument::Impl *SedDocument::pimpl() const
 
 SedDocumentPtr SedDocument::create(const FilePtr &pFile)
 {
-    auto res = SedDocumentPtr {new SedDocument {}};
+    auto res {SedDocumentPtr {new SedDocument {}}};
 
     res->pimpl()->initialise(res, pFile);
 

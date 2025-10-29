@@ -22,11 +22,11 @@ namespace {
 
 std::string cvodeExpectedSerialisation(const std::string &pSource, const std::map<std::string, std::string> &pParameters = {})
 {
-    auto integrationMethod = pParameters.find("KISAO:0000475");
-    auto iterationType = pParameters.find("KISAO:0000476");
-    auto linearSolver = pParameters.find("KISAO:0000477");
-    auto preconditioner = pParameters.find("KISAO:0000478");
-    auto interpolateSolution = pParameters.find("KISAO:0000481");
+    auto integrationMethod {pParameters.find("KISAO:0000475")};
+    auto iterationType {pParameters.find("KISAO:0000476")};
+    auto linearSolver {pParameters.find("KISAO:0000477")};
+    auto preconditioner {pParameters.find("KISAO:0000478")};
+    auto interpolateSolution {pParameters.find("KISAO:0000481")};
 
     return std::string(R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
@@ -73,7 +73,7 @@ std::string cvodeExpectedSerialisation(const std::string &pSource, const std::ma
 
 std::string kinsolExpectedSerialisation(const std::map<std::string, std::string> &pParameters = {})
 {
-    auto linearSolver = pParameters.find("KISAO:0000477");
+    auto linearSolver {pParameters.find("KISAO:0000477")};
 
     return std::string(R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
@@ -105,19 +105,19 @@ std::string kinsolExpectedSerialisation(const std::map<std::string, std::string>
 
 TEST(SerialiseSedTest, localCellmlFileWithBasePath)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
 
 TEST(SerialiseSedTest, localCellmlFileWithoutBasePath)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file {libOpenCOR::File::create(libOpenCOR::LOCAL_FILE)};
 
     file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::CELLML_CONTENTS));
 
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto document {libOpenCOR::SedDocument::create(file)};
 
 #ifdef BUILDING_USING_MSVC
     EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation("file:///P:/some/path/file.txt"));
@@ -128,50 +128,50 @@ TEST(SerialiseSedTest, localCellmlFileWithoutBasePath)
 
 TEST(SerialiseSedTest, relativeLocalCellmlFileWithBasePath)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(std::string(libOpenCOR::RESOURCE_LOCATION).append("/../..")), cvodeExpectedSerialisation("tests/res/cellml_2.cellml"));
 }
 
 TEST(SerialiseSedTest, relativeLocalCellmlFileWithoutBasePath)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE);
+    auto file {libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE)};
 
     file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::CELLML_CONTENTS));
 
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
 
 TEST(SerialiseSedTest, remoteCellmlFileWithBasePath)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(libOpenCOR::REMOTE_BASE_PATH), cvodeExpectedSerialisation("cellml_2.cellml"));
 }
 
 TEST(SerialiseSedTest, remoteCellmlFileWithoutBasePath)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(), cvodeExpectedSerialisation("https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"));
 }
 
 TEST(SerialiseSedTest, relativeRemoteCellmlFileWithBasePath)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(std::string(libOpenCOR::REMOTE_BASE_PATH).append("/../..")), cvodeExpectedSerialisation("tests/res/cellml_2.cellml"));
 }
 
 TEST(SerialiseSedTest, daeModel)
 {
-    static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
+    static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="api/sed/dae.cellml"/>
@@ -207,25 +207,25 @@ TEST(SerialiseSedTest, daeModel)
     <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
-)";
+)"};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
 
 TEST(SerialiseSedTest, nlaModel)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), kinsolExpectedSerialisation());
 }
 
 TEST(SerialiseSedTest, algebraicModel)
 {
-    static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
+    static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="api/sed/algebraic.cellml"/>
@@ -237,10 +237,10 @@ TEST(SerialiseSedTest, algebraicModel)
     <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
-)";
+)"};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
 }
@@ -278,16 +278,16 @@ std::string sedChangeExpectedSerialisation(const std::string &pComponent, const 
 
 TEST(SerialiseSedTest, modelWithChanges)
 {
-    auto changeAttribute = libOpenCOR::SedChangeAttribute::create("component", "variable", "123.456789");
+    auto changeAttribute {libOpenCOR::SedChangeAttribute::create("component", "variable", "123.456789")};
 
     EXPECT_EQ(changeAttribute->target(), "/cellml:model/cellml:component[@name='component']/cellml:variable[@name='variable']");
     EXPECT_EQ(changeAttribute->componentName(), "component");
     EXPECT_EQ(changeAttribute->variableName(), "variable");
     EXPECT_EQ(changeAttribute->newValue(), "123.456789");
 
-    auto document = libOpenCOR::SedDocument::create();
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
-    auto model = libOpenCOR::SedModel::create(document, file);
+    auto document {libOpenCOR::SedDocument::create()};
+    auto file {libOpenCOR::File::create(libOpenCOR::LOCAL_FILE)};
+    auto model {libOpenCOR::SedModel::create(document, file)};
 
     EXPECT_TRUE(model->addChange(changeAttribute));
     EXPECT_TRUE(document->addModel(model));
@@ -308,7 +308,7 @@ TEST(SerialiseSedTest, modelWithChanges)
 
 TEST(SerialiseSedTest, fixedStepOdeSolver)
 {
-    static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
+    static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
@@ -326,11 +326,11 @@ TEST(SerialiseSedTest, fixedStepOdeSolver)
     <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
-)";
+)"};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
 
     simulation->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
 
@@ -339,10 +339,10 @@ TEST(SerialiseSedTest, fixedStepOdeSolver)
 
 TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonInterationMethod)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setIntegrationMethod(libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON);
 
@@ -351,10 +351,10 @@ TEST(SerialiseSedTest, cvodeSolverWithAdamsMoultonInterationMethod)
 
 TEST(SerialiseSedTest, cvodeSolverWithFunctionalIterationType)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setIterationType(libOpenCOR::SolverCvode::IterationType::FUNCTIONAL);
 
@@ -363,10 +363,10 @@ TEST(SerialiseSedTest, cvodeSolverWithFunctionalIterationType)
 
 TEST(SerialiseSedTest, cvodeSolverWithBandedLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
 
@@ -375,10 +375,10 @@ TEST(SerialiseSedTest, cvodeSolverWithBandedLinearSolver)
 
 TEST(SerialiseSedTest, cvodeSolverWithDiagonalLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::DIAGONAL);
 
@@ -387,10 +387,10 @@ TEST(SerialiseSedTest, cvodeSolverWithDiagonalLinearSolver)
 
 TEST(SerialiseSedTest, cvodeSolverWithGmresLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
 
@@ -399,10 +399,10 @@ TEST(SerialiseSedTest, cvodeSolverWithGmresLinearSolver)
 
 TEST(SerialiseSedTest, cvodeSolverWithBicgstabLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
 
@@ -411,10 +411,10 @@ TEST(SerialiseSedTest, cvodeSolverWithBicgstabLinearSolver)
 
 TEST(SerialiseSedTest, cvodeSolverWithTfqmrLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
 
@@ -423,10 +423,10 @@ TEST(SerialiseSedTest, cvodeSolverWithTfqmrLinearSolver)
 
 TEST(SerialiseSedTest, cvodeSolverWithNoPreconditioner)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
 
@@ -435,10 +435,10 @@ TEST(SerialiseSedTest, cvodeSolverWithNoPreconditioner)
 
 TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setInterpolateSolution(false);
 
@@ -447,10 +447,10 @@ TEST(SerialiseSedTest, cvodeSolverWithNoInterpolateSolution)
 
 TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
 
@@ -459,10 +459,10 @@ TEST(SerialiseSedTest, kinsolWithBandedLinearSolver)
 
 TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::GMRES);
 
@@ -471,10 +471,10 @@ TEST(SerialiseSedTest, kinsolWithGmresLinearSolver)
 
 TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB);
 
@@ -483,10 +483,10 @@ TEST(SerialiseSedTest, kinsolWithBicgstabLinearSolver)
 
 TEST(SerialiseSedTest, kinsolWithTfmqrLinearSolver)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"));
-    auto document = libOpenCOR::SedDocument::create(file);
-    auto simulation = document->simulations()[0];
-    auto solver = std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver());
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {document->simulations()[0]};
+    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
 
@@ -495,7 +495,7 @@ TEST(SerialiseSedTest, kinsolWithTfmqrLinearSolver)
 
 TEST(SerialiseSedTest, oneStepSimulation)
 {
-    static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
+    static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model1" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
@@ -507,14 +507,14 @@ TEST(SerialiseSedTest, oneStepSimulation)
     <task id="task1" modelReference="model1" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
-)";
+)"};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     document->removeSimulation(document->simulations()[0]);
 
-    auto simulation = libOpenCOR::SedOneStep::create(document);
+    auto simulation {libOpenCOR::SedOneStep::create(document)};
 
     document->addSimulation(simulation);
 
@@ -523,10 +523,10 @@ TEST(SerialiseSedTest, oneStepSimulation)
 
 TEST(SerialiseSedTest, sedmlFile)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::WARNING, "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it."},
-    };
-    static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
+    }};
+    static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
     <model id="model" language="urn:sedml:language:cellml" source="cellml_2.cellml"/>
@@ -554,10 +554,10 @@ TEST(SerialiseSedTest, sedmlFile)
     <task id="task1" modelReference="model" simulationReference="simulation1"/>
   </listOfTasks>
 </sedML>
-)";
+)"};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);
@@ -565,7 +565,7 @@ TEST(SerialiseSedTest, sedmlFile)
 
 TEST(SerialiseSedTest, sedSimulation)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::WARNING, "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead."},
         {libOpenCOR::Issue::Type::WARNING, "The parameter 'KISAO:1234567' is not recognised. It will be ignored."},
         {libOpenCOR::Issue::Type::WARNING, "The step ('KISAO:0000483') cannot be equal to '-1.23'. It must be greater or equal to 0. A step of 1 will be used instead."},
@@ -606,8 +606,8 @@ TEST(SerialiseSedTest, sedSimulation)
         {libOpenCOR::Issue::Type::WARNING, "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead."},
         {libOpenCOR::Issue::Type::WARNING, "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead."},
         {libOpenCOR::Issue::Type::WARNING, "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead."},
-    };
-    static const std::string expectedSerialisation = R"(<?xml version="1.0" encoding="UTF-8"?>
+    }};
+    static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfSimulations>
     <oneStep id="oneStep1" step="3.69">
@@ -843,10 +843,10 @@ TEST(SerialiseSedTest, sedSimulation)
     </analysis>
   </listOfSimulations>
 </sedML>
-)";
+)"};
 
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/simulations.sedml"));
-    auto document = libOpenCOR::SedDocument::create(file);
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/simulations.sedml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     // EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
     EXPECT_EQ(document->serialise(libOpenCOR::RESOURCE_LOCATION), expectedSerialisation);

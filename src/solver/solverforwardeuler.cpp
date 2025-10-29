@@ -48,9 +48,9 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
     // We compute the following:
     //   Y_n+1 = Y_n + h * f(t_n, Y_n)
 
-    const auto voiStart = pVoi;
-    size_t voiCounter = 0;
-    auto realStep = mStep;
+    const auto voiStart {pVoi};
+    size_t voiCounter {0};
+    auto realStep {mStep};
 
     while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
@@ -65,7 +65,7 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
 
         // Compute Y_n+1.
 
-        for (size_t i = 0; i < mSize; ++i) {
+        for (size_t i {0}; i < mSize; ++i) {
             mStates[i] += realStep * mRates[i]; // NOLINT
         }
 

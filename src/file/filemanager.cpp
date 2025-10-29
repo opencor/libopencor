@@ -47,7 +47,7 @@ void FileManager::Impl::unmanage(File *pFile)
     while (!files.empty()) {
         // Retrieve the file at the top of the stack.
 
-        File *file = files.top();
+        auto *file {files.top()};
 
         files.pop();
 
@@ -59,7 +59,7 @@ void FileManager::Impl::unmanage(File *pFile)
 
         // Unmanage the current file.
 
-        auto iter = std::ranges::find(mFiles, file);
+        auto iter {std::ranges::find(mFiles, file)};
 
         if (iter != mFiles.cend()) {
             mFiles.erase(iter);
@@ -109,17 +109,17 @@ FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #endif
 {
 #if __clang_major__ < 16
-    auto [tIsLocalFile, tFileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
-    auto isLocalFile = tIsLocalFile;
-    auto fileNameOrUrl = tFileNameOrUrl;
+    auto [tIsLocalFile, tFileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
+    auto isLocalFile {tIsLocalFile};
+    auto fileNameOrUrl {tFileNameOrUrl};
 #else
-    auto [isLocalFile, fileNameOrUrl] = retrieveFileInfo(pFileNameOrUrl);
+    auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
 #endif
-    auto res = std::ranges::find_if(mFiles, [&](const auto &file) {
+    auto res {std::ranges::find_if(mFiles, [&](const auto &file) {
         return isLocalFile ?
                    file->fileName() == fileNameOrUrl :
                    file->url() == fileNameOrUrl;
-    });
+    })};
 
     if (res != mFiles.end()) {
         return (*res)->shared_from_this();
