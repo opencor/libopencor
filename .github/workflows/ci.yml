@@ -184,7 +184,7 @@ jobs:
             install_uninstall_and_package: ON
             use_install_prefix: ON
           - name: 'JavaScript bindings'
-            os: macos-15
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -251,7 +251,7 @@ jobs:
             context: PATH=$GITHUB_WORKSPACE:$PATH
             target: check_code_formatting
           - name: 'JavaScript code formatting'
-            os: macos-15
+            os: ubuntu-22.04
             build_type: Release
             code_analysis: OFF
             code_coverage: OFF
@@ -376,10 +376,13 @@ jobs:
           sudo mv clang-tidy /usr/local/bin
       - name: Install Emscripten
         if: ${{ matrix.javascript_support == 'ON' }}
-        run: brew install --overwrite emscripten
+        uses: mymindstorm/setup-emsdk@v14
       - name: Install Biome
         if: ${{ matrix.target == 'javascript_check_code_formatting' }}
-        run: brew install --overwrite biome
+        run: |
+          curl -L https://github.com/biomejs/biome/releases/latest/download/biome-linux-x64 -o biome
+          chmod +x biome
+          mv biome /usr/local/bin
       - name: Install uv
         if: ${{ matrix.documentation == 'ON' || matrix.python_support == 'ON' || matrix.target == 'python_check_code_formatting' }}
         uses: astral-sh/setup-uv@v6
