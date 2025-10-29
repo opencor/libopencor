@@ -535,6 +535,11 @@ std::string nlaSolverAddress(SolverNla *pNlaSolver)
     return oss.str();
 }
 
+bool isInfOrNan(double pNumber)
+{
+    return std::isinf(pNumber) || std::isnan(pNumber);
+}
+
 bool toBool(const std::string &pString)
 {
     return pString == "true";

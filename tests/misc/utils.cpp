@@ -33,3 +33,11 @@ TEST(UtilsTest, decodeUrl)
     EXPECT_EQ(libOpenCOR::decodeUrl("%XX"), "%XX");
     EXPECT_EQ(libOpenCOR::decodeUrl("%2X"), "%2X");
 }
+
+TEST(UtilsTest, isInfOrNan)
+{
+    EXPECT_FALSE(libOpenCOR::isInfOrNan(0.0));
+    EXPECT_TRUE(libOpenCOR::isInfOrNan(libOpenCOR::INF));
+    EXPECT_TRUE(libOpenCOR::isInfOrNan(-libOpenCOR::INF));
+    EXPECT_TRUE(libOpenCOR::isInfOrNan(libOpenCOR::NAN));
+}

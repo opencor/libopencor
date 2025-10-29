@@ -87,11 +87,22 @@ struct SolverKinsolUserData
 #endif
 
     void *userData {nullptr};
+    bool infOrNanFound {false};
 };
 
 int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
 {
+    // Make sure that our input vector doesn't contain any Inf or NaN values.
+
     auto *userData {static_cast<SolverKinsolUserData *>(pUserData)};
+
+    for (sunindextype i = 0; i < NV_LENGTH_S(pU); ++i) {
+        if (isInfOrNan(NV_Ith_S(pU, i))) {
+            userData->infOrNanFound = true;
+
+            return -1;
+        }
+    }
 
 #ifdef __EMSCRIPTEN__
     // clang-format off
@@ -357,10 +368,7 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     // Solve the model.
 
-#ifndef CODE_COVERAGE_ENABLED
-    auto res =
-#endif
-        KINSol(solver, u, KIN_LINESEARCH, ones, ones);
+    auto res = KINSol(solver, u, KIN_LINESEARCH, ones, ones);
 
     // Release some memory.
 
@@ -377,13 +385,19 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     // Check whether everything went fine.
 
-#ifndef CODE_COVERAGE_ENABLED
     if (res < KIN_SUCCESS) {
-        addError(mErrorMessage);
+#ifndef CODE_COVERAGE_ENABLED
+        if (userData.infOrNanFound) {
+#endif
+            addError("The input vector contains some Inf and/or NaN values.");
+#ifndef CODE_COVERAGE_ENABLED
+        } else {
+            addError(mErrorMessage);
+        }
+#endif
 
         return false;
     }
-#endif
 
     return true;
 }

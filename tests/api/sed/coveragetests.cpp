@@ -586,3 +586,16 @@ TEST(CoverageSedTest, math)
 
     EXPECT_EQ_VALUES(instanceTask, 0, {}, {}, {}, {}, {}, {}, COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS, {}, {});
 }
+
+TEST(CoverageSedTest, KinsolWithInfAndOrNanValues)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::ERROR, "The input vector contains some Inf and/or NaN values."},
+    };
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_inf_and_or_nan_values.cellml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->instantiate();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
