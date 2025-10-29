@@ -164,33 +164,33 @@
     <script src="https://cdn.jsdelivr.net/npm/@lightningchart/lcjs@4.2.2/dist/lcjs.iife.min.js"></script>
 
     <script type="module">
-        import { reset, run, showPage, updatePlottingAreaAndAxesInfo } from "./res/libopencor.js";
+    import { reset, run, showPage, updatePlottingAreaAndAxesInfo } from './res/libopencor.js';
 
-        $("#navHome").on("click", function() {
-            showPage("Home");
-        });
-        $("#navSimulation").on("click", function() {
-            showPage("Simulation");
-        });
-        $("#navVersions").on("click", function() {
-            showPage("Versions");
-        });
+    $('#navHome').on('click', function () {
+      showPage('Home');
+    });
+    $('#navSimulation').on('click', function () {
+      showPage('Simulation');
+    });
+    $('#navVersions').on('click', function () {
+      showPage('Versions');
+    });
 
-        $("#reset").on("click", function() {
-            reset();
-        });
+    $('#reset').on('click', function () {
+      reset();
+    });
 
-        $("#xAxis").on("change", function() {
-            updatePlottingAreaAndAxesInfo();
-        });
+    $('#xAxis').on('change', function () {
+      updatePlottingAreaAndAxesInfo();
+    });
 
-        $("#yAxis").on("change", function() {
-            updatePlottingAreaAndAxesInfo();
-        });
+    $('#yAxis').on('change', function () {
+      updatePlottingAreaAndAxesInfo();
+    });
 
-        $("#run").on("click", function() {
-            run();
-        });
+    $('#run').on('click', function () {
+      run();
+    });
     </script>
   </body>
 </html>
