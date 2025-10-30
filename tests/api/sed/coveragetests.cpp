@@ -162,13 +162,13 @@ TEST(CoverageSedTest, changes)
 )"));
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_1 {{
-        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'."},
-        {libOpenCOR::Issue::Type::ERROR, "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value."},
-        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''."},
-        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'."},
-        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''."},
-        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'."},
-        {libOpenCOR::Issue::Type::ERROR, "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."},
+        {libOpenCOR::Issue::Type::ERROR, "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'."},
+        {libOpenCOR::Issue::Type::ERROR, "SED-ML file: the new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value."},
+        {libOpenCOR::Issue::Type::ERROR, "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''."},
+        {libOpenCOR::Issue::Type::ERROR, "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'."},
+        {libOpenCOR::Issue::Type::ERROR, "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''."},
+        {libOpenCOR::Issue::Type::ERROR, "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'."},
+        {libOpenCOR::Issue::Type::ERROR, "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."},
     }};
 
     file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/invalid_sed_changes.omex"));
@@ -180,10 +180,10 @@ TEST(CoverageSedTest, changes)
 )"));
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_2 {{
-        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored."},
-        {libOpenCOR::Issue::Type::WARNING, "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored."},
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."},
     }};
 
     file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsupported_sed_changes.omex"));
@@ -302,8 +302,8 @@ TEST(CoverageSedTest, tasks)
     EXPECT_EQ(document->serialise(), sedTaskExpectedSerialisation(false));
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a model."},
-        {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a simulation."},
+        {libOpenCOR::Issue::Type::ERROR, "Task: task 'task1' requires a model."},
+        {libOpenCOR::Issue::Type::ERROR, "Task: task 'task1' requires a simulation."},
     }};
 
     auto instance {document->instantiate()};
@@ -414,7 +414,7 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
 TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     }};
     static const auto UPPER_HALF_BANDWIDTH {-1};
 
@@ -590,7 +590,7 @@ TEST(CoverageSedTest, math)
 TEST(CoverageSedTest, KinsolWithInfAndOrNanValues)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, "The input vector contains some Inf and/or NaN values."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the input vector contains some Inf and/or NaN values."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_inf_and_or_nan_values.cellml"));

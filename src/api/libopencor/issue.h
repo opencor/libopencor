@@ -93,7 +93,7 @@ private:
 
     Impl *mPimpl; /**< The private implementation, @private. */
 
-    explicit Issue(Type pType, const std::string &pDescription); /**< Constructor, @private. */
+    explicit Issue(Type pType, const std::string &pDescription, const std::string &pContext); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

@@ -37,11 +37,11 @@ def test_invalid_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The CellML file is invalid.",
+            "Task | Model: the CellML file is invalid.",
         ],
         [
             loc.Issue.Type.Error,
-            "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
+            "Task | Model | CellML | Analyser: equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS).",
         ],
     ]
 
@@ -56,11 +56,11 @@ def test_overconstrained_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The CellML file is overconstrained.",
+            "Task | Model: the CellML file is overconstrained.",
         ],
         [
             loc.Issue.Type.Error,
-            "Variable 'x' in component 'my_component' is computed more than once.",
+            "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is computed more than once.",
         ],
     ]
 
@@ -75,11 +75,11 @@ def test_underconstrained_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The CellML file is underconstrained.",
+            "Task | Model: the CellML file is underconstrained.",
         ],
         [
             loc.Issue.Type.Error,
-            "The type of variable 'x' in component 'my_component' is unknown.",
+            "Task | Model | CellML | Analyser: the type of variable 'x' in component 'my_component' is unknown.",
         ],
     ]
 
@@ -94,15 +94,15 @@ def test_unsuitable_constrained_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The CellML file is unsuitably constrained.",
+            "Task | Model: the CellML file is unsuitably constrained.",
         ],
         [
             loc.Issue.Type.Error,
-            "Variable 'y' in component 'my_component' is computed more than once.",
+            "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is computed more than once.",
         ],
         [
             loc.Issue.Type.Error,
-            "The type of variable 'x' in component 'my_component' is unknown.",
+            "Task | Model | CellML | Analyser: the type of variable 'x' in component 'my_component' is unknown.",
         ],
     ]
 
@@ -132,9 +132,9 @@ def run_ode_model():
         [
             loc.Issue.Type.Error,
             (
-                "At t = 0.00140013827899707, mxstep steps taken before reaching tout."
+                "Task | CVODE: at t = 0.00140013827899707, mxstep steps taken before reaching tout."
                 if platform.system() == "Darwin"
-                else "At t = 0.00140013827899996, mxstep steps taken before reaching tout."
+                else "Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout."
             ),
         ],
     ]
@@ -171,7 +171,7 @@ def test_ode_model_with_no_ode_solver():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
         ],
     ]
 
@@ -189,7 +189,7 @@ def test_nla_model():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+            "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
         ],
     ]
 
@@ -216,7 +216,7 @@ def test_nla_model_with_no_nla_solver():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
         ],
     ]
 
@@ -234,7 +234,7 @@ def test_dae_model():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
+            "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.",
         ],
     ]
 
@@ -267,11 +267,11 @@ def test_dae_model_with_no_ode_or_nla_solver():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
         ],
         [
             loc.Issue.Type.Error,
-            "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
         ],
     ]
 

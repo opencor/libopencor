@@ -141,7 +141,7 @@ def test_combine_archive_with_unknown_indirect_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "Task 'task1' requires a model of CellML type.",
+            "Task: task 'task1' requires a model of CellML type.",
         ],
     ]
 

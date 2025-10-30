@@ -91,7 +91,7 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
 
     sedmlFile->populateDocument(pOwner);
 
-    addIssues(sedmlFile);
+    addIssues(sedmlFile, "SED-ML file");
 }
 
 void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)

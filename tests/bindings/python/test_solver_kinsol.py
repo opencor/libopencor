@@ -24,7 +24,7 @@ def test_maximum_number_of_iterations_value_with_invalid_number():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The maximum number of iterations cannot be equal to 0. It must be greater than 0.",
+            "Task instance | KINSOL: the maximum number of iterations cannot be equal to 0. It must be greater than 0.",
         ]
     ]
 
@@ -44,7 +44,7 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_sma
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
+            "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
         ]
     ]
 
@@ -65,7 +65,7 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_big
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
+            "Task instance | KINSOL: the upper half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
         ]
     ]
 
@@ -86,7 +86,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_sma
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
+            "Task instance | KINSOL: the lower half-bandwidth cannot be equal to -1. It must be between 0 and 2.",
         ]
     ]
 
@@ -107,7 +107,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_big
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
+            "Task instance | KINSOL: the lower half-bandwidth cannot be equal to 1. It must be between 0 and 0.",
         ]
     ]
 

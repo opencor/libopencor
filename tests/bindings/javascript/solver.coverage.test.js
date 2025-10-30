@@ -54,19 +54,19 @@ test.describe('Solver coverage tests', () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.WARNING,
-        "The variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed."
+        "Task instance | Change attribute: the variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed."
       ],
       [
         loc.Issue.Type.WARNING,
-        "The variable 'membrane' in component 'X'could not be found and therefore could not be changed."
+        "Task instance | Change attribute: the variable 'membrane' in component 'X'could not be found and therefore could not be changed."
       ],
       [
         loc.Issue.Type.WARNING,
-        "The computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."
+        "Task instance | Change attribute: the computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."
       ],
       [
         loc.Issue.Type.WARNING,
-        "The algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."
+        "Task instance | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."
       ]
     ]);
   });

@@ -169,7 +169,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
     auto cellmlFileAnalyser {pCellmlFile->analyser()};
 
     if (cellmlFileAnalyser->errorCount() != 0) {
-        addIssues(cellmlFileAnalyser);
+        addIssues(cellmlFileAnalyser, "Analyser");
     } else {
         // Get an NLA solver, if needed.
 
@@ -341,7 +341,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         if (!mCompiler->compile(implementationCode, mWasmModule)) {
             // The compilation failed, so add the issues it generated.
 
-            addIssues(mCompiler);
+            addIssues(mCompiler, "Compiler");
 
             return;
         }
@@ -376,7 +376,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         if (!mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel()))) {
             // The compilation failed, so add the issues it generated.
 
-            addIssues(mCompiler);
+            addIssues(mCompiler, "Compiler");
 
             return;
         }
@@ -393,7 +393,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
 #    ifndef CODE_COVERAGE_ENABLED
             if (!functionAdded) {
-                addIssues(mCompiler);
+                addIssues(mCompiler, "Compiler");
 
                 return;
             }

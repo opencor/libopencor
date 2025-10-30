@@ -50,12 +50,15 @@ test.describe('Solver KINSOL tests', () => {
     const simulation = document.simulations.get(0);
     const solver = simulation.nlaSolver;
 
-    solver.maximumNumberOfIterations = -1.234;
+    solver.maximumNumberOfIterations = 0;
 
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The maximum number of iterations cannot be equal to -1. It must be greater than 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the maximum number of iterations cannot be equal to 0. It must be greater than 0.'
+      ]
     ]);
   });
 
@@ -74,7 +77,10 @@ test.describe('Solver KINSOL tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 2.'
+      ]
     ]);
   });
 
@@ -93,7 +99,10 @@ test.describe('Solver KINSOL tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the upper half-bandwidth cannot be equal to 1. It must be between 0 and 0.'
+      ]
     ]);
   });
 
@@ -112,7 +121,10 @@ test.describe('Solver KINSOL tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the lower half-bandwidth cannot be equal to -1. It must be between 0 and 2.'
+      ]
     ]);
   });
 
@@ -131,7 +143,10 @@ test.describe('Solver KINSOL tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the lower half-bandwidth cannot be equal to 1. It must be between 0 and 0.'
+      ]
     ]);
   });
 

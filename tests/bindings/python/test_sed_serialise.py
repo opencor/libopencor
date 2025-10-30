@@ -564,7 +564,7 @@ def test_sedml_file():
     expected_issues = [
         [
             loc.Issue.Type.Warning,
-            "The model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it.",
+            "SED-ML file: the model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it.",
         ],
     ]
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
@@ -608,163 +608,163 @@ def test_sed_simulation():
     expected_issues = [
         [
             loc.Issue.Type.Warning,
-            "The solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead.",
+            "SED-ML file: the solver 'KISAO:1234567' is not recognised. The CVODE solver will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
+            "SED-ML file | Forward Euler: the parameter 'KISAO:1234567' is not recognised. It will be ignored.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The step ('KISAO:0000483') cannot be equal to '-1.23'. It must be greater or equal to 0. A step of 1 will be used instead.",
+            "SED-ML file | Fourth-order Runge-Kutta: the step ('KISAO:0000483') cannot be equal to '-1.23'. It must be greater or equal to 0. A step of 1 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The step ('KISAO:0000483') cannot be equal to 'nan'. It must be greater or equal to 0. A step of 1 will be used instead.",
+            "SED-ML file | Heun: the step ('KISAO:0000483') cannot be equal to 'nan'. It must be greater or equal to 0. A step of 1 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The step ('KISAO:0000483') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A step of 1 will be used instead.",
+            "SED-ML file | Second-order Runge-Kutta: the step ('KISAO:0000483') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A step of 1 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
+            "SED-ML file | CVODE: the parameter 'KISAO:1234567' is not recognised. It will be ignored.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The relative tolerance ('KISAO:0000209') cannot be equal to '-1e-03'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
+            "SED-ML file | CVODE: the relative tolerance ('KISAO:0000209') cannot be equal to '-1e-03'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The absolute tolerance ('KISAO:0000211') cannot be equal to '-1e-05'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
+            "SED-ML file | CVODE: the absolute tolerance ('KISAO:0000211') cannot be equal to '-1e-05'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum number of steps ('KISAO:0000415') cannot be equal to '-369'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
+            "SED-ML file | CVODE: the maximum number of steps ('KISAO:0000415') cannot be equal to '-369'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum step ('KISAO:0000467') cannot be equal to '-0.01'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
+            "SED-ML file | CVODE: the maximum step ('KISAO:0000467') cannot be equal to '-0.01'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '-1'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
+            "SED-ML file | CVODE: the upper half-bandwidth ('KISAO:0000479') cannot be equal to '-1'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '-2'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
+            "SED-ML file | CVODE: the lower half-bandwidth ('KISAO:0000480') cannot be equal to '-2'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The relative tolerance ('KISAO:0000209') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
+            "SED-ML file | CVODE: the relative tolerance ('KISAO:0000209') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The absolute tolerance ('KISAO:0000211') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
+            "SED-ML file | CVODE: the absolute tolerance ('KISAO:0000211') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum number of steps ('KISAO:0000415') cannot be equal to 'NotANumber'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
+            "SED-ML file | CVODE: the maximum number of steps ('KISAO:0000415') cannot be equal to 'NotANumber'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum step ('KISAO:0000467') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
+            "SED-ML file | CVODE: the maximum step ('KISAO:0000467') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The integration method ('KISAO:0000475') cannot be equal to 'Unknown'. It must be equal to 'BDF' or 'Adams-Moulton'. A BDF integration method will be used instead.",
+            "SED-ML file | CVODE: the integration method ('KISAO:0000475') cannot be equal to 'Unknown'. It must be equal to 'BDF' or 'Adams-Moulton'. A BDF integration method will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The iteration type ('KISAO:0000476') cannot be equal to 'Unknown'. It must be equal to 'Functional' or 'Newton'. A Newton iteration type will be used instead.",
+            "SED-ML file | CVODE: the iteration type ('KISAO:0000476') cannot be equal to 'Unknown'. It must be equal to 'Functional' or 'Newton'. A Newton iteration type will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The preconditioner ('KISAO:0000478') cannot be equal to 'Unknown'. It must be equal to 'No' or 'Banded'. A Banded preconditioner will be used instead.",
+            "SED-ML file | CVODE: the preconditioner ('KISAO:0000478') cannot be equal to 'Unknown'. It must be equal to 'No' or 'Banded'. A Banded preconditioner will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The upper half-bandwidth ('KISAO:0000479') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
+            "SED-ML file | CVODE: the upper half-bandwidth ('KISAO:0000479') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The lower half-bandwidth ('KISAO:0000480') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
+            "SED-ML file | CVODE: the lower half-bandwidth ('KISAO:0000480') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The interpolate solution parameter ('KISAO:0000481') cannot be equal to 'True'. It must be equal to 'true' or 'false'. A value of true will be used instead.",
+            "SED-ML file | CVODE: the interpolate solution parameter ('KISAO:0000481') cannot be equal to 'True'. It must be equal to 'true' or 'false'. A value of true will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The relative tolerance ('KISAO:0000209') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
+            "SED-ML file | CVODE: the relative tolerance ('KISAO:0000209') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A relative tolerance of 1e-07 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The absolute tolerance ('KISAO:0000211') cannot be equal to '1.23e456789'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
+            "SED-ML file | CVODE: the absolute tolerance ('KISAO:0000211') cannot be equal to '1.23e456789'. It must be greater or equal to 0. An absolute tolerance of 1e-07 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum number of steps ('KISAO:0000415') cannot be equal to '1234567890123'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
+            "SED-ML file | CVODE: the maximum number of steps ('KISAO:0000415') cannot be equal to '1234567890123'. It must be greater than 0. A maximum number of steps of 500 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum step ('KISAO:0000467') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
+            "SED-ML file | CVODE: the maximum step ('KISAO:0000467') cannot be equal to '1.23e456789'. It must be greater or equal to 0. A maximum step of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
+            "SED-ML file | CVODE: the upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
+            "SED-ML file | CVODE: the lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
+            "SED-ML file | CVODE: the linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The parameter 'KISAO:1234567' is not recognised. It will be ignored.",
+            "SED-ML file | KINSOL: the parameter 'KISAO:1234567' is not recognised. It will be ignored.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum number of iterations ('KISAO:0000486') cannot be equal to '-123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
+            "SED-ML file | KINSOL: the maximum number of iterations ('KISAO:0000486') cannot be equal to '-123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '-1'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
+            "SED-ML file | KINSOL: the upper half-bandwidth ('KISAO:0000479') cannot be equal to '-1'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '-2'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
+            "SED-ML file | KINSOL: the lower half-bandwidth ('KISAO:0000480') cannot be equal to '-2'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum number of iterations ('KISAO:0000486') cannot be equal to 'NotANumber'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
+            "SED-ML file | KINSOL: the maximum number of iterations ('KISAO:0000486') cannot be equal to 'NotANumber'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The upper half-bandwidth ('KISAO:0000479') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
+            "SED-ML file | KINSOL: the upper half-bandwidth ('KISAO:0000479') cannot be equal to 'NotANumber'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The lower half-bandwidth ('KISAO:0000480') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
+            "SED-ML file | KINSOL: the lower half-bandwidth ('KISAO:0000480') cannot be equal to 'NotANumber'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The maximum number of iterations ('KISAO:0000486') cannot be equal to '1234567890123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
+            "SED-ML file | KINSOL: the maximum number of iterations ('KISAO:0000486') cannot be equal to '1234567890123'. It must be greater than 0. A maximum number of iterations of 200 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
+            "SED-ML file | KINSOL: the upper half-bandwidth ('KISAO:0000479') cannot be equal to '1234567890123'. It must be greater or equal to 0. An upper half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
+            "SED-ML file | KINSOL: the lower half-bandwidth ('KISAO:0000480') cannot be equal to '1234567890123'. It must be greater or equal to 0. A lower half-bandwidth of 0 will be used instead.",
         ],
         [
             loc.Issue.Type.Warning,
-            "The linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
+            "SED-ML file | KINSOL: the linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead.",
         ],
     ]
     expected_serialisation = """<?xml version="1.0" encoding="UTF-8"?>
