@@ -389,7 +389,7 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 #ifndef CODE_COVERAGE_ENABLED
         if (userData.infOrNanFound) {
 #endif
-            addError("The input vector contains some Inf and/or NaN values.");
+            addError("The NLA system could not be solved (it contains some Inf and/or NaN values).");
 #ifndef CODE_COVERAGE_ENABLED
         } else {
             addError(mErrorMessage);

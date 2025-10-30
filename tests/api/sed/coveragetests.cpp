@@ -590,7 +590,7 @@ TEST(CoverageSedTest, math)
 TEST(CoverageSedTest, KinsolWithInfAndOrNanValues)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
-        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the input vector contains some Inf and/or NaN values."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values)."},
     };
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_inf_and_or_nan_values.cellml"));
