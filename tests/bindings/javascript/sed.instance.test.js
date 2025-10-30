@@ -86,10 +86,10 @@ test.describe('Sed instance tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The CellML file is invalid.'],
+      [loc.Issue.Type.ERROR, 'Task | Model: the CellML file is invalid.'],
       [
         loc.Issue.Type.ERROR,
-        "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."
+        "Task | Model | CellML | Analyser: equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."
       ]
     ]);
   });
@@ -103,8 +103,11 @@ test.describe('Sed instance tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The CellML file is overconstrained.'],
-      [loc.Issue.Type.ERROR, "Variable 'x' in component 'my_component' is computed more than once."]
+      [loc.Issue.Type.ERROR, 'Task | Model: the CellML file is overconstrained.'],
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is computed more than once."
+      ]
     ]);
   });
 
@@ -117,8 +120,11 @@ test.describe('Sed instance tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The CellML file is underconstrained.'],
-      [loc.Issue.Type.ERROR, "The type of variable 'x' in component 'my_component' is unknown."]
+      [loc.Issue.Type.ERROR, 'Task | Model: the CellML file is underconstrained.'],
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Model | CellML | Analyser: the type of variable 'x' in component 'my_component' is unknown."
+      ]
     ]);
   });
 
@@ -131,9 +137,15 @@ test.describe('Sed instance tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The CellML file is unsuitably constrained.'],
-      [loc.Issue.Type.ERROR, "Variable 'y' in component 'my_component' is computed more than once."],
-      [loc.Issue.Type.ERROR, "The type of variable 'x' in component 'my_component' is unknown."]
+      [loc.Issue.Type.ERROR, 'Task | Model: the CellML file is unsuitably constrained.'],
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is computed more than once."
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Model | CellML | Analyser: the type of variable 'x' in component 'my_component' is unknown."
+      ]
     ]);
   });
 
@@ -168,7 +180,7 @@ test.describe('Sed instance tests', () => {
     instance.run();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'At t = 0.00140013827899996, mxstep steps taken before reaching tout.']
+      [loc.Issue.Type.ERROR, 'Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout.']
     ]);
 
     cvode.maximumNumberOfSteps = 500;
@@ -194,7 +206,7 @@ test.describe('Sed instance tests', () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."
       ]
     ]);
   });
@@ -214,7 +226,10 @@ test.describe('Sed instance tests', () => {
     let instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.'
+      ]
     ]);
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
@@ -238,7 +253,7 @@ test.describe('Sed instance tests', () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."
       ]
     ]);
   });
@@ -258,13 +273,19 @@ test.describe('Sed instance tests', () => {
     let instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.'
+      ]
     ]);
 
     instance.run();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0.'
+      ]
     ]);
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.DENSE;
@@ -292,11 +313,11 @@ test.describe('Sed instance tests', () => {
     assertIssues(loc, instance, [
       [
         loc.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."
       ],
       [
         loc.Issue.Type.ERROR,
-        "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."
       ]
     ]);
   });

@@ -53,7 +53,12 @@ test.describe('Solver Fourth-Order Runge-Kutta tests', () => {
 
     const instance = document.instantiate();
 
-    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, 'The step cannot be equal to 0. It must be greater than 0.']]);
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | Fourth-order Runge-Kutta: the step cannot be equal to 0. It must be greater than 0.'
+      ]
+    ]);
   });
 
   test('Solve', () => {

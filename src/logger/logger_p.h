@@ -49,10 +49,10 @@ public:
     IssuePtrs warnings() const;
     IssuePtr warning(size_t pIndex) const;
 
-    void addIssues(const LoggerPtr &pLogger);
-    void addIssues(const libcellml::LoggerPtr &pLogger);
+    void addIssues(const LoggerPtr &pLogger, const std::string &pContext);
+    void addIssues(const libcellml::LoggerPtr &pLogger, const std::string &pContext);
 
-    void addIssue(Issue::Type pType, const std::string &pDescription);
+    void addIssue(Issue::Type pType, const std::string &pDescription, const std::string &pContext = "");
 
     void addError(const std::string &pDescription);
     void addWarning(const std::string &pDescription);

@@ -24,7 +24,7 @@ def test_maximum_step_value_with_invalid_number():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The maximum step cannot be equal to -1.234. It must be greater or equal to 0.",
+            "Task instance | CVODE: the maximum step cannot be equal to -1.234. It must be greater or equal to 0.",
         ]
     ]
 
@@ -44,7 +44,7 @@ def test_maximum_number_of_steps_value_with_invalid_number():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The maximum number of steps cannot be equal to 0. It must be greater than 0.",
+            "Task instance | CVODE: the maximum number of steps cannot be equal to 0. It must be greater than 0.",
         ]
     ]
 
@@ -64,7 +64,7 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_sma
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
+            "Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ]
     ]
 
@@ -85,7 +85,7 @@ def test_banded_linear_solver_and_upper_half_bandwidth_value_with_number_too_big
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
+            "Task instance | CVODE: the upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
         ]
     ]
 
@@ -106,7 +106,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_sma
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
+            "Task instance | CVODE: the lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ]
     ]
 
@@ -127,7 +127,7 @@ def test_banded_linear_solver_and_lower_half_bandwidth_value_with_number_too_big
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
+            "Task instance | CVODE: the lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.",
         ]
     ]
 
@@ -148,7 +148,7 @@ def test_relative_tolerance_value_with_invalid_number():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
+            "Task instance | CVODE: the relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
         ]
     ]
 
@@ -168,7 +168,7 @@ def test_absolute_tolerance_value_with_invalid_number():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
+            "Task instance | CVODE: the absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.",
         ]
     ]
 

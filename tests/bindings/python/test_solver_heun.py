@@ -23,7 +23,7 @@ def test_step_value_with_invalid_number():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The step cannot be equal to 0. It must be greater than 0.",
+            "Task instance | Heun: the step cannot be equal to 0. It must be greater than 0.",
         ],
     ]
 

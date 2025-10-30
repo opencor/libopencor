@@ -25,8 +25,9 @@ class Issue::Impl
 public:
     Type mType;
     std::string mDescription;
+    std::string mContext;
 
-    explicit Impl(Type pType, const std::string &pDescription);
+    explicit Impl(Type pType, const std::string &pDescription, const std::string &pContext);
 
     Type type() const;
     std::string typeAsString() const;

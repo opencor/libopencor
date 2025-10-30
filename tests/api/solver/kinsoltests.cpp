@@ -21,7 +21,7 @@ limitations under the License.
 TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The maximum number of iterations cannot be equal to 0. It must be greater than 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the maximum number of iterations cannot be equal to 0. It must be greater than 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"))};
@@ -39,7 +39,7 @@ TEST(KinsolSolverTest, maximumNumberOfIterationsValueWithInvalidNumber)
 TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooSmall)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"))};
@@ -58,7 +58,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
 TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooBig)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 1. It must be between 0 and 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the upper half-bandwidth cannot be equal to 1. It must be between 0 and 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"))};
@@ -77,7 +77,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberToo
 TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooSmall)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the lower half-bandwidth cannot be equal to -1. It must be between 0 and 2."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla2.cellml"))};
@@ -96,7 +96,7 @@ TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberToo
 TEST(KinsolSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooBig)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to 1. It must be between 0 and 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the lower half-bandwidth cannot be equal to 1. It must be between 0 and 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/nla1.cellml"))};

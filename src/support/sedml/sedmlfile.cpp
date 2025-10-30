@@ -224,7 +224,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         if (odeSolver != nullptr) {
             odeSolver->pimpl()->populate(sedAlgorithm);
 
-            addIssues(odeSolver);
+            addIssues(odeSolver, odeSolver->name());
 
             simulation->setOdeSolver(odeSolver);
         }
@@ -232,7 +232,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         if (nlaSolver != nullptr) {
             nlaSolver->pimpl()->populate(sedAlgorithm);
 
-            addIssues(nlaSolver);
+            addIssues(nlaSolver, nlaSolver->name());
 
             simulation->setNlaSolver(nlaSolver);
         }

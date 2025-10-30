@@ -20,7 +20,7 @@ TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 {
     static const auto RELATIVE_TOLERANCE {-1.234};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The maximum step cannot be equal to -1.234. It must be greater or equal to 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the maximum step cannot be equal to -1.234. It must be greater or equal to 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
@@ -39,7 +39,7 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
 {
     static const auto MAXIMUM_NUMBER_OF_STEPS {0};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The maximum number of steps cannot be equal to 0. It must be greater than 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the maximum number of steps cannot be equal to 0. It must be greater than 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
@@ -58,7 +58,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooS
 {
     static const auto UPPER_HALF_BANDWIDTH {-1};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
@@ -78,7 +78,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooB
 {
     static const auto UPPER_HALF_BANDWIDTH {4};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the upper half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
@@ -98,7 +98,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooS
 {
     static const auto LOWER_HALF_BANDWIDTH {-1};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the lower half-bandwidth cannot be equal to -1. It must be between 0 and 3."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
@@ -118,7 +118,7 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooB
 {
     static const auto LOWER_HALF_BANDWIDTH {4};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the lower half-bandwidth cannot be equal to 4. It must be between 0 and 3."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
@@ -138,7 +138,7 @@ TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
 {
     static const auto RELATIVE_TOLERANCE {-1.234};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the relative tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
@@ -157,7 +157,7 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 {
     static const auto ABSOLUTE_TOLERANCE {-1.234};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | CVODE: the absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};

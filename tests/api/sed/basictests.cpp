@@ -134,7 +134,7 @@ TEST(BasicSedTest, combineArchiveWithUnknownDirectCellmlFile)
 TEST(BasicSedTest, combineArchiveWithUnknownIndirectCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "Task 'task1' requires a model of CellML type."},
+        {libOpenCOR::Issue::Type::ERROR, "Task: task 'task1' requires a model of CellML type."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unknown_indirect_cellml_file.omex"))};

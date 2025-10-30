@@ -58,13 +58,13 @@ bool SedTask::Impl::isValid()
     // Make sure that the model is valid.
 
     if (!mModel->pimpl()->isValid()) {
-        addIssues(mModel);
+        addIssues(mModel, "Model");
     }
 
     // Make sure that the simulation is valid for the model.
 
     if (!mSimulation->pimpl()->isValid(mModel)) {
-        addIssues(mSimulation);
+        addIssues(mSimulation, "Simulation");
     }
 
     return !hasIssues();

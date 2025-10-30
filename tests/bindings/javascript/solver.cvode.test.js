@@ -52,7 +52,10 @@ test.describe('Solver CVODE tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The maximum step cannot be equal to -1.234. It must be greater or equal to 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the maximum step cannot be equal to -1.234. It must be greater or equal to 0.'
+      ]
     ]);
   });
 
@@ -70,7 +73,10 @@ test.describe('Solver CVODE tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The maximum number of steps cannot be equal to 0. It must be greater than 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the maximum number of steps cannot be equal to 0. It must be greater than 0.'
+      ]
     ]);
   });
 
@@ -89,7 +95,10 @@ test.describe('Solver CVODE tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.'
+      ]
     ]);
   });
 
@@ -108,7 +117,10 @@ test.describe('Solver CVODE tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the upper half-bandwidth cannot be equal to 4. It must be between 0 and 3.'
+      ]
     ]);
   });
 
@@ -127,7 +139,10 @@ test.describe('Solver CVODE tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the lower half-bandwidth cannot be equal to -1. It must be between 0 and 3.'
+      ]
     ]);
   });
 
@@ -146,7 +161,10 @@ test.describe('Solver CVODE tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the lower half-bandwidth cannot be equal to 4. It must be between 0 and 3.'
+      ]
     ]);
   });
 
@@ -164,7 +182,10 @@ test.describe('Solver CVODE tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the relative tolerance cannot be equal to -1.234. It must be greater or equal to 0.'
+      ]
     ]);
   });
 
@@ -182,7 +203,10 @@ test.describe('Solver CVODE tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the absolute tolerance cannot be equal to -1.234. It must be greater or equal to 0.'
+      ]
     ]);
   });
 

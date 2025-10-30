@@ -103,31 +103,31 @@ def test_changes():
     expected_issues_1 = [
         [
             loc.Issue.Type.Error,
-            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'.",
+            "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'.",
         ],
         [
             loc.Issue.Type.Error,
-            "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value.",
+            "SED-ML file: the new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value.",
         ],
         [
             loc.Issue.Type.Error,
-            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''.",
+            "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''.",
         ],
         [
             loc.Issue.Type.Error,
-            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'.",
+            "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'.",
         ],
         [
             loc.Issue.Type.Error,
-            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''.",
+            "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''.",
         ],
         [
             loc.Issue.Type.Error,
-            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'.",
+            "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'.",
         ],
         [
             loc.Issue.Type.Error,
-            "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'.",
+            "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'.",
         ],
     ]
 
@@ -139,19 +139,19 @@ def test_changes():
     expected_issues_2 = [
         [
             loc.Issue.Type.Warning,
-            "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored.",
+            "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored.",
         ],
         [
             loc.Issue.Type.Warning,
-            "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored.",
+            "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored.",
         ],
         [
             loc.Issue.Type.Warning,
-            "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored.",
+            "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored.",
         ],
         [
             loc.Issue.Type.Warning,
-            "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored.",
+            "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored.",
         ],
     ]
 
@@ -269,11 +269,11 @@ def test_tasks():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "Task 'task1' requires a model.",
+            "Task: task 'task1' requires a model.",
         ],
         [
             loc.Issue.Type.Error,
-            "Task 'task1' requires a simulation.",
+            "Task: task 'task1' requires a simulation.",
         ],
     ]
 
@@ -366,7 +366,7 @@ def test_sed_instance_and_sed_instance_task_differential_model():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
+            "Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.",
         ],
     ]
 

@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "issue_p.h"
 #include "logger_p.h"
 
 namespace libOpenCOR {
@@ -90,27 +91,28 @@ IssuePtr Logger::Impl::warning(size_t pIndex) const
     return mWarnings[pIndex];
 }
 
-void Logger::Impl::addIssues(const LoggerPtr &pLogger)
+void Logger::Impl::addIssues(const LoggerPtr &pLogger, const std::string &pContext)
 {
     for (const auto &issue : pLogger->issues()) {
-        addIssue(issue->type(), issue->description());
+        addIssue(issue->type(), issue->mPimpl->mDescription,
+                 issue->mPimpl->mContext.empty() ? pContext : pContext + " | " + issue->mPimpl->mContext);
     }
 }
 
-void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger)
+void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger, const std::string &pContext)
 {
     for (size_t i {0}; i < pLogger->issueCount(); ++i) {
         auto issue {pLogger->issue(i)};
 
         addIssue((issue->level() == libcellml::Issue::Level::ERROR) ? Issue::Type::ERROR :
                                                                       Issue::Type::WARNING,
-                 issue->description());
+                 issue->description(), pContext);
     }
 }
 
-void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription)
+void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription, const std::string &pContext)
 {
-    auto issue {IssuePtr {new Issue {pType, pDescription}}};
+    auto issue {IssuePtr {new Issue {pType, pDescription, pContext}}};
     mIssues.push_back(issue);
 
     if (pType == Issue::Type::ERROR) {

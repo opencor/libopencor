@@ -153,31 +153,31 @@ test.describe('Sed coverage tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'."
+        "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target 'invalidTarget'."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value."
+        "SED-ML file: the new value 'invalidNewValue' for the change of type 'changeAttribute' is not a valid double value."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''."
+        "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name=''."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'."
+        "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName'."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''."
+        "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name=''."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'."
+        "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName'."
       ],
       [
         loc.Issue.Type.ERROR,
-        "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."
+        "SED-ML file: the component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '/cellml:model/cellml:component[@name='componentName']/cellml:variable[@name='variableName']Invalid'."
       ]
     ]);
 
@@ -188,19 +188,19 @@ test.describe('Sed coverage tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.WARNING,
-        "Only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored."
+        "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'addXML' has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "Only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored."
+        "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'changeXML' has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "Only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored."
+        "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'removeXML' has been ignored."
       ],
       [
         loc.Issue.Type.WARNING,
-        "Only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."
+        "SED-ML file: only changes of type 'changeAttribute' are currently supported. The change of type 'computeChange' has been ignored."
       ]
     ]);
   });
@@ -297,8 +297,8 @@ test.describe('Sed coverage tests', () => {
     const instance = document.instantiate();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, "Task 'task1' requires a model."],
-      [loc.Issue.Type.ERROR, "Task 'task1' requires a simulation."]
+      [loc.Issue.Type.ERROR, "Task: task 'task1' requires a model."],
+      [loc.Issue.Type.ERROR, "Task: task 'task1' requires a simulation."]
     ]);
 
     assert.strictEqual(document.addTask(task), false);
@@ -459,7 +459,10 @@ test.describe('Sed coverage tests', () => {
     instance.run();
 
     assertIssues(loc, instance, [
-      [loc.Issue.Type.ERROR, 'The upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.']
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | CVODE: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 3.'
+      ]
     ]);
   });
 

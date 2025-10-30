@@ -39,7 +39,7 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
         if (importer->resolveImports(mModel, pathToString(stringToPath(pFile->path()).parent_path()))) {
             mModel = importer->flattenModel(mModel);
         } else {
-            addIssues(importer);
+            addIssues(importer, "Importer");
         }
     }
 
@@ -53,7 +53,7 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
     mAnalyserModel = mAnalyser->model();
 
     if (mAnalyser->errorCount() != 0) {
-        addIssues(mAnalyser);
+        addIssues(mAnalyser, "Analyser");
     }
 }
 

@@ -95,21 +95,21 @@ void File::Impl::checkType(const FilePtr &pOwner, bool pResetType)
         if (mCellmlFile != nullptr) {
             mType = Type::CELLML_FILE;
 
-            addIssues(mCellmlFile);
+            addIssues(mCellmlFile, "CellML file");
         } else {
             mSedmlFile = SedmlFile::create(pOwner);
 
             if (mSedmlFile != nullptr) {
                 mType = Type::SEDML_FILE;
 
-                addIssues(mSedmlFile);
+                addIssues(mSedmlFile, "SED-ML file");
             } else {
                 mCombineArchive = CombineArchive::create(pOwner);
 
                 if (mCombineArchive != nullptr) {
                     mType = Type::COMBINE_ARCHIVE;
 
-                    addIssues(mCombineArchive);
+                    addIssues(mCombineArchive, "COMBINE archive");
                 } else {
                     addError("The file is not a CellML file, a SED-ML file, or a COMBINE archive.");
                 }

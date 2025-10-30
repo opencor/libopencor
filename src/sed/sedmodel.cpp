@@ -65,7 +65,7 @@ bool SedModel::Impl::isValid()
         break;
     }
 
-    addIssues(mFile->pimpl()->mCellmlFile);
+    addIssues(mFile->pimpl()->mCellmlFile, "CellML");
 
     return !hasErrors();
 }

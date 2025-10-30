@@ -20,7 +20,7 @@ TEST(FourthOrderRungeKuttaSolverTest, stepValueWithInvalidNumber)
 {
     static const auto STEP {0.0};
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The step cannot be equal to 0. It must be greater than 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | Fourth-order Runge-Kutta: the step cannot be equal to 0. It must be greater than 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};

@@ -48,7 +48,7 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
             // Make sure that the task is valid.
 
             if (!taskPimpl->isValid()) {
-                addIssues(task);
+                addIssues(task, "Task");
 
                 tasksValid = false;
             }
@@ -63,7 +63,7 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
                 mTasks.push_back(taskInstance);
 
                 if (taskInstance->hasIssues()) {
-                    addIssues(taskInstance);
+                    addIssues(taskInstance, "Task instance");
                 }
             }
         }
@@ -93,7 +93,7 @@ double SedInstance::Impl::run()
             res += task->pimpl()->run();
 
             if (task->hasIssues()) {
-                addIssues(task);
+                addIssues(task, "Task");
 
                 // Reset the issues of the task so that they are not reported again should the instance be run again.
 

@@ -33,8 +33,8 @@ TEST(InstanceSedTest, noFile)
 TEST(InstanceSedTest, invalidCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The CellML file is invalid."},
-        {libOpenCOR::Issue::Type::ERROR, "Equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is invalid."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE))};
@@ -47,8 +47,8 @@ TEST(InstanceSedTest, invalidCellmlFile)
 TEST(InstanceSedTest, overconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The CellML file is overconstrained."},
-        {libOpenCOR::Issue::Type::ERROR, "Variable 'x' in component 'my_component' is computed more than once."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is overconstrained."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is computed more than once."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"))};
@@ -61,8 +61,8 @@ TEST(InstanceSedTest, overconstrainedCellmlFile)
 TEST(InstanceSedTest, underconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The CellML file is underconstrained."},
-        {libOpenCOR::Issue::Type::ERROR, "The type of variable 'x' in component 'my_component' is unknown."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is underconstrained."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: the type of variable 'x' in component 'my_component' is unknown."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/underconstrained.cellml"))};
@@ -75,9 +75,9 @@ TEST(InstanceSedTest, underconstrainedCellmlFile)
 TEST(InstanceSedTest, unsuitablyConstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The CellML file is unsuitably constrained."},
-        {libOpenCOR::Issue::Type::ERROR, "Variable 'y' in component 'my_component' is computed more than once."},
-        {libOpenCOR::Issue::Type::ERROR, "The type of variable 'x' in component 'my_component' is unknown."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is unsuitably constrained."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is computed more than once."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: the type of variable 'x' in component 'my_component' is unknown."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/unsuitably_constrained.cellml"))};
@@ -102,13 +102,13 @@ TEST(InstanceSedTest, odeModel)
 {
     const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
 #ifdef BUILDING_ON_INTEL
-        {libOpenCOR::Issue::Type::ERROR, "At t = 0.00140013827899996, mxstep steps taken before reaching tout."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout."},
 #else
         {libOpenCOR::Issue::Type::ERROR,
 #    ifdef BUILDING_ON_WINDOWS
-         "At t = 0.00140013827899821, mxstep steps taken before reaching tout."
+         "Task | CVODE: at t = 0.00140013827899821, mxstep steps taken before reaching tout."
 #    else
-         "At t = 0.00140013827899707, mxstep steps taken before reaching tout."
+         "Task | CVODE: at t = 0.00140013827899707, mxstep steps taken before reaching tout."
 #    endif
         },
 #endif
@@ -146,7 +146,7 @@ TEST(InstanceSedTest, odeModel)
 TEST(InstanceSedTest, odeModelWithNoOdeSolver)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
@@ -162,7 +162,7 @@ TEST(InstanceSedTest, odeModelWithNoOdeSolver)
 TEST(InstanceSedTest, nlaModel)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
@@ -187,7 +187,7 @@ TEST(InstanceSedTest, nlaModel)
 TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
@@ -203,7 +203,7 @@ TEST(InstanceSedTest, nlaModelWithNoNlaSolver)
 TEST(InstanceSedTest, daeModel)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the upper half-bandwidth cannot be equal to -1. It must be between 0 and 0."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
@@ -234,8 +234,8 @@ TEST(InstanceSedTest, daeModel)
 TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
-        {libOpenCOR::Issue::Type::ERROR, "Simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};

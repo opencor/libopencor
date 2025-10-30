@@ -73,7 +73,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
 #ifndef CODE_COVERAGE_ENABLED
     if (mRuntime->hasErrors()) {
-        addIssues(mRuntime);
+        addIssues(mRuntime, "Runtime");
 
         return;
     }
@@ -141,7 +141,7 @@ void SedInstanceTask::Impl::applyChanges()
 
         changeAttribute->pimpl()->apply(mOwner.lock(), mAnalyserModel);
 
-        addIssues(changeAttribute);
+        addIssues(changeAttribute, "Change attribute");
     }
 }
 
@@ -194,7 +194,7 @@ void SedInstanceTask::Impl::initialise()
     // Make sure that the NLA solver, should it have been used, didn't report any issues.
 
     if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
-        addIssues(mNlaSolver);
+        addIssues(mNlaSolver, mNlaSolver->name());
 
         return;
     }
@@ -205,7 +205,7 @@ void SedInstanceTask::Impl::initialise()
         if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates,
                                              mConstants, mComputedConstants, mAlgebraic,
                                              mRuntime)) {
-            addIssues(mOdeSolver);
+            addIssues(mOdeSolver, mOdeSolver->name());
 
             return;
         }
@@ -264,7 +264,7 @@ double SedInstanceTask::Impl::run()
 
         while (!fuzzyCompare(mVoi, voiEnd)) {
             if (!mOdeSolver->pimpl()->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
-                addIssues(mOdeSolver);
+                addIssues(mOdeSolver, mOdeSolver->name());
 
                 return 0.0;
             }
@@ -283,7 +283,7 @@ double SedInstanceTask::Impl::run()
 
 #ifndef CODE_COVERAGE_ENABLED
             if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
-                addIssues(mNlaSolver);
+                addIssues(mNlaSolver, mNlaSolver->name());
 
                 return 0.0;
             }

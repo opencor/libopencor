@@ -18,9 +18,10 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-Issue::Impl::Impl(Type pType, const std::string &pDescription)
+Issue::Impl::Impl(Type pType, const std::string &pDescription, const std::string &pContext)
     : mType(pType)
     , mDescription(pDescription)
+    , mContext(pContext)
 {
 }
 
@@ -36,11 +37,27 @@ std::string Issue::Impl::typeAsString() const
 
 std::string Issue::Impl::description() const
 {
+    // Check whether we have some context to add to the description.
+
+    if (!mContext.empty()) {
+        auto description {mDescription};
+
+#ifndef CODE_COVERAGE_ENABLED
+        if (std::isupper(description[0]) != 0) {
+#endif
+            description[0] = static_cast<char>(std::tolower(description[0]));
+#ifndef CODE_COVERAGE_ENABLED
+        }
+#endif
+
+        return mContext + ": " + description;
+    }
+
     return mDescription;
 }
 
-Issue::Issue(Type pType, const std::string &pDescription)
-    : mPimpl(new Impl {pType, pDescription})
+Issue::Issue(Type pType, const std::string &pDescription, const std::string &pContext)
+    : mPimpl(new Impl {pType, pDescription, pContext})
 {
 }
 

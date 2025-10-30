@@ -236,7 +236,7 @@ test.describe('Sed basic tests', () => {
 
     instance.run();
 
-    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, "Task 'task1' requires a model of CellML type."]]);
+    assertIssues(loc, instance, [[loc.Issue.Type.ERROR, "Task: task 'task1' requires a model of CellML type."]]);
   });
 
   test('COMBINE archive with unknown SED-ML file', () => {
