@@ -108,10 +108,10 @@ test.describe('Solver coverage tests', () => {
     assert.strictEqual(instanceTask.rateCount, 0);
     assert.strictEqual(instanceTask.constantCount, 1);
     assert.strictEqual(instanceTask.computedConstantCount, 1);
-    assert.strictEqual(instanceTask.algebraicCount, 3);
+    assert.strictEqual(instanceTask.algebraicVariableCount, 3);
 
-    assertValue(instanceTask.algebraic(0).get(0), -28.14815, 5);
-    assertValue(instanceTask.algebraic(1).get(0), -13.18519, 5);
-    assertValue(instanceTask.algebraic(2).get(0), 33.33333, 5);
+    assertValue(instanceTask.algebraicVariable(0).get(0), -28.14815, 5);
+    assertValue(instanceTask.algebraicVariable(1).get(0), -13.18519, 5);
+    assertValue(instanceTask.algebraicVariable(2).get(0), 33.33333, 5);
   });
 });

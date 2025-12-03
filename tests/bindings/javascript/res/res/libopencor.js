@@ -108,8 +108,8 @@ function populateAxis(axisId) {
     addAxisElement(axis, instanceTask.computedConstantName(i));
   }
 
-  for (let i = 0; i < instanceTask.algebraicCount; ++i) {
-    addAxisElement(axis, instanceTask.algebraicName(i));
+  for (let i = 0; i < instanceTask.algebraicVariableCount; ++i) {
+    addAxisElement(axis, instanceTask.algebraicVariableName(i));
   }
 }
 

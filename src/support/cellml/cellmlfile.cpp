@@ -50,7 +50,7 @@ CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
 
     mAnalyser->analyseModel(mModel);
 
-    mAnalyserModel = mAnalyser->model();
+    mAnalyserModel = mAnalyser->analyserModel();
 
     if (mAnalyser->errorCount() != 0) {
         addIssues(mAnalyser, "Analyser");

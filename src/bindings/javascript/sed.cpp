@@ -120,11 +120,11 @@ void sedApi()
         .function("computedConstantAsArray", &libOpenCOR::SedInstanceTask::computedConstantAsArray)
         .function("computedConstantName", &libOpenCOR::SedInstanceTask::computedConstantName)
         .function("computedConstantUnit", &libOpenCOR::SedInstanceTask::computedConstantUnit)
-        .property("algebraicCount", &libOpenCOR::SedInstanceTask::algebraicCount)
-        .function("algebraic", &libOpenCOR::SedInstanceTask::algebraic)
-        .function("algebraicAsArray", &libOpenCOR::SedInstanceTask::algebraicAsArray)
-        .function("algebraicName", &libOpenCOR::SedInstanceTask::algebraicName)
-        .function("algebraicUnit", &libOpenCOR::SedInstanceTask::algebraicUnit);
+        .property("algebraicVariableCount", &libOpenCOR::SedInstanceTask::algebraicVariableCount)
+        .function("algebraicVariable", &libOpenCOR::SedInstanceTask::algebraicVariable)
+        .function("algebraicVariableAsArray", &libOpenCOR::SedInstanceTask::algebraicVariableAsArray)
+        .function("algebraicVariableName", &libOpenCOR::SedInstanceTask::algebraicVariableName)
+        .function("algebraicVariableUnit", &libOpenCOR::SedInstanceTask::algebraicVariableUnit);
 
     // SedModel API.
 

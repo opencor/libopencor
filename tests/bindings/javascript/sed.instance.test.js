@@ -106,7 +106,7 @@ test.describe('Sed instance tests', () => {
       [loc.Issue.Type.ERROR, 'Task | Model: the CellML file is overconstrained.'],
       [
         loc.Issue.Type.ERROR,
-        "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is computed more than once."
+        "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is overconstrained."
       ]
     ]);
   });
@@ -140,7 +140,7 @@ test.describe('Sed instance tests', () => {
       [loc.Issue.Type.ERROR, 'Task | Model: the CellML file is unsuitably constrained.'],
       [
         loc.Issue.Type.ERROR,
-        "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is computed more than once."
+        "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is overconstrained."
       ],
       [
         loc.Issue.Type.ERROR,

@@ -140,9 +140,9 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        for (size_t i {0}; i < pAnalyserModel->algebraicCount(); ++i) {
-            if (instanceTaskPimpl->algebraicName(i) == changeName) {
-                auto algebraicVariable {pAnalyserModel->algebraic()[i]->variable()};
+        for (size_t i {0}; i < pAnalyserModel->algebraicVariableCount(); ++i) {
+            if (instanceTaskPimpl->algebraicVariableName(i) == changeName) {
+                auto algebraicVariable {pAnalyserModel->algebraicVariables()[i]->variable()};
                 auto algebraicComponent {owningComponent(algebraicVariable)};
 
                 addWarning(std::string("The algebraic variable '").append(algebraicVariable->name()).append("' in component '").append(algebraicComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));

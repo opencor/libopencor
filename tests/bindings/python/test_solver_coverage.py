@@ -84,8 +84,14 @@ def test_algebraic_changes():
     assert instance_task.rate_count == 0
     assert instance_task.constant_count == 1
     assert instance_task.computed_constant_count == 1
-    assert instance_task.algebraic_count == 3
+    assert instance_task.algebraic_variable_count == 3
 
-    assert instance_task.algebraic(0)[0] == pytest.approx(-28.14815, abs=ABS_TOL)
-    assert instance_task.algebraic(1)[0] == pytest.approx(-13.18519, abs=ABS_TOL)
-    assert instance_task.algebraic(2)[0] == pytest.approx(33.33333, abs=ABS_TOL)
+    assert instance_task.algebraic_variable(0)[0] == pytest.approx(
+        -28.14815, abs=ABS_TOL
+    )
+    assert instance_task.algebraic_variable(1)[0] == pytest.approx(
+        -13.18519, abs=ABS_TOL
+    )
+    assert instance_task.algebraic_variable(2)[0] == pytest.approx(
+        33.33333, abs=ABS_TOL
+    )

@@ -33,7 +33,7 @@ TEST(RuntimeCellmlTest, invalidRuntimeBecauseOfAnalysisIssues)
 {
     static const libOpenCOR::ExpectedIssues expectedIssues {{
         {libOpenCOR::Issue::Type::WARNING, "Analyser: the units in 'x = 1.0' in component 'my_component' are not equivalent. 'x' is in 'volt' (i.e. 'ampere^-1 x kilogram x metre^2 x second^-3') while '1.0' is 'dimensionless'."},
-        {libOpenCOR::Issue::Type::ERROR, "Analyser: variable 'x' in component 'my_component' is computed more than once."},
+        {libOpenCOR::Issue::Type::ERROR, "Analyser: variable 'x' in component 'my_component' is overconstrained."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("support/cellml/model_with_analysis_issues.cellml"))};

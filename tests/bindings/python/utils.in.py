@@ -125,9 +125,9 @@ def assert_values(
             computed_constant_abs_tols[i],
         )
 
-    for i in range(instance_task.algebraic_count):
+    for i in range(instance_task.algebraic_variable_count):
         assert_value(
-            instance_task.algebraic(i)[index],
+            instance_task.algebraic_variable(i)[index],
             algebraic_values[i],
             algebraic_abs_tols[i],
         )

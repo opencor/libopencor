@@ -32,8 +32,8 @@ class CellmlFileRuntime: public Logger
 {
 public:
 #ifndef __EMSCRIPTEN__
-    using InitialiseVariablesForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
-    using InitialiseVariablesForDifferentialModel = void (*)(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
+    using InitialiseArraysForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
+    using InitialiseArraysForDifferentialModel = void (*)(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeComputedConstantsForAlgebraicModel = void (*)(double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeComputedConstantsForDifferentialModel = void (*)(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
     using ComputeRates = void (*)(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic);
@@ -53,16 +53,16 @@ public:
     static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 
 #ifdef __EMSCRIPTEN__
-    void initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeComputedConstantsForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
 #else
-    InitialiseVariablesForAlgebraicModel initialiseVariablesForAlgebraicModel() const;
-    InitialiseVariablesForDifferentialModel initialiseVariablesForDifferentialModel() const;
+    InitialiseArraysForAlgebraicModel initialiseArraysForAlgebraicModel() const;
+    InitialiseArraysForDifferentialModel initialiseArraysForDifferentialModel() const;
     ComputeComputedConstantsForAlgebraicModel computeComputedConstantsForAlgebraicModel() const;
     ComputeComputedConstantsForDifferentialModel computeComputedConstantsForDifferentialModel() const;
     ComputeRates computeRates() const;

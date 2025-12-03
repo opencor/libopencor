@@ -99,10 +99,10 @@ public:
     std::string computedConstantName(size_t pIndex) const;
     std::string computedConstantUnit(size_t pIndex) const;
 
-    size_t algebraicCount() const;
-    Doubles algebraic(size_t pIndex) const;
-    std::string algebraicName(size_t pIndex) const;
-    std::string algebraicUnit(size_t pIndex) const;
+    size_t algebraicVariableCount() const;
+    Doubles algebraicVariable(size_t pIndex) const;
+    std::string algebraicVariableName(size_t pIndex) const;
+    std::string algebraicVariableUnit(size_t pIndex) const;
 };
 
 } // namespace libOpenCOR

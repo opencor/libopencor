@@ -33,7 +33,7 @@ int main()
     std::cout << " - States and rates:    " << instanceTask->stateCount() << "\n";
     std::cout << " - Constants:           " << instanceTask->constantCount() << "\n";
     std::cout << " - Computed constants:  " << instanceTask->computedConstantCount() << "\n";
-    std::cout << " - Algebraic variables: " << instanceTask->algebraicCount() << "\n";
+    std::cout << " - Algebraic variables: " << instanceTask->algebraicVariableCount() << "\n";
 
     // Output the results of the simulation.
 
@@ -58,8 +58,8 @@ int main()
         std::cout << "," << instanceTask->computedConstantName(i) << " (" << instanceTask->computedConstantUnit(i) << ")";
     }
 
-    for (size_t i {0}; i < instanceTask->algebraicCount(); ++i) {
-        std::cout << "," << instanceTask->algebraicName(i) << " (" << instanceTask->algebraicUnit(i) << ")";
+    for (size_t i {0}; i < instanceTask->algebraicVariableCount(); ++i) {
+        std::cout << "," << instanceTask->algebraicVariableName(i) << " (" << instanceTask->algebraicVariableUnit(i) << ")";
     }
 
     std::cout << "\n";
@@ -83,8 +83,8 @@ int main()
             std::cout << "," << instanceTask->computedConstant(i)[j];
         }
 
-        for (size_t i {0}; i < instanceTask->algebraicCount(); ++i) {
-            std::cout << "," << instanceTask->algebraic(i)[j];
+        for (size_t i {0}; i < instanceTask->algebraicVariableCount(); ++i) {
+            std::cout << "," << instanceTask->algebraicVariable(i)[j];
         }
 
         std::cout << "\n";

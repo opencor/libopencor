@@ -34,49 +34,49 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         f3087749522fb85a72d440180b9b4c3b5bf77eb4)
+                         5bee3b3c508fb274e084468243b43d9f83647beb)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     b1bfb0c9d197e7b858f5f27f305bda5ae40a9ad7)
+                                     d277ce028be3806aa2514ba27ec4bed352faf069)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     4d06110bb96f71cff8f1fb0e0e463f94920f8fa9)
+                                     388a936417a5681fbcf835bdda20e8ed0fbf3382)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     214b685fbaf9c616739ad8786800b75d59a47f8b)
+                                     c768d8c59db5ee4a07baa0fc61d7a8ccac4ea6db)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     0d6d70f9fdf7443d82016216a78be7d2acea2e7e)
+                                     2fd521abaf83b480e5b07c746ae310be529faa7e)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8ccd4a8a95a3b4b243d900746340f167d9f31075)
+                                 055181384ac2e4e942603c6b1f3d0c20f439b523)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 72b1e4f2e4a2b76a0d45efced9ef96cbba263d66)
+                                 847c024d893e3a1f73172e8f6d2e55136e46dd86)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 623866e3cf071f652fe778a22868b5c6917db6f9)
+                                 f8d847dffd74264a3074e742149dca0ab4c57653)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9742ef210ca1cc88549b802c6f0fc5d1c0670f25)
+                                 674bb536a67cc7e7d4afef553c843ac38d44d43f)
             endif()
         endif()
     endif()
@@ -86,7 +86,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     build_package(${PACKAGE_NAME}
         URL
             # https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
-            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/6d27883.tar.gz
+            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/7cc5bea.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF

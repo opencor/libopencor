@@ -101,23 +101,23 @@ intptr_t instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferent
             const wasmInstanceFunctions = {};
 
             if ($2) {
-                wasmInstanceFunctions.initialiseVariables = wasmInstance.exports.initialiseVariables;
+                wasmInstanceFunctions.initialiseArrays = wasmInstance.exports.initialiseArrays;
                 wasmInstanceFunctions.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
                 wasmInstanceFunctions.computeRates = wasmInstance.exports.computeRates;
                 wasmInstanceFunctions.computeVariables = wasmInstance.exports.computeVariables;
 
-                if ((wasmInstanceFunctions.initialiseVariables === undefined)
+                if ((wasmInstanceFunctions.initialiseArrays === undefined)
                     || (wasmInstanceFunctions.computeComputedConstants === undefined)
                     || (wasmInstanceFunctions.computeRates === undefined)
                     || (wasmInstanceFunctions.computeVariables === undefined)) {
                     throw new Error("The functions needed to compute the " + ($3 ? "ODE" : "DAE") + " model could not be retrieved.");
                 }
             } else {
-                wasmInstanceFunctions.initialiseVariables = wasmInstance.exports.initialiseVariables;
+                wasmInstanceFunctions.initialiseArrays = wasmInstance.exports.initialiseArrays;
                 wasmInstanceFunctions.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
                 wasmInstanceFunctions.computeVariables = wasmInstance.exports.computeVariables;
 
-                if ((wasmInstanceFunctions.initialiseVariables === undefined)
+                if ((wasmInstanceFunctions.initialiseArrays === undefined)
                     || (wasmInstanceFunctions.computeComputedConstants === undefined)
                     || (wasmInstanceFunctions.computeVariables === undefined)) {
                     throw new Error("The functions needed to compute the " + ($4 ? "algebraic" : "NLA") + " model could not be retrieved.");
@@ -194,20 +194,20 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         generatorProfile->setImplementationStateCountString("");
         generatorProfile->setImplementationConstantCountString("");
         generatorProfile->setImplementationComputedConstantCountString("");
-        generatorProfile->setImplementationAlgebraicCountString("");
-        generatorProfile->setImplementationExternalCountString("");
+        generatorProfile->setImplementationAlgebraicVariableCountString("");
+        generatorProfile->setImplementationExternalVariableCountString("");
         generatorProfile->setImplementationLibcellmlVersionString("");
         generatorProfile->setImplementationVoiInfoString("");
         generatorProfile->setImplementationStateInfoString("");
         generatorProfile->setImplementationConstantInfoString("");
         generatorProfile->setImplementationComputedConstantInfoString("");
-        generatorProfile->setImplementationAlgebraicInfoString("");
-        generatorProfile->setImplementationExternalInfoString("");
+        generatorProfile->setImplementationAlgebraicVariableInfoString("");
+        generatorProfile->setImplementationExternalVariableInfoString("");
         generatorProfile->setImplementationCreateStatesArrayMethodString("");
         generatorProfile->setImplementationCreateConstantsArrayMethodString("");
         generatorProfile->setImplementationCreateComputedConstantsArrayMethodString("");
-        generatorProfile->setImplementationCreateAlgebraicArrayMethodString("");
-        generatorProfile->setImplementationCreateExternalsArrayMethodString("");
+        generatorProfile->setImplementationCreateAlgebraicVariablesArrayMethodString("");
+        generatorProfile->setImplementationCreateExternalVariablesArrayMethodString("");
         generatorProfile->setImplementationDeleteArrayMethodString("");
 
         static constexpr auto WITH_EXTERNAL_VARIABLES {false};
@@ -218,7 +218,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         if (pNlaSolver != nullptr) {
             if (differentialModel) {
                 generatorProfile->setFindRootMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                          R"(void findRoot[INDEX](double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraic)
+                                                          R"(void findRoot[INDEX](double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraicVariables)
 {
     RootFindingInfo *rfi = (RootFindingInfo *) malloc(sizeof(RootFindingInfo));
     double *u = (double *) malloc([SIZE] * sizeof(double));
@@ -228,7 +228,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
     rfi->rates = rates;
     rfi->constants = constants;
     rfi->computedConstants = computedConstants;
-    rfi->algebraic = algebraic;
+    rfi->algebraicVariables = algebraicVariables;
 
 [CODE]
 
@@ -238,14 +238,14 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 )");
             } else {
                 generatorProfile->setFindRootMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                          R"(void findRoot[INDEX](double *constants, double *computedConstants, double *algebraic)
+                                                          R"(void findRoot[INDEX](double *constants, double *computedConstants, double *algebraicVariables)
 {
     RootFindingInfo *rfi = (RootFindingInfo *) malloc(sizeof(RootFindingInfo));
     double *u = (double *) malloc([SIZE] * sizeof(double));
 
     rfi->constants = constants;
     rfi->computedConstants = computedConstants;
-    rfi->algebraic = algebraic;
+    rfi->algebraicVariables = algebraicVariables;
 
 [CODE]
 
@@ -258,8 +258,8 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         // Export our various methods.
 
-        generatorProfile->setImplementationInitialiseVariablesMethodString(differentialModel,
-                                                                           exportJavaScriptName("initialiseVariables").append(generatorProfile->implementationInitialiseVariablesMethodString(differentialModel)));
+        generatorProfile->setImplementationInitialiseArraysMethodString(differentialModel,
+                                                                        exportJavaScriptName("initialiseArrays").append(generatorProfile->implementationInitialiseArraysMethodString(differentialModel)));
         generatorProfile->setImplementationComputeComputedConstantsMethodString(differentialModel, exportJavaScriptName("computeComputedConstants").append(generatorProfile->implementationComputeComputedConstantsMethodString(differentialModel)));
         generatorProfile->setImplementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES,
                                                                     exportJavaScriptName("computeRates").append(generatorProfile->implementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES)));
@@ -306,19 +306,17 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 #endif
         }
 
-        generator->setProfile(generatorProfile);
-
 #ifdef __EMSCRIPTEN__
         // Export our various objective functions.
 
-        auto implementationCode {generator->implementationCode(pCellmlFile->analyserModel())};
+        auto implementationCode {generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile)};
 
         if (pNlaSolver != nullptr) {
             std::vector<size_t> handledNlaSystemIndices;
 
-            for (const auto &equation : pCellmlFile->analyserModel()->equations()) {
-                if (equation->type() == libcellml::AnalyserEquation::Type::NLA) {
-                    auto nlaSystemIndex {equation->nlaSystemIndex()};
+            for (const auto &analyserEquation : pCellmlFile->analyserModel()->analyserEquations()) {
+                if (analyserEquation->type() == libcellml::AnalyserEquation::Type::NLA) {
+                    auto nlaSystemIndex {analyserEquation->nlaSystemIndex()};
 
                     if (std::find(handledNlaSystemIndices.begin(), handledNlaSystemIndices.end(), nlaSystemIndex) == handledNlaSystemIndices.end()) {
                         auto objectiveFunctionName {std::string("objectiveFunction").append(std::to_string(nlaSystemIndex))};
@@ -371,9 +369,9 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         mWasmInstanceFunctionsId = wasmInstanceFunctionsId;
 #else
 #    ifdef CODE_COVERAGE_ENABLED
-        mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel()));
+        mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile));
 #    else
-        if (!mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel()))) {
+        if (!mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile))) {
             // The compilation failed, so add the issues it generated.
 
             addIssues(mCompiler, "Compiler");
@@ -403,13 +401,13 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         // Retrieve our algebraic/differential functions and make sure that we managed to retrieve them.
 
         if (differentialModel) {
-            mInitialiseVariablesForDifferentialModel = reinterpret_cast<InitialiseVariablesForDifferentialModel>(mCompiler->function("initialiseVariables"));
+            mInitialiseArraysForDifferentialModel = reinterpret_cast<InitialiseArraysForDifferentialModel>(mCompiler->function("initialiseArrays"));
             mComputeComputedConstantsForDifferentialModel = reinterpret_cast<ComputeComputedConstantsForDifferentialModel>(mCompiler->function("computeComputedConstants"));
             mComputeRates = reinterpret_cast<ComputeRates>(mCompiler->function("computeRates"));
             mComputeVariablesForDifferentialModel = reinterpret_cast<ComputeVariablesForDifferentialModel>(mCompiler->function("computeVariables"));
 
 #    ifndef CODE_COVERAGE_ENABLED
-            if ((mInitialiseVariablesForDifferentialModel == nullptr)
+            if ((mInitialiseArraysForDifferentialModel == nullptr)
                 || (mComputeComputedConstantsForDifferentialModel == nullptr)
                 || (mComputeRates == nullptr)
                 || (mComputeVariablesForDifferentialModel == nullptr)) {
@@ -417,12 +415,12 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
             }
 #    endif
         } else {
-            mInitialiseVariablesForAlgebraicModel = reinterpret_cast<InitialiseVariablesForAlgebraicModel>(mCompiler->function("initialiseVariables"));
+            mInitialiseArraysForAlgebraicModel = reinterpret_cast<InitialiseArraysForAlgebraicModel>(mCompiler->function("initialiseArrays"));
             mComputeComputedConstantsForAlgebraicModel = reinterpret_cast<ComputeComputedConstantsForAlgebraicModel>(mCompiler->function("computeComputedConstants"));
             mComputeVariablesForAlgebraicModel = reinterpret_cast<ComputeVariablesForAlgebraicModel>(mCompiler->function("computeVariables"));
 
 #    ifndef CODE_COVERAGE_ENABLED
-            if ((mInitialiseVariablesForAlgebraicModel == nullptr)
+            if ((mInitialiseArraysForAlgebraicModel == nullptr)
                 || (mComputeComputedConstantsForAlgebraicModel == nullptr)
                 || (mComputeVariablesForAlgebraicModel == nullptr)) {
                 addError(std::string("The functions needed to compute the ").append((cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC) ? "algebraic" : "NLA").append(" model could not be retrieved."));
@@ -434,22 +432,22 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 }
 
 #ifdef __EMSCRIPTEN__
-EM_JS(void, jsInitialiseVariablesForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseVariables(pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsInitialiseArraysForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pConstants, pComputedConstants, pAlgebraic);
 });
 
-void CellmlFileRuntime::Impl::initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsInitialiseVariablesForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraic);
+    jsInitialiseArraysForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraic);
 }
 
-EM_JS(void, jsInitialiseVariablesForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseVariables(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsInitialiseArraysForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 });
 
-void CellmlFileRuntime::Impl::initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    jsInitialiseVariablesForDifferentialModel(mWasmInstanceFunctionsId, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsInitialiseArraysForDifferentialModel(mWasmInstanceFunctionsId, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 
 EM_JS(void, jsComputeComputedConstantsForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
@@ -497,14 +495,14 @@ void CellmlFileRuntime::Impl::computeVariablesForDifferentialModel(double pVoi, 
     jsComputeVariablesForDifferentialModel(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 #else
-CellmlFileRuntime::InitialiseVariablesForAlgebraicModel CellmlFileRuntime::Impl::initialiseVariablesForAlgebraicModel() const
+CellmlFileRuntime::InitialiseArraysForAlgebraicModel CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel() const
 {
-    return mInitialiseVariablesForAlgebraicModel;
+    return mInitialiseArraysForAlgebraicModel;
 }
 
-CellmlFileRuntime::InitialiseVariablesForDifferentialModel CellmlFileRuntime::Impl::initialiseVariablesForDifferentialModel() const
+CellmlFileRuntime::InitialiseArraysForDifferentialModel CellmlFileRuntime::Impl::initialiseArraysForDifferentialModel() const
 {
-    return mInitialiseVariablesForDifferentialModel;
+    return mInitialiseArraysForDifferentialModel;
 }
 
 CellmlFileRuntime::ComputeComputedConstantsForAlgebraicModel CellmlFileRuntime::Impl::computeComputedConstantsForAlgebraicModel() const
@@ -559,14 +557,14 @@ CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile,
 }
 
 #ifdef __EMSCRIPTEN__
-void CellmlFileRuntime::initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    pimpl()->initialiseVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->initialiseArraysForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
 }
 
-void CellmlFileRuntime::initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
 {
-    pimpl()->initialiseVariablesForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->initialiseArraysForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 
 void CellmlFileRuntime::computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
@@ -594,14 +592,14 @@ void CellmlFileRuntime::computeVariablesForDifferentialModel(double pVoi, double
     pimpl()->computeVariablesForDifferentialModel(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
 }
 #else
-CellmlFileRuntime::InitialiseVariablesForAlgebraicModel CellmlFileRuntime::initialiseVariablesForAlgebraicModel() const
+CellmlFileRuntime::InitialiseArraysForAlgebraicModel CellmlFileRuntime::initialiseArraysForAlgebraicModel() const
 {
-    return pimpl()->initialiseVariablesForAlgebraicModel();
+    return pimpl()->initialiseArraysForAlgebraicModel();
 }
 
-CellmlFileRuntime::InitialiseVariablesForDifferentialModel CellmlFileRuntime::initialiseVariablesForDifferentialModel() const
+CellmlFileRuntime::InitialiseArraysForDifferentialModel CellmlFileRuntime::initialiseArraysForDifferentialModel() const
 {
-    return pimpl()->initialiseVariablesForDifferentialModel();
+    return pimpl()->initialiseArraysForDifferentialModel();
 }
 
 CellmlFileRuntime::ComputeComputedConstantsForAlgebraicModel CellmlFileRuntime::computeComputedConstantsForAlgebraicModel() const

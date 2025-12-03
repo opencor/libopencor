@@ -421,13 +421,13 @@ def test_sed_instance_and_sed_instance_task_differential_model():
     assert instance_task.computed_constant_unit(0) == "millivolt"
     assert instance_task.computed_constant_unit(3) == ""
 
-    assert instance_task.algebraic_count == 10
-    assert instance_task.algebraic(0) == []
-    assert instance_task.algebraic(10) == []
-    assert instance_task.algebraic_name(0) == "membrane/i_Stim"
-    assert instance_task.algebraic_name(10) == ""
-    assert instance_task.algebraic_unit(0) == "microA_per_cm2"
-    assert instance_task.algebraic_unit(10) == ""
+    assert instance_task.algebraic_variable_count == 10
+    assert instance_task.algebraic_variable(0) == []
+    assert instance_task.algebraic_variable(10) == []
+    assert instance_task.algebraic_variable_name(0) == "membrane/i_Stim"
+    assert instance_task.algebraic_variable_name(10) == ""
+    assert instance_task.algebraic_variable_unit(0) == "microA_per_cm2"
+    assert instance_task.algebraic_variable_unit(10) == ""
 
     instance.run()
 
@@ -593,7 +593,7 @@ def test_math():
 
     assert instance_task.constant_count == 0
     assert instance_task.computed_constant_count == 37
-    assert instance_task.algebraic_count == 0
+    assert instance_task.algebraic_variable_count == 0
 
     instance.run()
 

@@ -155,10 +155,10 @@ test.describe('Solver KINSOL tests', () => {
     assert.strictEqual(instanceTask.rateCount, 0);
     assert.strictEqual(instanceTask.constantCount, 0);
     assert.strictEqual(instanceTask.computedConstantCount, 0);
-    assert.strictEqual(instanceTask.algebraicCount, 2);
+    assert.strictEqual(instanceTask.algebraicVariableCount, 2);
 
-    assertValue(instanceTask.algebraic(0).get(0), 3.0, 5);
-    assertValue(instanceTask.algebraic(1).get(0), 7.0, 5);
+    assertValue(instanceTask.algebraicVariable(0).get(0), 3.0, 5);
+    assertValue(instanceTask.algebraicVariable(1).get(0), 7.0, 5);
   }
 
   function assertNla2Solution(instanceTask) {
@@ -166,11 +166,11 @@ test.describe('Solver KINSOL tests', () => {
     assert.strictEqual(instanceTask.rateCount, 0);
     assert.strictEqual(instanceTask.constantCount, 0);
     assert.strictEqual(instanceTask.computedConstantCount, 0);
-    assert.strictEqual(instanceTask.algebraicCount, 3);
+    assert.strictEqual(instanceTask.algebraicVariableCount, 3);
 
-    assertValue(instanceTask.algebraic(0).get(0), 7.0, 5);
-    assertValue(instanceTask.algebraic(1).get(0), -5.0, 5);
-    assertValue(instanceTask.algebraic(2).get(0), 3.0, 5);
+    assertValue(instanceTask.algebraicVariable(0).get(0), 7.0, 5);
+    assertValue(instanceTask.algebraicVariable(1).get(0), -5.0, 5);
+    assertValue(instanceTask.algebraicVariable(2).get(0), 3.0, 5);
   }
 
   test('Solve', () => {

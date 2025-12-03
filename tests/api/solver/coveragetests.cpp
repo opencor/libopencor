@@ -75,9 +75,9 @@ TEST(CoverageSolverTest, algebraicChanges)
     EXPECT_EQ(instanceTask->rateCount(), 0);
     EXPECT_EQ(instanceTask->constantCount(), 1);
     EXPECT_EQ(instanceTask->computedConstantCount(), 1);
-    EXPECT_EQ(instanceTask->algebraicCount(), 3);
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 3);
 
-    EXPECT_NEAR(instanceTask->algebraic(0)[0], -28.14815, ABS_TOL);
-    EXPECT_NEAR(instanceTask->algebraic(1)[0], -13.18519, ABS_TOL);
-    EXPECT_NEAR(instanceTask->algebraic(2)[0], 33.33333, ABS_TOL);
+    EXPECT_NEAR(instanceTask->algebraicVariable(0)[0], -28.14815, ABS_TOL);
+    EXPECT_NEAR(instanceTask->algebraicVariable(1)[0], -13.18519, ABS_TOL);
+    EXPECT_NEAR(instanceTask->algebraicVariable(2)[0], 33.33333, ABS_TOL);
 }
