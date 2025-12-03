@@ -23,11 +23,11 @@ def test_ode_changes():
     expected_issues = [
         [
             loc.Issue.Type.Warning,
-            "Task instance | Change attribute: the variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed.",
+            "Task instance | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed.",
         ],
         [
             loc.Issue.Type.Warning,
-            "Task instance | Change attribute: the variable 'membrane' in component 'X'could not be found and therefore could not be changed.",
+            "Task instance | Change attribute: the variable 'X' in component 'membrane' could not be found and therefore could not be changed.",
         ],
         [
             loc.Issue.Type.Warning,

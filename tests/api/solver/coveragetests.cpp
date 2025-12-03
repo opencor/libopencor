@@ -23,8 +23,8 @@ limitations under the License.
 TEST(CoverageSolverTest, odeChanges)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed."},
-        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable 'membrane' in component 'X'could not be found and therefore could not be changed."},
+        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed."},
+        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable 'X' in component 'membrane' could not be found and therefore could not be changed."},
         {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."},
         {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."},
     }};
