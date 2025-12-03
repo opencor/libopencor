@@ -399,7 +399,7 @@ jobs:
         run: uv pip install --system pytest pytest-html
       - name: Install Sphinx and some Sphinx packages
         if: ${{ matrix.documentation == 'ON' }}
-        run: uv pip install --system sphinx sphinx-copybutton sphinx-inline-tabs
+        run: uv pip install --system sphinx~=8.0 sphinx-copybutton sphinx-inline-tabs
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |

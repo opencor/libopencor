@@ -281,9 +281,19 @@ endif()
 
 if(DOXYGEN_EXE AND PATCH_EXE AND PYTHON_EXE AND SPHINX_EXE)
     set(EXPECTED_DOXYGEN_VERSION 1.9.3)
+    set(UNSUPPORTED_SPHINX_VERSION 9.0.0)
+
+    execute_process(COMMAND ${SPHINX_EXE} --version
+                    OUTPUT_VARIABLE SPHINX_VERSION_OUTPUT
+                    OUTPUT_STRIP_TRAILING_WHITESPACE
+                    ERROR_QUIET)
+
+    string(REGEX REPLACE "^sphinx-build ([0-9]+\\.[0-9]+\\.[0-9]+).*$" "\\1" SPHINX_VERSION "${SPHINX_VERSION_OUTPUT}")
 
     if(NOT DOXYGEN_VERSION VERSION_EQUAL EXPECTED_DOXYGEN_VERSION)
         set(DOCUMENTATION_AVAILABLE_ERROR_MESSAGE "Documentation is requested and Doxygen ${DOXYGEN_VERSION} was found, but version ${EXPECTED_DOXYGEN_VERSION} is needed.")
+    elseif(SPHINX_VERSION VERSION_GREATER_EQUAL UNSUPPORTED_SPHINX_VERSION)
+        set(DOCUMENTATION_AVAILABLE_ERROR_MESSAGE "Documentation is requested and Sphinx ${SPHINX_VERSION} was found, but version ${UNSUPPORTED_SPHINX_VERSION}+ is not supported." )
     else()
         check_python_package(sphinx-copybutton PYTHON_SPHINX_COPY_BUTTON_AVAILABLE)
         check_python_package(sphinx-inline-tabs PYTHON_SPHINX_INLINE_TABS_AVAILABLE)
