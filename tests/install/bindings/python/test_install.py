@@ -33,7 +33,7 @@ if __name__ == "__main__":
     print(f" - States and rates:    {instance_task.state_count}")
     print(f" - Constants:           {instance_task.constant_count}")
     print(f" - Computed constants:  {instance_task.computed_constant_count}")
-    print(f" - Algebraic variables: {instance_task.algebraic_count}")
+    print(f" - Algebraic variables: {instance_task.algebraic_variable_count}")
 
     # Output the results of the simulation.
 
@@ -62,9 +62,9 @@ if __name__ == "__main__":
             end="",
         )
 
-    for i in range(instance_task.algebraic_count):
+    for i in range(instance_task.algebraic_variable_count):
         print(
-            f", {instance_task.algebraic_name(i)} ({instance_task.algebraic_unit(i)})",
+            f", {instance_task.algebraic_variable_name(i)} ({instance_task.algebraic_variable_unit(i)})",
             end="",
         )
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         for i in range(instance_task.computed_constant_count):
             print(f", {instance_task.computed_constant(i)[j]}", end="")
 
-        for i in range(instance_task.algebraic_count):
-            print(f", {instance_task.algebraic(i)[j]}", end="")
+        for i in range(instance_task.algebraic_variable_count):
+            print(f", {instance_task.algebraic_variable(i)[j]}", end="")
 
         print("")

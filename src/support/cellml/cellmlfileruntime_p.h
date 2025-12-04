@@ -34,8 +34,8 @@ public:
 #endif
 
 #ifndef __EMSCRIPTEN__
-    InitialiseVariablesForAlgebraicModel mInitialiseVariablesForAlgebraicModel {nullptr};
-    InitialiseVariablesForDifferentialModel mInitialiseVariablesForDifferentialModel {nullptr};
+    InitialiseArraysForAlgebraicModel mInitialiseArraysForAlgebraicModel {nullptr};
+    InitialiseArraysForDifferentialModel mInitialiseArraysForDifferentialModel {nullptr};
     ComputeComputedConstantsForAlgebraicModel mComputeComputedConstantsForAlgebraicModel {nullptr};
     ComputeComputedConstantsForDifferentialModel mComputeComputedConstantsForDifferentialModel {nullptr};
     ComputeRates mComputeRates {nullptr};
@@ -46,16 +46,16 @@ public:
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 
 #ifdef __EMSCRIPTEN__
-    void initialiseVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void initialiseVariablesForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeComputedConstantsForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
     void computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
 #else
-    CellmlFileRuntime::InitialiseVariablesForAlgebraicModel initialiseVariablesForAlgebraicModel() const;
-    CellmlFileRuntime::InitialiseVariablesForDifferentialModel initialiseVariablesForDifferentialModel() const;
+    CellmlFileRuntime::InitialiseArraysForAlgebraicModel initialiseArraysForAlgebraicModel() const;
+    CellmlFileRuntime::InitialiseArraysForDifferentialModel initialiseArraysForDifferentialModel() const;
     CellmlFileRuntime::ComputeComputedConstantsForAlgebraicModel computeComputedConstantsForAlgebraicModel() const;
     CellmlFileRuntime::ComputeComputedConstantsForDifferentialModel computeComputedConstantsForDifferentialModel() const;
     CellmlFileRuntime::ComputeRates computeRates() const;

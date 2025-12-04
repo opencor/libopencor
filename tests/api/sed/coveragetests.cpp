@@ -469,13 +469,13 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
     EXPECT_EQ(instanceTask->computedConstantUnit(0), "millivolt");
     EXPECT_EQ(instanceTask->computedConstantUnit(3), "");
 
-    EXPECT_EQ(instanceTask->algebraicCount(), 10);
-    EXPECT_EQ(instanceTask->algebraic(0), NoDoubles);
-    EXPECT_EQ(instanceTask->algebraic(10), NoDoubles);
-    EXPECT_EQ(instanceTask->algebraicName(0), "membrane/i_Stim");
-    EXPECT_EQ(instanceTask->algebraicName(10), "");
-    EXPECT_EQ(instanceTask->algebraicUnit(0), "microA_per_cm2");
-    EXPECT_EQ(instanceTask->algebraicUnit(10), "");
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 10);
+    EXPECT_EQ(instanceTask->algebraicVariable(0), NoDoubles);
+    EXPECT_EQ(instanceTask->algebraicVariable(10), NoDoubles);
+    EXPECT_EQ(instanceTask->algebraicVariableName(0), "membrane/i_Stim");
+    EXPECT_EQ(instanceTask->algebraicVariableName(10), "");
+    EXPECT_EQ(instanceTask->algebraicVariableUnit(0), "microA_per_cm2");
+    EXPECT_EQ(instanceTask->algebraicVariableUnit(10), "");
 
     instance->run();
 
@@ -566,7 +566,7 @@ TEST(CoverageSedTest, math)
 
     EXPECT_EQ(instanceTask->constantCount(), 0);
     EXPECT_EQ(instanceTask->computedConstantCount(), 37);
-    EXPECT_EQ(instanceTask->algebraicCount(), 0);
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 0);
 
     instance->run();
 

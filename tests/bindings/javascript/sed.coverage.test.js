@@ -446,15 +446,15 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(instanceTask.computedConstantUnit(0), 'millivolt');
     assert.strictEqual(instanceTask.computedConstantUnit(3), '');
 
-    assert.strictEqual(instanceTask.algebraicCount, 10);
-    assert.strictEqual(instanceTask.algebraic(0).size(), 0);
-    assert.deepStrictEqual(instanceTask.algebraicAsArray(0), []);
-    assert.strictEqual(instanceTask.algebraic(10).size(), 0);
-    assert.deepStrictEqual(instanceTask.algebraicAsArray(10), []);
-    assert.strictEqual(instanceTask.algebraicName(0), 'membrane/i_Stim');
-    assert.strictEqual(instanceTask.algebraicName(10), '');
-    assert.strictEqual(instanceTask.algebraicUnit(0), 'microA_per_cm2');
-    assert.strictEqual(instanceTask.algebraicUnit(10), '');
+    assert.strictEqual(instanceTask.algebraicVariableCount, 10);
+    assert.strictEqual(instanceTask.algebraicVariable(0).size(), 0);
+    assert.deepStrictEqual(instanceTask.algebraicVariableAsArray(0), []);
+    assert.strictEqual(instanceTask.algebraicVariable(10).size(), 0);
+    assert.deepStrictEqual(instanceTask.algebraicVariableAsArray(10), []);
+    assert.strictEqual(instanceTask.algebraicVariableName(0), 'membrane/i_Stim');
+    assert.strictEqual(instanceTask.algebraicVariableName(10), '');
+    assert.strictEqual(instanceTask.algebraicVariableUnit(0), 'microA_per_cm2');
+    assert.strictEqual(instanceTask.algebraicVariableUnit(10), '');
 
     instance.run();
 
@@ -569,7 +569,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instanceTask.constantCount, 0);
     assert.strictEqual(instanceTask.computedConstantCount, 37);
-    assert.strictEqual(instanceTask.algebraicCount, 0);
+    assert.strictEqual(instanceTask.algebraicVariableCount, 0);
 
     instance.run();
 

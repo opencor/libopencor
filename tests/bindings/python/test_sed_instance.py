@@ -60,7 +60,7 @@ def test_overconstrained_cellml_file():
         ],
         [
             loc.Issue.Type.Error,
-            "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is computed more than once.",
+            "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is overconstrained.",
         ],
     ]
 
@@ -98,7 +98,7 @@ def test_unsuitable_constrained_cellml_file():
         ],
         [
             loc.Issue.Type.Error,
-            "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is computed more than once.",
+            "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is overconstrained.",
         ],
         [
             loc.Issue.Type.Error,

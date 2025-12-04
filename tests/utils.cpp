@@ -82,8 +82,8 @@ void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex,
         expectEqualValue(pInstanceTask->computedConstant(i)[pIndex], pComputedConstantValues[i], pComputedConstantAbsTols[i]);
     }
 
-    for (size_t i {0}; i < pInstanceTask->algebraicCount(); ++i) {
-        expectEqualValue(pInstanceTask->algebraic(i)[pIndex], pAlgebraicValues[i], pAlgebraicAbsTols[i]);
+    for (size_t i {0}; i < pInstanceTask->algebraicVariableCount(); ++i) {
+        expectEqualValue(pInstanceTask->algebraicVariable(i)[pIndex], pAlgebraicValues[i], pAlgebraicAbsTols[i]);
     }
 }
 

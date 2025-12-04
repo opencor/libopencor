@@ -124,10 +124,10 @@ void sedApi(nb::module_ &m)
         .def("computed_constant", &libOpenCOR::SedInstanceTask::computedConstant, "Return the values of a computed constant.")
         .def("computed_constant_name", &libOpenCOR::SedInstanceTask::computedConstantName, "Return the name of a computed constant.")
         .def("computed_constant_unit", &libOpenCOR::SedInstanceTask::computedConstantUnit, "Return the unit of a computed constant.")
-        .def_prop_ro("algebraic_count", &libOpenCOR::SedInstanceTask::algebraicCount, "Return the number of algebraic variables.")
-        .def("algebraic", &libOpenCOR::SedInstanceTask::algebraic, "Return the values of an algebraic variable.")
-        .def("algebraic_name", &libOpenCOR::SedInstanceTask::algebraicName, "Return the name of an algebraic variable.")
-        .def("algebraic_unit", &libOpenCOR::SedInstanceTask::algebraicUnit, "Return the unit of an algebraic variable.");
+        .def_prop_ro("algebraic_variable_count", &libOpenCOR::SedInstanceTask::algebraicVariableCount, "Return the number of algebraic variables.")
+        .def("algebraic_variable", &libOpenCOR::SedInstanceTask::algebraicVariable, "Return the values of an algebraic variable.")
+        .def("algebraic_variable_name", &libOpenCOR::SedInstanceTask::algebraicVariableName, "Return the name of an algebraic variable.")
+        .def("algebraic_variable_unit", &libOpenCOR::SedInstanceTask::algebraicVariableUnit, "Return the unit of an algebraic variable.");
 
     // SedModel API.
 

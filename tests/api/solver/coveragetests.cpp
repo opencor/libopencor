@@ -23,8 +23,8 @@ limitations under the License.
 TEST(CoverageSolverTest, odeChanges)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable of integration 'time' in component 'environment'cannot be changed. Only state variables and constants can be changed."},
-        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable 'membrane' in component 'X'could not be found and therefore could not be changed."},
+        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable of integration 'time' in component 'environment' cannot be changed. Only state variables and constants can be changed."},
+        {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the variable 'X' in component 'membrane' could not be found and therefore could not be changed."},
         {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the computed constant 'E_Na' in component 'sodium_channel' cannot be changed. Only state variables and constants can be changed."},
         {libOpenCOR::Issue::Type::WARNING, "Task instance | Change attribute: the algebraic variable 'i_Stim' in component 'membrane' cannot be changed. Only state variables and constants can be changed."},
     }};
@@ -75,9 +75,9 @@ TEST(CoverageSolverTest, algebraicChanges)
     EXPECT_EQ(instanceTask->rateCount(), 0);
     EXPECT_EQ(instanceTask->constantCount(), 1);
     EXPECT_EQ(instanceTask->computedConstantCount(), 1);
-    EXPECT_EQ(instanceTask->algebraicCount(), 3);
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 3);
 
-    EXPECT_NEAR(instanceTask->algebraic(0)[0], -28.14815, ABS_TOL);
-    EXPECT_NEAR(instanceTask->algebraic(1)[0], -13.18519, ABS_TOL);
-    EXPECT_NEAR(instanceTask->algebraic(2)[0], 33.33333, ABS_TOL);
+    EXPECT_NEAR(instanceTask->algebraicVariable(0)[0], -28.14815, ABS_TOL);
+    EXPECT_NEAR(instanceTask->algebraicVariable(1)[0], -13.18519, ABS_TOL);
+    EXPECT_NEAR(instanceTask->algebraicVariable(2)[0], 33.33333, ABS_TOL);
 }

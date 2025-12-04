@@ -48,7 +48,7 @@ TEST(InstanceSedTest, overconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is overconstrained."},
-        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is computed more than once."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: variable 'x' in component 'my_component' is overconstrained."},
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/overconstrained.cellml"))};
@@ -76,7 +76,7 @@ TEST(InstanceSedTest, unsuitablyConstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
         {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is unsuitably constrained."},
-        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is computed more than once."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: variable 'y' in component 'my_component' is overconstrained."},
         {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: the type of variable 'x' in component 'my_component' is unknown."},
     }};
 

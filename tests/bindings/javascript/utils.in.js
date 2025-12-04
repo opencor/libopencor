@@ -157,8 +157,8 @@ export function assertValues(
     );
   }
 
-  for (let i = 0; i < instanceTask.algebraicCount; ++i) {
-    assertValue(instanceTask.algebraicAsArray(i)[index], algebraicValues[i], algebraicPrecisions[i]);
+  for (let i = 0; i < instanceTask.algebraicVariableCount; ++i) {
+    assertValue(instanceTask.algebraicVariableAsArray(i)[index], algebraicValues[i], algebraicPrecisions[i]);
   }
 }
 

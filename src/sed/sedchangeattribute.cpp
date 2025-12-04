@@ -95,7 +95,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
         auto voiVariable {pAnalyserModel->voi()->variable()};
         auto voiComponent {owningComponent(voiVariable)};
 
-        addWarning(std::string("The variable of integration '").append(voiVariable->name()).append("' in component '").append(voiComponent->name()).append("'cannot be changed. Only state variables and constants can be changed."));
+        addWarning(std::string("The variable of integration '").append(voiVariable->name()).append("' in component '").append(voiComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
 
         return;
     }
@@ -140,9 +140,9 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        for (size_t i {0}; i < pAnalyserModel->algebraicCount(); ++i) {
-            if (instanceTaskPimpl->algebraicName(i) == changeName) {
-                auto algebraicVariable {pAnalyserModel->algebraic()[i]->variable()};
+        for (size_t i {0}; i < pAnalyserModel->algebraicVariableCount(); ++i) {
+            if (instanceTaskPimpl->algebraicVariableName(i) == changeName) {
+                auto algebraicVariable {pAnalyserModel->algebraicVariables()[i]->variable()};
                 auto algebraicComponent {owningComponent(algebraicVariable)};
 
                 addWarning(std::string("The algebraic variable '").append(algebraicVariable->name()).append("' in component '").append(algebraicComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
@@ -155,7 +155,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        addWarning(std::string("The variable '").append(mComponentName).append("' in component '").append(mVariableName).append("'could not be found and therefore could not be changed."));
+        addWarning(std::string("The variable '").append(mVariableName).append("' in component '").append(mComponentName).append("' could not be found and therefore could not be changed."));
     }
 }
 

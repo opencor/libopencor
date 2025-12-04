@@ -288,7 +288,7 @@ public:
      * @return The number of algebraic variables.
      */
 
-    size_t algebraicCount() const;
+    size_t algebraicVariableCount() const;
 
     /**
      * @brief Get the values of the algebraic variable at the given index.
@@ -300,10 +300,10 @@ public:
      * @return The values of the algebraic variable, as a @c Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    Doubles algebraic(size_t pIndex) const;
+    Doubles algebraicVariable(size_t pIndex) const;
 
 #ifdef __EMSCRIPTEN__
-    emscripten::val algebraicAsArray(size_t pIndex) const;
+    emscripten::val algebraicVariableAsArray(size_t pIndex) const;
 #endif
 
     /**
@@ -317,7 +317,7 @@ public:
      * otherwise.
      */
 
-    std::string algebraicName(size_t pIndex) const;
+    std::string algebraicVariableName(size_t pIndex) const;
 
     /**
      * @brief Get the unit of the algebraic variable.
@@ -330,7 +330,7 @@ public:
      * otherwise.
      */
 
-    std::string algebraicUnit(size_t pIndex) const;
+    std::string algebraicVariableUnit(size_t pIndex) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
