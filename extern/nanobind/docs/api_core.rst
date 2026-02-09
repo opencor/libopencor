@@ -2158,9 +2158,6 @@ declarations in generated :ref:`stubs <stubs>`,
    See the section on :ref:`creating generic types <typing_generics_creating>`
    for an example.
 
-   This feature is only supported on Python 3.9+. Nanobind will ignore
-   the attribute in Python 3.8 builds.
-
 .. cpp:struct:: template <typename T> supplement
 
    Indicate that ``sizeof(T)`` bytes of memory should be set aside to
@@ -2190,6 +2187,9 @@ declarations in generated :ref:`stubs <stubs>`,
       Declares a callback that will be invoked when a C++ instance is first
       cast into a Python object.
 
+.. cpp:struct:: never_destruct
+
+   Disables destroying the instance.
 
 .. _enum_binding_annotations:
 

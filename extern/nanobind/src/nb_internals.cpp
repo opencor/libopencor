@@ -32,11 +32,6 @@ extern int nb_bound_method_clear(PyObject *);
 extern void nb_bound_method_dealloc(PyObject *);
 extern PyObject *nb_method_descr_get(PyObject *, PyObject *, PyObject *);
 
-#if PY_VERSION_HEX >= 0x03090000
-#  define NB_HAVE_VECTORCALL_PY39_OR_NEWER NB_HAVE_VECTORCALL
-#else
-#  define NB_HAVE_VECTORCALL_PY39_OR_NEWER 0
-#endif
 
 static PyType_Slot nb_meta_slots[] = {
     { Py_tp_base, nullptr },
@@ -47,7 +42,8 @@ static PyType_Spec nb_meta_spec = {
     /* .name = */ "nanobind.nb_meta",
     /* .basicsize = */ 0,
     /* .itemsize = */ 0,
-    /* .flags = */ Py_TPFLAGS_DEFAULT,
+    /* .flags = */ Py_TPFLAGS_DEFAULT |
+                   NB_TPFLAGS_IMMUTABLETYPE,
     /* .slots = */ nb_meta_slots
 };
 
@@ -70,7 +66,6 @@ static PyType_Slot nb_func_slots[] = {
     { Py_tp_traverse, (void *) nb_func_traverse },
     { Py_tp_clear, (void *) nb_func_clear },
     { Py_tp_dealloc, (void *) nb_func_dealloc },
-    { Py_tp_traverse, (void *) nb_func_traverse },
     { Py_tp_new, (void *) PyType_GenericNew },
     { Py_tp_call, (void *) PyVectorcall_Call },
     { 0, nullptr }
@@ -80,8 +75,10 @@ static PyType_Spec nb_func_spec = {
     /* .name = */ "nanobind.nb_func",
     /* .basicsize = */ (int) sizeof(nb_func),
     /* .itemsize = */ (int) sizeof(func_data),
-    /* .flags = */ Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC |
-                   NB_HAVE_VECTORCALL_PY39_OR_NEWER,
+    /* .flags = */ Py_TPFLAGS_DEFAULT |
+                   Py_TPFLAGS_HAVE_GC |
+                   Py_TPFLAGS_HAVE_VECTORCALL |
+                   NB_TPFLAGS_IMMUTABLETYPE,
     /* .slots = */ nb_func_slots
 };
 
@@ -102,9 +99,11 @@ static PyType_Spec nb_method_spec = {
     /*.name = */ "nanobind.nb_method",
     /*.basicsize = */ (int) sizeof(nb_func),
     /*.itemsize = */ (int) sizeof(func_data),
-    /*.flags = */ Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC |
+    /*.flags = */ Py_TPFLAGS_DEFAULT |
+                  Py_TPFLAGS_HAVE_GC |
                   Py_TPFLAGS_METHOD_DESCRIPTOR |
-                  NB_HAVE_VECTORCALL_PY39_OR_NEWER,
+                  Py_TPFLAGS_HAVE_VECTORCALL |
+                  NB_TPFLAGS_IMMUTABLETYPE,
     /*.slots = */ nb_method_slots
 };
 
@@ -124,7 +123,6 @@ static PyType_Slot nb_bound_method_slots[] = {
     { Py_tp_traverse, (void *) nb_bound_method_traverse },
     { Py_tp_clear, (void *) nb_bound_method_clear },
     { Py_tp_dealloc, (void *) nb_bound_method_dealloc },
-    { Py_tp_traverse, (void *) nb_bound_method_traverse },
     { Py_tp_call, (void *) PyVectorcall_Call },
     { 0, nullptr }
 };
@@ -133,8 +131,10 @@ static PyType_Spec nb_bound_method_spec = {
     /* .name = */ "nanobind.nb_bound_method",
     /* .basicsize = */ (int) sizeof(nb_bound_method),
     /* .itemsize = */ 0,
-    /* .flags = */ Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_GC |
-                   NB_HAVE_VECTORCALL_PY39_OR_NEWER,
+    /* .flags = */ Py_TPFLAGS_DEFAULT |
+                   Py_TPFLAGS_HAVE_GC |
+                   Py_TPFLAGS_HAVE_VECTORCALL |
+                   NB_TPFLAGS_IMMUTABLETYPE,
     /* .slots = */ nb_bound_method_slots
 };
 
@@ -163,6 +163,73 @@ void default_exception_translator(const std::exception_ptr &p, void *) {
 // Initialized once when the module is loaded, no locking needed
 nb_internals *internals = nullptr;
 PyTypeObject *nb_meta_cache = nullptr;
+
+
+static const char* interned_c_strs[pyobj_name::string_count] {
+    "value",
+    "copy",
+    "clone",
+    "array",
+    "from_dlpack",
+    "__dlpack__",
+    "max_version",
+    "dl_device",
+};
+
+PyObject **static_pyobjects = nullptr;
+
+static bool init_pyobjects(PyObject* m) {
+    PyObject** pyobjects = (PyObject**) PyModule_GetState(m);
+    if (!pyobjects)
+        return false;
+
+    NB_NOUNROLL
+    for (int i = 0; i < pyobj_name::string_count; ++i)
+        pyobjects[i] = PyUnicode_InternFromString(interned_c_strs[i]);
+
+    pyobjects[pyobj_name::copy_tpl] =
+            PyTuple_Pack(1, pyobjects[pyobj_name::copy_str]);
+    pyobjects[pyobj_name::max_version_tpl] =
+            PyTuple_Pack(1, pyobjects[pyobj_name::max_version_str]);
+
+    PyObject* one = PyLong_FromLong(1);
+    PyObject* zero = PyLong_FromLong(0);
+    pyobjects[pyobj_name::dl_cpu_tpl] = PyTuple_Pack(2, one, zero);
+    Py_DECREF(zero);
+    Py_DECREF(one);
+
+    PyObject* major = PyLong_FromLong(dlpack::major_version);
+    PyObject* minor = PyLong_FromLong(dlpack::minor_version);
+    pyobjects[pyobj_name::dl_version_tpl] = PyTuple_Pack(2, major, minor);
+    Py_DECREF(minor);
+    Py_DECREF(major);
+
+    static_pyobjects = pyobjects;
+
+    return true;
+}
+
+NB_NOINLINE int nb_module_traverse(PyObject *m, visitproc visit, void *arg) {
+    PyObject** pyobjects = (PyObject**) PyModule_GetState(m);
+    NB_NOUNROLL
+    for (int i = 0; i < pyobj_name::total_count; ++i)
+        Py_VISIT(pyobjects[i]);
+    return 0;
+}
+
+NB_NOINLINE int nb_module_clear(PyObject *m) {
+    PyObject** pyobjects = (PyObject**) PyModule_GetState(m);
+    NB_NOUNROLL
+    for (int i = 0; i < pyobj_name::total_count; ++i)
+        Py_CLEAR(pyobjects[i]);
+    return 0;
+}
+
+void nb_module_free(void *m) {
+    // Allow nanobind_##name##_exec to omit calling nb_module_clear on error.
+    (void) nb_module_clear((PyObject *) m);
+}
+
 
 static bool is_alive_value = false;
 static bool *is_alive_ptr = &is_alive_value;
@@ -273,8 +340,8 @@ static void internals_cleanup() {
             for (auto [f, p2] : p->funcs) {
                 fprintf(stderr, " - leaked function \"%s\"\n",
                         nb_func_data(f)->name);
+                INC_CTR;
                 if (ctr == 10) {
-                    INC_CTR;
                     fprintf(stderr, " - ... skipped remainder\n");
                     break;
                 }
@@ -317,29 +384,32 @@ static void internals_cleanup() {
 #endif
 }
 
-NB_NOINLINE void init(const char *name) {
+NB_NOINLINE void nb_module_exec(const char *name, PyObject *m) {
     if (internals)
         return;
 
+    check(init_pyobjects(m), "nanobind::detail::nb_module_exec(): "
+                             "could not initialize module state!");
+
 #if defined(PYPY_VERSION)
     PyObject *dict = PyEval_GetBuiltins();
-#elif PY_VERSION_HEX < 0x03090000
-    PyObject *dict = PyInterpreterState_GetDict(_PyInterpreterState_Get());
 #else
     PyObject *dict = PyInterpreterState_GetDict(PyInterpreterState_Get());
 #endif
-    check(dict, "nanobind::detail::init(): could not access internals dictionary!");
+    check(dict, "nanobind::detail::nb_module_exec(): "
+                "could not access internals dictionary!");
 
     PyObject *key = PyUnicode_FromFormat("__nb_internals_%s_%s__",
                                          abi_tag(), name ? name : "");
-    check(key, "nanobind::detail::init(): could not create dictionary key!");
+    check(key, "nanobind::detail::nb_module_exec(): "
+               "could not create dictionary key!");
 
     PyObject *capsule = dict_get_item_ref_or_fail(dict, key);
     if (capsule) {
         Py_DECREF(key);
         internals = (nb_internals *) PyCapsule_GetPointer(capsule, "nb_internals");
-        check(internals,
-              "nanobind::detail::internals_fetch(): capsule pointer is NULL!");
+        check(internals, "nanobind::detail::nb_module_exec(): "
+                         "capsule pointer is NULL!");
         nb_meta_cache = internals->nb_meta;
         is_alive_ptr = internals->is_alive_ptr;
         Py_DECREF(capsule);
@@ -374,23 +444,9 @@ NB_NOINLINE void init(const char *name) {
     PyThread_tss_create(p->nb_static_property_disabled);
 #endif
 
-    for (size_t i = 0; i < shard_count; ++i) {
-        p->shards[i].keep_alive.min_load_factor(.1f);
-        p->shards[i].inst_c2p.min_load_factor(.1f);
-    }
-
     check(p->nb_module && p->nb_meta && p->nb_type_dict && p->nb_func &&
               p->nb_method && p->nb_bound_method,
-          "nanobind::detail::init(): initialization failed!");
-
-#if PY_VERSION_HEX < 0x03090000
-    p->nb_func->tp_flags |= NB_HAVE_VECTORCALL;
-    p->nb_func->tp_vectorcall_offset = offsetof(nb_func, vectorcall);
-    p->nb_method->tp_flags |= NB_HAVE_VECTORCALL;
-    p->nb_method->tp_vectorcall_offset = offsetof(nb_func, vectorcall);
-    p->nb_bound_method->tp_flags |= NB_HAVE_VECTORCALL;
-    p->nb_bound_method->tp_vectorcall_offset = offsetof(nb_bound_method, vectorcall);
-#endif
+          "nanobind::detail::nb_module_exec(): initialization failed!");
 
 #if defined(Py_LIMITED_API)
     // Cache important functions from PyType_Type and PyProperty_Type
@@ -427,6 +483,7 @@ NB_NOINLINE void init(const char *name) {
 #endif
 
     p->translators = { default_exception_translator, nullptr, nullptr };
+
     is_alive_value = true;
     is_alive_ptr = &is_alive_value;
     p->is_alive_ptr = is_alive_ptr;
@@ -476,7 +533,7 @@ NB_NOINLINE void init(const char *name) {
     capsule = PyCapsule_New(p, "nb_internals", nullptr);
     int rv = PyDict_SetItem(dict, key, capsule);
     check(!rv && capsule,
-          "nanobind::detail::init(): capsule creation failed!");
+          "nanobind::detail::nb_module_exec(): capsule creation failed!");
     Py_DECREF(capsule);
     Py_DECREF(key);
     internals = p;

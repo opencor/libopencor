@@ -9,8 +9,17 @@
 
 NAMESPACE_BEGIN(NB_NAMESPACE)
 
+NAMESPACE_BEGIN(dlpack)
+
+// The version of DLPack that is supported by libnanobind
+static constexpr uint32_t major_version = 1;
+static constexpr uint32_t minor_version = 1;
+
 // Forward declarations for types in ndarray.h (1)
-namespace dlpack { struct dltensor; struct dtype; }
+struct dltensor;
+struct dtype;
+
+NAMESPACE_END(dlpack)
 
 NAMESPACE_BEGIN(detail)
 
@@ -107,7 +116,10 @@ NB_CORE void raise_next_overload_if_null(void *p);
 
 // ========================================================================
 
-NB_CORE void init(const char *domain);
+NB_CORE void nb_module_exec(const char *domain, PyObject *m);
+NB_CORE int  nb_module_traverse(PyObject *m, visitproc visit, void *arg);
+NB_CORE int  nb_module_clear(PyObject *m);
+NB_CORE void nb_module_free(void *m);
 
 // ========================================================================
 
@@ -273,8 +285,11 @@ NB_CORE PyObject *capsule_new(const void *ptr, const char *name,
 
 // ========================================================================
 
+// Forward declaration for type in nb_attr.h
+struct func_data_prelim_base;
+
 /// Create a Python function object for the given function record
-NB_CORE PyObject *nb_func_new(const void *data) noexcept;
+NB_CORE PyObject *nb_func_new(const func_data_prelim_base *f) noexcept;
 
 // ========================================================================
 
@@ -452,9 +467,6 @@ NB_CORE PyObject *module_import(const char *name);
 /// Try to import a Python extension module, raises an exception upon failure
 NB_CORE PyObject *module_import(PyObject *name);
 
-/// Create a new extension module with the given name
-NB_CORE PyObject *module_new(const char *name, PyModuleDef *def) noexcept;
-
 /// Create a submodule of an existing module
 NB_CORE PyObject *module_new_submodule(PyObject *base, const char *name,
                                        const char *doc) noexcept;
@@ -469,7 +481,7 @@ NB_CORE ndarray_handle *ndarray_import(PyObject *o,
                                        cleanup_list *cleanup) noexcept;
 
 // Describe a local ndarray object using a DLPack capsule
-NB_CORE ndarray_handle *ndarray_create(void *value, size_t ndim,
+NB_CORE ndarray_handle *ndarray_create(void *data, size_t ndim,
                                        const size_t *shape, PyObject *owner,
                                        const int64_t *strides,
                                        dlpack::dtype dtype, bool ro,
