@@ -16,7 +16,6 @@
 import libopencor as loc
 import pathlib
 
-
 with open(pathlib.Path(__file__).parent.parent.parent / "VERSION.txt") as file:
     version_str = file.read().strip()
 
