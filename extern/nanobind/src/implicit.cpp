@@ -15,13 +15,13 @@ NAMESPACE_BEGIN(detail)
 
 void implicitly_convertible(const std::type_info *src,
                             const std::type_info *dst) noexcept {
-    nb_internals *internals_ {internals};
-    type_data *t {nb_type_c2p(internals_, dst)};
+    nb_internals *internals_ = internals;
+    type_data *t = nb_type_c2p(internals_, dst);
     check(t, "nanobind::detail::implicitly_convertible(src=%s, dst=%s): "
              "destination type unknown!", type_name(src), type_name(dst));
 
     lock_internals guard(internals_);
-    size_t size {0};
+    size_t size = 0;
 
     if (t->flags & (uint32_t) type_flags::has_implicit_conversions) {
         while (t->implicit.cpp && t->implicit.cpp[size])
@@ -45,13 +45,13 @@ void implicitly_convertible(const std::type_info *src,
 void implicitly_convertible(bool (*predicate)(PyTypeObject *, PyObject *,
                                               cleanup_list *),
                             const std::type_info *dst) noexcept {
-    nb_internals *internals_ {internals};
-    type_data *t {nb_type_c2p(internals_, dst)};
+    nb_internals *internals_ = internals;
+    type_data *t = nb_type_c2p(internals_, dst);
     check(t, "nanobind::detail::implicitly_convertible(src=<predicate>, dst=%s): "
              "destination type unknown!", type_name(dst));
 
     lock_internals guard(internals_);
-    size_t size {0};
+    size_t size = 0;
 
     if (t->flags & (uint32_t) type_flags::has_implicit_conversions) {
         while (t->implicit.py && t->implicit.py[size])

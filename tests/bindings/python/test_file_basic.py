@@ -19,7 +19,6 @@ import platform
 import utils
 from utils import assert_issues
 
-
 expected_no_issues = []
 expected_non_existing_file_issues = [
     [loc.Issue.Type.Error, "The file does not exist."],

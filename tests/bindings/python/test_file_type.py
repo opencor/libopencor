@@ -17,7 +17,6 @@ import libopencor as loc
 import utils
 from utils import assert_issues
 
-
 expected_unknown_file_issues = [
     [
         loc.Issue.Type.Error,

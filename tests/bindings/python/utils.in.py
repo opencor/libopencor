@@ -21,7 +21,6 @@ import pathlib
 import platform
 import pytest
 
-
 ResourceLocation = "@RESOURCE_LOCATION@"
 
 
