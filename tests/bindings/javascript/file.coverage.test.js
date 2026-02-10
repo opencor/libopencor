@@ -23,27 +23,14 @@ import * as utils from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('File coverage tests', () => {
-  let nullCharacterContentsPtr;
-  let combineArchiveContentsPtr;
-
-  test.before(() => {
-    nullCharacterContentsPtr = utils.allocateMemory(loc, utils.NULL_CHARACTER_CONTENTS);
-    combineArchiveContentsPtr = utils.allocateMemory(loc, utils.COMBINE_ARCHIVE_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, nullCharacterContentsPtr);
-    utils.freeMemory(loc, combineArchiveContentsPtr);
   });
 
   test('Empty file', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(null, 0);
+    file.setContents(null);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
   });
@@ -51,7 +38,7 @@ test.describe('File coverage tests', () => {
   test('File with null character', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(nullCharacterContentsPtr, utils.NULL_CHARACTER_CONTENTS.length);
+    file.setContents(utils.NULL_CHARACTER_CONTENTS);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
   });
@@ -59,7 +46,7 @@ test.describe('File coverage tests', () => {
   test('SED-ML file with no parent', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(utils.SEDML_CONTENTS, utils.SEDML_CONTENTS.length);
+    file.setContents(utils.SEDML_CONTENTS);
   });
 
   test('Same local file', () => {
@@ -80,7 +67,7 @@ test.describe('File coverage tests', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
     const fileManager = loc.FileManager.instance();
 
-    file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);
+    file.setContents(utils.COMBINE_ARCHIVE_CONTENTS);
 
     assert.strictEqual(fileManager.fileCount, 3);
 

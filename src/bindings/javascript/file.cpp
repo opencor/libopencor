@@ -41,10 +41,14 @@ void fileApi()
 
                       return res;
                   }))
-        .function("setContents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis, uintptr_t pContents, size_t pSize) {
-                      auto contents {reinterpret_cast<unsigned char *>(pContents)};
+        .function("setContents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis, emscripten::val pContents) {
+                      if (pContents.isNull() || pContents.isUndefined()) {
+                          pThis->setContents(libOpenCOR::UnsignedChars {});
 
-                      pThis->setContents(libOpenCOR::UnsignedChars(contents, contents + pSize));
+                          return;
+                      }
+
+                      pThis->setContents(emscripten::vecFromJSArray<unsigned char>(pContents));
                   }))
         .property("hasChildFiles", &libOpenCOR::File::hasChildFiles)
         .property("childFileCount", &libOpenCOR::File::childFileCount)

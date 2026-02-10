@@ -24,27 +24,14 @@ import { assertIssues, assertValue } from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('Solver coverage tests', () => {
-  let algebraicSedChangesContentsPtr;
-  let odeSedChangesContentsPtr;
-
-  test.before(() => {
-    algebraicSedChangesContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_SED_CHANGES_CONTENTS);
-    odeSedChangesContentsPtr = utils.allocateMemory(loc, utils.ODE_SED_CHANGES_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, algebraicSedChangesContentsPtr);
-    utils.freeMemory(loc, odeSedChangesContentsPtr);
   });
 
   test('ODE changes', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(odeSedChangesContentsPtr, utils.ODE_SED_CHANGES_CONTENTS.length);
+    file.setContents(utils.ODE_SED_CHANGES_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -95,7 +82,7 @@ test.describe('Solver coverage tests', () => {
 
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(algebraicSedChangesContentsPtr, utils.ALGEBRAIC_SED_CHANGES_CONTENTS.length);
+    file.setContents(utils.ALGEBRAIC_SED_CHANGES_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();

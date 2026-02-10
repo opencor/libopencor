@@ -24,33 +24,8 @@ import { assertIssues } from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('Sed serialise tests', () => {
-  let cellmlContentsPtr;
-  let sedmlContentsPtr;
-  let algebraicContentsPtr;
-  let daeContentsPtr;
-  let nlaContentsPtr;
-  let sedmlWithSimulationsContentsPtr;
-
-  test.before(() => {
-    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
-    sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
-    algebraicContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_CONTENTS);
-    daeContentsPtr = utils.allocateMemory(loc, utils.DAE_CONTENTS);
-    nlaContentsPtr = utils.allocateMemory(loc, utils.NLA_CONTENTS);
-    sedmlWithSimulationsContentsPtr = utils.allocateMemory(loc, utils.SEDML_WITH_SIMULATIONS_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, cellmlContentsPtr);
-    utils.freeMemory(loc, sedmlContentsPtr);
-    utils.freeMemory(loc, algebraicContentsPtr);
-    utils.freeMemory(loc, daeContentsPtr);
-    utils.freeMemory(loc, nlaContentsPtr);
-    utils.freeMemory(loc, sedmlWithSimulationsContentsPtr);
   });
 
   function cvodeExpectedSerialisation(source, parameters = {}) {
@@ -121,7 +96,7 @@ test.describe('Sed serialise tests', () => {
   test('Local CellML file with base path', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -131,7 +106,7 @@ test.describe('Sed serialise tests', () => {
   test('Local CellML file without base path', () => {
     const file = new loc.File(utils.LOCAL_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -141,7 +116,7 @@ test.describe('Sed serialise tests', () => {
   test('Relative local CellML file with base path', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -154,7 +129,7 @@ test.describe('Sed serialise tests', () => {
   test('Relative local CellML file without base path', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -164,7 +139,7 @@ test.describe('Sed serialise tests', () => {
   test('Remote CellML file with base path', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -174,7 +149,7 @@ test.describe('Sed serialise tests', () => {
   test('Remote CellML file without base path', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -189,7 +164,7 @@ test.describe('Sed serialise tests', () => {
   test('Relative remote CellML file with base path', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -240,7 +215,7 @@ test.describe('Sed serialise tests', () => {
 
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(daeContentsPtr, utils.DAE_CONTENTS.length);
+    file.setContents(utils.DAE_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -250,7 +225,7 @@ test.describe('Sed serialise tests', () => {
   test('NLA model', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
+    file.setContents(utils.NLA_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -274,7 +249,7 @@ test.describe('Sed serialise tests', () => {
 
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(algebraicContentsPtr, utils.ALGEBRAIC_CONTENTS.length);
+    file.setContents(utils.ALGEBRAIC_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -356,7 +331,7 @@ test.describe('Sed serialise tests', () => {
 
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -369,7 +344,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with the Adams-Moulton integration method', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -388,7 +363,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with a functional iteration type', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -407,7 +382,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with a banded linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -426,7 +401,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with a diagonal linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -445,7 +420,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with a GMRES linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -464,7 +439,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with a BiCGStab linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -483,7 +458,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with a TFQMR linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -502,7 +477,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with no preconditioner', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -519,7 +494,7 @@ test.describe('Sed serialise tests', () => {
   test('CVODE solver with no interpolate solution', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -538,7 +513,7 @@ test.describe('Sed serialise tests', () => {
   test('KINSOL solver with a banded linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
+    file.setContents(utils.NLA_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -555,7 +530,7 @@ test.describe('Sed serialise tests', () => {
   test('KINSOL solver with a GMRES linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
+    file.setContents(utils.NLA_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -572,7 +547,7 @@ test.describe('Sed serialise tests', () => {
   test('KINSOL solver with a BiCGStab linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
+    file.setContents(utils.NLA_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -589,7 +564,7 @@ test.describe('Sed serialise tests', () => {
   test('KINSOL solver with a TFQMR linear solver', () => {
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
+    file.setContents(utils.NLA_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -620,7 +595,7 @@ test.describe('Sed serialise tests', () => {
 
     const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -666,7 +641,7 @@ test.describe('Sed serialise tests', () => {
 
     const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
-    file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
+    file.setContents(utils.SEDML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -920,7 +895,7 @@ test.describe('Sed serialise tests', () => {
 
     const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
 
-    file.setContents(sedmlWithSimulationsContentsPtr, utils.SEDML_WITH_SIMULATIONS_CONTENTS.length);
+    file.setContents(utils.SEDML_WITH_SIMULATIONS_CONTENTS);
 
     const document = new loc.SedDocument(file);
 

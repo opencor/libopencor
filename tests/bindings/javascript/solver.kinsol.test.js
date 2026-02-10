@@ -24,27 +24,14 @@ import { assertIssues, assertValue } from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('Solver KINSOL tests', () => {
-  let solverNla1ContentsPtr;
-  let solverNla2ContentsPtr;
-
-  test.before(() => {
-    solverNla1ContentsPtr = utils.allocateMemory(loc, utils.SOLVER_NLA1_CONTENTS);
-    solverNla2ContentsPtr = utils.allocateMemory(loc, utils.SOLVER_NLA2_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, solverNla1ContentsPtr);
-    utils.freeMemory(loc, solverNla2ContentsPtr);
   });
 
   test('Maximum number of iterations value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA1_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -65,7 +52,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Banded linear solver and upper half-bandwidth value with number too small', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA2_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -87,7 +74,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Banded linear solver and upper half-bandwidth value with number too big', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA1_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -109,7 +96,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Banded linear solver and lower half-bandwidth value with number too small', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA2_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -131,7 +118,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Banded linear solver and lower half-bandwidth value with number too big', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA1_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -176,7 +163,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Solve', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA1_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -189,7 +176,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Solve with banded linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA2_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -209,7 +196,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Solve with GMRES linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA1_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -227,7 +214,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Solve with BiCGStab linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla2ContentsPtr, utils.SOLVER_NLA2_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA2_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -245,7 +232,7 @@ test.describe('Solver KINSOL tests', () => {
   test('Solve with TFQMR linear solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA1_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);

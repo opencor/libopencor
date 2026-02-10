@@ -23,30 +23,14 @@ import * as utils from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('Issue coverage tests', () => {
-  let cellmlContentsPtr;
-  let errorCellmlContentsPtr;
-  let sedmlContentsPtr;
-
-  test.before(() => {
-    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
-    errorCellmlContentsPtr = utils.allocateMemory(loc, utils.ERROR_CELLML_CONTENTS);
-    sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, cellmlContentsPtr);
-    utils.freeMemory(loc, errorCellmlContentsPtr);
-    utils.freeMemory(loc, sedmlContentsPtr);
   });
 
   test('hasIssues', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.hasIssues, false);
   });
@@ -54,7 +38,7 @@ test.describe('Issue coverage tests', () => {
   test('issueCount', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.issueCount, 0);
   });
@@ -62,7 +46,7 @@ test.describe('Issue coverage tests', () => {
   test('issues', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.issues.size(), 0);
   });
@@ -70,7 +54,7 @@ test.describe('Issue coverage tests', () => {
   test('issue()', () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
-    file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
+    file.setContents(utils.ERROR_CELLML_CONTENTS);
 
     assert.notStrictEqual(file.issue(0), null);
     assert.strictEqual(file.issue(file.issueCount), null);
@@ -79,7 +63,7 @@ test.describe('Issue coverage tests', () => {
   test('hasErrors', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.hasErrors, false);
   });
@@ -87,7 +71,7 @@ test.describe('Issue coverage tests', () => {
   test('errorCount', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.errorCount, 0);
   });
@@ -95,7 +79,7 @@ test.describe('Issue coverage tests', () => {
   test('errors', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.errors.size(), 0);
   });
@@ -103,7 +87,7 @@ test.describe('Issue coverage tests', () => {
   test('error()', () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
-    file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
+    file.setContents(utils.ERROR_CELLML_CONTENTS);
 
     assert.notStrictEqual(file.error(0), null);
     assert.strictEqual(file.error(file.errorCount), null);
@@ -112,7 +96,7 @@ test.describe('Issue coverage tests', () => {
   test('hasWarnings', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.hasWarnings, false);
   });
@@ -120,7 +104,7 @@ test.describe('Issue coverage tests', () => {
   test('warningCount', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.warningCount, 0);
   });
@@ -128,7 +112,7 @@ test.describe('Issue coverage tests', () => {
   test('warnings', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.warnings.size(), 0);
   });
@@ -136,7 +120,7 @@ test.describe('Issue coverage tests', () => {
   test('warning()', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
+    file.setContents(utils.SEDML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 

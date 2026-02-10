@@ -24,24 +24,14 @@ import { assertIssues } from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('Solver Second-Order Runge-Kutta tests', () => {
-  let solverOdeContentsPtr;
-
-  test.before(() => {
-    solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, solverOdeContentsPtr);
   });
 
   test('Step value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
+    file.setContents(utils.SOLVER_ODE_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -64,7 +54,7 @@ test.describe('Solver Second-Order Runge-Kutta tests', () => {
   test('Solve', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
+    file.setContents(utils.SOLVER_ODE_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);

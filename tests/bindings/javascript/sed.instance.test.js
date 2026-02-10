@@ -24,48 +24,8 @@ import { assertIssues } from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('Sed instance tests', () => {
-  let cellmlContentsPtr;
-  let errorCellmlContentsPtr;
-  let overconstrainedContentsPtr;
-  let underconstrainedContentsPtr;
-  let unsuitablyConstrainedContentsPtr;
-  let algebraicContentsPtr;
-  let nlaContentsPtr;
-  let daeContentsPtr;
-  let combineArchiveContentsPtr;
-  let combineArchiveWithCellmlFileAsMasterFileContentsPtr;
-
-  test.before(() => {
-    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
-    errorCellmlContentsPtr = utils.allocateMemory(loc, utils.ERROR_CELLML_CONTENTS);
-    overconstrainedContentsPtr = utils.allocateMemory(loc, utils.OVERCONSTRAINED_CONTENTS);
-    underconstrainedContentsPtr = utils.allocateMemory(loc, utils.UNDERCONSTRAINED_CONTENTS);
-    unsuitablyConstrainedContentsPtr = utils.allocateMemory(loc, utils.UNSUITABLY_CONSTRAINED_CONTENTS);
-    algebraicContentsPtr = utils.allocateMemory(loc, utils.ALGEBRAIC_CONTENTS);
-    nlaContentsPtr = utils.allocateMemory(loc, utils.NLA_CONTENTS);
-    daeContentsPtr = utils.allocateMemory(loc, utils.DAE_CONTENTS);
-    combineArchiveContentsPtr = utils.allocateMemory(loc, utils.COMBINE_ARCHIVE_CONTENTS);
-    combineArchiveWithCellmlFileAsMasterFileContentsPtr = utils.allocateMemory(
-      loc,
-      utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS
-    );
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, cellmlContentsPtr);
-    utils.freeMemory(loc, errorCellmlContentsPtr);
-    utils.freeMemory(loc, overconstrainedContentsPtr);
-    utils.freeMemory(loc, underconstrainedContentsPtr);
-    utils.freeMemory(loc, unsuitablyConstrainedContentsPtr);
-    utils.freeMemory(loc, algebraicContentsPtr);
-    utils.freeMemory(loc, nlaContentsPtr);
-    utils.freeMemory(loc, daeContentsPtr);
-    utils.freeMemory(loc, combineArchiveContentsPtr);
-    utils.freeMemory(loc, combineArchiveWithCellmlFileAsMasterFileContentsPtr);
   });
 
   test('No file', () => {
@@ -80,7 +40,7 @@ test.describe('Sed instance tests', () => {
   test('Invalid CellML file', () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
-    file.setContents(errorCellmlContentsPtr, utils.ERROR_CELLML_CONTENTS.length);
+    file.setContents(utils.ERROR_CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -97,7 +57,7 @@ test.describe('Sed instance tests', () => {
   test('Overconstrained CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(overconstrainedContentsPtr, utils.OVERCONSTRAINED_CONTENTS.length);
+    file.setContents(utils.OVERCONSTRAINED_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -114,7 +74,7 @@ test.describe('Sed instance tests', () => {
   test('Underconstrained CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(underconstrainedContentsPtr, utils.UNDERCONSTRAINED_CONTENTS.length);
+    file.setContents(utils.UNDERCONSTRAINED_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -131,7 +91,7 @@ test.describe('Sed instance tests', () => {
   test('Unsuitably constrained CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(unsuitablyConstrainedContentsPtr, utils.UNSUITABLY_CONSTRAINED_CONTENTS.length);
+    file.setContents(utils.UNSUITABLY_CONSTRAINED_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -152,7 +112,7 @@ test.describe('Sed instance tests', () => {
   test('Algebraic model', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(algebraicContentsPtr, utils.ALGEBRAIC_CONTENTS.length);
+    file.setContents(utils.ALGEBRAIC_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -165,7 +125,7 @@ test.describe('Sed instance tests', () => {
   test('ODE model', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -195,7 +155,7 @@ test.describe('Sed instance tests', () => {
   test('ODE model with no ODE solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -214,7 +174,7 @@ test.describe('Sed instance tests', () => {
   test('NLA model', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
+    file.setContents(utils.NLA_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -242,7 +202,7 @@ test.describe('Sed instance tests', () => {
   test('NLA model with no NLA solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(nlaContentsPtr, utils.NLA_CONTENTS.length);
+    file.setContents(utils.NLA_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -261,7 +221,7 @@ test.describe('Sed instance tests', () => {
   test('DAE model', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(daeContentsPtr, utils.DAE_CONTENTS.length);
+    file.setContents(utils.DAE_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -300,7 +260,7 @@ test.describe('Sed instance tests', () => {
   test('DAE model with no ODE or NLA solver', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(daeContentsPtr, utils.DAE_CONTENTS.length);
+    file.setContents(utils.DAE_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -325,7 +285,7 @@ test.describe('Sed instance tests', () => {
   test('COMBINE archive', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);
+    file.setContents(utils.COMBINE_ARCHIVE_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -338,10 +298,7 @@ test.describe('Sed instance tests', () => {
   test('COMBINE archive with CellML file as master file', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(
-      combineArchiveWithCellmlFileAsMasterFileContentsPtr,
-      utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS.length
-    );
+    file.setContents(utils.COMBINE_ARCHIVE_WITH_CELLML_FILE_AS_MASTER_FILE_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
