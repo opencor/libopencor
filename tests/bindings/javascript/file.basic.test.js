@@ -29,18 +29,8 @@ const expectedUnknownFileIssues = [
 ];
 
 test.describe('File basic tests', () => {
-  let unknownContentsPtr;
-
-  test.before(() => {
-    unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, unknownContentsPtr);
   });
 
   test('Local file', () => {
@@ -53,7 +43,7 @@ test.describe('File basic tests', () => {
     assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
     assertIssues(loc, file, expectedNoIssues);
 
-    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
+    file.setContents(utils.UNKNOWN_CONTENTS);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
@@ -70,7 +60,7 @@ test.describe('File basic tests', () => {
     assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
     assertIssues(loc, file, expectedNoIssues);
 
-    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
+    file.setContents(utils.UNKNOWN_CONTENTS);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
@@ -87,7 +77,7 @@ test.describe('File basic tests', () => {
     assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
     assertIssues(loc, file, expectedNoIssues);
 
-    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
+    file.setContents(utils.UNKNOWN_CONTENTS);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);

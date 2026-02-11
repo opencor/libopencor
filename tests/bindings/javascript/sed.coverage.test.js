@@ -24,33 +24,8 @@ import { assertIssues, assertValues } from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('Sed coverage tests', () => {
-  let sedChangesContentsPtr;
-  let invalidSedChangesContentsPtr;
-  let unsupportedSedChangesContentsPtr;
-  let solverOdeContentsPtr;
-  let solverNla1ContentsPtr;
-  let mathContentsPtr;
-
-  test.before(() => {
-    sedChangesContentsPtr = utils.allocateMemory(loc, utils.SED_CHANGES_CONTENTS);
-    invalidSedChangesContentsPtr = utils.allocateMemory(loc, utils.INVALID_SED_CHANGES_CONTENTS);
-    unsupportedSedChangesContentsPtr = utils.allocateMemory(loc, utils.UNSUPPORTED_SED_CHANGES_CONTENTS);
-    solverOdeContentsPtr = utils.allocateMemory(loc, utils.SOLVER_ODE_CONTENTS);
-    solverNla1ContentsPtr = utils.allocateMemory(loc, utils.SOLVER_NLA1_CONTENTS);
-    mathContentsPtr = utils.allocateMemory(loc, utils.MATH_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, sedChangesContentsPtr);
-    utils.freeMemory(loc, invalidSedChangesContentsPtr);
-    utils.freeMemory(loc, unsupportedSedChangesContentsPtr);
-    utils.freeMemory(loc, solverOdeContentsPtr);
-    utils.freeMemory(loc, solverNla1ContentsPtr);
-    utils.freeMemory(loc, mathContentsPtr);
   });
 
   function sedTaskExpectedSerialisation(withProperties) {
@@ -140,13 +115,13 @@ test.describe('Sed coverage tests', () => {
   test('Changes', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(sedChangesContentsPtr, utils.SED_CHANGES_CONTENTS.length);
+    file.setContents(utils.SED_CHANGES_CONTENTS);
 
     let document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
 
-    file.setContents(invalidSedChangesContentsPtr, utils.INVALID_SED_CHANGES_CONTENTS.length);
+    file.setContents(utils.INVALID_SED_CHANGES_CONTENTS);
 
     document = new loc.SedDocument(file);
 
@@ -181,7 +156,7 @@ test.describe('Sed coverage tests', () => {
       ]
     ]);
 
-    file.setContents(unsupportedSedChangesContentsPtr, utils.UNSUPPORTED_SED_CHANGES_CONTENTS.length);
+    file.setContents(utils.UNSUPPORTED_SED_CHANGES_CONTENTS);
 
     document = new loc.SedDocument(file);
 
@@ -385,7 +360,7 @@ test.describe('Sed coverage tests', () => {
   test('SedInstanceAndSedInstanceTaskDifferentialModel', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
+    file.setContents(utils.SOLVER_ODE_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const solver = document.simulations.get(0).odeSolver;
@@ -469,7 +444,7 @@ test.describe('Sed coverage tests', () => {
   test('SedInstanceAndSedInstanceTaskNonDifferentialModel', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverNla1ContentsPtr, utils.SOLVER_NLA1_CONTENTS.length);
+    file.setContents(utils.SOLVER_NLA1_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
@@ -513,7 +488,7 @@ test.describe('Sed coverage tests', () => {
 
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(solverOdeContentsPtr, utils.SOLVER_ODE_CONTENTS.length);
+    file.setContents(utils.SOLVER_ODE_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -561,7 +536,7 @@ test.describe('Sed coverage tests', () => {
   test('Math', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(mathContentsPtr, utils.MATH_CONTENTS.length);
+    file.setContents(utils.MATH_CONTENTS);
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();

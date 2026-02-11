@@ -12,3 +12,4 @@ You might also be interested in our [users](https://groups.google.com/forum/#!fo
 Please [contact us](https://opencor.ws/libopencor/contactUs.html) if you have any questions about libOpenCOR.
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/opencor/libopencor)
+![Alt](https://repobeats.axiom.co/api/embed/e57859796c7c35c163c88238f9bfd3f2aad9649f.svg "Repobeats analytics image")

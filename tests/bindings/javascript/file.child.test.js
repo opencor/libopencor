@@ -23,33 +23,14 @@ import * as utils from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('File type tests', () => {
-  let dataset135OmexContentsPtr;
-  let dataset135JsonContentsPtr;
-  let dataset157OmexContentsPtr;
-  let dataset157JsonContentsPtr;
-
-  test.before(() => {
-    dataset135OmexContentsPtr = utils.allocateMemory(loc, utils.DATASET_135_OMEX_CONTENTS);
-    dataset135JsonContentsPtr = utils.allocateMemory(loc, utils.DATASET_135_JSON_CONTENTS);
-    dataset157OmexContentsPtr = utils.allocateMemory(loc, utils.DATASET_157_OMEX_CONTENTS);
-    dataset157JsonContentsPtr = utils.allocateMemory(loc, utils.DATASET_157_JSON_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
   });
 
-  test.after(() => {
-    utils.freeMemory(loc, dataset135OmexContentsPtr);
-    utils.freeMemory(loc, dataset135JsonContentsPtr);
-    utils.freeMemory(loc, dataset157OmexContentsPtr);
-    utils.freeMemory(loc, dataset157JsonContentsPtr);
-  });
-
-  function doTestDataset(omexContentsPtr, omexContents, jsonContents, specificChildFileNames) {
+  function doTestDataset(omexContents, jsonContents, specificChildFileNames) {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(omexContentsPtr, omexContents.length);
+    file.setContents(omexContents);
 
     assert.strictEqual(file.hasChildFiles, true);
     assert.strictEqual(file.childFileCount, specificChildFileNames.length + 1);
@@ -85,13 +66,13 @@ test.describe('File type tests', () => {
   });
 
   test('Dataset 135', () => {
-    doTestDataset(dataset135OmexContentsPtr, utils.DATASET_135_OMEX_CONTENTS, utils.DATASET_135_JSON_CONTENTS, [
+    doTestDataset(utils.DATASET_135_OMEX_CONTENTS, utils.DATASET_135_JSON_CONTENTS, [
       'HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml'
     ]);
   });
 
   test('Dataset 157', () => {
-    doTestDataset(dataset157OmexContentsPtr, utils.DATASET_157_OMEX_CONTENTS, utils.DATASET_157_JSON_CONTENTS, [
+    doTestDataset(utils.DATASET_157_OMEX_CONTENTS, utils.DATASET_157_JSON_CONTENTS, [
       'fabbri_et_al_based_composite_SAN_model.cellml',
       'fabbri_et_al_based_composite_SAN_model.sedml'
     ]);

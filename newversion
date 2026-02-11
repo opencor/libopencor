@@ -1,38 +1,35 @@
 #!/bin/sh
 
-# Major version.
+# Current version from `VERSION.txt`.
 
-major_version=0
+version_file=$(cd "$(dirname "$0")" && pwd)/VERSION.txt
 
-# Minor version.
+old_version=$(cat "$version_file")
+
+old_major_version=$(echo $old_version | cut -d. -f1)
+old_minor_version=$(echo $old_version | cut -d. -f2)
+old_patch_version=$(echo $old_version | cut -d. -f3)
+
+# Determine the new version based on the current version and the current date.
 
 now=$(date +%Y%m%d)
-minor_version=$now
 
-# Patch version.
+new_major_version=$old_major_version
+new_minor_version=$now
 
-patch_version=0
-
-if latest_tag_commit=$(git rev-list --tags --max-count=1 2> /dev/null); then
-  if git_describe=$(git describe --tags "$latest_tag_commit" 2> /dev/null); then
-    if echo "$git_describe" | grep -Eo '^v?[0-9]+\.[0-9]+\.[0-9]+' > /dev/null; then
-      minor=$(echo "$git_describe" | cut -d. -f2)
-      patch=$(echo "$git_describe" | cut -d. -f3)
-      patch_version=$patch
-
-      if [ "$minor" = "$minor_version" ]; then
-        patch_version=$((patch_version + 1))
-      else
-        patch_version=0
-      fi
-    fi
-  fi
+if [ $old_minor_version -lt $now ]; then
+  new_patch_version=0
+else
+  new_patch_version=$(($old_patch_version + 1))
 fi
 
-# Full version.
-
-version="$major_version.$minor_version.$patch_version"
+new_version="$new_major_version.$new_minor_version.$new_patch_version"
 
 # Update our version file.
 
-echo $version > $(cd $(dirname $0); pwd)/VERSION.txt
+echo "$new_version" > "$version_file"
+
+# Display the old and new versions.
+
+printf '\033[1mOld version:\033[0m %s\n' "$old_version"
+printf '\033[1mNew version:\033[0m %s\n' "$new_version"

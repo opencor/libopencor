@@ -24,33 +24,14 @@ import { assertIssues } from './utils.js';
 const loc = await libOpenCOR();
 
 test.describe('File type tests', () => {
-  let unknownContentsPtr;
-  let cellmlContentsPtr;
-  let sedmlContentsPtr;
-  let combineArchiveContentsPtr;
-
-  test.before(() => {
-    unknownContentsPtr = utils.allocateMemory(loc, utils.UNKNOWN_CONTENTS);
-    cellmlContentsPtr = utils.allocateMemory(loc, utils.CELLML_CONTENTS);
-    sedmlContentsPtr = utils.allocateMemory(loc, utils.SEDML_CONTENTS);
-    combineArchiveContentsPtr = utils.allocateMemory(loc, utils.COMBINE_ARCHIVE_CONTENTS);
-  });
-
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
-  });
-
-  test.after(() => {
-    utils.freeMemory(loc, unknownContentsPtr);
-    utils.freeMemory(loc, cellmlContentsPtr);
-    utils.freeMemory(loc, sedmlContentsPtr);
-    utils.freeMemory(loc, combineArchiveContentsPtr);
   });
 
   test('Unknown file', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(unknownContentsPtr, utils.UNKNOWN_CONTENTS.length);
+    file.setContents(utils.UNKNOWN_CONTENTS);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assertIssues(loc, file, [
@@ -61,7 +42,7 @@ test.describe('File type tests', () => {
   test('CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(cellmlContentsPtr, utils.CELLML_CONTENTS.length);
+    file.setContents(utils.CELLML_CONTENTS);
 
     assert.strictEqual(file.type.value, loc.File.Type.CELLML_FILE.value);
   });
@@ -69,7 +50,7 @@ test.describe('File type tests', () => {
   test('SED-ML file', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(sedmlContentsPtr, utils.SEDML_CONTENTS.length);
+    file.setContents(utils.SEDML_CONTENTS);
 
     assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
   });
@@ -77,7 +58,7 @@ test.describe('File type tests', () => {
   test('COMBINE archive', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(combineArchiveContentsPtr, utils.COMBINE_ARCHIVE_CONTENTS.length);
+    file.setContents(utils.COMBINE_ARCHIVE_CONTENTS);
 
     assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
   });

@@ -199,23 +199,13 @@ $(() => {
         const inputFile = input.files[0];
         const fileReader = new FileReader();
 
-        input.value = ''; // Allow the user to select the same file again.
-
-        fileReader.readAsArrayBuffer(inputFile);
-
-        fileReader.onload = async () => {
+        fileReader.onload = () => {
           try {
-            // Retrieve the contents of the file.
-
-            const fileArrayBuffer = await inputFile.arrayBuffer();
-            const memPtr = loc._malloc(inputFile.size);
-            const mem = new Uint8Array(loc.HEAPU8.buffer, memPtr, inputFile.size);
-
-            mem.set(new Uint8Array(fileArrayBuffer));
+            // Retrieve the contents of the file and pass a Uint8Array to the binding.
 
             file = new loc.File(inputFile.name);
 
-            file.setContents(memPtr, inputFile.size);
+            file.setContents(new Uint8Array(fileReader.result));
 
             // Determine the type of the file.
 
@@ -307,6 +297,14 @@ $(() => {
         fileReader.onerror = () => {
           showIssues([fileReader.error.message]);
         };
+
+        // Reset the input so that the user can select the same file again if they want to.
+
+        input.value = '';
+
+        // Read the file as an array buffer.
+
+        fileReader.readAsArrayBuffer(inputFile);
       } else {
         updateFileUi(false, false, false, false);
       }
