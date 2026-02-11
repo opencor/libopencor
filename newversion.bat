@@ -2,49 +2,38 @@
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 
-REM Major version.
+REM Current version from `VERSION.txt`.
 
-SET MajorVersion=0
+SET VersionFile=%~dp0VERSION.txt
 
-REM Minor version.
+FOR /F "usebackq delims=" %%I IN ("%VersionFile%") DO SET OldVersion=%%I
+
+FOR /F "tokens=1-3 delims=." %%A IN ("!OldVersion!") DO (
+    SET OldMajorVersion=%%A
+    SET OldMinorVersion=%%B
+    SET OldPatchVersion=%%C
+)
+
+REM Determine the new version based on the current version and the current date.
 
 FOR /F "tokens=2 delims==" %%I IN ('wmic os get localdatetime /value') DO SET Now=%%I
-SET MinorVersion=!Now:~0,8!
-ECHO "MinorVersion: !MinorVersion!"
 
-REM Patch version.
+SET NewMajorVersion=!OldMajorVersion!
+SET NewMinorVersion=!Now:~0,8!
 
-SET PatchVersion=0
-
-FOR /F %%I IN ('git rev-list --tags --max-count=1 2^> NUL') DO (
-    SET LatestTagCommit=%%I
-)
-ECHO "LatestTagCommit: !LatestTagCommit!"
-
-IF DEFINED LatestTagCommit (
-    FOR /F %%I IN ('git describe --tags !LatestTagCommit! 2^> NUL') DO (
-      SET GitDescribe=%%I
-    )
-    ECHO "GitDescribe: !GitDescribe!"
-
-    FOR /F "tokens=2,3 delims=." %%A IN ("!GitDescribe!") DO (
-        SET MinorVersion=%%A
-        ECHO "MinorVersion: !MinorVersion!"
-        SET PatchVersion=%%B
-        ECHO "PatchVersion: !PatchVersion!"
-
-        IF "!MinorVersion!"=="!MinorVersion!" (
-            SET /A PatchVersion+=1
-        ) ELSE (
-            SET PatchVersion=0
-        )
-    )
+IF !OldMinorVersion! LSS !NewMinorVersion! (
+    SET NewPatchVersion=0
+) ELSE (
+    SET /A NewPatchVersion=!OldPatchVersion! + 1
 )
 
-REM Full version.
-
-SET Version=!MajorVersion!.!MinorVersion!.!PatchVersion!
+SET NewVersion=!NewMajorVersion!.!NewMinorVersion!.!NewPatchVersion!
 
 REM Update our version file.
 
-ECHO !Version! > "%~dp0VERSION.txt"
+ECHO !NewVersion! > "%VersionFile%"
+
+REM Display the old and new versions.
+
+ECHO Old version: !OldVersion!
+ECHO New version: !NewVersion!
