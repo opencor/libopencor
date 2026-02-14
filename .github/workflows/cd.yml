@@ -237,6 +237,11 @@ jobs:
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DJAVASCRIPT_UNIT_TESTING=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=OFF -DUNIT_TESTING=OFF
       - name: Build WebAssembly
         run: cmake --build build
+      - name: Create latest version
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        run: |
+          cd build/src/bindings/javascript/build/src/wasm
+          cp libopencor-*.js libopencor-latest.js
       - name: Upload WebAssembly artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
