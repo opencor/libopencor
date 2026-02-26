@@ -25,6 +25,18 @@ limitations under the License.
 
 namespace libOpenCOR {
 
+#ifdef __EMSCRIPTEN__
+static emscripten::val toFloat64Array(const Doubles &data)
+{
+    auto view {emscripten::typed_memory_view(data.size(), data.data())};
+    auto res {emscripten::val::global("Float64Array").new_(data.size())};
+
+    res.call<void>("set", view);
+
+    return res;
+}
+#endif
+
 SedInstanceTaskPtr SedInstanceTask::Impl::create(const SedAbstractTaskPtr &pTask)
 {
     auto res {SedInstanceTaskPtr {new SedInstanceTask {pTask}}};
@@ -527,7 +539,7 @@ Doubles SedInstanceTask::voi() const
 #ifdef __EMSCRIPTEN__
 emscripten::val SedInstanceTask::voiAsArray() const
 {
-    return emscripten::val::array(voi());
+    return toFloat64Array(voi());
 }
 #endif
 
@@ -554,7 +566,7 @@ Doubles SedInstanceTask::state(size_t pIndex) const
 #ifdef __EMSCRIPTEN__
 emscripten::val SedInstanceTask::stateAsArray(size_t pIndex) const
 {
-    return emscripten::val::array(state(pIndex));
+    return toFloat64Array(state(pIndex));
 }
 #endif
 
@@ -581,7 +593,7 @@ Doubles SedInstanceTask::rate(size_t pIndex) const
 #ifdef __EMSCRIPTEN__
 emscripten::val SedInstanceTask::rateAsArray(size_t pIndex) const
 {
-    return emscripten::val::array(rate(pIndex));
+    return toFloat64Array(rate(pIndex));
 }
 #endif
 
@@ -608,7 +620,7 @@ Doubles SedInstanceTask::constant(size_t pIndex) const
 #ifdef __EMSCRIPTEN__
 emscripten::val SedInstanceTask::constantAsArray(size_t pIndex) const
 {
-    return emscripten::val::array(constant(pIndex));
+    return toFloat64Array(constant(pIndex));
 }
 #endif
 
@@ -635,7 +647,7 @@ Doubles SedInstanceTask::computedConstant(size_t pIndex) const
 #ifdef __EMSCRIPTEN__
 emscripten::val SedInstanceTask::computedConstantAsArray(size_t pIndex) const
 {
-    return emscripten::val::array(computedConstant(pIndex));
+    return toFloat64Array(computedConstant(pIndex));
 }
 #endif
 
@@ -662,7 +674,7 @@ Doubles SedInstanceTask::algebraicVariable(size_t pIndex) const
 #ifdef __EMSCRIPTEN__
 emscripten::val SedInstanceTask::algebraicVariableAsArray(size_t pIndex) const
 {
-    return emscripten::val::array(algebraicVariable(pIndex));
+    return toFloat64Array(algebraicVariable(pIndex));
 }
 #endif
 
