@@ -1,6 +1,7 @@
+#include <nanobind/nanobind.h>
+
 #include <string.h>
 
-#include <nanobind/nanobind.h>
 #include <nanobind/stl/function.h>
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/string.h>
@@ -367,6 +368,8 @@ NB_MODULE(test_functions_ext, m) {
         return s.contains(h);
     });
 
+    m.def("test_memoryview", []() { return nb::memoryview(nb::bytes("123456")); });
+    m.def("test_bad_memview", []() { return nb::memoryview(nb::int_(0)); });
 
     m.def("test_del_list", [](nb::list l) { nb::del(l[2]); });
     m.def("test_del_dict", [](nb::dict l) { nb::del(l["a"]); });

@@ -190,15 +190,14 @@ NB_INLINE PyObject *func_create(Func &&func, Return (*)(Args...),
     };
 
     // The following temporary record will describe the function in detail
-    func_data_prelim<has_arg_defaults ? nargs : nargs_provided> f;
+    func_data_prelim<has_arg_defaults ? (nargs - is_method_det) : nargs_provided> f;
 
-    // Initialize argument flags. The first branch turns std::optional<> types
-    // into implicit nb::none() anotations.
+    // Pre-initialize argument flags with 'convert'. The 'accepts_none' flag
+    // for std::optional<> args is applied after func_extra_apply (see below).
     if constexpr (has_arg_defaults) {
-        size_t i = 0;
-        ((f.args[i++] = { nullptr, nullptr, nullptr, nullptr,
-            has_arg_defaults_v<Args> ? (uint8_t) cast_flags::accepts_none
-                                     : (uint8_t) 0 }), ...);
+        ((void)(Is < (size_t)is_method_det ||
+                (f.args[Is - is_method_det] = { nullptr, nullptr, nullptr, nullptr,
+                    (uint8_t) cast_flags::convert }, true)), ...);
     } else if constexpr (nargs_provided > 0) {
         for (size_t i = 0; i < nargs_provided; ++i)
             f.args[i].flag = 0;
@@ -325,6 +324,14 @@ NB_INLINE PyObject *func_create(Func &&func, Return (*)(Args...),
     (func_extra_apply(f, extra, arg_index), ...);
 
     (void) arg_index;
+
+    // Apply implicit accepts_none for std::optional<> typed arguments
+    // after func_extra_apply, so that explicit nb::arg().noconvert() works.
+    if constexpr (has_arg_defaults) {
+        ((void)(Is >= (size_t)is_method_det && has_arg_defaults_v<Args> &&
+                (f.args[Is - is_method_det].flag |=
+                     (uint8_t) cast_flags::accepts_none, true)), ...);
+    }
 
     return nb_func_new(&f);
 }

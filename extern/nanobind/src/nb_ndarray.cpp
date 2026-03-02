@@ -271,7 +271,7 @@ static PyObject *nb_ndarray_dlpack(PyObject *self, PyObject *const *args,
 
     ndarray_handle *th = ((nb_ndarray *) self)->th;
     PyObject *capsule;
-    if (max_major_version >= dlpack::major_version)
+    if (max_major_version >= (long)dlpack::major_version)
         capsule = th->make_capsule_versioned();
     else
         capsule = th->make_capsule_unversioned();
@@ -338,7 +338,7 @@ static PyTypeObject *nb_ndarray_tp() noexcept {
             /* .slots = */ slots
         };
 
-        tp = (PyTypeObject *) PyType_FromSpec(&spec);
+        tp = new_type(internals_, &spec);
         check(tp, "nb_ndarray type creation failed!");
 
         internals_->nb_ndarray.store_release(tp);
