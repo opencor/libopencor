@@ -15,6 +15,35 @@ case, both modules must use the same nanobind ABI version, or they will be
 isolated from each other. Releases that don't explicitly mention an ABI version
 below inherit that of the preceding release.
 
+Version 2.12.0 (Feb 25, 2025)
+-----------------------------
+
+- Added :cpp:class:`nb::memoryview` that wraps the Python ``memoryview`` type.
+  (PR `#1291 <https://github.com/wjakob/nanobind/pull/1291>`__).
+
+- Made stub generation compatible with the Realtime Sanitizer (RTSan)
+  from Clang 20.
+  (PR `#1285 <https://github.com/wjakob/nanobind/pull/1285>`__).
+
+- Fixed a use-after-free when calling functions after their module has been
+  deleted. The internals state is now reference-counted with references held by
+  modules, functions, and types. This also fixes memory leaks reported in issue
+  `#957 <https://github.com/wjakob/nanobind/issues/957>`__.
+  (PR `#1287 <https://github.com/wjakob/nanobind/pull/1287>`__).
+
+- Fixed two regressions from v2.11.0 related to the implicit ``std::optional``
+  :cpp:func:`.none() <arg::none>` annotation: an off-by-one error that applied
+  the annotation to the wrong argument for methods, and a missing ``convert``
+  flag that silently disabled implicit type conversions.
+  (issues `#1281 <https://github.com/wjakob/nanobind/issues/1281>`__,
+  `#1293 <https://github.com/wjakob/nanobind/issues/1293>`__,
+  commits `ed7ab31
+  <https://github.com/wjakob/nanobind/commit/ed7ab31f5ffe313b2ca945573e29112ea5e475b2>`__,
+  `1f96278
+  <https://github.com/wjakob/nanobind/commit/1f96278c09ec1f7110105f5e2e3dbd2f08dc66a4>`__).
+
+- ABI version 19.
+
 Version 2.11.0 (Jan 29, 2026)
 -----------------------------
 
@@ -92,7 +121,7 @@ Version 2.11.0 (Jan 29, 2026)
     (PR `#1255 <https://github.com/wjakob/nanobind/pull/1255>`__).
 
 Version 2.10.2 (Dec 10, 2025)
-----------------------------
+-----------------------------
 
 - Fixes a regression that broke compilation on 32-bit architectures.
   (PR `#1239 <https://github.com/wjakob/nanobind/pull/1239>`__).
@@ -564,7 +593,7 @@ Version 2.3.0
 
 There is no version 2.3.0 due to a deployment mishap.
 
-- Added casters for `Eigen::Map<Eigen::SparseMatrix<...>` types from the `Eigen library
+- Added casters for ``Eigen::Map<Eigen::SparseMatrix<...>>`` types from the `Eigen library
   <https://eigen.tuxfamily.org/index.php?title=Main_Page>`__. (PR `#782
   <https://github.com/wjakob/nanobind/pull/782>`_).
 

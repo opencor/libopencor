@@ -284,6 +284,12 @@ NB_MODULE(test_stl_ext, m) {
     m.def("optional_unbound_type_with_nullopt_as_default", [](std::optional<int> &x) { return x; }, nb::arg("x") = std::nullopt);
     m.def("optional_non_assignable", [](std::optional<NonAssignable> &x) { return x; });
 
+    // Regression test: std::optional<> with lossy implicit conversion on a
+    // sibling argument and no explicit nb::arg annotations (issue #1293)
+    m.def("optional_implicit_convert", [](float f, std::optional<int> o) {
+        return (double) f + o.value_or(0);
+    });
+
     // ----- test43-test50 ------
     m.def("variant_copyable", [](std::variant<Copyable, int> &) {});
     m.def("variant_copyable_none", [](std::variant<std::monostate, int, Copyable> &) {}, nb::arg("x").none());
