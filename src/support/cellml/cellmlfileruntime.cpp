@@ -432,67 +432,67 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 }
 
 #ifdef __EMSCRIPTEN__
-EM_JS(void, jsInitialiseArraysForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsInitialiseArraysForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pConstants, pComputedConstants, pAlgebraicVariables);
 });
 
-void CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsInitialiseArraysForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraic);
+    jsInitialiseArraysForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsInitialiseArraysForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsInitialiseArraysForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 });
 
-void CellmlFileRuntime::Impl::initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsInitialiseArraysForDifferentialModel(mWasmInstanceFunctionsId, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsInitialiseArraysForDifferentialModel(mWasmInstanceFunctionsId, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeComputedConstantsForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeComputedConstants(pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeComputedConstantsForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeComputedConstants(pConstants, pComputedConstants, pAlgebraicVariables);
 });
 
-void CellmlFileRuntime::Impl::computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeComputedConstantsForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraic);
+    jsComputeComputedConstantsForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeComputedConstantsForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeComputedConstants(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeComputedConstantsForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeComputedConstants(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 });
 
-void CellmlFileRuntime::Impl::computeComputedConstantsForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::computeComputedConstantsForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeComputedConstantsForDifferentialModel(mWasmInstanceFunctionsId, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsComputeComputedConstantsForDifferentialModel(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeRates, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeRates, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 });
 
-void CellmlFileRuntime::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeRates(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsComputeRates(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeVariablesForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeVariables(pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeVariablesForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeVariables(pConstants, pComputedConstants, pAlgebraicVariables);
 });
 
-void CellmlFileRuntime::Impl::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeVariablesForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraic);
+    jsComputeVariablesForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeVariablesForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeVariables(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+EM_JS(void, jsComputeVariablesForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
+    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeVariables(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 });
 
-void CellmlFileRuntime::Impl::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::Impl::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeVariablesForDifferentialModel(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    jsComputeVariablesForDifferentialModel(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 #else
 CellmlFileRuntime::InitialiseArraysForAlgebraicModel CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel() const
@@ -557,39 +557,39 @@ CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile,
 }
 
 #ifdef __EMSCRIPTEN__
-void CellmlFileRuntime::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    pimpl()->initialiseArraysForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->initialiseArraysForAlgebraicModel(pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-void CellmlFileRuntime::initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    pimpl()->initialiseArraysForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->initialiseArraysForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-void CellmlFileRuntime::computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    pimpl()->computeComputedConstantsForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->computeComputedConstantsForAlgebraicModel(pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-void CellmlFileRuntime::computeComputedConstantsForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::computeComputedConstantsForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    pimpl()->computeComputedConstantsForDifferentialModel(pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->computeComputedConstantsForDifferentialModel(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-void CellmlFileRuntime::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    pimpl()->computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-void CellmlFileRuntime::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    pimpl()->computeVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->computeVariablesForAlgebraicModel(pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-void CellmlFileRuntime::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const
+void CellmlFileRuntime::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    pimpl()->computeVariablesForDifferentialModel(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraic);
+    pimpl()->computeVariablesForDifferentialModel(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 #else
 CellmlFileRuntime::InitialiseArraysForAlgebraicModel CellmlFileRuntime::initialiseArraysForAlgebraicModel() const

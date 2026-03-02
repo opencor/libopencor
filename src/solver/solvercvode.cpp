@@ -304,7 +304,7 @@ StringStringMap SolverCvode::Impl::properties() const
 }
 
 bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                   double *pConstants, double *pComputedConstants, double *pAlgebraic,
+                                   double *pConstants, double *pComputedConstants, double *pAlgebraicVariables,
                                    const CellmlFileRuntimePtr &pRuntime)
 {
     resetInternals();
@@ -313,7 +313,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     // Initialise the ODE solver itself.
 
     SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates,
-                                pConstants, pComputedConstants, pAlgebraic,
+                                pConstants, pComputedConstants, pAlgebraicVariables,
                                 pRuntime);
 
     // Check the solver's properties.
@@ -398,7 +398,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     mUserData.constants = pConstants;
     mUserData.computedConstants = pComputedConstants;
-    mUserData.algebraic = pAlgebraic;
+    mUserData.algebraic = pAlgebraicVariables;
     mUserData.runtime = pRuntime;
 
     ASSERT_EQ(CVodeSetUserData(mSolver, &mUserData), CV_SUCCESS);

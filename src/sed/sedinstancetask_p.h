@@ -55,7 +55,7 @@ public:
     double *mRates {nullptr};
     double *mConstants {nullptr};
     double *mComputedConstants {nullptr};
-    double *mAlgebraic {nullptr};
+    double *mAlgebraicVariables {nullptr};
 
     Doubles mStateDoubles;
     Doubles mRateDoubles;

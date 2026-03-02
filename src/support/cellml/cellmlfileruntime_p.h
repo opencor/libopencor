@@ -46,13 +46,13 @@ public:
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 
 #ifdef __EMSCRIPTEN__
-    void initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void computeComputedConstantsForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
-    void computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+    void initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
+    void initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
+    void computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
+    void computeComputedConstantsForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
+    void computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
+    void computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
+    void computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
 #else
     CellmlFileRuntime::InitialiseArraysForAlgebraicModel initialiseArraysForAlgebraicModel() const;
     CellmlFileRuntime::InitialiseArraysForDifferentialModel initialiseArraysForDifferentialModel() const;

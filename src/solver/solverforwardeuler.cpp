@@ -31,7 +31,7 @@ SolverPtr SolverForwardEuler::Impl::duplicate()
 }
 
 bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                          double *pConstants, double *pComputedConstants, double *pAlgebraic,
+                                          double *pConstants, double *pComputedConstants, double *pAlgebraicVariables,
                                           const CellmlFileRuntimePtr &pRuntime)
 {
     removeAllIssues();
@@ -39,7 +39,7 @@ bool SolverForwardEuler::Impl::initialise(double pVoi, size_t pSize, double *pSt
     // Initialise the ODE solver itself.
 
     return SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates,
-                                                pConstants, pComputedConstants, pAlgebraic,
+                                                pConstants, pComputedConstants, pAlgebraicVariables,
                                                 pRuntime);
 }
 
