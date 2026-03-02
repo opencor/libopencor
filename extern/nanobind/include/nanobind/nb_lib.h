@@ -117,8 +117,6 @@ NB_CORE void raise_next_overload_if_null(void *p);
 // ========================================================================
 
 NB_CORE void nb_module_exec(const char *domain, PyObject *m);
-NB_CORE int  nb_module_traverse(PyObject *m, visitproc visit, void *arg);
-NB_CORE int  nb_module_clear(PyObject *m);
 NB_CORE void nb_module_free(void *m);
 
 // ========================================================================
@@ -175,6 +173,9 @@ NB_CORE PyObject *set_from_obj(PyObject *o);
 
 /// Convert a Python object into a Python frozenset
 NB_CORE PyObject *frozenset_from_obj(PyObject *o);
+
+/// Convert a Python object into a Python memoryview
+NB_CORE PyObject *memoryview_from_obj(PyObject *o);
 
 // ========================================================================
 
