@@ -388,6 +388,13 @@ def test38_std_optional_none():
     assert t.optional_non_assignable(None) == None
 
 
+def test38b_std_optional_implicit_convert():
+    # Regression test: std::optional<> with lossy implicit conversion on a
+    # sibling argument and no explicit nb::arg annotations (issue #1293)
+    assert t.optional_implicit_convert(16777217, 10) == 16777216.0 + 10
+    assert t.optional_implicit_convert(16777217, None) == 16777216.0
+
+
 def test39_std_optional_ret_opt_movable(clean):
     assert t.optional_ret_opt_movable().value == 5
     opt_movable = optional("test_stl_ext.Movable")

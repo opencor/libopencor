@@ -247,7 +247,6 @@ would require a substantial redesign and years of careful work by a team of C++
 metaprogramming experts. At the same time, changing anything in pybind11 is
 extremely hard because of the large number of downstream users and their
 requirements on API/ABI stability. I personally don't have the time and energy
-to fix pybind11 and have moved my focus to this project. The `testimonials
-section
-<https://github.com/wjakob/nanobind/blob/master/README.md#testimonials>` lists
+to fix pybind11 and have moved my focus to this project. The `testimonials section
+<https://github.com/wjakob/nanobind/blob/master/README.md#testimonials>`__ lists
 the experience of a number of large projects that made the switch.

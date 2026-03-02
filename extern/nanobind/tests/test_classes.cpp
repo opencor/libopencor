@@ -60,6 +60,13 @@ struct PairStruct {
     Struct s2;
 };
 
+// Test case for issue #1280
+struct OptionalNoneTest {
+    int compute(int i, std::optional<int> j, int k) const {
+        return i + j.value_or(0) + k;
+    }
+};
+
 struct Big {
     char data[1024];
     Big() { memset(data, 0xff, 1024); }
@@ -186,6 +193,12 @@ NB_MODULE(test_classes_ext, m) {
         .def(nb::init<>())
         .def_rw("s1", &PairStruct::s1, "A documented property")
         .def_rw("s2", &PairStruct::s2);
+
+    // Test case for issue #1280
+    nb::class_<OptionalNoneTest>(m, "OptionalNoneTest")
+        .def(nb::init<>())
+        .def("compute", &OptionalNoneTest::compute,
+             "i"_a, "j"_a = nb::none(), "k"_a = 0);
 
     m.def("stats", []{
         nb::dict d;

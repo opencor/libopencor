@@ -31,7 +31,7 @@ SolverPtr SolverHeun::Impl::duplicate()
 }
 
 bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                                  double *pConstants, double *pComputedConstants, double *pAlgebraic,
+                                  double *pConstants, double *pComputedConstants, double *pAlgebraicVariables,
                                   const CellmlFileRuntimePtr &pRuntime)
 {
     removeAllIssues();
@@ -39,7 +39,7 @@ bool SolverHeun::Impl::initialise(double pVoi, size_t pSize, double *pStates, do
     // Initialise the ODE solver itself.
 
     if (!SolverOdeFixedStep::Impl::initialise(pVoi, pSize, pStates, pRates,
-                                              pConstants, pComputedConstants, pAlgebraic,
+                                              pConstants, pComputedConstants, pAlgebraicVariables,
                                               pRuntime)) {
         return false;
     }

@@ -89,7 +89,7 @@ public:
     StringStringMap properties() const override;
 
     bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                    double *pConstants, double *pComputedConstants, double *pAlgebraic,
+                    double *pConstants, double *pComputedConstants, double *pAlgebraicVariables,
                     const CellmlFileRuntimePtr &pRuntime) override;
     /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     bool reinitialise(double pVoi) override;

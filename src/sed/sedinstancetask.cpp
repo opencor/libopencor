@@ -112,7 +112,7 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     mConstants = mConstantDoubles.data();
     mComputedConstants = mComputedConstantDoubles.data();
-    mAlgebraic = mAlgebraicDoubles.data();
+    mAlgebraicVariables = mAlgebraicDoubles.data();
 
     mResults.constants.resize(mAnalyserModel->constantCount(), {});
     mResults.computedConstants.resize(mAnalyserModel->computedConstantCount(), {});
@@ -137,7 +137,7 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     }
 
     for (size_t i {0}; i < mAnalyserModel->algebraicVariableCount(); ++i) {
-        mResults.algebraic[i][pIndex] = mAlgebraic[i]; // NOLINT
+        mResults.algebraic[i][pIndex] = mAlgebraicVariables[i]; // NOLINT
     }
 }
 
@@ -169,15 +169,15 @@ void SedInstanceTask::Impl::initialise()
         mVoi = mSedUniformTimeCourse->pimpl()->mOutputStartTime;
 
 #ifdef __EMSCRIPTEN__
-        mRuntime->initialiseArraysForDifferentialModel(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->initialiseArraysForDifferentialModel(mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
 #else
-        mRuntime->initialiseArraysForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->initialiseArraysForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
 #endif
     } else {
 #ifdef __EMSCRIPTEN__
-        mRuntime->initialiseArraysForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->initialiseArraysForAlgebraicModel(mConstants, mComputedConstants, mAlgebraicVariables);
 #else
-        mRuntime->initialiseArraysForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->initialiseArraysForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
 #endif
     }
 
@@ -185,21 +185,21 @@ void SedInstanceTask::Impl::initialise()
 
     if (mSedUniformTimeCourse != nullptr) {
 #ifdef __EMSCRIPTEN__
-        mRuntime->computeComputedConstantsForDifferentialModel(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-        mRuntime->computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-        mRuntime->computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeComputedConstantsForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
+        mRuntime->computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
+        mRuntime->computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
 #else
-        mRuntime->computeComputedConstantsForDifferentialModel()(mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-        mRuntime->computeRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-        mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeComputedConstantsForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
+        mRuntime->computeRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
+        mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
 #endif
     } else {
 #ifdef __EMSCRIPTEN__
-        mRuntime->computeComputedConstantsForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
-        mRuntime->computeVariablesForAlgebraicModel(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeComputedConstantsForAlgebraicModel(mConstants, mComputedConstants, mAlgebraicVariables);
+        mRuntime->computeVariablesForAlgebraicModel(mConstants, mComputedConstants, mAlgebraicVariables);
 #else
-        mRuntime->computeComputedConstantsForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
-        mRuntime->computeVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraic);
+        mRuntime->computeComputedConstantsForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
+        mRuntime->computeVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
 #endif
     }
 
@@ -215,7 +215,7 @@ void SedInstanceTask::Impl::initialise()
 
     if (mDifferentialModel) {
         if (!mOdeSolver->pimpl()->initialise(mVoi, mAnalyserModel->stateCount(), mStates, mRates,
-                                             mConstants, mComputedConstants, mAlgebraic,
+                                             mConstants, mComputedConstants, mAlgebraicVariables,
                                              mRuntime)) {
             addIssues(mOdeSolver, mOdeSolver->name());
 
@@ -283,10 +283,10 @@ double SedInstanceTask::Impl::run()
 
 #ifdef __EMSCRIPTEN__
             mRuntime->computeVariablesForDifferentialModel(mVoi, mStates, mRates,
-                                                           mConstants, mComputedConstants, mAlgebraic);
+                                                           mConstants, mComputedConstants, mAlgebraicVariables);
 #else
             mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates,
-                                                             mConstants, mComputedConstants, mAlgebraic);
+                                                             mConstants, mComputedConstants, mAlgebraicVariables);
 #endif
 
             //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD
@@ -315,7 +315,7 @@ double SedInstanceTask::Impl::run()
         }
 
         for (size_t i {0}; i < mAnalyserModel->algebraicVariableCount(); ++i) {
-            mResults.algebraic[i].resize(1, mAlgebraic[i]); // NOLINT
+            mResults.algebraic[i].resize(1, mAlgebraicVariables[i]); // NOLINT
         }
     }
 

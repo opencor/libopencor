@@ -40,7 +40,7 @@ public:
     explicit Impl(const std::string &pId, const std::string &pName);
 
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
-                            double *pConstants, double *pComputedConstants, double *pAlgebraic,
+                            double *pConstants, double *pComputedConstants, double *pAlgebraicVariables,
                             const CellmlFileRuntimePtr &pRuntime) = 0;
     /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     virtual bool reinitialise(double pVoi);
@@ -49,7 +49,7 @@ public:
     virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 
     void computeRates(double pVoi, double *pStates, double *pRates,
-                      double *pConstants, double *pComputedConstants, double *pAlgebraic) const;
+                      double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
 };
 
 } // namespace libOpenCOR
