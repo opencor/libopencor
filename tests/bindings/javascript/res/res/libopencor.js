@@ -138,23 +138,39 @@ export function run() {
 }
 
 function axisInfo(index) {
+  // Retrieve and return the array and unit corresponding to the given index.
+
   if (index === 0) {
     return [instanceTask.voiAsArray, instanceTask.voiUnit];
-  } else if (index <= 2 * instanceTask.stateCount) {
-    if (index % 2 !== 0) {
-      const ndx = (index - 1) / 2;
-
-      return [instanceTask.stateAsArray(ndx), instanceTask.stateUnit(ndx)];
-    } else {
-      const ndx = index / 2 - 1;
-
-      return [instanceTask.rateAsArray(ndx), instanceTask.rateUnit(ndx)];
-    }
-  } else {
-    const ndx = index - 1 - 2 * instanceTask.stateCount;
-
-    return [instanceTask.variableAsArray(ndx), instanceTask.variableUnit(ndx)];
   }
+
+  index -= 1;
+
+  if (index < 2 * instanceTask.stateCount) {
+    const stateOrRateIndex = Math.floor(index / 2);
+
+    if (index % 2 === 0) {
+      return [instanceTask.stateAsArray(stateOrRateIndex), instanceTask.stateUnit(stateOrRateIndex)];
+    }
+
+    return [instanceTask.rateAsArray(stateOrRateIndex), instanceTask.rateUnit(stateOrRateIndex)];
+  }
+
+  index -= 2 * instanceTask.stateCount;
+
+  if (index < instanceTask.constantCount) {
+    return [instanceTask.constantAsArray(index), instanceTask.constantUnit(index)];
+  }
+
+  index -= instanceTask.constantCount;
+
+  if (index < instanceTask.computedConstantCount) {
+    return [instanceTask.computedConstantAsArray(index), instanceTask.computedConstantUnit(index)];
+  }
+
+  index -= instanceTask.computedConstantCount;
+
+  return [instanceTask.algebraicVariableAsArray(index), instanceTask.algebraicVariableUnit(index)];
 }
 
 export function updatePlottingAreaAndAxesInfo() {
