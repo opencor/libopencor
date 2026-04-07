@@ -8,9 +8,10 @@
   },
   "description": "libOpenCOR is is a library that can be used to organise, edit, simulate, and analyse CellML files.",
   "exports": {
-    ".": "./dist/libopencor.js"
+    ".": "./dist/libopencor.js",
+    "./libopencor.wasm": "./dist/libopencor.wasm"
   },
-  "files": ["dist/libopencor.js", "README.md", "LICENSE.txt"],
+  "files": ["dist/libopencor.js", "dist/libopencor.wasm", "README.md", "LICENSE.txt"],
   "homepage": "https://opencor.ws/libopencor/",
   "keywords": ["cellml", "combine", "omex", "opencor", "sed-ml"],
   "license": "Apache-2.0",

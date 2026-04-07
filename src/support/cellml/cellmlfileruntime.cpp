@@ -31,7 +31,7 @@ std::string exportJavaScriptName(const std::string &pName)
     return std::string("__attribute__((export_name(\"").append(pName).append("\")))\n");
 }
 
-intptr_t instantiateWebAssemblyModule(UnsignedChars pWasmModule, bool pDifferentialModel, bool pIsOdeModel,
+intptr_t instantiateWebAssemblyModule(const UnsignedChars &pWasmModule, bool pDifferentialModel, bool pIsOdeModel,
                                       bool pIsAlgebraicModel, bool pHasObjectiveFunctions)
 {
     // clang-format off
@@ -432,6 +432,16 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 }
 
 #ifdef __EMSCRIPTEN__
+CellmlFileRuntime::Impl::~Impl()
+{
+    if (mWasmInstanceFunctionsId != 0) {
+        EM_ASM({
+            if (Module.wasmInstanceFunctions !== undefined) {
+                Module.wasmInstanceFunctions.delete($0);
+            } }, mWasmInstanceFunctionsId);
+    }
+}
+
 EM_JS(void, jsInitialiseArraysForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
     Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pConstants, pComputedConstants, pAlgebraicVariables);
 });

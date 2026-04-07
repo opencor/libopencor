@@ -28,12 +28,20 @@ namespace libOpenCOR {
 #ifdef __EMSCRIPTEN__
 static emscripten::val toFloat64Array(const Doubles &data)
 {
-    auto view {emscripten::typed_memory_view(data.size(), data.data())};
-    auto res {emscripten::val::global("Float64Array").new_(data.size())};
+    auto size = data.size();
 
-    res.call<void>("set", view);
+    if (size == 0) {
+        return emscripten::val::global("Float64Array").new_(0);
+    }
 
-    return res;
+    // Note: see the note in src/bindings/javascript/file.cpp for why we avoid typed_memory_view() and use EM_ASM()
+    //       instead.
+
+    return emscripten::val::take_ownership(
+        static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
+            var jsArray = new Float64Array(new Float64Array(HEAPU8.buffer, $0, $1));
+
+            return Emval.toHandle(jsArray); }, data.data(), size)));
 }
 #endif
 

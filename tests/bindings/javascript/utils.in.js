@@ -165,7 +165,7 @@ export function assertValues(
 export function allocateMemory(module, arrayBuffer) {
   const memPtr = module._malloc(arrayBuffer.length);
 
-  new Uint8Array(module.HEAPU8.buffer, memPtr, arrayBuffer.length).set(arrayBuffer);
+  module.HEAPU8.set(arrayBuffer, memPtr);
 
   return memPtr;
 }
