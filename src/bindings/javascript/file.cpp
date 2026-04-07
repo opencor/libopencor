@@ -34,12 +34,23 @@ void fileApi()
         .property("path", &libOpenCOR::File::path)
         .function("contents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis) {
                       auto contents {pThis->contents()};
-                      auto view {emscripten::typed_memory_view(contents.size(), contents.data())};
-                      auto res {emscripten::val::global("Uint8Array").new_(contents.size())};
+                      auto size = contents.size();
 
-                      res.call<void>("set", view);
+                      if (size == 0) {
+                          return emscripten::val::global("Uint8Array").new_(0);
+                      }
 
-                      return res;
+                      // Note: we avoid using emscripten::typed_memory_view() as an intermediate step since it creates a
+                      //       JavaScript's TypedArray view directly backed by wasmMemory.buffer. This is fragile and
+                      //       would break if ALLOW_MEMORY_GROWTH was to be enabled or if pthreads/SharedArrayBuffer
+                      //       support were to be added. By performing the copy entirely within a single EM_ASM() block,
+                      //       HEAPU8 is fetched and used atomically.
+
+                      return emscripten::val::take_ownership(
+                          static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
+                              var jsArray = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
+
+                              return Emval.toHandle(jsArray); }, contents.data(), size)));
                   }))
         .function("setContents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis, emscripten::val pContents) {
                       if (pContents.isNull() || pContents.isUndefined()) {
@@ -48,7 +59,17 @@ void fileApi()
                           return;
                       }
 
-                      pThis->setContents(emscripten::vecFromJSArray<unsigned char>(pContents));
+                      // Note: avoid using emscripten::vecFromJSArray() since it internally uses typed_memory_view (see
+                      //       the note in the contents() binding above).
+
+                      auto length = pContents["length"].as<size_t>();
+                      libOpenCOR::UnsignedChars contents(length);
+
+                      if (length > 0) {
+                          EM_ASM({ HEAPU8.set(Emval.toValue($0).subarray(0, $2), $1); }, pContents.as_handle(), contents.data(), length);
+                      }
+
+                      pThis->setContents(std::move(contents));
                   }))
         .property("hasChildFiles", &libOpenCOR::File::hasChildFiles)
         .property("childFileCount", &libOpenCOR::File::childFileCount)

@@ -269,31 +269,36 @@ if(EMSCRIPTEN)
                    ${SOURCE_FILES}
                    ${HEADER_FILES})
 
-    # Set the flags for our generated .js file.
-    # Note #1: we use -O3 to get the best performance, -flto to enable link-time optimization, -sALLOW_MEMORY_GROWTH to
-    #          allow the memory to grow dynamically, -sASSERTIONS=0 to disable assertions (which are not needed in
-    #          production), -sEXPORT_ES6=1 to export ES6 classes, -sEXPORTED_FUNCTIONS to export the functions we need,
-    #          -sINLINING_LIMIT to increase the inlining limit, -sMODULARIZE=1 to generate a module, -sSINGLE_FILE=1 to
-    #          generate a single file, -sSTACK_SIZE to increase the stack size, and --bind to generate the necessary
-    #          bindings.
+    # Set the flags for our generated .js and .wasm files.
+    # Note #1: we use -O3 to get the best performance, -flto to enable link-time optimisation, -sASSERTIONS=0 to disable
+    #          assertions (which are not needed in production), -sEXPORT_ES6=1 to export ES6 modules,
+    #          -sEXPORTED_FUNCTIONS to export the functions we need, -sEXPORTED_RUNTIME_METHODS to export the runtime
+    #          methods we need, -sINITIAL_MEMORY to set the total WASM memory to a fixed size (2 GB is the practical
+    #          safe maximum for WASM32), -sINLINING_LIMIT to increase the inlining limit, -sMODULARIZE=1 to generate a
+    #          module factory function, -sSTACK_SIZE to increase the main thread's stack size, and --bind to generate
+    #          the necessary Embind bindings. (Note that ALLOW_MEMORY_GROWTH is not used since we are setting a fixed
+    #          memory size with INITIAL_MEMORY.)
     # Note #2: by default, Emscripten uses 64KB of stack, but this is not enough for "complex" models such as the Zhang
     #          et al. model (see https://github.com/agarny/COR/blob/master/Models/zhang_SAN_model_2000_all.cellml). For
     #          that model, we need about 108KB of stack. However, Emscripten originally used to use 5MB of stack (see
-    #          https://github.com/emscripten-core/emscripten/pull/18191/files). So, here, we are using 4MB of stack,
+    #          https://github.com/emscripten-core/emscripten/pull/18191/files). So, here, we are using 32MB of stack,
     #          which should be more than enough for any model.
-    # Note #3: we originally used to generate both a .wasm and a .js file, but this doesn't work when trying to use
-    #          libOpenCOR in a Vue project (see https://stackoverflow.com/q/73579436 for a similar issue in a React
-    #          project). The solution is to have only a .js file, which can be done using either -sSINGLE_FILE=1 or
-    #          -sWASM=0. To use -sSINGLE_FILE=1 embeds the WASM in the .js file, but it means that neither pthreads nor
-    #          WASM workers can be used (see https://emscripten.org/docs/api_reference/wasm_workers.html), which may be
-    #          an issue the day we want to run simulations in their own thread. To use -sWASM=0 results in a JavaScript
-    #          file that can be used with asm.js, which has been superseded by WASM. And, indeed, although the resulting
-    #          .js file works fine in our playground, it crashes our JavaScript tests. So, at this stage, we are going
-    #          with -sSINGLE_FILE=1, but we may have to look for another solution someday.
 
-    set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
-                          COMPILE_FLAGS "-O3 -DNDEBUG"
-                          LINK_FLAGS "-O3 -flto -sALLOW_MEMORY_GROWTH -sASSERTIONS=0 -sEXPORT_ES6=1 -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh] -sEXPORTED_RUNTIME_METHODS=HEAPU8 -sINLINING_LIMIT -sMODULARIZE=1 -sSINGLE_FILE=1 -sSTACK_SIZE=4MB --bind")
+    target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
+                           -O3
+                           -DNDEBUG)
+    target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
+                        -O3
+                        -flto
+                        -sASSERTIONS=0
+                        -sEXPORT_ES6=1
+                        -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
+                        -sEXPORTED_RUNTIME_METHODS=HEAPU8
+                        -sINITIAL_MEMORY=2GB
+                        -sINLINING_LIMIT
+                        -sMODULARIZE=1
+                        -sSTACK_SIZE=32MB
+                        --bind)
 
     # Package our JavaScript bindings, if possible.
 
@@ -306,6 +311,7 @@ if(EMSCRIPTEN)
         add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E make_directory dist
                            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js dist
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm dist
                            COMMAND ${CMAKE_COMMAND} -E copy package.json dist
                            COMMAND ${NPM_EXE} pack
                            COMMAND ${CMAKE_COMMAND} -E copy opencor-${TGZ_FILENAME} ${TGZ_FILE})
@@ -313,18 +319,24 @@ if(EMSCRIPTEN)
         message(WARNING "npm could not be found, so libOpenCOR's JavaScript bindings could not be packaged.")
     endif()
 
-    # Copy our generated .js file over so that it can be deployed.
+    # Copy our generated files over so that they can be deployed.
+
+    foreach(DEPLOY_DIR ${CMAKE_PROJECT_VERSION} latest)
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E make_directory wasm/${DEPLOY_DIR}
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js
+                                                            wasm/${DEPLOY_DIR}/${CMAKE_PROJECT_NAME}.js
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm
+                                                            wasm/${DEPLOY_DIR}/${CMAKE_PROJECT_NAME}.wasm)
+    endforeach()
+
+    # Copy our generated files over so that they can be used by our test Web page.
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E make_directory wasm
                        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js
-                                                        wasm/${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}.js)
-
-    # Copy our generated .js file over so that it can be used by our test Web page.
-
-    add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js
-                                                        ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.js)
+                                                        ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.js
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm
+                                                        ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.wasm)
 
     # Let people know how to run our test Web page.
 
