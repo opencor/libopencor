@@ -270,19 +270,15 @@ if(EMSCRIPTEN)
                    ${HEADER_FILES})
 
     # Set the flags for our generated .js and .wasm files.
-    # Note #1: we use -O3 to get the best performance, -flto to enable link-time optimisation, -sASSERTIONS=0 to disable
-    #          assertions (which are not needed in production), -sEXPORT_ES6=1 to export ES6 modules,
-    #          -sEXPORTED_FUNCTIONS to export the functions we need, -sEXPORTED_RUNTIME_METHODS to export the runtime
-    #          methods we need, -sINITIAL_MEMORY to set the total WASM memory to a fixed size (2 GB is the practical
-    #          safe maximum for WASM32), -sINLINING_LIMIT to increase the inlining limit, -sMODULARIZE=1 to generate a
-    #          module factory function, -sSTACK_SIZE to increase the main thread's stack size, and --bind to generate
-    #          the necessary Embind bindings. (Note that ALLOW_MEMORY_GROWTH is not used since we are setting a fixed
-    #          memory size with INITIAL_MEMORY.)
-    # Note #2: by default, Emscripten uses 64KB of stack, but this is not enough for "complex" models such as the Zhang
-    #          et al. model (see https://github.com/agarny/COR/blob/master/Models/zhang_SAN_model_2000_all.cellml). For
-    #          that model, we need about 108KB of stack. However, Emscripten originally used to use 5MB of stack (see
-    #          https://github.com/emscripten-core/emscripten/pull/18191/files). So, here, we are using 32MB of stack,
-    #          which should be more than enough for any model.
+    # Note: we use -O3 to get the best performance, -flto to enable link-time optimisation, -sALLOW_MEMORY_GROWTH=1 to
+    #       let the WASM heap grow on demand, -sASSERTIONS=0 to disable assertions (which are not needed in production),
+    #       -sEXPORT_ES6=1 to export ES6 modules, -sEXPORTED_FUNCTIONS to export the functions we need,
+    #       -sEXPORTED_RUNTIME_METHODS to export the runtime methods we need, -sINITIAL_MEMORY=256MB to reserve a
+    #       reasonable amount of memory for the heap at startup (which is needed for "big" models), -sINLINING_LIMIT to
+    #       increase the inlining limit, -sMAXIMUM_MEMORY=2GB to keep the practical safe maximum for WASM32,
+    #       -sMODULARIZE=1 to generate a module factory function, -sSTACK_SIZE=8MB to reserve a reasonable amount of
+    #       memory for the stack at startup (which is needed for "big" models), and --bind to generate the necessary
+    #       Embind bindings.
 
     target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
                            -O3
@@ -290,14 +286,16 @@ if(EMSCRIPTEN)
     target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
                         -O3
                         -flto
+                        -sALLOW_MEMORY_GROWTH=1
                         -sASSERTIONS=0
                         -sEXPORT_ES6=1
                         -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
                         -sEXPORTED_RUNTIME_METHODS=HEAPU8
-                        -sINITIAL_MEMORY=2GB
+                        -sINITIAL_MEMORY=256MB
                         -sINLINING_LIMIT
+                        -sMAXIMUM_MEMORY=2GB
                         -sMODULARIZE=1
-                        -sSTACK_SIZE=32MB
+                        -sSTACK_SIZE=8MB
                         --bind)
 
     # Package our JavaScript bindings, if possible.
