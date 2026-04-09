@@ -167,14 +167,14 @@ jobs:
         uses: pypa/cibuildwheel@v3.2.0
         env:
           CIBW_ARCHS: auto64
-          CIBW_BUILD: 'cp*'
+          CIBW_BUILD: 'cp312-* cp313-* cp314-*'
           CIBW_ENVIRONMENT_MACOS: MACOSX_DEPLOYMENT_TARGET=13.0
           # Note #1: the value of CIBW_ENVIRONMENT_MACOS must be in sync with that of MACOS_DEPLOYMENT_TARGET in
           #          CMakelists.txt.
           # Note #2: for some reasons, we need to specify the minor version, hence using 13.0 rather than 13.
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
-          CIBW_SKIP: 'cp38* cp39* cp*t-* *musllinux*'
+          CIBW_SKIP: '*musllinux*'
       - name: Upload Python wheel artifacts
         uses: actions/upload-artifact@v4
         with:
