@@ -26,8 +26,9 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive)
-    : mArchive(pArchive)
+CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
+    : mArchiveContents(std::move(pArchiveContents))
+    , mArchive(pArchive)
     , mArchiveLocation(libOpenCOR::pathToString(libOpenCOR::stringToPath(pFile->fileName() + ".contents/")))
     , mArchiveLocationSize(mArchiveLocation.size())
 {
@@ -105,8 +106,8 @@ FilePtr CombineArchive::Impl::file(const std::string &pFileName) const
     return {};
 }
 
-CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive)
-    : Logger(new Impl {pFile, pArchive})
+CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
+    : Logger(new Impl {pFile, pArchive, std::move(pArchiveContents)})
 {
 }
 
@@ -158,7 +159,10 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 
         archive->initializeFromBuffer(fileContents);
 
-        return CombineArchivePtr {new CombineArchive {pFile, archive}};
+        return CombineArchivePtr {new CombineArchive {pFile, archive, std::move(fileContents)}};
+        // Note: libCOMBINE retains pointers into the supplied buffer, so we must not destroy it until the archive is
+        //       gone hence we keep the original ZIP buffer alive for the lifetime of the archive by moving it into the
+        //       CombineArchive::Impl object.
     }
 
     return {};

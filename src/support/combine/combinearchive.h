@@ -55,7 +55,7 @@ public:
 private:
     class Impl;
 
-    explicit CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive);
+    explicit CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents);
 
     Impl *pimpl();
     const Impl *pimpl() const;

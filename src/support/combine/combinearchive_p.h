@@ -25,13 +25,14 @@ namespace libOpenCOR {
 class CombineArchive::Impl: public Logger::Impl
 {
 public:
+    UnsignedChars mArchiveContents;
     libcombine::CombineArchive *mArchive;
     std::string mArchiveLocation;
     size_t mArchiveLocationSize;
     std::vector<FilePtr> mFiles;
     FilePtr mMasterFile;
 
-    explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive);
+    explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents);
     ~Impl() override;
 
     FilePtr masterFile() const;
