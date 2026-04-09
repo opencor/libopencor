@@ -30,6 +30,7 @@ setup(
     author="libOpenCOR contributors",
     url="https://opencor.ws/libopencor/",
     license="Apache 2.0",
+    python_requires=">=3.12, <3.15",
     packages=["libopencor"],
     package_dir={"": "src/bindings/python"},
     cmake_args=[
@@ -52,6 +53,10 @@ setup(
         "Programming Language :: C++",
         "Programming Language :: JavaScript",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
 )
