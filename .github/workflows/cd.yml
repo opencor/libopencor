@@ -48,19 +48,19 @@ jobs:
             build_type: Debug
             shared_libs: ON
           - name: 'Linux static library (Intel)'
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             build_type: Release
             shared_libs: OFF
           - name: 'Linux shared library (Intel)'
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             build_type: Release
             shared_libs: ON
           - name: 'Linux static library (ARM)'
-            os: ubuntu-22.04-arm
+            os: ubuntu-24.04-arm
             build_type: Release
             shared_libs: OFF
           - name: 'Linux shared library (ARM)'
-            os: ubuntu-22.04-arm
+            os: ubuntu-24.04-arm
             build_type: Release
             shared_libs: ON
           - name: 'macOS static library (Intel)'
@@ -137,9 +137,9 @@ jobs:
             os: windows-11-arm
             arch: amd64_arm64
           - name: 'Linux Python wheels (Intel)'
-            os: ubuntu-22.04
+            os: ubuntu-24.04
           - name: 'Linux Python wheels (ARM)'
-            os: ubuntu-22.04-arm
+            os: ubuntu-24.04-arm
           - name: 'macOS Python wheels (Intel)'
             os: macos-15-intel
           - name: 'macOS Python wheels (ARM)'
@@ -188,7 +188,7 @@ jobs:
   python_pypi:
     needs: [python_wheels]
     name: Publish to PyPI
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     environment: pypi
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
@@ -202,7 +202,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
   webassembly:
     name: WebAssembly
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       BUILDCACHE_ACCURACY: STRICT
       BUILDCACHE_COMPRESS_FORMAT: ZSTD
