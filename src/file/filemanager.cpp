@@ -95,8 +95,10 @@ FilePtrs FileManager::Impl::files() const
 
 FilePtr FileManager::Impl::file(size_t pIndex) const
 {
+    static const FilePtr NO_FILE_PTR;
+
     if (pIndex >= mFiles.size()) {
-        return {};
+        return NO_FILE_PTR;
     }
 
     return mFiles[pIndex]->shared_from_this();
@@ -108,6 +110,8 @@ FilePtr FileManager::Impl::fileFromFileNameOrUrl(const std::string &pFileNameOrU
 FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #endif
 {
+    static const FilePtr NO_FILE_PTR;
+
 #if __clang_major__ < 16
     auto [tIsLocalFile, tFileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
     auto isLocalFile {tIsLocalFile};
@@ -125,7 +129,7 @@ FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
         return (*res)->shared_from_this();
     }
 
-    return {};
+    return NO_FILE_PTR;
 }
 
 FileManager &FileManager::instance()

@@ -35,13 +35,13 @@ public:
     void setTarget(const std::string &pTarget) override;
     void updateTarget();
 
-    std::string componentName() const;
+    const std::string &componentName() const;
     void setComponentName(const std::string &pComponentName);
 
-    std::string variableName() const;
+    const std::string &variableName() const;
     void setVariableName(const std::string &pVariableName);
 
-    std::string newValue() const;
+    const std::string &newValue() const;
     void setNewValue(const std::string &pNewValue);
 
     void serialise(xmlNodePtr pNode) const override;

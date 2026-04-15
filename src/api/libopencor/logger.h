@@ -73,7 +73,7 @@ public:
      * @return The issues, as an @ref IssuePtrs.
      */
 
-    IssuePtrs issues() const;
+    const IssuePtrs &issues() const;
 
     /**
      * @brief Return an issue.
@@ -85,7 +85,7 @@ public:
      * @return The issue, as an @ref IssuePtr, if the index is valid, @c nullptr otherwise.
      */
 
-    IssuePtr issue(size_t pIndex) const;
+    const IssuePtr &issue(size_t pIndex) const;
 
     /**
      * @brief Return whether there are some errors.
@@ -115,7 +115,7 @@ public:
      * @return The errors, as a @ref IssuePtrs of type @ref Issue::Type::ERROR.
      */
 
-    IssuePtrs errors() const;
+    const IssuePtrs &errors() const;
 
     /**
      * @brief Return an error.
@@ -127,7 +127,7 @@ public:
      * @return The error, as an @ref IssuePtr, if the index is valid, @c nullptr otherwise.
      */
 
-    IssuePtr error(size_t pIndex) const;
+    const IssuePtr &error(size_t pIndex) const;
 
     /**
      * @brief Return whether there are some warnings.
@@ -157,7 +157,7 @@ public:
      * @return The warnings, as a @ref IssuePtrs of type @ref Issue::Type::WARNING.
      */
 
-    IssuePtrs warnings() const;
+    const IssuePtrs &warnings() const;
 
     /**
      * @brief Return a warning.
@@ -169,7 +169,7 @@ public:
      * @return The warning, as an @ref IssuePtr, if the index is valid, @c nullptr otherwise.
      */
 
-    IssuePtr warning(size_t pIndex) const;
+    const IssuePtr &warning(size_t pIndex) const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

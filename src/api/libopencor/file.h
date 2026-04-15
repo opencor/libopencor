@@ -119,7 +119,7 @@ public:
      * @return The file name, as a @c std::string, of this file.
      */
 
-    std::string fileName() const;
+    const std::string &fileName() const;
 
     /**
      * @brief Get the URL of this file.
@@ -132,7 +132,7 @@ public:
      * @return The URL, as a @c std::string, of this file.
      */
 
-    std::string url() const;
+    const std::string &url() const;
 
     /**
      * @brief Get the path of this file.
@@ -145,7 +145,7 @@ public:
      * @return The path, as a @c std::string, of this file.
      */
 
-    std::string path() const;
+    const std::string &path() const;
 
     /**
      * @brief Get the contents of this file.
@@ -155,7 +155,7 @@ public:
      * @return The contents, as an @ref UnsignedChars, of this file.
      */
 
-    UnsignedChars contents();
+    const UnsignedChars &contents();
 
     /**
      * @brief Set the contents of this file.
@@ -195,7 +195,7 @@ public:
      * @return The child file names, as a @ref Strings.
      */
 
-    Strings childFileNames() const;
+    const Strings &childFileNames() const;
 
     /**
      * @brief Return the child files.
@@ -205,7 +205,7 @@ public:
      * @return The child files, as a @ref FilePtrs.
      */
 
-    FilePtrs childFiles() const;
+    const FilePtrs &childFiles() const;
 
     /**
      * @brief Return a child file.
@@ -217,7 +217,7 @@ public:
      * @return The file, as a @ref FilePtr, if it is a child file of this file, @c nullptr otherwise.
      */
 
-    FilePtr childFile(size_t pIndex) const;
+    const FilePtr &childFile(size_t pIndex) const;
 
     /**
      * @brief Return a child file.
@@ -230,9 +230,9 @@ public:
      */
 
 #ifdef __EMSCRIPTEN__
-    FilePtr childFileFromFileName(const std::string &pFileName) const;
+    const FilePtr &childFileFromFileName(const std::string &pFileName) const;
 #else
-    FilePtr childFile(const std::string &pFileName) const;
+    const FilePtr &childFile(const std::string &pFileName) const;
 #endif
 
 private:

@@ -29,7 +29,7 @@ public:
 
     explicit Impl(const std::string &pTarget = {});
 
-    std::string target() const;
+    const std::string &target() const;
     virtual void setTarget(const std::string &pTarget) = 0;
 
     void serialise(xmlNodePtr pNode) const override;

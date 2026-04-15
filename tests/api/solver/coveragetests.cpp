@@ -69,7 +69,7 @@ TEST(CoverageSolverTest, algebraicChanges)
 
     static const auto ABS_TOL {1e-05};
 
-    auto instanceTask {instance->tasks()[0]};
+    const auto &instanceTask {instance->tasks()[0]};
 
     EXPECT_EQ(instanceTask->stateCount(), 0);
     EXPECT_EQ(instanceTask->rateCount(), 0);

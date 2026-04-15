@@ -34,6 +34,7 @@ public:
     Type mType {Type::UNKNOWN_FILE};
 
     std::filesystem::path mFilePath;
+    std::string mFileName;
     std::string mUrl;
 
     bool mTypeChecked {false};
@@ -52,22 +53,22 @@ public:
     void checkType(const FilePtr &pOwner, bool pResetType = false);
 
     Type type() const;
-    std::string fileName() const;
-    std::string url() const;
-    std::string path() const;
+    const std::string &fileName() const;
+    const std::string &url() const;
+    const std::string &path() const;
 
-    UnsignedChars contents();
+    const UnsignedChars &contents();
     void setContents(const UnsignedChars &pContents);
 
     bool hasChildFiles() const;
     size_t childFileCount() const;
-    Strings childFileNames() const;
-    FilePtrs childFiles() const;
-    FilePtr childFile(size_t pIndex) const;
+    const Strings &childFileNames() const;
+    const FilePtrs &childFiles() const;
+    const FilePtr &childFile(size_t pIndex) const;
 #ifdef __EMSCRIPTEN__
-    FilePtr childFileFromFileName(const std::string &pFileName) const;
+    const FilePtr &childFileFromFileName(const std::string &pFileName) const;
 #else
-    FilePtr childFile(const std::string &pFileName) const;
+    const FilePtr &childFile(const std::string &pFileName) const;
 #endif
 };
 

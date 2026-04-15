@@ -161,7 +161,7 @@ TEST(BasicFileTest, remoteVirtualFile)
 
 TEST(BasicFileTest, fileManager)
 {
-    auto fileManager {libOpenCOR::FileManager::instance()};
+    auto &fileManager {libOpenCOR::FileManager::instance()};
 
     EXPECT_FALSE(fileManager.hasFiles());
     EXPECT_EQ(fileManager.fileCount(), 0);
@@ -170,7 +170,7 @@ TEST(BasicFileTest, fileManager)
     EXPECT_EQ(fileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
 
     auto localFile {libOpenCOR::File::create(libOpenCOR::LOCAL_FILE)};
-    auto sameFileManager {libOpenCOR::FileManager::instance()};
+    auto &sameFileManager {libOpenCOR::FileManager::instance()};
 
     EXPECT_TRUE(sameFileManager.hasFiles());
     EXPECT_EQ(sameFileManager.fileCount(), 1);

@@ -31,7 +31,7 @@ TEST(FailingSimulationTest, basic)
 
     // Set the value of `membrane.test` to zero and rerun the simulation.
 
-    auto model = document->model(0);
+    const auto &model {document->model(0)};
 
     model->addChange(libOpenCOR::SedChangeAttribute::create("membrane", "test", "0.0"));
 

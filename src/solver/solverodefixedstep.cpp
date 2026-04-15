@@ -31,21 +31,46 @@ SolverOdeFixedStep::Impl::Impl(const std::string &pId, const std::string &pName)
 
 void SolverOdeFixedStep::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
+    auto addUnknownParameterWarning = [&](const std::string &pKisaoId) {
+        std::string warning;
+
+        warning.reserve(pKisaoId.size() + 49); // NOLINT
+
+        warning += "The parameter '";
+        warning += pKisaoId;
+        warning += "' is not recognised. It will be ignored.";
+
+        addWarning(warning);
+    };
+
     for (unsigned int i {0}; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
         auto *algorithmParameter {pAlgorithm->getAlgorithmParameter(i)};
-        auto kisaoId {algorithmParameter->getKisaoID()};
-        auto value {algorithmParameter->getValue()};
+        const auto &kisaoId {algorithmParameter->getKisaoID()};
+        const auto &value {algorithmParameter->getValue()};
 
         if (kisaoId == "KISAO:0000483") {
             mStep = toDouble(value);
 
             if ((mStep <= 0.0) || std::isnan(mStep)) {
-                addWarning(std::string("The step ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A step of ").append(toString(DEFAULT_STEP)).append(" will be used instead."));
+                const auto defaultStep {toString(DEFAULT_STEP)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultStep.size() + 85); // NOLINT
+
+                warning += "The step ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater or equal to 0. A step of ";
+                warning += defaultStep;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mStep = DEFAULT_STEP;
             }
         } else {
-            addWarning(std::string("The parameter '").append(kisaoId).append("' is not recognised. It will be ignored."));
+            addUnknownParameterWarning(kisaoId);
         }
     }
 }
@@ -81,7 +106,16 @@ bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pSt
     // Check the solver's properties.
 
     if (mStep <= 0.0) {
-        addError(std::string("The step cannot be equal to ").append(toString(mStep)).append(". It must be greater than 0."));
+        const auto stepAsString {toString(mStep)};
+        std::string error;
+
+        error.reserve(stepAsString.size() + 45); // NOLINT
+
+        error += "The step cannot be equal to ";
+        error += stepAsString;
+        error += ". It must be greater than 0.";
+
+        addError(error);
 
         return false;
     }

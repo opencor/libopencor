@@ -127,22 +127,60 @@ SolverKinsol::Impl::Impl()
 
 void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
+    auto addUnknownParameterWarning = [&](const std::string &pKisaoId) {
+        std::string warning;
+
+        warning.reserve(pKisaoId.size() + 49); // NOLINT
+
+        warning += "The parameter '";
+        warning += pKisaoId;
+        warning += "' is not recognised. It will be ignored.";
+
+        addWarning(warning);
+    };
+
     for (unsigned int i {0}; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
         auto *algorithmParameter {pAlgorithm->getAlgorithmParameter(i)};
-        auto kisaoId {algorithmParameter->getKisaoID()};
+        const auto &kisaoId {algorithmParameter->getKisaoID()};
         auto value {algorithmParameter->getValue()};
 
         if (kisaoId == "KISAO:0000486") {
             mMaximumNumberOfIterations = toInt(value);
 
             if (!isInt(value) || (mMaximumNumberOfIterations <= 0)) {
-                addWarning(std::string("The maximum number of iterations ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater than 0. A maximum number of iterations of ").append(toString(DEFAULT_MAXIMUM_NUMBER_OF_ITERATIONS)).append(" will be used instead."));
+                const auto defaultIterations {toString(DEFAULT_MAXIMUM_NUMBER_OF_ITERATIONS)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultIterations.size() + 130); // NOLINT
+
+                warning += "The maximum number of iterations ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater than 0. A maximum number of iterations of ";
+                warning += defaultIterations;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mMaximumNumberOfIterations = DEFAULT_MAXIMUM_NUMBER_OF_ITERATIONS;
             }
         } else if (kisaoId == "KISAO:0000477") {
             if ((value != "Dense") && (value != "Banded") && (value != "GMRES") && (value != "BiCGStab") && (value != "TFQMR")) {
-                addWarning(std::string("The linear solver ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A ").append(toString(DEFAULT_LINEAR_SOLVER)).append(" linear solver will be used instead."));
+                const auto defaultLinearSolver {toString(DEFAULT_LINEAR_SOLVER)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultLinearSolver.size() + 146); // NOLINT
+
+                warning += "The linear solver ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A ";
+                warning += defaultLinearSolver;
+                warning += " linear solver will be used instead.";
+
+                addWarning(warning);
 
                 value = toString(DEFAULT_LINEAR_SOLVER);
             }
@@ -160,7 +198,20 @@ void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
             mUpperHalfBandwidth = toInt(value);
 
             if (!isInt(value) || (mUpperHalfBandwidth < 0)) {
-                addWarning(std::string("The upper half-bandwidth ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. An upper half-bandwidth of ").append(toString(DEFAULT_UPPER_HALF_BANDWIDTH)).append(" will be used instead."));
+                const auto defaultUpperHalfBandwidth {toString(DEFAULT_UPPER_HALF_BANDWIDTH)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultUpperHalfBandwidth.size() + 113); // NOLINT
+
+                warning += "The upper half-bandwidth ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater or equal to 0. An upper half-bandwidth of ";
+                warning += defaultUpperHalfBandwidth;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mUpperHalfBandwidth = DEFAULT_UPPER_HALF_BANDWIDTH;
             }
@@ -168,12 +219,25 @@ void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
             mLowerHalfBandwidth = toInt(value);
 
             if (!isInt(value) || (mLowerHalfBandwidth < 0)) {
-                addWarning(std::string("The lower half-bandwidth ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A lower half-bandwidth of ").append(toString(DEFAULT_LOWER_HALF_BANDWIDTH)).append(" will be used instead."));
+                const auto defaultLowerHalfBandwidth {toString(DEFAULT_LOWER_HALF_BANDWIDTH)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultLowerHalfBandwidth.size() + 112); // NOLINT
+
+                warning += "The lower half-bandwidth ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater or equal to 0. A lower half-bandwidth of ";
+                warning += defaultLowerHalfBandwidth;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mLowerHalfBandwidth = DEFAULT_LOWER_HALF_BANDWIDTH;
             }
         } else {
-            addWarning(std::string("The parameter '").append(kisaoId).append("' is not recognised. It will be ignored."));
+            addUnknownParameterWarning(kisaoId);
         }
     }
 }
@@ -255,7 +319,16 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     // solver's properties are all valid.
 
     if (mMaximumNumberOfIterations <= 0) {
-        addError(std::string("The maximum number of iterations cannot be equal to ").append(toString(mMaximumNumberOfIterations)).append(". It must be greater than 0."));
+        const auto maximumNumberOfIterations {toString(mMaximumNumberOfIterations)};
+        std::string error;
+
+        error.reserve(maximumNumberOfIterations.size() + 72); // NOLINT
+
+        error += "The maximum number of iterations cannot be equal to ";
+        error += maximumNumberOfIterations;
+        error += ". It must be greater than 0.";
+
+        addError(error);
     }
 
     bool needUpperAndLowerHalfBandwidths = false;
@@ -268,11 +341,35 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     if (needUpperAndLowerHalfBandwidths) {
         if ((mUpperHalfBandwidth < 0) || std::cmp_greater_equal(mUpperHalfBandwidth, pN)) {
-            addError(std::string("The upper half-bandwidth cannot be equal to ").append(toString(mUpperHalfBandwidth)).append(". It must be between 0 and ").append(toString(pN - 1)).append("."));
+            const auto upperHalfBandwidth {toString(mUpperHalfBandwidth)};
+            const auto maximumUpperHalfBandwidth {toString(pN - 1)};
+            std::string error;
+
+            error.reserve(upperHalfBandwidth.size() + maximumUpperHalfBandwidth.size() + 62); // NOLINT
+
+            error += "The upper half-bandwidth cannot be equal to ";
+            error += upperHalfBandwidth;
+            error += ". It must be between 0 and ";
+            error += maximumUpperHalfBandwidth;
+            error += ".";
+
+            addError(error);
         }
 
         if ((mLowerHalfBandwidth < 0) || std::cmp_greater_equal(mLowerHalfBandwidth, pN)) {
-            addError(std::string("The lower half-bandwidth cannot be equal to ").append(toString(mLowerHalfBandwidth)).append(". It must be between 0 and ").append(toString(pN - 1)).append("."));
+            const auto lowerHalfBandwidth {toString(mLowerHalfBandwidth)};
+            const auto maximumLowerHalfBandwidth {toString(pN - 1)};
+            std::string error;
+
+            error.reserve(lowerHalfBandwidth.size() + maximumLowerHalfBandwidth.size() + 62); // NOLINT
+
+            error += "The lower half-bandwidth cannot be equal to ";
+            error += lowerHalfBandwidth;
+            error += ". It must be between 0 and ";
+            error += maximumLowerHalfBandwidth;
+            error += ".";
+
+            addError(error);
         }
     }
 

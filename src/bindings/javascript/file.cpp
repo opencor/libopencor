@@ -33,7 +33,7 @@ void fileApi()
         .property("url", &libOpenCOR::File::url)
         .property("path", &libOpenCOR::File::path)
         .function("contents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis) {
-                      auto contents {pThis->contents()};
+                      const auto &contents {pThis->contents()};
                       auto size = contents.size();
 
                       if (size == 0) {

@@ -50,6 +50,11 @@ public:
     SolverOdePtr mOdeSolver;
     SolverNlaPtr mNlaSolver;
 
+    size_t mStateCount {0};
+    size_t mConstantCount {0};
+    size_t mComputedConstantCount {0};
+    size_t mAlgebraicVariableCount {0};
+
     double mVoi {0.0};
     double *mStates {nullptr};
     double *mRates {nullptr};
@@ -65,6 +70,19 @@ public:
 
     SedInstanceTaskResults mResults;
 
+    std::string mVoiName;
+    std::string mVoiUnit;
+    Strings mStateNames;
+    Strings mStateUnits;
+    Strings mRateNames;
+    Strings mRateUnits;
+    Strings mConstantNames;
+    Strings mConstantUnits;
+    Strings mComputedConstantNames;
+    Strings mComputedConstantUnits;
+    Strings mAlgebraicVariableNames;
+    Strings mAlgebraicVariableUnits;
+
     static SedInstanceTaskPtr create(const SedAbstractTaskPtr &pTask);
 
     explicit Impl(const SedAbstractTaskPtr &pTask);
@@ -75,34 +93,34 @@ public:
     void initialise();
     double run();
 
-    Doubles voi() const;
-    std::string voiName() const;
-    std::string voiUnit() const;
+    const Doubles &voi() const;
+    const std::string &voiName() const;
+    const std::string &voiUnit() const;
 
     size_t stateCount() const;
-    Doubles state(size_t pIndex) const;
-    std::string stateName(size_t pIndex) const;
-    std::string stateUnit(size_t pIndex) const;
+    const Doubles &state(size_t pIndex) const;
+    const std::string &stateName(size_t pIndex) const;
+    const std::string &stateUnit(size_t pIndex) const;
 
     size_t rateCount() const;
-    Doubles rate(size_t pIndex) const;
-    std::string rateName(size_t pIndex) const;
-    std::string rateUnit(size_t pIndex) const;
+    const Doubles &rate(size_t pIndex) const;
+    const std::string &rateName(size_t pIndex) const;
+    const std::string &rateUnit(size_t pIndex) const;
 
     size_t constantCount() const;
-    Doubles constant(size_t pIndex) const;
-    std::string constantName(size_t pIndex) const;
-    std::string constantUnit(size_t pIndex) const;
+    const Doubles &constant(size_t pIndex) const;
+    const std::string &constantName(size_t pIndex) const;
+    const std::string &constantUnit(size_t pIndex) const;
 
     size_t computedConstantCount() const;
-    Doubles computedConstant(size_t pIndex) const;
-    std::string computedConstantName(size_t pIndex) const;
-    std::string computedConstantUnit(size_t pIndex) const;
+    const Doubles &computedConstant(size_t pIndex) const;
+    const std::string &computedConstantName(size_t pIndex) const;
+    const std::string &computedConstantUnit(size_t pIndex) const;
 
     size_t algebraicVariableCount() const;
-    Doubles algebraicVariable(size_t pIndex) const;
-    std::string algebraicVariableName(size_t pIndex) const;
-    std::string algebraicVariableUnit(size_t pIndex) const;
+    const Doubles &algebraicVariable(size_t pIndex) const;
+    const std::string &algebraicVariableName(size_t pIndex) const;
+    const std::string &algebraicVariableUnit(size_t pIndex) const;
 };
 
 } // namespace libOpenCOR

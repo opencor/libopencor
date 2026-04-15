@@ -25,7 +25,7 @@ SedBase::Impl::Impl(const std::string &pId)
 {
 }
 
-std::string SedBase::Impl::id() const
+const std::string &SedBase::Impl::id() const
 {
     return mId;
 }
@@ -55,7 +55,7 @@ const SedBase::Impl *SedBase::pimpl() const
     return static_cast<const Impl *>(Logger::mPimpl);
 }
 
-std::string SedBase::id() const
+const std::string &SedBase::id() const
 {
     return pimpl()->id();
 }

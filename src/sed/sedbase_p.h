@@ -33,7 +33,7 @@ public:
 
     explicit Impl(const std::string &pId = {});
 
-    std::string id() const;
+    const std::string &id() const;
     void setId(const std::string &pId);
 
     virtual void serialise(xmlNodePtr pNode) const;

@@ -76,7 +76,7 @@ public:
      * @return The type of this issue as a @c std::string.
      */
 
-    std::string typeAsString() const;
+    const std::string &typeAsString() const;
 
     /**
      * @brief Get the description of this issue.
@@ -86,7 +86,7 @@ public:
      * @return The @c std::string description of this issue.
      */
 
-    std::string description() const;
+    const std::string &description() const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

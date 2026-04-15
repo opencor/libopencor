@@ -49,7 +49,7 @@ public:
      * @return The target as a @c std::string.
      */
 
-    std::string target() const;
+    const std::string &target() const;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

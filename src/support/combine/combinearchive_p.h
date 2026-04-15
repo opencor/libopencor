@@ -30,18 +30,19 @@ public:
     std::string mArchiveLocation;
     size_t mArchiveLocationSize;
     std::vector<FilePtr> mFiles;
+    std::vector<std::string> mFileNames;
     FilePtr mMasterFile;
 
     explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents);
     ~Impl() override;
 
-    FilePtr masterFile() const;
+    const FilePtr &masterFile() const;
     bool hasFiles() const;
     size_t fileCount() const;
-    Strings fileNames() const;
-    FilePtrs files() const;
-    FilePtr file(size_t pIndex) const;
-    FilePtr file(const std::string &pFileName) const;
+    const Strings &fileNames() const;
+    const FilePtrs &files() const;
+    const FilePtr &file(size_t pIndex) const;
+    const FilePtr &file(const std::string &pFileName) const;
 };
 
 } // namespace libOpenCOR

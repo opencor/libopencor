@@ -81,7 +81,7 @@ public:
      * @return The tasks, as a @ref SedInstanceTaskPtrs.
      */
 
-    SedInstanceTaskPtrs tasks() const;
+    const SedInstanceTaskPtrs &tasks() const;
 
     /**
      * @brief Return the task at the given index.
@@ -93,7 +93,7 @@ public:
      * @return The task as a @ref SedInstanceTaskPtr, if the index is valid, @c nullptr otherwise.
      */
 
-    SedInstanceTaskPtr task(size_t pIndex) const;
+    const SedInstanceTaskPtr &task(size_t pIndex) const;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

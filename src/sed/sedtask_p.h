@@ -32,10 +32,10 @@ public:
 
     bool isValid() override;
 
-    SedModelPtr model() const;
+    const SedModelPtr &model() const;
     void setModel(const SedModelPtr &pModel);
 
-    SedSimulationPtr simulation() const;
+    const SedSimulationPtr &simulation() const;
     void setSimulation(const SedSimulationPtr &pSimulation);
 
     void serialise(xmlNodePtr pNode) const override;

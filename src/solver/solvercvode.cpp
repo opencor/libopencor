@@ -133,16 +133,41 @@ SolverCvode::Impl::~Impl()
 
 void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
+    auto addUnknownParameterWarning = [&](const std::string &pKisaoId) {
+        std::string warning;
+
+        warning.reserve(pKisaoId.size() + 49); // NOLINT
+
+        warning += "The parameter '";
+        warning += pKisaoId;
+        warning += "' is not recognised. It will be ignored.";
+
+        addWarning(warning);
+    };
+
     for (unsigned int i {0}; i < pAlgorithm->getNumAlgorithmParameters(); ++i) {
         auto *algorithmParameter {pAlgorithm->getAlgorithmParameter(i)};
-        auto kisaoId {algorithmParameter->getKisaoID()};
+        const auto &kisaoId {algorithmParameter->getKisaoID()};
         auto value {algorithmParameter->getValue()};
 
         if (kisaoId == "KISAO:0000467") {
             mMaximumStep = toDouble(value);
 
             if ((mMaximumStep < 0.0) || std::isnan(mMaximumStep)) {
-                addWarning(std::string("The maximum step ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A maximum step of ").append(toString(DEFAULT_MAXIMUM_STEP)).append(" will be used instead."));
+                const auto defaultMaximumStep {toString(DEFAULT_MAXIMUM_STEP)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultMaximumStep.size() + 98); // NOLINT
+
+                warning += "The maximum step ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater or equal to 0. A maximum step of ";
+                warning += defaultMaximumStep;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mMaximumStep = DEFAULT_MAXIMUM_STEP;
             }
@@ -150,13 +175,39 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
             mMaximumNumberOfSteps = toInt(value);
 
             if (!isInt(value) || (mMaximumNumberOfSteps <= 0)) {
-                addWarning(std::string("The maximum number of steps ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater than 0. A maximum number of steps of ").append(toString(DEFAULT_MAXIMUM_NUMBER_OF_STEPS)).append(" will be used instead."));
+                const auto defaultMaximumNumberOfSteps {toString(DEFAULT_MAXIMUM_NUMBER_OF_STEPS)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultMaximumNumberOfSteps.size() + 123); // NOLINT
+
+                warning += "The maximum number of steps ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater than 0. A maximum number of steps of ";
+                warning += defaultMaximumNumberOfSteps;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mMaximumNumberOfSteps = DEFAULT_MAXIMUM_NUMBER_OF_STEPS;
             }
         } else if (kisaoId == "KISAO:0000475") {
             if ((value != "BDF") && (value != "Adams-Moulton")) {
-                addWarning(std::string("The integration method ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'BDF' or 'Adams-Moulton'. A ").append(toString(DEFAULT_INTEGRATION_METHOD)).append(" integration method will be used instead."));
+                const auto defaultIntegrationMethod {toString(DEFAULT_INTEGRATION_METHOD)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultIntegrationMethod.size() + 116); // NOLINT
+
+                warning += "The integration method ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be equal to 'BDF' or 'Adams-Moulton'. A ";
+                warning += defaultIntegrationMethod;
+                warning += " integration method will be used instead.";
+
+                addWarning(warning);
 
                 value = toString(DEFAULT_INTEGRATION_METHOD);
             }
@@ -166,7 +217,20 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
                                      SolverCvode::IntegrationMethod::ADAMS_MOULTON;
         } else if (kisaoId == "KISAO:0000476") {
             if ((value != "Functional") && (value != "Newton")) {
-                addWarning(std::string("The iteration type ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'Functional' or 'Newton'. A ").append(toString(DEFAULT_ITERATION_TYPE)).append(" iteration type will be used instead."));
+                const auto defaultIterationType {toString(DEFAULT_ITERATION_TYPE)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultIterationType.size() + 112); // NOLINT
+
+                warning += "The iteration type ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be equal to 'Functional' or 'Newton'. A ";
+                warning += defaultIterationType;
+                warning += " iteration type will be used instead.";
+
+                addWarning(warning);
 
                 value = toString(DEFAULT_ITERATION_TYPE);
             }
@@ -176,7 +240,20 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
                                  SolverCvode::IterationType::NEWTON;
         } else if (kisaoId == "KISAO:0000477") {
             if ((value != "Dense") && (value != "Banded") && (value != "Diagonal") && (value != "GMRES") && (value != "BiCGStab") && (value != "TFQMR")) {
-                addWarning(std::string("The linear solver ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A ").append(toString(DEFAULT_LINEAR_SOLVER)).append(" linear solver will be used instead."));
+                const auto defaultLinearSolver {toString(DEFAULT_LINEAR_SOLVER)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultLinearSolver.size() + 157); // NOLINT
+
+                warning += "The linear solver ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be equal to 'Dense', 'Banded', 'Diagonal', 'GMRES', 'BiCGStab', or 'TFQMR'. A ";
+                warning += defaultLinearSolver;
+                warning += " linear solver will be used instead.";
+
+                addWarning(warning);
 
                 value = toString(DEFAULT_LINEAR_SOLVER);
             }
@@ -194,7 +271,20 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
                                 SolverCvode::LinearSolver::TFQMR;
         } else if (kisaoId == "KISAO:0000478") {
             if ((value != "No") && (value != "Banded")) {
-                addWarning(std::string("The preconditioner ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'No' or 'Banded'. A ").append(toString(DEFAULT_PRECONDITIONER)).append(" preconditioner will be used instead."));
+                const auto defaultPreconditioner {toString(DEFAULT_PRECONDITIONER)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultPreconditioner.size() + 108); // NOLINT
+
+                warning += "The preconditioner ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be equal to 'No' or 'Banded'. A ";
+                warning += defaultPreconditioner;
+                warning += " preconditioner will be used instead.";
+
+                addWarning(warning);
 
                 value = toString(DEFAULT_PRECONDITIONER);
             }
@@ -206,7 +296,20 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
             mUpperHalfBandwidth = toInt(value);
 
             if (!isInt(value) || (mUpperHalfBandwidth < 0)) {
-                addWarning(std::string("The upper half-bandwidth ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. An upper half-bandwidth of ").append(toString(DEFAULT_UPPER_HALF_BANDWIDTH)).append(" will be used instead."));
+                const auto defaultUpperHalfBandwidth {toString(DEFAULT_UPPER_HALF_BANDWIDTH)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultUpperHalfBandwidth.size() + 113); // NOLINT
+
+                warning += "The upper half-bandwidth ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater or equal to 0. An upper half-bandwidth of ";
+                warning += defaultUpperHalfBandwidth;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mUpperHalfBandwidth = DEFAULT_UPPER_HALF_BANDWIDTH;
             }
@@ -214,7 +317,20 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
             mLowerHalfBandwidth = toInt(value);
 
             if (!isInt(value) || (mLowerHalfBandwidth < 0)) {
-                addWarning(std::string("The lower half-bandwidth ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A lower half-bandwidth of ").append(toString(DEFAULT_LOWER_HALF_BANDWIDTH)).append(" will be used instead."));
+                const auto defaultLowerHalfBandwidth {toString(DEFAULT_LOWER_HALF_BANDWIDTH)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultLowerHalfBandwidth.size() + 112); // NOLINT
+
+                warning += "The lower half-bandwidth ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater or equal to 0. A lower half-bandwidth of ";
+                warning += defaultLowerHalfBandwidth;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mLowerHalfBandwidth = DEFAULT_LOWER_HALF_BANDWIDTH;
             }
@@ -222,7 +338,20 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
             mRelativeTolerance = toDouble(value);
 
             if ((mRelativeTolerance < 0.0) || std::isnan(mRelativeTolerance)) {
-                addWarning(std::string("The relative tolerance ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. A relative tolerance of ").append(toString(DEFAULT_RELATIVE_TOLERANCE)).append(" will be used instead."));
+                const auto defaultRelativeTolerance {toString(DEFAULT_RELATIVE_TOLERANCE)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultRelativeTolerance.size() + 112); // NOLINT
+
+                warning += "The relative tolerance ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater or equal to 0. A relative tolerance of ";
+                warning += defaultRelativeTolerance;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mRelativeTolerance = DEFAULT_RELATIVE_TOLERANCE;
             }
@@ -230,20 +359,46 @@ void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
             mAbsoluteTolerance = toDouble(value);
 
             if ((mAbsoluteTolerance < 0.0) || std::isnan(mAbsoluteTolerance)) {
-                addWarning(std::string("The absolute tolerance ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be greater or equal to 0. An absolute tolerance of ").append(toString(DEFAULT_ABSOLUTE_TOLERANCE)).append(" will be used instead."));
+                const auto defaultAbsoluteTolerance {toString(DEFAULT_ABSOLUTE_TOLERANCE)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultAbsoluteTolerance.size() + 113); // NOLINT
+
+                warning += "The absolute tolerance ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be greater or equal to 0. An absolute tolerance of ";
+                warning += defaultAbsoluteTolerance;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 mAbsoluteTolerance = DEFAULT_ABSOLUTE_TOLERANCE;
             }
         } else if (kisaoId == "KISAO:0000481") {
             if ((value != "true") && (value != "false")) {
-                addWarning(std::string("The interpolate solution parameter ('").append(kisaoId).append("') cannot be equal to '").append(value).append("'. It must be equal to 'true' or 'false'. A value of ").append(toString(DEFAULT_INTERPOLATE_SOLUTION)).append(" will be used instead."));
+                const auto defaultInterpolateSolution {toString(DEFAULT_INTERPOLATE_SOLUTION)};
+                std::string warning;
+
+                warning.reserve(kisaoId.size() + value.size() + defaultInterpolateSolution.size() + 121); // NOLINT
+
+                warning += "The interpolate solution parameter ('";
+                warning += kisaoId;
+                warning += "') cannot be equal to '";
+                warning += value;
+                warning += "'. It must be equal to 'true' or 'false'. A value of ";
+                warning += defaultInterpolateSolution;
+                warning += " will be used instead.";
+
+                addWarning(warning);
 
                 value = toString(DEFAULT_INTERPOLATE_SOLUTION);
             }
 
             mInterpolateSolution = toBool(value);
         } else {
-            addWarning(std::string("The parameter '").append(kisaoId).append("' is not recognised. It will be ignored."));
+            addUnknownParameterWarning(kisaoId);
         }
     }
 }
@@ -319,11 +474,29 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     // Check the solver's properties.
 
     if (mMaximumStep < 0.0) {
-        addError(std::string("The maximum step cannot be equal to ").append(toString(mMaximumStep)).append(". It must be greater or equal to 0."));
+        const auto maximumStep {toString(mMaximumStep)};
+        std::string error;
+
+        error.reserve(maximumStep.size() + 61); // NOLINT
+
+        error += "The maximum step cannot be equal to ";
+        error += maximumStep;
+        error += ". It must be greater or equal to 0.";
+
+        addError(error);
     }
 
     if (mMaximumNumberOfSteps <= 0) {
-        addError(std::string("The maximum number of steps cannot be equal to ").append(toString(mMaximumNumberOfSteps)).append(". It must be greater than 0."));
+        const auto maximumNumberOfSteps {toString(mMaximumNumberOfSteps)};
+        std::string error;
+
+        error.reserve(maximumNumberOfSteps.size() + 67); // NOLINT
+
+        error += "The maximum number of steps cannot be equal to ";
+        error += maximumNumberOfSteps;
+        error += ". It must be greater than 0.";
+
+        addError(error);
     }
 
     if (mIterationType == IterationType::NEWTON) {
@@ -349,21 +522,63 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
         if (needUpperAndLowerHalfBandwidths) {
             if ((mUpperHalfBandwidth < 0) || std::cmp_greater_equal(mUpperHalfBandwidth, pSize)) {
-                addError(std::string("The upper half-bandwidth cannot be equal to ").append(toString(mUpperHalfBandwidth)).append(". It must be between 0 and ").append(toString(pSize - 1)).append("."));
+                const auto upperHalfBandwidth {toString(mUpperHalfBandwidth)};
+                const auto maximumUpperHalfBandwidth {toString(pSize - 1)};
+                std::string error;
+
+                error.reserve(upperHalfBandwidth.size() + maximumUpperHalfBandwidth.size() + 62); // NOLINT
+
+                error += "The upper half-bandwidth cannot be equal to ";
+                error += upperHalfBandwidth;
+                error += ". It must be between 0 and ";
+                error += maximumUpperHalfBandwidth;
+                error += ".";
+
+                addError(error);
             }
 
             if ((mLowerHalfBandwidth < 0) || std::cmp_greater_equal(mLowerHalfBandwidth, pSize)) {
-                addError(std::string("The lower half-bandwidth cannot be equal to ").append(toString(mLowerHalfBandwidth)).append(". It must be between 0 and ").append(toString(pSize - 1)).append("."));
+                const auto lowerHalfBandwidth {toString(mLowerHalfBandwidth)};
+                const auto maximumLowerHalfBandwidth {toString(pSize - 1)};
+                std::string error;
+
+                error.reserve(lowerHalfBandwidth.size() + maximumLowerHalfBandwidth.size() + 62); // NOLINT
+
+                error += "The lower half-bandwidth cannot be equal to ";
+                error += lowerHalfBandwidth;
+                error += ". It must be between 0 and ";
+                error += maximumLowerHalfBandwidth;
+                error += ".";
+
+                addError(error);
             }
         }
     }
 
     if (mRelativeTolerance < 0.0) {
-        addError(std::string("The relative tolerance cannot be equal to ").append(toString(mRelativeTolerance)).append(". It must be greater or equal to 0."));
+        const auto relativeTolerance {toString(mRelativeTolerance)};
+        std::string error;
+
+        error.reserve(relativeTolerance.size() + 66); // NOLINT
+
+        error += "The relative tolerance cannot be equal to ";
+        error += relativeTolerance;
+        error += ". It must be greater or equal to 0.";
+
+        addError(error);
     }
 
     if (mAbsoluteTolerance < 0.0) {
-        addError(std::string("The absolute tolerance cannot be equal to ").append(toString(mAbsoluteTolerance)).append(". It must be greater or equal to 0."));
+        const auto absoluteTolerance {toString(mAbsoluteTolerance)};
+        std::string error;
+
+        error.reserve(absoluteTolerance.size() + 66); // NOLINT
+
+        error += "The absolute tolerance cannot be equal to ";
+        error += absoluteTolerance;
+        error += ". It must be greater or equal to 0.";
+
+        addError(error);
     }
 
     // Check whether we got some errors.

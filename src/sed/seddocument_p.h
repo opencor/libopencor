@@ -54,24 +54,24 @@ public:
 
     bool hasModels() const;
     size_t modelCount() const;
-    SedModelPtrs models() const;
-    SedModelPtr model(size_t pIndex) const;
+    const SedModelPtrs &models() const;
+    const SedModelPtr &model(size_t pIndex) const;
     bool addModel(const SedModelPtr &pModel);
     bool removeModel(const SedModelPtr &pModel);
     bool removeAllModels();
 
     bool hasSimulations() const;
     size_t simulationCount() const;
-    SedSimulationPtrs simulations() const;
-    SedSimulationPtr simulation(size_t pIndex) const;
+    const SedSimulationPtrs &simulations() const;
+    const SedSimulationPtr &simulation(size_t pIndex) const;
     bool addSimulation(const SedSimulationPtr &pSimulation);
     bool removeSimulation(const SedSimulationPtr &pSimulation);
     bool removeAllSimulations();
 
     bool hasTasks() const;
     size_t taskCount() const;
-    SedAbstractTaskPtrs tasks() const;
-    SedAbstractTaskPtr task(size_t pIndex) const;
+    const SedAbstractTaskPtrs &tasks() const;
+    const SedAbstractTaskPtr &task(size_t pIndex) const;
     bool addTask(const SedAbstractTaskPtr &pTask);
     bool removeTask(const SedAbstractTaskPtr &pTask);
     bool removeAllTasks();

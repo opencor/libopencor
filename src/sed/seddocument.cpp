@@ -24,6 +24,7 @@ limitations under the License.
 #include "utils.h"
 
 #include <algorithm>
+#include <format>
 #include <sstream>
 
 namespace libOpenCOR {
@@ -31,18 +32,10 @@ namespace libOpenCOR {
 std::string SedDocument::Impl::uniqueId(const std::string &pPrefix)
 {
     size_t counter {0};
-    std::stringstream stream;
-
-    stream << pPrefix << ++counter;
-
-    auto res {stream.str()};
+    auto res {pPrefix + std::format("{}", ++counter)};
 
     while (mIds.contains(res)) {
-        stream.str({});
-
-        stream << pPrefix << ++counter;
-
-        res = stream.str();
+        res = pPrefix + std::format("{}", ++counter);
     }
 
     mIds.insert(res);
@@ -96,7 +89,7 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
 
 void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    auto masterFile {pFile->pimpl()->mCombineArchive->masterFile()};
+    const auto &masterFile {pFile->pimpl()->mCombineArchive->masterFile()};
 
     if (masterFile == nullptr) {
         addError("A simulation experiment description cannot be created using a COMBINE archive with no master file.");
@@ -116,8 +109,8 @@ void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwne
 void SedDocument::Impl::serialise(xmlNodePtr pNode) const
 {
     xmlNewProp(pNode, toConstXmlCharPtr("xmlns"), toConstXmlCharPtr(mXmlns));
-    xmlNewProp(pNode, toConstXmlCharPtr("level"), toConstXmlCharPtr(std::to_string(mLevel)));
-    xmlNewProp(pNode, toConstXmlCharPtr("version"), toConstXmlCharPtr(std::to_string(mVersion)));
+    xmlNewProp(pNode, toConstXmlCharPtr("level"), toConstXmlCharPtr(std::format("{}", mLevel)));
+    xmlNewProp(pNode, toConstXmlCharPtr("version"), toConstXmlCharPtr(std::format("{}", mVersion)));
 }
 
 std::string SedDocument::Impl::serialise(const std::string &pBasePath) const
@@ -251,15 +244,17 @@ size_t SedDocument::Impl::modelCount() const
     return mModels.size();
 }
 
-SedModelPtrs SedDocument::Impl::models() const
+const SedModelPtrs &SedDocument::Impl::models() const
 {
     return mModels;
 }
 
-SedModelPtr SedDocument::Impl::model(size_t pIndex) const
+const SedModelPtr &SedDocument::Impl::model(size_t pIndex) const
 {
+    static const SedModelPtr NO_SED_MODEL_PTR;
+
     if (pIndex >= mModels.size()) {
-        return {};
+        return NO_SED_MODEL_PTR;
     }
 
     return mModels[pIndex];
@@ -323,15 +318,17 @@ size_t SedDocument::Impl::simulationCount() const
     return mSimulations.size();
 }
 
-SedSimulationPtrs SedDocument::Impl::simulations() const
+const SedSimulationPtrs &SedDocument::Impl::simulations() const
 {
     return mSimulations;
 }
 
-SedSimulationPtr SedDocument::Impl::simulation(size_t pIndex) const
+const SedSimulationPtr &SedDocument::Impl::simulation(size_t pIndex) const
 {
+    static const SedSimulationPtr NO_SED_SIMULATION_PTR;
+
     if (pIndex >= mSimulations.size()) {
-        return {};
+        return NO_SED_SIMULATION_PTR;
     }
 
     return mSimulations[pIndex];
@@ -395,15 +392,17 @@ size_t SedDocument::Impl::taskCount() const
     return mTasks.size();
 }
 
-SedAbstractTaskPtrs SedDocument::Impl::tasks() const
+const SedAbstractTaskPtrs &SedDocument::Impl::tasks() const
 {
     return mTasks;
 }
 
-SedAbstractTaskPtr SedDocument::Impl::task(size_t pIndex) const
+const SedAbstractTaskPtr &SedDocument::Impl::task(size_t pIndex) const
 {
+    static const SedAbstractTaskPtr NO_SED_ABSTRACT_TASK_PTR;
+
     if (pIndex >= mTasks.size()) {
-        return {};
+        return NO_SED_ABSTRACT_TASK_PTR;
     }
 
     return mTasks[pIndex];
@@ -513,12 +512,12 @@ size_t SedDocument::modelCount() const
     return pimpl()->modelCount();
 }
 
-SedModelPtrs SedDocument::models() const
+const SedModelPtrs &SedDocument::models() const
 {
     return pimpl()->models();
 }
 
-SedModelPtr SedDocument::model(size_t pIndex) const
+const SedModelPtr &SedDocument::model(size_t pIndex) const
 {
     return pimpl()->model(pIndex);
 }
@@ -548,12 +547,12 @@ size_t SedDocument::simulationCount() const
     return pimpl()->simulationCount();
 }
 
-SedSimulationPtrs SedDocument::simulations() const
+const SedSimulationPtrs &SedDocument::simulations() const
 {
     return pimpl()->simulations();
 }
 
-SedSimulationPtr SedDocument::simulation(size_t pIndex) const
+const SedSimulationPtr &SedDocument::simulation(size_t pIndex) const
 {
     return pimpl()->simulation(pIndex);
 }
@@ -583,12 +582,12 @@ size_t SedDocument::taskCount() const
     return pimpl()->taskCount();
 }
 
-SedAbstractTaskPtrs SedDocument::tasks() const
+const SedAbstractTaskPtrs &SedDocument::tasks() const
 {
     return pimpl()->tasks();
 }
 
-SedAbstractTaskPtr SedDocument::task(size_t pIndex) const
+const SedAbstractTaskPtr &SedDocument::task(size_t pIndex) const
 {
     return pimpl()->task(pIndex);
 }

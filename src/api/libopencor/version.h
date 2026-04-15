@@ -40,7 +40,7 @@ uint64_t LIBOPENCOR_EXPORT version();
  * @return A string that represents the version of libOpenCOR.
  */
 
-std::string LIBOPENCOR_EXPORT versionString();
+const std::string LIBOPENCOR_EXPORT &versionString();
 
 /**
  * Return the version of Clang as a number.
@@ -58,7 +58,7 @@ unsigned int LIBOPENCOR_EXPORT clangVersion();
  * @return A string that represents the version of Clang.
  */
 
-std::string LIBOPENCOR_EXPORT clangVersionString();
+const std::string LIBOPENCOR_EXPORT &clangVersionString();
 
 /**
  * Return the version of libCellML as a number.
@@ -76,7 +76,7 @@ unsigned int LIBOPENCOR_EXPORT libcellmlVersion();
  * @return A string that represents the version of libCellML.
  */
 
-std::string LIBOPENCOR_EXPORT libcellmlVersionString();
+const std::string LIBOPENCOR_EXPORT &libcellmlVersionString();
 
 /**
  * Return the version of libCOMBINE as a number.
@@ -94,7 +94,7 @@ unsigned int LIBOPENCOR_EXPORT libcombineVersion();
  * @return A string that represents the version of libCOMBINE.
  */
 
-std::string LIBOPENCOR_EXPORT libcombineVersionString();
+const std::string LIBOPENCOR_EXPORT &libcombineVersionString();
 
 #ifndef __EMSCRIPTEN__
 /**
@@ -113,7 +113,7 @@ unsigned int LIBOPENCOR_EXPORT libcurlVersion();
  * @return A string that represents the version of libcurl.
  */
 
-std::string LIBOPENCOR_EXPORT libcurlVersionString();
+const std::string LIBOPENCOR_EXPORT &libcurlVersionString();
 #endif
 
 /**
@@ -132,7 +132,7 @@ unsigned int LIBOPENCOR_EXPORT libsedmlVersion();
  * @return A string that represents the version of libSEDML.
  */
 
-std::string LIBOPENCOR_EXPORT libsedmlVersionString();
+const std::string LIBOPENCOR_EXPORT &libsedmlVersionString();
 
 /**
  * Return the version of LLVM as a number.
@@ -150,7 +150,7 @@ unsigned int LIBOPENCOR_EXPORT llvmVersion();
  * @return A string that represents the version of LLVM.
  */
 
-std::string LIBOPENCOR_EXPORT llvmVersionString();
+const std::string LIBOPENCOR_EXPORT &llvmVersionString();
 
 /**
  * Return the version of SUNDIALS as a number.

@@ -73,7 +73,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
     removeAllIssues();
 
-    auto fileManager {FileManager::instance()};
+    auto &fileManager {FileManager::instance()};
 
     for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
         auto source {mDocument->getModel(i)->getSource()};
@@ -82,16 +82,24 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
                               mLocation + fileNameOrUrl :
                               fileNameOrUrl};
 #ifdef __EMSCRIPTEN__
-        auto file {fileManager.fileFromFileNameOrUrl(modelSource)};
+        const auto &file {fileManager.fileFromFileNameOrUrl(modelSource)};
 #else
-        auto file {fileManager.file(modelSource)};
+        const auto &file {fileManager.file(modelSource)};
 #endif
         SedModelPtr model;
 
         if (file != nullptr) {
             model = SedModel::create(pDocument, file);
         } else {
-            addWarning(std::string("The model '").append(source).append("' could not be found in the file manager. It has been automatically added to it."));
+            std::string warning;
+
+            warning.reserve(source.size() + 80); // NOLINT
+
+            warning += "The model '";
+            warning += source;
+            warning += "' could not be found in the file manager. It has been automatically added to it.";
+
+            addWarning(warning);
 
             model = SedModel::create(pDocument, File::create(modelSource));
         }
@@ -142,13 +150,30 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
                 if (componentName.empty() || variableName.empty()) {
                     canAddChange = false;
 
-                    addError(std::string("The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '").append(changeAttribute->getTarget()).append("'."));
+                    const std::string targetString(changeAttribute->getTarget());
+                    std::string error;
+
+                    error.reserve(targetString.size() + 111); // NOLINT
+
+                    error += "The component and variable names could not be retrieved for the change of type 'changeAttribute' and of target '";
+                    error += targetString;
+                    error += "'.";
+
+                    addError(error);
                 }
 
                 if (!isDouble(newValue)) {
                     canAddChange = false;
 
-                    addError(std::string("The new value '").append(newValue).append("' for the change of type 'changeAttribute' is not a valid double value."));
+                    std::string error;
+
+                    error.reserve(newValue.size() + 70); // NOLINT
+
+                    error += "The new value '";
+                    error += newValue;
+                    error += "' for the change of type 'changeAttribute' is not a valid double value.";
+
+                    addError(error);
                 }
 
                 if (canAddChange) {
@@ -156,7 +181,16 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
                                                                 changeAttribute->getNewValue()));
                 }
             } else {
-                addWarning(std::string("Only changes of type 'changeAttribute' are currently supported. The change of type '").append(change->getElementName()).append("' has been ignored."));
+                const std::string changeElementName(change->getElementName());
+                std::string warning;
+
+                warning.reserve(changeElementName.size() + 92); // NOLINT
+
+                warning += "Only changes of type 'changeAttribute' are currently supported. The change of type '";
+                warning += changeElementName;
+                warning += "' has been ignored.";
+
+                addWarning(warning);
             }
         }
 
@@ -199,7 +233,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         // Populate the simulation's algorithm.
 
         auto *sedAlgorithm {sedSimulation->getAlgorithm()};
-        auto kisaoId {sedAlgorithm->getKisaoID()};
+        const auto &kisaoId {sedAlgorithm->getKisaoID()};
         SolverOdePtr odeSolver {nullptr};
         SolverNlaPtr nlaSolver {nullptr};
 
@@ -216,7 +250,15 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         } else if (kisaoId == "KISAO:0000381") {
             odeSolver = SolverSecondOrderRungeKutta::create();
         } else {
-            addWarning(std::string("The solver '").append(kisaoId).append("' is not recognised. The CVODE solver will be used instead."));
+            std::string warning;
+
+            warning.reserve(kisaoId.size() + 63); // NOLINT
+
+            warning += "The solver '";
+            warning += kisaoId;
+            warning += "' is not recognised. The CVODE solver will be used instead.";
+
+            addWarning(warning);
 
             odeSolver = SolverCvode::create();
         }
@@ -246,7 +288,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 #else
     if ((mDocument->getNumModels() == 1) && (mDocument->getNumSimulations() == 1)) {
 #endif
-        pDocument->addTask(SedTask::create(pDocument, pDocument->models()[0], pDocument->simulations()[0]));
+        pDocument->addTask(SedTask::create(pDocument, pDocument->model(0), pDocument->simulation(0)));
     }
 }
 
@@ -274,6 +316,8 @@ const SedmlFile::Impl *SedmlFile::pimpl() const
 
 SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 {
+    static const SedmlFilePtr NO_SEDML_FILE_PTR;
+
     // Check whether the file is a SED-ML file and if so then return its SedmlFile object.
 
     if (pFile->pimpl()->type() == File::Type::SEDML_FILE) {
@@ -284,7 +328,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
     // file contents again.
 
     if (pFile->pimpl()->mTypeChecked) {
-        return {};
+        return NO_SEDML_FILE_PTR;
     }
 
     // Try to retrieve a SED-ML document.
@@ -305,7 +349,7 @@ SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 
     delete document;
 
-    return {};
+    return NO_SEDML_FILE_PTR;
 }
 
 void SedmlFile::populateDocument(const SedDocumentPtr &pDocument)

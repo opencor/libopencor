@@ -55,7 +55,15 @@ std::string llvmClangError(llvm::Error pError)
 
     res[0] = static_cast<char>(toupper(res[0]));
 
-    return res.insert(0, " (").append(")");
+    std::string wrappedError;
+
+    wrappedError.reserve(res.size() + 3); // NOLINT
+
+    wrappedError += " (";
+    wrappedError += res;
+    wrappedError += ")";
+
+    return wrappedError;
 }
 #endif
 
@@ -131,7 +139,16 @@ bool Compiler::Impl::compile(const std::string &pCode)
     static constexpr auto CLANG {"clang"};
 
     if (strcmp(command.getCreator().getName(), CLANG) != 0) {
-        addError(std::string("The command name must be 'clang' while it is '").append(command.getCreator().getName()).append("'."));
+        const std::string commandName(command.getCreator().getName());
+        std::string error;
+
+        error.reserve(commandName.size() + 47); // NOLINT
+
+        error += "The command name must be 'clang' while it is '";
+        error += commandName;
+        error += "'.";
+
+        addError(error);
 
         return false;
     }
@@ -178,7 +195,7 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Map our code to a memory buffer.
 
-    auto code {R"(// Arithmetic operators.
+    std::string code {R"(// Arithmetic operators.
 
 extern double pow(double, double);
 extern double sqrt(double);
@@ -212,7 +229,9 @@ extern double atanh(double);
 #define INFINITY (__builtin_inf())
 #define NAN (__builtin_nan(""))
 
-)" + pCode};
+)"};
+
+    code += pCode;
 
     compilerInstance->getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
                                                                             llvm::MemoryBuffer::getMemBuffer(code).release());
@@ -254,11 +273,13 @@ extern double atanh(double);
                         error[error.size() - 1] = ' ';
                     }
 
-                    error += line.substr(notePos + NOTE_LENGTH) + ":";
+                    error += line.substr(notePos + NOTE_LENGTH);
+                    error += ":";
                 } else if (line.find(DUMMY_FILE_NAME) != std::string::npos) {
                     break;
                 } else {
-                    error += "\n" + line;
+                    error += "\n";
+                    error += line;
 
                     hasErrorDetails = true;
                 }
@@ -298,7 +319,17 @@ extern double atanh(double);
     if (target == nullptr) {
         error[0] = static_cast<char>(tolower(error[0]));
 
-        addError(std::string("the target (").append(module->getTargetTriple()).append(") could not be found: ").append(error));
+        const auto targetTriple {module->getTargetTriple()};
+        std::string targetError;
+
+        targetError.reserve(targetTriple.size() + error.size() + 32); // NOLINT
+
+        targetError += "the target (";
+        targetError += targetTriple;
+        targetError += ") could not be found: ";
+        targetError += error;
+
+        addError(targetError);
 
         return false;
     }
@@ -348,7 +379,16 @@ extern double atanh(double);
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!lljit) {
-        addError(std::string("An ORC-based JIT could not be created").append(llvmClangError(lljit.takeError())).append("."));
+        auto llvmError {llvmClangError(lljit.takeError())};
+        std::string error;
+
+        error.reserve(37 + llvmError.size()); // NOLINT
+
+        error += "An ORC-based JIT could not be created";
+        error += llvmError;
+        error += ".";
+
+        addError(error);
 
         return false;
     }
@@ -362,7 +402,16 @@ extern double atanh(double);
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!dynamicLibrarySearchGenerator) {
-        addError(std::string("The dynamic library search generator could not be created").append(llvmClangError(dynamicLibrarySearchGenerator.takeError())).append("."));
+        auto llvmError {llvmClangError(dynamicLibrarySearchGenerator.takeError())};
+        std::string error;
+
+        error.reserve(56 + llvmError.size()); // NOLINT
+
+        error += "The dynamic library search generator could not be created";
+        error += llvmError;
+        error += ".";
+
+        addError(error);
 
         return false;
     }
@@ -403,7 +452,15 @@ bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!res) {
-        addError(std::string("The ").append(pName).append("() function could not be added to the compiler."));
+        std::string error;
+
+        error.reserve(pName.size() + 48); // NOLINT
+
+        error += "The ";
+        error += pName;
+        error += "() function could not be added to the compiler.";
+
+        addError(error);
     }
 #    endif
 
@@ -421,7 +478,7 @@ void *Compiler::Impl::function(const std::string &pName) const
         return reinterpret_cast<void *>(symbol->getValue()); // NOLINT
     }
 
-    return {};
+    return nullptr;
 }
 #endif
 
