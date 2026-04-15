@@ -30,6 +30,7 @@ limitations under the License.
 
 #include <cmath>
 #include <cstring>
+#include <format>
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -58,7 +59,7 @@ void printIssues(const LoggerPtr &pLogger, const std::string &pHeader)
         std::cout << "---[" << pHeader << "]\n";
     }
 
-    for (auto &issue : pLogger->issues()) {
+    for (const auto &issue : pLogger->issues()) {
         std::cout << ((issue->type() == Issue::Type::ERROR) ? "ERROR" : "WARNING") << ": " << issue->description() << "\n";
     }
 
@@ -157,16 +158,29 @@ bool fuzzyCompare(double pNb1, double pNb2)
 
 std::string encodeUrl(const std::string &pUrl)
 {
-    std::ostringstream res;
+    static constexpr std::string_view URL_SAFE_CHARACTERS {"!#$&'()*+,-./:;=?@_~"};
+    static constexpr std::string_view HEX_DIGITS {"0123456789ABCDEF"};
+    static constexpr unsigned int HEX_HIGH_NIBBLE_SHIFT {4U};
+    static constexpr unsigned int HEX_LOW_NIBBLE_MASK {0x0FU};
 
-    for (const char c : pUrl) {
-        if ((isalnum(c) != 0) || (std::string("!#$&'()*+,-./:;=?@_~").find(c) != std::string::npos)) {
-            res << c;
+    std::string res;
+
+    res.reserve(pUrl.size() * 3); // NOLINT
+
+    for (const auto urlChar : pUrl) {
+        const auto unsignedChar {static_cast<unsigned char>(urlChar)};
+        const auto encodedChar {static_cast<unsigned int>(unsignedChar)};
+
+        if ((isalnum(unsignedChar) != 0) || (URL_SAFE_CHARACTERS.find(urlChar) != std::string::npos)) {
+            res += urlChar;
         } else {
-            res << '%' << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(static_cast<unsigned char>(c));
+            res += '%';
+            res += HEX_DIGITS[encodedChar >> HEX_HIGH_NIBBLE_SHIFT];
+            res += HEX_DIGITS[encodedChar & HEX_LOW_NIBBLE_MASK];
         }
     }
-    return res.str();
+
+    return res;
 }
 
 std::string decodeUrl(const std::string &pUrl)
@@ -463,12 +477,14 @@ size_t curlWriteFunction(char *pData, size_t pSize, size_t pDataSize, void *pUse
 
 std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 {
+    static const std::tuple<bool, std::filesystem::path> NO_TUPLE {false, std::filesystem::path()};
+
     auto filePath {uniqueFilePath()};
     std::ofstream file(filePath, std::ios_base::binary);
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!file.is_open()) {
-        return {};
+        return NO_TUPLE;
     }
 #    endif
 
@@ -504,23 +520,27 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
 
     std::filesystem::remove(filePath);
 
-    return {};
+    return NO_TUPLE;
 }
 
 UnsignedChars fileContents(const std::filesystem::path &pFilePath)
 {
+    static const UnsignedChars NO_UNSIGNED_CHARS;
+
     // Retrieve and return the contents of the given file.
 
     std::ifstream file(pFilePath, std::ios_base::binary);
 
     if (!file.is_open()) {
-        return {};
+        return NO_UNSIGNED_CHARS;
     }
 
     const auto fileSize {std::filesystem::file_size(pFilePath)};
-    UnsignedChars contents(fileSize);
+    UnsignedChars contents;
 
-    file.read(reinterpret_cast<char *>(&contents[0]), static_cast<std::streamsize>(fileSize)); // NOLINT
+    contents.resize(fileSize);
+
+    file.read(reinterpret_cast<char *>(contents.data()), static_cast<std::streamsize>(fileSize)); // NOLINT
 
     return contents;
 }
@@ -578,20 +598,12 @@ int toInt(const std::string &pString)
 
 std::string toString(int pNumber)
 {
-    std::ostringstream res;
-
-    res << pNumber;
-
-    return res.str();
+    return std::format("{}", pNumber);
 }
 
 std::string toString(size_t pNumber)
 {
-    std::ostringstream res;
-
-    res << pNumber;
-
-    return res.str();
+    return std::format("{}", pNumber);
 }
 
 bool isDouble(const std::string &pString)

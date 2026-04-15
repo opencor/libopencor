@@ -420,13 +420,13 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(document->simulations()[0]->odeSolver())};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(document->simulations()[0]->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
 
     auto instance {document->instantiate()};
-    auto instanceTask {instance->tasks()[0]};
+    const auto &instanceTask {instance->tasks()[0]};
 
     EXPECT_EQ(instance->hasTasks(), true);
     EXPECT_EQ(instance->taskCount(), 1);
@@ -488,7 +488,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskNonDifferentialModel)
     auto document {libOpenCOR::SedDocument::create(file)};
 
     auto instance {document->instantiate()};
-    auto instanceTask {instance->tasks()[0]};
+    const auto &instanceTask {instance->tasks()[0]};
 
     EXPECT_EQ(instanceTask->voi(), NoDoubles);
     EXPECT_EQ(instanceTask->voiName(), "");
@@ -562,7 +562,7 @@ TEST(CoverageSedTest, math)
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/math.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto instance {document->instantiate()};
-    auto instanceTask {instance->tasks()[0]};
+    const auto &instanceTask {instance->tasks()[0]};
 
     EXPECT_EQ(instanceTask->constantCount(), 0);
     EXPECT_EQ(instanceTask->computedConstantCount(), 37);

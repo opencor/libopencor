@@ -36,10 +36,10 @@ jobs:
             arch: amd64_arm64
             build_type: Debug
           - name: 'Linux (Intel)'
-            os: ubuntu-22.04
+            os: ubuntu-24.04
             build_type: Release
           - name: 'Linux (ARM)'
-            os: ubuntu-22.04-arm
+            os: ubuntu-24.04-arm
             build_type: Release
           - name: 'macOS (Intel)'
             os: macos-15-intel

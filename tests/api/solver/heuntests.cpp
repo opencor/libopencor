@@ -25,7 +25,7 @@ TEST(HeunSolverTest, stepValueWithInvalidNumber)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
     auto solver {libOpenCOR::SolverHeun::create()};
 
     solver->setStep(STEP);
@@ -53,7 +53,7 @@ TEST(HeunSolverTest, solve)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
     auto solver {libOpenCOR::SolverHeun::create()};
 
     solver->setStep(STEP);

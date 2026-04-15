@@ -56,12 +56,12 @@ if(EMSCRIPTEN)
 
     add_subdirectory(src)
 else()
-    # On macOS, deploy on macOS 13 and later.
+    # On macOS, deploy on macOS 14 and later.
     # Note: the value of MACOS_DEPLOYMENT_TARGET must be in sync with that of CIBW_ENVIRONMENT_MACOS in
     #       .github/workflows/cd.yml.
 
     if(APPLE)
-        set(MACOS_DEPLOYMENT_TARGET 13)
+        set(MACOS_DEPLOYMENT_TARGET 14)
 
         if("${CMAKE_OSX_DEPLOYMENT_TARGET}" STREQUAL "")
             set(CMAKE_OSX_DEPLOYMENT_TARGET ${MACOS_DEPLOYMENT_TARGET})

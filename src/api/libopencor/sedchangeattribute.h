@@ -71,7 +71,7 @@ public:
      * @return The name of the component as a @c std::string.
      */
 
-    std::string componentName() const;
+    const std::string &componentName() const;
 
     /**
      * @brief Set the name of the component.
@@ -91,7 +91,7 @@ public:
      * @return The name of the variable as a @c std::string.
      */
 
-    std::string variableName() const;
+    const std::string &variableName() const;
 
     /**
      * @brief Set the name of the variable.
@@ -111,7 +111,7 @@ public:
      * @return The new value as a @c std::string.
      */
 
-    std::string newValue() const;
+    const std::string &newValue() const;
 
     /**
      * @brief Set the new value.

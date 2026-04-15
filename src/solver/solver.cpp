@@ -24,12 +24,12 @@ Solver::Impl::Impl(const std::string &pId, const std::string &pName)
 {
 }
 
-std::string Solver::Impl::id() const
+const std::string &Solver::Impl::id() const
 {
     return mId;
 }
 
-std::string Solver::Impl::name() const
+const std::string &Solver::Impl::name() const
 {
     return mName;
 }
@@ -79,12 +79,12 @@ const Solver::Impl *Solver::pimpl() const
     return static_cast<const Impl *>(Logger::mPimpl);
 }
 
-std::string Solver::id() const
+const std::string &Solver::id() const
 {
     return pimpl()->id();
 }
 
-std::string Solver::name() const
+const std::string &Solver::name() const
 {
     return pimpl()->name();
 }

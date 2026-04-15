@@ -19,6 +19,9 @@ limitations under the License.
 
 #include "cellmlfile.h"
 
+#include <format>
+#include <unordered_set>
+
 namespace libOpenCOR {
 
 #ifdef __EMSCRIPTEN__
@@ -28,7 +31,15 @@ namespace {
 
 std::string exportJavaScriptName(const std::string &pName)
 {
-    return std::string("__attribute__((export_name(\"").append(pName).append("\")))\n");
+    std::string exportName;
+
+    exportName.reserve(pName.size() + 31); // NOLINT
+
+    exportName += "__attribute__((export_name(\"";
+    exportName += pName;
+    exportName += "\")))\n";
+
+    return exportName;
 }
 
 intptr_t instantiateWebAssemblyModule(const UnsignedChars &pWasmModule, bool pDifferentialModel, bool pIsOdeModel,
@@ -258,13 +269,26 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         // Export our various methods.
 
+        auto prependExportName = [](const std::string &pName, const std::string &pCode) {
+            auto exportName {exportJavaScriptName(pName)};
+            std::string res;
+
+            res.reserve(exportName.size() + pCode.size());
+
+            res += exportName;
+            res += pCode;
+
+            return res;
+        };
+
         generatorProfile->setImplementationInitialiseArraysMethodString(differentialModel,
-                                                                        exportJavaScriptName("initialiseArrays").append(generatorProfile->implementationInitialiseArraysMethodString(differentialModel)));
-        generatorProfile->setImplementationComputeComputedConstantsMethodString(differentialModel, exportJavaScriptName("computeComputedConstants").append(generatorProfile->implementationComputeComputedConstantsMethodString(differentialModel)));
+                                                                        prependExportName("initialiseArrays", generatorProfile->implementationInitialiseArraysMethodString(differentialModel)));
+        generatorProfile->setImplementationComputeComputedConstantsMethodString(differentialModel,
+                                                                                prependExportName("computeComputedConstants", generatorProfile->implementationComputeComputedConstantsMethodString(differentialModel)));
         generatorProfile->setImplementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES,
-                                                                    exportJavaScriptName("computeRates").append(generatorProfile->implementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES)));
+                                                                    prependExportName("computeRates", generatorProfile->implementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES)));
         generatorProfile->setImplementationComputeVariablesMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                                        exportJavaScriptName("computeVariables").append(generatorProfile->implementationComputeVariablesMethodString(differentialModel, WITH_EXTERNAL_VARIABLES)));
+                                                                        prependExportName("computeVariables", generatorProfile->implementationComputeVariablesMethodString(differentialModel, WITH_EXTERNAL_VARIABLES)));
 #endif
 
         if (pNlaSolver != nullptr) {
@@ -284,7 +308,7 @@ extern void free(void *ptr);
 extern void nlaSolve(uintptr_t nlaSolverAddress, size_t objectiveFunctionIndex, uintptr_t u, size_t n, uintptr_t data);
 )");
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                    std::string("nlaSolve(").append(mNlaSolverAddress).append(", [INDEX], (uintptr_t) u, [SIZE], (uintptr_t) rfi);\n"));
+                                                    "nlaSolve(" + mNlaSolverAddress + ", [INDEX], (uintptr_t) u, [SIZE], (uintptr_t) rfi);\n");
 #else
 #    ifdef BUILDING_USING_MSVC
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long long uintptr_t;
@@ -302,7 +326,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 )");
 #    endif
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                    std::string("nlaSolve(").append(mNlaSolverAddress).append(", objectiveFunction[INDEX], u, [SIZE], &rfi);\n"));
+                                                    "nlaSolve(" + mNlaSolverAddress + ", objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
 #endif
         }
 
@@ -312,19 +336,22 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         auto implementationCode {generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile)};
 
         if (pNlaSolver != nullptr) {
-            std::vector<size_t> handledNlaSystemIndices;
+            std::unordered_set<size_t> handledNlaSystemIndices;
+            const auto &analyserEquations = pCellmlFile->analyserModel()->analyserEquations();
 
-            for (const auto &analyserEquation : pCellmlFile->analyserModel()->analyserEquations()) {
+            handledNlaSystemIndices.reserve(analyserEquations.size());
+
+            for (const auto &analyserEquation : analyserEquations) {
                 if (analyserEquation->type() == libcellml::AnalyserEquation::Type::NLA) {
                     auto nlaSystemIndex {analyserEquation->nlaSystemIndex()};
 
-                    if (std::find(handledNlaSystemIndices.begin(), handledNlaSystemIndices.end(), nlaSystemIndex) == handledNlaSystemIndices.end()) {
-                        auto objectiveFunctionName {std::string("objectiveFunction").append(std::to_string(nlaSystemIndex))};
+                    if (!handledNlaSystemIndices.contains(nlaSystemIndex)) {
+                        auto objectiveFunctionName {"objectiveFunction" + std::format("{}", nlaSystemIndex)};
 
                         implementationCode.insert(implementationCode.find("void " + objectiveFunctionName),
                                                   exportJavaScriptName(objectiveFunctionName));
 
-                        handledNlaSystemIndices.push_back(nlaSystemIndex);
+                        handledNlaSystemIndices.insert(nlaSystemIndex);
                     }
                 }
             }
@@ -359,7 +386,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
             free(errorMessagePtr);
 
-            addError(std::string("The WebAssembly module could not be instantiated (").append(jsErrorMessage).append(")."));
+            addError("The WebAssembly module could not be instantiated (" + jsErrorMessage + ").");
 
             return;
         }
@@ -411,7 +438,9 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
                 || (mComputeComputedConstantsForDifferentialModel == nullptr)
                 || (mComputeRates == nullptr)
                 || (mComputeVariablesForDifferentialModel == nullptr)) {
-                addError(std::string("The functions needed to compute the ").append((cellmlFileType == libcellml::AnalyserModel::Type::ODE) ? "ODE" : "DAE").append(" model could not be retrieved."));
+                addError(std::string("The functions needed to compute the ")
+                         + ((cellmlFileType == libcellml::AnalyserModel::Type::ODE) ? "ODE" : "DAE")
+                         + " model could not be retrieved.");
             }
 #    endif
         } else {
@@ -423,7 +452,9 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
             if ((mInitialiseArraysForAlgebraicModel == nullptr)
                 || (mComputeComputedConstantsForAlgebraicModel == nullptr)
                 || (mComputeVariablesForAlgebraicModel == nullptr)) {
-                addError(std::string("The functions needed to compute the ").append((cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC) ? "algebraic" : "NLA").append(" model could not be retrieved."));
+                addError(std::string("The functions needed to compute the ")
+                         + ((cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC) ? "algebraic" : "NLA")
+                         + " model could not be retrieved.");
             }
 #    endif
         }

@@ -82,7 +82,7 @@ TEST(CoverageFileTest, doNotRetrieveContents)
 TEST(CoverageFileTest, unmanageFileWithChildren)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
-    auto fileManager = libOpenCOR::FileManager::instance();
+    auto &fileManager = libOpenCOR::FileManager::instance();
 
     EXPECT_EQ(fileManager.fileCount(), 3);
 

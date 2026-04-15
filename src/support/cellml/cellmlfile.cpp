@@ -139,6 +139,8 @@ const CellmlFile::Impl *CellmlFile::pimpl() const
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
 {
+    static const CellmlFilePtr NO_CELLML_FILE_PTR;
+
     // Check whether the file is a CellML file and if so then return its CellmlFile object.
 
     if (pFile->pimpl()->type() == File::Type::CELLML_FILE) {
@@ -149,7 +151,7 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
     // file contents again.
 
     if (pFile->pimpl()->mTypeChecked) {
-        return {};
+        return NO_CELLML_FILE_PTR;
     }
 
     // Try to parse the file contents as a CellML file, be it a CellML 1.x or a CellML 2.0 file.
@@ -161,7 +163,7 @@ CellmlFilePtr CellmlFile::create(const FilePtr &pFile)
         return CellmlFilePtr {new CellmlFile {pFile, model, false}};
     }
 
-    return {};
+    return NO_CELLML_FILE_PTR;
 }
 
 void CellmlFile::populateDocument(const SedDocumentPtr &pDocument)

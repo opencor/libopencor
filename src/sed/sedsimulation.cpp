@@ -33,25 +33,42 @@ SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
 bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
 {
     auto modelType {pModel->pimpl()->mFile->pimpl()->mCellmlFile->type()};
+    const auto &modelId = pModel->pimpl()->mId;
+
+    auto addMissingSolverError = [&](const char *pSolverType) {
+        std::string error;
+
+        error.reserve(mId.size() + modelId.size() + 96); // NOLINT
+
+        error += "Simulation '";
+        error += mId;
+        error += "' is to be used with model '";
+        error += modelId;
+        error += "' which requires an ";
+        error += pSolverType;
+        error += " solver but none is provided.";
+
+        addError(error);
+    };
 
     if ((modelType == libcellml::AnalyserModel::Type::ODE) && (mOdeSolver == nullptr)) {
-        addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an ODE solver but none is provided."));
+        addMissingSolverError("ODE");
     } else if ((modelType == libcellml::AnalyserModel::Type::NLA) && (mNlaSolver == nullptr)) {
-        addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an NLA solver but none is provided."));
+        addMissingSolverError("NLA");
     } else if (modelType == libcellml::AnalyserModel::Type::DAE) {
         if (mOdeSolver == nullptr) {
-            addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an ODE solver but none is provided."));
+            addMissingSolverError("ODE");
         }
 
         if (mNlaSolver == nullptr) {
-            addError(std::string("Simulation '").append(mId).append("' is to be used with model '").append(pModel->pimpl()->mId).append("' which requires an NLA solver but none is provided."));
+            addMissingSolverError("NLA");
         }
     }
 
     return !hasErrors();
 }
 
-SolverOdePtr SedSimulation::Impl::odeSolver() const
+const SolverOdePtr &SedSimulation::Impl::odeSolver() const
 {
     return mOdeSolver;
 }
@@ -61,7 +78,7 @@ void SedSimulation::Impl::setOdeSolver(const SolverOdePtr &pOdeSolver)
     mOdeSolver = pOdeSolver;
 }
 
-SolverNlaPtr SedSimulation::Impl::nlaSolver() const
+const SolverNlaPtr &SedSimulation::Impl::nlaSolver() const
 {
     return mNlaSolver;
 }
@@ -101,7 +118,7 @@ const SedSimulation::Impl *SedSimulation::pimpl() const
     return static_cast<const Impl *>(SedBase::pimpl());
 }
 
-SolverOdePtr SedSimulation::odeSolver() const
+const SolverOdePtr &SedSimulation::odeSolver() const
 {
     return pimpl()->odeSolver();
 }
@@ -111,7 +128,7 @@ void SedSimulation::setOdeSolver(const SolverOdePtr &pOdeSolver)
     pimpl()->setOdeSolver(pOdeSolver);
 }
 
-SolverNlaPtr SedSimulation::nlaSolver() const
+const SolverNlaPtr &SedSimulation::nlaSolver() const
 {
     return pimpl()->nlaSolver();
 }

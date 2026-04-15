@@ -26,12 +26,13 @@ public:
     Type mType;
     std::string mDescription;
     std::string mContext;
+    std::string mDescriptionWithContext;
 
     explicit Impl(Type pType, const std::string &pDescription, const std::string &pContext);
 
     Type type() const;
-    std::string typeAsString() const;
-    std::string description() const;
+    const std::string &typeAsString() const;
+    const std::string &description() const;
 };
 
 } // namespace libOpenCOR

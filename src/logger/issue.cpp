@@ -23,6 +23,24 @@ Issue::Impl::Impl(Type pType, const std::string &pDescription, const std::string
     , mDescription(pDescription)
     , mContext(pContext)
 {
+    // Check whether we have some context to add to the description.
+
+    if (!mContext.empty()) {
+        mDescriptionWithContext.reserve(mContext.size() + 2 + mDescription.size()); // NOLINT
+
+        mDescriptionWithContext.insert(0, mDescription);
+
+#ifndef CODE_COVERAGE_ENABLED
+        if (std::isupper(mDescriptionWithContext[0]) != 0) {
+#endif
+            mDescriptionWithContext[0] = static_cast<char>(std::tolower(mDescriptionWithContext[0]));
+#ifndef CODE_COVERAGE_ENABLED
+        }
+#endif
+
+        mDescriptionWithContext.insert(0, ": ");
+        mDescriptionWithContext.insert(0, mContext);
+    }
 }
 
 Issue::Type Issue::Impl::type() const
@@ -30,27 +48,18 @@ Issue::Type Issue::Impl::type() const
     return mType;
 }
 
-std::string Issue::Impl::typeAsString() const
+const std::string &Issue::Impl::typeAsString() const
 {
-    return (mType == Type::ERROR) ? "Error" : "Warning";
+    static const std::string ERROR_STRING {"Error"};
+    static const std::string WARNING_STRING {"Warning"};
+
+    return (mType == Type::ERROR) ? ERROR_STRING : WARNING_STRING;
 }
 
-std::string Issue::Impl::description() const
+const std::string &Issue::Impl::description() const
 {
-    // Check whether we have some context to add to the description.
-
     if (!mContext.empty()) {
-        auto description {mDescription};
-
-#ifndef CODE_COVERAGE_ENABLED
-        if (std::isupper(description[0]) != 0) {
-#endif
-            description[0] = static_cast<char>(std::tolower(description[0]));
-#ifndef CODE_COVERAGE_ENABLED
-        }
-#endif
-
-        return mContext + ": " + description;
+        return mDescriptionWithContext;
     }
 
     return mDescription;
@@ -71,12 +80,12 @@ Issue::Type Issue::type() const
     return mPimpl->type();
 }
 
-std::string Issue::typeAsString() const
+const std::string &Issue::typeAsString() const
 {
     return mPimpl->typeAsString();
 }
 
-std::string Issue::description() const
+const std::string &Issue::description() const
 {
     return mPimpl->description();
 }

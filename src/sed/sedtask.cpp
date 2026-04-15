@@ -33,14 +33,27 @@ SedTask::Impl::Impl(const SedDocumentPtr &pDocument, const SedModelPtr &pModel,
 
 bool SedTask::Impl::isValid()
 {
+    auto addTaskError = [&](const char *pMessage) {
+        std::string error;
+
+        error.reserve(mId.size() + 32 + std::string(pMessage).size()); // NOLINT
+
+        error += "Task '";
+        error += mId;
+        error += "' ";
+        error += pMessage;
+
+        addError(error);
+    };
+
     // Make sure that we have both a model and a simulation.
 
     if (mModel == nullptr) {
-        addError(std::string("Task '").append(mId).append("' requires a model."));
+        addTaskError("requires a model.");
     }
 
     if (mSimulation == nullptr) {
-        addError(std::string("Task '").append(mId).append("' requires a simulation."));
+        addTaskError("requires a simulation.");
     }
 
     if (hasIssues()) {
@@ -50,7 +63,7 @@ bool SedTask::Impl::isValid()
     // Make sure that the model is of CellML type.
 
     if (mModel->pimpl()->mFile->type() != File::Type::CELLML_FILE) {
-        addError(std::string("Task '").append(mId).append("' requires a model of CellML type."));
+        addTaskError("requires a model of CellML type.");
 
         return false;
     }
@@ -70,7 +83,7 @@ bool SedTask::Impl::isValid()
     return !hasIssues();
 }
 
-SedModelPtr SedTask::Impl::model() const
+const SedModelPtr &SedTask::Impl::model() const
 {
     return mModel;
 }
@@ -80,7 +93,7 @@ void SedTask::Impl::setModel(const SedModelPtr &pModel)
     mModel = pModel;
 }
 
-SedSimulationPtr SedTask::Impl::simulation() const
+const SedSimulationPtr &SedTask::Impl::simulation() const
 {
     return mSimulation;
 }
@@ -133,7 +146,7 @@ SedTaskPtr SedTask::create(const SedDocumentPtr &pDocument, const SedModelPtr &p
     return SedTaskPtr {new SedTask {pDocument, pModel, pSimulation}};
 }
 
-SedModelPtr SedTask::model() const
+const SedModelPtr &SedTask::model() const
 {
     return pimpl()->model();
 }
@@ -143,7 +156,7 @@ void SedTask::setModel(const SedModelPtr &pModel)
     pimpl()->setModel(pModel);
 }
 
-SedSimulationPtr SedTask::simulation() const
+const SedSimulationPtr &SedTask::simulation() const
 {
     return pimpl()->simulation();
 }

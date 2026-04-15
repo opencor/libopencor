@@ -45,6 +45,12 @@ if(BUILDING_USING_MSVC)
     endif()
 endif()
 
+# Prefer maximum optimisation for native non-MSVC release builds.
+
+if(RELEASE_MODE AND NOT BUILDING_USING_MSVC)
+    replace_compiler_flag("-O2" "-O3")
+endif()
+
 # Build our different third-party libraries.
 
 add_subdirectory(3rdparty)

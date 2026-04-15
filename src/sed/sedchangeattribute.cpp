@@ -40,7 +40,7 @@ void SedChangeAttribute::Impl::updateTarget()
     setTarget("/cellml:model/cellml:component[@name='" + mComponentName + "']/cellml:variable[@name='" + mVariableName + "']");
 }
 
-std::string SedChangeAttribute::Impl::componentName() const
+const std::string &SedChangeAttribute::Impl::componentName() const
 {
     return mComponentName;
 }
@@ -52,7 +52,7 @@ void SedChangeAttribute::Impl::setComponentName(const std::string &pComponentNam
     updateTarget();
 }
 
-std::string SedChangeAttribute::Impl::variableName() const
+const std::string &SedChangeAttribute::Impl::variableName() const
 {
     return mVariableName;
 }
@@ -64,7 +64,7 @@ void SedChangeAttribute::Impl::setVariableName(const std::string &pVariableName)
     updateTarget();
 }
 
-std::string SedChangeAttribute::Impl::newValue() const
+const std::string &SedChangeAttribute::Impl::newValue() const
 {
     return mNewValue;
 }
@@ -88,21 +88,43 @@ void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
 void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
                                      const libcellml::AnalyserModelPtr &pAnalyserModel)
 {
+    auto addCannotChangeWarning = [&](const std::string &pVariableName,
+                                      const std::string &pComponentName,
+                                      const char *pVariableType) {
+        std::string warning;
+
+        warning.reserve(pVariableName.size() + pComponentName.size() + 120); // NOLINT
+
+        warning += "The ";
+        warning += pVariableType;
+        warning += " '";
+        warning += pVariableName;
+        warning += "' in component '";
+        warning += pComponentName;
+        warning += "' cannot be changed. Only state variables and constants can be changed.";
+
+        addWarning(warning);
+    };
+
     auto *instanceTaskPimpl {pInstanceTask->pimpl()};
     auto changeName {name(mComponentName, mVariableName)};
+    const auto stateCount = instanceTaskPimpl->stateCount();
+    const auto constantCount = instanceTaskPimpl->constantCount();
+    const auto computedConstantCount = instanceTaskPimpl->computedConstantCount();
+    const auto algebraicVariableCount = instanceTaskPimpl->algebraicVariableCount();
 
     if (instanceTaskPimpl->voiName() == changeName) {
         auto voiVariable {pAnalyserModel->voi()->variable()};
         auto voiComponent {owningComponent(voiVariable)};
 
-        addWarning(std::string("The variable of integration '").append(voiVariable->name()).append("' in component '").append(voiComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
+        addCannotChangeWarning(voiVariable->name(), voiComponent->name(), "variable of integration");
 
         return;
     }
 
     auto isParameterSet {false};
 
-    for (size_t i {0}; i < pAnalyserModel->stateCount(); ++i) {
+    for (size_t i {0}; i < stateCount; ++i) {
         if (instanceTaskPimpl->stateName(i) == changeName) {
             instanceTaskPimpl->mStates[i] = toDouble(newValue()); // NOLINT
 
@@ -113,7 +135,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        for (size_t i {0}; i < pAnalyserModel->constantCount(); ++i) {
+        for (size_t i {0}; i < constantCount; ++i) {
             if (instanceTaskPimpl->constantName(i) == changeName) {
                 instanceTaskPimpl->mConstants[i] = toDouble(newValue()); // NOLINT
 
@@ -125,12 +147,14 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        for (size_t i {0}; i < pAnalyserModel->computedConstantCount(); ++i) {
+        const auto &computedConstants = pAnalyserModel->computedConstants();
+
+        for (size_t i {0}; i < computedConstantCount; ++i) {
             if (instanceTaskPimpl->computedConstantName(i) == changeName) {
-                auto computedConstantVariable {pAnalyserModel->computedConstants()[i]->variable()};
+                auto computedConstantVariable {computedConstants[i]->variable()};
                 auto computedConstantComponent {owningComponent(computedConstantVariable)};
 
-                addWarning(std::string("The computed constant '").append(computedConstantVariable->name()).append("' in component '").append(computedConstantComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
+                addCannotChangeWarning(computedConstantVariable->name(), computedConstantComponent->name(), "computed constant");
 
                 isParameterSet = true;
 
@@ -140,12 +164,14 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        for (size_t i {0}; i < pAnalyserModel->algebraicVariableCount(); ++i) {
+        const auto &algebraicVariables = pAnalyserModel->algebraicVariables();
+
+        for (size_t i {0}; i < algebraicVariableCount; ++i) {
             if (instanceTaskPimpl->algebraicVariableName(i) == changeName) {
-                auto algebraicVariable {pAnalyserModel->algebraicVariables()[i]->variable()};
+                auto algebraicVariable {algebraicVariables[i]->variable()};
                 auto algebraicComponent {owningComponent(algebraicVariable)};
 
-                addWarning(std::string("The algebraic variable '").append(algebraicVariable->name()).append("' in component '").append(algebraicComponent->name()).append("' cannot be changed. Only state variables and constants can be changed."));
+                addCannotChangeWarning(algebraicVariable->name(), algebraicComponent->name(), "algebraic variable");
 
                 isParameterSet = true;
 
@@ -155,7 +181,17 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     }
 
     if (!isParameterSet) {
-        addWarning(std::string("The variable '").append(mVariableName).append("' in component '").append(mComponentName).append("' could not be found and therefore could not be changed."));
+        std::string warning;
+
+        warning.reserve(mVariableName.size() + mComponentName.size() + 72); // NOLINT
+
+        warning += "The variable '";
+        warning += mVariableName;
+        warning += "' in component '";
+        warning += mComponentName;
+        warning += "' could not be found and therefore could not be changed.";
+
+        addWarning(warning);
     }
 }
 
@@ -186,7 +222,7 @@ SedChangeAttributePtr SedChangeAttribute::create(const std::string &pComponent, 
     return SedChangeAttributePtr(new SedChangeAttribute(pComponent, pVariable, pNewValue));
 }
 
-std::string SedChangeAttribute::componentName() const
+const std::string &SedChangeAttribute::componentName() const
 {
     return pimpl()->componentName();
 }
@@ -196,7 +232,7 @@ void SedChangeAttribute::setComponentName(const std::string &pComponentName)
     pimpl()->setComponentName(pComponentName);
 }
 
-std::string SedChangeAttribute::variableName() const
+const std::string &SedChangeAttribute::variableName() const
 {
     return pimpl()->variableName();
 }
@@ -206,7 +242,7 @@ void SedChangeAttribute::setVariableName(const std::string &pVariableName)
     pimpl()->setVariableName(pVariableName);
 }
 
-std::string SedChangeAttribute::newValue() const
+const std::string &SedChangeAttribute::newValue() const
 {
     return pimpl()->newValue();
 }

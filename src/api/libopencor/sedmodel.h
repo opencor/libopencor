@@ -74,7 +74,7 @@ public:
      * @return The file, as a smart pointer to a @ref File object.
      */
 
-    FilePtr file() const;
+    const FilePtr &file() const;
 
     /**
      * @brief Return whether there are some changes.
@@ -104,7 +104,7 @@ public:
      * @return The changes, as a @ref SedChangePtrs.
      */
 
-    SedChangePtrs changes() const;
+    const SedChangePtrs &changes() const;
 
     /**
      * @brief Return the change at the given index.
@@ -116,7 +116,7 @@ public:
      * @return The change as a @ref SedChangePtr, if the index is valid, @c nullptr otherwise.
      */
 
-    SedChangePtr change(size_t pIndex) const;
+    const SedChangePtr &change(size_t pIndex) const;
 
     /**
      * @brief Add the change to this model.

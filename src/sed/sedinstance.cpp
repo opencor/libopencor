@@ -37,7 +37,7 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
     if (pDocument->hasTasks()) {
         // Make sure that all the tasks are valid.
 
-        auto tasks {pDocument->tasks()};
+        const auto &tasks {pDocument->tasks()};
         auto tasksValid {true};
 
         for (const auto &task : tasks) {
@@ -57,6 +57,8 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
         // Create an instance of all the tasks, if they are all valid.
 
         if (tasksValid) {
+            mTasks.reserve(tasks.size());
+
             for (const auto &task : tasks) {
                 auto taskInstance {SedInstanceTask::Impl::create(task)};
 
@@ -115,15 +117,17 @@ size_t SedInstance::Impl::taskCount() const
     return mTasks.size();
 }
 
-SedInstanceTaskPtrs SedInstance::Impl::tasks() const
+const SedInstanceTaskPtrs &SedInstance::Impl::tasks() const
 {
     return mTasks;
 }
 
-SedInstanceTaskPtr SedInstance::Impl::task(size_t pIndex) const
+const SedInstanceTaskPtr &SedInstance::Impl::task(size_t pIndex) const
 {
+    static const SedInstanceTaskPtr NO_SED_INSTANCE_TASK_PTR;
+
     if (pIndex >= mTasks.size()) {
-        return {};
+        return NO_SED_INSTANCE_TASK_PTR;
     }
 
     return mTasks[pIndex];
@@ -164,12 +168,12 @@ size_t SedInstance::taskCount() const
     return pimpl()->taskCount();
 }
 
-SedInstanceTaskPtrs SedInstance::tasks() const
+const SedInstanceTaskPtrs &SedInstance::tasks() const
 {
     return pimpl()->tasks();
 }
 
-SedInstanceTaskPtr SedInstance::task(size_t pIndex) const
+const SedInstanceTaskPtr &SedInstance::task(size_t pIndex) const
 {
     return pimpl()->task(pIndex);
 }

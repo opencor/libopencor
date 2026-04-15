@@ -50,7 +50,7 @@ public:
      * @return The ODE solver for this simulation.
      */
 
-    SolverOdePtr odeSolver() const;
+    const SolverOdePtr &odeSolver() const;
 
     /**
      * @brief Set the ODE solver for this simulation.
@@ -70,7 +70,7 @@ public:
      * @return The NLA solver for this simulation.
      */
 
-    SolverNlaPtr nlaSolver() const;
+    const SolverNlaPtr &nlaSolver() const;
 
     /**
      * @brief Set the NLA solver for this simulation.

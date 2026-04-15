@@ -116,11 +116,11 @@ TEST(InstanceSedTest, odeModel)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
     static const auto NOK_MAXIMUM_NUMBER_OF_STEPS {10};
 
-    auto cvode {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &cvode {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
 
@@ -167,8 +167,8 @@ TEST(InstanceSedTest, nlaModel)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/nla.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0])};
-    auto kinsol {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedSteadyState>(document->simulations()[0])};
+    const auto &kinsol {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
@@ -208,8 +208,8 @@ TEST(InstanceSedTest, daeModel)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto kinsol {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &kinsol {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(simulation->nlaSolver())};
 
     kinsol->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::BANDED);
     kinsol->setUpperHalfBandwidth(-1);
@@ -240,7 +240,7 @@ TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {document->simulations()[0]};
+    const auto &simulation {document->simulations()[0]};
 
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);

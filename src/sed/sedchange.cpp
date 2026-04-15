@@ -25,7 +25,7 @@ SedChange::Impl::Impl(const std::string &pTarget)
 {
 }
 
-std::string SedChange::Impl::target() const
+const std::string &SedChange::Impl::target() const
 {
     return mTarget;
 }
@@ -60,7 +60,7 @@ const SedChange::Impl *SedChange::pimpl() const
     return static_cast<const Impl *>(SedBase::pimpl());
 }
 
-std::string SedChange::target() const
+const std::string &SedChange::target() const
 {
     return pimpl()->target();
 }

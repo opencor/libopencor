@@ -29,15 +29,17 @@ size_t Logger::Impl::issueCount() const
     return mIssues.size();
 }
 
-IssuePtrs Logger::Impl::issues() const
+const IssuePtrs &Logger::Impl::issues() const
 {
     return mIssues;
 }
 
-IssuePtr Logger::Impl::issue(size_t pIndex) const
+const IssuePtr &Logger::Impl::issue(size_t pIndex) const
 {
+    static const IssuePtr NO_ISSUE_PTR;
+
     if (pIndex >= mIssues.size()) {
-        return {};
+        return NO_ISSUE_PTR;
     }
 
     return mIssues[pIndex];
@@ -53,15 +55,17 @@ size_t Logger::Impl::errorCount() const
     return mErrors.size();
 }
 
-IssuePtrs Logger::Impl::errors() const
+const IssuePtrs &Logger::Impl::errors() const
 {
     return mErrors;
 }
 
-IssuePtr Logger::Impl::error(size_t pIndex) const
+const IssuePtr &Logger::Impl::error(size_t pIndex) const
 {
+    static const IssuePtr NO_ISSUE_PTR;
+
     if (pIndex >= mErrors.size()) {
-        return {};
+        return NO_ISSUE_PTR;
     }
 
     return mErrors[pIndex];
@@ -77,15 +81,17 @@ size_t Logger::Impl::warningCount() const
     return mWarnings.size();
 }
 
-IssuePtrs Logger::Impl::warnings() const
+const IssuePtrs &Logger::Impl::warnings() const
 {
     return mWarnings;
 }
 
-IssuePtr Logger::Impl::warning(size_t pIndex) const
+const IssuePtr &Logger::Impl::warning(size_t pIndex) const
 {
+    static const IssuePtr NO_ISSUE_PTR;
+
     if (pIndex >= mWarnings.size()) {
-        return {};
+        return NO_ISSUE_PTR;
     }
 
     return mWarnings[pIndex];
@@ -116,9 +122,9 @@ void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription, 
     mIssues.push_back(issue);
 
     if (pType == Issue::Type::ERROR) {
-        mErrors.push_back(issue);
+        mErrors.push_back(std::move(issue));
     } else {
-        mWarnings.push_back(issue);
+        mWarnings.push_back(std::move(issue));
     }
 }
 
@@ -155,12 +161,12 @@ size_t Logger::issueCount() const
     return mPimpl->issueCount();
 }
 
-IssuePtrs Logger::issues() const
+const IssuePtrs &Logger::issues() const
 {
     return mPimpl->issues();
 }
 
-IssuePtr Logger::issue(size_t pIndex) const
+const IssuePtr &Logger::issue(size_t pIndex) const
 {
     return mPimpl->issue(pIndex);
 }
@@ -175,12 +181,12 @@ size_t Logger::errorCount() const
     return mPimpl->errorCount();
 }
 
-IssuePtrs Logger::errors() const
+const IssuePtrs &Logger::errors() const
 {
     return mPimpl->errors();
 }
 
-IssuePtr Logger::error(size_t pIndex) const
+const IssuePtr &Logger::error(size_t pIndex) const
 {
     return mPimpl->error(pIndex);
 }
@@ -195,12 +201,12 @@ size_t Logger::warningCount() const
     return mPimpl->warningCount();
 }
 
-IssuePtrs Logger::warnings() const
+const IssuePtrs &Logger::warnings() const
 {
     return mPimpl->warnings();
 }
 
-IssuePtr Logger::warning(size_t pIndex) const
+const IssuePtr &Logger::warning(size_t pIndex) const
 {
     return mPimpl->warning(pIndex);
 }

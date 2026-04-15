@@ -28,7 +28,7 @@ void run(const libOpenCOR::SedDocumentPtr &pDocument,
     static const auto OUTPUT_END_TIME {50.0};
     static const auto NUMBER_OF_STEPS {50000};
 
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(pDocument->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(pDocument->simulations()[0])};
 
     simulation->setOutputEndTime(OUTPUT_END_TIME);
     simulation->setNumberOfSteps(NUMBER_OF_STEPS);
@@ -37,7 +37,7 @@ void run(const libOpenCOR::SedDocumentPtr &pDocument,
 
     instance->run();
 
-    auto instanceTask {instance->tasks()[0]};
+    const auto &instanceTask {instance->tasks()[0]};
 
     EXPECT_EQ_VALUES(instanceTask, 13000,
                      pStateValues, pStateAbsTols,

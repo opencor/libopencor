@@ -25,8 +25,8 @@ TEST(CvodeSolverTest, maximumStepValueWithInvalidNumber)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setMaximumStep(RELATIVE_TOLERANCE);
 
@@ -44,8 +44,8 @@ TEST(CvodeSolverTest, maximumNumberOfStepsValueWithInvalidNumber)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setMaximumNumberOfSteps(MAXIMUM_NUMBER_OF_STEPS);
 
@@ -63,8 +63,8 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooS
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
@@ -83,8 +83,8 @@ TEST(CvodeSolverTest, bandedLinearSolverAndUpperHalfBandwidthValueWithNumberTooB
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setUpperHalfBandwidth(UPPER_HALF_BANDWIDTH);
@@ -103,8 +103,8 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooS
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
@@ -123,8 +123,8 @@ TEST(CvodeSolverTest, bandedLinearSolverAndLowerHalfBandwidthValueWithNumberTooB
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
     solver->setLowerHalfBandwidth(LOWER_HALF_BANDWIDTH);
@@ -143,8 +143,8 @@ TEST(CvodeSolverTest, relativeToleranceValueWithInvalidNumber)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setRelativeTolerance(RELATIVE_TOLERANCE);
 
@@ -162,8 +162,8 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setAbsoluteTolerance(ABSOLUTE_TOLERANCE);
 
@@ -211,8 +211,8 @@ TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setInterpolateSolution(false);
 
@@ -239,8 +239,8 @@ TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setIntegrationMethod(libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON);
 
@@ -267,8 +267,8 @@ TEST(CvodeSolverTest, solveWithFunctionalIterationType)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setIterationType(libOpenCOR::SolverCvode::IterationType::FUNCTIONAL);
 
@@ -295,8 +295,8 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BANDED);
 
@@ -323,8 +323,8 @@ TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::DIAGONAL);
 
@@ -351,8 +351,8 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolver)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
 
@@ -379,8 +379,8 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolver)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
 
@@ -407,8 +407,8 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolver)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
 
@@ -435,8 +435,8 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::GMRES);
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
@@ -464,8 +464,8 @@ TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::BICGSTAB);
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);
@@ -493,8 +493,8 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
-    auto solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &solver {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
 
     solver->setLinearSolver(libOpenCOR::SolverCvode::LinearSolver::TFQMR);
     solver->setPreconditioner(libOpenCOR::SolverCvode::Preconditioner::NO);

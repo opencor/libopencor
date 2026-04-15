@@ -28,7 +28,7 @@ namespace libOpenCOR {
 
 void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues)
 {
-    auto issues {pLogger->issues()};
+    const auto &issues {pLogger->issues()};
 
     EXPECT_EQ(issues.size(), pExpectedIssues.size());
 

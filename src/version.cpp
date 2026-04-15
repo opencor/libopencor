@@ -75,9 +75,11 @@ uint64_t version()
     return LIBOPENCOR_VERSION;
 }
 
-std::string versionString()
+const std::string &versionString()
 {
-    return LIBOPENCOR_VERSION_STRING;
+    static const std::string res {LIBOPENCOR_VERSION_STRING};
+
+    return res;
 }
 
 unsigned int clangVersion()
@@ -87,9 +89,11 @@ unsigned int clangVersion()
            + PATCH_10 * firstDigit(CLANG_VERSION_PATCHLEVEL) + PATCH_01 * secondDigit(CLANG_VERSION_PATCHLEVEL);
 }
 
-std::string clangVersionString()
+const std::string &clangVersionString()
 {
-    return CLANG_VERSION_STRING;
+    static const std::string res {CLANG_VERSION_STRING};
+
+    return res;
 }
 
 unsigned int libcellmlVersion()
@@ -97,9 +101,11 @@ unsigned int libcellmlVersion()
     return libcellml::version();
 }
 
-std::string libcellmlVersionString()
+const std::string &libcellmlVersionString()
 {
-    return libcellml::versionString();
+    static const std::string res {libcellml::versionString()};
+
+    return res;
 }
 
 unsigned int libcombineVersion()
@@ -107,9 +113,11 @@ unsigned int libcombineVersion()
     return static_cast<unsigned int>(libcombine::getLibCombineVersion());
 }
 
-std::string libcombineVersionString()
+const std::string &libcombineVersionString()
 {
-    return libcombine::getLibCombineDottedVersion();
+    static const std::string res {libcombine::getLibCombineDottedVersion()};
+
+    return res;
 }
 
 #ifndef __EMSCRIPTEN__
@@ -118,9 +126,11 @@ unsigned int libcurlVersion()
     return LIBCURL_VERSION_NUM;
 }
 
-std::string libcurlVersionString()
+const std::string &libcurlVersionString()
 {
-    return LIBCURL_VERSION;
+    static const std::string res {LIBCURL_VERSION};
+
+    return res;
 }
 #endif
 
@@ -129,9 +139,11 @@ unsigned int libsedmlVersion()
     return static_cast<unsigned int>(libsedml::getLibSEDMLVersion());
 }
 
-std::string libsedmlVersionString()
+const std::string &libsedmlVersionString()
 {
-    return libsedml::getLibSEDMLDottedVersion();
+    static const std::string res {libsedml::getLibSEDMLDottedVersion()};
+
+    return res;
 }
 
 unsigned int llvmVersion()
@@ -141,9 +153,11 @@ unsigned int llvmVersion()
            + PATCH_10 * firstDigit(LLVM_VERSION_PATCH) + PATCH_01 * secondDigit(LLVM_VERSION_PATCH);
 }
 
-std::string llvmVersionString()
+const std::string &llvmVersionString()
 {
-    return LLVM_VERSION_STRING;
+    static const std::string res {LLVM_VERSION_STRING};
+
+    return res;
 }
 
 unsigned int sundialsVersion()

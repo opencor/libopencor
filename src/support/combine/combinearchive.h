@@ -43,14 +43,14 @@ public:
 
     static CombineArchivePtr create(const FilePtr &pFile);
 
-    FilePtr masterFile() const;
+    const FilePtr &masterFile() const;
 
     bool hasFiles() const;
     size_t fileCount() const;
-    Strings fileNames() const;
-    FilePtrs files() const;
-    FilePtr file(size_t pIndex) const;
-    FilePtr file(const std::string &pFileName) const;
+    const Strings &fileNames() const;
+    const FilePtrs &files() const;
+    const FilePtr &file(size_t pIndex) const;
+    const FilePtr &file(const std::string &pFileName) const;
 
 private:
     class Impl;

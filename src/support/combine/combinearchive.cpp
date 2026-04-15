@@ -34,6 +34,11 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 {
     // Extract all the files contained in the COMBINE archive.
 
+    auto fileCount {static_cast<size_t>(mArchive->getNumEntries())};
+
+    mFiles.reserve(fileCount);
+    mFileNames.reserve(fileCount);
+
     for (int i {0}; i < mArchive->getNumEntries(); ++i) {
         const auto *entry {mArchive->getEntry(i)};
         auto location {entry->getLocation()};
@@ -41,8 +46,8 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
 
         file->setContents(mArchive->extractEntryToBuffer(location));
 
-        mFiles.push_back(file); // So that the files (besides the master file) don't get automatically deleted when we
-                                // get out of scope.
+        mFiles.push_back(file);
+        mFileNames.push_back(location);
 
         if (entry->getMaster()) {
             mMasterFile = file;
@@ -55,7 +60,7 @@ CombineArchive::Impl::~Impl()
     delete mArchive;
 }
 
-FilePtr CombineArchive::Impl::masterFile() const
+const FilePtr &CombineArchive::Impl::masterFile() const
 {
     return mMasterFile;
 }
@@ -70,40 +75,38 @@ size_t CombineArchive::Impl::fileCount() const
     return mFiles.size();
 }
 
-Strings CombineArchive::Impl::fileNames() const
+const Strings &CombineArchive::Impl::fileNames() const
 {
-    Strings res;
-
-    for (const auto &file : mFiles) {
-        res.push_back(file->fileName().substr(mArchiveLocationSize));
-    }
-
-    return res;
+    return mFileNames;
 }
 
-FilePtrs CombineArchive::Impl::files() const
+const FilePtrs &CombineArchive::Impl::files() const
 {
     return mFiles;
 }
 
-FilePtr CombineArchive::Impl::file(size_t pIndex) const
+const FilePtr &CombineArchive::Impl::file(size_t pIndex) const
 {
+    static const FilePtr NO_FILE_PTR;
+
     if (pIndex >= mFiles.size()) {
-        return {};
+        return NO_FILE_PTR;
     }
 
     return mFiles[pIndex];
 }
 
-FilePtr CombineArchive::Impl::file(const std::string &pFileName) const
+const FilePtr &CombineArchive::Impl::file(const std::string &pFileName) const
 {
+    static const FilePtr NO_FILE_PTR;
+
     for (const auto &file : mFiles) {
         if (file->fileName() == mArchiveLocation + pFileName) {
             return file;
         }
     }
 
-    return {};
+    return NO_FILE_PTR;
 }
 
 CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
@@ -128,6 +131,8 @@ const CombineArchive::Impl *CombineArchive::pimpl() const
 
 CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 {
+    static const CombineArchivePtr NO_COMBINE_ARCHIVE_PTR;
+
     // Check whether the file is a COMBINE archive and if so then return its CombineArchive object.
 
     if (pFile->pimpl()->type() == File::Type::COMBINE_ARCHIVE) {
@@ -138,7 +143,7 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
     // file contents again.
 
     if (pFile->pimpl()->mTypeChecked) {
-        return {};
+        return NO_COMBINE_ARCHIVE_PTR;
     }
 
     // Try to retrieve a COMBINE archive.
@@ -165,10 +170,10 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
         //       CombineArchive::Impl object.
     }
 
-    return {};
+    return NO_COMBINE_ARCHIVE_PTR;
 }
 
-FilePtr CombineArchive::masterFile() const
+const FilePtr &CombineArchive::masterFile() const
 {
     return pimpl()->masterFile();
 }
@@ -183,22 +188,22 @@ size_t CombineArchive::fileCount() const
     return pimpl()->fileCount();
 }
 
-Strings CombineArchive::fileNames() const
+const Strings &CombineArchive::fileNames() const
 {
     return pimpl()->fileNames();
 }
 
-FilePtrs CombineArchive::files() const
+const FilePtrs &CombineArchive::files() const
 {
     return pimpl()->files();
 }
 
-FilePtr CombineArchive::file(size_t pIndex) const
+const FilePtr &CombineArchive::file(size_t pIndex) const
 {
     return pimpl()->file(pIndex);
 }
 
-FilePtr CombineArchive::file(const std::string &pFileName) const
+const FilePtr &CombineArchive::file(const std::string &pFileName) const
 {
     return pimpl()->file(pFileName);
 }

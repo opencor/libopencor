@@ -14,7 +14,7 @@ int main()
 
     auto file {libOpenCOR::File::create("https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex")};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
     simulation->setOutputEndTime(5.0);
     simulation->setNumberOfSteps(500);
@@ -23,7 +23,7 @@ int main()
 
     instance->run();
 
-    auto instanceTask {instance->tasks()[0]};
+    const auto &instanceTask {instance->tasks()[0]};
 
     std::cout << "\n";
     std::cout << "---[ File information ]---\n";

@@ -7,3 +7,4 @@
     mErrors.clear();
     if (pIndex >= mErrors.size()) {
     return mErrors[pIndex];
+        mErrors.push_back(std::move(issue));

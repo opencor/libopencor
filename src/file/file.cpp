@@ -62,6 +62,8 @@ File::Impl::Impl(const std::string &pFileNameOrUrl, bool pRetrieveContents)
         mFilePath = stringToPath("/some/path/file");
     }
 #endif
+
+    mFileName = pathToString(mFilePath);
 }
 
 File::Impl::~Impl()
@@ -127,22 +129,22 @@ File::Type File::Impl::type() const
     return mType;
 }
 
-std::string File::Impl::fileName() const
+const std::string &File::Impl::fileName() const
 {
-    return pathToString(mFilePath);
+    return mFileName;
 }
 
-std::string File::Impl::url() const
+const std::string &File::Impl::url() const
 {
     return mUrl;
 }
 
-std::string File::Impl::path() const
+const std::string &File::Impl::path() const
 {
-    return mUrl.empty() ? fileName() : mUrl;
+    return mUrl.empty() ? mFileName : mUrl;
 }
 
-UnsignedChars File::Impl::contents()
+const UnsignedChars &File::Impl::contents()
 {
 #ifndef __EMSCRIPTEN__
     // Retrieve the contents of the file, if needed.
@@ -181,48 +183,56 @@ size_t File::Impl::childFileCount() const
     return 0;
 }
 
-Strings File::Impl::childFileNames() const
+const Strings &File::Impl::childFileNames() const
 {
+    static const Strings NO_STRINGS;
+
     if (mType == Type::COMBINE_ARCHIVE) {
         return mCombineArchive->fileNames();
     }
 
-    return {};
+    return NO_STRINGS;
 }
 
-FilePtrs File::Impl::childFiles() const
+const FilePtrs &File::Impl::childFiles() const
 {
+    static const FilePtrs NO_FILE_PTRS;
+
     if (mType == Type::COMBINE_ARCHIVE) {
         return mCombineArchive->files();
     }
 
-    return {};
+    return NO_FILE_PTRS;
 }
 
-FilePtr File::Impl::childFile(size_t pIndex) const
+const FilePtr &File::Impl::childFile(size_t pIndex) const
 {
+    static const FilePtr NO_FILE_PTR;
+
     if (mType == Type::COMBINE_ARCHIVE) {
         if (pIndex >= mCombineArchive->fileCount()) {
-            return {};
+            return NO_FILE_PTR;
         }
 
         return mCombineArchive->file(pIndex);
     }
 
-    return {};
+    return NO_FILE_PTR;
 }
 
 #ifdef __EMSCRIPTEN__
-FilePtr File::Impl::childFileFromFileName(const std::string &pFileName) const
+const FilePtr &File::Impl::childFileFromFileName(const std::string &pFileName) const
 #else
-FilePtr File::Impl::childFile(const std::string &pFileName) const
+const FilePtr &File::Impl::childFile(const std::string &pFileName) const
 #endif
 {
+    static const FilePtr NO_FILE_PTR;
+
     if (mType == Type::COMBINE_ARCHIVE) {
         return mCombineArchive->file(pFileName);
     }
 
-    return {};
+    return NO_FILE_PTR;
 }
 
 File::File(const std::string &pFileNameOrUrl, bool pRetrieveContents)
@@ -258,11 +268,11 @@ FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     // Check whether the given file name or URL is already managed and if so then return it otherwise create, manage,
     // and return a new file object.
 
-    auto fileManager {FileManager::instance()};
+    auto &fileManager {FileManager::instance()};
 #ifdef __EMSCRIPTEN__
-    auto file {fileManager.fileFromFileNameOrUrl(pFileNameOrUrl)};
+    const auto &file {fileManager.fileFromFileNameOrUrl(pFileNameOrUrl)};
 #else
-    auto file {fileManager.file(pFileNameOrUrl)};
+    const auto &file {fileManager.file(pFileNameOrUrl)};
 #endif
 
     if (file != nullptr) {
@@ -287,22 +297,22 @@ File::Type File::type() const
     return pimpl()->type();
 }
 
-std::string File::fileName() const
+const std::string &File::fileName() const
 {
     return pimpl()->fileName();
 }
 
-std::string File::url() const
+const std::string &File::url() const
 {
     return pimpl()->url();
 }
 
-std::string File::path() const
+const std::string &File::path() const
 {
     return pimpl()->path();
 }
 
-UnsignedChars File::contents()
+const UnsignedChars &File::contents()
 {
     return pimpl()->contents();
 }
@@ -324,25 +334,25 @@ size_t File::childFileCount() const
     return pimpl()->childFileCount();
 }
 
-Strings File::childFileNames() const
+const Strings &File::childFileNames() const
 {
     return pimpl()->childFileNames();
 }
 
-FilePtrs File::childFiles() const
+const FilePtrs &File::childFiles() const
 {
     return pimpl()->childFiles();
 }
 
-FilePtr File::childFile(size_t pIndex) const
+const FilePtr &File::childFile(size_t pIndex) const
 {
     return pimpl()->childFile(pIndex);
 }
 
 #ifdef __EMSCRIPTEN__
-FilePtr File::childFileFromFileName(const std::string &pFileName) const
+const FilePtr &File::childFileFromFileName(const std::string &pFileName) const
 #else
-FilePtr File::childFile(const std::string &pFileName) const
+const FilePtr &File::childFile(const std::string &pFileName) const
 #endif
 {
 #ifdef __EMSCRIPTEN__

@@ -32,14 +32,14 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile);
 
-    FilePtr file() const;
+    const FilePtr &file() const;
 
     bool isValid();
 
     bool hasChanges() const;
     size_t changeCount() const;
-    SedChangePtrs changes() const;
-    SedChangePtr change(size_t pIndex) const;
+    const SedChangePtrs &changes() const;
+    const SedChangePtr &change(size_t pIndex) const;
     bool addChange(const SedChangePtr &pChange);
     bool removeChange(const SedChangePtr &pChange);
     bool removeAllChanges();

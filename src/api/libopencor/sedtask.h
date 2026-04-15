@@ -71,7 +71,7 @@ public:
      * @return The model, as a @ref SedModelPtr, used by this task.
      */
 
-    SedModelPtr model() const;
+    const SedModelPtr &model() const;
 
     /**
      * @brief Set the model to be used by this task.
@@ -91,7 +91,7 @@ public:
      * @return The simulation, as a @ref SedSimulationPtr, used by this task.
      */
 
-    SedSimulationPtr simulation() const;
+    const SedSimulationPtr &simulation() const;
 
     /**
      * @brief Set the simulation to be used by this task.

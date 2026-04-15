@@ -33,7 +33,7 @@ SedModel::Impl::Impl(const SedDocumentPtr &pDocument, const FilePtr &pFile)
 {
 }
 
-FilePtr SedModel::Impl::file() const
+const FilePtr &SedModel::Impl::file() const
 {
     return mFile;
 }
@@ -80,15 +80,17 @@ size_t SedModel::Impl::changeCount() const
     return mChanges.size();
 }
 
-SedChangePtrs SedModel::Impl::changes() const
+const SedChangePtrs &SedModel::Impl::changes() const
 {
     return mChanges;
 }
 
-SedChangePtr SedModel::Impl::change(size_t pIndex) const
+const SedChangePtr &SedModel::Impl::change(size_t pIndex) const
 {
+    static const SedChangePtr NO_SED_CHANGE_PTR;
+
     if (pIndex >= mChanges.size()) {
-        return {};
+        return NO_SED_CHANGE_PTR;
     }
 
     return mChanges[pIndex];
@@ -204,7 +206,7 @@ SedModelPtr SedModel::create(const SedDocumentPtr &pDocument, const FilePtr &pFi
     return SedModelPtr {new SedModel {pDocument, pFile}};
 }
 
-FilePtr SedModel::file() const
+const FilePtr &SedModel::file() const
 {
     return pimpl()->file();
 }
@@ -219,12 +221,12 @@ size_t SedModel::changeCount() const
     return pimpl()->changeCount();
 }
 
-SedChangePtrs SedModel::changes() const
+const SedChangePtrs &SedModel::changes() const
 {
     return pimpl()->changes();
 }
 
-SedChangePtr SedModel::change(size_t pIndex) const
+const SedChangePtr &SedModel::change(size_t pIndex) const
 {
     return pimpl()->change(pIndex);
 }

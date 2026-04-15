@@ -49,7 +49,7 @@ public:
      * @return The id as a @c std::string.
      */
 
-    std::string id() const;
+    const std::string &id() const;
 
     /**
      * @brief Set the id.
