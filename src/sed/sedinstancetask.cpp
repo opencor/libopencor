@@ -121,15 +121,15 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
 
     mConstantDoubles.resize(mConstantCount, NAN);
     mComputedConstantDoubles.resize(mComputedConstantCount, NAN);
-    mAlgebraicDoubles.resize(mAlgebraicVariableCount, NAN);
+    mAlgebraicVariableDoubles.resize(mAlgebraicVariableCount, NAN);
 
     mConstants = mConstantDoubles.data();
     mComputedConstants = mComputedConstantDoubles.data();
-    mAlgebraicVariables = mAlgebraicDoubles.data();
+    mAlgebraicVariables = mAlgebraicVariableDoubles.data();
 
     mResults.constants.resize(mConstantCount, {});
     mResults.computedConstants.resize(mComputedConstantCount, {});
-    mResults.algebraic.resize(mAlgebraicVariableCount, {});
+    mResults.algebraicVariables.resize(mAlgebraicVariableCount, {});
 
     // Retrieve our various strings.
 
@@ -203,7 +203,7 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     auto &rates = mResults.rates;
     auto &constants = mResults.constants;
     auto &computedConstants = mResults.computedConstants;
-    auto &algebraic = mResults.algebraic;
+    auto &algebraicVariables = mResults.algebraicVariables;
 
     for (size_t i {0}; i < mStateCount; ++i) {
         states[i][pIndex] = mStates[i]; // NOLINT
@@ -219,7 +219,7 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
     }
 
     for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
-        algebraic[i][pIndex] = mAlgebraicVariables[i]; // NOLINT
+        algebraicVariables[i][pIndex] = mAlgebraicVariables[i]; // NOLINT
     }
 }
 
@@ -337,7 +337,7 @@ double SedInstanceTask::Impl::run()
         }
 
         for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
-            mResults.algebraic[i].resize(resultsSize, NAN);
+            mResults.algebraicVariables[i].resize(resultsSize, NAN);
         }
 
         // Track our initial results.
@@ -397,7 +397,7 @@ double SedInstanceTask::Impl::run()
         }
 
         for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
-            mResults.algebraic[i].assign(1, mAlgebraicVariables[i]); // NOLINT
+            mResults.algebraicVariables[i].assign(1, mAlgebraicVariables[i]); // NOLINT
         }
     }
 
@@ -604,7 +604,7 @@ const Doubles &SedInstanceTask::Impl::algebraicVariable(size_t pIndex) const
         return NO_DOUBLES;
     }
 
-    return mResults.algebraic[pIndex];
+    return mResults.algebraicVariables[pIndex];
 }
 
 const std::string &SedInstanceTask::Impl::algebraicVariableName(size_t pIndex) const

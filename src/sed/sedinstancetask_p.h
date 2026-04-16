@@ -32,7 +32,7 @@ struct SedInstanceTaskResults
     std::vector<Doubles> rates;
     std::vector<Doubles> constants;
     std::vector<Doubles> computedConstants;
-    std::vector<Doubles> algebraic;
+    std::vector<Doubles> algebraicVariables;
 };
 
 using SedInstanceTaskWeakPtr = std::weak_ptr<SedInstanceTask>;
@@ -66,7 +66,7 @@ public:
     Doubles mRateDoubles;
     Doubles mConstantDoubles;
     Doubles mComputedConstantDoubles;
-    Doubles mAlgebraicDoubles;
+    Doubles mAlgebraicVariableDoubles;
 
     SedInstanceTaskResults mResults;
 
