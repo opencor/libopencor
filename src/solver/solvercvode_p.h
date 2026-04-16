@@ -31,7 +31,7 @@ struct SolverCvodeUserData
 {
     double *constants {nullptr};
     double *computedConstants {nullptr};
-    double *algebraic {nullptr};
+    double *algebraicVariables {nullptr};
 
     CellmlFileRuntimePtr runtime;
 };

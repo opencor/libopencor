@@ -108,10 +108,10 @@ int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 
 #ifdef __EMSCRIPTEN__
     userData->runtime->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
-                                    userData->constants, userData->computedConstants, userData->algebraic);
+                                    userData->constants, userData->computedConstants, userData->algebraicVariables);
 #else
         userData->runtime->computeRates()(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
-                                          userData->constants, userData->computedConstants, userData->algebraic);
+                                          userData->constants, userData->computedConstants, userData->algebraicVariables);
 #endif
 
     return 0;
@@ -613,7 +613,7 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
 
     mUserData.constants = pConstants;
     mUserData.computedConstants = pComputedConstants;
-    mUserData.algebraic = pAlgebraicVariables;
+    mUserData.algebraicVariables = pAlgebraicVariables;
     mUserData.runtime = pRuntime;
 
     ASSERT_EQ(CVodeSetUserData(mSolver, &mUserData), CV_SUCCESS);
