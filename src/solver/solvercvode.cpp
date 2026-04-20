@@ -16,22 +16,17 @@ limitations under the License.
 
 #include "solvercvode_p.h"
 
-#include "libsedmlbegin.h"
-#include "sedml/SedAlgorithm.h"
-#include "libsedmlend.h"
-
-#include "sundialsbegin.h"
 #include "cvodes/cvodes.h"
 #include "cvodes/cvodes_bandpre.h"
 #include "cvodes/cvodes_diag.h"
 #include "nvector/nvector_serial.h"
+#include "sedml/SedAlgorithm.h"
 #include "sunlinsol/sunlinsol_band.h"
 #include "sunlinsol/sunlinsol_dense.h"
 #include "sunlinsol/sunlinsol_spbcgs.h"
 #include "sunlinsol/sunlinsol_spgmr.h"
 #include "sunlinsol/sunlinsol_sptfqmr.h"
 #include "sunnonlinsol/sunnonlinsol_fixedpoint.h"
-#include "sundialsend.h"
 
 #include <utility>
 

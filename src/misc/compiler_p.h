@@ -21,9 +21,7 @@ limitations under the License.
 #include "compiler.h"
 
 #ifndef __EMSCRIPTEN__
-#    include "llvmbegin.h"
 #    include "llvm/ExecutionEngine/Orc/LLJIT.h"
-#    include "llvmend.h"
 #endif
 
 namespace libOpenCOR {

@@ -16,33 +16,19 @@ limitations under the License.
 
 #include "version.h"
 
-#include "clangbegin.h"
 #include "clang/Basic/Version.h"
-#include "clangend.h"
 
 #ifndef __EMSCRIPTEN__
 #    include "curl/curlver.h"
 #endif
 
-#include "libcellml/version.h"
-
 #include "libopencor/version.h"
 
-#include "llvmbegin.h"
+#include "libcellml/version.h"
 #include "llvm/Config/llvm-config.h"
-#include "llvmend.h"
-
-#include "libcombinebegin.h"
 #include "omex/common/libcombine-version.h"
-#include "libcombineend.h"
-
-#include "libsedmlbegin.h"
 #include "sedml/common/libsedml-version.h"
-#include "libsedmlend.h"
-
-#include "sundialsbegin.h"
 #include "sundials/sundials_version.h"
-#include "sundialsend.h"
 
 #include <array>
 #include <cmath>

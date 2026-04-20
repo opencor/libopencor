@@ -301,7 +301,7 @@ function(configure_target TARGET)
                          NO_CMAKE_SYSTEM_PATH)
         endif()
 
-        target_include_directories(${TARGET} PRIVATE
+        target_include_directories(${TARGET} SYSTEM PRIVATE
                                    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${AVAILABLE_PACKAGE}>
                                    $<BUILD_INTERFACE:${${AVAILABLE_PACKAGE_UC}_INCLUDE_DIR}>)
 

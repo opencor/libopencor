@@ -16,7 +16,6 @@ limitations under the License.
 
 #include "compiler_p.h"
 
-#include "clangbegin.h"
 #include "clang/Basic/TargetInfo.h"
 #include "clang/CodeGen/CodeGenAction.h"
 #include "clang/Driver/Compilation.h"
@@ -25,9 +24,6 @@ limitations under the License.
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Lex/PreprocessorOptions.h"
-#include "clangend.h"
-
-#include "llvmbegin.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
 #include "llvm/MC/TargetRegistry.h"
@@ -35,7 +31,6 @@ limitations under the License.
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm-c/Core.h"
-#include "llvmend.h"
 
 #include <random>
 #include <sstream>

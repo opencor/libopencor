@@ -16,19 +16,14 @@ limitations under the License.
 
 #include "solverkinsol_p.h"
 
-#include "libsedmlbegin.h"
-#include "sedml/SedAlgorithm.h"
-#include "libsedmlend.h"
-
-#include "sundialsbegin.h"
 #include "kinsol/kinsol.h"
 #include "nvector/nvector_serial.h"
+#include "sedml/SedAlgorithm.h"
 #include "sunlinsol/sunlinsol_band.h"
 #include "sunlinsol/sunlinsol_dense.h"
 #include "sunlinsol/sunlinsol_spbcgs.h"
 #include "sunlinsol/sunlinsol_spgmr.h"
 #include "sunlinsol/sunlinsol_sptfqmr.h"
-#include "sundialsend.h"
 
 #include <utility>
 
