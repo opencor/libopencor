@@ -38,13 +38,11 @@ limitations under the License.
 #include "libopencor/solverkinsol.h"
 #include "libopencor/solversecondorderrungekutta.h"
 
-#include "libsedmlbegin.h"
 #include "sedml/SedChangeAttribute.h"
 #include "sedml/SedDocument.h"
 #include "sedml/SedReader.h"
 #include "sedml/SedOneStep.h"
 #include "sedml/SedUniformTimeCourse.h"
-#include "libsedmlend.h"
 
 #include <ranges>
 

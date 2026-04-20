@@ -20,10 +20,8 @@ limitations under the License.
 
 #include "libopencor/solvercvode.h"
 
-#include "sundialsbegin.h"
 #include "sundials/sundials_linearsolver.h"
 #include "sundials/sundials_nonlinearsolver.h"
-#include "sundialsend.h"
 
 namespace libOpenCOR {
 
