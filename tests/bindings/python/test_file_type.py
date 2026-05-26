@@ -98,7 +98,7 @@ def test_type_unknown_virtual_file():
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == []
 
-    file.contents = utils.string_to_list(utils.SomeUnknownContents)
+    file.contents = utils.string_to_list(utils.UnknownContents)
 
     assert file.type == loc.File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
@@ -110,7 +110,7 @@ def test_type_cellml_virtual_file():
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == []
 
-    file.contents = utils.string_to_list(utils.SomeCellmlContents)
+    file.contents = utils.string_to_list(utils.CellmlContents)
 
     assert file.type == loc.File.Type.CellmlFile
 
@@ -121,7 +121,7 @@ def test_type_sedml_virtual_file():
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == []
 
-    file.contents = utils.string_to_list(utils.SomeSedmlContents)
+    file.contents = utils.string_to_list(utils.SedmlContents)
 
     assert file.type == loc.File.Type.SedmlFile
 
@@ -132,6 +132,6 @@ def test_type_combine_virtual_archive():
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == []
 
-    file.contents = utils.binary_to_list(utils.SomeCombineArchiveContents)
+    file.contents = utils.binary_to_list(utils.Base64CombineArchiveContents)
 
     assert file.type == loc.File.Type.CombineArchive

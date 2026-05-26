@@ -40,8 +40,6 @@ export const ENCODED_REMOTE_FILE =
 export const NON_ENCODED_REMOTE_FILE =
   'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml';
 
-export const NO_CONTENTS = stringToArrayBuffer('');
-export const NULL_CHARACTER_CONTENTS = stringToArrayBuffer('\0');
 export const UNKNOWN_CONTENTS = stringToArrayBuffer('Some unknown contents...');
 export const CELLML_CONTENTS = stringToArrayBuffer(`@CELLML_CONTENTS@`);
 export const ERROR_CELLML_CONTENTS = stringToArrayBuffer(`@ERROR_CELLML_CONTENTS@`);

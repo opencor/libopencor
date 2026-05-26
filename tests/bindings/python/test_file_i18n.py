@@ -27,10 +27,6 @@ def test_arabic_files():
         == loc.File.Type.SedmlFile
     )
     assert (
-        loc.File(utils.resource_path("i18n/ملف/file.sedml")).type
-        == loc.File.Type.SedmlFile
-    )
-    assert (
         loc.File(utils.resource_path("i18n/ملف/file.omex")).type
         == loc.File.Type.CombineArchive
     )
@@ -67,23 +63,18 @@ def test_hindi_files():
 
 
 def test_japanese_files():
-    # Note: see the comment in the corresponding C++ test.
-
-    if platform.system() == "Darwin":
-        assert (
-            loc.File(utils.resource_path("i18n/フォルダ/file.cellml")).type
-            == loc.File.Type.CellmlFile
-        )
-        assert (
-            loc.File(utils.resource_path("i18n/フォルダ/file.sedml")).type
-            == loc.File.Type.SedmlFile
-        )
-        assert (
-            loc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
-            == loc.File.Type.CombineArchive
-        )
-    else:
-        pass
+    assert (
+        loc.File(utils.resource_path("i18n/フォルダ/file.cellml")).type
+        == loc.File.Type.CellmlFile
+    )
+    assert (
+        loc.File(utils.resource_path("i18n/フォルダ/file.sedml")).type
+        == loc.File.Type.SedmlFile
+    )
+    assert (
+        loc.File(utils.resource_path("i18n/フォルダ/file.omex")).type
+        == loc.File.Type.CombineArchive
+    )
 
 
 def test_russian_files():

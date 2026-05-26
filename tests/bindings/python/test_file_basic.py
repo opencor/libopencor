@@ -123,7 +123,7 @@ def test_local_virtual_file():
     assert file.contents == []
     assert_issues(file, expected_no_issues)
 
-    some_unknown_contents_list = utils.string_to_list(utils.SomeUnknownContents)
+    some_unknown_contents_list = utils.string_to_list(utils.UnknownContents)
 
     file.contents = some_unknown_contents_list
 
@@ -147,7 +147,7 @@ def test_remote_virtual_file():
     assert file.contents == []
     assert_issues(file, expected_no_issues)
 
-    some_unknown_contents_list = utils.string_to_list(utils.SomeUnknownContents)
+    some_unknown_contents_list = utils.string_to_list(utils.UnknownContents)
 
     file.contents = some_unknown_contents_list
 

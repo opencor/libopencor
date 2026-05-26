@@ -53,7 +53,7 @@ namespace libOpenCOR {
 #ifndef CODE_COVERAGE_ENABLED
 void printIssues(const LoggerPtr &pLogger, const std::string &pHeader)
 {
-    std::cout << "---[ISSUES]---[BEGIN]";
+    std::cout << "---[ISSUES]---[BEGIN]\n";
 
     if (!pHeader.empty()) {
         std::cout << "---[" << pHeader << "]\n";
@@ -222,7 +222,7 @@ std::string pathToString(const std::filesystem::path &pPath)
 {
     auto path {pPath};
 
-#if defined(BUILDING_USING_MSVC)
+#ifdef BUILDING_USING_MSVC
     return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path.make_preferred().wstring());
 #else
     return path.make_preferred().string();
