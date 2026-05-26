@@ -558,6 +558,7 @@ endif()
 
 if(NOT EMSCRIPTEN AND NOT ONLY_BUILD_THIRD_PARTY_LIBRARIES)
     # Enable unit testing.
+    # Note: we suppress all warnings from GoogleTest sources since they have nothing to do with our code.
 
     if(LIBOPENCOR_UNIT_TESTING)
         enable_testing()
@@ -566,6 +567,10 @@ if(NOT EMSCRIPTEN AND NOT ONLY_BUILD_THIRD_PARTY_LIBRARIES)
         set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 
         add_subdirectory(extern/googletest)
+
+        foreach(TARGET gtest gtest_main)
+            suppress_target_warnings(${TARGET})
+        endforeach()
 
         mark_as_advanced(BUILD_GMOCK
                          GTEST_HAS_ABSL
