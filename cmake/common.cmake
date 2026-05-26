@@ -32,6 +32,12 @@ function(replace_compiler_flag OLD NEW)
     endforeach()
 endfunction()
 
+function(suppress_target_warnings TARGET)
+    target_compile_options(${TARGET} PRIVATE
+                           $<$<CXX_COMPILER_ID:MSVC>:/W0>
+                           $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-w>)
+endfunction()
+
 function(configure_target TARGET)
     # Ignore some MSVC warnings.
 
