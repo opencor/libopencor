@@ -377,13 +377,13 @@ std::string urlPath(const std::string &pPath)
 }
 
 #ifndef __EMSCRIPTEN__
+namespace {
+
 using TimeVal = struct
 {
     uint64_t seconds;
     uint64_t microeconds;
 };
-
-namespace {
 
 void getTimeOfDay(TimeVal &pTimeVal)
 {

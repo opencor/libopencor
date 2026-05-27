@@ -19,13 +19,28 @@ limitations under the License.
 #include <filesystem>
 #include <libopencor>
 
-static const libOpenCOR::ExpectedIssues EXPECTED_NO_ISSUES {};
-static const libOpenCOR::ExpectedIssues EXPECTED_NON_EXISTING_FILE_ISSUES {{
-    {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
-}};
-static const libOpenCOR::ExpectedIssues EXPECTED_UNKNOWN_FILE_ISSUES {{
-    {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
-}};
+namespace {
+
+libOpenCOR::ExpectedIssues expectedNoIssues()
+{
+    return {};
+}
+
+libOpenCOR::ExpectedIssues expectedNonExistingFileIssues()
+{
+    return {{
+        {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
+    }};
+}
+
+libOpenCOR::ExpectedIssues expectedUnknownFileIssues()
+{
+    return {{
+        {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
+    }};
+}
+
+} // namespace
 
 TEST(BasicFileTest, localFile)
 {
@@ -36,7 +51,7 @@ TEST(BasicFileTest, localFile)
     EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_NON_EXISTING_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
 TEST(BasicSedTest, existingRelativeLocalFile)
@@ -48,7 +63,7 @@ TEST(BasicSedTest, existingRelativeLocalFile)
     auto file {libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE)};
 
     EXPECT_FALSE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_NO_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedNoIssues());
 
     std::filesystem::current_path(origDir);
 }
@@ -74,7 +89,7 @@ TEST(BasicFileTest, nonExistingRelativeLocalFile)
     EXPECT_EQ(file->path(), "dir/file.txt");
 #endif
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_NON_EXISTING_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
 TEST(BasicFileTest, urlBasedLocalFile)
@@ -90,7 +105,7 @@ TEST(BasicFileTest, urlBasedLocalFile)
     EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_NON_EXISTING_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
 TEST(BasicFileTest, remoteFile)
@@ -124,7 +139,7 @@ TEST(BasicFileTest, localVirtualFile)
     EXPECT_EQ(file->url(), "");
     EXPECT_EQ(file->path(), libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_NO_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedNoIssues());
 
     auto someUnknownContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS)};
 
@@ -132,7 +147,7 @@ TEST(BasicFileTest, localVirtualFile)
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), someUnknownContents);
-    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
 }
 
 TEST(BasicFileTest, remoteVirtualFile)
@@ -148,7 +163,7 @@ TEST(BasicFileTest, remoteVirtualFile)
     EXPECT_EQ(file->url(), libOpenCOR::UNKNOWN_REMOTE_FILE);
     EXPECT_EQ(file->path(), libOpenCOR::UNKNOWN_REMOTE_FILE);
     EXPECT_TRUE(file->contents().empty());
-    EXPECT_EQ_ISSUES(file, EXPECTED_NO_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedNoIssues());
 
     auto someUnknownContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS)};
 
@@ -156,7 +171,7 @@ TEST(BasicFileTest, remoteVirtualFile)
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), someUnknownContents);
-    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
 }
 
 TEST(BasicFileTest, fileManager)

@@ -133,6 +133,7 @@ function(configure_target TARGET)
                 ${DISABLED_CERT_CHECKS}
                 cppcoreguidelines-*
                 -cppcoreguidelines-owning-memory
+                -cppcoreguidelines-pro-bounds-avoid-unchecked-container-access
                 -cppcoreguidelines-pro-type-reinterpret-cast
                 -cppcoreguidelines-pro-type-static-cast-downcast
                 ${DISABLED_CPPCOREGUIDELINES_CHECKS}
@@ -144,6 +145,7 @@ function(configure_target TARGET)
                 llvm-*
                 -llvm-header-guard
                 -llvm-include-order
+                -llvm-prefer-static-over-anonymous-namespace
                 misc-*
                 -misc-include-cleaner
                 ${MISC_CHECKS}
@@ -157,6 +159,7 @@ function(configure_target TARGET)
                 -readability-function-cognitive-complexity
                 -readability-identifier-length
                 -readability-math-missing-parentheses
+                -readability-use-concise-preprocessor-directives
                 ${READABILITY_CHECKS}
             )
 
