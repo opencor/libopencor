@@ -300,7 +300,7 @@ jobs:
             context: PATH=/opt/homebrew/opt/llvm@20/bin:$PATH CC=/opt/homebrew/opt/llvm@20/bin/clang CXX=/opt/homebrew/opt/llvm@20/bin/clang++
             target: code_coverage
           - name: 'Memory checks'
-            os: ubuntu-24.04
+            os: macos-15
             build_type: Debug
             code_analysis: OFF
             code_coverage: OFF
@@ -389,11 +389,6 @@ jobs:
       - name: Install Black
         if: ${{ matrix.target == 'python_check_code_formatting' }}
         run: uv pip install --system black
-      - name: Install Valgrind
-        if: ${{ matrix.memory_checks == 'ON' }}
-        run: |
-          sudo apt update
-          sudo apt install valgrind
       - name: Install pytest and pytest-html
         if: ${{ matrix.python_support == 'ON' }}
         run: uv pip install --system pytest pytest-html
