@@ -611,3 +611,198 @@ def test_math():
         [],
         [],
     )
+
+
+def test_kinsol_with_inf_and_or_nan_values():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task instance | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/kinsol_with_inf_and_or_nan_values.cellml")
+    )
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_issues)
+
+
+def test_sedml_file_nla_algorithm_and_nla_algorithm():
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the NLA solver is already set for the simulation 'simulation1'. The one specified in the nlaAlgorithm element will be ignored.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_nla_algorithm_and_nla_algorithm.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_sedml_file_several_nla_algorithms():
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: multiple nlaAlgorithm elements have been found for the simulation 'simulation1'. The first one will be used.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_several_nla_algorithms.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_sedml_file_unknown_nla_algorithm():
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the NLA solver 'KISAO:0000000' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_unknown_nla_algorithm.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_sedml_file_branch_coverage():
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_branch_coverage.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+
+def test_sedml_file_no_nla_algorithm():
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the NLA solver '' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_no_nla_algorithm.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_legacy_sedml_file_nla_algorithm_and_nla_solver():
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the NLA solver 'KINSOL' is specified in both the algorithm element and in the annotation of the simulation 'simulation1'. The one specified in the algorithm element will be used.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path(
+            "api/sed/dae/model_legacy_nla_algorithm_and_nla_solver.sedml"
+        )
+    )
+    document = loc.SedDocument(sedml_file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_legacy_sedml_file_several_nla_solvers():
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: multiple NLA solvers have been found in the annotation of the simulation 'simulation1'. The first one will be used.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_legacy_several_nla_solvers.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_legacy_sedml_file_unknown_namespace():
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_legacy_unknown_namespace.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+
+def test_legacy_sedml_file_unknown_element():
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_legacy_unknown_element.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+
+def test_legacy_sedml_file_unknown_nla_solver():
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the NLA solver 'UNKNOWN' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_legacy_unknown_nla_solver.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_legacy_sedml_file_unknown_property_namespace():
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_legacy_unknown_property_namespace.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+
+def test_legacy_sedml_file_unknown_property_element():
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_legacy_unknown_property_element.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+
+def test_legacy_sedml_file_unknown_property():
+    expected_issues = [
+        [
+            loc.Issue.Type.Warning,
+            "SED-ML file: the NLA solver property 'Unknown' is not recognised. It will be ignored.",
+        ],
+    ]
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(
+        utils.resource_path("api/sed/dae/model_legacy_unknown_property.sedml")
+    )
+    document = loc.SedDocument(sedml_file)
+
+    assert_issues(document, expected_issues)

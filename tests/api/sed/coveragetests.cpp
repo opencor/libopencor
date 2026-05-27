@@ -599,3 +599,142 @@ TEST(CoverageSedTest, KinsolWithInfAndOrNanValues)
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
+
+TEST(CoverageSedTest, sedmlFileNlaAlgorithmAndNlaAlgorithm)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the NLA solver is already set for the simulation 'simulation1'. The one specified in the nlaAlgorithm element will be ignored."},
+    };
+
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_nla_algorithm_and_nla_algorithm.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, sedmlFileSeveralNlaAlgorithms)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: multiple nlaAlgorithm elements have been found for the simulation 'simulation1'. The first one will be used."},
+    };
+
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_several_nla_algorithms.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, sedmlFileUnknownNlaAlgorithm)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the NLA solver 'KISAO:0000000' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead."},
+    };
+
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_unknown_nla_algorithm.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, sedmlFileBranchCoverage)
+{
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_branch_coverage.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+}
+
+TEST(CoverageSedTest, sedmlFileNoNlaAlgorithm)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the NLA solver '' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead."},
+    };
+
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_no_nla_algorithm.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, legacySedmlFileNlaAlgorithmAndNlaSolver)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the NLA solver 'KINSOL' is specified in both the algorithm element and in the annotation of the simulation 'simulation1'. The one specified in the algorithm element will be used."},
+    };
+
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy_nla_algorithm_and_nla_solver.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, legacySedmlFileSeveralNlaSolvers)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: multiple NLA solvers have been found in the annotation of the simulation 'simulation1'. The first one will be used."},
+    };
+
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy_several_nla_solvers.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, legacySedmlFileUnknownNamespace)
+{
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy_unknown_namespace.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+}
+
+TEST(CoverageSedTest, legacySedmlFileUnknownElement)
+{
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy_unknown_element.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+}
+
+TEST(CoverageSedTest, legacySedmlFileUnknownNlaSolver)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the NLA solver 'UNKNOWN' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead."},
+    };
+
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy_unknown_nla_solver.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, legacySedmlFileUnknownPropertyNamespace)
+{
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy_unknown_property_namespace.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+}
+
+TEST(CoverageSedTest, legacySedmlFileUnknownPropertyElement)
+{
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy_unknown_property_element.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+}
+
+TEST(CoverageSedTest, legacySedmlFileUnknownProperty)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::WARNING, "SED-ML file: the NLA solver property 'Unknown' is not recognised. It will be ignored."},
+    };
+
+    auto cellmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"));
+    auto sedmlFile = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy_unknown_property.sedml"));
+    auto document = libOpenCOR::SedDocument::create(sedmlFile);
+
+    EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}

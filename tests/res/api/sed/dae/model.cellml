@@ -1,0 +1,2308 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="my_model" xmlns="http://www.cellml.org/cellml/1.1#" xmlns:cellml="http://www.cellml.org/cellml/1.1#">
+    <!-- Oxygen transport model: alveoli to RBC including oxyhaemoglobin model. This version is driven by a prescribed sinusiodal airflow.-->
+    <units name="dim">
+        <unit units="dimensionless"/>
+    </units>
+    <units name="per_s">
+        <unit exponent="-1" units="second"/>
+    </units>
+    <units name="L_per_s">
+        <unit units="litre"/>
+        <unit exponent="-1" units="second"/>
+    </units>
+    <units name="mol_per_s">
+        <unit units="mole"/>
+        <unit exponent="-1" units="second"/>
+    </units>
+    <units name="mol_per_L">
+        <unit units="mole"/>
+        <unit exponent="-1" units="litre"/>
+    </units>
+    <units name="per_mol">
+        <unit exponent="-1" units="mole"/>
+    </units>
+    <units name="millimol_per_mol">
+        <unit prefix="milli" units="mole"/>
+        <unit exponent="-1" units="mole"/>
+    </units>
+    <units name="L_per_mol">
+        <unit units="litre"/>
+        <unit exponent="-1" units="mole"/>
+    </units>
+    <units name="mM">
+        <unit prefix="milli" units="mole"/>
+        <unit exponent="-1" units="litre"/>
+    </units>
+    <units name="mM2">
+        <unit exponent="2" units="mM"/>
+    </units>
+    <units name="J_per_mol">
+        <unit units="joule"/>
+        <unit exponent="-1" units="mole"/>
+    </units>
+    <units name="J_per_L">
+        <unit units="joule"/>
+        <unit exponent="-1" units="litre"/>
+    </units>
+    <units name="kPa">
+        <unit units="joule"/>
+        <unit exponent="-1" units="litre"/>
+    </units>
+    <units name="J_per_L2">
+        <unit units="joule"/>
+        <unit exponent="-2" units="litre"/>
+    </units>
+    <units name="mol_per_s_per_mM">
+        <unit units="mole"/>
+        <unit exponent="-1" units="second"/>
+        <unit exponent="-1" units="mM"/>
+    </units>
+    <units name="L_per_s_per_kPa">
+        <unit units="litre"/>
+        <unit exponent="-1" units="second"/>
+        <unit exponent="-1" units="kPa"/>
+    </units>
+    <units name="mol_per_s_per_kPa">
+        <unit units="mole"/>
+        <unit exponent="-1" units="second"/>
+        <unit exponent="-1" units="kPa"/>
+    </units>
+    <units name="mol_per_L_per_kPa">
+        <unit units="mole"/>
+        <unit exponent="-1" units="litre"/>
+        <unit exponent="-1" units="kPa"/>
+    </units>
+    <units name="J_per_mol_per_K">
+        <unit units="joule"/>
+        <unit exponent="-1" units="mole"/>
+        <unit exponent="-1" units="kelvin"/>
+    </units>
+    <units name="mM_per_kPa">
+        <unit units="mM"/>
+        <unit exponent="-1" units="kPa"/>
+    </units>
+    <component name="main">
+        <variable name="t" units="second"/>
+        <variable initial_value="8.314" name="R" units="J_per_mol_per_K"/>
+        <variable initial_value="308" name="T" units="kelvin"/>
+        <variable name="RT" units="J_per_mol"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>RT</ci>
+                <apply>
+                    <times/>
+                    <ci>R</ci>
+                    <ci>T</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="1" name="Vol" units="litre"/>
+        <variable initial_value="25" name="k_alv_m" units="L_per_mol"/>
+        <!--
+    INSPIRED AIR
+        -->
+        <variable name="t_respire" units="second"/>
+        <variable name="T_respire" units="second"/>
+        <variable initial_value="2" name="T_inspire" units="second"/>
+        <variable initial_value="3" name="T_expire" units="second"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>t_respire</ci>
+                <apply>
+                    <minus/>
+                    <ci>t</ci>
+                    <apply>
+                        <times/>
+                        <ci>T_respire</ci>
+                        <apply>
+                            <floor/>
+                            <apply>
+                                <divide/>
+                                <ci>t</ci>
+                                <ci>T_respire</ci>
+                            </apply>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>T_respire</ci>
+                <apply>
+                    <plus/>
+                    <ci>T_inspire</ci>
+                    <ci>T_expire</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="0.5" name="tidal_vol" units="litre"/>
+        <variable initial_value="1" name="tau_expire" units="second"/>
+        <variable name="A_ins" units="L_per_s"/>
+        <variable name="B_ins" units="L_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>A_ins</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <cn cellml:units="dim">0.5</cn>
+                        <ci>tidal_vol</ci>
+                    </apply>
+                    <ci>T_inspire</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>B_ins</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <minus/>
+                            <cn cellml:units="dim">2</cn>
+                        </apply>
+                        <ci>T_inspire</ci>
+                        <ci>A_ins</ci>
+                    </apply>
+                    <apply>
+                        <times/>
+                        <ci>tau_expire</ci>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <minus/>
+                                        <ci>T_expire</ci>
+                                    </apply>
+                                    <ci>tau_expire</ci>
+                                </apply>
+                            </apply>
+                            <cn cellml:units="dim">1</cn>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <variable name="v_ins_air" units="L_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_ins_air</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>A_ins</ci>
+                            <pi/>
+                            <apply>
+                                <sin/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <times/>
+                                        <pi/>
+                                        <ci>t_respire</ci>
+                                    </apply>
+                                    <ci>T_inspire</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                        <apply>
+                            <lt/>
+                            <ci>t_respire</ci>
+                            <ci>T_inspire</ci>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <apply>
+                            <times/>
+                            <apply>
+                                <minus/>
+                                <ci>B_ins</ci>
+                            </apply>
+                            <apply>
+                                <exp/>
+                                <apply>
+                                    <divide/>
+                                    <apply>
+                                        <minus/>
+                                        <apply>
+                                            <minus/>
+                                            <ci>t_respire</ci>
+                                            <ci>T_inspire</ci>
+                                        </apply>
+                                    </apply>
+                                    <ci>tau_expire</ci>
+                                </apply>
+                            </apply>
+                        </apply>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+        <variable initial_value="1.5" name="q_ins_air" units="litre"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_ins_air</ci>
+                </apply>
+                <ci>v_ins_air</ci>
+            </apply>
+        </math>
+        <!--        var q_seg_air: litre {init: 0.2};-->
+        <variable initial_value="0.1" name="q_seg_air" units="litre"/>
+        <!--        var q_adv_air: litre {init: 0.8};-->
+        <variable initial_value="0.2" name="q_adv_air" units="litre"/>
+        <variable name="q_alv_air" units="litre"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>q_alv_air</ci>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>q_ins_air</ci>
+                        <ci>q_seg_air</ci>
+                    </apply>
+                    <ci>q_adv_air</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="92" name="p_ins_air" units="kPa"/>
+        <!-- 100 kPa minus 8 kPa water vapour-->
+        <variable initial_value="0.21" name="alpha_ins_o2" units="dim"/>
+        <variable initial_value="0.00042" name="alpha_ins_co2" units="dim"/>
+        <!--
+    SEGMENT AIRWAYS
+ -->
+        <variable initial_value="0" name="q_seg_o2" units="litre"/>
+        <variable initial_value="0.2" name="q_seg_co2" units="litre"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_seg_o2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_seg_o2</ci>
+                    <ci>v_adv_o2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_seg_co2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_seg_co2</ci>
+                    <ci>v_adv_co2</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="alpha_seg_o2" units="dim"/>
+        <variable name="alpha_seg_co2" units="dim"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>alpha_seg_o2</ci>
+                <apply>
+                    <divide/>
+                    <ci>q_seg_o2</ci>
+                    <ci>q_seg_air</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>alpha_seg_co2</ci>
+                <apply>
+                    <divide/>
+                    <ci>q_seg_co2</ci>
+                    <ci>q_seg_air</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="p_seg_o2" units="kPa"/>
+        <variable name="p_seg_co2" units="kPa"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>p_seg_o2</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_seg_o2</ci>
+                    <ci>p_ins_air</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>p_seg_co2</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_seg_co2</ci>
+                    <ci>p_ins_air</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="v_seg_o2" units="L_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_seg_o2</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>alpha_ins_o2</ci>
+                            <ci>v_ins_air</ci>
+                        </apply>
+                        <apply>
+                            <gt/>
+                            <ci>v_ins_air</ci>
+                            <cn cellml:units="L_per_s">0</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <apply>
+                            <times/>
+                            <ci>alpha_seg_o2</ci>
+                            <ci>v_ins_air</ci>
+                        </apply>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+        <variable name="v_seg_co2" units="L_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_seg_co2</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>alpha_ins_co2</ci>
+                            <ci>v_ins_air</ci>
+                        </apply>
+                        <apply>
+                            <gt/>
+                            <ci>v_ins_air</ci>
+                            <cn cellml:units="L_per_s">0</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <apply>
+                            <times/>
+                            <ci>alpha_seg_co2</ci>
+                            <ci>v_ins_air</ci>
+                        </apply>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+        <!--
+    ADVECTIVE COMPARTMENT    
+        -->
+        <variable initial_value="0" name="q_adv_o2" units="litre"/>
+        <variable initial_value="0.2" name="q_adv_co2" units="litre"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_adv_o2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_adv_o2</ci>
+                    <ci>v_diff_o2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_adv_co2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_adv_co2</ci>
+                    <ci>v_diff_co2</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="alpha_adv_o2" units="dim"/>
+        <variable name="alpha_adv_co2" units="dim"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>alpha_adv_o2</ci>
+                <apply>
+                    <divide/>
+                    <ci>q_adv_o2</ci>
+                    <ci>q_adv_air</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>alpha_adv_co2</ci>
+                <apply>
+                    <divide/>
+                    <ci>q_adv_co2</ci>
+                    <ci>q_adv_air</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="p_adv_o2" units="kPa"/>
+        <variable name="p_adv_co2" units="kPa"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>p_adv_o2</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_adv_o2</ci>
+                    <ci>p_ins_air</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>p_adv_co2</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_adv_co2</ci>
+                    <ci>p_ins_air</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="v_adv_o2" units="L_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_adv_o2</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>alpha_seg_o2</ci>
+                            <ci>v_ins_air</ci>
+                        </apply>
+                        <apply>
+                            <gt/>
+                            <ci>v_ins_air</ci>
+                            <cn cellml:units="L_per_s">0</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <apply>
+                            <times/>
+                            <ci>alpha_adv_o2</ci>
+                            <ci>v_ins_air</ci>
+                        </apply>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+        <variable name="v_adv_co2" units="L_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_adv_co2</ci>
+                <piecewise>
+                    <piece>
+                        <apply>
+                            <times/>
+                            <ci>alpha_seg_co2</ci>
+                            <ci>v_ins_air</ci>
+                        </apply>
+                        <apply>
+                            <gt/>
+                            <ci>v_ins_air</ci>
+                            <cn cellml:units="L_per_s">0</cn>
+                        </apply>
+                    </piece>
+                    <otherwise>
+                        <apply>
+                            <times/>
+                            <ci>alpha_adv_co2</ci>
+                            <ci>v_ins_air</ci>
+                        </apply>
+                    </otherwise>
+                </piecewise>
+            </apply>
+        </math>
+        <!--
+    ALVEOLAR COMPARTMENT    
+        -->
+        <variable initial_value="0" name="q_alv_o2" units="litre"/>
+        <variable initial_value="0.2" name="q_alv_co2" units="litre"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_alv_o2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_diff_o2</ci>
+                    <ci>v_alv_o2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_alv_co2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_diff_co2</ci>
+                    <ci>v_alv_co2</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="alpha_alv_o2" units="dim"/>
+        <variable name="alpha_alv_co2" units="dim"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>alpha_alv_o2</ci>
+                <apply>
+                    <divide/>
+                    <ci>q_alv_o2</ci>
+                    <ci>q_alv_air</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>alpha_alv_co2</ci>
+                <apply>
+                    <divide/>
+                    <ci>q_alv_co2</ci>
+                    <ci>q_alv_air</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="p_alv_o2" units="kPa"/>
+        <variable name="p_alv_co2" units="kPa"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>p_alv_o2</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_alv_o2</ci>
+                    <ci>p_ins_air</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>p_alv_co2</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_alv_co2</ci>
+                    <ci>p_ins_air</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="v_diff_o2" units="L_per_s"/>
+        <variable name="v_diff_co2" units="L_per_s"/>
+        <variable initial_value="1e3" name="kappa_alv_diff" units="L_per_s_per_kPa"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_diff_o2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_alv_diff</ci>
+                    <apply>
+                        <minus/>
+                        <ci>p_adv_o2</ci>
+                        <ci>p_alv_o2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_diff_co2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_alv_diff</ci>
+                    <apply>
+                        <minus/>
+                        <ci>p_adv_co2</ci>
+                        <ci>p_alv_co2</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <!--
+    CONVERSION OF UNITS FROM J/L (kPa) x L/s to J/mol x mol/s -->
+        <variable name="u_alv_o2" units="J_per_mol"/>
+        <variable name="u_alv_co2" units="J_per_mol"/>
+        <variable name="v_alv_o2" units="L_per_s"/>
+        <variable name="v_alv_co2" units="L_per_s"/>
+        <variable name="v_cap_o2" units="mol_per_s"/>
+        <variable name="v_cap_co2" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>u_alv_o2</ci>
+                <apply>
+                    <times/>
+                    <ci>p_alv_o2</ci>
+                    <ci>k_alv_m</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>u_alv_co2</ci>
+                <apply>
+                    <times/>
+                    <ci>p_alv_co2</ci>
+                    <ci>k_alv_m</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_cap_o2</ci>
+                <apply>
+                    <divide/>
+                    <ci>v_alv_o2</ci>
+                    <ci>k_alv_m</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_cap_co2</ci>
+                <apply>
+                    <divide/>
+                    <ci>v_alv_co2</ci>
+                    <ci>k_alv_m</ci>
+                </apply>
+            </apply>
+        </math>
+        <!--
+    GAS EXCHANGE 
+        -->
+        <!-- Solubility of o2 in water-->
+        <variable initial_value="0.011" name="alpha_cap_o2" units="mM_per_kPa"/>
+        <!-- Solubility of co2 in water
+ var alpha_cap_co2: mM_per_kPa {init: 0.05};  //Solubility of co2 in water-->
+        <variable initial_value="0.22" name="alpha_cap_co2" units="mM_per_kPa"/>
+        <variable name="c_epi_o2" units="mM"/>
+        <variable name="c_epi_co2" units="mM"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>c_epi_o2</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_cap_o2</ci>
+                    <ci>p_alv_o2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_epi_co2</ci>
+                <apply>
+                    <times/>
+                    <ci>alpha_cap_co2</ci>
+                    <ci>p_alv_co2</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="c_cap_o2" units="mM"/>
+        <variable name="c_RBC_o2" units="mM"/>
+        <variable name="c_cap_co2" units="mM"/>
+        <variable name="c_RBC_co2" units="mM"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>c_cap_o2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_cap_o2</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_RBC_o2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_RBC_o2</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_cap_co2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_cap_co2</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_RBC_co2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_RBC_co2</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="v_RBCm_o2" units="mol_per_s"/>
+        <variable name="v_RBCm_co2" units="mol_per_s"/>
+        <variable initial_value="1e-1" name="kappa_m_Rx" units="mol_per_s_per_mM"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_cap_o2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_m_Rx</ci>
+                    <apply>
+                        <minus/>
+                        <ci>c_epi_o2</ci>
+                        <ci>c_cap_o2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_cap_co2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_m_Rx</ci>
+                    <apply>
+                        <minus/>
+                        <ci>c_epi_co2</ci>
+                        <ci>c_cap_co2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RBCm_o2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_m_Rx</ci>
+                    <apply>
+                        <minus/>
+                        <ci>c_cap_o2</ci>
+                        <ci>c_RBC_o2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RBCm_co2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_m_Rx</ci>
+                    <apply>
+                        <minus/>
+                        <ci>c_cap_co2</ci>
+                        <ci>c_RBC_co2</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="0.001" name="q_cap_o2" units="mole"/>
+        <variable initial_value="0.001" name="q_cap_co2" units="mole"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_cap_o2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_cap_o2</ci>
+                    <ci>v_RBCm_o2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_cap_co2</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_cap_co2</ci>
+                        <ci>v_RBCm_co2</ci>
+                    </apply>
+                    <ci>v_cap_CA_Rx</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="0.00015" name="q_RBC_o2" units="mole"/>
+        <!--Dissolved o2  is 0.15 mM-->
+        <variable initial_value="0.001" name="q_RBC_co2" units="mole"/>
+        <!--Dissolved co2 is 1 mM-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_RBC_o2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_RBCm_o2</ci>
+                    <ci>v_oxyHb_Rx</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_RBC_co2</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <ci>v_RBCm_co2</ci>
+                    <ci>v_RBC_CA_Rx</ci>
+                </apply>
+            </apply>
+        </math>
+        <!--
+    BICARBONATE & H+ in RBC 
+-->
+        <variable initial_value="0.0" name="v_blood" units="L_per_s"/>
+        <!--Volumetric cardiac output (0.1 L/s).-->
+        <variable name="v_cap_netinflux_bicarb" units="mol_per_s"/>
+        <variable name="v_RBC_netinflux_bicarb" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_cap_netinflux_bicarb</ci>
+                <apply>
+                    <times/>
+                    <ci>v_blood</ci>
+                    <cn cellml:units="mol_per_L">0.001</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RBC_netinflux_bicarb</ci>
+                <apply>
+                    <times/>
+                    <ci>v_blood</ci>
+                    <cn cellml:units="mol_per_L">0.001</cn>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="0.024" name="q_cap_bicarb" units="mole"/>
+        <!--Bicarbonate sb 0.024 (24 mM) in blood-->
+        <variable initial_value="0.024" name="q_RBC_bicarb" units="mole"/>
+        <!--Bicarbonate sb 0.024 (24 mM) in blood-->
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_cap_bicarb</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_cap_netinflux_bicarb</ci>
+                    <ci>v_cap_CA_Rx</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_RBC_bicarb</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <ci>v_RBC_netinflux_bicarb</ci>
+                    <ci>v_RBC_CA_Rx</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="c_cap_bicarb" units="mM"/>
+        <variable name="c_RBC_bicarb" units="mM"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>c_cap_bicarb</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_RBC_bicarb</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_RBC_bicarb</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_RBC_bicarb</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="1e-4" name="c_RBC_H" units="mM"/>
+        <variable initial_value="1e-4" name="c_cap_H" units="mM"/>
+        <!--
+    CARBONIC ANHYDRASE (CA) reactions for RBC and capillary serum
+        -->
+        <variable initial_value="1e4" name="v_CA_mx" units="mol_per_s"/>
+        <variable initial_value="0.1" name="k_CA_1" units="mM2"/>
+        <variable initial_value="0.1" name="k_CA_2" units="mM"/>
+        <variable name="v_cap_CA_Rx" units="mol_per_s"/>
+        <variable name="PHI_cap" units="mM2"/>
+        <variable initial_value="2e-3" name="Q_cap_CA" units="mM"/>
+        <!--Q = 24mM x 1e-4mM / 1.2mM = 2e-3 mM -->
+        <variable name="Q_cap_CAA" units="mM"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Q_cap_CAA</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>c_cap_bicarb</ci>
+                        <ci>c_cap_H</ci>
+                    </apply>
+                    <ci>c_cap_co2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>PHI_cap</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="mM2">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dim">1</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <ci>c_cap_bicarb</ci>
+                                <ci>c_cap_H</ci>
+                            </apply>
+                            <ci>k_CA_1</ci>
+                        </apply>
+                        <apply>
+                            <divide/>
+                            <ci>c_cap_co2</ci>
+                            <ci>k_CA_2</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_cap_CA_Rx</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <ci>v_CA_mx</ci>
+                        <ci>PHI_cap</ci>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>c_cap_bicarb</ci>
+                            <ci>c_cap_H</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>Q_cap_CA</ci>
+                            <ci>c_cap_co2</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <variable name="v_RBC_CA_Rx" units="mol_per_s"/>
+        <variable name="PHI_RBC" units="mM2"/>
+        <variable initial_value="2e-3" name="Q_RBC_CA" units="mM"/>
+        <!--Q = 24mM x 1e-4mM / 1.2mM = 2e-3 mM -->
+        <variable name="Q_RBC_CAA" units="mM"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Q_RBC_CAA</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>c_RBC_bicarb</ci>
+                        <ci>c_RBC_H</ci>
+                    </apply>
+                    <ci>c_RBC_co2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>PHI_RBC</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="mM2">1</cn>
+                    <apply>
+                        <plus/>
+                        <cn cellml:units="dim">1</cn>
+                        <apply>
+                            <divide/>
+                            <apply>
+                                <times/>
+                                <ci>c_RBC_bicarb</ci>
+                                <ci>c_RBC_H</ci>
+                            </apply>
+                            <ci>k_CA_1</ci>
+                        </apply>
+                        <apply>
+                            <divide/>
+                            <ci>c_RBC_co2</ci>
+                            <ci>k_CA_2</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RBC_CA_Rx</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <divide/>
+                        <ci>v_CA_mx</ci>
+                        <ci>PHI_RBC</ci>
+                    </apply>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>c_RBC_bicarb</ci>
+                            <ci>c_RBC_H</ci>
+                        </apply>
+                        <apply>
+                            <times/>
+                            <ci>Q_RBC_CA</ci>
+                            <ci>c_RBC_co2</ci>
+                        </apply>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <!--
+    OXYGEN BINDING to haemoglobin
+        -->
+        <variable name="v_Hbinflux" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_Hbinflux</ci>
+                <apply>
+                    <times/>
+                    <ci>v_blood</ci>
+                    <cn cellml:units="mol_per_L">0.024</cn>
+                </apply>
+            </apply>
+        </math>
+        <!-- Hb in blood is 2.4mM or 0.0024 moles/L-->
+        <variable name="v_oxyHb_Rx" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_oxyHb_Rx</ci>
+                <apply>
+                    <plus/>
+                    <ci>v_R1</ci>
+                    <ci>v_R2</ci>
+                    <ci>v_R3</ci>
+                    <ci>v_R4</ci>
+                    <ci>v_T1</ci>
+                    <ci>v_T2</ci>
+                    <ci>v_T3</ci>
+                    <ci>v_T4</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- Flux balance equations-->
+        <variable initial_value="0.004" name="q_R0" units="mole"/>
+        <variable initial_value="0" name="q_R1" units="mole"/>
+        <variable initial_value="0" name="q_R2" units="mole"/>
+        <variable initial_value="0" name="q_R3" units="mole"/>
+        <variable initial_value="0" name="q_R4" units="mole"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_R0</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <apply>
+                                <minus/>
+                                <ci>v_RT0</ci>
+                            </apply>
+                            <ci>v_R1</ci>
+                        </apply>
+                        <ci>v_Hbinflux</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_R1</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <ci>v_RT1</ci>
+                            </apply>
+                            <ci>v_R1</ci>
+                        </apply>
+                        <ci>v_R2</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_R2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <ci>v_RT2</ci>
+                            </apply>
+                            <ci>v_R2</ci>
+                        </apply>
+                        <ci>v_R3</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_R3</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <apply>
+                                <minus/>
+                                <ci>v_RT3</ci>
+                            </apply>
+                            <ci>v_R3</ci>
+                        </apply>
+                        <ci>v_R4</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_R4</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <apply>
+                            <minus/>
+                            <ci>v_RT4</ci>
+                        </apply>
+                        <ci>v_R4</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="0" name="q_T0" units="mole"/>
+        <variable initial_value="0" name="q_T1" units="mole"/>
+        <variable initial_value="0" name="q_T2" units="mole"/>
+        <variable initial_value="0" name="q_T3" units="mole"/>
+        <variable initial_value="0" name="q_T4" units="mole"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_T0</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <ci>v_RT0</ci>
+                        <ci>v_T1</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_T1</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>v_RT1</ci>
+                            <ci>v_T1</ci>
+                        </apply>
+                        <ci>v_T2</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_T2</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>v_RT2</ci>
+                            <ci>v_T2</ci>
+                        </apply>
+                        <ci>v_T3</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_T3</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <plus/>
+                            <ci>v_RT3</ci>
+                            <ci>v_T3</ci>
+                        </apply>
+                        <ci>v_T4</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>q_T4</ci>
+                </apply>
+                <apply>
+                    <minus/>
+                    <apply>
+                        <plus/>
+                        <ci>v_RT4</ci>
+                        <ci>v_T4</ci>
+                    </apply>
+                    <apply>
+                        <divide/>
+                        <ci>v_Hbinflux</ci>
+                        <cn cellml:units="dim">10</cn>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <!-- Concentrations-->
+        <variable name="c_R0" units="mM"/>
+        <variable name="c_R1" units="mM"/>
+        <variable name="c_R2" units="mM"/>
+        <variable name="c_R3" units="mM"/>
+        <variable name="c_R4" units="mM"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>c_R0</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_R0</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_R1</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_R1</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_R2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_R2</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_R3</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_R3</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_R4</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_R4</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="c_T0" units="mM"/>
+        <variable name="c_T1" units="mM"/>
+        <variable name="c_T2" units="mM"/>
+        <variable name="c_T3" units="mM"/>
+        <variable name="c_T4" units="mM"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>c_T0</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_T0</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_T1</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_T1</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_T2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_T2</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_T3</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_T3</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>c_T4</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>q_T4</ci>
+                        <cn cellml:units="millimol_per_mol" type="e-notation">1<sep/>3</cn>
+                    </apply>
+                    <ci>Vol</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- Fitted parameters-->
+        <variable initial_value="1e2" name="cc_RBC_o2" units="mM"/>
+        <variable name="Q_RBC_o2" units="dim"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Q_RBC_o2</ci>
+                <apply>
+                    <divide/>
+                    <ci>c_RBC_o2</ci>
+                    <ci>cc_RBC_o2</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable initial_value="2.1915e-2" name="K_Ro2" units="mM"/>
+        <variable initial_value="1.1284" name="K_To2" units="mM"/>
+        <variable initial_value="0.04625" name="K_RT0" units="dim"/>
+        <variable name="lambda_R" units="dim"/>
+        <variable name="lambda_T" units="dim"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>lambda_R</ci>
+                <apply>
+                    <divide/>
+                    <ci>K_Ro2</ci>
+                    <ci>cc_RBC_o2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>lambda_T</ci>
+                <apply>
+                    <divide/>
+                    <ci>K_To2</ci>
+                    <ci>cc_RBC_o2</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- Boltzmann constants-->
+        <variable initial_value="1e3" name="K_R0" units="per_mol"/>
+        <variable name="K_R1" units="per_mol"/>
+        <variable name="K_R2" units="per_mol"/>
+        <variable name="K_R3" units="per_mol"/>
+        <variable name="K_R4" units="per_mol"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>K_R1</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>lambda_R</ci>
+                        <ci>K_R0</ci>
+                    </apply>
+                    <cn cellml:units="dim">4</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_R2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <power/>
+                            <ci>lambda_R</ci>
+                            <cn cellml:units="dimensionless">2</cn>
+                        </apply>
+                        <ci>K_R0</ci>
+                    </apply>
+                    <cn cellml:units="dim">6</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_R3</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <apply>
+                            <power/>
+                            <ci>lambda_R</ci>
+                            <cn cellml:units="dim">3</cn>
+                        </apply>
+                        <ci>K_R0</ci>
+                    </apply>
+                    <cn cellml:units="dim">4</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_R4</ci>
+                <apply>
+                    <times/>
+                    <apply>
+                        <power/>
+                        <ci>lambda_R</ci>
+                        <cn cellml:units="dim">4</cn>
+                    </apply>
+                    <ci>K_R0</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="K_T0" units="per_mol"/>
+        <variable name="K_T1" units="per_mol"/>
+        <variable name="K_T2" units="per_mol"/>
+        <variable name="K_T3" units="per_mol"/>
+        <variable name="K_T4" units="per_mol"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>K_T0</ci>
+                <apply>
+                    <times/>
+                    <ci>K_RT0</ci>
+                    <ci>K_R0</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_T1</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>K_RT0</ci>
+                        <ci>lambda_T</ci>
+                        <ci>K_R0</ci>
+                    </apply>
+                    <cn cellml:units="dim">4</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_T2</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>K_RT0</ci>
+                        <apply>
+                            <power/>
+                            <ci>lambda_T</ci>
+                            <cn cellml:units="dimensionless">2</cn>
+                        </apply>
+                        <ci>K_R0</ci>
+                    </apply>
+                    <cn cellml:units="dim">6</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_T3</ci>
+                <apply>
+                    <divide/>
+                    <apply>
+                        <times/>
+                        <ci>K_RT0</ci>
+                        <apply>
+                            <power/>
+                            <ci>lambda_T</ci>
+                            <cn cellml:units="dim">3</cn>
+                        </apply>
+                        <ci>K_R0</ci>
+                    </apply>
+                    <cn cellml:units="dim">4</cn>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>K_T4</ci>
+                <apply>
+                    <times/>
+                    <ci>K_RT0</ci>
+                    <apply>
+                        <power/>
+                        <ci>lambda_T</ci>
+                        <cn cellml:units="dim">4</cn>
+                    </apply>
+                    <ci>K_R0</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- Non-dimensional quantities        -->
+        <variable name="Q_R0" units="dim"/>
+        <variable name="Q_R1" units="dim"/>
+        <variable name="Q_R2" units="dim"/>
+        <variable name="Q_R3" units="dim"/>
+        <variable name="Q_R4" units="dim"/>
+        <variable name="Q_T0" units="dim"/>
+        <variable name="Q_T1" units="dim"/>
+        <variable name="Q_T2" units="dim"/>
+        <variable name="Q_T3" units="dim"/>
+        <variable name="Q_T4" units="dim"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Q_R0</ci>
+                <apply>
+                    <times/>
+                    <ci>K_R0</ci>
+                    <ci>q_R0</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_R1</ci>
+                <apply>
+                    <times/>
+                    <ci>K_R1</ci>
+                    <ci>q_R1</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_R2</ci>
+                <apply>
+                    <times/>
+                    <ci>K_R2</ci>
+                    <ci>q_R2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_R3</ci>
+                <apply>
+                    <times/>
+                    <ci>K_R3</ci>
+                    <ci>q_R3</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_R4</ci>
+                <apply>
+                    <times/>
+                    <ci>K_R4</ci>
+                    <ci>q_R4</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_T0</ci>
+                <apply>
+                    <times/>
+                    <ci>K_T0</ci>
+                    <ci>q_T0</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_T1</ci>
+                <apply>
+                    <times/>
+                    <ci>K_T1</ci>
+                    <ci>q_T1</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_T2</ci>
+                <apply>
+                    <times/>
+                    <ci>K_T2</ci>
+                    <ci>q_T2</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_T3</ci>
+                <apply>
+                    <times/>
+                    <ci>K_T3</ci>
+                    <ci>q_T3</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>Q_T4</ci>
+                <apply>
+                    <times/>
+                    <ci>K_T4</ci>
+                    <ci>q_T4</ci>
+                </apply>
+            </apply>
+        </math>
+        <!-- Reactions-->
+        <variable initial_value="1e4" name="kappa" units="mol_per_s"/>
+        <variable name="kappa_R1" units="mol_per_s"/>
+        <variable name="kappa_R2" units="mol_per_s"/>
+        <variable name="kappa_R3" units="mol_per_s"/>
+        <variable name="kappa_R4" units="mol_per_s"/>
+        <variable name="kappa_T1" units="mol_per_s"/>
+        <variable name="kappa_T2" units="mol_per_s"/>
+        <variable name="kappa_T3" units="mol_per_s"/>
+        <variable name="kappa_T4" units="mol_per_s"/>
+        <variable name="kappa_RT0" units="mol_per_s"/>
+        <variable name="kappa_RT1" units="mol_per_s"/>
+        <variable name="kappa_RT2" units="mol_per_s"/>
+        <variable name="kappa_RT3" units="mol_per_s"/>
+        <variable name="kappa_RT4" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>kappa_R1</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_R2</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_R3</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_R4</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_T1</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_T2</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_T3</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_T4</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_RT0</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_RT1</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_RT2</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_RT3</ci>
+                <ci>kappa</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>kappa_RT4</ci>
+                <ci>kappa</ci>
+            </apply>
+        </math>
+        <variable name="v_R1" units="mol_per_s"/>
+        <variable name="v_R2" units="mol_per_s"/>
+        <variable name="v_R3" units="mol_per_s"/>
+        <variable name="v_R4" units="mol_per_s"/>
+        <variable name="v_T1" units="mol_per_s"/>
+        <variable name="v_T2" units="mol_per_s"/>
+        <variable name="v_T3" units="mol_per_s"/>
+        <variable name="v_T4" units="mol_per_s"/>
+        <variable name="v_RT0" units="mol_per_s"/>
+        <variable name="v_RT1" units="mol_per_s"/>
+        <variable name="v_RT2" units="mol_per_s"/>
+        <variable name="v_RT3" units="mol_per_s"/>
+        <variable name="v_RT4" units="mol_per_s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>v_R1</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_R1</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>Q_R0</ci>
+                            <ci>Q_RBC_o2</ci>
+                        </apply>
+                        <ci>Q_R1</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_R2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_R2</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>Q_R1</ci>
+                            <ci>Q_RBC_o2</ci>
+                        </apply>
+                        <ci>Q_R2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_R3</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_R3</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>Q_R2</ci>
+                            <ci>Q_RBC_o2</ci>
+                        </apply>
+                        <ci>Q_R3</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_R4</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_R4</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>Q_R3</ci>
+                            <ci>Q_RBC_o2</ci>
+                        </apply>
+                        <ci>Q_R4</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_T1</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_T1</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>Q_T0</ci>
+                            <ci>Q_RBC_o2</ci>
+                        </apply>
+                        <ci>Q_T1</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_T2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_T2</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>Q_T1</ci>
+                            <ci>Q_RBC_o2</ci>
+                        </apply>
+                        <ci>Q_T2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_T3</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_T3</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>Q_T2</ci>
+                            <ci>Q_RBC_o2</ci>
+                        </apply>
+                        <ci>Q_T3</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_T4</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_T4</ci>
+                    <apply>
+                        <minus/>
+                        <apply>
+                            <times/>
+                            <ci>Q_T3</ci>
+                            <ci>Q_RBC_o2</ci>
+                        </apply>
+                        <ci>Q_T4</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RT0</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_RT0</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Q_R0</ci>
+                        <ci>Q_T0</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RT1</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_RT1</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Q_R1</ci>
+                        <ci>Q_T1</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RT2</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_RT2</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Q_R2</ci>
+                        <ci>Q_T2</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RT3</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_RT3</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Q_R3</ci>
+                        <ci>Q_T3</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <ci>v_RT4</ci>
+                <apply>
+                    <times/>
+                    <ci>kappa_RT4</ci>
+                    <apply>
+                        <minus/>
+                        <ci>Q_R4</ci>
+                        <ci>Q_T4</ci>
+                    </apply>
+                </apply>
+            </apply>
+        </math>
+        <!--
+ Total Hb, total oxygen and total oxygen flux
+-->
+        <variable name="Hb_tot" units="mole"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Hb_tot</ci>
+                <apply>
+                    <plus/>
+                    <ci>q_R0</ci>
+                    <ci>q_R1</ci>
+                    <ci>q_R2</ci>
+                    <ci>q_R3</ci>
+                    <ci>q_R4</ci>
+                    <ci>q_T0</ci>
+                    <ci>q_T1</ci>
+                    <ci>q_T2</ci>
+                    <ci>q_T3</ci>
+                    <ci>q_T4</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="Hbo2_tot" units="mole"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>Hbo2_tot</ci>
+                <apply>
+                    <plus/>
+                    <ci>q_R1</ci>
+                    <ci>q_R2</ci>
+                    <ci>q_R3</ci>
+                    <ci>q_R4</ci>
+                    <ci>q_T1</ci>
+                    <ci>q_T2</ci>
+                    <ci>q_T3</ci>
+                    <ci>q_T4</ci>
+                </apply>
+            </apply>
+        </math>
+        <variable name="S_Hbo2" units="dim"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>S_Hbo2</ci>
+                <apply>
+                    <divide/>
+                    <ci>Hbo2_tot</ci>
+                    <ci>Hb_tot</ci>
+                </apply>
+            </apply>
+        </math>
+        <!--
+ Variables for Mass Conservation Check 
+-->
+        <!-- 1. Integrate boundary flux (Gas In/Out at the mouth) 
+        var q_env_exchanged: litre {init: 0};
+        ode(q_env_exchanged, t) = v_ins_o2;-->
+        <!-- 2. Integrate the chemical reaction rate (Oxygen leaving into the blood stream) 
+        var q_blood_sink: mole {init: 0};
+        ode(q_blood_sink, t) = v_oxyHb_Rx;-->
+        <!-- 3. Sum the instantaneous dissolved mass (excluding the washed-out Hb) 
+        var q_dissolved_total: mole;
+        q_dissolved_total = q_ins_o2+q_alv_o2+q_cap_o2+q_RBC_o2;-->
+        <!-- 4. Calculate True Conserved Mass: Current Mass - (Mass In from Air) + (Mass Out to Blood) 
+        var q_conserved_true: mole;
+        q_conserved_true = q_dissolved_total-q_env_exchanged+q_blood_sink;-->
+    </component>
+</model>

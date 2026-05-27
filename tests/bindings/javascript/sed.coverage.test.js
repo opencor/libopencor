@@ -602,4 +602,237 @@ test.describe('Sed coverage tests', () => {
       []
     );
   });
+
+  test('KINSOL with Inf and/or NaN values', () => {
+    const file = new loc.File('kinsol_with_inf_and_or_nan_values.cellml');
+
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/kinsol_with_inf_and_or_nan_values.cellml')));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        'Task instance | KINSOL: the NLA system could not be solved (it contains some Inf and/or NaN values).'
+      ]
+    ]);
+  });
+
+  test('SED-ML file with nlaAlgorithm and NLA algorithm', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_nla_algorithm_and_nla_algorithm.sedml');
+
+    sedmlFile.setContents(
+      utils.fileContents(utils.resourcePath('api/sed/dae/model_nla_algorithm_and_nla_algorithm.sedml'))
+    );
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the NLA solver is already set for the simulation 'simulation1'. The one specified in the nlaAlgorithm element will be ignored."
+      ]
+    ]);
+  });
+
+  test('SED-ML file with several nlaAlgorithms', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_several_nla_algorithms.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_several_nla_algorithms.sedml')));
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: multiple nlaAlgorithm elements have been found for the simulation 'simulation1'. The first one will be used."
+      ]
+    ]);
+  });
+
+  test('SED-ML file with unknown NLA algorithm', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_unknown_nla_algorithm.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_unknown_nla_algorithm.sedml')));
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the NLA solver 'KISAO:0000000' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead."
+      ]
+    ]);
+  });
+
+  test('SED-ML file branch coverage', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_branch_coverage.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_branch_coverage.sedml')));
+
+    new loc.SedDocument(sedmlFile);
+  });
+
+  test('SED-ML file with no NLA algorithm', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_no_nla_algorithm.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_no_nla_algorithm.sedml')));
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the NLA solver '' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead."
+      ]
+    ]);
+  });
+
+  test('Legacy SED-ML file with NLA algorithm and NLA solver', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy_nla_algorithm_and_nla_solver.sedml');
+
+    sedmlFile.setContents(
+      utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_nla_algorithm_and_nla_solver.sedml'))
+    );
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the NLA solver 'KINSOL' is specified in both the algorithm element and in the annotation of the simulation 'simulation1'. The one specified in the algorithm element will be used."
+      ]
+    ]);
+  });
+
+  test('Legacy SED-ML file with several NLA solvers', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy_several_nla_solvers.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_several_nla_solvers.sedml')));
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: multiple NLA solvers have been found in the annotation of the simulation 'simulation1'. The first one will be used."
+      ]
+    ]);
+  });
+
+  test('Legacy SED-ML file with unknown namespace', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy_unknown_namespace.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_namespace.sedml')));
+
+    new loc.SedDocument(sedmlFile);
+  });
+
+  test('Legacy SED-ML file with unknown element', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy_unknown_element.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_element.sedml')));
+
+    new loc.SedDocument(sedmlFile);
+  });
+
+  test('Legacy SED-ML file with unknown NLA solver', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy_unknown_nla_solver.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_nla_solver.sedml')));
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.WARNING,
+        "SED-ML file: the NLA solver 'UNKNOWN' in simulation 'simulation1' is not recognised. The KINSOL solver will be used instead."
+      ]
+    ]);
+  });
+
+  test('Legacy SED-ML file with unknown property namespace', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy_unknown_property_namespace.sedml');
+
+    sedmlFile.setContents(
+      utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_property_namespace.sedml'))
+    );
+
+    new loc.SedDocument(sedmlFile);
+  });
+
+  test('Legacy SED-ML file with unknown property element', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy_unknown_property_element.sedml');
+
+    sedmlFile.setContents(
+      utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_property_element.sedml'))
+    );
+
+    new loc.SedDocument(sedmlFile);
+  });
+
+  test('Legacy SED-ML file with unknown property', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy_unknown_property.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_property.sedml')));
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assertIssues(loc, document, [
+      [loc.Issue.Type.WARNING, "SED-ML file: the NLA solver property 'Unknown' is not recognised. It will be ignored."]
+    ]);
+  });
 });

@@ -269,3 +269,113 @@ TEST(InstanceSedTest, combineArchiveWithCellmlFileAsMasterFile)
 
     EXPECT_FALSE(instance->hasIssues());
 }
+
+TEST(InstanceSedTest, daeModelFromCellmlFile)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, daeModelFromSedmlFile)
+{
+    auto cellmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"))};
+    auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.sedml"))};
+    auto document {libOpenCOR::SedDocument::create(sedmlFile)};
+
+    EXPECT_FALSE(document->hasIssues());
+
+    auto nlaSolver {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(document->simulations()[0]->nlaSolver())};
+
+    EXPECT_EQ(nlaSolver->linearSolver(), libOpenCOR::SolverKinsol::LinearSolver::GMRES);
+    EXPECT_EQ(nlaSolver->maximumNumberOfIterations(), 123);
+    EXPECT_EQ(nlaSolver->upperHalfBandwidth(), 1);
+    EXPECT_EQ(nlaSolver->lowerHalfBandwidth(), 1);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, daeModelFromCombineArchive)
+{
+    auto combineArchive {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.omex"))};
+    auto document {libOpenCOR::SedDocument::create(combineArchive)};
+
+    EXPECT_FALSE(document->hasIssues());
+
+    auto nlaSolver {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(document->simulations()[0]->nlaSolver())};
+
+    EXPECT_EQ(nlaSolver->linearSolver(), libOpenCOR::SolverKinsol::LinearSolver::GMRES);
+    EXPECT_EQ(nlaSolver->maximumNumberOfIterations(), 123);
+    EXPECT_EQ(nlaSolver->upperHalfBandwidth(), 1);
+    EXPECT_EQ(nlaSolver->lowerHalfBandwidth(), 1);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, daeModelFromLegacySedmlFile)
+{
+    auto cellmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"))};
+    auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy.sedml"))};
+    auto document {libOpenCOR::SedDocument::create(sedmlFile)};
+
+    EXPECT_FALSE(document->hasIssues());
+
+    auto nlaSolver {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(document->simulations()[0]->nlaSolver())};
+
+    EXPECT_EQ(nlaSolver->linearSolver(), libOpenCOR::SolverKinsol::LinearSolver::GMRES);
+    EXPECT_EQ(nlaSolver->maximumNumberOfIterations(), 123);
+    EXPECT_EQ(nlaSolver->upperHalfBandwidth(), 1);
+    EXPECT_EQ(nlaSolver->lowerHalfBandwidth(), 1);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, daeModelFromLegacyCombineArchive)
+{
+    auto combineArchive {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy.omex"))};
+    auto document {libOpenCOR::SedDocument::create(combineArchive)};
+
+    EXPECT_FALSE(document->hasIssues());
+
+    auto nlaSolver {std::dynamic_pointer_cast<libOpenCOR::SolverKinsol>(document->simulations()[0]->nlaSolver())};
+
+    EXPECT_EQ(nlaSolver->linearSolver(), libOpenCOR::SolverKinsol::LinearSolver::GMRES);
+    EXPECT_EQ(nlaSolver->maximumNumberOfIterations(), 123);
+    EXPECT_EQ(nlaSolver->upperHalfBandwidth(), 1);
+    EXPECT_EQ(nlaSolver->lowerHalfBandwidth(), 1);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+}

@@ -305,4 +305,130 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
   });
+
+  test('DAE model from CellML file', () => {
+    const file = new loc.File(utils.CELLML_FILE);
+
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('DAE model from SED-ML file', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.sedml')));
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assert.strictEqual(document.hasIssues, false);
+
+    const nlaSolver = document.simulations.get(0).nlaSolver;
+
+    assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
+    assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
+    assert.strictEqual(nlaSolver.upperHalfBandwidth, 1);
+    assert.strictEqual(nlaSolver.lowerHalfBandwidth, 1);
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('DAE model from COMBINE archive', () => {
+    const combineArchive = new loc.File('model.omex');
+
+    combineArchive.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.omex')));
+
+    const document = new loc.SedDocument(combineArchive);
+
+    assert.strictEqual(document.hasIssues, false);
+
+    const nlaSolver = document.simulations.get(0).nlaSolver;
+
+    assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
+    assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
+    assert.strictEqual(nlaSolver.upperHalfBandwidth, 1);
+    assert.strictEqual(nlaSolver.lowerHalfBandwidth, 1);
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('DAE model from legacy SED-ML file', () => {
+    const cellmlFile = new loc.File('model.cellml');
+
+    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+
+    const sedmlFile = new loc.File('model_legacy.sedml');
+
+    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy.sedml')));
+
+    const document = new loc.SedDocument(sedmlFile);
+
+    assert.strictEqual(document.hasIssues, false);
+
+    const nlaSolver = document.simulations.get(0).nlaSolver;
+
+    assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
+    assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
+    assert.strictEqual(nlaSolver.upperHalfBandwidth, 1);
+    assert.strictEqual(nlaSolver.lowerHalfBandwidth, 1);
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('DAE model from legacy COMBINE archive', () => {
+    const combineArchive = new loc.File('model_legacy.omex');
+
+    combineArchive.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy.omex')));
+
+    const document = new loc.SedDocument(combineArchive);
+
+    assert.strictEqual(document.hasIssues, false);
+
+    const nlaSolver = document.simulations.get(0).nlaSolver;
+
+    assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
+    assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
+    assert.strictEqual(nlaSolver.upperHalfBandwidth, 1);
+    assert.strictEqual(nlaSolver.lowerHalfBandwidth, 1);
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
 });
