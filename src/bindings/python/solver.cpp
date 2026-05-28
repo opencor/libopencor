@@ -34,7 +34,10 @@ void solverApi(nb::module_ &m)
 
     solver.def_prop_ro("type", &libOpenCOR::Solver::type, "Get the type of the Solver object.")
         .def_prop_ro("id", &libOpenCOR::Solver::id, "Get the (KiSAO) id of the Solver object.")
-        .def_prop_ro("name", &libOpenCOR::Solver::name, "Get the name of the Solver object.");
+        .def_prop_ro("name", &libOpenCOR::Solver::name, "Get the name of the Solver object.")
+        .def("__repr__", [](const libOpenCOR::Solver &self) {
+            return "Solver(name=\"" + self.name() + "\")";
+        });
 
     // SolverOde API.
 

@@ -33,7 +33,7 @@ def test_cvode_solver():
     assert solver.lower_half_bandwidth == 0
     assert solver.relative_tolerance == 1e-07
     assert solver.absolute_tolerance == 1e-07
-    assert solver.interpolate_solution == True
+    assert solver.interpolate_solution
 
     solver.maximum_step = 1.23
     solver.maximum_number_of_steps = 123
@@ -57,7 +57,7 @@ def test_cvode_solver():
     assert solver.lower_half_bandwidth == 5
     assert solver.relative_tolerance == 1.23e-5
     assert solver.absolute_tolerance == 3.45e-7
-    assert solver.interpolate_solution == False
+    assert not solver.interpolate_solution
 
 
 def test_forward_euler_solver():

@@ -120,7 +120,7 @@ def run_algebraic_model():
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_algebraic_model():
@@ -148,7 +148,7 @@ def run_ode_model():
 
     instance = document.instantiate()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     instance.run()
 
@@ -160,7 +160,7 @@ def run_ode_model():
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_ode_model():
@@ -209,7 +209,7 @@ def test_nla_model():
 
     instance = document.instantiate()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_nla_model_with_no_nla_solver():
@@ -260,7 +260,7 @@ def test_dae_model():
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_dae_model_with_no_ode_or_nla_solver():
@@ -294,7 +294,7 @@ def test_combine_archive():
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_combine_archive_with_cellml_file_as_master_file():
@@ -309,22 +309,22 @@ def test_combine_archive_with_cellml_file_as_master_file():
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_dae_model_from_cellml_file():
     file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
     document = loc.SedDocument(file)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
     instance = document.instantiate()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_dae_model_from_sedml_file():
@@ -332,7 +332,7 @@ def test_dae_model_from_sedml_file():
     sedml_file = loc.File(utils.resource_path("api/sed/dae/model.sedml"))
     document = loc.SedDocument(sedml_file)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
     nla_solver = document.simulations[0].nla_solver
 
@@ -343,18 +343,18 @@ def test_dae_model_from_sedml_file():
 
     instance = document.instantiate()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_dae_model_from_combine_archive():
     combine_archive = loc.File(utils.resource_path("api/sed/dae/model.omex"))
     document = loc.SedDocument(combine_archive)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
     nla_solver = document.simulations[0].nla_solver
 
@@ -365,11 +365,11 @@ def test_dae_model_from_combine_archive():
 
     instance = document.instantiate()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_dae_model_from_legacy_sedml_file():
@@ -377,7 +377,7 @@ def test_dae_model_from_legacy_sedml_file():
     sedml_file = loc.File(utils.resource_path("api/sed/dae/model_legacy.sedml"))
     document = loc.SedDocument(sedml_file)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
     nla_solver = document.simulations[0].nla_solver
 
@@ -388,18 +388,18 @@ def test_dae_model_from_legacy_sedml_file():
 
     instance = document.instantiate()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_dae_model_from_legacy_combine_archive():
     combine_archive = loc.File(utils.resource_path("api/sed/dae/model_legacy.omex"))
     document = loc.SedDocument(combine_archive)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
     nla_solver = document.simulations[0].nla_solver
 
@@ -410,8 +410,8 @@ def test_dae_model_from_legacy_combine_archive():
 
     instance = document.instantiate()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues

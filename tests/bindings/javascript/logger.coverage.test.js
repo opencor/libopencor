@@ -48,7 +48,7 @@ test.describe('Issue coverage tests', () => {
 
     file.setContents(utils.CELLML_CONTENTS);
 
-    assert.strictEqual(file.issues.size(), 0);
+    assert.strictEqual(file.issues.length, 0);
   });
 
   test('issue()', () => {
@@ -81,7 +81,7 @@ test.describe('Issue coverage tests', () => {
 
     file.setContents(utils.CELLML_CONTENTS);
 
-    assert.strictEqual(file.errors.size(), 0);
+    assert.strictEqual(file.errors.length, 0);
   });
 
   test('error()', () => {
@@ -114,7 +114,7 @@ test.describe('Issue coverage tests', () => {
 
     file.setContents(utils.CELLML_CONTENTS);
 
-    assert.strictEqual(file.warnings.size(), 0);
+    assert.strictEqual(file.warnings.length, 0);
   });
 
   test('warning()', () => {
@@ -126,5 +126,16 @@ test.describe('Issue coverage tests', () => {
 
     assert.notStrictEqual(document.warning(0), null);
     assert.strictEqual(document.warning(document.warningCount), null);
+  });
+
+  test('toString()', () => {
+    const file = new loc.File(utils.ERROR_CELLML_FILE);
+
+    file.setContents(utils.fileContents(utils.resourcePath('error.cellml')));
+
+    const issue = file.issue(0);
+
+    assert.notStrictEqual(issue, null);
+    assert.strictEqual(String(issue), issue.description);
   });
 });

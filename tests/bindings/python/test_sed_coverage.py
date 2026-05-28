@@ -32,66 +32,66 @@ def test_initialise():
 def test_models():
     document = loc.SedDocument()
 
-    assert document.has_models == False
+    assert not document.has_models
     assert document.model_count == 0
     assert len(document.models) == 0
-    assert document.add_model(None) == False
+    assert not document.add_model(None)
 
     file = loc.File(utils.LocalFile)
     model = loc.SedModel(document, file)
 
     assert model.file == file
 
-    assert document.add_model(model) == True
+    assert document.add_model(model)
 
-    assert document.has_models == True
+    assert document.has_models
     assert document.model_count == 1
     assert len(document.models) == 1
     assert document.models[0] == model
     assert document.model(0) == model
-    assert document.model(1) == None
+    assert document.model(1) is None
 
-    assert document.add_model(model) == False
-    assert document.remove_model(model) == True
+    assert not document.add_model(model)
+    assert document.remove_model(model)
 
-    assert document.has_models == False
+    assert not document.has_models
     assert document.model_count == 0
     assert len(document.models) == 0
 
-    assert document.remove_model(None) == False
-    assert document.remove_all_models() == False
+    assert not document.remove_model(None)
+    assert not document.remove_all_models()
 
-    assert document.add_model(model) == True
-    assert document.remove_all_models() == True
+    assert document.add_model(model)
+    assert document.remove_all_models()
 
-    assert model.has_changes == False
+    assert not model.has_changes
     assert model.change_count == 0
     assert len(model.changes) == 0
-    assert model.add_change(None) == False
-    assert model.remove_all_changes() == False
+    assert not model.add_change(None)
+    assert not model.remove_all_changes()
 
     change_attribute = loc.SedChangeAttribute("component", "variable", "newValue")
 
-    assert model.add_change(change_attribute) == True
+    assert model.add_change(change_attribute)
 
-    assert model.has_changes == True
+    assert model.has_changes
     assert model.change_count == 1
     assert len(model.changes) == 1
     assert model.changes[0] == change_attribute
     assert model.change(0) == change_attribute
-    assert model.change(1) == None
+    assert model.change(1) is None
 
-    assert model.add_change(change_attribute) == False
-    assert model.remove_change(change_attribute) == True
+    assert not model.add_change(change_attribute)
+    assert model.remove_change(change_attribute)
 
-    assert model.add_change(change_attribute) == True
-    assert model.remove_all_changes() == True
+    assert model.add_change(change_attribute)
+    assert model.remove_all_changes()
 
-    assert model.has_changes == False
+    assert not model.has_changes
     assert model.change_count == 0
     assert len(model.changes) == 0
 
-    assert model.remove_change(None) == False
+    assert not model.remove_change(None)
 
 
 def test_changes():
@@ -164,22 +164,22 @@ def test_changes():
 def test_simulations():
     document = loc.SedDocument()
 
-    assert document.has_simulations == False
+    assert not document.has_simulations
     assert document.simulation_count == 0
     assert len(document.simulations) == 0
-    assert document.add_simulation(None) == False
+    assert not document.add_simulation(None)
 
     uniformTimeCourse = loc.SedUniformTimeCourse(document)
     oneStep = loc.SedOneStep(document)
     steadyState = loc.SedSteadyState(document)
     analysis = loc.SedAnalysis(document)
 
-    assert document.add_simulation(uniformTimeCourse) == True
-    assert document.add_simulation(oneStep) == True
-    assert document.add_simulation(steadyState) == True
-    assert document.add_simulation(analysis) == True
+    assert document.add_simulation(uniformTimeCourse)
+    assert document.add_simulation(oneStep)
+    assert document.add_simulation(steadyState)
+    assert document.add_simulation(analysis)
 
-    assert document.has_simulations == True
+    assert document.has_simulations
     assert document.simulation_count == 4
     assert len(document.simulations) == 4
     assert document.simulations[0] == uniformTimeCourse
@@ -190,29 +190,29 @@ def test_simulations():
     assert document.simulation(1) == oneStep
     assert document.simulation(2) == steadyState
     assert document.simulation(3) == analysis
-    assert document.simulation(4) == None
+    assert document.simulation(4) is None
 
-    assert document.add_simulation(uniformTimeCourse) == False
-    assert document.remove_simulation(uniformTimeCourse) == True
+    assert not document.add_simulation(uniformTimeCourse)
+    assert document.remove_simulation(uniformTimeCourse)
 
-    assert document.add_simulation(oneStep) == False
-    assert document.remove_simulation(oneStep) == True
+    assert not document.add_simulation(oneStep)
+    assert document.remove_simulation(oneStep)
 
-    assert document.add_simulation(steadyState) == False
-    assert document.remove_simulation(steadyState) == True
+    assert not document.add_simulation(steadyState)
+    assert document.remove_simulation(steadyState)
 
-    assert document.add_simulation(analysis) == False
-    assert document.remove_simulation(analysis) == True
+    assert not document.add_simulation(analysis)
+    assert document.remove_simulation(analysis)
 
-    assert document.has_simulations == False
+    assert not document.has_simulations
     assert document.simulation_count == 0
     assert len(document.simulations) == 0
 
-    assert document.remove_simulation(None) == False
-    assert document.remove_all_simulations() == False
+    assert not document.remove_simulation(None)
+    assert not document.remove_all_simulations()
 
-    assert document.add_simulation(uniformTimeCourse) == True
-    assert document.remove_all_simulations() == True
+    assert document.add_simulation(uniformTimeCourse)
+    assert document.remove_all_simulations()
 
 
 def sed_task_expected_serialisation(with_properties):
@@ -234,10 +234,10 @@ def sed_task_expected_serialisation(with_properties):
 def test_tasks():
     document = loc.SedDocument()
 
-    assert document.has_tasks == False
+    assert not document.has_tasks
     assert document.task_count == 0
     assert len(document.tasks) == 0
-    assert document.add_task(None) == False
+    assert not document.add_task(None)
 
     file = loc.File(utils.LocalFile)
     model = loc.SedModel(document, file)
@@ -247,22 +247,22 @@ def test_tasks():
     assert task.model == model
     assert task.simulation == simulation
 
-    assert document.add_task(task) == True
+    assert document.add_task(task)
 
-    assert document.has_tasks == True
+    assert document.has_tasks
     assert document.task_count == 1
     assert len(document.tasks) == 1
     assert document.tasks[0] == task
     assert document.task(0) == task
-    assert document.task(1) == None
+    assert document.task(1) is None
 
     assert document.serialise() == sed_task_expected_serialisation(True)
 
     task.model = None
     task.simulation = None
 
-    assert task.model == None
-    assert task.simulation == None
+    assert task.model is None
+    assert task.simulation is None
 
     assert document.serialise() == sed_task_expected_serialisation(False)
 
@@ -281,25 +281,25 @@ def test_tasks():
 
     assert_issues(instance, expected_issues)
 
-    assert document.add_task(task) == False
-    assert document.remove_task(task) == True
+    assert not document.add_task(task)
+    assert document.remove_task(task)
 
-    assert document.has_tasks == False
+    assert not document.has_tasks
     assert document.task_count == 0
     assert len(document.tasks) == 0
 
-    assert document.remove_task(None) == False
-    assert document.remove_all_tasks() == False
+    assert not document.remove_task(None)
+    assert not document.remove_all_tasks()
 
-    assert document.add_task(task) == True
-    assert document.remove_all_tasks() == True
+    assert document.add_task(task)
+    assert document.remove_all_tasks()
 
 
 def test_ode_solver():
     document = loc.SedDocument()
     simulation = loc.SedUniformTimeCourse(document)
 
-    assert simulation.ode_solver == None
+    assert simulation.ode_solver is None
 
     solver = loc.SolverCvode()
 
@@ -309,14 +309,14 @@ def test_ode_solver():
 
     simulation.ode_solver = None
 
-    assert simulation.ode_solver == None
+    assert simulation.ode_solver is None
 
 
 def test_nla_solver():
     document = loc.SedDocument()
     simulation = loc.SedUniformTimeCourse(document)
 
-    assert simulation.nla_solver == None
+    assert simulation.nla_solver is None
 
     solver = loc.SolverKinsol()
 
@@ -326,7 +326,7 @@ def test_nla_solver():
 
     simulation.nla_solver = None
 
-    assert simulation.nla_solver == None
+    assert simulation.nla_solver is None
 
 
 def test_sed_one_step():
@@ -380,10 +380,12 @@ def test_sed_instance_and_sed_instance_task_differential_model():
     instance = document.instantiate()
     instance_task = instance.tasks[0]
 
-    assert instance.has_tasks == True
+    assert instance.has_tasks
     assert instance.task_count == 1
+    assert len(instance) == 1
+    assert list(instance)[0] == instance_task
     assert instance.task(0) == instance_task
-    assert instance.task(1) == None
+    assert instance.task(1) is None
 
     assert instance_task.voi == []
     assert instance_task.voi_name == "environment/time"
@@ -479,7 +481,7 @@ def test_solver():
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     document.simulations[0].ode_solver = loc.SolverFourthOrderRungeKutta()
 
@@ -487,7 +489,7 @@ def test_solver():
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     document.simulations[0].ode_solver = loc.SolverHeun()
 
@@ -495,7 +497,7 @@ def test_solver():
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
     document.simulations[0].ode_solver = loc.SolverSecondOrderRungeKutta()
 
@@ -503,7 +505,7 @@ def test_solver():
 
     instance.run()
 
-    assert instance.has_issues == False
+    assert not instance.has_issues
 
 
 def test_math():

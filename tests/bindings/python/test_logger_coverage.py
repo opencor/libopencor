@@ -38,8 +38,16 @@ def test_issues():
 def test_issue():
     file = loc.File(utils.resource_path(utils.ErrorCellmlFile))
 
-    assert file.issue(0) != None
-    assert file.issue(file.issue_count) == None
+    assert file.issue(0) is not None
+    assert file.issue(file.issue_count) is None
+
+
+def test_issue_str():
+    file = loc.File(utils.resource_path(utils.ErrorCellmlFile))
+    issue = file.issue(0)
+
+    assert issue is not None
+    assert str(issue) == issue.description
 
 
 def test_has_errors():
@@ -63,8 +71,8 @@ def test_errors():
 def test_error():
     file = loc.File(utils.resource_path(utils.ErrorCellmlFile))
 
-    assert file.error(0) != None
-    assert file.error(file.error_count) == None
+    assert file.error(0) is not None
+    assert file.error(file.error_count) is None
 
 
 def test_has_warnings():
@@ -89,5 +97,5 @@ def test_warning():
     file = loc.File(utils.resource_path(utils.Sedml2File))
     document = loc.SedDocument(file)
 
-    assert document.warning(0) != None
-    assert document.warning(document.warning_count) == None
+    assert document.warning(0) is not None
+    assert document.warning(document.warning_count) is None

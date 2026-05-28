@@ -33,13 +33,11 @@ function showIssues(issues) {
   issuesElement.empty();
 
   if (Array.isArray(issues)) {
-    for (let i = 0; i < issues.length; ++i) {
-      issuesElement.append(`<li><span·class="bold">Error:</span>·${formattedIssueDescription(issues[i])}</li>`);
+    for (const issue of issues) {
+      issuesElement.append(`<li><span·class="bold">Error:</span>·${formattedIssueDescription(issue)}</li>`);
     }
   } else {
-    for (let i = 0; i < issues.size(); ++i) {
-      const issue = issues.get(i);
-
+    for (const issue of issues) {
       issuesElement.append(
         '<li><span class="bold">' +
           issue.typeAsString +
@@ -61,8 +59,8 @@ function listFiles() {
 
     const files = fileManager.files;
 
-    for (let i = 0; i < files.size(); ++i) {
-      console.log(` - ${files.get(i).fileName}`);
+    for (const file of files) {
+      console.log(` - ${file.fileName}`);
     }
   } else {
     console.log('No files.');

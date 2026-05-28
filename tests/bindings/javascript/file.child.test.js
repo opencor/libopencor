@@ -34,8 +34,8 @@ test.describe('File type tests', () => {
 
     assert.strictEqual(file.hasChildFiles, true);
     assert.strictEqual(file.childFileCount, specificChildFileNames.length + 1);
-    assert.strictEqual(file.childFileNames.size(), specificChildFileNames.length + 1);
-    assert.strictEqual(file.childFiles.size(), specificChildFileNames.length + 1);
+    assert.strictEqual(file.childFileNames.length, specificChildFileNames.length + 1);
+    assert.strictEqual(file.childFiles.length, specificChildFileNames.length + 1);
 
     let index = -1;
     const simulationFile = file.childFileFromFileName('simulation.json');
@@ -59,8 +59,8 @@ test.describe('File type tests', () => {
 
     assert.strictEqual(file.hasChildFiles, false);
     assert.strictEqual(file.childFileCount, 0);
-    assert.strictEqual(file.childFileNames.size(), 0);
-    assert.strictEqual(file.childFiles.size(), 0);
+    assert.strictEqual(file.childFileNames.length, 0);
+    assert.strictEqual(file.childFiles.length, 0);
     assert.strictEqual(file.childFile(0), null);
     assert.strictEqual(file.childFileFromFileName(utils.UNKNOWN_FILE), null);
   });

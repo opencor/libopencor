@@ -89,7 +89,7 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(fileManager.hasFiles, false);
     assert.strictEqual(fileManager.fileCount, 0);
-    assert.strictEqual(fileManager.files.size(), 0);
+    assert.strictEqual(fileManager.files.length, 0);
     assert.strictEqual(fileManager.file(0), null);
     assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), null);
 
@@ -98,7 +98,7 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(sameFileManager.hasFiles, true);
     assert.strictEqual(sameFileManager.fileCount, 1);
-    assert.strictEqual(sameFileManager.files.size(), 1);
+    assert.strictEqual(sameFileManager.files.length, 1);
     assert.deepStrictEqual(fileManager.file(0), localFile);
     assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), localFile);
 
@@ -106,7 +106,7 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(fileManager.hasFiles, true);
     assert.strictEqual(fileManager.fileCount, 2);
-    assert.strictEqual(fileManager.files.size(), 2);
+    assert.strictEqual(fileManager.files.length, 2);
     assert.deepStrictEqual(fileManager.file(1), remoteFile);
     assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE), remoteFile);
 
@@ -114,7 +114,7 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(sameFileManager.hasFiles, true);
     assert.strictEqual(sameFileManager.fileCount, 1);
-    assert.strictEqual(sameFileManager.files.size(), 1);
+    assert.strictEqual(sameFileManager.files.length, 1);
     assert.deepStrictEqual(fileManager.file(1), null);
     assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), null);
 
@@ -122,7 +122,7 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(sameFileManager.hasFiles, true);
     assert.strictEqual(sameFileManager.fileCount, 2);
-    assert.strictEqual(sameFileManager.files.size(), 2);
+    assert.strictEqual(sameFileManager.files.length, 2);
     assert.deepStrictEqual(fileManager.file(1), localFile);
     assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), localFile);
 
@@ -130,7 +130,7 @@ test.describe('File basic tests', () => {
 
     assert.strictEqual(fileManager.hasFiles, false);
     assert.strictEqual(fileManager.fileCount, 0);
-    assert.strictEqual(fileManager.files.size(), 0);
+    assert.strictEqual(fileManager.files.length, 0);
     assert.deepStrictEqual(fileManager.file(0), null);
     assert.deepStrictEqual(fileManager.file(1), null);
     assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE), null);
