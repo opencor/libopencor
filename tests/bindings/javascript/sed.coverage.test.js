@@ -53,7 +53,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasModels, false);
     assert.strictEqual(document.modelCount, 0);
-    assert.strictEqual(document.models.size(), 0);
+    assert.strictEqual(document.models.length, 0);
     assert.strictEqual(document.addModel(null), false);
 
     const file = new loc.File(utils.SEDML_FILE);
@@ -65,7 +65,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasModels, true);
     assert.strictEqual(document.modelCount, 1);
-    assert.strictEqual(document.models.size(), 1);
+    assert.strictEqual(document.models.length, 1);
     assert.deepStrictEqual(document.models.get(0), model);
     assert.deepStrictEqual(document.model(0), model);
     assert.deepStrictEqual(document.model(1), null);
@@ -75,7 +75,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasModels, false);
     assert.strictEqual(document.modelCount, 0);
-    assert.strictEqual(document.models.size(), 0);
+    assert.strictEqual(document.models.length, 0);
 
     assert.strictEqual(document.removeModel(null), false);
     assert.strictEqual(document.removeAllModels(), false);
@@ -85,7 +85,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(model.hasChanges, false);
     assert.strictEqual(model.changeCount, 0);
-    assert.strictEqual(model.changes.size(), 0);
+    assert.strictEqual(model.changes.length, 0);
     assert.strictEqual(model.addChange(null), false);
     assert.strictEqual(model.removeAllChanges(), false);
 
@@ -95,7 +95,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(model.hasChanges, true);
     assert.strictEqual(model.changeCount, 1);
-    assert.strictEqual(model.changes.size(), 1);
+    assert.strictEqual(model.changes.length, 1);
     assert.deepStrictEqual(model.changes.get(0), changeAttribute);
     assert.deepStrictEqual(model.change(0), changeAttribute);
     assert.deepStrictEqual(model.change(1), null);
@@ -108,7 +108,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(model.hasChanges, false);
     assert.strictEqual(model.changeCount, 0);
-    assert.strictEqual(model.changes.size(), 0);
+    assert.strictEqual(model.changes.length, 0);
 
     assert.strictEqual(model.removeChange(null), false);
   });
@@ -186,7 +186,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasSimulations, false);
     assert.strictEqual(document.simulationCount, 0);
-    assert.strictEqual(document.simulations.size(), 0);
+    assert.strictEqual(document.simulations.length, 0);
     assert.strictEqual(document.addSimulation(null), false);
 
     const uniform_time_course = new loc.SedUniformTimeCourse(document);
@@ -201,7 +201,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasSimulations, true);
     assert.strictEqual(document.simulationCount, 4);
-    assert.strictEqual(document.simulations.size(), 4);
+    assert.strictEqual(document.simulations.length, 4);
     assert.deepStrictEqual(document.simulations.get(0), uniform_time_course);
     assert.deepStrictEqual(document.simulations.get(1), one_step);
     assert.deepStrictEqual(document.simulations.get(2), steady_state);
@@ -226,7 +226,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasSimulations, false);
     assert.strictEqual(document.simulationCount, 0);
-    assert.strictEqual(document.simulations.size(), 0);
+    assert.strictEqual(document.simulations.length, 0);
 
     assert.strictEqual(document.removeSimulation(null), false);
     assert.strictEqual(document.removeAllSimulations(), false);
@@ -240,7 +240,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasTasks, false);
     assert.strictEqual(document.taskCount, 0);
-    assert.strictEqual(document.tasks.size(), 0);
+    assert.strictEqual(document.tasks.length, 0);
     assert.strictEqual(document.addTask(null), false);
 
     const file = new loc.File(utils.SEDML_FILE);
@@ -255,7 +255,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasTasks, true);
     assert.strictEqual(document.taskCount, 1);
-    assert.strictEqual(document.tasks.size(), 1);
+    assert.strictEqual(document.tasks.length, 1);
     assert.deepStrictEqual(document.tasks.get(0), task);
     assert.deepStrictEqual(document.task(0), task);
     assert.deepStrictEqual(document.task(1), null);
@@ -282,7 +282,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(document.hasTasks, false);
     assert.strictEqual(document.taskCount, 0);
-    assert.strictEqual(document.tasks.size(), 0);
+    assert.strictEqual(document.tasks.length, 0);
 
     assert.strictEqual(document.removeTask(null), false);
     assert.strictEqual(document.removeAllTasks(), false);
@@ -377,15 +377,15 @@ test.describe('Sed coverage tests', () => {
     assert.deepStrictEqual(instance.task(0), instanceTask);
     assert.strictEqual(instance.task(1), null);
 
-    assert.strictEqual(instanceTask.voi.size(), 0);
+    assert.strictEqual(instanceTask.voi.length, 0);
     assert.deepStrictEqual(instanceTask.voiAsArray, emptyFloat64Array);
     assert.strictEqual(instanceTask.voiName, 'environment/time');
     assert.strictEqual(instanceTask.voiUnit, 'millisecond');
 
     assert.strictEqual(instanceTask.stateCount, 4);
-    assert.strictEqual(instanceTask.state(0).size(), 0);
+    assert.strictEqual(instanceTask.state(0).length, 0);
     assert.deepStrictEqual(instanceTask.stateAsArray(0), emptyFloat64Array);
-    assert.strictEqual(instanceTask.state(4).size(), 0);
+    assert.strictEqual(instanceTask.state(4).length, 0);
     assert.deepStrictEqual(instanceTask.stateAsArray(4), emptyFloat64Array);
     assert.strictEqual(instanceTask.stateName(0), 'membrane/V');
     assert.strictEqual(instanceTask.stateName(4), '');
@@ -393,9 +393,9 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(instanceTask.stateUnit(4), '');
 
     assert.strictEqual(instanceTask.rateCount, 4);
-    assert.strictEqual(instanceTask.rate(0).size(), 0);
+    assert.strictEqual(instanceTask.rate(0).length, 0);
     assert.deepStrictEqual(instanceTask.rateAsArray(0), emptyFloat64Array);
-    assert.strictEqual(instanceTask.rate(4).size(), 0);
+    assert.strictEqual(instanceTask.rate(4).length, 0);
     assert.deepStrictEqual(instanceTask.rateAsArray(4), emptyFloat64Array);
     assert.strictEqual(instanceTask.rateName(0), "membrane/V'");
     assert.strictEqual(instanceTask.rateName(4), '');
@@ -403,9 +403,9 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(instanceTask.rateUnit(4), '');
 
     assert.strictEqual(instanceTask.constantCount, 5);
-    assert.strictEqual(instanceTask.constant(0).size(), 0);
+    assert.strictEqual(instanceTask.constant(0).length, 0);
     assert.deepStrictEqual(instanceTask.constantAsArray(0), emptyFloat64Array);
-    assert.strictEqual(instanceTask.constant(5).size(), 0);
+    assert.strictEqual(instanceTask.constant(5).length, 0);
     assert.deepStrictEqual(instanceTask.constantAsArray(5), emptyFloat64Array);
     assert.strictEqual(instanceTask.constantName(0), 'membrane/Cm');
     assert.strictEqual(instanceTask.constantName(5), '');
@@ -413,9 +413,9 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(instanceTask.constantUnit(5), '');
 
     assert.strictEqual(instanceTask.computedConstantCount, 3);
-    assert.strictEqual(instanceTask.computedConstant(0).size(), 0);
+    assert.strictEqual(instanceTask.computedConstant(0).length, 0);
     assert.deepStrictEqual(instanceTask.computedConstantAsArray(0), emptyFloat64Array);
-    assert.strictEqual(instanceTask.computedConstant(3).size(), 0);
+    assert.strictEqual(instanceTask.computedConstant(3).length, 0);
     assert.deepStrictEqual(instanceTask.computedConstantAsArray(3), emptyFloat64Array);
     assert.strictEqual(instanceTask.computedConstantName(0), 'leakage_current/E_L');
     assert.strictEqual(instanceTask.computedConstantName(3), '');
@@ -423,9 +423,9 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(instanceTask.computedConstantUnit(3), '');
 
     assert.strictEqual(instanceTask.algebraicVariableCount, 10);
-    assert.strictEqual(instanceTask.algebraicVariable(0).size(), 0);
+    assert.strictEqual(instanceTask.algebraicVariable(0).length, 0);
     assert.deepStrictEqual(instanceTask.algebraicVariableAsArray(0), emptyFloat64Array);
-    assert.strictEqual(instanceTask.algebraicVariable(10).size(), 0);
+    assert.strictEqual(instanceTask.algebraicVariable(10).length, 0);
     assert.deepStrictEqual(instanceTask.algebraicVariableAsArray(10), emptyFloat64Array);
     assert.strictEqual(instanceTask.algebraicVariableName(0), 'membrane/i_Stim');
     assert.strictEqual(instanceTask.algebraicVariableName(10), '');
@@ -452,19 +452,19 @@ test.describe('Sed coverage tests', () => {
     const instance = document.instantiate();
     const instanceTask = instance.tasks.get(0);
 
-    assert.strictEqual(instanceTask.voi.size(), 0);
+    assert.strictEqual(instanceTask.voi.length, 0);
     assert.deepStrictEqual(instanceTask.voiAsArray, emptyFloat64Array);
     assert.strictEqual(instanceTask.voiName, '');
     assert.strictEqual(instanceTask.voiUnit, '');
 
     assert.strictEqual(instanceTask.stateCount, 0);
-    assert.strictEqual(instanceTask.state(0).size(), 0);
+    assert.strictEqual(instanceTask.state(0).length, 0);
     assert.deepStrictEqual(instanceTask.stateAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.stateName(0), '');
     assert.strictEqual(instanceTask.stateUnit(0), '');
 
     assert.strictEqual(instanceTask.rateCount, 0);
-    assert.strictEqual(instanceTask.rate(0).size(), 0);
+    assert.strictEqual(instanceTask.rate(0).length, 0);
     assert.deepStrictEqual(instanceTask.rateAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.rateName(0), '');
     assert.strictEqual(instanceTask.rateUnit(0), '');

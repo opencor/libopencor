@@ -51,16 +51,16 @@ export const COMBINE_ARCHIVE_CONTENTS = stringToArrayBuffer(atob('@BASE64_COMBIN
 export function assertIssues(loc, logger, expectedIssues) {
   const issues = logger.issues;
 
-  assert.strictEqual(issues.size(), expectedIssues.length);
+  assert.strictEqual(issues.length, expectedIssues.length);
 
-  for (let i = 0; i < issues.size(); ++i) {
-    assert.strictEqual(issues.get(i).type.value, expectedIssues[i][0].value);
-    assert.strictEqual(issues.get(i).description, expectedIssues[i][1]);
+  for (const [i, issue] of Array.from(issues).entries()) {
+    assert.strictEqual(issue.type.value, expectedIssues[i][0].value);
+    assert.strictEqual(issue.description, expectedIssues[i][1]);
 
-    if (issues.get(i).type === loc.Issue.Type.ERROR) {
-      assert.strictEqual(issues.get(i).typeAsString, 'Error');
+    if (issue.type === loc.Issue.Type.ERROR) {
+      assert.strictEqual(issue.typeAsString, 'Error');
     } else {
-      assert.strictEqual(issues.get(i).typeAsString, 'Warning');
+      assert.strictEqual(issue.typeAsString, 'Warning');
     }
   }
 }
