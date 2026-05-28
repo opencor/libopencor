@@ -147,7 +147,7 @@ endif()
 
 find_program(7Z_EXE NAMES ${PREFERRED_7Z_NAMES} 7z)
 find_program(BIOME_EXE NAMES ${PREFERRED_BIOME_NAMES} biome)
-find_program(BLACK_EXE NAMES ${PREFERRED_BLACK_NAMES} black)
+find_program(RUFF_EXE NAMES ${PREFERRED_RUFF_NAMES} ruff)
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)
 find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(EMCC_EXE NAMES ${PREFERRED_EMCC_NAMES} emcc)
@@ -225,7 +225,7 @@ if(CLANG_FORMAT_EXE)
     endif()
 endif()
 
-if(BLACK_EXE)
+if(RUFF_EXE)
     set(PYTHON_FORMATTING_AVAILABLE TRUE)
 endif()
 
@@ -359,7 +359,6 @@ else()
 endif()
 
 mark_as_advanced(BIOME_EXE
-                 BLACK_EXE
                  BUILDCACHE_EXE
                  CLANG_FORMAT_EXE
                  CLANG_TIDY_EXE
@@ -374,5 +373,6 @@ mark_as_advanced(BIOME_EXE
                  NPM_EXE
                  PATCH_EXE
                  PYTEST_EXE
+                 RUFF_EXE
                  SPHINX_EXE
                  VALGRIND_EXE)

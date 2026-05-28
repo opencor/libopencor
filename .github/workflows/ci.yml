@@ -386,9 +386,9 @@ jobs:
       - name: Install uv
         if: ${{ matrix.documentation == 'ON' || matrix.python_support == 'ON' || matrix.target == 'python_check_code_formatting' }}
         uses: astral-sh/setup-uv@v6
-      - name: Install Black
+      - name: Install Ruff
         if: ${{ matrix.target == 'python_check_code_formatting' }}
-        run: uv pip install --system black
+        run: uv pip install --system ruff
       - name: Install pytest and pytest-html
         if: ${{ matrix.python_support == 'ON' }}
         run: uv pip install --system pytest pytest-html
