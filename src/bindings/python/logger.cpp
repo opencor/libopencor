@@ -52,5 +52,11 @@ void loggerApi(nb::module_ &m)
 
     issue.def_prop_ro("type", &libOpenCOR::Issue::type, "Get the type of this Issue object.")
         .def_prop_ro("type_as_string", &libOpenCOR::Issue::typeAsString, "Get the type of this Issue object as a string.")
-        .def_prop_ro("description", &libOpenCOR::Issue::description, "Get the description for this Issue object.");
+        .def_prop_ro("description", &libOpenCOR::Issue::description, "Get the description for this Issue object.")
+        .def("__repr__", [](const libOpenCOR::Issue &self) {
+            return "Issue(" + self.typeAsString() + ": \"" + self.description() + "\")";
+        })
+        .def("__str__", [](const libOpenCOR::Issue &self) {
+            return self.description();
+        });
 }

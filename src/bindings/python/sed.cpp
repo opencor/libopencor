@@ -99,7 +99,11 @@ void sedApi(nb::module_ &m)
         .def_prop_ro("has_tasks", &libOpenCOR::SedInstance::hasTasks, "Return whether there are some tasks.")
         .def_prop_ro("task_count", &libOpenCOR::SedInstance::taskCount, "Return the number of tasks.")
         .def_prop_ro("tasks", &libOpenCOR::SedInstance::tasks, "Return the tasks.")
-        .def("task", &libOpenCOR::SedInstance::task, "Return the task.");
+        .def("task", &libOpenCOR::SedInstance::task, "Return the task.")
+        .def("__len__", &libOpenCOR::SedInstance::taskCount)
+        .def("__iter__", [](const libOpenCOR::SedInstance &self) {
+            return nb::cast(self.tasks()).attr("__iter__")();
+        });
 
     // SedInstanceTask API.
 
