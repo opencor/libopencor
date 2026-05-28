@@ -50,5 +50,10 @@ void loggerApi()
         Module["Issue"]["Type"] = Module["Issue.Type"];
 
         delete Module["Issue.Type"];
+
+        Module["Issue"].prototype.toString = function()
+        {
+            return this.description;
+        };
     });
 }

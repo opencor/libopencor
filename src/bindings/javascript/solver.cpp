@@ -35,6 +35,11 @@ void solverApi()
         Module["Solver"]["Type"] = Module["Solver.Type"];
 
         delete Module["Solver.Type"];
+
+        Module["Solver"].prototype.toString = function()
+        {
+            return this.name;
+        };
     });
 
     // SolverOde API.

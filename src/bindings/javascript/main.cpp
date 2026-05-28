@@ -48,4 +48,46 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     sedApi();
     solverApi();
     versionApi();
+
+    // Make all registered vectors behave like native JavaScript arrays: expose a .length property and [Symbol.iterator]
+    // so that for-of loops, spread syntax, and destructuring work without requiring callers to use .size()/.get().
+    // Note: the code within the EM_ASM() block is such that it doesn't rely on top-level comma-heavy literals since
+    //       those commas can get interpreted as macro argument separators by the C++ preprocessor, which causes
+    //       compilation errors.
+
+    EM_ASM({
+        let vectorNames = 'Doubles|FilePtrs|IssuePtrs|SedAbstractTaskPtrs|SedChangePtrs|SedDataDescriptionPtrs|SedDataGeneratorPtrs|SedInstanceTaskPtrs|SedModelPtrs|SedOutputPtrs|SedSimulationPtrs|SedStylePtrs|Strings'.split('|');
+
+        vectorNames.forEach(function(name) {
+            let prototype = Module[name].prototype;
+
+            Object.defineProperty(prototype, 'length', {
+                get: function() { return this.size(); }
+    });
+
+    prototype[Symbol.iterator] = function()
+    {
+        let i = 0;
+        let n = this.size();
+        let iterator = {};
+
+        iterator.next = () =>
+        {
+            let result = {};
+
+            if (i < n) {
+                result.value = this.get(i++);
+                result.done = false;
+            } else {
+                result.value = undefined;
+                result.done = true;
+            }
+
+            return result;
+        };
+
+        return iterator;
+    };
+});
+});
 }
