@@ -153,7 +153,6 @@ find_program(CLANG_TIDY_EXE NAMES ${PREFERRED_CLANG_TIDY_NAMES} clang-tidy)
 find_program(EMCC_EXE NAMES ${PREFERRED_EMCC_NAMES} emcc)
 find_program(EMCMAKE_EXE NAMES ${PREFERRED_EMCMAKE_NAMES} emcmake)
 find_program(FIND_EXE NAMES ${PREFERRED_FIND_NAMES} find)
-find_program(GIT_EXE NAMES ${PRFERRED_GIT_NAMES} git)
 find_program(LLVM_COV_EXE NAMES ${PREFERRED_LLVM_COV_NAMES} llvm-cov)
 find_program(LLVM_PROFDATA_EXE NAMES ${PREFERRED_LLVM_PROFDATA_NAMES} llvm-profdata)
 find_program(NODE_EXE NAMES ${PREFERRED_NODE_NAMES} node)
@@ -218,10 +217,6 @@ if(CLANG_FORMAT_EXE)
         message(WARNING "ClangFormat ${CLANG_FORMAT_VERSION} was found, but version ${CLANG_FORMAT_MINIMUM_VERSION}+ is needed to check code formatting and/or format the code.")
     else()
         set(FORMAT_CODE_AVAILABLE TRUE)
-
-        if(GIT_EXE)
-            set(CHECK_CODE_FORMATTING_AVAILABLE TRUE)
-        endif()
     endif()
 endif()
 
@@ -365,7 +360,6 @@ mark_as_advanced(BIOME_EXE
                  EMCC_EXE
                  EMCMAKE_EXE
                  FIND_EXE
-                 GIT_EXE
                  LEAKS_EXE
                  LLVM_COV_EXE
                  LLVM_PROFDATA_EXE
