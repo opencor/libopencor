@@ -25,15 +25,9 @@ if(FORMAT_CODE_AVAILABLE)
         ${GIT_TESTS_HEADER_FILES}
     )
 
-    set(CODE_FORMATTING_CMAKE_FILE ${CMAKE_CURRENT_BINARY_DIR}/codeformatting.cmake)
-
-    configure_file(codeformatting.in.cmake ${CODE_FORMATTING_CMAKE_FILE} @ONLY)
-
-    if(CHECK_CODE_FORMATTING_AVAILABLE)
-        add_target(check_code_formatting
-                   COMMAND ${CMAKE_COMMAND} -P ${CODE_FORMATTING_CMAKE_FILE}
-                   COMMENT "Checking code formatting...")
-    endif()
+    add_target(check_code_formatting
+               COMMAND ${CLANG_FORMAT_EXE} --dry-run --Werror ${GIT_FILES}
+               COMMENT "Checking code formatting...")
 
     add_target(format_code
                COMMAND ${CLANG_FORMAT_EXE} -i ${GIT_FILES}
