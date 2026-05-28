@@ -116,13 +116,13 @@ test.describe('Sed coverage tests', () => {
   test('Changes', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.SED_CHANGES_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/sed_changes.omex')));
 
     let document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
 
-    file.setContents(utils.INVALID_SED_CHANGES_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/invalid_sed_changes.omex')));
 
     document = new loc.SedDocument(file);
 
@@ -157,7 +157,7 @@ test.describe('Sed coverage tests', () => {
       ]
     ]);
 
-    file.setContents(utils.UNSUPPORTED_SED_CHANGES_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/unsupported_sed_changes.omex')));
 
     document = new loc.SedDocument(file);
 
@@ -361,7 +361,7 @@ test.describe('Sed coverage tests', () => {
   test('SedInstanceAndSedInstanceTaskDifferentialModel', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(utils.SOLVER_ODE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
     const solver = document.simulations.get(0).odeSolver;
@@ -445,7 +445,7 @@ test.describe('Sed coverage tests', () => {
   test('SedInstanceAndSedInstanceTaskNonDifferentialModel', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(utils.SOLVER_NLA1_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
 
     const document = new loc.SedDocument(file);
 
@@ -489,7 +489,7 @@ test.describe('Sed coverage tests', () => {
 
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(utils.SOLVER_ODE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -537,7 +537,7 @@ test.describe('Sed coverage tests', () => {
   test('Math', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(utils.MATH_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/math.cellml')));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();

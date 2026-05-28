@@ -31,7 +31,7 @@ test.describe('Solver Forward Euler tests', () => {
   test('Step value with invalid number', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(utils.SOLVER_ODE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -51,7 +51,7 @@ test.describe('Solver Forward Euler tests', () => {
   test('Solve', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(utils.SOLVER_ODE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);

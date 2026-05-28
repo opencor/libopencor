@@ -31,7 +31,7 @@ test.describe('File type tests', () => {
   test('Unknown file', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(utils.UNKNOWN_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath(utils.UNKNOWN_FILE)));
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assertIssues(loc, file, [
@@ -42,7 +42,7 @@ test.describe('File type tests', () => {
   test('CellML file', () => {
     const file = new loc.File(utils.CELLML_FILE);
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath(utils.CELLML_FILE)));
 
     assert.strictEqual(file.type.value, loc.File.Type.CELLML_FILE.value);
   });
@@ -50,7 +50,7 @@ test.describe('File type tests', () => {
   test('SED-ML file', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(utils.SEDML_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath(utils.SEDML_FILE)));
 
     assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
   });
@@ -58,7 +58,7 @@ test.describe('File type tests', () => {
   test('COMBINE archive', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.COMBINE_ARCHIVE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath(utils.COMBINE_ARCHIVE)));
 
     assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
   });

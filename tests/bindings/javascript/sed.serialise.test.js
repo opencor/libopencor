@@ -94,13 +94,13 @@ test.describe('Sed serialise tests', () => {
   }
 
   test('Local CellML file with base path', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), cvodeExpectedSerialisation('cellml_2.cellml'));
+    assert.strictEqual(document.serialise(utils.SOME_PATH), cvodeExpectedSerialisation('cellml_2.cellml'));
   });
 
   test('Local CellML file without base path', () => {
@@ -114,14 +114,14 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('Relative local CellML file with base path', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
 
     assert.strictEqual(
-      document.serialise(`${utils.RESOURCE_LOCATION}/../..`),
+      document.serialise(`${utils.SOME_PATH}/../..`),
       cvodeExpectedSerialisation('some/path/cellml_2.cellml')
     );
   });
@@ -213,23 +213,23 @@ test.describe('Sed serialise tests', () => {
 </sedML>
 `;
 
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
-    file.setContents(utils.DAE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/dae.cellml')));
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.SOME_PATH), expectedSerialisation);
   });
 
   test('NLA model', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
-    file.setContents(utils.NLA_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), kinsolExpectedSerialisation());
+    assert.strictEqual(document.serialise(utils.SOME_PATH), kinsolExpectedSerialisation());
   });
 
   test('Algebraic model', () => {
@@ -247,13 +247,13 @@ test.describe('Sed serialise tests', () => {
 </sedML>
 `;
 
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
-    file.setContents(utils.ALGEBRAIC_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/algebraic.cellml')));
 
     const document = new loc.SedDocument(file);
 
-    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.SOME_PATH), expectedSerialisation);
   });
 
   function sedChangeExpectedSerialisation(component, variable, newValue) {
@@ -329,7 +329,7 @@ test.describe('Sed serialise tests', () => {
 </sedML>
 `;
 
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -338,11 +338,11 @@ test.describe('Sed serialise tests', () => {
 
     simulation.odeSolver = new loc.SolverForwardEuler();
 
-    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.SOME_PATH), expectedSerialisation);
   });
 
   test('CVODE solver with the Adams-Moulton integration method', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -353,7 +353,7 @@ test.describe('Sed serialise tests', () => {
     solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', {
         'KISAO:0000475': 'Adams-Moulton'
       })
@@ -361,7 +361,7 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('CVODE solver with a functional iteration type', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -372,7 +372,7 @@ test.describe('Sed serialise tests', () => {
     solver.iterationType = loc.SolverCvode.IterationType.FUNCTIONAL;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', {
         'KISAO:0000476': 'Functional'
       })
@@ -380,7 +380,7 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('CVODE solver with a banded linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -391,7 +391,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', {
         'KISAO:0000477': 'Banded'
       })
@@ -399,7 +399,7 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('CVODE solver with a diagonal linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -410,7 +410,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverCvode.LinearSolver.DIAGONAL;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', {
         'KISAO:0000477': 'Diagonal'
       })
@@ -418,7 +418,7 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('CVODE solver with a GMRES linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -429,7 +429,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', {
         'KISAO:0000477': 'GMRES'
       })
@@ -437,7 +437,7 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('CVODE solver with a BiCGStab linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -448,7 +448,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', {
         'KISAO:0000477': 'BiCGStab'
       })
@@ -456,7 +456,7 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('CVODE solver with a TFQMR linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -467,7 +467,7 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', {
         'KISAO:0000477': 'TFQMR'
       })
@@ -475,7 +475,7 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('CVODE solver with no preconditioner', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -486,13 +486,13 @@ test.describe('Sed serialise tests', () => {
     solver.preconditioner = loc.SolverCvode.Preconditioner.NO;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', { 'KISAO:0000478': 'No' })
     );
   });
 
   test('CVODE solver with no interpolate solution', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -503,7 +503,7 @@ test.describe('Sed serialise tests', () => {
     solver.interpolateSolution = false;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       cvodeExpectedSerialisation('cellml_2.cellml', {
         'KISAO:0000481': 'false'
       })
@@ -511,9 +511,9 @@ test.describe('Sed serialise tests', () => {
   });
 
   test('KINSOL solver with a banded linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
-    file.setContents(utils.NLA_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -521,16 +521,13 @@ test.describe('Sed serialise tests', () => {
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      kinsolExpectedSerialisation({ 'KISAO:0000477': 'Banded' })
-    );
+    assert.strictEqual(document.serialise(utils.SOME_PATH), kinsolExpectedSerialisation({ 'KISAO:0000477': 'Banded' }));
   });
 
   test('KINSOL solver with a GMRES linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
-    file.setContents(utils.NLA_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -538,16 +535,13 @@ test.describe('Sed serialise tests', () => {
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.GMRES;
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      kinsolExpectedSerialisation({ 'KISAO:0000477': 'GMRES' })
-    );
+    assert.strictEqual(document.serialise(utils.SOME_PATH), kinsolExpectedSerialisation({ 'KISAO:0000477': 'GMRES' }));
   });
 
   test('KINSOL solver with a BiCGStab linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
-    file.setContents(utils.NLA_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -556,15 +550,15 @@ test.describe('Sed serialise tests', () => {
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BICGSTAB;
 
     assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
+      document.serialise(utils.SOME_PATH),
       kinsolExpectedSerialisation({ 'KISAO:0000477': 'BiCGStab' })
     );
   });
 
   test('KINSOL solver with a TFQMR linear solver', () => {
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
-    file.setContents(utils.NLA_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
@@ -572,10 +566,7 @@ test.describe('Sed serialise tests', () => {
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.TFQMR;
 
-    assert.strictEqual(
-      document.serialise(utils.RESOURCE_LOCATION),
-      kinsolExpectedSerialisation({ 'KISAO:0000477': 'TFQMR' })
-    );
+    assert.strictEqual(document.serialise(utils.SOME_PATH), kinsolExpectedSerialisation({ 'KISAO:0000477': 'TFQMR' }));
   });
 
   test('One-step simulation', () => {
@@ -593,7 +584,7 @@ test.describe('Sed serialise tests', () => {
 </sedML>
 `;
 
-    const file = new loc.File(utils.resourcePath(utils.CELLML_FILE));
+    const file = new loc.File(utils.somePath(utils.CELLML_FILE));
 
     file.setContents(utils.CELLML_CONTENTS);
 
@@ -605,7 +596,7 @@ test.describe('Sed serialise tests', () => {
 
     document.addSimulation(simulation);
 
-    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.SOME_PATH), expectedSerialisation);
   });
 
   test('SED-ML file', () => {
@@ -639,7 +630,7 @@ test.describe('Sed serialise tests', () => {
 </sedML>
 `;
 
-    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.somePath(utils.SEDML_FILE));
 
     file.setContents(utils.SEDML_CONTENTS);
 
@@ -651,7 +642,7 @@ test.describe('Sed serialise tests', () => {
         "SED-ML file: the model 'cellml_2.cellml' could not be found in the file manager. It has been automatically added to it."
       ]
     ]);
-    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.SOME_PATH), expectedSerialisation);
   });
 
   test('SedSimulation', () => {
@@ -893,9 +884,9 @@ test.describe('Sed serialise tests', () => {
 </sedML>
 `;
 
-    const file = new loc.File(utils.resourcePath(utils.SEDML_FILE));
+    const file = new loc.File(utils.somePath(utils.SEDML_FILE));
 
-    file.setContents(utils.SEDML_WITH_SIMULATIONS_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/simulations.sedml')));
 
     const document = new loc.SedDocument(file);
 
@@ -1061,6 +1052,6 @@ test.describe('Sed serialise tests', () => {
         "SED-ML file | KINSOL: the linear solver ('KISAO:0000477') cannot be equal to 'Unknown'. It must be equal to 'Dense', 'Banded', 'GMRES', 'BiCGStab', or 'TFQMR'. A Dense linear solver will be used instead."
       ]
     ]);
-    assert.strictEqual(document.serialise(utils.RESOURCE_LOCATION), expectedSerialisation);
+    assert.strictEqual(document.serialise(utils.SOME_PATH), expectedSerialisation);
   });
 });

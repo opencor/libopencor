@@ -75,7 +75,7 @@ test.describe('Sed basic tests', () => {
   test('SED-ML file with absolute CellML file', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(utils.SEDML_WITH_ABSOLUTE_CELLML_FILE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/absolute_cellml_file.sedml')));
 
     let document = new loc.SedDocument(file);
 
@@ -91,7 +91,7 @@ test.describe('Sed basic tests', () => {
   test('SED-ML file with remote CellML file', () => {
     const file = new loc.File(utils.SEDML_FILE);
 
-    file.setContents(utils.SEDML_WITH_REMOTE_CELLML_FILE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/remote_cellml_file.sedml')));
 
     let document = new loc.SedDocument(file);
 
@@ -117,7 +117,7 @@ test.describe('Sed basic tests', () => {
   test('COMBINE archive with no manifest file', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.COMBINE_ARCHIVE_WITH_NO_MANIFEST_FILE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/no_manifest_file.omex')));
 
     const document = new loc.SedDocument(file);
 
@@ -132,7 +132,7 @@ test.describe('Sed basic tests', () => {
   test('COMBINE archive with no master file', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.COMBINE_ARCHIVE_WITH_NO_MASTER_FILE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/no_master_file.omex')));
 
     const document = new loc.SedDocument(file);
 
@@ -147,7 +147,7 @@ test.describe('Sed basic tests', () => {
   test('COMBINE archive with unknown direct CellML file', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.COMBINE_ARCHIVE_WITH_UNKNOWN_DIRECT_CELLML_FILE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/unknown_direct_cellml_file.omex')));
 
     const document = new loc.SedDocument(file);
 
@@ -162,7 +162,7 @@ test.describe('Sed basic tests', () => {
   test('COMBINE archive with unknown indirect CellML file', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.COMBINE_ARCHIVE_WITH_UNKNOWN_INDIRECT_CELLML_FILE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/unknown_indirect_cellml_file.omex')));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -175,7 +175,7 @@ test.describe('Sed basic tests', () => {
   test('COMBINE archive with unknown SED-ML file', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.COMBINE_ARCHIVE_WITH_UNKNOWN_SEDML_FILE_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/unknown_sedml_file.omex')));
 
     const document = new loc.SedDocument(file);
 
