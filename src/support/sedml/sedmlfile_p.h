@@ -21,16 +21,30 @@ limitations under the License.
 #include "sedmlfile.h"
 #include "utils.h"
 
+namespace libsedml {
+class SedSimulation;
+}
+
 namespace libOpenCOR {
+
+struct NlaSolverInfo
+{
+    SolverNlaPtr nlaSolver;
+    std::vector<std::string> warnings;
+};
 
 class SedmlFile::Impl: public Logger::Impl
 {
 public:
     std::string mLocation;
     libsedml::SedDocument *mDocument;
+    std::string mContents;
 
     explicit Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument);
     ~Impl() override;
+
+    NlaSolverInfo nlaSolver(const libsedml::SedSimulation *sedSimulation, bool hasNlaSolver) const;
+    NlaSolverInfo legacyNlaSolver(const libsedml::SedSimulation *sedSimulation, bool hasNlaSolver) const;
 
     void populateDocument(const SedDocumentPtr &pDocument);
 };

@@ -57,13 +57,10 @@ UnknownRemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master
 IrretrievableRemoteFile = "https://some.domain.com/irretrievable_file.txt"
 
 
-NoContents = ""
-SomeUnknownContents = "Some unknown contents..."
-SomeCellmlContents = """@CELLML_CONTENTS@"""
-SomeErrorCellmlContents = """@ERROR_CELLML_CONTENTS@"""
-SomeWarningCellmlContents = """@WARNING_CELLML_CONTENTS@"""
-SomeSedmlContents = """@SEDML_CONTENTS@"""
-SomeCombineArchiveContents = base64.b64decode(b"@BASE64_COMBINE_ARCHIVE_CONTENTS@")
+UnknownContents = "Some unknown contents..."
+CellmlContents = """@CELLML_CONTENTS@"""
+SedmlContents = """@SEDML_CONTENTS@"""
+Base64CombineArchiveContents = base64.b64decode(b"@BASE64_COMBINE_ARCHIVE_CONTENTS@")
 
 
 def assert_issues(logger, expected_issues):

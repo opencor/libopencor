@@ -54,7 +54,7 @@ test.describe('Issue coverage tests', () => {
   test('issue()', () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
-    file.setContents(utils.ERROR_CELLML_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('error.cellml')));
 
     assert.notStrictEqual(file.issue(0), null);
     assert.strictEqual(file.issue(file.issueCount), null);
@@ -87,7 +87,7 @@ test.describe('Issue coverage tests', () => {
   test('error()', () => {
     const file = new loc.File(utils.ERROR_CELLML_FILE);
 
-    file.setContents(utils.ERROR_CELLML_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('error.cellml')));
 
     assert.notStrictEqual(file.error(0), null);
     assert.strictEqual(file.error(file.errorCount), null);

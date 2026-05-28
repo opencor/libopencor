@@ -38,7 +38,7 @@ test.describe('File coverage tests', () => {
   test('File with null character', () => {
     const file = new loc.File(utils.UNKNOWN_FILE);
 
-    file.setContents(utils.NULL_CHARACTER_CONTENTS);
+    file.setContents(Uint8Array.from([0]));
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
   });

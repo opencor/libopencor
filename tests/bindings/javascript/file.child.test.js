@@ -66,15 +66,18 @@ test.describe('File type tests', () => {
   });
 
   test('Dataset 135', () => {
-    doTestDataset(utils.DATASET_135_OMEX_CONTENTS, utils.DATASET_135_JSON_CONTENTS, [
-      'HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml'
-    ]);
+    doTestDataset(
+      utils.fileContents(utils.resourcePath('api/file/dataset_135.omex')),
+      utils.fileContents(utils.resourcePath('api/file/dataset_135.json')),
+      ['HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml']
+    );
   });
 
   test('Dataset 157', () => {
-    doTestDataset(utils.DATASET_157_OMEX_CONTENTS, utils.DATASET_157_JSON_CONTENTS, [
-      'fabbri_et_al_based_composite_SAN_model.cellml',
-      'fabbri_et_al_based_composite_SAN_model.sedml'
-    ]);
+    doTestDataset(
+      utils.fileContents(utils.resourcePath('api/file/dataset_157.omex')),
+      utils.fileContents(utils.resourcePath('api/file/dataset_157.json')),
+      ['fabbri_et_al_based_composite_SAN_model.cellml', 'fabbri_et_al_based_composite_SAN_model.sedml']
+    );
   });
 });

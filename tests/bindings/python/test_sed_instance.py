@@ -310,3 +310,108 @@ def test_combine_archive_with_cellml_file_as_master_file():
     instance = document.instantiate()
 
     assert instance.has_issues == False
+
+
+def test_dae_model_from_cellml_file():
+    file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    document = loc.SedDocument(file)
+
+    assert document.has_issues == False
+
+    instance = document.instantiate()
+
+    assert instance.has_issues == False
+
+    instance.run()
+
+    assert instance.has_issues == False
+
+
+def test_dae_model_from_sedml_file():
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(utils.resource_path("api/sed/dae/model.sedml"))
+    document = loc.SedDocument(sedml_file)
+
+    assert document.has_issues == False
+
+    nla_solver = document.simulations[0].nla_solver
+
+    assert nla_solver.linear_solver == loc.SolverKinsol.LinearSolver.Gmres
+    assert nla_solver.maximum_number_of_iterations == 123
+    assert nla_solver.upper_half_bandwidth == 1
+    assert nla_solver.lower_half_bandwidth == 1
+
+    instance = document.instantiate()
+
+    assert instance.has_issues == False
+
+    instance.run()
+
+    assert instance.has_issues == False
+
+
+def test_dae_model_from_combine_archive():
+    combine_archive = loc.File(utils.resource_path("api/sed/dae/model.omex"))
+    document = loc.SedDocument(combine_archive)
+
+    assert document.has_issues == False
+
+    nla_solver = document.simulations[0].nla_solver
+
+    assert nla_solver.linear_solver == loc.SolverKinsol.LinearSolver.Gmres
+    assert nla_solver.maximum_number_of_iterations == 123
+    assert nla_solver.upper_half_bandwidth == 1
+    assert nla_solver.lower_half_bandwidth == 1
+
+    instance = document.instantiate()
+
+    assert instance.has_issues == False
+
+    instance.run()
+
+    assert instance.has_issues == False
+
+
+def test_dae_model_from_legacy_sedml_file():
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(utils.resource_path("api/sed/dae/model_legacy.sedml"))
+    document = loc.SedDocument(sedml_file)
+
+    assert document.has_issues == False
+
+    nla_solver = document.simulations[0].nla_solver
+
+    assert nla_solver.linear_solver == loc.SolverKinsol.LinearSolver.Gmres
+    assert nla_solver.maximum_number_of_iterations == 123
+    assert nla_solver.upper_half_bandwidth == 1
+    assert nla_solver.lower_half_bandwidth == 1
+
+    instance = document.instantiate()
+
+    assert instance.has_issues == False
+
+    instance.run()
+
+    assert instance.has_issues == False
+
+
+def test_dae_model_from_legacy_combine_archive():
+    combine_archive = loc.File(utils.resource_path("api/sed/dae/model_legacy.omex"))
+    document = loc.SedDocument(combine_archive)
+
+    assert document.has_issues == False
+
+    nla_solver = document.simulations[0].nla_solver
+
+    assert nla_solver.linear_solver == loc.SolverKinsol.LinearSolver.Gmres
+    assert nla_solver.maximum_number_of_iterations == 123
+    assert nla_solver.upper_half_bandwidth == 1
+    assert nla_solver.lower_half_bandwidth == 1
+
+    instance = document.instantiate()
+
+    assert instance.has_issues == False
+
+    instance.run()
+
+    assert instance.has_issues == False

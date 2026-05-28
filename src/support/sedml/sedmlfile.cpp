@@ -38,12 +38,16 @@ limitations under the License.
 #include "libopencor/solverkinsol.h"
 #include "libopencor/solversecondorderrungekutta.h"
 
+#include "libxml/parser.h"
+#include "libxml/tree.h"
+
 #include "sedml/SedChangeAttribute.h"
 #include "sedml/SedDocument.h"
 #include "sedml/SedReader.h"
 #include "sedml/SedOneStep.h"
 #include "sedml/SedUniformTimeCourse.h"
 
+#include <deque>
 #include <ranges>
 
 namespace libOpenCOR {
@@ -54,6 +58,7 @@ SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
                                               pFile->url())
                                  .parent_path()))
     , mDocument(pDocument)
+    , mContents(toString(pFile->contents()))
 {
     if (!mLocation.empty()) {
         mLocation += "/";
@@ -63,6 +68,281 @@ SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
 SedmlFile::Impl::~Impl()
 {
     delete mDocument;
+}
+
+NlaSolverInfo SedmlFile::Impl::nlaSolver(const libsedml::SedSimulation *sedSimulation, bool hasNlaSolver) const
+{
+    SolverNlaPtr nlaSolver {nullptr};
+    std::vector<std::string> warnings;
+    auto *doc {xmlReadMemory(mContents.c_str(), static_cast<int>(mContents.size()), nullptr, nullptr, XML_PARSE_NONET)};
+    auto *rootNode {xmlDocGetRootElement(doc)};
+    auto hasLocalNlaAlgorithm {false};
+    const auto &sedSimulationId {sedSimulation->getId()};
+    std::deque<xmlNodePtr> nodes {rootNode};
+
+    while (!nodes.empty()) {
+        auto *node {nodes.front()};
+
+        nodes.pop_front();
+
+        auto *id {xmlGetProp(node, toConstXmlCharPtr("id"))};
+
+        if (((xmlStrEqual(node->name, toConstXmlCharPtr("analysis")) != 0)
+             || (xmlStrEqual(node->name, toConstXmlCharPtr("oneStep")) != 0)
+             || (xmlStrEqual(node->name, toConstXmlCharPtr("steadyState")) != 0)
+             || (xmlStrEqual(node->name, toConstXmlCharPtr("uniformTimeCourse")) != 0))
+            && (id != nullptr) && (std::string(reinterpret_cast<const char *>(id)) == sedSimulationId)) {
+            for (auto *child {node->children}; child != nullptr; child = child->next) {
+                if ((child->type == XML_ELEMENT_NODE)
+                    && (xmlStrEqual(child->name, toConstXmlCharPtr("nlaAlgorithm")) != 0)
+                    && (xmlStrEqual(child->ns->href, toConstXmlCharPtr(LIBOPENCOR_NAMESPACE)) != 0)) {
+                    if (hasNlaSolver) {
+                        std::string warning;
+
+                        warning.reserve(sedSimulationId.size() + 108); // NOLINT
+
+                        warning += "The NLA solver is already set for the simulation '";
+                        warning += sedSimulationId;
+                        warning += "'. The one specified in the nlaAlgorithm element will be ignored.";
+
+                        warnings.push_back(warning);
+
+                        break;
+                    }
+
+                    if (hasLocalNlaAlgorithm) {
+                        std::string warning;
+
+                        warning.reserve(sedSimulationId.size() + 84); // NOLINT
+
+                        warning += "Multiple nlaAlgorithm elements have been found for the simulation '";
+                        warning += sedSimulationId;
+                        warning += "'. The first one will be used.";
+
+                        warnings.push_back(warning);
+
+                        break;
+                    }
+
+                    hasLocalNlaAlgorithm = true;
+
+                    auto *kisaoId {xmlGetProp(child, toConstXmlCharPtr("kisaoID"))};
+                    const std::string kisaoIdValue((kisaoId != nullptr) ? reinterpret_cast<const char *>(kisaoId) : "");
+
+                    if (kisaoId != nullptr) {
+                        xmlFree(kisaoId);
+                    }
+
+                    if (kisaoIdValue != "KISAO:0000282") {
+                        std::string warning;
+
+                        warning.reserve(kisaoIdValue.size() + sedSimulationId.size() + 63); // NOLINT
+
+                        warning += "The NLA solver '";
+                        warning += kisaoIdValue;
+                        warning += "' in simulation '";
+                        warning += sedSimulationId;
+                        warning += "' is not recognised. The KINSOL solver will be used instead.";
+
+                        warnings.push_back(warning);
+                    }
+
+                    auto *algorithm {new libsedml::SedAlgorithm()};
+
+                    for (auto *nlaAlgorithmChild {child->children}; nlaAlgorithmChild != nullptr; nlaAlgorithmChild = nlaAlgorithmChild->next) {
+                        if ((nlaAlgorithmChild->type == XML_ELEMENT_NODE)
+                            && (xmlStrEqual(nlaAlgorithmChild->name, toConstXmlCharPtr("listOfAlgorithmParameters")) != 0)
+                            && (xmlStrEqual(nlaAlgorithmChild->ns->href, toConstXmlCharPtr(LIBOPENCOR_NAMESPACE)) != 0)) {
+                            for (auto *algorithmParameterNode {nlaAlgorithmChild->children}; algorithmParameterNode != nullptr;
+                                 algorithmParameterNode = algorithmParameterNode->next) {
+                                if ((algorithmParameterNode->type == XML_ELEMENT_NODE)
+                                    && (xmlStrEqual(algorithmParameterNode->name, toConstXmlCharPtr("algorithmParameter")) != 0)
+                                    && (xmlStrEqual(algorithmParameterNode->ns->href, toConstXmlCharPtr(LIBOPENCOR_NAMESPACE)) != 0)) {
+                                    auto *algorithmParameterKisaoId {xmlGetProp(algorithmParameterNode, toConstXmlCharPtr("kisaoID"))};
+                                    auto *algorithmParameterValue {xmlGetProp(algorithmParameterNode, toConstXmlCharPtr("value"))};
+
+                                    if ((algorithmParameterKisaoId != nullptr) && (algorithmParameterValue != nullptr)) {
+                                        auto *algorithmParameter {algorithm->createAlgorithmParameter()};
+
+                                        algorithmParameter->setKisaoID(reinterpret_cast<const char *>(algorithmParameterKisaoId));
+                                        algorithmParameter->setValue(reinterpret_cast<const char *>(algorithmParameterValue));
+                                    }
+
+                                    if (algorithmParameterKisaoId != nullptr) {
+                                        xmlFree(algorithmParameterKisaoId);
+                                    }
+
+                                    if (algorithmParameterValue != nullptr) {
+                                        xmlFree(algorithmParameterValue);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    nlaSolver = SolverKinsol::create();
+
+                    nlaSolver->pimpl()->populate(algorithm);
+
+                    delete algorithm;
+                }
+            }
+
+            xmlFree(id);
+
+            nodes.clear();
+
+            continue;
+        }
+
+        if (id != nullptr) {
+            xmlFree(id);
+        }
+
+        for (auto *child {node->children}; child != nullptr; child = child->next) {
+            if (child->type == XML_ELEMENT_NODE) {
+                nodes.push_back(child);
+            }
+        }
+    }
+
+    xmlFreeDoc(doc);
+
+    return {nlaSolver, warnings};
+}
+
+NlaSolverInfo SedmlFile::Impl::legacyNlaSolver(const libsedml::SedSimulation *sedSimulation, bool hasNlaSolver) const // NOLINT
+{
+    static constexpr auto OPENCOR_NAMESPACE {"http://www.opencor.ws/"};
+
+    SolverNlaPtr nlaSolver {nullptr};
+    std::vector<std::string> warnings;
+    const auto *annotation {sedSimulation->getAnnotation()};
+
+    if (annotation != nullptr) {
+        auto hasLocalNlaSolver {false};
+        const auto &sedSimulationId {sedSimulation->getId()};
+
+        for (unsigned int i {0}; i < annotation->getNumChildren(); ++i) {
+            const auto &nlaSolverNode {annotation->getChild(i)};
+
+            if ((nlaSolverNode.getURI() == OPENCOR_NAMESPACE)
+                && (nlaSolverNode.getName() == "nlaSolver")) {
+                const auto &nlaSolverName {nlaSolverNode.getAttrValue("name")};
+
+                if (hasNlaSolver) {
+                    std::string warning;
+
+                    warning.reserve(nlaSolverName.size() + sedSimulationId.size() + 80); // NOLINT
+
+                    warning += "The NLA solver '";
+                    warning += nlaSolverName;
+                    warning += "' is specified in both the algorithm element and in the annotation of the simulation '";
+                    warning += sedSimulationId;
+                    warning += "'. The one specified in the algorithm element will be used.";
+
+                    warnings.push_back(warning);
+
+                    break;
+                }
+
+                if (hasLocalNlaSolver) {
+                    std::string warning;
+
+                    warning.reserve(sedSimulationId.size() + 80); // NOLINT
+
+                    warning += "Multiple NLA solvers have been found in the annotation of the simulation '";
+                    warning += sedSimulationId;
+                    warning += "'. The first one will be used.";
+
+                    warnings.push_back(warning);
+
+                    break;
+                }
+
+                hasLocalNlaSolver = true;
+
+                if (nlaSolverName != "KINSOL") {
+                    std::string warning;
+
+                    warning.reserve(nlaSolverName.size() + sedSimulationId.size() + 63); // NOLINT
+
+                    warning += "The NLA solver '";
+                    warning += nlaSolverName;
+                    warning += "' in simulation '";
+                    warning += sedSimulationId;
+                    warning += "' is not recognised. The KINSOL solver will be used instead.";
+
+                    warnings.push_back(warning);
+                }
+
+                auto *algorithm {new libsedml::SedAlgorithm()};
+
+                for (unsigned int j {0}; j < nlaSolverNode.getNumChildren(); ++j) {
+                    const auto &nlaSolverPropertyNode {nlaSolverNode.getChild(j)};
+
+                    // Convert the properties to a pointer to libsedml::SedAlgorithm so that we can then call SolverKinsol::Impl::populate() on it.
+
+                    if ((nlaSolverPropertyNode.getURI() == OPENCOR_NAMESPACE)
+                        && (nlaSolverPropertyNode.getName() == "solverProperty")) {
+                        const auto &id {nlaSolverPropertyNode.getAttrValue("id")};
+                        const auto &value {nlaSolverPropertyNode.getAttrValue("value")};
+                        std::string algorithmParameterKisaoId;
+                        std::string algorithmParameterValue;
+
+                        if ((id == "MaximumNumberOfIterations")) {
+                            algorithmParameterKisaoId = "KISAO:0000486";
+                            algorithmParameterValue = value;
+                        } else if (id == "LinearSolver") {
+                            algorithmParameterKisaoId = "KISAO:0000477";
+                            algorithmParameterValue = value;
+                        } else if (id == "UpperHalfBandwidth") {
+                            algorithmParameterKisaoId = "KISAO:0000479";
+                            algorithmParameterValue = value;
+                        } else if (id == "LowerHalfBandwidth") {
+                            algorithmParameterKisaoId = "KISAO:0000480";
+                            algorithmParameterValue = value;
+                        } else {
+                            std::string warning;
+
+                            warning.reserve(id.size() + 63); // NOLINT
+
+                            warning += "The NLA solver property '";
+                            warning += id;
+                            warning += "' is not recognised. It will be ignored.";
+
+                            warnings.push_back(warning);
+                        }
+
+                        if (!algorithmParameterKisaoId.empty()) {
+                            auto *algorithmParameter {algorithm->createAlgorithmParameter()};
+
+                            algorithmParameter->setKisaoID(algorithmParameterKisaoId);
+                            algorithmParameter->setValue(algorithmParameterValue);
+                        }
+                    } else {
+                        std::string warning;
+
+                        warning.reserve(nlaSolverPropertyNode.getName().size() + 63); // NOLINT
+
+                        warning += "Only NLA solver properties with name 'solverProperty' are currently supported. The element '";
+                        warning += nlaSolverPropertyNode.getName();
+                        warning += "' will be ignored.";
+
+                        warnings.push_back(warning);
+                    }
+                }
+
+                nlaSolver = SolverKinsol::create();
+
+                nlaSolver->pimpl()->populate(algorithm);
+
+                delete algorithm;
+            }
+        }
+    }
+
+    return {nlaSolver, warnings};
 }
 
 void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
@@ -231,50 +511,76 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
         // Populate the simulation's algorithm.
 
         auto *sedAlgorithm {sedSimulation->getAlgorithm()};
-        const auto &kisaoId {sedAlgorithm->getKisaoID()};
-        SolverOdePtr odeSolver {nullptr};
-        SolverNlaPtr nlaSolver {nullptr};
 
-        if (kisaoId == "KISAO:0000019") {
-            odeSolver = SolverCvode::create();
-        } else if (kisaoId == "KISAO:0000030") {
-            odeSolver = SolverForwardEuler::create();
-        } else if (kisaoId == "KISAO:0000032") {
-            odeSolver = SolverFourthOrderRungeKutta::create();
-        } else if (kisaoId == "KISAO:0000301") {
-            odeSolver = SolverHeun::create();
-        } else if (kisaoId == "KISAO:0000282") {
-            nlaSolver = SolverKinsol::create();
-        } else if (kisaoId == "KISAO:0000381") {
-            odeSolver = SolverSecondOrderRungeKutta::create();
-        } else {
-            std::string warning;
+        if (sedAlgorithm != nullptr) {
+            const auto &kisaoId {sedAlgorithm->getKisaoID()};
+            SolverOdePtr odeSolver {nullptr};
+            SolverNlaPtr nlaSolver {nullptr};
 
-            warning.reserve(kisaoId.size() + 63); // NOLINT
+            if (kisaoId == "KISAO:0000019") {
+                odeSolver = SolverCvode::create();
+            } else if (kisaoId == "KISAO:0000030") {
+                odeSolver = SolverForwardEuler::create();
+            } else if (kisaoId == "KISAO:0000032") {
+                odeSolver = SolverFourthOrderRungeKutta::create();
+            } else if (kisaoId == "KISAO:0000301") {
+                odeSolver = SolverHeun::create();
+            } else if (kisaoId == "KISAO:0000282") {
+                nlaSolver = SolverKinsol::create();
+            } else if (kisaoId == "KISAO:0000381") {
+                odeSolver = SolverSecondOrderRungeKutta::create();
+            } else {
+                std::string warning;
 
-            warning += "The solver '";
-            warning += kisaoId;
-            warning += "' is not recognised. The CVODE solver will be used instead.";
+                warning.reserve(kisaoId.size() + 63); // NOLINT
 
-            addWarning(warning);
+                warning += "The solver '";
+                warning += kisaoId;
+                warning += "' is not recognised. The CVODE solver will be used instead.";
 
-            odeSolver = SolverCvode::create();
-        }
+                addWarning(warning);
 
-        if (odeSolver != nullptr) {
-            odeSolver->pimpl()->populate(sedAlgorithm);
+                odeSolver = SolverCvode::create();
+            }
 
-            addIssues(odeSolver, odeSolver->name());
+            if (odeSolver != nullptr) {
+                odeSolver->pimpl()->populate(sedAlgorithm);
 
-            simulation->setOdeSolver(odeSolver);
-        }
+                addIssues(odeSolver, odeSolver->name());
 
-        if (nlaSolver != nullptr) {
-            nlaSolver->pimpl()->populate(sedAlgorithm);
+                simulation->setOdeSolver(odeSolver);
+            }
 
-            addIssues(nlaSolver, nlaSolver->name());
+            if (nlaSolver != nullptr) {
+                nlaSolver->pimpl()->populate(sedAlgorithm);
 
-            simulation->setNlaSolver(nlaSolver);
+                addIssues(nlaSolver, nlaSolver->name());
+
+                simulation->setNlaSolver(nlaSolver);
+            }
+
+            // Populate the NLA solver, if any, using our new approach (i.e. using libOpenCOR's nlaSolver element) and
+            // then using our legacy approach (i.e. using a SED-ML annotation).
+
+            auto applyNlaSolverInfo = [&](const auto &pNlaSolverInfo) {
+                for (const auto &nlaSolverWarning : pNlaSolverInfo.warnings) {
+                    addWarning(nlaSolverWarning);
+                }
+
+                if (pNlaSolverInfo.nlaSolver != nullptr) {
+                    addIssues(pNlaSolverInfo.nlaSolver, pNlaSolverInfo.nlaSolver->name());
+
+                    simulation->setNlaSolver(pNlaSolverInfo.nlaSolver);
+                }
+            };
+
+            auto nlaSolverInfo {Impl::nlaSolver(sedSimulation, simulation->nlaSolver() != nullptr)};
+
+            applyNlaSolverInfo(nlaSolverInfo);
+
+            auto legacyNlaSolverInfo {legacyNlaSolver(sedSimulation, simulation->nlaSolver() != nullptr)};
+
+            applyNlaSolverInfo(legacyNlaSolverInfo);
         }
     }
 

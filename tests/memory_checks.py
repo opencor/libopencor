@@ -98,6 +98,9 @@ def parse_errors(output):
             if back_trace.is_leak():
                 res.append(back_trace)
     else:
+        if "0 leaks for 0 total leaked bytes." in output:
+            return []
+
         leaks_report_line = 0
         lines = ""
 
@@ -110,11 +113,8 @@ def parse_errors(output):
 
                 leaks_report_line += 1
 
-                if leaks_report_line == 3:
-                    if "0 leaks for 0 total leaked bytes." in line:
-                        return []
-
-        res.append(lines)
+        if lines:
+            res.append(lines)
 
     return res
 

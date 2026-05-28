@@ -63,8 +63,6 @@ static constexpr auto IRRETRIEVABLE_REMOTE_FILE {"https://some.domain.com/irretr
 
 static constexpr auto UNKNOWN_CONTENTS {"Some unknown contents..."};
 static constexpr auto CELLML_CONTENTS {"@CELLML_CONTENTS_C@"};
-static constexpr auto ERROR_CELLML_CONTENTS {"@ERROR_CELLML_CONTENTS_C@"};
-static constexpr auto WARNING_CELLML_CONTENTS {"@WARNING_CELLML_CONTENTS_C@"};
 static constexpr auto SEDML_CONTENTS {"@SEDML_CONTENTS_C@"};
 static constexpr auto BASE64_COMBINE_ARCHIVE_CONTENTS {"@BASE64_COMBINE_ARCHIVE_CONTENTS@"};
 

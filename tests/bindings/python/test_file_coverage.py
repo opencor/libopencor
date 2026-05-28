@@ -20,7 +20,7 @@ import utils
 def test_empty_file():
     file = loc.File(utils.LocalFile)
 
-    file.contents = utils.string_to_list(utils.NoContents)
+    file.contents = []
 
     assert file.type == loc.File.Type.UnknownFile
 
@@ -36,7 +36,7 @@ def test_file_with_null_character():
 def test_sedml_file_with_no_parent():
     file = loc.File(utils.Sedml2File)
 
-    file.contents = utils.string_to_list(utils.SomeSedmlContents)
+    file.contents = utils.string_to_list(utils.SedmlContents)
 
 
 def test_irretrievable_virtual_file():

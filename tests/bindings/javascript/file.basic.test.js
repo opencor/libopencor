@@ -40,7 +40,7 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.fileName, utils.LOCAL_FILE);
     assert.strictEqual(file.url, '');
     assert.strictEqual(file.path, utils.LOCAL_FILE);
-    assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
 
     file.setContents(utils.UNKNOWN_CONTENTS);
@@ -57,7 +57,7 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.fileName, '/some/path/file');
     assert.strictEqual(file.url, utils.REMOTE_FILE);
     assert.strictEqual(file.path, utils.REMOTE_FILE);
-    assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
 
     file.setContents(utils.UNKNOWN_CONTENTS);
@@ -74,7 +74,7 @@ test.describe('File basic tests', () => {
     assert.strictEqual(file.fileName, '/some/path/file');
     assert.strictEqual(file.url, utils.NON_ENCODED_REMOTE_FILE);
     assert.strictEqual(file.path, utils.NON_ENCODED_REMOTE_FILE);
-    assert.deepStrictEqual(file.contents(), utils.NO_CONTENTS);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
 
     file.setContents(utils.UNKNOWN_CONTENTS);

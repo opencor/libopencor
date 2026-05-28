@@ -31,7 +31,7 @@ test.describe('Solver coverage tests', () => {
   test('ODE changes', () => {
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.ODE_SED_CHANGES_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode_sed_changes.omex')));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -82,7 +82,7 @@ test.describe('Solver coverage tests', () => {
 
     const file = new loc.File(utils.COMBINE_ARCHIVE);
 
-    file.setContents(utils.ALGEBRAIC_SED_CHANGES_CONTENTS);
+    file.setContents(utils.fileContents(utils.resourcePath('api/solver/algebraic_sed_changes.omex')));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();

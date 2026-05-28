@@ -18,20 +18,30 @@ limitations under the License.
 
 #include <libopencor>
 
-static const libOpenCOR::ExpectedIssues EXPECTED_UNKNOWN_FILE_ISSUES {{
-    {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
-}};
+namespace {
+
+libOpenCOR::ExpectedIssues expectedUnknownFileIssues()
+{
+    return {{
+        {libOpenCOR::Issue::Type::ERROR, "The file is not a CellML file, a SED-ML file, or a COMBINE archive."},
+    }};
+}
+
+libOpenCOR::ExpectedIssues expectedIrretrievableFileIssues()
+{
+    return {{
+        {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
+    }};
+}
+
+} // namespace
 
 TEST(TypeFileTest, irretrievableFile)
 {
-    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-        {libOpenCOR::Issue::Type::ERROR, "The file does not exist."},
-    }};
-
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ_ISSUES(file, EXPECTED_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedIrretrievableFileIssues());
 }
 
 TEST(TypeFileTest, unknownFile)
@@ -39,7 +49,7 @@ TEST(TypeFileTest, unknownFile)
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
 }
 
 TEST(TypeFileTest, sbmlFile)
@@ -47,7 +57,7 @@ TEST(TypeFileTest, sbmlFile)
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SBML_FILE))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
 }
 
 TEST(TypeFileTest, errorSedmlFile)
@@ -109,7 +119,7 @@ TEST(TypeFileTest, unknownVirtualFile)
     file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ_ISSUES(file, EXPECTED_UNKNOWN_FILE_ISSUES);
+    EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
 }
 
 TEST(TypeFileTest, cellmlVirtualFile)

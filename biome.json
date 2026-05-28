@@ -30,8 +30,7 @@
     "formatter": {
       "bracketSameLine": true,
       "enabled": true,
-      "selfCloseVoidElements": "always",
-      "whitespaceSensitivity": "ignore"
+      "selfCloseVoidElements": "always"
     }
   },
   "javascript": {

@@ -22,9 +22,11 @@ limitations under the License.
 
 #include <libopencor>
 
+namespace {
+
 class CompilerTest: public testing::Test
 {
-public:
+protected:
     libOpenCOR::CompilerPtr mCompiler;
 
     void SetUp() override
@@ -32,6 +34,8 @@ public:
         mCompiler = libOpenCOR::Compiler::create();
     }
 };
+
+} // namespace
 
 TEST_F(CompilerTest, basic)
 {
