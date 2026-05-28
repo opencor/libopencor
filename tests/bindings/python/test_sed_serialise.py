@@ -310,8 +310,8 @@ def test_changes():
     file = loc.File(utils.LocalFile)
     model = loc.SedModel(document, file)
 
-    assert model.add_change(change_attribute) == True
-    assert document.add_model(model) == True
+    assert model.add_change(change_attribute)
+    assert document.add_model(model)
 
     assert document.serialise() == sed_change_expected_serialisation(
         "component", "variable", "123.456789"

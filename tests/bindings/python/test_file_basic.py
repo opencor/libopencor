@@ -159,51 +159,52 @@ def test_remote_virtual_file():
 def test_file_manager():
     file_manager = loc.FileManager.instance()
 
-    assert file_manager.has_files == False
+    assert not file_manager.has_files
     assert file_manager.file_count == 0
-    assert len(file_manager.files) == 0
-    assert file_manager.file(0) == None
-    assert file_manager.file(utils.LocalFile) == None
+    assert len(file_manager) == 0
+    assert file_manager.file(0) is None
+    assert file_manager.file(utils.LocalFile) is None
 
     local_file = loc.File(utils.LocalFile)
     same_file_manager = loc.FileManager.instance()
 
-    assert same_file_manager.has_files == True
+    assert same_file_manager.has_files
     assert same_file_manager.file_count == 1
-    assert len(file_manager.files) == 1
+    assert len(file_manager) == 1
+    assert list(file_manager) == [local_file]
     assert file_manager.file(0) == local_file
     assert same_file_manager.file(utils.LocalFile) == local_file
 
     remote_file = loc.File(utils.RemoteFile)
 
-    assert file_manager.has_files == True
+    assert file_manager.has_files
     assert file_manager.file_count == 2
-    assert len(file_manager.files) == 2
+    assert len(file_manager) == 2
     assert file_manager.file(1) == remote_file
     assert file_manager.file(utils.RemoteFile) == remote_file
 
     same_file_manager.unmanage(local_file)
 
-    assert same_file_manager.has_files == True
+    assert same_file_manager.has_files
     assert same_file_manager.file_count == 1
-    assert len(file_manager.files) == 1
-    assert file_manager.file(1) == None
-    assert same_file_manager.file(utils.LocalFile) == None
+    assert len(file_manager) == 1
+    assert file_manager.file(1) is None
+    assert same_file_manager.file(utils.LocalFile) is None
 
     same_file_manager.manage(local_file)
 
-    assert same_file_manager.has_files == True
+    assert same_file_manager.has_files
     assert same_file_manager.file_count == 2
-    assert len(file_manager.files) == 2
+    assert len(file_manager) == 2
     assert file_manager.file(1) == local_file
     assert same_file_manager.file(utils.LocalFile) == local_file
 
     file_manager.reset()
 
-    assert file_manager.has_files == False
+    assert not file_manager.has_files
     assert file_manager.file_count == 0
-    assert len(file_manager.files) == 0
-    assert file_manager.file(0) == None
-    assert file_manager.file(1) == None
-    assert file_manager.file(utils.RemoteFile) == None
-    assert file_manager.file(utils.UnknownFile) == None
+    assert len(file_manager) == 0
+    assert file_manager.file(0) is None
+    assert file_manager.file(1) is None
+    assert file_manager.file(utils.RemoteFile) is None
+    assert file_manager.file(utils.UnknownFile) is None

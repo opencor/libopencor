@@ -21,11 +21,11 @@ from utils import assert_issues
 def test_no_file():
     document = loc.SedDocument()
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
     document = loc.SedDocument(None)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
 
 def test_unknown_file():
@@ -46,53 +46,53 @@ def test_cellml_file():
     file = loc.File(utils.resource_path(utils.Cellml2File))
     document = loc.SedDocument(file)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
 
 def test_sedml_file():
     file = loc.File(utils.resource_path(utils.Sedml2File))
     document = loc.SedDocument(file)
 
-    assert document.has_issues == True
+    assert document.has_issues
 
     needed_file = loc.File(utils.resource_path(utils.Cellml2File))
 
     document = loc.SedDocument(file)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
 
 def test_sedml_file_with_absolute_cellml_file():
     file = loc.File(utils.resource_path("api/sed/absolute_cellml_file.sedml"))
     document = loc.SedDocument(file)
 
-    assert document.has_issues == True
+    assert document.has_issues
 
     needed_file = loc.File(utils.LocalFile)
 
     document = loc.SedDocument(file)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
 
 def test_sedml_file_with_remote_cellml_file():
     file = loc.File(utils.resource_path("api/sed/remote_cellml_file.sedml"))
     document = loc.SedDocument(file)
 
-    assert document.has_issues == True
+    assert document.has_issues
 
     needed_file = loc.File(utils.RemoteFile)
 
     document = loc.SedDocument(file)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
 
 def test_combine_archive():
     file = loc.File(utils.resource_path(utils.Combine2Archive))
     document = loc.SedDocument(file)
 
-    assert document.has_issues == False
+    assert not document.has_issues
 
 
 def test_combine_archive_with_no_manifest_file():
