@@ -58,12 +58,12 @@ endif()
 
 if(PYTHON_FORMATTING_AVAILABLE)
     add_target(python_check_code_formatting
-               COMMAND ${BLACK_EXE} --check .
+               COMMAND ${RUFF_EXE} format --check .
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Checking Python code formatting...")
 
     add_target(python_format_code
-               COMMAND ${BLACK_EXE} .
+               COMMAND ${RUFF_EXE} format .
                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                COMMENT "Formatting the Python code...")
 endif()
