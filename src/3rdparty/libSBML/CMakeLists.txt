@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSBML)
-set(PACKAGE_VERSION 5.20.5)
+set(PACKAGE_VERSION 5.21.0)
 set(PACKAGE_REPOSITORY libsbml)
-set(RELEASE_TAG v5.20.5)
+set(RELEASE_TAG v5.21.0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -77,6 +77,17 @@ if(LIBOPENCOR_PREBUILT_LIBSBML)
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
 
+    # libSBML's FindLIBXML.cmake unconditionally probes ZLIB. Pre-seed the ZLIB variables so that FindZLIB.cmake can
+    # succeed even when zlib is not available (on Windows and with Emscripten), while still keeping zlib disabled for
+    # libSBML itself.
+
+    set(ZLIB_ARGS
+        -DWITH_ZLIB=OFF
+        -DZLIB_FOUND=TRUE
+        -DZLIB_INCLUDE_DIR=${CMAKE_CURRENT_BINARY_DIR}
+        -DZLIB_LIBRARY=${CMAKE_CURRENT_BINARY_DIR}/zlib.not.used
+    )
+
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
@@ -91,7 +102,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DWITH_BZIP2=OFF
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
-            -DWITH_ZLIB=OFF
+            ${ZLIB_ARGS}
     )
 
     # Patch some of our CMake configuration files.
