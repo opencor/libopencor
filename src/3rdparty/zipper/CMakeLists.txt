@@ -15,7 +15,7 @@
 set(PACKAGE_NAME zipper)
 set(PACKAGE_VERSION 0.9.1)
 set(PACKAGE_REPOSITORY zipper)
-set(RELEASE_TAG 966d3b2)
+set(RELEASE_TAG 83701e0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -24,63 +24,70 @@ if(LIBOPENCOR_PREBUILT_ZIPPER)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ffa3d9d8d1c908f4c2ceb5d6458752713e6a67be)
+                         32b71d3650a7f9b12205d19159a7b66b43b8053d)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     d9a1f4c3ca79c08a0c374fd4312e2a66ac8a9a98)
+                                     58c80587ec2e926f534dad28ac2bd51270a7478d)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     024f1739d168bd52456b9cbfb55ca3c995d81929)
+                                     4342c6af925245d06c099647d1abc94413dfd790)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     46b74fd7bd222b074fac49e190ec9671ffadd137)
+                                     30f92acc56e7ae6ca51fa7f7c8db358d6e645de3)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     7d6a468d06bb634d98a7f2dcbf606fead6b6d08d)
+                                     b69909d36c98248a367e55071dc4ff77803efd7f)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ed676c101edd61413660bf16a9d72e1bd53bdfba)
+                                 c191906c1143e8fbaf3d99efa624d88728d22757)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 9122983dd5f9cb356fdbc100fb8c07e870290a9a)
+                                 c345999013e5dca311f6567ea5a264476d6218af)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 481332ea711b286022341952253fde5b9e5d4884)
+                                 c2c699b0644ebfd4b934ec3dd49b12d787ca7782)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 e67c7b7c6aa174f73e79f50fb26c41a5efab8f2d)
+                                 2aad270e975e23afc8a79fcb67be784a09151088)
             endif()
         endif()
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
+    # Note: unlike for the other packages, we don't use a URL to retrieve zipper's source code since it contains a
+    #       submodule (minizip) and we need to make sure that it is retrieved.
 
     if(APPLE)
         set(PACKAGE_C_FLAGS -Wno-implicit-function-declaration)
     endif()
 
     build_package(${PACKAGE_NAME}
-        URL
-            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
-        DOWNLOAD_NO_PROGRESS ON
+        GIT_REPOSITORY
+            https://github.com/opencor/${PACKAGE_REPOSITORY}.git
+        GIT_TAG
+            ${RELEASE_TAG}
+        GIT_SUBMODULES
+            minizip
+        GIT_SUBMODULES_RECURSE
+            ON
         CMAKE_CACHE_ARGS
             -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         CMAKE_ARGS
