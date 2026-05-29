@@ -77,7 +77,7 @@ test.describe('Version tests', () => {
   });
 
   test('SUNDIALS', () => {
-    assert.strictEqual(loc.sundialsVersion(), 0x070300);
-    assert.strictEqual(loc.sundialsVersionString(), '7.3.0');
+    assert.strictEqual(loc.sundialsVersion(), 0x070700);
+    assert.strictEqual(loc.sundialsVersionString(), '7.7.0');
   });
 });

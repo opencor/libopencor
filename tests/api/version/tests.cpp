@@ -97,6 +97,6 @@ TEST(VersionTest, LLVM)
 
 TEST(VersionTest, SUNDIALS)
 {
-    EXPECT_EQ(0x070300U, libOpenCOR::sundialsVersion());
-    EXPECT_EQ("7.3.0", libOpenCOR::sundialsVersionString());
+    EXPECT_EQ(0x070700U, libOpenCOR::sundialsVersion());
+    EXPECT_EQ("7.7.0", libOpenCOR::sundialsVersionString());
 }

@@ -116,9 +116,9 @@ def test_llvm_version_string():
 
 def test_sundials_version():
     assert isinstance(loc.sundials_version(), int)
-    assert loc.sundials_version() == 0x070300
+    assert loc.sundials_version() == 0x070700
 
 
 def test_sundials_version_string():
     assert isinstance(loc.sundials_version_string(), str)
-    assert loc.sundials_version_string() == "7.3.0"
+    assert loc.sundials_version_string() == "7.7.0"
