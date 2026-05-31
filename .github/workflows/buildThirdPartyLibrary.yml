@@ -72,13 +72,16 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
-      - name: Configure libOpenCOR (only when building LLVM+Clang)
+      - name: Configure libOpenCOR (for LLVM+Clang)
         if: ${{ inputs.third_party_library_name == 'LLVMClang' }}
         shell: bash
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVMCLANG=OFF
-      - name: Configure libOpenCOR (only when NOT building LLVM+Clang)
-        if: ${{ inputs.third_party_library_name != 'LLVMClang' }}
+      - name: Configure libOpenCOR (for a specific third-party library except LLVM+Clang)
+        if: ${{ inputs.third_party_library_name != 'ALL' && inputs.third_party_library_name != 'LLVMClang' }}
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF
+      - name: Configure libOpenCOR (for all third-party libraries except LLVM+Clang)
+        if: ${{ inputs.third_party_library_name == 'ALL' }}
+        run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LIBCELLML=OFF -DPREBUILT_LIBCOMBINE=OFF -DPREBUILT_LIBCURL=OFF -DPREBUILT_LIBNUML=OFF -DPREBUILT_LIBSBML=OFF -DPREBUILT_LIBSEDML=OFF -DPREBUILT_LIBSSH2=OFF -DPREBUILT_LIBXML2=OFF -DPREBUILT_OPENSSL=OFF -DPREBUILT_SUNDIALS=OFF -DPREBUILT_ZIPPER=OFF -DPREBUILT_ZLIB=OFF
       - name: Upload library artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v4
@@ -109,8 +112,12 @@ jobs:
           cache_key: webassembly
       - name: Install Emscripten
         run: brew install emscripten
-      - name: Configure libOpenCOR
+      - name: Configure libOpenCOR (for a specific third-party library)
+        if: ${{ inputs.third_party_library_name != 'ALL' }}
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DJAVASCRIPT_BINDINGS=ON -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF
+      - name: Configure libOpenCOR (for all third-party libraries except LLVM+Clang)
+        if: ${{ inputs.third_party_library_name == 'ALL' }}
+        run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DJAVASCRIPT_BINDINGS=ON -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LIBCELLML=OFF -DPREBUILT_LIBCOMBINE=OFF -DPREBUILT_LIBCURL=OFF -DPREBUILT_LIBNUML=OFF -DPREBUILT_LIBSBML=OFF -DPREBUILT_LIBSEDML=OFF -DPREBUILT_LIBSSH2=OFF -DPREBUILT_LIBXML2=OFF -DPREBUILT_OPENSSL=OFF -DPREBUILT_SUNDIALS=OFF -DPREBUILT_ZIPPER=OFF -DPREBUILT_ZLIB=OFF
       - name: Build WebAssembly
         run: cmake --build build
       - name: Upload WebAssembly artifact

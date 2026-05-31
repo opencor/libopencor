@@ -1,0 +1,11 @@
+name: Build all third-party libraries except LLVM+Clang
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-all-third-party-libraries-except-llvm-clang:
+    name: Build all third-party libraries except LLVM+Clang
+    uses: ./.github/workflows/buildThirdPartyLibrary.yml
+    with:
+      third_party_library_name: ALL

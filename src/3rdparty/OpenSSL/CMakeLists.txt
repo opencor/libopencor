@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME OpenSSL)
-set(PACKAGE_VERSION 3.5.0)
+set(PACKAGE_VERSION 3.5.6)
 set(PACKAGE_REPOSITORY openssl)
-set(RELEASE_TAG openssl-3.5.0)
+set(RELEASE_TAG openssl-3.5.6)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.

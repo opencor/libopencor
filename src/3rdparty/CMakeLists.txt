@@ -20,7 +20,11 @@ include(packages)
 
 set(PACKAGES libCellML libCOMBINE libNuML libSBML libSEDML libxml2 LLVMClang SUNDIALS zipper zlib)
 
-if(NOT EMSCRIPTEN)
+if(EMSCRIPTEN OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
+    set(WASM_MODE TRUE)
+endif()
+
+if(NOT WASM_MODE)
     list(APPEND PACKAGES libcurl libssh2 OpenSSL)
 endif()
 
@@ -48,7 +52,7 @@ set(DEPENDENT_PACKAGES_TO_BUILD "" CACHE INTERNAL "Dependent packages to be buil
 
 check_dependent_packages(libxml2 libCellML libSBML)
 
-if(EMSCRIPTEN)
+if(WASM_MODE)
     check_dependent_packages(zlib libCellML libCOMBINE zipper)
 else()
     check_dependent_packages(OpenSSL libcurl libssh2)
@@ -58,7 +62,7 @@ endif()
 check_dependent_packages(libSBML libCOMBINE libNuML libSEDML)
 check_dependent_packages(libNuML libSEDML)
 
-if(NOT EMSCRIPTEN)
+if(NOT WASM_MODE)
     check_dependent_packages(libssh2 libcurl)
 endif()
 
@@ -77,7 +81,7 @@ endif()
 check_required_packages(libSBML libxml2)
 check_required_packages(libNuML libSBML)
 
-if(NOT EMSCRIPTEN)
+if(NOT WASM_MODE)
     check_required_packages(libssh2 OpenSSL)
 endif()
 
@@ -86,7 +90,7 @@ check_required_packages(zipper zlib)
 check_required_packages(libCellML libxml2 zlib)
 check_required_packages(libCOMBINE libSBML libxml2 zipper zlib)
 
-if(NOT EMSCRIPTEN)
+if(NOT WASM_MODE)
     check_required_packages(libcurl libssh2 OpenSSL zlib)
 endif()
 
@@ -106,7 +110,7 @@ list(SORT PACKAGES_TO_ADD)
 
 add_package(libxml2)
 
-if(NOT EMSCRIPTEN)
+if(NOT WASM_MODE)
     add_package(OpenSSL)
 endif()
 
@@ -115,7 +119,7 @@ add_package(zlib)
 add_package(libSBML) # Requires libxml2.
 add_package(libNuML) # Requires libSBML.
 
-if(NOT EMSCRIPTEN)
+if(NOT WASM_MODE)
     add_package(libssh2) # Requires OpenSSL and zlib.
 endif()
 
@@ -126,7 +130,7 @@ add_package(zipper) # Requires zlib.
 add_package(libCellML) # Requires libxml2 and zlib.
 add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
 
-if(NOT EMSCRIPTEN)
+if(NOT WASM_MODE)
     add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.
 endif()
 

@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME zlib)
-set(PACKAGE_VERSION 2.2.4)
+set(PACKAGE_VERSION 2.3.3)
 set(PACKAGE_REPOSITORY zlib-ng)
-set(RELEASE_TAG 2.2.4)
+set(RELEASE_TAG 2.3.3)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.

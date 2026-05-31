@@ -15,7 +15,7 @@
 set(PACKAGE_NAME zipper)
 set(PACKAGE_VERSION 0.9.1)
 set(PACKAGE_REPOSITORY zipper)
-set(RELEASE_TAG 966d3b2)
+set(RELEASE_TAG 83701e0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -72,15 +72,22 @@ if(LIBOPENCOR_PREBUILT_ZIPPER)
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
+    # Note: unlike for the other packages, we don't use a URL to retrieve zipper's source code since it contains a
+    #       submodule (minizip) and we need to make sure that it is retrieved.
 
     if(APPLE)
         set(PACKAGE_C_FLAGS -Wno-implicit-function-declaration)
     endif()
 
     build_package(${PACKAGE_NAME}
-        URL
-            https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
-        DOWNLOAD_NO_PROGRESS ON
+        GIT_REPOSITORY
+            https://github.com/opencor/${PACKAGE_REPOSITORY}.git
+        GIT_TAG
+            ${RELEASE_TAG}
+        GIT_SUBMODULES
+            minizip
+        GIT_SUBMODULES_RECURSE
+            ON
         CMAKE_CACHE_ARGS
             -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         CMAKE_ARGS
