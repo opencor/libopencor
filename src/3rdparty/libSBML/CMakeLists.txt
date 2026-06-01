@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libSBML)
-set(PACKAGE_VERSION 5.20.5)
+set(PACKAGE_VERSION 5.21.0)
 set(PACKAGE_REPOSITORY libsbml)
-set(RELEASE_TAG v5.20.5)
+set(RELEASE_TAG v5.21.0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 # Either retrieve or build our package.
@@ -28,54 +28,65 @@ if(LIBOPENCOR_PREBUILT_LIBSBML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         7af6669df81bb9ee61ddbca4970d46ae4dbabeee)
+                         54f84ef32f6a70cb7cbe6ffc4251d7762ec3c755)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     0ff9f19b3840bf61e7654b5d5cfbebf5af77b718)
+                                     27876adefeba2d0e38da978e6c425f7b303a42a6)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     a37af3f1fde2c1f8156e995be154a37eb368e85c)
+                                     ffc13b7e8a0e1ebf410579c09d80a212f4c69998)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     8ccc19c239357bebdd7e7e81a1e80449ee6d81d5)
+                                     c880538369168005bcd80daea453c7b32d95661e)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     e729dd13b6bb861644ba801903d9def7b6272f35)
+                                     d12c16ff4a2b8c667160ca8cb2378e332e089bb1)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 052aa4d544d1e93cc4530fcfdec68b39879f4878)
+                                 b0fbee2b7a45a35b3cb6751352e56bfc8f111bba)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 3e0ea2ce2b20189e83aa85c1cc6a45200526875b)
+                                 f3199a109ee56ea2e467ee34c6aca824d63363bb)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 00358806e25d038071f620c04af8c052c06aafcc)
+                                 3c936c1696294b602aa39dad9a6a255866c2f9bd)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 6978faf32f2c04d30d4973ae01c83262ae6d4693)
+                                 762d5c39d46a55fc894522ba99ad53c22a3ea1b3)
             endif()
         endif()
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
+
+    # libSBML's FindLIBXML.cmake unconditionally probes ZLIB. Pre-seed the ZLIB variables so that FindZLIB.cmake can
+    # succeed even when zlib is not available (on Windows and with Emscripten), while still keeping zlib disabled for
+    # libSBML itself.
+
+    set(ZLIB_ARGS
+        -DWITH_ZLIB=OFF
+        -DZLIB_FOUND=TRUE
+        -DZLIB_INCLUDE_DIR=${CMAKE_CURRENT_BINARY_DIR}
+        -DZLIB_LIBRARY=${CMAKE_CURRENT_BINARY_DIR}/zlib.not.used
+    )
 
     build_package(${PACKAGE_NAME}
         URL
@@ -91,7 +102,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DWITH_BZIP2=OFF
             -DWITH_CPP_NAMESPACE=ON
             -DWITH_SWIG=OFF
-            -DWITH_ZLIB=OFF
+            ${ZLIB_ARGS}
     )
 
     # Patch some of our CMake configuration files.

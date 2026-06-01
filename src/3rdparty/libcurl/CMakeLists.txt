@@ -13,9 +13,9 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libcurl)
-set(PACKAGE_VERSION 8.13.0)
+set(PACKAGE_VERSION 8.20.0)
 set(PACKAGE_REPOSITORY curl)
-set(RELEASE_TAG curl-8_13_0)
+set(RELEASE_TAG curl-8_20_0)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
@@ -30,42 +30,42 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5e8a72499d218023d67393f734404c7038e7aa14)
+                                 fcd780049a9da4bc87d6066f8b7ed94a0669ecb7)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 c99cd4ba1b592797e7ebd188f2e65704170d091f)
+                                 55ea4f0047efb61808856f9d6d246e9385277336)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 d732b6c4d7e18d7f3bfa8c328967eb8d8caf6dea)
+                                 30a4ad9b968829620dcb020b51b916d3c25fd1ba)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 bf29c92b63ba68b38ca1ba7c8daa36cdee69b77f)
+                                 dbaced2020520d73fcec616f6fd364454f98307a)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             5e7613a34a783a0f9770e51fa7b7dcece9e5cfc4)
+                             0b10f48c0fb7ca822058284c641a0ad4032e1635)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             828a81a2b5bd2f9f6c005c7303fe11359ccc9478)
+                             cc9d70b909e5f8171a4ea901c797d6b6f47ff5b2)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             aab92093559cd73a5929f8a0a37dd1b67f2d1557)
+                             2fe369235e2623b936ebe8a5c70e2cb84d329b5a)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f429be1ae9ee0814c51547d5cc424ad2abdb1757)
+                             8cdb9fbc1bd7b29a2cf35abb4717903a53ccf325)
         endif()
     endif()
 else()
@@ -79,11 +79,14 @@ else()
             -DCURL_BROTLI=OFF
             -DCURL_ZSTD=OFF
             -DBUILD_CURL_EXE=OFF
+            -DBUILD_LIBCURL_DOCS=OFF
             -DBUILD_TESTING=OFF
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DCURL_DISABLE_LDAP=ON
             -DCURL_USE_LIBPSL=OFF
             -DCURL_USE_OPENSSL=ON
+            -DENABLE_CURL_MANUAL=OFF
             -DLIBSSH2_INCLUDE_DIR=${LIBSSH2_INCLUDE_DIR}
             -DLIBSSH2_LIBRARY=${LIBSSH2_LIBRARY_FILE}
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
@@ -107,9 +110,11 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REPLACE "${LIBSSH2_LIBRARY_FILE}" "${LIBSSH2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "OpenSSL::Crypto" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "OpenSSL::SSL" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "CURL::libssh2" "${LIBSSH2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "CURL::OpenSSL_Crypto" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "CURL::OpenSSL_SSL" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "CURL::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "Threads::Threads" "" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "ZLIB::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
 
     if(APPLE)

@@ -86,12 +86,12 @@ def test_libcombine_version_string():
 
 def test_libcurl_version():
     assert isinstance(loc.libcurl_version(), int)
-    assert loc.libcurl_version() == 0x080D00
+    assert loc.libcurl_version() == 0x081400
 
 
 def test_libcurl_version_string():
     assert isinstance(loc.libcurl_version_string(), str)
-    assert loc.libcurl_version_string() == "8.13.0-DEV"
+    assert loc.libcurl_version_string() == "8.20.0-DEV"
 
 
 def test_libsedml_version():
@@ -116,9 +116,9 @@ def test_llvm_version_string():
 
 def test_sundials_version():
     assert isinstance(loc.sundials_version(), int)
-    assert loc.sundials_version() == 0x070300
+    assert loc.sundials_version() == 0x070700
 
 
 def test_sundials_version_string():
     assert isinstance(loc.sundials_version_string(), str)
-    assert loc.sundials_version_string() == "7.3.0"
+    assert loc.sundials_version_string() == "7.7.0"
