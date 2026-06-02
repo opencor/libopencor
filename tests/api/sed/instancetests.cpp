@@ -379,3 +379,54 @@ TEST(InstanceSedTest, daeModelFromLegacyCombineArchive)
 
     EXPECT_FALSE(instance->hasIssues());
 }
+
+TEST(InstanceSedTest, simulationWithInitialTime)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/simulation_with_initial_time.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    static const auto VOI_SIZE {50001};
+    static const auto VOI_START {0.0};
+    static const auto VOI_END {50.0};
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+
+    EXPECT_EQ(voi.size(), VOI_SIZE);
+    EXPECT_EQ(voi[0], VOI_START);
+    EXPECT_EQ(voi[voi.size() - 1], VOI_END);
+
+    static const auto INITIAL_VALUE {1.0};
+
+    const auto &x {instanceTask->state(0)};
+    const auto &y {instanceTask->state(1)};
+    const auto &z {instanceTask->state(2)};
+
+    EXPECT_EQ(x.size(), VOI_SIZE);
+    EXPECT_EQ(y.size(), VOI_SIZE);
+    EXPECT_EQ(z.size(), VOI_SIZE);
+
+    EXPECT_NE(x[0], INITIAL_VALUE);
+    EXPECT_NE(y[0], INITIAL_VALUE);
+    EXPECT_NE(z[0], INITIAL_VALUE);
+}
+
+TEST(InstanceSedTest, simulationWithInitialTimeFailing)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/simulation_with_initial_time_failing.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_TRUE(instance->hasIssues());
+}

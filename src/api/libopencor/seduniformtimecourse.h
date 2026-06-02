@@ -68,9 +68,6 @@ public:
      * Return the initial time used by this simulation.
      *
      * @return The initial time used by this simulation.
-     *
-     * @warning ---GRY--- The initial time of a simulation is currently ignored. We currently assume that the initial
-     * time is always the same as the output start time.
      */
 
     double initialTime() const;
@@ -81,9 +78,6 @@ public:
      * Set the initial time to be used by this simulation.
      *
      * @param pInitialTime The initial time to be used by this simulation.
-     *
-     * @warning ---GRY--- The initial time of a simulation is currently ignored. We currently assume that the initial
-     * time is always the same as the output start time.
      */
 
     void setInitialTime(double pInitialTime);

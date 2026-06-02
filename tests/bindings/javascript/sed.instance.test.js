@@ -431,4 +431,51 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
   });
+
+  test('Simulation with initial time', () => {
+    const file = new loc.File('simulation_with_initial_time.omex');
+
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/simulation_with_initial_time.omex')));
+
+    const instance = new loc.SedDocument(file).instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks.get(0);
+    const voi = instanceTask.voi;
+
+    assert.strictEqual(voi.length, 50001);
+    assert.strictEqual(voi.get(0), 0.0);
+    assert.strictEqual(voi.get(50000), 50.0);
+
+    const x = instanceTask.state(0);
+    const y = instanceTask.state(1);
+    const z = instanceTask.state(2);
+
+    assert.strictEqual(x.length, 50001);
+    assert.strictEqual(y.length, 50001);
+    assert.strictEqual(z.length, 50001);
+
+    assert.notStrictEqual(x.get(0), 1.0);
+    assert.notStrictEqual(y.get(0), 1.0);
+    assert.notStrictEqual(z.get(0), 1.0);
+  });
+
+  test('Simulation with initial time failing', () => {
+    const file = new loc.File('simulation_with_initial_time_failing.omex');
+
+    file.setContents(utils.fileContents(utils.resourcePath('api/sed/simulation_with_initial_time_failing.omex')));
+
+    const instance = new loc.SedDocument(file).instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, true);
+  });
 });
