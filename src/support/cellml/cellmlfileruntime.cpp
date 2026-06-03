@@ -72,7 +72,7 @@ intptr_t instantiateWebAssemblyModule(const UnsignedChars &pWasmModule, bool pDi
 
                     // NLA solve function.
 
-                    nlaSolve: function(nlaSolverAddress, objectiveFunctionIndex, u, n, data) {
+                    nlaSolve: (nlaSolverAddress, objectiveFunctionIndex, u, n, data) => {
                         Module.nlaSolve(Number(nlaSolverAddress), wasmInstanceFunctionsId, Number(objectiveFunctionIndex), Number(u), Number(n), Number(data));
                     },
 

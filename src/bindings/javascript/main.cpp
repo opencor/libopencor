@@ -59,7 +59,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     EM_ASM({
         let vectorNames = 'Doubles|FilePtrs|IssuePtrs|SedAbstractTaskPtrs|SedChangePtrs|SedDataDescriptionPtrs|SedDataGeneratorPtrs|SedInstanceTaskPtrs|SedModelPtrs|SedOutputPtrs|SedSimulationPtrs|SedStylePtrs|Strings'.split('|');
 
-        vectorNames.forEach(function(name) {
+        vectorNames.forEach((name) => {
             let prototype = Module[name].prototype;
 
             Object.defineProperty(prototype, 'length', {
@@ -91,14 +91,14 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
             };
 
             Object.setPrototypeOf(prototype, new Proxy(Object.getPrototypeOf(prototype), {
-                get: function(target, prop, receiver) {
+                get: (target, prop, receiver) => {
                     if (typeof prop === 'string' && /^[0-9]+$/.test(prop)) {
                         return receiver.get(parseInt(prop));
                     }
 
                     return Reflect.get(target, prop, receiver);
                 },
-                set: function(target, prop, value, receiver) {
+                set: (target, prop, value, receiver) => {
                     if (typeof prop === 'string' && /^[0-9]+$/.test(prop)) {
                         receiver.set(parseInt(prop), value);
 
