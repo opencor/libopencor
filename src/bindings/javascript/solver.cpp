@@ -31,16 +31,16 @@ void solverApi()
         .property("id", &libOpenCOR::Solver::id)
         .property("name", &libOpenCOR::Solver::name);
 
+    // clang-format off
     EM_ASM({
         Module["Solver"]["Type"] = Module["Solver.Type"];
 
         delete Module["Solver.Type"];
 
-        Module["Solver"].prototype.toString = function()
-        {
+        Module["Solver"].prototype.toString = function() {
             return this.name;
         };
-    });
+    }); // clang-format on
 
     // SolverOde API.
 
@@ -59,9 +59,10 @@ void solverApi()
                                                   reinterpret_cast<double *>(pU), pN, reinterpret_cast<void *>(pData));
                          }));
 
+    // clang-format off
     EM_ASM({
         Module["nlaSolve"] = Module["nlaSolve"];
-    });
+    }); // clang-format on
 
     emscripten::class_<libOpenCOR::SolverNla, emscripten::base<libOpenCOR::Solver>>("SolverNla")
         .smart_ptr<libOpenCOR::SolverNlaPtr>("SolverNla");
@@ -102,6 +103,7 @@ void solverApi()
         .property("absoluteTolerance", &libOpenCOR::SolverCvode::absoluteTolerance, &libOpenCOR::SolverCvode::setAbsoluteTolerance)
         .property("interpolateSolution", &libOpenCOR::SolverCvode::interpolateSolution, &libOpenCOR::SolverCvode::setInterpolateSolution);
 
+    // clang-format off
     EM_ASM({
         Module["SolverCvode"]["IntegrationMethod"] = Module["SolverCvode.IntegrationMethod"];
         Module["SolverCvode"]["IterationType"] = Module["SolverCvode.IterationType"];
@@ -112,7 +114,7 @@ void solverApi()
         delete Module["SolverCvode.IterationType"];
         delete Module["SolverCvode.LinearSolver"];
         delete Module["SolverCvode.Preconditioner"];
-    });
+    }); // clang-format on
 
     // SolverForwardEuler API.
 
@@ -145,11 +147,12 @@ void solverApi()
         .property("upperHalfBandwidth", &libOpenCOR::SolverKinsol::upperHalfBandwidth, &libOpenCOR::SolverKinsol::setUpperHalfBandwidth)
         .property("lowerHalfBandwidth", &libOpenCOR::SolverKinsol::lowerHalfBandwidth, &libOpenCOR::SolverKinsol::setLowerHalfBandwidth);
 
+    // clang-format off
     EM_ASM({
         Module["SolverKinsol"]["LinearSolver"] = Module["SolverKinsol.LinearSolver"];
 
         delete Module["SolverKinsol.LinearSolver"];
-    });
+    }); // clang-format on
 
     // SolverSecondOrderRungeKutta API.
 

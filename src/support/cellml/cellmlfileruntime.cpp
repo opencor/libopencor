@@ -466,10 +466,12 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 CellmlFileRuntime::Impl::~Impl()
 {
     if (mWasmInstanceFunctionsId != 0) {
+        // clang-format off
         EM_ASM({
             if (Module.wasmInstanceFunctions !== undefined) {
                 Module.wasmInstanceFunctions.delete($0);
-            } }, mWasmInstanceFunctionsId);
+            }
+        }, mWasmInstanceFunctionsId); // clang-format on
     }
 }
 

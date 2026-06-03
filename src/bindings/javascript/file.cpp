@@ -82,11 +82,12 @@ void fileApi()
         .function("childFile", &libOpenCOR::File::childFile)
         .function("childFileFromFileName", &libOpenCOR::File::childFileFromFileName);
 
+    // clang-format off
     EM_ASM({
         Module["File"]["Type"] = Module["File.Type"];
 
         delete Module["File.Type"];
-    });
+    }); // clang-format on
 
     // FileManager API.
 

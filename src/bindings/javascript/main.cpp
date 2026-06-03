@@ -55,6 +55,7 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     //       those commas can get interpreted as macro argument separators by the C++ preprocessor, which causes
     //       compilation errors.
 
+    // clang-format off
     EM_ASM({
         let vectorNames = 'Doubles|FilePtrs|IssuePtrs|SedAbstractTaskPtrs|SedChangePtrs|SedDataDescriptionPtrs|SedDataGeneratorPtrs|SedInstanceTaskPtrs|SedModelPtrs|SedOutputPtrs|SedSimulationPtrs|SedStylePtrs|Strings'.split('|');
 
@@ -62,7 +63,9 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
             let prototype = Module[name].prototype;
 
             Object.defineProperty(prototype, 'length', {
-                get: function() { return this.size(); }
+                get: function() {
+                    return this.size();
+                }
             });
 
             prototype[Symbol.iterator] = function() {
@@ -106,5 +109,5 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
                 }
             }));
         });
-    });
+    }); // clang-format on
 }

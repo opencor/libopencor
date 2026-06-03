@@ -37,11 +37,12 @@ static emscripten::val toFloat64Array(const Doubles &data)
     // Note: see the note in src/bindings/javascript/file.cpp for why we avoid typed_memory_view() and use EM_ASM()
     //       instead.
 
-    return emscripten::val::take_ownership(
-        static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
-            var jsArray = new Float64Array(new Float64Array(HEAPU8.buffer, $0, $1));
+    // clang-format off
+    return emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
+        let jsArray = new Float64Array(new Float64Array(HEAPU8.buffer, $0, $1));
 
-            return Emval.toHandle(jsArray); }, data.data(), size)));
+        return Emval.toHandle(jsArray);
+    }, data.data(), size))); // clang-format on
 }
 #endif
 
