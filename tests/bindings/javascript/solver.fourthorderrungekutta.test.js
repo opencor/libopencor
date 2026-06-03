@@ -34,7 +34,7 @@ test.describe('Solver Fourth-Order Runge-Kutta tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = new loc.SolverFourthOrderRungeKutta();
 
     solver.step = 0.0;
@@ -57,7 +57,7 @@ test.describe('Solver Fourth-Order Runge-Kutta tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = new loc.SolverFourthOrderRungeKutta();
 
     solver.step = 0.0123;

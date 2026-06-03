@@ -66,7 +66,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.hasModels, true);
     assert.strictEqual(document.modelCount, 1);
     assert.strictEqual(document.models.length, 1);
-    assert.deepStrictEqual(document.models.get(0), model);
+    assert.deepStrictEqual(document.models[0], model);
     assert.deepStrictEqual(document.model(0), model);
     assert.deepStrictEqual(document.model(1), null);
 
@@ -96,7 +96,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(model.hasChanges, true);
     assert.strictEqual(model.changeCount, 1);
     assert.strictEqual(model.changes.length, 1);
-    assert.deepStrictEqual(model.changes.get(0), changeAttribute);
+    assert.deepStrictEqual(model.changes[0], changeAttribute);
     assert.deepStrictEqual(model.change(0), changeAttribute);
     assert.deepStrictEqual(model.change(1), null);
 
@@ -202,10 +202,10 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.hasSimulations, true);
     assert.strictEqual(document.simulationCount, 4);
     assert.strictEqual(document.simulations.length, 4);
-    assert.deepStrictEqual(document.simulations.get(0), uniform_time_course);
-    assert.deepStrictEqual(document.simulations.get(1), one_step);
-    assert.deepStrictEqual(document.simulations.get(2), steady_state);
-    assert.deepStrictEqual(document.simulations.get(3), analysis);
+    assert.deepStrictEqual(document.simulations[0], uniform_time_course);
+    assert.deepStrictEqual(document.simulations[1], one_step);
+    assert.deepStrictEqual(document.simulations[2], steady_state);
+    assert.deepStrictEqual(document.simulations[3], analysis);
     assert.deepStrictEqual(document.simulation(0), uniform_time_course);
     assert.deepStrictEqual(document.simulation(1), one_step);
     assert.deepStrictEqual(document.simulation(2), steady_state);
@@ -256,7 +256,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.hasTasks, true);
     assert.strictEqual(document.taskCount, 1);
     assert.strictEqual(document.tasks.length, 1);
-    assert.deepStrictEqual(document.tasks.get(0), task);
+    assert.deepStrictEqual(document.tasks[0], task);
     assert.deepStrictEqual(document.task(0), task);
     assert.deepStrictEqual(document.task(1), null);
 
@@ -364,13 +364,13 @@ test.describe('Sed coverage tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const solver = document.simulations.get(0).odeSolver;
+    const solver = document.simulations[0].odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
     solver.upperHalfBandwidth = -1;
 
     const instance = document.instantiate();
-    const instanceTask = instance.tasks.get(0);
+    const instanceTask = instance.tasks[0];
 
     assert.strictEqual(instance.hasTasks, true);
     assert.strictEqual(instance.taskCount, 1);
@@ -450,7 +450,7 @@ test.describe('Sed coverage tests', () => {
     const document = new loc.SedDocument(file);
 
     const instance = document.instantiate();
-    const instanceTask = instance.tasks.get(0);
+    const instanceTask = instance.tasks[0];
 
     assert.strictEqual(instanceTask.voi.length, 0);
     assert.deepStrictEqual(instanceTask.voiAsArray, emptyFloat64Array);
@@ -492,7 +492,7 @@ test.describe('Sed coverage tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     let solver = new loc.SolverForwardEuler();
 
     simulation.odeSolver = solver;
@@ -541,7 +541,7 @@ test.describe('Sed coverage tests', () => {
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
-    const instanceTask = instance.tasks.get(0);
+    const instanceTask = instance.tasks[0];
 
     assert.strictEqual(instanceTask.constantCount, 0);
     assert.strictEqual(instanceTask.computedConstantCount, 37);

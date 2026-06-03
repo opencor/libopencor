@@ -128,7 +128,7 @@ test.describe('Sed instance tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const cvode = simulation.odeSolver;
 
     cvode.maximumNumberOfSteps = 10;
@@ -159,7 +159,7 @@ test.describe('Sed instance tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    document.simulations.get(0).odeSolver = null;
+    document.simulations[0].odeSolver = null;
 
     const instance = document.instantiate();
 
@@ -177,7 +177,7 @@ test.describe('Sed instance tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const kinsol = simulation.nlaSolver;
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -206,7 +206,7 @@ test.describe('Sed instance tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    document.simulations.get(0).nlaSolver = null;
+    document.simulations[0].nlaSolver = null;
 
     const instance = document.instantiate();
 
@@ -224,7 +224,7 @@ test.describe('Sed instance tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/sed/dae.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const kinsol = simulation.nlaSolver;
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -263,7 +263,7 @@ test.describe('Sed instance tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/sed/dae.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
 
     simulation.odeSolver = null;
     simulation.nlaSolver = null;
@@ -337,7 +337,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(document.hasIssues, false);
 
-    const nlaSolver = document.simulations.get(0).nlaSolver;
+    const nlaSolver = document.simulations[0].nlaSolver;
 
     assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
@@ -362,7 +362,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(document.hasIssues, false);
 
-    const nlaSolver = document.simulations.get(0).nlaSolver;
+    const nlaSolver = document.simulations[0].nlaSolver;
 
     assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
@@ -391,7 +391,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(document.hasIssues, false);
 
-    const nlaSolver = document.simulations.get(0).nlaSolver;
+    const nlaSolver = document.simulations[0].nlaSolver;
 
     assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
@@ -416,7 +416,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(document.hasIssues, false);
 
-    const nlaSolver = document.simulations.get(0).nlaSolver;
+    const nlaSolver = document.simulations[0].nlaSolver;
 
     assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
@@ -445,12 +445,12 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.hasIssues, false);
 
-    const instanceTask = instance.tasks.get(0);
+    const instanceTask = instance.tasks[0];
     const voi = instanceTask.voi;
 
     assert.strictEqual(voi.length, 50001);
-    assert.strictEqual(voi.get(0), 0.0);
-    assert.strictEqual(voi.get(50000), 50.0);
+    assert.strictEqual(voi[0], 0.0);
+    assert.strictEqual(voi[50000], 50.0);
 
     const x = instanceTask.state(0);
     const y = instanceTask.state(1);
@@ -460,9 +460,9 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(y.length, 50001);
     assert.strictEqual(z.length, 50001);
 
-    assert.notStrictEqual(x.get(0), 1.0);
-    assert.notStrictEqual(y.get(0), 1.0);
-    assert.notStrictEqual(z.get(0), 1.0);
+    assert.notStrictEqual(x[0], 1.0);
+    assert.notStrictEqual(y[0], 1.0);
+    assert.notStrictEqual(z[0], 1.0);
   });
 
   test('Simulation with initial time failing', () => {

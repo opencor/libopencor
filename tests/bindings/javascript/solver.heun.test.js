@@ -34,7 +34,7 @@ test.describe('Solver Heun tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = new loc.SolverHeun();
 
     solver.step = 0.0;
@@ -54,7 +54,7 @@ test.describe('Solver Heun tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = new loc.SolverHeun();
 
     solver.step = 0.0123;

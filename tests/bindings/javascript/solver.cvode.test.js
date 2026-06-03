@@ -34,7 +34,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.maximumStep = -1.234;
@@ -55,7 +55,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.maximumNumberOfSteps = 0;
@@ -76,7 +76,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
@@ -98,7 +98,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
@@ -120,7 +120,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
@@ -142,7 +142,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
@@ -164,7 +164,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.relativeTolerance = -1.234;
@@ -185,7 +185,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.absoluteTolerance = -1.234;
@@ -231,7 +231,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.interpolateSolution = false;
@@ -260,7 +260,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
@@ -289,7 +289,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.iterationType = loc.SolverCvode.IterationType.FUNCTIONAL;
@@ -318,7 +318,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
@@ -347,7 +347,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.DIAGONAL;
@@ -376,7 +376,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
@@ -405,7 +405,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB;
@@ -434,7 +434,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR;
@@ -463,7 +463,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
@@ -493,7 +493,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB;
@@ -523,7 +523,7 @@ test.describe('Solver CVODE tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR;

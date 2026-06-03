@@ -334,7 +334,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
 
     simulation.odeSolver = new loc.SolverForwardEuler();
 
@@ -347,7 +347,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.integrationMethod = loc.SolverCvode.IntegrationMethod.ADAMS_MOULTON;
@@ -366,7 +366,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.iterationType = loc.SolverCvode.IterationType.FUNCTIONAL;
@@ -385,7 +385,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
@@ -404,7 +404,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.DIAGONAL;
@@ -423,7 +423,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.GMRES;
@@ -442,7 +442,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BICGSTAB;
@@ -461,7 +461,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.TFQMR;
@@ -480,7 +480,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.preconditioner = loc.SolverCvode.Preconditioner.NO;
@@ -497,7 +497,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.CELLML_CONTENTS);
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.odeSolver;
 
     solver.interpolateSolution = false;
@@ -516,7 +516,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -530,7 +530,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.GMRES;
@@ -544,7 +544,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BICGSTAB;
@@ -561,7 +561,7 @@ test.describe('Sed serialise tests', () => {
     file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.TFQMR;
@@ -590,7 +590,7 @@ test.describe('Sed serialise tests', () => {
 
     const document = new loc.SedDocument(file);
 
-    document.removeSimulation(document.simulations.get(0));
+    document.removeSimulation(document.simulations[0]);
 
     const simulation = new loc.SedOneStep(document);
 

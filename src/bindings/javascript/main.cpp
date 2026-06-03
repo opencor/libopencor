@@ -63,31 +63,48 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
 
             Object.defineProperty(prototype, 'length', {
                 get: function() { return this.size(); }
+            });
+
+            prototype[Symbol.iterator] = function() {
+                let i = 0;
+                let n = this.size();
+                let iterator = {};
+
+                iterator.next = () => {
+                    let result = {};
+
+                    if (i < n) {
+                        result.value = this.get(i++);
+                        result.done = false;
+                    } else {
+                        result.value = undefined;
+                        result.done = true;
+                    }
+
+                    return result;
+                };
+
+                return iterator;
+            };
+
+            Object.setPrototypeOf(prototype, new Proxy(Object.getPrototypeOf(prototype), {
+                get: function(target, prop, receiver) {
+                    if (typeof prop === 'string' && /^[0-9]+$/.test(prop)) {
+                        return receiver.get(parseInt(prop));
+                    }
+
+                    return Reflect.get(target, prop, receiver);
+                },
+                set: function(target, prop, value, receiver) {
+                    if (typeof prop === 'string' && /^[0-9]+$/.test(prop)) {
+                        receiver.set(parseInt(prop), value);
+
+                        return true;
+                    }
+
+                    return Reflect.set(target, prop, value, receiver);
+                }
+            }));
+        });
     });
-
-    prototype[Symbol.iterator] = function()
-    {
-        let i = 0;
-        let n = this.size();
-        let iterator = {};
-
-        iterator.next = () =>
-        {
-            let result = {};
-
-            if (i < n) {
-                result.value = this.get(i++);
-                result.done = false;
-            } else {
-                result.value = undefined;
-                result.done = true;
-            }
-
-            return result;
-        };
-
-        return iterator;
-    };
-});
-});
 }
