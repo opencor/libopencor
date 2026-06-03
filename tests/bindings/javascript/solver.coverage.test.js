@@ -101,4 +101,16 @@ test.describe('Solver coverage tests', () => {
     assertValue(instanceTask.algebraicVariable(1)[0], -13.18519, 5);
     assertValue(instanceTask.algebraicVariable(2)[0], 33.33333, 5);
   });
+
+  test('toString()', () => {
+    const file = new loc.File(utils.COMBINE_ARCHIVE);
+
+    file.setContents(utils.fileContents(utils.resourcePath(utils.COMBINE_ARCHIVE)));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations[0];
+    const solver = simulation.odeSolver;
+
+    assert.strictEqual(solver.toString(), 'CVODE');
+  });
 });
