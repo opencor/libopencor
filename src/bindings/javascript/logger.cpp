@@ -46,14 +46,14 @@ void loggerApi()
         .property("typeAsString", &libOpenCOR::Issue::typeAsString)
         .property("description", &libOpenCOR::Issue::description);
 
+    // clang-format off
     EM_ASM({
         Module["Issue"]["Type"] = Module["Issue.Type"];
 
         delete Module["Issue.Type"];
 
-        Module["Issue"].prototype.toString = function()
-        {
+        Module["Issue"].prototype.toString = function() {
             return this.description;
         };
-    });
+    }); // clang-format on
 }

@@ -37,7 +37,7 @@ TEST(InstanceSedTest, invalidCellmlFile)
         {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: equation 'x+y+z' in component 'my_component' is not an equality statement (i.e. LHS = RHS)."},
     }};
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("error.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto instance {document->instantiate()};
 
@@ -114,7 +114,7 @@ TEST(InstanceSedTest, odeModel)
 #endif
     }};
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
@@ -149,7 +149,7 @@ TEST(InstanceSedTest, odeModelWithNoOdeSolver)
         {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
     }};
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     document->simulations()[0]->setOdeSolver(nullptr);
@@ -252,7 +252,7 @@ TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
 
 TEST(InstanceSedTest, combineArchive)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto instance {document->instantiate()};
 
@@ -312,8 +312,8 @@ TEST(InstanceSedTest, daeModelFromSedmlFile)
 
 TEST(InstanceSedTest, daeModelFromCombineArchive)
 {
-    auto combineArchive {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.omex"))};
-    auto document {libOpenCOR::SedDocument::create(combineArchive)};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_FALSE(document->hasIssues());
 
@@ -359,8 +359,8 @@ TEST(InstanceSedTest, daeModelFromLegacySedmlFile)
 
 TEST(InstanceSedTest, daeModelFromLegacyCombineArchive)
 {
-    auto combineArchive {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy.omex"))};
-    auto document {libOpenCOR::SedDocument::create(combineArchive)};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model_legacy.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_FALSE(document->hasIssues());
 
@@ -378,4 +378,55 @@ TEST(InstanceSedTest, daeModelFromLegacyCombineArchive)
     instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, simulationWithInitialTime)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/simulation_with_initial_time.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    static const auto VOI_SIZE {50001};
+    static const auto VOI_START {0.0};
+    static const auto VOI_END {50.0};
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto &voi {instanceTask->voi()};
+
+    EXPECT_EQ(voi.size(), VOI_SIZE);
+    EXPECT_EQ(voi[0], VOI_START);
+    EXPECT_EQ(voi[voi.size() - 1], VOI_END);
+
+    static const auto INITIAL_VALUE {1.0};
+
+    const auto &x {instanceTask->state(0)};
+    const auto &y {instanceTask->state(1)};
+    const auto &z {instanceTask->state(2)};
+
+    EXPECT_EQ(x.size(), VOI_SIZE);
+    EXPECT_EQ(y.size(), VOI_SIZE);
+    EXPECT_EQ(z.size(), VOI_SIZE);
+
+    EXPECT_NE(x[0], INITIAL_VALUE);
+    EXPECT_NE(y[0], INITIAL_VALUE);
+    EXPECT_NE(z[0], INITIAL_VALUE);
+}
+
+TEST(InstanceSedTest, simulationWithInitialTimeFailing)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/simulation_with_initial_time_failing.omex"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_TRUE(instance->hasIssues());
 }

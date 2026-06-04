@@ -29,12 +29,12 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Maximum number of iterations value with invalid number', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.maximumNumberOfIterations = 0;
@@ -50,12 +50,12 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Banded linear solver and upper half-bandwidth value with number too small', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla2.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -72,12 +72,12 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Banded linear solver and upper half-bandwidth value with number too big', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -94,12 +94,12 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Banded linear solver and lower half-bandwidth value with number too small', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla2.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -116,12 +116,12 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Banded linear solver and lower half-bandwidth value with number too big', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -144,8 +144,8 @@ test.describe('Solver KINSOL tests', () => {
     assert.strictEqual(instanceTask.computedConstantCount, 0);
     assert.strictEqual(instanceTask.algebraicVariableCount, 2);
 
-    assertValue(instanceTask.algebraicVariable(0).get(0), 3.0, 5);
-    assertValue(instanceTask.algebraicVariable(1).get(0), 7.0, 5);
+    assertValue(instanceTask.algebraicVariable(0)[0], 3.0, 5);
+    assertValue(instanceTask.algebraicVariable(1)[0], 7.0, 5);
   }
 
   function assertNla2Solution(instanceTask) {
@@ -155,31 +155,31 @@ test.describe('Solver KINSOL tests', () => {
     assert.strictEqual(instanceTask.computedConstantCount, 0);
     assert.strictEqual(instanceTask.algebraicVariableCount, 3);
 
-    assertValue(instanceTask.algebraicVariable(0).get(0), 7.0, 5);
-    assertValue(instanceTask.algebraicVariable(1).get(0), -5.0, 5);
-    assertValue(instanceTask.algebraicVariable(2).get(0), 3.0, 5);
+    assertValue(instanceTask.algebraicVariable(0)[0], 7.0, 5);
+    assertValue(instanceTask.algebraicVariable(1)[0], -5.0, 5);
+    assertValue(instanceTask.algebraicVariable(2)[0], 3.0, 5);
   }
 
   test('Solve', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
     instance.run();
 
-    assertNla1Solution(instance.tasks.get(0));
+    assertNla1Solution(instance.tasks[0]);
   });
 
   test('Solve with banded linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla2.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -190,16 +190,16 @@ test.describe('Solver KINSOL tests', () => {
 
     instance.run();
 
-    assertNla2Solution(instance.tasks.get(0));
+    assertNla2Solution(instance.tasks[0]);
   });
 
   test('Solve with GMRES linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.GMRES;
@@ -208,16 +208,16 @@ test.describe('Solver KINSOL tests', () => {
 
     instance.run();
 
-    assertNla1Solution(instance.tasks.get(0));
+    assertNla1Solution(instance.tasks[0]);
   });
 
   test('Solve with BiCGStab linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla2.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.BICGSTAB;
@@ -226,16 +226,16 @@ test.describe('Solver KINSOL tests', () => {
 
     instance.run();
 
-    assertNla2Solution(instance.tasks.get(0));
+    assertNla2Solution(instance.tasks[0]);
   });
 
   test('Solve with TFQMR linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = simulation.nlaSolver;
 
     solver.linearSolver = loc.SolverKinsol.LinearSolver.TFQMR;
@@ -244,6 +244,6 @@ test.describe('Solver KINSOL tests', () => {
 
     instance.run();
 
-    assertNla1Solution(instance.tasks.get(0));
+    assertNla1Solution(instance.tasks[0]);
   });
 });

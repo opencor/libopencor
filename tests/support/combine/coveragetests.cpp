@@ -22,7 +22,7 @@ limitations under the License.
 
 TEST(CoverageOmexTest, file)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"));
     auto combineArchive = libOpenCOR::CombineArchive::create(file);
 
     EXPECT_NE(combineArchive->file(0), nullptr);

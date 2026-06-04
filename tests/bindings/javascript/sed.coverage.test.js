@@ -56,7 +56,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.models.length, 0);
     assert.strictEqual(document.addModel(null), false);
 
-    const file = new loc.File(utils.SEDML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
     const model = new loc.SedModel(document, file);
 
     assert.deepStrictEqual(model.file, file);
@@ -66,7 +66,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.hasModels, true);
     assert.strictEqual(document.modelCount, 1);
     assert.strictEqual(document.models.length, 1);
-    assert.deepStrictEqual(document.models.get(0), model);
+    assert.deepStrictEqual(document.models[0], model);
     assert.deepStrictEqual(document.model(0), model);
     assert.deepStrictEqual(document.model(1), null);
 
@@ -96,7 +96,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(model.hasChanges, true);
     assert.strictEqual(model.changeCount, 1);
     assert.strictEqual(model.changes.length, 1);
-    assert.deepStrictEqual(model.changes.get(0), changeAttribute);
+    assert.deepStrictEqual(model.changes[0], changeAttribute);
     assert.deepStrictEqual(model.change(0), changeAttribute);
     assert.deepStrictEqual(model.change(1), null);
 
@@ -114,7 +114,7 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Changes', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File('file.omex');
 
     file.setContents(utils.fileContents(utils.resourcePath('api/sed/sed_changes.omex')));
 
@@ -202,10 +202,10 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.hasSimulations, true);
     assert.strictEqual(document.simulationCount, 4);
     assert.strictEqual(document.simulations.length, 4);
-    assert.deepStrictEqual(document.simulations.get(0), uniform_time_course);
-    assert.deepStrictEqual(document.simulations.get(1), one_step);
-    assert.deepStrictEqual(document.simulations.get(2), steady_state);
-    assert.deepStrictEqual(document.simulations.get(3), analysis);
+    assert.deepStrictEqual(document.simulations[0], uniform_time_course);
+    assert.deepStrictEqual(document.simulations[1], one_step);
+    assert.deepStrictEqual(document.simulations[2], steady_state);
+    assert.deepStrictEqual(document.simulations[3], analysis);
     assert.deepStrictEqual(document.simulation(0), uniform_time_course);
     assert.deepStrictEqual(document.simulation(1), one_step);
     assert.deepStrictEqual(document.simulation(2), steady_state);
@@ -243,7 +243,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.tasks.length, 0);
     assert.strictEqual(document.addTask(null), false);
 
-    const file = new loc.File(utils.SEDML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
     const model = new loc.SedModel(document, file);
     const simulation = new loc.SedUniformTimeCourse(document);
     const task = new loc.SedTask(document, model, simulation);
@@ -256,7 +256,7 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(document.hasTasks, true);
     assert.strictEqual(document.taskCount, 1);
     assert.strictEqual(document.tasks.length, 1);
-    assert.deepStrictEqual(document.tasks.get(0), task);
+    assert.deepStrictEqual(document.tasks[0], task);
     assert.deepStrictEqual(document.task(0), task);
     assert.deepStrictEqual(document.task(1), null);
 
@@ -326,7 +326,7 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SedOneStep', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedOneStep(document);
 
@@ -338,7 +338,7 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SedUniformTimeCourse', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
     const document = new loc.SedDocument(file);
     const simulation = new loc.SedUniformTimeCourse(document);
 
@@ -359,18 +359,18 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SedInstanceAndSedInstanceTaskDifferentialModel', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/ode.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const solver = document.simulations.get(0).odeSolver;
+    const solver = document.simulations[0].odeSolver;
 
     solver.linearSolver = loc.SolverCvode.LinearSolver.BANDED;
     solver.upperHalfBandwidth = -1;
 
     const instance = document.instantiate();
-    const instanceTask = instance.tasks.get(0);
+    const instanceTask = instance.tasks[0];
 
     assert.strictEqual(instance.hasTasks, true);
     assert.strictEqual(instance.taskCount, 1);
@@ -443,14 +443,14 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SedInstanceAndSedInstanceTaskNonDifferentialModel', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
 
     const instance = document.instantiate();
-    const instanceTask = instance.tasks.get(0);
+    const instanceTask = instance.tasks[0];
 
     assert.strictEqual(instanceTask.voi.length, 0);
     assert.deepStrictEqual(instanceTask.voiAsArray, emptyFloat64Array);
@@ -471,15 +471,17 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SedDocument', () => {
-    let file = new loc.File(utils.HTTP_REMOTE_CELLML_FILE);
+    // Note: the three following URLs use http rather than https to help with coverage testing.
+
+    let file = new loc.File('http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml');
 
     new loc.SedDocument(file);
 
-    file = new loc.File(utils.HTTP_REMOTE_SEDML_FILE);
+    file = new loc.File('http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml');
 
     new loc.SedDocument(file);
 
-    file = new loc.File(utils.HTTP_REMOTE_COMBINE_ARCHIVE);
+    file = new loc.File('http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex');
 
     new loc.SedDocument(file);
   });
@@ -487,12 +489,12 @@ test.describe('Sed coverage tests', () => {
   test('Solver', () => {
     // Get the duplicate() method of different solvers to be covered.
 
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     let solver = new loc.SolverForwardEuler();
 
     simulation.odeSolver = solver;
@@ -535,13 +537,13 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Math', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/math.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/math.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
-    const instanceTask = instance.tasks.get(0);
+    const instanceTask = instance.tasks[0];
 
     assert.strictEqual(instanceTask.constantCount, 0);
     assert.strictEqual(instanceTask.computedConstantCount, 37);
@@ -604,9 +606,9 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('KINSOL with Inf and/or NaN values', () => {
-    const file = new loc.File('kinsol_with_inf_and_or_nan_values.cellml');
+    const file = new loc.File(utils.resourcePath('api/sed/kinsol_with_inf_and_or_nan_values.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/kinsol_with_inf_and_or_nan_values.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -620,15 +622,13 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SED-ML file with nlaAlgorithm and NLA algorithm', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_nla_algorithm_and_nla_algorithm.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_nla_algorithm_and_nla_algorithm.sedml'));
 
-    sedmlFile.setContents(
-      utils.fileContents(utils.resourcePath('api/sed/dae/model_nla_algorithm_and_nla_algorithm.sedml'))
-    );
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
@@ -641,13 +641,13 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SED-ML file with several nlaAlgorithms', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_several_nla_algorithms.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_several_nla_algorithms.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_several_nla_algorithms.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
@@ -660,13 +660,13 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SED-ML file with unknown NLA algorithm', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_unknown_nla_algorithm.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_unknown_nla_algorithm.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_unknown_nla_algorithm.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
@@ -679,25 +679,25 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('SED-ML file branch coverage', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_branch_coverage.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_branch_coverage.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_branch_coverage.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     new loc.SedDocument(sedmlFile);
   });
 
   test('SED-ML file with no NLA algorithm', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_no_nla_algorithm.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_no_nla_algorithm.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_no_nla_algorithm.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
@@ -710,15 +710,13 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Legacy SED-ML file with NLA algorithm and NLA solver', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy_nla_algorithm_and_nla_solver.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy_nla_algorithm_and_nla_solver.sedml'));
 
-    sedmlFile.setContents(
-      utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_nla_algorithm_and_nla_solver.sedml'))
-    );
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
@@ -731,13 +729,13 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Legacy SED-ML file with several NLA solvers', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy_several_nla_solvers.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy_several_nla_solvers.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_several_nla_solvers.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
@@ -750,37 +748,37 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Legacy SED-ML file with unknown namespace', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy_unknown_namespace.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy_unknown_namespace.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_namespace.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     new loc.SedDocument(sedmlFile);
   });
 
   test('Legacy SED-ML file with unknown element', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy_unknown_element.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy_unknown_element.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_element.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     new loc.SedDocument(sedmlFile);
   });
 
   test('Legacy SED-ML file with unknown NLA solver', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy_unknown_nla_solver.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy_unknown_nla_solver.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_nla_solver.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
@@ -793,46 +791,48 @@ test.describe('Sed coverage tests', () => {
   });
 
   test('Legacy SED-ML file with unknown property namespace', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy_unknown_property_namespace.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy_unknown_property_namespace.sedml'));
 
-    sedmlFile.setContents(
-      utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_property_namespace.sedml'))
-    );
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     new loc.SedDocument(sedmlFile);
   });
 
   test('Legacy SED-ML file with unknown property element', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy_unknown_property_element.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy_unknown_property_element.sedml'));
 
-    sedmlFile.setContents(
-      utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_property_element.sedml'))
-    );
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     new loc.SedDocument(sedmlFile);
   });
 
   test('Legacy SED-ML file with unknown property', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy_unknown_property.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy_unknown_property.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy_unknown_property.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
     assertIssues(loc, document, [
       [loc.Issue.Type.WARNING, "SED-ML file: the NLA solver property 'Unknown' is not recognised. It will be ignored."]
     ]);
+  });
+
+  test('SED-ML file with bare filename', () => {
+    const file = new loc.File('cellml_2.sedml');
+
+    file.setContents(utils.fileContents(utils.resourcePath('cellml_2.sedml')));
   });
 });

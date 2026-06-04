@@ -27,10 +27,10 @@ test.describe('File type tests', () => {
     loc.FileManager.instance().reset();
   });
 
-  function doTestDataset(omexContents, jsonContents, specificChildFileNames) {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+  function doTestDataset(number, specificChildFileNames) {
+    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
-    file.setContents(omexContents);
+    file.setContents(utils.fileContents(utils.resourcePath(`api/file/dataset_${number}.omex`)));
 
     assert.strictEqual(file.hasChildFiles, true);
     assert.strictEqual(file.childFileCount, specificChildFileNames.length + 1);
@@ -49,35 +49,34 @@ test.describe('File type tests', () => {
     }
 
     assert.strictEqual(file.childFile(++index), null);
-    assert.strictEqual(file.childFileFromFileName(utils.UNKNOWN_FILE), null);
+    assert.strictEqual(file.childFileFromFileName(utils.resourcePath('unknown_file.txt')), null);
 
-    assert.deepStrictEqual(simulationFile.contents(), jsonContents);
+    assert.deepStrictEqual(
+      simulationFile.contents(),
+      utils.fileContents(utils.resourcePath(`api/file/dataset_${number}.json`))
+    );
   }
 
   test('No child files', () => {
-    const file = new loc.File(utils.UNKNOWN_FILE);
+    const filePath = utils.resourcePath('unknown_file.txt');
+    const file = new loc.File(filePath);
 
     assert.strictEqual(file.hasChildFiles, false);
     assert.strictEqual(file.childFileCount, 0);
     assert.strictEqual(file.childFileNames.length, 0);
     assert.strictEqual(file.childFiles.length, 0);
     assert.strictEqual(file.childFile(0), null);
-    assert.strictEqual(file.childFileFromFileName(utils.UNKNOWN_FILE), null);
+    assert.strictEqual(file.childFileFromFileName(filePath), null);
   });
 
   test('Dataset 135', () => {
-    doTestDataset(
-      utils.fileContents(utils.resourcePath('api/file/dataset_135.omex')),
-      utils.fileContents(utils.resourcePath('api/file/dataset_135.json')),
-      ['HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml']
-    );
+    doTestDataset(135, ['HumanSAN_Fabbri_Fantini_Wilders_Severi_2017.cellml']);
   });
 
   test('Dataset 157', () => {
-    doTestDataset(
-      utils.fileContents(utils.resourcePath('api/file/dataset_157.omex')),
-      utils.fileContents(utils.resourcePath('api/file/dataset_157.json')),
-      ['fabbri_et_al_based_composite_SAN_model.cellml', 'fabbri_et_al_based_composite_SAN_model.sedml']
-    );
+    doTestDataset(157, [
+      'fabbri_et_al_based_composite_SAN_model.cellml',
+      'fabbri_et_al_based_composite_SAN_model.sedml'
+    ]);
   });
 });

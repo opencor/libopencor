@@ -72,7 +72,7 @@ intptr_t instantiateWebAssemblyModule(const UnsignedChars &pWasmModule, bool pDi
 
                     // NLA solve function.
 
-                    nlaSolve: function(nlaSolverAddress, objectiveFunctionIndex, u, n, data) {
+                    nlaSolve: (nlaSolverAddress, objectiveFunctionIndex, u, n, data) => {
                         Module.nlaSolve(Number(nlaSolverAddress), wasmInstanceFunctionsId, Number(objectiveFunctionIndex), Number(u), Number(n), Number(data));
                     },
 
@@ -466,10 +466,12 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 CellmlFileRuntime::Impl::~Impl()
 {
     if (mWasmInstanceFunctionsId != 0) {
+        // clang-format off
         EM_ASM({
             if (Module.wasmInstanceFunctions !== undefined) {
                 Module.wasmInstanceFunctions.delete($0);
-            } }, mWasmInstanceFunctionsId);
+            }
+        }, mWasmInstanceFunctionsId); // clang-format on
     }
 }
 

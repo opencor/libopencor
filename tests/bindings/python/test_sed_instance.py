@@ -45,7 +45,7 @@ def test_invalid_cellml_file():
         ],
     ]
 
-    file = loc.File(utils.resource_path(utils.ErrorCellmlFile))
+    file = loc.File(utils.resource_path("error.cellml"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
@@ -139,7 +139,7 @@ def run_ode_model():
         ],
     ]
 
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     cvode = simulation.ode_solver
@@ -175,7 +175,7 @@ def test_ode_model_with_no_ode_solver():
         ],
     ]
 
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
 
     document.simulations[0].ode_solver = None
@@ -288,7 +288,7 @@ def test_dae_model_with_no_ode_or_nla_solver():
 
 
 def test_combine_archive():
-    file = loc.File(utils.resource_path(utils.Combine2Archive))
+    file = loc.File(utils.resource_path("cellml_2.omex"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
@@ -351,8 +351,8 @@ def test_dae_model_from_sedml_file():
 
 
 def test_dae_model_from_combine_archive():
-    combine_archive = loc.File(utils.resource_path("api/sed/dae/model.omex"))
-    document = loc.SedDocument(combine_archive)
+    file = loc.File(utils.resource_path("api/sed/dae/model.omex"))
+    document = loc.SedDocument(file)
 
     assert not document.has_issues
 
@@ -396,8 +396,8 @@ def test_dae_model_from_legacy_sedml_file():
 
 
 def test_dae_model_from_legacy_combine_archive():
-    combine_archive = loc.File(utils.resource_path("api/sed/dae/model_legacy.omex"))
-    document = loc.SedDocument(combine_archive)
+    file = loc.File(utils.resource_path("api/sed/dae/model_legacy.omex"))
+    document = loc.SedDocument(file)
 
     assert not document.has_issues
 
@@ -415,3 +415,48 @@ def test_dae_model_from_legacy_combine_archive():
     instance.run()
 
     assert not instance.has_issues
+
+
+def test_simulation_with_initial_time():
+    file = loc.File(utils.resource_path("api/sed/simulation_with_initial_time.omex"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+
+    assert len(voi) == 50001
+    assert voi[0] == 0.0
+    assert voi[50000] == 50.0
+
+    x = instance_task.state(0)
+    y = instance_task.state(1)
+    z = instance_task.state(2)
+
+    assert len(x) == 50001
+    assert len(y) == 50001
+    assert len(z) == 50001
+
+    assert x[0] != 1.0
+    assert y[0] != 1.0
+    assert z[0] != 1.0
+
+
+def test_simulation_with_initial_time_failing():
+    file = loc.File(
+        utils.resource_path("api/sed/simulation_with_initial_time_failing.omex")
+    )
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert instance.has_issues

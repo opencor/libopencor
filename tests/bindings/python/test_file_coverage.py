@@ -18,7 +18,7 @@ import utils
 
 
 def test_empty_file():
-    file = loc.File(utils.LocalFile)
+    file = loc.File(utils.resource_path("file.txt"))
 
     file.contents = []
 
@@ -26,32 +26,35 @@ def test_empty_file():
 
 
 def test_file_with_null_character():
-    file = loc.File(utils.LocalFile)
+    file = loc.File(utils.resource_path("file.txt"))
 
-    file.contents = utils.string_to_list("\0")
+    file.contents = utils.text_to_list("\0")
 
     assert file.type == loc.File.Type.UnknownFile
 
 
 def test_sedml_file_with_no_parent():
-    file = loc.File(utils.Sedml2File)
+    file = loc.File("cellml_2.sedml")
 
-    file.contents = utils.string_to_list(utils.SedmlContents)
+    file.contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.sedml"))
+    )
 
 
 def test_irretrievable_virtual_file():
-    file = loc.File(utils.IrretrievableFile, False)
+    file = loc.File(utils.resource_path("irretrievable_file.txt"), False)
 
     assert not file.has_issues
 
 
 def test_irretrievable_remote_file():
-    loc.File(utils.IrretrievableRemoteFile)
+    loc.File("https://some.domain.com/irretrievable_file.txt")
 
 
 def test_same_local_file():
-    file1 = loc.File(utils.LocalFile)
-    file2 = loc.File(utils.LocalFile)
+    file_path = utils.resource_path("file.txt")
+    file1 = loc.File(file_path)
+    file2 = loc.File(file_path)
 
     assert file1.__subclasshook__ == file2.__subclasshook__
 
@@ -71,7 +74,7 @@ def test_do_not_retrieve_contents():
 
 
 def test_unmanage_file_with_children():
-    file = loc.File(utils.resource_path(utils.Combine2Archive))
+    file = loc.File(utils.resource_path("cellml_2.omex"))
     file_manager = loc.FileManager.instance()
 
     assert file_manager.file_count == 3

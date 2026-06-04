@@ -29,9 +29,9 @@ test.describe('Solver coverage tests', () => {
   });
 
   test('ODE changes', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('api/solver/ode_sed_changes.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode_sed_changes.omex')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -80,16 +80,16 @@ test.describe('Solver coverage tests', () => {
     //  • y = -356/27 = -13.185185185185185
     //  • z = -760/27 = -28.148148148148145
 
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('api/solver/algebraic_sed_changes.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/algebraic_sed_changes.omex')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
     instance.run();
 
-    const instanceTask = instance.tasks.get(0);
+    const instanceTask = instance.tasks[0];
 
     assert.strictEqual(instanceTask.stateCount, 0);
     assert.strictEqual(instanceTask.rateCount, 0);
@@ -97,8 +97,20 @@ test.describe('Solver coverage tests', () => {
     assert.strictEqual(instanceTask.computedConstantCount, 1);
     assert.strictEqual(instanceTask.algebraicVariableCount, 3);
 
-    assertValue(instanceTask.algebraicVariable(0).get(0), -28.14815, 5);
-    assertValue(instanceTask.algebraicVariable(1).get(0), -13.18519, 5);
-    assertValue(instanceTask.algebraicVariable(2).get(0), 33.33333, 5);
+    assertValue(instanceTask.algebraicVariable(0)[0], -28.14815, 5);
+    assertValue(instanceTask.algebraicVariable(1)[0], -13.18519, 5);
+    assertValue(instanceTask.algebraicVariable(2)[0], 33.33333, 5);
+  });
+
+  test('toString()', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations[0];
+    const solver = simulation.odeSolver;
+
+    assert.strictEqual(solver.toString(), 'CVODE');
   });
 });

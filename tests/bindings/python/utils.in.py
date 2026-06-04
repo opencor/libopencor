@@ -24,43 +24,8 @@ import pytest
 ResourceLocation = "@RESOURCE_LOCATION@"
 
 
-UnknownFile = "unknown_file.txt"
-SbmlFile = "sbml.sbml"
-ErrorCellmlFile = "error.cellml"
-ErrorSedmlFile = "error.sedml"
-Cellml1xFile = "cellml_1_x.cellml"
-Sedml1xFile = "cellml_1_x.sedml"
-Combine1xArchive = "cellml_1_x.omex"
-Cellml2File = "cellml_2.cellml"
-Sedml2File = "cellml_2.sedml"
-Combine2Archive = "cellml_2.omex"
-IrretrievableFile = "irretrievable_file.txt"
-
-
-if platform.system() == "Windows":
-    LocalFile = "P:\\some\\path\\file.txt"
-else:
-    LocalFile = "/some/path/file.txt"
-
-
-# Note: the three following URLs use http rather than https to help with coverage testing.
-HttpRemoteCellmlFile = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-HttpRemoteSedmlFile = "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"
-HttpRemoteCombineArchive = (
-    "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
-)
 RemoteBasePath = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
 RemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
-EncodedRemoteFile = "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml"
-NonEncodedRemoteFile = "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml"
-UnknownRemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt"
-IrretrievableRemoteFile = "https://some.domain.com/irretrievable_file.txt"
-
-
-UnknownContents = "Some unknown contents..."
-CellmlContents = """@CELLML_CONTENTS@"""
-SedmlContents = """@SEDML_CONTENTS@"""
-Base64CombineArchiveContents = base64.b64decode(b"@BASE64_COMBINE_ARCHIVE_CONTENTS@")
 
 
 def assert_issues(logger, expected_issues):
@@ -133,20 +98,19 @@ def resource_path(relative_path=""):
     return os.path.realpath(ResourceLocation + "/" + relative_path)
 
 
-def string_to_list(string):
-    return [ord(x) for x in string]
+def forward_slash_path(path):
+    if platform.system() == "Windows":
+        return path.replace("\\", "/")
+
+    return path
 
 
-def binary_to_list(string):
-    return [x for x in string]
+def text_to_list(text):
+    return [ord(x) for x in text]
 
 
-def string_to_path(string):
-    return pathlib.Path(string)
-
-
-def path_to_string(path):
-    return str(path)
+def binary_to_list(binary):
+    return [x for x in binary]
 
 
 def to_string(array):
@@ -155,4 +119,9 @@ def to_string(array):
 
 def text_file_contents(file_name):
     with open(file_name, "r") as file:
+        return file.read()
+
+
+def binary_file_contents(file_name):
+    with open(file_name, "rb") as file:
         return file.read()

@@ -29,12 +29,12 @@ test.describe('Solver Heun tests', () => {
   });
 
   test('Step value with invalid number', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/ode.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = new loc.SolverHeun();
 
     solver.step = 0.0;
@@ -49,12 +49,12 @@ test.describe('Solver Heun tests', () => {
   });
 
   test('Solve', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/ode.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const solver = new loc.SolverHeun();
 
     solver.step = 0.0123;

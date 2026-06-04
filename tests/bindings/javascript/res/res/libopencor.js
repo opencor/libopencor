@@ -255,7 +255,7 @@ $(() => {
                   return;
                 }
 
-                simulation = document.simulations.get(0);
+                simulation = document.simulations[0];
 
                 if (simulation?.hasIssues) {
                   showIssues(simulation.issues);
@@ -271,7 +271,7 @@ $(() => {
                   return;
                 }
 
-                instanceTask = instance.tasks.get(0);
+                instanceTask = instance.tasks[0];
 
                 if (instanceTask?.hasIssues) {
                   showIssues(instanceTask.issues);

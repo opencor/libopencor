@@ -31,7 +31,7 @@ TEST(BasicSedTest, unknownFile)
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an unknown file."},
     }};
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("unknown_file.txt"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
@@ -39,7 +39,7 @@ TEST(BasicSedTest, unknownFile)
 
 TEST(BasicSedTest, cellmlFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_FALSE(document->hasIssues());
@@ -47,12 +47,12 @@ TEST(BasicSedTest, cellmlFile)
 
 TEST(BasicSedTest, sedmlFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.sedml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_TRUE(document->hasIssues());
 
-    auto neededFile {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto neededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
 
     document = libOpenCOR::SedDocument::create(file);
 
@@ -66,7 +66,7 @@ TEST(BasicSedTest, sedmlFileWithAbsoluteCellmlFile)
 
     EXPECT_TRUE(document->hasIssues());
 
-    auto neededFile {libOpenCOR::File::create(libOpenCOR::LOCAL_FILE)};
+    auto neededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("file.txt"))};
 
     document = libOpenCOR::SedDocument::create(file);
 
@@ -89,7 +89,7 @@ TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
 
 TEST(BasicSedTest, combineArchive)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_FALSE(document->hasIssues());
@@ -167,7 +167,7 @@ TEST(BasicSedTest, irretrievableFile)
         {libOpenCOR::Issue::Type::ERROR, "A simulation experiment description cannot be created using an irretrievable file."},
     }};
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("irretrievable_file.txt"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);

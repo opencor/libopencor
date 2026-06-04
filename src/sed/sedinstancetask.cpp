@@ -37,11 +37,12 @@ static emscripten::val toFloat64Array(const Doubles &data)
     // Note: see the note in src/bindings/javascript/file.cpp for why we avoid typed_memory_view() and use EM_ASM()
     //       instead.
 
-    return emscripten::val::take_ownership(
-        static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
-            var jsArray = new Float64Array(new Float64Array(HEAPU8.buffer, $0, $1));
+    // clang-format off
+    return emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
+        let jsArray = new Float64Array(new Float64Array(HEAPU8.buffer, $0, $1));
 
-            return Emval.toHandle(jsArray); }, data.data(), size)));
+        return Emval.toHandle(jsArray);
+    }, data.data(), size))); // clang-format on
 }
 #endif
 
@@ -246,7 +247,7 @@ void SedInstanceTask::Impl::initialise()
     // initialise our variables and compute computed constants and variables.
 
     if (mSedUniformTimeCourse != nullptr) {
-        mVoi = mSedUniformTimeCourse->pimpl()->mOutputStartTime;
+        mVoi = mSedUniformTimeCourse->pimpl()->mInitialTime;
 
 #ifdef __EMSCRIPTEN__
         mRuntime->initialiseArraysForDifferentialModel(mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
@@ -302,6 +303,56 @@ void SedInstanceTask::Impl::initialise()
     }
 }
 
+void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInterval, bool pTrackResults)
+{
+    // Track our initial results.
+
+    size_t index {0};
+
+    if (pTrackResults) {
+        trackResults(index);
+    }
+
+    // Compute the differential model.
+
+    auto *odeSolverPimpl {mOdeSolver->pimpl()};
+    size_t voiCounter {0};
+
+#ifndef __EMSCRIPTEN__
+    const auto computeVariablesForDifferentialModel = mRuntime->computeVariablesForDifferentialModel();
+#endif
+
+    while (!fuzzyCompare(mVoi, pVoiEnd)) {
+        if (!odeSolverPimpl->solve(mVoi, std::min(pVoiStart + static_cast<double>(++voiCounter) * pVoiInterval, pVoiEnd))) {
+            addIssues(mOdeSolver, mOdeSolver->name());
+
+            return;
+        }
+
+#ifdef __EMSCRIPTEN__
+        mRuntime->computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
+#else
+        computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
+#endif
+
+        //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD TRIGGER
+        //          NLA ISSUES HERE, WHICH WE DON'T HAVE YET HENCE WE DISABLE THE FOLLOWING CODE WHEN DOING CODE
+        //          COVERAGE.
+
+#ifndef CODE_COVERAGE_ENABLED
+        if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+            addIssues(mNlaSolver, mNlaSolver->name());
+
+            return;
+        }
+#endif
+
+        if (pTrackResults) {
+            trackResults(++index);
+        }
+    }
+}
+
 double SedInstanceTask::Impl::run()
 {
     // Start our timer.
@@ -340,50 +391,22 @@ double SedInstanceTask::Impl::run()
             mResults.algebraicVariables[i].resize(resultsSize, NAN);
         }
 
-        // Track our initial results.
+        // Run our simulation from the initial time to the output start time, without tracking our results.
 
-        size_t index {0};
+        const auto voiInterval {(sedUniformTimeCoursePimpl->mOutputEndTime - sedUniformTimeCoursePimpl->mOutputStartTime) / sedUniformTimeCoursePimpl->mNumberOfSteps};
 
-        trackResults(index);
+        run(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime, voiInterval, false);
 
-        // Compute the differential model.
+        if (hasIssues()) {
+            return 0.0;
+        }
 
-        auto *odeSolverPimpl {mOdeSolver->pimpl()};
-        const auto voiStart {mVoi};
-        const auto voiEnd {sedUniformTimeCoursePimpl->mOutputEndTime};
-        const auto voiInterval {(voiEnd - mVoi) / sedUniformTimeCoursePimpl->mNumberOfSteps};
-        size_t voiCounter {0};
+        // Run our simulation from the output start time to the output end time, tracking our results.
 
-#ifndef __EMSCRIPTEN__
-        const auto computeVariablesForDifferentialModel = mRuntime->computeVariablesForDifferentialModel();
-#endif
+        run(sedUniformTimeCoursePimpl->mOutputStartTime, sedUniformTimeCoursePimpl->mOutputEndTime, voiInterval, true);
 
-        while (!fuzzyCompare(mVoi, voiEnd)) {
-            if (!odeSolverPimpl->solve(mVoi, std::min(voiStart + static_cast<double>(++voiCounter) * voiInterval, voiEnd))) {
-                addIssues(mOdeSolver, mOdeSolver->name());
-
-                return 0.0;
-            }
-
-#ifdef __EMSCRIPTEN__
-            mRuntime->computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
-#else
-            computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
-#endif
-
-            //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD
-            //          TRIGGER NLA ISSUES HERE, WHICH WE DON'T HAVE YET HENCE WE DISABLE THE FOLLOWING CODE WHEN DOING
-            //          CODE COVERAGE.
-
-#ifndef CODE_COVERAGE_ENABLED
-            if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
-                addIssues(mNlaSolver, mNlaSolver->name());
-
-                return 0.0;
-            }
-#endif
-
-            trackResults(++index);
+        if (hasIssues()) {
+            return 0.0;
         }
     } else {
         // Track our results.

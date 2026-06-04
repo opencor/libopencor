@@ -29,7 +29,7 @@ export function run(
   algebraicValues,
   algebraicPrecisions
 ) {
-  const simulation = document.simulations.get(0);
+  const simulation = document.simulations[0];
 
   simulation.outputEndTime = 50.0;
   simulation.numberOfSteps = 50000;
@@ -38,7 +38,7 @@ export function run(
 
   instance.run();
 
-  const instanceTask = instance.tasks.get(0);
+  const instanceTask = instance.tasks[0];
 
   assertValues(
     instanceTask,

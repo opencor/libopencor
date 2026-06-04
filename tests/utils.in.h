@@ -32,39 +32,8 @@ namespace libOpenCOR {
 
 static constexpr auto RESOURCE_LOCATION {"@RESOURCE_LOCATION@"};
 
-static constexpr auto UNKNOWN_FILE {"unknown_file.txt"};
-static constexpr auto SBML_FILE {"sbml.sbml"};
-static constexpr auto ERROR_CELLML_FILE {"error.cellml"};
-static constexpr auto ERROR_SEDML_FILE {"error.sedml"};
-static constexpr auto CELLML_1_X_FILE {"cellml_1_x.cellml"};
-static constexpr auto SEDML_1_X_FILE {"cellml_1_x.sedml"};
-static constexpr auto COMBINE_1_X_ARCHIVE {"cellml_1_x.omex"};
-static constexpr auto CELLML_2_FILE {"cellml_2.cellml"};
-static constexpr auto SEDML_2_FILE {"cellml_2.sedml"};
-static constexpr auto COMBINE_2_ARCHIVE {"cellml_2.omex"};
-static constexpr auto IRRETRIEVABLE_FILE {"irretrievable_file.txt"};
-
-#ifdef BUILDING_ON_WINDOWS
-static constexpr auto LOCAL_FILE {R"(P:\some\path\file.txt)"};
-#else
-static constexpr auto LOCAL_FILE {"/some/path/file.txt"};
-#endif
-
-// Note: the three following URLs use http rather than https to help with coverage testing.
-static constexpr auto HTTP_REMOTE_CELLML_FILE {"http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"};
-static constexpr auto HTTP_REMOTE_SEDML_FILE {"http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"};
-static constexpr auto HTTP_REMOTE_COMBINE_ARCHIVE {"http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"};
 static constexpr auto REMOTE_BASE_PATH {"https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"};
 static constexpr auto REMOTE_FILE {"https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"};
-static constexpr auto ENCODED_REMOTE_FILE {"https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml"};
-static constexpr auto NON_ENCODED_REMOTE_FILE {"https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml"};
-static constexpr auto UNKNOWN_REMOTE_FILE {"https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt"};
-static constexpr auto IRRETRIEVABLE_REMOTE_FILE {"https://some.domain.com/irretrievable_file.txt"};
-
-static constexpr auto UNKNOWN_CONTENTS {"Some unknown contents..."};
-static constexpr auto CELLML_CONTENTS {"@CELLML_CONTENTS_C@"};
-static constexpr auto SEDML_CONTENTS {"@SEDML_CONTENTS_C@"};
-static constexpr auto BASE64_COMBINE_ARCHIVE_CONTENTS {"@BASE64_COMBINE_ARCHIVE_CONTENTS@"};
 
 typedef struct
 {
@@ -92,10 +61,8 @@ void expectEqualValues(const SedInstanceTaskPtr &pInstanceTask, size_t pIndex,
     expectEqualValues(pInstanceTask, pIndex, pStateValues, pStateAbsTols, pRateValues, pRateAbsTols, pConstantValues, pConstantAbsTols, pComputedConstantValues, pComputedConstantAbsTols, pAlgebraicValues, pAlgebraicAbsTols)
 
 std::string resourcePath(const std::string &pResourceRelativePath = {});
+
 std::string textFileContents(const std::string &pFileName);
-
 UnsignedChars charArrayToUnsignedChars(const char *pContents);
-
-UnsignedChars base64Decode(const char *pContents);
 
 } // namespace libOpenCOR

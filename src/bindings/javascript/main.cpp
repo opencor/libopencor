@@ -55,39 +55,59 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
     //       those commas can get interpreted as macro argument separators by the C++ preprocessor, which causes
     //       compilation errors.
 
+    // clang-format off
     EM_ASM({
         let vectorNames = 'Doubles|FilePtrs|IssuePtrs|SedAbstractTaskPtrs|SedChangePtrs|SedDataDescriptionPtrs|SedDataGeneratorPtrs|SedInstanceTaskPtrs|SedModelPtrs|SedOutputPtrs|SedSimulationPtrs|SedStylePtrs|Strings'.split('|');
 
-        vectorNames.forEach(function(name) {
+        vectorNames.forEach((name) => {
             let prototype = Module[name].prototype;
 
             Object.defineProperty(prototype, 'length', {
-                get: function() { return this.size(); }
-    });
+                get: function() {
+                    return this.size();
+                }
+            });
 
-    prototype[Symbol.iterator] = function()
-    {
-        let i = 0;
-        let n = this.size();
-        let iterator = {};
+            prototype[Symbol.iterator] = function() {
+                let i = 0;
+                let n = this.size();
+                let iterator = {};
 
-        iterator.next = () =>
-        {
-            let result = {};
+                iterator.next = () => {
+                    let result = {};
 
-            if (i < n) {
-                result.value = this.get(i++);
-                result.done = false;
-            } else {
-                result.value = undefined;
-                result.done = true;
-            }
+                    if (i < n) {
+                        result.value = this.get(i++);
+                        result.done = false;
+                    } else {
+                        result.value = undefined;
+                        result.done = true;
+                    }
 
-            return result;
-        };
+                    return result;
+                };
 
-        return iterator;
-    };
-});
-});
+                return iterator;
+            };
+
+            Object.setPrototypeOf(prototype, new Proxy(Object.getPrototypeOf(prototype), {
+                get: (target, prop, receiver) => {
+                    if (typeof prop === 'string' && /^[0-9]+$/.test(prop)) {
+                        return receiver.get(parseInt(prop));
+                    }
+
+                    return Reflect.get(target, prop, receiver);
+                },
+                set: (target, prop, value, receiver) => {
+                    if (typeof prop === 'string' && /^[0-9]+$/.test(prop)) {
+                        receiver.set(parseInt(prop), value);
+
+                        return true;
+                    }
+
+                    return Reflect.set(target, prop, value, receiver);
+                }
+            }));
+        });
+    }); // clang-format on
 }

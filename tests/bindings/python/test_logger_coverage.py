@@ -18,32 +18,32 @@ import utils
 
 
 def test_has_issues():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert not file.has_issues
 
 
 def test_issue_count():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert file.issue_count == 0
 
 
 def test_issues():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert len(file.issues) == 0
 
 
 def test_issue():
-    file = loc.File(utils.resource_path(utils.ErrorCellmlFile))
+    file = loc.File(utils.resource_path("error.cellml"))
 
     assert file.issue(0) is not None
     assert file.issue(file.issue_count) is None
 
 
 def test_issue_str():
-    file = loc.File(utils.resource_path(utils.ErrorCellmlFile))
+    file = loc.File(utils.resource_path("error.cellml"))
     issue = file.issue(0)
 
     assert issue is not None
@@ -51,50 +51,50 @@ def test_issue_str():
 
 
 def test_has_errors():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert not file.has_errors
 
 
 def test_error_count():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert file.error_count == 0
 
 
 def test_errors():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert len(file.errors) == 0
 
 
 def test_error():
-    file = loc.File(utils.resource_path(utils.ErrorCellmlFile))
+    file = loc.File(utils.resource_path("error.cellml"))
 
     assert file.error(0) is not None
     assert file.error(file.error_count) is None
 
 
 def test_has_warnings():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert not file.has_warnings
 
 
 def test_warning_count():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert file.warning_count == 0
 
 
 def test_warnings():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert len(file.warnings) == 0
 
 
 def test_warning():
-    file = loc.File(utils.resource_path(utils.Sedml2File))
+    file = loc.File(utils.resource_path("cellml_2.sedml"))
     document = loc.SedDocument(file)
 
     assert document.warning(0) is not None

@@ -32,45 +32,49 @@ void fileApi()
         .property("fileName", &libOpenCOR::File::fileName)
         .property("url", &libOpenCOR::File::url)
         .property("path", &libOpenCOR::File::path)
+        // clang-format off
         .function("contents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis) {
-                      const auto &contents {pThis->contents()};
-                      auto size = contents.size();
+            const auto &contents {pThis->contents()};
+            auto size = contents.size();
 
-                      if (size == 0) {
-                          return emscripten::val::global("Uint8Array").new_(0);
-                      }
+            if (size == 0) {
+                return emscripten::val::global("Uint8Array").new_(0);
+            }
 
-                      // Note: we avoid using emscripten::typed_memory_view() as an intermediate step since it creates a
-                      //       JavaScript's TypedArray view directly backed by wasmMemory.buffer. This is fragile and
-                      //       would break if ALLOW_MEMORY_GROWTH was to be enabled or if pthreads/SharedArrayBuffer
-                      //       support were to be added. By performing the copy entirely within a single EM_ASM() block,
-                      //       HEAPU8 is fetched and used atomically.
+            // Note: we avoid using emscripten::typed_memory_view() as an intermediate step since it creates a
+            //       JavaScript's TypedArray view directly backed by wasmMemory.buffer. This is fragile and would break
+            //       if ALLOW_MEMORY_GROWTH was to be enabled or if pthreads/SharedArrayBuffer support were to be added.
+            //       By performing the copy entirely within a single EM_ASM() block, HEAPU8 is fetched and used
+            //       atomically.
 
-                      return emscripten::val::take_ownership(
-                          static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
-                              var jsArray = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
+            return emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(
+                EM_ASM_PTR({
+                    let jsArray = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
 
-                              return Emval.toHandle(jsArray); }, contents.data(), size)));
-                  }))
+                    return Emval.toHandle(jsArray);
+                }, contents.data(), size)));
+        }))
         .function("setContents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis, emscripten::val pContents) {
-                      if (pContents.isNull() || pContents.isUndefined()) {
-                          pThis->setContents(libOpenCOR::UnsignedChars {});
+            if (pContents.isNull() || pContents.isUndefined()) {
+                pThis->setContents(libOpenCOR::UnsignedChars {});
 
-                          return;
-                      }
+                return;
+            }
 
-                      // Note: avoid using emscripten::vecFromJSArray() since it internally uses typed_memory_view (see
-                      //       the note in the contents() binding above).
+            // Note: avoid using emscripten::vecFromJSArray() since it internally uses typed_memory_view (see the note
+            //       in the contents() binding above).
 
-                      auto length = pContents["length"].as<size_t>();
-                      libOpenCOR::UnsignedChars contents(length);
+            auto length = pContents["length"].as<size_t>();
+            libOpenCOR::UnsignedChars contents(length);
 
-                      if (length > 0) {
-                          EM_ASM({ HEAPU8.set(Emval.toValue($0).subarray(0, $2), $1); }, pContents.as_handle(), contents.data(), length);
-                      }
+            if (length > 0) {
+                EM_ASM({
+                    HEAPU8.set(Emval.toValue($0).subarray(0, $2), $1);
+                }, pContents.as_handle(), contents.data(), length);
+            }
 
-                      pThis->setContents(std::move(contents));
-                  }))
+            pThis->setContents(std::move(contents));
+        })) // clang-format on
         .property("hasChildFiles", &libOpenCOR::File::hasChildFiles)
         .property("childFileCount", &libOpenCOR::File::childFileCount)
         .property("childFileNames", &libOpenCOR::File::childFileNames)
@@ -78,11 +82,12 @@ void fileApi()
         .function("childFile", &libOpenCOR::File::childFile)
         .function("childFileFromFileName", &libOpenCOR::File::childFileFromFileName);
 
+    // clang-format off
     EM_ASM({
         Module["File"]["Type"] = Module["File.Type"];
 
         delete Module["File.Type"];
-    });
+    }); // clang-format on
 
     // FileManager API.
 

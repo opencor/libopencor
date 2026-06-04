@@ -91,6 +91,7 @@ public:
 
     void applyChanges();
     void initialise();
+    void run(double pVoiStart, double pVoiEnd, double pVoiInterval, bool pTrackResults);
     double run();
 
     const Doubles &voi() const;

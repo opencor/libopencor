@@ -38,9 +38,9 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Invalid CellML file', () => {
-    const file = new loc.File(utils.ERROR_CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('error.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('error.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -55,9 +55,9 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Overconstrained CellML file', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/overconstrained.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/overconstrained.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -72,9 +72,9 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Underconstrained CellML file', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/underconstrained.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/underconstrained.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -89,9 +89,9 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Unsuitably constrained CellML file', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/unsuitably_constrained.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/unsuitably_constrained.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -110,9 +110,9 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Algebraic model', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/algebraic.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/algebraic.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -123,12 +123,12 @@ test.describe('Sed instance tests', () => {
   });
 
   test('ODE model', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const cvode = simulation.odeSolver;
 
     cvode.maximumNumberOfSteps = 10;
@@ -153,13 +153,13 @@ test.describe('Sed instance tests', () => {
   });
 
   test('ODE model with no ODE solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
 
-    document.simulations.get(0).odeSolver = null;
+    document.simulations[0].odeSolver = null;
 
     const instance = document.instantiate();
 
@@ -172,12 +172,12 @@ test.describe('Sed instance tests', () => {
   });
 
   test('NLA model', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/nla.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const kinsol = simulation.nlaSolver;
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -200,13 +200,13 @@ test.describe('Sed instance tests', () => {
   });
 
   test('NLA model with no NLA solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/nla.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/nla.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
 
-    document.simulations.get(0).nlaSolver = null;
+    document.simulations[0].nlaSolver = null;
 
     const instance = document.instantiate();
 
@@ -219,12 +219,12 @@ test.describe('Sed instance tests', () => {
   });
 
   test('DAE model', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/dae.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/dae.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
     const kinsol = simulation.nlaSolver;
 
     kinsol.linearSolver = loc.SolverKinsol.LinearSolver.BANDED;
@@ -258,12 +258,12 @@ test.describe('Sed instance tests', () => {
   });
 
   test('DAE model with no ODE or NLA solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/dae.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/dae.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
-    const simulation = document.simulations.get(0);
+    const simulation = document.simulations[0];
 
     simulation.odeSolver = null;
     simulation.nlaSolver = null;
@@ -283,9 +283,9 @@ test.describe('Sed instance tests', () => {
   });
 
   test('COMBINE archive', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
-    file.setContents(utils.COMBINE_ARCHIVE_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -296,9 +296,9 @@ test.describe('Sed instance tests', () => {
   });
 
   test('COMBINE archive with CellML file as master file', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('api/sed/cellml_file_as_master_file.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/cellml_file_as_master_file.omex')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -307,9 +307,9 @@ test.describe('Sed instance tests', () => {
   });
 
   test('DAE model from CellML file', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
 
@@ -325,19 +325,19 @@ test.describe('Sed instance tests', () => {
   });
 
   test('DAE model from SED-ML file', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
     assert.strictEqual(document.hasIssues, false);
 
-    const nlaSolver = document.simulations.get(0).nlaSolver;
+    const nlaSolver = document.simulations[0].nlaSolver;
 
     assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
@@ -354,15 +354,15 @@ test.describe('Sed instance tests', () => {
   });
 
   test('DAE model from COMBINE archive', () => {
-    const combineArchive = new loc.File('model.omex');
+    const file = new loc.File(utils.resourcePath('api/sed/dae/model.omex'));
 
-    combineArchive.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.omex')));
+    file.setContents(utils.fileContents(file.path));
 
-    const document = new loc.SedDocument(combineArchive);
+    const document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
 
-    const nlaSolver = document.simulations.get(0).nlaSolver;
+    const nlaSolver = document.simulations[0].nlaSolver;
 
     assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
@@ -379,19 +379,19 @@ test.describe('Sed instance tests', () => {
   });
 
   test('DAE model from legacy SED-ML file', () => {
-    const cellmlFile = new loc.File('model.cellml');
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model.cellml')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
 
-    const sedmlFile = new loc.File('model_legacy.sedml');
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model_legacy.sedml'));
 
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy.sedml')));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
 
     const document = new loc.SedDocument(sedmlFile);
 
     assert.strictEqual(document.hasIssues, false);
 
-    const nlaSolver = document.simulations.get(0).nlaSolver;
+    const nlaSolver = document.simulations[0].nlaSolver;
 
     assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
@@ -408,15 +408,15 @@ test.describe('Sed instance tests', () => {
   });
 
   test('DAE model from legacy COMBINE archive', () => {
-    const combineArchive = new loc.File('model_legacy.omex');
+    const file = new loc.File(utils.resourcePath('api/sed/dae/model_legacy.omex'));
 
-    combineArchive.setContents(utils.fileContents(utils.resourcePath('api/sed/dae/model_legacy.omex')));
+    file.setContents(utils.fileContents(file.path));
 
-    const document = new loc.SedDocument(combineArchive);
+    const document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
 
-    const nlaSolver = document.simulations.get(0).nlaSolver;
+    const nlaSolver = document.simulations[0].nlaSolver;
 
     assert.strictEqual(nlaSolver.linearSolver, loc.SolverKinsol.LinearSolver.GMRES);
     assert.strictEqual(nlaSolver.maximumNumberOfIterations, 123);
@@ -430,5 +430,52 @@ test.describe('Sed instance tests', () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Simulation with initial time', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/simulation_with_initial_time.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const instance = new loc.SedDocument(file).instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+
+    assert.strictEqual(voi.length, 50001);
+    assert.strictEqual(voi[0], 0.0);
+    assert.strictEqual(voi[50000], 50.0);
+
+    const x = instanceTask.state(0);
+    const y = instanceTask.state(1);
+    const z = instanceTask.state(2);
+
+    assert.strictEqual(x.length, 50001);
+    assert.strictEqual(y.length, 50001);
+    assert.strictEqual(z.length, 50001);
+
+    assert.notStrictEqual(x[0], 1.0);
+    assert.notStrictEqual(y[0], 1.0);
+    assert.notStrictEqual(z[0], 1.0);
+  });
+
+  test('Simulation with initial time failing', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/simulation_with_initial_time_failing.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const instance = new loc.SedDocument(file).instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, true);
   });
 });

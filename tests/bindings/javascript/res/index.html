@@ -153,29 +153,29 @@
     <script type="module">
     import { reset, run, showPage, updatePlottingAreaAndAxesInfo } from './res/libopencor.js';
 
-    $('#navHome').on('click', function () {
+    $('#navHome').on('click', () => {
       showPage('Home');
     });
-    $('#navSimulation').on('click', function () {
+    $('#navSimulation').on('click', () => {
       showPage('Simulation');
     });
-    $('#navVersions').on('click', function () {
+    $('#navVersions').on('click', () => {
       showPage('Versions');
     });
 
-    $('#reset').on('click', function () {
+    $('#reset').on('click', () => {
       reset();
     });
 
-    $('#xAxis').on('change', function () {
+    $('#xAxis').on('change', () => {
       updatePlottingAreaAndAxesInfo();
     });
 
-    $('#yAxis').on('change', function () {
+    $('#yAxis').on('change', () => {
       updatePlottingAreaAndAxesInfo();
     });
 
-    $('#run').on('click', function () {
+    $('#run').on('click', () => {
       run();
     });
     </script>

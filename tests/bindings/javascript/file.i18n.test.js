@@ -28,13 +28,13 @@ test.describe('File i18n tests', () => {
   });
 
   test('Arabic files', () => {
-    const cellmlFile = new loc.File('file.cellml');
-    const sedmlFile = new loc.File('file.sedml');
-    const omexFile = new loc.File('file.omex');
+    const cellmlFile = new loc.File(utils.resourcePath('i18n/ملف/file.cellml'));
+    const sedmlFile = new loc.File(utils.resourcePath('i18n/ملف/file.sedml'));
+    const omexFile = new loc.File(utils.resourcePath('i18n/ملف/file.omex'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/ملف/file.cellml')));
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/ملف/file.sedml')));
-    omexFile.setContents(utils.fileContents(utils.resourcePath('i18n/ملف/file.omex')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
+    omexFile.setContents(utils.fileContents(omexFile.path));
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
@@ -42,13 +42,13 @@ test.describe('File i18n tests', () => {
   });
 
   test('Chinese files', () => {
-    const cellmlFile = new loc.File('file.cellml');
-    const sedmlFile = new loc.File('file.sedml');
-    const omexFile = new loc.File('file.omex');
+    const cellmlFile = new loc.File(utils.resourcePath('i18n/文件夹/file.cellml'));
+    const sedmlFile = new loc.File(utils.resourcePath('i18n/文件夹/file.sedml'));
+    const omexFile = new loc.File(utils.resourcePath('i18n/文件夹/file.omex'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/文件夹/file.cellml')));
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/文件夹/file.sedml')));
-    omexFile.setContents(utils.fileContents(utils.resourcePath('i18n/文件夹/file.omex')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
+    omexFile.setContents(utils.fileContents(omexFile.path));
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
@@ -56,13 +56,13 @@ test.describe('File i18n tests', () => {
   });
 
   test('Hindi files', () => {
-    const cellmlFile = new loc.File('file.cellml');
-    const sedmlFile = new loc.File('file.sedml');
-    const omexFile = new loc.File('file.omex');
+    const cellmlFile = new loc.File(utils.resourcePath('i18n/फोल्डर/file.cellml'));
+    const sedmlFile = new loc.File(utils.resourcePath('i18n/फोल्डर/file.sedml'));
+    const omexFile = new loc.File(utils.resourcePath('i18n/फोल्डर/file.omex'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/फोल्डर/file.cellml')));
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/फोल्डर/file.sedml')));
-    omexFile.setContents(utils.fileContents(utils.resourcePath('i18n/फोल्डर/file.omex')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
+    omexFile.setContents(utils.fileContents(omexFile.path));
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
@@ -70,13 +70,13 @@ test.describe('File i18n tests', () => {
   });
 
   test('Japanese files', () => {
-    const cellmlFile = new loc.File('file.cellml');
-    const sedmlFile = new loc.File('file.sedml');
-    const omexFile = new loc.File('file.omex');
+    const cellmlFile = new loc.File(utils.resourcePath('i18n/フォルダ/file.cellml'));
+    const sedmlFile = new loc.File(utils.resourcePath('i18n/フォルダ/file.sedml'));
+    const omexFile = new loc.File(utils.resourcePath('i18n/フォルダ/file.omex'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/フォルダ/file.cellml')));
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/フォルダ/file.sedml')));
-    omexFile.setContents(utils.fileContents(utils.resourcePath('i18n/フォルダ/file.omex')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
+    omexFile.setContents(utils.fileContents(omexFile.path));
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
@@ -84,13 +84,13 @@ test.describe('File i18n tests', () => {
   });
 
   test('Russian files', () => {
-    const cellmlFile = new loc.File('file.cellml');
-    const sedmlFile = new loc.File('file.sedml');
-    const omexFile = new loc.File('file.omex');
+    const cellmlFile = new loc.File(utils.resourcePath('i18n/папка/file.cellml'));
+    const sedmlFile = new loc.File(utils.resourcePath('i18n/папка/file.sedml'));
+    const omexFile = new loc.File(utils.resourcePath('i18n/папка/file.omex'));
 
-    cellmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/папка/file.cellml')));
-    sedmlFile.setContents(utils.fileContents(utils.resourcePath('i18n/папка/file.sedml')));
-    omexFile.setContents(utils.fileContents(utils.resourcePath('i18n/папка/file.omex')));
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
+    omexFile.setContents(utils.fileContents(omexFile.path));
 
     assert.strictEqual(cellmlFile.type.value, loc.File.Type.CELLML_FILE.value);
     assert.strictEqual(sedmlFile.type.value, loc.File.Type.SEDML_FILE.value);
