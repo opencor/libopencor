@@ -20,7 +20,7 @@ limitations under the License.
 
 TEST(CoverageFileTest, emptyFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("file.txt"));
 
     file->setContents({});
 
@@ -29,7 +29,7 @@ TEST(CoverageFileTest, emptyFile)
 
 TEST(CoverageFileTest, fileWithNullCharacter)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("file.txt"));
 
     file->setContents({0});
 
@@ -38,27 +38,28 @@ TEST(CoverageFileTest, fileWithNullCharacter)
 
 TEST(CoverageFileTest, sedmlFileWithNoParent)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::SEDML_2_FILE);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.sedml"));
 
-    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SEDML_CONTENTS));
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(file->path()).c_str()));
 }
 
 TEST(CoverageFileTest, irretrievableVirtualFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_FILE, false);
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("irretrievable_file.txt"), false);
 
     EXPECT_FALSE(file->hasIssues());
 }
 
 TEST(CoverageFileTest, irretrievableRemoteFile)
 {
-    libOpenCOR::File::create(libOpenCOR::IRRETRIEVABLE_REMOTE_FILE);
+    libOpenCOR::File::create("https://some.domain.com/irretrievable_file.txt");
 }
 
 TEST(CoverageFileTest, sameLocalFile)
 {
-    auto file1 = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
-    auto file2 = libOpenCOR::File::create(libOpenCOR::LOCAL_FILE);
+    auto filePath {libOpenCOR::resourcePath("file.txt")};
+    auto file1 = libOpenCOR::File::create(filePath);
+    auto file2 = libOpenCOR::File::create(filePath);
 
     EXPECT_EQ(file1, file2);
 }
@@ -81,7 +82,7 @@ TEST(CoverageFileTest, doNotRetrieveContents)
 
 TEST(CoverageFileTest, unmanageFileWithChildren)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"));
     auto &fileManager = libOpenCOR::FileManager::instance();
 
     EXPECT_EQ(fileManager.fileCount(), 3);

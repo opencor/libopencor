@@ -28,99 +28,99 @@ test.describe('Issue coverage tests', () => {
   });
 
   test('hasIssues', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.hasIssues, false);
   });
 
   test('issueCount', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.issueCount, 0);
   });
 
   test('issues', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.issues.length, 0);
   });
 
   test('issue()', () => {
-    const file = new loc.File(utils.ERROR_CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('error.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('error.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     assert.notStrictEqual(file.issue(0), null);
     assert.strictEqual(file.issue(file.issueCount), null);
   });
 
   test('hasErrors', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.hasErrors, false);
   });
 
   test('errorCount', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.errorCount, 0);
   });
 
   test('errors', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.errors.length, 0);
   });
 
   test('error()', () => {
-    const file = new loc.File(utils.ERROR_CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('error.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('error.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     assert.notStrictEqual(file.error(0), null);
     assert.strictEqual(file.error(file.errorCount), null);
   });
 
   test('hasWarnings', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.hasWarnings, false);
   });
 
   test('warningCount', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.warningCount, 0);
   });
 
   test('warnings', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.CELLML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.warnings.length, 0);
   });
 
   test('warning()', () => {
-    const file = new loc.File(utils.SEDML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
 
-    file.setContents(utils.SEDML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
 
@@ -129,9 +129,9 @@ test.describe('Issue coverage tests', () => {
   });
 
   test('toString()', () => {
-    const file = new loc.File(utils.ERROR_CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('error.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('error.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const issue = file.issue(0);
 

@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
+
 #include "tests/utils.h"
 
 #include <filesystem>
@@ -44,12 +46,13 @@ libOpenCOR::ExpectedIssues expectedUnknownFileIssues()
 
 TEST(BasicFileTest, localFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::LOCAL_FILE)};
+    auto filePath {libOpenCOR::resourcePath("file.txt")};
+    auto file {libOpenCOR::File::create(filePath)};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::LOCAL_FILE);
+    EXPECT_EQ(file->fileName(), filePath);
     EXPECT_EQ(file->url(), "");
-    EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
+    EXPECT_EQ(file->path(), filePath);
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
@@ -60,7 +63,7 @@ TEST(BasicSedTest, existingRelativeLocalFile)
 
     std::filesystem::current_path(libOpenCOR::resourcePath());
 
-    auto file {libOpenCOR::File::create(libOpenCOR::CELLML_2_FILE)};
+    auto file {libOpenCOR::File::create("cellml_2.cellml")};
 
     EXPECT_FALSE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNoIssues());
@@ -94,16 +97,17 @@ TEST(BasicFileTest, nonExistingRelativeLocalFile)
 
 TEST(BasicFileTest, urlBasedLocalFile)
 {
+    auto filePath {libOpenCOR::resourcePath("file.txt")};
 #ifdef BUILDING_ON_WINDOWS
-    auto file {libOpenCOR::File::create("file:///P:/some/path/file.txt")};
+    auto file {libOpenCOR::File::create(std::string("file:///") + libOpenCOR::forwardSlashPath(filePath))};
 #else
-    auto file {libOpenCOR::File::create("file:///some/path/file.txt")};
+    auto file {libOpenCOR::File::create(std::string("file://") + filePath)};
 #endif
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::LOCAL_FILE);
+    EXPECT_EQ(file->fileName(), filePath);
     EXPECT_EQ(file->url(), "");
-    EXPECT_EQ(file->path(), libOpenCOR::LOCAL_FILE);
+    EXPECT_EQ(file->path(), filePath);
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
@@ -121,27 +125,28 @@ TEST(BasicFileTest, remoteFile)
 
 TEST(BasicFileTest, encodedRemoteFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::ENCODED_REMOTE_FILE)};
+    auto file {libOpenCOR::File::create("https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml")};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
     EXPECT_NE(file->fileName(), "");
-    EXPECT_EQ(file->url(), libOpenCOR::NON_ENCODED_REMOTE_FILE);
-    EXPECT_EQ(file->path(), libOpenCOR::NON_ENCODED_REMOTE_FILE);
+    EXPECT_EQ(file->url(), "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml");
+    EXPECT_EQ(file->path(), "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml");
     EXPECT_FALSE(file->contents().empty());
 }
 
 TEST(BasicFileTest, localVirtualFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE), false)};
+    auto filePath {libOpenCOR::resourcePath("unknown_file.txt")};
+    auto file {libOpenCOR::File::create(filePath, false)};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
-    EXPECT_EQ(file->fileName(), libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
+    EXPECT_EQ(file->fileName(), filePath);
     EXPECT_EQ(file->url(), "");
-    EXPECT_EQ(file->path(), libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
+    EXPECT_EQ(file->path(), filePath);
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNoIssues());
 
-    auto someUnknownContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS)};
+    auto someUnknownContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(filePath).c_str())};
 
     file->setContents(someUnknownContents);
 
@@ -152,7 +157,7 @@ TEST(BasicFileTest, localVirtualFile)
 
 TEST(BasicFileTest, remoteVirtualFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::UNKNOWN_REMOTE_FILE, false)};
+    auto file {libOpenCOR::File::create("https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt", false)};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
 #ifdef BUILDING_USING_MSVC
@@ -160,12 +165,13 @@ TEST(BasicFileTest, remoteVirtualFile)
 #else
     EXPECT_EQ(file->fileName(), "/some/path/file");
 #endif
-    EXPECT_EQ(file->url(), libOpenCOR::UNKNOWN_REMOTE_FILE);
-    EXPECT_EQ(file->path(), libOpenCOR::UNKNOWN_REMOTE_FILE);
+    EXPECT_EQ(file->url(), "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt");
+    EXPECT_EQ(file->path(), "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/unknown_file.txt");
     EXPECT_TRUE(file->contents().empty());
     EXPECT_EQ_ISSUES(file, expectedNoIssues());
 
-    auto someUnknownContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS)};
+    auto filePath {libOpenCOR::resourcePath("unknown_file.txt")};
+    auto someUnknownContents {libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(filePath).c_str())};
 
     file->setContents(someUnknownContents);
 
@@ -177,21 +183,22 @@ TEST(BasicFileTest, remoteVirtualFile)
 TEST(BasicFileTest, fileManager)
 {
     auto &fileManager {libOpenCOR::FileManager::instance()};
+    auto filePath {libOpenCOR::resourcePath("file.txt")};
 
     EXPECT_FALSE(fileManager.hasFiles());
     EXPECT_EQ(fileManager.fileCount(), 0);
     EXPECT_TRUE(fileManager.files().empty());
     EXPECT_EQ(fileManager.file(0), nullptr);
-    EXPECT_EQ(fileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
+    EXPECT_EQ(fileManager.file(filePath), nullptr);
 
-    auto localFile {libOpenCOR::File::create(libOpenCOR::LOCAL_FILE)};
+    auto localFile {libOpenCOR::File::create(filePath)};
     auto &sameFileManager {libOpenCOR::FileManager::instance()};
 
     EXPECT_TRUE(sameFileManager.hasFiles());
     EXPECT_EQ(sameFileManager.fileCount(), 1);
     EXPECT_EQ(sameFileManager.files().size(), 1);
     EXPECT_EQ(fileManager.file(0), localFile);
-    EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), localFile);
+    EXPECT_EQ(sameFileManager.file(filePath), localFile);
 
     auto remoteFile {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
 
@@ -207,7 +214,7 @@ TEST(BasicFileTest, fileManager)
     EXPECT_EQ(sameFileManager.fileCount(), 1);
     EXPECT_EQ(sameFileManager.files().size(), 1);
     EXPECT_EQ(fileManager.file(1), nullptr);
-    EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), nullptr);
+    EXPECT_EQ(sameFileManager.file(filePath), nullptr);
 
     sameFileManager.manage(localFile);
 
@@ -215,7 +222,7 @@ TEST(BasicFileTest, fileManager)
     EXPECT_EQ(sameFileManager.fileCount(), 2);
     EXPECT_EQ(sameFileManager.files().size(), 2);
     EXPECT_EQ(fileManager.file(1), localFile);
-    EXPECT_EQ(sameFileManager.file(libOpenCOR::LOCAL_FILE), localFile);
+    EXPECT_EQ(sameFileManager.file(filePath), localFile);
 
     fileManager.reset();
 
@@ -225,5 +232,5 @@ TEST(BasicFileTest, fileManager)
     EXPECT_EQ(fileManager.file(0), nullptr);
     EXPECT_EQ(fileManager.file(1), nullptr);
     EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), nullptr);
-    EXPECT_EQ(fileManager.file(libOpenCOR::UNKNOWN_FILE), nullptr);
+    EXPECT_EQ(fileManager.file(libOpenCOR::resourcePath("unknown_file.txt")), nullptr);
 }

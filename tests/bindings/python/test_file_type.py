@@ -30,108 +30,116 @@ def test_type_irretrievable_file():
         [loc.Issue.Type.Error, "The file does not exist."],
     ]
 
-    file = loc.File(utils.resource_path(utils.IrretrievableFile))
+    file = loc.File(utils.resource_path("irretrievable_file.txt"))
 
     assert file.type == loc.File.Type.IrretrievableFile
     assert_issues(file, expected_non_existing_file_issues)
 
 
 def test_type_unknown_file():
-    file = loc.File(utils.resource_path(utils.UnknownFile))
+    file = loc.File(utils.resource_path("unknown_file.txt"))
 
     assert file.type == loc.File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_sbml_file():
-    file = loc.File(utils.resource_path(utils.SbmlFile))
+    file = loc.File(utils.resource_path("sbml.sbml"))
 
     assert file.type == loc.File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_error_sedml_file():
-    file = loc.File(utils.resource_path(utils.ErrorSedmlFile))
+    file = loc.File(utils.resource_path("error.sedml"))
 
     assert file.type == loc.File.Type.SedmlFile
 
 
 def test_type_cellml_1_x_file():
-    file = loc.File(utils.resource_path(utils.Cellml1xFile))
+    file = loc.File(utils.resource_path("cellml_1_x.cellml"))
 
     assert file.type == loc.File.Type.CellmlFile
 
 
 def test_type_sedml_1_x_file():
-    file = loc.File(utils.resource_path(utils.Sedml1xFile))
+    file = loc.File(utils.resource_path("cellml_1_x.sedml"))
 
     assert file.type == loc.File.Type.SedmlFile
 
 
 def test_type_combine_1_x_archive():
-    file = loc.File(utils.resource_path(utils.Combine1xArchive))
+    file = loc.File(utils.resource_path("cellml_1_x.omex"))
 
     assert file.type == loc.File.Type.CombineArchive
 
 
 def test_type_cellml_2_file():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     assert file.type == loc.File.Type.CellmlFile
 
 
 def test_type_sedml_2_file():
-    file = loc.File(utils.resource_path(utils.Sedml2File))
+    file = loc.File(utils.resource_path("cellml_2.sedml"))
 
     assert file.type == loc.File.Type.SedmlFile
 
 
 def test_type_combine_2_archive():
-    file = loc.File(utils.resource_path(utils.Combine2Archive))
+    file = loc.File(utils.resource_path("cellml_2.omex"))
 
     assert file.type == loc.File.Type.CombineArchive
 
 
 def test_type_unknown_virtual_file():
-    file = loc.File(utils.resource_path(utils.UnknownFile), False)
+    file = loc.File(utils.resource_path("unknown_file.txt"), False)
 
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == []
 
-    file.contents = utils.string_to_list(utils.UnknownContents)
+    file.contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("unknown_file.txt"))
+    )
 
     assert file.type == loc.File.Type.UnknownFile
     assert_issues(file, expected_unknown_file_issues)
 
 
 def test_type_cellml_virtual_file():
-    file = loc.File(utils.resource_path(utils.Cellml2File), False)
+    file = loc.File(utils.resource_path("cellml_2.cellml"), False)
 
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == []
 
-    file.contents = utils.string_to_list(utils.CellmlContents)
+    file.contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
 
     assert file.type == loc.File.Type.CellmlFile
 
 
 def test_type_sedml_virtual_file():
-    file = loc.File(utils.resource_path(utils.Sedml2File), False)
+    file = loc.File(utils.resource_path("cellml_2.sedml"), False)
 
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == []
 
-    file.contents = utils.string_to_list(utils.SedmlContents)
+    file.contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.sedml"))
+    )
 
     assert file.type == loc.File.Type.SedmlFile
 
 
 def test_type_combine_virtual_archive():
-    file = loc.File(utils.resource_path(utils.Combine2Archive), False)
+    file = loc.File(utils.resource_path("cellml_2.omex"), False)
 
     assert file.type == loc.File.Type.UnknownFile
     assert file.contents == []
 
-    file.contents = utils.binary_to_list(utils.Base64CombineArchiveContents)
+    file.contents = utils.binary_to_list(
+        utils.binary_file_contents(utils.resource_path("cellml_2.omex"))
+    )
 
     assert file.type == loc.File.Type.CombineArchive

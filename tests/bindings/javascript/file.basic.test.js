@@ -34,19 +34,20 @@ test.describe('File basic tests', () => {
   });
 
   test('Local file', () => {
-    const file = new loc.File(utils.LOCAL_FILE);
+    const fileName = utils.resourcePath('unknown_file.txt');
+    const file = new loc.File(fileName);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.strictEqual(file.fileName, utils.LOCAL_FILE);
+    assert.strictEqual(file.fileName, fileName);
     assert.strictEqual(file.url, '');
-    assert.strictEqual(file.path, utils.LOCAL_FILE);
+    assert.strictEqual(file.path, fileName);
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
 
-    file.setContents(utils.UNKNOWN_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
+    assert.deepStrictEqual(file.contents(), utils.fileContents(file.path));
     assertIssues(loc, file, expectedUnknownFileIssues);
   });
 
@@ -60,47 +61,60 @@ test.describe('File basic tests', () => {
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
 
-    file.setContents(utils.UNKNOWN_CONTENTS);
+    const fileContents = utils.fileContents(utils.resourcePath('unknown_file.txt'));
+
+    file.setContents(fileContents);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
+    assert.deepStrictEqual(file.contents(), fileContents);
     assertIssues(loc, file, expectedUnknownFileIssues);
   });
 
   test('Encoded remote file', () => {
-    const file = new loc.File(utils.ENCODED_REMOTE_FILE);
+    const file = new loc.File(
+      'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO%20BG%20example%203.1.cellml'
+    );
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assert.strictEqual(file.fileName, '/some/path/file');
-    assert.strictEqual(file.url, utils.NON_ENCODED_REMOTE_FILE);
-    assert.strictEqual(file.path, utils.NON_ENCODED_REMOTE_FILE);
+    assert.strictEqual(
+      file.url,
+      'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml'
+    );
+    assert.strictEqual(
+      file.path,
+      'https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml'
+    );
     assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
     assertIssues(loc, file, expectedNoIssues);
 
-    file.setContents(utils.UNKNOWN_CONTENTS);
+    const fileContents = utils.fileContents(utils.resourcePath('unknown_file.txt'));
+
+    file.setContents(fileContents);
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
-    assert.deepStrictEqual(file.contents(), utils.UNKNOWN_CONTENTS);
+    assert.deepStrictEqual(file.contents(), fileContents);
     assertIssues(loc, file, expectedUnknownFileIssues);
   });
 
   test('File manager', () => {
     const fileManager = loc.FileManager.instance();
+    const fileName = utils.resourcePath('file.txt');
 
     assert.strictEqual(fileManager.hasFiles, false);
     assert.strictEqual(fileManager.fileCount, 0);
     assert.strictEqual(fileManager.files.length, 0);
     assert.strictEqual(fileManager.file(0), null);
-    assert.strictEqual(fileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), null);
+    assert.strictEqual(fileManager.fileFromFileNameOrUrl(fileName), null);
 
-    const localFile = new loc.File(utils.LOCAL_FILE);
+    const localFile = new loc.File(fileName);
     const sameFileManager = loc.FileManager.instance();
 
     assert.strictEqual(sameFileManager.hasFiles, true);
     assert.strictEqual(sameFileManager.fileCount, 1);
     assert.strictEqual(sameFileManager.files.length, 1);
     assert.deepStrictEqual(fileManager.file(0), localFile);
-    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), localFile);
+    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(fileName), localFile);
 
     const remoteFile = new loc.File(utils.REMOTE_FILE);
 
@@ -116,7 +130,7 @@ test.describe('File basic tests', () => {
     assert.strictEqual(sameFileManager.fileCount, 1);
     assert.strictEqual(sameFileManager.files.length, 1);
     assert.deepStrictEqual(fileManager.file(1), null);
-    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), null);
+    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(fileName), null);
 
     sameFileManager.manage(localFile);
 
@@ -124,7 +138,7 @@ test.describe('File basic tests', () => {
     assert.strictEqual(sameFileManager.fileCount, 2);
     assert.strictEqual(sameFileManager.files.length, 2);
     assert.deepStrictEqual(fileManager.file(1), localFile);
-    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(utils.LOCAL_FILE), localFile);
+    assert.deepStrictEqual(sameFileManager.fileFromFileNameOrUrl(fileName), localFile);
 
     fileManager.reset();
 
@@ -134,6 +148,6 @@ test.describe('File basic tests', () => {
     assert.deepStrictEqual(fileManager.file(0), null);
     assert.deepStrictEqual(fileManager.file(1), null);
     assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.REMOTE_FILE), null);
-    assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.UNKNOWN_FILE), null);
+    assert.deepStrictEqual(fileManager.fileFromFileNameOrUrl(utils.resourcePath('unknown_file.txt')), null);
   });
 });

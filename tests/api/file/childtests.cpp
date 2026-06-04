@@ -43,7 +43,7 @@ void doTestDataset(const std::string &pNumber, const std::vector<std::string> &p
     }
 
     EXPECT_EQ(file->childFile(++index), nullptr);
-    EXPECT_EQ(file->childFile(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE)), nullptr);
+    EXPECT_EQ(file->childFile(libOpenCOR::resourcePath("unknown_file.txt")), nullptr);
 
     EXPECT_EQ(libOpenCOR::toString(simulationFile->contents()), libOpenCOR::textFileContents(libOpenCOR::resourcePath("api/file/dataset_" + pNumber + ".json")));
 }
@@ -52,14 +52,15 @@ void doTestDataset(const std::string &pNumber, const std::vector<std::string> &p
 
 TEST(ChildFileTest, noChildFiles)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE))};
+    auto filePath {libOpenCOR::resourcePath("unknown_file.txt")};
+    auto file {libOpenCOR::File::create(filePath)};
 
     EXPECT_FALSE(file->hasChildFiles());
     EXPECT_EQ(file->childFileCount(), 0);
     EXPECT_EQ(file->childFileNames().size(), 0);
     EXPECT_EQ(file->childFiles().size(), 0);
     EXPECT_EQ(file->childFile(0), nullptr);
-    EXPECT_EQ(file->childFile(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE)), nullptr);
+    EXPECT_EQ(file->childFile(filePath), nullptr);
 }
 
 TEST(ChildFileTest, dataset135)

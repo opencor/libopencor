@@ -22,7 +22,7 @@ limitations under the License.
 
 TEST(RuntimeCellmlTest, validRuntime)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto cellmlFile {libOpenCOR::CellmlFile::create(file)};
     auto cellmlFileRuntime {cellmlFile->runtime()};
 

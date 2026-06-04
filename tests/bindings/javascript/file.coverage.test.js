@@ -28,7 +28,7 @@ test.describe('File coverage tests', () => {
   });
 
   test('Empty file', () => {
-    const file = new loc.File(utils.UNKNOWN_FILE);
+    const file = new loc.File(utils.resourcePath('unknown_file.txt'));
 
     file.setContents(null);
 
@@ -36,7 +36,7 @@ test.describe('File coverage tests', () => {
   });
 
   test('File with null character', () => {
-    const file = new loc.File(utils.UNKNOWN_FILE);
+    const file = new loc.File(utils.resourcePath('unknown_file.txt'));
 
     file.setContents(Uint8Array.from([0]));
 
@@ -44,14 +44,15 @@ test.describe('File coverage tests', () => {
   });
 
   test('SED-ML file with no parent', () => {
-    const file = new loc.File(utils.SEDML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
 
-    file.setContents(utils.SEDML_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
   });
 
   test('Same local file', () => {
-    const file1 = new loc.File(utils.LOCAL_FILE);
-    const file2 = new loc.File(utils.LOCAL_FILE);
+    const filePath = utils.resourcePath('file.txt');
+    const file1 = new loc.File(filePath);
+    const file2 = new loc.File(filePath);
 
     assert.deepStrictEqual(file1, file2);
   });
@@ -64,10 +65,10 @@ test.describe('File coverage tests', () => {
   });
 
   test('Unmanage file with children', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
     const fileManager = loc.FileManager.instance();
 
-    file.setContents(utils.COMBINE_ARCHIVE_CONTENTS);
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(fileManager.fileCount, 3);
 

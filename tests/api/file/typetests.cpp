@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include "utils.h"
 #include "tests/utils.h"
 
 #include <libopencor>
@@ -38,7 +39,7 @@ libOpenCOR::ExpectedIssues expectedIrretrievableFileIssues()
 
 TEST(TypeFileTest, irretrievableFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::IRRETRIEVABLE_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("irretrievable_file.txt"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
     EXPECT_EQ_ISSUES(file, expectedIrretrievableFileIssues());
@@ -46,7 +47,7 @@ TEST(TypeFileTest, irretrievableFile)
 
 TEST(TypeFileTest, unknownFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("unknown_file.txt"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
@@ -54,7 +55,7 @@ TEST(TypeFileTest, unknownFile)
 
 TEST(TypeFileTest, sbmlFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SBML_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("sbml.sbml"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
@@ -62,61 +63,62 @@ TEST(TypeFileTest, sbmlFile)
 
 TEST(TypeFileTest, errorSedmlFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_SEDML_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("error.sedml"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
 TEST(TypeFileTest, cellml1xFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_1_X_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_1_x.cellml"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
 
 TEST(TypeFileTest, sedml1xFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_1_X_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_1_x.sedml"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
 TEST(TypeFileTest, combine1xArchive)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_1_X_ARCHIVE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_1_x.omex"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
 
 TEST(TypeFileTest, cellml2File)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
 
 TEST(TypeFileTest, sedml2File)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.sedml"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
 TEST(TypeFileTest, combine2Archive)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }
 
 TEST(TypeFileTest, unknownVirtualFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE), false)};
+    auto filePath {libOpenCOR::resourcePath("unknown_file.txt")};
+    auto file {libOpenCOR::File::create(filePath, false)};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 
-    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::UNKNOWN_CONTENTS));
+    file->setContents(libOpenCOR::fileContents(filePath));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ_ISSUES(file, expectedUnknownFileIssues());
@@ -124,36 +126,39 @@ TEST(TypeFileTest, unknownVirtualFile)
 
 TEST(TypeFileTest, cellmlVirtualFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE), false)};
+    auto filePath {libOpenCOR::resourcePath("cellml_2.cellml")};
+    auto file {libOpenCOR::File::create(filePath, false)};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 
-    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::CELLML_CONTENTS));
+    file->setContents(libOpenCOR::fileContents(filePath));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::CELLML_FILE);
 }
 
 TEST(TypeFileTest, sedmlVirtualFile)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE), false)};
+    auto filePath {libOpenCOR::resourcePath("cellml_2.sedml")};
+    auto file {libOpenCOR::File::create(filePath, false)};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 
-    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::SEDML_CONTENTS));
+    file->setContents(libOpenCOR::fileContents(filePath));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::SEDML_FILE);
 }
 
 TEST(TypeFileTest, combineVirtualArchive)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::COMBINE_2_ARCHIVE), false)};
+    auto filePath {libOpenCOR::resourcePath("cellml_2.omex")};
+    auto file {libOpenCOR::File::create(filePath, false)};
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
     EXPECT_EQ(file->contents(), libOpenCOR::UnsignedChars());
 
-    file->setContents(libOpenCOR::base64Decode(libOpenCOR::BASE64_COMBINE_ARCHIVE_CONTENTS));
+    file->setContents(libOpenCOR::fileContents(filePath));
 
     EXPECT_EQ(file->type(), libOpenCOR::File::Type::COMBINE_ARCHIVE);
 }

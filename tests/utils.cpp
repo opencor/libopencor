@@ -109,15 +109,4 @@ UnsignedChars charArrayToUnsignedChars(const char *pContents)
     return {pContents, pContents + strlen(pContents)}; // NOLINT
 }
 
-UnsignedChars base64Decode(const char *pContents)
-{
-    char *buffer {new char[modp_b64_decode_len(strlen(pContents))]};
-    const size_t length {modp_b64_decode(buffer, pContents, strlen(pContents))};
-    UnsignedChars res(buffer, buffer + length); // NOLINT
-
-    delete[] buffer;
-
-    return res;
-}
-
 } // namespace libOpenCOR

@@ -22,7 +22,7 @@ limitations under the License.
 
 TEST(BasicCellmlTest, sedmlFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.sedml"));
     auto sedmlFile = libOpenCOR::SedmlFile::create(file);
 
     EXPECT_FALSE(sedmlFile->hasIssues());
@@ -30,7 +30,7 @@ TEST(BasicCellmlTest, sedmlFile)
 
 TEST(BasicSedmlTest, createSedmlFileWithNonSedmlFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("unknown_file.txt"));
     auto sedmlFile = libOpenCOR::SedmlFile::create(file);
 
     EXPECT_EQ(sedmlFile, nullptr);

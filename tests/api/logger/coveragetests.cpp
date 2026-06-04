@@ -20,28 +20,28 @@ limitations under the License.
 
 TEST(CoverageLoggerTest, hasIssues)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_FALSE(file->hasIssues());
 }
 
 TEST(CoverageLoggerTest, issueCount)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_EQ(file->issueCount(), 0);
 }
 
 TEST(CoverageLoggerTest, issues)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_TRUE(file->issues().empty());
 }
 
 TEST(CoverageLoggerTest, issue)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("error.cellml"));
 
     EXPECT_NE(file->issue(0), nullptr);
     EXPECT_EQ(file->issue(file->issueCount()), nullptr);
@@ -49,28 +49,28 @@ TEST(CoverageLoggerTest, issue)
 
 TEST(CoverageLoggerTest, hasErrors)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_FALSE(file->hasErrors());
 }
 
 TEST(CoverageLoggerTest, errorCount)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_EQ(file->errorCount(), 0);
 }
 
 TEST(CoverageLoggerTest, errors)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_TRUE(file->errors().empty());
 }
 
 TEST(CoverageLoggerTest, error)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::ERROR_CELLML_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("error.cellml"));
 
     EXPECT_NE(file->error(0), nullptr);
     EXPECT_EQ(file->error(file->errorCount()), nullptr);
@@ -78,28 +78,28 @@ TEST(CoverageLoggerTest, error)
 
 TEST(CoverageLoggerTest, hasWarnings)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_FALSE(file->hasWarnings());
 }
 
 TEST(CoverageLoggerTest, warningCount)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_EQ(file->warningCount(), 0);
 }
 
 TEST(CoverageLoggerTest, warnings)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
     EXPECT_TRUE(file->warnings().empty());
 }
 
 TEST(CoverageLoggerTest, warning)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::SEDML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.sedml"));
     auto document = libOpenCOR::SedDocument::create(file);
 
     EXPECT_NE(document->warning(0), nullptr);

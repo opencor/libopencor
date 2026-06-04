@@ -39,7 +39,7 @@ def do_test_dataset(number, specific_child_file_names):
         assert file.child_file(specific_child_file_name) is not None
 
     assert file.child_file(index + 1) is None
-    assert file.child_file(utils.resource_path(utils.UnknownFile)) is None
+    assert file.child_file(utils.resource_path("unknown_file.txt")) is None
 
     assert utils.to_string(simulation_file.contents) == utils.text_file_contents(
         utils.resource_path("api/file/dataset_" + str(number) + ".json")
@@ -47,14 +47,15 @@ def do_test_dataset(number, specific_child_file_names):
 
 
 def test_type_no_child_files():
-    file = File(utils.resource_path(utils.UnknownFile))
+    file_path = utils.resource_path("unknown_file.txt")
+    file = File(file_path)
 
     assert not file.has_child_files
     assert file.child_file_count == 0
     assert len(file.child_file_names) == 0
     assert len(file.child_files) == 0
     assert file.child_file(0) is None
-    assert file.child_file("unknown_file") is None
+    assert file.child_file(file_path) is None
 
 
 def test_type_dataset_135():

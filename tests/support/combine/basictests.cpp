@@ -22,7 +22,7 @@ limitations under the License.
 
 TEST(BasicOmexTest, createCombineArchiveWithNonCombineArchive)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("unknown_file.txt"));
     auto combineArchive = libOpenCOR::CombineArchive::create(file);
 
     EXPECT_EQ(combineArchive, nullptr);

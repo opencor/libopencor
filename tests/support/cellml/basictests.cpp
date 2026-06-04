@@ -22,7 +22,7 @@ limitations under the License.
 
 TEST(BasicCellmlTest, cellml1xModel)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_1_X_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_1_x.cellml"));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
 
     EXPECT_FALSE(cellmlFile->hasIssues());
@@ -30,7 +30,7 @@ TEST(BasicCellmlTest, cellml1xModel)
 
 TEST(BasicCellmlTest, cellml2Model)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
 
     EXPECT_FALSE(cellmlFile->hasIssues());
@@ -54,7 +54,7 @@ TEST(BasicCellmlTest, modelWithInvalidImports)
 
 TEST(BasicCellmlTest, createCellmlFileWithNonCellmlFile)
 {
-    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::UNKNOWN_FILE));
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("unknown_file.txt"));
     auto cellmlFile = libOpenCOR::CellmlFile::create(file);
 
     EXPECT_EQ(cellmlFile, nullptr);

@@ -42,7 +42,7 @@ TEST(CoverageSedTest, models)
     EXPECT_EQ(document->models().size(), 0);
     EXPECT_FALSE(document->addModel(nullptr));
 
-    auto file {libOpenCOR::File::create(libOpenCOR::LOCAL_FILE)};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("file.txt"))};
     auto model {libOpenCOR::SedModel::create(document, file)};
 
     EXPECT_EQ(model->file(), file);
@@ -274,7 +274,7 @@ TEST(CoverageSedTest, tasks)
     EXPECT_EQ(document->tasks().size(), 0);
     EXPECT_FALSE(document->addTask(nullptr));
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto model {libOpenCOR::SedModel::create(document, file)};
     auto simulation {libOpenCOR::SedUniformTimeCourse::create(document)};
     auto task {libOpenCOR::SedTask::create(document, model, simulation)};
@@ -362,7 +362,7 @@ TEST(CoverageSedTest, nlaSolver)
 
 TEST(CoverageSedTest, sedBase)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto simulation {libOpenCOR::SedOneStep::create(document)};
 
@@ -371,7 +371,7 @@ TEST(CoverageSedTest, sedBase)
 
 TEST(CoverageSedTest, sedOneStep)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto simulation {libOpenCOR::SedOneStep::create(document)};
 
@@ -391,7 +391,7 @@ TEST(CoverageSedTest, sedUniformTimeCourse)
     static const auto OUTPUT_END_TIME {7.89};
     static const auto NUMBER_OF_STEPS {10};
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
     auto simulation {libOpenCOR::SedUniformTimeCourse::create(document)};
 
@@ -507,13 +507,15 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskNonDifferentialModel)
 
 TEST(CoverageSedTest, sedDocument)
 {
-    auto file {libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_CELLML_FILE)};
+    // Note: the three following URLs use http rather than https to help with coverage testing.
+
+    auto file {libOpenCOR::File::create("http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml")};
     libOpenCOR::SedDocument::create(file);
 
-    file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_SEDML_FILE);
+    file = libOpenCOR::File::create("http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml");
     libOpenCOR::SedDocument::create(file);
 
-    file = libOpenCOR::File::create(libOpenCOR::HTTP_REMOTE_COMBINE_ARCHIVE);
+    file = libOpenCOR::File::create("http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex");
     libOpenCOR::SedDocument::create(file);
 }
 
@@ -521,7 +523,7 @@ TEST(CoverageSedTest, solver)
 {
     // Get the duplicate() method of different solvers to be covered.
 
-    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath(libOpenCOR::CELLML_2_FILE))};
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
 
     document->simulations()[0]->setOdeSolver(libOpenCOR::SolverForwardEuler::create());
@@ -737,4 +739,11 @@ TEST(CoverageSedTest, legacySedmlFileUnknownProperty)
     auto document = libOpenCOR::SedDocument::create(sedmlFile);
 
     EXPECT_EQ_ISSUES(document, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, sedmlFileWithBareFilename)
+{
+    auto file {libOpenCOR::File::create("cellml_2.sedml")};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(libOpenCOR::textFileContents(libOpenCOR::resourcePath("cellml_2.sedml")).c_str()));
 }

@@ -36,26 +36,26 @@ def test_unknown_file():
         ],
     ]
 
-    file = loc.File(utils.resource_path(utils.UnknownFile))
+    file = loc.File(utils.resource_path("unknown_file.txt"))
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues)
 
 
 def test_cellml_file():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
 
     assert not document.has_issues
 
 
 def test_sedml_file():
-    file = loc.File(utils.resource_path(utils.Sedml2File))
+    file = loc.File(utils.resource_path("cellml_2.sedml"))
     document = loc.SedDocument(file)
 
     assert document.has_issues
 
-    needed_file = loc.File(utils.resource_path(utils.Cellml2File))
+    needed_file = loc.File(utils.resource_path("cellml_2.cellml"))
 
     document = loc.SedDocument(file)
 
@@ -68,7 +68,7 @@ def test_sedml_file_with_absolute_cellml_file():
 
     assert document.has_issues
 
-    needed_file = loc.File(utils.LocalFile)
+    needed_file = loc.File(utils.resource_path("file.txt"))
 
     document = loc.SedDocument(file)
 
@@ -89,7 +89,7 @@ def test_sedml_file_with_remote_cellml_file():
 
 
 def test_combine_archive():
-    file = loc.File(utils.resource_path(utils.Combine2Archive))
+    file = loc.File(utils.resource_path("cellml_2.omex"))
     document = loc.SedDocument(file)
 
     assert not document.has_issues
@@ -176,7 +176,7 @@ def test_irretrievable_file():
         ],
     ]
 
-    file = loc.File(utils.resource_path(utils.IrretrievableFile))
+    file = loc.File(utils.resource_path("irretrievable_file.txt"))
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues)

@@ -37,7 +37,7 @@ def test_models():
     assert len(document.models) == 0
     assert not document.add_model(None)
 
-    file = loc.File(utils.LocalFile)
+    file = loc.File(utils.resource_path("file.txt"))
     model = loc.SedModel(document, file)
 
     assert model.file == file
@@ -239,7 +239,7 @@ def test_tasks():
     assert len(document.tasks) == 0
     assert not document.add_task(None)
 
-    file = loc.File(utils.LocalFile)
+    file = loc.File(utils.resource_path("file.txt"))
     model = loc.SedModel(document, file)
     simulation = loc.SedUniformTimeCourse(document)
     task = loc.SedTask(document, model, simulation)
@@ -330,7 +330,7 @@ def test_nla_solver():
 
 
 def test_sed_one_step():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = loc.SedOneStep(document)
 
@@ -342,7 +342,7 @@ def test_sed_one_step():
 
 
 def test_sed_uniform_time_course():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = loc.SedUniformTimeCourse(document)
 
@@ -459,20 +459,34 @@ def test_sed_instance_and_sed_instance_task_non_differential_model():
 
 
 def test_sed_document():
-    file = loc.File(utils.resource_path(utils.HttpRemoteCellmlFile))
+    # Note: the three following URLs use http rather than https to help with coverage testing.
+
+    file = loc.File(
+        utils.resource_path(
+            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+        )
+    )
     loc.SedDocument(file)
 
-    file = loc.File(utils.resource_path(utils.HttpRemoteSedmlFile))
+    file = loc.File(
+        utils.resource_path(
+            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.sedml"
+        )
+    )
     loc.SedDocument(file)
 
-    file = loc.File(utils.resource_path(utils.HttpRemoteCombineArchive))
+    file = loc.File(
+        utils.resource_path(
+            "http://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.omex"
+        )
+    )
     loc.SedDocument(file)
 
 
 def test_solver():
     # Get the duplicate() method of different solvers to be covered.
 
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
 
     document.simulations[0].ode_solver = loc.SolverForwardEuler()
@@ -808,3 +822,11 @@ def test_legacy_sedml_file_unknown_property():
     document = loc.SedDocument(sedml_file)
 
     assert_issues(document, expected_issues)
+
+
+def test_sedml_file_with_bare_filename():
+    file = loc.File("cellml_2.sedml")
+
+    file.contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.sedml"))
+    )

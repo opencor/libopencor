@@ -29,9 +29,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Maximum number of iterations value with invalid number', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
@@ -50,9 +50,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Banded linear solver and upper half-bandwidth value with number too small', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla2.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
@@ -72,9 +72,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Banded linear solver and upper half-bandwidth value with number too big', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
@@ -94,9 +94,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Banded linear solver and lower half-bandwidth value with number too small', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla2.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
@@ -116,9 +116,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Banded linear solver and lower half-bandwidth value with number too big', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
@@ -161,9 +161,9 @@ test.describe('Solver KINSOL tests', () => {
   }
 
   test('Solve', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -174,9 +174,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Solve with banded linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla2.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
@@ -194,9 +194,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Solve with GMRES linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
@@ -212,9 +212,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Solve with BiCGStab linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla2.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];
@@ -230,9 +230,9 @@ test.describe('Solver KINSOL tests', () => {
   });
 
   test('Solve with TFQMR linear solver', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('api/solver/nla1.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/nla1.cellml')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];

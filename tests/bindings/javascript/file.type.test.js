@@ -29,9 +29,9 @@ test.describe('File type tests', () => {
   });
 
   test('Unknown file', () => {
-    const file = new loc.File(utils.UNKNOWN_FILE);
+    const file = new loc.File(utils.resourcePath('unknown_file.txt'));
 
-    file.setContents(utils.fileContents(utils.resourcePath(utils.UNKNOWN_FILE)));
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
     assertIssues(loc, file, [
@@ -40,25 +40,25 @@ test.describe('File type tests', () => {
   });
 
   test('CellML file', () => {
-    const file = new loc.File(utils.CELLML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath(utils.CELLML_FILE)));
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.type.value, loc.File.Type.CELLML_FILE.value);
   });
 
   test('SED-ML file', () => {
-    const file = new loc.File(utils.SEDML_FILE);
+    const file = new loc.File(utils.resourcePath('cellml_2.sedml'));
 
-    file.setContents(utils.fileContents(utils.resourcePath(utils.SEDML_FILE)));
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.type.value, loc.File.Type.SEDML_FILE.value);
   });
 
   test('COMBINE archive', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath(utils.COMBINE_ARCHIVE)));
+    file.setContents(utils.fileContents(file.path));
 
     assert.strictEqual(file.type.value, loc.File.Type.COMBINE_ARCHIVE.value);
   });

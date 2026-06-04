@@ -29,9 +29,9 @@ test.describe('Solver coverage tests', () => {
   });
 
   test('ODE changes', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('api/solver/ode_sed_changes.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/ode_sed_changes.omex')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -80,9 +80,9 @@ test.describe('Solver coverage tests', () => {
     //  • y = -356/27 = -13.185185185185185
     //  • z = -760/27 = -28.148148148148145
 
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('api/solver/algebraic_sed_changes.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath('api/solver/algebraic_sed_changes.omex')));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
@@ -103,9 +103,9 @@ test.describe('Solver coverage tests', () => {
   });
 
   test('toString()', () => {
-    const file = new loc.File(utils.COMBINE_ARCHIVE);
+    const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
-    file.setContents(utils.fileContents(utils.resourcePath(utils.COMBINE_ARCHIVE)));
+    file.setContents(utils.fileContents(file.path));
 
     const document = new loc.SedDocument(file);
     const simulation = document.simulations[0];

@@ -109,7 +109,7 @@ def kinsol_expected_serialisation(parameters=None):
 
 
 def test_local_cellml_file_with_base_path():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
 
     assert document.serialise(utils.ResourceLocation) == cvode_expected_serialisation(
@@ -118,24 +118,23 @@ def test_local_cellml_file_with_base_path():
 
 
 def test_local_cellml_file_without_base_path():
-    file = loc.File(utils.LocalFile)
+    file_path = utils.resource_path("cellml_2.cellml")
+    file = loc.File(file_path)
 
-    file.contents = utils.string_to_list(utils.CellmlContents)
+    file.contents = utils.text_to_list(utils.text_file_contents(file_path))
 
     document = loc.SedDocument(file)
 
     if platform.system() == "Windows":
-        assert document.serialise() == cvode_expected_serialisation(
-            "file:///P:/some/path/file.txt"
-        )
+        expected_url = "file:///" + utils.forward_slash_path(file_path)
     else:
-        assert document.serialise() == cvode_expected_serialisation(
-            "file:///some/path/file.txt"
-        )
+        expected_url = f"file://{file_path}"
+
+    assert document.serialise() == cvode_expected_serialisation(expected_url)
 
 
 def test_relative_local_cellml_file_with_base_path():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
 
     assert document.serialise(
@@ -144,9 +143,11 @@ def test_relative_local_cellml_file_with_base_path():
 
 
 def test_relative_local_cellml_file_without_base_path():
-    file = loc.File(utils.Cellml2File)
+    file = loc.File("cellml_2.cellml")
 
-    file.contents = utils.string_to_list(utils.CellmlContents)
+    file.contents = utils.text_to_list(
+        utils.text_file_contents(utils.resource_path("cellml_2.cellml"))
+    )
 
     document = loc.SedDocument(file)
 
@@ -276,12 +277,12 @@ def test_algebraic_model():
     assert document.serialise(utils.ResourceLocation) == expected_serialisation
 
 
-def sed_change_expected_serialisation(component, variable, new_value):
-    source = (
-        "file:///P:/some/path/file.txt"
-        if platform.system() == "Windows"
-        else "file:///some/path/file.txt"
-    )
+def sed_change_expected_serialisation(file_path, component, variable, new_value):
+    if platform.system() == "Windows":
+        source = "file:///" + utils.forward_slash_path(file_path)
+    else:
+        source = f"file://{file_path}"
+
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <sedML xmlns="http://sed-ml.org/sed-ml/level1/version4" level="1" version="4">
   <listOfModels>
@@ -307,14 +308,14 @@ def test_changes():
     assert change_attribute.new_value == "123.456789"
 
     document = loc.SedDocument()
-    file = loc.File(utils.LocalFile)
+    file = loc.File(utils.resource_path("file.txt"))
     model = loc.SedModel(document, file)
 
     assert model.add_change(change_attribute)
     assert document.add_model(model)
 
     assert document.serialise() == sed_change_expected_serialisation(
-        "component", "variable", "123.456789"
+        file.path, "component", "variable", "123.456789"
     )
 
     change_attribute.component_name = "new_component"
@@ -330,7 +331,7 @@ def test_changes():
     assert change_attribute.new_value == "987.654321"
 
     assert document.serialise() == sed_change_expected_serialisation(
-        "new_component", "new_variable", "987.654321"
+        file.path, "new_component", "new_variable", "987.654321"
     )
 
 
@@ -355,7 +356,7 @@ def test_fixed_step_ode_solver():
 </sedML>
 """
 
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
 
@@ -365,7 +366,7 @@ def test_fixed_step_ode_solver():
 
 
 def test_cvode_solver_with_adams_moulton_interation_method():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -378,7 +379,7 @@ def test_cvode_solver_with_adams_moulton_interation_method():
 
 
 def test_cvode_solver_with_functional_iteration_type():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -391,7 +392,7 @@ def test_cvode_solver_with_functional_iteration_type():
 
 
 def test_cvode_solver_with_banded_linear_solver():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -404,7 +405,7 @@ def test_cvode_solver_with_banded_linear_solver():
 
 
 def test_cvode_solver_with_diagonal_linear_solver():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -417,7 +418,7 @@ def test_cvode_solver_with_diagonal_linear_solver():
 
 
 def test_cvode_solver_with_gmres_linear_solver():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -430,7 +431,7 @@ def test_cvode_solver_with_gmres_linear_solver():
 
 
 def test_cvode_solver_with_bicgstab_linear_solver():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -443,7 +444,7 @@ def test_cvode_solver_with_bicgstab_linear_solver():
 
 
 def test_cvode_solver_with_tfqmr_linear_solver():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -456,7 +457,7 @@ def test_cvode_solver_with_tfqmr_linear_solver():
 
 
 def test_cvode_solver_with_no_preconditioner():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -469,7 +470,7 @@ def test_cvode_solver_with_no_preconditioner():
 
 
 def test_cvode_solver_with_no_interpolate_solution():
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
     solver = simulation.ode_solver
@@ -548,7 +549,7 @@ def test_one_step_simulation():
 </sedML>
 """
 
-    file = loc.File(utils.resource_path(utils.Cellml2File))
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
 
     document.remove_simulation(document.simulations[0])
@@ -597,7 +598,7 @@ def test_sedml_file():
 </sedML>
 """
 
-    file = loc.File(utils.resource_path(utils.Sedml2File))
+    file = loc.File(utils.resource_path("cellml_2.sedml"))
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues)

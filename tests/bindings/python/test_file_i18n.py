@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import libopencor as loc
-import platform
 import utils
 
 
