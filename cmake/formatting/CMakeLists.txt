@@ -17,6 +17,8 @@
 
 if(FORMAT_CODE_AVAILABLE)
     set(GIT_FILES
+        ${CMAKE_SOURCE_DIR}/cmake/base64encoder.cpp
+        ${CMAKE_SOURCE_DIR}/cmake/clcachewrapper.c
         ${GIT_API_HEADER_FILES}
         ${GIT_API_MODULE_FILE}
         ${GIT_SOURCE_FILES}

@@ -21,12 +21,20 @@ if(LIBOPENCOR_COMPILER_CACHING)
     elseif(CLCACHE_EXE)
         set(CLCACHEWRAPPER ${CMAKE_BINARY_DIR}/clcachewrapper)
 
-        try_compile(CLCACHEWRAPPER_EXE ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR}/cmake/clcachewrapper.c
+        message(STATUS "Building clcachewrapper")
+
+        try_compile(CLCACHEWRAPPER_EXE ${CMAKE_BINARY_DIR}
+                    SOURCES ${CMAKE_SOURCE_DIR}/cmake/clcachewrapper.c
                     COPY_FILE ${CLCACHEWRAPPER})
 
         if(CLCACHEWRAPPER_EXE)
+            message(STATUS "Building clcachewrapper - Success")
+
             set(CMAKE_C_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
             set(CMAKE_CXX_COMPILER_LAUNCHER ${CLCACHEWRAPPER})
+        else()
+            message(STATUS "Building clcachewrapper - Failed")
+            message(WARNING "clcachewrapper could not be built, so clcache will not be used.")
         endif()
     else()
         set(CMAKE_C_COMPILER_LAUNCHER ${CCACHE_EXE})
