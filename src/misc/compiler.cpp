@@ -101,7 +101,9 @@ bool Compiler::Impl::compile(const std::string &pCode)
     static const std::vector<const char *> COMPILATION_ARGUMENTS {{"clang", "-fsyntax-only",
                                                                    "-O3",
                                                                    "-fno-math-errno",
+                                                                   "-fno-trapping-math",
                                                                    "-fno-stack-protector",
+                                                                   "-funroll-loops",
                                                                    DUMMY_FILE_NAME}};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
