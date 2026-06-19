@@ -52,8 +52,8 @@ test.describe('Version tests', () => {
   });
 
   test('Clang', () => {
-    assert.strictEqual(loc.clangVersion(), 0x160006);
-    assert.strictEqual(loc.clangVersionString(), '16.0.6');
+    assert.strictEqual(loc.clangVersion(), 0x220108);
+    assert.strictEqual(loc.clangVersionString(), '22.1.8');
   });
 
   test('libCellML', () => {
@@ -72,8 +72,8 @@ test.describe('Version tests', () => {
   });
 
   test('LLVM', () => {
-    assert.strictEqual(loc.llvmVersion(), 0x160006);
-    assert.strictEqual(loc.llvmVersionString(), '16.0.6');
+    assert.strictEqual(loc.llvmVersion(), 0x220108);
+    assert.strictEqual(loc.llvmVersionString(), '22.1.8');
   });
 
   test('SUNDIALS', () => {

@@ -43,7 +43,7 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_01 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected identifier or '(':\nvoid\n    ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected identifier or '(':\n   35 | void\n      |     ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("void"));
@@ -53,8 +53,8 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_02 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Variable has incomplete type 'void':\nvoid function\n     ^"},
-        {libOpenCOR::Issue::Type::ERROR, "Expected ';' after top level declarator:\nvoid function\n             ^\n             ;"},
+        {libOpenCOR::Issue::Type::ERROR, "Variable has incomplete type 'void':\n   35 | void function\n      |      ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected ';' after top level declarator:\n   35 | void function\n      |              ^\n      |              ;"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("void function"));
@@ -64,9 +64,9 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_03 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected parameter declarator:\nvoid function(\n              ^"},
-        {libOpenCOR::Issue::Type::ERROR, "Expected ')' to match this '(':\nvoid function(\n             ^"},
-        {libOpenCOR::Issue::Type::ERROR, "Expected function body after function declarator:\nvoid function(\n              ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected parameter declarator:\n   35 | void function(\n      |               ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected ')' to match this '(':\n   35 | void function(\n      |              ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected function body after function declarator:\n   35 | void function(\n      |               ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("void function("));
@@ -76,7 +76,7 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_04 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected function body after function declarator:\nvoid function()\n               ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected function body after function declarator:\n   35 | void function()\n      |                ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("void function()"));
@@ -86,7 +86,7 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_05 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected '}':\nvoid function() {\n                 ^\nto match this '{':\nvoid function() {\n                ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected '}':\n   35 | void function() {\n      |                  ^\nto match this '{':\n   35 | void function() {\n      |                 ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("void function() {"));
@@ -105,7 +105,7 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_06 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Non-void function does not return a value:\ndouble function() {}\n                   ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Non-void function does not return a value:\n   35 | double function() {}\n      |                    ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("double function() {}"));
@@ -115,8 +115,8 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_07 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected expression:\ndouble function() { return\n                          ^"},
-        {libOpenCOR::Issue::Type::ERROR, "Expected '}' to match this '{':\ndouble function() { return\n                  ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected expression:\n   35 | double function() { return\n      |                           ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected '}' to match this '{':\n   35 | double function() { return\n      |                   ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("double function() { return"));
@@ -126,8 +126,8 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_08 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected ';' after return statement:\ndouble function() { return 3.0\n                              ^\n                              ;"},
-        {libOpenCOR::Issue::Type::ERROR, "Expected '}' to match this '{':\ndouble function() { return 3.0\n                  ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected ';' after return statement:\n   35 | double function() { return 3.0\n      |                               ^\n      |                               ;"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected '}' to match this '{':\n   35 | double function() { return 3.0\n      |                   ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0"));
@@ -137,7 +137,7 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_09 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected '}':\ndouble function() { return 3.0;\n                               ^\nto match this '{':\ndouble function() { return 3.0;\n                  ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected '}':\n   35 | double function() { return 3.0;\n      |                                ^\nto match this '{':\n   35 | double function() { return 3.0;\n      |                   ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0;"));
@@ -153,7 +153,7 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_10 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected identifier or '(':\ndouble .function() { return 3.0; }\n       ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected identifier or '(':\n   35 | double .function() { return 3.0; }\n      |        ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("double .function() { return 3.0; }"));
@@ -163,8 +163,8 @@ TEST_F(CompilerTest, basic)
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES_11 {{
         {libOpenCOR::Issue::Type::ERROR, "The given code could not be compiled."},
-        {libOpenCOR::Issue::Type::ERROR, "Expected expression:\ndouble function() { return 3.0+*-/a; }\n                                 ^"},
-        {libOpenCOR::Issue::Type::ERROR, "Use of undeclared identifier 'a':\ndouble function() { return 3.0+*-/a; }\n                                  ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Expected expression:\n   35 | double function() { return 3.0+*-/a; }\n      |                                  ^"},
+        {libOpenCOR::Issue::Type::ERROR, "Use of undeclared identifier 'a':\n   35 | double function() { return 3.0+*-/a; }\n      |                                   ^"},
     }};
 
     EXPECT_FALSE(mCompiler->compile("double function() { return 3.0+*-/a; }"));

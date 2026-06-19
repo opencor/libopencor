@@ -7,7 +7,7 @@ file(READ ${CMAKE_FILE} FILE_CONTENTS)
 # entry to those needed system libraries or remove the INTERFACE_LINK_LIBRARIES entry altogether.
 
 if(WIN32)
-    string(REGEX REPLACE "INTERFACE_LINK_LIBRARIES[^\n]*\n" "INTERFACE_LINK_LIBRARIES \"$<LINK_ONLY:bcrypt.lib>;$<LINK_ONLY:crypt32.lib>;$<LINK_ONLY:iphlpapi.lib>;$<LINK_ONLY:version.lib>;$<LINK_ONLY:wldap32.lib>;$<LINK_ONLY:ws2_32.lib>\"\n" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REGEX REPLACE "INTERFACE_LINK_LIBRARIES[^\n]*\n" "INTERFACE_LINK_LIBRARIES \"$<LINK_ONLY:bcrypt.lib>;$<LINK_ONLY:crypt32.lib>;$<LINK_ONLY:iphlpapi.lib>;$<LINK_ONLY:ntdll.lib>;$<LINK_ONLY:version.lib>;$<LINK_ONLY:wldap32.lib>;$<LINK_ONLY:ws2_32.lib>\"\n" FILE_CONTENTS "${FILE_CONTENTS}")
 elseif(APPLE)
     string(REGEX REPLACE "INTERFACE_LINK_LIBRARIES[^\n]*\n" "INTERFACE_LINK_LIBRARIES \"-framework CoreFoundation;-framework SystemConfiguration;$<LINK_ONLY:ldap>\"\n" FILE_CONTENTS "${FILE_CONTENTS}")
 else()

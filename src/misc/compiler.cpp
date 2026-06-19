@@ -27,9 +27,9 @@ limitations under the License.
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
 #include "llvm/MC/TargetRegistry.h"
-#include "llvm/Support/Host.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Target/TargetMachine.h"
+#include "llvm/TargetParser/Host.h"
 #include "llvm-c/Core.h"
 
 #include <random>
@@ -80,12 +80,12 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     // Create a diagnostics engine.
 
-    auto diagnosticOptions {llvm::IntrusiveRefCntPtr<clang::DiagnosticOptions>(std::make_unique<clang::DiagnosticOptions>())};
+    auto diagnosticOptions {std::make_unique<clang::DiagnosticOptions>()};
     std::string diagnostics;
     llvm::raw_string_ostream outputStream(diagnostics);
     auto diagnosticsEngine {llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(std::make_unique<clang::DiagnosticsEngine>(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(std::make_unique<clang::DiagnosticIDs>()),
-                                                                                                                          &*diagnosticOptions,
-                                                                                                                          std::make_unique<clang::TextDiagnosticPrinter>(outputStream, &*diagnosticOptions).release()))};
+                                                                                                                          *diagnosticOptions,
+                                                                                                                          new clang::TextDiagnosticPrinter(outputStream, *diagnosticOptions)))};
 
     diagnosticsEngine->setWarningsAsErrors(true);
 
@@ -314,7 +314,7 @@ extern double atanh(double);
     if (target == nullptr) {
         error[0] = static_cast<char>(tolower(error[0]));
 
-        const auto targetTriple {module->getTargetTriple()};
+        const auto targetTriple {module->getTargetTriple().str()};
         std::string targetError;
 
         targetError.reserve(targetTriple.size() + error.size() + 32); // NOLINT
@@ -348,7 +348,7 @@ extern double atanh(double);
     llvm::SmallVector<char, 0> outputBuffer;
     llvm::raw_svector_ostream output(outputBuffer);
 
-    if (targetMachine->addPassesToEmitFile(passManager, output, nullptr, llvm::CGFT_ObjectFile)) {
+    if (targetMachine->addPassesToEmitFile(passManager, output, nullptr, llvm::CodeGenFileType::ObjectFile)) {
         addError("The target machine cannot emit some WebAssembly code.");
 
         return false;
@@ -442,7 +442,7 @@ bool Compiler::Impl::addFunction(const std::string &pName, void *pFunction)
     // name, and function.
 
     const bool res {!mLljit->getMainJITDylib().define(llvm::orc::absoluteSymbols({
-        {mLljit->mangleAndIntern(pName), llvm::JITEvaluatedSymbol(llvm::pointerToJITTargetAddress(pFunction), llvm::JITSymbolFlags::Exported)},
+        {mLljit->mangleAndIntern(pName), llvm::orc::ExecutorSymbolDef(llvm::orc::ExecutorAddr::fromPtr(pFunction), llvm::JITSymbolFlags::Exported)},
     }))};
 
 #    ifndef CODE_COVERAGE_ENABLED

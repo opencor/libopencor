@@ -145,7 +145,6 @@ if(NOT BUILDCACHE_EXE)
     endif()
 endif()
 
-find_program(7Z_EXE NAMES ${PREFERRED_7Z_NAMES} 7z)
 find_program(BIOME_EXE NAMES ${PREFERRED_BIOME_NAMES} biome)
 find_program(RUFF_EXE NAMES ${PREFERRED_RUFF_NAMES} ruff)
 find_program(CLANG_FORMAT_EXE NAMES ${PREFERRED_CLANG_FORMAT_NAMES} clang-format)

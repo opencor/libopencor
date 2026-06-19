@@ -60,10 +60,6 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
 
         set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
 
-        if(NOT LIBOPENCOR_PREBUILT_LLVMCLANG)
-            set(NATIVE_PREBUILT_DIR -DNATIVE_PREBUILT_DIR=${PREBUILT_DIR})
-        endif()
-
         add_custom_target(${JAVASCRIPT_BINDINGS_TARGET}
                           COMMAND ${EMCMAKE_EXE} ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" -S ${CMAKE_SOURCE_DIR} -B build
                                                                   -DBUILDCACHE_EXE=${BUILDCACHE_EXE}
@@ -83,7 +79,6 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                                                                   -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}
                                                                   -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
                                                                   -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}
-                                                                  ${NATIVE_PREBUILT_DIR}
                                                                   -DONLY_BUILD_THIRD_PARTY_LIBRARIES=${ONLY_BUILD_THIRD_PARTY_LIBRARIES}
                                                                   -DREAL_CMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME_LC}
                           COMMAND ${CMAKE_COMMAND} --build build)

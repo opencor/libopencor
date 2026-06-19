@@ -369,13 +369,33 @@ else()
     # against all of its dependencies.
 
     if(NOT LIBOPENCOR_SHARED_LIBS)
+        # Build the static archive extractor that will be used to extract the object files from our various packages. It
+        # handles duplicate object names (e.g., two object files named X86.cpp.o within the same library) by prepending
+        # a unique index to each output filename, which ar -x cannot do since the second extraction silently overwrites
+        # the first, losing symbols.
+
+        set(STATIC_ARCHIVE_EXTRACTOR ${CMAKE_BINARY_DIR}/staticarchiveextractor)
+
+        message(STATUS "Building staticarchiveextractor")
+
+        try_compile(STATIC_ARCHIVE_EXTRACTOR_EXE ${CMAKE_BINARY_DIR}
+                    SOURCES ${CMAKE_SOURCE_DIR}/cmake/staticarchiveextractor.cpp
+                    COPY_FILE ${STATIC_ARCHIVE_EXTRACTOR})
+
+        if(STATIC_ARCHIVE_EXTRACTOR_EXE)
+            message(STATUS "Building staticarchiveextractor - Success")
+        else()
+            message(STATUS "Building staticarchiveextractor - Failed")
+            message(FATAL_ERROR "staticarchiveextractor could not be built.")
+        endif()
+
         # Retrieve the path to our various packages.
 
         set(PACKAGES_DIR ${CMAKE_BINARY_DIR}/packages)
 
         file(GLOB_RECURSE PACKAGES ${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX})
 
-        # Extract the object files from our various packages.
+        # Extract the object files from our various packages, handling duplicate object names.
 
         set(PACKAGES_OBJECT_FILES)
 
@@ -386,30 +406,13 @@ else()
 
             file(MAKE_DIRECTORY ${PACKAGE_DIR})
 
-            if(WIN32)
-                if(7Z_EXE)
-                    execute_process(COMMAND ${7Z_EXE} e ${PACKAGE} -bso0
-                                    WORKING_DIRECTORY ${PACKAGE_DIR})
-                else()
-                    execute_process(COMMAND ${CMAKE_AR} /NOLOGO /LIST ${PACKAGE}
-                                    OUTPUT_VARIABLE PACKAGE_FILES
-                                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+            message(STATUS "Extracting object files from ${PACKAGE}")
 
-                    string(REPLACE "\n" ";" PACKAGE_FILES ${PACKAGE_FILES})
+            execute_process(COMMAND ${STATIC_ARCHIVE_EXTRACTOR} ${PACKAGE}
+                            WORKING_DIRECTORY ${PACKAGE_DIR})
 
-                    foreach(PACKAGE_FILE ${PACKAGE_FILES})
-                        string(REGEX MATCH ".*\\${CMAKE_CXX_OUTPUT_EXTENSION}$" IS_OBJECT_FILE ${PACKAGE_FILE})
+            message(STATUS "Extracting object files from ${PACKAGE} - done")
 
-                        if(IS_OBJECT_FILE)
-                            execute_process(COMMAND ${CMAKE_AR} /NOLOGO /EXTRACT:${PACKAGE_FILE} ${PACKAGE}
-                                            WORKING_DIRECTORY ${PACKAGE_DIR})
-                        endif()
-                    endforeach()
-                endif()
-            else()
-                execute_process(COMMAND ${CMAKE_AR} -x ${PACKAGE}
-                                WORKING_DIRECTORY ${PACKAGE_DIR})
-            endif()
 
             file(GLOB_RECURSE PACKAGE_OBJECT_FILES ${PACKAGE_DIR}/*${CMAKE_CXX_OUTPUT_EXTENSION})
 
