@@ -101,7 +101,9 @@ bool Compiler::Impl::compile(const std::string &pCode)
     static const std::vector<const char *> COMPILATION_ARGUMENTS {{"clang", "-fsyntax-only",
                                                                    "-O3",
                                                                    "-fno-math-errno",
+                                                                   "-fno-trapping-math",
                                                                    "-fno-stack-protector",
+                                                                   "-funroll-loops",
                                                                    DUMMY_FILE_NAME}};
 
     std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
@@ -334,7 +336,9 @@ extern double atanh(double);
     auto targetMachine {std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module->getTargetTriple(),
                                                                                          "generic", "",
                                                                                          llvm::TargetOptions(),
-                                                                                         llvm::Reloc::Static))};
+                                                                                         llvm::Reloc::Static,
+                                                                                         std::nullopt,
+                                                                                         llvm::CodeGenOptLevel::Aggressive))};
 
     if (targetMachine == nullptr) {
         addError("A target machine could not be created.");
@@ -368,9 +372,13 @@ extern double atanh(double);
 
     return true;
 #else
-    // Create an ORC-based JIT and keep track of it.
+    // Create an ORC-based JIT with aggressive code generation and keep track of it.
 
-    auto lljit {llvm::orc::LLJITBuilder().create()};
+    auto jitTargetMachineBuilder {llvm::orc::JITTargetMachineBuilder(llvm::Triple(llvm::sys::getProcessTriple()))};
+
+    jitTargetMachineBuilder.setCodeGenOptLevel(llvm::CodeGenOptLevel::Aggressive);
+
+    auto lljit {llvm::orc::LLJITBuilder().setJITTargetMachineBuilder(std::move(jitTargetMachineBuilder)).create()};
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!lljit) {
