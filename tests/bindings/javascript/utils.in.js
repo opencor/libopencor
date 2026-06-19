@@ -15,7 +15,10 @@ limitations under the License.
 */
 
 import assert from 'node:assert';
+import { setMaxListeners } from 'node:events';
 import { readFileSync } from 'node:fs';
+
+setMaxListeners(Infinity);
 
 export const RESOURCE_LOCATION = '@CMAKE_SOURCE_DIR@/tests/res';
 
