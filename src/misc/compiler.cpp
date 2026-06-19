@@ -334,7 +334,9 @@ extern double atanh(double);
     auto targetMachine {std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module->getTargetTriple(),
                                                                                          "generic", "",
                                                                                          llvm::TargetOptions(),
-                                                                                         llvm::Reloc::Static))};
+                                                                                         llvm::Reloc::Static,
+                                                                                         std::nullopt,
+                                                                                         llvm::CodeGenOptLevel::Aggressive))};
 
     if (targetMachine == nullptr) {
         addError("A target machine could not be created.");
@@ -368,9 +370,13 @@ extern double atanh(double);
 
     return true;
 #else
-    // Create an ORC-based JIT and keep track of it.
+    // Create an ORC-based JIT with aggressive code generation and keep track of it.
 
-    auto lljit {llvm::orc::LLJITBuilder().create()};
+    auto jitTargetMachineBuilder {llvm::orc::JITTargetMachineBuilder(llvm::Triple(llvm::sys::getProcessTriple()))};
+
+    jitTargetMachineBuilder.setCodeGenOptLevel(llvm::CodeGenOptLevel::Aggressive);
+
+    auto lljit {llvm::orc::LLJITBuilder().setJITTargetMachineBuilder(std::move(jitTargetMachineBuilder)).create()};
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!lljit) {
