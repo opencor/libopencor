@@ -110,6 +110,10 @@ jobs:
         uses: opencor/buildcache-action@v1
         with:
           cache_key: webassembly
+      - name: Install LLVM
+        run: |
+          brew install llvm
+          echo "$(brew --prefix llvm)/bin" >> $GITHUB_PATH
       - name: Install Emscripten
         run: brew install emscripten
       - name: Configure libOpenCOR (for a specific third-party library)

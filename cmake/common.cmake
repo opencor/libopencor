@@ -42,8 +42,21 @@ function(configure_target TARGET)
     # Ignore some MSVC warnings.
 
     if(BUILDING_USING_MSVC)
+        # Suppress the warning about needing to export classes from a DLL when using the /MD or /MDd options, which is
+        # the case for all our targets, as we want to be able to link them with both static and dynamic libraries. This
+        # warning is triggered by the use of std::string in our public API, but it doesn't cause any issues as long as
+        # we are consistent with the runtime library we are using (which we are, as we use the same runtime library for
+        # all our targets).
+
         target_compile_options(${TARGET} PRIVATE
                                /wd4251)
+
+        # Suppress warnings from SYSTEM (external) headers, which includes all third-party library headers (LLVM+Clang,
+        # libcurl, libxml2, etc.). This avoids having to manually wrap every third-party include with
+        # #pragma warning(disable/default: ...) in each source file.
+
+        target_compile_options(${TARGET} PRIVATE
+                               /wd4702)
     endif()
 
     # Treat warnings as errors.
@@ -67,6 +80,14 @@ function(configure_target TARGET)
             target_compile_options(${TARGET} PRIVATE
                                    ${COMPILE_OPTIONS})
         endif()
+    endif()
+
+    # Add the /Zc:preprocessor option to avoid multiple OPT_ enums defaulting to the exact same name when using
+    # LLVM+Clang.
+
+    if(BUILDING_USING_MSVC)
+        target_compile_options(${TARGET} PRIVATE
+                               /Zc:preprocessor)
     endif()
 
     # Analyse the code.

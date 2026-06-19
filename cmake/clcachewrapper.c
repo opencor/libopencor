@@ -21,7 +21,7 @@ int main(int pArgC, char *pArgV[])
 {
     // Call clcache with the given arguments, except the first one, which is the full path to the MSVC compiler.
 
-    #define STRING_SIZE 32768
+#define STRING_SIZE 32768
 
     char clcacheCommand[STRING_SIZE] = "clcache";
     int k = 6;
