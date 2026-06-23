@@ -67,7 +67,25 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
 else()
     # Build our package.
 
-    find_package(Perl REQUIRED QUIET)
+    if(WIN32)
+        # Look for Strawberry Perl since Git for Windows' Perl is incomplete.
+
+        find_program(STRAWBERRY_PERL perl.exe HINTS "C:/Strawberry/perl/bin")
+
+        if(STRAWBERRY_PERL)
+            set(PERL_EXECUTABLE "${STRAWBERRY_PERL}")
+        else()
+            find_package(Perl REQUIRED QUIET)
+        endif()
+
+        # Ensure that MSVC's linker takes precedence over any other linker.
+
+        get_filename_component(MSVC_BIN_DIR "${CMAKE_C_COMPILER}" DIRECTORY)
+
+        set(ENV{PATH} "${MSVC_BIN_DIR};$ENV{PATH}")
+    else()
+        find_package(Perl REQUIRED QUIET)
+    endif()
 
     set(CONFIG_OPTIONS no-shared no-tests no-threads --prefix=${INSTALL_DIR})
 
