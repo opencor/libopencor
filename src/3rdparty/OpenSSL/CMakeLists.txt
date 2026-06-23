@@ -139,6 +139,10 @@ else()
     # architecture.
 
     if(NOT WIN32 AND NOT APPLE AND INTEL_MODE)
+        if(EXISTS "${INSTALL_DIR}/lib")
+            file(REMOVE_RECURSE "${INSTALL_DIR}/lib")
+        endif()
+
         file(RENAME "${INSTALL_DIR}/lib64" "${INSTALL_DIR}/lib")
     endif()
 
