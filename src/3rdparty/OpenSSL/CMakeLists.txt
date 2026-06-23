@@ -67,7 +67,25 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
 else()
     # Build our package.
 
-    find_package(Perl REQUIRED QUIET)
+    if(WIN32)
+        # Look for Strawberry Perl since Git for Windows' Perl is incomplete.
+
+        find_program(STRAWBERRY_PERL perl.exe HINTS "C:/Strawberry/perl/bin")
+
+        if(STRAWBERRY_PERL)
+            set(PERL_EXECUTABLE "${STRAWBERRY_PERL}")
+        else()
+            find_package(Perl REQUIRED QUIET)
+        endif()
+
+        # Ensure that MSVC's linker takes precedence over any other linker.
+
+        get_filename_component(MSVC_BIN_DIR "${CMAKE_C_COMPILER}" DIRECTORY)
+
+        set(ENV{PATH} "${MSVC_BIN_DIR};$ENV{PATH}")
+    else()
+        find_package(Perl REQUIRED QUIET)
+    endif()
 
     set(CONFIG_OPTIONS no-shared no-tests no-threads --prefix=${INSTALL_DIR})
 
@@ -105,23 +123,6 @@ else()
         list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
     endif()
 
-    if(WIN32 AND NOT INTEL_MODE)
-        #---GRY--- THE BELOW SHOULD BE REMOVED ONCE THE OpenSSL ISSUE ON WoA HAS BEEN FIXED.
-
-        # There is currently an issue with building OpenSSL on Windows on ARM, which results in libcurl segfaulting
-        # whenever we try to use it. A temporary fix is to build OpenSSL without optimisation. We can do this by
-        # setting the CFLAGS environment variable. By default, the flags passed to the C compiler are
-        # "/W3 /wd4090 /nologo /O2", so here we set CFLAGS to "/W3 /wd4090 /nologo". See
-        # https://github.com/openssl/openssl/issues/26239 and
-        # https://developercommunity.visualstudio.com/t/Openssl-crashes-on-arm64-when-built-with/10896571 for more
-        # details.
-
-        string(REPLACE " " "\\ " ESCAPED_CMAKE_COMMAND ${CMAKE_COMMAND})
-        string(REPLACE " " "\\ " ESCAPED_CFLAGS "/W3 /wd4090 /nologo")
-
-        set(PRE_CONFIGURE_COMMAND ${ESCAPED_CMAKE_COMMAND} -E env CFLAGS=${ESCAPED_CFLAGS})
-    endif()
-
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
@@ -138,6 +139,10 @@ else()
     # architecture.
 
     if(NOT WIN32 AND NOT APPLE AND INTEL_MODE)
+        if(EXISTS "${INSTALL_DIR}/lib")
+            file(REMOVE_RECURSE "${INSTALL_DIR}/lib")
+        endif()
+
         file(RENAME "${INSTALL_DIR}/lib64" "${INSTALL_DIR}/lib")
     endif()
 
