@@ -13,6 +13,7 @@
       "**/*.js",
       "**/*.json",
       "!**/*.min.css",
+      "!.buildcache/**",
       "!build/**",
       "!doc/**",
       "!extern/**",
