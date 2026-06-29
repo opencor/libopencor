@@ -43,41 +43,41 @@ public:
     SedSimulation &operator=(SedSimulation &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the ODE solver for this simulation.
+     * @brief Return the ODE solver.
      *
-     * Return the ODE Solver for this simulation.
+     * Return the ODE Solver.
      *
-     * @return The ODE solver for this simulation.
+     * @return The ODE solver.
      */
 
     const SolverOdePtr &odeSolver() const;
 
     /**
-     * @brief Set the ODE solver for this simulation.
+     * @brief Set the ODE solver.
      *
-     * Set the ODE solver for this simulation.
+     * Set the ODE solver.
      *
-     * @param pOdeSolver The ODE solver, as a @ref SolverOdePtr, for this simulation.
+     * @param pOdeSolver The ODE solver, as a @ref SolverOdePtr.
      */
 
     void setOdeSolver(const SolverOdePtr &pOdeSolver);
 
     /**
-     * @brief Get the NLA solver for this simulation.
+     * @brief Return the NLA solver.
      *
-     * Return the NLA Solver for this simulation.
+     * Return the NLA Solver.
      *
-     * @return The NLA solver for this simulation.
+     * @return The NLA solver.
      */
 
     const SolverNlaPtr &nlaSolver() const;
 
     /**
-     * @brief Set the NLA solver for this simulation.
+     * @brief Set the NLA solver.
      *
-     * Set the NLA solver for this simulation.
+     * Set the NLA solver.
      *
-     * @param pNlaSolver The NLA solver, as a @ref SolverNlaPtr, for this simulation.
+     * @param pNlaSolver The NLA solver, as a @ref SolverNlaPtr.
      */
 
     void setNlaSolver(const SolverNlaPtr &pNlaSolver);

@@ -56,31 +56,31 @@ public:
     Solver &operator=(Solver &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the type of the solver.
+     * @brief Return the type.
      *
-     * Return the type of the solver, i.e. @ref Solver::Type::ODE or @ref Solver::Type::NLA.
+     * Return the type, i.e. @ref Solver::Type::ODE or @ref Solver::Type::NLA.
      *
-     * @return The type, as a @ref Solver::Type, of the solver.
+     * @return The type, as a @ref Solver::Type.
      */
 
     virtual Solver::Type type() const = 0;
 
     /**
-     * @brief Get the (KiSAO) id of the solver.
+     * @brief Return the (KiSAO) id.
      *
-     * Return the (<a href="https://www.ebi.ac.uk/ols/ontologies/kisao">KiSAO</a>) id of the solver.
+     * Return the (<a href="https://www.ebi.ac.uk/ols/ontologies/kisao">KiSAO</a>) id.
      *
-     * @return The (KiSAO) id, as a @c std::string, of the solver.
+     * @return The (KiSAO) id, as a @c std::string.
      */
 
     const std::string &id() const;
 
     /**
-     * @brief Get the name of the solver.
+     * @brief Return the name.
      *
-     * Return the name of the solver.
+     * Return the name.
      *
-     * @return The name, as a @c std::string, of the solver.
+     * @return The name, as a @c std::string.
      */
 
     const std::string &name() const;

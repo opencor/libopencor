@@ -71,81 +71,81 @@ public:
     static SolverKinsolPtr create();
 
     /**
-     * @brief Get the maximum number of iterations used by the solver.
+     * @brief Return the maximum number of iterations.
      *
-     * Return the maximum number of iterations used by the solver.
+     * Return the maximum number of iterations.
      *
-     * @return The maximum number of iterations used by the solver.
+     * @return The maximum number of iterations.
      */
 
     int maximumNumberOfIterations() const;
 
     /**
-     * @brief Set the maximum number of iterations to be used by the solver.
+     * @brief Set the maximum number of iterations.
      *
-     * Set the maximum number of iterations to be used by the solver.
+     * Set the maximum number of iterations.
      *
-     * @param pMaximumNumberOfIterations The maximum number of iterations to be used by the solver.
+     * @param pMaximumNumberOfIterations The maximum number of iterations.
      */
 
     void setMaximumNumberOfIterations(int pMaximumNumberOfIterations);
 
     /**
-     * @brief Get the linear solver used by the solver.
+     * @brief Return the linear solver.
      *
-     * Return the linear solver used by the solver.
+     * Return the linear solver.
      *
-     * @return The linear solver used by the solver.
+     * @return The linear solver.
      */
 
     LinearSolver linearSolver() const;
 
     /**
-     * @brief Set the linear solver to be used by the solver.
+     * @brief Set the linear solver.
      *
-     * Set the linear solver to be used by the solver.
+     * Set the linear solver.
      *
-     * @param pLinearSolver The linear solver to be used by the solver.
+     * @param pLinearSolver The linear solver.
      */
 
     void setLinearSolver(LinearSolver pLinearSolver);
 
     /**
-     * @brief Get the upper half-bandwidth used by the solver.
+     * @brief Return the upper half-bandwidth.
      *
-     * Return the upper half-bandwidth used by the solver.
+     * Return the upper half-bandwidth.
      *
-     * @return The upper half-bandwidth used by the solver.
+     * @return The upper half-bandwidth.
      */
 
     int upperHalfBandwidth() const;
 
     /**
-     * @brief Set the upper half-bandwidth to be used by the solver.
+     * @brief Set the upper half-bandwidth.
      *
-     * Set the upper half-bandwidth to be used by the solver.
+     * Set the upper half-bandwidth.
      *
-     * @param pUpperHalfBandwidth The upper half-bandwidth to be used by the solver.
+     * @param pUpperHalfBandwidth The upper half-bandwidth.
      */
 
     void setUpperHalfBandwidth(int pUpperHalfBandwidth);
 
     /**
-     * @brief Get the lower half-bandwidth used by the solver.
+     * @brief Return the lower half-bandwidth.
      *
-     * Return the lower half-bandwidth used by the solver.
+     * Return the lower half-bandwidth.
      *
-     * @return The lower half-bandwidth used by the solver.
+     * @return The lower half-bandwidth.
      */
 
     int lowerHalfBandwidth() const;
 
     /**
-     * @brief Set the lower half-bandwidth to be used by the solver.
+     * @brief Set the lower half-bandwidth.
      *
-     * Set the lower half-bandwidth to be used by the solver.
+     * Set the lower half-bandwidth.
      *
-     * @param pLowerHalfBandwidth The lower half-bandwidth to be used by the solver.
+     * @param pLowerHalfBandwidth The lower half-bandwidth.
      */
 
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);

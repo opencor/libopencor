@@ -108,207 +108,207 @@ public:
     static SolverCvodePtr create();
 
     /**
-     * @brief Get the maximum step used by the solver.
+     * @brief Return the maximum step.
      *
-     * Return the maximum step used by the solver.
+     * Return the maximum step.
      *
-     * @return The maximum step used by the solver.
+     * @return The maximum step.
      */
 
     double maximumStep() const;
 
     /**
-     * @brief Set the maximum step to be used by the solver.
+     * @brief Set the maximum step.
      *
-     * Set the maximum step to be used by the solver.
+     * Set the maximum step.
      *
-     * @param pMaximumStep The maximum step to be used by the solver.
+     * @param pMaximumStep The maximum step.
      */
 
     void setMaximumStep(double pMaximumStep);
 
     /**
-     * @brief Get the maximum number of steps used by the solver.
+     * @brief Return the maximum number of steps.
      *
-     * Return the maximum number of steps used by the solver.
+     * Return the maximum number of steps.
      *
-     * @return The maximum number of steps used by the solver.
+     * @return The maximum number of steps.
      */
 
     int maximumNumberOfSteps() const;
 
     /**
-     * @brief Set the maximum number of steps to be used by the solver.
+     * @brief Set the maximum number of steps.
      *
-     * Set the maximum number of steps to be used by the solver.
+     * Set the maximum number of steps.
      *
-     * @param pMaximumNumberOfSteps The maximum number of steps to be used by the solver.
+     * @param pMaximumNumberOfSteps The maximum number of steps.
      */
 
     void setMaximumNumberOfSteps(int pMaximumNumberOfSteps);
 
     /**
-     * @brief Get the integration method used by the solver.
+     * @brief Return the integration method.
      *
-     * Return the integration method used by the solver.
+     * Return the integration method.
      *
-     * @return The integration method used by the solver.
+     * @return The integration method.
      */
 
     IntegrationMethod integrationMethod() const;
 
     /**
-     * @brief Set the integration method to be used by the solver.
+     * @brief Set the integration method.
      *
-     * Set the integration method to be used by the solver.
+     * Set the integration method.
      *
-     * @param pIntegrationMethod The integration method to be used by the solver.
+     * @param pIntegrationMethod The integration method.
      */
 
     void setIntegrationMethod(IntegrationMethod pIntegrationMethod);
 
     /**
-     * @brief Get the iteration type used by the solver.
+     * @brief Return the iteration type.
      *
-     * Return the iteration type used by the solver.
+     * Return the iteration type.
      *
-     * @return The iteration type used by the solver.
+     * @return The iteration type.
      */
 
     IterationType iterationType() const;
 
     /**
-     * @brief Set the iteration type to be used by the solver.
+     * @brief Set the iteration type.
      *
-     * Set the iteration type to be used by the solver.
+     * Set the iteration type.
      *
-     * @param pIterationType The iteration type to be used by the solver.
+     * @param pIterationType The iteration type.
      */
 
     void setIterationType(IterationType pIterationType);
 
     /**
-     * @brief Get the linear solver used by the solver.
+     * @brief Return the linear solver.
      *
-     * Return the linear solver used by the solver.
+     * Return the linear solver.
      *
-     * @return The linear solver used by the solver.
+     * @return The linear solver.
      */
 
     LinearSolver linearSolver() const;
 
     /**
-     * @brief Set the linear solver to be used by the solver.
+     * @brief Set the linear solver.
      *
-     * Set the linear solver to be used by the solver.
+     * Set the linear solver.
      *
-     * @param pLinearSolver The linear solver to be used by the solver.
+     * @param pLinearSolver The linear solver.
      */
 
     void setLinearSolver(LinearSolver pLinearSolver);
 
     /**
-     * @brief Get the preconditioner used by the solver.
+     * @brief Return the preconditioner.
      *
-     * Return the preconditioner used by the solver.
+     * Return the preconditioner.
      *
-     * @return The preconditioner used by the solver.
+     * @return The preconditioner.
      */
 
     Preconditioner preconditioner() const;
 
     /**
-     * @brief Set the preconditioner to be used by the solver.
+     * @brief Set the preconditioner.
      *
-     * Set the preconditioner to be used by the solver.
+     * Set the preconditioner.
      *
-     * @param pPreconditioner The preconditioner to be used by the solver.
+     * @param pPreconditioner The preconditioner.
      */
 
     void setPreconditioner(Preconditioner pPreconditioner);
 
     /**
-     * @brief Get the upper half-bandwidth used by the solver.
+     * @brief Return the upper half-bandwidth.
      *
-     * Return the upper half-bandwidth used by the solver.
+     * Return the upper half-bandwidth.
      *
-     * @return The upper half-bandwidth used by the solver.
+     * @return The upper half-bandwidth.
      */
 
     int upperHalfBandwidth() const;
 
     /**
-     * @brief Set the upper half-bandwidth to be used by the solver.
+     * @brief Set the upper half-bandwidth.
      *
-     * Set the upper half-bandwidth to be used by the solver.
+     * Set the upper half-bandwidth.
      *
-     * @param pUpperHalfBandwidth The upper half-bandwidth to be used by the solver.
+     * @param pUpperHalfBandwidth The upper half-bandwidth.
      */
 
     void setUpperHalfBandwidth(int pUpperHalfBandwidth);
 
     /**
-     * @brief Get the lower half-bandwidth used by the solver.
+     * @brief Return the lower half-bandwidth.
      *
-     * Return the lower half-bandwidth used by the solver.
+     * Return the lower half-bandwidth.
      *
-     * @return The lower half-bandwidth used by the solver.
+     * @return The lower half-bandwidth.
      */
 
     int lowerHalfBandwidth() const;
 
     /**
-     * @brief Set the lower half-bandwidth to be used by the solver.
+     * @brief Set the lower half-bandwidth.
      *
-     * Set the lower half-bandwidth to be used by the solver.
+     * Set the lower half-bandwidth.
      *
-     * @param pLowerHalfBandwidth The lower half-bandwidth to be used by the solver.
+     * @param pLowerHalfBandwidth The lower half-bandwidth.
      */
 
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
 
     /**
-     * @brief Get the relative tolerance used by the solver.
+     * @brief Return the relative tolerance.
      *
-     * Return the relative tolerance used by the solver.
+     * Return the relative tolerance.
      *
-     * @return The relative tolerance used by the solver.
+     * @return The relative tolerance.
      */
 
     double relativeTolerance() const;
 
     /**
-     * @brief Set the relative tolerance to be used by the solver.
+     * @brief Set the relative tolerance.
      *
-     * Set the relative tolerance to be used by the solver.
+     * Set the relative tolerance.
      *
-     * @param pRelativeTolerance The relative tolerance to be used by the solver.
+     * @param pRelativeTolerance The relative tolerance.
      */
 
     void setRelativeTolerance(double pRelativeTolerance);
 
     /**
-     * @brief Get the absolute tolerance used by the solver.
+     * @brief Return the absolute tolerance.
      *
-     * Return the absolute tolerance used by the solver.
+     * Return the absolute tolerance.
      *
-     * @return The absolute tolerance used by the solver.
+     * @return The absolute tolerance.
      */
 
     double absoluteTolerance() const;
 
     /**
-     * @brief Set the absolute tolerance to be used by the solver.
+     * @brief Set the absolute tolerance.
      *
-     * Set the absolute tolerance to be used by the solver.
+     * Set the absolute tolerance.
      *
-     * @param pAbsoluteTolerance The absolute tolerance to be used by the solver.
+     * @param pAbsoluteTolerance The absolute tolerance.
      */
 
     void setAbsoluteTolerance(double pAbsoluteTolerance);
 
     /**
-     * @brief Get whether the solution should be interpolated or not.
+     * @brief Return whether the solution should be interpolated or not.
      *
      * Return whether the solution should be interpolated or not.
      *
@@ -318,11 +318,11 @@ public:
     bool interpolateSolution() const;
 
     /**
-     * @brief Set whether the solution should be interpolated or not.
+     * @brief Set whether the solution should be interpolated.
      *
-     * Set whether the solution should be interpolated or not.
+     * Set whether the solution should be interpolated.
      *
-     * @param pInterpolateSolution Whether the solution should be interpolated or not.
+     * @param pInterpolateSolution Whether the solution should be interpolated.
      */
 
     void setInterpolateSolution(bool pInterpolateSolution);

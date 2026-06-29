@@ -32,9 +32,9 @@ void solverApi(nb::module_ &m)
         .value("Nla", libOpenCOR::Solver::Type::NLA)
         .export_values();
 
-    solver.def_prop_ro("type", &libOpenCOR::Solver::type, "Get the type of the Solver object.")
-        .def_prop_ro("id", &libOpenCOR::Solver::id, "Get the (KiSAO) id of the Solver object.")
-        .def_prop_ro("name", &libOpenCOR::Solver::name, "Get the name of the Solver object.")
+    solver.def_prop_ro("type", &libOpenCOR::Solver::type, "Return the type.")
+        .def_prop_ro("id", &libOpenCOR::Solver::id, "Return the (KiSAO) id.")
+        .def_prop_ro("name", &libOpenCOR::Solver::name, "Return the name.")
         .def("__repr__", [](const libOpenCOR::Solver &self) {
             return "Solver(name=\"" + self.name() + "\")";
         });
@@ -47,7 +47,7 @@ void solverApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SolverOdeFixedStep, libOpenCOR::SolverOde> solverOdeFixedStep(m, "SolverOdeFixedStep");
 
-    solverOdeFixedStep.def_prop_rw("step", &libOpenCOR::SolverOdeFixedStep::step, &libOpenCOR::SolverOdeFixedStep::setStep, "The step of the SolverOdeFixedStep object.");
+    solverOdeFixedStep.def_prop_rw("step", &libOpenCOR::SolverOdeFixedStep::step, &libOpenCOR::SolverOdeFixedStep::setStep, "The step.");
 
     // SolverNla API.
 
@@ -82,17 +82,17 @@ void solverApi(nb::module_ &m)
         .export_values();
 
     solverCvode.def(nb::new_(&libOpenCOR::SolverCvode::create), "Create a SolverCvode object.")
-        .def_prop_rw("maximum_step", &libOpenCOR::SolverCvode::maximumStep, &libOpenCOR::SolverCvode::setMaximumStep, "The maximum step of the SolverCvode object.")
-        .def_prop_rw("maximum_number_of_steps", &libOpenCOR::SolverCvode::maximumNumberOfSteps, &libOpenCOR::SolverCvode::setMaximumNumberOfSteps, "The maximum number of steps of the SolverCvode object.")
-        .def_prop_rw("integration_method", &libOpenCOR::SolverCvode::integrationMethod, &libOpenCOR::SolverCvode::setIntegrationMethod, "The integration method of the SolverCvode object.")
-        .def_prop_rw("iteration_type", &libOpenCOR::SolverCvode::iterationType, &libOpenCOR::SolverCvode::setIterationType, "The iteration type of the SolverCvode object.")
-        .def_prop_rw("linear_solver", &libOpenCOR::SolverCvode::linearSolver, &libOpenCOR::SolverCvode::setLinearSolver, "The linear solver of the SolverCvode object.")
-        .def_prop_rw("preconditioner", &libOpenCOR::SolverCvode::preconditioner, &libOpenCOR::SolverCvode::setPreconditioner, "The preconditioner of the SolverCvode object.")
-        .def_prop_rw("upper_half_bandwidth", &libOpenCOR::SolverCvode::upperHalfBandwidth, &libOpenCOR::SolverCvode::setUpperHalfBandwidth, "The upper half-bandwidth of the SolverCvode object.")
-        .def_prop_rw("lower_half_bandwidth", &libOpenCOR::SolverCvode::lowerHalfBandwidth, &libOpenCOR::SolverCvode::setLowerHalfBandwidth, "The lower half-bandwidth of the SolverCvode object.")
-        .def_prop_rw("relative_tolerance", &libOpenCOR::SolverCvode::relativeTolerance, &libOpenCOR::SolverCvode::setRelativeTolerance, "The relative tolerance of the SolverCvode object.")
-        .def_prop_rw("absolute_tolerance", &libOpenCOR::SolverCvode::absoluteTolerance, &libOpenCOR::SolverCvode::setAbsoluteTolerance, "The absolute tolerance of the SolverCvode object.")
-        .def_prop_rw("interpolate_solution", &libOpenCOR::SolverCvode::interpolateSolution, &libOpenCOR::SolverCvode::setInterpolateSolution, "The interpolate solution of the SolverCvode object.");
+        .def_prop_rw("maximum_step", &libOpenCOR::SolverCvode::maximumStep, &libOpenCOR::SolverCvode::setMaximumStep, "The maximum step.")
+        .def_prop_rw("maximum_number_of_steps", &libOpenCOR::SolverCvode::maximumNumberOfSteps, &libOpenCOR::SolverCvode::setMaximumNumberOfSteps, "The maximum number of steps.")
+        .def_prop_rw("integration_method", &libOpenCOR::SolverCvode::integrationMethod, &libOpenCOR::SolverCvode::setIntegrationMethod, "The integration method.")
+        .def_prop_rw("iteration_type", &libOpenCOR::SolverCvode::iterationType, &libOpenCOR::SolverCvode::setIterationType, "The iteration type.")
+        .def_prop_rw("linear_solver", &libOpenCOR::SolverCvode::linearSolver, &libOpenCOR::SolverCvode::setLinearSolver, "The linear solver.")
+        .def_prop_rw("preconditioner", &libOpenCOR::SolverCvode::preconditioner, &libOpenCOR::SolverCvode::setPreconditioner, "The preconditioner.")
+        .def_prop_rw("upper_half_bandwidth", &libOpenCOR::SolverCvode::upperHalfBandwidth, &libOpenCOR::SolverCvode::setUpperHalfBandwidth, "The upper half-bandwidth.")
+        .def_prop_rw("lower_half_bandwidth", &libOpenCOR::SolverCvode::lowerHalfBandwidth, &libOpenCOR::SolverCvode::setLowerHalfBandwidth, "The lower half-bandwidth.")
+        .def_prop_rw("relative_tolerance", &libOpenCOR::SolverCvode::relativeTolerance, &libOpenCOR::SolverCvode::setRelativeTolerance, "The relative tolerance.")
+        .def_prop_rw("absolute_tolerance", &libOpenCOR::SolverCvode::absoluteTolerance, &libOpenCOR::SolverCvode::setAbsoluteTolerance, "The absolute tolerance.")
+        .def_prop_rw("interpolate_solution", &libOpenCOR::SolverCvode::interpolateSolution, &libOpenCOR::SolverCvode::setInterpolateSolution, "Whether the solution should be interpolated.");
 
     // SolverForwardEuler API.
 
@@ -125,10 +125,10 @@ void solverApi(nb::module_ &m)
         .export_values();
 
     solverKinsol.def(nb::new_(&libOpenCOR::SolverKinsol::create), "Create a SolverKinsol object.")
-        .def_prop_rw("maximum_number_of_iterations", &libOpenCOR::SolverKinsol::maximumNumberOfIterations, &libOpenCOR::SolverKinsol::setMaximumNumberOfIterations, "The maximum number of iterations of the SolverKinsol object.")
-        .def_prop_rw("linear_solver", &libOpenCOR::SolverKinsol::linearSolver, &libOpenCOR::SolverKinsol::setLinearSolver, "The linear solver of the SolverKinsol object.")
-        .def_prop_rw("upper_half_bandwidth", &libOpenCOR::SolverKinsol::upperHalfBandwidth, &libOpenCOR::SolverKinsol::setUpperHalfBandwidth, "The upper half-bandwidth of the SolverKinsol object.")
-        .def_prop_rw("lower_half_bandwidth", &libOpenCOR::SolverKinsol::lowerHalfBandwidth, &libOpenCOR::SolverKinsol::setLowerHalfBandwidth, "The lower half-bandwidth of the SolverKinsol object.");
+        .def_prop_rw("maximum_number_of_iterations", &libOpenCOR::SolverKinsol::maximumNumberOfIterations, &libOpenCOR::SolverKinsol::setMaximumNumberOfIterations, "The maximum number of iterations.")
+        .def_prop_rw("linear_solver", &libOpenCOR::SolverKinsol::linearSolver, &libOpenCOR::SolverKinsol::setLinearSolver, "The linear solver.")
+        .def_prop_rw("upper_half_bandwidth", &libOpenCOR::SolverKinsol::upperHalfBandwidth, &libOpenCOR::SolverKinsol::setUpperHalfBandwidth, "The upper half-bandwidth.")
+        .def_prop_rw("lower_half_bandwidth", &libOpenCOR::SolverKinsol::lowerHalfBandwidth, &libOpenCOR::SolverKinsol::setLowerHalfBandwidth, "The lower half-bandwidth.");
 
     // SolverSecondOrderRungeKutta API.
 

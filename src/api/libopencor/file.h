@@ -99,80 +99,80 @@ public:
 #endif
 
     /**
-     * @brief Get the type of this file.
+     * @brief Return the type.
      *
-     * Return the type of this file.
+     * Return the type.
      *
-     * @return The type, as a @ref Type, of this file.
+     * @return The type, as a @ref Type.
      */
 
     Type type() const;
 
     /**
-     * @brief Get the file name of this file.
+     * @brief Return the file name.
      *
-     * Return the file name of this file. If the file is remote then we return the file name of its local copy.
+     * Return the file name. If the file is remote then we return the file name of its local copy.
      *
      * @sa url()
      * @sa path()
      *
-     * @return The file name, as a @c std::string, of this file.
+     * @return The file name, as a @c std::string.
      */
 
     const std::string &fileName() const;
 
     /**
-     * @brief Get the URL of this file.
+     * @brief Return the URL.
      *
-     * Return the URL of this file. If the file is local then we return an empty string.
+     * Return the URL. If the file is local then we return an empty string.
      *
      * @sa fileName()
      * @sa path()
      *
-     * @return The URL, as a @c std::string, of this file.
+     * @return The URL, as a @c std::string.
      */
 
     const std::string &url() const;
 
     /**
-     * @brief Get the path of this file.
+     * @brief Return the path.
      *
-     * Return the path of this file. If the file is local then we return its file name otherwise its URL.
+     * Return the path. If the file is local then we return its file name otherwise its URL.
      *
      * @sa fileName()
      * @sa url()
      *
-     * @return The path, as a @c std::string, of this file.
+     * @return The path, as a @c std::string.
      */
 
     const std::string &path() const;
 
     /**
-     * @brief Get the contents of this file.
+     * @brief Return the contents.
      *
-     * Return the contents of this file.
+     * Return the contents.
      *
-     * @return The contents, as an @ref UnsignedChars, of this file.
+     * @return The contents, as an @ref UnsignedChars.
      */
 
     const UnsignedChars &contents();
 
     /**
-     * @brief Set the contents of this file.
+     * @brief Set the contents.
      *
-     * Set the contents of this file.
+     * Set the contents.
      *
-     * @param pContents The contents, as an @ref UnsignedChars, of this file.
+     * @param pContents The contents, as an @ref UnsignedChars.
      */
 
     void setContents(const UnsignedChars &pContents);
 
     /**
-     * @brief Return whether this file has child files.
+     * @brief Return whether there are some child files.
      *
-     * Return whether this file has child files. This method is only relevant for COMBINE archives.
+     * Return whether there are some child files. This method is only relevant for COMBINE archives.
      *
-     * @return @c true if this file has child files, @c false otherwise.
+     * @return @c true if there are some child files, @c false otherwise.
      */
 
     bool hasChildFiles() const;
@@ -208,25 +208,25 @@ public:
     const FilePtrs &childFiles() const;
 
     /**
-     * @brief Return a child file.
+     * @brief Return the child file at the given index.
      *
-     * Return a child file. This method is only relevant for COMBINE archives.
+     * Return the child file at the given index. This method is only relevant for COMBINE archives.
      *
      * @param pIndex The index of the child file.
      *
-     * @return The file, as a @ref FilePtr, if it is a child file of this file, @c nullptr otherwise.
+     * @return The file, as a @ref FilePtr, if it is a child file, @c nullptr otherwise.
      */
 
     const FilePtr &childFile(size_t pIndex) const;
 
     /**
-     * @brief Return a child file.
+     * @brief Return the child file with the given file name.
      *
-     * Return a child file. This method is only relevant for COMBINE archives.
+     * Return the child file with the given file name. This method is only relevant for COMBINE archives.
      *
      * @param pFileName The name of the child file.
      *
-     * @return The file, as a @ref FilePtr, if it is a child file of this file, @c nullptr otherwise.
+     * @return The file, as a @ref FilePtr, if it is a child file, @c nullptr otherwise.
      */
 
 #ifdef __EMSCRIPTEN__
