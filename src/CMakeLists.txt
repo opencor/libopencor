@@ -336,19 +336,15 @@ if(EMSCRIPTEN)
     foreach(DEPLOY_DIR ${CMAKE_PROJECT_VERSION} latest)
         add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E make_directory wasm/${DEPLOY_DIR}
-                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js
-                                                            wasm/${DEPLOY_DIR}/${CMAKE_PROJECT_NAME}.js
-                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm
-                                                            wasm/${DEPLOY_DIR}/${CMAKE_PROJECT_NAME}.wasm)
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js wasm/${DEPLOY_DIR}/${CMAKE_PROJECT_NAME}.js
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm wasm/${DEPLOY_DIR}/${CMAKE_PROJECT_NAME}.wasm)
     endforeach()
 
     # Copy our generated files over so that they can be used by our test Web page.
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js
-                                                        ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.js
-                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm
-                                                        ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.wasm)
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.js
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.wasm)
 
     # Let people know how to run our test Web page.
 
@@ -397,22 +393,25 @@ else()
 
         # Extract the object files from our various packages, handling duplicate object names.
 
+        list(LENGTH PACKAGES PACKAGE_COUNT)
+
+        set(PACKAGE_INDEX 0)
         set(PACKAGES_OBJECT_FILES)
 
         foreach(PACKAGE ${PACKAGES})
+            math(EXPR PACKAGE_INDEX "${PACKAGE_INDEX} + 1")
             get_filename_component(PACKAGE_NAME ${PACKAGE} NAME_WE)
 
             set(PACKAGE_DIR ${PACKAGES_DIR}/${PACKAGE_NAME})
 
             file(MAKE_DIRECTORY ${PACKAGE_DIR})
 
-            message(STATUS "Extracting object files from ${PACKAGE}")
+            message(STATUS "[${PACKAGE_INDEX}/${PACKAGE_COUNT}] Extracting object files from ${PACKAGE_NAME}")
 
             execute_process(COMMAND ${STATIC_ARCHIVE_EXTRACTOR} ${PACKAGE}
                             WORKING_DIRECTORY ${PACKAGE_DIR})
 
-            message(STATUS "Extracting object files from ${PACKAGE} - done")
-
+            message(STATUS "[${PACKAGE_INDEX}/${PACKAGE_COUNT}] Extracting object files from ${PACKAGE_NAME} - done")
 
             file(GLOB_RECURSE PACKAGE_OBJECT_FILES ${PACKAGE_DIR}/*${CMAKE_CXX_OUTPUT_EXTENSION})
 

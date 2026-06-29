@@ -80,7 +80,7 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
 
 double SedInstance::Impl::run()
 {
-    // Reset iourselves.
+    // Reset ourselves.
 
     removeAllIssues();
 
