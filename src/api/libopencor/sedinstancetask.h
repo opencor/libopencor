@@ -47,6 +47,16 @@ public:
     SedInstanceTask &operator=(SedInstanceTask &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
+     * @brief Return the progress of this task.
+     *
+     * Return the progress of this task as a value between @c 0.0 (not started) and @c 1.0 (complete).
+     *
+     * @return The progress as a value in [0.0, 1.0].
+     */
+
+    double progress() const;
+
+    /**
      * @brief Return the values of the variable of integration.
      *
      * Return the values of the variable of integration.

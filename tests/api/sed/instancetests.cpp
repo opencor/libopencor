@@ -18,6 +18,9 @@ limitations under the License.
 
 #include <libopencor>
 
+#include <chrono>
+#include <thread>
+
 TEST(InstanceSedTest, noFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
@@ -28,6 +31,7 @@ TEST(InstanceSedTest, noFile)
     auto instance {document->instantiate()};
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
 }
 
 TEST(InstanceSedTest, invalidCellmlFile)
@@ -95,6 +99,366 @@ TEST(InstanceSedTest, algebraicModel)
 
     instance->run();
 
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, asynchronousRunWithoutActiveRun)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->waitForRun(), 0.0);
+}
+
+TEST(InstanceSedTest, asynchronousRunLifecycle)
+{
+    static const auto WAIT_ITERATIONS = 200;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (!instance->isRunning()) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_GT(instance->waitForRun(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, asynchronousRunCanBeRestarted)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+    EXPECT_GT(instance->waitForRun(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+
+    EXPECT_TRUE(instance->startRun());
+    EXPECT_GT(instance->waitForRun(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, progressBeforeAnyRun)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+    EXPECT_DOUBLE_EQ(instance->tasks()[0]->progress(), 0.0);
+}
+
+TEST(InstanceSedTest, progressOfAlgebraicModel)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/algebraic.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+
+    instance->run();
+
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+    EXPECT_DOUBLE_EQ(instance->tasks()[0]->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, progressOfOdeModel)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+
+    instance->run();
+
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+    EXPECT_DOUBLE_EQ(instance->tasks()[0]->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, stopRun)
+{
+    static const auto LARGE_STEP_COUNT {1000000};
+    static const auto WAIT_ITERATIONS = 60000;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(LARGE_STEP_COUNT);
+    simulation->setOutputEndTime(static_cast<double>(LARGE_STEP_COUNT));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    instance->stopRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (!instance->isRunning()) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_LT(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, stopRunWhenNotRunning)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    instance->stopRun();
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+}
+
+TEST(InstanceSedTest, pauseRunAndResumeRun)
+{
+    static const auto LARGE_STEP_COUNT {1000000};
+    static const auto WAIT_ITERATIONS = 60000;
+    static const auto PAUSE_SLEEP = 50;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(LARGE_STEP_COUNT);
+    simulation->setOutputEndTime(static_cast<double>(LARGE_STEP_COUNT));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    instance->pauseRun();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(PAUSE_SLEEP));
+
+    instance->resumeRun();
+    instance->stopRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (!instance->isRunning()) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_LT(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, pauseRunAndResumeRunWhenNotRunning)
+{
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    instance->pauseRun();
+    instance->resumeRun();
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
+}
+
+TEST(InstanceSedTest, pauseRunThenStopRun)
+{
+    static const auto LARGE_STEP_COUNT {1000000};
+    static const auto WAIT_ITERATIONS = 60000;
+    static const auto PAUSE_SLEEP = 50;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(LARGE_STEP_COUNT);
+    simulation->setOutputEndTime(static_cast<double>(LARGE_STEP_COUNT));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    instance->pauseRun();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(PAUSE_SLEEP));
+
+    instance->stopRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (!instance->isRunning()) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_LT(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, pauseRunAndResumeRunWithNaturalCompletion)
+{
+    static const auto MODERATE_STEP_COUNT {50000};
+    static const auto WAIT_ITERATIONS = 60000;
+    static const auto PAUSE_SLEEP = 50;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(MODERATE_STEP_COUNT);
+    simulation->setOutputEndTime(static_cast<double>(MODERATE_STEP_COUNT));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    instance->pauseRun();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(PAUSE_SLEEP));
+
+    instance->resumeRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (!instance->isRunning()) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_GT(instance->waitForRun(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, startRunWhileAlreadyRunning)
+{
+    static const auto LARGE_STEP_COUNT {1000000};
+    static const auto WAIT_ITERATIONS = 60000;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(LARGE_STEP_COUNT);
+    simulation->setOutputEndTime(static_cast<double>(LARGE_STEP_COUNT));
+
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_FALSE(instance->startRun());
+
+    instance->stopRun();
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (!instance->isRunning()) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_LT(instance->progress(), 1.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
+TEST(InstanceSedTest, startRunAfterPreviousRunCompleted)
+{
+    static const auto WAIT_ITERATIONS = 60000;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (!instance->isRunning()) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_FALSE(instance->isRunning());
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (!instance->isRunning()) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    EXPECT_FALSE(instance->isRunning());
+    EXPECT_GT(instance->waitForRun(), 0.0);
     EXPECT_FALSE(instance->hasIssues());
 }
 

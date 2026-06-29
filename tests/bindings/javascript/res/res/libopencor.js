@@ -4,6 +4,8 @@ let document = null;
 let simulation = null;
 let instance = null;
 let instanceTask = null;
+let simulationId = 0;
+let isPaused = false;
 const { lightningChart } = lcjs;
 const chart = lightningChart()
   .ChartXY({
@@ -12,6 +14,7 @@ const chart = lightningChart()
   .setTitle('')
   .setAnimationsEnabled(false);
 const lineSeries = chart.addLineSeries().setName('');
+let plottedPointCount = 0;
 
 export function showPage(page) {
   $('.nav-link').each(function () {
@@ -112,27 +115,166 @@ function populateAxis(axisId) {
 }
 
 export function run() {
-  // Reset the plotting area (in case we have some simulation results).
+  if (instance.isRunning) {
+    // Toggle between pause and resume.
+
+    if (isPaused) {
+      isPaused = false;
+
+      $('#run').text('Pause');
+
+      instance.resumeRun();
+    } else {
+      isPaused = true;
+
+      $('#run').text('Resume');
+
+      instance.pauseRun();
+    }
+
+    return;
+  }
+
+  // Keep track of which simulation this is so we can ignore stale callbacks.
+
+  const currentSimulationId = ++simulationId;
+
+  // Disable the run button.
+
+  $('#run').prop('disabled', true);
+
+  // Reset the plotting area and the progress bar.
 
   lineSeries.clear();
 
+  plottedPointCount = 0;
+
+  const $progressBarFill = $('#progressBarFill');
+
+  $progressBarFill.css('width', '0%');
+  $progressBarFill.removeClass('complete');
+
   // Retrieve the duration of the simulation and the number of steps.
 
-  simulation.outputEndTime = $('#endingPoint').val();
-  simulation.numberOfSteps = $('#endingPoint').val() / $('#pointInterval').val();
+  simulation.outputEndTime = $('#simulationDuration').val();
+  simulation.numberOfSteps = $('#simulationDuration').val() / $('#simulationInterval').val();
 
-  // Run the simulation.
+  // Run the simulation either synchronously or asynchronously.
 
+  setTimeout(() => {
+    if (simulationId !== currentSimulationId) {
+      return;
+    }
+
+    if ($('#runAsync').is(':checked')) {
+      runAsync();
+    } else {
+      runSync();
+    }
+  }, 0);
+}
+
+export function stopSimulation() {
+  instance.stopRun();
+
+  isPaused = false;
+
+  $('#run').text('Run').prop('disabled', true);
+  $('#stop').prop('disabled', true);
+}
+
+function plotAndUpdateProgressBar() {
+  const currentSimulationId = simulationId;
+  const $progressBarFill = $('#progressBarFill');
+
+  $progressBarFill.css('width', `${instance.progress * 100}%`);
+
+  if (instance.progress >= 1.0) {
+    $progressBarFill.addClass('complete');
+  }
+
+  setTimeout(() => {
+    if (simulationId !== currentSimulationId) {
+      return;
+    }
+
+    // Update the plotting area and the axes information.
+
+    console.time('Plotting time');
+    updatePlottingAreaAndAxesInfo();
+    console.timeEnd('Plotting time');
+
+    // Reset the progress bar after a short delay.
+
+    setTimeout(() => {
+      $progressBarFill.css('width', '0%');
+      $progressBarFill.removeClass('complete');
+    }, 169);
+  }, 0);
+}
+
+function runSync() {
   console.log('-------------------');
   console.time('Computing time');
   instance.run();
   console.timeEnd('Computing time');
 
-  // Plot the results.
+  $('#run').prop('disabled', false);
 
-  console.time('Plotting time');
-  updatePlottingAreaAndAxesInfo();
-  console.timeEnd('Plotting time');
+  plotAndUpdateProgressBar();
+}
+
+function runAsync() {
+  const currentSimulationId = simulationId;
+  const $progressBarFill = $('#progressBarFill');
+
+  console.log('-------------------');
+  console.time('Computing time');
+  instance.startRun();
+
+  // Update the button states for a running simulation.
+
+  $('#run').text('Pause').prop('disabled', false);
+  $('#stop').prop('disabled', false);
+
+  const intervalId = setInterval(() => {
+    if (simulationId !== currentSimulationId) {
+      clearInterval(intervalId);
+
+      return;
+    }
+
+    const progress = instance.progress;
+
+    $progressBarFill.css('width', `${progress * 100}%`);
+
+    if (progress >= 1.0) {
+      $progressBarFill.addClass('complete');
+    }
+
+    // Update the plot with the data computed so far.
+
+    const completedSteps = Math.round(progress * simulation.numberOfSteps);
+
+    if (completedSteps > 0) {
+      updatePlottingAreaAndAxesInfo(completedSteps + 1);
+    }
+
+    if (!instance.isRunning) {
+      clearInterval(intervalId);
+      instance.waitForRun();
+      console.timeEnd('Computing time');
+
+      // Reset the button states.
+
+      isPaused = false;
+
+      $('#run').text('Run').prop('disabled', false);
+      $('#stop').prop('disabled', true);
+
+      plotAndUpdateProgressBar();
+    }
+  }, 50);
 }
 
 function axisInfo(index) {
@@ -171,19 +313,50 @@ function axisInfo(index) {
   return [instanceTask.algebraicVariableAsArray(index), instanceTask.algebraicVariableUnit(index)];
 }
 
-export function updatePlottingAreaAndAxesInfo() {
-  lineSeries.clear();
+export function updateAxisIntervals() {
+  const xAxisIndex = $('#xAxis').prop('selectedIndex');
+  const yAxisIndex = $('#yAxis').prop('selectedIndex');
 
-  const [xAxisArray, xAxisUnit] = axisInfo($('#xAxis').prop('selectedIndex'));
-  const [yAxisArray, yAxisUnit] = axisInfo($('#yAxis').prop('selectedIndex'));
+  if (xAxisIndex === 0) {
+    chart.getDefaultAxisX().setInterval({ start: 0, end: parseFloat($('#simulationDuration').val()) });
+  } else {
+    chart.getDefaultAxisX().fit();
+  }
 
-  lineSeries.addArraysXY(xAxisArray, yAxisArray);
+  if (yAxisIndex === 0) {
+    chart.getDefaultAxisY().setInterval({ start: 0, end: parseFloat($('#simulationDuration').val()) });
+  } else {
+    chart.getDefaultAxisY().fit();
+  }
+}
+
+export function updatePlottingAreaAndAxesInfo(pointCount = 0) {
+  const xAxisIndex = $('#xAxis').prop('selectedIndex');
+  const yAxisIndex = $('#yAxis').prop('selectedIndex');
+  const [xAxisArray, xAxisUnit] = axisInfo(xAxisIndex);
+  const [yAxisArray, yAxisUnit] = axisInfo(yAxisIndex);
+
+  if (pointCount > 0) {
+    const newCount = Math.min(pointCount, xAxisArray.length);
+
+    if (newCount > plottedPointCount) {
+      lineSeries.addArraysXY(
+        xAxisArray.slice(plottedPointCount, newCount),
+        yAxisArray.slice(plottedPointCount, newCount)
+      );
+
+      plottedPointCount = newCount;
+    }
+  } else {
+    lineSeries.clear();
+
+    lineSeries.addArraysXY(xAxisArray, yAxisArray);
+
+    plottedPointCount = xAxisArray.length;
+  }
 
   $('#xAxisUnit').text(xAxisUnit);
   $('#yAxisUnit').text(yAxisUnit);
-
-  chart.getDefaultAxisX().fit();
-  chart.getDefaultAxisY().fit();
 }
 
 function formattedIssueDescription(issue) {
@@ -279,11 +452,11 @@ $(() => {
                   return;
                 }
 
-                $('#endingPoint').val(simulation.outputEndTime);
-                $('#endingPointUnit').text(instanceTask.voiUnit);
+                $('#simulationDuration').val(simulation.outputEndTime);
+                $('#simulationDurationUnit').text(instanceTask.voiUnit);
 
-                $('#pointInterval').val(simulation.outputEndTime / simulation.numberOfSteps);
-                $('#pointIntervalUnit').text(instanceTask.voiUnit);
+                $('#simulationInterval').val(simulation.outputEndTime / simulation.numberOfSteps);
+                $('#simulationIntervalUnit').text(instanceTask.voiUnit);
 
                 // Populate the X and Y axis dropdown lists.
 
@@ -295,10 +468,10 @@ $(() => {
                 $('#xAxis').val(instanceTask.voiName);
                 $('#yAxis').val(instanceTask.stateName(0));
 
-                // Update the plotting area (in case we have some simulation results and we drop a new file) and the
-                // axes information.
+                // Update the plotting area and the axes information.
 
                 updatePlottingAreaAndAxesInfo();
+                updateAxisIntervals();
 
                 updateFileUi(true, false, true, true);
               }

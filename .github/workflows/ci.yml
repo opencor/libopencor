@@ -399,6 +399,9 @@ jobs:
       - name: Install Sphinx and some Sphinx packages
         if: ${{ matrix.documentation == 'ON' }}
         run: uv pip install --system sphinx~=8.0 sphinx-copybutton sphinx-inline-tabs
+      - name: Install NumPy
+        if: ${{ matrix.python_support == 'ON' }}
+        run: uv pip install --system numpy
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |

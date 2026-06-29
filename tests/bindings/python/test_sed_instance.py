@@ -15,6 +15,7 @@
 
 import libopencor as loc
 import platform
+import time
 import utils
 from utils import assert_issues
 
@@ -31,6 +32,7 @@ def test_no_file():
     instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
+    assert instance.progress == 0.0
 
 
 def test_invalid_cellml_file():
@@ -125,6 +127,315 @@ def run_algebraic_model():
 
 def test_algebraic_model():
     run_algebraic_model()
+
+
+def test_asynchronous_run_without_active_run():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.is_running is False
+    assert instance.wait_for_run() == 0.0
+
+
+def test_asynchronous_run_lifecycle():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(200):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.is_running is False
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+
+def test_asynchronous_run_can_be_restarted():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+    assert instance.start_run() is True
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+
+def test_progress_before_any_run():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.progress == 0.0
+    assert instance.tasks[0].progress == 0.0
+
+
+def test_progress_of_algebraic_model():
+    file = loc.File(utils.resource_path("api/sed/algebraic.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.progress == 0.0
+
+    instance.run()
+
+    assert instance.progress == 1.0
+    assert instance.tasks[0].progress == 1.0
+    assert not instance.has_issues
+
+
+def test_progress_of_ode_model():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.progress == 0.0
+
+    instance.run()
+
+    assert instance.progress == 1.0
+    assert instance.tasks[0].progress == 1.0
+    assert not instance.has_issues
+
+
+def test_stop_run():
+    large_step_count = 1000000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    simulation.number_of_steps = large_step_count
+    simulation.output_end_time = float(large_step_count)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(60000):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    instance.stop_run()
+
+    for _ in range(60000):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.progress < 1.0
+    assert not instance.has_issues
+
+
+def test_stop_run_when_not_running():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    # Calling stop_run() when idle is a no-op.
+
+    instance.stop_run()
+
+    assert instance.is_running is False
+    assert instance.progress == 0.0
+
+
+def test_pause_run_and_resume_run():
+    large_step_count = 1000000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = large_step_count
+    simulation.output_end_time = float(large_step_count)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(60000):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    instance.pause_run()
+
+    time.sleep(0.05)
+
+    instance.resume_run()
+    instance.stop_run()
+
+    for _ in range(60000):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.is_running is False
+    assert instance.progress < 1.0
+    assert not instance.has_issues
+
+
+def test_pause_run_and_resume_run_when_not_running():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.pause_run()
+    instance.resume_run()
+
+    assert instance.is_running is False
+    assert instance.progress == 0.0
+
+
+def test_pause_run_then_stop_run():
+    large_step_count = 1000000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = large_step_count
+    simulation.output_end_time = float(large_step_count)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(60000):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    instance.pause_run()
+
+    time.sleep(0.05)
+
+    instance.stop_run()
+
+    for _ in range(60000):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.is_running is False
+    assert instance.progress < 1.0
+    assert not instance.has_issues
+
+
+def test_pause_run_and_resume_run_with_natural_completion():
+    moderate_step_count = 50000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = moderate_step_count
+    simulation.output_end_time = float(moderate_step_count)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(60000):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    instance.pause_run()
+
+    time.sleep(0.05)
+
+    instance.resume_run()
+
+    for _ in range(60000):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.is_running is False
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
+
+
+def test_start_run_while_already_running():
+    large_step_count = 1000000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = large_step_count
+    simulation.output_end_time = float(large_step_count)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(60000):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.start_run() is False
+
+    instance.stop_run()
+
+    for _ in range(60000):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.is_running is False
+    assert instance.progress < 1.0
+    assert not instance.has_issues
+
+
+def test_start_run_after_previous_run_completed():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(60000):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.is_running is False
+
+    assert instance.start_run() is True
+
+    for _ in range(60000):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.is_running is False
+    assert instance.wait_for_run() > 0.0
+    assert not instance.has_issues
 
 
 def run_ode_model():

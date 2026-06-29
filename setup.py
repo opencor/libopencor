@@ -31,6 +31,7 @@ setup(
     url="https://opencor.ws/libopencor/",
     license="Apache 2.0",
     python_requires=">=3.12, <3.15",
+    install_requires=["numpy"],
     packages=["libopencor"],
     package_dir={"": "src/bindings/python"},
     cmake_args=[

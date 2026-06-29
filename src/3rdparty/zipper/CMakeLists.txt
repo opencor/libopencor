@@ -24,7 +24,7 @@ if(LIBOPENCOR_PREBUILT_ZIPPER)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         32b71d3650a7f9b12205d19159a7b66b43b8053d)
+                         ab06db31708e8de29f4c0e5744028cdebc36a051)
     else()
         if(WIN32)
             if(RELEASE_MODE)

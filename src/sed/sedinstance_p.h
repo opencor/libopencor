@@ -17,8 +17,13 @@ limitations under the License.
 #pragma once
 
 #include "logger_p.h"
+#include "sedinstancetask_p.h"
 
 #include "libopencor/sedinstance.h"
+
+#include <condition_variable>
+#include <future>
+#include <mutex>
 
 namespace libOpenCOR {
 
@@ -28,11 +33,28 @@ public:
     SedInstanceTaskPtrs mTasks;
     IssuePtrs mTasksIssues;
 
+    mutable std::atomic<bool> mRunning {false};
+    mutable std::mutex mRunMutex;
+    mutable std::future<double> mRunFuture;
+    mutable std::atomic<double> mLastRunElapsedTime {0.0};
+
+    std::atomic<unsigned> mRunControl {INSTANCE_RUN_CONTROL_NONE};
+
+    std::condition_variable mPauseConditionVariable;
+    std::mutex mPauseMutex;
+
     static SedInstancePtr create(const SedDocumentPtr &pDocument);
 
     explicit Impl(const SedDocumentPtr &pDocument);
 
     double run();
+    bool startRun();
+    bool isRunning() const;
+    double waitForRun();
+    void pauseRun();
+    void resumeRun();
+    void stopRun();
+    double progress() const;
 
     bool hasTasks() const;
     size_t taskCount() const;

@@ -53,6 +53,11 @@ public:
     static CellmlFileRuntimePtr create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 
 #ifdef __EMSCRIPTEN__
+    void initialiseWorkerWasm() const;
+    void cleanupWorkerWasm() const;
+
+    void setNlaSolverAddress(uintptr_t pAddress) const;
+
     void initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
     void initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
     void computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;

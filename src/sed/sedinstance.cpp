@@ -20,7 +20,15 @@ limitations under the License.
 
 #include "libopencor/seddocument.h"
 
+#include <chrono>
+
 namespace libOpenCOR {
+
+namespace {
+
+constexpr auto ZERO_WAIT {std::chrono::milliseconds {0}};
+
+} // namespace
 
 SedInstancePtr SedInstance::Impl::create(const SedDocumentPtr &pDocument)
 {
@@ -86,6 +94,17 @@ double SedInstance::Impl::run()
 
     mIssues = mTasksIssues;
 
+    // Reset our control flags and make sure that they are passed to each task so that they can be used by them.
+
+    mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
+
+    for (const auto &task : mTasks) {
+        task->pimpl()->mRunControl = &mRunControl;
+
+        task->pimpl()->mPauseMutex = &mPauseMutex;
+        task->pimpl()->mPauseConditionVariable = &mPauseConditionVariable;
+    }
+
     // Run all the tasks associated with this instance unless they have some issues.
 
     auto res {0.0};
@@ -104,7 +123,104 @@ double SedInstance::Impl::run()
         }
     }
 
+    // Reset and make sure that our control flags are no longer passed to each task.
+
+    for (const auto &task : mTasks) {
+        task->pimpl()->mRunControl = nullptr;
+
+        task->pimpl()->mPauseMutex = nullptr;
+        task->pimpl()->mPauseConditionVariable = nullptr;
+    }
+
     return res;
+}
+
+bool SedInstance::Impl::startRun()
+{
+    const std::scoped_lock<std::mutex> runLock(mRunMutex);
+
+    if (mRunFuture.valid()) {
+        if (mRunFuture.wait_for(ZERO_WAIT) != std::future_status::ready) {
+            return false;
+        }
+
+        mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
+    }
+
+    mRunning.store(true, std::memory_order_release);
+
+    mRunFuture = std::async(std::launch::async, [this]() {
+        const auto result = run();
+
+#ifdef __EMSCRIPTEN__
+        // Clean up our per-worker WASM runtime data.
+        // Note: indeed, each pthread worker maintains its own globalThis.runtime, so without cleanup, compiled
+        //       WebAssembly.Module objects would accumulate on reused workers and therefore leak native memory.
+
+        for (const auto &task : mTasks) {
+            task->pimpl()->mRuntime->cleanupWorkerWasm();
+        }
+#endif
+
+        mRunning.store(false, std::memory_order_release);
+
+        return result;
+    });
+
+    return true;
+}
+
+bool SedInstance::Impl::isRunning() const
+{
+    return mRunning.load(std::memory_order_acquire);
+}
+
+double SedInstance::Impl::waitForRun()
+{
+    const std::scoped_lock<std::mutex> runLock(mRunMutex);
+
+    if (!mRunFuture.valid()) {
+        return mLastRunElapsedTime.load(std::memory_order_relaxed);
+    }
+
+    mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
+    mRunning.store(false, std::memory_order_release);
+
+    return mLastRunElapsedTime.load(std::memory_order_relaxed);
+}
+
+void SedInstance::Impl::pauseRun()
+{
+    mRunControl.fetch_or(INSTANCE_RUN_CONTROL_PAUSE, std::memory_order_relaxed);
+}
+
+void SedInstance::Impl::resumeRun()
+{
+    mRunControl.fetch_and(~INSTANCE_RUN_CONTROL_PAUSE, std::memory_order_relaxed);
+
+    mPauseConditionVariable.notify_all();
+}
+
+void SedInstance::Impl::stopRun()
+{
+    mRunControl.fetch_or(INSTANCE_RUN_CONTROL_STOP, std::memory_order_relaxed);
+
+    mPauseConditionVariable.notify_all();
+}
+
+double SedInstance::Impl::progress() const
+{
+    if (mTasks.empty()) {
+        return 0.0;
+    }
+
+    auto total {0.0};
+
+    for (const auto &task : mTasks) {
+        total += task->pimpl()->progress();
+    }
+
+    return total / static_cast<double>(mTasks.size());
 }
 
 bool SedInstance::Impl::hasTasks() const
@@ -140,6 +256,8 @@ SedInstance::SedInstance(const SedDocumentPtr &pDocument)
 
 SedInstance::~SedInstance()
 {
+    pimpl()->waitForRun(); // To ensure that the instance is not running before we delete it.
+
     delete pimpl();
 }
 
@@ -156,6 +274,41 @@ const SedInstance::Impl *SedInstance::pimpl() const
 double SedInstance::run()
 {
     return pimpl()->run();
+}
+
+bool SedInstance::startRun()
+{
+    return pimpl()->startRun();
+}
+
+bool SedInstance::isRunning() const
+{
+    return pimpl()->isRunning();
+}
+
+double SedInstance::waitForRun()
+{
+    return pimpl()->waitForRun();
+}
+
+void SedInstance::pauseRun()
+{
+    pimpl()->pauseRun();
+}
+
+void SedInstance::resumeRun()
+{
+    pimpl()->resumeRun();
+}
+
+void SedInstance::stopRun()
+{
+    pimpl()->stopRun();
+}
+
+double SedInstance::progress() const
+{
+    return pimpl()->progress();
 }
 
 bool SedInstance::hasTasks() const

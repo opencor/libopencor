@@ -34,7 +34,7 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         5cb4721d595594e82506c2b100642f34a7426e67)
+                         e4739c98f7a79436185934be1882baaaac9b314a)
     else()
         if(WIN32)
             if(RELEASE_MODE)

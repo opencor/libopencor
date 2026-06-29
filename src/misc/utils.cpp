@@ -17,6 +17,7 @@ limitations under the License.
 #include "utils.h"
 
 #include "libopencor/issue.h"
+#include "libopencor/logger.h"
 
 #ifndef __EMSCRIPTEN__
 #    include "curl/curl.h"
@@ -545,15 +546,6 @@ UnsignedChars fileContents(const std::filesystem::path &pFilePath)
     return contents;
 }
 #endif
-
-std::string nlaSolverAddress(SolverNla *pNlaSolver)
-{
-    std::ostringstream oss;
-
-    oss << "0x" << std::hex << reinterpret_cast<uintptr_t>(pNlaSolver);
-
-    return oss.str();
-}
 
 bool isInfOrNan(double pNumber)
 {
