@@ -67,9 +67,9 @@ public:
     static SedModelPtr create(const SedDocumentPtr &pDocument, const FilePtr &pFile);
 
     /**
-     * @brief Get the file.
+     * @brief Return the file.
      *
-     * Get the file for the @ref SedModel object.
+     * Return the file for the @ref SedModel object.
      *
      * @return The file, as a smart pointer to a @ref File object.
      */
@@ -119,35 +119,35 @@ public:
     const SedChangePtr &change(size_t pIndex) const;
 
     /**
-     * @brief Add the change to this model.
+     * @brief Add the given change.
      *
-     * Add the change to this model.
+     * Add the given change.
      *
      * @param pChange The @ref SedChange object to be added.
      *
-     * @return @c true if the change was added, @c false otherwise.
+     * @return @c true if the given change was added, @c false otherwise.
      */
 
     bool addChange(const SedChangePtr &pChange);
 
     /**
-     * @brief Remove the change from this model.
+     * @brief Remove the given change.
      *
-     * Remove the change from this model.
+     * Remove the given change.
      *
      * @param pChange The @ref SedChange object to be removed.
      *
-     * @return @c true if the change was removed, @c false otherwise.
+     * @return @c true if the given change was removed, @c false otherwise.
      */
 
     bool removeChange(const SedChangePtr &pChange);
 
     /**
-     * @brief Remove all changes from this model.
+     * @brief Remove all the changes.
      *
-     * Remove all changes from this model.
+     * Remove all the changes.
      *
-     * @return @c true if all changes were removed, @c false otherwise.
+     * @return @c true if all the changes were removed, @c false otherwise.
      */
     bool removeAllChanges();
 

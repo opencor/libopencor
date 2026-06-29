@@ -64,9 +64,9 @@ public:
                                         const std::string &pNewValue);
 
     /**
-     * @brief Get the name of the component.
+     * @brief Return the name of the component.
      *
-     * Get the name of the component.
+     * Return the name of the component.
      *
      * @return The name of the component as a @c std::string.
      */
@@ -84,9 +84,9 @@ public:
     void setComponentName(const std::string &pComponentName);
 
     /**
-     * @brief Get the name of the variable.
+     * @brief Return the name of the variable.
      *
-     * Get the name of the variable.
+     * Return the name of the variable.
      *
      * @return The name of the variable as a @c std::string.
      */
@@ -104,9 +104,9 @@ public:
     void setVariableName(const std::string &pVariableName);
 
     /**
-     * @brief Get the new value.
+     * @brief Return the new value.
      *
-     * Get the new value.
+     * Return the new value.
      *
      * @return The new value as a @c std::string.
      */

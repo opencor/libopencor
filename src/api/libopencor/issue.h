@@ -59,31 +59,31 @@ public:
     Issue &operator=(Issue &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the type of this issue.
+     * @brief Return the type.
      *
-     * Return the type of this issue.
+     * Return the type.
      *
-     * @return The @ref Type of this issue.
+     * @return The @ref Type.
      */
 
     Type type() const;
 
     /**
-     * @brief Get the type of this issue as a @c std::string.
+     * @brief Return the type as a @c std::string.
      *
-     * Return the type of this issue as a @c std::string.
+     * Return the type as a @c std::string.
      *
-     * @return The type of this issue as a @c std::string.
+     * @return The type as a @c std::string.
      */
 
     const std::string &typeAsString() const;
 
     /**
-     * @brief Get the description of this issue.
+     * @brief Return the description.
      *
-     * Return the @c std::string description of this issue.
+     * Return the @c std::string description.
      *
-     * @return The @c std::string description of this issue.
+     * @return The @c std::string description.
      */
 
     const std::string &description() const;

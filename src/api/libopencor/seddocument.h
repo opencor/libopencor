@@ -68,7 +68,7 @@ public:
 #endif
 
     /**
-     * @brief Get the serialised version of this simulation experiment description.
+     * @brief Return the serialised version of this simulation experiment description.
      *
      * Return the @c std::string serialised version of this simulation experiment description.
      *
@@ -78,9 +78,9 @@ public:
     std::string serialise() const;
 
     /**
-     * @brief Get the serialised version of this simulation experiment description.
+     * @brief Return the serialised version of this simulation experiment description with the given base path.
      *
-     * Return the @c std::string serialised version of this simulation experiment description.
+     * Return the @c std::string serialised version of this simulation experiment description with the given base path.
      *
      * @param pBasePath The @c std::string base path to use to determine the relative path, if possible, of a model
      * source.
@@ -127,41 +127,41 @@ public:
      *
      * @param pIndex The index of the model to return.
      *
-     * @return The model as a @ref SedModelPtr, if the index is valid, @c nullptr otherwise.
+     * @return The model, as a @ref SedModelPtr, if the index is valid, @c nullptr otherwise.
      */
 
     const SedModelPtr &model(size_t pIndex) const;
 
     /**
-     * @brief Add the model to this simulation experiment description.
+     * @brief Add the given model.
      *
-     * Add the model to this simulation experiment description.
+     * Add the given model.
      *
      * @param pModel The @ref SedModel object to be added.
      *
-     * @return @c true if the model was added, @c false otherwise.
+     * @return @c true if the given model was added, @c false otherwise.
      */
 
     bool addModel(const SedModelPtr &pModel);
 
     /**
-     * @brief Remove the model from this simulation experiment description.
+     * @brief Remove the given model.
      *
-     * Remove the model from this simulation experiment description.
+     * Remove the given model.
      *
      * @param pModel The @ref SedModel object to be removed.
      *
-     * @return @c true if the model was removed, @c false otherwise.
+     * @return @c true if the given model was removed, @c false otherwise.
      */
 
     bool removeModel(const SedModelPtr &pModel);
 
     /**
-     * @brief Remove all models from this simulation experiment description.
+     * @brief Remove all the models.
      *
-     * Remove all models from this simulation experiment description.
+     * Remove all the models.
      *
-     * @return @c true if all models were removed, @c false otherwise.
+     * @return @c true if all the models were removed, @c false otherwise.
      */
     bool removeAllModels();
 
@@ -202,41 +202,41 @@ public:
      *
      * @param pIndex The index of the simulation to return.
      *
-     * @return The simulation as a @ref SedSimulationPtr, if the index is valid, @c nullptr otherwise.
+     * @return The simulation, as a @ref SedSimulationPtr, if the index is valid, @c nullptr otherwise.
      */
 
     const SedSimulationPtr &simulation(size_t pIndex) const;
 
     /**
-     * @brief Add the simulation to this simulation experiment description.
+     * @brief Add the given simulation.
      *
-     * Add the simulation to this simulation experiment description.
+     * Add the given simulation.
      *
      * @param pSimulation The @ref SedSimulation object to be added.
      *
-     * @return @c true if the simulation was added, @c false otherwise.
+     * @return @c true if the given simulation was added, @c false otherwise.
      */
 
     bool addSimulation(const SedSimulationPtr &pSimulation);
 
     /**
-     * @brief Remove the simulation from this simulation experiment description.
+     * @brief Remove the given simulation.
      *
-     * Remove the simulation from this simulation experiment description.
+     * Remove the given simulation.
      *
      * @param pSimulation The @ref SedSimulation object to be removed.
      *
-     * @return @c true if the simulation was removed, @c false otherwise.
+     * @return @c true if the given simulation was removed, @c false otherwise.
      */
 
     bool removeSimulation(const SedSimulationPtr &pSimulation);
 
     /**
-     * @brief Remove all simulations from this simulation experiment description.
+     * @brief Remove all the simulations.
      *
-     * Remove all simulations from this simulation experiment description.
+     * Remove all the simulations.
      *
-     * @return @c true if all simulations were removed, @c false otherwise.
+     * @return @c true if all the simulations were removed, @c false otherwise.
      */
     bool removeAllSimulations();
 
@@ -283,35 +283,35 @@ public:
     const SedAbstractTaskPtr &task(size_t pIndex) const;
 
     /**
-     * @brief Add the task to this simulation experiment description.
+     * @brief Add the given task.
      *
-     * Add the task to this simulation experiment description.
+     * Add the given task.
      *
      * @param pTask The @ref SedAbstractTask object to be added.
      *
-     * @return @c true if the task was added, @c false otherwise.
+     * @return @c true if the given task was added, @c false otherwise.
      */
 
     bool addTask(const SedAbstractTaskPtr &pTask);
 
     /**
-     * @brief Remove the task from this simulation experiment description.
+     * @brief Remove the given task.
      *
-     * Remove the task from this simulation experiment description.
+     * Remove the given task.
      *
      * @param pTask The @ref SedAbstractTask object to be removed.
      *
-     * @return @c true if the task was removed, @c false otherwise.
+     * @return @c true if the given task was removed, @c false otherwise.
      */
 
     bool removeTask(const SedAbstractTaskPtr &pTask);
 
     /**
-     * @brief Remove all tasks from this simulation experiment description.
+     * @brief Remove all the tasks.
      *
-     * Remove all tasks from this simulation experiment description.
+     * Remove all the tasks.
      *
-     * @return @c true if all tasks were removed, @c false otherwise.
+     * @return @c true if all the tasks were removed, @c false otherwise.
      */
     bool removeAllTasks();
 

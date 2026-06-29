@@ -47,9 +47,9 @@ public:
     SedInstanceTask &operator=(SedInstanceTask &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the values of the variable of integration.
+     * @brief Return the values of the variable of integration.
      *
-     * Get the values of the variable of integration.
+     * Return the values of the variable of integration.
      *
      * @return The values of the variable of integration.
      */
@@ -61,9 +61,9 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the variable of integration.
+     * @brief Return the name of the variable of integration.
      *
-     * Get the name of the variable of integration.
+     * Return the name of the variable of integration.
      *
      * @return The name of the variable of integration.
      */
@@ -71,9 +71,9 @@ public:
     const std::string &voiName() const;
 
     /**
-     * @brief Get the unit of the variable of integration.
+     * @brief Return the unit of the variable of integration.
      *
-     * Get the unit of the variable of integration.
+     * Return the unit of the variable of integration.
      *
      * @return The unit of the variable of integration.
      */
@@ -81,9 +81,9 @@ public:
     const std::string &voiUnit() const;
 
     /**
-     * @brief Get the number of states.
+     * @brief Return the number of states.
      *
-     * Get the number of states.
+     * Return the number of states.
      *
      * @return The number of states.
      */
@@ -91,9 +91,9 @@ public:
     size_t stateCount() const;
 
     /**
-     * @brief Get the values of the state at the given index.
+     * @brief Return the values of the state at the given index.
      *
-     * Get the values of the state at the given index.
+     * Return the values of the state at the given index.
      *
      * @param pIndex The index of the state.
      *
@@ -107,9 +107,9 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the state.
+     * @brief Return the name of the state at the given index.
      *
-     * Get the name of the state at the given index.
+     * Return the name of the state at the given index.
      *
      * @param pIndex The index of the state.
      *
@@ -119,9 +119,9 @@ public:
     const std::string &stateName(size_t pIndex) const;
 
     /**
-     * @brief Get the unit of the state.
+     * @brief Return the unit of the state at the given index.
      *
-     * Get the unit of the state at the given index.
+     * Return the unit of the state at the given index.
      *
      * @param pIndex The index of the state.
      *
@@ -131,9 +131,9 @@ public:
     const std::string &stateUnit(size_t pIndex) const;
 
     /**
-     * @brief Get the number of rates.
+     * @brief Return the number of rates.
      *
-     * Get the number of rates.
+     * Return the number of rates.
      *
      * @return The number of rates.
      */
@@ -141,9 +141,9 @@ public:
     size_t rateCount() const;
 
     /**
-     * @brief Get the values of the rate at the given index.
+     * @brief Return the values of the rate at the given index.
      *
-     * Get the values of the rate at the given index.
+     * Return the values of the rate at the given index.
      *
      * @param pIndex The index of the rate.
      *
@@ -157,9 +157,9 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the rate.
+     * @brief Return the name of the rate at the given index.
      *
-     * Get the name of the rate at the given index.
+     * Return the name of the rate at the given index.
      *
      * @param pIndex The index of the rate.
      *
@@ -169,9 +169,9 @@ public:
     const std::string &rateName(size_t pIndex) const;
 
     /**
-     * @brief Get the unit of the rate.
+     * @brief Return the unit of the rate at the given index.
      *
-     * Get the unit of the rate at the given index.
+     * Return the unit of the rate at the given index.
      *
      * @param pIndex The index of the rate.
      *
@@ -181,9 +181,9 @@ public:
     const std::string &rateUnit(size_t pIndex) const;
 
     /**
-     * @brief Get the number of constants.
+     * @brief Return the number of constants.
      *
-     * Get the number of constants.
+     * Return the number of constants.
      *
      * @return The number of constants.
      */
@@ -191,9 +191,9 @@ public:
     size_t constantCount() const;
 
     /**
-     * @brief Get the values of the constant at the given index.
+     * @brief Return the values of the constant at the given index.
      *
-     * Get the values of the constant at the given index.
+     * Return the values of the constant at the given index.
      *
      * @param pIndex The index of the constant.
      *
@@ -207,9 +207,9 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the constant.
+     * @brief Return the name of the constant at the given index.
      *
-     * Get the name of the constant at the given index.
+     * Return the name of the constant at the given index.
      *
      * @param pIndex The index of the constant.
      *
@@ -219,9 +219,9 @@ public:
     const std::string &constantName(size_t pIndex) const;
 
     /**
-     * @brief Get the unit of the constant.
+     * @brief Return the unit of the constant at the given index.
      *
-     * Get the unit of the constant at the given index.
+     * Return the unit of the constant at the given index.
      *
      * @param pIndex The index of the constant.
      *
@@ -231,9 +231,9 @@ public:
     const std::string &constantUnit(size_t pIndex) const;
 
     /**
-     * @brief Get the number of computed constants.
+     * @brief Return the number of computed constants.
      *
-     * Get the number of computed constants.
+     * Return the number of computed constants.
      *
      * @return The number of computed constants.
      */
@@ -241,9 +241,9 @@ public:
     size_t computedConstantCount() const;
 
     /**
-     * @brief Get the values of the computed constant at the given index.
+     * @brief Return the values of the computed constant at the given index.
      *
-     * Get the values of the computed constant at the given index.
+     * Return the values of the computed constant at the given index.
      *
      * @param pIndex The index of the computed constant.
      *
@@ -257,9 +257,9 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the computed constant.
+     * @brief Return the name of the computed constant at the given index.
      *
-     * Get the name of the computed constant at the given index.
+     * Return the name of the computed constant at the given index.
      *
      * @param pIndex The index of the computed constant.
      *
@@ -269,9 +269,9 @@ public:
     const std::string &computedConstantName(size_t pIndex) const;
 
     /**
-     * @brief Get the unit of the computed constant.
+     * @brief Return the unit of the computed constant at the given index.
      *
-     * Get the unit of the computed constant at the given index.
+     * Return the unit of the computed constant at the given index.
      *
      * @param pIndex The index of the computed constant.
      *
@@ -281,9 +281,9 @@ public:
     const std::string &computedConstantUnit(size_t pIndex) const;
 
     /**
-     * @brief Get the number of algebraic variables.
+     * @brief Return the number of algebraic variables.
      *
-     * Get the number of algebraic variables.
+     * Return the number of algebraic variables.
      *
      * @return The number of algebraic variables.
      */
@@ -291,9 +291,9 @@ public:
     size_t algebraicVariableCount() const;
 
     /**
-     * @brief Get the values of the algebraic variable at the given index.
+     * @brief Return the values of the algebraic variable at the given index.
      *
-     * Get the values of the algebraic variable at the given index.
+     * Return the values of the algebraic variable at the given index.
      *
      * @param pIndex The index of the algebraic variable.
      *
@@ -307,9 +307,9 @@ public:
 #endif
 
     /**
-     * @brief Get the name of the algebraic variable.
+     * @brief Return the name of the algebraic variable at the given index.
      *
-     * Get the name of the algebraic variable at the given index.
+     * Return the name of the algebraic variable at the given index.
      *
      * @param pIndex The index of the algebraic variable.
      *
@@ -320,9 +320,9 @@ public:
     const std::string &algebraicVariableName(size_t pIndex) const;
 
     /**
-     * @brief Get the unit of the algebraic variable.
+     * @brief Return the unit of the algebraic variable at the given index.
      *
-     * Get the unit of the algebraic variable at the given index.
+     * Return the unit of the algebraic variable at the given index.
      *
      * @param pIndex The index of the algebraic variable.
      *

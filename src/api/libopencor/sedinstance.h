@@ -74,9 +74,9 @@ public:
     size_t taskCount() const;
 
     /**
-     * @brief Return the tasks.
+     * @brief Return all the tasks.
      *
-     * Return the tasks.
+     * Return all the tasks.
      *
      * @return The tasks, as a @ref SedInstanceTaskPtrs.
      */

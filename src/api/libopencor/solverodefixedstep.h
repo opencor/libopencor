@@ -40,21 +40,21 @@ public:
     SolverOdeFixedStep &operator=(SolverOdeFixedStep &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the step used by the solver.
+     * @brief Return the step.
      *
-     * Return the step used by the solver.
+     * Return the step.
      *
-     * @return The step used by the solver.
+     * @return The step.
      */
 
     double step() const;
 
     /**
-     * @brief Set the step to be used by the solver.
+     * @brief Set the step.
      *
-     * Set the step to be used by the solver.
+     * Set the step.
      *
-     * @param pStep The step to be used by the solver.
+     * @param pStep The step.
      */
 
     void setStep(double pStep);
