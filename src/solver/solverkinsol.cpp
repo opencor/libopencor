@@ -67,16 +67,10 @@ void errorHandler(int pLine, const char *pFunction, const char *pFile, const cha
 }
 #endif
 
-#ifdef __EMSCRIPTEN__
-static constexpr auto MAX_SIZE_T {std::numeric_limits<size_t>::max()};
-static constexpr auto MAX_INTPTR_T {std::numeric_limits<intptr_t>::max()};
-#endif
-
 struct SolverKinsolUserData
 {
 #ifdef __EMSCRIPTEN__
-    intptr_t wasmInstanceFunctionsId {MAX_INTPTR_T};
-    size_t computeObjectiveFunctionIndex {MAX_SIZE_T};
+    intptr_t computeObjectiveFunctionIndex {0};
 #else
     SolverNla::ComputeObjectiveFunction computeObjectiveFunction {nullptr};
 #endif
@@ -89,9 +83,10 @@ int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
 {
     // Make sure that our input vector doesn't contain any Inf or NaN values.
 
+    auto iMax {NV_LENGTH_S(pU)};
     auto *userData {static_cast<SolverKinsolUserData *>(pUserData)};
 
-    for (sunindextype i = 0; i < NV_LENGTH_S(pU); ++i) {
+    for (sunindextype i = 0; i < iMax; ++i) {
         if (isInfOrNan(NV_Ith_S(pU, i))) {
             userData->infOrNanFound = true;
 
@@ -102,8 +97,8 @@ int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
 #ifdef __EMSCRIPTEN__
     // clang-format off
     EM_ASM({
-        Module.wasmInstanceFunctions.get($0).objectiveFunctions[$1]($2, $3, $4);
-    }, userData->wasmInstanceFunctionsId, userData->computeObjectiveFunctionIndex, N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData); // clang-format on
+        globalThis.runtime.computeObjectiveFunctions[$0]($1, $2, $3);
+    }, userData->computeObjectiveFunctionIndex, N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData); // clang-format on
 #else
     userData->computeObjectiveFunction(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
 #endif
@@ -303,7 +298,7 @@ void SolverKinsol::Impl::setLowerHalfBandwidth(int pLowerHalfBandwidth)
 }
 
 #ifdef __EMSCRIPTEN__
-bool SolverKinsol::Impl::solve(intptr_t pWasmInstanceFunctionsId, size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
+bool SolverKinsol::Impl::solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
 #else
 bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData)
 #endif
@@ -445,7 +440,6 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     SolverKinsolUserData userData;
 
 #ifdef __EMSCRIPTEN__
-    userData.wasmInstanceFunctionsId = pWasmInstanceFunctionsId;
     userData.computeObjectiveFunctionIndex = pComputeObjectiveFunctionIndex;
 #else
     userData.computeObjectiveFunction = pComputeObjectiveFunction;

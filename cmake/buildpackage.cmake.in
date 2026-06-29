@@ -18,4 +18,4 @@ project(@PACKAGE_NAME@)
 
 include(ExternalProject)
 
-ExternalProject_Add(@PACKAGE_NAME@ @ARGN@)
+ExternalProject_Add(@PACKAGE_NAME@ @ARGN_QUOTED@)

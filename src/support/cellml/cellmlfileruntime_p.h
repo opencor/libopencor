@@ -27,10 +27,8 @@ class CellmlFileRuntime::Impl: public Logger::Impl
 {
 public:
     CompilerPtr mCompiler {nullptr};
-    std::string mNlaSolverAddress;
 #ifdef __EMSCRIPTEN__
     UnsignedChars mWasmModule;
-    intptr_t mWasmInstanceFunctionsId {0};
 #endif
 
 #ifndef __EMSCRIPTEN__
@@ -46,6 +44,11 @@ public:
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 #ifdef __EMSCRIPTEN__
     ~Impl() override;
+
+    void initialiseWorkerWasm() const;
+    void cleanupWorkerWasm() const;
+
+    void setNlaSolverAddress(uintptr_t pAddress) const;
 
     void initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;
     void initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const;

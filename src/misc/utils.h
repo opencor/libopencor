@@ -107,8 +107,6 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl);
 UnsignedChars LIBOPENCOR_UNIT_TESTING_EXPORT fileContents(const std::filesystem::path &pFilePath);
 #endif
 
-std::string nlaSolverAddress(SolverNla *pNlaSolver);
-
 bool LIBOPENCOR_UNIT_TESTING_EXPORT isInfOrNan(double pNumber);
 
 bool toBool(const std::string &pString);

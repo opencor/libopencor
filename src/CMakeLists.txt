@@ -283,32 +283,52 @@ if(EMSCRIPTEN)
                    ${SOURCE_FILES}
                    ${HEADER_FILES})
 
+    # Preserve Emscripten thread/shared-memory support for libOpenCOR and for its third-party libraries.
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -matomics -mbulk-memory -pthread -sSHARED_MEMORY=1" CACHE STRING "Emscripten C flags" FORCE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -matomics -mbulk-memory -pthread -sSHARED_MEMORY=1" CACHE STRING "Emscripten C++ flags" FORCE)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_TABLE_GROWTH -sINITIAL_TABLE=65536 -sSHARED_MEMORY=1" CACHE STRING "Emscripten exe linker flags" FORCE)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -sSHARED_MEMORY=1" CACHE STRING "Emscripten shared linker flags" FORCE)
+
     # Set the flags for our generated .js and .wasm files.
-    # Note: we use -O3 to get the best performance, -flto to enable link-time optimisation, -sALLOW_MEMORY_GROWTH=1 to
-    #       let the WASM heap grow on demand, -sASSERTIONS=0 to disable assertions (which are not needed in production),
-    #       -sEXPORT_ES6=1 to export ES6 modules, -sEXPORTED_FUNCTIONS to export the functions we need,
-    #       -sEXPORTED_RUNTIME_METHODS to export the runtime methods we need, -sINITIAL_MEMORY=256MB to reserve a
-    #       reasonable amount of memory for the heap at startup (which is needed for "big" models), -sINLINING_LIMIT to
-    #       increase the inlining limit, -sMAXIMUM_MEMORY=2GB to keep the practical safe maximum for WASM32,
-    #       -sMODULARIZE=1 to generate a module factory function, -sSTACK_SIZE=8MB to reserve a reasonable amount of
-    #       memory for the stack at startup (which is needed for "big" models), and --bind to generate the necessary
-    #       Embind bindings.
+    # Note #1: for compiling, we use -O3 to get the best performance, -matomics to enable atomic operations,
+    #          -mbulk-memory to enable bulk memory operations, -pthread to enable native threading support,
+    #          -sSHARED_MEMORY=1 to enable shared memory support, and -DNDEBUG to disable debugging information (it is
+    #          not needed in production).
+    # Note #2: for linking, we use -O3 to get the best performance, -flto to enable link-time optimisation, -pthread to
+    #          enable native threading support, -sALLOW_TABLE_GROWTH to allow the WebAssembly table to grow,
+    #          -sASSERTIONS=0 to disable assertions (they are not needed in production), -sEXPORT_ES6=1 to export ES6
+    #          modules, -sEXPORTED_FUNCTIONS to export the functions we need, -sEXPORTED_RUNTIME_METHODS to export the
+    #          runtime methods we need, -sINITIAL_MEMORY=2GB to have enough memory for "big" models,
+    #          -sINITIAL_TABLE=65536 to have enough space for our WebAssembly table, -sINLINING_LIMIT to increase the
+    #          inlining limit, -sMODULARIZE=1 to generate a module factory function, -sSHARED_MEMORY=1 to enable shared
+    #          memory support, -sSTACK_SIZE=8MB to reserve a reasonable amount of memory for the stack at startup (which
+    #          is needed for "big" models), and --bind to generate the necessary Embind bindings.
+    # Note #3: for linking, we used to have -sALLOW_MEMORY_GROWTH=1, -sINITIAL_MEMORY=256MB, and -sMAXIMUM_MEMORY=2GB,
+    #          but we now support threading and to allow memory growth might non-WASM code to run slowly. So, now, we
+    #          use -sINITIAL_MEMORY=2GB and don't allow memory growth.
 
     target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
                            -O3
+                           -matomics
+                           -mbulk-memory
+                           -pthread
+                           -sSHARED_MEMORY=1
                            -DNDEBUG)
     target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
                         -O3
                         -flto
-                        -sALLOW_MEMORY_GROWTH=1
+                        -pthread
+                        -sALLOW_TABLE_GROWTH
                         -sASSERTIONS=0
                         -sEXPORT_ES6=1
                         -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
                         -sEXPORTED_RUNTIME_METHODS=HEAPU8
-                        -sINITIAL_MEMORY=256MB
+                        -sINITIAL_MEMORY=2GB
+                        -sINITIAL_TABLE=65536
                         -sINLINING_LIMIT
-                        -sMAXIMUM_MEMORY=2GB
                         -sMODULARIZE=1
+                        -sSHARED_MEMORY=1
                         -sSTACK_SIZE=8MB
                         --bind)
 

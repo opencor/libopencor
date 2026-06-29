@@ -27,7 +27,19 @@ limitations under the License.
 #include "libopencor/solvercvode.h"
 #include "libopencor/solverkinsol.h"
 
+#include <mutex>
+#include <unordered_map>
+
 namespace libOpenCOR {
+
+namespace {
+
+// Cache of compiled runtimes, keyed by CellmlFile pointer.
+
+std::mutex sRuntimesMutex; // NOLINT
+std::unordered_map<const CellmlFile *, CellmlFileRuntimePtr> sRuntimes; // NOLINT
+
+} // namespace
 
 CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
     : mFile(pFile)
@@ -116,7 +128,28 @@ libcellml::AnalyserModelPtr CellmlFile::Impl::analyserModel() const
 
 CellmlFileRuntimePtr CellmlFile::Impl::runtime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
-    return CellmlFileRuntime::create(pCellmlFile, pNlaSolver);
+    // Check whether we already have a compiled runtime and if so then return it.
+
+    {
+        const std::scoped_lock<std::mutex> lock(sRuntimesMutex);
+        const auto it = sRuntimes.find(pCellmlFile.get());
+
+        if (it != sRuntimes.end()) {
+            return it->second;
+        }
+    }
+
+    // There is no compiled runtime for this CellML file, so create one, track it, and return it.
+
+    auto runtime = CellmlFileRuntime::create(pCellmlFile, pNlaSolver);
+
+    {
+        const std::scoped_lock<std::mutex> lock(sRuntimesMutex);
+
+        sRuntimes[pCellmlFile.get()] = runtime;
+    }
+
+    return runtime;
 }
 
 CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
@@ -126,6 +159,14 @@ CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, 
 
 CellmlFile::~CellmlFile()
 {
+    // Stop tracking our compiled runtime.
+
+    {
+        const std::scoped_lock<std::mutex> lock(sRuntimesMutex);
+
+        sRuntimes.erase(this);
+    }
+
     delete pimpl();
 }
 

@@ -24,7 +24,7 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         d51821a5f6edf151e72e53ad9edb700022e44b98)
+                         770a7e84f8e986310c6ece0ed662e4ef11035c8d)
     else()
         if(WIN32)
             if(RELEASE_MODE)

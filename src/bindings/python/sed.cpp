@@ -16,6 +16,7 @@ limitations under the License.
 
 #include <libopencor>
 
+#include <nanobind/ndarray.h>
 #include <nanobind/stl/shared_ptr.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/vector.h>
@@ -95,7 +96,14 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedInstance, libOpenCOR::Logger> sedInstance(m, "SedInstance");
 
-    sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run all the tasks associated with this instance.")
+    sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run all the tasks associated with this instance.", nb::call_guard<nb::gil_scoped_release>())
+        .def("start_run", &libOpenCOR::SedInstance::startRun, "Start running, in a background thread, all the tasks associated with this instance.")
+        .def_prop_ro("is_running", &libOpenCOR::SedInstance::isRunning, "Return whether this instance is currently running.")
+        .def("wait_for_run", &libOpenCOR::SedInstance::waitForRun, "Wait for any currently-running instance to complete.", nb::call_guard<nb::gil_scoped_release>())
+        .def("pause_run", &libOpenCOR::SedInstance::pauseRun, "Pause a currently-running instance.")
+        .def("resume_run", &libOpenCOR::SedInstance::resumeRun, "Resume a currently-paused instance.")
+        .def("stop_run", &libOpenCOR::SedInstance::stopRun, "Stop any currently-running instance.")
+        .def_prop_ro("progress", &libOpenCOR::SedInstance::progress, "Return the progress of the current instance run.")
         .def_prop_ro("has_tasks", &libOpenCOR::SedInstance::hasTasks, "Return whether there are some tasks.")
         .def_prop_ro("task_count", &libOpenCOR::SedInstance::taskCount, "Return the number of tasks.")
         .def_prop_ro("tasks", &libOpenCOR::SedInstance::tasks, "Return all the tasks.")
@@ -109,27 +117,64 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedInstanceTask, libOpenCOR::Logger> sedInstanceTask(m, "SedInstanceTask");
 
-    sedInstanceTask.def_prop_ro("voi", &libOpenCOR::SedInstanceTask::voi, "Return the values of the variable of integration.")
+    sedInstanceTask.def_prop_ro("progress", &libOpenCOR::SedInstanceTask::progress, "Return the progress of this task.")
+        .def_prop_ro("voi", [](const libOpenCOR::SedInstanceTask &self) {
+            const auto &data = self.voi();
+            size_t shape[1] = {data.size()};
+
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+        },
+                     "Return the values of the variable of integration as a zero-copy NumPy array.")
         .def_prop_ro("voi_name", &libOpenCOR::SedInstanceTask::voiName, "Return the name of the variable of integration.")
         .def_prop_ro("voi_unit", &libOpenCOR::SedInstanceTask::voiUnit, "Return the unit of the variable of integration.")
         .def_prop_ro("state_count", &libOpenCOR::SedInstanceTask::stateCount, "Return the number of states.")
-        .def("state", &libOpenCOR::SedInstanceTask::state, "Return the values of the state at the given index.", nb::arg("index"))
+        .def("state", [](const libOpenCOR::SedInstanceTask &self, size_t pIndex) {
+            const auto &data = self.state(pIndex);
+            size_t shape[1] = {data.size()};
+
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+        },
+             "Return the values of the state at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("state_name", &libOpenCOR::SedInstanceTask::stateName, "Return the name of the state at the given index.", nb::arg("index"))
         .def("state_unit", &libOpenCOR::SedInstanceTask::stateUnit, "Return the unit of the state at the given index.", nb::arg("index"))
         .def_prop_ro("rate_count", &libOpenCOR::SedInstanceTask::rateCount, "Return the number of rates.")
-        .def("rate", &libOpenCOR::SedInstanceTask::rate, "Return the values of the rate at the given index.", nb::arg("index"))
+        .def("rate", [](const libOpenCOR::SedInstanceTask &self, size_t pIndex) {
+            const auto &data = self.rate(pIndex);
+            size_t shape[1] = {data.size()};
+
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+        },
+             "Return the values of the rate at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("rate_name", &libOpenCOR::SedInstanceTask::rateName, "Return the name of the rate at the given index.", nb::arg("index"))
         .def("rate_unit", &libOpenCOR::SedInstanceTask::rateUnit, "Return the unit of the rate at the given index.", nb::arg("index"))
         .def_prop_ro("constant_count", &libOpenCOR::SedInstanceTask::constantCount, "Return the number of constants.")
-        .def("constant", &libOpenCOR::SedInstanceTask::constant, "Return the values of the constant at the given index.", nb::arg("index"))
+        .def("constant", [](const libOpenCOR::SedInstanceTask &self, size_t pIndex) {
+            const auto &data = self.constant(pIndex);
+            size_t shape[1] = {data.size()};
+
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+        },
+             "Return the values of the constant at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("constant_name", &libOpenCOR::SedInstanceTask::constantName, "Return the name of the constant at the given index.", nb::arg("index"))
         .def("constant_unit", &libOpenCOR::SedInstanceTask::constantUnit, "Return the unit of the constant at the given index.", nb::arg("index"))
         .def_prop_ro("computed_constant_count", &libOpenCOR::SedInstanceTask::computedConstantCount, "Return the number of computed constants.")
-        .def("computed_constant", &libOpenCOR::SedInstanceTask::computedConstant, "Return the values of the computed constant at the given index.", nb::arg("index"))
+        .def("computed_constant", [](const libOpenCOR::SedInstanceTask &self, size_t pIndex) {
+            const auto &data = self.computedConstant(pIndex);
+            size_t shape[1] = {data.size()};
+
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+        },
+             "Return the values of the computed constant at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("computed_constant_name", &libOpenCOR::SedInstanceTask::computedConstantName, "Return the name of the computed constant at the given index.", nb::arg("index"))
         .def("computed_constant_unit", &libOpenCOR::SedInstanceTask::computedConstantUnit, "Return the unit of the computed constant at the given index.", nb::arg("index"))
         .def_prop_ro("algebraic_variable_count", &libOpenCOR::SedInstanceTask::algebraicVariableCount, "Return the number of algebraic variables.")
-        .def("algebraic_variable", &libOpenCOR::SedInstanceTask::algebraicVariable, "Return the values of the algebraic variable at the given index.", nb::arg("index"))
+        .def("algebraic_variable", [](const libOpenCOR::SedInstanceTask &self, size_t pIndex) {
+            const auto &data = self.algebraicVariable(pIndex);
+            size_t shape[1] = {data.size()};
+
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+        },
+             "Return the values of the algebraic variable at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("algebraic_variable_name", &libOpenCOR::SedInstanceTask::algebraicVariableName, "Return the name of the algebraic variable at the given index.", nb::arg("index"))
         .def("algebraic_variable_unit", &libOpenCOR::SedInstanceTask::algebraicVariableUnit, "Return the unit of the algebraic variable at the given index.", nb::arg("index"));
 
