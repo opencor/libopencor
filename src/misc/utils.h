@@ -18,8 +18,6 @@ limitations under the License.
 
 #include "unittestingexport.h"
 
-#include "libopencor/solvercvode.h"
-#include "libopencor/solverkinsol.h"
 #include "libopencor/types.h"
 
 #include "libxml/xmlstring.h"
@@ -28,6 +26,7 @@ limitations under the License.
 #    include <cassert>
 #endif
 #include <filesystem>
+#include <map>
 #include <libcellml>
 
 #ifdef INF
