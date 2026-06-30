@@ -266,7 +266,7 @@ bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
         return false;
     }
 
-    auto model {std::ranges::find_if(mModels, [&](const auto &m) {
+    auto model {std::ranges::find_if(mModels, [&pModel](const auto &m) {
         return m == pModel;
     })};
 
@@ -281,7 +281,7 @@ bool SedDocument::Impl::addModel(const SedModelPtr &pModel)
 
 bool SedDocument::Impl::removeModel(const SedModelPtr &pModel)
 {
-    auto model {std::ranges::find_if(mModels, [&](const auto &m) {
+    auto model {std::ranges::find_if(mModels, [&pModel](const auto &m) {
         return m == pModel;
     })};
 
@@ -340,7 +340,7 @@ bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
         return false;
     }
 
-    auto simulation {std::ranges::find_if(mSimulations, [&](const auto &s) {
+    auto simulation {std::ranges::find_if(mSimulations, [&pSimulation](const auto &s) {
         return s == pSimulation;
     })};
 
@@ -355,7 +355,7 @@ bool SedDocument::Impl::addSimulation(const SedSimulationPtr &pSimulation)
 
 bool SedDocument::Impl::removeSimulation(const SedSimulationPtr &pSimulation)
 {
-    auto simulation {std::ranges::find_if(mSimulations, [&](const auto &s) {
+    auto simulation {std::ranges::find_if(mSimulations, [&pSimulation](const auto &s) {
         return s == pSimulation;
     })};
 
@@ -414,7 +414,7 @@ bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
         return false;
     }
 
-    auto task {std::ranges::find_if(mTasks, [&](const auto &t) {
+    auto task {std::ranges::find_if(mTasks, [&pTask](const auto &t) {
         return t == pTask;
     })};
 
@@ -429,7 +429,7 @@ bool SedDocument::Impl::addTask(const SedAbstractTaskPtr &pTask)
 
 bool SedDocument::Impl::removeTask(const SedAbstractTaskPtr &pTask)
 {
-    auto task {std::ranges::find_if(mTasks, [&](const auto &t) {
+    auto task {std::ranges::find_if(mTasks, [&pTask](const auto &t) {
         return t == pTask;
     })};
 

@@ -35,7 +35,7 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
     auto modelType {pModel->pimpl()->mFile->pimpl()->mCellmlFile->type()};
     const auto &modelId = pModel->pimpl()->mId;
 
-    auto addMissingSolverError = [&](const char *pSolverType) {
+    auto addMissingSolverError = [this, &modelId](const char *pSolverType) {
         std::string error;
 
         error.reserve(mId.size() + modelId.size() + 96); // NOLINT

@@ -33,7 +33,7 @@ SedTask::Impl::Impl(const SedDocumentPtr &pDocument, const SedModelPtr &pModel,
 
 bool SedTask::Impl::isValid()
 {
-    auto addTaskError = [&](const char *pMessage) {
+    auto addTaskError = [this](const char *pMessage) {
         std::string error;
 
         error.reserve(mId.size() + 32 + std::string(pMessage).size()); // NOLINT
