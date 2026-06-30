@@ -102,7 +102,7 @@ bool SedModel::Impl::addChange(const SedChangePtr &pChange)
         return false;
     }
 
-    auto change {std::ranges::find_if(mChanges, [&](const auto &c) {
+    auto change {std::ranges::find_if(mChanges, [&pChange](const auto &c) {
         return c == pChange;
     })};
 
@@ -117,7 +117,7 @@ bool SedModel::Impl::addChange(const SedChangePtr &pChange)
 
 bool SedModel::Impl::removeChange(const SedChangePtr &pChange)
 {
-    auto change {std::ranges::find_if(mChanges, [&](const auto &c) {
+    auto change {std::ranges::find_if(mChanges, [&pChange](const auto &c) {
         return c == pChange;
     })};
 

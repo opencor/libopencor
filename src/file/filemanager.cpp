@@ -119,7 +119,7 @@ FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #else
     auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
 #endif
-    auto res {std::ranges::find_if(mFiles, [&](const auto &file) {
+    auto res {std::ranges::find_if(mFiles, [&isLocalFile, &fileNameOrUrl](const auto &file) {
         return isLocalFile ?
                    file->fileName() == fileNameOrUrl :
                    file->url() == fileNameOrUrl;

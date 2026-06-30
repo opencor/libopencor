@@ -29,7 +29,7 @@ SolverOdeFixedStep::Impl::Impl(const std::string &pId, const std::string &pName)
 
 void SolverOdeFixedStep::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
-    auto addUnknownParameterWarning = [&](const std::string &pKisaoId) {
+    auto addUnknownParameterWarning = [this](const std::string &pKisaoId) {
         std::string warning;
 
         warning.reserve(pKisaoId.size() + 49); // NOLINT

@@ -122,7 +122,7 @@ SolverKinsol::Impl::Impl()
 
 void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
-    auto addUnknownParameterWarning = [&](const std::string &pKisaoId) {
+    auto addUnknownParameterWarning = [this](const std::string &pKisaoId) {
         std::string warning;
 
         warning.reserve(pKisaoId.size() + 49); // NOLINT

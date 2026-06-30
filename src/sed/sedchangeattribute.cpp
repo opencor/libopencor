@@ -88,9 +88,9 @@ void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
 void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
                                      const libcellml::AnalyserModelPtr &pAnalyserModel)
 {
-    auto addCannotChangeWarning = [&](const std::string &pVariableName,
-                                      const std::string &pComponentName,
-                                      const char *pVariableType) {
+    auto addCannotChangeWarning = [this](const std::string &pVariableName,
+                                         const std::string &pComponentName,
+                                         const char *pVariableType) {
         std::string warning;
 
         warning.reserve(pVariableName.size() + pComponentName.size() + 120); // NOLINT
