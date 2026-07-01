@@ -11,6 +11,8 @@
 #include <memory>
 #include <cstring>
 #include <vector>
+#include <atomic>
+#include <initializer_list>
 #include <nanobind/stl/detail/traits.h>
 #include "inter_module.h"
 #include "test_classes.h"
@@ -60,6 +62,14 @@ struct PairStruct {
     Struct s2;
 };
 
+// Test case for issue #1074: nb::init must not use list-initialization, which
+// would spuriously prefer the std::initializer_list constructor.
+struct InitListTest {
+    int value;
+    InitListTest(int count) : value(count) { }
+    InitListTest(std::initializer_list<int>) : value(-1) { }
+};
+
 // Test case for issue #1280
 struct OptionalNoneTest {
     int compute(int i, std::optional<int> j, int k) const {
@@ -86,6 +96,79 @@ struct Animal {
     virtual std::string name() const { return "Animal"; }
     virtual std::string what() const = 0;
     virtual void void_ret() { }
+};
+
+// Instance pooling test type (nb::pooled). Counts constructions and
+// destructions so the Python test can verify that the C++ object lifecycle is
+// correct even though the wrapper memory is recycled. The counters are atomic so
+// that the multi-threaded free-threaded test can check exact totals.
+static std::atomic<int> pooled_constructed{0}, pooled_destructed{0};
+
+struct Pooled {
+    int value;
+    Pooled(int v = 0) : value(v) { pooled_constructed++; }
+    Pooled(const Pooled &o) : value(o.value) { pooled_constructed++; }
+    ~Pooled() { pooled_destructed++; }
+    int get() const { return value; }
+};
+
+// Like 'Pooled', but bound as a GC type (dynamic_attr + weak-referenceable).
+static std::atomic<int> pooled_gc_constructed{0}, pooled_gc_destructed{0};
+
+struct PooledGC {
+    int value;
+    PooledGC(int v = 0) : value(v) { pooled_gc_constructed++; }
+    PooledGC(const PooledGC &o) : value(o.value) { pooled_gc_constructed++; }
+    ~PooledGC() { pooled_gc_destructed++; }
+    int get() const { return value; }
+};
+
+// A pooled GC type with a custom tp_traverse/tp_clear that reads the C++ payload
+// (a held Python reference).
+static std::atomic<int> pooled_tr_constructed{0}, pooled_tr_destructed{0};
+
+struct PooledTraverse {
+    PyObject *ref;
+    PooledTraverse(nb::object o) : ref(o.ptr()) {
+        Py_XINCREF(ref);
+        pooled_tr_constructed++;
+    }
+    ~PooledTraverse() { Py_XDECREF(ref); pooled_tr_destructed++; }
+    nb::object get() const { return nb::borrow(ref); }
+};
+
+int pooled_tr_traverse(PyObject *self, visitproc visit, void *arg) {
+    Py_VISIT(Py_TYPE(self));
+    if (!nb::inst_ready(self))  // payload not valid until the constructor runs
+        return 0;
+    Py_VISIT(nb::inst_ptr<PooledTraverse>(self)->ref);
+    return 0;
+}
+
+int pooled_tr_clear(PyObject *self) {
+    PyObject *&ref = nb::inst_ptr<PooledTraverse>(self)->ref;
+    Py_CLEAR(ref);
+    return 0;
+}
+
+PyType_Slot pooled_tr_slots[] = {
+    { Py_tp_traverse, (void *) pooled_tr_traverse },
+    { Py_tp_clear, (void *) pooled_tr_clear },
+    { 0, nullptr }
+};
+
+// Benchmark types: identical, minimal shape; the only difference is whether the
+// binding opts into nb::pooled. Kept free of side effects (no counters) so
+// the measurement isolates allocation / registration cost.
+struct BenchPooled {
+    int value;
+    BenchPooled(int v = 0) : value(v) {}
+    int get() const { return value; }
+};
+struct BenchUnpooled {
+    int value;
+    BenchUnpooled(int v = 0) : value(v) {}
+    int get() const { return value; }
 };
 
 struct StaticProperties {
@@ -129,6 +212,15 @@ struct UniqueInt {
     int nlook = 0;
 };
 std::map<int, std::weak_ptr<UniqueInt>> UniqueInt::instances;
+
+struct DefVisitor : nb::def_visitor<DefVisitor> {
+  int mem;
+};
+
+// Default- and aggregate-initialization compile.
+DefVisitor dv1;
+DefVisitor dv2 { };
+DefVisitor dv3 { {}, 1 };
 
 int wrapper_tp_traverse(PyObject *self, visitproc visit, void *arg) {
     // We must traverse the implicit dependency of an object on its associated type object.
@@ -179,12 +271,30 @@ NB_MODULE(test_classes_ext, m) {
         .def("__setstate__", &Struct::setstate)
         .def_static("static_test", nb::overload_cast<int>(&Struct::static_test))
         .def_static("static_test", nb::overload_cast<float>(&Struct::static_test))
+        .def_prop_ro_static("static_ro", [](nb::handle) { return 42; })
+        .def_prop_rw_static("static_rw",
+            [](nb::handle) { return 42; },
+            [](nb::handle, int) {})
         .def_static("create_move", &Struct::create_move)
         .def_static("create_reference", &Struct::create_reference,
                     nb::rv_policy::reference)
         .def_static("create_copy", &Struct::create_copy,
                     nb::rv_policy::copy)
         .def_static("create_take", &Struct::create_take);
+
+    cls.attr("class_method") =
+        nb::module_::import_("builtins").attr("classmethod")(
+            nb::cpp_function(
+                [](nb::handle, int value) -> int { return value * 2; },
+                "cls"_a, "value"_a = 0,
+                "A classmethod that wraps a nanobind function."));
+
+    cls.attr("static_method") =
+        nb::module_::import_("builtins").attr("staticmethod")(
+            nb::cpp_function(
+                [](int value) -> int { return value * 3; },
+                "value"_a = 0,
+                "A staticmethod that wraps a nanobind function."));
 
     if (!nb::type<Struct>().is(cls))
         nb::detail::raise("type lookup failed!");
@@ -193,6 +303,11 @@ NB_MODULE(test_classes_ext, m) {
         .def(nb::init<>())
         .def_rw("s1", &PairStruct::s1, "A documented property")
         .def_rw("s2", &PairStruct::s2);
+
+    // Test case for issue #1074
+    nb::class_<InitListTest>(m, "InitListTest")
+        .def(nb::init<int>())
+        .def_ro("value", &InitListTest::value);
 
     // Test case for issue #1280
     nb::class_<OptionalNoneTest>(m, "OptionalNoneTest")
@@ -225,6 +340,64 @@ NB_MODULE(test_classes_ext, m) {
         pickled = 0;
         unpickled = 0;
     });
+
+    // test_pooled
+
+    nb::class_<Pooled>(m, "Pooled", nb::pooled(4))
+        .def(nb::init<int>())
+        .def("get", &Pooled::get)
+        .def_rw("value", &Pooled::value)
+        // Returns a new Pooled by value -> exercises return-by-value pooling
+        .def("__add__",
+             [](const Pooled &p, int o) { return Pooled(p.value + o); },
+             nb::is_operator());
+
+    m.def("pooled_stats", [] {
+        return std::make_pair(pooled_constructed.load(), pooled_destructed.load());
+    });
+    m.def("pooled_reset", [] { pooled_constructed = pooled_destructed = 0; });
+
+    nb::class_<PooledGC>(m, "PooledGC", nb::pooled(4), nb::dynamic_attr(),
+                         nb::is_weak_referenceable())
+        .def(nb::init<int>())
+        .def("get", &PooledGC::get)
+        .def_rw("value", &PooledGC::value)
+        .def("__add__",
+             [](const PooledGC &p, int o) { return PooledGC(p.value + o); },
+             nb::is_operator());
+
+    m.def("pooled_gc_stats", [] {
+        return std::make_pair(pooled_gc_constructed.load(),
+                              pooled_gc_destructed.load());
+    });
+    m.def("pooled_gc_reset", [] {
+        pooled_gc_constructed = pooled_gc_destructed = 0;
+    });
+
+    nb::class_<PooledTraverse>(m, "PooledTraverse", nb::pooled(4),
+                               nb::type_slots(pooled_tr_slots))
+        .def(nb::init<nb::object>(), nb::arg("obj") = nb::none())
+        .def("get", &PooledTraverse::get);
+
+    m.def("pooled_tr_stats", [] {
+        return std::make_pair(pooled_tr_constructed.load(),
+                              pooled_tr_destructed.load());
+    });
+    m.def("pooled_tr_reset", [] {
+        pooled_tr_constructed = pooled_tr_destructed = 0;
+    });
+
+    // Benchmark pair (see benchmark_pooled.py)
+    nb::class_<BenchPooled>(m, "BenchPooled", nb::pooled(128))
+        .def(nb::init<int>())
+        .def("get", &BenchPooled::get)
+        .def("__add__", [](const BenchPooled &p, int o) { return BenchPooled(p.value + o); },
+             nb::is_operator());
+    nb::class_<BenchUnpooled>(m, "BenchUnpooled")
+        .def(nb::init<int>())
+        .def("get", &BenchUnpooled::get)
+        .def("__add__", [](const BenchUnpooled &p, int o) { return BenchUnpooled(p.value + o); },
+             nb::is_operator());
 
     // test06_big
 
@@ -402,7 +575,7 @@ NB_MODULE(test_classes_ext, m) {
     struct Int {
         int i;
         Int operator+(Int o) const { return {i + o.i}; }
-        Int operator-(float j) const { return {int(i - j)}; }
+        Int operator-(float j) const { return {int((float)i - j)}; }
         bool operator==(Int o) const { return i == o.i; }
         Int &operator+=(Int o) {
             i += o.i;
@@ -430,12 +603,16 @@ NB_MODULE(test_classes_ext, m) {
 
     // test17_name_qualname_module()
     m.def("f", []{});
-    struct MyClass { struct NestedClass { }; };
+    struct MyClass { struct NestedClass { }; struct Sibling { }; };
     nb::class_<MyClass> mcls(m, "MyClass");
+    nb::class_<MyClass::Sibling> sib_cls(mcls, "Sibling");
     nb::class_<MyClass::NestedClass> ncls(mcls, "NestedClass");
     mcls.def(nb::init<>());
     mcls.def("f", [](MyClass&){});
     ncls.def("f", [](MyClass::NestedClass&){});
+    // A sibling reference must keep its qualified name ("MyClass.Sibling"):
+    // class scopes don't nest, so "Sibling" is not in NestedClass's scope.
+    ncls.def("g", [](MyClass::NestedClass&, MyClass::Sibling){});
 
     // test18_static_properties
     nb::class_<StaticProperties>(m, "StaticProperties")
@@ -546,6 +723,16 @@ NB_MODULE(test_classes_ext, m) {
     m.def("none_2", [](Struct *s) { return s == nullptr; }, nb::arg("arg"));
     m.def("none_3", [](Struct *s) { return s == nullptr; }, nb::arg().none());
     m.def("none_4", [](Struct *s) { return s == nullptr; }, nb::arg("arg").none());
+
+    // A single-argument free function (dispatched via the 'simple_1'
+    // vectorcall path) must not treat its sole argument as the cleanup-list
+    // 'self'. With reference_internal and no self, the call must fail rather
+    // than silently keep-aliving the result on the argument.
+    m.def("create_reference_internal_free", []() { return struct_tmp.get(); },
+          nb::rv_policy::reference_internal);
+    m.def("create_reference_internal_free_1arg",
+          [](int) { return struct_tmp.get(); },
+          nb::rv_policy::reference_internal);
 
     // test25_is_final
     struct FinalType { };
@@ -729,13 +916,13 @@ NB_MODULE(test_classes_ext, m) {
         .def_ro("value", &NewDflt::value);
     nb::class_<NewStarPosOnly>(m, "NewStarPosOnly")
         .def(nb::new_([](nb::args a, int value) {
-            return NewStarPosOnly{nb::len(a) + value};
+            return NewStarPosOnly{nb::len(a) + (size_t) value};
         }),
             "args"_a, "value"_a = 42)
         .def_ro("value", &NewStarPosOnly::value);
     nb::class_<NewStar>(m, "NewStar")
         .def(nb::new_([](nb::args a, int value, nb::kwargs k) {
-            return NewStar{nb::len(a) + value + 10 * nb::len(k)};
+            return NewStar{nb::len(a) + (size_t) value + 10 * nb::len(k)};
         }),
             "args"_a, "value"_a = 42, "kwargs"_a)
         .def_ro("value", &NewStar::value);

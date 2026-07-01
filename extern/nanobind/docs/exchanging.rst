@@ -143,6 +143,8 @@ to external projects that provide further casters:
     - ``#include <nanobind/eigen/dense.h>``
   * - ``Eigen::SparseMatrix<..>``
     - ``#include <nanobind/eigen/sparse.h>``
+  * - ``Eigen::Tensor<..>``, ``Eigen::TensorMap<..>``, ``Eigen::TensorRef<..>``
+    - ``#include <nanobind/eigen/tensor.h>``
   * - Apache Arrow types
     -  `https://github.com/maximiliank/nanobind_pyarrow <https://github.com/maximiliank/nanobind_pyarrow>`__
   * - ...
@@ -396,7 +398,7 @@ directives:
 :cpp:class:`frozenset`, :cpp:class:`iterable`, :cpp:class:`iterator`,
 :cpp:class:`list`, :cpp:class:`mapping`,
 :cpp:class:`module_`, :cpp:class:`object`, :cpp:class:`set`, :cpp:class:`sequence`,
-:cpp:class:`slice`, :cpp:class:`str`, :cpp:class:`tuple`,
+:cpp:class:`memoryview`, :cpp:class:`slice`, :cpp:class:`str`, :cpp:class:`tuple`,
 :cpp:class:`weakref`,
 :cpp:class:`type_object`, :cpp:class:`type_object_t\<T\> <type_object_t>`,
 :cpp:class:`args`, :cpp:class:`kwargs`, and
