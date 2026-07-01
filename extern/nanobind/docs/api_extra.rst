@@ -735,7 +735,7 @@ section <ndarrays>`.
 
    .. _ndarray_dynamic_constructor:
 
-   .. cpp:function:: ndarray(VoidPtr data, const std::initializer_list<size_t> shape = { }, handle owner = { }, std::initializer_list<int64_t> strides = { }, dlpack::dtype dtype = nanobind::dtype<Scalar>(), int32_t device_type = DeviceType, int32_t device_id = 0, char order = Order)
+   .. cpp:function:: ndarray(VoidPtr data, const std::initializer_list<size_t> shape = { }, handle owner = { }, std::initializer_list<int64_t> strides = { }, dlpack::dtype dtype = nanobind::dtype<Scalar>(), int32_t device_type = DeviceType, int32_t device_id = 0, char order = Order, uint64_t byte_offset = 0)
 
       Create an array wrapping an existing memory allocation.
 
@@ -796,6 +796,11 @@ section <ndarrays>`.
         implementation uses the order specified as an ndarray template
         argument, or C-style order as a fallback.
 
+      - `byte_offset` specifies the DLPack ``DLTensor::byte_offset`` field in
+        bytes. This is useful when `data` is an opaque device handle pointing to
+        the start of an allocation, while the logical array begins later in the
+        allocation.
+
       Both ``strides`` and ``shape`` will be copied by the constructor, hence
       the targets of these initializer lists do not need to remain valid
       following the constructor call.
@@ -805,7 +810,7 @@ section <ndarrays>`.
          The Python *global interpreter lock* (GIL) must be held when calling
          this function.
 
-   .. cpp:function:: ndarray(VoidPtr data, size_t ndim, const size_t * shape, handle owner, const int64_t * strides = nullptr, dlpack::dtype dtype = nanobind::dtype<Scalar>(), int device_type = DeviceType, int device_id = 0, char order = Order)
+   .. cpp:function:: ndarray(VoidPtr data, size_t ndim, const size_t * shape, handle owner, const int64_t * strides = nullptr, dlpack::dtype dtype = nanobind::dtype<Scalar>(), int device_type = DeviceType, int device_id = 0, char order = Order, uint64_t byte_offset = 0)
 
       Alternative form of the above constructor, which accepts the `shape`
       and `strides` arguments using pointers instead of initializer lists.
@@ -878,6 +883,16 @@ section <ndarrays>`.
 
       Return a pointer to the array data.
       If :cpp:var:`ReadOnly` is true, a pointer-to-const is returned.
+
+   .. cpp:function:: void * data_handle() const
+
+      Return the raw DLPack ``DLTensor::data`` field without applying the byte
+      offset. For non-CPU devices, this may be an opaque device handle such as
+      an ``id<MTLBuffer>`` for :cpp:class:`device::metal <device::metal>`.
+
+   .. cpp:function:: uint64_t byte_offset() const
+
+      Return the DLPack ``DLTensor::byte_offset`` value in bytes.
 
    .. cpp:function:: template <typename... Args2> auto& operator()(Args2... indices)
 
@@ -1104,6 +1119,11 @@ convert into an equivalent representation in one of the following frameworks:
 
 .. cpp:class:: cupy
 
+.. cpp:class:: mlx
+
+   Apple ``mlx.core.array``. The constructor always copies into a
+   unified-memory buffer, so a requested copy is performed inherently.
+
 .. cpp:class:: memview
 
    Builtin Python ``memoryview`` for CPU-resident data.
@@ -1112,6 +1132,13 @@ convert into an equivalent representation in one of the following frameworks:
 
    An object that both implements the buffer protocol and also has the
    ``__dlpack__`` and ``__dlpack_device__`` attributes.
+
+.. cpp:class:: no_framework
+
+   The default when no framework annotation is given. Instead of a
+   framework-specific array, the :cpp:class:`nb::ndarray <ndarray>` converts
+   into a raw `DLPack <https://github.com/dmlc/dlpack>`__ capsule wrapping a
+   ``DLManagedTensor``.
 
 Eigen convenience type aliases
 ------------------------------
@@ -1136,6 +1163,26 @@ The following helper type aliases require an additional include directive:
 
    This templated type alias creates an ``Eigen::Map<..>`` with flexible strides for
    zero-copy data exchange between Eigen and NumPy.
+
+.. cpp:type:: DStride1 = Eigen::Stride<Eigen::Dynamic, 1>
+
+   Like :cpp:type:`DStride`, but with a *unit inner stride* fixed at compile
+   time. It accepts an arbitrary outer stride while requiring a contiguous inner
+   dimension. Fixing the inner stride this way preserves Eigen's vectorization,
+   which is otherwise disabled when the inner stride is dynamic. See the section
+   on :ref:`auto-vectorization <eigen_vectorization>` for details.
+
+.. cpp:type:: template <typename T> DRef1 = Eigen::Ref<T, 0, DStride1>
+
+   Variant of :cpp:type:`DRef` that uses :cpp:type:`DStride1`. Use it instead of
+   :cpp:type:`DRef` in performance-critical bindings to retain Eigen's
+   vectorization. The contiguous inner dimension must match the storage order of
+   ``T`` (a row-major ``T`` for C-contiguous arrays, a column-major ``T`` for
+   F-contiguous arrays).
+
+.. cpp:type:: template <typename T> DMap1 = Eigen::Map<T, 0, DStride1>
+
+   Variant of :cpp:type:`DMap` that uses :cpp:type:`DStride1`.
 
 .. _chrono_conversions:
 

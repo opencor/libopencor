@@ -86,7 +86,7 @@ template <typename T> using make_caster = type_caster<intrinsic_t<T>>;
 
 template <typename Impl> class accessor;
 struct str_attr; struct obj_attr;
-struct str_item; struct obj_item; struct num_item;
+struct str_item; struct obj_item; struct num_item; struct dict_item;
 struct num_item_list; struct num_item_tuple;
 class args_proxy; class kwargs_proxy;
 struct borrow_t { };
@@ -372,10 +372,15 @@ class capsule : public object {
         m_ptr = detail::capsule_new(ptr, name, cleanup);
     }
 
-    const char *name() const { return PyCapsule_GetName(m_ptr); }
+    const char *name() const {
+        return (m_ptr != Py_None) ? PyCapsule_GetName(m_ptr) : nullptr;
+    }
 
-    void *data() const { return PyCapsule_GetPointer(m_ptr, name()); }
+    void *data() const {
+        return (m_ptr != Py_None) ? PyCapsule_GetPointer(m_ptr, name()) : nullptr;
+    }
     void *data(const char *name) const {
+        if (m_ptr == Py_None) return nullptr;
         void *p = PyCapsule_GetPointer(m_ptr, name);
         if (!p && PyErr_Occurred())
             raise_python_error();
@@ -387,10 +392,11 @@ class bool_ : public object {
     NB_OBJECT_DEFAULT(bool_, object, "bool", PyBool_Check)
 
     explicit bool_(handle h)
-        : object(detail::bool_from_obj(h.ptr()), detail::borrow_t{}) { }
+        : object(detail::bool_from_obj(h.ptr()), detail::steal_t{}) { }
 
     explicit bool_(bool value)
-        : object(value ? Py_True : Py_False, detail::borrow_t{}) { }
+        : object(value ? detail::true_ref() : detail::false_ref(),
+                 detail::steal_t{}) { }
 
     explicit operator bool() const {
         return m_ptr == Py_True;
@@ -407,6 +413,10 @@ class int_ : public object {
     explicit int_(T value) {
         if constexpr (std::is_floating_point_v<T>)
             m_ptr = PyLong_FromDouble((double) value);
+        else if constexpr (detail::is_std_char_v<T>)
+            // Treat character types as integers rather than (single-char) strings
+            m_ptr = detail::type_caster<std::make_signed_t<T>>::from_cpp(
+                (std::make_signed_t<T>) value, rv_policy::copy, nullptr).ptr();
         else
             m_ptr = detail::type_caster<T>::from_cpp(value, rv_policy::copy, nullptr).ptr();
 
@@ -562,7 +572,7 @@ class list : public object {
             raise_python_error();
     }
 
-#if !defined(Py_LIMITED_API) && !defined(PYPY_VERSION)
+#if !defined(Py_LIMITED_API) && !defined(PYPY_VERSION) && !defined(NB_FREE_THREADED)
     detail::fast_iterator begin() const;
     detail::fast_iterator end() const;
 #endif
@@ -579,16 +589,13 @@ class dict : public object {
     list values() const { return steal<list>(detail::obj_op_1(m_ptr, PyDict_Values)); }
     list items() const { return steal<list>(detail::obj_op_1(m_ptr, PyDict_Items)); }
     object get(handle key, handle def) const {
-        PyObject *o = PyDict_GetItem(m_ptr, key.ptr());
-        if (!o)
-            o = def.ptr();
-        return borrow(o);
+        return steal(detail::dict_getitem_or_default(m_ptr, key.ptr(), def.ptr()));
     }
-    object get(const char *key, handle def) const {
-        PyObject *o = PyDict_GetItemString(m_ptr, key);
-        if (!o)
-            o = def.ptr();
-        return borrow(o);
+    object get(const char *key_, handle def) const {
+        object key = steal(PyUnicode_FromString(key_));
+        if (!key.is_valid())
+            raise_python_error();
+        return steal(detail::dict_getitem_or_default(m_ptr, key.ptr(), def.ptr()));
     }
     template <typename T> bool contains(T&& key) const;
     void clear() { PyDict_Clear(m_ptr); }
@@ -597,6 +604,9 @@ class dict : public object {
             raise_python_error();
     }
     bool empty() const { return size() == 0; }
+
+    using object::operator[];
+    detail::accessor<detail::dict_item> operator[](handle key) const;
 };
 
 class set : public object {
@@ -722,7 +732,7 @@ inline void print(const char *str, handle end = handle(), handle file = handle()
     print(nanobind::str(str), end, file);
 }
 
-inline object none() { return borrow(Py_None); }
+inline object none() { return steal(detail::none_ref()); }
 inline dict builtins() { return borrow<dict>(PyEval_GetBuiltins()); }
 
 inline iterator iter(handle h) {
@@ -997,6 +1007,7 @@ inline detail::fast_iterator tuple::end() const {
     PyTupleObject *v = (PyTupleObject *) m_ptr;
     return v->ob_item + v->ob_base.ob_size;
 }
+#if !defined(NB_FREE_THREADED)
 inline detail::fast_iterator list::begin() const {
     return ((PyListObject *) m_ptr)->ob_item;
 }
@@ -1004,6 +1015,7 @@ inline detail::fast_iterator list::end() const {
     PyListObject *v = (PyListObject *) m_ptr;
     return v->ob_item + v->ob_base.ob_size;
 }
+#endif
 #endif
 
 template <typename T> void del(detail::accessor<T> &a) { a.del(); }

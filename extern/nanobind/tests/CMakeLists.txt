@@ -24,7 +24,12 @@ if (MSVC)
     add_compile_options(/W4)
   endif()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU|IntelLLVM")
-  add_compile_options(-Wall -Wextra)
+  # Not enabling -Werror on CUDA compiler because of many visibility attribute warnings in tests
+  add_compile_options(
+      $<$<COMPILE_LANGUAGE:CXX>:-Werror>
+      # $<$<COMPILE_LANGUAGE:CUDA>:--compiler-options=-Werror>
+      -Wall -Wextra -Wconversion
+  )
 endif()
 
 if (UNIX AND (CMAKE_SIZEOF_VOID_P EQUAL 4) AND (CMAKE_SYSTEM_PROCESSOR STREQUAL i686))
@@ -130,10 +135,13 @@ foreach (NAME functions classes ndarray jax tensorflow stl enum typing make_iter
     ${EXTRA})
 endforeach()
 
-find_package (Eigen3 3.3.1 NO_MODULE)
-if (TARGET Eigen3::Eigen)
+# Check the version manually: Eigen's "SameMajorVersion" config rejects ranges like "3...5"
+find_package (Eigen3 NO_MODULE)
+if (TARGET Eigen3::Eigen AND Eigen3_VERSION VERSION_GREATER_EQUAL 3.3.1)
   nanobind_add_module(test_eigen_ext test_eigen.cpp ${NB_EXTRA_ARGS})
   target_link_libraries(test_eigen_ext PRIVATE Eigen3::Eigen)
+  nanobind_add_module(test_eigen_tensor_ext test_eigen_tensor.cpp ${NB_EXTRA_ARGS})
+  target_link_libraries(test_eigen_tensor_ext PRIVATE Eigen3::Eigen)
 endif()
 
 add_library(
@@ -159,6 +167,7 @@ set(TEST_FILES
   test_callbacks.py
   test_classes.py
   test_eigen.py
+  test_eigen_tensor.py
   test_enum.py
   test_eval.py
   test_exception.py
@@ -193,6 +202,9 @@ set(TEST_FILES
   py_stub_test.pyi.ref
   py_recursive_stub_test/__init__.pyi.ref
   py_recursive_stub_test/bar.pyi.ref
+  test_prefix_module/__init__.pyi.ref
+  test_prefix_module/prefix.pyi.ref
+  test_prefix_module/prefixabc.pyi.ref
 )
 
 set (PY_STUB_TEST py_stub_test.py)
@@ -227,5 +239,18 @@ nanobind_add_stub(
   OUTPUT
     ${PYI_PREFIX}py_recursive_stub_test/__init__.pyi
     ${PYI_PREFIX}py_recursive_stub_test/bar.pyi
+  PYTHON_PATH ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+nanobind_add_stub(
+  test_prefix_module_stub
+  RECURSIVE
+  MODULE test_prefix_module
+  OUTPUT_PATH
+    ${PYI_PREFIX}test_prefix_module
+  OUTPUT
+    ${PYI_PREFIX}test_prefix_module/__init__.pyi
+    ${PYI_PREFIX}test_prefix_module/prefix.pyi
+    ${PYI_PREFIX}test_prefix_module/prefixabc.pyi
   PYTHON_PATH ${CMAKE_CURRENT_SOURCE_DIR}
 )
