@@ -34,7 +34,7 @@ struct SolverCvodeUserData
     CellmlFileRuntimePtr runtime;
 };
 
-class SolverCvode::Impl: public SolverOde::Impl
+class SolverCvode::Impl final: public SolverOde::Impl
 {
 public:
     std::string mErrorMessage;

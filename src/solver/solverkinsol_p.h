@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class SolverKinsol::Impl: public SolverNla::Impl
+class SolverKinsol::Impl final: public SolverNla::Impl
 {
 public:
     std::string mErrorMessage;

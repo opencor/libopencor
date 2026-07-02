@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class SolverSecondOrderRungeKutta::Impl: public SolverOdeFixedStep::Impl
+class SolverSecondOrderRungeKutta::Impl final: public SolverOdeFixedStep::Impl
 {
 public:
     double *mYk {nullptr};
