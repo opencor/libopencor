@@ -64,41 +64,41 @@ public:
                              const SedSimulationPtr &pSimulation);
 
     /**
-     * @brief Get the model used by this task.
+     * @brief Return the model.
      *
-     * Return the model used by this task.
+     * Return the model.
      *
-     * @return The model, as a @ref SedModelPtr, used by this task.
+     * @return The model, as a @ref SedModelPtr.
      */
 
     const SedModelPtr &model() const;
 
     /**
-     * @brief Set the model to be used by this task.
+     * @brief Set the model.
      *
-     * Set the model to be used by this task.
+     * Set the model.
      *
-     * @param pModel The model to be used by this task.
+     * @param pModel The model.
      */
 
     void setModel(const SedModelPtr &pModel);
 
     /**
-     * @brief Get the simulation used by this task.
+     * @brief Return the simulation.
      *
-     * Return the simulation used by this task.
+     * Return the simulation.
      *
-     * @return The simulation, as a @ref SedSimulationPtr, used by this task.
+     * @return The simulation, as a @ref SedSimulationPtr.
      */
 
     const SedSimulationPtr &simulation() const;
 
     /**
-     * @brief Set the simulation to be used by this task.
+     * @brief Set the simulation.
      *
-     * Set the simulation to be used by this task.
+     * Set the simulation.
      *
-     * @param pSimulation The simulation to be used by this task.
+     * @param pSimulation The simulation.
      */
 
     void setSimulation(const SedSimulationPtr &pSimulation);

@@ -19,8 +19,6 @@ limitations under the License.
 #include "libopencor/export.h"
 #include "libopencor/types.h"
 
-#include <vector>
-
 namespace libOpenCOR {
 
 /**

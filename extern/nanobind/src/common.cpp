@@ -20,10 +20,10 @@ create_exception(exception_type type, const char *fmt, va_list args_) {
     va_list args;
 
     va_copy(args, args_);
-    int size = vsnprintf(buf, sizeof(buf), fmt, args);
+    size_t size = (size_t) vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
-    if (size < (int) sizeof(buf)) {
+    if (size < sizeof(buf)) {
         return builtin_exception(type, buf);
     } else {
         scoped_pymalloc<char> temp(size + 1);
@@ -82,6 +82,9 @@ void fail(const char *fmt, ...) noexcept {
 
 PyObject *capsule_new(const void *ptr, const char *name,
         void (*cleanup)(void *) noexcept) noexcept {
+    if (!ptr)
+        return none_ref();
+
     auto capsule_cleanup = [](PyObject *o) {
         auto cleanup_2 = (void (*)(void *))(PyCapsule_GetContext(o));
         if (cleanup_2)
@@ -103,11 +106,6 @@ void raise_python_error() {
           "nanobind::detail::raise_python_error() called without "
           "an error condition!");
     throw python_error();
-}
-
-void raise_next_overload_if_null(void *p) {
-    if (NB_UNLIKELY(!p))
-        throw next_overload();
 }
 
 void raise_python_or_cast_error() {
@@ -235,7 +233,7 @@ size_t obj_len_hint(PyObject *o) noexcept {
     }
 
     try {
-        return cast<size_t>(handle(o).attr("__length_hint__")());
+        return cast<size_t>(handle(o).attr(NB_INTERNED(__length_hint__))());
     } catch (...) {
         return 0;
     }
@@ -275,15 +273,16 @@ PyObject *obj_op_2(PyObject *a, PyObject *b,
 PyObject *obj_vectorcall(PyObject *base, PyObject *const *args, size_t nargsf,
                          PyObject *kwnames, bool method_call) {
     PyObject *res = nullptr;
-    bool gil_error = false, cast_error = false;
+    bool cast_error = false;
 
     size_t nargs_total = (size_t) (PyVectorcall_NARGS(nargsf) +
                          (kwnames ? NB_TUPLE_GET_SIZE(kwnames) : 0));
 
 #if !defined(Py_LIMITED_API)
     if (!PyGILState_Check()) {
-        gil_error = true;
-        goto end;
+        // Deliberately leak the argument references: decref'ing them without
+        // holding the GIL would be undefined behavior, and we are about to raise.
+        raise("nanobind::detail::obj_vectorcall(): PyGILState_Check() failure.");
     }
 #endif
 
@@ -306,8 +305,6 @@ end:
     if (!res) {
         if (cast_error)
             raise_python_or_cast_error();
-        else if (gil_error)
-            raise("nanobind::detail::obj_vectorcall(): PyGILState_Check() failure.");
         else
             raise_python_error();
     }
@@ -624,9 +621,11 @@ PyObject *bytearray_from_cstr_and_size(const void *str, size_t size) {
 
 PyObject *bool_from_obj(PyObject *o) {
     int rv = PyObject_IsTrue(o);
-    if (rv == -1)
-        raise_python_error();
-    return rv == 1 ? Py_True : Py_False;
+    if (rv == 1)
+        return true_ref();
+    if (rv == 0)
+        return false_ref();
+    raise_python_error();
 }
 
 PyObject *int_from_obj(PyObject *o) {
@@ -729,8 +728,7 @@ PyObject **seq_get(PyObject *seq, size_t *size_out, PyObject **temp_out) noexcep
         Py_ssize_t size_seq = PySequence_Length(seq);
 
         if (size_seq >= 0) {
-            result = (PyObject **) PyMem_Malloc(sizeof(PyObject *) *
-                                                (size_seq + 1));
+            result = (PyObject **) PyMem_Malloc(sizeof(PyObject *) * (size_t) (size_seq + 1));
 
             if (result) {
                 result[size_seq] = nullptr;
@@ -741,6 +739,7 @@ PyObject **seq_get(PyObject *seq, size_t *size_out, PyObject **temp_out) noexcep
                     if (o) {
                         result[i] = o;
                     } else {
+                        PyErr_Clear();
                         for (Py_ssize_t j = 0; j < i; ++j)
                             Py_DECREF(result[j]);
 
@@ -843,6 +842,7 @@ PyObject **seq_get_with_size(PyObject *seq, size_t size,
                     if (o) {
                         result[i] = o;
                     } else {
+                        PyErr_Clear();
                         for (Py_ssize_t j = 0; j < i; ++j)
                             Py_DECREF(result[j]);
 
@@ -888,8 +888,8 @@ static void property_install_impl(PyTypeObject *tp, PyObject *scope,
     PyObject *m = getter ? getter : setter;
     object doc = none();
 
-    if (m && (Py_TYPE(m) == internals->nb_func ||
-              Py_TYPE(m) == internals->nb_method)) {
+    PyTypeObject *mt = m ? Py_TYPE(m) : nullptr;
+    if (m && (mt == internals->nb_func || mt == internals->nb_method)) {
         func_data *f = nb_func_data(m);
         if (f->flags & (uint32_t) func_flags::has_doc)
             doc = str(f->doc);
@@ -918,7 +918,7 @@ void property_install_static(PyObject *scope, const char *name,
 
 void tuple_check(PyObject *tuple, size_t nargs) {
     for (size_t i = 0; i < nargs; ++i) {
-        if (!NB_TUPLE_GET_ITEM(tuple, i))
+        if (!NB_TUPLE_GET_ITEM(tuple, (Py_ssize_t) i))
             raise_python_or_cast_error();
     }
 }
@@ -964,7 +964,7 @@ NB_CORE bool load_cmplx(PyObject *ob, uint8_t flags,
     // functions PyComplex_{Real,Imag}AsDouble(), so we do so ourselves.
     if (!is_complex && convert
             && !PyType_IsSubtype(Py_TYPE(ob), &PyComplex_Type)
-            && PyObject_HasAttrString(ob, "__complex__")) {
+            && PyObject_HasAttr(ob, NB_INTERNED(__complex__))) {
         PyObject* tmp = PyObject_CallFunctionObjArgs(
                 (PyObject*) &PyComplex_Type, ob, NULL);
         if (tmp) {
@@ -1237,30 +1237,39 @@ bool iterable_check(PyObject *o) noexcept {
 // ========================================================================
 
 NB_CORE PyObject *repr_list(PyObject *o) {
-    object s = steal(nb_inst_name(o));
-    s += str("([");
+    object name = steal(nb_inst_name(o));
     size_t len = obj_len(o);
-    for (size_t i = 0; i < len; ++i) {
-        s += repr(handle(o)[i]);
-        if (i + 1 < len)
-            s += str(", ");
-    }
-    s += str("])");
-    return s.release().ptr();
+    list items;
+    for (size_t i = 0; i < len; ++i)
+        items.append(repr(handle(o)[i]));
+    object body = steal(PyUnicode_Join(str(", ").ptr(), items.ptr()));
+    if (!body.is_valid())
+        raise_python_error();
+    PyObject *result =
+        PyUnicode_FromFormat("%U([%U])", name.ptr(), body.ptr());
+    if (!result)
+        raise_python_error();
+    return result;
 }
 
 NB_CORE PyObject *repr_map(PyObject *o) {
-    object s = steal(nb_inst_name(o));
-    s += str("({");
-    bool first = true;
+    object name = steal(nb_inst_name(o));
+    list items;
     for (handle kv : handle(o).attr("items")()) {
-        if (!first)
-            s += str(", ");
-        s += repr(kv[0]) + str(": ") + repr(kv[1]);
-        first = false;
+        object k = kv[0], v = kv[1],
+               item = steal(PyUnicode_FromFormat("%R: %R", k.ptr(), v.ptr()));
+        if (!item.is_valid())
+            raise_python_error();
+        items.append(item);
     }
-    s += str("})");
-    return s.release().ptr();
+    object body = steal(PyUnicode_Join(str(", ").ptr(), items.ptr()));
+    if (!body.is_valid())
+        raise_python_error();
+    PyObject *result =
+        PyUnicode_FromFormat("%U({%U})", name.ptr(), body.ptr());
+    if (!result)
+        raise_python_error();
+    return result;
 }
 
 // ========================================================================
@@ -1274,21 +1283,57 @@ bool issubclass(PyObject *a, PyObject *b) {
 
 // ========================================================================
 
-PyObject *dict_get_item_ref_or_fail(PyObject *d, PyObject *k) {
+// Look up 'k' in the dictionary 'd', returning a *new* reference
+static PyObject *dict_lookup_ref(PyObject *d, PyObject *k, bool *error) {
     PyObject *value;
-    bool error = false;
-
-#if PY_VERSION_HEX < 0x030D00A1 || defined(Py_LIMITED_API)
+#if (defined(Py_LIMITED_API) ? Py_LIMITED_API : PY_VERSION_HEX) < 0x030D0000
     value = PyDict_GetItemWithError(d, k);
     if (value)
         Py_INCREF(value);
-    else
-        error = PyErr_Occurred();
+    *error = !value && PyErr_Occurred() != nullptr;
 #else
-    error = PyDict_GetItemRef(d, k, &value) == -1;
+    *error = PyDict_GetItemRef(d, k, &value) == -1;
 #endif
-    check(!error, "nanobind::detail::dict_get_item_ref_or_fail(): dictionary lookup failed!");
     return value;
+}
+
+void dict_getitem_or_raise(PyObject *obj, PyObject *key, PyObject **out) {
+    if (*out)
+        return;
+
+    bool error;
+    PyObject *value = dict_lookup_ref(obj, key, &error);
+    if (error)
+        raise_python_error();
+
+    if (!value) {
+        PyErr_SetObject(PyExc_KeyError, key);
+        raise_python_error();
+    }
+
+    *out = value;
+}
+
+PyObject *dict_getitem_or_default(PyObject *d, PyObject *k, PyObject *def) {
+    bool error;
+    PyObject *value = dict_lookup_ref(d, k, &error);
+    if (error)
+        raise_python_error();
+    if (!value) {
+        Py_XINCREF(def);
+        value = def;
+    }
+    return value;
+}
+
+void dict_setitem(PyObject *obj, PyObject *key, PyObject *value) {
+    if (PyDict_SetItem(obj, key, value))
+        raise_python_error();
+}
+
+void dict_delitem(PyObject *obj, PyObject *key) {
+    if (PyDict_DelItem(obj, key))
+        raise_python_error();
 }
 
 NAMESPACE_END(detail)

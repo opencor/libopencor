@@ -27,7 +27,8 @@ enum class dtype_code : uint8_t {
     Float8_E4M3FN = 10, Float8_E4M3FNUZ = 11, Float8_E5M2 = 12,
     Float8_E5M2FNUZ = 13, Float8_E8M0FNU = 14,
     Float6_E2M3FN = 15, Float6_E3M2FN = 16,
-    Float4_E2M1FN = 17
+    Float4_E2M1FN = 17,
+    Bcomplex = 18
 };
 
 struct device {
@@ -88,10 +89,11 @@ NB_FRAMEWORK(no_framework, 0, "ndarray");
 NB_FRAMEWORK(numpy, 1, "numpy.ndarray");
 NB_FRAMEWORK(pytorch, 2, "torch.Tensor");
 NB_FRAMEWORK(tensorflow, 3, "tensorflow.python.framework.ops.EagerTensor");
-NB_FRAMEWORK(jax, 4, "jaxlib.xla_extension.DeviceArray");
+NB_FRAMEWORK(jax, 4, "jaxlib._jax.ArrayImpl");
 NB_FRAMEWORK(cupy, 5, "cupy.ndarray");
 NB_FRAMEWORK(memview, 6, "memoryview");
 NB_FRAMEWORK(array_api, 7, "ArrayLike");
+NB_FRAMEWORK(mlx, 8, "mlx.core.array");
 
 NAMESPACE_BEGIN(device)
 NB_DEVICE(none, 0); NB_DEVICE(cpu, 1); NB_DEVICE(cuda, 2);
@@ -165,10 +167,12 @@ template <ssize_t... Is> struct shape {
     }
 
     static void put(size_t *out) {
-        if constexpr (((Is == -1) || ...))
+        if constexpr (((Is == -1) || ...)) {
             detail::fail("Negative ndarray sizes are not allowed here!");
-        size_t ctr = 0;
-        ((out[ctr++] = (size_t) Is), ...);
+        } else {
+            size_t ctr = 0;
+            ((out[ctr++] = (size_t) Is), ...);
+        }
     }
 };
 
@@ -288,7 +292,7 @@ template <typename Scalar, size_t Dim, char Order> struct ndarray_view {
     }
 
     size_t ndim() const { return Dim; }
-    size_t shape(size_t i) const { return m_shape[i]; }
+    size_t shape(size_t i) const { return (size_t) m_shape[i]; }
     int64_t stride(size_t i) const { return m_strides[i]; }
     Scalar *data() const { return m_data; }
 
@@ -325,6 +329,7 @@ private:
 template <typename... Args> class ndarray {
 public:
     template <typename...> friend class ndarray;
+    template <typename, typename> friend struct detail::type_caster;
 
     using Config = detail::ndarray_config_t<int, Args...>;
     using Scalar = typename Config::Scalar;
@@ -351,11 +356,12 @@ public:
             dlpack::dtype dtype = nanobind::dtype<Scalar>(),
             int device_type = DeviceType,
             int device_id = 0,
-            char order = Order) {
+            char order = Order,
+            uint64_t byte_offset = 0) {
 
         m_handle = detail::ndarray_create(
             (void *) data, ndim, shape, owner.ptr(), strides, dtype,
-            ReadOnly, device_type, device_id, order);
+            ReadOnly, device_type, device_id, order, byte_offset);
 
         m_dltensor = *detail::ndarray_inc_ref(m_handle);
     }
@@ -367,7 +373,8 @@ public:
             dlpack::dtype dtype = nanobind::dtype<Scalar>(),
             int device_type = DeviceType,
             int device_id = 0,
-            char order = Order) {
+            char order = Order,
+            uint64_t byte_offset = 0) {
 
         size_t shape_size = shape.size();
 
@@ -390,7 +397,7 @@ public:
         m_handle = detail::ndarray_create(
             (void *) data, shape_size, shape_ptr, owner.ptr(),
             (strides.size() == 0) ? nullptr : strides.begin(), dtype,
-            ReadOnly, device_type, device_id, order);
+            ReadOnly, device_type, device_id, order, byte_offset);
 
         m_dltensor = *detail::ndarray_inc_ref(m_handle);
     }
@@ -404,16 +411,16 @@ public:
     }
 
     ndarray(ndarray &&t) noexcept : m_handle(t.m_handle), m_dltensor(t.m_dltensor) {
+        // Only reset m_handle, it's safe to leave m_dltensor as-is
         t.m_handle = nullptr;
-        t.m_dltensor = dlpack::dltensor();
     }
 
     ndarray &operator=(ndarray &&t) noexcept {
         detail::ndarray_dec_ref(m_handle);
         m_handle = t.m_handle;
         m_dltensor = t.m_dltensor;
+        // Only reset t.m_handle, it's safe to leave t.m_dltensor as-is
         t.m_handle = nullptr;
-        t.m_dltensor = dlpack::dltensor();
         return *this;
     }
 
@@ -434,6 +441,8 @@ public:
     bool is_valid() const { return m_handle != nullptr; }
     int device_type() const { return (int) m_dltensor.device.device_type; }
     int device_id() const { return (int) m_dltensor.device.device_id; }
+    void *data_handle() const { return m_dltensor.data; }
+    uint64_t byte_offset() const { return m_dltensor.byte_offset; }
     detail::ndarray_handle *handle() const { return m_handle; }
 
     size_t size() const {
@@ -454,7 +463,7 @@ public:
     template <typename... Args2>
     NB_INLINE auto& operator()(Args2... indices) const {
         return *(Scalar *) ((uint8_t *) m_dltensor.data +
-                            byte_offset(indices...));
+                            compute_byte_offset(indices...));
     }
 
     template <typename... Args2> NB_INLINE auto view() const {
@@ -490,7 +499,7 @@ public:
 
 private:
     template <typename... Args2>
-    NB_INLINE int64_t byte_offset(Args2... indices) const {
+    NB_INLINE int64_t compute_byte_offset(Args2... indices) const {
         constexpr bool has_scalar = !std::is_void_v<Scalar>,
                        has_shape  = Config::N != -1;
 
@@ -510,7 +519,7 @@ private:
             int64_t index = 0;
             ((index += int64_t(indices) * m_dltensor.strides[counter++]), ...);
 
-            return (int64_t) m_dltensor.byte_offset + index * sizeof(Scalar);
+            return (int64_t) m_dltensor.byte_offset + index * (int64_t) sizeof(Scalar);
         } else {
             return 0;
         }
@@ -565,11 +574,15 @@ template <typename... Args> struct type_caster<ndarray<Args...>> {
             (void) shape_buf;
         }
 
-        value = Value(ndarray_import(src.ptr(), &config,
-                                     flags & (uint8_t) cast_flags::convert,
-                                     cleanup));
+        detail::ndarray_handle *h = ndarray_import(
+            src.ptr(), &config, flags & (uint8_t) cast_flags::convert, cleanup);
 
-        return value.is_valid();
+        if (NB_UNLIKELY(value.m_handle))
+            detail::ndarray_dec_ref(value.m_handle);
+        if (NB_LIKELY(h))
+            value.m_dltensor = *detail::ndarray_inc_ref(h);
+        value.m_handle = h;
+        return h != nullptr;
     }
 
     static handle from_cpp(const ndarray<Args...> &tensor, rv_policy policy,

@@ -32,9 +32,9 @@ class LIBOPENCOR_EXPORT FileManager
 
 public:
     /**
-     * @brief Get the file manager instance.
+     * @brief Return the file manager instance.
      *
-     * Get the file manager instance.
+     * Return the file manager instance.
      *
      * @return The file manager instance, as a reference to a @ref FileManager object.
      */
@@ -42,9 +42,9 @@ public:
     static FileManager &instance();
 
     /**
-     * @brief Manage a file.
+     * @brief Manage the given file.
      *
-     * Manage a file.
+     * Manage the given file.
      *
      * @param pFile The file to be managed.
      *
@@ -54,9 +54,9 @@ public:
     void manage(const FilePtr &pFile);
 
     /**
-     * @brief Unmanage a file.
+     * @brief Unmanage the given file.
      *
-     * Unmanage a file.
+     * Unmanage the given file.
      *
      * @param pFile The file to be unmanaged.
      *
@@ -76,11 +76,11 @@ public:
     void reset();
 
     /**
-     * @brief Return whether there are managed files.
+     * @brief Return whether there are some managed files.
      *
-     * Return whether there are managed files.
+     * Return whether there are some managed files.
      *
-     * @return @c true if there are managed files, @c false otherwise.
+     * @return @c true if there are some managed files, @c false otherwise.
      */
 
     bool hasFiles() const;
@@ -106,9 +106,9 @@ public:
     FilePtrs files() const;
 
     /**
-     * @brief Get a given managed file.
+     * @brief Return the managed file at the given index.
      *
-     * Get a given managed file.
+     * Return the managed file at the given index.
      *
      * @param pIndex The index of the managed file.
      *
@@ -118,9 +118,9 @@ public:
     FilePtr file(size_t pIndex) const;
 
     /**
-     * @brief Get a given managed file.
+     * @brief Return the managed file with the given name or URL.
      *
-     * Get a given managed file.
+     * Return the managed file with the given name or URL.
      *
      * @param pFileNameOrUrl The name of the managed file or its URL.
      *

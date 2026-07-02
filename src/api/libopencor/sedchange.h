@@ -42,9 +42,9 @@ public:
     SedChange &operator=(SedChange &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the target.
+     * @brief Return the target.
      *
-     * Get the target.
+     * Return the target.
      *
      * @return The target as a @c std::string.
      */

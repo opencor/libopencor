@@ -50,9 +50,9 @@ void loggerApi(nb::module_ &m)
         .value("Warning", libOpenCOR::Issue::Type::WARNING)
         .export_values();
 
-    issue.def_prop_ro("type", &libOpenCOR::Issue::type, "Get the type of this Issue object.")
-        .def_prop_ro("type_as_string", &libOpenCOR::Issue::typeAsString, "Get the type of this Issue object as a string.")
-        .def_prop_ro("description", &libOpenCOR::Issue::description, "Get the description for this Issue object.")
+    issue.def_prop_ro("type", &libOpenCOR::Issue::type, "Return the type.")
+        .def_prop_ro("type_as_string", &libOpenCOR::Issue::typeAsString, "Return the type as a string.")
+        .def_prop_ro("description", &libOpenCOR::Issue::description, "Return the description.")
         .def("__repr__", [](const libOpenCOR::Issue &self) {
             return "Issue(" + self.typeAsString() + ": \"" + self.description() + "\")";
         })

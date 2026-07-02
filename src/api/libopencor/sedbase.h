@@ -42,9 +42,9 @@ public:
     SedBase &operator=(SedBase &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the id.
+     * @brief Return the id.
      *
-     * Get the id.
+     * Return the id.
      *
      * @return The id as a @c std::string.
      */

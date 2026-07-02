@@ -47,12 +47,11 @@ void fileApi()
             //       By performing the copy entirely within a single EM_ASM() block, HEAPU8 is fetched and used
             //       atomically.
 
-            return emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(
-                EM_ASM_PTR({
-                    let jsArray = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
+            return emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
+                let jsArray = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
 
-                    return Emval.toHandle(jsArray);
-                }, contents.data(), size)));
+                return Emval.toHandle(jsArray);
+            }, contents.data(), size)));
         }))
         .function("setContents", emscripten::optional_override([](const libOpenCOR::FilePtr &pThis, emscripten::val pContents) {
             if (pContents.isNull() || pContents.isUndefined()) {

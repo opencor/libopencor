@@ -562,7 +562,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             // Populate the NLA solver, if any, using our new approach (i.e. using libOpenCOR's nlaSolver element) and
             // then using our legacy approach (i.e. using a SED-ML annotation).
 
-            auto applyNlaSolverInfo = [&](const auto &pNlaSolverInfo) {
+            auto applyNlaSolverInfo = [this, &simulation](const auto &pNlaSolverInfo) {
                 for (const auto &nlaSolverWarning : pNlaSolverInfo.warnings) {
                     addWarning(nlaSolverWarning);
                 }

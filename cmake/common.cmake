@@ -108,6 +108,7 @@ function(configure_target TARGET)
                 -Wno-global-constructors
                 -Wno-padded
                 -Wno-switch-enum
+                -Wno-thread-safety-negative
                 -Wno-unsafe-buffer-usage
                 -Wno-weak-vtables
             )

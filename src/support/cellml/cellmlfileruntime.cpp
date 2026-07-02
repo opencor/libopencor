@@ -24,170 +24,17 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-#ifdef __EMSCRIPTEN__
-// Some utilities.
-
-namespace {
-
-std::string exportJavaScriptName(const std::string &pName)
-{
-    std::string exportName;
-
-    exportName.reserve(pName.size() + 31); // NOLINT
-
-    exportName += "__attribute__((export_name(\"";
-    exportName += pName;
-    exportName += "\")))\n";
-
-    return exportName;
-}
-
-intptr_t instantiateWebAssemblyModule(const UnsignedChars &pWasmModule, bool pDifferentialModel, bool pIsOdeModel,
-                                      bool pIsAlgebraicModel, bool pHasObjectiveFunctions)
-{
-    // clang-format off
-    return EM_ASM_INT({
-        try {
-            // Instantiate the WebAssembly module.
-
-            const wasmBytes = new Uint8Array(HEAPU8.subarray($0, $0 + $1));
-            const wasmModule = new WebAssembly.Module(wasmBytes);
-
-            if (Module.wasmInstanceFunctions === undefined) {
-                Module.wasmInstanceFunctions = new Map();
-                Module.wasmInstanceFunctionsId = 0;
-            }
-
-            const wasmInstanceFunctionsId = ++Module.wasmInstanceFunctionsId;
-            const wasmInstance = new WebAssembly.Instance(wasmModule, {
-                env: {
-                    __linear_memory: wasmMemory,
-                    __indirect_function_table: wasmTable,
-
-                    // Some standard C library functions.
-
-                    free: _free,
-                    malloc: _malloc,
-                    memset: _memset,
-
-                    // NLA solve function.
-
-                    nlaSolve: (nlaSolverAddress, objectiveFunctionIndex, u, n, data) => {
-                        Module.nlaSolve(Number(nlaSolverAddress), wasmInstanceFunctionsId, Number(objectiveFunctionIndex), Number(u), Number(n), Number(data));
-                    },
-
-                    // Arithmetic operators.
-
-                    pow: _pow,
-                    sqrt: _sqrt,
-                    fabs: _fabs,
-                    exp: _exp,
-                    log: _log,
-                    log10: _log10,
-                    ceil: _ceil,
-                    floor: _floor,
-                    fmin: _fmin,
-                    fmax: _fmax,
-                    fmod: _fmod,
-
-                    // Trigonometric operators.
-
-                    sin: _sin,
-                    cos: _cos,
-                    tan: _tan,
-                    sinh: _sinh,
-                    cosh: _cosh,
-                    tanh: _tanh,
-                    asin: _asin,
-                    acos: _acos,
-                    atan: _atan,
-                    asinh: _asinh,
-                    acosh: _acosh,
-                    atanh: _atanh,
-                }
-            });
-
-            // Retrieve the functions needed to compute the model.
-
-            const wasmInstanceFunctions = {};
-
-            if ($2) {
-                wasmInstanceFunctions.initialiseArrays = wasmInstance.exports.initialiseArrays;
-                wasmInstanceFunctions.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
-                wasmInstanceFunctions.computeRates = wasmInstance.exports.computeRates;
-                wasmInstanceFunctions.computeVariables = wasmInstance.exports.computeVariables;
-
-                if ((wasmInstanceFunctions.initialiseArrays === undefined)
-                    || (wasmInstanceFunctions.computeComputedConstants === undefined)
-                    || (wasmInstanceFunctions.computeRates === undefined)
-                    || (wasmInstanceFunctions.computeVariables === undefined)) {
-                    throw new Error("The functions needed to compute the " + ($3 ? "ODE" : "DAE") + " model could not be retrieved.");
-                }
-            } else {
-                wasmInstanceFunctions.initialiseArrays = wasmInstance.exports.initialiseArrays;
-                wasmInstanceFunctions.computeComputedConstants = wasmInstance.exports.computeComputedConstants;
-                wasmInstanceFunctions.computeVariables = wasmInstance.exports.computeVariables;
-
-                if ((wasmInstanceFunctions.initialiseArrays === undefined)
-                    || (wasmInstanceFunctions.computeComputedConstants === undefined)
-                    || (wasmInstanceFunctions.computeVariables === undefined)) {
-                    throw new Error("The functions needed to compute the " + ($4 ? "algebraic" : "NLA") + " model could not be retrieved.");
-                }
-            }
-
-            // Retrieve the objective functions, if any.
-
-            if ($5) {
-                wasmInstanceFunctions.objectiveFunctions = {};
-
-                for (let name in wasmInstance.exports) {
-                    if (name.startsWith("objectiveFunction")) {
-                        const objectiveFunctionIndex = parseInt(name.replace("objectiveFunction", ""), 10);
-
-                        wasmInstanceFunctions.objectiveFunctions[objectiveFunctionIndex] = wasmInstance.exports[name];
-                    }
-                }
-
-                if (Object.keys(wasmInstanceFunctions.objectiveFunctions).length === 0) {
-                    throw new Error("The objective functions could not be retrieved.");
-                }
-            }
-
-            // Store the WASM instance functions.
-
-            Module.wasmInstanceFunctions.set(wasmInstanceFunctionsId, wasmInstanceFunctions);
-
-            return wasmInstanceFunctionsId;
-        } catch (error) {
-            const errorMessage = error.toString();
-            const errorMessageLength = lengthBytesUTF8(errorMessage) + 1;
-            const errorMessagePtr = _malloc(errorMessageLength);
-
-            stringToUTF8(errorMessage, errorMessagePtr, errorMessageLength);
-
-            // Return the error message pointer as a negative number to indicate an error.
-
-            return -errorMessagePtr;
-        }
-    }, pWasmModule.data(), pWasmModule.size(), pDifferentialModel, pIsOdeModel, pIsAlgebraicModel, pHasObjectiveFunctions); // clang-format on
-}
-
-} // namespace
-#endif
-
 CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
+#ifndef __EMSCRIPTEN__
+    (void)pNlaSolver;
+#endif
+
     auto cellmlFileAnalyser {pCellmlFile->analyser()};
 
     if (cellmlFileAnalyser->errorCount() != 0) {
         addIssues(cellmlFileAnalyser, "Analyser");
     } else {
-        // Get an NLA solver, if needed.
-
-        if (pNlaSolver != nullptr) {
-            mNlaSolverAddress = nlaSolverAddress(pNlaSolver.get());
-        }
-
         // Determine the type of the model.
 
         auto cellmlFileType {pCellmlFile->type()};
@@ -269,7 +116,19 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         // Export our various methods.
 
-        auto prependExportName = [](const std::string &pName, const std::string &pCode) {
+        auto exportJavaScriptName = [](const std::string &pName) -> std::string {
+            std::string exportName;
+
+            exportName.reserve(pName.size() + 31); // NOLINT
+
+            exportName += "__attribute__((export_name(\"";
+            exportName += pName;
+            exportName += "\")))\n";
+
+            return exportName;
+        };
+
+        auto prependExportName = [&exportJavaScriptName](const std::string &pName, const std::string &pCode) {
             auto exportName {exportJavaScriptName(pName)};
             std::string res;
 
@@ -294,7 +153,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         if (pNlaSolver != nullptr) {
             // Note: both uintptr_t and size_t are defined as follows:
             //        - Emscripten (wasm32): unsigned int (which is the same as unsigned long on 32 bits and is what we
-            //                               need to use here since malloc() expects an unsigned long);
+            //          need to use here since malloc() expects an unsigned long);
             //        - Windows (64 bits): unsigned long long; and
             //        - Linux/macOS (64 bits): unsigned long.
 
@@ -305,15 +164,17 @@ typedef unsigned long size_t;
 extern void *malloc(size_t size);
 extern void free(void *ptr);
 
-extern void nlaSolve(uintptr_t nlaSolverAddress, size_t objectiveFunctionIndex, uintptr_t u, size_t n, uintptr_t data);
+extern uintptr_t nlaSolverAddress();
+extern void nlaSolve(uintptr_t nlaSolverAddress, size_t computeObjectiveFunctionIndex, uintptr_t u, size_t n, uintptr_t data);
 )");
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                    "nlaSolve(" + mNlaSolverAddress + ", [INDEX], (uintptr_t) u, [SIZE], (uintptr_t) rfi);\n");
+                                                    "nlaSolve(nlaSolverAddress(), [INDEX], (uintptr_t) u, [SIZE], (uintptr_t) rfi);\n");
 #else
 #    ifdef BUILDING_USING_MSVC
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long long uintptr_t;
 typedef unsigned long long size_t;
 
+extern uintptr_t nlaSolverAddress();
 extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(double *, double *, void *),
                      double *u, size_t n, void *data);
 )");
@@ -321,12 +182,13 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long uintptr_t;
 typedef unsigned long size_t;
 
+extern uintptr_t nlaSolverAddress();
 extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(double *, double *, void *),
                      double *u, size_t n, void *data);
 )");
 #    endif
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                    "nlaSolve(" + mNlaSolverAddress + ", objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
+                                                    "nlaSolve(nlaSolverAddress(), objectiveFunction[INDEX], u, [SIZE], &rfi);\n");
 #endif
         }
 
@@ -370,30 +232,6 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
             return;
         }
-
-        // Instantiate the WebAssembly module.
-
-        auto wasmInstanceFunctionsId {instantiateWebAssemblyModule(mWasmModule, differentialModel,
-                                                                   cellmlFileType == libcellml::AnalyserModel::Type::ODE,
-                                                                   cellmlFileType == libcellml::AnalyserModel::Type::ALGEBRAIC,
-                                                                   pNlaSolver != nullptr)};
-
-        if (wasmInstanceFunctionsId < 0) {
-            // An error occurred and the error message pointer is the negative of the returned value.
-
-            auto errorMessagePtr {reinterpret_cast<char *>(-wasmInstanceFunctionsId)};
-            std::string jsErrorMessage(errorMessagePtr);
-
-            free(errorMessagePtr);
-
-            addError("The WebAssembly module could not be instantiated (" + jsErrorMessage + ").");
-
-            return;
-        }
-
-        // Keep track of the WASM instance functions ID.
-
-        mWasmInstanceFunctionsId = wasmInstanceFunctionsId;
 #else
 #    ifdef CODE_COVERAGE_ENABLED
         mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile));
@@ -412,7 +250,18 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         if ((cellmlFileType == libcellml::AnalyserModel::Type::NLA)
             || (cellmlFileType == libcellml::AnalyserModel::Type::DAE)) {
 #    ifndef CODE_COVERAGE_ENABLED
-            const bool functionAdded =
+            auto functionAdded =
+#    endif
+                mCompiler->addFunction("nlaSolverAddress", reinterpret_cast<void *>(nlaSolverAddress));
+
+#    ifndef CODE_COVERAGE_ENABLED
+            if (!functionAdded) {
+                addIssues(mCompiler, "Compiler");
+
+                return;
+            }
+
+            functionAdded =
 #    endif
                 mCompiler->addFunction("nlaSolve", reinterpret_cast<void *>(nlaSolve));
 
@@ -465,77 +314,179 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 #ifdef __EMSCRIPTEN__
 CellmlFileRuntime::Impl::~Impl()
 {
-    if (mWasmInstanceFunctionsId != 0) {
-        // clang-format off
-        EM_ASM({
-            if (Module.wasmInstanceFunctions !== undefined) {
-                Module.wasmInstanceFunctions.delete($0);
-            }
-        }, mWasmInstanceFunctionsId); // clang-format on
-    }
+    cleanupWorkerWasm();
 }
 
-EM_JS(void, jsInitialiseArraysForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pConstants, pComputedConstants, pAlgebraicVariables);
-});
+// Lazily create a WebAssembly.Module + Instance in the current worker's private JavaScript scope, so dispatch methods
+// can call the CellML-generated functions directly on the worker thread.
+
+// clang-format off
+EM_JS(void, initialiseWorkerWasmJS, (const void* wasmBytesPtr, size_t wasmBytesSize), {
+    // Create a WebAssembly.Module + Instance in the current worker's private JavaScript scope, so dispatch methods can
+    // call the CellML-generated functions directly on the worker thread.
+
+    const wasmBytes = new Uint8Array(HEAPU8.buffer, wasmBytesPtr, wasmBytesSize);
+    const wasmModule = new WebAssembly.Module(wasmBytes);
+    const wasmInstance = new WebAssembly.Instance(wasmModule, {
+        env: {
+            __linear_memory: wasmMemory,
+            __indirect_function_table: wasmTable,
+
+            // Some standard C library functions.
+
+            free: _free,
+            malloc: _malloc,
+            memset: _memset,
+
+            // NLA solve function.
+
+            nlaSolverAddress: function() {
+                return globalThis.runtime.nlaSolverAddress;
+            },
+            nlaSolve: function(nlaSolverAddress, objectiveFunctionIndex, u, n, data) {
+                Module.nlaSolve(nlaSolverAddress, objectiveFunctionIndex, u, n, data);
+            },
+
+            // Arithmetic operators.
+
+            pow: _pow,
+            sqrt: _sqrt,
+            fabs: _fabs,
+            exp: _exp,
+            log: _log,
+            log10: _log10,
+            ceil: _ceil,
+            floor: _floor,
+            fmin: _fmin,
+            fmax: _fmax,
+            fmod: _fmod,
+
+            // Trigonometric operators.
+
+            sin: _sin,
+            cos: _cos,
+            tan: _tan,
+            sinh: _sinh,
+            cosh: _cosh,
+            tanh: _tanh,
+            asin: _asin,
+            acos: _acos,
+            atan: _atan,
+            asinh: _asinh,
+            acosh: _acosh,
+            atanh: _atanh
+        }
+    });
+    const exports = wasmInstance.exports;
+    const runtime = {
+        initialiseArrays: exports.initialiseArrays,
+        computeComputedConstants: exports.computeComputedConstants,
+        computeRates: exports.computeRates,
+        computeVariables: exports.computeVariables,
+        computeObjectiveFunctions: {},
+        computeObjectiveFunctionCount: 0
+    };
+
+    for (const key in exports) {
+        if (key.indexOf("objectiveFunction") === 0) {
+            runtime.computeObjectiveFunctions[parseInt(key.substring(17), 10)] = exports[key];
+
+            ++runtime.computeObjectiveFunctionCount;
+        }
+    }
+
+    globalThis.runtime = runtime;
+}); // clang-format on
+
+void CellmlFileRuntime::Impl::initialiseWorkerWasm() const
+{
+    initialiseWorkerWasmJS(mWasmModule.data(), mWasmModule.size());
+}
+
+void CellmlFileRuntime::Impl::cleanupWorkerWasm() const
+{
+    // clang-format off
+    EM_ASM({
+        delete globalThis.runtime;
+    }); // clang-format on
+}
+
+void CellmlFileRuntime::Impl::setNlaSolverAddress(uintptr_t pAddress) const
+{
+    // clang-format off
+    EM_ASM({
+        globalThis.runtime.nlaSolverAddress = $0;
+    }, pAddress); // clang-format on
+}
+
+// clang-format off
+EM_JS(void, initialiseArraysForAlgebraicModelJS, (const void* constants, const void* computedConstants, const void* algebraicVariables), {
+    globalThis.runtime.initialiseArrays(constants, computedConstants, algebraicVariables);
+}); // clang-format on
 
 void CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsInitialiseArraysForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraicVariables);
+    initialiseArraysForAlgebraicModelJS(pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsInitialiseArraysForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).initialiseArrays(pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
-});
+// clang-format off
+EM_JS(void, initialiseArraysForDifferentialModelJS, (const void* states, const void* rates, const void* constants, const void* computedConstants, const void* algebraicVariables), {
+    globalThis.runtime.initialiseArrays(states, rates, constants, computedConstants, algebraicVariables);
+}); // clang-format on
 
 void CellmlFileRuntime::Impl::initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsInitialiseArraysForDifferentialModel(mWasmInstanceFunctionsId, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
+    initialiseArraysForDifferentialModelJS(pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeComputedConstantsForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeComputedConstants(pConstants, pComputedConstants, pAlgebraicVariables);
-});
+// clang-format off
+EM_JS(void, computeComputedConstantsForAlgebraicModelJS, (const void* constants, const void* computedConstants, const void* algebraicVariables), {
+    globalThis.runtime.computeComputedConstants(constants, computedConstants, algebraicVariables);
+}); // clang-format on
 
 void CellmlFileRuntime::Impl::computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeComputedConstantsForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraicVariables);
+    computeComputedConstantsForAlgebraicModelJS(pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeComputedConstantsForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeComputedConstants(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
-});
+// clang-format off
+EM_JS(void, computeComputedConstantsForDifferentialModelJS, (double voi, const void* states, const void* rates, const void* constants, const void* computedConstants, const void* algebraicVariables), {
+    globalThis.runtime.computeComputedConstants(voi, states, rates, constants, computedConstants, algebraicVariables);
+}); // clang-format on
 
 void CellmlFileRuntime::Impl::computeComputedConstantsForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeComputedConstantsForDifferentialModel(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
+    computeComputedConstantsForDifferentialModelJS(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeRates, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeRates(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
-});
+// clang-format off
+EM_JS(void, computeRatesJS, (double voi, const void* states, const void* rates, const void* constants, const void* computedConstants, const void* algebraicVariables), {
+    globalThis.runtime.computeRates(voi, states, rates, constants, computedConstants, algebraicVariables);
+}); // clang-format on
 
 void CellmlFileRuntime::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeRates(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
+    computeRatesJS(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeVariablesForAlgebraicModel, (intptr_t pWasmInstanceFunctionsId, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeVariables(pConstants, pComputedConstants, pAlgebraicVariables);
-});
+// clang-format off
+EM_JS(void, computeVariablesForAlgebraicModelJS, (const void* constants, const void* computedConstants, const void* algebraicVariables), {
+    globalThis.runtime.computeVariables(constants, computedConstants, algebraicVariables);
+}); // clang-format on
 
 void CellmlFileRuntime::Impl::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeVariablesForAlgebraicModel(mWasmInstanceFunctionsId, pConstants, pComputedConstants, pAlgebraicVariables);
+    computeVariablesForAlgebraicModelJS(pConstants, pComputedConstants, pAlgebraicVariables);
 }
 
-EM_JS(void, jsComputeVariablesForDifferentialModel, (intptr_t pWasmInstanceFunctionsId, double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables), {
-    Module.wasmInstanceFunctions.get(pWasmInstanceFunctionsId).computeVariables(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
-});
+// clang-format off
+EM_JS(void, computeVariablesForDifferentialModelJS, (double voi, const void* states, const void* rates, const void* constants, const void* computedConstants, const void* algebraicVariables), {
+    globalThis.runtime.computeVariables(voi, states, rates, constants, computedConstants, algebraicVariables);
+}); // clang-format on
 
 void CellmlFileRuntime::Impl::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
-    jsComputeVariablesForDifferentialModel(mWasmInstanceFunctionsId, pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
+    computeVariablesForDifferentialModelJS(pVoi, pStates, pRates, pConstants, pComputedConstants, pAlgebraicVariables);
 }
 #else
 CellmlFileRuntime::InitialiseArraysForAlgebraicModel CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel() const
@@ -600,6 +551,21 @@ CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile,
 }
 
 #ifdef __EMSCRIPTEN__
+void CellmlFileRuntime::initialiseWorkerWasm() const
+{
+    pimpl()->initialiseWorkerWasm();
+}
+
+void CellmlFileRuntime::cleanupWorkerWasm() const
+{
+    pimpl()->cleanupWorkerWasm();
+}
+
+void CellmlFileRuntime::setNlaSolverAddress(uintptr_t pAddress) const
+{
+    pimpl()->setNlaSolverAddress(pAddress);
+}
+
 void CellmlFileRuntime::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
 {
     pimpl()->initialiseArraysForAlgebraicModel(pConstants, pComputedConstants, pAlgebraicVariables);

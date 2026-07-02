@@ -16,8 +16,8 @@ NAMESPACE_BEGIN(detail)
 #define NB_IMPL_ACCESSOR_OP_I(name, op)                                        \
     template <typename Impl> template <typename T>                             \
     accessor<Impl>& accessor<Impl>::name(const api<T> &o) {                    \
-        PyObject *res = obj_op_2(ptr(), o.derived().ptr(), op);                \
-        Impl::set(m_base, m_key, res);                                         \
+        object tmp = steal(obj_op_2(ptr(), o.derived().ptr(), op));            \
+        Impl::set(m_base, m_key, tmp.ptr());                                   \
         return *this;                                                          \
     }
 
@@ -87,7 +87,7 @@ struct str_attr {
 
 struct obj_attr {
     static constexpr bool cache_dec_ref = true;
-    using key_type = handle;
+    using key_type = object;
 
     NB_INLINE static void get(PyObject *obj, handle key, PyObject **cache) {
         detail::getattr_or_raise(obj, key.ptr(), cache);
@@ -122,7 +122,7 @@ struct str_item {
 
 struct obj_item {
     static constexpr bool cache_dec_ref = true;
-    using key_type = handle;
+    using key_type = object;
 
     NB_INLINE static void get(PyObject *obj, handle key, PyObject **cache) {
         detail::getitem_or_raise(obj, key.ptr(), cache);
@@ -134,6 +134,28 @@ struct obj_item {
 
     NB_INLINE static void del(PyObject *obj, handle key) {
         delitem(obj, key.ptr());
+    }
+};
+
+struct dict_item {
+    static constexpr bool cache_dec_ref = true;
+    using key_type = object;
+
+    NB_INLINE static void get(PyObject *obj, handle key, PyObject **cache) {
+        detail::dict_getitem_or_raise(obj, key.ptr(), cache);
+    }
+
+    NB_INLINE static void set(PyObject *obj, handle key, PyObject *v) {
+        dict_setitem(obj, key.ptr(), v);
+    }
+
+    NB_INLINE static void del(PyObject *obj, handle key) {
+        dict_delitem(obj, key.ptr());
+    }
+
+    NB_INLINE static PyObject *key(handle key) {
+        Py_INCREF(key.ptr());
+        return key.ptr();
     }
 };
 
@@ -165,6 +187,8 @@ struct num_item_list {
 
     NB_INLINE static void get(PyObject *obj, Py_ssize_t index, PyObject **cache) {
         #if defined(Py_GIL_DISABLED)
+            if (*cache)
+                return;
             *cache = PyList_GetItemRef(obj, index);
         #else
             *cache = NB_LIST_GET_ITEM(obj, index);
@@ -248,6 +272,10 @@ detail::accessor<detail::num_item_list> list::operator[](T index) const {
 template <typename T, detail::enable_if_t<std::is_arithmetic_v<T>>>
 detail::accessor<detail::num_item_tuple> tuple::operator[](T index) const {
     return { derived(), (Py_ssize_t) index };
+}
+
+inline detail::accessor<detail::dict_item> dict::operator[](handle key) const {
+    return { *this, borrow(key) };
 }
 
 template <typename... Args> str str::format(Args&&... args) const {

@@ -75,28 +75,52 @@
         <div class="file info last row simulation" id="simulation">
           <div id="plottingArea"></div>
           <div class="mb-3">
-            <label>Ending point:</label>
-            <div class="input-group">
-              <input type="text" class="form-control" id="endingPoint" />
-              <span class="input-group-text" id="endingPointUnit"></span>
+            <div class="row">
+              <div class="col">
+                <label>Simulation duration:</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="simulationDuration" />
+                  <span class="input-group-text" id="simulationDurationUnit"></span>
+                </div>
+              </div>
+              <div class="col">
+                <label>Simulation interval:</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="simulationInterval" />
+                  <span class="input-group-text" id="simulationIntervalUnit"></span>
+                </div>
+              </div>
             </div>
-            <label>Point interval:</label>
-            <div class="input-group">
-              <input type="text" class="form-control" id="pointInterval" />
-              <span class="input-group-text" id="pointIntervalUnit"></span>
+            <div class="row">
+              <div class="col">
+                <label>X:</label>
+                <div class="input-group">
+                  <select class="form-select" id="xAxis"></select>
+                  <span class="input-group-text" id="xAxisUnit"></span>
+                </div>
+              </div>
+              <div class="col">
+                <label>Y:</label>
+                <div class="input-group">
+                  <select class="form-select" id="yAxis"></select>
+                  <span class="input-group-text" id="yAxisUnit"></span>
+                </div>
+              </div>
             </div>
-            <label>X:</label>
-            <div class="input-group">
-              <select class="form-select" id="xAxis"></select>
-              <span class="input-group-text" id="xAxisUnit"></span>
-            </div>
-            <label>Y:</label>
-            <div class="input-group">
-              <select class="form-select" id="yAxis"></select>
-              <span class="input-group-text" id="yAxisUnit"></span>
+            <div class="d-flex align-items-center gap-3 mt-3">
+              <div class="form-check form-switch my-0" style="white-space: nowrap;">
+                <input class="form-check-input" type="checkbox" id="runAsync" checked />
+                <label class="form-check-label" for="runAsync">Run asynchronously</label>
+              </div>
+              <div id="progressBar">
+                <div id="progressBarFill"></div>
+              </div>
             </div>
           </div>
-          <div><button type="button" class="btn btn-secondary mb-3 run-button w-100" id="run">Run</button></div>
+          <div class="d-flex gap-2 mb-3">
+            <button type="button" class="btn btn-secondary run-button flex-grow-1" id="run">Run</button>
+            <button type="button" class="btn btn-danger stop-button" id="stop" disabled>Stop</button>
+          </div>
         </div>
       </div>
 
@@ -146,12 +170,19 @@
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@4.0.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@lightningchart/lcjs@4.2.2/dist/lcjs.iife.min.js"></script>
 
     <script type="module">
-    import { reset, run, showPage, updatePlottingAreaAndAxesInfo } from './res/libopencor.js';
+    import {
+      reset,
+      run,
+      showPage,
+      stopSimulation,
+      updateAxisIntervals,
+      updatePlottingAreaAndAxesInfo
+    } from './res/libopencor.js';
 
     $('#navHome').on('click', () => {
       showPage('Home');
@@ -167,16 +198,26 @@
       reset();
     });
 
+    $('#simulationDuration').on('input', () => {
+      updateAxisIntervals();
+    });
+
     $('#xAxis').on('change', () => {
       updatePlottingAreaAndAxesInfo();
+      updateAxisIntervals();
     });
 
     $('#yAxis').on('change', () => {
       updatePlottingAreaAndAxesInfo();
+      updateAxisIntervals();
     });
 
     $('#run').on('click', () => {
       run();
+    });
+
+    $('#stop').on('click', () => {
+      stopSimulation();
     });
     </script>
   </body>

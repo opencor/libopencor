@@ -23,7 +23,21 @@ limitations under the License.
 
 #include "libopencor/sedinstancetask.h"
 
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+
 namespace libOpenCOR {
+
+// Combined status flags for pausing/stopping a running instance.
+// Note: to use a single atomic reduces the number of atomic loads in the hot simulation loop.
+
+enum InstanceRunControl : unsigned
+{
+    INSTANCE_RUN_CONTROL_NONE = 0,
+    INSTANCE_RUN_CONTROL_PAUSE = 1 << 0,
+    INSTANCE_RUN_CONTROL_STOP = 1 << 1,
+};
 
 struct SedInstanceTaskResults
 {
@@ -70,6 +84,14 @@ public:
 
     SedInstanceTaskResults mResults;
 
+    std::atomic<size_t> mCompletedSteps {0};
+    std::atomic<size_t> mTotalSteps {0};
+
+    const std::atomic<unsigned> *mRunControl {nullptr};
+
+    std::condition_variable *mPauseConditionVariable {nullptr};
+    std::mutex *mPauseMutex {nullptr};
+
     std::string mVoiName;
     std::string mVoiUnit;
     Strings mStateNames;
@@ -93,6 +115,8 @@ public:
     void initialise();
     void run(double pVoiStart, double pVoiEnd, double pVoiInterval, bool pTrackResults);
     double run();
+
+    double progress() const;
 
     const Doubles &voi() const;
     const std::string &voiName() const;
