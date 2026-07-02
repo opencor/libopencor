@@ -26,7 +26,7 @@ limitations under the License.
 #    include <cassert>
 #endif
 #include <filesystem>
-#include <map>
+#include <unordered_map>
 #include <libcellml>
 
 #ifdef INF
@@ -44,7 +44,7 @@ static constexpr auto LIBOPENCOR_NAMESPACE {"https://opencor.ws/libopencor"};
 static constexpr auto INF {std::numeric_limits<double>::infinity()};
 static constexpr auto NAN {std::numeric_limits<double>::quiet_NaN()};
 
-using StringStringMap = std::map<std::string, std::string>;
+using StringStringMap = std::unordered_map<std::string, std::string>;
 
 #if defined(NDEBUG) || defined(CODE_COVERAGE_ENABLED)
 #    define ASSERT_EQ(x, y) \

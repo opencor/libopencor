@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace {
 
-std::string cvodeExpectedSerialisation(const std::string &pSource, const std::map<std::string, std::string> &pParameters = {})
+std::string cvodeExpectedSerialisation(const std::string &pSource, const std::unordered_map<std::string, std::string> &pParameters = {})
 {
     auto integrationMethod {pParameters.find("KISAO:0000475")};
     auto iterationType {pParameters.find("KISAO:0000476")};
@@ -73,7 +73,7 @@ std::string cvodeExpectedSerialisation(const std::string &pSource, const std::ma
 )");
 }
 
-std::string kinsolExpectedSerialisation(const std::map<std::string, std::string> &pParameters = {})
+std::string kinsolExpectedSerialisation(const std::unordered_map<std::string, std::string> &pParameters = {})
 {
     auto linearSolver {pParameters.find("KISAO:0000477")};
 

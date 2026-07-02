@@ -16,6 +16,9 @@ limitations under the License.
 
 #include "solver_p.h"
 
+#include <algorithm>
+#include <vector>
+
 namespace libOpenCOR {
 
 Solver::Impl::Impl(const std::string &pId, const std::string &pName)
@@ -54,11 +57,16 @@ void Solver::Impl::serialise(xmlNodePtr pNode, bool pNlaAlgorithm) const
 
     xmlAddChild(algorithmNode, propertiesNode);
 
-    for (auto const &property : properties()) {
+    auto props {properties()};
+    std::vector<std::pair<std::string, std::string>> sortedProps(props.begin(), props.end());
+
+    std::ranges::sort(sortedProps.begin(), sortedProps.end());
+
+    for (const auto &[key, value] : sortedProps) {
         auto *propertyNode {xmlNewNode(nullptr, toConstXmlCharPtr("algorithmParameter"))};
 
-        xmlNewProp(propertyNode, toConstXmlCharPtr("kisaoID"), toConstXmlCharPtr(property.first));
-        xmlNewProp(propertyNode, toConstXmlCharPtr("value"), toConstXmlCharPtr(property.second));
+        xmlNewProp(propertyNode, toConstXmlCharPtr("kisaoID"), toConstXmlCharPtr(key));
+        xmlNewProp(propertyNode, toConstXmlCharPtr("value"), toConstXmlCharPtr(value));
 
         xmlAddChild(propertiesNode, propertyNode);
     }
