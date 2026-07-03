@@ -122,7 +122,7 @@ void sedApi(nb::module_ &m)
             const auto &data = self.voi();
             size_t shape[1] = {data.size()};
 
-            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::cast(self, nb::rv_policy::reference));
         },
                      "Return the values of the variable of integration as a zero-copy NumPy array.")
         .def_prop_ro("voi_name", &libOpenCOR::SedInstanceTask::voiName, "Return the name of the variable of integration.")
@@ -132,7 +132,7 @@ void sedApi(nb::module_ &m)
             const auto &data = self.state(pIndex);
             size_t shape[1] = {data.size()};
 
-            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::cast(self, nb::rv_policy::reference));
         },
              "Return the values of the state at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("state_name", &libOpenCOR::SedInstanceTask::stateName, "Return the name of the state at the given index.", nb::arg("index"))
@@ -142,7 +142,7 @@ void sedApi(nb::module_ &m)
             const auto &data = self.rate(pIndex);
             size_t shape[1] = {data.size()};
 
-            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::cast(self, nb::rv_policy::reference));
         },
              "Return the values of the rate at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("rate_name", &libOpenCOR::SedInstanceTask::rateName, "Return the name of the rate at the given index.", nb::arg("index"))
@@ -152,7 +152,7 @@ void sedApi(nb::module_ &m)
             const auto &data = self.constant(pIndex);
             size_t shape[1] = {data.size()};
 
-            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::cast(self, nb::rv_policy::reference));
         },
              "Return the values of the constant at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("constant_name", &libOpenCOR::SedInstanceTask::constantName, "Return the name of the constant at the given index.", nb::arg("index"))
@@ -162,7 +162,7 @@ void sedApi(nb::module_ &m)
             const auto &data = self.computedConstant(pIndex);
             size_t shape[1] = {data.size()};
 
-            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::cast(self, nb::rv_policy::reference));
         },
              "Return the values of the computed constant at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("computed_constant_name", &libOpenCOR::SedInstanceTask::computedConstantName, "Return the name of the computed constant at the given index.", nb::arg("index"))
@@ -172,7 +172,7 @@ void sedApi(nb::module_ &m)
             const auto &data = self.algebraicVariable(pIndex);
             size_t shape[1] = {data.size()};
 
-            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::handle());
+            return nb::ndarray<nb::numpy, const double>(data.data(), 1, shape, nb::cast(self, nb::rv_policy::reference));
         },
              "Return the values of the algebraic variable at the given index as a zero-copy NumPy array.", nb::arg("index"))
         .def("algebraic_variable_name", &libOpenCOR::SedInstanceTask::algebraicVariableName, "Return the name of the algebraic variable at the given index.", nb::arg("index"))
