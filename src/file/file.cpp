@@ -269,15 +269,27 @@ FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     // and return a new file object.
 
     auto &fileManager {FileManager::instance()};
-#ifdef __EMSCRIPTEN__
-    const auto &file {fileManager.fileFromFileNameOrUrl(pFileNameOrUrl)};
-#else
-    const auto &file {fileManager.file(pFileNameOrUrl)};
-#endif
 
-    if (file != nullptr) {
-        return file;
+    // Fast-path check whether the file is already managed. This is just an optimisation under a shared lock (the
+    // authoritative check happens under the exclusive lock in manage()).
+
+#ifdef __EMSCRIPTEN__
+    {
+        const auto &file {fileManager.fileFromFileNameOrUrl(pFileNameOrUrl)};
+
+        if (file != nullptr) {
+            return file;
+        }
     }
+#else
+    {
+        const auto &file {fileManager.file(pFileNameOrUrl)};
+
+        if (file != nullptr) {
+            return file;
+        }
+    }
+#endif
 
 #ifdef __EMSCRIPTEN__
     auto res {FilePtr {new File {pFileNameOrUrl, false}}};
@@ -287,9 +299,11 @@ FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 
     res->pimpl()->checkType(res);
 
-    fileManager.mPimpl.manage(res.get());
+    // Atomically register the new file.
+    // Note: if another thread managed a file with the same name/URL between our fast-path check and this call, then
+    //       manage() will return the existing file and our copy is discarded.
 
-    return res;
+    return fileManager.mPimpl.manage(res);
 }
 
 File::Type File::type() const
