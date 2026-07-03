@@ -42,9 +42,7 @@ public:
     virtual bool initialise(double pVoi, size_t pSize, double *pStates, double *pRates,
                             double *pConstants, double *pComputedConstants, double *pAlgebraicVariables,
                             const CellmlFileRuntimePtr &pRuntime) = 0;
-    /*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
     virtual bool reinitialise(double pVoi);
-    */
 
     virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 
