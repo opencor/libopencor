@@ -423,14 +423,17 @@ double SedInstanceTask::Impl::run()
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {
-        // Run our simulation from the initial time to the output start time, without tracking our results.
+        // Run our simulation from the initial time to the output start time, without tracking our results, but only if
+        // the output start time is after the initial time.
 
         const auto voiInterval {(sedUniformTimeCoursePimpl->mOutputEndTime - sedUniformTimeCoursePimpl->mOutputStartTime) / sedUniformTimeCoursePimpl->mNumberOfSteps};
 
-        run(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime, voiInterval, false);
+        if (!fuzzyCompare(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime)) {
+            run(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime, voiInterval, false);
 
-        if (hasIssues()) {
-            return 0.0;
+            if (hasIssues()) {
+                return 0.0;
+            }
         }
 
         // Initialise our results structure.
