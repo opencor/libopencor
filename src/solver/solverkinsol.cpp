@@ -115,6 +115,13 @@ SolverKinsol::Impl::Impl()
 {
 }
 
+SolverKinsol::Impl::~Impl()
+{
+    if (mSunContext != nullptr) {
+        SUNContext_Free(&mSunContext);
+    }
+}
+
 void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
     auto addUnknownParameterWarning = [this](const std::string &pKisaoId) {
@@ -369,29 +376,29 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
         return false;
     }
 
-    // Create our SUNDIALS context.
+    // Create our SUNDIALS context, or reuse the cached one.
 
-    SUNContext context {nullptr};
-
-    ASSERT_EQ(SUNContext_Create(SUN_COMM_NULL, &context), 0);
+    if (mSunContext == nullptr) {
+        ASSERT_EQ(SUNContext_Create(SUN_COMM_NULL, &mSunContext), 0);
+    }
 
     // Create our KINSOL solver.
 
-    auto *solver {KINCreate(context)};
+    auto *solver {KINCreate(mSunContext)};
 
     ASSERT_NE(solver, nullptr);
 
     // Use our own error handler and disable the logger.
 
 #ifndef CODE_COVERAGE_ENABLED
-    ASSERT_EQ(SUNContext_PushErrHandler(context, errorHandler, &mErrorMessage), KIN_SUCCESS);
-    ASSERT_EQ(SUNContext_SetLogger(context, nullptr), KIN_SUCCESS);
+    ASSERT_EQ(SUNContext_PushErrHandler(mSunContext, errorHandler, &mErrorMessage), KIN_SUCCESS);
+    ASSERT_EQ(SUNContext_SetLogger(mSunContext, nullptr), KIN_SUCCESS);
 #endif
 
     // Initialise our KINSOL solver.
 
-    auto *u {N_VMake_Serial(static_cast<int64_t>(pN), pU, context)};
-    auto *ones {N_VNew_Serial(static_cast<int64_t>(pN), context)};
+    auto *u {N_VMake_Serial(static_cast<int64_t>(pN), pU, mSunContext)};
+    auto *ones {N_VNew_Serial(static_cast<int64_t>(pN), mSunContext)};
 
     ASSERT_NE(u, nullptr);
     ASSERT_NE(ones, nullptr);
@@ -406,28 +413,28 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     SUNLinearSolver sunLinearSolver {nullptr};
 
     if (mLinearSolver == LinearSolver::DENSE) {
-        sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), context);
+        sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), mSunContext);
 
         ASSERT_NE(sunMatrix, nullptr);
 
-        sunLinearSolver = SUNLinSol_Dense(u, sunMatrix, context);
+        sunLinearSolver = SUNLinSol_Dense(u, sunMatrix, mSunContext);
     } else if (mLinearSolver == LinearSolver::BANDED) {
         sunMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
                                   static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
-                                  context);
+                                  mSunContext);
 
         ASSERT_NE(sunMatrix, nullptr);
 
-        sunLinearSolver = SUNLinSol_Band(u, sunMatrix, context);
+        sunLinearSolver = SUNLinSol_Band(u, sunMatrix, mSunContext);
     } else {
         sunMatrix = nullptr;
 
         if (mLinearSolver == LinearSolver::GMRES) {
-            sunLinearSolver = SUNLinSol_SPGMR(u, SUN_PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPGMR(u, SUN_PREC_NONE, 0, mSunContext);
         } else if (mLinearSolver == LinearSolver::BICGSTAB) {
-            sunLinearSolver = SUNLinSol_SPBCGS(u, SUN_PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPBCGS(u, SUN_PREC_NONE, 0, mSunContext);
         } else {
-            sunLinearSolver = SUNLinSol_SPTFQMR(u, SUN_PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPTFQMR(u, SUN_PREC_NONE, 0, mSunContext);
         }
     }
 
@@ -456,7 +463,7 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     auto res = KINSol(solver, u, KIN_LINESEARCH, ones, ones);
 
-    // Release some memory.
+    // Release some memory, but keep the SUNContext cached for reuse.
 
     N_VDestroy_Serial(u);
     N_VDestroy_Serial(ones);
@@ -465,9 +472,7 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     KINFree(&solver);
 
-    SUNContext_PopErrHandler(context);
-
-    SUNContext_Free(&context);
+    SUNContext_PopErrHandler(mSunContext);
 
     // Check whether everything went fine.
 
