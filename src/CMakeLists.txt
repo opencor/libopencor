@@ -59,6 +59,18 @@ if(RELEASE_MODE AND NOT BUILDING_USING_MSVC)
     replace_compiler_flag("-O2" "-O3")
 endif()
 
+# Enable auto-vectorisation (useful for fixed-step solver loops on x86-64 release builds).
+# Note: we use -march=x86-64-v3 (AVX2) rather than -march=native so that binaries built on one x86-64 machine run on any
+#       other modern x86-64 machine. x86-64-v3 is supported by all CPUs since Intel Haswell (2013) and AMD Excavator
+#       (2015). For ARM64, the compiler defaults already include NEON/ASIMD.
+
+if(RELEASE_MODE AND NOT EMSCRIPTEN AND NOT BUILDING_USING_MSVC)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64-v3")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64-v3")
+    endif()
+endif()
+
 # Enable link-time optimisation (LTO) for release builds to allow cross translation unit inlining and devirtualisation.
 # Note: we don't enable LTO for code analysis builds since the custom Clang used for analysis produces LLVM bitcode
 #       objects when LTO is enabled, which cannot be consumed by the system GNU linker.
