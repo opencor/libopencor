@@ -115,7 +115,7 @@ public:
      * @return The maximum step.
      */
 
-    double maximumStep() const;
+    double maximumStep() const noexcept;
 
     /**
      * @brief Set the maximum step.
@@ -135,7 +135,7 @@ public:
      * @return The maximum number of steps.
      */
 
-    int maximumNumberOfSteps() const;
+    int maximumNumberOfSteps() const noexcept;
 
     /**
      * @brief Set the maximum number of steps.
@@ -155,7 +155,7 @@ public:
      * @return The integration method.
      */
 
-    IntegrationMethod integrationMethod() const;
+    IntegrationMethod integrationMethod() const noexcept;
 
     /**
      * @brief Set the integration method.
@@ -175,7 +175,7 @@ public:
      * @return The iteration type.
      */
 
-    IterationType iterationType() const;
+    IterationType iterationType() const noexcept;
 
     /**
      * @brief Set the iteration type.
@@ -195,7 +195,7 @@ public:
      * @return The linear solver.
      */
 
-    LinearSolver linearSolver() const;
+    LinearSolver linearSolver() const noexcept;
 
     /**
      * @brief Set the linear solver.
@@ -215,7 +215,7 @@ public:
      * @return The preconditioner.
      */
 
-    Preconditioner preconditioner() const;
+    Preconditioner preconditioner() const noexcept;
 
     /**
      * @brief Set the preconditioner.
@@ -235,7 +235,7 @@ public:
      * @return The upper half-bandwidth.
      */
 
-    int upperHalfBandwidth() const;
+    int upperHalfBandwidth() const noexcept;
 
     /**
      * @brief Set the upper half-bandwidth.
@@ -255,7 +255,7 @@ public:
      * @return The lower half-bandwidth.
      */
 
-    int lowerHalfBandwidth() const;
+    int lowerHalfBandwidth() const noexcept;
 
     /**
      * @brief Set the lower half-bandwidth.
@@ -275,7 +275,7 @@ public:
      * @return The relative tolerance.
      */
 
-    double relativeTolerance() const;
+    double relativeTolerance() const noexcept;
 
     /**
      * @brief Set the relative tolerance.
@@ -295,7 +295,7 @@ public:
      * @return The absolute tolerance.
      */
 
-    double absoluteTolerance() const;
+    double absoluteTolerance() const noexcept;
 
     /**
      * @brief Set the absolute tolerance.
@@ -315,7 +315,7 @@ public:
      * @return Whether the solution should be interpolated or not.
      */
 
-    bool interpolateSolution() const;
+    bool interpolateSolution() const noexcept;
 
     /**
      * @brief Set whether the solution should be interpolated.

@@ -121,7 +121,7 @@ bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pSt
     return true;
 }
 
-double SolverOdeFixedStep::Impl::step() const
+double SolverOdeFixedStep::Impl::step() const noexcept
 {
     return mStep;
 }
@@ -146,7 +146,7 @@ const SolverOdeFixedStep::Impl *SolverOdeFixedStep::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-double SolverOdeFixedStep::step() const
+double SolverOdeFixedStep::step() const noexcept
 {
     return pimpl()->step();
 }

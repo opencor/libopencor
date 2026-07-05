@@ -63,7 +63,7 @@ public:
      * @return The type, as a @ref Solver::Type.
      */
 
-    virtual Solver::Type type() const = 0;
+    virtual Solver::Type type() const noexcept = 0;
 
     /**
      * @brief Return the (KiSAO) id.
@@ -73,7 +73,7 @@ public:
      * @return The (KiSAO) id, as a @c std::string.
      */
 
-    const std::string &id() const;
+    const std::string &id() const noexcept;
 
     /**
      * @brief Return the name.
@@ -83,7 +83,7 @@ public:
      * @return The name, as a @c std::string.
      */
 
-    const std::string &name() const;
+    const std::string &name() const noexcept;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

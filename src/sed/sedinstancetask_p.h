@@ -116,36 +116,36 @@ public:
     void run(double pVoiStart, double pVoiEnd, double pVoiInterval, bool pTrackResults);
     double run();
 
-    double progress() const;
+    double progress() const noexcept;
 
-    const Doubles &voi() const;
-    const std::string &voiName() const;
-    const std::string &voiUnit() const;
+    const Doubles &voi() const noexcept;
+    const std::string &voiName() const noexcept;
+    const std::string &voiUnit() const noexcept;
 
-    size_t stateCount() const;
-    const Doubles &state(size_t pIndex) const;
-    const std::string &stateName(size_t pIndex) const;
-    const std::string &stateUnit(size_t pIndex) const;
+    size_t stateCount() const noexcept;
+    const Doubles &state(size_t pIndex) const noexcept;
+    const std::string &stateName(size_t pIndex) const noexcept;
+    const std::string &stateUnit(size_t pIndex) const noexcept;
 
-    size_t rateCount() const;
-    const Doubles &rate(size_t pIndex) const;
-    const std::string &rateName(size_t pIndex) const;
-    const std::string &rateUnit(size_t pIndex) const;
+    size_t rateCount() const noexcept;
+    const Doubles &rate(size_t pIndex) const noexcept;
+    const std::string &rateName(size_t pIndex) const noexcept;
+    const std::string &rateUnit(size_t pIndex) const noexcept;
 
-    size_t constantCount() const;
-    const Doubles &constant(size_t pIndex) const;
-    const std::string &constantName(size_t pIndex) const;
-    const std::string &constantUnit(size_t pIndex) const;
+    size_t constantCount() const noexcept;
+    const Doubles &constant(size_t pIndex) const noexcept;
+    const std::string &constantName(size_t pIndex) const noexcept;
+    const std::string &constantUnit(size_t pIndex) const noexcept;
 
-    size_t computedConstantCount() const;
-    const Doubles &computedConstant(size_t pIndex) const;
-    const std::string &computedConstantName(size_t pIndex) const;
-    const std::string &computedConstantUnit(size_t pIndex) const;
+    size_t computedConstantCount() const noexcept;
+    const Doubles &computedConstant(size_t pIndex) const noexcept;
+    const std::string &computedConstantName(size_t pIndex) const noexcept;
+    const std::string &computedConstantUnit(size_t pIndex) const noexcept;
 
-    size_t algebraicVariableCount() const;
-    const Doubles &algebraicVariable(size_t pIndex) const;
-    const std::string &algebraicVariableName(size_t pIndex) const;
-    const std::string &algebraicVariableUnit(size_t pIndex) const;
+    size_t algebraicVariableCount() const noexcept;
+    const Doubles &algebraicVariable(size_t pIndex) const noexcept;
+    const std::string &algebraicVariableName(size_t pIndex) const noexcept;
+    const std::string &algebraicVariableUnit(size_t pIndex) const noexcept;
 };
 
 } // namespace libOpenCOR

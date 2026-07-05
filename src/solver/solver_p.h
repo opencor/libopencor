@@ -44,8 +44,8 @@ public:
 
     virtual void populate(libsedml::SedAlgorithm *pAlgorithm) = 0;
 
-    const std::string &id() const;
-    const std::string &name() const;
+    const std::string &id() const noexcept;
+    const std::string &name() const noexcept;
 
     void serialise(xmlNodePtr pNode, bool pNlaAlgorithm = false) const;
 

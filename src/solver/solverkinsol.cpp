@@ -264,7 +264,7 @@ StringStringMap SolverKinsol::Impl::properties() const
     return res;
 }
 
-int SolverKinsol::Impl::maximumNumberOfIterations() const
+int SolverKinsol::Impl::maximumNumberOfIterations() const noexcept
 {
     return mMaximumNumberOfIterations;
 }
@@ -274,7 +274,7 @@ void SolverKinsol::Impl::setMaximumNumberOfIterations(int pMaximumNumberOfIterat
     mMaximumNumberOfIterations = pMaximumNumberOfIterations;
 }
 
-SolverKinsol::LinearSolver SolverKinsol::Impl::linearSolver() const
+SolverKinsol::LinearSolver SolverKinsol::Impl::linearSolver() const noexcept
 {
     return mLinearSolver;
 }
@@ -284,7 +284,7 @@ void SolverKinsol::Impl::setLinearSolver(LinearSolver pLinearSolver)
     mLinearSolver = pLinearSolver;
 }
 
-int SolverKinsol::Impl::upperHalfBandwidth() const
+int SolverKinsol::Impl::upperHalfBandwidth() const noexcept
 {
     return mUpperHalfBandwidth;
 }
@@ -294,7 +294,7 @@ void SolverKinsol::Impl::setUpperHalfBandwidth(int pUpperHalfBandwidth)
     mUpperHalfBandwidth = pUpperHalfBandwidth;
 }
 
-int SolverKinsol::Impl::lowerHalfBandwidth() const
+int SolverKinsol::Impl::lowerHalfBandwidth() const noexcept
 {
     return mLowerHalfBandwidth;
 }
@@ -518,7 +518,7 @@ SolverKinsolPtr SolverKinsol::create()
     return SolverKinsolPtr {new SolverKinsol {}};
 }
 
-int SolverKinsol::maximumNumberOfIterations() const
+int SolverKinsol::maximumNumberOfIterations() const noexcept
 {
     return pimpl()->maximumNumberOfIterations();
 }
@@ -528,7 +528,7 @@ void SolverKinsol::setMaximumNumberOfIterations(int pMaximumNumberOfIterations)
     pimpl()->setMaximumNumberOfIterations(pMaximumNumberOfIterations);
 }
 
-SolverKinsol::LinearSolver SolverKinsol::linearSolver() const
+SolverKinsol::LinearSolver SolverKinsol::linearSolver() const noexcept
 {
     return pimpl()->linearSolver();
 }
@@ -538,7 +538,7 @@ void SolverKinsol::setLinearSolver(LinearSolver pLinearSolver)
     pimpl()->setLinearSolver(pLinearSolver);
 }
 
-int SolverKinsol::upperHalfBandwidth() const
+int SolverKinsol::upperHalfBandwidth() const noexcept
 {
     return pimpl()->upperHalfBandwidth();
 }
@@ -548,7 +548,7 @@ void SolverKinsol::setUpperHalfBandwidth(int pUpperHalfBandwidth)
     pimpl()->setUpperHalfBandwidth(pUpperHalfBandwidth);
 }
 
-int SolverKinsol::lowerHalfBandwidth() const
+int SolverKinsol::lowerHalfBandwidth() const noexcept
 {
     return pimpl()->lowerHalfBandwidth();
 }

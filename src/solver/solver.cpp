@@ -27,12 +27,12 @@ Solver::Impl::Impl(const std::string &pId, const std::string &pName)
 {
 }
 
-const std::string &Solver::Impl::id() const
+const std::string &Solver::Impl::id() const noexcept
 {
     return mId;
 }
 
-const std::string &Solver::Impl::name() const
+const std::string &Solver::Impl::name() const noexcept
 {
     return mName;
 }
@@ -87,12 +87,12 @@ const Solver::Impl *Solver::pimpl() const
     return static_cast<const Impl *>(Logger::mPimpl);
 }
 
-const std::string &Solver::id() const
+const std::string &Solver::id() const noexcept
 {
     return pimpl()->id();
 }
 
-const std::string &Solver::name() const
+const std::string &Solver::name() const noexcept
 {
     return pimpl()->name();
 }

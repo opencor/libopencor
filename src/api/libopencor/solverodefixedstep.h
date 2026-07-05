@@ -47,7 +47,7 @@ public:
      * @return The step.
      */
 
-    double step() const;
+    double step() const noexcept;
 
     /**
      * @brief Set the step.

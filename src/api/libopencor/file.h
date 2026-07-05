@@ -106,7 +106,7 @@ public:
      * @return The type, as a @ref Type.
      */
 
-    Type type() const;
+    Type type() const noexcept;
 
     /**
      * @brief Return the file name.
@@ -119,7 +119,7 @@ public:
      * @return The file name, as a @c std::string.
      */
 
-    const std::string &fileName() const;
+    const std::string &fileName() const noexcept;
 
     /**
      * @brief Return the URL.
@@ -132,7 +132,7 @@ public:
      * @return The URL, as a @c std::string.
      */
 
-    const std::string &url() const;
+    const std::string &url() const noexcept;
 
     /**
      * @brief Return the path.
@@ -145,7 +145,7 @@ public:
      * @return The path, as a @c std::string.
      */
 
-    const std::string &path() const;
+    const std::string &path() const noexcept;
 
     /**
      * @brief Return the contents.
@@ -175,7 +175,7 @@ public:
      * @return @c true if there are some child files, @c false otherwise.
      */
 
-    bool hasChildFiles() const;
+    bool hasChildFiles() const noexcept;
 
     /**
      * @brief Return the number of child files.
@@ -185,7 +185,7 @@ public:
      * @return The number of child files.
      */
 
-    size_t childFileCount() const;
+    size_t childFileCount() const noexcept;
 
     /**
      * @brief Return the child file names.
@@ -195,7 +195,7 @@ public:
      * @return The child file names, as a @ref Strings.
      */
 
-    const Strings &childFileNames() const;
+    const Strings &childFileNames() const noexcept;
 
     /**
      * @brief Return the child files.
@@ -205,7 +205,7 @@ public:
      * @return The child files, as a @ref FilePtrs.
      */
 
-    const FilePtrs &childFiles() const;
+    const FilePtrs &childFiles() const noexcept;
 
     /**
      * @brief Return the child file at the given index.
@@ -217,7 +217,7 @@ public:
      * @return The file, as a @ref FilePtr, if it is a child file, @c nullptr otherwise.
      */
 
-    const FilePtr &childFile(size_t pIndex) const;
+    const FilePtr &childFile(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the child file with the given file name.
@@ -230,9 +230,9 @@ public:
      */
 
 #ifdef __EMSCRIPTEN__
-    const FilePtr &childFileFromFileName(const std::string &pFileName) const;
+    const FilePtr &childFileFromFileName(const std::string &pFileName) const noexcept;
 #else
-    const FilePtr &childFile(const std::string &pFileName) const;
+    const FilePtr &childFile(const std::string &pFileName) const noexcept;
 #endif
 
 private:

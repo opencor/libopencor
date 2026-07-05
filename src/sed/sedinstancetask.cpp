@@ -521,7 +521,7 @@ double SedInstanceTask::Impl::run()
     return std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - startTime).count();
 }
 
-double SedInstanceTask::Impl::progress() const
+double SedInstanceTask::Impl::progress() const noexcept
 {
     const auto totalSteps {mTotalSteps.load(std::memory_order_relaxed)};
 
@@ -532,7 +532,7 @@ double SedInstanceTask::Impl::progress() const
     return static_cast<double>(mCompletedSteps.load(std::memory_order_relaxed)) / static_cast<double>(totalSteps);
 }
 
-const Doubles &SedInstanceTask::Impl::voi() const
+const Doubles &SedInstanceTask::Impl::voi() const noexcept
 {
     static const Doubles NO_DOUBLES;
 
@@ -543,7 +543,7 @@ const Doubles &SedInstanceTask::Impl::voi() const
     return NO_DOUBLES;
 }
 
-const std::string &SedInstanceTask::Impl::voiName() const
+const std::string &SedInstanceTask::Impl::voiName() const noexcept
 {
     static const std::string NO_STRING;
 
@@ -554,7 +554,7 @@ const std::string &SedInstanceTask::Impl::voiName() const
     return NO_STRING;
 }
 
-const std::string &SedInstanceTask::Impl::voiUnit() const
+const std::string &SedInstanceTask::Impl::voiUnit() const noexcept
 {
     static const std::string NO_STRING;
 
@@ -565,12 +565,12 @@ const std::string &SedInstanceTask::Impl::voiUnit() const
     return NO_STRING;
 }
 
-size_t SedInstanceTask::Impl::stateCount() const
+size_t SedInstanceTask::Impl::stateCount() const noexcept
 {
     return mStateCount;
 }
 
-const Doubles &SedInstanceTask::Impl::state(size_t pIndex) const
+const Doubles &SedInstanceTask::Impl::state(size_t pIndex) const noexcept
 {
     static const Doubles NO_DOUBLES;
 
@@ -581,7 +581,7 @@ const Doubles &SedInstanceTask::Impl::state(size_t pIndex) const
     return mResults.states[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::stateName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::stateName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -592,7 +592,7 @@ const std::string &SedInstanceTask::Impl::stateName(size_t pIndex) const
     return mStateNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::stateUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::stateUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -603,12 +603,12 @@ const std::string &SedInstanceTask::Impl::stateUnit(size_t pIndex) const
     return mStateUnits[pIndex];
 }
 
-size_t SedInstanceTask::Impl::rateCount() const
+size_t SedInstanceTask::Impl::rateCount() const noexcept
 {
     return stateCount();
 }
 
-const Doubles &SedInstanceTask::Impl::rate(size_t pIndex) const
+const Doubles &SedInstanceTask::Impl::rate(size_t pIndex) const noexcept
 {
     static const Doubles NO_DOUBLES;
 
@@ -619,7 +619,7 @@ const Doubles &SedInstanceTask::Impl::rate(size_t pIndex) const
     return mResults.rates[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::rateName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::rateName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -630,7 +630,7 @@ const std::string &SedInstanceTask::Impl::rateName(size_t pIndex) const
     return mRateNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::rateUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::rateUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -641,12 +641,12 @@ const std::string &SedInstanceTask::Impl::rateUnit(size_t pIndex) const
     return mRateUnits[pIndex];
 }
 
-size_t SedInstanceTask::Impl::constantCount() const
+size_t SedInstanceTask::Impl::constantCount() const noexcept
 {
     return mConstantCount;
 }
 
-const Doubles &SedInstanceTask::Impl::constant(size_t pIndex) const
+const Doubles &SedInstanceTask::Impl::constant(size_t pIndex) const noexcept
 {
     static const Doubles NO_DOUBLES;
 
@@ -657,7 +657,7 @@ const Doubles &SedInstanceTask::Impl::constant(size_t pIndex) const
     return mResults.constants[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::constantName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::constantName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -668,7 +668,7 @@ const std::string &SedInstanceTask::Impl::constantName(size_t pIndex) const
     return mConstantNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::constantUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::constantUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -679,12 +679,12 @@ const std::string &SedInstanceTask::Impl::constantUnit(size_t pIndex) const
     return mConstantUnits[pIndex];
 }
 
-size_t SedInstanceTask::Impl::computedConstantCount() const
+size_t SedInstanceTask::Impl::computedConstantCount() const noexcept
 {
     return mComputedConstantCount;
 }
 
-const Doubles &SedInstanceTask::Impl::computedConstant(size_t pIndex) const
+const Doubles &SedInstanceTask::Impl::computedConstant(size_t pIndex) const noexcept
 {
     static const Doubles NO_DOUBLES;
 
@@ -695,7 +695,7 @@ const Doubles &SedInstanceTask::Impl::computedConstant(size_t pIndex) const
     return mResults.computedConstants[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::computedConstantName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::computedConstantName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -706,7 +706,7 @@ const std::string &SedInstanceTask::Impl::computedConstantName(size_t pIndex) co
     return mComputedConstantNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::computedConstantUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::computedConstantUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -717,12 +717,12 @@ const std::string &SedInstanceTask::Impl::computedConstantUnit(size_t pIndex) co
     return mComputedConstantUnits[pIndex];
 }
 
-size_t SedInstanceTask::Impl::algebraicVariableCount() const
+size_t SedInstanceTask::Impl::algebraicVariableCount() const noexcept
 {
     return mAlgebraicVariableCount;
 }
 
-const Doubles &SedInstanceTask::Impl::algebraicVariable(size_t pIndex) const
+const Doubles &SedInstanceTask::Impl::algebraicVariable(size_t pIndex) const noexcept
 {
     static const Doubles NO_DOUBLES;
 
@@ -733,7 +733,7 @@ const Doubles &SedInstanceTask::Impl::algebraicVariable(size_t pIndex) const
     return mResults.algebraicVariables[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::algebraicVariableName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::algebraicVariableName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -744,7 +744,7 @@ const std::string &SedInstanceTask::Impl::algebraicVariableName(size_t pIndex) c
     return mAlgebraicVariableNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::algebraicVariableUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::algebraicVariableUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -775,12 +775,12 @@ const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
     return static_cast<const Impl *>(Logger::mPimpl);
 }
 
-double SedInstanceTask::progress() const
+double SedInstanceTask::progress() const noexcept
 {
     return pimpl()->progress();
 }
 
-const Doubles &SedInstanceTask::voi() const
+const Doubles &SedInstanceTask::voi() const noexcept
 {
     return pimpl()->voi();
 }
@@ -807,22 +807,22 @@ const emscripten::val &SedInstanceTask::voiAsArray() const
 }
 #endif
 
-const std::string &SedInstanceTask::voiName() const
+const std::string &SedInstanceTask::voiName() const noexcept
 {
     return pimpl()->voiName();
 }
 
-const std::string &SedInstanceTask::voiUnit() const
+const std::string &SedInstanceTask::voiUnit() const noexcept
 {
     return pimpl()->voiUnit();
 }
 
-size_t SedInstanceTask::stateCount() const
+size_t SedInstanceTask::stateCount() const noexcept
 {
     return pimpl()->stateCount();
 }
 
-const Doubles &SedInstanceTask::state(size_t pIndex) const
+const Doubles &SedInstanceTask::state(size_t pIndex) const noexcept
 {
     return pimpl()->state(pIndex);
 }
@@ -851,22 +851,22 @@ const emscripten::val &SedInstanceTask::stateAsArray(size_t pIndex) const
 }
 #endif
 
-const std::string &SedInstanceTask::stateName(size_t pIndex) const
+const std::string &SedInstanceTask::stateName(size_t pIndex) const noexcept
 {
     return pimpl()->stateName(pIndex);
 }
 
-const std::string &SedInstanceTask::stateUnit(size_t pIndex) const
+const std::string &SedInstanceTask::stateUnit(size_t pIndex) const noexcept
 {
     return pimpl()->stateUnit(pIndex);
 }
 
-size_t SedInstanceTask::rateCount() const
+size_t SedInstanceTask::rateCount() const noexcept
 {
     return pimpl()->rateCount();
 }
 
-const Doubles &SedInstanceTask::rate(size_t pIndex) const
+const Doubles &SedInstanceTask::rate(size_t pIndex) const noexcept
 {
     return pimpl()->rate(pIndex);
 }
@@ -895,22 +895,22 @@ const emscripten::val &SedInstanceTask::rateAsArray(size_t pIndex) const
 }
 #endif
 
-const std::string &SedInstanceTask::rateName(size_t pIndex) const
+const std::string &SedInstanceTask::rateName(size_t pIndex) const noexcept
 {
     return pimpl()->rateName(pIndex);
 }
 
-const std::string &SedInstanceTask::rateUnit(size_t pIndex) const
+const std::string &SedInstanceTask::rateUnit(size_t pIndex) const noexcept
 {
     return pimpl()->rateUnit(pIndex);
 }
 
-size_t SedInstanceTask::constantCount() const
+size_t SedInstanceTask::constantCount() const noexcept
 {
     return pimpl()->constantCount();
 }
 
-const Doubles &SedInstanceTask::constant(size_t pIndex) const
+const Doubles &SedInstanceTask::constant(size_t pIndex) const noexcept
 {
     return pimpl()->constant(pIndex);
 }
@@ -939,22 +939,22 @@ const emscripten::val &SedInstanceTask::constantAsArray(size_t pIndex) const
 }
 #endif
 
-const std::string &SedInstanceTask::constantName(size_t pIndex) const
+const std::string &SedInstanceTask::constantName(size_t pIndex) const noexcept
 {
     return pimpl()->constantName(pIndex);
 }
 
-const std::string &SedInstanceTask::constantUnit(size_t pIndex) const
+const std::string &SedInstanceTask::constantUnit(size_t pIndex) const noexcept
 {
     return pimpl()->constantUnit(pIndex);
 }
 
-size_t SedInstanceTask::computedConstantCount() const
+size_t SedInstanceTask::computedConstantCount() const noexcept
 {
     return pimpl()->computedConstantCount();
 }
 
-const Doubles &SedInstanceTask::computedConstant(size_t pIndex) const
+const Doubles &SedInstanceTask::computedConstant(size_t pIndex) const noexcept
 {
     return pimpl()->computedConstant(pIndex);
 }
@@ -983,22 +983,22 @@ const emscripten::val &SedInstanceTask::computedConstantAsArray(size_t pIndex) c
 }
 #endif
 
-const std::string &SedInstanceTask::computedConstantName(size_t pIndex) const
+const std::string &SedInstanceTask::computedConstantName(size_t pIndex) const noexcept
 {
     return pimpl()->computedConstantName(pIndex);
 }
 
-const std::string &SedInstanceTask::computedConstantUnit(size_t pIndex) const
+const std::string &SedInstanceTask::computedConstantUnit(size_t pIndex) const noexcept
 {
     return pimpl()->computedConstantUnit(pIndex);
 }
 
-size_t SedInstanceTask::algebraicVariableCount() const
+size_t SedInstanceTask::algebraicVariableCount() const noexcept
 {
     return pimpl()->algebraicVariableCount();
 }
 
-const Doubles &SedInstanceTask::algebraicVariable(size_t pIndex) const
+const Doubles &SedInstanceTask::algebraicVariable(size_t pIndex) const noexcept
 {
     return pimpl()->algebraicVariable(pIndex);
 }
@@ -1027,12 +1027,12 @@ const emscripten::val &SedInstanceTask::algebraicVariableAsArray(size_t pIndex) 
 }
 #endif
 
-const std::string &SedInstanceTask::algebraicVariableName(size_t pIndex) const
+const std::string &SedInstanceTask::algebraicVariableName(size_t pIndex) const noexcept
 {
     return pimpl()->algebraicVariableName(pIndex);
 }
 
-const std::string &SedInstanceTask::algebraicVariableUnit(size_t pIndex) const
+const std::string &SedInstanceTask::algebraicVariableUnit(size_t pIndex) const noexcept
 {
     return pimpl()->algebraicVariableUnit(pIndex);
 }

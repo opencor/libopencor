@@ -47,7 +47,7 @@ public:
     SolverNla &operator=(const SolverNla &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverNla &operator=(SolverNla &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-    Solver::Type type() const override;
+    Solver::Type type() const noexcept override;
 
     /**
      * @brief Solve the NLA system.

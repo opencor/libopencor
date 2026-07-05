@@ -306,22 +306,22 @@ FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     return fileManager.mPimpl.manage(res);
 }
 
-File::Type File::type() const
+File::Type File::type() const noexcept
 {
     return pimpl()->type();
 }
 
-const std::string &File::fileName() const
+const std::string &File::fileName() const noexcept
 {
     return pimpl()->fileName();
 }
 
-const std::string &File::url() const
+const std::string &File::url() const noexcept
 {
     return pimpl()->url();
 }
 
-const std::string &File::path() const
+const std::string &File::path() const noexcept
 {
     return pimpl()->path();
 }
@@ -338,35 +338,35 @@ void File::setContents(const UnsignedChars &pContents)
     pimpl()->checkType(shared_from_this(), true);
 }
 
-bool File::hasChildFiles() const
+bool File::hasChildFiles() const noexcept
 {
     return pimpl()->hasChildFiles();
 }
 
-size_t File::childFileCount() const
+size_t File::childFileCount() const noexcept
 {
     return pimpl()->childFileCount();
 }
 
-const Strings &File::childFileNames() const
+const Strings &File::childFileNames() const noexcept
 {
     return pimpl()->childFileNames();
 }
 
-const FilePtrs &File::childFiles() const
+const FilePtrs &File::childFiles() const noexcept
 {
     return pimpl()->childFiles();
 }
 
-const FilePtr &File::childFile(size_t pIndex) const
+const FilePtr &File::childFile(size_t pIndex) const noexcept
 {
     return pimpl()->childFile(pIndex);
 }
 
 #ifdef __EMSCRIPTEN__
-const FilePtr &File::childFileFromFileName(const std::string &pFileName) const
+const FilePtr &File::childFileFromFileName(const std::string &pFileName) const noexcept
 #else
-const FilePtr &File::childFile(const std::string &pFileName) const
+const FilePtr &File::childFile(const std::string &pFileName) const noexcept
 #endif
 {
 #ifdef __EMSCRIPTEN__

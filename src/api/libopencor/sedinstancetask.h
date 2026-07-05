@@ -54,7 +54,7 @@ public:
      * @return The progress as a value in [0.0, 1.0].
      */
 
-    double progress() const;
+    double progress() const noexcept;
 
     /**
      * @brief Return the values of the variable of integration.
@@ -64,7 +64,7 @@ public:
      * @return The values of the variable of integration.
      */
 
-    const Doubles &voi() const;
+    const Doubles &voi() const noexcept;
 
 #ifdef __EMSCRIPTEN__
     const emscripten::val &voiAsArray() const;
@@ -78,7 +78,7 @@ public:
      * @return The name of the variable of integration.
      */
 
-    const std::string &voiName() const;
+    const std::string &voiName() const noexcept;
 
     /**
      * @brief Return the unit of the variable of integration.
@@ -88,7 +88,7 @@ public:
      * @return The unit of the variable of integration.
      */
 
-    const std::string &voiUnit() const;
+    const std::string &voiUnit() const noexcept;
 
     /**
      * @brief Return the number of states.
@@ -98,7 +98,7 @@ public:
      * @return The number of states.
      */
 
-    size_t stateCount() const;
+    size_t stateCount() const noexcept;
 
     /**
      * @brief Return the values of the state at the given index.
@@ -110,7 +110,7 @@ public:
      * @return The values of the state, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &state(size_t pIndex) const;
+    const Doubles &state(size_t pIndex) const noexcept;
 
 #ifdef __EMSCRIPTEN__
     const emscripten::val &stateAsArray(size_t pIndex) const;
@@ -126,7 +126,7 @@ public:
      * @return The name of the state, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &stateName(size_t pIndex) const;
+    const std::string &stateName(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the unit of the state at the given index.
@@ -138,7 +138,7 @@ public:
      * @return The unit of the state, as a @c std::string, if the index is valid, an empty vector otherwise.
      */
 
-    const std::string &stateUnit(size_t pIndex) const;
+    const std::string &stateUnit(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the number of rates.
@@ -148,7 +148,7 @@ public:
      * @return The number of rates.
      */
 
-    size_t rateCount() const;
+    size_t rateCount() const noexcept;
 
     /**
      * @brief Return the values of the rate at the given index.
@@ -160,7 +160,7 @@ public:
      * @return The values of the rate, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &rate(size_t pIndex) const;
+    const Doubles &rate(size_t pIndex) const noexcept;
 
 #ifdef __EMSCRIPTEN__
     const emscripten::val &rateAsArray(size_t pIndex) const;
@@ -176,7 +176,7 @@ public:
      * @return The name of the rate, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &rateName(size_t pIndex) const;
+    const std::string &rateName(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the unit of the rate at the given index.
@@ -188,7 +188,7 @@ public:
      * @return The unit of the rate, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &rateUnit(size_t pIndex) const;
+    const std::string &rateUnit(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the number of constants.
@@ -198,7 +198,7 @@ public:
      * @return The number of constants.
      */
 
-    size_t constantCount() const;
+    size_t constantCount() const noexcept;
 
     /**
      * @brief Return the values of the constant at the given index.
@@ -210,7 +210,7 @@ public:
      * @return The values of the constant, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &constant(size_t pIndex) const;
+    const Doubles &constant(size_t pIndex) const noexcept;
 
 #ifdef __EMSCRIPTEN__
     const emscripten::val &constantAsArray(size_t pIndex) const;
@@ -226,7 +226,7 @@ public:
      * @return The name of the constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &constantName(size_t pIndex) const;
+    const std::string &constantName(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the unit of the constant at the given index.
@@ -238,7 +238,7 @@ public:
      * @return The unit of the constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &constantUnit(size_t pIndex) const;
+    const std::string &constantUnit(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the number of computed constants.
@@ -248,7 +248,7 @@ public:
      * @return The number of computed constants.
      */
 
-    size_t computedConstantCount() const;
+    size_t computedConstantCount() const noexcept;
 
     /**
      * @brief Return the values of the computed constant at the given index.
@@ -260,7 +260,7 @@ public:
      * @return The values of the computed constant, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &computedConstant(size_t pIndex) const;
+    const Doubles &computedConstant(size_t pIndex) const noexcept;
 
 #ifdef __EMSCRIPTEN__
     const emscripten::val &computedConstantAsArray(size_t pIndex) const;
@@ -276,7 +276,7 @@ public:
      * @return The name of the computed constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &computedConstantName(size_t pIndex) const;
+    const std::string &computedConstantName(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the unit of the computed constant at the given index.
@@ -288,7 +288,7 @@ public:
      * @return The unit of the computed constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &computedConstantUnit(size_t pIndex) const;
+    const std::string &computedConstantUnit(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the number of algebraic variables.
@@ -298,7 +298,7 @@ public:
      * @return The number of algebraic variables.
      */
 
-    size_t algebraicVariableCount() const;
+    size_t algebraicVariableCount() const noexcept;
 
     /**
      * @brief Return the values of the algebraic variable at the given index.
@@ -310,7 +310,7 @@ public:
      * @return The values of the algebraic variable, as a @c Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &algebraicVariable(size_t pIndex) const;
+    const Doubles &algebraicVariable(size_t pIndex) const noexcept;
 
 #ifdef __EMSCRIPTEN__
     const emscripten::val &algebraicVariableAsArray(size_t pIndex) const;
@@ -327,7 +327,7 @@ public:
      * otherwise.
      */
 
-    const std::string &algebraicVariableName(size_t pIndex) const;
+    const std::string &algebraicVariableName(size_t pIndex) const noexcept;
 
     /**
      * @brief Return the unit of the algebraic variable at the given index.
@@ -340,7 +340,7 @@ public:
      * otherwise.
      */
 
-    const std::string &algebraicVariableUnit(size_t pIndex) const;
+    const std::string &algebraicVariableUnit(size_t pIndex) const noexcept;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

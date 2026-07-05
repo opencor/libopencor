@@ -50,16 +50,16 @@ public:
 
     StringStringMap properties() const override;
 
-    int maximumNumberOfIterations() const;
+    int maximumNumberOfIterations() const noexcept;
     void setMaximumNumberOfIterations(int pMaximumNumberOfIterations);
 
-    LinearSolver linearSolver() const;
+    LinearSolver linearSolver() const noexcept;
     void setLinearSolver(LinearSolver pLinearSolver);
 
-    int upperHalfBandwidth() const;
+    int upperHalfBandwidth() const noexcept;
     void setUpperHalfBandwidth(int pUpperHalfBandwidth);
 
-    int lowerHalfBandwidth() const;
+    int lowerHalfBandwidth() const noexcept;
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
 
 #ifdef __EMSCRIPTEN__

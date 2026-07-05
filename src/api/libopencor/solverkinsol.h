@@ -78,7 +78,7 @@ public:
      * @return The maximum number of iterations.
      */
 
-    int maximumNumberOfIterations() const;
+    int maximumNumberOfIterations() const noexcept;
 
     /**
      * @brief Set the maximum number of iterations.
@@ -98,7 +98,7 @@ public:
      * @return The linear solver.
      */
 
-    LinearSolver linearSolver() const;
+    LinearSolver linearSolver() const noexcept;
 
     /**
      * @brief Set the linear solver.
@@ -118,7 +118,7 @@ public:
      * @return The upper half-bandwidth.
      */
 
-    int upperHalfBandwidth() const;
+    int upperHalfBandwidth() const noexcept;
 
     /**
      * @brief Set the upper half-bandwidth.
@@ -138,7 +138,7 @@ public:
      * @return The lower half-bandwidth.
      */
 
-    int lowerHalfBandwidth() const;
+    int lowerHalfBandwidth() const noexcept;
 
     /**
      * @brief Set the lower half-bandwidth.

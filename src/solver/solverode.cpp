@@ -74,7 +74,7 @@ const SolverOde::Impl *SolverOde::pimpl() const
     return static_cast<const Impl *>(Solver::pimpl());
 }
 
-Solver::Type SolverOde::type() const
+Solver::Type SolverOde::type() const noexcept
 {
     return Type::ODE;
 }

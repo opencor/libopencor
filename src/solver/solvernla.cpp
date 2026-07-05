@@ -67,7 +67,7 @@ const SolverNla::Impl *SolverNla::pimpl() const
     return static_cast<const Impl *>(Solver::pimpl());
 }
 
-Solver::Type SolverNla::type() const
+Solver::Type SolverNla::type() const noexcept
 {
     return Type::NLA;
 }

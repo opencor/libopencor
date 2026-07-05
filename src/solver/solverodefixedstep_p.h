@@ -43,7 +43,7 @@ public:
                     double *pConstants, double *pComputedConstants, double *pAlgebraicVariables,
                     const CellmlFileRuntimePtr &pRuntime) override;
 
-    double step() const;
+    double step() const noexcept;
     void setStep(double pStep);
 };
 

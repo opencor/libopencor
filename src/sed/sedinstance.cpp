@@ -281,7 +281,7 @@ bool SedInstance::startRun()
     return pimpl()->startRun();
 }
 
-bool SedInstance::isRunning() const
+bool SedInstance::isRunning() const noexcept
 {
     return pimpl()->isRunning();
 }
@@ -306,27 +306,27 @@ void SedInstance::stopRun()
     pimpl()->stopRun();
 }
 
-double SedInstance::progress() const
+double SedInstance::progress() const noexcept
 {
     return pimpl()->progress();
 }
 
-bool SedInstance::hasTasks() const
+bool SedInstance::hasTasks() const noexcept
 {
     return pimpl()->hasTasks();
 }
 
-size_t SedInstance::taskCount() const
+size_t SedInstance::taskCount() const noexcept
 {
     return pimpl()->taskCount();
 }
 
-const SedInstanceTaskPtrs &SedInstance::tasks() const
+const SedInstanceTaskPtrs &SedInstance::tasks() const noexcept
 {
     return pimpl()->tasks();
 }
 
-const SedInstanceTaskPtr &SedInstance::task(size_t pIndex) const
+const SedInstanceTaskPtr &SedInstance::task(size_t pIndex) const noexcept
 {
     return pimpl()->task(pIndex);
 }

@@ -91,37 +91,37 @@ public:
                     const CellmlFileRuntimePtr &pRuntime) override;
     bool reinitialise(double pVoi) override;
 
-    double maximumStep() const;
+    double maximumStep() const noexcept;
     void setMaximumStep(double pMaximumStep);
 
-    int maximumNumberOfSteps() const;
+    int maximumNumberOfSteps() const noexcept;
     void setMaximumNumberOfSteps(int pMaximumNumberOfSteps);
 
-    IntegrationMethod integrationMethod() const;
+    IntegrationMethod integrationMethod() const noexcept;
     void setIntegrationMethod(IntegrationMethod pIntegrationMethod);
 
-    IterationType iterationType() const;
+    IterationType iterationType() const noexcept;
     void setIterationType(IterationType pIterationType);
 
-    LinearSolver linearSolver() const;
+    LinearSolver linearSolver() const noexcept;
     void setLinearSolver(LinearSolver pLinearSolver);
 
-    Preconditioner preconditioner() const;
+    Preconditioner preconditioner() const noexcept;
     void setPreconditioner(Preconditioner pPreconditioner);
 
-    int upperHalfBandwidth() const;
+    int upperHalfBandwidth() const noexcept;
     void setUpperHalfBandwidth(int pUpperHalfBandwidth);
 
-    int lowerHalfBandwidth() const;
+    int lowerHalfBandwidth() const noexcept;
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
 
-    double relativeTolerance() const;
+    double relativeTolerance() const noexcept;
     void setRelativeTolerance(double pRelativeTolerance);
 
-    double absoluteTolerance() const;
+    double absoluteTolerance() const noexcept;
     void setAbsoluteTolerance(double pAbsoluteTolerance);
 
-    bool interpolateSolution() const;
+    bool interpolateSolution() const noexcept;
     void setInterpolateSolution(bool pInterpolateSolution);
 
     bool solve(double &pVoi, double pVoiEnd) override;
