@@ -23,6 +23,8 @@ limitations under the License.
 #include "solvernla_p.h"
 #include "solverode_p.h"
 
+#include <algorithm>
+#include <cmath>
 #include <cstdint>
 #include <condition_variable>
 #include <mutex>
@@ -112,8 +114,8 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     mAlgebraicVariableCount = mAnalyserModel->algebraicVariableCount();
 
     if (mDifferentialModel) {
-        mStateDoubles.resize(mStateCount, NAN);
-        mRateDoubles.resize(mStateCount, NAN);
+        mStateDoubles.resize(mStateCount);
+        mRateDoubles.resize(mStateCount);
 
         mStates = mStateDoubles.data();
         mRates = mRateDoubles.data();
@@ -122,9 +124,9 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
         mResults.rates.resize(mStateCount, {});
     }
 
-    mConstantDoubles.resize(mConstantCount, NAN);
-    mComputedConstantDoubles.resize(mComputedConstantCount, NAN);
-    mAlgebraicVariableDoubles.resize(mAlgebraicVariableCount, NAN);
+    mConstantDoubles.resize(mConstantCount);
+    mComputedConstantDoubles.resize(mComputedConstantCount);
+    mAlgebraicVariableDoubles.resize(mAlgebraicVariableCount);
 
     mConstants = mConstantDoubles.data();
     mComputedConstants = mComputedConstantDoubles.data();
@@ -202,27 +204,21 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
 {
     mResults.voi[pIndex] = mVoi;
 
-    auto &states = mResults.states;
-    auto &rates = mResults.rates;
-    auto &constants = mResults.constants;
-    auto &computedConstants = mResults.computedConstants;
-    auto &algebraicVariables = mResults.algebraicVariables;
-
     for (size_t i {0}; i < mStateCount; ++i) {
-        states[i][pIndex] = mStates[i]; // NOLINT
-        rates[i][pIndex] = mRates[i]; // NOLINT
+        mResults.states[i][pIndex] = mStates[i]; // NOLINT
+        mResults.rates[i][pIndex] = mRates[i]; // NOLINT
     }
 
     for (size_t i {0}; i < mConstantCount; ++i) {
-        constants[i][pIndex] = mConstants[i]; // NOLINT
+        mResults.constants[i][pIndex] = mConstants[i]; // NOLINT
     }
 
     for (size_t i {0}; i < mComputedConstantCount; ++i) {
-        computedConstants[i][pIndex] = mComputedConstants[i]; // NOLINT
+        mResults.computedConstants[i][pIndex] = mComputedConstants[i]; // NOLINT
     }
 
     for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
-        algebraicVariables[i][pIndex] = mAlgebraicVariables[i]; // NOLINT
+        mResults.algebraicVariables[i][pIndex] = mAlgebraicVariables[i]; // NOLINT
     }
 }
 
@@ -331,6 +327,34 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         trackResults(index);
     }
 
+    // Set up a guard function to fill the tail of our results with NaN values in case we exit this function before
+    // reaching the end of our simulation.
+
+    auto guard = [this, &index, pTrackResults]() {
+        if (!pTrackResults) {
+            return;
+        }
+
+        auto nanFillTail = [](Doubles &pVec, size_t pStartIndex) {
+            if (pStartIndex < pVec.size()) {
+                std::fill(pVec.begin() + static_cast<std::ptrdiff_t>(pStartIndex), pVec.end(), NAN);
+            }
+        };
+
+        auto nanFillAll = [&nanFillTail, index](auto &pResults, size_t pCount) {
+            for (size_t i {0}; i < pCount; ++i) {
+                nanFillTail(pResults[i], index + 1);
+            }
+        };
+
+        nanFillTail(mResults.voi, index + 1);
+        nanFillAll(mResults.states, mStateCount);
+        nanFillAll(mResults.rates, mStateCount);
+        nanFillAll(mResults.constants, mConstantCount);
+        nanFillAll(mResults.computedConstants, mComputedConstantCount);
+        nanFillAll(mResults.algebraicVariables, mAlgebraicVariableCount);
+    };
+
     // Compute the differential model.
 
     auto *odeSolverPimpl {mOdeSolver->pimpl()};
@@ -355,11 +379,15 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
             });
 
             if ((mRunControl->load(std::memory_order_relaxed) & INSTANCE_RUN_CONTROL_STOP) != 0) {
+                guard();
+
                 return;
             }
         }
 
         if ((runControl & INSTANCE_RUN_CONTROL_STOP) != 0) {
+            guard();
+
             return;
         }
 
@@ -367,6 +395,8 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
 
         if (!odeSolverPimpl->solve(mVoi, std::min(pVoiStart + static_cast<double>(++voiCounter) * pVoiInterval, pVoiEnd))) {
             addIssues(mOdeSolver, mOdeSolver->name());
+
+            guard();
 
             return;
         }
@@ -384,6 +414,8 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
 #ifndef CODE_COVERAGE_ENABLED
         if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
             addIssues(mNlaSolver, mNlaSolver->name());
+
+            guard();
 
             return;
         }
@@ -440,23 +472,23 @@ double SedInstanceTask::Impl::run()
 
         const auto resultsSize {totalSteps + 1};
 
-        mResults.voi.assign(resultsSize, NAN);
+        mResults.voi.resize(resultsSize);
 
         for (size_t i {0}; i < mStateCount; ++i) {
-            mResults.states[i].assign(resultsSize, NAN);
-            mResults.rates[i].assign(resultsSize, NAN);
+            mResults.states[i].resize(resultsSize);
+            mResults.rates[i].resize(resultsSize);
         }
 
         for (size_t i {0}; i < mConstantCount; ++i) {
-            mResults.constants[i].assign(resultsSize, NAN);
+            mResults.constants[i].resize(resultsSize);
         }
 
         for (size_t i {0}; i < mComputedConstantCount; ++i) {
-            mResults.computedConstants[i].assign(resultsSize, NAN);
+            mResults.computedConstants[i].resize(resultsSize);
         }
 
         for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
-            mResults.algebraicVariables[i].assign(resultsSize, NAN);
+            mResults.algebraicVariables[i].resize(resultsSize);
         }
 
         // Run our simulation from the output start time to the output end time, tracking our results.
