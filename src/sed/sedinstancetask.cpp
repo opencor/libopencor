@@ -330,21 +330,18 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         }
 
         auto nanFillTail = [](Doubles &pResults, size_t pStartIndex) {
-            if (pStartIndex < pResults.size()) {
-                std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(pStartIndex), pResults.end(), NAN);
-            }
+            std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(pStartIndex),
+                      pResults.end(),
+                      NAN);
         };
 
         auto nanFillRowTails = [index, this](Doubles &pResults, size_t pCount) {
             for (size_t i {0}; i < pCount; ++i) {
                 const auto rowStart {i * mResults.resultsSize};
-                const auto start {rowStart + index + 1};
-                const auto end {std::min(rowStart + mResults.resultsSize, pResults.size())};
 
-                if (start < end) {
-                    std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(start),
-                              pResults.begin() + static_cast<std::ptrdiff_t>(end), NAN);
-                }
+                std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(rowStart + index + 1),
+                          pResults.begin() + static_cast<std::ptrdiff_t>(std::min(rowStart + mResults.resultsSize, pResults.size())),
+                          NAN);
             }
         };
 

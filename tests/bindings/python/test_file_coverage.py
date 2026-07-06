@@ -82,3 +82,31 @@ def test_unmanage_file_with_children():
     file_manager.unmanage(file)
 
     assert file_manager.file_count == 0
+
+
+def test_manage_local_file_through_manager():
+    file = loc.File(utils.resource_path("file.txt"))
+    file_manager = loc.FileManager.instance()
+
+    assert file_manager.file_count == 1
+
+    file_manager.manage(file)
+
+    assert file_manager.file_count == 1
+    assert file_manager.file(0) == file
+
+    file_manager.reset()
+
+
+def test_manage_remote_file_through_manager():
+    file = loc.File(utils.RemoteFile)
+    file_manager = loc.FileManager.instance()
+
+    assert file_manager.file_count == 1
+
+    file_manager.manage(file)
+
+    assert file_manager.file_count == 1
+    assert file_manager.file(0) == file
+
+    file_manager.reset()

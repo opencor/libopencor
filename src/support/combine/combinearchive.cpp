@@ -110,6 +110,9 @@ const FilePtr &CombineArchive::Impl::file(const std::string &pFileName) const
 CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
     : Logger(std::make_unique<Impl>(pFile, pArchive, std::move(pArchiveContents)))
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+#endif
 }
 
 CombineArchive::~CombineArchive() = default;

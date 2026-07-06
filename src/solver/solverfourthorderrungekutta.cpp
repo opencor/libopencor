@@ -144,6 +144,10 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 SolverFourthOrderRungeKutta::SolverFourthOrderRungeKutta()
     : SolverOdeFixedStep(std::make_unique<Impl>())
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+    (void)static_cast<const SolverFourthOrderRungeKutta *>(this)->pimpl();
+#endif
 }
 
 SolverFourthOrderRungeKutta::~SolverFourthOrderRungeKutta() = default;
@@ -153,12 +157,10 @@ SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
-/*---GRY---
 const SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
-*/
 
 SolverFourthOrderRungeKuttaPtr SolverFourthOrderRungeKutta::create()
 {

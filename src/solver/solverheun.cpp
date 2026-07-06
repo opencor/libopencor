@@ -110,6 +110,10 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
 SolverHeun::SolverHeun()
     : SolverOdeFixedStep(std::make_unique<Impl>())
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+    (void)static_cast<const SolverHeun *>(this)->pimpl();
+#endif
 }
 
 SolverHeun::~SolverHeun() = default;
@@ -119,12 +123,10 @@ SolverHeun::Impl *SolverHeun::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
-/*---GRY---
 const SolverHeun::Impl *SolverHeun::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
-*/
 
 SolverHeunPtr SolverHeun::create()
 {

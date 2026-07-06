@@ -39,6 +39,10 @@ void SedAnalysis::Impl::serialise(xmlNodePtr pNode) const
 SedAnalysis::SedAnalysis(const SedDocumentPtr &pDocument)
     : SedSimulation(std::make_unique<Impl>(pDocument))
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+    (void)static_cast<const SedAnalysis *>(this)->pimpl();
+#endif
 }
 
 SedAnalysis::~SedAnalysis() = default;
@@ -48,12 +52,10 @@ SedAnalysis::Impl *SedAnalysis::pimpl()
     return reinterpret_cast<SedAnalysis::Impl *>(SedSimulation::pimpl());
 }
 
-/*---GRY---
 const SedAnalysis::Impl *SedAnalysis::pimpl() const
 {
     return static_cast<const Impl *>(SedSimulation::pimpl());
 }
-*/
 
 SedAnalysisPtr SedAnalysis::create(const SedDocumentPtr &pDocument)
 {

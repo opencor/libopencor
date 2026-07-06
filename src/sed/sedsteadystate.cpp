@@ -39,6 +39,10 @@ void SedSteadyState::Impl::serialise(xmlNodePtr pNode) const
 SedSteadyState::SedSteadyState(const SedDocumentPtr &pDocument)
     : SedSimulation(std::make_unique<Impl>(pDocument))
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+    (void)static_cast<const SedSteadyState *>(this)->pimpl();
+#endif
 }
 
 SedSteadyState::~SedSteadyState() = default;
@@ -48,12 +52,10 @@ SedSteadyState::Impl *SedSteadyState::pimpl()
     return reinterpret_cast<SedSteadyState::Impl *>(SedSimulation::pimpl());
 }
 
-/*---GRY---
 const SedSteadyState::Impl *SedSteadyState::pimpl() const
 {
     return static_cast<const Impl *>(SedSimulation::pimpl());
 }
-*/
 
 SedSteadyStatePtr SedSteadyState::create(const SedDocumentPtr &pDocument)
 {

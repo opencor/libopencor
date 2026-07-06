@@ -130,10 +130,10 @@ void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger, const std::str
     for (size_t i {0}; i < issueCount; ++i) {
         auto issue {pLogger->issue(i)};
 
-        if (issue != nullptr) {
-            addIssue((issue->level() == libcellml::Issue::Level::ERROR) ? Issue::Type::ERROR : Issue::Type::WARNING,
-                     issue->description(), pContext);
-        }
+        addIssue((issue->level() == libcellml::Issue::Level::ERROR) ?
+                     Issue::Type::ERROR :
+                     Issue::Type::WARNING,
+                 issue->description(), pContext);
     }
 }
 

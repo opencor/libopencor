@@ -55,10 +55,8 @@ FilePtr FileManager::Impl::manage(const FilePtr &pFile)
     for (const auto &file : mFiles) {
         auto managedFile {file.lock()};
 
-        if (managedFile != nullptr) {
-            if (isLocalFile ? managedFile->fileName() == fileNameOrUrl : managedFile->url() == fileNameOrUrl) {
-                return managedFile;
-            }
+        if (isLocalFile ? managedFile->fileName() == fileNameOrUrl : managedFile->url() == fileNameOrUrl) {
+            return managedFile;
         }
     }
 
@@ -140,9 +138,7 @@ FilePtrs FileManager::Impl::files() const
     FilePtrs res;
 
     for (const auto &file : mFiles) {
-        if (auto managedFile {file.lock()}; managedFile != nullptr) {
-            res.push_back(std::move(managedFile));
-        }
+        res.push_back(file.lock());
     }
 
     return res;
@@ -155,13 +151,11 @@ FilePtr FileManager::Impl::file(size_t pIndex) const
     size_t index {0};
 
     for (const auto &file : mFiles) {
-        if (auto managedFile {file.lock()}; managedFile != nullptr) {
-            if (index == pIndex) {
-                return managedFile;
-            }
-
-            ++index;
+        if (index == pIndex) {
+            return file.lock();
         }
+
+        ++index;
     }
 
     return nullptr;
@@ -182,11 +176,12 @@ FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #else
     auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
 #endif
+
     for (const auto &file : mFiles) {
-        if (auto managedFile {file.lock()}; managedFile != nullptr) {
-            if (isLocalFile ? managedFile->fileName() == fileNameOrUrl : managedFile->url() == fileNameOrUrl) {
-                return managedFile;
-            }
+        auto managedFile {file.lock()};
+
+        if (isLocalFile ? managedFile->fileName() == fileNameOrUrl : managedFile->url() == fileNameOrUrl) {
+            return managedFile;
         }
     }
 

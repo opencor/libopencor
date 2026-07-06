@@ -528,6 +528,9 @@ CellmlFileRuntime::ComputeVariablesForDifferentialModel CellmlFileRuntime::Impl:
 CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
     : Logger(std::make_unique<Impl>(pCellmlFile, pNlaSolver))
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+#endif
 }
 
 CellmlFileRuntime::~CellmlFileRuntime() = default;

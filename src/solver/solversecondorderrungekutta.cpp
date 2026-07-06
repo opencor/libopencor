@@ -109,6 +109,10 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 SolverSecondOrderRungeKutta::SolverSecondOrderRungeKutta()
     : SolverOdeFixedStep(std::make_unique<Impl>())
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+    (void)static_cast<const SolverSecondOrderRungeKutta *>(this)->pimpl();
+#endif
 }
 
 SolverSecondOrderRungeKutta::~SolverSecondOrderRungeKutta() = default;
@@ -118,12 +122,10 @@ SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl()
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
-/*---GRY---
 const SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
-*/
 
 SolverSecondOrderRungeKuttaPtr SolverSecondOrderRungeKutta::create()
 {

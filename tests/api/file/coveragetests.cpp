@@ -91,3 +91,33 @@ TEST(CoverageFileTest, unmanageFileWithChildren)
 
     EXPECT_EQ(fileManager.fileCount(), 0U);
 }
+
+TEST(CoverageFileTest, manageLocalFileThroughManager)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("file.txt"));
+    auto &fileManager = libOpenCOR::FileManager::instance();
+
+    EXPECT_EQ(fileManager.fileCount(), 1U);
+
+    fileManager.manage(file);
+
+    EXPECT_EQ(fileManager.fileCount(), 1U);
+    EXPECT_EQ(fileManager.file(0), file);
+
+    fileManager.reset();
+}
+
+TEST(CoverageFileTest, manageRemoteFileThroughManager)
+{
+    auto file = libOpenCOR::File::create(libOpenCOR::REMOTE_FILE);
+    auto &fileManager = libOpenCOR::FileManager::instance();
+
+    EXPECT_EQ(fileManager.fileCount(), 1U);
+
+    fileManager.manage(file);
+
+    EXPECT_EQ(fileManager.fileCount(), 1U);
+    EXPECT_EQ(fileManager.file(0), file);
+
+    fileManager.reset();
+}
