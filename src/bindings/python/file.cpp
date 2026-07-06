@@ -69,6 +69,6 @@ void fileApi(nb::module_ &m)
         .def("file", nb::overload_cast<const std::string &>(&libOpenCOR::FileManager::file, nb::const_), "Return the managed file with the given name or URL.", nb::arg("file_name_or_url"))
         .def("__len__", &libOpenCOR::FileManager::fileCount)
         .def("__iter__", [](const libOpenCOR::FileManager &self) {
-            return nb::cast(self.files()).attr("__iter__")();
+            return nb::iter(nb::cast(self.files()));
         });
 }

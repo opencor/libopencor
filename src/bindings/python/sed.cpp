@@ -110,7 +110,7 @@ void sedApi(nb::module_ &m)
         .def("task", &libOpenCOR::SedInstance::task, "Return the task at the given index.", nb::arg("index"))
         .def("__len__", &libOpenCOR::SedInstance::taskCount)
         .def("__iter__", [](const libOpenCOR::SedInstance &self) {
-            return nb::cast(self.tasks()).attr("__iter__")();
+            return nb::iter(nb::cast(self.tasks()));
         });
 
     // SedInstanceTask API.
