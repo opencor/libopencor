@@ -208,19 +208,20 @@ def test_progress_of_ode_model():
 
 
 def test_stop_run():
-    large_step_count = 1000000
+    SIMULATION_PROPERTY = 1000000
+    WAIT_ITERATIONS = 60000
 
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
-    simulation.number_of_steps = large_step_count
-    simulation.output_end_time = float(large_step_count)
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
 
     instance = document.instantiate()
 
     assert instance.start_run() is True
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if instance.progress > 0.0:
             break
 
@@ -228,7 +229,7 @@ def test_stop_run():
 
     instance.stop_run()
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if not instance.is_running:
             break
 
@@ -252,20 +253,21 @@ def test_stop_run_when_not_running():
 
 
 def test_pause_run_and_resume_run():
-    large_step_count = 1000000
+    SIMULATION_PROPERTY = 1000000
+    WAIT_ITERATIONS = 60000
 
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
 
-    simulation.number_of_steps = large_step_count
-    simulation.output_end_time = float(large_step_count)
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
 
     instance = document.instantiate()
 
     assert instance.start_run() is True
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if instance.progress > 0.0:
             break
 
@@ -278,7 +280,7 @@ def test_pause_run_and_resume_run():
     instance.resume_run()
     instance.stop_run()
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if not instance.is_running:
             break
 
@@ -302,20 +304,21 @@ def test_pause_run_and_resume_run_when_not_running():
 
 
 def test_pause_run_then_stop_run():
-    large_step_count = 1000000
+    SIMULATION_PROPERTY = 1000000
+    WAIT_ITERATIONS = 60000
 
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
 
-    simulation.number_of_steps = large_step_count
-    simulation.output_end_time = float(large_step_count)
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
 
     instance = document.instantiate()
 
     assert instance.start_run() is True
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if instance.progress > 0.0:
             break
 
@@ -327,7 +330,7 @@ def test_pause_run_then_stop_run():
 
     instance.stop_run()
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if not instance.is_running:
             break
 
@@ -340,6 +343,7 @@ def test_pause_run_then_stop_run():
 
 def test_pause_run_and_resume_run_with_natural_completion():
     moderate_step_count = 50000
+    WAIT_ITERATIONS = 60000
 
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
@@ -352,7 +356,7 @@ def test_pause_run_and_resume_run_with_natural_completion():
 
     assert instance.start_run() is True
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if instance.progress > 0.0:
             break
 
@@ -364,7 +368,7 @@ def test_pause_run_and_resume_run_with_natural_completion():
 
     instance.resume_run()
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if not instance.is_running:
             break
 
@@ -376,20 +380,21 @@ def test_pause_run_and_resume_run_with_natural_completion():
 
 
 def test_start_run_while_already_running():
-    large_step_count = 1000000
+    SIMULATION_PROPERTY = 1000000
+    WAIT_ITERATIONS = 60000
 
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     simulation = document.simulations[0]
 
-    simulation.number_of_steps = large_step_count
-    simulation.output_end_time = float(large_step_count)
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
 
     instance = document.instantiate()
 
     assert instance.start_run() is True
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if instance.progress > 0.0:
             break
 
@@ -399,7 +404,7 @@ def test_start_run_while_already_running():
 
     instance.stop_run()
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if not instance.is_running:
             break
 
@@ -411,13 +416,15 @@ def test_start_run_while_already_running():
 
 
 def test_start_run_after_previous_run_completed():
+    WAIT_ITERATIONS = 60000
+
     file = loc.File(utils.resource_path("cellml_2.cellml"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
     assert instance.start_run() is True
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if not instance.is_running:
             break
 
@@ -427,7 +434,7 @@ def test_start_run_after_previous_run_completed():
 
     assert instance.start_run() is True
 
-    for _ in range(60000):
+    for _ in range(WAIT_ITERATIONS):
         if not instance.is_running:
             break
 

@@ -227,7 +227,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Stop run', async () => {
-    const largeStepCount = 1000000;
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
@@ -236,14 +237,14 @@ test.describe('Sed instance tests', () => {
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
 
-    simulation.numberOfSteps = largeStepCount;
-    simulation.outputEndTime = largeStepCount;
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
 
     const instance = document.instantiate();
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (instance.progress > 0.0) {
         break;
       }
@@ -253,7 +254,7 @@ test.describe('Sed instance tests', () => {
 
     instance.stopRun();
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (!instance.isRunning) {
         break;
       }
@@ -280,7 +281,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Pause run and resume run', async () => {
-    const largeStepCount = 1000000;
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
@@ -289,14 +291,14 @@ test.describe('Sed instance tests', () => {
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
 
-    simulation.numberOfSteps = largeStepCount;
-    simulation.outputEndTime = largeStepCount;
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
 
     const instance = document.instantiate();
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (instance.progress > 0.0) {
         break;
       }
@@ -311,7 +313,7 @@ test.describe('Sed instance tests', () => {
     instance.resumeRun();
     instance.stopRun();
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (!instance.isRunning) {
         break;
       }
@@ -340,7 +342,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Pause run then stop run', async () => {
-    const largeStepCount = 1000000;
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
@@ -349,14 +352,14 @@ test.describe('Sed instance tests', () => {
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
 
-    simulation.numberOfSteps = largeStepCount;
-    simulation.outputEndTime = largeStepCount;
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
 
     const instance = document.instantiate();
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (instance.progress > 0.0) {
         break;
       }
@@ -370,7 +373,7 @@ test.describe('Sed instance tests', () => {
 
     instance.stopRun();
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (!instance.isRunning) {
         break;
       }
@@ -385,6 +388,7 @@ test.describe('Sed instance tests', () => {
 
   test('Pause run and resume run with natural completion', async () => {
     const moderateStepCount = 50000;
+    const WAIT_ITERATIONS = 60000;
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
@@ -400,7 +404,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (instance.progress > 0.0) {
         break;
       }
@@ -414,7 +418,7 @@ test.describe('Sed instance tests', () => {
 
     instance.resumeRun();
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (!instance.isRunning) {
         break;
       }
@@ -428,7 +432,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Start run while already running', async () => {
-    const largeStepCount = 1000000;
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
 
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
@@ -437,14 +442,14 @@ test.describe('Sed instance tests', () => {
     const document = new loc.SedDocument(file);
     const simulation = document.simulations.get(0);
 
-    simulation.numberOfSteps = largeStepCount;
-    simulation.outputEndTime = largeStepCount;
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
 
     const instance = document.instantiate();
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (instance.progress > 0.0) {
         break;
       }
@@ -456,7 +461,7 @@ test.describe('Sed instance tests', () => {
 
     instance.stopRun();
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (!instance.isRunning) {
         break;
       }
@@ -470,6 +475,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Start run after previous run completed', async () => {
+    const WAIT_ITERATIONS = 60000;
+
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
     file.setContents(utils.fileContents(file.path));
@@ -479,7 +486,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (!instance.isRunning) {
         break;
       }
@@ -491,7 +498,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 60000; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (!instance.isRunning) {
         break;
       }

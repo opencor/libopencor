@@ -85,9 +85,9 @@ TEST(CoverageFileTest, unmanageFileWithChildren)
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"));
     auto &fileManager = libOpenCOR::FileManager::instance();
 
-    EXPECT_EQ(fileManager.fileCount(), 3);
+    EXPECT_EQ(fileManager.fileCount(), 3u);
 
     fileManager.unmanage(file);
 
-    EXPECT_EQ(fileManager.fileCount(), 0);
+    EXPECT_EQ(fileManager.fileCount(), 0u);
 }

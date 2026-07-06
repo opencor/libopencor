@@ -71,11 +71,11 @@ TEST(CoverageSolverTest, algebraicChanges)
 
     const auto &instanceTask {instance->tasks()[0]};
 
-    EXPECT_EQ(instanceTask->stateCount(), 0);
-    EXPECT_EQ(instanceTask->rateCount(), 0);
-    EXPECT_EQ(instanceTask->constantCount(), 1);
-    EXPECT_EQ(instanceTask->computedConstantCount(), 1);
-    EXPECT_EQ(instanceTask->algebraicVariableCount(), 3);
+    EXPECT_EQ(instanceTask->stateCount(), 0u);
+    EXPECT_EQ(instanceTask->rateCount(), 0u);
+    EXPECT_EQ(instanceTask->constantCount(), 1u);
+    EXPECT_EQ(instanceTask->computedConstantCount(), 1u);
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 3u);
 
     EXPECT_NEAR(instanceTask->algebraicVariable(0)[0], -28.14815, ABS_TOL);
     EXPECT_NEAR(instanceTask->algebraicVariable(1)[0], -13.18519, ABS_TOL);

@@ -36,8 +36,8 @@ TEST(CoverageSedTest, models)
     auto document {libOpenCOR::SedDocument::create()};
 
     EXPECT_FALSE(document->hasModels());
-    EXPECT_EQ(document->modelCount(), 0);
-    EXPECT_EQ(document->models().size(), 0);
+    EXPECT_EQ(document->modelCount(), 0u);
+    EXPECT_EQ(document->models().size(), 0u);
     EXPECT_FALSE(document->addModel(nullptr));
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("file.txt"))};
@@ -48,8 +48,8 @@ TEST(CoverageSedTest, models)
     EXPECT_TRUE(document->addModel(model));
 
     EXPECT_TRUE(document->hasModels());
-    EXPECT_EQ(document->modelCount(), 1);
-    EXPECT_EQ(document->models().size(), 1);
+    EXPECT_EQ(document->modelCount(), 1u);
+    EXPECT_EQ(document->models().size(), 1u);
     EXPECT_EQ(document->models()[0], model);
     EXPECT_EQ(document->model(0), model);
     EXPECT_EQ(document->model(1), nullptr);
@@ -58,8 +58,8 @@ TEST(CoverageSedTest, models)
     EXPECT_TRUE(document->removeModel(model));
 
     EXPECT_FALSE(document->hasModels());
-    EXPECT_EQ(document->modelCount(), 0);
-    EXPECT_EQ(document->models().size(), 0);
+    EXPECT_EQ(document->modelCount(), 0u);
+    EXPECT_EQ(document->models().size(), 0u);
 
     EXPECT_FALSE(document->removeModel(nullptr));
     EXPECT_FALSE(document->removeAllModels());
@@ -68,8 +68,8 @@ TEST(CoverageSedTest, models)
     EXPECT_TRUE(document->removeAllModels());
 
     EXPECT_FALSE(model->hasChanges());
-    EXPECT_EQ(model->changeCount(), 0);
-    EXPECT_EQ(model->changes().size(), 0);
+    EXPECT_EQ(model->changeCount(), 0u);
+    EXPECT_EQ(model->changes().size(), 0u);
     EXPECT_FALSE(model->addChange(nullptr));
     EXPECT_FALSE(model->removeAllChanges());
 
@@ -78,8 +78,8 @@ TEST(CoverageSedTest, models)
     EXPECT_TRUE(model->addChange(changeAttribute));
 
     EXPECT_TRUE(model->hasChanges());
-    EXPECT_EQ(model->changeCount(), 1);
-    EXPECT_EQ(model->changes().size(), 1);
+    EXPECT_EQ(model->changeCount(), 1u);
+    EXPECT_EQ(model->changes().size(), 1u);
     EXPECT_EQ(model->changes()[0], changeAttribute);
     EXPECT_EQ(model->change(0), changeAttribute);
     EXPECT_EQ(model->change(1), nullptr);
@@ -91,8 +91,8 @@ TEST(CoverageSedTest, models)
     EXPECT_TRUE(model->removeAllChanges());
 
     EXPECT_FALSE(model->hasChanges());
-    EXPECT_EQ(model->changeCount(), 0);
-    EXPECT_EQ(model->changes().size(), 0);
+    EXPECT_EQ(model->changeCount(), 0u);
+    EXPECT_EQ(model->changes().size(), 0u);
 
     EXPECT_FALSE(model->removeChange(nullptr));
 }
@@ -196,8 +196,8 @@ TEST(CoverageSedTest, simulations)
     auto document {libOpenCOR::SedDocument::create()};
 
     EXPECT_FALSE(document->hasSimulations());
-    EXPECT_EQ(document->simulationCount(), 0);
-    EXPECT_EQ(document->simulations().size(), 0);
+    EXPECT_EQ(document->simulationCount(), 0u);
+    EXPECT_EQ(document->simulations().size(), 0u);
     EXPECT_FALSE(document->addSimulation(nullptr));
 
     auto uniformTimeCourse {libOpenCOR::SedUniformTimeCourse::create(document)};
@@ -211,8 +211,8 @@ TEST(CoverageSedTest, simulations)
     EXPECT_TRUE(document->addSimulation(analysis));
 
     EXPECT_TRUE(document->hasSimulations());
-    EXPECT_EQ(document->simulationCount(), 4);
-    EXPECT_EQ(document->simulations().size(), 4);
+    EXPECT_EQ(document->simulationCount(), 4u);
+    EXPECT_EQ(document->simulations().size(), 4u);
     EXPECT_EQ(document->simulations()[0], uniformTimeCourse);
     EXPECT_EQ(document->simulations()[1], oneStep);
     EXPECT_EQ(document->simulations()[2], steadyState);
@@ -236,8 +236,8 @@ TEST(CoverageSedTest, simulations)
     EXPECT_TRUE(document->removeSimulation(analysis));
 
     EXPECT_FALSE(document->hasSimulations());
-    EXPECT_EQ(document->simulationCount(), 0);
-    EXPECT_EQ(document->simulations().size(), 0);
+    EXPECT_EQ(document->simulationCount(), 0u);
+    EXPECT_EQ(document->simulations().size(), 0u);
 
     EXPECT_FALSE(document->removeSimulation(nullptr));
     EXPECT_FALSE(document->removeAllSimulations());
@@ -268,8 +268,8 @@ TEST(CoverageSedTest, tasks)
     auto document {libOpenCOR::SedDocument::create()};
 
     EXPECT_FALSE(document->hasTasks());
-    EXPECT_EQ(document->taskCount(), 0);
-    EXPECT_EQ(document->tasks().size(), 0);
+    EXPECT_EQ(document->taskCount(), 0u);
+    EXPECT_EQ(document->tasks().size(), 0u);
     EXPECT_FALSE(document->addTask(nullptr));
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
@@ -283,8 +283,8 @@ TEST(CoverageSedTest, tasks)
     EXPECT_TRUE(document->addTask(task));
 
     EXPECT_TRUE(document->hasTasks());
-    EXPECT_EQ(document->taskCount(), 1);
-    EXPECT_EQ(document->tasks().size(), 1);
+    EXPECT_EQ(document->taskCount(), 1u);
+    EXPECT_EQ(document->tasks().size(), 1u);
     EXPECT_EQ(document->tasks()[0], task);
     EXPECT_EQ(document->task(0), task);
     EXPECT_EQ(document->task(1), nullptr);
@@ -312,8 +312,8 @@ TEST(CoverageSedTest, tasks)
     EXPECT_TRUE(document->removeTask(task));
 
     EXPECT_FALSE(document->hasTasks());
-    EXPECT_EQ(document->taskCount(), 0);
-    EXPECT_EQ(document->tasks().size(), 0);
+    EXPECT_EQ(document->taskCount(), 0u);
+    EXPECT_EQ(document->tasks().size(), 0u);
 
     EXPECT_FALSE(document->removeTask(nullptr));
     EXPECT_FALSE(document->removeAllTasks());
@@ -427,7 +427,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
     const auto &instanceTask {instance->tasks()[0]};
 
     EXPECT_EQ(instance->hasTasks(), true);
-    EXPECT_EQ(instance->taskCount(), 1);
+    EXPECT_EQ(instance->taskCount(), 1u);
     EXPECT_EQ(instance->task(0), instanceTask);
     EXPECT_EQ(instance->task(1), nullptr);
 
@@ -435,7 +435,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
     EXPECT_EQ(instanceTask->voiName(), "environment/time");
     EXPECT_EQ(instanceTask->voiUnit(), "millisecond");
 
-    EXPECT_EQ(instanceTask->stateCount(), 4);
+    EXPECT_EQ(instanceTask->stateCount(), 4u);
     EXPECT_EQ(instanceTask->state(0).size(), 0u);
     EXPECT_EQ(instanceTask->state(4).size(), 0u);
     EXPECT_EQ(instanceTask->stateName(0), "membrane/V");
@@ -443,7 +443,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
     EXPECT_EQ(instanceTask->stateUnit(0), "millivolt");
     EXPECT_EQ(instanceTask->stateUnit(4), "");
 
-    EXPECT_EQ(instanceTask->rateCount(), 4);
+    EXPECT_EQ(instanceTask->rateCount(), 4u);
     EXPECT_EQ(instanceTask->rate(0).size(), 0u);
     EXPECT_EQ(instanceTask->rate(4).size(), 0u);
     EXPECT_EQ(instanceTask->rateName(0), "membrane/V'");
@@ -451,7 +451,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
     EXPECT_EQ(instanceTask->rateUnit(0), "millivolt/millisecond");
     EXPECT_EQ(instanceTask->rateUnit(4), "");
 
-    EXPECT_EQ(instanceTask->constantCount(), 5);
+    EXPECT_EQ(instanceTask->constantCount(), 5u);
     EXPECT_EQ(instanceTask->constant(0).size(), 0u);
     EXPECT_EQ(instanceTask->constant(5).size(), 0u);
     EXPECT_EQ(instanceTask->constantName(0), "membrane/Cm");
@@ -459,7 +459,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
     EXPECT_EQ(instanceTask->constantUnit(0), "microF_per_cm2");
     EXPECT_EQ(instanceTask->constantUnit(5), "");
 
-    EXPECT_EQ(instanceTask->computedConstantCount(), 3);
+    EXPECT_EQ(instanceTask->computedConstantCount(), 3u);
     EXPECT_EQ(instanceTask->computedConstant(0).size(), 0u);
     EXPECT_EQ(instanceTask->computedConstant(3).size(), 0u);
     EXPECT_EQ(instanceTask->computedConstantName(0), "leakage_current/E_L");
@@ -467,7 +467,7 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
     EXPECT_EQ(instanceTask->computedConstantUnit(0), "millivolt");
     EXPECT_EQ(instanceTask->computedConstantUnit(3), "");
 
-    EXPECT_EQ(instanceTask->algebraicVariableCount(), 10);
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 10u);
     EXPECT_EQ(instanceTask->algebraicVariable(0).size(), 0u);
     EXPECT_EQ(instanceTask->algebraicVariable(10).size(), 0u);
     EXPECT_EQ(instanceTask->algebraicVariableName(0), "membrane/i_Stim");
@@ -492,12 +492,12 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskNonDifferentialModel)
     EXPECT_EQ(instanceTask->voiName(), "");
     EXPECT_EQ(instanceTask->voiUnit(), "");
 
-    EXPECT_EQ(instanceTask->stateCount(), 0);
+    EXPECT_EQ(instanceTask->stateCount(), 0u);
     EXPECT_EQ(instanceTask->state(0).size(), 0u);
     EXPECT_EQ(instanceTask->stateName(0), "");
     EXPECT_EQ(instanceTask->stateUnit(0), "");
 
-    EXPECT_EQ(instanceTask->rateCount(), 0);
+    EXPECT_EQ(instanceTask->rateCount(), 0u);
     EXPECT_EQ(instanceTask->rate(0).size(), 0u);
     EXPECT_EQ(instanceTask->rateName(0), "");
     EXPECT_EQ(instanceTask->rateUnit(0), "");
@@ -564,9 +564,9 @@ TEST(CoverageSedTest, math)
     auto instance {document->instantiate()};
     const auto &instanceTask {instance->tasks()[0]};
 
-    EXPECT_EQ(instanceTask->constantCount(), 0);
-    EXPECT_EQ(instanceTask->computedConstantCount(), 37);
-    EXPECT_EQ(instanceTask->algebraicVariableCount(), 0);
+    EXPECT_EQ(instanceTask->constantCount(), 0u);
+    EXPECT_EQ(instanceTask->computedConstantCount(), 37u);
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 0u);
 
     instance->run();
 

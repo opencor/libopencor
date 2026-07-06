@@ -186,7 +186,7 @@ TEST(BasicFileTest, fileManager)
     auto filePath {libOpenCOR::resourcePath("file.txt")};
 
     EXPECT_FALSE(fileManager.hasFiles());
-    EXPECT_EQ(fileManager.fileCount(), 0);
+    EXPECT_EQ(fileManager.fileCount(), 0u);
     EXPECT_TRUE(fileManager.files().empty());
     EXPECT_EQ(fileManager.file(0), nullptr);
     EXPECT_EQ(fileManager.file(filePath), nullptr);
@@ -195,40 +195,40 @@ TEST(BasicFileTest, fileManager)
     auto &sameFileManager {libOpenCOR::FileManager::instance()};
 
     EXPECT_TRUE(sameFileManager.hasFiles());
-    EXPECT_EQ(sameFileManager.fileCount(), 1);
-    EXPECT_EQ(sameFileManager.files().size(), 1);
+    EXPECT_EQ(sameFileManager.fileCount(), 1u);
+    EXPECT_EQ(sameFileManager.files().size(), 1u);
     EXPECT_EQ(fileManager.file(0), localFile);
     EXPECT_EQ(sameFileManager.file(filePath), localFile);
 
     auto remoteFile {libOpenCOR::File::create(libOpenCOR::REMOTE_FILE)};
 
     EXPECT_TRUE(fileManager.hasFiles());
-    EXPECT_EQ(fileManager.fileCount(), 2);
-    EXPECT_EQ(fileManager.files().size(), 2);
+    EXPECT_EQ(fileManager.fileCount(), 2u);
+    EXPECT_EQ(fileManager.files().size(), 2u);
     EXPECT_EQ(fileManager.file(1), remoteFile);
     EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), remoteFile);
 
     sameFileManager.unmanage(localFile);
 
     EXPECT_TRUE(sameFileManager.hasFiles());
-    EXPECT_EQ(sameFileManager.fileCount(), 1);
-    EXPECT_EQ(sameFileManager.files().size(), 1);
+    EXPECT_EQ(sameFileManager.fileCount(), 1u);
+    EXPECT_EQ(sameFileManager.files().size(), 1u);
     EXPECT_EQ(fileManager.file(1), nullptr);
     EXPECT_EQ(sameFileManager.file(filePath), nullptr);
 
     sameFileManager.manage(localFile);
 
     EXPECT_TRUE(sameFileManager.hasFiles());
-    EXPECT_EQ(sameFileManager.fileCount(), 2);
-    EXPECT_EQ(sameFileManager.files().size(), 2);
+    EXPECT_EQ(sameFileManager.fileCount(), 2u);
+    EXPECT_EQ(sameFileManager.files().size(), 2u);
     EXPECT_EQ(fileManager.file(1), localFile);
     EXPECT_EQ(sameFileManager.file(filePath), localFile);
 
     fileManager.reset();
 
     EXPECT_FALSE(fileManager.hasFiles());
-    EXPECT_EQ(fileManager.fileCount(), 0);
-    EXPECT_EQ(fileManager.files().size(), 0);
+    EXPECT_EQ(fileManager.fileCount(), 0u);
+    EXPECT_EQ(fileManager.files().size(), 0u);
     EXPECT_EQ(fileManager.file(0), nullptr);
     EXPECT_EQ(fileManager.file(1), nullptr);
     EXPECT_EQ(fileManager.file(libOpenCOR::REMOTE_FILE), nullptr);

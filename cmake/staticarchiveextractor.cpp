@@ -176,9 +176,9 @@ int main(int pArgC, char *pArgV[])
         // Parse the size field (right-justified decimal, 10 characters).
 
         long memberSize {};
+        auto [_, ec] = std::from_chars(header.size, header.size + 10, memberSize);
 
-        if (auto [ptr, ec] = std::from_chars(header.size, header.size + 10, memberSize);
-            ec != std::errc {}) {
+        if (ec != std::errc {}) {
             break;
         }
 
@@ -210,9 +210,9 @@ int main(int pArgC, char *pArgV[])
             // BSD ar format (#1/N): the first N bytes of the data area contain the member name.
 
             long nameSize {};
+            auto [_, ec] = std::from_chars(nameBuf + 3, nameBuf + nameEnd, nameSize);
 
-            if (auto [ptr, ec] = std::from_chars(nameBuf + 3, nameBuf + nameEnd, nameSize);
-                ec != std::errc {}) {
+            if (ec != std::errc {}) {
                 nameSize = 0;
             }
 
@@ -274,9 +274,9 @@ int main(int pArgC, char *pArgV[])
 
             if (allDigits) {
                 long offset {};
+                auto [_, ec] = std::from_chars(memberName.data() + 1, memberName.data() + memberName.size(), offset);
 
-                if (auto [ptr, ec] = std::from_chars(memberName.data() + 1, memberName.data() + memberName.size(), offset);
-                    (ec == std::errc {}) && (offset >= 0) && (static_cast<size_t>(offset) < stringTable.size())) {
+                if ((ec == std::errc {}) && (offset >= 0) && (static_cast<size_t>(offset) < stringTable.size())) {
                     auto end {static_cast<size_t>(offset)};
 
                     while ((end < stringTable.size()) && (stringTable[end] != '/') && (stringTable[end] != '\n') && (stringTable[end] != '\0')) {

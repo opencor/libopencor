@@ -192,15 +192,15 @@ TEST(InstanceSedTest, progressOfOdeModel)
 
 TEST(InstanceSedTest, stopRun)
 {
-    static const auto LARGE_STEP_COUNT {1000000};
+    static const auto SIMULATION_PROPERTY {1000000};
     static const auto WAIT_ITERATIONS = 60000;
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
-    simulation->setNumberOfSteps(LARGE_STEP_COUNT);
-    simulation->setOutputEndTime(static_cast<double>(LARGE_STEP_COUNT));
+    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
+    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
 
     auto instance {document->instantiate()};
 
@@ -242,16 +242,16 @@ TEST(InstanceSedTest, stopRunWhenNotRunning)
 
 TEST(InstanceSedTest, pauseRunAndResumeRun)
 {
-    static const auto LARGE_STEP_COUNT {1000000};
+    static const auto SIMULATION_PROPERTY {1000000};
     static const auto WAIT_ITERATIONS = 60000;
     static const auto PAUSE_SLEEP = 50;
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
-    simulation->setNumberOfSteps(LARGE_STEP_COUNT);
-    simulation->setOutputEndTime(static_cast<double>(LARGE_STEP_COUNT));
+    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
+    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
 
     auto instance {document->instantiate()};
 
@@ -300,16 +300,16 @@ TEST(InstanceSedTest, pauseRunAndResumeRunWhenNotRunning)
 
 TEST(InstanceSedTest, pauseRunThenStopRun)
 {
-    static const auto LARGE_STEP_COUNT {1000000};
+    static const auto SIMULATION_PROPERTY {1000000};
     static const auto WAIT_ITERATIONS = 60000;
     static const auto PAUSE_SLEEP = 50;
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
-    simulation->setNumberOfSteps(LARGE_STEP_COUNT);
-    simulation->setOutputEndTime(static_cast<double>(LARGE_STEP_COUNT));
+    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
+    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
 
     auto instance {document->instantiate()};
 
@@ -350,7 +350,7 @@ TEST(InstanceSedTest, pauseRunAndResumeRunWithNaturalCompletion)
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
     simulation->setNumberOfSteps(MODERATE_STEP_COUNT);
     simulation->setOutputEndTime(static_cast<double>(MODERATE_STEP_COUNT));
@@ -388,15 +388,15 @@ TEST(InstanceSedTest, pauseRunAndResumeRunWithNaturalCompletion)
 
 TEST(InstanceSedTest, startRunWhileAlreadyRunning)
 {
-    static const auto LARGE_STEP_COUNT {1000000};
+    static const auto SIMULATION_PROPERTY {1000000};
     static const auto WAIT_ITERATIONS = 60000;
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
-    auto simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
 
-    simulation->setNumberOfSteps(LARGE_STEP_COUNT);
-    simulation->setOutputEndTime(static_cast<double>(LARGE_STEP_COUNT));
+    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
+    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
 
     auto instance {document->instantiate()};
 
@@ -756,7 +756,7 @@ TEST(InstanceSedTest, simulationWithInitialTime)
 
     EXPECT_FALSE(instance->hasIssues());
 
-    static const auto VOI_SIZE {50001};
+    static const auto VOI_SIZE {50001u};
     static const auto VOI_START {0.0};
     static const auto VOI_END {50.0};
 

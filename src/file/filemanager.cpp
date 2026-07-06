@@ -19,6 +19,7 @@ limitations under the License.
 #include "utils.h"
 
 #include <algorithm>
+#include <mutex>
 #include <stack>
 
 namespace libOpenCOR {
