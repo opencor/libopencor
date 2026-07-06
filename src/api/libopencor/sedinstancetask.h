@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
+#include <span>
+
 namespace libOpenCOR {
 
 /**
@@ -64,10 +66,10 @@ public:
      * @return The values of the variable of integration.
      */
 
-    const Doubles &voi() const noexcept;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &voiAsArray() const;
+    const emscripten::val &voi() const noexcept;
+#else
+    std::span<const double> voi() const noexcept;
 #endif
 
     /**
@@ -110,10 +112,10 @@ public:
      * @return The values of the state, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &state(size_t pIndex) const noexcept;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &stateAsArray(size_t pIndex) const;
+    const emscripten::val &state(size_t pIndex) const noexcept;
+#else
+    std::span<const double> state(size_t pIndex) const noexcept;
 #endif
 
     /**
@@ -160,10 +162,10 @@ public:
      * @return The values of the rate, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &rate(size_t pIndex) const noexcept;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &rateAsArray(size_t pIndex) const;
+    const emscripten::val &rate(size_t pIndex) const noexcept;
+#else
+    std::span<const double> rate(size_t pIndex) const noexcept;
 #endif
 
     /**
@@ -210,10 +212,10 @@ public:
      * @return The values of the constant, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &constant(size_t pIndex) const noexcept;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &constantAsArray(size_t pIndex) const;
+    const emscripten::val &constant(size_t pIndex) const noexcept;
+#else
+    std::span<const double> constant(size_t pIndex) const noexcept;
 #endif
 
     /**
@@ -260,10 +262,10 @@ public:
      * @return The values of the computed constant, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &computedConstant(size_t pIndex) const noexcept;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &computedConstantAsArray(size_t pIndex) const;
+    const emscripten::val &computedConstant(size_t pIndex) const noexcept;
+#else
+    std::span<const double> computedConstant(size_t pIndex) const noexcept;
 #endif
 
     /**
@@ -310,10 +312,10 @@ public:
      * @return The values of the algebraic variable, as a @c Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &algebraicVariable(size_t pIndex) const noexcept;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &algebraicVariableAsArray(size_t pIndex) const;
+    const emscripten::val &algebraicVariable(size_t pIndex) const noexcept;
+#else
+    std::span<const double> algebraicVariable(size_t pIndex) const noexcept;
 #endif
 
     /**

@@ -20,8 +20,6 @@ limitations under the License.
 
 #include <libopencor>
 
-static const auto NoDoubles {std::vector<double> {}};
-
 TEST(CoverageSedTest, initialise)
 {
     static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
@@ -433,45 +431,45 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskDifferentialModel)
     EXPECT_EQ(instance->task(0), instanceTask);
     EXPECT_EQ(instance->task(1), nullptr);
 
-    EXPECT_EQ(instanceTask->voi(), NoDoubles);
+    EXPECT_EQ(instanceTask->voi().size(), 0u);
     EXPECT_EQ(instanceTask->voiName(), "environment/time");
     EXPECT_EQ(instanceTask->voiUnit(), "millisecond");
 
     EXPECT_EQ(instanceTask->stateCount(), 4);
-    EXPECT_EQ(instanceTask->state(0), NoDoubles);
-    EXPECT_EQ(instanceTask->state(4), NoDoubles);
+    EXPECT_EQ(instanceTask->state(0).size(), 0u);
+    EXPECT_EQ(instanceTask->state(4).size(), 0u);
     EXPECT_EQ(instanceTask->stateName(0), "membrane/V");
     EXPECT_EQ(instanceTask->stateName(4), "");
     EXPECT_EQ(instanceTask->stateUnit(0), "millivolt");
     EXPECT_EQ(instanceTask->stateUnit(4), "");
 
     EXPECT_EQ(instanceTask->rateCount(), 4);
-    EXPECT_EQ(instanceTask->rate(0), NoDoubles);
-    EXPECT_EQ(instanceTask->rate(4), NoDoubles);
+    EXPECT_EQ(instanceTask->rate(0).size(), 0u);
+    EXPECT_EQ(instanceTask->rate(4).size(), 0u);
     EXPECT_EQ(instanceTask->rateName(0), "membrane/V'");
     EXPECT_EQ(instanceTask->rateName(4), "");
     EXPECT_EQ(instanceTask->rateUnit(0), "millivolt/millisecond");
     EXPECT_EQ(instanceTask->rateUnit(4), "");
 
     EXPECT_EQ(instanceTask->constantCount(), 5);
-    EXPECT_EQ(instanceTask->constant(0), NoDoubles);
-    EXPECT_EQ(instanceTask->constant(5), NoDoubles);
+    EXPECT_EQ(instanceTask->constant(0).size(), 0u);
+    EXPECT_EQ(instanceTask->constant(5).size(), 0u);
     EXPECT_EQ(instanceTask->constantName(0), "membrane/Cm");
     EXPECT_EQ(instanceTask->constantName(5), "");
     EXPECT_EQ(instanceTask->constantUnit(0), "microF_per_cm2");
     EXPECT_EQ(instanceTask->constantUnit(5), "");
 
     EXPECT_EQ(instanceTask->computedConstantCount(), 3);
-    EXPECT_EQ(instanceTask->computedConstant(0), NoDoubles);
-    EXPECT_EQ(instanceTask->computedConstant(3), NoDoubles);
+    EXPECT_EQ(instanceTask->computedConstant(0).size(), 0u);
+    EXPECT_EQ(instanceTask->computedConstant(3).size(), 0u);
     EXPECT_EQ(instanceTask->computedConstantName(0), "leakage_current/E_L");
     EXPECT_EQ(instanceTask->computedConstantName(3), "");
     EXPECT_EQ(instanceTask->computedConstantUnit(0), "millivolt");
     EXPECT_EQ(instanceTask->computedConstantUnit(3), "");
 
     EXPECT_EQ(instanceTask->algebraicVariableCount(), 10);
-    EXPECT_EQ(instanceTask->algebraicVariable(0), NoDoubles);
-    EXPECT_EQ(instanceTask->algebraicVariable(10), NoDoubles);
+    EXPECT_EQ(instanceTask->algebraicVariable(0).size(), 0u);
+    EXPECT_EQ(instanceTask->algebraicVariable(10).size(), 0u);
     EXPECT_EQ(instanceTask->algebraicVariableName(0), "membrane/i_Stim");
     EXPECT_EQ(instanceTask->algebraicVariableName(10), "");
     EXPECT_EQ(instanceTask->algebraicVariableUnit(0), "microA_per_cm2");
@@ -490,17 +488,17 @@ TEST(CoverageSedTest, sedInstanceAndSedInstanceTaskNonDifferentialModel)
     auto instance {document->instantiate()};
     const auto &instanceTask {instance->tasks()[0]};
 
-    EXPECT_EQ(instanceTask->voi(), NoDoubles);
+    EXPECT_EQ(instanceTask->voi().size(), 0u);
     EXPECT_EQ(instanceTask->voiName(), "");
     EXPECT_EQ(instanceTask->voiUnit(), "");
 
     EXPECT_EQ(instanceTask->stateCount(), 0);
-    EXPECT_EQ(instanceTask->state(0), NoDoubles);
+    EXPECT_EQ(instanceTask->state(0).size(), 0u);
     EXPECT_EQ(instanceTask->stateName(0), "");
     EXPECT_EQ(instanceTask->stateUnit(0), "");
 
     EXPECT_EQ(instanceTask->rateCount(), 0);
-    EXPECT_EQ(instanceTask->rate(0), NoDoubles);
+    EXPECT_EQ(instanceTask->rate(0).size(), 0u);
     EXPECT_EQ(instanceTask->rateName(0), "");
     EXPECT_EQ(instanceTask->rateUnit(0), "");
 }

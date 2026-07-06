@@ -281,7 +281,7 @@ function axisInfo(index) {
   // Retrieve and return the array and unit corresponding to the given index.
 
   if (index === 0) {
-    return [instanceTask.voiAsArray, instanceTask.voiUnit];
+    return [instanceTask.voi, instanceTask.voiUnit];
   }
 
   index -= 1;
@@ -290,27 +290,27 @@ function axisInfo(index) {
     const stateOrRateIndex = Math.floor(index / 2);
 
     if (index % 2 === 0) {
-      return [instanceTask.stateAsArray(stateOrRateIndex), instanceTask.stateUnit(stateOrRateIndex)];
+      return [instanceTask.state(stateOrRateIndex), instanceTask.stateUnit(stateOrRateIndex)];
     }
 
-    return [instanceTask.rateAsArray(stateOrRateIndex), instanceTask.rateUnit(stateOrRateIndex)];
+    return [instanceTask.rate(stateOrRateIndex), instanceTask.rateUnit(stateOrRateIndex)];
   }
 
   index -= 2 * instanceTask.stateCount;
 
   if (index < instanceTask.constantCount) {
-    return [instanceTask.constantAsArray(index), instanceTask.constantUnit(index)];
+    return [instanceTask.constant(index), instanceTask.constantUnit(index)];
   }
 
   index -= instanceTask.constantCount;
 
   if (index < instanceTask.computedConstantCount) {
-    return [instanceTask.computedConstantAsArray(index), instanceTask.computedConstantUnit(index)];
+    return [instanceTask.computedConstant(index), instanceTask.computedConstantUnit(index)];
   }
 
   index -= instanceTask.computedConstantCount;
 
-  return [instanceTask.algebraicVariableAsArray(index), instanceTask.algebraicVariableUnit(index)];
+  return [instanceTask.algebraicVariable(index), instanceTask.algebraicVariableUnit(index)];
 }
 
 export function updateAxisIntervals() {
