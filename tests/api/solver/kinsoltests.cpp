@@ -118,11 +118,11 @@ namespace {
 
 void expectNla1Solution(const libOpenCOR::SedInstanceTaskPtr &pInstanceTask)
 {
-    EXPECT_EQ(pInstanceTask->stateCount(), 0u);
-    EXPECT_EQ(pInstanceTask->rateCount(), 0u);
-    EXPECT_EQ(pInstanceTask->constantCount(), 0u);
-    EXPECT_EQ(pInstanceTask->computedConstantCount(), 0u);
-    EXPECT_EQ(pInstanceTask->algebraicVariableCount(), 2u);
+    EXPECT_EQ(pInstanceTask->stateCount(), 0U);
+    EXPECT_EQ(pInstanceTask->rateCount(), 0U);
+    EXPECT_EQ(pInstanceTask->constantCount(), 0U);
+    EXPECT_EQ(pInstanceTask->computedConstantCount(), 0U);
+    EXPECT_EQ(pInstanceTask->algebraicVariableCount(), 2U);
 
     EXPECT_NEAR(pInstanceTask->algebraicVariable(0)[0], 3.0, ABS_TOL);
     EXPECT_NEAR(pInstanceTask->algebraicVariable(1)[0], 7.0, ABS_TOL);
@@ -130,11 +130,11 @@ void expectNla1Solution(const libOpenCOR::SedInstanceTaskPtr &pInstanceTask)
 
 void expectNla2Solution(const libOpenCOR::SedInstanceTaskPtr &pInstanceTask)
 {
-    EXPECT_EQ(pInstanceTask->stateCount(), 0u);
-    EXPECT_EQ(pInstanceTask->rateCount(), 0u);
-    EXPECT_EQ(pInstanceTask->constantCount(), 0u);
-    EXPECT_EQ(pInstanceTask->computedConstantCount(), 0u);
-    EXPECT_EQ(pInstanceTask->algebraicVariableCount(), 3u);
+    EXPECT_EQ(pInstanceTask->stateCount(), 0U);
+    EXPECT_EQ(pInstanceTask->rateCount(), 0U);
+    EXPECT_EQ(pInstanceTask->constantCount(), 0U);
+    EXPECT_EQ(pInstanceTask->computedConstantCount(), 0U);
+    EXPECT_EQ(pInstanceTask->algebraicVariableCount(), 3U);
 
     EXPECT_NEAR(pInstanceTask->algebraicVariable(0)[0], 7.0, ABS_TOL);
     EXPECT_NEAR(pInstanceTask->algebraicVariable(1)[0], -5.0, ABS_TOL);

@@ -819,7 +819,7 @@ TEST(InstanceSedTest, simulationWithInitialTime)
 
     EXPECT_FALSE(instance->hasIssues());
 
-    static const auto VOI_SIZE {50001u};
+    static const auto VOI_SIZE {50001U};
     static const auto VOI_START {0.0};
     static const auto VOI_END {50.0};
 

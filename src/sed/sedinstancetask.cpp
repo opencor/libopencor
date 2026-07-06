@@ -569,7 +569,7 @@ std::span<const double> SedInstanceTask::Impl::state(size_t pIndex) const noexce
         return {};
     }
 
-    return {mResults.states.data() + pIndex * mResults.resultsSize, mResults.resultsSize};
+    return std::span(mResults.states).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
 const std::string &SedInstanceTask::Impl::stateName(size_t pIndex) const noexcept
@@ -605,7 +605,7 @@ std::span<const double> SedInstanceTask::Impl::rate(size_t pIndex) const noexcep
         return {};
     }
 
-    return {mResults.rates.data() + pIndex * mResults.resultsSize, mResults.resultsSize};
+    return std::span(mResults.rates).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
 const std::string &SedInstanceTask::Impl::rateName(size_t pIndex) const noexcept
@@ -641,7 +641,7 @@ std::span<const double> SedInstanceTask::Impl::constant(size_t pIndex) const noe
         return {};
     }
 
-    return {mResults.constants.data() + pIndex * mResults.resultsSize, mResults.resultsSize};
+    return std::span(mResults.constants).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
 const std::string &SedInstanceTask::Impl::constantName(size_t pIndex) const noexcept
@@ -677,7 +677,7 @@ std::span<const double> SedInstanceTask::Impl::computedConstant(size_t pIndex) c
         return {};
     }
 
-    return {mResults.computedConstants.data() + pIndex * mResults.resultsSize, mResults.resultsSize};
+    return std::span(mResults.computedConstants).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
 const std::string &SedInstanceTask::Impl::computedConstantName(size_t pIndex) const noexcept
@@ -713,7 +713,7 @@ std::span<const double> SedInstanceTask::Impl::algebraicVariable(size_t pIndex) 
         return {};
     }
 
-    return {mResults.algebraicVariables.data() + pIndex * mResults.resultsSize, mResults.resultsSize};
+    return std::span(mResults.algebraicVariables).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
 const std::string &SedInstanceTask::Impl::algebraicVariableName(size_t pIndex) const noexcept

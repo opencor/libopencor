@@ -56,9 +56,9 @@ TEST(ChildFileTest, noChildFiles)
     auto file {libOpenCOR::File::create(filePath)};
 
     EXPECT_FALSE(file->hasChildFiles());
-    EXPECT_EQ(file->childFileCount(), 0u);
-    EXPECT_EQ(file->childFileNames().size(), 0u);
-    EXPECT_EQ(file->childFiles().size(), 0u);
+    EXPECT_EQ(file->childFileCount(), 0U);
+    EXPECT_EQ(file->childFileNames().size(), 0U);
+    EXPECT_EQ(file->childFiles().size(), 0U);
     EXPECT_EQ(file->childFile(0), nullptr);
     EXPECT_EQ(file->childFile(filePath), nullptr);
 }

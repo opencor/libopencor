@@ -24,7 +24,7 @@ limitations under the License.
 
 TEST(ConcurrentSedTest, parallelIndependentInstances)
 {
-    static const auto INSTANCE_COUNT {3u};
+    static const auto INSTANCE_COUNT {3U};
     static const auto SIMULATION_PROPERTY {10000};
 
     std::vector<libOpenCOR::SedInstancePtr> instances;
@@ -42,6 +42,8 @@ TEST(ConcurrentSedTest, parallelIndependentInstances)
 
     std::vector<std::thread> threads;
     std::atomic<size_t> completedCount {0};
+
+    threads.reserve(instances.size());
 
     for (auto &instance : instances) {
         threads.emplace_back([&instance, &completedCount]() {
@@ -119,7 +121,7 @@ TEST(ConcurrentSedTest, parallelSharedDocument)
 
 TEST(ConcurrentSedTest, parallelAsyncLifecycle)
 {
-    static const auto INSTANCE_COUNT {3u};
+    static const auto INSTANCE_COUNT {3U};
     static const auto SIMULATION_PROPERTY {10000};
 
     std::vector<libOpenCOR::SedInstancePtr> instances;

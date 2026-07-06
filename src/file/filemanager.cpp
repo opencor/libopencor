@@ -37,9 +37,9 @@ FilePtr FileManager::Impl::manage(const FilePtr &pFile)
 
     // Opportunistically remove any expired entries and correct our file count.
 
-    const auto expiredEnd = std::remove_if(mFiles.begin(), mFiles.end(), [](const auto &file) {
-        return file.expired();
-    });
+    const auto expiredEnd = std::ranges::remove_if(mFiles.begin(), mFiles.end(), [](const auto &file) {
+                                return file.expired();
+                            }).begin();
 
     mFileCount -= static_cast<size_t>(mFiles.end() - expiredEnd);
 
@@ -97,11 +97,11 @@ void FileManager::Impl::unmanage(File *pFile)
 
         // Unmanage the current file.
 
-        const auto removeEnd = std::remove_if(mFiles.begin(), mFiles.end(), [&file](const auto &managedFile) {
-            auto managedFilePtr {managedFile.lock()};
+        const auto removeEnd = std::ranges::remove_if(mFiles.begin(), mFiles.end(), [&file](const auto &managedFile) {
+                                   auto managedFilePtr {managedFile.lock()};
 
-            return (managedFilePtr == nullptr) || (managedFilePtr.get() == file);
-        });
+                                   return (managedFilePtr == nullptr) || (managedFilePtr.get() == file);
+                               }).begin();
 
         mFileCount -= static_cast<size_t>(mFiles.end() - removeEnd);
 
