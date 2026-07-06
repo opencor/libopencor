@@ -14,6 +14,7 @@
 
 
 import libopencor as loc
+import math
 import platform
 import time
 import utils
@@ -237,6 +238,60 @@ def test_stop_run():
 
     assert instance.progress < 1.0
     assert not instance.has_issues
+
+
+def test_stop_run_results_have_nans():
+    SIMULATION_PROPERTY = 1000000
+    WAIT_ITERATIONS = 60000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    instance.stop_run()
+
+    for _ in range(WAIT_ITERATIONS):
+        if not instance.is_running:
+            break
+
+        time.sleep(0.001)
+
+    assert instance.progress < 1.0
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state0 = instance_task.state(0)
+
+    assert len(voi) == len(state0)
+    assert len(voi) == SIMULATION_PROPERTY + 1
+
+    assert not math.isnan(voi[0])
+    assert not math.isnan(state0[0])
+
+    nan_index = len(voi)
+
+    for i in range(1, len(voi)):
+        if math.isnan(state0[i]):
+            nan_index = i
+
+            break
+
+    assert nan_index < len(voi)
+    assert math.isnan(voi[nan_index])
+    assert nan_index < len(voi) - 1
 
 
 def test_stop_run_when_not_running():
