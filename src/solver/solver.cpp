@@ -72,19 +72,19 @@ void Solver::Impl::serialise(xmlNodePtr pNode, bool pNlaAlgorithm) const
     }
 }
 
-Solver::Solver(Impl *pPimpl)
-    : Logger(pPimpl)
+Solver::Solver(std::unique_ptr<Impl> pPimpl)
+    : Logger(std::move(pPimpl))
 {
 }
 
 Solver::Impl *Solver::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const Solver::Impl *Solver::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 const std::string &Solver::id() const noexcept

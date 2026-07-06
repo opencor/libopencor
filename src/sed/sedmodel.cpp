@@ -22,6 +22,7 @@ limitations under the License.
 #include "utils.h"
 
 #include <algorithm>
+#include <memory>
 
 namespace libOpenCOR {
 
@@ -182,14 +183,11 @@ void SedModel::Impl::serialise(xmlNodePtr pNode) const
 }
 
 SedModel::SedModel(const SedDocumentPtr &pDocument, const FilePtr &pFile)
-    : SedBase(new Impl(pDocument, pFile))
+    : SedBase(std::make_unique<Impl>(pDocument, pFile))
 {
 }
 
-SedModel::~SedModel()
-{
-    delete pimpl();
-}
+SedModel::~SedModel() = default;
 
 SedModel::Impl *SedModel::pimpl()
 {

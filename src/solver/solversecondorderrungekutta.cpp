@@ -107,14 +107,11 @@ bool SolverSecondOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 }
 
 SolverSecondOrderRungeKutta::SolverSecondOrderRungeKutta()
-    : SolverOdeFixedStep(new Impl {})
+    : SolverOdeFixedStep(std::make_unique<Impl>())
 {
 }
 
-SolverSecondOrderRungeKutta::~SolverSecondOrderRungeKutta()
-{
-    delete pimpl();
-}
+SolverSecondOrderRungeKutta::~SolverSecondOrderRungeKutta() = default;
 
 SolverSecondOrderRungeKutta::Impl *SolverSecondOrderRungeKutta::pimpl()
 {

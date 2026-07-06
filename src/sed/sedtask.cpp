@@ -21,6 +21,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 SedTask::Impl::Impl(const SedDocumentPtr &pDocument, const SedModelPtr &pModel,
@@ -121,14 +123,11 @@ void SedTask::Impl::serialise(xmlNodePtr pNode) const
 }
 
 SedTask::SedTask(const SedDocumentPtr &pDocument, const SedModelPtr &pModel, const SedSimulationPtr &pSimulation)
-    : SedAbstractTask(new Impl(pDocument, pModel, pSimulation))
+    : SedAbstractTask(std::make_unique<Impl>(pDocument, pModel, pSimulation))
 {
 }
 
-SedTask::~SedTask()
-{
-    delete pimpl();
-}
+SedTask::~SedTask() = default;
 
 SedTask::Impl *SedTask::pimpl()
 {

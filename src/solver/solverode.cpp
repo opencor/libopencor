@@ -59,8 +59,8 @@ void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates,
 #endif
 }
 
-SolverOde::SolverOde(Impl *pPimpl)
-    : Solver(pPimpl)
+SolverOde::SolverOde(std::unique_ptr<Impl> pPimpl)
+    : Solver(std::move(pPimpl))
 {
 }
 

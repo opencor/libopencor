@@ -746,23 +746,20 @@ void *Compiler::Impl::function(const std::string &pName) const
 #endif
 
 Compiler::Compiler()
-    : Logger(new Impl {})
+    : Logger(std::make_unique<Impl>())
 {
 }
 
-Compiler::~Compiler()
-{
-    delete pimpl();
-}
+Compiler::~Compiler() = default;
 
 Compiler::Impl *Compiler::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const Compiler::Impl *Compiler::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 CompilerPtr Compiler::create()

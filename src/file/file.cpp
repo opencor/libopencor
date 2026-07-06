@@ -236,7 +236,7 @@ const FilePtr &File::Impl::childFile(const std::string &pFileName) const
 }
 
 File::File(const std::string &pFileNameOrUrl, bool pRetrieveContents)
-    : Logger(new Impl {pFileNameOrUrl, pRetrieveContents})
+    : Logger(std::make_unique<Impl>(pFileNameOrUrl, pRetrieveContents))
 {
 }
 
@@ -245,18 +245,16 @@ File::~File()
     // Have ourselves unmanaged.
 
     FileManager::instance().mPimpl.unmanage(this);
-
-    delete pimpl();
 }
 
 File::Impl *File::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const File::Impl *File::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 #ifdef __EMSCRIPTEN__

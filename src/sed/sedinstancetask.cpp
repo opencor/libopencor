@@ -27,6 +27,7 @@ limitations under the License.
 #include <cmath>
 #include <cstdint>
 #include <condition_variable>
+#include <memory>
 #include <mutex>
 
 namespace libOpenCOR {
@@ -756,23 +757,20 @@ const std::string &SedInstanceTask::Impl::algebraicVariableUnit(size_t pIndex) c
 }
 
 SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask)
-    : Logger(new Impl(pTask))
+    : Logger(std::make_unique<Impl>(pTask))
 {
 }
 
-SedInstanceTask::~SedInstanceTask()
-{
-    delete pimpl();
-}
+SedInstanceTask::~SedInstanceTask() = default;
 
 SedInstanceTask::Impl *SedInstanceTask::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 double SedInstanceTask::progress() const noexcept

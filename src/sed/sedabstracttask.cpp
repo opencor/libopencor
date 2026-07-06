@@ -31,8 +31,8 @@ void SedAbstractTask::Impl::serialise(xmlNodePtr pNode) const
     SedBase::Impl::serialise(pNode);
 }
 
-SedAbstractTask::SedAbstractTask(Impl *pPimpl)
-    : SedBase(pPimpl)
+SedAbstractTask::SedAbstractTask(std::unique_ptr<Impl> pPimpl)
+    : SedBase(std::move(pPimpl))
 {
 }
 

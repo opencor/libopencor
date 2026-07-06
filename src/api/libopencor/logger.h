@@ -19,6 +19,8 @@ limitations under the License.
 #include "libopencor/export.h"
 #include "libopencor/types.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 /**
@@ -35,7 +37,7 @@ public:
      */
 
     Logger() = delete; /**< No default constructor allowed, @private. */
-    virtual ~Logger() = default; /**< Destructor, @private. */
+    virtual ~Logger(); /**< Destructor, @private. */
 
     Logger(const Logger &pOther) = delete; /**< No copy constructor allowed, @private. */
     Logger(Logger &&pOther) noexcept = delete; /**< No move constructor allowed, @private. */
@@ -172,9 +174,9 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *mPimpl; /**< The private implementation, @private. */
+    std::unique_ptr<Impl> mPimpl; /**< The private implementation, @private. */
 
-    explicit Logger(Impl *pPimpl); /**< Constructor, @private. */
+    explicit Logger(std::unique_ptr<Impl> pPimpl); /**< Constructor, @private. */
 };
 
 } // namespace libOpenCOR

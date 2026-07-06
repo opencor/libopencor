@@ -131,8 +131,8 @@ void SolverOdeFixedStep::Impl::setStep(double pStep)
     mStep = pStep;
 }
 
-SolverOdeFixedStep::SolverOdeFixedStep(Impl *pPimpl)
-    : SolverOde(pPimpl)
+SolverOdeFixedStep::SolverOdeFixedStep(std::unique_ptr<Impl> pPimpl)
+    : SolverOde(std::move(pPimpl))
 {
 }
 

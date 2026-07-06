@@ -494,14 +494,11 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 }
 
 SolverKinsol::SolverKinsol()
-    : SolverNla(new Impl {})
+    : SolverNla(std::make_unique<Impl>())
 {
 }
 
-SolverKinsol::~SolverKinsol()
-{
-    delete pimpl();
-}
+SolverKinsol::~SolverKinsol() = default;
 
 SolverKinsol::Impl *SolverKinsol::pimpl()
 {

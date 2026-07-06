@@ -171,10 +171,12 @@ void Logger::Impl::removeAllIssues()
     mWarnings.clear();
 }
 
-Logger::Logger(Impl *pPimpl)
-    : mPimpl(pPimpl)
+Logger::Logger(std::unique_ptr<Impl> pPimpl)
+    : mPimpl(std::move(pPimpl))
 {
 }
+
+Logger::~Logger() = default;
 
 bool Logger::hasIssues() const
 {

@@ -597,24 +597,21 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 }
 
 SedmlFile::SedmlFile(const FilePtr &pFile, libsedml::SedDocument *pDocument)
-    : Logger(new Impl {pFile, pDocument})
+    : Logger(std::make_unique<Impl>(pFile, pDocument))
 {
 }
 
-SedmlFile::~SedmlFile()
-{
-    delete pimpl();
-}
+SedmlFile::~SedmlFile() = default;
 
 SedmlFile::Impl *SedmlFile::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 /*---GRY---
 const SedmlFile::Impl *SedmlFile::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 */
 

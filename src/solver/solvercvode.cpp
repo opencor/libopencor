@@ -870,14 +870,11 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 }
 
 SolverCvode::SolverCvode()
-    : SolverOde(new Impl {})
+    : SolverOde(std::make_unique<Impl>())
 {
 }
 
-SolverCvode::~SolverCvode()
-{
-    delete pimpl();
-}
+SolverCvode::~SolverCvode() = default;
 
 SolverCvode::Impl *SolverCvode::pimpl()
 {

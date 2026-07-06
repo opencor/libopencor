@@ -45,8 +45,8 @@ void SedChange::Impl::serialise(xmlNodePtr pNode) const
 #endif
 }
 
-SedChange::SedChange(Impl *pPimpl)
-    : SedBase(pPimpl)
+SedChange::SedChange(std::unique_ptr<Impl> pPimpl)
+    : SedBase(std::move(pPimpl))
 {
 }
 

@@ -108,14 +108,11 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
 }
 
 SolverHeun::SolverHeun()
-    : SolverOdeFixedStep(new Impl {})
+    : SolverOdeFixedStep(std::make_unique<Impl>())
 {
 }
 
-SolverHeun::~SolverHeun()
-{
-    delete pimpl();
-}
+SolverHeun::~SolverHeun() = default;
 
 SolverHeun::Impl *SolverHeun::pimpl()
 {

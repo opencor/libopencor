@@ -66,14 +66,11 @@ const std::string &Issue::Impl::description() const
 }
 
 Issue::Issue(Type pType, const std::string &pDescription, const std::string &pContext)
-    : mPimpl(new Impl {pType, pDescription, pContext})
+    : mPimpl(std::make_unique<Impl>(pType, pDescription, pContext))
 {
 }
 
-Issue::~Issue()
-{
-    delete mPimpl;
-}
+Issue::~Issue() = default;
 
 Issue::Type Issue::type() const
 {

@@ -25,6 +25,7 @@ limitations under the License.
 
 #include <algorithm>
 #include <format>
+#include <memory>
 #include <sstream>
 
 namespace libOpenCOR {
@@ -457,23 +458,20 @@ bool SedDocument::Impl::removeAllTasks()
 }
 
 SedDocument::SedDocument()
-    : Logger(new Impl {})
+    : Logger(std::make_unique<Impl>())
 {
 }
 
-SedDocument::~SedDocument()
-{
-    delete pimpl();
-}
+SedDocument::~SedDocument() = default;
 
 SedDocument::Impl *SedDocument::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const SedDocument::Impl *SedDocument::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 SedDocumentPtr SedDocument::create(const FilePtr &pFile)

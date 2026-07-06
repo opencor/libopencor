@@ -52,8 +52,8 @@ SolverNla::Impl::Impl(const std::string &pId, const std::string &pName)
 {
 }
 
-SolverNla::SolverNla(Impl *pPimpl)
-    : Solver(pPimpl)
+SolverNla::SolverNla(std::unique_ptr<Impl> pPimpl)
+    : Solver(std::move(pPimpl))
 {
 }
 

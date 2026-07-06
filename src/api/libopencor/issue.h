@@ -18,6 +18,7 @@ limitations under the License.
 
 #include "libopencor/export.h"
 
+#include <memory>
 #include <string>
 
 namespace libOpenCOR {
@@ -91,7 +92,7 @@ public:
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    Impl *mPimpl; /**< The private implementation, @private. */
+    std::unique_ptr<Impl> mPimpl; /**< The private implementation, @private. */
 
     explicit Issue(Type pType, const std::string &pDescription, const std::string &pContext); /**< Constructor, @private. */
 };

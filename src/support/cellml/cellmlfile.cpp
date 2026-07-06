@@ -153,7 +153,7 @@ CellmlFileRuntimePtr CellmlFile::Impl::runtime(const CellmlFilePtr &pCellmlFile,
 }
 
 CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
-    : Logger(new Impl {pFile, pModel, pStrict})
+    : Logger(std::make_unique<Impl>(pFile, pModel, pStrict))
 {
 }
 
@@ -166,18 +166,16 @@ CellmlFile::~CellmlFile()
 
         sRuntimes.erase(this);
     }
-
-    delete pimpl();
 }
 
 CellmlFile::Impl *CellmlFile::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const CellmlFile::Impl *CellmlFile::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)

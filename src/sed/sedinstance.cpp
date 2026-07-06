@@ -21,6 +21,7 @@ limitations under the License.
 #include "libopencor/seddocument.h"
 
 #include <chrono>
+#include <memory>
 
 namespace libOpenCOR {
 
@@ -250,25 +251,23 @@ const SedInstanceTaskPtr &SedInstance::Impl::task(size_t pIndex) const
 }
 
 SedInstance::SedInstance(const SedDocumentPtr &pDocument)
-    : Logger(new Impl(pDocument))
+    : Logger(std::make_unique<Impl>(pDocument))
 {
 }
 
 SedInstance::~SedInstance()
 {
     pimpl()->waitForRun(); // To ensure that the instance is not running before we delete it.
-
-    delete pimpl();
 }
 
 SedInstance::Impl *SedInstance::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const SedInstance::Impl *SedInstance::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 double SedInstance::run()

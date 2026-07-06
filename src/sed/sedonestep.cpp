@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 SedOneStep::Impl::Impl(const SedDocumentPtr &pDocument)
@@ -47,14 +49,11 @@ void SedOneStep::Impl::serialise(xmlNodePtr pNode) const
 }
 
 SedOneStep::SedOneStep(const SedDocumentPtr &pDocument)
-    : SedSimulation(new Impl(pDocument))
+    : SedSimulation(std::make_unique<Impl>(pDocument))
 {
 }
 
-SedOneStep::~SedOneStep()
-{
-    delete pimpl();
-}
+SedOneStep::~SedOneStep() = default;
 
 SedOneStep::Impl *SedOneStep::pimpl()
 {

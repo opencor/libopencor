@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 SedUniformTimeCourse::Impl::Impl(const SedDocumentPtr &pDocument)
@@ -80,14 +82,11 @@ void SedUniformTimeCourse::Impl::serialise(xmlNodePtr pNode) const
 }
 
 SedUniformTimeCourse::SedUniformTimeCourse(const SedDocumentPtr &pDocument)
-    : SedSimulation(new Impl(pDocument))
+    : SedSimulation(std::make_unique<Impl>(pDocument))
 {
 }
 
-SedUniformTimeCourse::~SedUniformTimeCourse()
-{
-    delete pimpl();
-}
+SedUniformTimeCourse::~SedUniformTimeCourse() = default;
 
 SedUniformTimeCourse::Impl *SedUniformTimeCourse::pimpl()
 {

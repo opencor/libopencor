@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 SedAnalysis::Impl::Impl(const SedDocumentPtr &pDocument)
@@ -35,14 +37,11 @@ void SedAnalysis::Impl::serialise(xmlNodePtr pNode) const
 }
 
 SedAnalysis::SedAnalysis(const SedDocumentPtr &pDocument)
-    : SedSimulation(new Impl(pDocument))
+    : SedSimulation(std::make_unique<Impl>(pDocument))
 {
 }
 
-SedAnalysis::~SedAnalysis()
-{
-    delete pimpl();
-}
+SedAnalysis::~SedAnalysis() = default;
 
 SedAnalysis::Impl *SedAnalysis::pimpl()
 {

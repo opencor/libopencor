@@ -142,14 +142,11 @@ bool SolverFourthOrderRungeKutta::Impl::solve(double &pVoi, double pVoiEnd)
 }
 
 SolverFourthOrderRungeKutta::SolverFourthOrderRungeKutta()
-    : SolverOdeFixedStep(new Impl {})
+    : SolverOdeFixedStep(std::make_unique<Impl>())
 {
 }
 
-SolverFourthOrderRungeKutta::~SolverFourthOrderRungeKutta()
-{
-    delete pimpl();
-}
+SolverFourthOrderRungeKutta::~SolverFourthOrderRungeKutta() = default;
 
 SolverFourthOrderRungeKutta::Impl *SolverFourthOrderRungeKutta::pimpl()
 {

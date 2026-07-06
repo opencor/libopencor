@@ -40,19 +40,19 @@ void SedBase::Impl::serialise(xmlNodePtr pNode) const
     xmlNewProp(pNode, toConstXmlCharPtr("id"), toConstXmlCharPtr(mId));
 }
 
-SedBase::SedBase(Impl *pPimpl)
-    : Logger(pPimpl)
+SedBase::SedBase(std::unique_ptr<Impl> pPimpl)
+    : Logger(std::move(pPimpl))
 {
 }
 
 SedBase::Impl *SedBase::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const SedBase::Impl *SedBase::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 const std::string &SedBase::id() const

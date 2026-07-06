@@ -18,6 +18,7 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
+#include <memory>
 #include <string>
 
 namespace libOpenCOR {
@@ -88,7 +89,7 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit Solver(Impl *pPimpl); /**< Constructor, @private. */
+    explicit Solver(std::unique_ptr<Impl> pPimpl); /**< Constructor, @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

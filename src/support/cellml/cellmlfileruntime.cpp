@@ -526,23 +526,20 @@ CellmlFileRuntime::ComputeVariablesForDifferentialModel CellmlFileRuntime::Impl:
 #endif
 
 CellmlFileRuntime::CellmlFileRuntime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
-    : Logger(new Impl {pCellmlFile, pNlaSolver})
+    : Logger(std::make_unique<Impl>(pCellmlFile, pNlaSolver))
 {
 }
 
-CellmlFileRuntime::~CellmlFileRuntime()
-{
-    delete pimpl();
-}
+CellmlFileRuntime::~CellmlFileRuntime() = default;
 
 CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const CellmlFileRuntime::Impl *CellmlFileRuntime::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)

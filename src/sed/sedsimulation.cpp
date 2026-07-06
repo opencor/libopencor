@@ -103,8 +103,8 @@ void SedSimulation::Impl::serialise(xmlNodePtr pNode) const
     }
 }
 
-SedSimulation::SedSimulation(Impl *pPimpl)
-    : SedBase(pPimpl)
+SedSimulation::SedSimulation(std::unique_ptr<Impl> pPimpl)
+    : SedBase(std::move(pPimpl))
 {
 }
 
