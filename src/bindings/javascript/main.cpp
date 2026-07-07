@@ -68,44 +68,38 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
                 }
             });
 
-            prototype[Symbol.iterator] = function() {
-                let i = 0;
+            prototype[Symbol.iterator] = function*() {
                 let n = this.size();
-                let iterator = {};
 
-                iterator.next = () => {
-                    let result = {};
-
-                    if (i < n) {
-                        result.value = this.get(i++);
-                        result.done = false;
-                    } else {
-                        result.value = undefined;
-                        result.done = true;
-                    }
-
-                    return result;
-                };
-
-                return iterator;
+                for (let i = 0; i < n; ++i) {
+                    yield this.get(i);
+                }
             };
 
             Object.setPrototypeOf(prototype, new Proxy(Object.getPrototypeOf(prototype), {
-                get: (target, prop, receiver) => {
-                    if (typeof prop === 'string' && /^[0-9]+$/.test(prop)) {
-                        return receiver.get(parseInt(prop));
+                get: (target, property, receiver) => {
+                    if (typeof property === 'string') {
+                        let number = property >>> 0;
+
+                        if (String(number) === property) {
+                            return receiver.get(number);
+                        }
                     }
 
-                    return Reflect.get(target, prop, receiver);
+                    return Reflect.get(target, property, receiver);
                 },
-                set: (target, prop, value, receiver) => {
-                    if (typeof prop === 'string' && /^[0-9]+$/.test(prop)) {
-                        receiver.set(parseInt(prop), value);
+                set: (target, property, value, receiver) => {
+                    if (typeof property === 'string') {
+                        let number = property >>> 0;
 
-                        return true;
+                        if (String(number) === property) {
+                            receiver.set(number, value);
+
+                            return true;
+                        }
                     }
 
-                    return Reflect.set(target, prop, value, receiver);
+                    return Reflect.set(target, property, value, receiver);
                 }
             }));
         });
