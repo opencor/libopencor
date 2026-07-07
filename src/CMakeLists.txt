@@ -54,9 +54,14 @@ if(BUILDING_USING_MSVC)
 endif()
 
 # Prefer maximum optimisation for native non-MSVC release builds.
+# Note: -fno-math-errno and -fno-trapping-math are a safe subset of -ffast-math that allow the compiler to vectorise
+#       mathematical operations more aggressively.
 
 if(RELEASE_MODE AND NOT BUILDING_USING_MSVC)
     replace_compiler_flag("-O2" "-O3")
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-math-errno -fno-trapping-math")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-math-errno -fno-trapping-math")
 endif()
 
 # Enable auto-vectorisation (useful for fixed-step solver loops on x86-64 release builds).
