@@ -396,6 +396,15 @@ EM_JS(void, initialiseWorkerWasmJS, (const void* wasmBytesPtr, size_t wasmBytesS
     }
 
     globalThis.runtime = runtime;
+
+    // Cache the function references on Module to avoid property lookups through globalThis.runtime on every call from
+    // the EM_JS trampolines.
+
+    Module.initialiseArrays = runtime.initialiseArrays;
+    Module.computeComputedConstants = runtime.computeComputedConstants;
+    Module.computeRates = runtime.computeRates;
+    Module.computeVariables = runtime.computeVariables;
+    Module.computeObjectiveFunctions = runtime.computeObjectiveFunctions;
 }); // clang-format on
 
 void CellmlFileRuntime::Impl::initialiseWorkerWasm() const
@@ -421,7 +430,7 @@ void CellmlFileRuntime::Impl::setNlaSolverAddress(uintptr_t pAddress) const
 
 // clang-format off
 EM_JS(void, initialiseArraysForAlgebraicModelJS, (const void* constants, const void* computedConstants, const void* algebraicVariables), {
-    globalThis.runtime.initialiseArrays(constants, computedConstants, algebraicVariables);
+    Module.initialiseArrays(constants, computedConstants, algebraicVariables);
 }); // clang-format on
 
 void CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
@@ -431,7 +440,7 @@ void CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel(double *pConstan
 
 // clang-format off
 EM_JS(void, initialiseArraysForDifferentialModelJS, (const void* states, const void* rates, const void* constants, const void* computedConstants, const void* algebraicVariables), {
-    globalThis.runtime.initialiseArrays(states, rates, constants, computedConstants, algebraicVariables);
+    Module.initialiseArrays(states, rates, constants, computedConstants, algebraicVariables);
 }); // clang-format on
 
 void CellmlFileRuntime::Impl::initialiseArraysForDifferentialModel(double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
@@ -441,7 +450,7 @@ void CellmlFileRuntime::Impl::initialiseArraysForDifferentialModel(double *pStat
 
 // clang-format off
 EM_JS(void, computeComputedConstantsForAlgebraicModelJS, (const void* constants, const void* computedConstants, const void* algebraicVariables), {
-    globalThis.runtime.computeComputedConstants(constants, computedConstants, algebraicVariables);
+    Module.computeComputedConstants(constants, computedConstants, algebraicVariables);
 }); // clang-format on
 
 void CellmlFileRuntime::Impl::computeComputedConstantsForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
@@ -451,7 +460,7 @@ void CellmlFileRuntime::Impl::computeComputedConstantsForAlgebraicModel(double *
 
 // clang-format off
 EM_JS(void, computeComputedConstantsForDifferentialModelJS, (double voi, const void* states, const void* rates, const void* constants, const void* computedConstants, const void* algebraicVariables), {
-    globalThis.runtime.computeComputedConstants(voi, states, rates, constants, computedConstants, algebraicVariables);
+    Module.computeComputedConstants(voi, states, rates, constants, computedConstants, algebraicVariables);
 }); // clang-format on
 
 void CellmlFileRuntime::Impl::computeComputedConstantsForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
@@ -461,7 +470,7 @@ void CellmlFileRuntime::Impl::computeComputedConstantsForDifferentialModel(doubl
 
 // clang-format off
 EM_JS(void, computeRatesJS, (double voi, const void* states, const void* rates, const void* constants, const void* computedConstants, const void* algebraicVariables), {
-    globalThis.runtime.computeRates(voi, states, rates, constants, computedConstants, algebraicVariables);
+    Module.computeRates(voi, states, rates, constants, computedConstants, algebraicVariables);
 }); // clang-format on
 
 void CellmlFileRuntime::Impl::computeRates(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
@@ -471,7 +480,7 @@ void CellmlFileRuntime::Impl::computeRates(double pVoi, double *pStates, double 
 
 // clang-format off
 EM_JS(void, computeVariablesForAlgebraicModelJS, (const void* constants, const void* computedConstants, const void* algebraicVariables), {
-    globalThis.runtime.computeVariables(constants, computedConstants, algebraicVariables);
+    Module.computeVariables(constants, computedConstants, algebraicVariables);
 }); // clang-format on
 
 void CellmlFileRuntime::Impl::computeVariablesForAlgebraicModel(double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
@@ -481,7 +490,7 @@ void CellmlFileRuntime::Impl::computeVariablesForAlgebraicModel(double *pConstan
 
 // clang-format off
 EM_JS(void, computeVariablesForDifferentialModelJS, (double voi, const void* states, const void* rates, const void* constants, const void* computedConstants, const void* algebraicVariables), {
-    globalThis.runtime.computeVariables(voi, states, rates, constants, computedConstants, algebraicVariables);
+    Module.computeVariables(voi, states, rates, constants, computedConstants, algebraicVariables);
 }); // clang-format on
 
 void CellmlFileRuntime::Impl::computeVariablesForDifferentialModel(double pVoi, double *pStates, double *pRates, double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
