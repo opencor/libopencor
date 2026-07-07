@@ -71,15 +71,17 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         static constexpr auto WITH_EXTERNAL_VARIABLES {false};
 
 #ifdef __EMSCRIPTEN__
-        // Allocate the memory needed by our objective functions on the heap rather than on the stack.
+        // Allocate the memory needed by our objective functions using thread-local static buffers.
 
         if (pNlaSolver != nullptr) {
             if (differentialModel) {
                 generatorProfile->setFindRootMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
                                                           R"(void findRoot[INDEX](double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraicVariables)
 {
-    RootFindingInfo *rfi = (RootFindingInfo *) malloc(sizeof(RootFindingInfo));
-    double *u = (double *) malloc([SIZE] * sizeof(double));
+    static RootFindingInfo rfiStorage;
+    static double u[[SIZE]];
+
+    RootFindingInfo *rfi = &rfiStorage;
 
     rfi->voi = voi;
     rfi->states = states;
@@ -89,26 +91,22 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
     rfi->algebraicVariables = algebraicVariables;
 
 [CODE]
-
-    free(u);
-    free(rfi);
 }
 )");
             } else {
                 generatorProfile->setFindRootMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
                                                           R"(void findRoot[INDEX](double *constants, double *computedConstants, double *algebraicVariables)
 {
-    RootFindingInfo *rfi = (RootFindingInfo *) malloc(sizeof(RootFindingInfo));
-    double *u = (double *) malloc([SIZE] * sizeof(double));
+    static RootFindingInfo rfiStorage;
+    static double u[[SIZE]];
+
+    RootFindingInfo *rfi = &rfiStorage;
 
     rfi->constants = constants;
     rfi->computedConstants = computedConstants;
     rfi->algebraicVariables = algebraicVariables;
 
 [CODE]
-
-    free(u);
-    free(rfi);
 }
 )");
             }
