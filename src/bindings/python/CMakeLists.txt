@@ -59,7 +59,27 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     add_subdirectory(${CMAKE_PROJECT_NAME_LC})
 
+    # Auto-generate Python type stubs (.pyi) for type checkers (PEP 561).
+
+    file(RELATIVE_PATH PYTHON_BINDINGS_REL_DIR ${CMAKE_CURRENT_BINARY_DIR} ${PYTHON_BINDINGS_DIR})
+
+    nanobind_add_stub(${PYTHON_BINDINGS_TARGET}_stub
+                      MODULE libopencor
+                      RECURSIVE
+                      OUTPUT_PATH ${PYTHON_BINDINGS_REL_DIR}/${CMAKE_PROJECT_NAME_LC}
+                      OUTPUT
+                          __init__.pyi
+                          module.pyi
+                      MARKER_FILE ${PYTHON_BINDINGS_REL_DIR}/${CMAKE_PROJECT_NAME_LC}/py.typed
+                      PYTHON_PATH ${PYTHON_BINDINGS_REL_DIR}
+                      DEPENDS ${PYTHON_BINDINGS_TARGET})
+
     # Install our Python bindings.
 
     install(TARGETS ${PYTHON_BINDINGS_TARGET} DESTINATION .)
+
+    install(FILES ${PYTHON_BINDINGS_DIR}/${CMAKE_PROJECT_NAME_LC}/__init__.pyi
+                  ${PYTHON_BINDINGS_DIR}/${CMAKE_PROJECT_NAME_LC}/module.pyi
+                  ${PYTHON_BINDINGS_DIR}/${CMAKE_PROJECT_NAME_LC}/py.typed
+            DESTINATION .)
 endif()

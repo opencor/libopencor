@@ -28,18 +28,18 @@ Issue::Impl::Impl(Type pType, const std::string &pDescription, const std::string
     if (!mContext.empty()) {
         mDescriptionWithContext.reserve(mContext.size() + 2 + mDescription.size()); // NOLINT
 
-        mDescriptionWithContext.insert(0, mDescription);
+        mDescriptionWithContext = mContext;
+        mDescriptionWithContext += ": ";
 
 #ifndef CODE_COVERAGE_ENABLED
-        if (std::isupper(mDescriptionWithContext[0]) != 0) {
-#endif
-            mDescriptionWithContext[0] = static_cast<char>(std::tolower(mDescriptionWithContext[0]));
-#ifndef CODE_COVERAGE_ENABLED
-        }
+        mDescriptionWithContext += (std::isupper(mDescription[0]) != 0) ?
+                                       static_cast<char>(std::tolower(mDescription[0])) :
+                                       mDescription[0];
+#else
+        mDescriptionWithContext += static_cast<char>(std::tolower(mDescription[0]));
 #endif
 
-        mDescriptionWithContext.insert(0, ": ");
-        mDescriptionWithContext.insert(0, mContext);
+        mDescriptionWithContext += mDescription.substr(1);
     }
 }
 
@@ -66,14 +66,11 @@ const std::string &Issue::Impl::description() const
 }
 
 Issue::Issue(Type pType, const std::string &pDescription, const std::string &pContext)
-    : mPimpl(new Impl {pType, pDescription, pContext})
+    : mPimpl(std::make_unique<Impl>(pType, pDescription, pContext))
 {
 }
 
-Issue::~Issue()
-{
-    delete mPimpl;
-}
+Issue::~Issue() = default;
 
 Issue::Type Issue::type() const
 {

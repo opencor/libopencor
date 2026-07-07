@@ -357,10 +357,20 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: ${{ matrix.arch }}
+      - name: Install (latest) GCC
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          GCC_LATEST=$(apt-cache search ^gcc-[0-9]+$ | sort -V | tail -1 | awk '{print $1}')
+          GXX_LATEST=$(echo "$GCC_LATEST" | sed 's/gcc/g++/')
+          sudo apt-get install -y "$GCC_LATEST" "$GXX_LATEST"
+          sudo ln -sf "/usr/bin/$GCC_LATEST" /usr/local/bin/cc
+          sudo ln -sf "/usr/bin/$GXX_LATEST" /usr/local/bin/c++
       - name: Install LLVM
         if: ${{ matrix.code_coverage == 'ON' }}
         run: brew install llvm
-      - name: Install Clang
+      - name: Install LLVM+Clang tools
         if: ${{ matrix.code_analysis == 'ON' }}
         run: |
           wget https://github.com/opencor/gha/releases/download/gha/clang.tar.gz -O - | tar -xz
@@ -368,14 +378,8 @@ jobs:
           sudo cp /usr/local/bin/clang /usr/local/bin/clang++
           wget https://github.com/opencor/gha/releases/download/gha/clang-include.tar.gz -O - | tar -xz
           sudo mv include/* /usr/local/include
-      - name: Install ClangFormat
-        if: ${{ matrix.target == 'check_code_formatting' }}
-        run: |
           wget https://github.com/opencor/gha/releases/download/gha/clang-format.tar.gz -O - | tar -xz
           sudo mv clang-format /usr/local/bin
-      - name: Install Clang-Tidy
-        if: ${{ matrix.name == 'Code analysis' }}
-        run: |
           wget https://github.com/opencor/gha/releases/download/gha/clang-tidy.tar.gz -O - | tar -xz
           sudo mv clang-tidy /usr/local/bin
       - name: Install Emscripten
@@ -399,6 +403,9 @@ jobs:
       - name: Install Sphinx and some Sphinx packages
         if: ${{ matrix.documentation == 'ON' }}
         run: uv pip install --system sphinx~=8.0 sphinx-copybutton sphinx-inline-tabs
+      - name: Install NumPy
+        if: ${{ matrix.python_support == 'ON' }}
+        run: uv pip install --system numpy
       - name: Install Doxygen
         if: ${{ matrix.documentation == 'ON' }}
         run: |

@@ -61,21 +61,21 @@ public:
     static SedOneStepPtr create(const SedDocumentPtr &pDocument);
 
     /**
-     * @brief Get the step used by this simulation.
+     * @brief Return the step.
      *
-     * Return the step used by this simulation.
+     * Return the step.
      *
-     * @return The step used by this simulation.
+     * @return The step used.
      */
 
     double step() const;
 
     /**
-     * @brief Set the step to be used by this simulation.
+     * @brief Set the step.
      *
-     * Set the step to be used by this simulation.
+     * Set the step.
      *
-     * @param pStep The step to be used by this simulation.
+     * @param pStep The step.
      */
 
     void setStep(double pStep);

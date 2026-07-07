@@ -18,18 +18,25 @@ limitations under the License.
 
 #include "libopencor/filemanager.h"
 
+#include <atomic>
+#include <memory>
+#include <shared_mutex>
+
 namespace libOpenCOR {
 
-using Files = std::vector<File *>;
+using Files = std::vector<std::weak_ptr<File>>;
 
 class FileManager::Impl
 {
 public:
+    mutable std::shared_mutex mMutex;
+
     Files mFiles;
+    mutable std::atomic<size_t> mFileCount {0};
 
     static Impl &instance();
 
-    void manage(File *pFile);
+    FilePtr manage(const FilePtr &pFile);
     void unmanage(File *pFile);
 
     void reset();

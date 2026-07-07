@@ -67,27 +67,23 @@ export function assertValues(
   algebraicPrecisions
 ) {
   for (let i = 0; i < instanceTask.stateCount; ++i) {
-    assertValue(instanceTask.stateAsArray(i)[index], stateValues[i], statePrecisions[i]);
+    assertValue(instanceTask.state(i)[index], stateValues[i], statePrecisions[i]);
   }
 
   for (let i = 0; i < instanceTask.rateCount; ++i) {
-    assertValue(instanceTask.rateAsArray(i)[index], rateValues[i], ratePrecisions[i]);
+    assertValue(instanceTask.rate(i)[index], rateValues[i], ratePrecisions[i]);
   }
 
   for (let i = 0; i < instanceTask.constantCount; ++i) {
-    assertValue(instanceTask.constantAsArray(i)[index], constantValues[i], constantPrecisions[i]);
+    assertValue(instanceTask.constant(i)[index], constantValues[i], constantPrecisions[i]);
   }
 
   for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
-    assertValue(
-      instanceTask.computedConstantAsArray(i)[index],
-      computedConstantValues[i],
-      computedConstantPrecisions[i]
-    );
+    assertValue(instanceTask.computedConstant(i)[index], computedConstantValues[i], computedConstantPrecisions[i]);
   }
 
   for (let i = 0; i < instanceTask.algebraicVariableCount; ++i) {
-    assertValue(instanceTask.algebraicVariableAsArray(i)[index], algebraicValues[i], algebraicPrecisions[i]);
+    assertValue(instanceTask.algebraicVariable(i)[index], algebraicValues[i], algebraicPrecisions[i]);
   }
 }
 

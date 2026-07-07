@@ -108,23 +108,23 @@ const FilePtr &CombineArchive::Impl::file(const std::string &pFileName) const
 }
 
 CombineArchive::CombineArchive(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
-    : Logger(new Impl {pFile, pArchive, std::move(pArchiveContents)})
+    : Logger(std::make_unique<Impl>(pFile, pArchive, std::move(pArchiveContents)))
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+#endif
 }
 
-CombineArchive::~CombineArchive()
-{
-    delete pimpl();
-}
+CombineArchive::~CombineArchive() = default;
 
 CombineArchive::Impl *CombineArchive::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const CombineArchive::Impl *CombineArchive::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 CombineArchivePtr CombineArchive::create(const FilePtr &pFile)

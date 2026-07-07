@@ -57,6 +57,21 @@ function(build_package PACKAGE_NAME)
 
     message(STATUS "Building ${PACKAGE_NAME}")
 
+    set(ARGN_QUOTED)
+
+    foreach(ARG ${ARGN})
+        string(REPLACE "\\" "\\\\" ARG_ESCAPED "${ARG}")
+        string(REPLACE "\"" "\\\"" ARG_ESCAPED "${ARG_ESCAPED}")
+
+        if(NOT WIN32)
+            string(REPLACE " " "\\ " ARG_ESCAPED "${ARG_ESCAPED}")
+        endif()
+
+        list(APPEND ARGN_QUOTED "\"${ARG_ESCAPED}\"")
+    endforeach()
+
+    string(REPLACE ";" " " ARGN_QUOTED "${ARGN_QUOTED}")
+
     configure_file(${CMAKE_SOURCE_DIR}/cmake/buildpackage.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/CMakeLists.txt)
 
     if(EMSCRIPTEN)
@@ -263,8 +278,15 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
     add_custom_target(${PACKAGE_NAME})
 endfunction()
 
-function(escape_path OLD_PATH NEW_PATH)
-    # Escape spaces and parentheses in a path.
+function(safe_path OLD_PATH NEW_PATH)
+    # Make a path safe for use in CMake arguments by double quoting it on Windows and by escaping spaces and parentheses
+    # on Linux and macOS.
+
+    if(WIN32)
+        set(${NEW_PATH} "${OLD_PATH}" PARENT_SCOPE)
+
+        return()
+    endif()
 
     string(REPLACE " " "\\ " NEW_PATH_VALUE "${OLD_PATH}")
     string(REPLACE "(" "\\(" NEW_PATH_VALUE "${NEW_PATH_VALUE}")
@@ -276,7 +298,7 @@ endfunction()
 # Determine the platform on which we are and the architecture on which we want to build.
 
 if(EMSCRIPTEN)
-    set(TARGET_PLATFORM_ARCHITECTURE wasm)
+    set(TARGET_PLATFORM_ARCHITECTURE wasm-threaded) #---GRY--- This should eventually be renamed to just "wasm" once we are done with running simulations in their own thread.
 else()
     if(WIN32)
         if(RELEASE_MODE)
@@ -336,8 +358,8 @@ if(APPLE)
 endif()
 
 if(CMAKE_C_COMPILER_LAUNCHER AND CMAKE_CXX_COMPILER_LAUNCHER)
-    escape_path(${CMAKE_C_COMPILER_LAUNCHER} EP_CMAKE_C_COMPILER_LAUNCHER)
-    escape_path(${CMAKE_CXX_COMPILER_LAUNCHER} EP_CMAKE_CXX_COMPILER_LAUNCHER)
+    safe_path(${CMAKE_C_COMPILER_LAUNCHER} EP_CMAKE_C_COMPILER_LAUNCHER)
+    safe_path(${CMAKE_CXX_COMPILER_LAUNCHER} EP_CMAKE_CXX_COMPILER_LAUNCHER)
 
     list(APPEND CMAKE_ARGS
         -DCMAKE_C_COMPILER_LAUNCHER=${EP_CMAKE_C_COMPILER_LAUNCHER}
@@ -346,13 +368,20 @@ if(CMAKE_C_COMPILER_LAUNCHER AND CMAKE_CXX_COMPILER_LAUNCHER)
 endif()
 
 if(EMSCRIPTEN)
+    # Note: we are using the same CMake variables that we used to build libOpenCOR so that we can build our third-party
+    #       libraries in the same way that we built libOpenCOR.
+
     list(APPEND CMAKE_ARGS
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
         -DCMAKE_CROSSCOMPILING_EMULATOR=${CMAKE_CROSSCOMPILING_EMULATOR}
+        -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+        -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
+        -DCMAKE_EXE_LINKER_FLAGS=${CMAKE_EXE_LINKER_FLAGS}
+        -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
     )
 else()
-    escape_path(${CMAKE_C_COMPILER} EP_CMAKE_C_COMPILER)
-    escape_path(${CMAKE_CXX_COMPILER} EP_CMAKE_CXX_COMPILER)
+    safe_path(${CMAKE_C_COMPILER} EP_CMAKE_C_COMPILER)
+    safe_path(${CMAKE_CXX_COMPILER} EP_CMAKE_CXX_COMPILER)
 
     list(APPEND CMAKE_ARGS
         -DCMAKE_C_COMPILER=${EP_CMAKE_C_COMPILER}

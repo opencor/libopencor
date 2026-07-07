@@ -29,7 +29,7 @@ TEST(CoverageLoggerTest, issueCount)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
-    EXPECT_EQ(file->issueCount(), 0);
+    EXPECT_EQ(file->issueCount(), 0U);
 }
 
 TEST(CoverageLoggerTest, issues)
@@ -58,7 +58,7 @@ TEST(CoverageLoggerTest, errorCount)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
-    EXPECT_EQ(file->errorCount(), 0);
+    EXPECT_EQ(file->errorCount(), 0U);
 }
 
 TEST(CoverageLoggerTest, errors)
@@ -87,7 +87,7 @@ TEST(CoverageLoggerTest, warningCount)
 {
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"));
 
-    EXPECT_EQ(file->warningCount(), 0);
+    EXPECT_EQ(file->warningCount(), 0U);
 }
 
 TEST(CoverageLoggerTest, warnings)

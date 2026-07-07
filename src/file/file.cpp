@@ -236,7 +236,7 @@ const FilePtr &File::Impl::childFile(const std::string &pFileName) const
 }
 
 File::File(const std::string &pFileNameOrUrl, bool pRetrieveContents)
-    : Logger(new Impl {pFileNameOrUrl, pRetrieveContents})
+    : Logger(std::make_unique<Impl>(pFileNameOrUrl, pRetrieveContents))
 {
 }
 
@@ -245,18 +245,16 @@ File::~File()
     // Have ourselves unmanaged.
 
     FileManager::instance().mPimpl.unmanage(this);
-
-    delete pimpl();
 }
 
 File::Impl *File::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const File::Impl *File::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 #ifdef __EMSCRIPTEN__
@@ -269,15 +267,27 @@ FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
     // and return a new file object.
 
     auto &fileManager {FileManager::instance()};
-#ifdef __EMSCRIPTEN__
-    const auto &file {fileManager.fileFromFileNameOrUrl(pFileNameOrUrl)};
-#else
-    const auto &file {fileManager.file(pFileNameOrUrl)};
-#endif
 
-    if (file != nullptr) {
-        return file;
+    // Fast-path check whether the file is already managed. This is just an optimisation under a shared lock (the
+    // authoritative check happens under the exclusive lock in manage()).
+
+#ifdef __EMSCRIPTEN__
+    {
+        const auto &file {fileManager.fileFromFileNameOrUrl(pFileNameOrUrl)};
+
+        if (file != nullptr) {
+            return file;
+        }
     }
+#else
+    {
+        const auto &file {fileManager.file(pFileNameOrUrl)};
+
+        if (file != nullptr) {
+            return file;
+        }
+    }
+#endif
 
 #ifdef __EMSCRIPTEN__
     auto res {FilePtr {new File {pFileNameOrUrl, false}}};
@@ -287,27 +297,29 @@ FilePtr File::create(const std::string &pFileNameOrUrl, bool pRetrieveContents)
 
     res->pimpl()->checkType(res);
 
-    fileManager.mPimpl.manage(res.get());
+    // Atomically register the new file.
+    // Note: if another thread managed a file with the same name/URL between our fast-path check and this call, then
+    //       manage() will return the existing file and our copy is discarded.
 
-    return res;
+    return fileManager.mPimpl.manage(res);
 }
 
-File::Type File::type() const
+File::Type File::type() const noexcept
 {
     return pimpl()->type();
 }
 
-const std::string &File::fileName() const
+const std::string &File::fileName() const noexcept
 {
     return pimpl()->fileName();
 }
 
-const std::string &File::url() const
+const std::string &File::url() const noexcept
 {
     return pimpl()->url();
 }
 
-const std::string &File::path() const
+const std::string &File::path() const noexcept
 {
     return pimpl()->path();
 }
@@ -324,35 +336,35 @@ void File::setContents(const UnsignedChars &pContents)
     pimpl()->checkType(shared_from_this(), true);
 }
 
-bool File::hasChildFiles() const
+bool File::hasChildFiles() const noexcept
 {
     return pimpl()->hasChildFiles();
 }
 
-size_t File::childFileCount() const
+size_t File::childFileCount() const noexcept
 {
     return pimpl()->childFileCount();
 }
 
-const Strings &File::childFileNames() const
+const Strings &File::childFileNames() const noexcept
 {
     return pimpl()->childFileNames();
 }
 
-const FilePtrs &File::childFiles() const
+const FilePtrs &File::childFiles() const noexcept
 {
     return pimpl()->childFiles();
 }
 
-const FilePtr &File::childFile(size_t pIndex) const
+const FilePtr &File::childFile(size_t pIndex) const noexcept
 {
     return pimpl()->childFile(pIndex);
 }
 
 #ifdef __EMSCRIPTEN__
-const FilePtr &File::childFileFromFileName(const std::string &pFileName) const
+const FilePtr &File::childFileFromFileName(const std::string &pFileName) const noexcept
 #else
-const FilePtr &File::childFile(const std::string &pFileName) const
+const FilePtr &File::childFile(const std::string &pFileName) const noexcept
 #endif
 {
 #ifdef __EMSCRIPTEN__

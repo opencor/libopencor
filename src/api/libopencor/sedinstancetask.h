@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/logger.h"
 
+#include <span>
+
 namespace libOpenCOR {
 
 /**
@@ -47,269 +49,279 @@ public:
     SedInstanceTask &operator=(SedInstanceTask &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the values of the variable of integration.
+     * @brief Return the progress of this task.
      *
-     * Get the values of the variable of integration.
+     * Return the progress of this task as a value between @c 0.0 (not started) and @c 1.0 (complete).
+     *
+     * @return The progress as a value in [0.0, 1.0].
+     */
+
+    double progress() const noexcept;
+
+    /**
+     * @brief Return the values of the variable of integration.
+     *
+     * Return the values of the variable of integration.
      *
      * @return The values of the variable of integration.
      */
 
-    const Doubles &voi() const;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &voiAsArray() const;
+    const emscripten::val &voi() const noexcept;
+#else
+    std::span<const double> voi() const noexcept;
 #endif
 
     /**
-     * @brief Get the name of the variable of integration.
+     * @brief Return the name of the variable of integration.
      *
-     * Get the name of the variable of integration.
+     * Return the name of the variable of integration.
      *
      * @return The name of the variable of integration.
      */
 
-    const std::string &voiName() const;
+    const std::string &voiName() const noexcept;
 
     /**
-     * @brief Get the unit of the variable of integration.
+     * @brief Return the unit of the variable of integration.
      *
-     * Get the unit of the variable of integration.
+     * Return the unit of the variable of integration.
      *
      * @return The unit of the variable of integration.
      */
 
-    const std::string &voiUnit() const;
+    const std::string &voiUnit() const noexcept;
 
     /**
-     * @brief Get the number of states.
+     * @brief Return the number of states.
      *
-     * Get the number of states.
+     * Return the number of states.
      *
      * @return The number of states.
      */
 
-    size_t stateCount() const;
+    size_t stateCount() const noexcept;
 
     /**
-     * @brief Get the values of the state at the given index.
+     * @brief Return the values of the state at the given index.
      *
-     * Get the values of the state at the given index.
+     * Return the values of the state at the given index.
      *
      * @param pIndex The index of the state.
      *
      * @return The values of the state, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &state(size_t pIndex) const;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &stateAsArray(size_t pIndex) const;
+    const emscripten::val &state(size_t pIndex) const noexcept;
+#else
+    std::span<const double> state(size_t pIndex) const noexcept;
 #endif
 
     /**
-     * @brief Get the name of the state.
+     * @brief Return the name of the state at the given index.
      *
-     * Get the name of the state at the given index.
+     * Return the name of the state at the given index.
      *
      * @param pIndex The index of the state.
      *
      * @return The name of the state, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &stateName(size_t pIndex) const;
+    const std::string &stateName(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the unit of the state.
+     * @brief Return the unit of the state at the given index.
      *
-     * Get the unit of the state at the given index.
+     * Return the unit of the state at the given index.
      *
      * @param pIndex The index of the state.
      *
      * @return The unit of the state, as a @c std::string, if the index is valid, an empty vector otherwise.
      */
 
-    const std::string &stateUnit(size_t pIndex) const;
+    const std::string &stateUnit(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the number of rates.
+     * @brief Return the number of rates.
      *
-     * Get the number of rates.
+     * Return the number of rates.
      *
      * @return The number of rates.
      */
 
-    size_t rateCount() const;
+    size_t rateCount() const noexcept;
 
     /**
-     * @brief Get the values of the rate at the given index.
+     * @brief Return the values of the rate at the given index.
      *
-     * Get the values of the rate at the given index.
+     * Return the values of the rate at the given index.
      *
      * @param pIndex The index of the rate.
      *
      * @return The values of the rate, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &rate(size_t pIndex) const;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &rateAsArray(size_t pIndex) const;
+    const emscripten::val &rate(size_t pIndex) const noexcept;
+#else
+    std::span<const double> rate(size_t pIndex) const noexcept;
 #endif
 
     /**
-     * @brief Get the name of the rate.
+     * @brief Return the name of the rate at the given index.
      *
-     * Get the name of the rate at the given index.
+     * Return the name of the rate at the given index.
      *
      * @param pIndex The index of the rate.
      *
      * @return The name of the rate, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &rateName(size_t pIndex) const;
+    const std::string &rateName(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the unit of the rate.
+     * @brief Return the unit of the rate at the given index.
      *
-     * Get the unit of the rate at the given index.
+     * Return the unit of the rate at the given index.
      *
      * @param pIndex The index of the rate.
      *
      * @return The unit of the rate, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &rateUnit(size_t pIndex) const;
+    const std::string &rateUnit(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the number of constants.
+     * @brief Return the number of constants.
      *
-     * Get the number of constants.
+     * Return the number of constants.
      *
      * @return The number of constants.
      */
 
-    size_t constantCount() const;
+    size_t constantCount() const noexcept;
 
     /**
-     * @brief Get the values of the constant at the given index.
+     * @brief Return the values of the constant at the given index.
      *
-     * Get the values of the constant at the given index.
+     * Return the values of the constant at the given index.
      *
      * @param pIndex The index of the constant.
      *
      * @return The values of the constant, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &constant(size_t pIndex) const;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &constantAsArray(size_t pIndex) const;
+    const emscripten::val &constant(size_t pIndex) const noexcept;
+#else
+    std::span<const double> constant(size_t pIndex) const noexcept;
 #endif
 
     /**
-     * @brief Get the name of the constant.
+     * @brief Return the name of the constant at the given index.
      *
-     * Get the name of the constant at the given index.
+     * Return the name of the constant at the given index.
      *
      * @param pIndex The index of the constant.
      *
      * @return The name of the constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &constantName(size_t pIndex) const;
+    const std::string &constantName(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the unit of the constant.
+     * @brief Return the unit of the constant at the given index.
      *
-     * Get the unit of the constant at the given index.
+     * Return the unit of the constant at the given index.
      *
      * @param pIndex The index of the constant.
      *
      * @return The unit of the constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &constantUnit(size_t pIndex) const;
+    const std::string &constantUnit(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the number of computed constants.
+     * @brief Return the number of computed constants.
      *
-     * Get the number of computed constants.
+     * Return the number of computed constants.
      *
      * @return The number of computed constants.
      */
 
-    size_t computedConstantCount() const;
+    size_t computedConstantCount() const noexcept;
 
     /**
-     * @brief Get the values of the computed constant at the given index.
+     * @brief Return the values of the computed constant at the given index.
      *
-     * Get the values of the computed constant at the given index.
+     * Return the values of the computed constant at the given index.
      *
      * @param pIndex The index of the computed constant.
      *
      * @return The values of the computed constant, as a @ref Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &computedConstant(size_t pIndex) const;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &computedConstantAsArray(size_t pIndex) const;
+    const emscripten::val &computedConstant(size_t pIndex) const noexcept;
+#else
+    std::span<const double> computedConstant(size_t pIndex) const noexcept;
 #endif
 
     /**
-     * @brief Get the name of the computed constant.
+     * @brief Return the name of the computed constant at the given index.
      *
-     * Get the name of the computed constant at the given index.
+     * Return the name of the computed constant at the given index.
      *
      * @param pIndex The index of the computed constant.
      *
      * @return The name of the computed constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &computedConstantName(size_t pIndex) const;
+    const std::string &computedConstantName(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the unit of the computed constant.
+     * @brief Return the unit of the computed constant at the given index.
      *
-     * Get the unit of the computed constant at the given index.
+     * Return the unit of the computed constant at the given index.
      *
      * @param pIndex The index of the computed constant.
      *
      * @return The unit of the computed constant, as a @c std::string, if the index is valid, an empty string otherwise.
      */
 
-    const std::string &computedConstantUnit(size_t pIndex) const;
+    const std::string &computedConstantUnit(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the number of algebraic variables.
+     * @brief Return the number of algebraic variables.
      *
-     * Get the number of algebraic variables.
+     * Return the number of algebraic variables.
      *
      * @return The number of algebraic variables.
      */
 
-    size_t algebraicVariableCount() const;
+    size_t algebraicVariableCount() const noexcept;
 
     /**
-     * @brief Get the values of the algebraic variable at the given index.
+     * @brief Return the values of the algebraic variable at the given index.
      *
-     * Get the values of the algebraic variable at the given index.
+     * Return the values of the algebraic variable at the given index.
      *
      * @param pIndex The index of the algebraic variable.
      *
      * @return The values of the algebraic variable, as a @c Doubles, if the index is valid, an empty vector otherwise.
      */
 
-    const Doubles &algebraicVariable(size_t pIndex) const;
-
 #ifdef __EMSCRIPTEN__
-    const emscripten::val &algebraicVariableAsArray(size_t pIndex) const;
+    const emscripten::val &algebraicVariable(size_t pIndex) const noexcept;
+#else
+    std::span<const double> algebraicVariable(size_t pIndex) const noexcept;
 #endif
 
     /**
-     * @brief Get the name of the algebraic variable.
+     * @brief Return the name of the algebraic variable at the given index.
      *
-     * Get the name of the algebraic variable at the given index.
+     * Return the name of the algebraic variable at the given index.
      *
      * @param pIndex The index of the algebraic variable.
      *
@@ -317,12 +329,12 @@ public:
      * otherwise.
      */
 
-    const std::string &algebraicVariableName(size_t pIndex) const;
+    const std::string &algebraicVariableName(size_t pIndex) const noexcept;
 
     /**
-     * @brief Get the unit of the algebraic variable.
+     * @brief Return the unit of the algebraic variable at the given index.
      *
-     * Get the unit of the algebraic variable at the given index.
+     * Return the unit of the algebraic variable at the given index.
      *
      * @param pIndex The index of the algebraic variable.
      *
@@ -330,7 +342,7 @@ public:
      * otherwise.
      */
 
-    const std::string &algebraicVariableUnit(size_t pIndex) const;
+    const std::string &algebraicVariableUnit(size_t pIndex) const noexcept;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

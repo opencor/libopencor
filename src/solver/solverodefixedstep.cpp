@@ -29,7 +29,7 @@ SolverOdeFixedStep::Impl::Impl(const std::string &pId, const std::string &pName)
 
 void SolverOdeFixedStep::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
-    auto addUnknownParameterWarning = [&](const std::string &pKisaoId) {
+    auto addUnknownParameterWarning = [this](const std::string &pKisaoId) {
         std::string warning;
 
         warning.reserve(pKisaoId.size() + 49); // NOLINT
@@ -121,7 +121,7 @@ bool SolverOdeFixedStep::Impl::initialise(double pVoi, size_t pSize, double *pSt
     return true;
 }
 
-double SolverOdeFixedStep::Impl::step() const
+double SolverOdeFixedStep::Impl::step() const noexcept
 {
     return mStep;
 }
@@ -131,8 +131,8 @@ void SolverOdeFixedStep::Impl::setStep(double pStep)
     mStep = pStep;
 }
 
-SolverOdeFixedStep::SolverOdeFixedStep(Impl *pPimpl)
-    : SolverOde(pPimpl)
+SolverOdeFixedStep::SolverOdeFixedStep(std::unique_ptr<Impl> pPimpl)
+    : SolverOde(std::move(pPimpl))
 {
 }
 
@@ -146,7 +146,7 @@ const SolverOdeFixedStep::Impl *SolverOdeFixedStep::pimpl() const
     return static_cast<const Impl *>(SolverOde::pimpl());
 }
 
-double SolverOdeFixedStep::step() const
+double SolverOdeFixedStep::step() const noexcept
 {
     return pimpl()->step();
 }

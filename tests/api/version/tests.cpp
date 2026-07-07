@@ -79,8 +79,8 @@ TEST(VersionTest, libCOMBINE)
 
 TEST(VersionTest, libcurl)
 {
-    EXPECT_EQ(0x081400U, libOpenCOR::libcurlVersion());
-    EXPECT_EQ("8.20.0-DEV", libOpenCOR::libcurlVersionString());
+    EXPECT_EQ(0x081500U, libOpenCOR::libcurlVersion());
+    EXPECT_EQ("8.21.0-DEV", libOpenCOR::libcurlVersionString());
 }
 
 TEST(VersionTest, libSEDML)

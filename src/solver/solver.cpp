@@ -16,6 +16,9 @@ limitations under the License.
 
 #include "solver_p.h"
 
+#include <algorithm>
+#include <vector>
+
 namespace libOpenCOR {
 
 Solver::Impl::Impl(const std::string &pId, const std::string &pName)
@@ -24,12 +27,12 @@ Solver::Impl::Impl(const std::string &pId, const std::string &pName)
 {
 }
 
-const std::string &Solver::Impl::id() const
+const std::string &Solver::Impl::id() const noexcept
 {
     return mId;
 }
 
-const std::string &Solver::Impl::name() const
+const std::string &Solver::Impl::name() const noexcept
 {
     return mName;
 }
@@ -54,37 +57,42 @@ void Solver::Impl::serialise(xmlNodePtr pNode, bool pNlaAlgorithm) const
 
     xmlAddChild(algorithmNode, propertiesNode);
 
-    for (auto const &property : properties()) {
+    auto props {properties()};
+    std::vector<std::pair<std::string, std::string>> sortedProps(props.begin(), props.end());
+
+    std::ranges::sort(sortedProps.begin(), sortedProps.end());
+
+    for (const auto &[key, value] : sortedProps) {
         auto *propertyNode {xmlNewNode(nullptr, toConstXmlCharPtr("algorithmParameter"))};
 
-        xmlNewProp(propertyNode, toConstXmlCharPtr("kisaoID"), toConstXmlCharPtr(property.first));
-        xmlNewProp(propertyNode, toConstXmlCharPtr("value"), toConstXmlCharPtr(property.second));
+        xmlNewProp(propertyNode, toConstXmlCharPtr("kisaoID"), toConstXmlCharPtr(key));
+        xmlNewProp(propertyNode, toConstXmlCharPtr("value"), toConstXmlCharPtr(value));
 
         xmlAddChild(propertiesNode, propertyNode);
     }
 }
 
-Solver::Solver(Impl *pPimpl)
-    : Logger(pPimpl)
+Solver::Solver(std::unique_ptr<Impl> pPimpl)
+    : Logger(std::move(pPimpl))
 {
 }
 
 Solver::Impl *Solver::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const Solver::Impl *Solver::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
-const std::string &Solver::id() const
+const std::string &Solver::id() const noexcept
 {
     return pimpl()->id();
 }
 
-const std::string &Solver::name() const
+const std::string &Solver::name() const noexcept
 {
     return pimpl()->name();
 }

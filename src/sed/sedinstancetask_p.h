@@ -23,16 +23,33 @@ limitations under the License.
 
 #include "libopencor/sedinstancetask.h"
 
+#include <atomic>
+#include <condition_variable>
+#include <mutex>
+#include <span>
+
 namespace libOpenCOR {
+
+// Combined status flags for pausing/stopping a running instance.
+// Note: to use a single atomic reduces the number of atomic loads in the hot simulation loop.
+
+enum InstanceRunControl : unsigned
+{
+    INSTANCE_RUN_CONTROL_NONE = 0,
+    INSTANCE_RUN_CONTROL_PAUSE = 1 << 0,
+    INSTANCE_RUN_CONTROL_STOP = 1 << 1,
+};
 
 struct SedInstanceTaskResults
 {
+    size_t resultsSize {0};
+
     Doubles voi;
-    std::vector<Doubles> states;
-    std::vector<Doubles> rates;
-    std::vector<Doubles> constants;
-    std::vector<Doubles> computedConstants;
-    std::vector<Doubles> algebraicVariables;
+    Doubles states;
+    Doubles rates;
+    Doubles constants;
+    Doubles computedConstants;
+    Doubles algebraicVariables;
 };
 
 using SedInstanceTaskWeakPtr = std::weak_ptr<SedInstanceTask>;
@@ -70,6 +87,14 @@ public:
 
     SedInstanceTaskResults mResults;
 
+    std::atomic<size_t> mCompletedSteps {0};
+    std::atomic<size_t> mTotalSteps {0};
+
+    const std::atomic<unsigned> *mRunControl {nullptr};
+
+    std::condition_variable *mPauseConditionVariable {nullptr};
+    std::mutex *mPauseMutex {nullptr};
+
     std::string mVoiName;
     std::string mVoiUnit;
     Strings mStateNames;
@@ -94,34 +119,36 @@ public:
     void run(double pVoiStart, double pVoiEnd, double pVoiInterval, bool pTrackResults);
     double run();
 
-    const Doubles &voi() const;
-    const std::string &voiName() const;
-    const std::string &voiUnit() const;
+    double progress() const noexcept;
 
-    size_t stateCount() const;
-    const Doubles &state(size_t pIndex) const;
-    const std::string &stateName(size_t pIndex) const;
-    const std::string &stateUnit(size_t pIndex) const;
+    std::span<const double> voi() const noexcept;
+    const std::string &voiName() const noexcept;
+    const std::string &voiUnit() const noexcept;
 
-    size_t rateCount() const;
-    const Doubles &rate(size_t pIndex) const;
-    const std::string &rateName(size_t pIndex) const;
-    const std::string &rateUnit(size_t pIndex) const;
+    size_t stateCount() const noexcept;
+    std::span<const double> state(size_t pIndex) const noexcept;
+    const std::string &stateName(size_t pIndex) const noexcept;
+    const std::string &stateUnit(size_t pIndex) const noexcept;
 
-    size_t constantCount() const;
-    const Doubles &constant(size_t pIndex) const;
-    const std::string &constantName(size_t pIndex) const;
-    const std::string &constantUnit(size_t pIndex) const;
+    size_t rateCount() const noexcept;
+    std::span<const double> rate(size_t pIndex) const noexcept;
+    const std::string &rateName(size_t pIndex) const noexcept;
+    const std::string &rateUnit(size_t pIndex) const noexcept;
 
-    size_t computedConstantCount() const;
-    const Doubles &computedConstant(size_t pIndex) const;
-    const std::string &computedConstantName(size_t pIndex) const;
-    const std::string &computedConstantUnit(size_t pIndex) const;
+    size_t constantCount() const noexcept;
+    std::span<const double> constant(size_t pIndex) const noexcept;
+    const std::string &constantName(size_t pIndex) const noexcept;
+    const std::string &constantUnit(size_t pIndex) const noexcept;
 
-    size_t algebraicVariableCount() const;
-    const Doubles &algebraicVariable(size_t pIndex) const;
-    const std::string &algebraicVariableName(size_t pIndex) const;
-    const std::string &algebraicVariableUnit(size_t pIndex) const;
+    size_t computedConstantCount() const noexcept;
+    std::span<const double> computedConstant(size_t pIndex) const noexcept;
+    const std::string &computedConstantName(size_t pIndex) const noexcept;
+    const std::string &computedConstantUnit(size_t pIndex) const noexcept;
+
+    size_t algebraicVariableCount() const noexcept;
+    std::span<const double> algebraicVariable(size_t pIndex) const noexcept;
+    const std::string &algebraicVariableName(size_t pIndex) const noexcept;
+    const std::string &algebraicVariableUnit(size_t pIndex) const noexcept;
 };
 
 } // namespace libOpenCOR

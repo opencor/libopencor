@@ -80,26 +80,25 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
 }
 
 SolverForwardEuler::SolverForwardEuler()
-    : SolverOdeFixedStep(new Impl {})
+    : SolverOdeFixedStep(std::make_unique<Impl>())
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+    (void)static_cast<const SolverForwardEuler *>(this)->pimpl();
+#endif
 }
 
-SolverForwardEuler::~SolverForwardEuler()
-{
-    delete pimpl();
-}
+SolverForwardEuler::~SolverForwardEuler() = default;
 
 SolverForwardEuler::Impl *SolverForwardEuler::pimpl()
 {
     return static_cast<Impl *>(SolverOdeFixedStep::pimpl());
 }
 
-/*---GRY---
 const SolverForwardEuler::Impl *SolverForwardEuler::pimpl() const
 {
     return static_cast<const Impl *>(SolverOdeFixedStep::pimpl());
 }
-*/
 
 SolverForwardEulerPtr SolverForwardEuler::create()
 {

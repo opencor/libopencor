@@ -21,25 +21,31 @@ namespace libOpenCOR {
 
 bool Logger::Impl::hasIssues() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return !mIssues.empty();
 }
 
 size_t Logger::Impl::issueCount() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return mIssues.size();
 }
 
-const IssuePtrs &Logger::Impl::issues() const
+IssuePtrs Logger::Impl::issues() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return mIssues;
 }
 
-const IssuePtr &Logger::Impl::issue(size_t pIndex) const
+IssuePtr Logger::Impl::issue(size_t pIndex) const
 {
-    static const IssuePtr NO_ISSUE_PTR;
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
 
     if (pIndex >= mIssues.size()) {
-        return NO_ISSUE_PTR;
+        return nullptr;
     }
 
     return mIssues[pIndex];
@@ -47,25 +53,31 @@ const IssuePtr &Logger::Impl::issue(size_t pIndex) const
 
 bool Logger::Impl::hasErrors() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return !mErrors.empty();
 }
 
 size_t Logger::Impl::errorCount() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return mErrors.size();
 }
 
-const IssuePtrs &Logger::Impl::errors() const
+IssuePtrs Logger::Impl::errors() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return mErrors;
 }
 
-const IssuePtr &Logger::Impl::error(size_t pIndex) const
+IssuePtr Logger::Impl::error(size_t pIndex) const
 {
-    static const IssuePtr NO_ISSUE_PTR;
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
 
     if (pIndex >= mErrors.size()) {
-        return NO_ISSUE_PTR;
+        return nullptr;
     }
 
     return mErrors[pIndex];
@@ -73,25 +85,31 @@ const IssuePtr &Logger::Impl::error(size_t pIndex) const
 
 bool Logger::Impl::hasWarnings() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return !mWarnings.empty();
 }
 
 size_t Logger::Impl::warningCount() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return mWarnings.size();
 }
 
-const IssuePtrs &Logger::Impl::warnings() const
+IssuePtrs Logger::Impl::warnings() const
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     return mWarnings;
 }
 
-const IssuePtr &Logger::Impl::warning(size_t pIndex) const
+IssuePtr Logger::Impl::warning(size_t pIndex) const
 {
-    static const IssuePtr NO_ISSUE_PTR;
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
 
     if (pIndex >= mWarnings.size()) {
-        return NO_ISSUE_PTR;
+        return nullptr;
     }
 
     return mWarnings[pIndex];
@@ -107,17 +125,22 @@ void Logger::Impl::addIssues(const LoggerPtr &pLogger, const std::string &pConte
 
 void Logger::Impl::addIssues(const libcellml::LoggerPtr &pLogger, const std::string &pContext)
 {
-    for (size_t i {0}; i < pLogger->issueCount(); ++i) {
+    const auto issueCount = pLogger->issueCount();
+
+    for (size_t i {0}; i < issueCount; ++i) {
         auto issue {pLogger->issue(i)};
 
-        addIssue((issue->level() == libcellml::Issue::Level::ERROR) ? Issue::Type::ERROR :
-                                                                      Issue::Type::WARNING,
+        addIssue((issue->level() == libcellml::Issue::Level::ERROR) ?
+                     Issue::Type::ERROR :
+                     Issue::Type::WARNING,
                  issue->description(), pContext);
     }
 }
 
 void Logger::Impl::addIssue(Issue::Type pType, const std::string &pDescription, const std::string &pContext)
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     auto issue {IssuePtr {new Issue {pType, pDescription, pContext}}};
     mIssues.push_back(issue);
 
@@ -140,16 +163,20 @@ void Logger::Impl::addWarning(const std::string &pDescription)
 
 void Logger::Impl::removeAllIssues()
 {
+    const std::scoped_lock<std::recursive_mutex> lock(mMutex);
+
     mIssues.clear();
 
     mErrors.clear();
     mWarnings.clear();
 }
 
-Logger::Logger(Impl *pPimpl)
-    : mPimpl(pPimpl)
+Logger::Logger(std::unique_ptr<Impl> pPimpl)
+    : mPimpl(std::move(pPimpl))
 {
 }
+
+Logger::~Logger() = default;
 
 bool Logger::hasIssues() const
 {
@@ -161,12 +188,12 @@ size_t Logger::issueCount() const
     return mPimpl->issueCount();
 }
 
-const IssuePtrs &Logger::issues() const
+IssuePtrs Logger::issues() const
 {
     return mPimpl->issues();
 }
 
-const IssuePtr &Logger::issue(size_t pIndex) const
+IssuePtr Logger::issue(size_t pIndex) const
 {
     return mPimpl->issue(pIndex);
 }
@@ -181,12 +208,12 @@ size_t Logger::errorCount() const
     return mPimpl->errorCount();
 }
 
-const IssuePtrs &Logger::errors() const
+IssuePtrs Logger::errors() const
 {
     return mPimpl->errors();
 }
 
-const IssuePtr &Logger::error(size_t pIndex) const
+IssuePtr Logger::error(size_t pIndex) const
 {
     return mPimpl->error(pIndex);
 }
@@ -201,12 +228,12 @@ size_t Logger::warningCount() const
     return mPimpl->warningCount();
 }
 
-const IssuePtrs &Logger::warnings() const
+IssuePtrs Logger::warnings() const
 {
     return mPimpl->warnings();
 }
 
-const IssuePtr &Logger::warning(size_t pIndex) const
+IssuePtr Logger::warning(size_t pIndex) const
 {
     return mPimpl->warning(pIndex);
 }

@@ -20,9 +20,11 @@ limitations under the License.
 
 #include "libopencor/solverkinsol.h"
 
+#include "sundials/sundials_context.h"
+
 namespace libOpenCOR {
 
-class SolverKinsol::Impl: public SolverNla::Impl
+class SolverKinsol::Impl final: public SolverNla::Impl
 {
 public:
     std::string mErrorMessage;
@@ -37,7 +39,10 @@ public:
     int mUpperHalfBandwidth {DEFAULT_UPPER_HALF_BANDWIDTH};
     int mLowerHalfBandwidth {DEFAULT_LOWER_HALF_BANDWIDTH};
 
+    SUNContext mSunContext {nullptr};
+
     explicit Impl();
+    ~Impl() override;
 
     void populate(libsedml::SedAlgorithm *pAlgorithm) override;
 
@@ -45,20 +50,20 @@ public:
 
     StringStringMap properties() const override;
 
-    int maximumNumberOfIterations() const;
+    int maximumNumberOfIterations() const noexcept;
     void setMaximumNumberOfIterations(int pMaximumNumberOfIterations);
 
-    LinearSolver linearSolver() const;
+    LinearSolver linearSolver() const noexcept;
     void setLinearSolver(LinearSolver pLinearSolver);
 
-    int upperHalfBandwidth() const;
+    int upperHalfBandwidth() const noexcept;
     void setUpperHalfBandwidth(int pUpperHalfBandwidth);
 
-    int lowerHalfBandwidth() const;
+    int lowerHalfBandwidth() const noexcept;
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
 
 #ifdef __EMSCRIPTEN__
-    bool solve(intptr_t pWasmInstanceFunctionsId, size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData) override;
+    bool solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData) override;
 #else
     bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData) override;
 #endif

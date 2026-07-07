@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 SedSteadyState::Impl::Impl(const SedDocumentPtr &pDocument)
@@ -35,26 +37,25 @@ void SedSteadyState::Impl::serialise(xmlNodePtr pNode) const
 }
 
 SedSteadyState::SedSteadyState(const SedDocumentPtr &pDocument)
-    : SedSimulation(new Impl(pDocument))
+    : SedSimulation(std::make_unique<Impl>(pDocument))
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)pimpl();
+    (void)static_cast<const SedSteadyState *>(this)->pimpl();
+#endif
 }
 
-SedSteadyState::~SedSteadyState()
-{
-    delete pimpl();
-}
+SedSteadyState::~SedSteadyState() = default;
 
 SedSteadyState::Impl *SedSteadyState::pimpl()
 {
     return reinterpret_cast<SedSteadyState::Impl *>(SedSimulation::pimpl());
 }
 
-/*---GRY---
 const SedSteadyState::Impl *SedSteadyState::pimpl() const
 {
     return static_cast<const Impl *>(SedSimulation::pimpl());
 }
-*/
 
 SedSteadyStatePtr SedSteadyState::create(const SedDocumentPtr &pDocument)
 {

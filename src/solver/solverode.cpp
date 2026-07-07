@@ -42,14 +42,12 @@ bool SolverOde::Impl::initialise(double pVoi, size_t pSize, double *pStates, dou
     return true;
 }
 
-/*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
 bool SolverOde::Impl::reinitialise(double pVoi)
 {
     (void)pVoi;
 
     return true;
 }
-*/
 
 void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates,
                                    double *pConstants, double *pComputedConstants, double *pAlgebraicVariables) const
@@ -61,8 +59,8 @@ void SolverOde::Impl::computeRates(double pVoi, double *pStates, double *pRates,
 #endif
 }
 
-SolverOde::SolverOde(Impl *pPimpl)
-    : Solver(pPimpl)
+SolverOde::SolverOde(std::unique_ptr<Impl> pPimpl)
+    : Solver(std::move(pPimpl))
 {
 }
 
@@ -76,7 +74,7 @@ const SolverOde::Impl *SolverOde::pimpl() const
     return static_cast<const Impl *>(Solver::pimpl());
 }
 
-Solver::Type SolverOde::type() const
+Solver::Type SolverOde::type() const noexcept
 {
     return Type::ODE;
 }

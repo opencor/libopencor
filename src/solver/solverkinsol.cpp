@@ -67,16 +67,10 @@ void errorHandler(int pLine, const char *pFunction, const char *pFile, const cha
 }
 #endif
 
-#ifdef __EMSCRIPTEN__
-static constexpr auto MAX_SIZE_T {std::numeric_limits<size_t>::max()};
-static constexpr auto MAX_INTPTR_T {std::numeric_limits<intptr_t>::max()};
-#endif
-
 struct SolverKinsolUserData
 {
 #ifdef __EMSCRIPTEN__
-    intptr_t wasmInstanceFunctionsId {MAX_INTPTR_T};
-    size_t computeObjectiveFunctionIndex {MAX_SIZE_T};
+    intptr_t computeObjectiveFunctionIndex {0};
 #else
     SolverNla::ComputeObjectiveFunction computeObjectiveFunction {nullptr};
 #endif
@@ -89,9 +83,10 @@ int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
 {
     // Make sure that our input vector doesn't contain any Inf or NaN values.
 
+    auto iMax {NV_LENGTH_S(pU)};
     auto *userData {static_cast<SolverKinsolUserData *>(pUserData)};
 
-    for (sunindextype i = 0; i < NV_LENGTH_S(pU); ++i) {
+    for (sunindextype i = 0; i < iMax; ++i) {
         if (isInfOrNan(NV_Ith_S(pU, i))) {
             userData->infOrNanFound = true;
 
@@ -102,8 +97,8 @@ int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
 #ifdef __EMSCRIPTEN__
     // clang-format off
     EM_ASM({
-        Module.wasmInstanceFunctions.get($0).objectiveFunctions[$1]($2, $3, $4);
-    }, userData->wasmInstanceFunctionsId, userData->computeObjectiveFunctionIndex, N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData); // clang-format on
+        globalThis.runtime.computeObjectiveFunctions[$0]($1, $2, $3);
+    }, userData->computeObjectiveFunctionIndex, N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData); // clang-format on
 #else
     userData->computeObjectiveFunction(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
 #endif
@@ -120,9 +115,16 @@ SolverKinsol::Impl::Impl()
 {
 }
 
+SolverKinsol::Impl::~Impl()
+{
+    if (mSunContext != nullptr) {
+        SUNContext_Free(&mSunContext);
+    }
+}
+
 void SolverKinsol::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
-    auto addUnknownParameterWarning = [&](const std::string &pKisaoId) {
+    auto addUnknownParameterWarning = [this](const std::string &pKisaoId) {
         std::string warning;
 
         warning.reserve(pKisaoId.size() + 49); // NOLINT
@@ -262,7 +264,7 @@ StringStringMap SolverKinsol::Impl::properties() const
     return res;
 }
 
-int SolverKinsol::Impl::maximumNumberOfIterations() const
+int SolverKinsol::Impl::maximumNumberOfIterations() const noexcept
 {
     return mMaximumNumberOfIterations;
 }
@@ -272,7 +274,7 @@ void SolverKinsol::Impl::setMaximumNumberOfIterations(int pMaximumNumberOfIterat
     mMaximumNumberOfIterations = pMaximumNumberOfIterations;
 }
 
-SolverKinsol::LinearSolver SolverKinsol::Impl::linearSolver() const
+SolverKinsol::LinearSolver SolverKinsol::Impl::linearSolver() const noexcept
 {
     return mLinearSolver;
 }
@@ -282,7 +284,7 @@ void SolverKinsol::Impl::setLinearSolver(LinearSolver pLinearSolver)
     mLinearSolver = pLinearSolver;
 }
 
-int SolverKinsol::Impl::upperHalfBandwidth() const
+int SolverKinsol::Impl::upperHalfBandwidth() const noexcept
 {
     return mUpperHalfBandwidth;
 }
@@ -292,7 +294,7 @@ void SolverKinsol::Impl::setUpperHalfBandwidth(int pUpperHalfBandwidth)
     mUpperHalfBandwidth = pUpperHalfBandwidth;
 }
 
-int SolverKinsol::Impl::lowerHalfBandwidth() const
+int SolverKinsol::Impl::lowerHalfBandwidth() const noexcept
 {
     return mLowerHalfBandwidth;
 }
@@ -303,7 +305,7 @@ void SolverKinsol::Impl::setLowerHalfBandwidth(int pLowerHalfBandwidth)
 }
 
 #ifdef __EMSCRIPTEN__
-bool SolverKinsol::Impl::solve(intptr_t pWasmInstanceFunctionsId, size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
+bool SolverKinsol::Impl::solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
 #else
 bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData)
 #endif
@@ -374,29 +376,29 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
         return false;
     }
 
-    // Create our SUNDIALS context.
+    // Create our SUNDIALS context, or reuse the cached one.
 
-    SUNContext context {nullptr};
-
-    ASSERT_EQ(SUNContext_Create(SUN_COMM_NULL, &context), 0);
+    if (mSunContext == nullptr) {
+        ASSERT_EQ(SUNContext_Create(SUN_COMM_NULL, &mSunContext), 0);
+    }
 
     // Create our KINSOL solver.
 
-    auto *solver {KINCreate(context)};
+    auto *solver {KINCreate(mSunContext)};
 
     ASSERT_NE(solver, nullptr);
 
     // Use our own error handler and disable the logger.
 
 #ifndef CODE_COVERAGE_ENABLED
-    ASSERT_EQ(SUNContext_PushErrHandler(context, errorHandler, &mErrorMessage), KIN_SUCCESS);
-    ASSERT_EQ(SUNContext_SetLogger(context, nullptr), KIN_SUCCESS);
+    ASSERT_EQ(SUNContext_PushErrHandler(mSunContext, errorHandler, &mErrorMessage), KIN_SUCCESS);
+    ASSERT_EQ(SUNContext_SetLogger(mSunContext, nullptr), KIN_SUCCESS);
 #endif
 
     // Initialise our KINSOL solver.
 
-    auto *u {N_VMake_Serial(static_cast<int64_t>(pN), pU, context)};
-    auto *ones {N_VNew_Serial(static_cast<int64_t>(pN), context)};
+    auto *u {N_VMake_Serial(static_cast<int64_t>(pN), pU, mSunContext)};
+    auto *ones {N_VNew_Serial(static_cast<int64_t>(pN), mSunContext)};
 
     ASSERT_NE(u, nullptr);
     ASSERT_NE(ones, nullptr);
@@ -411,28 +413,28 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     SUNLinearSolver sunLinearSolver {nullptr};
 
     if (mLinearSolver == LinearSolver::DENSE) {
-        sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), context);
+        sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), mSunContext);
 
         ASSERT_NE(sunMatrix, nullptr);
 
-        sunLinearSolver = SUNLinSol_Dense(u, sunMatrix, context);
+        sunLinearSolver = SUNLinSol_Dense(u, sunMatrix, mSunContext);
     } else if (mLinearSolver == LinearSolver::BANDED) {
         sunMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
                                   static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
-                                  context);
+                                  mSunContext);
 
         ASSERT_NE(sunMatrix, nullptr);
 
-        sunLinearSolver = SUNLinSol_Band(u, sunMatrix, context);
+        sunLinearSolver = SUNLinSol_Band(u, sunMatrix, mSunContext);
     } else {
         sunMatrix = nullptr;
 
         if (mLinearSolver == LinearSolver::GMRES) {
-            sunLinearSolver = SUNLinSol_SPGMR(u, SUN_PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPGMR(u, SUN_PREC_NONE, 0, mSunContext);
         } else if (mLinearSolver == LinearSolver::BICGSTAB) {
-            sunLinearSolver = SUNLinSol_SPBCGS(u, SUN_PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPBCGS(u, SUN_PREC_NONE, 0, mSunContext);
         } else {
-            sunLinearSolver = SUNLinSol_SPTFQMR(u, SUN_PREC_NONE, 0, context);
+            sunLinearSolver = SUNLinSol_SPTFQMR(u, SUN_PREC_NONE, 0, mSunContext);
         }
     }
 
@@ -445,7 +447,6 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     SolverKinsolUserData userData;
 
 #ifdef __EMSCRIPTEN__
-    userData.wasmInstanceFunctionsId = pWasmInstanceFunctionsId;
     userData.computeObjectiveFunctionIndex = pComputeObjectiveFunctionIndex;
 #else
     userData.computeObjectiveFunction = pComputeObjectiveFunction;
@@ -462,7 +463,7 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     auto res = KINSol(solver, u, KIN_LINESEARCH, ones, ones);
 
-    // Release some memory.
+    // Release some memory, but keep the SUNContext cached for reuse.
 
     N_VDestroy_Serial(u);
     N_VDestroy_Serial(ones);
@@ -471,9 +472,7 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     KINFree(&solver);
 
-    SUNContext_PopErrHandler(context);
-
-    SUNContext_Free(&context);
+    SUNContext_PopErrHandler(mSunContext);
 
     // Check whether everything went fine.
 
@@ -495,14 +494,11 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 }
 
 SolverKinsol::SolverKinsol()
-    : SolverNla(new Impl {})
+    : SolverNla(std::make_unique<Impl>())
 {
 }
 
-SolverKinsol::~SolverKinsol()
-{
-    delete pimpl();
-}
+SolverKinsol::~SolverKinsol() = default;
 
 SolverKinsol::Impl *SolverKinsol::pimpl()
 {
@@ -519,7 +515,7 @@ SolverKinsolPtr SolverKinsol::create()
     return SolverKinsolPtr {new SolverKinsol {}};
 }
 
-int SolverKinsol::maximumNumberOfIterations() const
+int SolverKinsol::maximumNumberOfIterations() const noexcept
 {
     return pimpl()->maximumNumberOfIterations();
 }
@@ -529,7 +525,7 @@ void SolverKinsol::setMaximumNumberOfIterations(int pMaximumNumberOfIterations)
     pimpl()->setMaximumNumberOfIterations(pMaximumNumberOfIterations);
 }
 
-SolverKinsol::LinearSolver SolverKinsol::linearSolver() const
+SolverKinsol::LinearSolver SolverKinsol::linearSolver() const noexcept
 {
     return pimpl()->linearSolver();
 }
@@ -539,7 +535,7 @@ void SolverKinsol::setLinearSolver(LinearSolver pLinearSolver)
     pimpl()->setLinearSolver(pLinearSolver);
 }
 
-int SolverKinsol::upperHalfBandwidth() const
+int SolverKinsol::upperHalfBandwidth() const noexcept
 {
     return pimpl()->upperHalfBandwidth();
 }
@@ -549,7 +545,7 @@ void SolverKinsol::setUpperHalfBandwidth(int pUpperHalfBandwidth)
     pimpl()->setUpperHalfBandwidth(pUpperHalfBandwidth);
 }
 
-int SolverKinsol::lowerHalfBandwidth() const
+int SolverKinsol::lowerHalfBandwidth() const noexcept
 {
     return pimpl()->lowerHalfBandwidth();
 }

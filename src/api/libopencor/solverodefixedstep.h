@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/solverode.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 /**
@@ -40,21 +42,21 @@ public:
     SolverOdeFixedStep &operator=(SolverOdeFixedStep &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the step used by the solver.
+     * @brief Return the step.
      *
-     * Return the step used by the solver.
+     * Return the step.
      *
-     * @return The step used by the solver.
+     * @return The step.
      */
 
-    double step() const;
+    double step() const noexcept;
 
     /**
-     * @brief Set the step to be used by the solver.
+     * @brief Set the step.
      *
-     * Set the step to be used by the solver.
+     * Set the step.
      *
-     * @param pStep The step to be used by the solver.
+     * @param pStep The step.
      */
 
     void setStep(double pStep);
@@ -62,7 +64,7 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SolverOdeFixedStep(Impl *pPimpl); /**< Constructor, @private. */
+    explicit SolverOdeFixedStep(std::unique_ptr<Impl> pPimpl); /**< Constructor, @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

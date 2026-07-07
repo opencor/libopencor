@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/sedbase.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 /**
@@ -42,9 +44,9 @@ public:
     SedChange &operator=(SedChange &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
-     * @brief Get the target.
+     * @brief Return the target.
      *
-     * Get the target.
+     * Return the target.
      *
      * @return The target as a @c std::string.
      */
@@ -54,7 +56,7 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedChange(Impl *pPimpl); /**< Constructor @private. */
+    explicit SedChange(std::unique_ptr<Impl> pPimpl); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/sedbase.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 /**
@@ -45,7 +47,7 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SedAbstractTask(Impl *pPimpl); /**< Constructor @private. */
+    explicit SedAbstractTask(std::unique_ptr<Impl> pPimpl); /**< Constructor @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

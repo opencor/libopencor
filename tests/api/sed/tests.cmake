@@ -19,6 +19,7 @@ list(APPEND TESTS ${TEST})
 set(${TEST}_CATEGORY api)
 set(${TEST}_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/basictests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/concurrenttests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/coveragetests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/instancetests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/serialisetests.cpp

@@ -562,7 +562,7 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
             // Populate the NLA solver, if any, using our new approach (i.e. using libOpenCOR's nlaSolver element) and
             // then using our legacy approach (i.e. using a SED-ML annotation).
 
-            auto applyNlaSolverInfo = [&](const auto &pNlaSolverInfo) {
+            auto applyNlaSolverInfo = [this, &simulation](const auto &pNlaSolverInfo) {
                 for (const auto &nlaSolverWarning : pNlaSolverInfo.warnings) {
                     addWarning(nlaSolverWarning);
                 }
@@ -597,26 +597,24 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 }
 
 SedmlFile::SedmlFile(const FilePtr &pFile, libsedml::SedDocument *pDocument)
-    : Logger(new Impl {pFile, pDocument})
+    : Logger(std::make_unique<Impl>(pFile, pDocument))
 {
+#ifdef CODE_COVERAGE_ENABLED
+    (void)static_cast<const SedmlFile *>(this)->pimpl();
+#endif
 }
 
-SedmlFile::~SedmlFile()
-{
-    delete pimpl();
-}
+SedmlFile::~SedmlFile() = default;
 
 SedmlFile::Impl *SedmlFile::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
-/*---GRY---
 const SedmlFile::Impl *SedmlFile::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
-*/
 
 SedmlFilePtr SedmlFile::create(const FilePtr &pFile)
 {

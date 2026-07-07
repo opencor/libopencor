@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class SolverHeun::Impl: public SolverOdeFixedStep::Impl
+class SolverHeun::Impl final: public SolverOdeFixedStep::Impl
 {
 public:
     double *mK {nullptr};

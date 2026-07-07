@@ -24,8 +24,22 @@ limitations under the License.
 #include "libopencor/sedsteadystate.h"
 #include "libopencor/sedtask.h"
 #include "libopencor/seduniformtimecourse.h"
+#include "libopencor/solvercvode.h"
+#include "libopencor/solverkinsol.h"
+
+#include <mutex>
+#include <unordered_map>
 
 namespace libOpenCOR {
+
+namespace {
+
+// Cache of compiled runtimes, keyed by CellmlFile pointer.
+
+std::mutex sRuntimesMutex; // NOLINT
+std::unordered_map<const CellmlFile *, CellmlFileRuntimePtr> sRuntimes; // NOLINT
+
+} // namespace
 
 CellmlFile::Impl::Impl(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
     : mFile(pFile)
@@ -114,27 +128,54 @@ libcellml::AnalyserModelPtr CellmlFile::Impl::analyserModel() const
 
 CellmlFileRuntimePtr CellmlFile::Impl::runtime(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
-    return CellmlFileRuntime::create(pCellmlFile, pNlaSolver);
+    // Check whether we already have a compiled runtime and if so then return it.
+
+    {
+        const std::scoped_lock<std::mutex> lock(sRuntimesMutex);
+        const auto it = sRuntimes.find(pCellmlFile.get());
+
+        if (it != sRuntimes.end()) {
+            return it->second;
+        }
+    }
+
+    // There is no compiled runtime for this CellML file, so create one, track it, and return it.
+
+    auto runtime = CellmlFileRuntime::create(pCellmlFile, pNlaSolver);
+
+    {
+        const std::scoped_lock<std::mutex> lock(sRuntimesMutex);
+
+        sRuntimes.try_emplace(pCellmlFile.get(), runtime);
+    }
+
+    return runtime;
 }
 
 CellmlFile::CellmlFile(const FilePtr &pFile, const libcellml::ModelPtr &pModel, bool pStrict)
-    : Logger(new Impl {pFile, pModel, pStrict})
+    : Logger(std::make_unique<Impl>(pFile, pModel, pStrict))
 {
 }
 
 CellmlFile::~CellmlFile()
 {
-    delete pimpl();
+    // Stop tracking our compiled runtime.
+
+    {
+        const std::scoped_lock<std::mutex> lock(sRuntimesMutex);
+
+        sRuntimes.erase(this);
+    }
 }
 
 CellmlFile::Impl *CellmlFile::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const CellmlFile::Impl *CellmlFile::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
 CellmlFilePtr CellmlFile::create(const FilePtr &pFile)

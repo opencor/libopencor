@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/solver.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 /**
@@ -47,7 +49,7 @@ public:
     SolverNla &operator=(const SolverNla &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverNla &operator=(SolverNla &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-    Solver::Type type() const override;
+    Solver::Type type() const noexcept override;
 
     /**
      * @brief Solve the NLA system.
@@ -63,7 +65,7 @@ public:
      */
 
 #ifdef __EMSCRIPTEN__
-    bool solve(intptr_t pWasmInstanceFunctionsId, size_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData);
+    bool solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData);
 #else
     bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData);
 #endif
@@ -71,7 +73,7 @@ public:
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SolverNla(Impl *pPimpl); /**< Constructor, @private. */
+    explicit SolverNla(std::unique_ptr<Impl> pPimpl); /**< Constructor, @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

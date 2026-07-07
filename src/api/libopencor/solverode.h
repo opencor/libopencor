@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "libopencor/solver.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 /**
@@ -45,12 +47,12 @@ public:
     SolverOde &operator=(const SolverOde &pRhs) = delete; /**< No copy assignment operator allowed, @private. */
     SolverOde &operator=(SolverOde &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
-    Solver::Type type() const override;
+    Solver::Type type() const noexcept override;
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */
 
-    explicit SolverOde(Impl *pPimpl); /**< Constructor, @private. */
+    explicit SolverOde(std::unique_ptr<Impl> pPimpl); /**< Constructor, @private. */
 
     Impl *pimpl(); /**< Private implementation pointer, @private. */
     const Impl *pimpl() const; /**< Constant private implementation pointer, @private. */

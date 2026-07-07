@@ -23,26 +23,31 @@ limitations under the License.
 #include "solvernla_p.h"
 #include "solverode_p.h"
 
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <condition_variable>
+#include <memory>
+#include <mutex>
+
 namespace libOpenCOR {
 
 #ifdef __EMSCRIPTEN__
-static emscripten::val toFloat64Array(const Doubles &data)
-{
-    auto size = data.size();
-
-    if (size == 0) {
-        return emscripten::val::global("Float64Array").new_(0);
+// clang-format off
+EM_JS(intptr_t, toFloat64ArrayJS, (const void* data, size_t size), {
+    if (size === 0) {
+        return Emval.toHandle(new Float64Array(0));
     }
 
-    // Note: see the note in src/bindings/javascript/file.cpp for why we avoid typed_memory_view() and use EM_ASM()
-    //       instead.
+    return Emval.toHandle(new Float64Array(HEAPU8.subarray(data, data + 8 * size).buffer, data, size));
+    // Note: we use HEAPU8.subarray() to create a view over the WASM heap's Float64Array buffer because it is safer than
+    //       accessing HEAPU8.buffer directly in case the WASM heap was ever to grow (we don't allow this to happen, but
+    //       it is still safer to use HEAPU8.subarray()) since it creates a view with the correct byte offset.
+}); // clang-format on
 
-    // clang-format off
-    return emscripten::val::take_ownership(static_cast<emscripten::EM_VAL>(EM_ASM_PTR({
-        let jsArray = new Float64Array(new Float64Array(HEAPU8.buffer, $0, $1));
-
-        return Emval.toHandle(jsArray);
-    }, data.data(), size))); // clang-format on
+static emscripten::val toFloat64Array(std::span<const double> data)
+{
+    return emscripten::val::take_ownership(reinterpret_cast<emscripten::EM_VAL>(toFloat64ArrayJS(data.data(), data.size())));
 }
 #endif
 
@@ -110,27 +115,20 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     mAlgebraicVariableCount = mAnalyserModel->algebraicVariableCount();
 
     if (mDifferentialModel) {
-        mStateDoubles.resize(mStateCount, NAN);
-        mRateDoubles.resize(mStateCount, NAN);
+        mStateDoubles.resize(mStateCount);
+        mRateDoubles.resize(mStateCount);
 
         mStates = mStateDoubles.data();
         mRates = mRateDoubles.data();
-
-        mResults.states.resize(mStateCount, {});
-        mResults.rates.resize(mStateCount, {});
     }
 
-    mConstantDoubles.resize(mConstantCount, NAN);
-    mComputedConstantDoubles.resize(mComputedConstantCount, NAN);
-    mAlgebraicVariableDoubles.resize(mAlgebraicVariableCount, NAN);
+    mConstantDoubles.resize(mConstantCount);
+    mComputedConstantDoubles.resize(mComputedConstantCount);
+    mAlgebraicVariableDoubles.resize(mAlgebraicVariableCount);
 
     mConstants = mConstantDoubles.data();
     mComputedConstants = mComputedConstantDoubles.data();
     mAlgebraicVariables = mAlgebraicVariableDoubles.data();
-
-    mResults.constants.resize(mConstantCount, {});
-    mResults.computedConstants.resize(mComputedConstantCount, {});
-    mResults.algebraicVariables.resize(mAlgebraicVariableCount, {});
 
     // Retrieve our various strings.
 
@@ -200,27 +198,21 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
 {
     mResults.voi[pIndex] = mVoi;
 
-    auto &states = mResults.states;
-    auto &rates = mResults.rates;
-    auto &constants = mResults.constants;
-    auto &computedConstants = mResults.computedConstants;
-    auto &algebraicVariables = mResults.algebraicVariables;
-
     for (size_t i {0}; i < mStateCount; ++i) {
-        states[i][pIndex] = mStates[i]; // NOLINT
-        rates[i][pIndex] = mRates[i]; // NOLINT
+        mResults.states[i * mResults.resultsSize + pIndex] = mStates[i]; // NOLINT
+        mResults.rates[i * mResults.resultsSize + pIndex] = mRates[i]; // NOLINT
     }
 
     for (size_t i {0}; i < mConstantCount; ++i) {
-        constants[i][pIndex] = mConstants[i]; // NOLINT
+        mResults.constants[i * mResults.resultsSize + pIndex] = mConstants[i]; // NOLINT
     }
 
     for (size_t i {0}; i < mComputedConstantCount; ++i) {
-        computedConstants[i][pIndex] = mComputedConstants[i]; // NOLINT
+        mResults.computedConstants[i * mResults.resultsSize + pIndex] = mComputedConstants[i]; // NOLINT
     }
 
     for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
-        algebraicVariables[i][pIndex] = mAlgebraicVariables[i]; // NOLINT
+        mResults.algebraicVariables[i * mResults.resultsSize + pIndex] = mAlgebraicVariables[i]; // NOLINT
     }
 }
 
@@ -242,6 +234,22 @@ void SedInstanceTask::Impl::applyChanges()
 
 void SedInstanceTask::Impl::initialise()
 {
+#ifdef __EMSCRIPTEN__
+    // Initialise our per-worker WASM runtime data.
+
+    mRuntime->initialiseWorkerWasm();
+#endif
+
+    // Set the NLA solver address so JIT-compiled code can resolve it at runtime.
+
+    if (mNlaSolver != nullptr) {
+#ifdef __EMSCRIPTEN__
+        mRuntime->setNlaSolverAddress(reinterpret_cast<uintptr_t>(mNlaSolver.get()));
+#else
+        setNlaSolverAddress(reinterpret_cast<uintptr_t>(mNlaSolver.get()));
+#endif
+    }
+
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
     // variables, compute computed constants, rates, and variables, while for an algebraic/NLA model we need to
     // initialise our variables and compute computed constants and variables.
@@ -313,6 +321,38 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         trackResults(index);
     }
 
+    // Set up a guard function to fill the tail of our results with NaN values in case we exit this function before
+    // reaching the end of our simulation.
+
+    auto guard = [this, &index, pTrackResults]() {
+        if (!pTrackResults) {
+            return;
+        }
+
+        auto nanFillTail = [](Doubles &pResults, size_t pStartIndex) {
+            std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(pStartIndex),
+                      pResults.end(),
+                      NAN);
+        };
+
+        auto nanFillRowTails = [index, this](Doubles &pResults, size_t pCount) {
+            for (size_t i {0}; i < pCount; ++i) {
+                const auto rowStart {i * mResults.resultsSize};
+
+                std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(rowStart + index + 1),
+                          pResults.begin() + static_cast<std::ptrdiff_t>(std::min(rowStart + mResults.resultsSize, pResults.size())),
+                          NAN);
+            }
+        };
+
+        nanFillTail(mResults.voi, index + 1);
+        nanFillRowTails(mResults.states, mStateCount);
+        nanFillRowTails(mResults.rates, mStateCount);
+        nanFillRowTails(mResults.constants, mConstantCount);
+        nanFillRowTails(mResults.computedConstants, mComputedConstantCount);
+        nanFillRowTails(mResults.algebraicVariables, mAlgebraicVariableCount);
+    };
+
     // Compute the differential model.
 
     auto *odeSolverPimpl {mOdeSolver->pimpl()};
@@ -323,8 +363,38 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
 #endif
 
     while (!fuzzyCompare(mVoi, pVoiEnd)) {
+        // Check whether a pause or stop has been requested.
+
+        const auto runControl = mRunControl->load(std::memory_order_relaxed);
+
+        if ((runControl & INSTANCE_RUN_CONTROL_PAUSE) != 0) {
+            std::unique_lock<std::mutex> pauseLock(*mPauseMutex);
+
+            mPauseConditionVariable->wait(pauseLock, [this]() {
+                const auto crtRunControl = mRunControl->load(std::memory_order_relaxed);
+
+                return ((crtRunControl & INSTANCE_RUN_CONTROL_PAUSE) == 0) || ((crtRunControl & INSTANCE_RUN_CONTROL_STOP) != 0);
+            });
+
+            if ((mRunControl->load(std::memory_order_relaxed) & INSTANCE_RUN_CONTROL_STOP) != 0) {
+                guard();
+
+                return;
+            }
+        }
+
+        if ((runControl & INSTANCE_RUN_CONTROL_STOP) != 0) {
+            guard();
+
+            return;
+        }
+
+        // Update our model's state.
+
         if (!odeSolverPimpl->solve(mVoi, std::min(pVoiStart + static_cast<double>(++voiCounter) * pVoiInterval, pVoiEnd))) {
             addIssues(mOdeSolver, mOdeSolver->name());
+
+            guard();
 
             return;
         }
@@ -343,9 +413,17 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
             addIssues(mNlaSolver, mNlaSolver->name());
 
+            guard();
+
             return;
         }
 #endif
+
+        // Update our progress.
+
+        mCompletedSteps.fetch_add(1, std::memory_order_relaxed);
+
+        // Track our results, if needed.
 
         if (pTrackResults) {
             trackResults(++index);
@@ -359,6 +437,14 @@ double SedInstanceTask::Impl::run()
 
     auto startTime {std::chrono::high_resolution_clock::now()};
 
+    // Reset our progress counters.
+
+    const auto *sedUniformTimeCoursePimpl {mDifferentialModel ? mSedUniformTimeCourse->pimpl() : nullptr};
+    const auto totalSteps {mDifferentialModel ? static_cast<size_t>(sedUniformTimeCoursePimpl->mNumberOfSteps) : 1};
+
+    mCompletedSteps.store(0, std::memory_order_relaxed);
+    mTotalSteps.store(totalSteps, std::memory_order_relaxed);
+
     // (Re)initialise our model.
     // Note: reinitialise our model because we initialised it when we created the instance task.
 
@@ -367,39 +453,30 @@ double SedInstanceTask::Impl::run()
     // Compute our model, unless it's an algebraic/NLA model in which case we are already done.
 
     if (mDifferentialModel) {
-        // Initialise our results structure.
-
-        const auto *sedUniformTimeCoursePimpl {mSedUniformTimeCourse->pimpl()};
-        const auto resultsSize {static_cast<size_t>(sedUniformTimeCoursePimpl->mNumberOfSteps) + 1};
-
-        mResults.voi.resize(resultsSize, NAN);
-
-        for (size_t i {0}; i < mStateCount; ++i) {
-            mResults.states[i].resize(resultsSize, NAN);
-            mResults.rates[i].resize(resultsSize, NAN);
-        }
-
-        for (size_t i {0}; i < mConstantCount; ++i) {
-            mResults.constants[i].resize(resultsSize, NAN);
-        }
-
-        for (size_t i {0}; i < mComputedConstantCount; ++i) {
-            mResults.computedConstants[i].resize(resultsSize, NAN);
-        }
-
-        for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
-            mResults.algebraicVariables[i].resize(resultsSize, NAN);
-        }
-
-        // Run our simulation from the initial time to the output start time, without tracking our results.
+        // Run our simulation from the initial time to the output start time, without tracking our results, but only if
+        // the output start time is after the initial time.
 
         const auto voiInterval {(sedUniformTimeCoursePimpl->mOutputEndTime - sedUniformTimeCoursePimpl->mOutputStartTime) / sedUniformTimeCoursePimpl->mNumberOfSteps};
 
-        run(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime, voiInterval, false);
+        if (!fuzzyCompare(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime)) {
+            run(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime, voiInterval, false);
 
-        if (hasIssues()) {
-            return 0.0;
+            if (hasIssues()) {
+                return 0.0;
+            }
         }
+
+        // Initialise our results structure.
+
+        const auto resultsSize {totalSteps + 1};
+
+        mResults.resultsSize = resultsSize;
+        mResults.voi.resize(resultsSize);
+        mResults.states.resize(mStateCount * resultsSize);
+        mResults.rates.resize(mStateCount * resultsSize);
+        mResults.constants.resize(mConstantCount * resultsSize);
+        mResults.computedConstants.resize(mComputedConstantCount * resultsSize);
+        mResults.algebraicVariables.resize(mAlgebraicVariableCount * resultsSize);
 
         // Run our simulation from the output start time to the output end time, tracking our results.
 
@@ -411,17 +488,24 @@ double SedInstanceTask::Impl::run()
     } else {
         // Track our results.
 
+        mResults.resultsSize = 1;
+        mResults.constants.resize(mConstantCount);
+        mResults.computedConstants.resize(mComputedConstantCount);
+        mResults.algebraicVariables.resize(mAlgebraicVariableCount);
+
         for (size_t i {0}; i < mConstantCount; ++i) {
-            mResults.constants[i].assign(1, mConstants[i]); // NOLINT
+            mResults.constants[i] = mConstants[i]; // NOLINT
         }
 
         for (size_t i {0}; i < mComputedConstantCount; ++i) {
-            mResults.computedConstants[i].assign(1, mComputedConstants[i]); // NOLINT
+            mResults.computedConstants[i] = mComputedConstants[i]; // NOLINT
         }
 
         for (size_t i {0}; i < mAlgebraicVariableCount; ++i) {
-            mResults.algebraicVariables[i].assign(1, mAlgebraicVariables[i]); // NOLINT
+            mResults.algebraicVariables[i] = mAlgebraicVariables[i]; // NOLINT
         }
+
+        mCompletedSteps.store(1, std::memory_order_relaxed);
     }
 
     // Stop our timer and return the elapsed time in milliseconds.
@@ -429,18 +513,27 @@ double SedInstanceTask::Impl::run()
     return std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - startTime).count();
 }
 
-const Doubles &SedInstanceTask::Impl::voi() const
+double SedInstanceTask::Impl::progress() const noexcept
 {
-    static const Doubles NO_DOUBLES;
+    const auto totalSteps {mTotalSteps.load(std::memory_order_relaxed)};
 
+    if (totalSteps == 0) {
+        return 0.0;
+    }
+
+    return static_cast<double>(mCompletedSteps.load(std::memory_order_relaxed)) / static_cast<double>(totalSteps);
+}
+
+std::span<const double> SedInstanceTask::Impl::voi() const noexcept
+{
     if (mDifferentialModel) {
         return mResults.voi;
     }
 
-    return NO_DOUBLES;
+    return {};
 }
 
-const std::string &SedInstanceTask::Impl::voiName() const
+const std::string &SedInstanceTask::Impl::voiName() const noexcept
 {
     static const std::string NO_STRING;
 
@@ -451,7 +544,7 @@ const std::string &SedInstanceTask::Impl::voiName() const
     return NO_STRING;
 }
 
-const std::string &SedInstanceTask::Impl::voiUnit() const
+const std::string &SedInstanceTask::Impl::voiUnit() const noexcept
 {
     static const std::string NO_STRING;
 
@@ -462,23 +555,21 @@ const std::string &SedInstanceTask::Impl::voiUnit() const
     return NO_STRING;
 }
 
-size_t SedInstanceTask::Impl::stateCount() const
+size_t SedInstanceTask::Impl::stateCount() const noexcept
 {
     return mStateCount;
 }
 
-const Doubles &SedInstanceTask::Impl::state(size_t pIndex) const
+std::span<const double> SedInstanceTask::Impl::state(size_t pIndex) const noexcept
 {
-    static const Doubles NO_DOUBLES;
-
     if (!mDifferentialModel || (pIndex >= mStateCount)) {
-        return NO_DOUBLES;
+        return {};
     }
 
-    return mResults.states[pIndex];
+    return std::span(mResults.states).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
-const std::string &SedInstanceTask::Impl::stateName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::stateName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -489,7 +580,7 @@ const std::string &SedInstanceTask::Impl::stateName(size_t pIndex) const
     return mStateNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::stateUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::stateUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -500,23 +591,21 @@ const std::string &SedInstanceTask::Impl::stateUnit(size_t pIndex) const
     return mStateUnits[pIndex];
 }
 
-size_t SedInstanceTask::Impl::rateCount() const
+size_t SedInstanceTask::Impl::rateCount() const noexcept
 {
     return stateCount();
 }
 
-const Doubles &SedInstanceTask::Impl::rate(size_t pIndex) const
+std::span<const double> SedInstanceTask::Impl::rate(size_t pIndex) const noexcept
 {
-    static const Doubles NO_DOUBLES;
-
     if (!mDifferentialModel || (pIndex >= mStateCount)) {
-        return NO_DOUBLES;
+        return {};
     }
 
-    return mResults.rates[pIndex];
+    return std::span(mResults.rates).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
-const std::string &SedInstanceTask::Impl::rateName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::rateName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -527,7 +616,7 @@ const std::string &SedInstanceTask::Impl::rateName(size_t pIndex) const
     return mRateNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::rateUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::rateUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -538,23 +627,21 @@ const std::string &SedInstanceTask::Impl::rateUnit(size_t pIndex) const
     return mRateUnits[pIndex];
 }
 
-size_t SedInstanceTask::Impl::constantCount() const
+size_t SedInstanceTask::Impl::constantCount() const noexcept
 {
     return mConstantCount;
 }
 
-const Doubles &SedInstanceTask::Impl::constant(size_t pIndex) const
+std::span<const double> SedInstanceTask::Impl::constant(size_t pIndex) const noexcept
 {
-    static const Doubles NO_DOUBLES;
-
     if (pIndex >= mConstantCount) {
-        return NO_DOUBLES;
+        return {};
     }
 
-    return mResults.constants[pIndex];
+    return std::span(mResults.constants).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
-const std::string &SedInstanceTask::Impl::constantName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::constantName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -565,7 +652,7 @@ const std::string &SedInstanceTask::Impl::constantName(size_t pIndex) const
     return mConstantNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::constantUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::constantUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -576,23 +663,21 @@ const std::string &SedInstanceTask::Impl::constantUnit(size_t pIndex) const
     return mConstantUnits[pIndex];
 }
 
-size_t SedInstanceTask::Impl::computedConstantCount() const
+size_t SedInstanceTask::Impl::computedConstantCount() const noexcept
 {
     return mComputedConstantCount;
 }
 
-const Doubles &SedInstanceTask::Impl::computedConstant(size_t pIndex) const
+std::span<const double> SedInstanceTask::Impl::computedConstant(size_t pIndex) const noexcept
 {
-    static const Doubles NO_DOUBLES;
-
     if (pIndex >= mComputedConstantCount) {
-        return NO_DOUBLES;
+        return {};
     }
 
-    return mResults.computedConstants[pIndex];
+    return std::span(mResults.computedConstants).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
-const std::string &SedInstanceTask::Impl::computedConstantName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::computedConstantName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -603,7 +688,7 @@ const std::string &SedInstanceTask::Impl::computedConstantName(size_t pIndex) co
     return mComputedConstantNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::computedConstantUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::computedConstantUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -614,23 +699,21 @@ const std::string &SedInstanceTask::Impl::computedConstantUnit(size_t pIndex) co
     return mComputedConstantUnits[pIndex];
 }
 
-size_t SedInstanceTask::Impl::algebraicVariableCount() const
+size_t SedInstanceTask::Impl::algebraicVariableCount() const noexcept
 {
     return mAlgebraicVariableCount;
 }
 
-const Doubles &SedInstanceTask::Impl::algebraicVariable(size_t pIndex) const
+std::span<const double> SedInstanceTask::Impl::algebraicVariable(size_t pIndex) const noexcept
 {
-    static const Doubles NO_DOUBLES;
-
     if (pIndex >= mAlgebraicVariableCount) {
-        return NO_DOUBLES;
+        return {};
     }
 
-    return mResults.algebraicVariables[pIndex];
+    return std::span(mResults.algebraicVariables).subspan(pIndex * mResults.resultsSize, mResults.resultsSize);
 }
 
-const std::string &SedInstanceTask::Impl::algebraicVariableName(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::algebraicVariableName(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -641,7 +724,7 @@ const std::string &SedInstanceTask::Impl::algebraicVariableName(size_t pIndex) c
     return mAlgebraicVariableNames[pIndex];
 }
 
-const std::string &SedInstanceTask::Impl::algebraicVariableUnit(size_t pIndex) const
+const std::string &SedInstanceTask::Impl::algebraicVariableUnit(size_t pIndex) const noexcept
 {
     static const std::string NO_STRING;
 
@@ -653,202 +736,280 @@ const std::string &SedInstanceTask::Impl::algebraicVariableUnit(size_t pIndex) c
 }
 
 SedInstanceTask::SedInstanceTask(const SedAbstractTaskPtr &pTask)
-    : Logger(new Impl(pTask))
+    : Logger(std::make_unique<Impl>(pTask))
 {
 }
 
-SedInstanceTask::~SedInstanceTask()
-{
-    delete pimpl();
-}
+SedInstanceTask::~SedInstanceTask() = default;
 
 SedInstanceTask::Impl *SedInstanceTask::pimpl()
 {
-    return static_cast<Impl *>(Logger::mPimpl);
+    return static_cast<Impl *>(Logger::mPimpl.get());
 }
 
 const SedInstanceTask::Impl *SedInstanceTask::pimpl() const
 {
-    return static_cast<const Impl *>(Logger::mPimpl);
+    return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
-const Doubles &SedInstanceTask::voi() const
+double SedInstanceTask::progress() const noexcept
 {
-    return pimpl()->voi();
+    return pimpl()->progress();
 }
 
 #ifdef __EMSCRIPTEN__
-const emscripten::val &SedInstanceTask::voiAsArray() const
+const emscripten::val &SedInstanceTask::voi() const noexcept
 {
-    static thread_local emscripten::val res {emscripten::val::undefined()};
+    static thread_local emscripten::val res;
+    static thread_local const double *cachedDataPtr {nullptr};
+    static thread_local auto cachedSize {SIZE_MAX};
 
-    res = toFloat64Array(voi());
+    const auto &data = pimpl()->voi();
+    const auto *dataPtr = data.data();
+    const auto dataSize = data.size();
+
+    if ((cachedDataPtr != dataPtr) || (cachedSize != dataSize)) {
+        res = toFloat64Array(data);
+
+        cachedDataPtr = dataPtr;
+        cachedSize = dataSize;
+    }
 
     return res;
 }
+#else
+std::span<const double> SedInstanceTask::voi() const noexcept
+{
+    return pimpl()->voi();
+}
 #endif
 
-const std::string &SedInstanceTask::voiName() const
+const std::string &SedInstanceTask::voiName() const noexcept
 {
     return pimpl()->voiName();
 }
 
-const std::string &SedInstanceTask::voiUnit() const
+const std::string &SedInstanceTask::voiUnit() const noexcept
 {
     return pimpl()->voiUnit();
 }
 
-size_t SedInstanceTask::stateCount() const
+size_t SedInstanceTask::stateCount() const noexcept
 {
     return pimpl()->stateCount();
 }
 
-const Doubles &SedInstanceTask::state(size_t pIndex) const
-{
-    return pimpl()->state(pIndex);
-}
-
 #ifdef __EMSCRIPTEN__
-const emscripten::val &SedInstanceTask::stateAsArray(size_t pIndex) const
+const emscripten::val &SedInstanceTask::state(size_t pIndex) const noexcept
 {
-    static thread_local emscripten::val res {emscripten::val::undefined()};
+    static thread_local emscripten::val res;
+    static thread_local auto cachedIndex {SIZE_MAX};
+    static thread_local const double *cachedFlatPtr {nullptr};
+    static thread_local auto cachedStride {SIZE_MAX};
 
-    res = toFloat64Array(state(pIndex));
+    const auto &data = pimpl()->state(pIndex);
+    const auto *flatPtr = data.data() - pIndex * data.size();
+    const auto stride = data.size();
+
+    if ((cachedIndex != pIndex) || (cachedFlatPtr != flatPtr) || (cachedStride != stride)) {
+        res = toFloat64Array(data);
+
+        cachedFlatPtr = flatPtr;
+        cachedStride = stride;
+        cachedIndex = pIndex;
+    }
 
     return res;
 }
+#else
+std::span<const double> SedInstanceTask::state(size_t pIndex) const noexcept
+{
+    return pimpl()->state(pIndex);
+}
 #endif
 
-const std::string &SedInstanceTask::stateName(size_t pIndex) const
+const std::string &SedInstanceTask::stateName(size_t pIndex) const noexcept
 {
     return pimpl()->stateName(pIndex);
 }
 
-const std::string &SedInstanceTask::stateUnit(size_t pIndex) const
+const std::string &SedInstanceTask::stateUnit(size_t pIndex) const noexcept
 {
     return pimpl()->stateUnit(pIndex);
 }
 
-size_t SedInstanceTask::rateCount() const
+size_t SedInstanceTask::rateCount() const noexcept
 {
     return pimpl()->rateCount();
 }
 
-const Doubles &SedInstanceTask::rate(size_t pIndex) const
-{
-    return pimpl()->rate(pIndex);
-}
-
 #ifdef __EMSCRIPTEN__
-const emscripten::val &SedInstanceTask::rateAsArray(size_t pIndex) const
+const emscripten::val &SedInstanceTask::rate(size_t pIndex) const noexcept
 {
-    static thread_local emscripten::val res {emscripten::val::undefined()};
+    static thread_local emscripten::val res;
+    static thread_local auto cachedIndex {SIZE_MAX};
+    static thread_local const double *cachedFlatPtr {nullptr};
+    static thread_local auto cachedStride {SIZE_MAX};
 
-    res = toFloat64Array(rate(pIndex));
+    const auto &data = pimpl()->rate(pIndex);
+    const auto *flatPtr = data.data() - pIndex * data.size();
+    const auto stride = data.size();
+
+    if ((cachedIndex != pIndex) || (cachedFlatPtr != flatPtr) || (cachedStride != stride)) {
+        res = toFloat64Array(data);
+
+        cachedFlatPtr = flatPtr;
+        cachedStride = stride;
+        cachedIndex = pIndex;
+    }
 
     return res;
 }
+#else
+std::span<const double> SedInstanceTask::rate(size_t pIndex) const noexcept
+{
+    return pimpl()->rate(pIndex);
+}
 #endif
 
-const std::string &SedInstanceTask::rateName(size_t pIndex) const
+const std::string &SedInstanceTask::rateName(size_t pIndex) const noexcept
 {
     return pimpl()->rateName(pIndex);
 }
 
-const std::string &SedInstanceTask::rateUnit(size_t pIndex) const
+const std::string &SedInstanceTask::rateUnit(size_t pIndex) const noexcept
 {
     return pimpl()->rateUnit(pIndex);
 }
 
-size_t SedInstanceTask::constantCount() const
+size_t SedInstanceTask::constantCount() const noexcept
 {
     return pimpl()->constantCount();
 }
 
-const Doubles &SedInstanceTask::constant(size_t pIndex) const
-{
-    return pimpl()->constant(pIndex);
-}
-
 #ifdef __EMSCRIPTEN__
-const emscripten::val &SedInstanceTask::constantAsArray(size_t pIndex) const
+const emscripten::val &SedInstanceTask::constant(size_t pIndex) const noexcept
 {
-    static thread_local emscripten::val res {emscripten::val::undefined()};
+    static thread_local emscripten::val res;
+    static thread_local auto cachedIndex {SIZE_MAX};
+    static thread_local const double *cachedFlatPtr {nullptr};
+    static thread_local auto cachedStride {SIZE_MAX};
 
-    res = toFloat64Array(constant(pIndex));
+    const auto &data = pimpl()->constant(pIndex);
+    const auto *flatPtr = data.data() - pIndex * data.size();
+    const auto stride = data.size();
+
+    if ((cachedIndex != pIndex) || (cachedFlatPtr != flatPtr) || (cachedStride != stride)) {
+        res = toFloat64Array(data);
+
+        cachedFlatPtr = flatPtr;
+        cachedStride = stride;
+        cachedIndex = pIndex;
+    }
 
     return res;
 }
+#else
+std::span<const double> SedInstanceTask::constant(size_t pIndex) const noexcept
+{
+    return pimpl()->constant(pIndex);
+}
 #endif
 
-const std::string &SedInstanceTask::constantName(size_t pIndex) const
+const std::string &SedInstanceTask::constantName(size_t pIndex) const noexcept
 {
     return pimpl()->constantName(pIndex);
 }
 
-const std::string &SedInstanceTask::constantUnit(size_t pIndex) const
+const std::string &SedInstanceTask::constantUnit(size_t pIndex) const noexcept
 {
     return pimpl()->constantUnit(pIndex);
 }
 
-size_t SedInstanceTask::computedConstantCount() const
+size_t SedInstanceTask::computedConstantCount() const noexcept
 {
     return pimpl()->computedConstantCount();
 }
 
-const Doubles &SedInstanceTask::computedConstant(size_t pIndex) const
-{
-    return pimpl()->computedConstant(pIndex);
-}
-
 #ifdef __EMSCRIPTEN__
-const emscripten::val &SedInstanceTask::computedConstantAsArray(size_t pIndex) const
+const emscripten::val &SedInstanceTask::computedConstant(size_t pIndex) const noexcept
 {
-    static thread_local emscripten::val res {emscripten::val::undefined()};
+    static thread_local emscripten::val res;
+    static thread_local auto cachedIndex {SIZE_MAX};
+    static thread_local const double *cachedFlatPtr {nullptr};
+    static thread_local auto cachedStride {SIZE_MAX};
 
-    res = toFloat64Array(computedConstant(pIndex));
+    const auto &data = pimpl()->computedConstant(pIndex);
+    const auto *flatPtr = data.data() - pIndex * data.size();
+    const auto stride = data.size();
+
+    if ((cachedIndex != pIndex) || (cachedFlatPtr != flatPtr) || (cachedStride != stride)) {
+        res = toFloat64Array(data);
+
+        cachedFlatPtr = flatPtr;
+        cachedStride = stride;
+        cachedIndex = pIndex;
+    }
 
     return res;
 }
+#else
+std::span<const double> SedInstanceTask::computedConstant(size_t pIndex) const noexcept
+{
+    return pimpl()->computedConstant(pIndex);
+}
 #endif
 
-const std::string &SedInstanceTask::computedConstantName(size_t pIndex) const
+const std::string &SedInstanceTask::computedConstantName(size_t pIndex) const noexcept
 {
     return pimpl()->computedConstantName(pIndex);
 }
 
-const std::string &SedInstanceTask::computedConstantUnit(size_t pIndex) const
+const std::string &SedInstanceTask::computedConstantUnit(size_t pIndex) const noexcept
 {
     return pimpl()->computedConstantUnit(pIndex);
 }
 
-size_t SedInstanceTask::algebraicVariableCount() const
+size_t SedInstanceTask::algebraicVariableCount() const noexcept
 {
     return pimpl()->algebraicVariableCount();
 }
 
-const Doubles &SedInstanceTask::algebraicVariable(size_t pIndex) const
-{
-    return pimpl()->algebraicVariable(pIndex);
-}
-
 #ifdef __EMSCRIPTEN__
-const emscripten::val &SedInstanceTask::algebraicVariableAsArray(size_t pIndex) const
+const emscripten::val &SedInstanceTask::algebraicVariable(size_t pIndex) const noexcept
 {
-    static thread_local emscripten::val res {emscripten::val::undefined()};
+    static thread_local emscripten::val res;
+    static thread_local auto cachedIndex {SIZE_MAX};
+    static thread_local const double *cachedFlatPtr {nullptr};
+    static thread_local auto cachedStride {SIZE_MAX};
 
-    res = toFloat64Array(algebraicVariable(pIndex));
+    const auto &data = pimpl()->algebraicVariable(pIndex);
+    const auto *flatPtr = data.data() - pIndex * data.size();
+    const auto stride = data.size();
+
+    if ((cachedIndex != pIndex) || (cachedFlatPtr != flatPtr) || (cachedStride != stride)) {
+        res = toFloat64Array(data);
+
+        cachedFlatPtr = flatPtr;
+        cachedStride = stride;
+        cachedIndex = pIndex;
+    }
 
     return res;
 }
+#else
+std::span<const double> SedInstanceTask::algebraicVariable(size_t pIndex) const noexcept
+{
+    return pimpl()->algebraicVariable(pIndex);
+}
 #endif
 
-const std::string &SedInstanceTask::algebraicVariableName(size_t pIndex) const
+const std::string &SedInstanceTask::algebraicVariableName(size_t pIndex) const noexcept
 {
     return pimpl()->algebraicVariableName(pIndex);
 }
 
-const std::string &SedInstanceTask::algebraicVariableUnit(size_t pIndex) const
+const std::string &SedInstanceTask::algebraicVariableUnit(size_t pIndex) const noexcept
 {
     return pimpl()->algebraicVariableUnit(pIndex);
 }

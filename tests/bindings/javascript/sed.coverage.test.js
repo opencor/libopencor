@@ -22,7 +22,6 @@ import * as utils from './utils.js';
 import { assertIssues, assertValues } from './utils.js';
 
 const loc = await libOpenCOR();
-const emptyFloat64Array = new Float64Array();
 
 test.describe('Sed coverage tests', () => {
   test.beforeEach(() => {
@@ -378,15 +377,12 @@ test.describe('Sed coverage tests', () => {
     assert.strictEqual(instance.task(1), null);
 
     assert.strictEqual(instanceTask.voi.length, 0);
-    assert.deepStrictEqual(instanceTask.voiAsArray, emptyFloat64Array);
     assert.strictEqual(instanceTask.voiName, 'environment/time');
     assert.strictEqual(instanceTask.voiUnit, 'millisecond');
 
     assert.strictEqual(instanceTask.stateCount, 4);
     assert.strictEqual(instanceTask.state(0).length, 0);
-    assert.deepStrictEqual(instanceTask.stateAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.state(4).length, 0);
-    assert.deepStrictEqual(instanceTask.stateAsArray(4), emptyFloat64Array);
     assert.strictEqual(instanceTask.stateName(0), 'membrane/V');
     assert.strictEqual(instanceTask.stateName(4), '');
     assert.strictEqual(instanceTask.stateUnit(0), 'millivolt');
@@ -394,9 +390,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instanceTask.rateCount, 4);
     assert.strictEqual(instanceTask.rate(0).length, 0);
-    assert.deepStrictEqual(instanceTask.rateAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.rate(4).length, 0);
-    assert.deepStrictEqual(instanceTask.rateAsArray(4), emptyFloat64Array);
     assert.strictEqual(instanceTask.rateName(0), "membrane/V'");
     assert.strictEqual(instanceTask.rateName(4), '');
     assert.strictEqual(instanceTask.rateUnit(0), 'millivolt/millisecond');
@@ -404,9 +398,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instanceTask.constantCount, 5);
     assert.strictEqual(instanceTask.constant(0).length, 0);
-    assert.deepStrictEqual(instanceTask.constantAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.constant(5).length, 0);
-    assert.deepStrictEqual(instanceTask.constantAsArray(5), emptyFloat64Array);
     assert.strictEqual(instanceTask.constantName(0), 'membrane/Cm');
     assert.strictEqual(instanceTask.constantName(5), '');
     assert.strictEqual(instanceTask.constantUnit(0), 'microF_per_cm2');
@@ -414,9 +406,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instanceTask.computedConstantCount, 3);
     assert.strictEqual(instanceTask.computedConstant(0).length, 0);
-    assert.deepStrictEqual(instanceTask.computedConstantAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.computedConstant(3).length, 0);
-    assert.deepStrictEqual(instanceTask.computedConstantAsArray(3), emptyFloat64Array);
     assert.strictEqual(instanceTask.computedConstantName(0), 'leakage_current/E_L');
     assert.strictEqual(instanceTask.computedConstantName(3), '');
     assert.strictEqual(instanceTask.computedConstantUnit(0), 'millivolt');
@@ -424,9 +414,7 @@ test.describe('Sed coverage tests', () => {
 
     assert.strictEqual(instanceTask.algebraicVariableCount, 10);
     assert.strictEqual(instanceTask.algebraicVariable(0).length, 0);
-    assert.deepStrictEqual(instanceTask.algebraicVariableAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.algebraicVariable(10).length, 0);
-    assert.deepStrictEqual(instanceTask.algebraicVariableAsArray(10), emptyFloat64Array);
     assert.strictEqual(instanceTask.algebraicVariableName(0), 'membrane/i_Stim');
     assert.strictEqual(instanceTask.algebraicVariableName(10), '');
     assert.strictEqual(instanceTask.algebraicVariableUnit(0), 'microA_per_cm2');
@@ -453,19 +441,16 @@ test.describe('Sed coverage tests', () => {
     const instanceTask = instance.tasks[0];
 
     assert.strictEqual(instanceTask.voi.length, 0);
-    assert.deepStrictEqual(instanceTask.voiAsArray, emptyFloat64Array);
     assert.strictEqual(instanceTask.voiName, '');
     assert.strictEqual(instanceTask.voiUnit, '');
 
     assert.strictEqual(instanceTask.stateCount, 0);
     assert.strictEqual(instanceTask.state(0).length, 0);
-    assert.deepStrictEqual(instanceTask.stateAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.stateName(0), '');
     assert.strictEqual(instanceTask.stateUnit(0), '');
 
     assert.strictEqual(instanceTask.rateCount, 0);
     assert.strictEqual(instanceTask.rate(0).length, 0);
-    assert.deepStrictEqual(instanceTask.rateAsArray(0), emptyFloat64Array);
     assert.strictEqual(instanceTask.rateName(0), '');
     assert.strictEqual(instanceTask.rateUnit(0), '');
   });

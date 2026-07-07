@@ -76,4 +76,32 @@ test.describe('File coverage tests', () => {
 
     assert.strictEqual(fileManager.fileCount, 0);
   });
+
+  test('Manage local file through manager', () => {
+    const file = new loc.File(utils.resourcePath('file.txt'));
+    const fileManager = loc.FileManager.instance();
+
+    assert.strictEqual(fileManager.fileCount, 1);
+
+    fileManager.manage(file);
+
+    assert.strictEqual(fileManager.fileCount, 1);
+    assert.deepStrictEqual(fileManager.file(0), file);
+
+    fileManager.reset();
+  });
+
+  test('Manage remote file through manager', () => {
+    const file = new loc.File(utils.REMOTE_FILE);
+    const fileManager = loc.FileManager.instance();
+
+    assert.strictEqual(fileManager.fileCount, 1);
+
+    fileManager.manage(file);
+
+    assert.strictEqual(fileManager.fileCount, 1);
+    assert.deepStrictEqual(fileManager.file(0), file);
+
+    fileManager.reset();
+  });
 });

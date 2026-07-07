@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-class SolverForwardEuler::Impl: public SolverOdeFixedStep::Impl
+class SolverForwardEuler::Impl final: public SolverOdeFixedStep::Impl
 {
 public:
     explicit Impl();

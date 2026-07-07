@@ -387,45 +387,45 @@ def test_sed_instance_and_sed_instance_task_differential_model():
     assert instance.task(0) == instance_task
     assert instance.task(1) is None
 
-    assert instance_task.voi == []
+    assert len(instance_task.voi) == 0
     assert instance_task.voi_name == "environment/time"
     assert instance_task.voi_unit == "millisecond"
 
     assert instance_task.state_count == 4
-    assert instance_task.state(0) == []
-    assert instance_task.state(4) == []
+    assert len(instance_task.state(0)) == 0
+    assert len(instance_task.state(4)) == 0
     assert instance_task.state_name(0) == "membrane/V"
     assert instance_task.state_name(4) == ""
     assert instance_task.state_unit(0) == "millivolt"
     assert instance_task.state_unit(4) == ""
 
     assert instance_task.rate_count == 4
-    assert instance_task.rate(0) == []
-    assert instance_task.rate(4) == []
+    assert len(instance_task.rate(0)) == 0
+    assert len(instance_task.rate(4)) == 0
     assert instance_task.rate_name(0) == "membrane/V'"
     assert instance_task.rate_name(4) == ""
     assert instance_task.rate_unit(0) == "millivolt/millisecond"
     assert instance_task.rate_unit(4) == ""
 
     assert instance_task.constant_count == 5
-    assert instance_task.constant(0) == []
-    assert instance_task.constant(5) == []
+    assert len(instance_task.constant(0)) == 0
+    assert len(instance_task.constant(5)) == 0
     assert instance_task.constant_name(0) == "membrane/Cm"
     assert instance_task.constant_name(5) == ""
     assert instance_task.constant_unit(0) == "microF_per_cm2"
     assert instance_task.constant_unit(5) == ""
 
     assert instance_task.computed_constant_count == 3
-    assert instance_task.computed_constant(0) == []
-    assert instance_task.computed_constant(3) == []
+    assert len(instance_task.computed_constant(0)) == 0
+    assert len(instance_task.computed_constant(3)) == 0
     assert instance_task.computed_constant_name(0) == "leakage_current/E_L"
     assert instance_task.computed_constant_name(3) == ""
     assert instance_task.computed_constant_unit(0) == "millivolt"
     assert instance_task.computed_constant_unit(3) == ""
 
     assert instance_task.algebraic_variable_count == 10
-    assert instance_task.algebraic_variable(0) == []
-    assert instance_task.algebraic_variable(10) == []
+    assert len(instance_task.algebraic_variable(0)) == 0
+    assert len(instance_task.algebraic_variable(10)) == 0
     assert instance_task.algebraic_variable_name(0) == "membrane/i_Stim"
     assert instance_task.algebraic_variable_name(10) == ""
     assert instance_task.algebraic_variable_unit(0) == "microA_per_cm2"
@@ -443,17 +443,17 @@ def test_sed_instance_and_sed_instance_task_non_differential_model():
     instance = document.instantiate()
     instance_task = instance.tasks[0]
 
-    assert instance_task.voi == []
+    assert len(instance_task.voi) == 0
     assert instance_task.voi_name == ""
     assert instance_task.voi_unit == ""
 
     assert instance_task.state_count == 0
-    assert instance_task.state(0) == []
+    assert len(instance_task.state(0)) == 0
     assert instance_task.state_name(0) == ""
     assert instance_task.state_unit(0) == ""
 
     assert instance_task.rate_count == 0
-    assert instance_task.rate(0) == []
+    assert len(instance_task.rate(0)) == 0
     assert instance_task.rate_name(0) == ""
     assert instance_task.rate_unit(0) == ""
 

@@ -95,7 +95,8 @@
 }
 
 .reset-button,
-.run-button {
+.run-button,
+.stop-button {
   --bs-btn-padding-y: 0.25rem;
   --bs-btn-font-size: 0.75rem;
 }
@@ -127,4 +128,23 @@ span.bold {
   margin: 1rem auto 1rem 1rem;
   width: var(--plotting-area-width);
   height: var(--plotting-area-height);
+}
+
+#progressBar {
+  height: 8px;
+  flex-grow: 1;
+  background: #444;
+  border-radius: 3px;
+}
+
+#progressBarFill {
+  height: 100%;
+  width: 0%;
+  background: #0d6efd;
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+#progressBarFill.complete {
+  background: #198754;
 }

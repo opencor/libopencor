@@ -54,6 +54,70 @@ public:
     double run();
 
     /**
+     * @brief Start running, in a background thread, all the tasks associated with this instance.
+     *
+     * Start running, in a background thread, all the tasks associated with this instance.
+     *
+     * @return @c true if a new run was started, @c false if a run is already in progress.
+     */
+
+    bool startRun();
+
+    /**
+     * @brief Return whether this instance is currently running.
+     *
+     * Return whether this instance is currently running.
+     *
+     * @return @c true if this instance is running, @c false otherwise.
+     */
+
+    bool isRunning() const noexcept;
+
+    /**
+     * @brief Wait for any currently-running instance to complete.
+     *
+     * Wait for any currently-running instance to complete.
+     *
+     * @return The elapsed time in milliseconds for the last completed instance run.
+     */
+
+    double waitForRun();
+
+    /**
+     * @brief Pause a currently-running instance.
+     *
+     * Pause a currently-running instance.
+     */
+
+    void pauseRun();
+
+    /**
+     * @brief Resume a currently-paused instance.
+     *
+     * Resume a currently-paused instance.
+     */
+
+    void resumeRun();
+
+    /**
+     * @brief Stop any currently-running instance.
+     *
+     * Stop any currently-running instance.
+     */
+
+    void stopRun();
+
+    /**
+     * @brief Return the progress of the current instance run.
+     *
+     * Return the progress of the current instance run as a value between @c 0.0 (not started) and @c 1.0 (complete).
+     *
+     * @return The progress as a value in [0.0, 1.0].
+     */
+
+    double progress() const noexcept;
+
+    /**
      * @brief Return whether there are some tasks.
      *
      * Return whether there are some tasks.
@@ -61,7 +125,7 @@ public:
      * @return @c true if there are some tasks, @c false otherwise.
      */
 
-    bool hasTasks() const;
+    bool hasTasks() const noexcept;
 
     /**
      * @brief Return the number of tasks.
@@ -71,17 +135,17 @@ public:
      * @return The number of tasks.
      */
 
-    size_t taskCount() const;
+    size_t taskCount() const noexcept;
 
     /**
-     * @brief Return the tasks.
+     * @brief Return all the tasks.
      *
-     * Return the tasks.
+     * Return all the tasks.
      *
      * @return The tasks, as a @ref SedInstanceTaskPtrs.
      */
 
-    const SedInstanceTaskPtrs &tasks() const;
+    const SedInstanceTaskPtrs &tasks() const noexcept;
 
     /**
      * @brief Return the task at the given index.
@@ -93,7 +157,7 @@ public:
      * @return The task as a @ref SedInstanceTaskPtr, if the index is valid, @c nullptr otherwise.
      */
 
-    const SedInstanceTaskPtr &task(size_t pIndex) const;
+    const SedInstanceTaskPtr &task(size_t pIndex) const noexcept;
 
 private:
     class Impl; /**< Forward declaration of the implementation class, @private. */

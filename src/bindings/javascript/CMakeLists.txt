@@ -65,6 +65,10 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                                                                   -DBUILDCACHE_EXE=${BUILDCACHE_EXE}
                                                                   -DCCACHE_EXE=${CCACHE_EXE}
                                                                   -DCLCACHE_EXE=${CLCACHE_EXE}
+                                                                  -DCMAKE_C_FLAGS=-matomics\ -mbulk-memory\ -pthread\ -sSHARED_MEMORY=1
+                                                                  -DCMAKE_CXX_FLAGS=-matomics\ -mbulk-memory\ -pthread\ -sSHARED_MEMORY=1
+                                                                  -DCMAKE_EXE_LINKER_FLAGS=-sALLOW_TABLE_GROWTH\ -sINITIAL_TABLE=65536\ -sSHARED_MEMORY=1
+                                                                  -DCMAKE_SHARED_LINKER_FLAGS=-sSHARED_MEMORY=1
                                                                   -DEMCMAKE_EXE=${EMCMAKE_EXE}
                                                                   -DLIBOPENCOR_BUILD_TYPE=${LIBOPENCOR_BUILD_TYPE}
                                                                   -DLIBOPENCOR_COMPILER_CACHING=${LIBOPENCOR_COMPILER_CACHING}

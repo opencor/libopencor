@@ -19,6 +19,8 @@ limitations under the License.
 
 #include "utils.h"
 
+#include <memory>
+
 namespace libOpenCOR {
 
 SedChangeAttribute::Impl::Impl(const std::string &pComponentName, const std::string &pVariableName,
@@ -88,9 +90,9 @@ void SedChangeAttribute::Impl::serialise(xmlNodePtr pNode) const
 void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
                                      const libcellml::AnalyserModelPtr &pAnalyserModel)
 {
-    auto addCannotChangeWarning = [&](const std::string &pVariableName,
-                                      const std::string &pComponentName,
-                                      const char *pVariableType) {
+    auto addCannotChangeWarning = [this](const std::string &pVariableName,
+                                         const std::string &pComponentName,
+                                         const char *pVariableType) {
         std::string warning;
 
         warning.reserve(pVariableName.size() + pComponentName.size() + 120); // NOLINT
@@ -197,14 +199,11 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
 
 SedChangeAttribute::SedChangeAttribute(const std::string &pComponentName, const std::string &pVariableName,
                                        const std::string &pNewValue)
-    : SedChange(new Impl(pComponentName, pVariableName, pNewValue))
+    : SedChange(std::make_unique<Impl>(pComponentName, pVariableName, pNewValue))
 {
 }
 
-SedChangeAttribute::~SedChangeAttribute()
-{
-    delete pimpl();
-}
+SedChangeAttribute::~SedChangeAttribute() = default;
 
 SedChangeAttribute::Impl *SedChangeAttribute::pimpl()
 {

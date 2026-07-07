@@ -23,6 +23,11 @@ import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
+const sleep = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
 test.describe('Sed instance tests', () => {
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
@@ -35,6 +40,7 @@ test.describe('Sed instance tests', () => {
     assertIssues(loc, instance, [
       [loc.Issue.Type.ERROR, 'The simulation experiment description does not contain any tasks to run.']
     ]);
+    assert.strictEqual(instance.progress, 0.0);
   });
 
   test('Invalid CellML file', () => {
@@ -119,6 +125,453 @@ test.describe('Sed instance tests', () => {
 
     instance.run();
 
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Asynchronous run without active run', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.waitForRun(), 0.0);
+  });
+
+  test('Asynchronous run lifecycle', async () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < 200; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Asynchronous run can be restarted', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    assert.strictEqual(instance.startRun(), true);
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Progress before any run', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.progress, 0.0);
+    assert.strictEqual(instance.tasks.get(0).progress, 0.0);
+  });
+
+  test('Progress of algebraic model', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/algebraic.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.progress, 0.0);
+
+    instance.run();
+
+    assert.strictEqual(instance.progress, 1.0);
+    assert.strictEqual(instance.tasks.get(0).progress, 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Progress of ODE model', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.progress, 0.0);
+
+    instance.run();
+
+    assert.strictEqual(instance.progress, 1.0);
+    assert.strictEqual(instance.tasks.get(0).progress, 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Stop run', async () => {
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > 0.0) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    instance.stopRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.ok(instance.progress < 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Stop run results have NaNs', async () => {
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > 0.0) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    instance.stopRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.ok(instance.progress < 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+    const state0 = instanceTask.state(0);
+
+    assert.strictEqual(voi.length, state0.length);
+    assert.strictEqual(voi.length, SIMULATION_PROPERTY + 1);
+
+    assert.strictEqual(Number.isNaN(voi[0]), false);
+    assert.strictEqual(Number.isNaN(state0[0]), false);
+
+    let nanIndex = voi.length;
+
+    for (let i = 1; i < voi.length; ++i) {
+      if (Number.isNaN(state0[i])) {
+        nanIndex = i;
+
+        break;
+      }
+    }
+
+    assert.ok(nanIndex < voi.length);
+    assert.strictEqual(Number.isNaN(voi[nanIndex]), true);
+    assert.ok(nanIndex < voi.length - 1);
+  });
+
+  test('Stop run when not running', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.stopRun();
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.progress, 0.0);
+  });
+
+  test('Pause run and resume run', async () => {
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > 0.0) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    instance.pauseRun();
+
+    await sleep(50);
+
+    instance.resumeRun();
+    instance.stopRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.ok(instance.progress < 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Pause run and resume run when not running', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.pauseRun();
+    instance.resumeRun();
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.progress, 0.0);
+  });
+
+  test('Pause run then stop run', async () => {
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > 0.0) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    instance.pauseRun();
+
+    await sleep(50);
+
+    instance.stopRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.ok(instance.progress < 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Pause run and resume run with natural completion', async () => {
+    const moderateStepCount = 50000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = moderateStepCount;
+    simulation.outputEndTime = moderateStepCount;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > 0.0) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    instance.pauseRun();
+
+    await sleep(50);
+
+    instance.resumeRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.ok(instance.waitForRun() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Start run while already running', async () => {
+    const SIMULATION_PROPERTY = 1000000;
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = SIMULATION_PROPERTY;
+    simulation.outputEndTime = SIMULATION_PROPERTY;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (instance.progress > 0.0) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.startRun(), false);
+
+    instance.stopRun();
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.ok(instance.progress < 1.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('Start run after previous run completed', async () => {
+    const WAIT_ITERATIONS = 60000;
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.isRunning, false);
+
+    assert.strictEqual(instance.startRun(), true);
+
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
+      if (!instance.isRunning) {
+        break;
+      }
+
+      await sleep(1);
+    }
+
+    assert.strictEqual(instance.isRunning, false);
+    assert.ok(instance.waitForRun() > 0.0);
     assert.strictEqual(instance.hasIssues, false);
   });
 

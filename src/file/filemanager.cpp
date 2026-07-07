@@ -19,6 +19,7 @@ limitations under the License.
 #include "utils.h"
 
 #include <algorithm>
+#include <mutex>
 #include <stack>
 
 namespace libOpenCOR {
@@ -30,13 +31,48 @@ FileManager::Impl &FileManager::Impl::instance()
     return instance;
 }
 
-void FileManager::Impl::manage(File *pFile)
+FilePtr FileManager::Impl::manage(const FilePtr &pFile)
 {
-    mFiles.push_back(pFile);
+    const std::unique_lock<std::shared_mutex> lock(mMutex);
+
+    // Opportunistically remove any expired entries and correct our file count.
+
+    const auto expiredEnd = std::ranges::remove_if(mFiles.begin(), mFiles.end(), [](const auto &file) {
+                                return file.expired();
+                            }).begin();
+
+    mFileCount -= static_cast<size_t>(mFiles.end() - expiredEnd);
+
+    mFiles.erase(expiredEnd, mFiles.end());
+
+    // Check whether we already manage a file with the same name or URL. This must be done under the exclusive lock to
+    // avoid a TOCTOU race with another thread that might have just managed the same file between our caller's existence
+    // check and this call.
+
+    const bool isLocalFile = pFile->url().empty();
+    const auto &fileNameOrUrl = isLocalFile ? pFile->fileName() : pFile->url();
+
+    for (const auto &file : mFiles) {
+        auto managedFile {file.lock()};
+
+        if (isLocalFile ? managedFile->fileName() == fileNameOrUrl : managedFile->url() == fileNameOrUrl) {
+            return managedFile;
+        }
+    }
+
+    // No duplicate found, so manage the new file.
+
+    mFiles.emplace_back(pFile);
+
+    ++mFileCount;
+
+    return pFile;
 }
 
 void FileManager::Impl::unmanage(File *pFile)
 {
+    const std::unique_lock<std::shared_mutex> lock(mMutex);
+
     // Iteratively unmanage the file and all its child files.
     // Note: it would be much simpler to use recursion, but Clang-Tidy does not like it.
 
@@ -59,35 +95,50 @@ void FileManager::Impl::unmanage(File *pFile)
 
         // Unmanage the current file.
 
-        auto iter {std::ranges::find(mFiles, file)};
+        const auto removeEnd = std::ranges::remove_if(mFiles.begin(), mFiles.end(), [&file](const auto &managedFile) {
+                                   auto managedFilePtr {managedFile.lock()};
 
-        if (iter != mFiles.cend()) {
-            mFiles.erase(iter);
-        }
+                                   return (managedFilePtr == nullptr) || (managedFilePtr.get() == file);
+                               }).begin();
+
+        mFileCount -= static_cast<size_t>(mFiles.end() - removeEnd);
+
+        mFiles.erase(removeEnd, mFiles.end());
     }
 }
 
 void FileManager::Impl::reset()
 {
+    const std::unique_lock<std::shared_mutex> lock(mMutex);
+
     mFiles.clear();
+
+    mFileCount = 0;
 }
 
 bool FileManager::Impl::hasFiles() const
 {
-    return !mFiles.empty();
+    return mFileCount != 0;
+    // Note: mFileCount is an atomic near-real-time counter. It is updated in manage(), unmanage(), and reset(), so it
+    //       may briefly lag behind a file that has just expired but whose destructor has not yet entered unmanage().
+    //       This is an inherent TOCTOU property of weak_ptr semantics. Callers that need a strict point-in-time
+    //       snapshot should use files() instead.
 }
 
 size_t FileManager::Impl::fileCount() const
 {
-    return mFiles.size();
+    return mFileCount;
+    // Note: same semantics as hasFiles() (see the note above).
 }
 
 FilePtrs FileManager::Impl::files() const
 {
+    const std::shared_lock<std::shared_mutex> lock(mMutex);
+
     FilePtrs res;
 
     for (const auto &file : mFiles) {
-        res.push_back(file->shared_from_this());
+        res.push_back(file.lock());
     }
 
     return res;
@@ -95,13 +146,19 @@ FilePtrs FileManager::Impl::files() const
 
 FilePtr FileManager::Impl::file(size_t pIndex) const
 {
-    static const FilePtr NO_FILE_PTR;
+    const std::shared_lock<std::shared_mutex> lock(mMutex);
 
-    if (pIndex >= mFiles.size()) {
-        return NO_FILE_PTR;
+    size_t index {0};
+
+    for (const auto &file : mFiles) {
+        if (index == pIndex) {
+            return file.lock();
+        }
+
+        ++index;
     }
 
-    return mFiles[pIndex]->shared_from_this();
+    return nullptr;
 }
 
 #ifdef __EMSCRIPTEN__
@@ -110,7 +167,7 @@ FilePtr FileManager::Impl::fileFromFileNameOrUrl(const std::string &pFileNameOrU
 FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #endif
 {
-    static const FilePtr NO_FILE_PTR;
+    const std::shared_lock<std::shared_mutex> lock(mMutex);
 
 #if __clang_major__ < 16
     auto [tIsLocalFile, tFileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
@@ -119,17 +176,16 @@ FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #else
     auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
 #endif
-    auto res {std::ranges::find_if(mFiles, [&](const auto &file) {
-        return isLocalFile ?
-                   file->fileName() == fileNameOrUrl :
-                   file->url() == fileNameOrUrl;
-    })};
 
-    if (res != mFiles.end()) {
-        return (*res)->shared_from_this();
+    for (const auto &file : mFiles) {
+        auto managedFile {file.lock()};
+
+        if (isLocalFile ? managedFile->fileName() == fileNameOrUrl : managedFile->url() == fileNameOrUrl) {
+            return managedFile;
+        }
     }
 
-    return NO_FILE_PTR;
+    return nullptr;
 }
 
 FileManager &FileManager::instance()
@@ -146,7 +202,7 @@ FileManager::FileManager()
 
 void FileManager::manage(const FilePtr &pFile)
 {
-    mPimpl.manage(pFile.get());
+    mPimpl.manage(pFile);
 }
 
 void FileManager::unmanage(const FilePtr &pFile)

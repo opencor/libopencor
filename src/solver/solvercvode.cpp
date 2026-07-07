@@ -128,7 +128,7 @@ SolverCvode::Impl::~Impl()
 
 void SolverCvode::Impl::populate(libsedml::SedAlgorithm *pAlgorithm)
 {
-    auto addUnknownParameterWarning = [&](const std::string &pKisaoId) {
+    auto addUnknownParameterWarning = [this](const std::string &pKisaoId) {
         std::string warning;
 
         warning.reserve(pKisaoId.size() + 49); // NOLINT
@@ -457,6 +457,25 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
                                    double *pConstants, double *pComputedConstants, double *pAlgebraicVariables,
                                    const CellmlFileRuntimePtr &pRuntime)
 {
+    // If already initialised, then update the state pointers and reinitialise ourselves.
+
+    if (mSunContext != nullptr) {
+        SolverOde::Impl::initialise(pVoi, pSize, pStates, pRates,
+                                    pConstants, pComputedConstants, pAlgebraicVariables,
+                                    pRuntime);
+
+        mUserData.constants = pConstants;
+        mUserData.computedConstants = pComputedConstants;
+        mUserData.algebraicVariables = pAlgebraicVariables;
+        mUserData.runtime = pRuntime;
+
+        ASSERT_EQ(CVodeSetUserData(mSolver, &mUserData), CV_SUCCESS);
+
+        return reinitialise(pVoi);
+    }
+
+    // Reset the solver's internals and remove any issues.
+
     resetInternals();
     removeAllIssues();
 
@@ -696,7 +715,6 @@ bool SolverCvode::Impl::initialise(double pVoi, size_t pSize, double *pStates, d
     return true;
 }
 
-/*---GRY--- TO BE UNCOMMENTED ONCE WE ACTUALLY NEED IT.
 bool SolverCvode::Impl::reinitialise(double pVoi)
 {
     // Reinitialise the ODE solver itself.
@@ -709,9 +727,8 @@ bool SolverCvode::Impl::reinitialise(double pVoi)
 
     return true;
 }
-*/
 
-double SolverCvode::Impl::maximumStep() const
+double SolverCvode::Impl::maximumStep() const noexcept
 {
     return mMaximumStep;
 }
@@ -721,7 +738,7 @@ void SolverCvode::Impl::setMaximumStep(double pMaximumStep)
     mMaximumStep = pMaximumStep;
 }
 
-int SolverCvode::Impl::maximumNumberOfSteps() const
+int SolverCvode::Impl::maximumNumberOfSteps() const noexcept
 {
     return mMaximumNumberOfSteps;
 }
@@ -731,7 +748,7 @@ void SolverCvode::Impl::setMaximumNumberOfSteps(int pMaximumNumberOfSteps)
     mMaximumNumberOfSteps = pMaximumNumberOfSteps;
 }
 
-SolverCvode::IntegrationMethod SolverCvode::Impl::integrationMethod() const
+SolverCvode::IntegrationMethod SolverCvode::Impl::integrationMethod() const noexcept
 {
     return mIntegrationMethod;
 }
@@ -741,7 +758,7 @@ void SolverCvode::Impl::setIntegrationMethod(SolverCvode::IntegrationMethod pInt
     mIntegrationMethod = pIntegrationMethod;
 }
 
-SolverCvode::IterationType SolverCvode::Impl::iterationType() const
+SolverCvode::IterationType SolverCvode::Impl::iterationType() const noexcept
 {
     return mIterationType;
 }
@@ -751,7 +768,7 @@ void SolverCvode::Impl::setIterationType(SolverCvode::IterationType pIterationTy
     mIterationType = pIterationType;
 }
 
-SolverCvode::LinearSolver SolverCvode::Impl::linearSolver() const
+SolverCvode::LinearSolver SolverCvode::Impl::linearSolver() const noexcept
 {
     return mLinearSolver;
 }
@@ -761,7 +778,7 @@ void SolverCvode::Impl::setLinearSolver(SolverCvode::LinearSolver pLinearSolver)
     mLinearSolver = pLinearSolver;
 }
 
-SolverCvode::Preconditioner SolverCvode::Impl::preconditioner() const
+SolverCvode::Preconditioner SolverCvode::Impl::preconditioner() const noexcept
 {
     return mPreconditioner;
 }
@@ -771,7 +788,7 @@ void SolverCvode::Impl::setPreconditioner(SolverCvode::Preconditioner pPrecondit
     mPreconditioner = pPreconditioner;
 }
 
-int SolverCvode::Impl::upperHalfBandwidth() const
+int SolverCvode::Impl::upperHalfBandwidth() const noexcept
 {
     return mUpperHalfBandwidth;
 }
@@ -781,7 +798,7 @@ void SolverCvode::Impl::setUpperHalfBandwidth(int pUpperHalfBandwidth)
     mUpperHalfBandwidth = pUpperHalfBandwidth;
 }
 
-int SolverCvode::Impl::lowerHalfBandwidth() const
+int SolverCvode::Impl::lowerHalfBandwidth() const noexcept
 {
     return mLowerHalfBandwidth;
 }
@@ -791,7 +808,7 @@ void SolverCvode::Impl::setLowerHalfBandwidth(int pLowerHalfBandwidth)
     mLowerHalfBandwidth = pLowerHalfBandwidth;
 }
 
-double SolverCvode::Impl::relativeTolerance() const
+double SolverCvode::Impl::relativeTolerance() const noexcept
 {
     return mRelativeTolerance;
 }
@@ -801,7 +818,7 @@ void SolverCvode::Impl::setRelativeTolerance(double pRelativeTolerance)
     mRelativeTolerance = pRelativeTolerance;
 }
 
-double SolverCvode::Impl::absoluteTolerance() const
+double SolverCvode::Impl::absoluteTolerance() const noexcept
 {
     return mAbsoluteTolerance;
 }
@@ -811,7 +828,7 @@ void SolverCvode::Impl::setAbsoluteTolerance(double pAbsoluteTolerance)
     mAbsoluteTolerance = pAbsoluteTolerance;
 }
 
-bool SolverCvode::Impl::interpolateSolution() const
+bool SolverCvode::Impl::interpolateSolution() const noexcept
 {
     return mInterpolateSolution;
 }
@@ -823,15 +840,6 @@ void SolverCvode::Impl::setInterpolateSolution(bool pInterpolateSolution)
 
 bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 {
-    // Note: rate values are computed and handled internally by CVODE, so we can't access them and therefore need to
-    //       compute them ourselves. To do so, we keep track of the old state values (in mRates, to save memory) and
-    //       then update mRates once we have the new state values.
-
-    auto *oldStates {mRates};
-    auto oneOverdVoi {1.0 / (pVoiEnd - pVoi)};
-
-    std::copy(mStates, mStates + mSize, oldStates); // NOLINT
-
     // Solve the model using interpolation, if needed.
 
     if (!mInterpolateSolution) {
@@ -839,12 +847,6 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
     }
 
     auto res {CVode(mSolver, pVoiEnd, mStatesVector, &pVoi, CV_NORMAL)};
-
-    // Compute the rate values.
-
-    for (size_t i {0}; i < mSize; ++i) {
-        mRates[i] = oneOverdVoi * (mStates[i] - oldStates[i]); // NOLINT
-    }
 
     // Make sure that everything went fine.
 
@@ -860,18 +862,19 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
         return false;
     }
 
+    // Make sure the rates are up to date.
+
+    computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+
     return true;
 }
 
 SolverCvode::SolverCvode()
-    : SolverOde(new Impl {})
+    : SolverOde(std::make_unique<Impl>())
 {
 }
 
-SolverCvode::~SolverCvode()
-{
-    delete pimpl();
-}
+SolverCvode::~SolverCvode() = default;
 
 SolverCvode::Impl *SolverCvode::pimpl()
 {
@@ -888,7 +891,7 @@ SolverCvodePtr SolverCvode::create()
     return SolverCvodePtr {new SolverCvode {}};
 }
 
-double SolverCvode::maximumStep() const
+double SolverCvode::maximumStep() const noexcept
 {
     return pimpl()->maximumStep();
 }
@@ -898,7 +901,7 @@ void SolverCvode::setMaximumStep(double pMaximumStep)
     pimpl()->setMaximumStep(pMaximumStep);
 }
 
-int SolverCvode::maximumNumberOfSteps() const
+int SolverCvode::maximumNumberOfSteps() const noexcept
 {
     return pimpl()->maximumNumberOfSteps();
 }
@@ -908,7 +911,7 @@ void SolverCvode::setMaximumNumberOfSteps(int pMaximumNumberOfSteps)
     pimpl()->setMaximumNumberOfSteps(pMaximumNumberOfSteps);
 }
 
-SolverCvode::IntegrationMethod SolverCvode::integrationMethod() const
+SolverCvode::IntegrationMethod SolverCvode::integrationMethod() const noexcept
 {
     return pimpl()->integrationMethod();
 }
@@ -918,7 +921,7 @@ void SolverCvode::setIntegrationMethod(SolverCvode::IntegrationMethod pIntegrati
     pimpl()->setIntegrationMethod(pIntegrationMethod);
 }
 
-SolverCvode::IterationType SolverCvode::iterationType() const
+SolverCvode::IterationType SolverCvode::iterationType() const noexcept
 {
     return pimpl()->iterationType();
 }
@@ -928,7 +931,7 @@ void SolverCvode::setIterationType(SolverCvode::IterationType pIterationType)
     pimpl()->setIterationType(pIterationType);
 }
 
-SolverCvode::LinearSolver SolverCvode::linearSolver() const
+SolverCvode::LinearSolver SolverCvode::linearSolver() const noexcept
 {
     return pimpl()->linearSolver();
 }
@@ -938,7 +941,7 @@ void SolverCvode::setLinearSolver(SolverCvode::LinearSolver pLinearSolver)
     pimpl()->setLinearSolver(pLinearSolver);
 }
 
-SolverCvode::Preconditioner SolverCvode::preconditioner() const
+SolverCvode::Preconditioner SolverCvode::preconditioner() const noexcept
 {
     return pimpl()->preconditioner();
 }
@@ -948,7 +951,7 @@ void SolverCvode::setPreconditioner(SolverCvode::Preconditioner pPreconditioner)
     pimpl()->setPreconditioner(pPreconditioner);
 }
 
-int SolverCvode::upperHalfBandwidth() const
+int SolverCvode::upperHalfBandwidth() const noexcept
 {
     return pimpl()->upperHalfBandwidth();
 }
@@ -958,7 +961,7 @@ void SolverCvode::setUpperHalfBandwidth(int pUpperHalfBandwidth)
     pimpl()->setUpperHalfBandwidth(pUpperHalfBandwidth);
 }
 
-int SolverCvode::lowerHalfBandwidth() const
+int SolverCvode::lowerHalfBandwidth() const noexcept
 {
     return pimpl()->lowerHalfBandwidth();
 }
@@ -968,7 +971,7 @@ void SolverCvode::setLowerHalfBandwidth(int pLowerHalfBandwidth)
     pimpl()->setLowerHalfBandwidth(pLowerHalfBandwidth);
 }
 
-double SolverCvode::relativeTolerance() const
+double SolverCvode::relativeTolerance() const noexcept
 {
     return pimpl()->relativeTolerance();
 }
@@ -978,7 +981,7 @@ void SolverCvode::setRelativeTolerance(double pRelativeTolerance)
     pimpl()->setRelativeTolerance(pRelativeTolerance);
 }
 
-double SolverCvode::absoluteTolerance() const
+double SolverCvode::absoluteTolerance() const noexcept
 {
     return pimpl()->absoluteTolerance();
 }
@@ -988,7 +991,7 @@ void SolverCvode::setAbsoluteTolerance(double pAbsoluteTolerance)
     pimpl()->setAbsoluteTolerance(pAbsoluteTolerance);
 }
 
-bool SolverCvode::interpolateSolution() const
+bool SolverCvode::interpolateSolution() const noexcept
 {
     return pimpl()->interpolateSolution();
 }
