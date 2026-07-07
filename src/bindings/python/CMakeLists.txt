@@ -18,6 +18,7 @@
 
 set(PYTHON_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/glibc.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed.cpp
@@ -33,6 +34,22 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     set(PYTHON_BINDINGS_DIR ${CMAKE_BINARY_DIR}/tests/bindings/python CACHE INTERNAL "Python bindings directory.")
 
+    # Check whether we need to provide a glibc compatibility wrapper for __isoc23_strtoll().
+    # Note: indeed, it is used by our prebuilt LLVM+Clang and libssh2 libraries which are compiled using glibc 2.38+
+    #       (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that uses glibc
+    #       2.38+, so we need to provide a compatibility wrapper for this function in order to be able to build our
+    #       Python wheels.
+
+    include(CheckSymbolExists)
+
+    check_symbol_exists(__isoc23_strtoll stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL)
+
+    set(ACTUAL_PYTHON_SOURCE_FILES ${PYTHON_SOURCE_FILES})
+
+    if(NOT LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL)
+        list(REMOVE_ITEM ACTUAL_PYTHON_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/glibc.cpp)
+    endif()
+
     # Build our Python bindings.
 
     set(PYTHON_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_Python CACHE INTERNAL "Python bindings target.")
@@ -42,7 +59,7 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
                         NOMINSIZE
                         NB_STATIC
                         STABLE_ABI
-                        ${PYTHON_SOURCE_FILES})
+                        ${ACTUAL_PYTHON_SOURCE_FILES})
 
     set_target_properties(${PYTHON_BINDINGS_TARGET} PROPERTIES
                           OUTPUT_NAME ${CMAKE_PROJECT_NAME_LC}/module)
