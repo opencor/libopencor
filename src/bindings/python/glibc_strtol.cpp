@@ -14,13 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <stddef.h>
+#include <stdint.h>
+
 #if defined(__linux__) && defined(__GNUC__)
 // On glibc 2.38+, strtol(), strtoll(), strtoul(), and strtoull() are redirected to __isoc23_strtol(),
 // __isoc23_strtoll(), __isoc23_strtoul(), and __isoc23_strtoull(), respectively, either via preprocessor macro (Intel)
-// or via __asm__("__isoc23_*") on the declaration (ARM). The latter is a compiler-level redirect that cannot be undone
-// with #undef, so calling strtol() inside our __isoc23_strtol() wrapper would cause infinite recursion on ARM. To
-// bypass this, we forward-declare the underlying functions ourselves without the compiler-level redirect, giving us a
-// direct reference to glibc's implementation unaffected by any asm redirect on the standard names.
+// or via __asm__("__isoc23_*") on the declaration (ARM). Both approaches would cause any call to strtol() inside our
+// __isoc23_strtol() wrapper to resolve back to __isoc23_strtol() (either via macro expansion on Intel or via the asm
+// redirect on ARM), leading to infinite recursion. To bypass this, we forward-declare the underlying strtol functions
+// ourselves without the compiler-level redirect, giving us a direct reference to glibc's implementation that is
+// unaffected by any macro or asm redirect on the standard names.
+//
+// Important: we do NOT include <stdlib.h> because on Intel, glibc redirects using preprocessor macros:
+//   #define strtol __isoc23_strtol
+//   #define strtoll __isoc23_strtoll
+//   #define strtoul __isoc23_strtoul
+//   #define strtoull __isoc23_strtoull
+// which would macro-expand both our forward declarations and the return strtol() calls inside our wrappers, making
+// them recursive. On ARM, glibc instead uses __asm__("__isoc23_strtol") on the declarations in <stdlib.h>, which would
+// conflict with our own forward declarations (different asm labels on the same symbol). Either way, omitting <stdlib.h>
+// entirely avoids both problems while still allowing us to forward-declare the real symbols.
 
 extern "C" {
 long strtol(const char *pString, char **pEndPtr, int pBase);

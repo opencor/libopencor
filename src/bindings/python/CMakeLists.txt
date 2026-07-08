@@ -18,7 +18,8 @@
 
 set(PYTHON_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/glibc.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/glibc_arc4random.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/glibc_strtol.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logger.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/sed.cpp
@@ -34,27 +35,44 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     set(PYTHON_BINDINGS_DIR ${CMAKE_BINARY_DIR}/tests/bindings/python CACHE INTERNAL "Python bindings directory.")
 
-    # Check whether we need to provide a glibc compatibility wrapper for __isoc23_strtol(), __isoc23_strtoll(),
-    # __isoc23_strtoul(), and __isoc23_strtoull().
-    # Note: indeed, they are used by our prebuilt LLVM+Clang and libssh2 libraries which are compiled using glibc 2.38+
-    #       (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that uses glibc
-    #       2.38+, so we need to provide a compatibility wrapper for these functions in order to be able to build our
-    #       Python wheels.
-
-    include(CheckSymbolExists)
-
-    check_symbol_exists(__isoc23_strtol stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL)
-    check_symbol_exists(__isoc23_strtoll stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL)
-    check_symbol_exists(__isoc23_strtoul stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL)
-    check_symbol_exists(__isoc23_strtoull stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
+    # Check whether we need to provide glibc compatibility wrappers for __isoc23_strtol(), __isoc23_strtoll(),
+    # __isoc23_strtoul(), __isoc23_strtoull() (glibc 2.38+), and arc4random(), arc4random_buf(), arc4random_uniform()
+    # (glibc 2.36+). These are referenced by our prebuilt LLVM+Clang and libssh2 libraries which are compiled using
+    # glibc 2.38+ (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that use glibc
+    # 2.38+, so we need compatibility wrappers to build Python wheels. Each symbol group is guarded independently so
+    # that only the wrappers for actually missing functions are compiled into the module, avoiding weak-symbol
+    # interposition against the native glibc implementation.
 
     set(ACTUAL_PYTHON_SOURCE_FILES ${PYTHON_SOURCE_FILES})
 
-    if(    LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL
-       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL
-       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL
-       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
-        list(REMOVE_ITEM ACTUAL_PYTHON_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/glibc.cpp)
+    if(WIN32 OR APPLE)
+        list(REMOVE_ITEM ACTUAL_PYTHON_SOURCE_FILES
+             ${CMAKE_CURRENT_SOURCE_DIR}/glibc_arc4random.cpp
+             ${CMAKE_CURRENT_SOURCE_DIR}/glibc_strtol.cpp)
+    else()
+        include(CheckSymbolExists)
+
+        check_symbol_exists(arc4random stdlib.h LIBOPENCOR_GLIBC_HAS_ARC4RANDOM)
+        check_symbol_exists(arc4random_buf stdlib.h LIBOPENCOR_GLIBC_HAS_ARC4RANDOM_BUF)
+        check_symbol_exists(arc4random_uniform stdlib.h LIBOPENCOR_GLIBC_HAS_ARC4RANDOM_UNIFORM)
+
+        if(    LIBOPENCOR_GLIBC_HAS_ARC4RANDOM
+           AND LIBOPENCOR_GLIBC_HAS_ARC4RANDOM_BUF
+           AND LIBOPENCOR_GLIBC_HAS_ARC4RANDOM_UNIFORM)
+            list(REMOVE_ITEM ACTUAL_PYTHON_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/glibc_arc4random.cpp)
+        endif()
+
+        check_symbol_exists(__isoc23_strtol stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL)
+        check_symbol_exists(__isoc23_strtoll stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL)
+        check_symbol_exists(__isoc23_strtoul stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL)
+        check_symbol_exists(__isoc23_strtoull stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
+
+        if(    LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL
+           AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL
+           AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL
+           AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
+            list(REMOVE_ITEM ACTUAL_PYTHON_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/glibc_strtol.cpp)
+        endif()
     endif()
 
     # Build our Python bindings.
