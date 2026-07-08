@@ -35,26 +35,36 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
     set(PYTHON_BINDINGS_DIR ${CMAKE_BINARY_DIR}/tests/bindings/python CACHE INTERNAL "Python bindings directory.")
 
     # Check whether we need to provide a glibc compatibility wrapper for __isoc23_strtol(), __isoc23_strtoll(),
-    # __isoc23_strtoul(), and __isoc23_strtoull().
+    # __isoc23_strtoul(), __isoc23_strtoull(), arc4random(), arc4random_buf(), and arc4random_uniform().
     # Note: indeed, they are used by our prebuilt LLVM+Clang and libssh2 libraries which are compiled using glibc 2.38+
     #       (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that uses glibc
     #       2.38+, so we need to provide a compatibility wrapper for these functions in order to be able to build our
     #       Python wheels.
 
-    include(CheckSymbolExists)
-
-    check_symbol_exists(__isoc23_strtol stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL)
-    check_symbol_exists(__isoc23_strtoll stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL)
-    check_symbol_exists(__isoc23_strtoul stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL)
-    check_symbol_exists(__isoc23_strtoull stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
-
     set(ACTUAL_PYTHON_SOURCE_FILES ${PYTHON_SOURCE_FILES})
 
-    if(    LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL
-       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL
-       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL
-       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
+    if(WIN32 OR APPLE)
         list(REMOVE_ITEM ACTUAL_PYTHON_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/glibc.cpp)
+    else()
+        include(CheckSymbolExists)
+
+        check_symbol_exists(__isoc23_strtol stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL)
+        check_symbol_exists(__isoc23_strtoll stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL)
+        check_symbol_exists(__isoc23_strtoul stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL)
+        check_symbol_exists(__isoc23_strtoull stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
+        check_symbol_exists(arc4random stdlib.h LIBOPENCOR_GLIBC_HAS_ARC4RANDOM)
+        check_symbol_exists(arc4random_buf stdlib.h LIBOPENCOR_GLIBC_HAS_ARC4RANDOM_BUF)
+        check_symbol_exists(arc4random_uniform stdlib.h LIBOPENCOR_GLIBC_HAS_ARC4RANDOM_UNIFORM)
+
+        if(    LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL
+           AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL
+           AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL
+           AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL
+           AND LIBOPENCOR_GLIBC_HAS_ARC4RANDOM
+           AND LIBOPENCOR_GLIBC_HAS_ARC4RANDOM_BUF
+           AND LIBOPENCOR_GLIBC_HAS_ARC4RANDOM_UNIFORM)
+            list(REMOVE_ITEM ACTUAL_PYTHON_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/glibc.cpp)
+        endif()
     endif()
 
     # Build our Python bindings.
