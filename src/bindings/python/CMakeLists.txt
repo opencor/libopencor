@@ -34,7 +34,8 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     set(PYTHON_BINDINGS_DIR ${CMAKE_BINARY_DIR}/tests/bindings/python CACHE INTERNAL "Python bindings directory.")
 
-    # Check whether we need to provide a glibc compatibility wrapper for __isoc23_strtol() and __isoc23_strtoll().
+    # Check whether we need to provide a glibc compatibility wrapper for __isoc23_strtol(), __isoc23_strtoll(),
+    # __isoc23_strtoul(), and __isoc23_strtoull().
     # Note: indeed, they are used by our prebuilt LLVM+Clang and libssh2 libraries which are compiled using glibc 2.38+
     #       (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that uses glibc
     #       2.38+, so we need to provide a compatibility wrapper for these functions in order to be able to build our
@@ -44,10 +45,15 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     check_symbol_exists(__isoc23_strtol stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL)
     check_symbol_exists(__isoc23_strtoll stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL)
+    check_symbol_exists(__isoc23_strtoul stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL)
+    check_symbol_exists(__isoc23_strtoull stdlib.h LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
 
     set(ACTUAL_PYTHON_SOURCE_FILES ${PYTHON_SOURCE_FILES})
 
-    if(LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL)
+    if(    LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOL
+       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOLL
+       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOUL
+       AND LIBOPENCOR_GLIBC_HAS_ISOC23_STRTOULL)
         list(REMOVE_ITEM ACTUAL_PYTHON_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/glibc.cpp)
     endif()
 

@@ -15,16 +15,18 @@ limitations under the License.
 */
 
 #if defined(__linux__) && defined(__GNUC__)
-// On glibc 2.38+, strtol() and strtoll() are redirected to __isoc23_strtol() and __isoc23_strtoll(), respectively,
-// either via preprocessor macro (Intel) or via __asm__("__isoc23_strtol") on the declaration (ARM). The latter is a
-// compiler-level redirect that cannot be undone with #undef, so calling strtol() inside our __isoc23_strtol() wrapper
-// would cause infinite recursion on ARM. To bypass this, we forward-declare strtol()/strtoll() ourselves without the
-// compiler-level redirect, giving us a direct reference to glibc's implementation unaffected by any asm redirect on the
-// standard names.
+// On glibc 2.38+, strtol(), strtoll(), strtoul(), and strtoull() are redirected to __isoc23_strtol(),
+// __isoc23_strtoll(), __isoc23_strtoul(), and __isoc23_strtoull(), respectively, either via preprocessor macro (Intel)
+// or via __asm__("__isoc23_*") on the declaration (ARM). The latter is a compiler-level redirect that cannot be undone
+// with #undef, so calling strtol() inside our __isoc23_strtol() wrapper would cause infinite recursion on ARM. To
+// bypass this, we forward-declare the underlying functions ourselves without the compiler-level redirect, giving us a
+// direct reference to glibc's implementation unaffected by any asm redirect on the standard names.
 
 extern "C" {
 long strtol(const char *pString, char **pEndPtr, int pBase);
 long long strtoll(const char *pString, char **pEndPtr, int pBase);
+unsigned long strtoul(const char *pString, char **pEndPtr, int pBase);
+unsigned long long strtoull(const char *pString, char **pEndPtr, int pBase);
 
 __attribute__((weak)) long __isoc23_strtol(const char *pString, char **pEndPtr, int pBase)
 {
@@ -34,6 +36,16 @@ __attribute__((weak)) long __isoc23_strtol(const char *pString, char **pEndPtr, 
 __attribute__((weak)) long long __isoc23_strtoll(const char *pString, char **pEndPtr, int pBase)
 {
     return strtoll(pString, pEndPtr, pBase);
+}
+
+__attribute__((weak)) unsigned long __isoc23_strtoul(const char *pString, char **pEndPtr, int pBase)
+{
+    return strtoul(pString, pEndPtr, pBase);
+}
+
+__attribute__((weak)) unsigned long long __isoc23_strtoull(const char *pString, char **pEndPtr, int pBase)
+{
+    return strtoull(pString, pEndPtr, pBase);
 }
 }
 
