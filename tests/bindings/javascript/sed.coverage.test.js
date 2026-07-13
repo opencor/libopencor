@@ -820,4 +820,26 @@ test.describe('Sed coverage tests', () => {
 
     file.setContents(utils.fileContents(utils.resourcePath('cellml_2.sedml')));
   });
+
+  test('Simulation results are of Float64Array type', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.voi instanceof Float64Array, true);
+    assert.strictEqual(instanceTask.state(0) instanceof Float64Array, true);
+    assert.strictEqual(instanceTask.rate(0) instanceof Float64Array, true);
+    assert.strictEqual(instanceTask.constant(0) instanceof Float64Array, true);
+    assert.strictEqual(instanceTask.computedConstant(0) instanceof Float64Array, true);
+    assert.strictEqual(instanceTask.algebraicVariable(0) instanceof Float64Array, true);
+  });
 });

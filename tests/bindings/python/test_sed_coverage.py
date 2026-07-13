@@ -15,6 +15,7 @@
 
 import libopencor as loc
 import math
+import numpy
 import utils
 from utils import assert_issues, assert_values
 
@@ -830,3 +831,22 @@ def test_sedml_file_with_bare_filename():
     file.contents = utils.text_to_list(
         utils.text_file_contents(utils.resource_path("cellml_2.sedml"))
     )
+
+
+def test_simulation_results_are_numpy_arrays():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+
+    assert isinstance(instance_task.voi, numpy.ndarray)
+    assert isinstance(instance_task.state(0), numpy.ndarray)
+    assert isinstance(instance_task.rate(0), numpy.ndarray)
+    assert isinstance(instance_task.constant(0), numpy.ndarray)
+    assert isinstance(instance_task.computed_constant(0), numpy.ndarray)
+    assert isinstance(instance_task.algebraic_variable(0), numpy.ndarray)
