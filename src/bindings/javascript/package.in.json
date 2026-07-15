@@ -6,7 +6,7 @@
   "bugs": {
     "url": "https://github.com/opencor/libopencor/issues"
   },
-  "description": "libOpenCOR is is a library that can be used to organise, edit, simulate, and analyse CellML files.",
+  "description": "libOpenCOR is a library that can be used to organise, edit, simulate, and analyse CellML files.",
   "exports": {
     ".": "./dist/libopencor.js",
     "./libopencor.wasm": "./dist/libopencor.wasm"
