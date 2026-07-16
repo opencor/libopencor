@@ -1,0 +1,25 @@
+{
+  "author": {
+    "name": "Alan Garny",
+    "email": "a.garny@auckland.ac.nz"
+  },
+  "bugs": {
+    "url": "https://github.com/opencor/libopencor/issues"
+  },
+  "description": "libOpenCOR TypeScript type definitions.",
+  "files": ["dist/libopencor.d.ts", "README.md", "LICENSE.txt"],
+  "homepage": "https://opencor.ws/libopencor/",
+  "keywords": ["cellml", "combine", "omex", "opencor", "sed-ml", "types"],
+  "license": "Apache-2.0",
+  "main": "dist/libopencor.d.ts",
+  "name": "@opencor/libopencor-types",
+  "productName": "libOpenCOR types",
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opencor/libopencor.git"
+  },
+  "type": "module",
+  "types": "dist/libopencor.d.ts",
+  "version": "@PROJECT_VERSION@"
+}

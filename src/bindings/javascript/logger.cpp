@@ -48,12 +48,14 @@ void loggerApi()
 
     // clang-format off
     EM_ASM({
-        Module["Issue"]["Type"] = Module["Issue.Type"];
+        if (Module["Issue"]) {
+            Module["Issue"]["Type"] = Module["Issue.Type"];
 
-        delete Module["Issue.Type"];
+            delete Module["Issue.Type"];
 
-        Module["Issue"].prototype.toString = function() {
-            return this.description;
-        };
+            Module["Issue"].prototype.toString = function() {
+                return this.description;
+            };
+        }
     }); // clang-format on
 }

@@ -328,10 +328,13 @@ if(EMSCRIPTEN)
     #          -sINITIAL_TABLE=65536 to have enough space for our WebAssembly table, -sINLINING_LIMIT to increase the
     #          inlining limit, -sMODULARIZE=1 to generate a module factory function, -sSHARED_MEMORY=1 to enable shared
     #          memory support, -sSTACK_SIZE=8MB to reserve a reasonable amount of memory for the stack at startup (which
-    #          is needed for "big" models), and --bind to generate the necessary Embind bindings.
+    #          is needed for "big" models), --bind to generate the necessary Embind bindings, and --emit-tsd to generate
+    #          a TypeScript type definitions file.
     # Note #3: for linking, we used to have -sALLOW_MEMORY_GROWTH=1, -sINITIAL_MEMORY=256MB, and -sMAXIMUM_MEMORY=2GB,
     #          but we now support threading and to allow memory growth might non-WASM code to run slowly. So, now, we
     #          use -sINITIAL_MEMORY=2GB and don't allow memory growth.
+
+    set(DTS_FILE ${CMAKE_PROJECT_NAME}.d.ts)
 
     target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE
                            -O3
@@ -355,25 +358,48 @@ if(EMSCRIPTEN)
                         -sMODULARIZE=1
                         -sSHARED_MEMORY=1
                         -sSTACK_SIZE=8MB
-                        --bind)
+                        --bind
+                        --emit-tsd ${DTS_FILE})
 
     # Package our JavaScript bindings, if possible.
 
+    find_program(NODE_EXE NAMES node)
     find_program(NPM_EXE NAMES ${PREFERRED_NPM_NAMES} npm)
 
-    if(NPM_EXE)
+    if(NODE_EXE AND NPM_EXE)
+        # Post-process the generated .d.ts to match our EM_ASM runtime patches.
+
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                           COMMAND ${NODE_EXE} ${CMAKE_SOURCE_DIR}/src/bindings/javascript/postprocess.dts.mjs ${DTS_FILE})
+
+        # Package our JavaScript bindings into a .tgz file that can be published to npm.
+
         set(TGZ_FILENAME ${REAL_CMAKE_PROJECT_NAME}-${PROJECT_VERSION}.tgz)
         set(TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${TGZ_FILENAME})
 
         add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E make_directory dist
+                           COMMAND ${CMAKE_COMMAND} -E copy ${DTS_FILE} dist
                            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js dist
                            COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm dist
-                           COMMAND ${CMAKE_COMMAND} -E copy package.json dist
                            COMMAND ${NPM_EXE} pack
                            COMMAND ${CMAKE_COMMAND} -E copy opencor-${TGZ_FILENAME} ${TGZ_FILE})
+
+        # Also package our .d.ts file as a standalone TypeScript type definitions package.
+
+        set(TYPES_TGZ_FILENAME ${REAL_CMAKE_PROJECT_NAME}-types-${PROJECT_VERSION}.tgz)
+        set(TYPES_TGZ_FILE ${CMAKE_BINARY_DIR}/../../../../${TYPES_TGZ_FILENAME})
+
+        add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E make_directory types/dist
+                           COMMAND ${CMAKE_COMMAND} -E copy package.types.json types/package.json
+                           COMMAND ${CMAKE_COMMAND} -E copy README.md types
+                           COMMAND ${CMAKE_COMMAND} -E copy LICENSE.txt types
+                           COMMAND ${CMAKE_COMMAND} -E copy ${DTS_FILE} types/dist
+                           COMMAND ${CMAKE_COMMAND} -E chdir types ${NPM_EXE} pack
+                           COMMAND ${CMAKE_COMMAND} -E copy types/opencor-${TYPES_TGZ_FILENAME} ${TYPES_TGZ_FILE})
     else()
-        message(WARNING "npm could not be found, so libOpenCOR's JavaScript bindings could not be packaged.")
+        message(FATAL_ERROR "The node and/or npm tools could not be found, so libOpenCOR's JavaScript bindings could not be finalised and packaged.")
     endif()
 
     # Copy our generated files over so that they can be deployed.
@@ -381,15 +407,17 @@ if(EMSCRIPTEN)
     foreach(DEPLOY_DIR ${CMAKE_PROJECT_VERSION} latest)
         add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E make_directory wasm/${DEPLOY_DIR}
-                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js wasm/${DEPLOY_DIR}/${CMAKE_PROJECT_NAME}.js
-                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm wasm/${DEPLOY_DIR}/${CMAKE_PROJECT_NAME}.wasm)
+                           COMMAND ${CMAKE_COMMAND} -E copy ${DTS_FILE} wasm/${DEPLOY_DIR}
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js wasm/${DEPLOY_DIR}
+                           COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm wasm/${DEPLOY_DIR})
     endforeach()
 
     # Copy our generated files over so that they can be used by our test Web page.
 
     add_custom_command(TARGET ${CMAKE_PROJECT_NAME} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.js
-                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm ${JAVASCRIPT_BINDINGS_DIR}/${CMAKE_PROJECT_NAME}.wasm)
+                       COMMAND ${CMAKE_COMMAND} -E copy ${DTS_FILE} ${JAVASCRIPT_BINDINGS_DIR}/${DTS_FILE}
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.js ${JAVASCRIPT_BINDINGS_DIR}
+                       COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_PROJECT_NAME}.wasm ${JAVASCRIPT_BINDINGS_DIR})
 
     # Let people know how to run our test Web page.
 
