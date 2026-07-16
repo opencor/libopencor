@@ -276,6 +276,6 @@ jobs:
         # "opencor/libopencor" repository. (Provenance can be disabled, but we prefer to be open.)
         run: |
           cd build/src/bindings/javascript/build/src
-          npm publish --access public --no-git-checks
+          npm publish --access public
           cd types
-          npm publish --access public --no-git-checks
+          npm publish --access public
