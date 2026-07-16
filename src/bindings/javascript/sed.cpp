@@ -45,11 +45,13 @@ void sedApi()
 
     // SedDataDescription API.
 
-    emscripten::class_<libOpenCOR::SedDataDescription, emscripten::base<libOpenCOR::SedBase>>("SedDataDescription");
+    emscripten::class_<libOpenCOR::SedDataDescription, emscripten::base<libOpenCOR::SedBase>>("SedDataDescription")
+        .smart_ptr<libOpenCOR::SedDataDescriptionPtr>("SedDataDescription");
 
     // SedDataGenerator API.
 
-    emscripten::class_<libOpenCOR::SedDataGenerator, emscripten::base<libOpenCOR::SedBase>>("SedDataGenerator");
+    emscripten::class_<libOpenCOR::SedDataGenerator, emscripten::base<libOpenCOR::SedBase>>("SedDataGenerator")
+        .smart_ptr<libOpenCOR::SedDataGeneratorPtr>("SedDataGenerator");
 
     // SedDocument API.
 
@@ -143,7 +145,8 @@ void sedApi()
 
     // SedOutput API.
 
-    emscripten::class_<libOpenCOR::SedOutput, emscripten::base<libOpenCOR::SedBase>>("SedOutput");
+    emscripten::class_<libOpenCOR::SedOutput, emscripten::base<libOpenCOR::SedBase>>("SedOutput")
+        .smart_ptr<libOpenCOR::SedOutputPtr>("SedOutput");
 
     // SedRepeatedTask API.
 
@@ -186,7 +189,8 @@ void sedApi()
 
     // SedStyle API.
 
-    emscripten::class_<libOpenCOR::SedStyle, emscripten::base<libOpenCOR::SedBase>>("SedStyle");
+    emscripten::class_<libOpenCOR::SedStyle, emscripten::base<libOpenCOR::SedBase>>("SedStyle")
+        .smart_ptr<libOpenCOR::SedStylePtr>("SedStyle");
 
     // SedTask API.
 

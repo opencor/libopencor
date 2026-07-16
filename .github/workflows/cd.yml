@@ -269,11 +269,13 @@ jobs:
           local-path: ./build/src/bindings/javascript/build/src/wasm
           remote-path: /home/www/opencor.ws/libopencor/downloads/wasm
           sync: full
-      - name: Publish libOpenCOR
+      - name: Publish libOpenCOR and its types
         # To publish using OIDC implies automatic provenance generation, so no need to specify --provenance (see
         # https://docs.npmjs.com/trusted-publishers). Provenance requires "repository.url" in package.json to match the
         # repository from which we are publishing. In our case, it means that we can only publish to npm from the
         # "opencor/libopencor" repository. (Provenance can be disabled, but we prefer to be open.)
         run: |
           cd build/src/bindings/javascript/build/src
+          npm publish --access public --no-git-checks
+          cd types
           npm publish --access public --no-git-checks

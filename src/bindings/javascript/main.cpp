@@ -60,7 +60,13 @@ EMSCRIPTEN_BINDINGS(libOpenCOR)
         let vectorNames = 'Doubles|FilePtrs|IssuePtrs|SedAbstractTaskPtrs|SedChangePtrs|SedDataDescriptionPtrs|SedDataGeneratorPtrs|SedInstanceTaskPtrs|SedModelPtrs|SedOutputPtrs|SedSimulationPtrs|SedStylePtrs|Strings'.split('|');
 
         vectorNames.forEach((name) => {
-            let prototype = Module[name].prototype;
+            let vectorClass = Module[name];
+
+            if (!vectorClass) {
+                return;
+            }
+
+            let prototype = vectorClass.prototype;
 
             Object.defineProperty(prototype, 'length', {
                 get: function() {

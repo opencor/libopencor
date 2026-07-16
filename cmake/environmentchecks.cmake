@@ -127,10 +127,14 @@ if(Python_EXECUTABLE)
 
     mark_as_advanced(NB_CREATE_INSTALL_RULES
                      NB_TEST
-                     NB_TEST_SANITZE
+                     NB_TEST_CUDA
+                     NB_TEST_FREE_THREADED
+                     NB_TEST_SANITIZERS_ASAN
+                     NB_TEST_SANITIZERS_TSAN
+                     NB_TEST_SANITIZERS_UBSAN
                      NB_TEST_SHARED_BUILD
                      NB_TEST_STABLE_ABI
-                     nanobind_DIR)
+                     NB_USE_SUBMODULE_DEPS)
 endif()
 
 # Look for various programs.

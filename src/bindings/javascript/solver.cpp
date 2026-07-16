@@ -33,13 +33,15 @@ void solverApi()
 
     // clang-format off
     EM_ASM({
-        Module["Solver"]["Type"] = Module["Solver.Type"];
+        if (Module["Solver"]) {
+            Module["Solver"]["Type"] = Module["Solver.Type"];
 
-        delete Module["Solver.Type"];
+            delete Module["Solver.Type"];
 
-        Module["Solver"].prototype.toString = function() {
-            return this.name;
-        };
+            Module["Solver"].prototype.toString = function() {
+                return this.name;
+            };
+        }
     }); // clang-format on
 
     // SolverOde API.
@@ -50,6 +52,7 @@ void solverApi()
     // SolverOdeFixedStep API.
 
     emscripten::class_<libOpenCOR::SolverOdeFixedStep, emscripten::base<libOpenCOR::SolverOde>>("SolverOdeFixedStep")
+        .smart_ptr<libOpenCOR::SolverOdeFixedStepPtr>("SolverOdeFixedStep")
         .property("step", &libOpenCOR::SolverOdeFixedStep::step, &libOpenCOR::SolverOdeFixedStep::setStep);
 
     // SolverNla API.
@@ -103,15 +106,17 @@ void solverApi()
         .property("interpolateSolution", &libOpenCOR::SolverCvode::interpolateSolution, &libOpenCOR::SolverCvode::setInterpolateSolution);
 
     EM_ASM({
-        Module["SolverCvode"]["IntegrationMethod"] = Module["SolverCvode.IntegrationMethod"];
-        Module["SolverCvode"]["IterationType"] = Module["SolverCvode.IterationType"];
-        Module["SolverCvode"]["LinearSolver"] = Module["SolverCvode.LinearSolver"];
-        Module["SolverCvode"]["Preconditioner"] = Module["SolverCvode.Preconditioner"];
+        if (Module["SolverCvode"]) {
+            Module["SolverCvode"]["IntegrationMethod"] = Module["SolverCvode.IntegrationMethod"];
+            Module["SolverCvode"]["IterationType"] = Module["SolverCvode.IterationType"];
+            Module["SolverCvode"]["LinearSolver"] = Module["SolverCvode.LinearSolver"];
+            Module["SolverCvode"]["Preconditioner"] = Module["SolverCvode.Preconditioner"];
 
-        delete Module["SolverCvode.IntegrationMethod"];
-        delete Module["SolverCvode.IterationType"];
-        delete Module["SolverCvode.LinearSolver"];
-        delete Module["SolverCvode.Preconditioner"];
+            delete Module["SolverCvode.IntegrationMethod"];
+            delete Module["SolverCvode.IterationType"];
+            delete Module["SolverCvode.LinearSolver"];
+            delete Module["SolverCvode.Preconditioner"];
+        }
     });
 
     // SolverForwardEuler API.
@@ -146,9 +151,11 @@ void solverApi()
         .property("lowerHalfBandwidth", &libOpenCOR::SolverKinsol::lowerHalfBandwidth, &libOpenCOR::SolverKinsol::setLowerHalfBandwidth);
 
     EM_ASM({
-        Module["SolverKinsol"]["LinearSolver"] = Module["SolverKinsol.LinearSolver"];
+        if (Module["SolverKinsol"]) {
+            Module["SolverKinsol"]["LinearSolver"] = Module["SolverKinsol.LinearSolver"];
 
-        delete Module["SolverKinsol.LinearSolver"];
+            delete Module["SolverKinsol.LinearSolver"];
+        }
     });
 
     // SolverSecondOrderRungeKutta API.

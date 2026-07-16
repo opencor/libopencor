@@ -363,12 +363,14 @@ function(configure_target TARGET)
     # Mark as advanced the CMake variables set by our various packages.
 
     mark_as_advanced(CURL_DIR
+                     CURL_USE_CMAKECONFIG
+                     CURL_USE_PKGCONFIG
                      Clang_DIR
                      LLVM_DIR
-                     Libssh2_DIR
                      SUNDIALS_DIR
                      combine-static_DIR
                      libCellML_DIR
+                     libssh2_DIR
                      numl-static_DIR
                      sbml-static_DIR
                      sedml-static_DIR)

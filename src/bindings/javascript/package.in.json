@@ -6,22 +6,27 @@
   "bugs": {
     "url": "https://github.com/opencor/libopencor/issues"
   },
-  "description": "libOpenCOR is is a library that can be used to organise, edit, simulate, and analyse CellML files.",
+  "description": "libOpenCOR is a library that can be used to organise, edit, simulate, and analyse CellML files.",
   "exports": {
-    ".": "./dist/libopencor.js",
-    "./libopencor.wasm": "./dist/libopencor.wasm"
+    ".": {
+      "types": "./dist/libopencor.d.ts",
+      "import": "./dist/libopencor.js"
+    }
   },
-  "files": ["dist/libopencor.js", "dist/libopencor.wasm", "README.md", "LICENSE.txt"],
+  "files": ["dist/libopencor.d.ts", "dist/libopencor.js", "dist/libopencor.wasm", "README.md", "LICENSE.txt"],
   "homepage": "https://opencor.ws/libopencor/",
   "keywords": ["cellml", "combine", "omex", "opencor", "sed-ml"],
   "license": "Apache-2.0",
+  "main": "dist/libopencor.js",
   "module": "dist/libopencor.js",
   "name": "@opencor/libopencor",
   "productName": "libOpenCOR",
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/opencor/libopencor.git"
   },
   "type": "module",
+  "types": "dist/libopencor.d.ts",
   "version": "@PROJECT_VERSION@"
 }
