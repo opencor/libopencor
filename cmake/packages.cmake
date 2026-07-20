@@ -298,7 +298,7 @@ endfunction()
 # Determine the platform on which we are and the architecture on which we want to build.
 
 if(EMSCRIPTEN)
-    set(TARGET_PLATFORM_ARCHITECTURE wasm-threaded) #---GRY--- This should eventually be renamed to just "wasm" once we are done with running simulations in their own thread.
+    set(TARGET_PLATFORM_ARCHITECTURE wasm)
 else()
     if(WIN32)
         if(RELEASE_MODE)
