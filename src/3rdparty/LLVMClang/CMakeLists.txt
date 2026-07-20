@@ -98,7 +98,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DCLANG_TABLEGEN=${CLANG_TBLGEN_EXE}
         )
     else()
-        if(APPLE AND NOT INTEL_MODE AND NOT EMSCRIPTEN)
+        if(APPLE AND NOT INTEL_MODE)
             set(CMAKE_CACHE_ARGS
                 -DCMAKE_C_FLAGS:STRING=-mcpu=generic
                 -DCMAKE_CXX_FLAGS:STRING=-mcpu=generic
