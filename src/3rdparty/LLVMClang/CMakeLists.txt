@@ -56,7 +56,7 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 48ec6912ab47446fb6bfd6c15017ba8680f26518)
+                                 79c71de6c27ee5f45771676928eb70a5a73c29e5)
             endif()
         else()
             if(INTEL_MODE)
@@ -98,10 +98,10 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DCLANG_TABLEGEN=${CLANG_TBLGEN_EXE}
         )
     else()
-        if(APPLE AND NOT INTEL_MODE AND NOT EMSCRIPTEN)
+        if(APPLE AND NOT INTEL_MODE)
             set(CMAKE_CACHE_ARGS
-                -DCMAKE_C_FLAGS:STRING=-mcpu=generic
-                -DCMAKE_CXX_FLAGS:STRING=-mcpu=generic
+                -DCMAKE_C_FLAGS:STRING=-mcpu=generic\ -Xclang\ -target-feature\ -Xclang\ -zcm\ -Xclang\ -target-feature\ -Xclang\ -zcz
+                -DCMAKE_CXX_FLAGS:STRING=-mcpu=generic\ -Xclang\ -target-feature\ -Xclang\ -zcm\ -Xclang\ -target-feature\ -Xclang\ -zcz
             )
         endif()
 
