@@ -52,11 +52,11 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 4dc2ce69c478e89cfd905154f2de5824a44caf03)
+                                 38cfd874eb9c386e6cfc978979d55fcfed210e3f)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 79c71de6c27ee5f45771676928eb70a5a73c29e5)
+                                 de2862e2f2c238a122e2573e16af2bbcdc37d17f)
             endif()
         else()
             if(INTEL_MODE)
@@ -98,13 +98,6 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DCLANG_TABLEGEN=${CLANG_TBLGEN_EXE}
         )
     else()
-        if(APPLE AND NOT INTEL_MODE)
-            set(CMAKE_CACHE_ARGS
-                -DCMAKE_C_FLAGS:STRING=-mcpu=generic\ -Xclang\ -target-feature\ -Xclang\ -zcm\ -Xclang\ -target-feature\ -Xclang\ -zcz
-                -DCMAKE_CXX_FLAGS:STRING=-mcpu=generic\ -Xclang\ -target-feature\ -Xclang\ -zcm\ -Xclang\ -target-feature\ -Xclang\ -zcz
-            )
-        endif()
-
         set(LIBCLANG_BUILD_STATIC ON)
 
         if(INTEL_MODE)
@@ -136,8 +129,6 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
         DOWNLOAD_NO_PROGRESS ON
         SOURCE_SUBDIR
             llvm
-        CMAKE_CACHE_ARGS
-            ${CMAKE_CACHE_ARGS}
         CMAKE_ARGS
             -DCLANG_BUILD_TOOLS=OFF
             -DCLANG_ENABLE_LIBXML2=OFF
