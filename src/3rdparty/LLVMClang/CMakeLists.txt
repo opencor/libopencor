@@ -24,49 +24,49 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         4f2906d4b6df1b0be5a636a88f7582425b30df49)
+                         05cd2766a9164a86fefeed6c54af6ff177024a70)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     7eca038345d2bb5354d469da999fe38ac7a51e96)
+                                     9b4c654acab324912b28f30765697477312a83cf)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     38178c9f5550499a796c24ecebe5d45325e34e66)
+                                     974ec78f371bf89ce5a475a0855fb428f5724cd6)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     0a77b2f65286f89a4175cc52ceaf07909a7cec4e)
+                                     f57bcc2c99a3cddc423e09d06870ad4243e514bd)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     b394f358e96039d5d844547b2cafda678a824776)
+                                     bd417f60cd0182a33ef4c4c20fc23c03ece70a58)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 da706ed5933abedcee5e9f8c6006b71b061c5ebf)
+                                 4dc2ce69c478e89cfd905154f2de5824a44caf03)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 30642e4e208a800e60b8ada95e15425c89a4b4f9)
+                                 48ec6912ab47446fb6bfd6c15017ba8680f26518)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 540878be30175da91557ab1a9f546383b458a06e)
+                                 7cf85ece2ac15636c82e42d285fa4ab49420a8b3)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 2a68f667a7c571561416451a543024fff9096012)
+                                 a439ad9559ea909f42c192ba1c2033bd0f564877)
             endif()
         endif()
     endif()
@@ -78,6 +78,10 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
 
         set(LLVM_TARGETS_TO_BUILD WebAssembly)
         set(LLVM_HOST_TRIPLE wasm32-unknown-emscripten)
+
+        set(LLVM_ENABLE_LIBCXX
+            -DLLVM_ENABLE_LIBCXX=ON
+        )
 
         find_program(LLVM_TBLGEN_EXE NAMES llvm-tblgen)
         find_program(CLANG_TBLGEN_EXE NAMES clang-tblgen)
@@ -94,6 +98,13 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DCLANG_TABLEGEN=${CLANG_TBLGEN_EXE}
         )
     else()
+        if(APPLE AND NOT INTEL_MODE AND NOT EMSCRIPTEN)
+            set(CMAKE_CACHE_ARGS
+                -DCMAKE_C_FLAGS:STRING=-mcpu=generic
+                -DCMAKE_CXX_FLAGS:STRING=-mcpu=generic
+            )
+        endif()
+
         set(LIBCLANG_BUILD_STATIC ON)
 
         if(INTEL_MODE)
@@ -125,6 +136,8 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
         DOWNLOAD_NO_PROGRESS ON
         SOURCE_SUBDIR
             llvm
+        CMAKE_CACHE_ARGS
+            ${CMAKE_CACHE_ARGS}
         CMAKE_ARGS
             -DCLANG_BUILD_TOOLS=OFF
             -DCLANG_ENABLE_LIBXML2=OFF
@@ -152,6 +165,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DLLVM_ENABLE_LIBEDIT=OFF
             -DLLVM_ENABLE_LIBPFM=OFF
             -DLLVM_ENABLE_LIBXML2=OFF
+            ${LLVM_ENABLE_LIBCXX}
             -DLLVM_ENABLE_MODULE_DEBUGGING=OFF
             -DLLVM_ENABLE_OCAMLDOC=OFF
             -DLLVM_ENABLE_ONDISK_CAS=OFF
