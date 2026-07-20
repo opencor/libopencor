@@ -86,8 +86,11 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             message(FATAL_ERROR "llvm-tblgen and clang-tblgen executables are required to build ${PACKAGE_NAME} with Emscripten.")
         endif()
 
-        set(TABLEGENS
+        set(LLVM_TABLEGEN
             -DLLVM_TABLEGEN=${LLVM_TBLGEN_EXE}
+        )
+
+        set(CLANG_TABLEGEN
             -DCLANG_TABLEGEN=${CLANG_TBLGEN_EXE}
         )
     else()
@@ -129,6 +132,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DCLANG_INCLUDE_DOCS=OFF
             -DCLANG_INCLUDE_TESTS=OFF
             -DCLANG_PLUGIN_SUPPORT=OFF
+            ${CLANG_TABLEGEN}
             -DCLANG_TOOL_DICTIONARY_BUILD=OFF
             -DCLANG_TOOL_HANDLE_CXX_BUILD=OFF
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
@@ -168,8 +172,8 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DLLVM_INCLUDE_TESTS=OFF
             -DLLVM_INCLUDE_TOOLS=ON
             -DLLVM_INCLUDE_UTILS=OFF
+            ${LLVM_TABLEGEN}
             -DLLVM_TARGETS_TO_BUILD=${LLVM_TARGETS_TO_BUILD}
-            ${TABLEGENS}
     )
 
     # Create our package.
