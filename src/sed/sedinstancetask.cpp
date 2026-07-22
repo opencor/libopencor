@@ -329,12 +329,6 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
             return;
         }
 
-        auto nanFillTail = [](Doubles &pResults, size_t pStartIndex) {
-            std::fill(pResults.begin() + static_cast<std::ptrdiff_t>(pStartIndex),
-                      pResults.end(),
-                      NAN);
-        };
-
         auto nanFillRowTails = [index, this](Doubles &pResults, size_t pCount) {
             for (size_t i {0}; i < pCount; ++i) {
                 const auto rowStart {i * mResults.resultsSize};
@@ -345,7 +339,10 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
             }
         };
 
-        nanFillTail(mResults.voi, index + 1);
+        std::fill(mResults.voi.begin() + static_cast<std::ptrdiff_t>(index + 1),
+                  mResults.voi.end(),
+                  NAN);
+
         nanFillRowTails(mResults.states, mStateCount);
         nanFillRowTails(mResults.rates, mStateCount);
         nanFillRowTails(mResults.constants, mConstantCount);
@@ -471,6 +468,7 @@ double SedInstanceTask::Impl::run()
         const auto resultsSize {totalSteps + 1};
 
         mResults.resultsSize = resultsSize;
+
         mResults.voi.resize(resultsSize);
         mResults.states.resize(mStateCount * resultsSize);
         mResults.rates.resize(mStateCount * resultsSize);
@@ -489,6 +487,7 @@ double SedInstanceTask::Impl::run()
         // Track our results.
 
         mResults.resultsSize = 1;
+
         mResults.constants.resize(mConstantCount);
         mResults.computedConstants.resize(mComputedConstantCount);
         mResults.algebraicVariables.resize(mAlgebraicVariableCount);
