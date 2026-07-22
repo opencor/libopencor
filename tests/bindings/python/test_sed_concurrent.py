@@ -134,5 +134,5 @@ def test_parallel_async_lifecycle():
         assert instance.wait_for_run() > 0.0
 
     for instance in instances:
-        assert instance.is_running is False
+        assert instance.status == loc.SedInstance.Status.Idle
         assert not instance.has_issues

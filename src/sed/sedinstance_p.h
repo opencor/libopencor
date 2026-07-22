@@ -47,9 +47,10 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument);
 
+    Status status() const;
+
     double run();
     bool startRun();
-    bool isRunning() const;
     double waitForRun();
     void pauseRun();
     void resumeRun();

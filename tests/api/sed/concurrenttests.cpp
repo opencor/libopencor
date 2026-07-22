@@ -146,7 +146,7 @@ TEST(ConcurrentSedTest, parallelAsyncLifecycle)
     }
 
     for (const auto &instance : instances) {
-        EXPECT_FALSE(instance->isRunning());
+        EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
         EXPECT_FALSE(instance->hasIssues());
     }
 }

@@ -96,9 +96,15 @@ void sedApi(nb::module_ &m)
 
     nb::class_<libOpenCOR::SedInstance, libOpenCOR::Logger> sedInstance(m, "SedInstance");
 
-    sedInstance.def("run", &libOpenCOR::SedInstance::run, "Run all the tasks associated with this instance.", nb::call_guard<nb::gil_scoped_release>())
+    nb::enum_<libOpenCOR::SedInstance::Status>(sedInstance, "Status")
+        .value("Idle", libOpenCOR::SedInstance::Status::IDLE)
+        .value("Running", libOpenCOR::SedInstance::Status::RUNNING)
+        .value("Paused", libOpenCOR::SedInstance::Status::PAUSED)
+        .export_values();
+
+    sedInstance.def_prop_ro("status", &libOpenCOR::SedInstance::status, "Return the status of this instance.")
+        .def("run", &libOpenCOR::SedInstance::run, "Run all the tasks associated with this instance.", nb::call_guard<nb::gil_scoped_release>())
         .def("start_run", &libOpenCOR::SedInstance::startRun, "Start running, in a background thread, all the tasks associated with this instance.")
-        .def_prop_ro("is_running", &libOpenCOR::SedInstance::isRunning, "Return whether this instance is currently running.")
         .def("wait_for_run", &libOpenCOR::SedInstance::waitForRun, "Wait for any currently-running instance to complete.", nb::call_guard<nb::gil_scoped_release>())
         .def("pause_run", &libOpenCOR::SedInstance::pauseRun, "Pause a currently-running instance.")
         .def("resume_run", &libOpenCOR::SedInstance::resumeRun, "Resume a currently-paused instance.")

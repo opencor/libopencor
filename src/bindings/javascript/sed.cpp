@@ -86,11 +86,16 @@ void sedApi()
 
     // SedInstance API.
 
+    emscripten::enum_<libOpenCOR::SedInstance::Status>("SedInstance.Status")
+        .value("IDLE", libOpenCOR::SedInstance::Status::IDLE)
+        .value("RUNNING", libOpenCOR::SedInstance::Status::RUNNING)
+        .value("PAUSED", libOpenCOR::SedInstance::Status::PAUSED);
+
     emscripten::class_<libOpenCOR::SedInstance, emscripten::base<libOpenCOR::Logger>>("SedInstance")
         .smart_ptr<libOpenCOR::SedInstancePtr>("SedInstance")
+        .property("status", &libOpenCOR::SedInstance::status)
         .function("run", &libOpenCOR::SedInstance::run)
         .function("startRun", &libOpenCOR::SedInstance::startRun)
-        .property("isRunning", &libOpenCOR::SedInstance::isRunning)
         .function("waitForRun", &libOpenCOR::SedInstance::waitForRun)
         .function("pauseRun", &libOpenCOR::SedInstance::pauseRun)
         .function("resumeRun", &libOpenCOR::SedInstance::resumeRun)
@@ -100,6 +105,14 @@ void sedApi()
         .property("taskCount", &libOpenCOR::SedInstance::taskCount)
         .property("tasks", &libOpenCOR::SedInstance::tasks)
         .function("task", &libOpenCOR::SedInstance::task);
+
+    EM_ASM({
+        if (Module["SedInstance"]) {
+            Module["SedInstance"]["Status"] = Module["SedInstance.Status"];
+
+            delete Module["SedInstance.Status"];
+        }
+    });
 
     // SedInstanceTask API.
 
