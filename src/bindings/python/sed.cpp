@@ -99,8 +99,7 @@ void sedApi(nb::module_ &m)
     nb::enum_<libOpenCOR::SedInstance::Status>(sedInstance, "Status")
         .value("Idle", libOpenCOR::SedInstance::Status::IDLE)
         .value("Running", libOpenCOR::SedInstance::Status::RUNNING)
-        .value("Paused", libOpenCOR::SedInstance::Status::PAUSED)
-        .export_values();
+        .value("Paused", libOpenCOR::SedInstance::Status::PAUSED);
 
     sedInstance.def_prop_ro("status", &libOpenCOR::SedInstance::status, "Return the status of this instance.")
         .def("run", &libOpenCOR::SedInstance::run, "Run all the tasks associated with this instance.", nb::call_guard<nb::gil_scoped_release>())

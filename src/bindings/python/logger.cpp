@@ -47,8 +47,7 @@ void loggerApi(nb::module_ &m)
 
     nb::enum_<libOpenCOR::Issue::Type>(issue, "Type")
         .value("Error", libOpenCOR::Issue::Type::ERROR)
-        .value("Warning", libOpenCOR::Issue::Type::WARNING)
-        .export_values();
+        .value("Warning", libOpenCOR::Issue::Type::WARNING);
 
     issue.def_prop_ro("type", &libOpenCOR::Issue::type, "Return the type.")
         .def_prop_ro("type_as_string", &libOpenCOR::Issue::typeAsString, "Return the type as a string.")
