@@ -46,6 +46,7 @@ class LIBOPENCOR_UNIT_TESTING_EXPORT CellmlFile: public Logger
 {
 public:
     CellmlFile() = delete;
+    ~CellmlFile() override;
 
     CellmlFile(const CellmlFile &pOther) = delete;
     CellmlFile(CellmlFile &&pOther) noexcept = delete;
