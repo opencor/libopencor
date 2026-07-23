@@ -33,8 +33,7 @@ void fileApi(nb::module_ &m)
         .value("CellmlFile", libOpenCOR::File::Type::CELLML_FILE)
         .value("SedmlFile", libOpenCOR::File::Type::SEDML_FILE)
         .value("CombineArchive", libOpenCOR::File::Type::COMBINE_ARCHIVE)
-        .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE)
-        .export_values();
+        .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
 
     file.def(nb::new_(&libOpenCOR::File::create), "Create a File object.", nb::arg("file_name_or_url"), nb::arg("retrieve_contents") = true)
         .def_prop_ro("type", &libOpenCOR::File::type, "Return the type.")

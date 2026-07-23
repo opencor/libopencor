@@ -124,7 +124,7 @@ test.describe('Sed concurrent tests', () => {
     }
 
     for (const instance of instances) {
-      assert.strictEqual(instance.isRunning, false);
+      assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
       assert.strictEqual(instance.hasIssues, false);
     }
   });

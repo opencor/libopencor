@@ -109,7 +109,7 @@ TEST(InstanceSedTest, asynchronousRunWithoutActiveRun)
     auto document {libOpenCOR::SedDocument::create(file)};
     auto instance {document->instantiate()};
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_EQ(instance->waitForRun(), 0.0);
 }
 
@@ -124,14 +124,14 @@ TEST(InstanceSedTest, asynchronousRunLifecycle)
     EXPECT_TRUE(instance->startRun());
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_GT(instance->waitForRun(), 0.0);
     EXPECT_FALSE(instance->hasIssues());
 }
@@ -218,7 +218,7 @@ TEST(InstanceSedTest, stopRun)
     instance->stopRun();
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
@@ -237,7 +237,7 @@ TEST(InstanceSedTest, stopRunWhenNotRunning)
 
     instance->stopRun();
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
 }
 
@@ -268,7 +268,7 @@ TEST(InstanceSedTest, stopRunResultsHaveNans)
     instance->stopRun();
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
@@ -336,14 +336,14 @@ TEST(InstanceSedTest, pauseRunAndResumeRun)
     instance->stopRun();
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_LT(instance->progress(), 1.0);
     EXPECT_FALSE(instance->hasIssues());
 }
@@ -357,7 +357,7 @@ TEST(InstanceSedTest, pauseRunAndResumeRunWhenNotRunning)
     instance->pauseRun();
     instance->resumeRun();
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_DOUBLE_EQ(instance->progress(), 0.0);
 }
 
@@ -393,14 +393,14 @@ TEST(InstanceSedTest, pauseRunThenStopRun)
     instance->stopRun();
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_LT(instance->progress(), 1.0);
     EXPECT_FALSE(instance->hasIssues());
 }
@@ -437,14 +437,14 @@ TEST(InstanceSedTest, pauseRunAndResumeRunWithNaturalCompletion)
     instance->resumeRun();
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_GT(instance->waitForRun(), 0.0);
     EXPECT_FALSE(instance->hasIssues());
 }
@@ -478,14 +478,14 @@ TEST(InstanceSedTest, startRunWhileAlreadyRunning)
     instance->stopRun();
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_LT(instance->progress(), 1.0);
     EXPECT_FALSE(instance->hasIssues());
 }
@@ -501,26 +501,26 @@ TEST(InstanceSedTest, startRunAfterPreviousRunCompleted)
     EXPECT_TRUE(instance->startRun());
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
 
     EXPECT_TRUE(instance->startRun());
 
     for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
-        if (!instance->isRunning()) {
+        if (instance->status() == libOpenCOR::SedInstance::Status::IDLE) {
             break;
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    EXPECT_FALSE(instance->isRunning());
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
     EXPECT_GT(instance->waitForRun(), 0.0);
     EXPECT_FALSE(instance->hasIssues());
 }

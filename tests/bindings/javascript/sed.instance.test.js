@@ -136,7 +136,7 @@ test.describe('Sed instance tests', () => {
     const document = new loc.SedDocument(file);
     const instance = document.instantiate();
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.strictEqual(instance.waitForRun(), 0.0);
   });
 
@@ -151,14 +151,14 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.startRun(), true);
 
     for (let i = 0; i < 200; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
       await sleep(1);
     }
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.ok(instance.waitForRun() > 0.0);
     assert.strictEqual(instance.hasIssues, false);
   });
@@ -255,7 +255,7 @@ test.describe('Sed instance tests', () => {
     instance.stopRun();
 
     for (let i = 0; i < WAIT_ITERATIONS; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
@@ -295,7 +295,7 @@ test.describe('Sed instance tests', () => {
     instance.stopRun();
 
     for (let i = 0; i < WAIT_ITERATIONS; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
@@ -340,7 +340,7 @@ test.describe('Sed instance tests', () => {
 
     instance.stopRun();
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.strictEqual(instance.progress, 0.0);
   });
 
@@ -378,14 +378,14 @@ test.describe('Sed instance tests', () => {
     instance.stopRun();
 
     for (let i = 0; i < WAIT_ITERATIONS; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
       await sleep(1);
     }
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.ok(instance.progress < 1.0);
     assert.strictEqual(instance.hasIssues, false);
   });
@@ -401,7 +401,7 @@ test.describe('Sed instance tests', () => {
     instance.pauseRun();
     instance.resumeRun();
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.strictEqual(instance.progress, 0.0);
   });
 
@@ -438,14 +438,14 @@ test.describe('Sed instance tests', () => {
     instance.stopRun();
 
     for (let i = 0; i < WAIT_ITERATIONS; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
       await sleep(1);
     }
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.ok(instance.progress < 1.0);
     assert.strictEqual(instance.hasIssues, false);
   });
@@ -483,14 +483,14 @@ test.describe('Sed instance tests', () => {
     instance.resumeRun();
 
     for (let i = 0; i < WAIT_ITERATIONS; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
       await sleep(1);
     }
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.ok(instance.waitForRun() > 0.0);
     assert.strictEqual(instance.hasIssues, false);
   });
@@ -526,14 +526,14 @@ test.describe('Sed instance tests', () => {
     instance.stopRun();
 
     for (let i = 0; i < WAIT_ITERATIONS; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
       await sleep(1);
     }
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.ok(instance.progress < 1.0);
     assert.strictEqual(instance.hasIssues, false);
   });
@@ -551,26 +551,26 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.startRun(), true);
 
     for (let i = 0; i < WAIT_ITERATIONS; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
       await sleep(1);
     }
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
 
     assert.strictEqual(instance.startRun(), true);
 
     for (let i = 0; i < WAIT_ITERATIONS; ++i) {
-      if (!instance.isRunning) {
+      if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
 
       await sleep(1);
     }
 
-    assert.strictEqual(instance.isRunning, false);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
     assert.ok(instance.waitForRun() > 0.0);
     assert.strictEqual(instance.hasIssues, false);
   });

@@ -29,8 +29,7 @@ void solverApi(nb::module_ &m)
 
     nb::enum_<libOpenCOR::Solver::Type>(solver, "Type")
         .value("Ode", libOpenCOR::Solver::Type::ODE)
-        .value("Nla", libOpenCOR::Solver::Type::NLA)
-        .export_values();
+        .value("Nla", libOpenCOR::Solver::Type::NLA);
 
     solver.def_prop_ro("type", &libOpenCOR::Solver::type, "Return the type.")
         .def_prop_ro("id", &libOpenCOR::Solver::id, "Return the (KiSAO) id.")
@@ -59,13 +58,11 @@ void solverApi(nb::module_ &m)
 
     nb::enum_<libOpenCOR::SolverCvode::IntegrationMethod>(solverCvode, "IntegrationMethod")
         .value("AdamsMoulton", libOpenCOR::SolverCvode::IntegrationMethod::ADAMS_MOULTON)
-        .value("Bdf", libOpenCOR::SolverCvode::IntegrationMethod::BDF)
-        .export_values();
+        .value("Bdf", libOpenCOR::SolverCvode::IntegrationMethod::BDF);
 
     nb::enum_<libOpenCOR::SolverCvode::IterationType>(solverCvode, "IterationType")
         .value("Functional", libOpenCOR::SolverCvode::IterationType::FUNCTIONAL)
-        .value("Newton", libOpenCOR::SolverCvode::IterationType::NEWTON)
-        .export_values();
+        .value("Newton", libOpenCOR::SolverCvode::IterationType::NEWTON);
 
     nb::enum_<libOpenCOR::SolverCvode::LinearSolver>(solverCvode, "LinearSolver")
         .value("Dense", libOpenCOR::SolverCvode::LinearSolver::DENSE)
@@ -73,13 +70,11 @@ void solverApi(nb::module_ &m)
         .value("Diagonal", libOpenCOR::SolverCvode::LinearSolver::DIAGONAL)
         .value("Gmres", libOpenCOR::SolverCvode::LinearSolver::GMRES)
         .value("Bicgstab", libOpenCOR::SolverCvode::LinearSolver::BICGSTAB)
-        .value("Tfqmr", libOpenCOR::SolverCvode::LinearSolver::TFQMR)
-        .export_values();
+        .value("Tfqmr", libOpenCOR::SolverCvode::LinearSolver::TFQMR);
 
     nb::enum_<libOpenCOR::SolverCvode::Preconditioner>(solverCvode, "Preconditioner")
         .value("No", libOpenCOR::SolverCvode::Preconditioner::NO)
-        .value("Banded", libOpenCOR::SolverCvode::Preconditioner::BANDED)
-        .export_values();
+        .value("Banded", libOpenCOR::SolverCvode::Preconditioner::BANDED);
 
     solverCvode.def(nb::new_(&libOpenCOR::SolverCvode::create), "Create a SolverCvode object.")
         .def_prop_rw("maximum_step", &libOpenCOR::SolverCvode::maximumStep, &libOpenCOR::SolverCvode::setMaximumStep, "The maximum step.")
@@ -121,8 +116,7 @@ void solverApi(nb::module_ &m)
         .value("Banded", libOpenCOR::SolverKinsol::LinearSolver::BANDED)
         .value("Gmres", libOpenCOR::SolverKinsol::LinearSolver::GMRES)
         .value("Bicgstab", libOpenCOR::SolverKinsol::LinearSolver::BICGSTAB)
-        .value("Tfqmr", libOpenCOR::SolverKinsol::LinearSolver::TFQMR)
-        .export_values();
+        .value("Tfqmr", libOpenCOR::SolverKinsol::LinearSolver::TFQMR);
 
     solverKinsol.def(nb::new_(&libOpenCOR::SolverKinsol::create), "Create a SolverKinsol object.")
         .def_prop_rw("maximum_number_of_iterations", &libOpenCOR::SolverKinsol::maximumNumberOfIterations, &libOpenCOR::SolverKinsol::setMaximumNumberOfIterations, "The maximum number of iterations.")

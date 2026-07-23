@@ -115,7 +115,7 @@ function populateAxis(axisId) {
 }
 
 export function run() {
-  if (instance.isRunning) {
+  if (instance.status !== loc.SedInstance.Status.IDLE) {
     // Toggle between pause and resume.
 
     if (isPaused) {
@@ -260,7 +260,7 @@ function runAsync() {
       updatePlottingAreaAndAxesInfo(completedSteps + 1);
     }
 
-    if (!instance.isRunning) {
+    if (instance.status === loc.SedInstance.Status.IDLE) {
       clearInterval(intervalId);
       instance.waitForRun();
       console.timeEnd('Computing time');

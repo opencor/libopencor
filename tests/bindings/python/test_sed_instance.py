@@ -135,7 +135,7 @@ def test_asynchronous_run_without_active_run():
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.wait_for_run() == 0.0
 
 
@@ -147,12 +147,12 @@ def test_asynchronous_run_lifecycle():
     assert instance.start_run() is True
 
     for _ in range(200):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.wait_for_run() > 0.0
     assert not instance.has_issues
 
@@ -231,7 +231,7 @@ def test_stop_run():
     instance.stop_run()
 
     for _ in range(WAIT_ITERATIONS):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
@@ -263,7 +263,7 @@ def test_stop_run_results_have_nans():
     instance.stop_run()
 
     for _ in range(WAIT_ITERATIONS):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
@@ -303,7 +303,7 @@ def test_stop_run_when_not_running():
 
     instance.stop_run()
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.progress == 0.0
 
 
@@ -336,12 +336,12 @@ def test_pause_run_and_resume_run():
     instance.stop_run()
 
     for _ in range(WAIT_ITERATIONS):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.progress < 1.0
     assert not instance.has_issues
 
@@ -354,7 +354,7 @@ def test_pause_run_and_resume_run_when_not_running():
     instance.pause_run()
     instance.resume_run()
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.progress == 0.0
 
 
@@ -386,12 +386,12 @@ def test_pause_run_then_stop_run():
     instance.stop_run()
 
     for _ in range(WAIT_ITERATIONS):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.progress < 1.0
     assert not instance.has_issues
 
@@ -424,12 +424,12 @@ def test_pause_run_and_resume_run_with_natural_completion():
     instance.resume_run()
 
     for _ in range(WAIT_ITERATIONS):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.wait_for_run() > 0.0
     assert not instance.has_issues
 
@@ -460,12 +460,12 @@ def test_start_run_while_already_running():
     instance.stop_run()
 
     for _ in range(WAIT_ITERATIONS):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.progress < 1.0
     assert not instance.has_issues
 
@@ -480,22 +480,22 @@ def test_start_run_after_previous_run_completed():
     assert instance.start_run() is True
 
     for _ in range(WAIT_ITERATIONS):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
 
     assert instance.start_run() is True
 
     for _ in range(WAIT_ITERATIONS):
-        if not instance.is_running:
+        if instance.status == loc.SedInstance.Status.Idle:
             break
 
         time.sleep(0.001)
 
-    assert instance.is_running is False
+    assert instance.status == loc.SedInstance.Status.Idle
     assert instance.wait_for_run() > 0.0
     assert not instance.has_issues
 

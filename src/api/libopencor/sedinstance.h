@@ -44,6 +44,29 @@ public:
     SedInstance &operator=(SedInstance &&pRhs) noexcept = delete; /**< No move assignment operator allowed, @private. */
 
     /**
+     * @brief The status of an instance.
+     *
+     * The status of an instance, i.e. whether it is idle, running, or paused.
+     */
+
+    enum class Status
+    {
+        IDLE, /**< The instance is idle. */
+        RUNNING, /**< The instance is currently running. */
+        PAUSED /**< The instance is currently paused. */
+    };
+
+    /**
+     * @brief Return the status of this instance.
+     *
+     * Return the status of this instance.
+     *
+     * @return The status of this instance.
+     */
+
+    Status status() const noexcept;
+
+    /**
      * @brief Run all the tasks associated with this instance.
      *
      * Run all the tasks associated with this instance.
@@ -62,16 +85,6 @@ public:
      */
 
     bool startRun();
-
-    /**
-     * @brief Return whether this instance is currently running.
-     *
-     * Return whether this instance is currently running.
-     *
-     * @return @c true if this instance is running, @c false otherwise.
-     */
-
-    bool isRunning() const noexcept;
 
     /**
      * @brief Wait for any currently-running instance to complete.

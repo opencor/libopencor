@@ -87,6 +87,19 @@ SedInstance::Impl::Impl(const SedDocumentPtr &pDocument)
     }
 }
 
+SedInstance::Status SedInstance::Impl::status() const
+{
+    if (!mRunning.load(std::memory_order_acquire)) {
+        return Status::IDLE;
+    }
+
+    if ((mRunControl.load(std::memory_order_relaxed) & INSTANCE_RUN_CONTROL_PAUSE) != 0U) {
+        return Status::PAUSED;
+    }
+
+    return Status::RUNNING;
+}
+
 double SedInstance::Impl::run()
 {
     // Reset ourselves.
@@ -169,11 +182,6 @@ bool SedInstance::Impl::startRun()
     });
 
     return true;
-}
-
-bool SedInstance::Impl::isRunning() const
-{
-    return mRunning.load(std::memory_order_acquire);
 }
 
 double SedInstance::Impl::waitForRun()
@@ -270,6 +278,11 @@ const SedInstance::Impl *SedInstance::pimpl() const
     return static_cast<const Impl *>(Logger::mPimpl.get());
 }
 
+SedInstance::Status SedInstance::status() const noexcept
+{
+    return pimpl()->status();
+}
+
 double SedInstance::run()
 {
     return pimpl()->run();
@@ -278,11 +291,6 @@ double SedInstance::run()
 bool SedInstance::startRun()
 {
     return pimpl()->startRun();
-}
-
-bool SedInstance::isRunning() const noexcept
-{
-    return pimpl()->isRunning();
 }
 
 double SedInstance::waitForRun()
