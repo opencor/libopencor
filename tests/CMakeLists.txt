@@ -132,6 +132,30 @@ if(LIBOPENCOR_UNIT_TESTING)
                COMMENT "Running unit testing...")
 endif()
 
+# Build our benchmark (not part of the unit tests).
+
+if(LIBOPENCOR_UNIT_TESTING AND NOT EMSCRIPTEN)
+    add_executable(benchmark_executable
+                   ${CMAKE_CURRENT_SOURCE_DIR}/benchmark/benchmark.cpp)
+
+    add_dependencies(benchmark_executable ${CMAKE_PROJECT_NAME})
+
+    target_link_libraries(benchmark_executable PRIVATE
+                          ${CMAKE_PROJECT_NAME})
+
+    target_compile_definitions(benchmark_executable PRIVATE
+                               BENCHMARK_RESOURCE_LOCATION="${CMAKE_CURRENT_SOURCE_DIR}/res")
+
+    configure_target(benchmark_executable)
+
+    add_target(benchmark
+               COMMAND $<TARGET_FILE:benchmark_executable>
+               DEPENDS benchmark_executable
+               WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+               USES_TERMINAL
+               COMMENT "Running benchmark...")
+endif()
+
 # Let libOpenCOR know whether unit testing is enabled.
 
 if(LIBOPENCOR_UNIT_TESTING)

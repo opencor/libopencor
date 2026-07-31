@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Configure our utilities.
+# Configure our utilities and benchmark.
 
 configure_file(utils.in.py ${PYTHON_BINDINGS_DIR}/utils.py)
+configure_file(benchmark.in.py ${PYTHON_BINDINGS_DIR}/benchmark.py)
 
 # Copy our Python files over.
 
@@ -52,3 +53,13 @@ if(PYTHON_UNIT_TESTING_REPORT_AVAILABLE)
                WORKING_DIRECTORY ${PYTHON_BINDINGS_DIR}
                COMMENT "Running Python unit testing report...")
 endif()
+
+# Run our Python benchmark (not part of the unit tests).
+
+add_target(python_benchmark
+           ${COMMANDS}
+           COMMAND ${PYTHON_EXE} benchmark.py
+           DEPENDS ${PYTHON_BINDINGS_TARGET}
+           USES_TERMINAL
+           WORKING_DIRECTORY ${PYTHON_BINDINGS_DIR}
+           COMMENT "Running Python benchmark...")

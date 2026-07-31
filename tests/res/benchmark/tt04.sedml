@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sedML level="1" version="3" xmlns="http://sed-ml.org/sed-ml/level1/version3" xmlns:cellml="http://www.cellml.org/cellml/1.0#">
+    <listOfModels>
+        <model id="model" language="urn:sedml:language:cellml.1_0" source="tt04.cellml"/>
+    </listOfModels>
+    <listOfSimulations>
+        <uniformTimeCourse id="simulation1" initialTime="0" numberOfPoints="3000" outputEndTime="3000" outputStartTime="0">
+            <algorithm kisaoID="KISAO:0000019">
+                <listOfAlgorithmParameters>
+                    <algorithmParameter kisaoID="KISAO:0000211" value="1e-07"/>
+                    <algorithmParameter kisaoID="KISAO:0000475" value="BDF"/>
+                    <algorithmParameter kisaoID="KISAO:0000481" value="true"/>
+                    <algorithmParameter kisaoID="KISAO:0000476" value="Newton"/>
+                    <algorithmParameter kisaoID="KISAO:0000477" value="Dense"/>
+                    <algorithmParameter kisaoID="KISAO:0000480" value="0"/>
+                    <algorithmParameter kisaoID="KISAO:0000415" value="500"/>
+                    <algorithmParameter kisaoID="KISAO:0000467" value="1"/>
+                    <algorithmParameter kisaoID="KISAO:0000478" value="Banded"/>
+                    <algorithmParameter kisaoID="KISAO:0000209" value="1e-07"/>
+                    <algorithmParameter kisaoID="KISAO:0000479" value="0"/>
+                </listOfAlgorithmParameters>
+            </algorithm>
+        </uniformTimeCourse>
+    </listOfSimulations>
+    <listOfTasks>
+        <repeatedTask id="repeatedTask" range="once" resetModel="true">
+            <listOfRanges>
+                <vectorRange id="once">
+                    <value> 1 </value>
+                </vectorRange>
+            </listOfRanges>
+            <listOfSubTasks>
+                <subTask order="1" task="task1"/>
+            </listOfSubTasks>
+        </repeatedTask>
+        <task id="task1" modelReference="model" simulationReference="simulation1"/>
+    </listOfTasks>
+    <listOfDataGenerators>
+        <dataGenerator id="xDataGenerator1_1">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> xVariable1_1 </ci>
+            </math>
+            <listOfVariables>
+                <variable id="xVariable1_1" target="/cellml:model/cellml:component[@name='environment']/cellml:variable[@name='time']" taskReference="repeatedTask"/>
+            </listOfVariables>
+        </dataGenerator>
+        <dataGenerator id="yDataGenerator1_1">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <ci> yVariable1_1 </ci>
+            </math>
+            <listOfVariables>
+                <variable id="yVariable1_1" target="/cellml:model/cellml:component[@name='membrane']/cellml:variable[@name='V']" taskReference="repeatedTask"/>
+            </listOfVariables>
+        </dataGenerator>
+    </listOfDataGenerators>
+    <listOfOutputs>
+        <plot2D id="plot1">
+            <annotation>
+                <properties version="2" xmlns="http://www.opencor.ws/">
+                    <backgroundColor>#ffffff</backgroundColor>
+                    <fontSize>10</fontSize>
+                    <foregroundColor>#000000</foregroundColor>
+                    <height>1</height>
+                    <gridLines>
+                        <style>dot</style>
+                        <width>1</width>
+                        <color>#a0a0a4</color>
+                    </gridLines>
+                    <legend>
+                        <fontSize>10</fontSize>
+                        <visible>true</visible>
+                    </legend>
+                    <pointCoordinates>
+                        <style>dash</style>
+                        <width>1</width>
+                        <color>#b0008080</color>
+                        <fontColor>#ffffff</fontColor>
+                        <fontSize>10</fontSize>
+                    </pointCoordinates>
+                    <surroundingArea>
+                        <backgroundColor>#ececec</backgroundColor>
+                        <foregroundColor>#000000</foregroundColor>
+                    </surroundingArea>
+                    <title/>
+                    <xAxis>
+                        <fontSize>10</fontSize>
+                        <logarithmicScale>false</logarithmicScale>
+                        <title/>
+                    </xAxis>
+                    <yAxis>
+                        <fontSize>10</fontSize>
+                        <logarithmicScale>false</logarithmicScale>
+                        <title/>
+                    </yAxis>
+                    <zoomRegion>
+                        <style>solid</style>
+                        <width>1</width>
+                        <color>#b0800000</color>
+                        <fontColor>#ffffff</fontColor>
+                        <fontSize>10</fontSize>
+                        <filled>true</filled>
+                        <fillColor>#30ffff00</fillColor>
+                    </zoomRegion>
+                </properties>
+            </annotation>
+            <listOfCurves>
+                <curve id="curve1_1" logX="false" logY="false" xDataReference="xDataGenerator1_1" yDataReference="yDataGenerator1_1">
+                    <annotation>
+                        <properties xmlns="http://www.opencor.ws/">
+                            <selected>true</selected>
+                            <title>V</title>
+                            <line>
+                                <style>solid</style>
+                                <width>2</width>
+                                <color>#0072bd</color>
+                            </line>
+                            <symbol>
+                                <style>none</style>
+                                <size>8</size>
+                                <color>#0072bd</color>
+                                <filled>true</filled>
+                                <fillColor>#ffffff</fillColor>
+                            </symbol>
+                        </properties>
+                    </annotation>
+                </curve>
+            </listOfCurves>
+        </plot2D>
+    </listOfOutputs>
+</sedML>

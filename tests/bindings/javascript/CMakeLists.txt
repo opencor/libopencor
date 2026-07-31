@@ -40,3 +40,12 @@ add_target(javascript_unit_testing
            DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
            USES_TERMINAL
            COMMENT "Running JavaScript unit testing...")
+
+# Run our JavaScript benchmark (not part of the unit tests).
+
+add_target(javascript_benchmark
+           COMMAND ${NODE_EXE} benchmark.js
+           DEPENDS ${JAVASCRIPT_BINDINGS_TARGET}
+           USES_TERMINAL
+           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+           COMMENT "Running JavaScript benchmark...")
