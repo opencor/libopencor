@@ -28,6 +28,7 @@ limitations under the License.
 #include "sunlinsol/sunlinsol_sptfqmr.h"
 #include "sunnonlinsol/sunnonlinsol_fixedpoint.h"
 
+#include <cmath>
 #include <utility>
 
 namespace libOpenCOR {
