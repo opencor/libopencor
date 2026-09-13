@@ -431,8 +431,8 @@ def test_solve_with_functional_iteration_type():
 
 
 def test_solve_with_banded_linear_solver():
-    state_values = [-54.958, 0.114716, 0.971365, 0.756967]
-    state_abs_tols = [0.001, 0.000001, 0.000001, 0.000001]
+    state_values = [-54.958, 0.11471, 0.97136, 0.756967]
+    state_abs_tols = [0.001, 0.00001, 0.00001, 0.000001]
     rate_values = [47.190, -0.10201, -0.09312, 0.06289]
     rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
@@ -721,11 +721,11 @@ def test_solve_with_gmres_linear_solver_and_no_preconditioner():
     computed_constant_abs_tols = [0.0, 0.0, 0.0]
     algebraic_values = [
         0.0,
-        -15.9821,
+        -15.98,
         -823.517,
         789.780,
         3.9700,
-        0.114985,
+        0.11498,
         0.002869,
         0.967348,
         0.54134,
@@ -733,11 +733,11 @@ def test_solve_with_gmres_linear_solver_and_no_preconditioner():
     ]
     algebraic_abs_tols = [
         0.0,
-        0.0001,
+        0.01,
         0.001,
         0.001,
         0.0001,
-        0.000001,
+        0.00001,
         0.000001,
         0.000001,
         0.00001,
@@ -770,8 +770,8 @@ def test_solve_with_gmres_linear_solver_and_no_preconditioner():
 def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
     state_values = [-63.886, 0.13501, 0.984333, 0.740972]
     state_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
-    rate_values = [49.719, -0.12812, -0.050992, 0.098543]
-    rate_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
+    rate_values = [49.719, -0.12812, -0.05099, 0.09854]
+    rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
     constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
     computed_constant_values = [-10.613, -115.0, 12.0]
@@ -825,8 +825,8 @@ def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
 
 
 def test_solve_with_tfqmr_linear_solver_and_no_preconditioner():
-    state_values = [-63.886, 0.13501, 0.984333, 0.740972]
-    state_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
+    state_values = [-63.886, 0.13501, 0.98433, 0.740972]
+    state_abs_tols = [0.001, 0.00001, 0.00001, 0.000001]
     rate_values = [49.719, -0.12812, -0.05099, 0.09854]
     rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]

@@ -24,58 +24,66 @@ if(LIBOPENCOR_PREBUILT_LLVMCLANG)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         05cd2766a9164a86fefeed6c54af6ff177024a70)
+                         f2cc407da19873669391aaee0cfa0de87bfd4e45)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     9b4c654acab324912b28f30765697477312a83cf)
+                                     38d26a253f5eddfa256be16adad7d1bd4434dd20)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     974ec78f371bf89ce5a475a0855fb428f5724cd6)
+                                     2e0ae5200b16854a5b74ee7482a26ee7700ee023)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     f57bcc2c99a3cddc423e09d06870ad4243e514bd)
+                                     8b0172b7de13c9a86735778edee503f4f2265a72)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     bd417f60cd0182a33ef4c4c20fc23c03ece70a58)
+                                     acd1aeac95765256cff01fca60b9ffff8f49c208)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 38cfd874eb9c386e6cfc978979d55fcfed210e3f)
+                                 573e4963e2c73e4ae5bac2f0fa3c37f370fd501b)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 de2862e2f2c238a122e2573e16af2bbcdc37d17f)
+                                 052828c7510107cddf01a119421e0f4d38435508)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 7cf85ece2ac15636c82e42d285fa4ab49420a8b3)
+                                 309840bef9888908789bdec3bf5e344aafcffc6f)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a439ad9559ea909f42c192ba1c2033bd0f564877)
+                                 a437231186bc1442c92e673f7da5e6fd5f8d8cd2)
             endif()
         endif()
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
-    # Note: libOpenCOR's WASM version doesn't use LLVM+Clang's typeinfo (e.g., the JIT parts of compiler.cpp are not
-    #       compiled for WebAssembly), so we can disable RTTI to reduce the size of our WASM package. On the other hand,
-    #       libOpenCOR's native versions do use LLVM+Clang's typeinfo (e.g., compiler.cpp instantiates LLVM+Clang
-    #       templates whose typeinfo references LLVM+Clang's own typeinfo), so we must enable RTTI for them.
+    # Note #1: we determine Clang's -cc1 arguments ourselves rather than have Clang's driver compute them for us (see
+    #          compiler.cpp), this so that we don't drag all of Clang's toolchains into libOpenCOR. So, we don't need
+    #          to build Clang's driver at all (see CLANG_ENABLE_DRIVER below).
+    # Note #2: we only ever compile code for the architecture that we run on, so we don't need the target support that
+    #          Clang would otherwise build for every single architecture that it knows about. CLANG_ENABLE_ALL_TARGETS
+    #          (see below) narrows it down to LLVM_TARGETS_TO_BUILD, which is why that variable must name exactly one
+    #          architecture.
+    # Note #3: libOpenCOR's WASM version doesn't use LLVM+Clang's typeinfo (e.g., the JIT parts of compiler.cpp are
+    #          not compiled for WebAssembly), so we can disable RTTI to reduce the size of our WASM package. On the
+    #          other hand, libOpenCOR's native versions do use LLVM+Clang's typeinfo (e.g., compiler.cpp instantiates
+    #          LLVM+Clang templates whose typeinfo references LLVM+Clang's own typeinfo), so we must enable RTTI for
+    #          them.
 
     if(EMSCRIPTEN)
         set(LLVM_TARGETS_TO_BUILD WebAssembly)
@@ -116,19 +124,19 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
         )
     endif()
 
-    # Build LLVM+Clang with size optimisation.
-    # Note: this doesn't affect the quality of the code that LLVM+Clang generates for us. It only affects its own size
-    #       and, to some extent, how fast it can compile code.
+    # Build our WASM version of LLVM+Clang with size optimisation.
+    # Note #1: this doesn't affect the quality of the code that LLVM+Clang generates for us. It only affects its own
+    #          size and, to some extent, how fast it can compile code.
+    # Note #2: we only do this for our WASM version, whose size is what matters most to us since our Web app
+    #          dynamically imports it. Our native versions keep LLVM+Clang's default release flags so that they
+    #          compile our models as fast as possible.
 
-    if(MSVC AND NOT EMSCRIPTEN)
-        set(LLVMCLANG_RELEASE_FLAGS "/O1 /DNDEBUG")
-    else()
-        set(LLVMCLANG_RELEASE_FLAGS "-Os -DNDEBUG")
+    if(EMSCRIPTEN)
+        set(LLVMCLANG_RELEASE_FLAGS
+            "-DCMAKE_CXX_FLAGS_RELEASE=-Oz -DNDEBUG"
+            "-DCMAKE_C_FLAGS_RELEASE=-Oz -DNDEBUG"
+        )
     endif()
-
-    # The patches to apply to LLVM+Clang.
-
-    file(GLOB_RECURSE LLVMCLANG_PATCH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/patches/*.patch")
 
     # Build LLVM+Clang.
 
@@ -140,10 +148,12 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             llvm
         PATCH_COMMAND
             ${CMAKE_COMMAND} -DLLVMCLANG_SOURCE_DIR=<SOURCE_DIR>
-                             -DLLVMCLANG_PATCH_FILES="${LLVMCLANG_PATCH_FILES}"
+                             -DLLVMCLANG_PATCHES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/patches
                              -P ${CMAKE_CURRENT_SOURCE_DIR}/applypatches.cmake
         CMAKE_ARGS
             -DCLANG_BUILD_TOOLS=OFF
+            -DCLANG_ENABLE_ALL_TARGETS=OFF
+            -DCLANG_ENABLE_DRIVER=OFF
             -DCLANG_ENABLE_INTERPRETER=OFF
             -DCLANG_ENABLE_LIBXML2=OFF
             -DCLANG_ENABLE_STATIC_ANALYZER=OFF
@@ -159,8 +169,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DCLANG_TOOL_HANDLE_LLVM_BUILD=OFF
             -DCLANG_TOOL_LIBCLANG_BUILD=OFF
             ${CMAKE_ARGS}
-            -DCMAKE_CXX_FLAGS_RELEASE=${LLVMCLANG_RELEASE_FLAGS}
-            -DCMAKE_C_FLAGS_RELEASE=${LLVMCLANG_RELEASE_FLAGS}
+            ${LLVMCLANG_RELEASE_FLAGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DLLVM_BUILD_LLVM_C_DYLIB=OFF
             -DLLVM_BUILD_RUNTIME=OFF
@@ -202,17 +211,6 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     )
 
     # Create our package.
-    # Note: we also package llvm-tblgen and clang-tblgen since we need them to build our JavaScript bindings.
-
-    if(NOT EMSCRIPTEN)
-        set(TABLEGEN_EXES_BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/build/LLVMClang-prefix/src/LLVMClang-build)
-
-        file(GLOB TABLEGEN_EXES "${TABLEGEN_EXES_BUILD_DIR}/bin/*tblgen")
-
-        foreach(TABLEGEN_EXE ${TABLEGEN_EXES})
-            file(COPY ${TABLEGEN_EXE} DESTINATION ${INSTALL_DIR}/bin)
-        endforeach()
-    endif()
 
     create_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                    ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
@@ -221,30 +219,52 @@ endif()
 
 # Make our package accessible.
 
+# The libraries that are specific to the platform for which we are building, i.e. the backend of the target for which
+# LLVM+Clang generates code and, for our native versions only, LLVM's ORC-based JIT (our WASM version doesn't JIT
+# anything; see compiler.cpp).
+# Note #1: we never assemble or disassemble any code, so we don't need our target's assembly parser or disassembler.
+#          As elsewhere in this file, the libraries that we explicitly don't want are commented out rather than
+#          omitted.
+# Note #2: we don't need Clang's driver since we determine Clang's -cc1 arguments ourselves (see compiler.cpp).
+#          clangOptions, which Clang's option table lives in and which clang::CompilerInvocation::CreateFromArgs()
+#          needs, is a separate library, so it stays. So does LLVMWindowsDriver, which, despite its name, is not
+#          only used by Clang's driver: LLVM's ORC-based JIT needs it to locate the MSVC toolchain.
+
 if(EMSCRIPTEN)
     set(EXTRA_LLVMCLANG_LIBRARIES
-        LLVMWebAssemblyAsmParser
+        # LLVMWebAssemblyAsmParser
         LLVMWebAssemblyCodeGen
         LLVMWebAssemblyDesc
-        LLVMWebAssemblyDisassembler
+        # LLVMWebAssemblyDisassembler
         LLVMWebAssemblyInfo
         LLVMWebAssemblyUtils
     )
 else()
+    set(EXTRA_LLVMCLANG_LIBRARIES
+        # clangDriver
+        LLVMExecutionEngine
+        LLVMJITLink
+        LLVMOrcJIT
+        LLVMOrcShared
+        LLVMOrcTargetProcess
+        LLVMRuntimeDyld
+        LLVMWindowsDriver
+    )
+
     if(INTEL_MODE)
-        set(EXTRA_LLVMCLANG_LIBRARIES
-            LLVMX86AsmParser
+        list(APPEND EXTRA_LLVMCLANG_LIBRARIES
+            # LLVMX86AsmParser
             LLVMX86CodeGen
             LLVMX86Desc
-            LLVMX86Disassembler
+            # LLVMX86Disassembler
             LLVMX86Info
         )
     else()
-        set(EXTRA_LLVMCLANG_LIBRARIES
-            LLVMAArch64AsmParser
+        list(APPEND EXTRA_LLVMCLANG_LIBRARIES
+            # LLVMAArch64AsmParser
             LLVMAArch64CodeGen
             LLVMAArch64Desc
-            LLVMAArch64Disassembler
+            # LLVMAArch64Disassembler
             LLVMAArch64Info
             LLVMAArch64Utils
         )
@@ -257,51 +277,61 @@ set(LLVMCLANG_CMAKE_DIRS ${INSTALL_DIR}/lib/cmake/llvm ${INSTALL_DIR}/lib/cmake/
 set(LLVMCLANG_CMAKE_PACKAGE_NAME Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(LLVMCLANG_CMAKE_PACKAGE_NAMES LLVM Clang CACHE INTERNAL "${PACKAGE_NAME}'s CMake package names.")
 set(LLVMCLANG_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
+
+# The LLVM+Clang libraries that libOpenCOR needs on every platform, i.e. all of them except for those that are only
+# used by LLVM+Clang's own tools and/or by libclang, none of which we use. Those are commented out below, so that it
+# is clear which libraries we explicitly don't want. The platform-specific ones are added through
+# EXTRA_LLVMCLANG_LIBRARIES above.
+# Note: this list is also what decides which of LLVM+Clang's archives get merged into our static native library (see
+#       src/CMakeLists.txt), so it must be the full transitive closure of the libraries that we link against, and not
+#       just those that we reference directly. This is why, for instance, LLVMSymbolize and the debug information
+#       libraries that it needs are in the list even though we never symbolise anything: LLVMProfileData, which
+#       clangCodeGen needs, depends on them.
+
 set(LLVMCLANG_LIBRARIES
     clangAnalysis
-    clangAnalysisFlowSensitive
-    clangAnalysisFlowSensitiveModels
+    # clangAnalysisFlowSensitive
+    # clangAnalysisFlowSensitiveModels
     clangAnalysisLifetimeSafety
-    clangAnalysisScalable
+    # clangAnalysisScalable
     clangAPINotes
     clangAST
     clangASTMatchers
     clangBasic
     clangCodeGen
-    clangCrossTU
-    clangDependencyScanning
-    clangDirectoryWatcher
-    clangDriver
-    clangDynamicASTMatchers
+    # clangCrossTU
+    # clangDependencyScanning
+    # clangDirectoryWatcher
+    # clangDynamicASTMatchers
     clangEdit
-    clangExtractAPI
-    clangFormat
+    # clangExtractAPI
+    # clangFormat
     clangFrontend
-    clangFrontendTool
-    clangIndex
-    clangIndexSerialization
-    clangInstallAPI
-    clangInterpreter
+    # clangFrontendTool
+    # clangIndex
+    # clangIndexSerialization
+    # clangInstallAPI
+    # clangInterpreter
     clangLex
     clangOptions
     clangParse
-    clangRewrite
-    clangRewriteFrontend
+    # clangRewrite
+    # clangRewriteFrontend
     clangSema
     clangSerialization
-    clangStaticAnalyzerCheckers
-    clangStaticAnalyzerCore
-    clangStaticAnalyzerFrontend
+    # clangStaticAnalyzerCheckers
+    # clangStaticAnalyzerCore
+    # clangStaticAnalyzerFrontend
     clangSupport
-    clangTooling
-    clangToolingASTDiff
-    clangToolingCore
-    clangToolingInclusions
-    clangToolingInclusionsStdlib
-    clangToolingRefactoring
-    clangToolingSyntax
-    clangTransformer
-    LLVMABI
+    # clangTooling
+    # clangToolingASTDiff
+    # clangToolingCore
+    # clangToolingInclusions
+    # clangToolingInclusionsStdlib
+    # clangToolingRefactoring
+    # clangToolingSyntax
+    # clangTransformer
+    # LLVMABI
     LLVMAggressiveInstCombine
     LLVMAnalysis
     LLVMAsmParser
@@ -310,9 +340,9 @@ set(LLVMCLANG_LIBRARIES
     LLVMBitReader
     LLVMBitstreamReader
     LLVMBitWriter
-    LLVMCAS
+    # LLVMCAS
     LLVMCFGuard
-    LLVMCFIVerify
+    # LLVMCFIVerify
     LLVMCGData
     LLVMCodeGen
     LLVMCodeGenTypes
@@ -321,89 +351,82 @@ set(LLVMCLANG_LIBRARIES
     LLVMCoverage
     LLVMDebugInfoBTF
     LLVMDebugInfoCodeView
-    LLVMDebuginfod
+    # LLVMDebuginfod
     LLVMDebugInfoDWARF
     LLVMDebugInfoDWARFLowLevel
     LLVMDebugInfoGSYM
-    LLVMDebugInfoLogicalView
+    # LLVMDebugInfoLogicalView
     LLVMDebugInfoMSF
     LLVMDebugInfoPDB
     LLVMDemangle
-    LLVMDiff
-    LLVMDlltoolDriver
-    LLVMDTLTO
-    LLVMDWARFCFIChecker
-    LLVMDWARFLinker
-    LLVMDWARFLinkerClassic
-    LLVMDWARFLinkerParallel
-    LLVMDWP
-    LLVMExecutionEngine
-    LLVMExegesis
+    # LLVMDiff
+    # LLVMDlltoolDriver
+    # LLVMDTLTO
+    # LLVMDWARFCFIChecker
+    # LLVMDWARFLinker
+    # LLVMDWARFLinkerClassic
+    # LLVMDWARFLinkerParallel
+    # LLVMDWP
+    # LLVMExegesis
     LLVMExtensions
-    LLVMFileCheck
+    # LLVMFileCheck
     LLVMFrontendAtomic
     LLVMFrontendDirective
     LLVMFrontendDriver
     LLVMFrontendHLSL
     LLVMFrontendOffloading
-    LLVMFrontendOpenACC
+    # LLVMFrontendOpenACC
     LLVMFrontendOpenMP
-    LLVMFuzzerCLI
-    LLVMFuzzMutate
+    # LLVMFuzzerCLI
+    # LLVMFuzzMutate
     LLVMGlobalISel
     LLVMHipStdPar
     LLVMInstCombine
     LLVMInstrumentation
-    LLVMInterfaceStub
-    LLVMInterpreter
+    # LLVMInterfaceStub
+    # LLVMInterpreter
     LLVMipo
     LLVMIRPrinter
     LLVMIRReader
-    LLVMJITLink
-    LLVMLibDriver
-    LLVMLineEditor
+    # LLVMLibDriver
+    # LLVMLineEditor
     LLVMLinker
     LLVMLTO
     LLVMMC
-    LLVMMCA
+    # LLVMMCA
     LLVMMCDisassembler
-    LLVMMCJIT
+    # LLVMMCJIT
     LLVMMCParser
-    LLVMMIRParser
+    # LLVMMIRParser
     LLVMObjCARCOpts
-    LLVMObjCopy
+    # LLVMObjCopy
     LLVMObject
     LLVMObjectYAML
-    LLVMOptDriver
+    # LLVMOptDriver
     LLVMOption
-    LLVMOrcDebugging
-    LLVMOrcJIT
-    LLVMOrcShared
-    LLVMOrcTargetProcess
+    # LLVMOrcDebugging
     LLVMPasses
     LLVMPlugins
     LLVMProfileData
     LLVMRemarks
-    LLVMRuntimeDyld
     LLVMSandboxIR
     LLVMScalarOpts
     LLVMSelectionDAG
     LLVMSupport
-    LLVMSupportLSP
+    # LLVMSupportLSP
     LLVMSymbolize
-    LLVMTableGen
-    LLVMTableGenBasic
-    LLVMTableGenCommon
+    # LLVMTableGen
+    # LLVMTableGenBasic
+    # LLVMTableGenCommon
     LLVMTarget
     LLVMTargetParser
-    LLVMTelemetry
+    # LLVMTelemetry
     LLVMTextAPI
-    LLVMTextAPIBinaryReader
+    # LLVMTextAPIBinaryReader
     LLVMTransformUtils
     LLVMVectorize
-    LLVMWindowsDriver
-    LLVMWindowsManifest
-    LLVMXRay
+    # LLVMWindowsManifest
+    # LLVMXRay
     ${EXTRA_LLVMCLANG_LIBRARIES}
     CACHE INTERNAL "${PACKAGE_NAME}'s libraries."
 )

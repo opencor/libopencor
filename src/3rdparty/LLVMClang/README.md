@@ -1,3 +1,13 @@
-libOpenCOR only needs a subset of the LLVM+Clang libraries, so we do everything we can to minimise the LLVM+Clang footprint.
+libOpenCOR only needs a subset of LLVM+Clang, so we do everything we can to minimise its footprint. This matters most to our WASM version since our Web app dynamically imports it, but our native versions benefit from it too since we merge LLVM+Clang into our static library.
 
-Otherwise, LLVM+Clang requires the changes captured in patches/llvm-lib-support-commandline.patch to build and work correctly with libOpenCOR.
+To this end, our WASM version of LLVM+Clang is built with size optimisation (`-Oz`) and without RTTI, while our native versions keep LLVM+Clang's default release flags so that they compile our models as fast as possible. Every version is built with only the backend of the target for which it generates code, and with the patches in `patches`, which are applied by `applypatches.cmake`:
+
+- `clang-optional-libraries.patch` adds four options, all `ON` by default so that LLVM+Clang otherwise builds exactly as it normally would:
+  - `CLANG_ENABLE_TOOLING_LIBS` and `CLANG_ENABLE_INTERPRETER` skip the clang libraries that only the clang tools and libclang need. The patch also makes `clangAnalysis` only build `MacroExpansionContext.cpp` when the tooling libraries are built, since that one file is what would otherwise make every clang embedder depend on `clangFormat` and `clangToolingCore`.
+  - `CLANG_ENABLE_DRIVER` skips Clang's driver, which we don't use (see below).
+  - `CLANG_ENABLE_ALL_TARGETS` narrows Clang's target support down to the one architecture named by `LLVM_TARGETS_TO_BUILD`. Indeed, Clang builds a `TargetInfo` (`clang/lib/Basic`) and a target code generation info (`clang/lib/CodeGen`) for every architecture that it knows about, whatever `LLVM_TARGETS_TO_BUILD` says, and the functions that allocate them reference all of them, so the linker cannot drop any of them.
+- `llvm-lib-support-commandline.patch` makes LLVM ignore, rather than report, an option that gets registered more than once.
+
+On top of this, we determine Clang's `-cc1` arguments ourselves rather than have Clang's driver compute them for us (see `src/misc/compiler.cpp`). Indeed, `clang::driver::Driver` references every single one of Clang's toolchains, which would otherwise all end up in libOpenCOR even though only one of them can ever run. Our code never includes a system header and we JIT the result (or, for our WASM version, emit it directly), so we don't need anything that the driver works out for us. On macOS, this also means that we no longer ask Xcode for an SDK path and a linker version every time we compile some code.
+
+Note that `clangOptions` (Clang's option table, which `clang::CompilerInvocation::CreateFromArgs()` needs) and `LLVMWindowsDriver` (which LLVM's ORC-based JIT uses to locate the MSVC toolchain) are separate libraries, so we still need both.

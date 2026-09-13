@@ -598,6 +598,8 @@ def test_sedml_file():
 </sedML>
 """
 
+    loc.FileManager.instance().reset()
+
     file = loc.File(utils.resource_path("cellml_2.sedml"))
     document = loc.SedDocument(file)
 

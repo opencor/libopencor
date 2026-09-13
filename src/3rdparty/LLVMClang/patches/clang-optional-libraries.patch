@@ -1,0 +1,775 @@
+diff --git a/clang/CMakeLists.txt b/clang/CMakeLists.txt
+index e4cb1a3..e5121e2 100644
+--- a/clang/CMakeLists.txt
++++ b/clang/CMakeLists.txt
+@@ -451,6 +451,26 @@ option(CLANG_ENABLE_STATIC_ANALYZER
+ 
+ option(CLANG_ENABLE_PROTO_FUZZER "Build Clang protobuf fuzzer." OFF)
+ 
++# libOpenCOR: allow the libraries that are only needed by the clang tools and/or libclang to be excluded from the
++# build. libOpenCOR only needs a small subset of the clang libraries, so it disables these options to minimise its
++# footprint. CLANG_ENABLE_DRIVER can also be disabled by an embedder that computes the -cc1 arguments itself, which
++# is what libOpenCOR does so as not to drag all of the clang toolchains into it.
++option(CLANG_ENABLE_DRIVER
++  "Build the clang driver library." ON)
++option(CLANG_ENABLE_INTERPRETER
++  "Build the clang interpreter library." ON)
++option(CLANG_ENABLE_TOOLING_LIBS
++  "Build the clang libraries that are only needed by the clang tools and libclang." ON)
++
++# libOpenCOR: clang builds a TargetInfo (clang/lib/Basic) and target code generation info (clang/lib/CodeGen) for
++# every architecture that it knows about, whatever LLVM_TARGETS_TO_BUILD says, and the functions that allocate them
++# reference all of them, so the linker cannot drop any. That is several megabytes of builtin, CPU and ABI tables that
++# an embedder which only ever compiles for the one architecture that it runs on, as libOpenCOR does, can never use.
++# When this option is disabled, the target support is narrowed down to LLVM_TARGETS_TO_BUILD, which must then name
++# exactly one of the architectures that clang/lib/Basic/CMakeLists.txt knows how to narrow down to.
++option(CLANG_ENABLE_ALL_TARGETS
++  "Build the target support for every architecture that clang knows about, rather than for LLVM_TARGETS_TO_BUILD only." ON)
++
+ if (DEFINED CLANG_ENABLE_ARCMT)
+   set(CLANG_ENABLE_OBJC_REWRITER ${CLANG_ENABLE_ARCMT})
+   message(DEPRECATION "'CLANG_ENABLE_ARCMT' is deprecated as ARCMigrate has been removed from Clang. Please use 'CLANG_ENABLE_OBJC_REWRITER' instead to enable or disable the Objective-C rewriter.")
+diff --git a/clang/lib/ASTMatchers/CMakeLists.txt b/clang/lib/ASTMatchers/CMakeLists.txt
+index 29ad27d..fd382d5 100644
+--- a/clang/lib/ASTMatchers/CMakeLists.txt
++++ b/clang/lib/ASTMatchers/CMakeLists.txt
+@@ -1,4 +1,6 @@
+-add_subdirectory(Dynamic)
++if(CLANG_ENABLE_TOOLING_LIBS)
++  add_subdirectory(Dynamic)
++endif()
+ 
+ set(LLVM_LINK_COMPONENTS
+   FrontendOpenMP
+diff --git a/clang/lib/Analysis/CMakeLists.txt b/clang/lib/Analysis/CMakeLists.txt
+index c41f1fd..519c418 100644
+--- a/clang/lib/Analysis/CMakeLists.txt
++++ b/clang/lib/Analysis/CMakeLists.txt
+@@ -3,6 +3,25 @@ set(LLVM_LINK_COMPONENTS
+   Support
+   )
+ 
++# libOpenCOR: MacroExpansionContext is only used by clangCrossTU and the static analyzer, yet it is what makes
++# clangAnalysis (which every clang embedder needs) depend on clangFormat and clangToolingCore. So, only build it when
++# the tooling libraries are built.
++
++if(CLANG_ENABLE_TOOLING_LIBS)
++  set(CLANG_ANALYSIS_TOOLING_SOURCES
++    MacroExpansionContext.cpp
++    )
++  set(CLANG_ANALYSIS_TOOLING_LIBS
++    clangFormat
++    clangToolingCore
++    )
++else()
++  # Let llvm_check_source_file_list() know that MacroExpansionContext.cpp is deliberately not built.
++  set(LLVM_OPTIONAL_SOURCES
++    MacroExpansionContext.cpp
++    )
++endif()
++
+ add_clang_library(clangAnalysis
+   AnalysisDeclContext.cpp
+   BodyFarm.cpp
+@@ -22,7 +41,6 @@ add_clang_library(clangAnalysis
+   IntervalPartition.cpp
+   IssueHash.cpp
+   LiveVariables.cpp
+-  MacroExpansionContext.cpp
+   ObjCNoReturn.cpp
+   PathDiagnostic.cpp
+   PostOrderCFGView.cpp
+@@ -35,14 +53,14 @@ add_clang_library(clangAnalysis
+   ThreadSafetyTIL.cpp
+   UninitializedValues.cpp
+   UnsafeBufferUsage.cpp
++  ${CLANG_ANALYSIS_TOOLING_SOURCES}
+ 
+   LINK_LIBS
+   clangAST
+   clangASTMatchers
+   clangBasic
+-  clangFormat
+   clangLex
+-  clangToolingCore
++  ${CLANG_ANALYSIS_TOOLING_LIBS}
+ 
+   DEPENDS
+   omp_gen
+@@ -50,6 +68,8 @@ add_clang_library(clangAnalysis
+   )
+ 
+ add_subdirectory(plugins)
+-add_subdirectory(FlowSensitive)
+ add_subdirectory(LifetimeSafety)
+-add_subdirectory(Scalable)
++if(CLANG_ENABLE_TOOLING_LIBS)
++  add_subdirectory(FlowSensitive)
++  add_subdirectory(Scalable)
++endif()
+diff --git a/clang/lib/Basic/CMakeLists.txt b/clang/lib/Basic/CMakeLists.txt
+index adfc6ee..c40e057 100644
+--- a/clang/lib/Basic/CMakeLists.txt
++++ b/clang/lib/Basic/CMakeLists.txt
+@@ -54,6 +54,70 @@ if(CLANG_VENDOR)
+     PROPERTIES COMPILE_DEFINITIONS "CLANG_VENDOR=\"${CLANG_VENDOR} \"")
+ endif()
+ 
++# libOpenCOR: clang always builds a TargetInfo for every architecture it knows about, whatever LLVM_TARGETS_TO_BUILD
++# says, and AllocateTarget() references all of them, so the linker cannot drop any. That is several megabytes of
++# builtin and CPU tables that an embedder which only ever compiles for one architecture can never use. So, allow the
++# target infos to be narrowed down to the one architecture named by LLVM_TARGETS_TO_BUILD.
++# Note: OSTargets.cpp is needed whatever the architecture. Its AArch64.h include is unused, so it does not bring the
++#       AArch64 target info back in.
++
++if(CLANG_ENABLE_ALL_TARGETS)
++  set(CLANG_BASIC_TARGET_SOURCES
++    Targets/AArch64.cpp
++    Targets/AMDGPU.cpp
++    Targets/ARC.cpp
++    Targets/ARM.cpp
++    Targets/AVR.cpp
++    Targets/BPF.cpp
++    Targets/CSKY.cpp
++    Targets/DirectX.cpp
++    Targets/Hexagon.cpp
++    Targets/Lanai.cpp
++    Targets/LoongArch.cpp
++    Targets/M68k.cpp
++    Targets/MSP430.cpp
++    Targets/Mips.cpp
++    Targets/NVPTX.cpp
++    Targets/OSTargets.cpp
++    Targets/PPC.cpp
++    Targets/RISCV.cpp
++    Targets/SPIR.cpp
++    Targets/Sparc.cpp
++    Targets/SystemZ.cpp
++    Targets/TCE.cpp
++    Targets/VE.cpp
++    Targets/WebAssembly.cpp
++    Targets/X86.cpp
++    Targets/XCore.cpp
++    Targets/Xtensa.cpp
++    )
++elseif("${LLVM_TARGETS_TO_BUILD}" STREQUAL "AArch64")
++  set(CLANG_BASIC_TARGET_SOURCES
++    Targets/AArch64.cpp
++    Targets/OSTargets.cpp
++    )
++
++  add_compile_definitions(CLANG_SINGLE_TARGET_ONLY CLANG_AARCH64_TARGET_ONLY)
++elseif("${LLVM_TARGETS_TO_BUILD}" STREQUAL "X86")
++  set(CLANG_BASIC_TARGET_SOURCES
++    Targets/OSTargets.cpp
++    Targets/X86.cpp
++    )
++
++  add_compile_definitions(CLANG_SINGLE_TARGET_ONLY CLANG_X86_TARGET_ONLY)
++elseif("${LLVM_TARGETS_TO_BUILD}" STREQUAL "WebAssembly")
++  set(CLANG_BASIC_TARGET_SOURCES
++    Targets/OSTargets.cpp
++    Targets/WebAssembly.cpp
++    )
++
++  add_compile_definitions(CLANG_SINGLE_TARGET_ONLY CLANG_WEBASSEMBLY_TARGET_ONLY)
++else()
++  message(FATAL_ERROR
++          "CLANG_ENABLE_ALL_TARGETS is disabled, so LLVM_TARGETS_TO_BUILD must name exactly one of AArch64, X86 and "
++          "WebAssembly, while it is '${LLVM_TARGETS_TO_BUILD}'.")
++endif()
++
+ add_clang_library(clangBasic
+   ASTSourceDescriptor.cpp
+   Attributes.cpp
+@@ -95,33 +159,7 @@ add_clang_library(clangBasic
+   TargetID.cpp
+   TargetInfo.cpp
+   Targets.cpp
+-  Targets/AArch64.cpp
+-  Targets/AMDGPU.cpp
+-  Targets/ARC.cpp
+-  Targets/ARM.cpp
+-  Targets/AVR.cpp
+-  Targets/BPF.cpp
+-  Targets/CSKY.cpp
+-  Targets/DirectX.cpp
+-  Targets/Hexagon.cpp
+-  Targets/Lanai.cpp
+-  Targets/LoongArch.cpp
+-  Targets/M68k.cpp
+-  Targets/MSP430.cpp
+-  Targets/Mips.cpp
+-  Targets/NVPTX.cpp
+-  Targets/OSTargets.cpp
+-  Targets/PPC.cpp
+-  Targets/RISCV.cpp
+-  Targets/SPIR.cpp
+-  Targets/Sparc.cpp
+-  Targets/SystemZ.cpp
+-  Targets/TCE.cpp
+-  Targets/VE.cpp
+-  Targets/WebAssembly.cpp
+-  Targets/X86.cpp
+-  Targets/XCore.cpp
+-  Targets/Xtensa.cpp
++  ${CLANG_BASIC_TARGET_SOURCES}
+   TokenKinds.cpp
+   TypeTraits.cpp
+   Version.cpp
+diff --git a/clang/lib/Basic/Targets.cpp b/clang/lib/Basic/Targets.cpp
+index 2632539..24e0d6b 100644
+--- a/clang/lib/Basic/Targets.cpp
++++ b/clang/lib/Basic/Targets.cpp
+@@ -112,6 +112,274 @@ std::unique_ptr<TargetInfo> AllocateTarget(const llvm::Triple &Triple,
+                                            const TargetOptions &Opts) {
+   llvm::Triple::OSType os = Triple.getOS();
+ 
++#ifdef CLANG_SINGLE_TARGET_ONLY
++  // libOpenCOR: only one architecture can ever be targeted (see clang/lib/Basic/CMakeLists.txt), so the arms below
++  // are verbatim copies of that architecture's arms in the full switch that follows. Every other architecture
++  // returns nullptr, which is exactly what the full switch does for an architecture that clang has no target for.
++
++  switch (Triple.getArch()) {
++  default:
++    return nullptr;
++
++#ifdef CLANG_AARCH64_TARGET_ONLY
++  case llvm::Triple::aarch64_32:
++    if (Triple.isOSDarwin())
++      return std::make_unique<DarwinAArch64TargetInfo>(Triple, Opts);
++    else if (Triple.isAppleMachO())
++      return std::make_unique<AppleMachOAArch64TargetInfo>(Triple, Opts);
++
++    return nullptr;
++  case llvm::Triple::aarch64:
++    if (Triple.isOSDarwin())
++      return std::make_unique<DarwinAArch64TargetInfo>(Triple, Opts);
++    else if (Triple.isAppleMachO())
++      return std::make_unique<AppleMachOAArch64TargetInfo>(Triple, Opts);
++
++    switch (os) {
++    case llvm::Triple::FreeBSD:
++      return std::make_unique<FreeBSDTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                      Opts);
++    case llvm::Triple::Fuchsia:
++      return std::make_unique<FuchsiaTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                      Opts);
++    case llvm::Triple::Haiku:
++      return std::make_unique<HaikuTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                    Opts);
++    case llvm::Triple::Linux:
++      switch (Triple.getEnvironment()) {
++      default:
++        return std::make_unique<LinuxTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                      Opts);
++      case llvm::Triple::OpenHOS:
++        return std::make_unique<OHOSTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                     Opts);
++      }
++    case llvm::Triple::Managarm:
++      return std::make_unique<ManagarmTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                       Opts);
++    case llvm::Triple::NetBSD:
++      return std::make_unique<NetBSDTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                     Opts);
++    case llvm::Triple::OpenBSD:
++      return std::make_unique<OpenBSDTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                      Opts);
++    case llvm::Triple::Hurd:
++      return std::make_unique<HurdTargetInfo<AArch64leTargetInfo>>(Triple,
++                                                                   Opts);
++    case llvm::Triple::Win32:
++      switch (Triple.getEnvironment()) {
++      case llvm::Triple::GNU:
++        return std::make_unique<MinGWARM64TargetInfo>(Triple, Opts);
++      case llvm::Triple::MSVC:
++      default: // Assume MSVC for unknown environments
++        return std::make_unique<MicrosoftARM64TargetInfo>(Triple, Opts);
++      }
++    default:
++      return std::make_unique<AArch64leTargetInfo>(Triple, Opts);
++    }
++
++  case llvm::Triple::aarch64_be:
++    switch (os) {
++    case llvm::Triple::FreeBSD:
++      return std::make_unique<FreeBSDTargetInfo<AArch64beTargetInfo>>(Triple,
++                                                                      Opts);
++    case llvm::Triple::Fuchsia:
++      return std::make_unique<FuchsiaTargetInfo<AArch64beTargetInfo>>(Triple,
++                                                                      Opts);
++    case llvm::Triple::Linux:
++      return std::make_unique<LinuxTargetInfo<AArch64beTargetInfo>>(Triple,
++                                                                    Opts);
++    case llvm::Triple::NetBSD:
++      return std::make_unique<NetBSDTargetInfo<AArch64beTargetInfo>>(Triple,
++                                                                     Opts);
++    default:
++      return std::make_unique<AArch64beTargetInfo>(Triple, Opts);
++    }
++#endif
++
++#ifdef CLANG_X86_TARGET_ONLY
++  case llvm::Triple::x86:
++    if (Triple.isOSDarwin())
++      return std::make_unique<DarwinI386TargetInfo>(Triple, Opts);
++    else if (Triple.isAppleMachO())
++      return std::make_unique<AppleMachOI386TargetInfo>(Triple, Opts);
++
++    switch (os) {
++    case llvm::Triple::Linux: {
++      switch (Triple.getEnvironment()) {
++      default:
++        return std::make_unique<LinuxTargetInfo<X86_32TargetInfo>>(Triple,
++                                                                   Opts);
++      case llvm::Triple::Android:
++        return std::make_unique<AndroidX86_32TargetInfo>(Triple, Opts);
++      }
++    }
++    case llvm::Triple::DragonFly:
++      return std::make_unique<DragonFlyBSDTargetInfo<X86_32TargetInfo>>(Triple,
++                                                                        Opts);
++    case llvm::Triple::NetBSD:
++      return std::make_unique<NetBSDI386TargetInfo>(Triple, Opts);
++    case llvm::Triple::OpenBSD:
++      return std::make_unique<OpenBSDI386TargetInfo>(Triple, Opts);
++    case llvm::Triple::FreeBSD:
++      return std::make_unique<FreeBSDTargetInfo<X86_32TargetInfo>>(Triple,
++                                                                   Opts);
++    case llvm::Triple::Fuchsia:
++      return std::make_unique<FuchsiaTargetInfo<X86_32TargetInfo>>(Triple,
++                                                                   Opts);
++    case llvm::Triple::KFreeBSD:
++      return std::make_unique<KFreeBSDTargetInfo<X86_32TargetInfo>>(Triple,
++                                                                    Opts);
++    case llvm::Triple::Solaris:
++      return std::make_unique<SolarisTargetInfo<X86_32TargetInfo>>(Triple,
++                                                                   Opts);
++    case llvm::Triple::Win32: {
++      switch (Triple.getEnvironment()) {
++      case llvm::Triple::Cygnus:
++        return std::make_unique<CygwinX86_32TargetInfo>(Triple, Opts);
++      case llvm::Triple::GNU:
++        return std::make_unique<MinGWX86_32TargetInfo>(Triple, Opts);
++      case llvm::Triple::Itanium:
++      case llvm::Triple::MSVC:
++      default: // Assume MSVC for unknown environments
++        return std::make_unique<MicrosoftX86_32TargetInfo>(Triple, Opts);
++      }
++    }
++    case llvm::Triple::Haiku:
++      return std::make_unique<HaikuX86_32TargetInfo>(Triple, Opts);
++    case llvm::Triple::RTEMS:
++      return std::make_unique<RTEMSX86_32TargetInfo>(Triple, Opts);
++    case llvm::Triple::ELFIAMCU:
++      return std::make_unique<MCUX86_32TargetInfo>(Triple, Opts);
++    case llvm::Triple::Hurd:
++      return std::make_unique<HurdTargetInfo<X86_32TargetInfo>>(Triple, Opts);
++    default:
++      return std::make_unique<X86_32TargetInfo>(Triple, Opts);
++    }
++
++  case llvm::Triple::x86_64:
++    if (Triple.isOSDarwin() || Triple.isOSBinFormatMachO())
++      return std::make_unique<DarwinX86_64TargetInfo>(Triple, Opts);
++
++    switch (os) {
++    case llvm::Triple::Linux: {
++      switch (Triple.getEnvironment()) {
++      default:
++        return std::make_unique<LinuxTargetInfo<X86_64TargetInfo>>(Triple,
++                                                                   Opts);
++      case llvm::Triple::Android:
++        return std::make_unique<AndroidX86_64TargetInfo>(Triple, Opts);
++      case llvm::Triple::OpenHOS:
++        return std::make_unique<OHOSX86_64TargetInfo>(Triple, Opts);
++      }
++    }
++    case llvm::Triple::DragonFly:
++      return std::make_unique<DragonFlyBSDTargetInfo<X86_64TargetInfo>>(Triple,
++                                                                        Opts);
++    case llvm::Triple::NetBSD:
++      return std::make_unique<NetBSDTargetInfo<X86_64TargetInfo>>(Triple, Opts);
++    case llvm::Triple::OpenBSD:
++      return std::make_unique<OpenBSDX86_64TargetInfo>(Triple, Opts);
++    case llvm::Triple::FreeBSD:
++      return std::make_unique<FreeBSDTargetInfo<X86_64TargetInfo>>(Triple,
++                                                                   Opts);
++    case llvm::Triple::Fuchsia:
++      return std::make_unique<FuchsiaTargetInfo<X86_64TargetInfo>>(Triple,
++                                                                   Opts);
++    case llvm::Triple::KFreeBSD:
++      return std::make_unique<KFreeBSDTargetInfo<X86_64TargetInfo>>(Triple,
++                                                                    Opts);
++    case llvm::Triple::Solaris:
++      return std::make_unique<SolarisTargetInfo<X86_64TargetInfo>>(Triple,
++                                                                   Opts);
++    case llvm::Triple::UEFI:
++      return std::make_unique<UEFIX86_64TargetInfo>(Triple, Opts);
++
++    case llvm::Triple::Win32: {
++      switch (Triple.getEnvironment()) {
++      case llvm::Triple::Cygnus:
++        return std::make_unique<CygwinX86_64TargetInfo>(Triple, Opts);
++      case llvm::Triple::GNU:
++        return std::make_unique<MinGWX86_64TargetInfo>(Triple, Opts);
++      case llvm::Triple::MSVC:
++      default: // Assume MSVC for unknown environments
++        return std::make_unique<MicrosoftX86_64TargetInfo>(Triple, Opts);
++      }
++    }
++    case llvm::Triple::Haiku:
++      return std::make_unique<HaikuTargetInfo<X86_64TargetInfo>>(Triple, Opts);
++    case llvm::Triple::PS4:
++      return std::make_unique<PS4OSTargetInfo<X86_64TargetInfo>>(Triple, Opts);
++    case llvm::Triple::PS5:
++      return std::make_unique<PS5OSTargetInfo<X86_64TargetInfo>>(Triple, Opts);
++    case llvm::Triple::Hurd:
++      return std::make_unique<HurdTargetInfo<X86_64TargetInfo>>(Triple, Opts);
++    case llvm::Triple::Managarm:
++      return std::make_unique<ManagarmTargetInfo<X86_64TargetInfo>>(Triple,
++                                                                    Opts);
++    default:
++      return std::make_unique<X86_64TargetInfo>(Triple, Opts);
++    }
++#endif
++
++#ifdef CLANG_WEBASSEMBLY_TARGET_ONLY
++  case llvm::Triple::wasm32:
++    if (Triple.getSubArch() != llvm::Triple::NoSubArch ||
++        Triple.getVendor() != llvm::Triple::UnknownVendor ||
++        !Triple.isOSBinFormatWasm())
++      return nullptr;
++    switch (os) {
++    case llvm::Triple::WASI: // Treat "wasi" as "wasip1" for now.
++    case llvm::Triple::WASIp1:
++      return std::make_unique<WASIP1TargetInfo<WebAssembly32TargetInfo>>(Triple,
++                                                                         Opts);
++    case llvm::Triple::WASIp2:
++      return std::make_unique<WASIP2TargetInfo<WebAssembly32TargetInfo>>(Triple,
++                                                                         Opts);
++    case llvm::Triple::WASIp3:
++      return std::make_unique<WASIP3TargetInfo<WebAssembly32TargetInfo>>(Triple,
++                                                                         Opts);
++    case llvm::Triple::Emscripten:
++      return std::make_unique<EmscriptenTargetInfo<WebAssembly32TargetInfo>>(
++          Triple, Opts);
++
++      case llvm::Triple::Linux:
++        return std::make_unique<WALITargetInfo<WebAssembly32TargetInfo>>(Triple,
++                                                                         Opts);
++      case llvm::Triple::UnknownOS:
++      return std::make_unique<WebAssemblyOSTargetInfo<WebAssembly32TargetInfo>>(
++          Triple, Opts);
++      default:
++        return nullptr;
++    }
++  case llvm::Triple::wasm64:
++    if (Triple.getSubArch() != llvm::Triple::NoSubArch ||
++        Triple.getVendor() != llvm::Triple::UnknownVendor ||
++        !Triple.isOSBinFormatWasm())
++      return nullptr;
++    switch (os) {
++    case llvm::Triple::WASI: // Treat "wasi" as "wasip1" for now.
++    case llvm::Triple::WASIp1:
++      return std::make_unique<WASIP1TargetInfo<WebAssembly64TargetInfo>>(Triple,
++                                                                         Opts);
++    case llvm::Triple::WASIp2:
++      return std::make_unique<WASIP2TargetInfo<WebAssembly64TargetInfo>>(Triple,
++                                                                         Opts);
++    case llvm::Triple::WASIp3:
++      return std::make_unique<WASIP3TargetInfo<WebAssembly64TargetInfo>>(Triple,
++                                                                         Opts);
++    case llvm::Triple::Emscripten:
++      return std::make_unique<EmscriptenTargetInfo<WebAssembly64TargetInfo>>(
++          Triple, Opts);
++      case llvm::Triple::UnknownOS:
++      return std::make_unique<WebAssemblyOSTargetInfo<WebAssembly64TargetInfo>>(
++          Triple, Opts);
++      default:
++        return nullptr;
++    }
++#endif
++  }
++#else
+   switch (Triple.getArch()) {
+   default:
+     return nullptr;
+@@ -796,6 +1064,7 @@ std::unique_ptr<TargetInfo> AllocateTarget(const llvm::Triple &Triple,
+   case llvm::Triple::xtensa:
+     return std::make_unique<XtensaTargetInfo>(Triple, Opts);
+   }
++#endif
+ }
+ } // namespace targets
+ } // namespace clang
+diff --git a/clang/lib/CMakeLists.txt b/clang/lib/CMakeLists.txt
+index 2fc69e4..eccec9c 100644
+--- a/clang/lib/CMakeLists.txt
++++ b/clang/lib/CMakeLists.txt
+@@ -5,30 +5,44 @@ add_subdirectory(Lex)
+ add_subdirectory(Parse)
+ add_subdirectory(AST)
+ add_subdirectory(ASTMatchers)
+-add_subdirectory(CrossTU)
++if(CLANG_ENABLE_TOOLING_LIBS)
++  add_subdirectory(CrossTU)
++endif()
+ add_subdirectory(Sema)
+ add_subdirectory(CodeGen)
+ add_subdirectory(Analysis)
+ add_subdirectory(Edit)
+-add_subdirectory(ExtractAPI)
+-add_subdirectory(Rewrite)
+-add_subdirectory(Driver)
++if(CLANG_ENABLE_TOOLING_LIBS)
++  add_subdirectory(ExtractAPI)
++  add_subdirectory(Rewrite)
++endif()
++if(CLANG_ENABLE_DRIVER)
++  add_subdirectory(Driver)
++endif()
+ add_subdirectory(Options)
+ add_subdirectory(Serialization)
+ add_subdirectory(Frontend)
+-add_subdirectory(FrontendTool)
+-add_subdirectory(Tooling)
+-add_subdirectory(DependencyScanning)
+-add_subdirectory(DirectoryWatcher)
+-add_subdirectory(Index)
+-add_subdirectory(IndexSerialization)
+-add_subdirectory(InstallAPI)
+-add_subdirectory(StaticAnalyzer)
+-add_subdirectory(Format)
++if(CLANG_ENABLE_TOOLING_LIBS)
++  add_subdirectory(FrontendTool)
++  add_subdirectory(Tooling)
++  add_subdirectory(DependencyScanning)
++  add_subdirectory(DirectoryWatcher)
++  add_subdirectory(Index)
++  add_subdirectory(IndexSerialization)
++  add_subdirectory(InstallAPI)
++endif()
++if(CLANG_ENABLE_STATIC_ANALYZER)
++  add_subdirectory(StaticAnalyzer)
++endif()
++if(CLANG_ENABLE_TOOLING_LIBS)
++  add_subdirectory(Format)
++endif()
+ if(CLANG_INCLUDE_TESTS)
+   add_subdirectory(Testing)
+ endif()
+-add_subdirectory(Interpreter)
++if(CLANG_ENABLE_INTERPRETER)
++  add_subdirectory(Interpreter)
++endif()
+ add_subdirectory(Support)
+ 
+ if(CLANG_ENABLE_CIR)
+diff --git a/clang/lib/CodeGen/CMakeLists.txt b/clang/lib/CodeGen/CMakeLists.txt
+index dbbc35b..abf0ec1 100644
+--- a/clang/lib/CodeGen/CMakeLists.txt
++++ b/clang/lib/CodeGen/CMakeLists.txt
+@@ -55,6 +55,71 @@ if(MSVC AND NOT CMAKE_CXX_COMPILER_ID MATCHES Clang
+   endif()
+ endif()
+ 
++# libOpenCOR: as in clang/lib/Basic, clang builds the target-specific ABI/code generation info for every architecture
++# it knows about and createTargetCodeGenInfo() references all of them, so the linker cannot drop any. See
++# CLANG_ENABLE_ALL_TARGETS in clang/lib/Basic/CMakeLists.txt, where that option is declared.
++# Note: AMDGPU.cpp, NVPTX.cpp and SPIR.cpp are kept whatever the architecture that we narrow down to. They don't only
++#       provide their target's code generation info: they also define CodeGenModule::handleAMDGPU*Attr(),
++#       CodeGenModule::handleCUDALaunchBoundsAttr() and computeSPIRKernelABIInfo(), which CGOpenMPRuntime.cpp and
++#       CGCall.cpp call unconditionally.
++
++if(CLANG_ENABLE_ALL_TARGETS)
++  set(CLANG_CODEGEN_TARGET_SOURCES
++    Targets/AArch64.cpp
++    Targets/AMDGPU.cpp
++    Targets/ARC.cpp
++    Targets/ARM.cpp
++    Targets/AVR.cpp
++    Targets/BPF.cpp
++    Targets/CSKY.cpp
++    Targets/DirectX.cpp
++    Targets/Hexagon.cpp
++    Targets/Lanai.cpp
++    Targets/LoongArch.cpp
++    Targets/M68k.cpp
++    Targets/MSP430.cpp
++    Targets/Mips.cpp
++    Targets/NVPTX.cpp
++    Targets/PPC.cpp
++    Targets/RISCV.cpp
++    Targets/SPIR.cpp
++    Targets/Sparc.cpp
++    Targets/SystemZ.cpp
++    Targets/TCE.cpp
++    Targets/VE.cpp
++    Targets/WebAssembly.cpp
++    Targets/X86.cpp
++    Targets/XCore.cpp
++    )
++else()
++  set(CLANG_CODEGEN_TARGET_SOURCES
++    Targets/AMDGPU.cpp
++    Targets/NVPTX.cpp
++    Targets/SPIR.cpp
++    )
++
++  if("${LLVM_TARGETS_TO_BUILD}" STREQUAL "AArch64")
++    # Note: X86.cpp is needed too. AArch64.cpp calls createWinX86_64TargetCodeGenInfo() for ARM64EC and
++    #       TargetCodeGenInfo::qualifyWindowsLibrary(), which X86.cpp defines.
++
++    list(APPEND CLANG_CODEGEN_TARGET_SOURCES Targets/AArch64.cpp Targets/X86.cpp)
++
++    add_compile_definitions(CLANG_SINGLE_TARGET_ONLY CLANG_AARCH64_TARGET_ONLY)
++  elseif("${LLVM_TARGETS_TO_BUILD}" STREQUAL "X86")
++    list(APPEND CLANG_CODEGEN_TARGET_SOURCES Targets/X86.cpp)
++
++    add_compile_definitions(CLANG_SINGLE_TARGET_ONLY CLANG_X86_TARGET_ONLY)
++  elseif("${LLVM_TARGETS_TO_BUILD}" STREQUAL "WebAssembly")
++    list(APPEND CLANG_CODEGEN_TARGET_SOURCES Targets/WebAssembly.cpp)
++
++    add_compile_definitions(CLANG_SINGLE_TARGET_ONLY CLANG_WEBASSEMBLY_TARGET_ONLY)
++  else()
++    message(FATAL_ERROR
++            "CLANG_ENABLE_ALL_TARGETS is disabled, so LLVM_TARGETS_TO_BUILD must name exactly one of AArch64, X86 "
++            "and WebAssembly, while it is '${LLVM_TARGETS_TO_BUILD}'.")
++  endif()
++endif()
++
+ add_clang_library(clangCodeGen
+   ABIInfo.cpp
+   ABIInfoImpl.cpp
+@@ -130,31 +195,7 @@ add_clang_library(clangCodeGen
+   TargetBuiltins/WebAssembly.cpp
+   TargetBuiltins/X86.cpp
+   TargetInfo.cpp
+-  Targets/AArch64.cpp
+-  Targets/AMDGPU.cpp
+-  Targets/ARC.cpp
+-  Targets/ARM.cpp
+-  Targets/AVR.cpp
+-  Targets/BPF.cpp
+-  Targets/CSKY.cpp
+-  Targets/DirectX.cpp
+-  Targets/Hexagon.cpp
+-  Targets/Lanai.cpp
+-  Targets/LoongArch.cpp
+-  Targets/M68k.cpp
+-  Targets/MSP430.cpp
+-  Targets/Mips.cpp
+-  Targets/NVPTX.cpp
+-  Targets/PPC.cpp
+-  Targets/RISCV.cpp
+-  Targets/SPIR.cpp
+-  Targets/Sparc.cpp
+-  Targets/SystemZ.cpp
+-  Targets/TCE.cpp
+-  Targets/VE.cpp
+-  Targets/WebAssembly.cpp
+-  Targets/X86.cpp
+-  Targets/XCore.cpp
++  ${CLANG_CODEGEN_TARGET_SOURCES}
+   TrapReasonBuilder.cpp
+   VarBypassDetector.cpp
+ 
+diff --git a/clang/lib/CodeGen/CodeGenModule.cpp b/clang/lib/CodeGen/CodeGenModule.cpp
+index 85ed38f..74edf3e 100644
+--- a/clang/lib/CodeGen/CodeGenModule.cpp
++++ b/clang/lib/CodeGen/CodeGenModule.cpp
+@@ -113,6 +113,72 @@ createTargetCodeGenInfo(CodeGenModule &CGM) {
+   const llvm::Triple &Triple = Target.getTriple();
+   const CodeGenOptions &CodeGenOpts = CGM.getCodeGenOpts();
+ 
++#ifdef CLANG_SINGLE_TARGET_ONLY
++  // libOpenCOR: only one architecture can ever be targeted (see clang/lib/CodeGen/CMakeLists.txt), so the arms below
++  // are verbatim copies of that architecture's arms in the full switch that follows.
++
++  switch (Triple.getArch()) {
++  default:
++    return createDefaultTargetCodeGenInfo(CGM);
++
++#ifdef CLANG_AARCH64_TARGET_ONLY
++  case llvm::Triple::aarch64:
++  case llvm::Triple::aarch64_32:
++  case llvm::Triple::aarch64_be: {
++    AArch64ABIKind Kind = AArch64ABIKind::AAPCS;
++    if (Target.getABI() == "darwinpcs")
++      Kind = AArch64ABIKind::DarwinPCS;
++    else if (Triple.isOSWindows())
++      return createWindowsAArch64TargetCodeGenInfo(CGM, AArch64ABIKind::Win64);
++    else if (Target.getABI() == "aapcs-soft")
++      Kind = AArch64ABIKind::AAPCSSoft;
++
++    return createAArch64TargetCodeGenInfo(CGM, Kind);
++  }
++#endif
++
++#ifdef CLANG_X86_TARGET_ONLY
++  case llvm::Triple::x86: {
++    bool IsDarwinVectorABI = Triple.isOSDarwin();
++    bool IsWin32FloatStructABI = Triple.isOSWindows() && !Triple.isOSCygMing();
++
++    if (Triple.getOS() == llvm::Triple::Win32) {
++      return createWinX86_32TargetCodeGenInfo(
++          CGM, IsDarwinVectorABI, IsWin32FloatStructABI,
++          CodeGenOpts.NumRegisterParameters);
++    }
++    return createX86_32TargetCodeGenInfo(
++        CGM, IsDarwinVectorABI, IsWin32FloatStructABI,
++        CodeGenOpts.NumRegisterParameters, CodeGenOpts.FloatABI == "soft");
++  }
++
++  case llvm::Triple::x86_64: {
++    StringRef ABI = Target.getABI();
++    X86AVXABILevel AVXLevel = (ABI == "avx512" ? X86AVXABILevel::AVX512
++                               : ABI == "avx"  ? X86AVXABILevel::AVX
++                                               : X86AVXABILevel::None);
++
++    switch (Triple.getOS()) {
++    case llvm::Triple::UEFI:
++    case llvm::Triple::Win32:
++      return createWinX86_64TargetCodeGenInfo(CGM, AVXLevel);
++    default:
++      return createX86_64TargetCodeGenInfo(CGM, AVXLevel);
++    }
++  }
++#endif
++
++#ifdef CLANG_WEBASSEMBLY_TARGET_ONLY
++  case llvm::Triple::wasm32:
++  case llvm::Triple::wasm64: {
++    WebAssemblyABIKind Kind = WebAssemblyABIKind::MVP;
++    if (Target.getABI() == "experimental-mv")
++      Kind = WebAssemblyABIKind::ExperimentalMV;
++    return createWebAssemblyTargetCodeGenInfo(CGM, Kind);
++  }
++#endif
++  }
++#else
+   switch (Triple.getArch()) {
+   default:
+     return createDefaultTargetCodeGenInfo(CGM);
+@@ -324,6 +390,7 @@ createTargetCodeGenInfo(CodeGenModule &CGM) {
+         CGM, Target.getPointerWidth(LangAS::Default), ABIFRLen);
+   }
+   }
++#endif
+ }
+ 
+ const TargetCodeGenInfo &CodeGenModule::getTargetCodeGenInfo() {
+diff --git a/clang/lib/Frontend/CMakeLists.txt b/clang/lib/Frontend/CMakeLists.txt
+index c40baa3..9378c93 100644
+--- a/clang/lib/Frontend/CMakeLists.txt
++++ b/clang/lib/Frontend/CMakeLists.txt
+@@ -1,4 +1,6 @@
+-add_subdirectory(Rewrite)
++if(CLANG_ENABLE_TOOLING_LIBS)
++  add_subdirectory(Rewrite)
++endif()
+ 
+ set(LLVM_LINK_COMPONENTS
+   BitReader

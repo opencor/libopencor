@@ -20,11 +20,47 @@ limitations under the License.
 
 #include "../extern/modp_b64/modp_b64.h"
 
+#include <charconv>
 #include <cmath>
 #include <libopencor>
 #include <regex>
+#include <string>
 
 namespace libOpenCOR {
+
+namespace {
+
+std::string normaliseDescription(const std::string &pDescription)
+{
+    // Normalise the value of any time (t = ...) and step size (h = ...) in the given description so that
+    // differences at the last few significant digits are ignored. Indeed, the exact value of a time or step size
+    // can vary slightly depending on the platform and the CPU used to generate the model code.
+
+    static const std::regex TIME_VALUE_REGEX {"([th] = )([-+0-9.eE]+)"};
+    std::string res;
+    std::string suffix {pDescription};
+    std::smatch match;
+
+    while (std::regex_search(suffix, match, TIME_VALUE_REGEX)) {
+        res += match.prefix();
+        res += match[1].str();
+
+        static constexpr auto FORMATTED_VALUE_SIZE {64};
+        char formattedValue[FORMATTED_VALUE_SIZE];
+        const auto formattedValueResult {std::to_chars(formattedValue, formattedValue + FORMATTED_VALUE_SIZE,
+                                                       std::stod(match[2].str()), std::chars_format::general, 6)};
+
+        res += std::string(formattedValue, formattedValueResult.ptr);
+
+        suffix = match.suffix();
+    }
+
+    res += suffix;
+
+    return res;
+}
+
+} // namespace
 
 void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpectedIssues)
 {
@@ -34,7 +70,7 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
 
     for (size_t i {0}; i < issues.size(); ++i) {
         EXPECT_EQ(issues[i]->type(), pExpectedIssues[i].type);
-        EXPECT_EQ(issues[i]->description(), pExpectedIssues[i].description);
+        EXPECT_EQ(normaliseDescription(issues[i]->description()), normaliseDescription(pExpectedIssues[i].description));
 
         if (issues[i]->type() == Issue::Type::ERROR) {
             EXPECT_EQ(issues[i]->typeAsString(), "Error");

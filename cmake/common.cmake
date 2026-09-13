@@ -32,6 +32,25 @@ function(replace_compiler_flag OLD NEW)
     endforeach()
 endfunction()
 
+function(add_cache_flags VARIABLE FLAGS DOCSTRING)
+    # Add the given flags to the given cache variable, but only if they are not already there.
+    # Note: the variable may already have them since our JavaScript bindings target passes them to the Emscripten build
+    #       that it kicks off (see src/bindings/javascript/CMakeLists.txt). And, because we must force the cache entry,
+    #       they would otherwise be added once more on every single reconfiguration, making the variable grow without
+    #       bound and, with BUILDCACHE_ACCURACY set to STRICT, invalidating our compiler cache each time.
+
+    string(FIND "${${VARIABLE}}" "${FLAGS}" INDEX)
+
+    if(NOT INDEX EQUAL -1)
+        return()
+    endif()
+
+    string(STRIP "${${VARIABLE}} ${FLAGS}" NEW_FLAGS)
+
+    set(${VARIABLE} "${NEW_FLAGS}" CACHE STRING "${DOCSTRING}" FORCE)
+    set(${VARIABLE} "${NEW_FLAGS}" PARENT_SCOPE)
+endfunction()
+
 function(suppress_target_warnings TARGET)
     target_compile_options(${TARGET} PRIVATE
                            $<$<CXX_COMPILER_ID:MSVC>:/W0>

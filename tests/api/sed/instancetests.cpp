@@ -533,17 +533,7 @@ TEST(InstanceSedTest, startRunAfterPreviousRunCompleted)
 TEST(InstanceSedTest, odeModel)
 {
     const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-#ifdef BUILDING_ON_INTEL
         {libOpenCOR::Issue::Type::ERROR, "Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout."},
-#else
-        {libOpenCOR::Issue::Type::ERROR,
-#    ifdef BUILDING_ON_WINDOWS
-         "Task | CVODE: at t = 0.00140013827899821, mxstep steps taken before reaching tout."
-#    else
-         "Task | CVODE: at t = 0.00140013827899707, mxstep steps taken before reaching tout."
-#    endif
-        },
-#endif
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};

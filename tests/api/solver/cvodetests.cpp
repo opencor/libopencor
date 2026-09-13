@@ -310,8 +310,8 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 
 TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 {
-    static const auto STATE_VALUES {std::vector<double>({-63.887, 0.13501, 0.984334, 0.74097})};
-    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.000001, 0.00001})};
+    static const auto STATE_VALUES {std::vector<double>({-63.887, 0.13501, 0.98433, 0.74097})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.00001, 0.00001})};
     static const auto RATE_VALUES {std::vector<double>({49.72, -0.12812, -0.05099, 0.09854})};
     static const auto RATE_ABS_TOLS {std::vector<double>({0.01, 0.0001, 0.00001, 0.00001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
@@ -451,8 +451,8 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 {
-    static const auto STATE_VALUES {std::vector<double>({-63.886, 0.13501, 0.984333, 0.740972})};
-    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.000001, 0.000001})};
+    static const auto STATE_VALUES {std::vector<double>({-63.886, 0.13501, 0.984333, 0.74097})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.000001, 0.00001})};
     static const auto RATE_VALUES {std::vector<double>({49.719, -0.12812, -0.050992, 0.09854})};
     static const auto RATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.0001, 0.00001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};

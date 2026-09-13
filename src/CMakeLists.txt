@@ -84,13 +84,22 @@ if(RELEASE_MODE AND NOT EMSCRIPTEN AND NOT LIBOPENCOR_CODE_ANALYSIS)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 endif()
 
+# The flags that our WASM version must be built with.
+# Note: they are needed both here, when we are the Emscripten build, and in src/bindings/javascript/CMakeLists.txt,
+#       which passes them on to the Emscripten build that it kicks off. So, we define them once, here, rather than
+#       repeat them in both places and risk them drifting apart.
+
+set(EMSCRIPTEN_COMPILER_FLAGS "-matomics -mbulk-memory -pthread -sSHARED_MEMORY=1")
+set(EMSCRIPTEN_EXE_LINKER_FLAGS "-sALLOW_TABLE_GROWTH -sINITIAL_TABLE=65536 -sSHARED_MEMORY=1")
+set(EMSCRIPTEN_SHARED_LINKER_FLAGS "-sSHARED_MEMORY=1")
+
 # Build our different third-party libraries.
 # Note: for Emscripten, we set the C/C++ flags before building our third-party libraries so that they are built with the
 #       same flags as libOpenCOR (see packages.cmake, which passes them on to each third-party library).
 
 if(EMSCRIPTEN)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -matomics -mbulk-memory -pthread -sSHARED_MEMORY=1" CACHE STRING "Emscripten C flags" FORCE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -matomics -mbulk-memory -pthread -sSHARED_MEMORY=1" CACHE STRING "Emscripten C++ flags" FORCE)
+    add_cache_flags(CMAKE_C_FLAGS "${EMSCRIPTEN_COMPILER_FLAGS}" "Emscripten C flags")
+    add_cache_flags(CMAKE_CXX_FLAGS "${EMSCRIPTEN_COMPILER_FLAGS}" "Emscripten C++ flags")
 endif()
 
 add_subdirectory(3rdparty)
@@ -317,8 +326,8 @@ if(EMSCRIPTEN)
 
     # Preserve Emscripten thread/shared-memory support for libOpenCOR.
 
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_TABLE_GROWTH -sINITIAL_TABLE=65536 -sSHARED_MEMORY=1" CACHE STRING "Emscripten exe linker flags" FORCE)
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -sSHARED_MEMORY=1" CACHE STRING "Emscripten shared linker flags" FORCE)
+    add_cache_flags(CMAKE_EXE_LINKER_FLAGS "${EMSCRIPTEN_EXE_LINKER_FLAGS}" "Emscripten exe linker flags")
+    add_cache_flags(CMAKE_SHARED_LINKER_FLAGS "${EMSCRIPTEN_SHARED_LINKER_FLAGS}" "Emscripten shared linker flags")
 
     # Set the flags for our generated .js and .wasm files.
     # Note #1: for compiling, we use -O3 to get the best performance, -matomics to enable atomic operations,
@@ -468,6 +477,35 @@ else()
         set(PACKAGES_DIR ${CMAKE_BINARY_DIR}/packages)
 
         file(GLOB_RECURSE PACKAGES ${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX})
+
+        # Only keep LLVM+Clang's libraries that we need (see LLVMCLANG_LIBRARIES in
+        # src/3rdparty/LLVMClang/CMakeLists.txt), together with our other packages' libraries.
+        # Note: we cannot remove LLVM+Clang's libraries that we don't need from the package itself since its
+        #       installed CMake files reference them all. So, we simply exclude them from the object files that
+        #       are merged into libOpenCOR's static version.
+
+        set(LLVMCLANG_ARCHIVE_NAMES)
+
+        foreach(LLVMCLANG_LIBRARY ${LLVMCLANG_LIBRARIES})
+            list(APPEND LLVMCLANG_ARCHIVE_NAMES
+                 "${CMAKE_STATIC_LIBRARY_PREFIX}${LLVMCLANG_LIBRARY}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+        endforeach()
+
+        set(KEPT_PACKAGES)
+
+        foreach(PACKAGE ${PACKAGES})
+            if(PACKAGE MATCHES "/LLVMClang/lib/")
+                get_filename_component(PACKAGE_ARCHIVE_NAME ${PACKAGE} NAME)
+
+                if(NOT PACKAGE_ARCHIVE_NAME IN_LIST LLVMCLANG_ARCHIVE_NAMES)
+                    continue()
+                endif()
+            endif()
+
+            list(APPEND KEPT_PACKAGES ${PACKAGE})
+        endforeach()
+
+        set(PACKAGES ${KEPT_PACKAGES})
 
         # Extract the object files from our various packages, handling duplicate object names.
 

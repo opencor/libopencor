@@ -18,9 +18,6 @@ limitations under the License.
 
 #include "clang/Basic/TargetInfo.h"
 #include "clang/CodeGen/CodeGenAction.h"
-#include "clang/Driver/Compilation.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Driver/Tool.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Frontend/TextDiagnosticPrinter.h"
 #include "clang/Lex/PreprocessorOptions.h"
@@ -321,81 +318,107 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     diagnosticsEngine->setWarningsAsErrors(true);
 
-    // Get a driver object and ask it not to check that input files exist.
-
-    clang::driver::Driver driver("clang", llvm::sys::getProcessTriple(), *diagnosticsEngine);
-
-    driver.setCheckInputsExist(false);
-
-    // Get a compilation object to which we pass some arguments.
+    // Determine the -cc1 arguments with which to compile our code.
+    //
+    // Build them ourselves rather than have Clang's driver compute them for us. Indeed, the driver references every
+    // single one of its toolchains (~65,000 lines of code for platforms that we can never target), which would
+    // otherwise all end up in libOpenCOR. Here, our code never includes a system header and we JIT the result rather
+    // than emit an object file, so the arguments below are exactly those that the driver would compute for
+    //     clang -fsyntax-only -O3 -fno-math-errno -fno-trapping-math -fno-stack-protector -funroll-loops dummy.c
+    // minus:
+    //  - the resource/sysroot include paths, which we have no use for (and which, on macOS, made us ask Xcode for an
+    //    SDK path and a linker version every time we compiled some code);
+    //  - the debug/coverage compilation directories, the debugger tuning, the target linker version and the address
+    //    significance table, none of which mean anything for code that we JIT rather than emit as an object file;
+    //  - the diagnostic options that only apply to Objective-C and to system headers;
+    //  - -target-cpu, so that the CPU that we give our ORC-based JIT's target machine (i.e. the host CPU; see below)
+    //    is the one that drives code generation. The driver picks a conservative CPU (e.g. x86-64 on Linux, which
+    //    means no AVX) and puts it in a per-function "target-cpu" attribute, which LLVM prefers over the target
+    //    machine's CPU, so leaving it out is what makes our host CPU setting effective;
+    //  - on Windows, -relaxed-aliasing, which the driver adds for MSVC compatibility and which disables TBAA. Our
+    //    code is well-typed, so we'd rather keep TBAA and generate the same code on all platforms.
+    // Note #1: -fno-math-errno, -fno-trapping-math and -fno-stack-protector have no -cc1 counterpart. They are,
+    //          instead, expressed as the absence of -fmath-errno and -stack-protector, and as
+    //          -ffp-exception-behavior=ignore.
+    // Note #2: our WASM version always targets wasm32-unknown-emscripten and doesn't JIT anything, hence its
+    //          arguments are both fixed and rather different from our native versions'.
 
     static constexpr auto DUMMY_FILE_NAME {"dummy.c"};
-    static const std::vector<const char *> COMPILATION_ARGUMENTS {{"clang", "-fsyntax-only",
-                                                                   "-O3",
-                                                                   "-fno-math-errno",
-                                                                   "-fno-trapping-math",
-                                                                   "-fno-stack-protector",
-                                                                   "-funroll-loops",
-                                                                   DUMMY_FILE_NAME}};
 
-    std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
-
-#ifndef CODE_COVERAGE_ENABLED
-    if (compilation == nullptr) {
-        addError("A compilation object could not be created.");
-
-        return false;
-    }
-#endif
-
-    // The compilation object should have one command, so if it doesn't then something went wrong.
-
-    clang::driver::JobList &jobs {compilation->getJobs()};
-
-#ifndef CODE_COVERAGE_ENABLED
-    if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
-        addError("The compilation object must have one command.");
-
-        return false;
-    }
-#endif
-
-    // Retrieve the command and make sure that its name is "clang".
-
-    auto &command {llvm::cast<clang::driver::Command>(*jobs.begin())};
-
-#ifndef CODE_COVERAGE_ENABLED
-    static constexpr auto CLANG {"clang"};
-
-    if (strcmp(command.getCreator().getName(), CLANG) != 0) {
-        const std::string commandName(command.getCreator().getName());
-        std::string error;
-
-        error.reserve(commandName.size() + 47); // NOLINT
-
-        error += "The command name must be 'clang' while it is '";
-        error += commandName;
-        error += "'.";
-
-        addError(error);
-
-        return false;
-    }
-#endif
-
-    // Prevent the Clang driver from asking cc1 to leak memory, this by removing -disable-free from the command
-    // arguments.
-
-    auto commandArguments {command.getArguments()};
-
-#ifdef CODE_COVERAGE_ENABLED
-    commandArguments.erase(find(commandArguments, llvm::StringRef("-disable-free")));
+#ifdef __EMSCRIPTEN__
+    static const std::vector<const char *> commandArguments {{"-triple", "wasm32-unknown-emscripten",
+                                                              "-O3",
+                                                              "-clear-ast-before-backend",
+                                                              "-disable-llvm-verifier",
+                                                              "-discard-value-names",
+                                                              "-main-file-name", DUMMY_FILE_NAME,
+                                                              "-mrelocation-model", "static",
+                                                              "-mframe-pointer=none",
+                                                              "-ffp-contract=on",
+                                                              "-fno-rounding-math",
+                                                              "-ffp-exception-behavior=ignore",
+                                                              "-mconstructor-aliases",
+                                                              "-target-cpu", "generic",
+                                                              "-fvisibility=hidden",
+                                                              "-ferror-limit", "19",
+                                                              "-funroll-loops",
+                                                              "-fgnuc-version=4.2.1",
+                                                              "-vectorize-loops",
+                                                              "-vectorize-slp",
+                                                              "-x", "c",
+                                                              DUMMY_FILE_NAME}};
 #else
-    auto *commandArgument {find(commandArguments, llvm::StringRef("-disable-free"))};
+    // Note: the triple is that of the process rather than a literal since, unlike our WASM version, our native
+    //       versions can be built for several architectures and operating system versions.
 
-    if (commandArgument != commandArguments.end()) {
-        commandArguments.erase(commandArgument);
-    }
+    static const std::string triple {llvm::sys::getProcessTriple()};
+
+    static const std::vector<const char *> commandArguments {{"-triple", triple.c_str(),
+                                                              "-O3",
+                                                              "-clear-ast-before-backend",
+                                                              "-disable-llvm-verifier",
+                                                              "-discard-value-names",
+                                                              "-main-file-name", DUMMY_FILE_NAME,
+                                                              "-mrelocation-model", "pic",
+                                                              "-pic-level", "2",
+#    if defined(__APPLE__) && defined(__aarch64__)
+                                                              "-mframe-pointer=non-leaf-no-reserve",
+                                                              "-funwind-tables=1",
+#    elif defined(__APPLE__)
+                                                              "-mframe-pointer=all",
+                                                              "-funwind-tables=2",
+#    elif defined(_WIN32) && (defined(_M_ARM64) || defined(__aarch64__))
+                                                              "-mframe-pointer=reserved",
+                                                              "-funwind-tables=2",
+                                                              "-mconstructor-aliases",
+#    elif defined(_WIN32)
+                                                              "-mframe-pointer=none",
+                                                              "-funwind-tables=2",
+                                                              "-mconstructor-aliases",
+#    elif defined(__aarch64__)
+                                                              // Note: char is unsigned on AArch64 Linux.
+
+                                                              "-mframe-pointer=non-leaf-no-reserve",
+                                                              "-funwind-tables=2",
+                                                              "-mconstructor-aliases",
+                                                              "-pic-is-pie",
+                                                              "-fno-signed-char",
+#    else
+                                                              "-mframe-pointer=none",
+                                                              "-funwind-tables=2",
+                                                              "-mconstructor-aliases",
+                                                              "-pic-is-pie",
+#    endif
+                                                              "-ffp-contract=on",
+                                                              "-fno-rounding-math",
+                                                              "-ffp-exception-behavior=ignore",
+                                                              "-ferror-limit", "19",
+                                                              "-funroll-loops",
+                                                              "-fgnuc-version=4.2.1",
+                                                              "-vectorize-loops",
+                                                              "-vectorize-slp",
+                                                              "-x", "c",
+                                                              DUMMY_FILE_NAME}};
 #endif
 
     // Create a compiler instance.
@@ -635,7 +658,9 @@ extern double atanh(double);
     // Create an ORC-based JIT with a target machine builder for the host system.
     // Note: we set the CPU to the host CPU name and the optimisation level to aggressive. This is because the default
     //       CPU is generic and the default optimisation level is none, which can lead to suboptimal performance for the
-    //       generated code.
+    //       generated code. The CPU that we set here is the one that LLVM uses since, as mentioned above, we make a
+    //       point of not passing -target-cpu to the frontend (a per-function "target-cpu" attribute would otherwise
+    //       take precedence over it).
 
     auto jitTargetMachineBuilder {llvm::orc::JITTargetMachineBuilder(llvm::Triple(llvm::sys::getProcessTriple()))};
 

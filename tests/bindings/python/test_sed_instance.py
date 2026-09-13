@@ -15,7 +15,6 @@
 
 import libopencor as loc
 import math
-import platform
 import time
 import utils
 from utils import assert_issues
@@ -509,11 +508,7 @@ def run_ode_model():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            (
-                "Task | CVODE: at t = 0.00140013827899707, mxstep steps taken before reaching tout."
-                if platform.system() == "Darwin"
-                else "Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout."
-            ),
+            "Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout.",
         ],
     ]
 
