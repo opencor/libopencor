@@ -340,8 +340,22 @@ set(PREBUILT_DIR "${PREBUILT_DIR}" CACHE INTERNAL "Prebuilt directory.")
 include(ExternalProject)
 
 if(NOT WIN32 AND NOT APPLE AND NOT EMSCRIPTEN)
-    set(CMAKE_C_FLAGS_ARGS -DCMAKE_C_FLAGS=-fPIC)
-    set(CMAKE_CXX_FLAGS_ARGS -DCMAKE_CXX_FLAGS=-fPIC)
+    set(THIRD_PARTY_C_FLAGS -fPIC)
+    set(THIRD_PARTY_CXX_FLAGS -fPIC)
+endif()
+
+# Build our third-party libraries for x86-64-v3 on Intel (see X86_64_V3_COMPILER_FLAGS in src/CMakeLists.txt).
+# Note: setting CMAKE_C_FLAGS/CMAKE_CXX_FLAGS replaces the default flags that CMake would otherwise use (e.g., /EHsc for
+#       MSVC), so we start from those default flags.
+
+if(X86_64_V3_COMPILER_FLAGS)
+    string(STRIP "${CMAKE_C_FLAGS_INIT} ${THIRD_PARTY_C_FLAGS} ${X86_64_V3_COMPILER_FLAGS}" THIRD_PARTY_C_FLAGS)
+    string(STRIP "${CMAKE_CXX_FLAGS_INIT} ${THIRD_PARTY_CXX_FLAGS} ${X86_64_V3_COMPILER_FLAGS}" THIRD_PARTY_CXX_FLAGS)
+endif()
+
+if(THIRD_PARTY_C_FLAGS)
+    set(CMAKE_C_FLAGS_ARGS -DCMAKE_C_FLAGS=${THIRD_PARTY_C_FLAGS})
+    set(CMAKE_CXX_FLAGS_ARGS -DCMAKE_CXX_FLAGS=${THIRD_PARTY_CXX_FLAGS})
 endif()
 
 set(CMAKE_ARGS

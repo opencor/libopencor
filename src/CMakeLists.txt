@@ -64,16 +64,31 @@ if(RELEASE_MODE AND NOT BUILDING_USING_MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-math-errno -fno-trapping-math")
 endif()
 
-# Enable auto-vectorisation (useful for fixed-step solver loops on x86-64 release builds).
-# Note: we use -march=x86-64-v3 (AVX2) rather than -march=native so that binaries built on one x86-64 machine run on any
-#       other modern x86-64 machine. x86-64-v3 is supported by all CPUs since Intel Haswell (2013) and AMD Excavator
-#       (2015). For ARM64, the compiler defaults already include NEON/ASIMD.
+# Target x86-64-v3 (i.e. AVX2, FMA, etc.) on Intel, so that the compiler can auto-vectorise our code and that of our
+# third-party libraries (e.g., SUNDIALS' dense linear algebra, which is where most of the simulation time is spent).
+# Note #1: we use x86-64-v3 rather than the host CPU so that binaries built on one x86-64 machine run on any other
+#          modern x86-64 machine. x86-64-v3 is supported by all CPUs since Intel Haswell (2013) and AMD Excavator
+#          (2015). For ARM64, the compiler defaults already include NEON/ASIMD.
+# Note #2: MSVC only uses FMA instructions if it is allowed to contract floating-point operations, hence /fp:contract.
+# Note #3: we use those flags whatever the build type, so that our debug and release builds give the same results.
+# Note #4: the flags are also passed on to our third-party libraries (see packages.cmake and, for SUNDIALS, which uses
+#          CMAKE_C_FLAGS, src/3rdparty/SUNDIALS/CMakeLists.txt).
+# Note #5: on macOS, we may build for Intel on an ARM machine. Some third-party libraries (e.g., SUNDIALS) run checks
+#          that use CMAKE_C_FLAGS but not CMAKE_OSX_ARCHITECTURES, i.e. that compile for the host architecture, which
+#          fails with -march=x86-64-v3 on an ARM machine. So, we use -Xarch_x86_64 to only use -march=x86-64-v3 when
+#          compiling for Intel.
 
-if(RELEASE_MODE AND NOT EMSCRIPTEN AND NOT BUILDING_USING_MSVC)
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64-v3")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64-v3")
+if(INTEL_MODE AND NOT EMSCRIPTEN)
+    if(BUILDING_USING_MSVC)
+        set(X86_64_V3_COMPILER_FLAGS "/arch:AVX2 /fp:contract")
+    elseif(APPLE)
+        set(X86_64_V3_COMPILER_FLAGS "-Xarch_x86_64 -march=x86-64-v3")
+    else()
+        set(X86_64_V3_COMPILER_FLAGS "-march=x86-64-v3")
     endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${X86_64_V3_COMPILER_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${X86_64_V3_COMPILER_FLAGS}")
 endif()
 
 # Enable link-time optimisation (LTO) for release builds to allow cross translation unit inlining and devirtualisation.

@@ -75,6 +75,15 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
 
     set(PACKAGE_C_FLAGS "-DNO_FPRINTF_OUTPUT ${CMAKE_C_FLAGS}")
 
+    # Enable WebAssembly SIMD for our WASM version.
+    # Note: most of the simulation time is spent in SUNDIALS' dense linear algebra, which the compiler can then
+    #       auto-vectorise. This makes our stiff models run 8-16% faster. WebAssembly SIMD is supported by all modern
+    #       browsers (Chrome 91+, Firefox 89+, and Safari 16.4+).
+
+    if(EMSCRIPTEN)
+        set(PACKAGE_C_FLAGS "${PACKAGE_C_FLAGS} -msimd128")
+    endif()
+
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
