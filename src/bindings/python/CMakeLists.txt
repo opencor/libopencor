@@ -37,11 +37,11 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     # Check whether we need to provide glibc compatibility wrappers for __isoc23_strtol(), __isoc23_strtoll(),
     # __isoc23_strtoul(), __isoc23_strtoull() (glibc 2.38+), and arc4random(), arc4random_buf(), arc4random_uniform()
-    # (glibc 2.36+). These are referenced by our prebuilt LLVM+Clang and libssh2 libraries which are compiled using
-    # glibc 2.38+ (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that use glibc
-    # 2.38+, so we need compatibility wrappers to build Python wheels. Each symbol group is guarded independently so
-    # that only the wrappers for actually missing functions are compiled into the module, avoiding weak-symbol
-    # interposition against the native glibc implementation.
+    # (glibc 2.36+). These are referenced by our prebuilt LLVM and libcurl libraries which are compiled using glibc
+    # 2.38+ (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that use glibc 2.38+,
+    # so we need compatibility wrappers to build Python wheels. Each symbol group is guarded independently so that only
+    # the wrappers for actually missing functions are compiled into the module, avoiding weak-symbol interposition
+    # against the native glibc implementation.
 
     set(ACTUAL_PYTHON_SOURCE_FILES ${PYTHON_SOURCE_FILES})
 

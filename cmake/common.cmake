@@ -370,7 +370,6 @@ function(configure_target TARGET)
                      SUNDIALS_DIR
                      combine-static_DIR
                      libCellML_DIR
-                     libssh2_DIR
                      numl-static_DIR
                      sbml-static_DIR
                      sedml-static_DIR)
