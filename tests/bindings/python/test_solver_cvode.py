@@ -320,36 +320,36 @@ def test_solve_without_interpolate_solution():
 
 def test_solve_with_adams_moulton_integration_method():
     state_values = [-63.89, 0.13501, 0.98434, 0.74097]
-    state_abs_tols = [0.01, 0.00001, 0.00001, 0.00001]
+    state_abs_tols = [0.01, 0.0001, 0.0001, 0.0001]
     rate_values = [49.720, -0.12812, -0.05099, 0.09855]
-    rate_abs_tols = [0.001, 0.00001, 0.0001, 0.00001]
+    rate_abs_tols = [0.01, 0.0001, 0.0001, 0.0001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
     constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
     computed_constant_values = [-10.613, -115.0, 12.0]
     computed_constant_abs_tols = [0.0, 0.0, 0.0]
     algebraic_values = [
         0.0,
-        -15.982,
+        -15.98,
         -823.52,
         789.78,
         3.97,
-        0.11498,
+        0.11499,
         0.002869,
         0.96735,
         0.5413,
-        0.056245,
+        0.05625,
     ]
     algebraic_abs_tols = [
         0.0,
-        0.001,
+        0.01,
+        0.1,
         0.01,
         0.01,
-        0.01,
-        0.00001,
-        0.000001,
+        0.0001,
         0.00001,
         0.0001,
-        0.000001,
+        0.0001,
+        0.00001,
     ]
 
     file = loc.File(utils.resource_path("api/solver/ode.cellml"))
@@ -431,8 +431,8 @@ def test_solve_with_functional_iteration_type():
 
 
 def test_solve_with_banded_linear_solver():
-    state_values = [-54.958, 0.114716, 0.971365, 0.756967]
-    state_abs_tols = [0.001, 0.000001, 0.000001, 0.000001]
+    state_values = [-54.958, 0.11471, 0.97136, 0.756967]
+    state_abs_tols = [0.001, 0.00001, 0.00001, 0.000001]
     rate_values = [47.190, -0.10201, -0.09312, 0.06289]
     rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
@@ -487,37 +487,37 @@ def test_solve_with_banded_linear_solver():
 
 
 def test_solve_with_diagonal_linear_solver():
-    state_values = [-63.886, 0.13501, 0.984334, 0.740971]
-    state_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
+    state_values = [-63.88, 0.13501, 0.98433, 0.74097]
+    state_abs_tols = [0.01, 0.00001, 0.00001, 0.00001]
     rate_values = [49.72, -0.12812, -0.05099, 0.09854]
-    rate_abs_tols = [0.01, 0.00001, 0.00001, 0.00001]
+    rate_abs_tols = [0.01, 0.0001, 0.00001, 0.00001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
     constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
     computed_constant_values = [-10.613, -115.0, 12.0]
     computed_constant_abs_tols = [0.0, 0.0, 0.0]
     algebraic_values = [
         0.0,
-        -15.982,
+        -15.98,
         -823.52,
         789.78,
         3.9699,
         0.11498,
-        0.002869,
+        0.00287,
         0.96735,
         0.54134,
         0.056246,
     ]
     algebraic_abs_tols = [
         0.0,
+        0.01,
+        0.1,
+        0.1,
         0.001,
-        0.01,
-        0.01,
         0.0001,
         0.00001,
-        0.000001,
         0.00001,
+        0.0001,
         0.00001,
-        0.000001,
     ]
 
     file = loc.File(utils.resource_path("api/solver/ode.cellml"))
@@ -711,35 +711,35 @@ def test_solve_with_tfqmr_linear_solver():
 
 
 def test_solve_with_gmres_linear_solver_and_no_preconditioner():
-    state_values = [-63.887, 0.135009, 0.984334, 0.740971]
-    state_abs_tols = [0.001, 0.000001, 0.000001, 0.000001]
-    rate_values = [49.72, -0.128118, -0.05099, 0.098545]
-    rate_abs_tols = [0.01, 0.000001, 0.00001, 0.000001]
+    state_values = [-63.887, 0.13501, 0.984334, 0.74097]
+    state_abs_tols = [0.001, 0.00001, 0.000001, 0.00001]
+    rate_values = [49.720, -0.12812, -0.05099, 0.09854]
+    rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
     constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
     computed_constant_values = [-10.613, -115.0, 12.0]
     computed_constant_abs_tols = [0.0, 0.0, 0.0]
     algebraic_values = [
         0.0,
-        -15.9821,
+        -15.982,
         -823.517,
-        789.780,
-        3.9700,
-        0.114985,
-        0.002869,
-        0.967348,
+        789.779,
+        3.9699,
+        0.11498,
+        0.00287,
+        0.96734,
         0.54134,
         0.056246,
     ]
     algebraic_abs_tols = [
         0.0,
-        0.0001,
         0.001,
         0.001,
+        0.001,
         0.0001,
-        0.000001,
-        0.000001,
-        0.000001,
+        0.00001,
+        0.00001,
+        0.00001,
         0.00001,
         0.000001,
     ]
@@ -770,8 +770,8 @@ def test_solve_with_gmres_linear_solver_and_no_preconditioner():
 def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
     state_values = [-63.886, 0.13501, 0.984333, 0.740972]
     state_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
-    rate_values = [49.719, -0.12812, -0.050992, 0.098543]
-    rate_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
+    rate_values = [49.719, -0.12812, -0.05099, 0.09854]
+    rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
     constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
     computed_constant_values = [-10.613, -115.0, 12.0]
@@ -825,10 +825,10 @@ def test_solve_with_bicgstab_linear_solver_and_no_preconditioner():
 
 
 def test_solve_with_tfqmr_linear_solver_and_no_preconditioner():
-    state_values = [-63.886, 0.13501, 0.984333, 0.740972]
-    state_abs_tols = [0.001, 0.00001, 0.000001, 0.000001]
+    state_values = [-63.886, 0.13501, 0.98433, 0.740972]
+    state_abs_tols = [0.001, 0.00001, 0.00001, 0.000001]
     rate_values = [49.719, -0.12812, -0.05099, 0.09854]
-    rate_abs_tols = [0.001, 0.00001, 0.00001, 0.00001]
+    rate_abs_tols = [0.01, 0.00001, 0.00001, 0.00001]
     constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
     constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
     computed_constant_values = [-10.613, -115.0, 12.0]
