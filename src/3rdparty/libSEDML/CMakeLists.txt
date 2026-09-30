@@ -28,58 +28,63 @@ if(LIBOPENCOR_PREBUILT_LIBSEDML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         48270118e62002f1fbb34c88d20c57b6b38d1cdf)
+                         03ae2a5a15f91485f07861f1487579615714a5d1)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     06c8792ca40c9ed37d6e80d755d46863ddb51dc7)
+                                     20770dec5a869ea640bc019fdcd33a19a957ec39)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     8df0cd6b0fc94cd1fdcc4583c029b6765691da27)
+                                     d2a26b99a611082d325089b91638f2456fd711c2)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     336cc5ac4f4d969f56d74a47250904db4de13c27)
+                                     6fb9a49a4397bb0d880ce9b4e2e790f4ede5e1c3)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     fce75c61ddfcda2f9882d32025e5af8ced479f3f)
+                                     21a005437591498927d39da9406fa8b070cdef20)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 4c9cd5394acb7007e94fb49ef223d713373d6599)
+                                 1f721458d2cf5f749eae1c21a7852b037d4fecd2)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 52b25f91c001c0b3b987bfe19305a079f385bb58)
+                                 0182e33e5fa27618f818169ea3655e6affa124ef)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ba7d558348bd1fad496b4524de26c8b34e69911f)
+                                 7fb07fc5284b3fc8b455a63ed7d3dfdce74388cf)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 33f72b38723f6931fabd33378cd7011cae8a3426)
+                                 e665c1c208aae0ae7c95f917f11e2417d270eda1)
             endif()
         endif()
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
 
+    # Apply our patches to libSEDML's source code (see README.md).
+
+    patch_package_args(${PACKAGE_NAME} ${RELEASE_TAG} LIBSEDML_PATCH_ARGS)
+
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+        ${LIBSEDML_PATCH_ARGS}
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBUILD_TESTS=OFF

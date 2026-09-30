@@ -52,6 +52,45 @@ function(check_required_packages PACKAGE)
     endif()
 endfunction()
 
+function(patch_package_args PACKAGE_NAME RELEASE_TAG PATCH_ARGS)
+    # Return, in PATCH_ARGS, the build_package() arguments that apply the patches in the patches folder of the calling
+    # CMakeLists.txt file to the source code of the given package (see applypatches.cmake).
+    # Note: we use the SHA-1 value of our patches and of the script that applies them in the name of the file to which
+    #       ExternalProject downloads the package's source code, so that any change to our patches or to
+    #       applypatches.cmake results in the package's source code being downloaded, extracted, and patched afresh
+    #       (ExternalProject only re-runs its patch step when the patch command itself changes and, even then, in the
+    #       source directory that it previously patched). We also make sure that such a change results in CMake being
+    #       re-run.
+
+    set(PATCHES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/patches)
+    set(APPLY_PATCHES_SCRIPT ${CMAKE_SOURCE_DIR}/cmake/applypatches.cmake)
+
+    file(GLOB_RECURSE PATCH_FILES ${PATCHES_DIR}/*.patch)
+
+    set(PATCHES_SHA1S)
+
+    foreach(PATCH_FILE IN LISTS PATCH_FILES ITEMS ${APPLY_PATCHES_SCRIPT})
+        get_filename_component(PATCH_NAME ${PATCH_FILE} NAME)
+        file(SHA1 ${PATCH_FILE} PATCH_SHA1)
+
+        string(APPEND PATCHES_SHA1S "${PATCH_NAME}=${PATCH_SHA1}\n")
+
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${PATCH_FILE})
+    endforeach()
+
+    string(SHA1 PATCHES_SHA1 "${PATCHES_SHA1S}")
+
+    set(${PATCH_ARGS}
+        DOWNLOAD_NAME
+            ${RELEASE_TAG}.${PATCHES_SHA1}.tar.gz
+        PATCH_COMMAND
+            ${CMAKE_COMMAND} -DPACKAGE_NAME=${PACKAGE_NAME}
+                             -DSOURCE_DIR=<SOURCE_DIR>
+                             -DPATCHES_DIR=${PATCHES_DIR}
+                             -P ${APPLY_PATCHES_SCRIPT}
+        PARENT_SCOPE)
+endfunction()
+
 function(build_package PACKAGE_NAME)
     # Configure and run a CMake script to build the package for us.
 

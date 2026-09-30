@@ -1,0 +1,130 @@
+diff --git a/src/sedml/SedAlgorithm.cpp b/src/sedml/SedAlgorithm.cpp
+index 6f26b60..d668117 100755
+--- a/src/sedml/SedAlgorithm.cpp
++++ b/src/sedml/SedAlgorithm.cpp
+@@ -43,7 +43,8 @@ using namespace std;
+ 
+ LIBSEDML_CPP_NAMESPACE_BEGIN
+ 
+-extern map<int, string> g_kisaomap;
++// libOpenCOR: see kisaomap.cpp.
++const char* getKisaoTermName(int kisaoID);
+ 
+ 
+ 
+@@ -154,9 +155,9 @@ SedAlgorithm::setKisaoID(const std::string& kisaoID)
+ {
+   mKisaoID = kisaoID;
+   if (!isSetName()) {
+-      int knum = getKisaoIDasInt();
+-      if (g_kisaomap.find(knum) != g_kisaomap.end()) {
+-          setName(g_kisaomap[knum]);
++      const char* name = getKisaoTermName(getKisaoIDasInt());
++      if (name != NULL) {
++          setName(name);
+       }
+   }
+   return LIBSEDML_OPERATION_SUCCESS;
+@@ -985,8 +986,11 @@ SedAlgorithm::setKisaoID(int kisaoID)
+       << std::setw(7)
+       << kisaoID; 
+   mKisaoID = str.str();
+-  if (!isSetName() && g_kisaomap.find(kisaoID) != g_kisaomap.end()) {
+-      setName(g_kisaomap[kisaoID]);
++  if (!isSetName()) {
++      const char* name = getKisaoTermName(kisaoID);
++      if (name != NULL) {
++          setName(name);
++      }
+   }
+   return LIBSEDML_OPERATION_SUCCESS;
+ }
+diff --git a/src/sedml/SedAlgorithmParameter.cpp b/src/sedml/SedAlgorithmParameter.cpp
+index 57ee04d..25005f9 100755
+--- a/src/sedml/SedAlgorithmParameter.cpp
++++ b/src/sedml/SedAlgorithmParameter.cpp
+@@ -42,7 +42,8 @@ using namespace std;
+ 
+ LIBSEDML_CPP_NAMESPACE_BEGIN
+ 
+-extern map<int, string> g_kisaomap;
++// libOpenCOR: see kisaomap.cpp.
++const char* getKisaoTermName(int kisaoID);
+ 
+ 
+ 
+@@ -196,9 +197,9 @@ SedAlgorithmParameter::setKisaoID(const std::string& kisaoID)
+ {
+   mKisaoID = kisaoID;
+   if (!isSetName()) {
+-      int knum = getKisaoIDasInt();
+-      if (g_kisaomap.find(knum) != g_kisaomap.end()) {
+-          setName(g_kisaomap[knum]);
++      const char* name = getKisaoTermName(getKisaoIDasInt());
++      if (name != NULL) {
++          setName(name);
+       }
+   }
+   return LIBSEDML_OPERATION_SUCCESS;
+@@ -1135,8 +1136,11 @@ SedAlgorithmParameter::setKisaoID(int kisaoID)
+       << std::setw(7)
+       << kisaoID; 
+   mKisaoID = str.str();
+-  if (!isSetName() && g_kisaomap.find(kisaoID) != g_kisaomap.end()) {
+-      setName(g_kisaomap[kisaoID]);
++  if (!isSetName()) {
++      const char* name = getKisaoTermName(kisaoID);
++      if (name != NULL) {
++          setName(name);
++      }
+   }
+   return LIBSEDML_OPERATION_SUCCESS;
+ }
+diff --git a/src/sedml/kisaomap.cpp b/src/sedml/kisaomap.cpp
+index 919bd2b..b399426 100644
+--- a/src/sedml/kisaomap.cpp
++++ b/src/sedml/kisaomap.cpp
+@@ -38,13 +38,23 @@
+  * 
+  */
+  
+-#include <map>
+-#include <string>
++#include <algorithm>
++#include <cstddef>
++#include <iterator>
+ #include "sedml/common/libsedml-version.h"
+ 
+ LIBSEDML_CPP_NAMESPACE_BEGIN
+ 
+-std::map<int, std::string> g_kisaomap = {
++// libOpenCOR: use a constant array (sorted by KiSAO id) rather than a std::map, so that it doesn't need to be built
++//             when libSEDML is loaded.
++
++struct KisaoTerm
++{
++   int id;
++   const char* name;
++};
++
++static constexpr KisaoTerm KISAO_TERMS[] = {
+    {0, "modelling and simulation algorithm"},
+    {3, "weighted stochastic simulation algorithm"},
+    {15, "Gillespie first reaction algorithm"},
+@@ -567,5 +577,16 @@ std::map<int, std::string> g_kisaomap = {
+    {858, "variance ignoring NaN"},
+    {859, "variance"},
+ };
++
++const char*
++getKisaoTermName(int kisaoID)
++{
++  const KisaoTerm* end = std::end(KISAO_TERMS);
++  const KisaoTerm* term = std::lower_bound(std::begin(KISAO_TERMS), end, kisaoID,
++    [](const KisaoTerm& kisaoTerm, int id) { return kisaoTerm.id < id; });
++
++  return ((term != end) && (term->id == kisaoID)) ? term->name : NULL;
++}
++
+ LIBSEDML_CPP_NAMESPACE_END
+ 
