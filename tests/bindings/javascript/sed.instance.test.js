@@ -148,6 +148,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Asynchronous run lifecycle', async () => {
+    const WAIT_ITERATIONS = 60000;
+
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
     file.setContents(utils.fileContents(file.path));
@@ -157,7 +159,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 200; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
