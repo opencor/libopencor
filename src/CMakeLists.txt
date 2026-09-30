@@ -458,11 +458,18 @@ else()
             message(FATAL_ERROR "staticarchiveextractor could not be built.")
         endif()
 
-        # Retrieve the path to our various packages.
+        # Retrieve the path to the libraries of the packages that we use.
+        # Note: we only look for them in the directories of those packages since PREBUILT_DIR may contain other packages
+        #       (e.g., one that has since been renamed), which libraries we must not merge into our static library.
 
         set(PACKAGES_DIR ${CMAKE_BINARY_DIR}/packages)
+        set(PACKAGES)
 
-        file(GLOB_RECURSE PACKAGES ${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX})
+        foreach(AVAILABLE_PACKAGE ${AVAILABLE_PACKAGES})
+            file(GLOB_RECURSE AVAILABLE_PACKAGE_LIBRARIES ${PREBUILT_DIR}/${AVAILABLE_PACKAGE}/*${CMAKE_STATIC_LIBRARY_SUFFIX})
+
+            list(APPEND PACKAGES ${AVAILABLE_PACKAGE_LIBRARIES})
+        endforeach()
 
         # Extract the object files from our various packages, handling duplicate object names.
 
