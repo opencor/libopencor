@@ -26,8 +26,6 @@ void versionApi(nb::module_ &m)
 
     m.def("version", &libOpenCOR::version, "Get the version number of libOpenCOR.")
         .def("version_string", &libOpenCOR::versionString, "Get the version string of libOpenCOR.")
-        .def("clang_version", &libOpenCOR::clangVersion, "Get the version number of Clang.")
-        .def("clang_version_string", &libOpenCOR::clangVersionString, "Get the version string of Clang.")
         .def("libcellml_version", &libOpenCOR::libcellmlVersion, "Get the version number of libCellML.")
         .def("libcellml_version_string", &libOpenCOR::libcellmlVersionString, "Get the version string of libCellML.")
         .def("libcombine_version", &libOpenCOR::libcombineVersion, "Get the version number of libCOMBINE.")

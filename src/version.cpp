@@ -16,8 +16,6 @@ limitations under the License.
 
 #include "version.h"
 
-#include "clang/Basic/Version.h"
-
 #ifndef __EMSCRIPTEN__
 #    include "curl/curlver.h"
 #endif
@@ -64,20 +62,6 @@ uint64_t version()
 const std::string &versionString()
 {
     static const std::string res {LIBOPENCOR_VERSION_STRING};
-
-    return res;
-}
-
-unsigned int clangVersion()
-{
-    return MAJOR_10 * firstDigit(CLANG_VERSION_MAJOR) + MAJOR_01 * secondDigit(CLANG_VERSION_MAJOR)
-           + MINOR_10 * firstDigit(CLANG_VERSION_MINOR) + MINOR_01 * secondDigit(CLANG_VERSION_MINOR)
-           + PATCH_10 * firstDigit(CLANG_VERSION_PATCHLEVEL) + PATCH_01 * secondDigit(CLANG_VERSION_PATCHLEVEL);
-}
-
-const std::string &clangVersionString()
-{
-    static const std::string res {CLANG_VERSION_STRING};
 
     return res;
 }

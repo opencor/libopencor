@@ -54,16 +54,6 @@ def test_version_string():
     assert loc.version_string() == version
 
 
-def test_clang_version():
-    assert isinstance(loc.clang_version(), int)
-    assert loc.clang_version() == 0x220108
-
-
-def test_clang_version_string():
-    assert isinstance(loc.clang_version_string(), str)
-    assert loc.clang_version_string() == "22.1.8"
-
-
 def test_libcellml_version():
     assert isinstance(loc.libcellml_version(), int)
     assert loc.libcellml_version() == 0x000701

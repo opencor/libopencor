@@ -15,33 +15,26 @@ limitations under the License.
 */
 
 #include "compiler_p.h"
+#include "irgenerator.h"
 
-#include "clang/Basic/TargetInfo.h"
-#include "clang/CodeGen/CodeGenAction.h"
-#include "clang/Driver/Compilation.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Driver/Tool.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/TextDiagnosticPrinter.h"
-#include "clang/Lex/PreprocessorOptions.h"
+#include "llvm/Analysis/AliasAnalysis.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/OptBisect.h"
 #include "llvm/MC/TargetRegistry.h"
+#include "llvm/Passes/PassBuilder.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Target/TargetMachine.h"
-#include "llvm/TargetParser/Host.h"
-#include "llvm-c/Core.h"
 
-#include <cstdio>
-#include <random>
-#include <sstream>
+#include <climits>
+#include <cstring>
 
 namespace libOpenCOR {
 
 namespace {
 
 #ifndef CODE_COVERAGE_ENABLED
-std::string llvmClangError(llvm::Error pError)
+std::string llvmErrorMessage(llvm::Error pError)
 {
     std::string res;
 
@@ -51,17 +44,57 @@ std::string llvmClangError(llvm::Error pError)
 
     res[0] = static_cast<char>(toupper(res[0]));
 
-    std::string wrappedError;
-
-    wrappedError.reserve(res.size() + 3); // NOLINT
-
-    wrappedError += " (";
-    wrappedError += res;
-    wrappedError += ")";
-
-    return wrappedError;
+    return " (" + res + ")";
 }
 #endif
+
+void optimise(llvm::Module &pModule, llvm::TargetMachine &pTargetMachine)
+{
+    // Optimise the given module in the same way as Clang does at -O3 (with -funroll-loops, -vectorize-loops, and
+    // -vectorize-slp), i.e. using LLVM's default per-module pipeline and default alias analysis pipeline.
+    // Note: for our WASM version, we don't vectorise straight-line code (i.e. we don't use -vectorize-slp) since, for
+    //       the code that libCellML generates for our models (i.e. straight-line code), it makes no measurable
+    //       difference to the time it takes to compute a model while it is expensive to do.
+
+    llvm::PipelineTuningOptions pipelineTuningOptions;
+
+    pipelineTuningOptions.LoopUnrolling = true;
+    pipelineTuningOptions.LoopInterleaving = true;
+    pipelineTuningOptions.LoopVectorization = true;
+#ifdef __EMSCRIPTEN__
+    pipelineTuningOptions.SLPVectorization = false;
+#else
+    pipelineTuningOptions.SLPVectorization = true;
+#endif
+
+    // Skip dead store elimination (DSE) since, for the code that libCellML generates for our models, it doesn't remove
+    // anything (each array element is stored at most once per function and the local arrays of our NLA systems are all
+    // read by nlaSolve()) while it accounts for a significant part of the time it takes to optimise a model.
+
+    llvm::PassInstrumentationCallbacks passInstrumentationCallbacks;
+
+    passInstrumentationCallbacks.registerShouldRunOptionalPassCallback([](llvm::StringRef pPassId, const llvm::Any & /*pIr*/) {
+        return pPassId != "DSEPass";
+    });
+
+    llvm::PassBuilder passBuilder(&pTargetMachine, pipelineTuningOptions, std::nullopt, &passInstrumentationCallbacks);
+    llvm::LoopAnalysisManager loopAnalysisManager;
+    llvm::FunctionAnalysisManager functionAnalysisManager;
+    llvm::CGSCCAnalysisManager cgsccAnalysisManager;
+    llvm::ModuleAnalysisManager moduleAnalysisManager;
+
+    functionAnalysisManager.registerPass([&passBuilder] {
+        return passBuilder.buildDefaultAAPipeline();
+    });
+
+    passBuilder.registerModuleAnalyses(moduleAnalysisManager);
+    passBuilder.registerCGSCCAnalyses(cgsccAnalysisManager);
+    passBuilder.registerFunctionAnalyses(functionAnalysisManager);
+    passBuilder.registerLoopAnalyses(loopAnalysisManager);
+    passBuilder.crossRegisterProxies(loopAnalysisManager, functionAnalysisManager, cgsccAnalysisManager, moduleAnalysisManager);
+
+    passBuilder.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O3).run(pModule, moduleAnalysisManager);
+}
 
 #ifdef __EMSCRIPTEN__
 static void patchWasmSharedMemory(UnsignedChars &pWasmModule)
@@ -310,299 +343,264 @@ bool Compiler::Impl::compile(const std::string &pCode)
 
     removeAllIssues();
 
-    // Create a diagnostics engine.
-
-    auto diagnosticOptions {std::make_unique<clang::DiagnosticOptions>()};
-    std::string diagnostics;
-    llvm::raw_string_ostream outputStream(diagnostics);
-    auto diagnosticsEngine {llvm::IntrusiveRefCntPtr<clang::DiagnosticsEngine>(std::make_unique<clang::DiagnosticsEngine>(llvm::IntrusiveRefCntPtr<clang::DiagnosticIDs>(std::make_unique<clang::DiagnosticIDs>()),
-                                                                                                                          *diagnosticOptions,
-                                                                                                                          new clang::TextDiagnosticPrinter(outputStream, *diagnosticOptions)))};
-
-    diagnosticsEngine->setWarningsAsErrors(true);
-
-    // Get a driver object and ask it not to check that input files exist.
-
-    clang::driver::Driver driver("clang", llvm::sys::getProcessTriple(), *diagnosticsEngine);
-
-    driver.setCheckInputsExist(false);
-
-    // Get a compilation object to which we pass some arguments.
-
-    static constexpr auto DUMMY_FILE_NAME {"dummy.c"};
-    static const std::vector<const char *> COMPILATION_ARGUMENTS {{"clang", "-fsyntax-only",
-                                                                   "-O3",
-                                                                   "-fno-math-errno",
-                                                                   "-fno-trapping-math",
-                                                                   "-fno-stack-protector",
-                                                                   "-funroll-loops",
-                                                                   DUMMY_FILE_NAME}};
-
-    std::unique_ptr<clang::driver::Compilation> compilation(driver.BuildCompilation(COMPILATION_ARGUMENTS));
-
-#ifndef CODE_COVERAGE_ENABLED
-    if (compilation == nullptr) {
-        addError("A compilation object could not be created.");
-
-        return false;
-    }
-#endif
-
-    // The compilation object should have one command, so if it doesn't then something went wrong.
-
-    clang::driver::JobList &jobs {compilation->getJobs()};
-
-#ifndef CODE_COVERAGE_ENABLED
-    if ((jobs.size() != 1) || !llvm::isa<clang::driver::Command>(*jobs.begin())) {
-        addError("The compilation object must have one command.");
-
-        return false;
-    }
-#endif
-
-    // Retrieve the command and make sure that its name is "clang".
-
-    auto &command {llvm::cast<clang::driver::Command>(*jobs.begin())};
-
-#ifndef CODE_COVERAGE_ENABLED
-    static constexpr auto CLANG {"clang"};
-
-    if (strcmp(command.getCreator().getName(), CLANG) != 0) {
-        const std::string commandName(command.getCreator().getName());
-        std::string error;
-
-        error.reserve(commandName.size() + 47); // NOLINT
-
-        error += "The command name must be 'clang' while it is '";
-        error += commandName;
-        error += "'.";
-
-        addError(error);
-
-        return false;
-    }
-#endif
-
-    // Prevent the Clang driver from asking cc1 to leak memory, this by removing -disable-free from the command
-    // arguments.
-
-    auto commandArguments {command.getArguments()};
-
-#ifdef CODE_COVERAGE_ENABLED
-    commandArguments.erase(find(commandArguments, llvm::StringRef("-disable-free")));
-#else
-    auto *commandArgument {find(commandArguments, llvm::StringRef("-disable-free"))};
-
-    if (commandArgument != commandArguments.end()) {
-        commandArguments.erase(commandArgument);
-    }
-#endif
-
-    // Create a compiler instance.
-
-    auto compilerInstance {std::make_unique<clang::CompilerInstance>()};
-
-    compilerInstance->setDiagnostics(diagnosticsEngine.get());
-    compilerInstance->setVerboseOutputStream(llvm::nulls());
-
-    // Create a compiler invocation object.
-
-#ifndef CODE_COVERAGE_ENABLED
-    bool res =
-#endif
-        clang::CompilerInvocation::CreateFromArgs(compilerInstance->getInvocation(),
-                                                  commandArguments,
-                                                  *diagnosticsEngine);
-
-#ifndef CODE_COVERAGE_ENABLED
-    if (!res) {
-        addError("A compiler invocation object could not be created.");
-
-        return false;
-    }
-#endif
-
-    // Map our code to a memory buffer.
-
-    std::string code {R"(// Arithmetic operators.
-
-extern double pow(double, double);
-extern double sqrt(double);
-extern double fabs(double);
-extern double exp(double);
-extern double log(double);
-extern double log10(double);
-extern double ceil(double);
-extern double floor(double);
-extern double fmin(double, double);
-extern double fmax(double, double);
-extern double fmod(double, double);
-
-// Trigonometric operators.
-
-extern double sin(double);
-extern double cos(double);
-extern double tan(double);
-extern double sinh(double);
-extern double cosh(double);
-extern double tanh(double);
-extern double asin(double);
-extern double acos(double);
-extern double atan(double);
-extern double asinh(double);
-extern double acosh(double);
-extern double atanh(double);
-
-// Constants.
-
-#define INFINITY (__builtin_inf())
-#define NAN (__builtin_nan(""))
-
-)"};
-
-    code += pCode;
-
-    compilerInstance->getInvocation().getPreprocessorOpts().addRemappedFile(DUMMY_FILE_NAME,
-                                                                            llvm::MemoryBuffer::getMemBuffer(code).release());
-
-    // Compile the given code, resulting in an LLVM bitcode module.
-
-    auto llvmContext {std::make_unique<llvm::LLVMContext>()};
-    auto codeGenAction {std::make_unique<clang::EmitLLVMOnlyAction>(llvmContext.get())};
-
-    if (!compilerInstance->ExecuteAction(*codeGenAction)) {
-        addError("The given code could not be compiled.");
-
-        static constexpr auto ERROR {": error: "};
-        static auto ERROR_LENGTH {strlen(ERROR)};
-        static constexpr auto NOTE {": note: "};
-        static auto NOTE_LENGTH {strlen(NOTE)};
-
-        std::istringstream input(diagnostics);
-        std::string line;
-
-        std::getline(input, line);
-
-        while (!input.eof()) {
-            std::string error {line.substr(line.find(ERROR) + ERROR_LENGTH) + ":"};
-
-            error[0] = static_cast<char>(std::toupper(error[0]));
-
-            std::getline(input, line);
-
-            auto hasErrorDetails {false};
-
-            while (!input.eof()) {
-                const auto notePos {line.find(NOTE)};
-
-                if (notePos != std::string::npos) {
-                    if (hasErrorDetails) {
-                        error += "\n";
-                    } else {
-                        error[error.size() - 1] = ' ';
-                    }
-
-                    error += line.substr(notePos + NOTE_LENGTH);
-                    error += ":";
-                } else if (line.find(DUMMY_FILE_NAME) != std::string::npos) {
-                    break;
-                } else {
-                    error += "\n";
-                    error += line;
-
-                    hasErrorDetails = true;
-                }
-
-                std::getline(input, line);
-            }
-
-            addError(error);
-        }
-
-        return false;
-    }
-
-    // Retrieve the LLVM module.
-
-    auto module {codeGenAction->takeModule()};
-
-#ifndef CODE_COVERAGE_ENABLED
-    if (module == nullptr) {
-        addError("The LLVM module could not be retrieved.");
-
-        return false;
-    }
-#endif
+    // Initialise the native target and its ASM printer, once and for all, and in a thread-safe way (hence the static
+    // initialisation).
+
+    static const auto nativeTargetInitialised {[] {
+        llvm::InitializeNativeTarget();
+        llvm::InitializeNativeTargetAsmPrinter();
+
+        return true;
+    }()};
+
+    (void)nativeTargetInitialised;
+
+    // Create a target machine for our target, i.e. a generic WebAssembly CPU with the atomics, bulk memory and SIMD
+    // features (which libOpenCOR itself is built with) for our WASM version and the host CPU for our native versions
+    // (since we JIT our code on the machine that runs it).
+    // Note #1: our target machine is used to optimise our code (e.g., to decide whether and how to vectorise it) and,
+    //          for our WASM version, to generate it. Our native versions generate it using our ORC-based JIT, which
+    //          uses its own target machine, but for the same host CPU and features.
+    // Note #2: Clang's driver maps the host CPU's features onto its own list of AArch64 extensions, which we cannot do
+    //          without it, so on AArch64 we optimise our code using the features that the host CPU implies. On x86-64,
+    //          we do use the host CPU's features, as the driver does for -march=native. Indeed, the operating system
+    //          may not support all the features that the host CPU's name implies (e.g., AVX in some virtual machines),
+    //          in which case getHostCPUFeatures() reports them as disabled.
 
 #ifdef __EMSCRIPTEN__
-    // Ensure all functions have atomics enabled in their target features. Clang doesn't add +atomics by default for
-    // WebAssembly targets, but without it the WebAssembly backend won't mark the memory import as shared, causing
-    // instantiation failures when loading the compiled module into a shared memory environment.
+    // Note: the features that Clang uses are those of the generic CPU and those that we want to use (i.e. atomics, bulk
+    //       memory, and SIMD).
 
-    for (auto &func : *module) {
-        if (func.isDeclaration()) {
-            continue;
-        }
-
-        const auto featuresAttr {func.getFnAttribute("target-features")};
-
-        if (featuresAttr.isValid()) {
-            std::string featuresString {featuresAttr.getValueAsString()};
-
-            if (featuresString.find("+atomics") == std::string::npos) {
-                featuresString += ",+atomics";
-
-                func.addFnAttr("target-features", featuresString);
-            }
-        }
-    }
-#endif
-
-    // Initialise the native target and its ASM printer.
-
-    llvm::InitializeNativeTarget();
-    llvm::InitializeNativeTargetAsmPrinter();
-
-#ifdef __EMSCRIPTEN__
-    // Look up the target.
+    static constexpr auto TRIPLE {"wasm32-unknown-emscripten"};
+    static constexpr auto FEATURES {"+atomics,+bulk-memory,+bulk-memory-opt,+call-indirect-overlong,+multivalue,+mutable-globals,+nontrapping-fptoint,+reference-types,+sign-ext,+simd128"};
 
     std::string error;
-    auto target {llvm::TargetRegistry::lookupTarget(module->getTargetTriple(), error)};
+    auto target {llvm::TargetRegistry::lookupTarget(llvm::Triple(TRIPLE), error)};
 
     if (target == nullptr) {
-        error[0] = static_cast<char>(tolower(error[0]));
-
-        const auto targetTriple {module->getTargetTriple().str()};
-        std::string targetError;
-
-        targetError.reserve(targetTriple.size() + error.size() + 32); // NOLINT
-
-        targetError += "the target (";
-        targetError += targetTriple;
-        targetError += ") could not be found: ";
-        targetError += error;
-
-        addError(targetError);
+        addError("The target (" + std::string(TRIPLE) + ") could not be found (" + error + ").");
 
         return false;
     }
 
-    // Create a target machine.
-
-    auto targetMachine {std::unique_ptr<llvm::TargetMachine>(target->createTargetMachine(module->getTargetTriple(),
-                                                                                         "generic", "+atomics,+bulk-memory",
-                                                                                         llvm::TargetOptions(),
-                                                                                         llvm::Reloc::Static,
-                                                                                         std::nullopt,
-                                                                                         llvm::CodeGenOptLevel::Aggressive))};
+    std::unique_ptr<llvm::TargetMachine> targetMachine {target->createTargetMachine(llvm::Triple(TRIPLE), "generic", FEATURES,
+                                                                                    llvm::TargetOptions(),
+                                                                                    llvm::Reloc::Static,
+                                                                                    std::nullopt,
+                                                                                    llvm::CodeGenOptLevel::Aggressive)};
 
     if (targetMachine == nullptr) {
         addError("A target machine could not be created.");
 
         return false;
     }
+#else
+    auto jitTargetMachineBuilder {llvm::orc::JITTargetMachineBuilder::detectHost()};
 
-    // Get the target machine to emit some WebAssembly code.
+#    ifndef CODE_COVERAGE_ENABLED
+    if (!jitTargetMachineBuilder) {
+        addError("A target machine builder for the host system could not be created" + llvmErrorMessage(jitTargetMachineBuilder.takeError()) + ".");
+
+        return false;
+    }
+#    endif
+
+    jitTargetMachineBuilder->setCodeGenOptLevel(llvm::CodeGenOptLevel::Aggressive);
+
+    auto optimisationTargetMachineBuilder {*jitTargetMachineBuilder};
+
+#    ifndef BUILDING_ON_INTEL
+    optimisationTargetMachineBuilder.getFeatures() = llvm::SubtargetFeatures();
+#    endif
+
+    auto expectedTargetMachine {optimisationTargetMachineBuilder.createTargetMachine()};
+
+#    ifndef CODE_COVERAGE_ENABLED
+    if (!expectedTargetMachine) {
+        addError("A target machine could not be created" + llvmErrorMessage(expectedTargetMachine.takeError()) + ".");
+
+        return false;
+    }
+#    endif
+
+    auto targetMachine {std::move(*expectedTargetMachine)};
+#endif
+
+    // Generate some LLVM IR for the given code.
+    // Note: we generate the IR that Clang would have generated for us, i.e. the IR that its driver would have generated
+    //       for
+    //           clang -O3 -fno-math-errno -fno-trapping-math -fno-stack-protector -funroll-loops -march=native
+    //       (with -mcpu=native rather than -march=native on AArch64), and our IR generator only needs to know about the
+    //       parts of it that depend on our target. For our WASM version, it is the IR for wasm32-unknown-emscripten with
+    //       -fvisibility=hidden and a static relocation model (we don't link our code, we just instantiate it).
+
+    static const auto irGeneratorTarget {[&targetMachine] {
+        IrGeneratorTarget res;
+
+        res.triple = targetMachine->getTargetTriple().str();
+        res.dataLayout = targetMachine->createDataLayout().getStringRepresentation();
+        res.longBits = static_cast<unsigned int>(sizeof(long) * CHAR_BIT); // NOLINT
+        res.functionAttributes = {
+            {"no-trapping-math", "true"},
+            {"stack-protector-buffer-size", "8"},
+            {"target-cpu", targetMachine->getTargetCPU().str()},
+        };
+
+        // Note: the module flags are those that Clang sets (in that order), i.e. the size of wchar_t (2 bytes on
+        //       Windows and 4 bytes elsewhere) and, for our native versions, the PIC level (-pic-level 2), the PIE
+        //       level (-pic-is-pie, on Linux only), the kind of unwind tables (-funwind-tables), and the frame pointer
+        //       (-mframe-pointer, unless it is none).
+
+        static constexpr auto ERROR {static_cast<unsigned int>(llvm::Module::Error)};
+        [[maybe_unused]] static constexpr auto MAX {static_cast<unsigned int>(llvm::Module::Max)};
+        [[maybe_unused]] static constexpr auto BIG_PIC {static_cast<unsigned int>(llvm::PICLevel::BigPIC)};
+        [[maybe_unused]] static constexpr auto SYNC_UWTABLE {static_cast<unsigned int>(llvm::UWTableKind::Sync)};
+        [[maybe_unused]] static constexpr auto ASYNC_UWTABLE {static_cast<unsigned int>(llvm::UWTableKind::Async)};
+
+#ifdef __EMSCRIPTEN__
+        res.functionAttributes.emplace_back("target-features", FEATURES);
+        res.unprototypedDeclarationAttributes.emplace_back("no-prototype", "");
+
+        res.moduleFlags = {{ERROR, "wchar_size", 4}};
+        res.largeArrayMinBits = 128; // NOLINT
+        res.largeArrayAlignment = 128; // NOLINT
+        res.definitionVisibility = llvm::GlobalValue::HiddenVisibility;
+        res.dsoLocalDefinitions = true;
+#else
+#    if defined(BUILDING_ON_WINDOWS)
+#        if defined(BUILDING_ON_INTEL)
+        res.functionAttributes.emplace_back("frame-pointer", "none");
+
+        res.moduleFlags = {{ERROR, "wchar_size", 2},
+                           {MAX, "PIC Level", BIG_PIC},
+                           {MAX, "uwtable", ASYNC_UWTABLE}};
+#        else
+        res.functionAttributes.emplace_back("frame-pointer", "reserved");
+
+        res.moduleFlags = {{ERROR, "wchar_size", 2},
+                           {MAX, "PIC Level", BIG_PIC},
+                           {MAX, "uwtable", ASYNC_UWTABLE},
+                           {MAX, "frame-pointer", static_cast<unsigned int>(llvm::FramePointerKind::Reserved)}};
+#        endif
+
+        res.uwtable = ASYNC_UWTABLE;
+        res.dsoLocalDefinitions = true;
+        res.dsoLocalDeclarations = true;
+#    elif defined(BUILDING_ON_LINUX)
+        static constexpr auto LARGE_PIE {static_cast<unsigned int>(llvm::PIELevel::Large)};
+
+#        if defined(BUILDING_ON_INTEL)
+        res.functionAttributes.emplace_back("frame-pointer", "none");
+
+        res.moduleFlags = {{ERROR, "wchar_size", 4},
+                           {MAX, "PIC Level", BIG_PIC},
+                           {MAX, "PIE Level", LARGE_PIE},
+                           {MAX, "uwtable", ASYNC_UWTABLE}};
+#        else
+        res.functionAttributes.emplace_back("frame-pointer", "non-leaf-no-reserve");
+
+        res.moduleFlags = {{ERROR, "wchar_size", 4},
+                           {MAX, "PIC Level", BIG_PIC},
+                           {MAX, "PIE Level", LARGE_PIE},
+                           {MAX, "uwtable", ASYNC_UWTABLE},
+                           {MAX, "frame-pointer", static_cast<unsigned int>(llvm::FramePointerKind::NonLeafNoReserve)}};
+#        endif
+
+        res.uwtable = ASYNC_UWTABLE;
+        res.dsoLocalDefinitions = true;
+#    elif defined(BUILDING_ON_INTEL)
+        res.functionAttributes.emplace_back("frame-pointer", "all");
+
+        res.moduleFlags = {{ERROR, "wchar_size", 4},
+                           {MAX, "PIC Level", BIG_PIC},
+                           {MAX, "uwtable", ASYNC_UWTABLE},
+                           {MAX, "frame-pointer", static_cast<unsigned int>(llvm::FramePointerKind::All)}};
+        res.uwtable = ASYNC_UWTABLE;
+#    else
+        res.functionAttributes.emplace_back("frame-pointer", "non-leaf-no-reserve");
+
+        res.moduleFlags = {{ERROR, "wchar_size", 4},
+                           {MAX, "PIC Level", BIG_PIC},
+                           {MAX, "uwtable", SYNC_UWTABLE},
+                           {MAX, "frame-pointer", static_cast<unsigned int>(llvm::FramePointerKind::NonLeafNoReserve)}};
+        res.uwtable = SYNC_UWTABLE;
+#    endif
+
+#    ifdef BUILDING_ON_INTEL
+        res.functionAttributes.emplace_back("target-features", targetMachine->getTargetFeatureString().str());
+        res.functionAttributes.emplace_back("min-legal-vector-width", "0");
+
+        res.largeArrayMinBits = 128; // NOLINT
+        res.largeArrayAlignment = 128; // NOLINT
+#    endif
+#endif
+
+        return res;
+    }()};
+
+    // Note: as Clang does (with -discard-value-names), we discard the names of the values that are created since we
+    //       have no use for them.
+
+    auto llvmContext {std::make_unique<llvm::LLVMContext>()};
+
+    llvmContext->setDiscardValueNames(true);
+
+#if defined(BUILDING_ON_MACOS) && defined(BUILDING_ON_ARM)
+    // Skip LLVM's machine instruction scheduler on Apple Silicon since, there, it accounts for about a third of the time
+    // it takes to compile a big model (AArch64 schedules in both directions while tracking register pressure) while it
+    // makes no measurable difference to the time it takes to compute it (Apple's cores are wide out-of-order cores).
+    // Note: an OptPassGate is given the argument of a (legacy) pass, i.e. "machine-scheduler" in our case.
+
+    class NoMachineSchedulerPassGate: public llvm::OptPassGate
+    {
+    public:
+        [[nodiscard]] bool shouldRunPass(llvm::StringRef pPassName, llvm::StringRef /*pIrDescription*/) const override
+        {
+            return pPassName != "machine-scheduler";
+        }
+
+        [[nodiscard]] bool isEnabled() const override
+        {
+            return true;
+        }
+    };
+
+    static NoMachineSchedulerPassGate noMachineSchedulerPassGate;
+
+    llvmContext->setOptPassGate(noMachineSchedulerPassGate);
+#endif
+
+    std::string irGeneratorError;
+    auto module {generateIr(pCode, *llvmContext, irGeneratorTarget, irGeneratorError)};
+
+    if (module == nullptr) {
+        addError("The given code could not be compiled.");
+        addError(irGeneratorError);
+
+        return false;
+    }
+
+    // Optimise our LLVM IR.
+
+    optimise(*module, *targetMachine);
+
+#if defined(BUILDING_ON_WINDOWS) && defined(BUILDING_ON_ARM)
+    // On Windows on ARM, our ORC-based JIT uses RuntimeDyld which relocates the address of an external function (e.g.,
+    // cos() when it is used as a function pointer) using an ADRP instruction, i.e. within ±4 GB of our code and without
+    // checking that range. So, we would end up with an invalid address for a function that is further away (as is
+    // typically the case for a function in a DLL). To avoid this, we import our external functions (as if they were in
+    // a DLL), in which case RuntimeDyld stores their full address next to our code.
+
+    for (auto &function : *module) {
+        if (function.isDeclaration() && !function.isIntrinsic()) {
+            function.setDSOLocal(false);
+            function.setDLLStorageClass(llvm::GlobalValue::DLLImportStorageClass);
+        }
+    }
+#endif
+
+#ifdef __EMSCRIPTEN__
+    // Get our target machine to emit some WebAssembly code.
 
     llvm::legacy::PassManager passManager;
     llvm::SmallVector<char, 0> outputBuffer;
@@ -632,30 +630,13 @@ extern double atanh(double);
 
     return true;
 #else
-    // Create an ORC-based JIT with a target machine builder for the host system.
-    // Note: we set the CPU to the host CPU name and the optimisation level to aggressive. This is because the default
-    //       CPU is generic and the default optimisation level is none, which can lead to suboptimal performance for the
-    //       generated code.
+    // Create an ORC-based JIT with our target machine builder for the host system.
 
-    auto jitTargetMachineBuilder {llvm::orc::JITTargetMachineBuilder(llvm::Triple(llvm::sys::getProcessTriple()))};
-
-    jitTargetMachineBuilder.setCPU(llvm::sys::getHostCPUName().str());
-    jitTargetMachineBuilder.setCodeGenOptLevel(llvm::CodeGenOptLevel::Aggressive);
-
-    auto lljit {llvm::orc::LLJITBuilder().setJITTargetMachineBuilder(std::move(jitTargetMachineBuilder)).create()};
+    auto lljit {llvm::orc::LLJITBuilder().setJITTargetMachineBuilder(std::move(*jitTargetMachineBuilder)).create()};
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!lljit) {
-        auto llvmError {llvmClangError(lljit.takeError())};
-        std::string error;
-
-        error.reserve(37 + llvmError.size()); // NOLINT
-
-        error += "An ORC-based JIT could not be created";
-        error += llvmError;
-        error += ".";
-
-        addError(error);
+        addError("An ORC-based JIT could not be created" + llvmErrorMessage(lljit.takeError()) + ".");
 
         return false;
     }
@@ -669,16 +650,7 @@ extern double atanh(double);
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!dynamicLibrarySearchGenerator) {
-        auto llvmError {llvmClangError(dynamicLibrarySearchGenerator.takeError())};
-        std::string error;
-
-        error.reserve(56 + llvmError.size()); // NOLINT
-
-        error += "The dynamic library search generator could not be created";
-        error += llvmError;
-        error += ".";
-
-        addError(error);
+        addError("The dynamic library search generator could not be created" + llvmErrorMessage(dynamicLibrarySearchGenerator.takeError()) + ".");
 
         return false;
     }
@@ -686,20 +658,13 @@ extern double atanh(double);
 
     mLljit->getMainJITDylib().addGenerator(std::move(*dynamicLibrarySearchGenerator));
 
-    // Add our LLVM bitcode module to our ORC-based JIT.
+    // Add our LLVM IR module to our ORC-based JIT.
 
-    auto threadSafeModule {llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext))};
-
-#    ifdef CODE_COVERAGE_ENABLED
-    const bool res =
-#    else
-    res =
-#    endif
-        !mLljit->addIRModule(std::move(threadSafeModule));
+    const bool res {!mLljit->addIRModule(llvm::orc::ThreadSafeModule(std::move(module), std::move(llvmContext)))};
 
 #    ifndef CODE_COVERAGE_ENABLED
     if (!res) {
-        addError("The LLVM bitcode module could not be added to the ORC-based JIT.");
+        addError("The LLVM IR module could not be added to the ORC-based JIT.");
     }
 #    endif
 

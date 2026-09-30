@@ -1,0 +1,979 @@
+diff --git a/llvm/CMakeLists.txt b/llvm/CMakeLists.txt
+index fcbfed4..ff3cbfe 100644
+--- a/llvm/CMakeLists.txt
++++ b/llvm/CMakeLists.txt
+@@ -684,6 +684,29 @@ option(LLVM_ENABLE_PEDANTIC "Compile with pedantic enabled." ON)
+ option(LLVM_ENABLE_WERROR "Fail and stop if a warning is triggered." OFF)
+ 
+ option(LLVM_ENABLE_DUMP "Enable dump functions even when assertions are disabled" OFF)
++
++# libOpenCOR: allow the optimizations that LLVM's default pipelines only perform when given profile data or a vector
++# library (-fveclib=), when enabled through a command-line option (-mllvm) or a pipeline tuning option that is off by
++# default (loop interchange, loop fusion, function merging and speculative devirtualization), or on code that uses
++# OpenMP or coroutines, to be compiled out, so as to minimise the footprint of an embedder that never uses them. When
++# this option is disabled, the default pipelines are otherwise unchanged, profile data, vector libraries and those
++# pipeline tuning options result in a fatal error, the command-line options that would enable those optimizations are
++# not available, coroutines are not supported, and the analyses that the default pipelines never use are not registered
++# (so they cannot be used in a textual pipeline).
++option(LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
++  "Support the optimizations that LLVM's default pipelines only perform with profile data, a vector library, a command-line option, a non-default pipeline tuning option, OpenMP or coroutines." ON)
++
++# libOpenCOR: allow the SLP vectorizer to be compiled out, so as to minimise the footprint of an embedder that never
++# uses it (i.e. that never sets PipelineTuningOptions::SLPVectorization). When this option is disabled, setting
++# PipelineTuningOptions::SLPVectorization results in a fatal error.
++option(LLVM_ENABLE_SLP_VECTORIZER "Support SLP vectorization." ON)
++
++# libOpenCOR: allow the code generator's support for inline assembly and debug information, as well as the demangling
++# of names in diagnostics, to be compiled out, so as to minimise the footprint of an embedder that never uses them.
++# When this option is disabled, inline assembly and debug information result in a fatal error, and diagnostics
++# report mangled names.
++option(LLVM_ENABLE_OPTIONAL_CODE_GENERATION
++  "Support inline assembly and debug information in the code generator, and demangled names in diagnostics." ON)
+ option(LLVM_UNREACHABLE_OPTIMIZE "Optimize llvm_unreachable() as undefined behavior (default), guaranteed trap when OFF" ON)
+ 
+ if( NOT uppercase_CMAKE_BUILD_TYPE STREQUAL "DEBUG" )
+@@ -852,6 +875,12 @@ option(LLVM_BUILD_TESTS
+   "Build LLVM unit tests. If OFF, just generate build targets." OFF)
+ option(LLVM_INCLUDE_TESTS "Generate build targets for the LLVM unit tests." ON)
+ 
++# libOpenCOR: see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS, LLVM_ENABLE_SLP_VECTORIZER and
++# LLVM_ENABLE_OPTIONAL_CODE_GENERATION above.
++if(LLVM_INCLUDE_TESTS AND NOT (LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS AND LLVM_ENABLE_SLP_VECTORIZER AND LLVM_ENABLE_OPTIONAL_CODE_GENERATION))
++  message(FATAL_ERROR "LLVM_INCLUDE_TESTS requires LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS, LLVM_ENABLE_SLP_VECTORIZER and LLVM_ENABLE_OPTIONAL_CODE_GENERATION.")
++endif()
++
+ option(LLVM_INSTALL_GTEST
+   "Install the llvm gtest library.  This should be on if you want to do
+    stand-alone builds of the other projects and run their unit tests." OFF)
+diff --git a/llvm/include/llvm/Config/config.h.cmake b/llvm/include/llvm/Config/config.h.cmake
+index ce83de8..f93ff02 100644
+--- a/llvm/include/llvm/Config/config.h.cmake
++++ b/llvm/include/llvm/Config/config.h.cmake
+@@ -19,6 +19,21 @@
+ /* Define to 1 to enable crash memory dumps, and to 0 otherwise. */
+ #cmakedefine01 LLVM_ENABLE_CRASH_DUMPS
+ 
++/* libOpenCOR: define to 1 to support the optimizations that the default
++   pipelines only perform with profile data, a vector library, a command-line
++   option, a non-default pipeline tuning option, OpenMP or coroutines, and to 0
++   otherwise (see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS in llvm/CMakeLists.txt). */
++#cmakedefine01 LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
++
++/* libOpenCOR: define to 1 to support SLP vectorization, and to 0 otherwise (see
++   LLVM_ENABLE_SLP_VECTORIZER in llvm/CMakeLists.txt). */
++#cmakedefine01 LLVM_ENABLE_SLP_VECTORIZER
++
++/* libOpenCOR: define to 1 to support inline assembly and debug information in
++   the code generator, and demangled names in diagnostics, and to 0 otherwise
++   (see LLVM_ENABLE_OPTIONAL_CODE_GENERATION in llvm/CMakeLists.txt). */
++#cmakedefine01 LLVM_ENABLE_OPTIONAL_CODE_GENERATION
++
+ /* Define to 1 to prefer forward slashes on Windows, and to 0 prefer
+    backslashes. */
+ #cmakedefine01 LLVM_WINDOWS_PREFER_FORWARD_SLASH
+diff --git a/llvm/lib/Analysis/InlineAdvisor.cpp b/llvm/lib/Analysis/InlineAdvisor.cpp
+index 1fb2f7e..0027474 100644
+--- a/llvm/lib/Analysis/InlineAdvisor.cpp
++++ b/llvm/lib/Analysis/InlineAdvisor.cpp
+@@ -23,6 +23,7 @@
+ #include "llvm/Analysis/ReplayInlineAdvisor.h"
+ #include "llvm/Analysis/TargetLibraryInfo.h"
+ #include "llvm/Analysis/TargetTransformInfo.h"
++#include "llvm/Config/config.h"
+ #include "llvm/Analysis/Utils/ImportedFunctionsInliningStatistics.h"
+ #include "llvm/IR/DebugInfoMetadata.h"
+ #include "llvm/IR/Module.h"
+@@ -248,9 +249,15 @@ bool InlineAdvisorAnalysis::Result::tryCreate(
+     // Restrict replay to default advisor, ML advisors are stateful so
+     // replay will need augmentations to interleave with them correctly.
+     if (!ReplaySettings.ReplayFile.empty()) {
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+       Advisor = llvm::getReplayInlineAdvisor(M, FAM, M.getContext(),
+                                              std::move(Advisor), ReplaySettings,
+                                              /* EmitRemarks =*/true, IC);
++#else
++      // libOpenCOR: see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS in
++      // llvm/CMakeLists.txt.
++      report_fatal_error("Inline replay is not supported by this build of LLVM.");
++#endif
+     }
+     break;
+     // Run IR2VecVocabAnalysis once per module to get the vocabulary.
+@@ -265,10 +272,15 @@ bool InlineAdvisorAnalysis::Result::tryCreate(
+ #endif
+     break;
+   case InliningAdvisorMode::Release:
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+     LLVM_DEBUG(dbgs() << "Using release-mode inliner policy.\n");
+     if (!InlineAdvisorAnalysis::initializeIR2VecVocabIfRequested(M, MAM))
+       return false;
+     Advisor = llvm::getReleaseModeAdvisor(M, MAM, GetDefaultAdvice);
++#else
++    // libOpenCOR: see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS in llvm/CMakeLists.txt.
++    report_fatal_error("The ML inliner is not supported by this build of LLVM.");
++#endif
+     break;
+   }
+ 
+diff --git a/llvm/lib/Analysis/TargetLibraryInfo.cpp b/llvm/lib/Analysis/TargetLibraryInfo.cpp
+index 51b1f58..b93b51b 100644
+--- a/llvm/lib/Analysis/TargetLibraryInfo.cpp
++++ b/llvm/lib/Analysis/TargetLibraryInfo.cpp
+@@ -14,10 +14,12 @@
+ #include "llvm/ADT/DenseMap.h"
+ #include "llvm/ADT/SmallString.h"
+ #include "llvm/ADT/StringTable.h"
++#include "llvm/Config/config.h"
+ #include "llvm/IR/Constants.h"
+ #include "llvm/IR/Module.h"
+ #include "llvm/IR/SystemLibraries.h"
+ #include "llvm/InitializePasses.h"
++#include "llvm/Support/ErrorHandling.h"
+ #include "llvm/TargetParser/Triple.h"
+ using namespace llvm;
+ 
+@@ -1252,6 +1254,7 @@ void TargetLibraryInfoImpl::addVectorizableFunctions(ArrayRef<VecDesc> Fns) {
+   llvm::sort(ScalarDescs, compareByVectorFnName);
+ }
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static const VecDesc VecFuncs_Accelerate[] = {
+ #define TLI_DEFINE_ACCELERATE_VECFUNCS
+ #include "llvm/Analysis/VecFuncs.def"
+@@ -1335,9 +1338,16 @@ const VecDesc VecFuncs_AMDLIBM[] = {
+ #include "llvm/Analysis/VecFuncs.def"
+ #undef TLI_DEFINE_AMDLIBM_VECFUNCS
+ };
++#endif
+ 
+ void TargetLibraryInfoImpl::addVectorizableFunctionsFromVecLib(
+     enum VectorLibrary VecLib, const llvm::Triple &TargetTriple) {
++#if !LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
++  // libOpenCOR: see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS in llvm/CMakeLists.txt.
++  if (VecLib != VectorLibrary::NoLibrary)
++    report_fatal_error(
++        "Vector libraries are not supported by this build of LLVM.");
++#else
+   switch (VecLib) {
+   case VectorLibrary::Accelerate: {
+     addVectorizableFunctions(VecFuncs_Accelerate);
+@@ -1404,6 +1414,7 @@ void TargetLibraryInfoImpl::addVectorizableFunctionsFromVecLib(
+   case VectorLibrary::NoLibrary:
+     break;
+   }
++#endif
+ }
+ 
+ bool TargetLibraryInfoImpl::isFunctionVectorizable(StringRef funcName) const {
+diff --git a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+index d96294e..0069f7e 100644
+--- a/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
++++ b/llvm/lib/CodeGen/AsmPrinter/AsmPrinter.cpp
+@@ -589,6 +589,12 @@ bool AsmPrinter::doInitialization(Module &M) {
+     OutStreamer->addBlankLine();
+   }
+ 
++#if !LLVM_ENABLE_OPTIONAL_CODE_GENERATION
++  // libOpenCOR: see LLVM_ENABLE_OPTIONAL_CODE_GENERATION in llvm/CMakeLists.txt.
++  if (hasDebugInfo())
++    report_fatal_error(
++        "Debug information is not supported by this build of LLVM.");
++#else
+   if (MAI->doesSupportDebugInformation()) {
+     bool EmitCodeView = M.getCodeViewFlag();
+     // On Windows targets, emit minimal CodeView compiler info even when debug
+@@ -603,6 +609,7 @@ bool AsmPrinter::doInitialization(Module &M) {
+       }
+     }
+   }
++#endif
+ 
+   if (M.getNamedMetadata(PseudoProbeDescMetadataName))
+     PP = std::make_unique<PseudoProbeHandler>(this);
+diff --git a/llvm/lib/CodeGen/AsmPrinter/AsmPrinterInlineAsm.cpp b/llvm/lib/CodeGen/AsmPrinter/AsmPrinterInlineAsm.cpp
+index ae9fff8..967690f 100644
+--- a/llvm/lib/CodeGen/AsmPrinter/AsmPrinterInlineAsm.cpp
++++ b/llvm/lib/CodeGen/AsmPrinter/AsmPrinterInlineAsm.cpp
+@@ -22,6 +22,7 @@
+ #include "llvm/CodeGen/TargetSubtargetInfo.h"
+ #include "llvm/IR/Constants.h"
+ #include "llvm/IR/DataLayout.h"
++#include "llvm/Config/config.h"
+ #include "llvm/IR/DiagnosticInfo.h"
+ #include "llvm/IR/InlineAsm.h"
+ #include "llvm/IR/LLVMContext.h"
+@@ -98,6 +99,10 @@ void AsmPrinter::emitInlineAsm(StringRef Str, const MCSubtargetInfo &STI,
+     return;
+   }
+ 
++#if !LLVM_ENABLE_OPTIONAL_CODE_GENERATION
++  // libOpenCOR: see LLVM_ENABLE_OPTIONAL_CODE_GENERATION in llvm/CMakeLists.txt.
++  report_fatal_error("Inline assembly is not supported by this build of LLVM.");
++#else
+   unsigned BufNum = addInlineAsmDiagBuffer(Str, LocMDNode);
+   SourceMgr &SrcMgr = *MMI->getContext().getInlineSourceManager();
+   SrcMgr.setIncludeDirs(MCOptions.IASSearchPaths);
+@@ -137,8 +142,10 @@ void AsmPrinter::emitInlineAsm(StringRef Str, const MCSubtargetInfo &STI,
+   (void)Parser->Run(/*NoInitialTextSection*/ true,
+                     /*NoFinalize*/ true);
+   emitInlineAsmEnd(STI, &TAP->getSTI(), MI);
++#endif
+ }
+ 
++#if LLVM_ENABLE_OPTIONAL_CODE_GENERATION
+ static void EmitInlineAsmStr(const char *AsmStr, const MachineInstr *MI,
+                              MachineModuleInfo *MMI, const MCAsmInfo *MAI,
+                              AsmPrinter *AP, uint64_t LocCookie,
+@@ -424,6 +431,12 @@ void AsmPrinter::emitInlineAsm(const MachineInstr *MI) {
+   // enabled, so we use emitRawComment.
+   OutStreamer->emitRawComment(MAI->getInlineAsmEnd());
+ }
++#else
++void AsmPrinter::emitInlineAsm(const MachineInstr *) {
++  // libOpenCOR: see LLVM_ENABLE_OPTIONAL_CODE_GENERATION in llvm/CMakeLists.txt.
++  report_fatal_error("Inline assembly is not supported by this build of LLVM.");
++}
++#endif
+ 
+ /// PrintSpecial - Print information related to the specified machine instr
+ /// that is independent of the operand, and may be independent of the instr
+diff --git a/llvm/lib/CodeGen/CodeGen.cpp b/llvm/lib/CodeGen/CodeGen.cpp
+index 3550eea..715942e 100644
+--- a/llvm/lib/CodeGen/CodeGen.cpp
++++ b/llvm/lib/CodeGen/CodeGen.cpp
+@@ -11,6 +11,7 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++#include "llvm/Config/config.h"
+ #include "llvm/InitializePasses.h"
+ #include "llvm/PassRegistry.h"
+ 
+@@ -69,7 +70,10 @@ void llvm::initializeCodeGen(PassRegistry &Registry) {
+   initializeMIRAddFSDiscriminatorsPass(Registry);
+   initializeMIRCanonicalizerPass(Registry);
+   initializeMIRNamerPass(Registry);
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
++  // libOpenCOR: see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS in llvm/CMakeLists.txt.
+   initializeMIRProfileLoaderPassPass(Registry);
++#endif
+   initializeMachineBlockFrequencyInfoWrapperPassPass(Registry);
+   initializeMachineBlockPlacementLegacyPass(Registry);
+   initializeMachineBlockPlacementStatsLegacyPass(Registry);
+diff --git a/llvm/lib/CodeGen/MIRSampleProfile.cpp b/llvm/lib/CodeGen/MIRSampleProfile.cpp
+index d44f577..6d9093f 100644
+--- a/llvm/lib/CodeGen/MIRSampleProfile.cpp
++++ b/llvm/lib/CodeGen/MIRSampleProfile.cpp
+@@ -24,6 +24,7 @@
+ #include "llvm/CodeGen/MachineOptimizationRemarkEmitter.h"
+ #include "llvm/CodeGen/MachinePostDominators.h"
+ #include "llvm/CodeGen/Passes.h"
++#include "llvm/Config/config.h"
+ #include "llvm/IR/Function.h"
+ #include "llvm/IR/PseudoProbe.h"
+ #include "llvm/InitializePasses.h"
+@@ -82,7 +83,13 @@ FunctionPass *
+ llvm::createMIRProfileLoaderPass(std::string File, std::string RemappingFile,
+                                  FSDiscriminatorPass P,
+                                  IntrusiveRefCntPtr<vfs::FileSystem> FS) {
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+   return new MIRProfileLoaderPass(File, RemappingFile, P, std::move(FS));
++#else
++  // libOpenCOR: see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS in llvm/CMakeLists.txt.
++  report_fatal_error(
++      "Profile-guided optimizations are not supported by this build of LLVM.");
++#endif
+ }
+ 
+ namespace llvm {
+diff --git a/llvm/lib/IR/DiagnosticInfo.cpp b/llvm/lib/IR/DiagnosticInfo.cpp
+index 8e6d654..4866056 100644
+--- a/llvm/lib/IR/DiagnosticInfo.cpp
++++ b/llvm/lib/IR/DiagnosticInfo.cpp
+@@ -15,6 +15,7 @@
+ #include "llvm/ADT/StringExtras.h"
+ #include "llvm/ADT/Twine.h"
+ #include "llvm/ADT/iterator_range.h"
++#include "llvm/Config/config.h"
+ #include "llvm/Demangle/Demangle.h"
+ #include "llvm/IR/BasicBlock.h"
+ #include "llvm/IR/Constants.h"
+@@ -495,7 +496,12 @@ void llvm::diagnoseDontCall(const CallInst &CI) {
+ }
+ 
+ void DiagnosticInfoDontCall::print(DiagnosticPrinter &DP) const {
++#if LLVM_ENABLE_OPTIONAL_CODE_GENERATION
+   DP << "call to " << demangle(getFunctionName()) << " marked \"dontcall-";
++#else
++  // libOpenCOR: see LLVM_ENABLE_OPTIONAL_CODE_GENERATION in llvm/CMakeLists.txt.
++  DP << "call to " << getFunctionName() << " marked \"dontcall-";
++#endif
+   if (getSeverity() == DiagnosticSeverity::DS_Error)
+     DP << "error\"";
+   else
+diff --git a/llvm/lib/Passes/PassBuilder.cpp b/llvm/lib/Passes/PassBuilder.cpp
+index 8bb78c8..2051a24 100644
+--- a/llvm/lib/Passes/PassBuilder.cpp
++++ b/llvm/lib/Passes/PassBuilder.cpp
+@@ -179,6 +179,7 @@
+ #include "llvm/CodeGen/WasmEHPrepare.h"
+ #include "llvm/CodeGen/WinEHPrepare.h"
+ #include "llvm/CodeGen/XRayInstrumentation.h"
++#include "llvm/Config/config.h"
+ #include "llvm/IR/DebugInfo.h"
+ #include "llvm/IR/Dominators.h"
+ #include "llvm/IR/PassManager.h"
+@@ -507,8 +508,30 @@ PassBuilder::PassBuilder(TargetMachine *TM, PipelineTuningOptions PTO,
+                          PassInstrumentationCallbacks *PIC,
+                          IntrusiveRefCntPtr<vfs::FileSystem> FS)
+     : TM(TM), PTO(PTO), PGOOpt(PGOOpt), PIC(PIC), FS(std::move(FS)) {
++#if !LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
++  // libOpenCOR: see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS in llvm/CMakeLists.txt.
++  if (PGOOpt)
++    report_fatal_error(
++        "Profile-guided optimizations are not supported by this build of LLVM.");
++  if (PTO.LoopInterchange || PTO.LoopFusion || PTO.MergeFunctions ||
++      PTO.DevirtualizeSpeculatively)
++    report_fatal_error("Loop interchange, loop fusion, function merging and "
++                       "speculative devirtualization are not supported by "
++                       "this build of LLVM.");
++#endif
++#if !LLVM_ENABLE_SLP_VECTORIZER
++  // libOpenCOR: see LLVM_ENABLE_SLP_VECTORIZER in llvm/CMakeLists.txt.
++  if (PTO.SLPVectorization)
++    report_fatal_error(
++        "SLP vectorization is not supported by this build of LLVM.");
++#endif
+   if (TM)
+     TM->registerPassBuilderCallbacks(*this);
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
++  // libOpenCOR: when LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS is disabled (see
++  // llvm/CMakeLists.txt), pass instrumentation refers to passes by their class
++  // name and textual pipelines cannot invoke extension point callbacks (e.g.
++  // "vectorizer-start").
+   if (PIC) {
+     PIC->registerClassToPassNameCallback([this, PIC]() {
+       // MSVC requires this to be captured if it's used inside decltype.
+@@ -642,6 +665,7 @@ PassBuilder::PassBuilder(TargetMachine *TM, PipelineTuningOptions PTO,
+ #include "PassRegistry.def"
+         return false;
+       });
++#endif
+ }
+ 
+ void PassBuilder::registerModuleAnalyses(ModuleAnalysisManager &MAM) {
+diff --git a/llvm/lib/Passes/PassBuilderPipelines.cpp b/llvm/lib/Passes/PassBuilderPipelines.cpp
+index 1584d30..7130286 100644
+--- a/llvm/lib/Passes/PassBuilderPipelines.cpp
++++ b/llvm/lib/Passes/PassBuilderPipelines.cpp
+@@ -26,6 +26,7 @@
+ #include "llvm/Analysis/ProfileSummaryInfo.h"
+ #include "llvm/Analysis/ScopedNoAliasAA.h"
+ #include "llvm/Analysis/TypeBasedAliasAnalysis.h"
++#include "llvm/Config/config.h"
+ #include "llvm/IR/PassManager.h"
+ #include "llvm/Pass.h"
+ #include "llvm/Passes/OptimizationLevel.h"
+@@ -153,8 +154,31 @@
+ 
+ using namespace llvm;
+ 
++#if !LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
++// libOpenCOR: profile-guided optimizations are compiled out (see
++// LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS in llvm/CMakeLists.txt) and the
++// PassBuilder constructor rejects any PGO options, which means that
++// PassBuilder::PGOOpt is always empty. Let the compiler know it, so that it can
++// drop all the code that depends on PassBuilder::PGOOpt.
++#define PGOOpt (std::optional<PGOOptions>{})
++#endif
++
++// libOpenCOR: when LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS is disabled (see
++// llvm/CMakeLists.txt), the PassBuilder constructor rejects the pipeline tuning
++// options that enable loop interchange, loop fusion, function merging and
++// speculative devirtualization, and we don't run the passes that only transform
++// code that uses OpenMP (i.e. that has an "openmp" module flag) or coroutines
++// (i.e. that uses coroutine intrinsics). Similarly, when
++// LLVM_ENABLE_SLP_VECTORIZER is disabled, the PassBuilder constructor rejects
++// the pipeline tuning option that enables SLP vectorization. Let the compiler
++// know it, so that it can drop all the code that depends on them.
++static constexpr bool OptionalOptimizations =
++    LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS;
++static constexpr bool SLPVectorizer = LLVM_ENABLE_SLP_VECTORIZER;
++
+ namespace llvm {
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<InliningAdvisorMode> UseInlineAdvisor(
+     "enable-ml-inliner", cl::init(InliningAdvisorMode::Default), cl::Hidden,
+     cl::desc("Enable ML policy for inliner. Currently trained for -Oz only"),
+@@ -164,6 +188,10 @@ static cl::opt<InliningAdvisorMode> UseInlineAdvisor(
+                           "Use development mode (runtime-loadable model)"),
+                clEnumValN(InliningAdvisorMode::Release, "release",
+                           "Use release mode (AOT-compiled model)")));
++#else
++static constexpr InliningAdvisorMode UseInlineAdvisor =
++    InliningAdvisorMode::Default;
++#endif
+ 
+ /// Flag to enable inline deferral during PGO.
+ static cl::opt<bool>
+@@ -171,9 +199,13 @@ static cl::opt<bool>
+                             cl::Hidden,
+                             cl::desc("Enable inline deferral during PGO"));
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> EnableModuleInliner("enable-module-inliner",
+                                          cl::init(false), cl::Hidden,
+                                          cl::desc("Enable module inliner"));
++#else
++static constexpr bool EnableModuleInliner = false;
++#endif
+ 
+ static cl::opt<bool> PerformMandatoryInliningsFirst(
+     "mandatory-inlining-first", cl::init(false), cl::Hidden,
+@@ -184,9 +216,13 @@ static cl::opt<bool> EnableEagerlyInvalidateAnalyses(
+     "eagerly-invalidate-analyses", cl::init(true), cl::Hidden,
+     cl::desc("Eagerly invalidate more analyses in default pipelines"));
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> EnableMergeFunctions(
+     "enable-merge-functions", cl::init(false), cl::Hidden,
+     cl::desc("Enable function merging as part of the optimization pipeline"));
++#else
++static constexpr bool EnableMergeFunctions = false;
++#endif
+ 
+ static cl::opt<bool> EnablePostPGOLoopRotation(
+     "enable-post-pgo-loop-rotation", cl::init(true), cl::Hidden,
+@@ -196,28 +232,52 @@ static cl::opt<bool> EnableGlobalAnalyses(
+     "enable-global-analyses", cl::init(true), cl::Hidden,
+     cl::desc("Enable inter-procedural analyses"));
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> RunPartialInlining("enable-partial-inlining",
+                                         cl::init(false), cl::Hidden,
+                                         cl::desc("Run Partial inlining pass"));
++#else
++static constexpr bool RunPartialInlining = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> ExtraVectorizerPasses(
+     "extra-vectorizer-passes", cl::init(false), cl::Hidden,
+     cl::desc("Run cleanup optimization passes after vectorization"));
++#else
++static constexpr bool ExtraVectorizerPasses = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> RunNewGVN("enable-newgvn", cl::init(false), cl::Hidden,
+                                cl::desc("Run the NewGVN pass"));
++#else
++static constexpr bool RunNewGVN = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool>
+     EnableLoopInterchange("enable-loopinterchange", cl::init(false), cl::Hidden,
+                           cl::desc("Enable the LoopInterchange Pass"));
++#else
++static constexpr bool EnableLoopInterchange = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> EnableUnrollAndJam("enable-unroll-and-jam",
+                                         cl::init(false), cl::Hidden,
+                                         cl::desc("Enable Unroll And Jam Pass"));
++#else
++static constexpr bool EnableUnrollAndJam = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> EnableLoopFlatten("enable-loop-flatten", cl::init(false),
+                                        cl::Hidden,
+                                        cl::desc("Enable the LoopFlatten Pass"));
++#else
++static constexpr bool EnableLoopFlatten = false;
++#endif
+ 
+ // Experimentally allow loop header duplication. This should allow for better
+ // optimization at Oz, since loop-idiom recognition can then recognize things
+@@ -228,18 +288,30 @@ static cl::opt<bool> EnableLoopHeaderDuplication(
+     "enable-loop-header-duplication", cl::init(false), cl::Hidden,
+     cl::desc("Enable loop header duplication at any optimization level"));
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool>
+     EnableDFAJumpThreading("enable-dfa-jump-thread",
+                            cl::desc("Enable DFA jump threading"),
+                            cl::init(false), cl::Hidden);
++#else
++static constexpr bool EnableDFAJumpThreading = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool>
+     EnableHotColdSplit("hot-cold-split",
+                        cl::desc("Enable hot-cold splitting pass"));
++#else
++static constexpr bool EnableHotColdSplit = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> EnableIROutliner("ir-outliner", cl::init(false),
+                                       cl::Hidden,
+                                       cl::desc("Enable ir outliner pass"));
++#else
++static constexpr bool EnableIROutliner = false;
++#endif
+ 
+ static cl::opt<bool>
+     DisablePreInliner("disable-preinline", cl::init(false), cl::Hidden,
+@@ -250,38 +322,61 @@ static cl::opt<int> PreInlineThreshold(
+     cl::desc("Control the amount of inlining in pre-instrumentation inliner "
+              "(default = 75)"));
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool>
+     EnableGVNHoist("enable-gvn-hoist",
+                    cl::desc("Enable the GVN hoisting pass (default = off)"));
++#else
++static constexpr bool EnableGVNHoist = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool>
+     EnableGVNSink("enable-gvn-sink",
+                   cl::desc("Enable the GVN sinking pass (default = off)"));
++#else
++static constexpr bool EnableGVNSink = false;
++#endif
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> EnableJumpTableToSwitch(
+     "enable-jump-table-to-switch",
+     cl::desc("Enable JumpTableToSwitch pass (default = off)"));
++#else
++static constexpr bool EnableJumpTableToSwitch = false;
++#endif
+ 
+ // This option is used in simplifying testing SampleFDO optimizations for
+ // profile loading.
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool>
+     EnableCHR("enable-chr", cl::init(true), cl::Hidden,
+               cl::desc("Enable control height reduction optimization (CHR)"));
++#else
++// libOpenCOR: CHR only transforms code that has profile data (see
++// ControlHeightReductionPass::run()).
++static constexpr bool EnableCHR = false;
++#endif
+ 
+ static cl::opt<bool> FlattenedProfileUsed(
+     "flattened-profile-used", cl::init(false), cl::Hidden,
+     cl::desc("Indicate the sample profile being used is flattened, i.e., "
+              "no inline hierarchy exists in the profile"));
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool>
+     EnableMatrix("enable-matrix", cl::init(false), cl::Hidden,
+                  cl::desc("Enable lowering of the matrix intrinsics"));
++#else
++static constexpr bool EnableMatrix = false;
++#endif
+ 
+ static cl::opt<bool> EnableConstraintElimination(
+     "enable-constraint-elimination", cl::init(true), cl::Hidden,
+     cl::desc(
+         "Enable pass to eliminate conditions based on linear constraints"));
+ 
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<AttributorRunOption> AttributorRun(
+     "attributor-enable", cl::Hidden, cl::init(AttributorRunOption::NONE),
+     cl::desc("Enable the attributor inter-procedural deduction pass"),
+@@ -293,13 +388,20 @@ static cl::opt<AttributorRunOption> AttributorRun(
+                           "enable call graph SCC attributor runs"),
+                clEnumValN(AttributorRunOption::NONE, "none",
+                           "disable attributor runs")));
++#else
++static constexpr AttributorRunOption AttributorRun = AttributorRunOption::NONE;
++#endif
+ 
+ static cl::opt<bool> EnableSampledInstr(
+     "enable-sampled-instrumentation", cl::init(false), cl::Hidden,
+     cl::desc("Enable profile instrumentation sampling (default = off)"));
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> UseLoopVersioningLICM(
+     "enable-loop-versioning-licm", cl::init(false), cl::Hidden,
+     cl::desc("Enable the experimental Loop Versioning LICM pass"));
++#else
++static constexpr bool UseLoopVersioningLICM = false;
++#endif
+ 
+ static cl::opt<std::string> InstrumentColdFuncOnlyPath(
+     "instrument-cold-function-only-path", cl::init(""),
+@@ -309,10 +411,14 @@ static cl::opt<std::string> InstrumentColdFuncOnlyPath(
+ 
+ // TODO: There is a similar flag in WPD pass, we should consolidate them by
+ // parsing the option only once in PassBuilder and share it across both places.
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ static cl::opt<bool> EnableDevirtualizeSpeculatively(
+     "enable-devirtualize-speculatively",
+     cl::desc("Enable speculative devirtualization optimization"),
+     cl::init(false));
++#else
++static constexpr bool EnableDevirtualizeSpeculatively = false;
++#endif
+ 
+ extern cl::opt<std::string> UseCtxProfile;
+ extern cl::opt<bool> PGOInstrumentColdFunctionOnly;
+@@ -437,12 +543,14 @@ static bool isLTOPostLink(ThinOrFullLTOPhase Phase) {
+ static CoroConditionalWrapper buildCoroWrapper(ThinOrFullLTOPhase Phase) {
+   // TODO: Skip passes according to Phase.
+   ModulePassManager CoroPM;
+-  CoroPM.addPass(CoroEarlyPass());
+-  CGSCCPassManager CGPM;
+-  CGPM.addPass(CoroSplitPass());
+-  CoroPM.addPass(createModuleToPostOrderCGSCCPassAdaptor(std::move(CGPM)));
+-  CoroPM.addPass(CoroCleanupPass());
+-  CoroPM.addPass(GlobalDCEPass());
++  if (OptionalOptimizations) {
++    CoroPM.addPass(CoroEarlyPass());
++    CGSCCPassManager CGPM;
++    CGPM.addPass(CoroSplitPass());
++    CoroPM.addPass(createModuleToPostOrderCGSCCPassAdaptor(std::move(CGPM)));
++    CoroPM.addPass(CoroCleanupPass());
++    CoroPM.addPass(GlobalDCEPass());
++  }
+   return CoroConditionalWrapper(std::move(CoroPM));
+ }
+ 
+@@ -566,7 +674,8 @@ PassBuilder::buildO1FunctionSimplificationPipeline(OptimizationLevel Level,
+   FPM.addPass(InstCombinePass());
+   invokePeepholeEPCallbacks(FPM, Level);
+ 
+-  FPM.addPass(CoroElidePass());
++  if (OptionalOptimizations)
++    FPM.addPass(CoroElidePass());
+ 
+   invokeScalarOptimizerLateEPCallbacks(FPM, Level);
+ 
+@@ -788,7 +897,8 @@ PassBuilder::buildFunctionSimplificationPipeline(OptimizationLevel Level,
+                /*AllowSpeculation=*/true),
+       /*UseMemorySSA=*/true));
+ 
+-  FPM.addPass(CoroElidePass());
++  if (OptionalOptimizations)
++    FPM.addPass(CoroElidePass());
+ 
+   invokeScalarOptimizerLateEPCallbacks(FPM, Level);
+ 
+@@ -998,7 +1108,8 @@ PassBuilder::buildInlinerPipeline(OptimizationLevel Level,
+ 
+   // Try to perform OpenMP specific optimizations. This is a (quick!) no-op if
+   // there are no OpenMP runtime calls present in the module.
+-  if (Level == OptimizationLevel::O2 || Level == OptimizationLevel::O3)
++  if (OptionalOptimizations &&
++      (Level == OptimizationLevel::O2 || Level == OptimizationLevel::O3))
+     MainCGPipeline.addPass(OpenMPOptCGSCCPass(Phase));
+ 
+   invokeCGSCCOptimizerLateEPCallbacks(MainCGPipeline, Level);
+@@ -1019,7 +1130,7 @@ PassBuilder::buildInlinerPipeline(OptimizationLevel Level,
+   MainCGPipeline.addPass(createCGSCCToFunctionPassAdaptor(
+       RequireAnalysisPass<ShouldNotRunFunctionPassesAnalysis, Function>()));
+ 
+-  if (Phase != ThinOrFullLTOPhase::ThinLTOPreLink) {
++  if (OptionalOptimizations && Phase != ThinOrFullLTOPhase::ThinLTOPreLink) {
+     MainCGPipeline.addPass(CoroSplitPass(Level != OptimizationLevel::O0));
+     MainCGPipeline.addPass(CoroAnnotationElidePass());
+   }
+@@ -1069,7 +1180,7 @@ PassBuilder::buildModuleInlinerPipeline(OptimizationLevel Level,
+       buildFunctionSimplificationPipeline(Level, Phase),
+       PTO.EagerlyInvalidateAnalyses));
+ 
+-  if (Phase != ThinOrFullLTOPhase::ThinLTOPreLink) {
++  if (OptionalOptimizations && Phase != ThinOrFullLTOPhase::ThinLTOPreLink) {
+     MPM.addPass(createModuleToPostOrderCGSCCPassAdaptor(
+         CoroSplitPass(Level != OptimizationLevel::O0)));
+     MPM.addPass(
+@@ -1129,7 +1240,8 @@ PassBuilder::buildModuleSimplificationPipeline(OptimizationLevel Level,
+     // Do basic inference of function attributes from known properties of system
+     // libraries and other oracles.
+     MPM.addPass(InferFunctionAttrsPass());
+-    MPM.addPass(CoroEarlyPass());
++    if (OptionalOptimizations)
++      MPM.addPass(CoroEarlyPass());
+ 
+     FunctionPassManager EarlyFPM;
+     EarlyFPM.addPass(EntryExitInstrumenterPass(/*PostInlining=*/false));
+@@ -1167,7 +1279,8 @@ PassBuilder::buildModuleSimplificationPipeline(OptimizationLevel Level,
+ 
+   // Try to perform OpenMP specific optimizations on the module. This is a
+   // (quick!) no-op if there are no OpenMP runtime calls present in the module.
+-  MPM.addPass(OpenMPOptPass(Phase));
++  if (OptionalOptimizations)
++    MPM.addPass(OpenMPOptPass(Phase));
+ 
+   if (AttributorRun & AttributorRunOption::MODULE)
+     MPM.addPass(AttributorPass());
+@@ -1303,7 +1416,7 @@ PassBuilder::buildModuleSimplificationPipeline(OptimizationLevel Level,
+   if (Phase == ThinOrFullLTOPhase::ThinLTOPostLink)
+     MPM.addPass(SimplifyTypeTestsPass());
+ 
+-  if (Phase != ThinOrFullLTOPhase::ThinLTOPreLink)
++  if (OptionalOptimizations && Phase != ThinOrFullLTOPhase::ThinLTOPreLink)
+     MPM.addPass(CoroCleanupPass());
+ 
+   // Optimize globals now that functions are fully simplified.
+@@ -1410,7 +1523,7 @@ void PassBuilder::addVectorPasses(OptimizationLevel Level,
+   }
+ 
+   // Optimize parallel scalar instruction chains into SIMD instructions.
+-  if (PTO.SLPVectorization) {
++  if (SLPVectorizer && PTO.SLPVectorization) {
+     FPM.addPass(SLPVectorizerPass());
+     if (Level.getSpeedupLevel() > 1 && ExtraVectorizerPasses) {
+       FPM.addPass(EarlyCSEPass());
+@@ -1576,7 +1689,7 @@ PassBuilder::buildModuleOptimizationPipeline(OptimizationLevel Level,
+   //        in the simplification pipeline.
+   LPM.addPass(LoopDeletionPass());
+ 
+-  if (PTO.LoopInterchange)
++  if (OptionalOptimizations && PTO.LoopInterchange)
+     LPM.addPass(LoopInterchangePass());
+ 
+   OptimizePM.addPass(
+@@ -1584,7 +1697,7 @@ PassBuilder::buildModuleOptimizationPipeline(OptimizationLevel Level,
+ 
+   // FIXME: This may not be the right place in the pipeline.
+   // We need to have the data to support the right place.
+-  if (PTO.LoopFusion)
++  if (OptionalOptimizations && PTO.LoopFusion)
+     OptimizePM.addPass(LoopFusePass());
+ 
+   // Distribute loops to allow partial vectorization.  I.e. isolate dependences
+@@ -1661,7 +1774,7 @@ PassBuilder::buildModuleOptimizationPipeline(OptimizationLevel Level,
+ 
+   // Merge functions if requested. It has a better chance to merge functions
+   // after ConstantMerge folded jump tables.
+-  if (PTO.MergeFunctions)
++  if (OptionalOptimizations && PTO.MergeFunctions)
+     MPM.addPass(MergeFunctionsPass());
+ 
+   if (PTO.CallGraphProfile && !LTOPreLink)
+@@ -1673,7 +1786,8 @@ PassBuilder::buildModuleOptimizationPipeline(OptimizationLevel Level,
+ 
+   // Add devirtualization pass only when LTO is not enabled, as otherwise
+   // the pass is already enabled in the LTO pipeline.
+-  if (PTO.DevirtualizeSpeculatively && LTOPhase == ThinOrFullLTOPhase::None) {
++  if (OptionalOptimizations && PTO.DevirtualizeSpeculatively &&
++      LTOPhase == ThinOrFullLTOPhase::None) {
+     // TODO: explore a better pipeline configuration that can improve
+     // compilation time overhead.
+     MPM.addPass(WholeProgramDevirtPass(
+@@ -1780,7 +1894,7 @@ PassBuilder::buildFatLTODefaultPipeline(OptimizationLevel Level, bool ThinLTO,
+     // ModuleSimplification does not run the coroutine passes for
+     // ThinLTOPreLink, so we need the coroutine passes to run for ThinLTO
+     // builds, otherwise they will miscompile.
+-    if (ThinLTO) {
++    if (OptionalOptimizations && ThinLTO) {
+       // TODO: replace w/ buildCoroWrapper() when it takes phase and level into
+       // consideration.
+       CGSCCPassManager CGPM;
+@@ -1992,7 +2106,8 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
+   }
+ 
+   // Try to run OpenMP optimizations, quick no-op if no OpenMP metadata present.
+-  MPM.addPass(OpenMPOptPass(ThinOrFullLTOPhase::FullLTOPostLink));
++  if (OptionalOptimizations)
++    MPM.addPass(OpenMPOptPass(ThinOrFullLTOPhase::FullLTOPostLink));
+ 
+   // Remove unused virtual tables to improve the quality of code generated by
+   // whole-program devirtualization and bitset lowering.
+@@ -2073,7 +2188,8 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
+   }
+ 
+   // TODO: Skip to match buildCoroWrapper.
+-  MPM.addPass(CoroEarlyPass());
++  if (OptionalOptimizations)
++    MPM.addPass(CoroEarlyPass());
+ 
+   // Optimize globals to try and fold them into constants.
+   MPM.addPass(GlobalOptPass());
+@@ -2133,7 +2249,8 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
+   MPM.addPass(GlobalOptPass());
+ 
+   // Run the OpenMPOpt pass again after global optimizations.
+-  MPM.addPass(OpenMPOptPass(ThinOrFullLTOPhase::FullLTOPostLink));
++  if (OptionalOptimizations)
++    MPM.addPass(OpenMPOptPass(ThinOrFullLTOPhase::FullLTOPostLink));
+ 
+   // Garbage collect dead functions.
+   MPM.addPass(GlobalDCEPass(/*InLTOPostLink=*/true));
+@@ -2142,8 +2259,10 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
+   // transform it to pass arguments by value instead of by reference.
+   CGSCCPassManager CGPM;
+   CGPM.addPass(ArgumentPromotionPass());
+-  CGPM.addPass(CoroSplitPass(Level != OptimizationLevel::O0));
+-  CGPM.addPass(CoroAnnotationElidePass());
++  if (OptionalOptimizations) {
++    CGPM.addPass(CoroSplitPass(Level != OptimizationLevel::O0));
++    CGPM.addPass(CoroAnnotationElidePass());
++  }
+   MPM.addPass(createModuleToPostOrderCGSCCPassAdaptor(std::move(CGPM)));
+ 
+   FunctionPassManager FPM;
+@@ -2238,8 +2357,9 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
+   invokeVectorizerEndEPCallbacks(MainFPM, Level);
+ 
+   // Run the OpenMPOpt CGSCC pass again late.
+-  MPM.addPass(createModuleToPostOrderCGSCCPassAdaptor(
+-      OpenMPOptCGSCCPass(ThinOrFullLTOPhase::FullLTOPostLink)));
++  if (OptionalOptimizations)
++    MPM.addPass(createModuleToPostOrderCGSCCPassAdaptor(
++        OpenMPOptCGSCCPass(ThinOrFullLTOPhase::FullLTOPostLink)));
+ 
+   invokePeepholeEPCallbacks(MainFPM, Level);
+   MainFPM.addPass(JumpThreadingPass());
+@@ -2288,7 +2408,7 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
+   // Now that we have optimized the program, discard unreachable functions.
+   MPM.addPass(GlobalDCEPass(/*InLTOPostLink=*/true));
+ 
+-  if (PTO.MergeFunctions)
++  if (OptionalOptimizations && PTO.MergeFunctions)
+     MPM.addPass(MergeFunctionsPass());
+ 
+   MPM.addPass(RelLookupTableConverterPass());
+@@ -2296,7 +2416,8 @@ PassBuilder::buildLTODefaultPipeline(OptimizationLevel Level,
+   if (PTO.CallGraphProfile)
+     MPM.addPass(CGProfilePass(/*InLTOPostLink=*/true));
+ 
+-  MPM.addPass(CoroCleanupPass());
++  if (OptionalOptimizations)
++    MPM.addPass(CoroCleanupPass());
+ 
+   // AllocToken transforms heap allocation calls; this needs to run late after
+   // other allocation call transformations (such as those in InstCombine).
+@@ -2364,7 +2485,7 @@ PassBuilder::buildO0DefaultPipeline(OptimizationLevel Level,
+   MPM.addPass(AlwaysInlinerPass(
+       /*InsertLifetimeIntrinsics=*/false));
+ 
+-  if (PTO.MergeFunctions)
++  if (OptionalOptimizations && PTO.MergeFunctions)
+     MPM.addPass(MergeFunctionsPass());
+ 
+   if (EnableMatrix)
+diff --git a/llvm/lib/Passes/PassRegistry.def b/llvm/lib/Passes/PassRegistry.def
+index 2cfb5b2..134631d 100644
+--- a/llvm/lib/Passes/PassRegistry.def
++++ b/llvm/lib/Passes/PassRegistry.def
+@@ -15,29 +15,43 @@
+ 
+ // NOTE: NO INCLUDE GUARD DESIRED!
+ 
++// libOpenCOR: when LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS is disabled (see
++// llvm/CMakeLists.txt), the analyses that LLVM's default pipelines never use are
++// not registered.
++
+ #ifndef MODULE_ANALYSIS
+ #define MODULE_ANALYSIS(NAME, CREATE_PASS)
+ #endif
+ MODULE_ANALYSIS("callgraph", CallGraphAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ MODULE_ANALYSIS("collector-metadata", CollectorMetadataAnalysis())
+ MODULE_ANALYSIS("ctx-prof-analysis", CtxProfAnalysis())
+ MODULE_ANALYSIS("dxil-metadata", DXILMetadataAnalysis())
+ MODULE_ANALYSIS("dxil-resources", DXILResourceAnalysis())
+ MODULE_ANALYSIS("dxil-resource-type", DXILResourceTypeAnalysis())
+ MODULE_ANALYSIS("dxil-resource-bindings", DXILResourceBindingAnalysis())
++#endif
+ MODULE_ANALYSIS("inline-advisor", InlineAdvisorAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ MODULE_ANALYSIS("ir2vec-vocab", IR2VecVocabAnalysis())
+ MODULE_ANALYSIS("ir-similarity", IRSimilarityAnalysis())
++#endif
+ MODULE_ANALYSIS("last-run-tracking", LastRunTrackingAnalysis())
+ MODULE_ANALYSIS("lcg", LazyCallGraphAnalysis())
+ MODULE_ANALYSIS("libcall-lowering-info", LibcallLoweringModuleAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ MODULE_ANALYSIS("module-summary", ModuleSummaryIndexAnalysis())
++#endif
+ MODULE_ANALYSIS("no-op-module", NoOpModuleAnalysis())
+ MODULE_ANALYSIS("pass-instrumentation", PassInstrumentationAnalysis(PIC))
+ MODULE_ANALYSIS("profile-summary", ProfileSummaryAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ MODULE_ANALYSIS("reg-usage", PhysicalRegisterUsageAnalysis())
++#endif
+ MODULE_ANALYSIS("runtime-libcall-info", RuntimeLibraryAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ MODULE_ANALYSIS("stack-safety", StackSafetyGlobalAnalysis())
++#endif
+ MODULE_ANALYSIS("verify", VerifierAnalysis())
+ 
+ #ifndef MODULE_ALIAS_ANALYSIS
+@@ -347,20 +361,30 @@ CGSCC_PASS_WITH_PARAMS(
+ FUNCTION_ANALYSIS("aa", AAManager())
+ FUNCTION_ANALYSIS("access-info", LoopAccessAnalysis())
+ FUNCTION_ANALYSIS("assumptions", AssumptionAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ FUNCTION_ANALYSIS("bb-sections-profile-reader",
+                   BasicBlockSectionsProfileReaderAnalysis(*TM))
++#endif
+ FUNCTION_ANALYSIS("block-freq", BlockFrequencyAnalysis())
+ FUNCTION_ANALYSIS("branch-prob", BranchProbabilityAnalysis())
+ FUNCTION_ANALYSIS("cycles", CycleAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ FUNCTION_ANALYSIS("da", DependenceAnalysis())
+ FUNCTION_ANALYSIS("debug-ata", DebugAssignmentTrackingAnalysis())
++#endif
+ FUNCTION_ANALYSIS("demanded-bits", DemandedBitsAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ FUNCTION_ANALYSIS("domfrontier", DominanceFrontierAnalysis())
++#endif
+ FUNCTION_ANALYSIS("domtree", DominatorTreeAnalysis())
+ FUNCTION_ANALYSIS("ephemerals", EphemeralValuesAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ FUNCTION_ANALYSIS("func-properties", FunctionPropertiesAnalysis())
++#endif
+ FUNCTION_ANALYSIS("machine-function-info", MachineFunctionAnalysis(*TM))
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ FUNCTION_ANALYSIS("gc-function", GCFunctionAnalysis())
++#endif
+ FUNCTION_ANALYSIS("last-run-tracking", LastRunTrackingAnalysis())
+ FUNCTION_ANALYSIS("lazy-value-info", LazyValueAnalysis())
+ FUNCTION_ANALYSIS("loops", LoopAnalysis())
+@@ -371,18 +395,24 @@ FUNCTION_ANALYSIS("opt-remark-emit", OptimizationRemarkEmitterAnalysis())
+ FUNCTION_ANALYSIS("pass-instrumentation", PassInstrumentationAnalysis(PIC))
+ FUNCTION_ANALYSIS("phi-values", PhiValuesAnalysis())
+ FUNCTION_ANALYSIS("postdomtree", PostDominatorTreeAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ FUNCTION_ANALYSIS("regions", RegionInfoAnalysis())
++#endif
+ FUNCTION_ANALYSIS("scalar-evolution", ScalarEvolutionAnalysis())
+ FUNCTION_ANALYSIS("should-not-run-function-passes",
+                   ShouldNotRunFunctionPassesAnalysis())
+ FUNCTION_ANALYSIS("should-run-extra-vector-passes",
+                   ShouldRunExtraVectorPasses())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ FUNCTION_ANALYSIS("ssp-layout", SSPLayoutAnalysis())
+ FUNCTION_ANALYSIS("stack-safety-local", StackSafetyAnalysis())
++#endif
+ FUNCTION_ANALYSIS("target-ir",
+                   TM ? TM->getTargetIRAnalysis() : TargetIRAnalysis())
+ FUNCTION_ANALYSIS("target-lib-info", TargetLibraryAnalysis())
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ FUNCTION_ANALYSIS("uniformity", UniformityInfoAnalysis())
++#endif
+ FUNCTION_ANALYSIS("verify", VerifierAnalysis())
+ 
+ #ifndef FUNCTION_ALIAS_ANALYSIS
+@@ -750,7 +780,9 @@ LOOPNEST_PASS("no-op-loopnest", NoOpLoopNestPass())
+ #ifndef LOOP_ANALYSIS
+ #define LOOP_ANALYSIS(NAME, CREATE_PASS)
+ #endif
++#if LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS
+ LOOP_ANALYSIS("ddg", DDGAnalysis())
++#endif
+ LOOP_ANALYSIS("iv-users", IVUsersAnalysis())
+ LOOP_ANALYSIS("no-op-loop", NoOpLoopAnalysis())
+ LOOP_ANALYSIS("pass-instrumentation", PassInstrumentationAnalysis(PIC))

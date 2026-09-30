@@ -1,1 +1,0 @@
-Our copy of LLVM+Clang 22.1.8 requires the changes listed [here](https://github.com/opencor/llvm-project/compare/llvmorg-22.1.8...opencor:llvm-project:llvmorg-22.1.8-libopencor) to build and work correctly with libOpenCOR.

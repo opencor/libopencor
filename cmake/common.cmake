@@ -51,7 +51,7 @@ function(configure_target TARGET)
         target_compile_options(${TARGET} PRIVATE
                                /wd4251)
 
-        # Suppress warnings from SYSTEM (external) headers, which includes all third-party library headers (LLVM+Clang,
+        # Suppress warnings from SYSTEM (external) headers, which includes all third-party library headers (LLVM,
         # libcurl, libxml2, etc.). This avoids having to manually wrap every third-party include with
         # #pragma warning(disable/default: ...) in each source file.
 
@@ -80,14 +80,6 @@ function(configure_target TARGET)
             target_compile_options(${TARGET} PRIVATE
                                    ${COMPILE_OPTIONS})
         endif()
-    endif()
-
-    # Add the /Zc:preprocessor option to avoid multiple OPT_ enums defaulting to the exact same name when using
-    # LLVM+Clang.
-
-    if(BUILDING_USING_MSVC)
-        target_compile_options(${TARGET} PRIVATE
-                               /Zc:preprocessor)
     endif()
 
     # Analyse the code.
@@ -280,12 +272,20 @@ function(configure_target TARGET)
     foreach(AVAILABLE_PACKAGE ${AVAILABLE_PACKAGES})
         string(TOUPPER "${AVAILABLE_PACKAGE}" AVAILABLE_PACKAGE_UC)
 
+        # Retrieve the include directory, libraries, and definitions of the package before we (may) call find_package()
+        # since the package's CMake configuration files may set variables with the same name (e.g., LLVMConfig.cmake
+        # sets LLVM_INCLUDE_DIR and LLVM_DEFINITIONS, the latter to a single string of -D flags).
+
+        set(PACKAGE_INCLUDE_DIR ${${AVAILABLE_PACKAGE_UC}_INCLUDE_DIR})
+        set(PACKAGE_LIBRARIES ${${AVAILABLE_PACKAGE_UC}_LIBRARY} ${${AVAILABLE_PACKAGE_UC}_LIBRARIES})
+        set(PACKAGE_DEFINITIONS ${${AVAILABLE_PACKAGE_UC}_DEFINITIONS})
+
         if(    "${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR}" STREQUAL ""
            AND "${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}" STREQUAL "")
             # There are no CMake configuration files, so manually configure the package using targets of the form
             # <PACKAGE_NAME>::<LIBRARY_NAME>.
 
-            foreach(AVAILABLE_PACKAGE_LIBRARY ${${AVAILABLE_PACKAGE_UC}_LIBRARY} ${${AVAILABLE_PACKAGE_UC}_LIBRARIES})
+            foreach(AVAILABLE_PACKAGE_LIBRARY ${PACKAGE_LIBRARIES})
                 if(NOT TARGET ${AVAILABLE_PACKAGE_LIBRARY})
                     add_library(${AVAILABLE_PACKAGE_LIBRARY} STATIC IMPORTED)
 
@@ -307,23 +307,11 @@ function(configure_target TARGET)
             endforeach()
         else()
             # There are some CMake configuration files, so use them to configure the package.
+            # Note: we always tell find_package() where the package's CMake configuration files are, so that a value of
+            #       <PackageName>_DIR cached by an existing build directory (e.g., for a package that has since been
+            #       renamed) cannot take precedence.
 
-            if(EMSCRIPTEN)
-                if("${${AVAILABLE_PACKAGE_UC}_CMAKE_DIRS}" STREQUAL "")
-                    set(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}_DIR ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR})
-                else()
-                    list(LENGTH ${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAMES SUB_PACKAGES_COUNT)
-
-                    foreach(INDEX RANGE 1 ${SUB_PACKAGES_COUNT})
-                        math(EXPR REAL_INDEX "${INDEX}-1")
-
-                        list(GET ${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAMES ${REAL_INDEX} SUB_PACKAGE_NAME)
-                        list(GET ${AVAILABLE_PACKAGE_UC}_CMAKE_DIRS ${REAL_INDEX} SUB_PACKAGE_DIR)
-
-                        set(${SUB_PACKAGE_NAME}_DIR ${SUB_PACKAGE_DIR})
-                    endforeach()
-                endif()
-            endif()
+            set(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME}_DIR ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR})
 
             find_package(${${AVAILABLE_PACKAGE_UC}_CMAKE_PACKAGE_NAME} REQUIRED
                          PATHS ${${AVAILABLE_PACKAGE_UC}_CMAKE_DIR}
@@ -334,14 +322,14 @@ function(configure_target TARGET)
 
         target_include_directories(${TARGET} SYSTEM PRIVATE
                                    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/3rdparty/${AVAILABLE_PACKAGE}>
-                                   $<BUILD_INTERFACE:${${AVAILABLE_PACKAGE_UC}_INCLUDE_DIR}>)
+                                   $<BUILD_INTERFACE:${PACKAGE_INCLUDE_DIR}>)
 
         target_link_libraries(${TARGET} PRIVATE
-                              ${${AVAILABLE_PACKAGE_UC}_LIBRARY} ${${AVAILABLE_PACKAGE_UC}_LIBRARIES})
+                              ${PACKAGE_LIBRARIES})
 
-        if(${AVAILABLE_PACKAGE_UC}_DEFINITIONS)
+        if(PACKAGE_DEFINITIONS)
             target_compile_definitions(${TARGET} PRIVATE
-                                       ${${AVAILABLE_PACKAGE_UC}_DEFINITIONS})
+                                       ${PACKAGE_DEFINITIONS})
         endif()
     endforeach()
 
@@ -365,7 +353,6 @@ function(configure_target TARGET)
     mark_as_advanced(CURL_DIR
                      CURL_USE_CMAKECONFIG
                      CURL_USE_PKGCONFIG
-                     Clang_DIR
                      LLVM_DIR
                      SUNDIALS_DIR
                      combine-static_DIR

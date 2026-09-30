@@ -82,14 +82,14 @@ jobs:
           sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-16 100
           echo "CC=gcc-16" >> "$GITHUB_ENV"
           echo "CXX=g++-16" >> "$GITHUB_ENV"
-      - name: Configure libOpenCOR (for LLVM+Clang)
-        if: ${{ inputs.third_party_library_name == 'LLVMClang' }}
+      - name: Configure libOpenCOR (for LLVM)
+        if: ${{ inputs.third_party_library_name == 'LLVM' }}
         shell: bash
-        run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVMCLANG=OFF
-      - name: Configure libOpenCOR (for a specific third-party library except LLVM+Clang)
-        if: ${{ inputs.third_party_library_name != 'ALL' && inputs.third_party_library_name != 'LLVMClang' }}
+        run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LLVM=OFF
+      - name: Configure libOpenCOR (for a specific third-party library except LLVM)
+        if: ${{ inputs.third_party_library_name != 'ALL' && inputs.third_party_library_name != 'LLVM' }}
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF
-      - name: Configure libOpenCOR (for all third-party libraries except LLVM+Clang)
+      - name: Configure libOpenCOR (for all third-party libraries except LLVM)
         if: ${{ inputs.third_party_library_name == 'ALL' }}
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LIBCELLML=OFF -DPREBUILT_LIBCOMBINE=OFF -DPREBUILT_LIBCURL=OFF -DPREBUILT_LIBNUML=OFF -DPREBUILT_LIBSBML=OFF -DPREBUILT_LIBSEDML=OFF -DPREBUILT_LIBXML2=OFF -DPREBUILT_OPENSSL=OFF -DPREBUILT_SUNDIALS=OFF -DPREBUILT_ZIPPER=OFF -DPREBUILT_ZLIB=OFF
       - name: Upload library artifact
@@ -125,7 +125,7 @@ jobs:
       - name: Configure libOpenCOR (for a specific third-party library)
         if: ${{ inputs.third_party_library_name != 'ALL' }}
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DJAVASCRIPT_BINDINGS=ON -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_${{ inputs.third_party_library_name }}=OFF
-      - name: Configure libOpenCOR (for all third-party libraries except LLVM+Clang)
+      - name: Configure libOpenCOR (for all third-party libraries except LLVM)
         if: ${{ inputs.third_party_library_name == 'ALL' }}
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DJAVASCRIPT_BINDINGS=ON -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LIBCELLML=OFF -DPREBUILT_LIBCOMBINE=OFF -DPREBUILT_LIBCURL=OFF -DPREBUILT_LIBNUML=OFF -DPREBUILT_LIBSBML=OFF -DPREBUILT_LIBSEDML=OFF -DPREBUILT_LIBXML2=OFF -DPREBUILT_OPENSSL=OFF -DPREBUILT_SUNDIALS=OFF -DPREBUILT_ZIPPER=OFF -DPREBUILT_ZLIB=OFF
       - name: Build WebAssembly

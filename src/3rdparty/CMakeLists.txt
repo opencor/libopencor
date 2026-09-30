@@ -18,7 +18,7 @@ include(packages)
 
 # Keep track of which packages are to be built.
 
-set(PACKAGES libCellML libCOMBINE libNuML libSBML libSEDML libxml2 LLVMClang SUNDIALS zipper zlib)
+set(PACKAGES libCellML libCOMBINE libNuML libSBML libSEDML libxml2 LLVM SUNDIALS zipper zlib)
 
 if(EMSCRIPTEN OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     set(WASM_MODE TRUE)
@@ -121,5 +121,5 @@ endif()
 
 add_package(libSEDML) # Requires libNuML and libSBML.
 
-add_package(LLVMClang)
+add_package(LLVM)
 add_package(SUNDIALS)

@@ -529,7 +529,6 @@ $(() => {
 
     // Versions page.
 
-    $('#Clang').html(loc.clangVersionString());
     $('#libCellML').html(loc.libcellmlVersionString());
     $('#libCOMBINE').html(loc.libcombineVersionString());
     $('#libOpenCOR').html(loc.versionString());

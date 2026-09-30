@@ -1,0 +1,18 @@
+libOpenCOR only needs a subset of LLVM, so we do everything we can to minimise its footprint. This matters most to our WASM version since Web OpenCOR dynamically imports it, but OpenCOR benefits from it too since we merge LLVM into our static library.
+
+To this end, we don't build Clang at all. Indeed, the only C code that libOpenCOR ever compiles is the code that libCellML generates for a model, which uses a small and well-defined subset of C. So, libOpenCOR compiles it itself: `src/misc/irgenerator.cpp` parses it and generates the LLVM IR that Clang would normally generate for it, and `src/misc/compiler.cpp` has LLVM optimise that IR (using the same `-O3` pipeline as Clang) and generate some machine code for it (using LLVM's ORC-based JIT for our native versions, and as a WebAssembly module for our WASM version).
+
+Also, we only build and package the LLVM libraries that we need (see `LLVM_LIBRARIES` in `CMakeLists.txt`), using LLVM's distribution support.
+
+Our WASM version of LLVM is built with size optimisation (`-Oz`), while our native versions keep LLVM's default release flags so that they compile our models as fast as possible. Every version is built without RTTI (libOpenCOR never uses LLVM's RTTI, and our only files ours that include LLVM headers are also compiled without RTTI; see `src/CMakeLists.txt`) with only the backend of the target for which it generates code and with the patches in `patches`, which are applied by `cmake/applypatches.cmake` (to a freshly extracted copy of LLVM's source code whenever they change):
+
+- `llvm-optional-optimizations.patch` adds three options, all `ON` by default so that LLVM otherwise builds exactly as it normally would:
+  - `LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS` which, when `OFF`, compiles out the optimisations that LLVM's default pipelines only perform when given profile data or a vector library (`-fveclib=`) when enabled through a command-line option (`-mllvm`) or a pipeline tuning option that is off by default (other than SLP vectorisation which has its own option; see below), or on code that uses OpenMP or coroutines, none of which we ever do or have. It also doesn't register the analyses that LLVM's default pipelines never use.
+  - `LLVM_ENABLE_SLP_VECTORIZER` which, when `OFF`, compiles out the SLP vectoriser, which our WASM version doesn't use (see `src/misc/compiler.cpp`). So, we only turn this option off for our WASM version.
+  - `LLVM_ENABLE_OPTIONAL_CODE_GENERATION` which, when `OFF`, compiles out the code generator's support for inline assembly and debug information, neither of which our code ever contains, as well as the demangling of names in diagnostics.
+
+  None of this changes the code that LLVM generates for us. However, giving LLVM something that these options compile out the support for (e.g., profile data, a vector library, or some inline assembly) then results in a fatal error and the command-line options that would enable the optimisations that they compile out are no longer available.
+
+Our native shared library and our Python module only export our own symbols (see `src/CMakeLists.txt` and `src/bindings/python/CMakeLists.txt`). This lets the linker remove the parts of LLVM that we don't use. It also means that, on Linux, another copy of LLVM in the same process (e.g., one from another Python module) cannot interpose its symbols with ours, which is what would otherwise make LLVM report that some of its options are registered more than once.
+
+Note that `LLVMWindowsDriver` (which LLVM's ORC-based JIT uses to locate the MSVC toolchain) and `LLVMOption` (which `LLVMWindowsDriver` needs) are needed by our native versions.

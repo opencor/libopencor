@@ -53,8 +53,6 @@ from .module import (
     # Version API.
     version,
     version_string,
-    clang_version,
-    clang_version_string,
     libcellml_version,
     libcellml_version_string,
     libcombine_version,
@@ -109,8 +107,6 @@ __all__ = (
     # Version API.
     "version",
     "version_string",
-    "clang_version",
-    "clang_version_string",
     "libcellml_version",
     "libcellml_version_string",
     "libcombine_version",

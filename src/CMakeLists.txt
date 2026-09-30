@@ -178,6 +178,7 @@ set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/irgenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode.cpp
@@ -254,9 +255,29 @@ set(SOURCE_FILES
     ${INTERNAL_SOURCE_FILES}
 )
 
+# Compile the only files that include LLVM headers without RTTI, as is LLVM itself (see
+# src/3rdparty/LLVM/CMakeLists.txt).
+# Note #1: with RTTI, compilers may emit the typeinfo of some of the LLVM classes that are fully defined in LLVM's
+#          headers (e.g., GCC in release mode, for classes derived from llvm::orc::MaterializationUnit and
+#          llvm::vfs::FileSystem, and Clang in debug mode, for llvm::ErrorInfo<>) and that typeinfo references the
+#          typeinfo of LLVM classes that LLVM doesn't provide since it is built without RTTI.
+# Note #2: those files don't use RTTI (e.g., dynamic_cast or typeid) and nothing uses RTTI on the classes that they
+#          define (e.g., Compiler).
+# Note #3: MSVC doesn't have that problem and to mix /GR and /GR- files is not safe with MSVC's STL (e.g.,
+#          std::function's layout depends on _HAS_STATIC_RTTI), so we only do this for GCC and Clang.
+# Note #4: our WASM version doesn't have that problem either (it doesn't use LLVM's ORC-based JIT) and Emscripten's
+#          Embind requires RTTI.
+
+if(NOT EMSCRIPTEN AND NOT BUILDING_USING_MSVC)
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+                                ${CMAKE_CURRENT_SOURCE_DIR}/misc/irgenerator.cpp
+                                PROPERTIES COMPILE_OPTIONS -fno-rtti)
+endif()
+
 set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/irgenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode_p.h

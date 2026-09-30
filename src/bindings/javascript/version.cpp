@@ -22,8 +22,6 @@ void versionApi()
 
     emscripten::function("version", &libOpenCOR::version);
     emscripten::function("versionString", &libOpenCOR::versionString);
-    emscripten::function("clangVersion", &libOpenCOR::clangVersion);
-    emscripten::function("clangVersionString", &libOpenCOR::clangVersionString);
     emscripten::function("libcellmlVersion", &libOpenCOR::libcellmlVersion);
     emscripten::function("libcellmlVersionString", &libOpenCOR::libcellmlVersionString);
     emscripten::function("libcombineVersion", &libOpenCOR::libcombineVersion);
