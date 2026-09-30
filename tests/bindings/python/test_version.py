@@ -66,12 +66,12 @@ def test_clang_version_string():
 
 def test_libcellml_version():
     assert isinstance(loc.libcellml_version(), int)
-    assert loc.libcellml_version() == 0x000603
+    assert loc.libcellml_version() == 0x000701
 
 
 def test_libcellml_version_string():
     assert isinstance(loc.libcellml_version_string(), str)
-    assert loc.libcellml_version_string() == "0.6.3"
+    assert loc.libcellml_version_string() == "0.7.1"
 
 
 def test_libcombine_version():

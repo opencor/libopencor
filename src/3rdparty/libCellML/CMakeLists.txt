@@ -13,14 +13,50 @@
 # limitations under the License.
 
 set(PACKAGE_NAME libCellML)
-set(PACKAGE_VERSION 0.6.3)
+set(PACKAGE_VERSION 2026-09-30)
 set(PACKAGE_REPOSITORY libcellml)
-set(RELEASE_TAG v0.6.3)
+set(RELEASE_TAG 2026-09-30)
 set(INSTALL_DIR ${PREBUILT_DIR}/${PACKAGE_NAME})
 
 if(WIN32 AND NOT RELEASE_MODE)
     set(DEBUG_TAG d)
 endif()
+
+# Provide some CMake configuration files for our copy of libxml2 and zlib.
+# Note: libCellML resolves libxml2 and zlib using find_package(), first in config mode, both when building it and when
+#       using it (see libcellml-config.cmake). So, we set LibXml2_DIR and ZLIB_DIR to the location of our CMake
+#       configuration files so that libCellML is built with and uses our copy of libxml2 and zlib rather than a system
+#       copy.
+
+set(LibXml2_DIR ${CMAKE_CURRENT_BINARY_DIR}/LibXml2 CACHE INTERNAL "LibXml2's CMake directory.")
+set(ZLIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/ZLIB CACHE INTERNAL "ZLIB's CMake directory.")
+
+file(CONFIGURE OUTPUT ${LibXml2_DIR}/LibXml2Config.cmake
+     CONTENT [=[
+if(NOT TARGET LibXml2::LibXml2)
+    add_library(LibXml2::LibXml2 STATIC IMPORTED)
+
+    set_target_properties(LibXml2::LibXml2 PROPERTIES
+                          IMPORTED_LOCATION "@LIBXML2_LIBRARY_FILE@"
+                          INTERFACE_COMPILE_DEFINITIONS "@LIBXML2_DEFINITIONS@"
+                          INTERFACE_INCLUDE_DIRECTORIES "@LIBXML2_INCLUDE_DIR@")
+endif()
+
+set(LIBXML2_INCLUDE_DIRS "@LIBXML2_INCLUDE_DIR@")
+]=] @ONLY)
+
+file(CONFIGURE OUTPUT ${ZLIB_DIR}/ZLIBConfig.cmake
+     CONTENT [=[
+if(NOT TARGET ZLIB::ZLIB)
+    add_library(ZLIB::ZLIB STATIC IMPORTED)
+
+    set_target_properties(ZLIB::ZLIB PROPERTIES
+                          IMPORTED_LOCATION "@ZLIB_LIBRARY_FILE@"
+                          INTERFACE_INCLUDE_DIRECTORIES "@ZLIB_INCLUDE_DIR@")
+endif()
+
+set(ZLIB_INCLUDE_DIRS "@ZLIB_INCLUDE_DIR@")
+]=] @ONLY)
 
 # Either retrieve or build our package.
 
@@ -34,75 +70,84 @@ if(LIBOPENCOR_PREBUILT_LIBCELLML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         e4739c98f7a79436185934be1882baaaac9b314a)
+                         fd71e7cc14fc17376d07a95b18fd781fefe5e304)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     727b7dc43a9f125965105d340be0d5da3b0ca107)
+                                     804408373eb61c78b52bbf2997978a817460b0cc)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     8efb6f27fb2487cae75e4f2001058e987084e520)
+                                     3fc56f83e7281c1896046457b67d2c16fc47a461)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     e65148844e68d800f6542a1aaf9e1803f8abb10f)
+                                     9b224a50d9703bd6104c88ae5c4e17c66012cb4d)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     89a0a89adba941858aa269e0ee1ca88f385c01e3)
+                                     26a620435dda554560274bfbbbcc7b306e367175)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a825eaa30456ae131d146174b4575d247173a603)
+                                 332ca72a7d93036d0f249447812703d0be76cd0b)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8afff08fe254df1e1599a8b2aae5c1061de06728)
+                                 81e062f1aa60c055326bfe44b93e2d272cf9a95d)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 a6972bf4124a2fd24bc4323383e1f4af5a0e1a05)
+                                 4dc35caae4f3245cf378a6e0f2eb39063391fb9d)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 e973eabfc82f250fe1f4512f43d16091e61146fc)
+                                 b6522d7b1a752794aefc54315da895686c23ba9b)
             endif()
         endif()
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
+    # Build our WASM version of libCellML with size optimisation.
+    # Note: -Os makes libCellML's contribution to our WASM file noticeably smaller without making it noticeably slower to
+    #       load (i.e. parse and validate) or instantiate (i.e. analyse and generate code for) a model, unlike -Oz.
+
+    if(EMSCRIPTEN)
+        set(WASM_FLAGS
+            "-DCMAKE_CXX_FLAGS_RELEASE=-Os -DNDEBUG"
+            "-DCMAKE_C_FLAGS_RELEASE=-Os -DNDEBUG"
+        )
+    endif()
+
     # Build our package.
 
     build_package(${PACKAGE_NAME}
         URL
             # https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
-            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/6c970b7.tar.gz
+            https://github.com/agarny/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             -DBINDINGS_PYTHON=OFF
             -DBUILD_SHARED=OFF
             ${CMAKE_ARGS}
+            ${WASM_FLAGS}
             -DCOVERAGE=OFF
             -DINSTALL_PREFIX=${INSTALL_DIR}
-            -DLIBXML2_INCLUDE_DIR=${LIBXML2_INCLUDE_DIR}
-            -DLIBXML2_LIBRARY=${LIBXML2_LIBRARY_FILE}
-            -DLIBXML2_DEFINITIONS=${LIBXML2_DEFINITIONS}
+            -DLibXml2_DIR=${LibXml2_DIR}
             -DLLVM_COVERAGE=OFF
             -DMEMCHECK=OFF
             -DPYTHON_COVERAGE=OFF
             -DUNIT_TESTS=OFF
-            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
-            -DZLIB_LIBRARY=${ZLIB_LIBRARY_FILE}
+            -DZLIB_DIR=${ZLIB_DIR}
     )
 
     # Patch some of our CMake configuration files.
@@ -116,10 +161,6 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
     string(REPLACE "${INSTALL_DIR}" "\${_IMPORT_PREFIX}" FILE_CONTENTS "${FILE_CONTENTS}")
-
-    foreach(LIBRARY libxml2 zlib)
-        string(REPLACE "${PREBUILT_DIR}/${LIBRARY}" "\${_IMPORT_PREFIX}/../${LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    endforeach()
 
     file(WRITE ${CONFIG_FILE} "${FILE_CONTENTS}")
 

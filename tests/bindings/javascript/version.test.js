@@ -57,8 +57,8 @@ test.describe('Version tests', () => {
   });
 
   test('libCellML', () => {
-    assert.strictEqual(loc.libcellmlVersion(), 0x000603);
-    assert.strictEqual(loc.libcellmlVersionString(), '0.6.3');
+    assert.strictEqual(loc.libcellmlVersion(), 0x000701);
+    assert.strictEqual(loc.libcellmlVersionString(), '0.7.1');
   });
 
   test('libCOMBINE', () => {

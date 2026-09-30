@@ -247,7 +247,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         set(PACKAGE_URL "https://github.com/opencor/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
 
         if("${PACKAGE_NAME}" STREQUAL "libCellML")
-            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/6c970b7/${PACKAGE_FILE}")
+            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
         endif()
 
         set(ATTEMPT 1)
