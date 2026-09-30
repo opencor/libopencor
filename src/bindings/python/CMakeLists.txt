@@ -95,6 +95,28 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
     target_link_libraries(${PYTHON_BINDINGS_TARGET} PRIVATE
                           $<TARGET_NAME:${CMAKE_PROJECT_NAME}>)
 
+    # Only export our Python module's initialisation function and, in release mode on Linux, have the linker remove the
+    # code that we don't use (nanobind already does this on macOS).
+    # Note: our Python module embeds libOpenCOR's static library which embeds all of our third-party libraries and which
+    #       symbols have default visibility. So, without this, our Python module would export all of them, which would
+    #       prevent the linker from removing any of their code that we don't use and, on Linux, would allow another copy
+    #       of LLVM in the same Python process (e.g., one from another Python module) to interpose its symbols with
+    #       ours. On Windows, a DLL only exports the symbols that are explicitly marked as such, so there is nothing for
+    #       us to do.
+
+    if(APPLE)
+        target_link_options(${PYTHON_BINDINGS_TARGET} PRIVATE
+                            -Wl,-exported_symbol,_PyInit_module)
+    elseif(NOT WIN32)
+        target_link_options(${PYTHON_BINDINGS_TARGET} PRIVATE
+                            -Wl,--exclude-libs,ALL)
+
+        if(RELEASE_MODE)
+            target_link_options(${PYTHON_BINDINGS_TARGET} PRIVATE
+                                -Wl,--gc-sections)
+        endif()
+    endif()
+
     add_custom_command(TARGET ${PYTHON_BINDINGS_TARGET} POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PYTHON_BINDINGS_TARGET}>
                                                         ${PYTHON_BINDINGS_DIR}/${CMAKE_PROJECT_NAME_LC}/$<TARGET_FILE_NAME:${PYTHON_BINDINGS_TARGET}>)

@@ -346,16 +346,17 @@ if(EMSCRIPTEN)
     #          -mbulk-memory to enable bulk memory operations, -pthread to enable native threading support,
     #          -sSHARED_MEMORY=1 to enable shared memory support, and -DNDEBUG to disable debugging information (it is
     #          not needed in production).
-    # Note #2: for linking, we use -O3 to get the best performance, -flto to enable link-time optimisation, -pthread to
-    #          enable native threading support, -sALLOW_TABLE_GROWTH to allow the WebAssembly table to grow,
-    #          -sASSERTIONS=0 to disable assertions (they are not needed in production), -sEXPORT_ES6=1 to export ES6
-    #          modules, -sEXPORTED_FUNCTIONS to export the functions we need, -sEXPORTED_RUNTIME_METHODS to export the
-    #          runtime methods we need, -sINITIAL_MEMORY=2GB to have enough memory for "big" models,
-    #          -sINITIAL_TABLE=65536 to have enough space for our WebAssembly table, -sINLINING_LIMIT to increase the
-    #          inlining limit, -sMODULARIZE=1 to generate a module factory function, -sSHARED_MEMORY=1 to enable shared
-    #          memory support, -sSTACK_SIZE=8MB to reserve a reasonable amount of memory for the stack at startup (which
-    #          is needed for "big" models), --bind to generate the necessary Embind bindings, and --emit-tsd to generate
-    #          a TypeScript type definitions file.
+    # Note #2: for linking, we use -O2 (rather than -O3) since our compressed .wasm file is then smaller with no loss of
+    #          performance (and it links faster), -flto to use the LTO version of Emscripten's system libraries (our
+    #          object files are not LTO ones), -pthread to enable native threading support, -sALLOW_TABLE_GROWTH to
+    #          allow the WebAssembly table to grow, -sASSERTIONS=0 to disable assertions (they are not needed in
+    #          production), -sEXPORT_ES6=1 to export ES6 modules, -sEXPORTED_FUNCTIONS to export the functions we need
+    #          (i.e. those needed by the WebAssembly modules that we generate for our models, see
+    #          initialiseWorkerWasmJS()), -sEXPORTED_RUNTIME_METHODS to export the runtime methods we need,
+    #          -sINITIAL_MEMORY=2GB to have enough memory for "big" models, -sMODULARIZE=1 to generate a module factory
+    #          function, -sSHARED_MEMORY=1 to enable shared memory support, -sSTACK_SIZE=8MB to reserve a reasonable
+    #          amount of memory for the stack at startup (which is needed for "big" models), --bind to generate the
+    #          necessary Embind bindings, and --emit-tsd to generate a TypeScript type definitions file.
     # Note #3: for linking, we used to have -sALLOW_MEMORY_GROWTH=1, -sINITIAL_MEMORY=256MB, and -sMAXIMUM_MEMORY=2GB,
     #          but we now support threading and to allow memory growth might non-WASM code to run slowly. So, now, we
     #          use -sINITIAL_MEMORY=2GB and don't allow memory growth.
@@ -370,17 +371,15 @@ if(EMSCRIPTEN)
                            -sSHARED_MEMORY=1
                            -DNDEBUG)
     target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
-                        -O3
+                        -O2
                         -flto
                         -pthread
                         -sALLOW_TABLE_GROWTH
                         -sASSERTIONS=0
                         -sEXPORT_ES6=1
-                        -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
+                        -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_nlaSolverAddress,_wasmNlaSolve,_pow,_sqrt,_fabs,_exp,_exp2,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
                         -sEXPORTED_RUNTIME_METHODS=HEAPU8
                         -sINITIAL_MEMORY=2GB
-                        -sINITIAL_TABLE=65536
-                        -sINLINING_LIMIT
                         -sMODULARIZE=1
                         -sSHARED_MEMORY=1
                         -sSTACK_SIZE=8MB
@@ -604,6 +603,39 @@ elseif(BUILDING_USING_CLANG)
 
     if(XCODE_VERSION VERSION_LESS 15.0)
         add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,-undefined,error)
+    endif()
+endif()
+
+# Only export our own symbols from our shared library and, in release mode (unless we are doing code coverage, so as not
+# to affect our code coverage reports), have the linker remove the code that we don't use and discard our local symbols.
+# Note #1: our third-party libraries (e.g., LLVM) are static libraries which symbols have default visibility. So,
+#          without this, our shared library would export all of them, which would prevent the linker from removing any
+#          of their code that we don't use and, on Linux, would allow another copy of LLVM in the same process (e.g.,
+#          one from another Python module) to interpose its symbols with ours.
+# Note #2: on Windows, a DLL only exports the symbols that are explicitly marked as such and, in release mode, MSVC's
+#          linker removes unreferenced code by default, so there is nothing for us to do.
+# Note #3: on macOS, there is no equivalent of --exclude-libs, so we only export the symbols that have "libOpenCOR" in
+#          their (mangled) name. This is fine since our own code is built with hidden visibility (see
+#          CXX_VISIBILITY_PRESET above), so the only symbols of ours that could be exported are those that we export on
+#          purpose and they are all in the libOpenCOR namespace.
+
+if(LIBOPENCOR_SHARED_LIBS AND NOT EMSCRIPTEN)
+    if(APPLE)
+        set(EXPORTED_SYMBOLS_FILE ${CMAKE_CURRENT_BINARY_DIR}/exportedsymbols.txt)
+
+        file(WRITE ${EXPORTED_SYMBOLS_FILE} "*libOpenCOR*\n")
+
+        add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,-exported_symbols_list,${EXPORTED_SYMBOLS_FILE})
+
+        if(RELEASE_MODE AND NOT LIBOPENCOR_CODE_COVERAGE)
+            add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,-dead_strip -Wl,-x)
+        endif()
+    elseif(NOT WIN32)
+        add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,--exclude-libs,ALL)
+
+        if(RELEASE_MODE AND NOT LIBOPENCOR_CODE_COVERAGE)
+            add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,--gc-sections -Wl,-x)
+        endif()
     endif()
 endif()
 
