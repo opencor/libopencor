@@ -25,6 +25,17 @@ export const RESOURCE_LOCATION = '@CMAKE_SOURCE_DIR@/tests/res';
 export const REMOTE_BASE_PATH = 'https://raw.githubusercontent.com/opencor/libopencor/master/tests/res';
 export const REMOTE_FILE = 'https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml';
 
+export function normaliseDescription(description) {
+  // Normalise the value of any time (t = ...) and step size (h = ...) in the given description so that differences at
+  // the last few significant digits are ignored. Indeed, the exact value of a time or step size can vary slightly
+  // depending on the platform and the CPU used to generate the model code.
+
+  return description.replace(
+    /([th] = )([-+0-9.eE]+)/g,
+    (_match, prefix, value) => prefix + Number(value).toPrecision(6)
+  );
+}
+
 export function assertIssues(loc, logger, expectedIssues) {
   const issues = logger.issues;
 
@@ -32,7 +43,7 @@ export function assertIssues(loc, logger, expectedIssues) {
 
   for (const [i, issue] of Array.from(issues).entries()) {
     assert.strictEqual(issue.type.value, expectedIssues[i][0].value);
-    assert.strictEqual(issue.description, expectedIssues[i][1]);
+    assert.strictEqual(normaliseDescription(issue.description), normaliseDescription(expectedIssues[i][1]));
 
     if (issue.type === loc.Issue.Type.ERROR) {
       assert.strictEqual(issue.typeAsString, 'Error');
