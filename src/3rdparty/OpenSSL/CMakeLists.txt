@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 40307b2d211297948e9a58dcc2a4620fb96712a5)
+                                 b424224c512d163c921808b3372f0a2d0f385ada)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5426fa6d6e82d062736736b2b3a39b580d791f54)
+                                 55942cdcb815ba23cd20c3694c7749a9fda0e621)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ea5657e94b1f391e991a8edf7e42c41e760ddd26)
+                                 e81dea8b502a8bd018295d2e1f29c06db551cffe)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 fb9ca26faf1c1643183262e98e7c38fedc6fa535)
+                                 3b525753b896b445d7d9585470d7059ff803ef76)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f266f77bfe238c0714daee27df8e0ef938f0a00a)
+                             fb7a25e31b318b132fcce4b4014f8f5dadf62c5c)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             cf4fa1aeac45f584c24d0ad5cde70e8ddd0a9fcf)
+                             9b7de8860912c6fefad7fd794b7f3e0354d18c6d)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b8301e4ca3cee1e4f6cf90b29c64857f14273244)
+                             7e10ccc82fceac4cfd1bf0274e010e322fd67f41)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f63b191509678142efd04c5c6529e881209bcec1)
+                             aee0ec707689d501ff743ec51b9c5aee2216ebd5)
         endif()
     endif()
 else()
@@ -87,7 +87,21 @@ else()
         find_package(Perl REQUIRED QUIET)
     endif()
 
-    set(CONFIG_OPTIONS no-shared no-tests no-threads --prefix=${INSTALL_DIR})
+    # Configure OpenSSL.
+    # Note: OpenSSL is only used by libcurl, which libOpenCOR only uses to download files over HTTPS. So, we only keep
+    #       what a TLS 1.2/1.3 client needs (e.g., RSA, EC, X25519/X448, AES, ChaCha20-Poly1305, SHA-2/3, HKDF, and
+    #       ML-KEM) and disable everything else (e.g., the OpenSSL command-line tool, the legacy provider, engines,
+    #       deprecated APIs, DTLS, QUIC, and many algorithms that are either obsolete or not used by TLS). This matters
+    #       since OpenSSL's default provider references every algorithm that is built, so the linker cannot remove the
+    #       ones that we don't use.
+
+    set(CONFIG_OPTIONS no-shared no-tests no-threads
+                       no-apps no-argon2 no-aria no-bf no-blake2 no-camellia no-cast no-cmp no-cms no-comp no-ct
+                       no-deprecated no-des no-docs no-dsa no-dtls no-ec2m no-engine no-gost no-http no-idea no-legacy
+                       no-md4 no-mdc2 no-ml-dsa no-module no-nextprotoneg no-ocb no-ocsp no-psk no-quic no-rc2 no-rc4
+                       no-rc5 no-rfc3779 no-rmd160 no-scrypt no-seed no-siphash no-siv no-slh-dsa no-sm2 no-sm3 no-sm4
+                       no-srp no-srtp no-ssl-trace no-ssl3 no-tls-deprecated-ec no-ts no-ui-console no-whirlpool
+                       --prefix=${INSTALL_DIR})
 
     if(WIN32)
         list(APPEND CONFIG_OPTIONS no-asm)

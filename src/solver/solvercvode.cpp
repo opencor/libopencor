@@ -16,9 +16,9 @@ limitations under the License.
 
 #include "solvercvode_p.h"
 
-#include "cvodes/cvodes.h"
-#include "cvodes/cvodes_bandpre.h"
-#include "cvodes/cvodes_diag.h"
+#include "cvode/cvode.h"
+#include "cvode/cvode_bandpre.h"
+#include "cvode/cvode_diag.h"
 #include "nvector/nvector_serial.h"
 #include "sedml/SedAlgorithm.h"
 #include "sunlinsol/sunlinsol_band.h"

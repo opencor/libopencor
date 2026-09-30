@@ -24,54 +24,57 @@ if(LIBOPENCOR_PREBUILT_LIBXML2)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         c0252e7b473026121d77fd7cff20d6c6150d0572)
+                         2ffe324bacff69797be5370476c33f179d0a18b9)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     b1a6e4cae66caa28f8303cf2f27e12c33013d235)
+                                     57954ad0fab2e06453a8cd81bc9ef1d84b918e38)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     52ca269ef0fb9af83961a5cef430f7b6364048ae)
+                                     6b1717d8dcf585acf2e521f57debf92c4637a16d)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     a97b5eae4fab32d8fae5950c26196df6bd36eeae)
+                                     2708c5b98762b797fe64764f18af699542e8a7c0)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     99ebec63515098b62b1d9b1046ff3c1eac32016b)
+                                     67b654292b5b267e83cb735c21bd879d2efdbc85)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 c3d1140afb1e737f2774b1f0e7efd8029bf89a44)
+                                 72ba239ddb572251c5d14ede6997aec80b52527c)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 1004d818b0d771d04625ed0f18f07cfc3290d609)
+                                 ce4e88957c21e39eef300d36227170524b375bdb)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 cedbd7db06eef5d776155a572486640b50ad139f)
+                                 ecaaf18a6ec7995d9a2ed0a5bc86225c8251f366)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 32aa85e0fea4f2580597dfb42aaa277fe9cea091)
+                                 e3d956440b5a571c937c3e3b75cd527cf8ffdf96)
             endif()
         endif()
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
+    # Note: libCellML, libSBML, and libCOMBINE only need libxml2's tree, parsing (incl. push parsing), serialisation,
+    #       and DTD validation support (the latter needs regular expressions support), so we disable everything else
+    #       (e.g., HTML, XPath, XInclude, schemas, catalogs, and FTP/HTTP support).
 
     build_package(${PACKAGE_NAME}
         URL
@@ -80,14 +83,28 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DLIBXML2_WITH_C14N=OFF
+            -DLIBXML2_WITH_CATALOG=OFF
             -DLIBXML2_WITH_DEBUG=OFF
+            -DLIBXML2_WITH_DOCB=OFF
+            -DLIBXML2_WITH_FTP=OFF
+            -DLIBXML2_WITH_HTML=OFF
+            -DLIBXML2_WITH_HTTP=OFF
             -DLIBXML2_WITH_ICONV=OFF
             -DLIBXML2_WITH_LEGACY=OFF
             -DLIBXML2_WITH_LZMA=OFF
             -DLIBXML2_WITH_MODULES=OFF
+            -DLIBXML2_WITH_PATTERN=OFF
             -DLIBXML2_WITH_PROGRAMS=OFF
             -DLIBXML2_WITH_PYTHON=OFF
+            -DLIBXML2_WITH_READER=OFF
+            -DLIBXML2_WITH_SCHEMAS=OFF
+            -DLIBXML2_WITH_SCHEMATRON=OFF
             -DLIBXML2_WITH_TESTS=OFF
+            -DLIBXML2_WITH_WRITER=OFF
+            -DLIBXML2_WITH_XINCLUDE=OFF
+            -DLIBXML2_WITH_XPATH=OFF
+            -DLIBXML2_WITH_XPTR=OFF
             -DLIBXML2_WITH_ZLIB=OFF
     )
 

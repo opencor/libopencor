@@ -24,68 +24,75 @@ if(LIBOPENCOR_PREBUILT_SUNDIALS)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         770a7e84f8e986310c6ece0ed662e4ef11035c8d)
+                         46127fd03b3955faccdff0bd9d58c60b67e69496)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     ea5e25fbe26a8f1309f9c9424e688abe626700c5)
+                                     888d450c225eee7f5dea21825958be601f5375fb)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     9526d5b7723b31f77f8c68ed8a8e356ae7029503)
+                                     4cefab102da157841b909bae6029c19165cf765b)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     a84a217438bd69c61ba7649ccf54ea3def6f0cdb)
+                                     aefccdc200b1b074d31fbb4c933553a51195cd90)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     0ce0997d40fec38b3f2a6ecea7f39a29a66bef79)
+                                     7b87efd5e47b21be3c72eca53f5383400062d13d)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 0cfb4f6722c19acd12935b9d2a2f9dbea9e44cba)
+                                 15eb07cddf63a4e125ed67da2f0a7734ab3ca2a8)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 6e36a58950250682f16117715d780adb1a9588f5)
+                                 407ba0159dcd5763f1b5a288197dafa00d5a154f)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 e4501231ad79082f46c031a34c2da1c50d6e7db3)
+                                 0d1d157f3fca87070d2129fe262a60bc116ce572)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 68ca5feee035f3a958225fdaaea6bfab3bae7aa2)
+                                 53d8115ec1d6a9b711b48f64d5e3ea57090a2b0b)
             endif()
         endif()
     endif()
 elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
-
-    set(PACKAGE_C_FLAGS "-DNO_FPRINTF_OUTPUT ${CMAKE_C_FLAGS}")
+    # Note: we only need CVODE and KINSOL (and none of SUNDIALS' other packages), and we don't need SUNDIALS' logging
+    #       since we handle errors ourselves and don't use a logger (see src/solver/solvercvode.cpp and
+    #       src/solver/solverkinsol.cpp).
 
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_CACHE_ARGS
-            -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
+            -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
         CMAKE_ARGS
             ${CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-            -DEXAMPLES_ENABLE_C=OFF
-            -DEXAMPLES_INSTALL=OFF
+            -DSUNDIALS_ENABLE_ARKODE=OFF
+            -DSUNDIALS_ENABLE_C_EXAMPLES=OFF
+            -DSUNDIALS_ENABLE_CVODES=OFF
+            -DSUNDIALS_ENABLE_EXAMPLES_INSTALL=OFF
+            -DSUNDIALS_ENABLE_IDA=OFF
+            -DSUNDIALS_ENABLE_IDAS=OFF
+            -DSUNDIALS_ENABLE_NVECTOR_MANYVECTOR=OFF
+            -DSUNDIALS_LOGGING_LEVEL=0
     )
 
     # Create our package.
@@ -102,14 +109,9 @@ set(SUNDIALS_CMAKE_DIR ${INSTALL_DIR}/lib/cmake/sundials CACHE INTERNAL "${PACKA
 set(SUNDIALS_CMAKE_PACKAGE_NAME ${PACKAGE_NAME} CACHE INTERNAL "${PACKAGE_NAME}'s CMake package name.")
 set(SUNDIALS_INCLUDE_DIR ${INSTALL_DIR}/include CACHE INTERNAL "${PACKAGE_NAME}'s include directory.")
 set(SUNDIALS_LIBRARIES
-    SUNDIALS::arkode_static
     SUNDIALS::core_static
     SUNDIALS::cvode_static
-    SUNDIALS::cvodes_static
-    SUNDIALS::ida_static
-    SUNDIALS::idas_static
     SUNDIALS::kinsol_static
-    SUNDIALS::nvecmanyvector_static
     SUNDIALS::nvecserial_static
     SUNDIALS::sunlinsolband_static
     SUNDIALS::sunlinsoldense_static
