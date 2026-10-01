@@ -928,6 +928,7 @@ test.describe('Sed instance tests', () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(instance.progress, 1.0);
 
     const instanceTask = instance.tasks[0];
     const voi = instanceTask.voi;

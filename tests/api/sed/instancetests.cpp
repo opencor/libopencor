@@ -837,6 +837,7 @@ TEST(InstanceSedTest, simulationWithInitialTime)
     instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
 
     static const auto VOI_SIZE {50001U};
     static const auto VOI_START {0.0};

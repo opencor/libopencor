@@ -824,6 +824,7 @@ def test_simulation_with_initial_time():
     instance.run()
 
     assert not instance.has_issues
+    assert instance.progress == 1.0
 
     instance_task = instance.tasks[0]
     voi = instance_task.voi

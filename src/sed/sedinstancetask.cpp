@@ -383,8 +383,13 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
 
         // Compute our rates and variables at the point that we have reached, i.e. the point that we are going to
         // report.
-        // Note: this also means that our rates are up to date the next time we call our ODE solver (see
-        //       SolverOde::Impl::solve()).
+        // Note #1: this also means that our rates are up to date the next time we call our ODE solver (see
+        //          SolverOde::Impl::solve()).
+        // Note #2: we compute our variables even when we don't track our results (i.e. when we run our simulation from
+        //          its initial time to its output start time). Indeed, computeVariables() may solve some NLA systems,
+        //          which use the current value of their unknowns as an initial guess, so computing them at each output
+        //          interval keeps that initial guess close to the solution. Otherwise, computeVariables() is cheap since
+        //          most of our algebraic variables are computed by computeRates().
 
         computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
@@ -399,13 +404,12 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
             return;
         }
 
-        // Update our progress.
-
-        mCompletedSteps.fetch_add(1, std::memory_order_relaxed);
-
-        // Track our results, if needed.
+        // Update our progress and track our results, if needed.
+        // Note: our progress is only about the steps for which we track our results (see run() below).
 
         if (pTrackResults) {
+            mCompletedSteps.fetch_add(1, std::memory_order_relaxed);
+
             trackResults(++index);
         }
     }
