@@ -18,6 +18,8 @@ limitations under the License.
 #include "irgenerator.h"
 
 #include "llvm/Analysis/AliasAnalysis.h"
+#include "llvm/IR/InstIterator.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/OptBisect.h"
@@ -400,7 +402,7 @@ std::string patchWasmSharedMemory(UnsignedChars &pWasmModule)
 } // namespace
 
 #ifdef __EMSCRIPTEN__
-bool Compiler::Impl::compile(const std::string &pCode, UnsignedChars &pWasmModule)
+bool Compiler::Impl::compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize)
 #else
 bool Compiler::Impl::compile(const std::string &pCode)
 #endif
@@ -683,6 +685,42 @@ bool Compiler::Impl::compile(const std::string &pCode)
         }
     }
 
+    // Determine the size of the stack that our WebAssembly code needs (see initialiseWorkerWasm() in
+    // cellmlfileruntime.cpp).
+    // Note: WebAssembly keeps our values in its own locals, so the only memory that our code uses on its stack (which is
+    //       in linear memory and has no guard page) is that of our allocas. Also, our code is never re-entered: our
+    //       functions may call nlaSolve(), which runs on the stack of our main WebAssembly module and calls our objective
+    //       functions, which themselves don't call any of our functions. So, the memory needed by all of our allocas is
+    //       an upper bound on the size of the stack that our code needs, as long as our allocas are static (i.e. they
+    //       have a fixed size and are in the entry block of their function otherwise they would allocate some memory
+    //       each time they are executed). We align each of our functions' frames to 16 bytes, as the WebAssembly
+    //       backend does.
+
+    static constexpr uint64_t WASM_STACK_ALIGNMENT {16};
+
+    const auto &dataLayout {module->getDataLayout()};
+    uint64_t stackSize {0};
+
+    for (const auto &function : *module) {
+        for (const auto &instruction : llvm::instructions(function)) {
+            if (const auto *alloca {llvm::dyn_cast<llvm::AllocaInst>(&instruction)}; alloca != nullptr) {
+                const auto allocationSize {alloca->getAllocationSize(dataLayout)};
+
+                if (!alloca->isStaticAlloca() || !allocationSize.has_value() || allocationSize->isScalable()) {
+                    addError("The WebAssembly code cannot use dynamically allocated memory on its stack.");
+
+                    return false;
+                }
+
+                stackSize = llvm::alignTo(stackSize, alloca->getAlign()) + allocationSize->getFixedValue();
+            }
+        }
+
+        stackSize = llvm::alignTo(stackSize, WASM_STACK_ALIGNMENT);
+    }
+
+    pWasmStackSize = static_cast<size_t>(stackSize);
+
     // Get our target machine to emit some WebAssembly code.
 
     llvm::legacy::PassManager passManager;
@@ -825,9 +863,9 @@ CompilerPtr Compiler::create()
 }
 
 #ifdef __EMSCRIPTEN__
-bool Compiler::compile(const std::string &pCode, UnsignedChars &pWasmModule)
+bool Compiler::compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize)
 {
-    return pimpl()->compile(pCode, pWasmModule);
+    return pimpl()->compile(pCode, pWasmModule, pWasmStackSize);
 }
 #else
 bool Compiler::compile(const std::string &pCode)

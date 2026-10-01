@@ -41,7 +41,7 @@ public:
     static CompilerPtr create();
 
 #ifdef __EMSCRIPTEN__
-    bool compile(const std::string &pCode, UnsignedChars &pWasmModule);
+    bool compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize);
 #else
     bool compile(const std::string &pCode);
 

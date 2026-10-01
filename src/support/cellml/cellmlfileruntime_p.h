@@ -28,14 +28,13 @@ class CellmlFileRuntime::Impl: public Logger::Impl
 public:
     CompilerPtr mCompiler {nullptr};
 #ifdef __EMSCRIPTEN__
-    // The size, in bytes, of the stack of our WebAssembly instances (see initialiseWorkerWasm()), i.e. a base size plus
-    // some room for the unknowns of our NLA systems, if any.
+    // The size, in bytes, of the stack of our WebAssembly instances (see initialiseWorkerWasm()), i.e. the size that our
+    // compiler tells us our WebAssembly code needs plus a safety margin.
 
-    static constexpr size_t WASM_STACK_BASE_SIZE {65536};
-    static constexpr size_t WASM_STACK_SIZE_PER_VARIABLE {16};
+    static constexpr size_t WASM_STACK_MARGIN_SIZE {65536};
 
     UnsignedChars mWasmModule;
-    size_t mWasmStackSize {WASM_STACK_BASE_SIZE};
+    size_t mWasmStackSize {WASM_STACK_MARGIN_SIZE};
 #endif
 
     InitialiseArraysForAlgebraicModel mInitialiseArraysForAlgebraicModel {nullptr};

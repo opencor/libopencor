@@ -90,16 +90,6 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
         }
 
 #ifdef __EMSCRIPTEN__
-        // Note: our objective functions keep their data on the stack, as they do natively, and our WebAssembly instances
-        //       have their own stack (see initialiseWorkerWasm()), the size of which is bounded by the number of variables
-        //       in our model (since the unknowns of an NLA system are variables of our model).
-
-        const auto analyserModel {pCellmlFile->analyserModel()};
-        const auto variableCount {analyserModel->stateCount() + analyserModel->constantCount()
-                                  + analyserModel->computedConstantCount() + analyserModel->algebraicVariableCount()};
-
-        mWasmStackSize = WASM_STACK_BASE_SIZE + (WASM_STACK_SIZE_PER_VARIABLE * variableCount);
-
         // Export our various methods.
 
         auto exportJavaScriptName = [](const std::string &pName) -> std::string {
@@ -208,13 +198,20 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         mCompiler = Compiler::create();
 
 #ifdef __EMSCRIPTEN__
-        if (!mCompiler->compile(implementationCode, mWasmModule)) {
+        // Note: our WebAssembly instances have their own stack (see initialiseWorkerWasm()), the size of which is what
+        //       our compiler tells us our WebAssembly code needs plus some safety margin.
+
+        size_t wasmStackSize {0};
+
+        if (!mCompiler->compile(implementationCode, mWasmModule, wasmStackSize)) {
             // The compilation failed, so add the issues it generated.
 
             addIssues(mCompiler, "Compiler");
 
             return;
         }
+
+        mWasmStackSize = WASM_STACK_MARGIN_SIZE + wasmStackSize;
 #else
 #    ifdef CODE_COVERAGE_ENABLED
         mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile));

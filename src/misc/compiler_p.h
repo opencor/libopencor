@@ -30,7 +30,7 @@ class Compiler::Impl: public Logger::Impl
 {
 public:
 #ifdef __EMSCRIPTEN__
-    bool compile(const std::string &pCode, UnsignedChars &pWasmModule);
+    bool compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize);
 #else
     std::unique_ptr<llvm::orc::LLJIT> mLljit;
 
