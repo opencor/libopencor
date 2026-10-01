@@ -95,7 +95,7 @@ else()
     #       file, and many algorithms that are either obsolete or not used by TLS). This matters since OpenSSL's default
     #       provider references every algorithm that is built, so the linker cannot remove the ones that we don't use.
 
-    set(CONFIG_OPTIONS no-shared no-tests no-threads
+    set(CONFIG_OPTIONS no-shared no-tests
                        no-apps no-argon2 no-aria no-autoload-config no-bf no-blake2 no-camellia no-cast no-cmp no-cms
                        no-comp no-ct no-deprecated no-des no-docs no-dsa no-dtls no-ec2m no-engine no-err no-gost
                        no-http no-idea no-legacy no-md4 no-mdc2 no-ml-dsa no-module no-nextprotoneg no-ocb no-ocsp

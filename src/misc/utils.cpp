@@ -465,6 +465,28 @@ std::filesystem::path uniqueFilePath()
     return res;
 }
 
+// Initialise libcurl when constructed and clean it up when destroyed (see downloadFile()).
+
+class CurlGlobal
+{
+public:
+    CurlGlobal()
+    {
+        curl_global_init(CURL_GLOBAL_DEFAULT);
+    }
+
+    ~CurlGlobal()
+    {
+        curl_global_cleanup();
+    }
+
+    CurlGlobal(const CurlGlobal &pOther) = delete;
+    CurlGlobal(CurlGlobal &&pOther) noexcept = delete;
+
+    CurlGlobal &operator=(const CurlGlobal &pRhs) = delete;
+    CurlGlobal &operator=(CurlGlobal &&pRhs) noexcept = delete;
+};
+
 size_t curlWriteFunction(char *pData, size_t pSize, size_t pDataSize, void *pUserData)
 {
     const auto realDataSize {pSize * pDataSize};
@@ -489,7 +511,13 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     }
 #    endif
 
-    curl_global_init(CURL_GLOBAL_DEFAULT);
+    // Make sure that libcurl is initialised.
+    // Note: libcurl must only be initialised once (and only be cleaned up once no thread uses it anymore), hence we
+    //       initialise it the first time a file is downloaded (in a thread-safe way, this being a function-local static
+    //       variable) and clean it up when libOpenCOR is unloaded. After that, several threads can download a file at
+    //       the same time since each of them uses its own libcurl handle and our OpenSSL is thread-safe.
+
+    static const CurlGlobal curlGlobal;
 
     auto res {false};
     auto *curl {curl_easy_init()};
@@ -511,7 +539,6 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
     }
 
     curl_easy_cleanup(curl);
-    curl_global_cleanup();
 
     file.close();
 
