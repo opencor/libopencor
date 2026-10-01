@@ -30,51 +30,63 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 f0c14f3fd186399a73825a4f6eaf839908978e44)
+                                 f5c54653a38b68ca5b173444b45d68e3d0bdeaed)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 17c9c0eddcb2352a62f4fd7d10cee22d665d9cbf)
+                                 9e2e0adf5eb828546e707f85c1de64eb5943bf84)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 86ce1716ab57751f2f05f12f83e61879d1104c2e)
+                                 37b99eb8fa40fdad0fcb194203be22b012b4d7b9)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 8f6061699d1b4d7ae235104cd4281e4c17b6c9cd)
+                                 416d1d81d3d36ad46b49ae10a37ee44322a7260c)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             e6acd53caf05a5375cae0fa502ce3b31395f9f32)
+                             763ba3c0d68640e6f1d3a3657634522a4a935e10)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             50a548ddf494b307d8abb12bd1ae3471a6b81062)
+                             ae574d1d9f87cf85444324c61de97de0b42a2dbe)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7342e5e9eae7a40b6c82e96948d775a0847c8336)
+                             7bfacde01d69ef0314e3c90788c1d02cd46e1fa8)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             36cc3f5101c5474c8f1b39a61d3443fc7c1c4032)
+                             b779a319037b890b6a0b3e98af3f248e4d54ba95)
         endif()
     endif()
 else()
     # Build our package.
-    # Note: libOpenCOR only uses libcurl to download files over HTTP(S) (following redirects, if needed), so we only
-    #       build its HTTP(S) support and disable the features that we don't use (e.g., cookies, HSTS, DoH, MIME, and
-    #       most authentication methods). We don't need zlib either since we never ask for compressed content. However,
-    #       we keep proxy support (and Basic authentication) since libcurl honours the http_proxy, https_proxy, and
-    #       no_proxy environment variables, which some users may rely on.
+    # Note #1: libOpenCOR only uses libcurl to download files over HTTP(S) (following redirects, if needed), so we only
+    #          build its HTTP(S) support and disable the features that we don't use (e.g., cookies, HSTS, DoH, MIME, and
+    #          most authentication methods). We don't need zlib either since we never ask for compressed content.
+    #          However, we keep proxy support (and Basic authentication) since libcurl honours the http_proxy,
+    #          https_proxy, and no_proxy environment variables, which some users may rely on.
+    # Note #2: we prepend our OpenSSL include directory to CMAKE_C_FLAGS so that it comes before any other include
+    #          directory. Otherwise, on macOS (Intel), libcurl gets compiled against Homebrew's OpenSSL headers (in
+    #          /usr/local/include), which are configured differently from our OpenSSL (e.g., with engine and OCSP
+    #          support), and linking against our OpenSSL libraries then fails.
+
+    if(THIRD_PARTY_C_FLAGS)
+        set(LIBCURL_C_FLAGS ${THIRD_PARTY_C_FLAGS})
+    else()
+        set(LIBCURL_C_FLAGS ${CMAKE_C_FLAGS_INIT})
+    endif()
+
+    string(STRIP "-I${OPENSSL_INCLUDE_DIR} ${LIBCURL_C_FLAGS}" LIBCURL_C_FLAGS)
 
     build_package(${PACKAGE_NAME}
         URL
@@ -89,6 +101,7 @@ else()
             -DBUILD_MISC_DOCS=OFF
             -DBUILD_TESTING=OFF
             ${CMAKE_ARGS}
+            -DCMAKE_C_FLAGS=${LIBCURL_C_FLAGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
             -DCURL_DISABLE_ALTSVC=ON
             -DCURL_DISABLE_AWS=ON
@@ -137,6 +150,8 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
+    string(REPLACE "CURL::OpenSSL_Crypto" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "CURL::OpenSSL_SSL" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "OpenSSL::Crypto" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "OpenSSL::SSL" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "Threads::Threads" "" FILE_CONTENTS "${FILE_CONTENTS}")
