@@ -1,0 +1,13 @@
+diff --git a/CMakeModules/FindLIBXML.cmake b/CMakeModules/FindLIBXML.cmake
+index 1796ec2..e420363 100644
+--- a/CMakeModules/FindLIBXML.cmake
++++ b/CMakeModules/FindLIBXML.cmake
+@@ -105,7 +105,7 @@ main(void)
+ {
+   LIBXML_TEST_VERSION
+   xmlKeepBlanksDefault(0);
+-  xmlDocPtr doc = xmlParseFile(\"none\");
++  xmlDocPtr doc = xmlReadFile(\"none\", NULL, 0);
+   xmlCleanupParser();
+   return 0;
+ }

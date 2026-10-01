@@ -74,7 +74,8 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
     # Note: libCellML, libSBML, and libCOMBINE only need libxml2's tree, parsing (incl. push parsing), serialisation,
     #       and DTD validation support (the latter needs regular expressions support), so we disable everything else
-    #       (e.g., HTML, XPath, XInclude, schemas, catalogs, and FTP/HTTP support).
+    #       (e.g., HTML, XPath, XInclude, schemas, catalogs, FTP/HTTP support, the older SAX1 interface, and the
+    #       built-in ISO-8859-2 to ISO-8859-16 encodings, UTF-8, UTF-16, and ISO-8859-1 being always supported).
 
     build_package(${PACKAGE_NAME}
         URL
@@ -91,6 +92,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DLIBXML2_WITH_HTML=OFF
             -DLIBXML2_WITH_HTTP=OFF
             -DLIBXML2_WITH_ICONV=OFF
+            -DLIBXML2_WITH_ISO8859X=OFF
             -DLIBXML2_WITH_LEGACY=OFF
             -DLIBXML2_WITH_LZMA=OFF
             -DLIBXML2_WITH_MODULES=OFF
@@ -98,6 +100,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DLIBXML2_WITH_PROGRAMS=OFF
             -DLIBXML2_WITH_PYTHON=OFF
             -DLIBXML2_WITH_READER=OFF
+            -DLIBXML2_WITH_SAX1=OFF
             -DLIBXML2_WITH_SCHEMAS=OFF
             -DLIBXML2_WITH_SCHEMATRON=OFF
             -DLIBXML2_WITH_TESTS=OFF

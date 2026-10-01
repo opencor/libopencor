@@ -91,16 +91,17 @@ else()
     # Note: OpenSSL is only used by libcurl, which libOpenCOR only uses to download files over HTTPS. So, we only keep
     #       what a TLS 1.2/1.3 client needs (e.g., RSA, EC, X25519/X448, AES, ChaCha20-Poly1305, SHA-2/3, HKDF, and
     #       ML-KEM) and disable everything else (e.g., the OpenSSL command-line tool, the legacy provider, engines,
-    #       deprecated APIs, DTLS, QUIC, and many algorithms that are either obsolete or not used by TLS). This matters
-    #       since OpenSSL's default provider references every algorithm that is built, so the linker cannot remove the
-    #       ones that we don't use.
+    #       deprecated APIs, TLS 1.0/1.1, DTLS, QUIC, error strings, the automatic loading of OpenSSL's configuration
+    #       file, and many algorithms that are either obsolete or not used by TLS). This matters since OpenSSL's default
+    #       provider references every algorithm that is built, so the linker cannot remove the ones that we don't use.
 
     set(CONFIG_OPTIONS no-shared no-tests no-threads
-                       no-apps no-argon2 no-aria no-bf no-blake2 no-camellia no-cast no-cmp no-cms no-comp no-ct
-                       no-deprecated no-des no-docs no-dsa no-dtls no-ec2m no-engine no-gost no-http no-idea no-legacy
-                       no-md4 no-mdc2 no-ml-dsa no-module no-nextprotoneg no-ocb no-ocsp no-psk no-quic no-rc2 no-rc4
-                       no-rc5 no-rfc3779 no-rmd160 no-scrypt no-seed no-siphash no-siv no-slh-dsa no-sm2 no-sm3 no-sm4
-                       no-srp no-srtp no-ssl-trace no-ssl3 no-tls-deprecated-ec no-ts no-ui-console no-whirlpool
+                       no-apps no-argon2 no-aria no-autoload-config no-bf no-blake2 no-camellia no-cast no-cmp no-cms
+                       no-comp no-ct no-deprecated no-des no-docs no-dsa no-dtls no-ec2m no-engine no-err no-gost
+                       no-http no-idea no-legacy no-md4 no-mdc2 no-ml-dsa no-module no-nextprotoneg no-ocb no-ocsp
+                       no-psk no-quic no-rc2 no-rc4 no-rc5 no-rfc3779 no-rmd160 no-scrypt no-seed no-siphash no-siv
+                       no-slh-dsa no-sm2 no-sm3 no-sm4 no-srp no-srtp no-ssl-trace no-ssl3 no-tls-deprecated-ec no-tls1
+                       no-tls1_1 no-ts no-ui-console no-whirlpool
                        --prefix=${INSTALL_DIR})
 
     if(WIN32)

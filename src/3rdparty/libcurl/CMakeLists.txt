@@ -71,8 +71,9 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
 else()
     # Build our package.
     # Note #1: libOpenCOR only uses libcurl to download files over HTTP(S) (following redirects, if needed), so we only
-    #          build its HTTP(S) support and disable the features that we don't use (e.g., cookies, HSTS, DoH, MIME, and
-    #          most authentication methods). We don't need zlib either since we never ask for compressed content.
+    #          build its HTTP(S) support and disable the features that we don't use (e.g., cookies, HSTS, DoH, MIME,
+    #          WebSockets, and most authentication methods, incl. NTLM) as well as libcurl's verbose strings (since we
+    #          never report libcurl's messages). We don't need zlib either since we never ask for compressed content.
     #          However, we keep proxy support (and Basic authentication) since libcurl honours the http_proxy,
     #          https_proxy, and no_proxy environment variables, which some users may rely on.
     # Note #2: we prepend our OpenSSL include directory to CMAKE_C_FLAGS so that it comes before any other include
@@ -119,11 +120,14 @@ else()
             -DCURL_DISABLE_MIME=ON
             -DCURL_DISABLE_NEGOTIATE_AUTH=ON
             -DCURL_DISABLE_NETRC=ON
+            -DCURL_DISABLE_NTLM=ON
             -DCURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG=ON
             -DCURL_DISABLE_PARSEDATE=ON
             -DCURL_DISABLE_PROGRESS_METER=ON
             -DCURL_DISABLE_SHA512_256=ON
             -DCURL_DISABLE_SRP=ON
+            -DCURL_DISABLE_VERBOSE_STRINGS=ON
+            -DCURL_DISABLE_WEBSOCKETS=ON
             -DCURL_USE_LIBPSL=OFF
             -DCURL_USE_LIBSSH2=OFF
             -DCURL_USE_OPENSSL=ON
