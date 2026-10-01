@@ -497,6 +497,12 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     }
 
     // Check whether everything went fine.
+    // Note: KINSOL may return a positive value, i.e. KIN_INITIAL_GUESS_OK (our initial guess is a solution) or
+    //       KIN_STEP_LT_STPTOL (the last Newton step was too small to make any further progress). We consider the
+    //       latter to be a success too since it typically means that our solution is as accurate as it can be in
+    //       double precision, but that our NLA system is so badly scaled (e.g., because of a large rate constant)
+    //       that its residual is above KINSOL's tolerance. Should KINSOL make no progress away from a solution, then it
+    //       would instead return KIN_LINESEARCH_NONCONV, KIN_MAXITER_REACHED, etc.
 
     if (res < KIN_SUCCESS) {
         if (userData.infOrNanFound) {
