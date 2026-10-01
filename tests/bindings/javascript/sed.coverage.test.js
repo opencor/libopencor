@@ -664,6 +664,22 @@ test.describe('Sed coverage tests', () => {
     ]);
   });
 
+  test('KINSOL with no solution', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/kinsol_with_no_solution.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        "Task instance | KINSOL: the linear solver's setup function failed in an unrecoverable manner."
+      ]
+    ]);
+  });
+
   test('SED-ML file with nlaAlgorithm and NLA algorithm', () => {
     const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 

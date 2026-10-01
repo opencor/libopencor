@@ -667,6 +667,19 @@ TEST(CoverageSedTest, KinsolWithInfAndOrNanValues)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+TEST(CoverageSedTest, KinsolWithNoSolution)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the linear solver's setup function failed in an unrecoverable manner."},
+    };
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_no_solution.cellml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->instantiate();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
 TEST(CoverageSedTest, sedmlFileNlaAlgorithmAndNlaAlgorithm)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {

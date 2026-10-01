@@ -772,6 +772,21 @@ def test_kinsol_with_inf_and_or_nan_values():
     assert_issues(instance, expected_issues)
 
 
+def test_kinsol_with_no_solution():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task instance | KINSOL: the linear solver's setup function failed in an unrecoverable manner.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/kinsol_with_no_solution.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_issues)
+
+
 def test_sedml_file_nla_algorithm_and_nla_algorithm():
     expected_issues = [
         [

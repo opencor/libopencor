@@ -263,6 +263,18 @@ void SedInstanceTask::Impl::initialise()
     if (mSedUniformTimeCourse != nullptr) {
         mRuntime->computeComputedConstantsForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         mRuntime->computeRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
+
+        // Make sure that the NLA solver, should it have been used, didn't report any issues since our rates would
+        // otherwise be wrong (and our fixed-step ODE solvers would use them for their first step).
+        // Note: we must check this now since SolverKinsol::Impl::solve() removes all the issues of a previous call and
+        //       computeVariablesForDifferentialModel() may solve the same NLA systems again, and successfully so.
+
+        if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+            addIssues(mNlaSolver, mNlaSolver->name());
+
+            return;
+        }
+
         mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
     } else {
         mRuntime->computeComputedConstantsForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
