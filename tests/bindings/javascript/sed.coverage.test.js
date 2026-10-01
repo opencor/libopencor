@@ -590,6 +590,64 @@ test.describe('Sed coverage tests', () => {
     );
   });
 
+  test('Math with VOI', () => {
+    // Note: unlike in the math test, our mathematical functions are evaluated at run time rather than possibly at
+    //       compile time. Also, LLVM may optimise 2^t to exp2(t), in which case exp2() must be available to our model.
+
+    const outputEndTime = 10.0;
+    const numberOfSteps = 10;
+
+    const file = new loc.File(utils.resourcePath('api/sed/math_with_voi.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations[0];
+
+    simulation.outputEndTime = outputEndTime;
+    simulation.numberOfSteps = numberOfSteps;
+
+    const instance = document.instantiate();
+    const instanceTask = instance.tasks[0];
+
+    assert.strictEqual(instanceTask.stateCount, 1);
+    assert.strictEqual(instanceTask.constantCount, 0);
+    assert.strictEqual(instanceTask.computedConstantCount, 0);
+    assert.strictEqual(instanceTask.algebraicVariableCount, 35);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    // At t = 0, our algebraic variables have the same values as the computed constants of the math test.
+
+    assertValues(
+      instanceTask,
+      0,
+      [0.0],
+      [7],
+      [1.0],
+      [7],
+      [],
+      [],
+      [],
+      [],
+      [
+        243.0, 3.0, 7.0, 20.085536923187668, 1.0986122886681098, 0.47712125471966244, 4.0, 3.0, 3.0, 5.0, 3.0,
+        0.1411200080598672, -0.9899924966004454, -0.1425465430742778, -1.0101086659079939, 7.086167395737187,
+        -7.015252551434534, 10.017874927409903, 10.067661995777765, 0.9950547536867305, 0.0993279274194332,
+        0.09982156966882273, 1.0049698233136892, 0.3046926540153975, 1.2661036727794992, 1.2490457723982544,
+        1.2309594173407747, 0.3398369094541219, 0.3217505543966422, 1.8184464592320668, 1.762747174039086,
+        0.30951960420311175, 1.8738202425274144, 0.32745015023725843, 0.34657359027997264
+      ],
+      [7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7]
+    );
+
+    // At t = 10, x = (2^10-1)/ln(2).
+
+    assert.ok(Math.abs(instanceTask.state(0)[numberOfSteps] - 1475.8770268294097) < 0.01);
+  });
+
   test('KINSOL with Inf and/or NaN values', () => {
     const file = new loc.File(utils.resourcePath('api/sed/kinsol_with_inf_and_or_nan_values.cellml'));
 

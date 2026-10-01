@@ -25,7 +25,6 @@ limitations under the License.
 #include "sunlinsol/sunlinsol_spgmr.h"
 #include "sunlinsol/sunlinsol_sptfqmr.h"
 
-#include <unordered_map>
 #include <utility>
 
 namespace libOpenCOR {
@@ -72,24 +71,9 @@ void errorHandler(int pLine, const char *pFunction, const char *pFile, const cha
 #endif
 }
 
-#ifdef __EMSCRIPTEN__
-// The objective-function table slots cached in sObjectiveFunctionSlots are only valid for the runtime that is currently
-// initialised on the current thread. Each worker lazily creates its own WebAssembly instance and installs its exported
-// functions at potentially different table slot offsets (see sWasmFunctionBase in cellmlfileruntime.cpp), so the
-// cached slots from one thread are meaningless on another. The cache is cleared at the start of each solve() because
-// the WebAssembly instance is recreated between solver invocations, invalidating the previously resolved slots.
-
-thread_local std::unordered_map<intptr_t, intptr_t> sObjectiveFunctionSlots; // NOLINT
-#endif
-
 struct SolverKinsolUserData
 {
-#ifdef __EMSCRIPTEN__
-    intptr_t computeObjectiveFunctionIndex {0};
-#else
-        SolverNla::ComputeObjectiveFunction computeObjectiveFunction {nullptr};
-#endif
-
+    SolverNla::ComputeObjectiveFunction computeObjectiveFunction {nullptr};
     void *userData {nullptr};
     bool infOrNanFound {false};
 };
@@ -109,26 +93,7 @@ int computeObjectiveFunction(N_Vector pU, N_Vector pF, void *pUserData)
         }
     }
 
-#ifdef __EMSCRIPTEN__
-    // Resolve the WebAssembly table slot of our objective function, if needed, and call it.
-    // Note: the objective-function table slots cached in sObjectiveFunctionSlots are only valid for the runtime that is
-    //       currently initialised on the current thread, so resolve them (once per solve) from globalThis.runtime.
-
-    auto slotIt {sObjectiveFunctionSlots.find(userData->computeObjectiveFunctionIndex)};
-
-    if (slotIt == sObjectiveFunctionSlots.end()) {
-        // clang-format off
-        auto slot {EM_ASM_INT({
-            return globalThis.runtime.computeObjectiveFunctionSlots[$0] | 0;
-        }, userData->computeObjectiveFunctionIndex)}; // clang-format on
-
-        slotIt = sObjectiveFunctionSlots.emplace(userData->computeObjectiveFunctionIndex, slot).first;
-    }
-
-    reinterpret_cast<SolverNla::ComputeObjectiveFunction>(slotIt->second)(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
-#else
-        userData->computeObjectiveFunction(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
-#endif
+    userData->computeObjectiveFunction(N_VGetArrayPointer_Serial(pU), N_VGetArrayPointer_Serial(pF), userData->userData);
 
     return 0;
 }
@@ -348,18 +313,8 @@ void SolverKinsol::Impl::setLowerHalfBandwidth(int pLowerHalfBandwidth)
     mLowerHalfBandwidth = pLowerHalfBandwidth;
 }
 
-#ifdef __EMSCRIPTEN__
-bool SolverKinsol::Impl::solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
-#else
 bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData)
-#endif
 {
-#ifdef __EMSCRIPTEN__
-    // Clear our cache of the WebAssembly table slots of our objective functions.
-
-    sObjectiveFunctionSlots.clear();
-#endif
-
     removeAllIssues();
 
     // We don't have any data associated with the given objective function, so get some by first making sure that the
@@ -464,6 +419,8 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
         ASSERT_NE(mU, nullptr);
         ASSERT_NE(mOnes, nullptr);
 
+        N_VConst(1.0, mOnes);
+
         ASSERT_EQ(KINInit(mSolver, computeObjectiveFunction, mU), KIN_SUCCESS);
 
         // Set our linear solver.
@@ -501,32 +458,21 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
         // Keep track of what our KINSOL objects are associated with.
 
         mCachedN = pN;
-        mCachedU = pU;
         mCachedLinearSolver = mLinearSolver;
         mCachedUpperHalfBandwidth = mUpperHalfBandwidth;
         mCachedLowerHalfBandwidth = mLowerHalfBandwidth;
-    } else if (mCachedU != pU) {
-        // The NLA system is the same size, but the solution vector differs, so recreate a thin wrapper around it.
-        // Note: N_VMake_Serial() doesn't allocate any data, unlike N_VNew_Serial(), so this is cheap.
-
-        N_VDestroy_Serial(mU);
-
-        mU = N_VMake_Serial(static_cast<int64_t>(pN), pU, mSunContext);
-
-        ASSERT_NE(mU, nullptr);
-
-        mCachedU = pU;
     }
+
+    // Make our solution vector wrap the given solution array (which may differ from one call to another, e.g. if our
+    // NLA system is solved from different places), which is much cheaper than recreating our solution vector.
+
+    N_VSetArrayPointer_Serial(pU, mU);
 
     // Set our user data.
 
     SolverKinsolUserData userData;
 
-#ifdef __EMSCRIPTEN__
-    userData.computeObjectiveFunctionIndex = pComputeObjectiveFunctionIndex;
-#else
     userData.computeObjectiveFunction = pComputeObjectiveFunction;
-#endif
     userData.userData = pUserData;
 
     ASSERT_EQ(KINSetUserData(mSolver, &userData), KIN_SUCCESS);
@@ -537,9 +483,18 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
 
     // Solve the model.
 
-    N_VConst(1.0, mOnes);
-
     auto res = KINSol(mSolver, mU, KIN_LINESEARCH, mOnes, mOnes);
+
+    // KINSOL limits the (scaled) length of a Newton step to 1,000 times the (scaled) norm of the initial guess (or to 1
+    // if that norm is smaller than 1) and it gives up after five consecutive steps of that maximum length. So, if the
+    // initial guess is (close to) zero, which is typically the case the first time that an NLA system is solved, then
+    // KINSOL cannot move by more than about 5 from it and it fails, even if the NLA system is linear. If that happens,
+    // then we try again from where KINSOL stopped, which means that the maximum length of a Newton step will be much
+    // bigger.
+
+    if (res == KIN_MXNEWT_5X_EXCEEDED) {
+        res = KINSol(mSolver, mU, KIN_LINESEARCH, mOnes, mOnes);
+    }
 
     // Check whether everything went fine.
 

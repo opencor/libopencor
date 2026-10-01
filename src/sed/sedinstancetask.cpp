@@ -240,14 +240,10 @@ void SedInstanceTask::Impl::initialise()
     mRuntime->initialiseWorkerWasm();
 #endif
 
-    // Set the NLA solver address so JIT-compiled code can resolve it at runtime.
+    // Set the NLA solver address so that our compiled code can resolve it at runtime.
 
     if (mNlaSolver != nullptr) {
-#ifdef __EMSCRIPTEN__
-        mRuntime->setNlaSolverAddress(reinterpret_cast<uintptr_t>(mNlaSolver.get()));
-#else
         setNlaSolverAddress(reinterpret_cast<uintptr_t>(mNlaSolver.get()));
-#endif
     }
 
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and

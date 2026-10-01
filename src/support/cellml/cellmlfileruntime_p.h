@@ -28,7 +28,14 @@ class CellmlFileRuntime::Impl: public Logger::Impl
 public:
     CompilerPtr mCompiler {nullptr};
 #ifdef __EMSCRIPTEN__
+    // The size, in bytes, of the stack of our WebAssembly instances (see initialiseWorkerWasm()), i.e. a base size plus
+    // some room for the unknowns of our NLA systems, if any.
+
+    static constexpr size_t WASM_STACK_BASE_SIZE {65536};
+    static constexpr size_t WASM_STACK_SIZE_PER_VARIABLE {16};
+
     UnsignedChars mWasmModule;
+    size_t mWasmStackSize {WASM_STACK_BASE_SIZE};
 #endif
 
     InitialiseArraysForAlgebraicModel mInitialiseArraysForAlgebraicModel {nullptr};
@@ -41,12 +48,7 @@ public:
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 #ifdef __EMSCRIPTEN__
-    ~Impl() override;
-
     void initialiseWorkerWasm() const;
-    void cleanupWorkerWasm() const;
-
-    void setNlaSolverAddress(uintptr_t pAddress) const;
 #endif
 
     CellmlFileRuntime::InitialiseArraysForAlgebraicModel initialiseArraysForAlgebraicModel() const;

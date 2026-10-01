@@ -100,13 +100,9 @@ if(RELEASE_MODE AND NOT EMSCRIPTEN AND NOT LIBOPENCOR_CODE_ANALYSIS)
 endif()
 
 # Build our different third-party libraries.
-# Note: for Emscripten, we set the C/C++ flags before building our third-party libraries so that they are built with the
-#       same flags as libOpenCOR (see packages.cmake, which passes them on to each third-party library).
-
-if(EMSCRIPTEN)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -matomics -mbulk-memory -pthread -sSHARED_MEMORY=1" CACHE STRING "Emscripten C flags" FORCE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -matomics -mbulk-memory -pthread -sSHARED_MEMORY=1" CACHE STRING "Emscripten C++ flags" FORCE)
-endif()
+# Note: for Emscripten, our C/C++ flags are those that src/bindings/javascript/CMakeLists.txt passes on to the
+#       Emscripten build that it kicks off, so our third-party libraries are built with the same flags as libOpenCOR
+#       (see packages.cmake which passes them on to each third-party library).
 
 add_subdirectory(3rdparty)
 
@@ -350,11 +346,6 @@ if(EMSCRIPTEN)
                    ${API_HEADER_FILES}
                    ${SOURCE_FILES}
                    ${HEADER_FILES})
-
-    # Preserve Emscripten thread/shared-memory support for libOpenCOR.
-
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_TABLE_GROWTH -sINITIAL_TABLE=65536 -sSHARED_MEMORY=1" CACHE STRING "Emscripten exe linker flags" FORCE)
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -sSHARED_MEMORY=1" CACHE STRING "Emscripten shared linker flags" FORCE)
 
     # Set the flags for our generated .js and .wasm files.
     # Note #1: for compiling, we use -O3 to get the best performance, -matomics to enable atomic operations,

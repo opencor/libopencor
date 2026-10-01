@@ -186,16 +186,6 @@ bool SedInstance::Impl::startRun()
     mRunFuture = std::async(std::launch::async, [this]() {
         const auto result = run();
 
-#ifdef __EMSCRIPTEN__
-        // Clean up our per-worker WASM runtime data.
-        // Note: indeed, each pthread worker maintains its own globalThis.runtime, so without cleanup, compiled
-        //       WebAssembly.Module objects would accumulate on reused workers and therefore leak native memory.
-
-        for (const auto &task : mTasks) {
-            task->pimpl()->mRuntime->cleanupWorkerWasm();
-        }
-#endif
-
         mRunning.store(false, std::memory_order_release);
 
         return result;

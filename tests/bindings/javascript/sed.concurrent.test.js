@@ -128,4 +128,53 @@ test.describe('Sed concurrent tests', () => {
       assert.strictEqual(instance.hasIssues, false);
     }
   });
+
+  test('Parallel instances with NLA systems', () => {
+    // Make sure that simulations of a model with NLA systems don't interfere with one another when run in parallel, i.e.
+    // that they give the same results as when run sequentially.
+
+    const INSTANCE_COUNT = 3;
+
+    const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
+
+    cellmlFile.setContents(utils.fileContents(cellmlFile.path));
+
+    const sedmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.sedml'));
+
+    sedmlFile.setContents(utils.fileContents(sedmlFile.path));
+
+    const document = new loc.SedDocument(sedmlFile);
+    const results = (instance) => {
+      const instanceTask = instance.tasks[0];
+
+      return [Array.from(instanceTask.state(0)), Array.from(instanceTask.algebraicVariable(0))];
+    };
+
+    const sequentialInstance = document.instantiate();
+
+    sequentialInstance.run();
+
+    assert.strictEqual(sequentialInstance.hasIssues, false);
+
+    const expectedResults = results(sequentialInstance);
+    const instances = [];
+
+    for (let i = 0; i < INSTANCE_COUNT; ++i) {
+      instances.push(document.instantiate());
+    }
+
+    for (const instance of instances) {
+      assert.strictEqual(instance.startRun(), true);
+    }
+
+    for (const instance of instances) {
+      assert.ok(instance.waitForRun() > 0.0);
+    }
+
+    for (const instance of instances) {
+      assert.strictEqual(instance.progress, 1.0);
+      assert.strictEqual(instance.hasIssues, false);
+      assert.deepStrictEqual(results(instance), expectedResults);
+    }
+  });
 });

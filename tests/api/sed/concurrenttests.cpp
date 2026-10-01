@@ -150,3 +150,48 @@ TEST(ConcurrentSedTest, parallelAsyncLifecycle)
         EXPECT_FALSE(instance->hasIssues());
     }
 }
+
+TEST(ConcurrentSedTest, parallelInstancesWithNlaSystems)
+{
+    // Make sure that simulations of a model with NLA systems don't interfere with one another when run in parallel, i.e.
+    // that they give the same results as when run sequentially.
+
+    static const auto INSTANCE_COUNT {3U};
+
+    auto cellmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.cellml"))};
+    auto sedmlFile {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae/model.sedml"))};
+    auto document {libOpenCOR::SedDocument::create(sedmlFile)};
+    auto results = [](const libOpenCOR::SedInstancePtr &pInstance) {
+        const auto &instanceTask {pInstance->tasks()[0]};
+        const auto state {instanceTask->state(0)};
+        const auto algebraicVariable {instanceTask->algebraicVariable(0)};
+
+        return std::vector<std::vector<double>> {{state.begin(), state.end()}, {algebraicVariable.begin(), algebraicVariable.end()}};
+    };
+    auto sequentialInstance {document->instantiate()};
+
+    sequentialInstance->run();
+
+    EXPECT_FALSE(sequentialInstance->hasIssues());
+
+    const auto expectedResults {results(sequentialInstance)};
+    std::vector<libOpenCOR::SedInstancePtr> instances;
+
+    for (size_t i {0}; i < INSTANCE_COUNT; ++i) {
+        instances.push_back(document->instantiate());
+    }
+
+    for (auto &instance : instances) {
+        EXPECT_TRUE(instance->startRun());
+    }
+
+    for (auto &instance : instances) {
+        EXPECT_GT(instance->waitForRun(), 0.0);
+    }
+
+    for (const auto &instance : instances) {
+        EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+        EXPECT_FALSE(instance->hasIssues());
+        EXPECT_EQ(results(instance), expectedResults);
+    }
+}

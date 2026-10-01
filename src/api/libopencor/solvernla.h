@@ -64,11 +64,7 @@ public:
      * @return @c true if the NLA system could be solved, @c false otherwise.
      */
 
-#ifdef __EMSCRIPTEN__
-    bool solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData);
-#else
     bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData);
-#endif
 
 protected:
     class Impl; /**< Forward declaration of the implementation class, @private. */

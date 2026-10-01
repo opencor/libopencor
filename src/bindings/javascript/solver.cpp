@@ -14,8 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include "solvernla_p.h"
-
 #include <libopencor>
 
 void solverApi()
@@ -56,15 +54,6 @@ void solverApi()
         .property("step", &libOpenCOR::SolverOdeFixedStep::step, &libOpenCOR::SolverOdeFixedStep::setStep);
 
     // SolverNla API.
-
-    emscripten::function("nlaSolve", emscripten::optional_override([](uintptr_t pNlaSolverAddress, intptr_t pComputeObjectiveFunctionIndex, uintptr_t pU, size_t pN, uintptr_t pData) {
-                             libOpenCOR::nlaSolve(pNlaSolverAddress, pComputeObjectiveFunctionIndex,
-                                                  reinterpret_cast<double *>(pU), pN, reinterpret_cast<void *>(pData));
-                         }));
-
-    EM_ASM({
-        Module["nlaSolve"] = Module["nlaSolve"];
-    });
 
     emscripten::class_<libOpenCOR::SolverNla, emscripten::base<libOpenCOR::Solver>>("SolverNla")
         .smart_ptr<libOpenCOR::SolverNlaPtr>("SolverNla");

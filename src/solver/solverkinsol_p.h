@@ -58,7 +58,6 @@ public:
     SUNLinearSolver mSunLinearSolver {nullptr};
 
     size_t mCachedN {0};
-    double *mCachedU {nullptr};
     LinearSolver mCachedLinearSolver {DEFAULT_LINEAR_SOLVER};
     int mCachedUpperHalfBandwidth {DEFAULT_UPPER_HALF_BANDWIDTH};
     int mCachedLowerHalfBandwidth {DEFAULT_LOWER_HALF_BANDWIDTH};
@@ -86,11 +85,7 @@ public:
     int lowerHalfBandwidth() const noexcept;
     void setLowerHalfBandwidth(int pLowerHalfBandwidth);
 
-#ifdef __EMSCRIPTEN__
-    bool solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData) override;
-#else
     bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData) override;
-#endif
 };
 
 } // namespace libOpenCOR

@@ -22,27 +22,19 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-#ifdef __EMSCRIPTEN__
-void nlaSolve(uintptr_t pNlaSolverAddress, intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pData);
-#else
 void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
               double *pU, size_t pN, void *pData);
 
 extern "C" uintptr_t nlaSolverAddress();
 
 void setNlaSolverAddress(uintptr_t pAddress);
-#endif
 
 class SolverNla::Impl: public Solver::Impl
 {
 public:
     explicit Impl(const std::string &pId, const std::string &pName);
 
-#ifdef __EMSCRIPTEN__
-    virtual bool solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData) = 0;
-#else
     virtual bool solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData) = 0;
-#endif
 };
 
 } // namespace libOpenCOR

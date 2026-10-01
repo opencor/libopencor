@@ -52,9 +52,6 @@ public:
 
 #ifdef __EMSCRIPTEN__
     void initialiseWorkerWasm() const;
-    void cleanupWorkerWasm() const;
-
-    void setNlaSolverAddress(uintptr_t pAddress) const;
 #endif
 
     InitialiseArraysForAlgebraicModel initialiseArraysForAlgebraicModel() const;

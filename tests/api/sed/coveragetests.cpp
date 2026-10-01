@@ -587,6 +587,73 @@ TEST(CoverageSedTest, math)
     EXPECT_EQ_VALUES(instanceTask, 0, {}, {}, {}, {}, {}, {}, COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS, {}, {});
 }
 
+TEST(CoverageSedTest, mathWithVoi)
+{
+    // Note: unlike in the math test, our mathematical functions are evaluated at run time rather than possibly at
+    //       compile time. Also, LLVM may optimise 2^t to exp2(t), in which case exp2() must be available to our model.
+
+    static const auto OUTPUT_END_TIME {10.0};
+    static const auto NUMBER_OF_STEPS {10};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/math_with_voi.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setOutputEndTime(OUTPUT_END_TIME);
+    simulation->setNumberOfSteps(NUMBER_OF_STEPS);
+
+    auto instance {document->instantiate()};
+    const auto &instanceTask {instance->tasks()[0]};
+
+    EXPECT_EQ(instanceTask->stateCount(), 1U);
+    EXPECT_EQ(instanceTask->constantCount(), 0U);
+    EXPECT_EQ(instanceTask->computedConstantCount(), 0U);
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 35U);
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    // At t = 0, our algebraic variables have the same values as the computed constants of the math test.
+
+    static const auto STATE_VALUES {std::vector<double>({0.0})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.0000001})};
+    static const auto RATE_VALUES {std::vector<double>({1.0})};
+    static const auto RATE_ABS_TOLS {std::vector<double>({0.0000001})};
+    static const auto ALGEBRAIC_VALUES {std::vector<double>({243.0, 3.0, 7.0, 20.085536923187668, 1.0986122886681098,
+                                                             0.47712125471966244, 4.0, 3.0, 3.0, 5.0, 3.0,
+                                                             0.14112000805986721, -0.98999249660044542,
+                                                             -0.1425465430742778, -1.0101086659079939,
+                                                             7.0861673957371867, -7.0152525514345339,
+                                                             10.017874927409903, 10.067661995777765,
+                                                             0.99505475368673046, 0.099327927419433207,
+                                                             0.099821569668822732, 1.0049698233136892,
+                                                             0.30469265401539747, 1.266103672779499,
+                                                             1.2490457723982544, 1.2309594173407747,
+                                                             0.33983690945412193, 0.32175055439664219,
+                                                             1.8184464592320668, 1.7627471740390861,
+                                                             0.30951960420311175, 1.8738202425274144,
+                                                             0.32745015023725843, 0.34657359027997264})};
+    static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0000001, 0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001})};
+
+    EXPECT_EQ_VALUES(instanceTask, 0, STATE_VALUES, STATE_ABS_TOLS, RATE_VALUES, RATE_ABS_TOLS, {}, {}, {}, {}, ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
+
+    // At t = 10, x = (2^10-1)/ln(2).
+
+    static const auto X_VALUE {1475.8770268294097};
+    static const auto X_ABS_TOL {0.01};
+
+    EXPECT_NEAR(instanceTask->state(0)[NUMBER_OF_STEPS], X_VALUE, X_ABS_TOL);
+}
+
 TEST(CoverageSedTest, KinsolWithInfAndOrNanValues)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
