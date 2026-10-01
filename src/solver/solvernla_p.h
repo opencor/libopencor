@@ -29,6 +29,9 @@ extern "C" uintptr_t nlaSolverAddress();
 
 void setNlaSolverAddress(uintptr_t pAddress);
 
+bool nlaSolveFailed();
+void resetNlaSolveFailed();
+
 class SolverNla::Impl: public Solver::Impl
 {
 public:

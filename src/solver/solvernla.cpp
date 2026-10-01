@@ -22,12 +22,30 @@ namespace libOpenCOR {
 
 namespace {
 thread_local uintptr_t sNlaSolverAddress = 0; // NOLINT
+thread_local bool sNlaSolveFailed = false; // NOLINT
 } // namespace
 
 void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
               double *pU, size_t pN, void *pData)
 {
-    reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunction, pU, pN, pData); // NOLINT
+    // Solve the given NLA system, unless an NLA system could not be solved since resetNlaSolveFailed() was last called.
+    // Indeed, our model would then be computed using some wrong values anyway and the NLA solver would remove the
+    // issues that explain why an NLA system could not be solved (since it removes its issues each time it is used),
+    // should it then successfully solve another (or the same) NLA system.
+
+    if (!sNlaSolveFailed) {
+        sNlaSolveFailed = !reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunction, pU, pN, pData); // NOLINT
+    }
+}
+
+bool nlaSolveFailed()
+{
+    return sNlaSolveFailed;
+}
+
+void resetNlaSolveFailed()
+{
+    sNlaSolveFailed = false;
 }
 
 extern "C" uintptr_t nlaSolverAddress()

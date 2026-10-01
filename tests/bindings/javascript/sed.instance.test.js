@@ -744,6 +744,28 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
+  test('DAE model with failing ODE solver', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/dae.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations[0];
+    const cvode = simulation.odeSolver;
+
+    cvode.maximumNumberOfSteps = 1;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assertIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, 'Task | CVODE: at t = 1.08537561647883e-09, mxstep steps taken before reaching tout.']
+    ]);
+  });
+
   test('COMBINE archive', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 

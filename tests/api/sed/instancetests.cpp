@@ -672,6 +672,30 @@ TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+TEST(InstanceSedTest, daeModelWithFailingOdeSolver)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | CVODE: at t = 1.08537561647883e-09, mxstep steps taken before reaching tout."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &cvode {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+
+    static const auto NOK_MAXIMUM_NUMBER_OF_STEPS {1};
+
+    cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
 TEST(InstanceSedTest, combineArchive)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.omex"))};

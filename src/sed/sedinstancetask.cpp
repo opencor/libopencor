@@ -240,10 +240,12 @@ void SedInstanceTask::Impl::initialise()
     mRuntime->initialiseWorkerWasm();
 #endif
 
-    // Set the NLA solver address so that our compiled code can resolve it at runtime.
+    // Set the NLA solver address so that our compiled code can resolve it at runtime and forget about any NLA system
+    // that could not be solved in a previous run.
 
     if (mNlaSolver != nullptr) {
         setNlaSolverAddress(reinterpret_cast<uintptr_t>(mNlaSolver.get()));
+        resetNlaSolveFailed();
     }
 
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -263,27 +265,15 @@ void SedInstanceTask::Impl::initialise()
     if (mSedUniformTimeCourse != nullptr) {
         mRuntime->computeComputedConstantsForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         mRuntime->computeRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
-
-        // Make sure that the NLA solver, should it have been used, didn't report any issues since our rates would
-        // otherwise be wrong (and our fixed-step ODE solvers would use them for their first step).
-        // Note: we must check this now since SolverKinsol::Impl::solve() removes all the issues of a previous call and
-        //       computeVariablesForDifferentialModel() may solve the same NLA systems again, and successfully so.
-
-        if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
-            addIssues(mNlaSolver, mNlaSolver->name());
-
-            return;
-        }
-
         mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
     } else {
         mRuntime->computeComputedConstantsForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
         mRuntime->computeVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
     }
 
-    // Make sure that the NLA solver, should it have been used, didn't report any issues.
+    // Make sure that our NLA systems, if any, could all be solved.
 
-    if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+    if ((mNlaSolver != nullptr) && nlaSolveFailed()) {
         addIssues(mNlaSolver, mNlaSolver->name());
 
         return;
@@ -377,6 +367,13 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         // Update our model's state.
 
         if (!odeSolverPimpl->solve(mVoi, std::min(pVoiStart + static_cast<double>(++voiCounter) * pVoiInterval, pVoiEnd))) {
+            // Note: an NLA system that could not be solved is a likely reason for our ODE solver to have failed (see
+            //       rhsFunction() in solvercvode.cpp).
+
+            if ((mNlaSolver != nullptr) && nlaSolveFailed()) {
+                addIssues(mNlaSolver, mNlaSolver->name());
+            }
+
             addIssues(mOdeSolver, mOdeSolver->name());
 
             guard();
@@ -392,19 +389,15 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
 
-        //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD TRIGGER
-        //          NLA ISSUES HERE, WHICH WE DON'T HAVE YET HENCE WE DISABLE THE FOLLOWING CODE WHEN DOING CODE
-        //          COVERAGE.
+        // Make sure that our NLA systems, if any, could all be solved, be it by our ODE solver or by us.
 
-#ifndef CODE_COVERAGE_ENABLED
-        if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+        if ((mNlaSolver != nullptr) && nlaSolveFailed()) {
             addIssues(mNlaSolver, mNlaSolver->name());
 
             guard();
 
             return;
         }
-#endif
 
         // Update our progress.
 

@@ -787,6 +787,60 @@ def test_kinsol_with_no_solution():
     assert_issues(instance, expected_issues)
 
 
+def test_kinsol_with_no_solution_over_time():
+    # The first NLA system of our model only has a solution until t = ln(2) while its second NLA system always has a
+    # solution, so our simulation should fail at t = ln(2), whether we use a fixed-step ODE solver or CVODE.
+    # Note: we cannot check the full description of CVODE's error since it includes the step size, which may vary from
+    #       one platform to another.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | KINSOL: the maximum number of iterations was reached before convergence.",
+        ],
+    ]
+    last_valid_index = 6
+    cvode_error_start = "Task | CVODE: at t = 0.6931"
+
+    file = loc.File(
+        utils.resource_path("api/sed/kinsol_with_no_solution_over_time.cellml")
+    )
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    forward_euler = loc.SolverForwardEuler()
+
+    simulation.output_end_time = 2.0
+    simulation.number_of_steps = 20
+
+    forward_euler.step = 0.01
+
+    simulation.ode_solver = forward_euler
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert_issues(instance, expected_issues)
+    assert not math.isnan(instance.tasks[0].voi[last_valid_index])
+    assert math.isnan(instance.tasks[0].voi[last_valid_index + 1])
+
+    simulation.ode_solver = loc.SolverCvode()
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert len(instance.issues) == 2
+    assert instance.issues[0].description == expected_issues[0][1]
+    assert instance.issues[1].description.startswith(cvode_error_start)
+    assert not math.isnan(instance.tasks[0].voi[last_valid_index])
+    assert math.isnan(instance.tasks[0].voi[last_valid_index + 1])
+
+
 def test_sedml_file_nla_algorithm_and_nla_algorithm():
     expected_issues = [
         [

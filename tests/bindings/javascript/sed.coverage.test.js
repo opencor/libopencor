@@ -680,6 +680,60 @@ test.describe('Sed coverage tests', () => {
     ]);
   });
 
+  test('KINSOL with no solution over time', () => {
+    // The first NLA system of our model only has a solution until t = ln(2) while its second NLA system always has a
+    // solution, so our simulation should fail at t = ln(2), whether we use a fixed-step ODE solver or CVODE.
+    // Note: we cannot check the full description of CVODE's error since it includes the step size, which may vary from
+    //       one platform to another.
+
+    const expectedIssues = [
+      [loc.Issue.Type.ERROR, 'Task | KINSOL: the maximum number of iterations was reached before convergence.']
+    ];
+    const lastValidIndex = 6;
+    const cvodeErrorStart = 'Task | CVODE: at t = 0.6931';
+
+    const file = new loc.File(utils.resourcePath('api/sed/kinsol_with_no_solution_over_time.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations[0];
+    const forwardEuler = new loc.SolverForwardEuler();
+
+    simulation.outputEndTime = 2.0;
+    simulation.numberOfSteps = 20;
+
+    forwardEuler.step = 0.01;
+
+    simulation.odeSolver = forwardEuler;
+
+    let instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assertIssues(loc, instance, expectedIssues);
+    assert.strictEqual(Number.isNaN(instance.tasks[0].voi[lastValidIndex]), false);
+    assert.strictEqual(Number.isNaN(instance.tasks[0].voi[lastValidIndex + 1]), true);
+
+    simulation.odeSolver = new loc.SolverCvode();
+
+    instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    const issues = instance.issues;
+
+    assert.strictEqual(issues.length, 2);
+    assert.strictEqual(issues[0].description, expectedIssues[0][1]);
+    assert.ok(issues[1].description.startsWith(cvodeErrorStart));
+    assert.strictEqual(Number.isNaN(instance.tasks[0].voi[lastValidIndex]), false);
+    assert.strictEqual(Number.isNaN(instance.tasks[0].voi[lastValidIndex + 1]), true);
+  });
+
   test('SED-ML file with nlaAlgorithm and NLA algorithm', () => {
     const cellmlFile = new loc.File(utils.resourcePath('api/sed/dae/model.cellml'));
 

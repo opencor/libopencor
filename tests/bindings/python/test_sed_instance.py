@@ -660,6 +660,30 @@ def test_dae_model_with_no_ode_or_nla_solver():
     assert_issues(instance, expected_issues)
 
 
+def test_dae_model_with_failing_ode_solver():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | CVODE: at t = 1.08537561647883e-09, mxstep steps taken before reaching tout.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/dae.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    cvode = simulation.ode_solver
+
+    cvode.maximum_number_of_steps = 1
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert_issues(instance, expected_issues)
+
+
 def test_combine_archive():
     file = loc.File(utils.resource_path("cellml_2.omex"))
     document = loc.SedDocument(file)

@@ -20,6 +20,8 @@ limitations under the License.
 
 #include <libopencor>
 
+#include <cmath>
+
 TEST(CoverageSedTest, initialise)
 {
     static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
@@ -678,6 +680,59 @@ TEST(CoverageSedTest, KinsolWithNoSolution)
     auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, KinsolWithNoSolutionOverTime)
+{
+    // The first NLA system of our model only has a solution until t = ln(2) while its second NLA system always has a
+    // solution, so our simulation should fail at t = ln(2), whether we use a fixed-step ODE solver or CVODE.
+    // Note: we cannot check the full description of CVODE's error since it includes the step size, which may vary from
+    //       one platform to another.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::ERROR, "Task | KINSOL: the maximum number of iterations was reached before convergence."},
+    };
+    static constexpr auto OUTPUT_END_TIME {2.0};
+    static constexpr auto NUMBER_OF_STEPS {20};
+    static constexpr auto STEP {0.01};
+    static constexpr auto LAST_VALID_INDEX {6};
+    static const std::string CVODE_ERROR_START {"Task | CVODE: at t = 0.6931"};
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_no_solution_over_time.cellml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    auto forwardEuler {libOpenCOR::SolverForwardEuler::create()};
+
+    simulation->setOutputEndTime(OUTPUT_END_TIME);
+    simulation->setNumberOfSteps(NUMBER_OF_STEPS);
+
+    forwardEuler->setStep(STEP);
+
+    simulation->setOdeSolver(forwardEuler);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+    EXPECT_FALSE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX]));
+    EXPECT_TRUE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX + 1]));
+
+    simulation->setOdeSolver(libOpenCOR::SolverCvode::create());
+
+    instance = document->instantiate();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    ASSERT_EQ(instance->issueCount(), 2U);
+    EXPECT_EQ(instance->issue(0)->description(), EXPECTED_ISSUES[0].description);
+    EXPECT_EQ(instance->issue(1)->description().substr(0, CVODE_ERROR_START.size()), CVODE_ERROR_START);
+    EXPECT_FALSE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX]));
+    EXPECT_TRUE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX + 1]));
 }
 
 TEST(CoverageSedTest, sedmlFileNlaAlgorithmAndNlaAlgorithm)
