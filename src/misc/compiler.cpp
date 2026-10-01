@@ -30,7 +30,12 @@ limitations under the License.
 #include <array>
 #include <climits>
 #include <cstring>
+#include <format>
 #include <string_view>
+
+#ifdef __EMSCRIPTEN__
+#    include <emscripten/heap.h>
+#endif
 
 namespace libOpenCOR {
 
@@ -141,9 +146,9 @@ std::string patchWasmSharedMemory(UnsignedChars &pWasmModule)
     // memory import flags as non-shared through the machine code layer. The shared flag is normally set by the linker,
     // but we don't use one. So, to patch the binary directly handles both issues reliably across all LLVM versions.
     // Also, since we are going through the imports of the WASM module, check that it only imports functions that we
-    // provide (see WASM_FUNCTION_IMPORTS) and return the name of the first one that we don't provide, if any. Indeed,
-    // LLVM may replace a call to a mathematical function with a call to another one (e.g., pow(2.0, x) with exp2(x)),
-    // in which case our WASM module could not be instantiated.
+    // provide (see WASM_FUNCTION_IMPORTS). Indeed, LLVM may replace a call to a mathematical function with a call to
+    // another one (e.g., pow(2.0, x) with exp2(x)), in which case our WASM module could not be instantiated.
+    // Note: we return a description of the first problem that we come across, if any.
 
     std::string res;
 
@@ -313,7 +318,7 @@ std::string patchWasmSharedMemory(UnsignedChars &pWasmModule)
                     // Function import: check that we provide it and skip the type index.
 
                     if (res.empty() && (std::ranges::find(WASM_FUNCTION_IMPORTS, fieldName) == WASM_FUNCTION_IMPORTS.end())) {
-                        res = fieldName;
+                        res = "The WebAssembly code requires a function that is not available ('" + std::string(fieldName) + "').";
                     }
 
                     decodeULEB128(pWasmModule.data(), pos);
@@ -332,34 +337,50 @@ std::string patchWasmSharedMemory(UnsignedChars &pWasmModule)
                         }
                     }
                 } else if (importKind == 0x02) {
-                    // Memory import: patch flags to mark it as shared and add a maximum value if not present.
+                    // Memory import: patch its flags to mark it as shared and give it a maximum size, if it doesn't
+                    // already have one. That maximum size must be at least that of the memory of our main WebAssembly
+                    // module (i.e. the memory that we import), which we retrieve at runtime rather than hard-code it
+                    // since it depends on -sINITIAL_MEMORY, etc. (see src/CMakeLists.txt).
+                    // Note: LLVM currently emits a 32-bit, non-shared memory import without a maximum size (i.e. flags
+                    //       0x00), but we handle a memory import with a maximum size (i.e. flags 0x01) and/or that is
+                    //       already shared (i.e. flags 0x03) in case a future version of LLVM does so. Any other
+                    //       flags (e.g., a 64-bit memory) are not supported.
 
                     if (pos < sectionEnd) {
-                        pWasmModule[pos] = 0x03; // Set flags to 0x03 (i.e. has_maximum | shared).
+                        static constexpr unsigned char HAS_MAXIMUM {0x01};
+                        static constexpr unsigned char SHARED {0x02};
+                        static constexpr size_t MEMORY_PAGE_SIZE {65536};
 
-                        ++pos; // Advance past the flags byte.
+                        auto flags {pWasmModule[pos]};
 
-                        decodeULEB128(pWasmModule.data(), pos); // Initial value (should be 0 for LLVM modules).
+                        if ((flags & ~(HAS_MAXIMUM | SHARED)) != 0) {
+                            return "The WebAssembly code imports a memory that is not supported (flags 0x" + std::format("{:02x}", flags) + ").";
+                        }
 
-                        // Encode the maximum value.
+                        pWasmModule[pos++] = HAS_MAXIMUM | SHARED;
 
-                        static constexpr size_t RUNTIME_MEMORY_MAX = 32768;
-                        unsigned char runtimeMemory[5];
-                        size_t runtimeMemorySize = encodeULEB128(runtimeMemory, RUNTIME_MEMORY_MAX);
+                        decodeULEB128(pWasmModule.data(), pos); // Initial size.
 
-                        // Insert the maximum value right after the initial value.
+                        auto maximumSize {emscripten_get_heap_max() / MEMORY_PAGE_SIZE};
 
-                        pWasmModule.insert(pWasmModule.begin() + static_cast<std::vector<unsigned char>::difference_type>(pos),
-                                           runtimeMemory, runtimeMemory + runtimeMemorySize);
+                        if ((flags & HAS_MAXIMUM) != 0) {
+                            if (decodeULEB128(pWasmModule.data(), pos) < maximumSize) {
+                                return "The WebAssembly code imports a memory that is too small.";
+                            }
+                        } else {
+                            // Insert our maximum size right after the initial size and account for it.
 
-                        // Update the section size to account for the new maximum value.
+                            unsigned char encodedMaximumSize[5];
+                            auto encodedMaximumSizeSize {encodeULEB128(encodedMaximumSize, maximumSize)};
 
-                        addToLeb128Size(pWasmModule.data() + sizeFieldPos, runtimeMemorySize);
+                            pWasmModule.insert(pWasmModule.begin() + static_cast<std::vector<unsigned char>::difference_type>(pos),
+                                               encodedMaximumSize, encodedMaximumSize + encodedMaximumSizeSize);
 
-                        // Update the section end and our position to account for the new maximum value.
+                            addToLeb128Size(pWasmModule.data() + sizeFieldPos, encodedMaximumSizeSize);
 
-                        sectionEnd += runtimeMemorySize;
-                        pos += runtimeMemorySize;
+                            sectionEnd += encodedMaximumSizeSize;
+                            pos += encodedMaximumSizeSize;
+                        }
                     }
                 } else if (importKind == 0x03) {
                     // Global import: skip the value type and mutability.
@@ -689,8 +710,8 @@ bool Compiler::Impl::compile(const std::string &pCode)
     // Patch the WebAssembly code to ensure that it can be loaded into a shared memory environment and make sure that it
     // only imports functions that we provide.
 
-    if (auto function {patchWasmSharedMemory(pWasmModule)}; !function.empty()) {
-        addError("The WebAssembly code requires a function that is not available ('" + function + "').");
+    if (auto error {patchWasmSharedMemory(pWasmModule)}; !error.empty()) {
+        addError(error);
 
         return false;
     }
