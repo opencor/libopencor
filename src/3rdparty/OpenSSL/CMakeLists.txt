@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b424224c512d163c921808b3372f0a2d0f385ada)
+                                 42f0dacc21728e3f8bcc770857ddc24fc977426a)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 55942cdcb815ba23cd20c3694c7749a9fda0e621)
+                                 b15dc57552411f3a19d20be5a5494c6eb09ca1da)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 e81dea8b502a8bd018295d2e1f29c06db551cffe)
+                                 557544d10c2f3169e89b40f2b285dd8f8cb9dbf8)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 3b525753b896b445d7d9585470d7059ff803ef76)
+                                 95e2d433807214ffc235dfd5579f25dcbfbd62d8)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             fb7a25e31b318b132fcce4b4014f8f5dadf62c5c)
+                             ec455d703206d8d4bb807d53271af4cbad29bdfc)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             9b7de8860912c6fefad7fd794b7f3e0354d18c6d)
+                             f774e0ef7f1ac705718f21508b429cf108ec31f6)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             7e10ccc82fceac4cfd1bf0274e010e322fd67f41)
+                             4eb65984ff663316c94bb08929f1e2bc0ee221aa)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             aee0ec707689d501ff743ec51b9c5aee2216ebd5)
+                             688e1ac00090571b7992a7a2a77c59437889adca)
         endif()
     endif()
 else()
@@ -105,6 +105,16 @@ else()
 
     if(WIN32)
         list(APPEND CONFIG_OPTIONS no-asm)
+
+        # On ARM, MSVC 2026 may call __chkstk() before saving the link register in a function's prologue, meaning that
+        # the function then returns into its own prologue and crashes. This is notably the case for
+        # tls_parse_all_extensions(), i.e. every TLS handshake. OpenSSL builds with /Gs0, i.e. it probes the stack in
+        # every function with a stack frame, so we restore MSVC's default threshold (i.e. /Gs4096), which avoids the
+        # issue.
+
+        if(NOT INTEL_MODE)
+            list(APPEND CONFIG_OPTIONS -Gs4096)
+        endif()
 
         if(RELEASE_MODE)
             if(INTEL_MODE)
