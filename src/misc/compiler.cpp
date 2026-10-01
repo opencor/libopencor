@@ -26,8 +26,11 @@ limitations under the License.
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Target/TargetMachine.h"
 
+#include <algorithm>
+#include <array>
 #include <climits>
 #include <cstring>
+#include <string_view>
 
 namespace libOpenCOR {
 
@@ -97,12 +100,52 @@ void optimise(llvm::Module &pModule, llvm::TargetMachine &pTargetMachine)
 }
 
 #ifdef __EMSCRIPTEN__
-static void patchWasmSharedMemory(UnsignedChars &pWasmModule)
+// The functions that the WebAssembly code of a model may import, i.e. those that initialiseWorkerWasmJS() provides (see
+// cellmlfileruntime.cpp), which our main WebAssembly module must export (see -sEXPORTED_FUNCTIONS in
+// src/CMakeLists.txt).
+
+constexpr std::array WASM_FUNCTION_IMPORTS {
+    std::string_view {"memset"},
+    std::string_view {"nlaSolverAddress"},
+    std::string_view {"nlaSolve"},
+    std::string_view {"pow"},
+    std::string_view {"sqrt"},
+    std::string_view {"fabs"},
+    std::string_view {"exp"},
+    std::string_view {"exp2"},
+    std::string_view {"log"},
+    std::string_view {"log10"},
+    std::string_view {"ceil"},
+    std::string_view {"floor"},
+    std::string_view {"fmin"},
+    std::string_view {"fmax"},
+    std::string_view {"fmod"},
+    std::string_view {"sin"},
+    std::string_view {"cos"},
+    std::string_view {"tan"},
+    std::string_view {"sinh"},
+    std::string_view {"cosh"},
+    std::string_view {"tanh"},
+    std::string_view {"asin"},
+    std::string_view {"acos"},
+    std::string_view {"atan"},
+    std::string_view {"asinh"},
+    std::string_view {"acosh"},
+    std::string_view {"atanh"},
+};
+
+std::string patchWasmSharedMemory(UnsignedChars &pWasmModule)
 {
     // Patch the WASM module to mark the imported memory as shared and add the shared-mem target feature. Indeed, some
     // LLVM versions don't recognise +shared-mem as a WebAssembly CPU feature, and even those that do still output the
     // memory import flags as non-shared through the machine code layer. The shared flag is normally set by the linker,
     // but we don't use one. So, to patch the binary directly handles both issues reliably across all LLVM versions.
+    // Also, since we are going through the imports of the WASM module, check that it only imports functions that we
+    // provide (see WASM_FUNCTION_IMPORTS) and return the name of the first one that we don't provide, if any. Indeed,
+    // LLVM may replace a call to a mathematical function with a call to another one (e.g., pow(2.0, x) with exp2(x)),
+    // in which case our WASM module could not be instantiated.
+
+    std::string res;
 
     // Helper to decode ULEB128.
 
@@ -168,7 +211,7 @@ static void patchWasmSharedMemory(UnsignedChars &pWasmModule)
         || (pWasmModule[2] != 0x73) || (pWasmModule[3] != 0x6D)
         || (pWasmModule[4] != 0x01) || (pWasmModule[5] != 0x00)
         || (pWasmModule[6] != 0x00) || (pWasmModule[7] != 0x00)) {
-        return;
+        return res;
     }
 
     // Patch the WebAssembly module by scanning its sections to find the import section and the target_features custom
@@ -254,6 +297,7 @@ static void patchWasmSharedMemory(UnsignedChars &pWasmModule)
                 // Decode and skip the field name.
 
                 auto fieldNameSize {decodeULEB128(pWasmModule.data(), pos)};
+                std::string_view fieldName(reinterpret_cast<const char *>(pWasmModule.data()) + pos, fieldNameSize);
 
                 pos += fieldNameSize;
 
@@ -266,7 +310,11 @@ static void patchWasmSharedMemory(UnsignedChars &pWasmModule)
                 auto importKind {pWasmModule[pos++]};
 
                 if (importKind == 0x00) {
-                    // Function import: skip the type index.
+                    // Function import: check that we provide it and skip the type index.
+
+                    if (res.empty() && (std::ranges::find(WASM_FUNCTION_IMPORTS, fieldName) == WASM_FUNCTION_IMPORTS.end())) {
+                        res = fieldName;
+                    }
 
                     decodeULEB128(pWasmModule.data(), pos);
                 } else if (importKind == 0x01) {
@@ -308,12 +356,11 @@ static void patchWasmSharedMemory(UnsignedChars &pWasmModule)
 
                         addToLeb128Size(pWasmModule.data() + sizeFieldPos, runtimeMemorySize);
 
-                        // Update the section end to account for the new maximum value.
+                        // Update the section end and our position to account for the new maximum value.
 
                         sectionEnd += runtimeMemorySize;
+                        pos += runtimeMemorySize;
                     }
-
-                    break;
                 } else if (importKind == 0x03) {
                     // Global import: skip the value type and mutability.
 
@@ -324,6 +371,8 @@ static void patchWasmSharedMemory(UnsignedChars &pWasmModule)
 
         pos = sectionEnd;
     }
+
+    return res;
 }
 #endif
 
@@ -624,9 +673,14 @@ bool Compiler::Impl::compile(const std::string &pCode)
         return false;
     }
 
-    // Patch the WebAssembly code to ensure that it can be loaded into a shared memory environment.
+    // Patch the WebAssembly code to ensure that it can be loaded into a shared memory environment and make sure that it
+    // only imports functions that we provide.
 
-    patchWasmSharedMemory(pWasmModule);
+    if (auto function {patchWasmSharedMemory(pWasmModule)}; !function.empty()) {
+        addError("The WebAssembly code requires a function that is not available ('" + function + "').");
+
+        return false;
+    }
 
     return true;
 #else
