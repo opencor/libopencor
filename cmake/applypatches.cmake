@@ -42,10 +42,11 @@ if(NOT GIT_EXECUTABLE)
     message(FATAL_ERROR "Git could not be found, so the ${PACKAGE_NAME} patches could not be applied.")
 endif()
 
-# Make sure that the source directory is a Git repository.
-# Note: indeed, otherwise, git apply would silently skip the patches since it only applies them if the current or a
-#       parent directory is a Git repository, which is not something we can rely on (e.g., if libOpenCOR's source is a
-#       tarball rather than a clone).
+# Make sure that the source directory is the root of a Git repository.
+# Note: indeed, when run from within a Git repository, git apply interprets the paths in a patch as relative to the root
+#       of that repository and silently skips (i.e. with an exit code of 0) the files that are not in the current
+#       directory. This is what would happen with our build directory being in our clone of libOpenCOR (as is normally
+#       the case), the paths in our patches being relative to the source directory.
 
 execute_process(COMMAND ${GIT_EXECUTABLE} init -q
                 WORKING_DIRECTORY "${SOURCE_DIR}"
@@ -56,7 +57,9 @@ if(NOT RESULT EQUAL 0)
     message(FATAL_ERROR "git init failed, so the ${PACKAGE_NAME} patches could not be applied (${ERROR}).")
 endif()
 
-# Apply our patches, unless they have already been applied (i.e. they can be reverse-applied).
+# Apply our patches.
+# Note: we always patch a pristine copy of the source code (see Note #2 above), so we don't check whether a patch has
+#       already been applied.
 
 set(GIT_APPLY ${GIT_EXECUTABLE} -c core.autocrlf=input apply --whitespace=nowarn --ignore-space-change)
 
@@ -67,24 +70,14 @@ foreach(PATCH_FILE IN LISTS PATCH_FILES)
 
     message(STATUS "Applying the ${PACKAGE_NAME} patch ${PATCH_NAME}")
 
-    execute_process(COMMAND ${GIT_APPLY} --reverse --check "${PATCH_FILE}"
+    execute_process(COMMAND ${GIT_APPLY} "${PATCH_FILE}"
                     WORKING_DIRECTORY "${SOURCE_DIR}"
                     RESULT_VARIABLE RESULT
-                    OUTPUT_QUIET
-                    ERROR_QUIET)
+                    ERROR_VARIABLE ERROR)
 
-    if(RESULT EQUAL 0)
-        message(STATUS "Applying the ${PACKAGE_NAME} patch ${PATCH_NAME} - Already applied")
-    else()
-        execute_process(COMMAND ${GIT_APPLY} "${PATCH_FILE}"
-                        WORKING_DIRECTORY "${SOURCE_DIR}"
-                        RESULT_VARIABLE RESULT
-                        ERROR_VARIABLE ERROR)
-
-        if(NOT RESULT EQUAL 0)
-            message(FATAL_ERROR "The ${PACKAGE_NAME} patch ${PATCH_NAME} could not be applied (${ERROR}).")
-        endif()
-
-        message(STATUS "Applying the ${PACKAGE_NAME} patch ${PATCH_NAME} - Success")
+    if(NOT RESULT EQUAL 0)
+        message(FATAL_ERROR "The ${PACKAGE_NAME} patch ${PATCH_NAME} could not be applied (${ERROR}).")
     endif()
+
+    message(STATUS "Applying the ${PACKAGE_NAME} patch ${PATCH_NAME} - Success")
 endforeach()
