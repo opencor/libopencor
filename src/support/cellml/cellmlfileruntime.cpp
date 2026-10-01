@@ -89,6 +89,36 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
                                                                             "}\n");
         }
 
+        // Similarly, restrict-qualify the u and f parameters of our objective functions since they never point to the
+        // same array (i.e. KINSOL always passes its current iterate and its own residual vector), something that allows
+        // LLVM not to reload the value of an unknown after having computed a residual, this in a function that KINSOL
+        // calls repeatedly.
+
+        if (differentialModel) {
+            generatorProfile->setObjectiveFunctionMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                               "void objectiveFunction[INDEX](double * restrict u, double * restrict f, void *data)\n"
+                                                               "{\n"
+                                                               "    double voi = ((RootFindingInfo *) data)->voi;\n"
+                                                               "    double *states = ((RootFindingInfo *) data)->states;\n"
+                                                               "    double *rates = ((RootFindingInfo *) data)->rates;\n"
+                                                               "    double *constants = ((RootFindingInfo *) data)->constants;\n"
+                                                               "    double *computedConstants = ((RootFindingInfo *) data)->computedConstants;\n"
+                                                               "    double *algebraicVariables = ((RootFindingInfo *) data)->algebraicVariables;\n"
+                                                               "\n"
+                                                               "[CODE]"
+                                                               "}\n");
+        } else {
+            generatorProfile->setObjectiveFunctionMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                               "void objectiveFunction[INDEX](double * restrict u, double * restrict f, void *data)\n"
+                                                               "{\n"
+                                                               "    double *constants = ((RootFindingInfo *) data)->constants;\n"
+                                                               "    double *computedConstants = ((RootFindingInfo *) data)->computedConstants;\n"
+                                                               "    double *algebraicVariables = ((RootFindingInfo *) data)->algebraicVariables;\n"
+                                                               "\n"
+                                                               "[CODE]"
+                                                               "}\n");
+        }
+
 #ifdef __EMSCRIPTEN__
         // Export our various methods.
 
