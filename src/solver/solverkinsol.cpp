@@ -110,24 +110,24 @@ SolverKinsol::Impl::Impl()
 SolverKinsol::Impl::~Impl()
 {
     if (mSunContext != nullptr) {
-        freeSolverObjects();
+        for (auto &kinsolObjects : mKinsolObjects) {
+            freeKinsolObjects(kinsolObjects.second);
+        }
 
         SUNContext_Free(&mSunContext);
     }
 }
 
-void SolverKinsol::Impl::freeSolverObjects()
+void SolverKinsol::Impl::freeKinsolObjects(KinsolObjects &pKinsolObjects)
 {
-    if (mSolver != nullptr) {
-        N_VDestroy_Serial(mU);
-        N_VDestroy_Serial(mOnes);
+    if (pKinsolObjects.solver != nullptr) {
+        N_VDestroy_Serial(pKinsolObjects.u);
+        N_VDestroy_Serial(pKinsolObjects.ones);
 
-        SUNMatDestroy(mSunMatrix);
-        SUNLinSolFree(mSunLinearSolver);
+        SUNMatDestroy(pKinsolObjects.sunMatrix);
+        SUNLinSolFree(pKinsolObjects.sunLinearSolver);
 
-        KINFree(&mSolver);
-
-        SUNContext_PopErrHandler(mSunContext);
+        KINFree(&pKinsolObjects.solver);
     }
 }
 
@@ -381,92 +381,107 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
         return false;
     }
 
-    // Create our SUNDIALS context, or reuse the cached one.
+    // Create our SUNDIALS context, or reuse the cached one, and have it use our own error handler and no logger.
 
     if (mSunContext == nullptr) {
         ASSERT_EQ(SUNContext_Create(SUN_COMM_NULL, &mSunContext), 0);
-    }
-
-    // (Re)create our KINSOL solver and its associated objects if we have never created them, if the size of the NLA
-    // system has changed, or if the linear solver settings have changed. Otherwise, reuse them since creating them is
-    // expensive.
-
-    if ((mSolver == nullptr)
-        || (mCachedN != pN)
-        || (mCachedLinearSolver != mLinearSolver)
-        || (mCachedUpperHalfBandwidth != mUpperHalfBandwidth)
-        || (mCachedLowerHalfBandwidth != mLowerHalfBandwidth)) {
-        // Free our current KINSOL objects, if any.
-
-        freeSolverObjects();
-
-        // Create our KINSOL solver.
-
-        mSolver = KINCreate(mSunContext);
-
-        ASSERT_NE(mSolver, nullptr);
-
-        // Use our own error handler and disable the logger.
 
         ASSERT_EQ(SUNContext_PushErrHandler(mSunContext, errorHandler, &mErrorMessage), KIN_SUCCESS);
         ASSERT_EQ(SUNContext_SetLogger(mSunContext, nullptr), KIN_SUCCESS);
+    }
+
+    // Retrieve the KINSOL objects for our NLA system, i.e. for the given objective function and size, and (re)create
+    // them if we have never created them or if the linear solver settings have changed. Otherwise, reuse them since
+    // creating them is expensive.
+
+    auto &kinsolObjects {mKinsolObjects[{reinterpret_cast<uintptr_t>(pComputeObjectiveFunction), pN}]};
+
+    if ((kinsolObjects.solver == nullptr)
+        || (kinsolObjects.linearSolver != mLinearSolver)
+        || (kinsolObjects.upperHalfBandwidth != mUpperHalfBandwidth)
+        || (kinsolObjects.lowerHalfBandwidth != mLowerHalfBandwidth)) {
+        // Free our current KINSOL objects, if any.
+
+        freeKinsolObjects(kinsolObjects);
+
+        // Create our KINSOL solver.
+
+        kinsolObjects.solver = KINCreate(mSunContext);
+
+        ASSERT_NE(kinsolObjects.solver, nullptr);
 
         // Initialise our KINSOL solver.
 
-        mU = N_VMake_Serial(static_cast<int64_t>(pN), pU, mSunContext);
-        mOnes = N_VNew_Serial(static_cast<int64_t>(pN), mSunContext);
+        kinsolObjects.u = N_VMake_Serial(static_cast<int64_t>(pN), pU, mSunContext);
+        kinsolObjects.ones = N_VNew_Serial(static_cast<int64_t>(pN), mSunContext);
 
-        ASSERT_NE(mU, nullptr);
-        ASSERT_NE(mOnes, nullptr);
+        ASSERT_NE(kinsolObjects.u, nullptr);
+        ASSERT_NE(kinsolObjects.ones, nullptr);
 
-        N_VConst(1.0, mOnes);
+        N_VConst(1.0, kinsolObjects.ones);
 
-        ASSERT_EQ(KINInit(mSolver, computeObjectiveFunction, mU), KIN_SUCCESS);
+        ASSERT_EQ(KINInit(kinsolObjects.solver, computeObjectiveFunction, kinsolObjects.u), KIN_SUCCESS);
 
         // Set our linear solver.
 
         if (mLinearSolver == LinearSolver::DENSE) {
-            mSunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), mSunContext);
+            kinsolObjects.sunMatrix = SUNDenseMatrix(static_cast<int64_t>(pN), static_cast<int64_t>(pN), mSunContext);
 
-            ASSERT_NE(mSunMatrix, nullptr);
+            ASSERT_NE(kinsolObjects.sunMatrix, nullptr);
 
-            mSunLinearSolver = SUNLinSol_Dense(mU, mSunMatrix, mSunContext);
+            kinsolObjects.sunLinearSolver = SUNLinSol_Dense(kinsolObjects.u, kinsolObjects.sunMatrix, mSunContext);
         } else if (mLinearSolver == LinearSolver::BANDED) {
-            mSunMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
-                                       static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
-                                       mSunContext);
+            kinsolObjects.sunMatrix = SUNBandMatrix(static_cast<int64_t>(pN),
+                                                    static_cast<int64_t>(mUpperHalfBandwidth), static_cast<int64_t>(mLowerHalfBandwidth),
+                                                    mSunContext);
 
-            ASSERT_NE(mSunMatrix, nullptr);
+            ASSERT_NE(kinsolObjects.sunMatrix, nullptr);
 
-            mSunLinearSolver = SUNLinSol_Band(mU, mSunMatrix, mSunContext);
+            kinsolObjects.sunLinearSolver = SUNLinSol_Band(kinsolObjects.u, kinsolObjects.sunMatrix, mSunContext);
         } else {
-            mSunMatrix = nullptr;
+            kinsolObjects.sunMatrix = nullptr;
 
             if (mLinearSolver == LinearSolver::GMRES) {
-                mSunLinearSolver = SUNLinSol_SPGMR(mU, SUN_PREC_NONE, 0, mSunContext);
+                kinsolObjects.sunLinearSolver = SUNLinSol_SPGMR(kinsolObjects.u, SUN_PREC_NONE, 0, mSunContext);
             } else if (mLinearSolver == LinearSolver::BICGSTAB) {
-                mSunLinearSolver = SUNLinSol_SPBCGS(mU, SUN_PREC_NONE, 0, mSunContext);
+                kinsolObjects.sunLinearSolver = SUNLinSol_SPBCGS(kinsolObjects.u, SUN_PREC_NONE, 0, mSunContext);
             } else {
-                mSunLinearSolver = SUNLinSol_SPTFQMR(mU, SUN_PREC_NONE, 0, mSunContext);
+                kinsolObjects.sunLinearSolver = SUNLinSol_SPTFQMR(kinsolObjects.u, SUN_PREC_NONE, 0, mSunContext);
             }
         }
 
-        ASSERT_NE(mSunLinearSolver, nullptr);
+        ASSERT_NE(kinsolObjects.sunLinearSolver, nullptr);
 
-        ASSERT_EQ(KINSetLinearSolver(mSolver, mSunLinearSolver, mSunMatrix), KINLS_SUCCESS);
+        ASSERT_EQ(KINSetLinearSolver(kinsolObjects.solver, kinsolObjects.sunLinearSolver, kinsolObjects.sunMatrix), KINLS_SUCCESS);
 
-        // Keep track of what our KINSOL objects are associated with.
+        // Keep track of the linear solver settings with which our KINSOL objects were created and of the fact that their
+        // linear solver has yet to be set up.
 
-        mCachedN = pN;
-        mCachedLinearSolver = mLinearSolver;
-        mCachedUpperHalfBandwidth = mUpperHalfBandwidth;
-        mCachedLowerHalfBandwidth = mLowerHalfBandwidth;
+        kinsolObjects.linearSolver = mLinearSolver;
+        kinsolObjects.upperHalfBandwidth = mUpperHalfBandwidth;
+        kinsolObjects.lowerHalfBandwidth = mLowerHalfBandwidth;
+        kinsolObjects.linearSolverSetUp = false;
     }
+
+    // Retrieve our KINSOL objects.
+
+    auto *solver {kinsolObjects.solver};
+    auto *u {kinsolObjects.u};
+    auto *ones {kinsolObjects.ones};
 
     // Make our solution vector wrap the given solution array (which may differ from one call to another, e.g. if our
     // NLA system is solved from different places), which is much cheaper than recreating our solution vector.
 
-    N_VSetArrayPointer_Serial(pU, mU);
+    N_VSetArrayPointer_Serial(pU, u);
+
+    // Reuse the Jacobian from the last time we solved our NLA system, if any, rather than compute a new one before our
+    // first iteration.
+    // Note: our NLA system has typically changed little since then (e.g., it was solved at a nearby point in time), so
+    //       its Jacobian is usually still good enough. Should it not be, KINSOL would compute a new one, as it does
+    //       anyway after a given number of iterations (10, by default) and since KINSOL checks convergence using our
+    //       objective function this doesn't affect the accuracy of our solution.
+
+    ASSERT_EQ(KINSetNoInitSetup(solver, static_cast<sunbooleantype>(kinsolObjects.linearSolverSetUp)), KIN_SUCCESS);
 
     // Set our user data.
 
@@ -475,15 +490,15 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     userData.computeObjectiveFunction = pComputeObjectiveFunction;
     userData.userData = pUserData;
 
-    ASSERT_EQ(KINSetUserData(mSolver, &userData), KIN_SUCCESS);
+    ASSERT_EQ(KINSetUserData(solver, &userData), KIN_SUCCESS);
 
     // Set our maximum number of iterations.
 
-    ASSERT_EQ(KINSetNumMaxIters(mSolver, mMaximumNumberOfIterations), KIN_SUCCESS);
+    ASSERT_EQ(KINSetNumMaxIters(solver, mMaximumNumberOfIterations), KIN_SUCCESS);
 
     // Solve the model.
 
-    auto res = KINSol(mSolver, mU, KIN_LINESEARCH, mOnes, mOnes);
+    auto res = KINSol(solver, u, KIN_LINESEARCH, ones, ones);
 
     // KINSOL limits the (scaled) length of a Newton step to 1,000 times the (scaled) norm of the initial guess (or to 1
     // if that norm is smaller than 1) and it gives up after five consecutive steps of that maximum length. So, if the
@@ -493,8 +508,14 @@ bool SolverKinsol::Impl::solve(ComputeObjectiveFunction pComputeObjectiveFunctio
     // bigger.
 
     if (res == KIN_MXNEWT_5X_EXCEEDED) {
-        res = KINSol(mSolver, mU, KIN_LINESEARCH, mOnes, mOnes);
+        res = KINSol(solver, u, KIN_LINESEARCH, ones, ones);
     }
+
+    // Our linear solver has been set up if KINSOL successfully iterated towards a solution, in which case its Jacobian
+    // can be reused the next time we solve our NLA system. Otherwise (e.g., KINSOL failed or our initial guess was
+    // already a solution, in which case KINSOL didn't set up our linear solver), we will compute a new Jacobian.
+
+    kinsolObjects.linearSolverSetUp = res == KIN_SUCCESS;
 
     // Check whether everything went fine.
     // Note: KINSOL may return a positive value, i.e. KIN_INITIAL_GUESS_OK (our initial guess is a solution) or

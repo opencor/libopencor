@@ -683,14 +683,19 @@ test.describe('Sed coverage tests', () => {
   test('KINSOL with no solution over time', () => {
     // The first NLA system of our model only has a solution until t = ln(2) while its second NLA system always has a
     // solution, so our simulation should fail at t = ln(2), whether we use a fixed-step ODE solver or CVODE.
-    // Note: we cannot check the full description of CVODE's error since it includes the step size, which may vary from
-    //       one platform to another.
+    // Note #1: we cannot check the full description of CVODE's error since it includes the step size, which may vary
+    //          from one platform to another.
+    // Note #2: KINSOL reuses the Jacobian of an NLA system from one solve to the next, which, with CVODE (which solves
+    //          our NLA systems many times per step), results in KINSOL failing because of its line search rather than
+    //          because of its maximum number of iterations.
 
     const expectedIssues = [
       [loc.Issue.Type.ERROR, 'Task | KINSOL: the maximum number of iterations was reached before convergence.']
     ];
-    const lastValidIndex = 6;
+    const cvodeKinsolError =
+      'Task | KINSOL: the line search algorithm was unable to find an iterate sufficiently distinct from the current iterate.';
     const cvodeErrorStart = 'Task | CVODE: at t = 0.6931';
+    const lastValidIndex = 6;
 
     const file = new loc.File(utils.resourcePath('api/sed/kinsol_with_no_solution_over_time.cellml'));
 
@@ -728,7 +733,7 @@ test.describe('Sed coverage tests', () => {
     const issues = instance.issues;
 
     assert.strictEqual(issues.length, 2);
-    assert.strictEqual(issues[0].description, expectedIssues[0][1]);
+    assert.strictEqual(issues[0].description, cvodeKinsolError);
     assert.ok(issues[1].description.startsWith(cvodeErrorStart));
     assert.strictEqual(Number.isNaN(instance.tasks[0].voi[lastValidIndex]), false);
     assert.strictEqual(Number.isNaN(instance.tasks[0].voi[lastValidIndex + 1]), true);

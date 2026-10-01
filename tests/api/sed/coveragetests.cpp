@@ -686,17 +686,21 @@ TEST(CoverageSedTest, KinsolWithNoSolutionOverTime)
 {
     // The first NLA system of our model only has a solution until t = ln(2) while its second NLA system always has a
     // solution, so our simulation should fail at t = ln(2), whether we use a fixed-step ODE solver or CVODE.
-    // Note: we cannot check the full description of CVODE's error since it includes the step size, which may vary from
-    //       one platform to another.
+    // Note #1: we cannot check the full description of CVODE's error since it includes the step size, which may vary
+    //          from one platform to another.
+    // Note #2: KINSOL reuses the Jacobian of an NLA system from one solve to the next, which, with CVODE (which solves
+    //          our NLA systems many times per step), results in KINSOL failing because of its line search rather than
+    //          because of its maximum number of iterations.
 
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
         {libOpenCOR::Issue::Type::ERROR, "Task | KINSOL: the maximum number of iterations was reached before convergence."},
     };
+    static const std::string CVODE_KINSOL_ERROR {"Task | KINSOL: the line search algorithm was unable to find an iterate sufficiently distinct from the current iterate."};
+    static const std::string CVODE_ERROR_START {"Task | CVODE: at t = 0.6931"};
     static constexpr auto OUTPUT_END_TIME {2.0};
     static constexpr auto NUMBER_OF_STEPS {20};
     static constexpr auto STEP {0.01};
     static constexpr auto LAST_VALID_INDEX {6};
-    static const std::string CVODE_ERROR_START {"Task | CVODE: at t = 0.6931"};
 
     auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_no_solution_over_time.cellml"));
     auto document = libOpenCOR::SedDocument::create(file);
@@ -729,7 +733,7 @@ TEST(CoverageSedTest, KinsolWithNoSolutionOverTime)
     instance->run();
 
     ASSERT_EQ(instance->issueCount(), 2U);
-    EXPECT_EQ(instance->issue(0)->description(), EXPECTED_ISSUES[0].description);
+    EXPECT_EQ(instance->issue(0)->description(), CVODE_KINSOL_ERROR);
     EXPECT_EQ(instance->issue(1)->description().substr(0, CVODE_ERROR_START.size()), CVODE_ERROR_START);
     EXPECT_FALSE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX]));
     EXPECT_TRUE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX + 1]));

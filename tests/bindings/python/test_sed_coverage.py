@@ -790,8 +790,11 @@ def test_kinsol_with_no_solution():
 def test_kinsol_with_no_solution_over_time():
     # The first NLA system of our model only has a solution until t = ln(2) while its second NLA system always has a
     # solution, so our simulation should fail at t = ln(2), whether we use a fixed-step ODE solver or CVODE.
-    # Note: we cannot check the full description of CVODE's error since it includes the step size, which may vary from
-    #       one platform to another.
+    # Note #1: we cannot check the full description of CVODE's error since it includes the step size, which may vary
+    #          from one platform to another.
+    # Note #2: KINSOL reuses the Jacobian of an NLA system from one solve to the next, which, with CVODE (which solves
+    #          our NLA systems many times per step), results in KINSOL failing because of its line search rather than
+    #          because of its maximum number of iterations.
 
     expected_issues = [
         [
@@ -799,8 +802,9 @@ def test_kinsol_with_no_solution_over_time():
             "Task | KINSOL: the maximum number of iterations was reached before convergence.",
         ],
     ]
-    last_valid_index = 6
+    cvode_kinsol_error = "Task | KINSOL: the line search algorithm was unable to find an iterate sufficiently distinct from the current iterate."
     cvode_error_start = "Task | CVODE: at t = 0.6931"
+    last_valid_index = 6
 
     file = loc.File(
         utils.resource_path("api/sed/kinsol_with_no_solution_over_time.cellml")
@@ -835,7 +839,7 @@ def test_kinsol_with_no_solution_over_time():
     instance.run()
 
     assert len(instance.issues) == 2
-    assert instance.issues[0].description == expected_issues[0][1]
+    assert instance.issues[0].description == cvode_kinsol_error
     assert instance.issues[1].description.startswith(cvode_error_start)
     assert not math.isnan(instance.tasks[0].voi[last_valid_index])
     assert math.isnan(instance.tasks[0].voi[last_valid_index + 1])

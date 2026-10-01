@@ -25,6 +25,8 @@ limitations under the License.
 #include "sundials/sundials_matrix.h"
 #include "sundials/sundials_nvector.h"
 
+#include <map>
+
 namespace libOpenCOR {
 
 class SolverKinsol::Impl final: public SolverNla::Impl
@@ -44,28 +46,39 @@ public:
 
     SUNContext mSunContext {nullptr};
 
-    // Note: KINSOL and its associated objects below are cached and reused across solve() calls to avoid repeated
-    //       creation/destruction overhead. This means a single SolverKinsol instance is NOT thread-safe for concurrent
-    //       solve() calls (multiple threads sharing the same solver instance would race on these members). The intended
-    //       usage model is one solver instance per simulation thread.
+    // A KINSOL solver and its associated objects, as well as the linear solver settings with which they were created
+    // and whether their linear solver has been set up (i.e. whether there is a Jacobian that can be reused).
 
-    void *mSolver {nullptr};
+    struct KinsolObjects
+    {
+        void *solver {nullptr};
 
-    N_Vector mU {nullptr};
-    N_Vector mOnes {nullptr};
+        N_Vector u {nullptr};
+        N_Vector ones {nullptr};
 
-    SUNMatrix mSunMatrix {nullptr};
-    SUNLinearSolver mSunLinearSolver {nullptr};
+        SUNMatrix sunMatrix {nullptr};
+        SUNLinearSolver sunLinearSolver {nullptr};
 
-    size_t mCachedN {0};
-    LinearSolver mCachedLinearSolver {DEFAULT_LINEAR_SOLVER};
-    int mCachedUpperHalfBandwidth {DEFAULT_UPPER_HALF_BANDWIDTH};
-    int mCachedLowerHalfBandwidth {DEFAULT_LOWER_HALF_BANDWIDTH};
+        LinearSolver linearSolver {DEFAULT_LINEAR_SOLVER};
+        int upperHalfBandwidth {DEFAULT_UPPER_HALF_BANDWIDTH};
+        int lowerHalfBandwidth {DEFAULT_LOWER_HALF_BANDWIDTH};
+
+        bool linearSolverSetUp {false};
+    };
+
+    // Note: we keep some KINSOL objects for each NLA system that we solve, i.e. for each objective function and size,
+    //       and reuse them across solve() calls since creating them is expensive and a model may have several NLA
+    //       systems, which are typically solved in turn (e.g., each time the rates of a DAE model are computed). This
+    //       means that a SolverKinsol instance is NOT thread-safe for concurrent solve() calls (multiple threads
+    //       sharing the same solver instance would race on these objects). The intended usage model is one solver
+    //       instance per simulation thread.
+
+    std::map<std::pair<uintptr_t, size_t>, KinsolObjects> mKinsolObjects;
 
     explicit Impl();
     ~Impl() override;
 
-    void freeSolverObjects();
+    static void freeKinsolObjects(KinsolObjects &pKinsolObjects);
 
     void populate(libsedml::SedAlgorithm *pAlgorithm) override;
 

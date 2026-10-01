@@ -121,7 +121,7 @@ void expectKinsolSolveSolution(std::span<const double> pU, const std::vector<dou
 TEST(CoverageSolverTest, kinsolSolveWithChangedSettings)
 {
     // Solve different NLA systems (both in terms of size and settings) using the same solver instance to make sure that
-    // the underlying KINSOL objects are (re)created as needed.
+    // the underlying KINSOL objects of each NLA system are created, reused, and recreated as needed.
 
     auto solver {libOpenCOR::SolverKinsol::create()};
 
@@ -134,7 +134,7 @@ TEST(CoverageSolverTest, kinsolSolveWithChangedSettings)
 
     expectKinsolSolveSolution(u2, data2.targets);
 
-    // Solve our first NLA system again, using the same settings: reuse the KINSOL objects.
+    // Solve our first NLA system again, using the same settings: reuse its KINSOL objects (and Jacobian).
 
     std::array<double, 2> u2b {0.0, 0.0};
 
@@ -142,8 +142,7 @@ TEST(CoverageSolverTest, kinsolSolveWithChangedSettings)
 
     expectKinsolSolveSolution(u2b, data2.targets);
 
-    // Solve our second NLA system (3 unknowns), still using the default settings: the size of our NLA system has
-    // changed: recreate the KINSOL objects.
+    // Solve our second NLA system (3 unknowns), still using the default settings: create its KINSOL objects.
 
     KinsolSolveData data3 {{FIRST_TARGET, SECOND_TARGET, THIRD_TARGET}};
     std::array<double, 3> u3 {0.0, 0.0, 0.0};
@@ -152,7 +151,16 @@ TEST(CoverageSolverTest, kinsolSolveWithChangedSettings)
 
     expectKinsolSolveSolution(u3, data3.targets);
 
-    // Solve our second NLA system with a different linear solver: recreate the KINSOL objects.
+    // Solve our first NLA system again: reuse its KINSOL objects (and Jacobian), even though we solved our second NLA
+    // system in between.
+
+    std::array<double, 2> u2c {0.0, 0.0};
+
+    EXPECT_TRUE(solver->solve(computeObjectiveFunction, u2c.data(), 2, &data2));
+
+    expectKinsolSolveSolution(u2c, data2.targets);
+
+    // Solve our second NLA system with a different linear solver: recreate its KINSOL objects.
 
     solver->setLinearSolver(libOpenCOR::SolverKinsol::LinearSolver::GMRES);
 
@@ -162,7 +170,7 @@ TEST(CoverageSolverTest, kinsolSolveWithChangedSettings)
 
     expectKinsolSolveSolution(u3b, data3.targets);
 
-    // Solve our second NLA system with a different upper half-bandwidth: recreate the KINSOL objects.
+    // Solve our second NLA system with a different upper half-bandwidth: recreate its KINSOL objects.
 
     solver->setUpperHalfBandwidth(1);
 
@@ -172,7 +180,7 @@ TEST(CoverageSolverTest, kinsolSolveWithChangedSettings)
 
     expectKinsolSolveSolution(u3c, data3.targets);
 
-    // Solve our second NLA system with a different lower half-bandwidth: recreate the KINSOL objects.
+    // Solve our second NLA system with a different lower half-bandwidth: recreate its KINSOL objects.
 
     solver->setLowerHalfBandwidth(2);
 
