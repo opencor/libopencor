@@ -649,6 +649,19 @@ bool Compiler::Impl::compile(const std::string &pCode)
 #endif
 
 #ifdef __EMSCRIPTEN__
+    // Make sure that our code doesn't use any global variable (be it one of ours, e.g. a static local variable, or one
+    // that LLVM created when optimising our code, e.g. a lookup table). Indeed, we don't link our WebAssembly code, so
+    // the address of a global variable would not be relocated, i.e. our code would read from and write to the start of
+    // the memory that it shares with our main WebAssembly module (and with the WebAssembly code of other models).
+
+    for (const auto &global : module->globals()) {
+        if (!global.getName().starts_with("llvm.")) {
+            addError("The WebAssembly code cannot use global variables ('" + global.getName().str() + "').");
+
+            return false;
+        }
+    }
+
     // Get our target machine to emit some WebAssembly code.
 
     llvm::legacy::PassManager passManager;
