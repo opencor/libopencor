@@ -26,12 +26,14 @@ thread_local bool sNlaSolveFailed = false; // NOLINT
 } // namespace
 
 void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
-              double *pU, size_t pN, void *pData)
+              double *pU, size_t pN, void *pData) noexcept
 {
     // Solve the given NLA system, unless an NLA system could not be solved since resetNlaSolveFailed() was last called.
     // Indeed, our model would then be computed using some wrong values anyway and the NLA solver would remove the
     // issues that explain why an NLA system could not be solved (since it removes its issues each time it is used),
     // should it then successfully solve another (or the same) NLA system.
+    // Note: this function is called from our compiled code, so it must not let an exception escape. Indeed, unwinding
+    //       through the frames of our compiled code is not supported (and, on Windows, it terminates the process).
 
     if (!sNlaSolveFailed) {
         sNlaSolveFailed = !reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunction, pU, pN, pData); // NOLINT

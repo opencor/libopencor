@@ -454,8 +454,9 @@ static constexpr intptr_t OBJECTIVE_FUNCTIONS_TABLE_OFFSET = 4;
 // The function that our generated code calls to solve an NLA system (see initialiseWorkerWasmJS()), with the objective
 // function given by its NLA system index. It is called directly from WebAssembly and it simply resolves the table slot
 // of the objective function (a function pointer being a table slot in WebAssembly) before calling nlaSolve().
+// Note: like nlaSolve(), this function must not let an exception escape since it is called from our compiled code.
 
-extern "C" void wasmNlaSolve(uintptr_t pNlaSolverAddress, size_t pObjectiveFunctionIndex, double *pU, size_t pN, void *pData)
+extern "C" void wasmNlaSolve(uintptr_t pNlaSolverAddress, size_t pObjectiveFunctionIndex, double *pU, size_t pN, void *pData) noexcept
 {
     nlaSolve(pNlaSolverAddress,
              reinterpret_cast<SolverNla::ComputeObjectiveFunction>(sWasmFunctionBase + OBJECTIVE_FUNCTIONS_TABLE_OFFSET + static_cast<intptr_t>(pObjectiveFunctionIndex)),

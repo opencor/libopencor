@@ -23,7 +23,7 @@ limitations under the License.
 namespace libOpenCOR {
 
 void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
-              double *pU, size_t pN, void *pData);
+              double *pU, size_t pN, void *pData) noexcept;
 
 extern "C" uintptr_t nlaSolverAddress();
 
