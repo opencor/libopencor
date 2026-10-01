@@ -344,6 +344,7 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
     auto *odeSolverPimpl {mOdeSolver->pimpl()};
     size_t voiCounter {0};
 
+    const auto computeRates = mRuntime->computeRates();
     const auto computeVariablesForDifferentialModel = mRuntime->computeVariablesForDifferentialModel();
 
     while (!fuzzyCompare(mVoi, pVoiEnd)) {
@@ -383,6 +384,12 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
             return;
         }
 
+        // Compute our rates and variables at the point that we have reached, i.e. the point that we are going to
+        // report.
+        // Note: this also means that our rates are up to date the next time we call our ODE solver (see
+        //       SolverOde::Impl::solve()).
+
+        computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
 
         //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD TRIGGER

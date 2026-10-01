@@ -42,13 +42,46 @@ TEST(SecondOrderRungeKuttaSolverTest, solve)
     static const auto STEP {0.0123};
     static const auto STATE_VALUES {std::vector<double>({-63.886525, 0.135009, 0.984334, 0.740971})};
     static const auto STATE_ABS_TOLS {std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001})};
-    static const auto RATE_VALUES {std::vector<double>({49.725722, -0.128194, -0.050903, 0.098651})};
+    static const auto RATE_VALUES {std::vector<double>({49.719385, -0.128118, -0.050991, 0.098546})};
     static const auto RATE_ABS_TOLS {std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
     static const auto CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0, 0.0, 0.0})};
     static const auto COMPUTED_CONSTANT_VALUES {std::vector<double>({-10.613, -115.0, 12.0})};
     static const auto COMPUTED_CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0})};
     static const auto ALGEBRAIC_VALUES {std::vector<double>({0.0, -15.982058, -823.516942, 789.779614, 3.969929, 0.114985, 0.00287, 0.967348, 0.541338, 0.056246})};
+    static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.00001, 0.000001, 0.000001, 0.000001})};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    auto solver {libOpenCOR::SolverSecondOrderRungeKutta::create()};
+
+    solver->setStep(STEP);
+
+    simulation->setOdeSolver(solver);
+
+    OdeModel::run(document,
+                  STATE_VALUES, STATE_ABS_TOLS,
+                  RATE_VALUES, RATE_ABS_TOLS,
+                  CONSTANT_VALUES, CONSTANT_ABS_TOLS,
+                  COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
+}
+
+TEST(SecondOrderRungeKuttaSolverTest, solveWithSeveralStepsPerOutputPoint)
+{
+    // Note: the output interval is 0.001, hence our step means that we have several steps per output point.
+
+    static const auto STEP {0.00023};
+    static const auto STATE_VALUES {std::vector<double>({-63.886513, 0.135009, 0.984334, 0.740971})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001})};
+    static const auto RATE_VALUES {std::vector<double>({49.719531, -0.128118, -0.050991, 0.098546})};
+    static const auto RATE_ABS_TOLS {std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001})};
+    static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
+    static const auto CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0, 0.0, 0.0})};
+    static const auto COMPUTED_CONSTANT_VALUES {std::vector<double>({-10.613, -115.0, 12.0})};
+    static const auto COMPUTED_CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0})};
+    static const auto ALGEBRAIC_VALUES {std::vector<double>({0.0, -15.982054, -823.517142, 789.779665, 3.969927, 0.114985, 0.00287, 0.967348, 0.541338, 0.056246})};
     static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.00001, 0.000001, 0.000001, 0.000001})};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};

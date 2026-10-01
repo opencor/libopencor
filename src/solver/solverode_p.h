@@ -46,6 +46,10 @@ public:
                             const CellmlFileRuntimePtr &pRuntime) = 0;
     virtual bool reinitialise(double pVoi);
 
+    // Solve our model from pVoi to pVoiEnd.
+    // Note: our rates are up to date when we get called (i.e. they are those at pVoi), but they may not be when we
+    //       return (see SedInstanceTask::Impl::run()).
+
     virtual bool solve(double &pVoi, double pVoiEnd) = 0;
 
     void computeRates(double pVoi, double *pStates, double *pRates,

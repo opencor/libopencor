@@ -864,10 +864,6 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
         return false;
     }
 
-    // Make sure the rates are up to date.
-
-    computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
-
     return true;
 }
 

@@ -42,13 +42,46 @@ TEST(HeunSolverTest, solve)
     static const auto STEP {0.0123};
     static const auto STATE_VALUES {std::vector<double>({-63.691259, 0.134516, 0.984133, 0.74137})};
     static const auto STATE_ABS_TOLS {std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001})};
-    static const auto RATE_VALUES {std::vector<double>({49.66942, -0.127532, -0.051693, 0.097711})};
+    static const auto RATE_VALUES {std::vector<double>({49.668883, -0.127533, -0.051692, 0.097711})};
     static const auto RATE_ABS_TOLS {std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
     static const auto CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0, 0.0, 0.0})};
     static const auto COMPUTED_CONSTANT_VALUES {std::vector<double>({-10.613, -115.0, 12.0})};
     static const auto COMPUTED_CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0})};
     static const auto ALGEBRAIC_VALUES {std::vector<double>({0.0, -15.923478, -823.166811, 789.421406, 3.951622, 0.116239, 0.002898, 0.966726, 0.539425, 0.056383})};
+    static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001})};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    auto solver {libOpenCOR::SolverHeun::create()};
+
+    solver->setStep(STEP);
+
+    simulation->setOdeSolver(solver);
+
+    OdeModel::run(document,
+                  STATE_VALUES, STATE_ABS_TOLS,
+                  RATE_VALUES, RATE_ABS_TOLS,
+                  CONSTANT_VALUES, CONSTANT_ABS_TOLS,
+                  COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS,
+                  ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
+}
+
+TEST(HeunSolverTest, solveWithSeveralStepsPerOutputPoint)
+{
+    // Note: the output interval is 0.001, hence our step means that we have several steps per output point.
+
+    static const auto STEP {0.00023};
+    static const auto STATE_VALUES {std::vector<double>({-63.858008, 0.134937, 0.984305, 0.74103})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001})};
+    static const auto RATE_VALUES {std::vector<double>({49.712176, -0.128033, -0.051093, 0.098423})};
+    static const auto RATE_ABS_TOLS {std::vector<double>({0.000001, 0.000001, 0.000001, 0.000001})};
+    static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
+    static const auto CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0, 0.0, 0.0})};
+    static const auto COMPUTED_CONSTANT_VALUES {std::vector<double>({-10.613, -115.0, 12.0})};
+    static const auto COMPUTED_CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0})};
+    static const auto ALGEBRAIC_VALUES {std::vector<double>({0.0, -15.973503, -823.467764, 789.729091, 3.967254, 0.115167, 0.002874, 0.967258, 0.541059, 0.056266})};
     static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001, 0.000001})};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
