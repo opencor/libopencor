@@ -378,9 +378,16 @@ set(PREBUILT_DIR "${PREBUILT_DIR}" CACHE INTERNAL "Prebuilt directory.")
 
 include(ExternalProject)
 
+# On Linux, build our third-party libraries as position-independent code and put each of their functions and data in
+# its own section, so that the linker can remove the ones that we don't use when building libOpenCOR (see --gc-sections
+# in src/CMakeLists.txt and src/bindings/python/CMakeLists.txt). Indeed, the linker can only remove whole sections and,
+# without this, all the functions of an object file would be in the same section.
+# Note: there is no need for this on Windows (MSVC does it by default in release mode) or on macOS (the linker removes
+#       unused functions and data anyway, see -dead_strip in src/CMakeLists.txt).
+
 if(NOT WIN32 AND NOT APPLE AND NOT EMSCRIPTEN)
-    set(THIRD_PARTY_C_FLAGS -fPIC)
-    set(THIRD_PARTY_CXX_FLAGS -fPIC)
+    set(THIRD_PARTY_C_FLAGS "-fPIC -ffunction-sections -fdata-sections")
+    set(THIRD_PARTY_CXX_FLAGS "-fPIC -ffunction-sections -fdata-sections")
 endif()
 
 # Build our third-party libraries for x86-64-v3 on Intel (see X86_64_V3_COMPILER_FLAGS in src/CMakeLists.txt).

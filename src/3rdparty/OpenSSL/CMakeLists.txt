@@ -145,7 +145,10 @@ else()
             set(PLATFORM linux-aarch64)
         endif()
 
-        list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
+        # Put each function and data in its own section, so that the linker can remove the ones that we don't use (see
+        # THIRD_PARTY_C_FLAGS in cmake/packages.cmake).
+
+        list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack" -ffunction-sections -fdata-sections)
     endif()
 
     build_package(${PACKAGE_NAME}

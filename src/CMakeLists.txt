@@ -612,6 +612,15 @@ elseif(BUILDING_USING_CLANG)
     endif()
 endif()
 
+# On Linux, in release mode (unless we are doing code coverage), put each of our functions and data in its own section,
+# so that the linker can remove the ones that we don't use, be it when linking our shared library or our Python module
+# (which embeds our static library). Our third-party libraries are built the same way (see THIRD_PARTY_C_FLAGS in
+# cmake/packages.cmake).
+
+if(NOT WIN32 AND NOT APPLE AND NOT EMSCRIPTEN AND RELEASE_MODE AND NOT LIBOPENCOR_CODE_COVERAGE)
+    add_compiler_flags(${CMAKE_PROJECT_NAME} -ffunction-sections -fdata-sections)
+endif()
+
 # Only export our own symbols from our shared library and, in release mode (unless we are doing code coverage, so as not
 # to affect our code coverage reports), have the linker remove the code that we don't use and discard our local symbols.
 # Note #1: our third-party libraries (e.g., LLVM) are static libraries which symbols have default visibility. So,
