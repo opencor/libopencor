@@ -12,3 +12,4 @@
         mErrors = mTasksErrors;
         mErrorCount.store(mErrors.size(), std::memory_order_release);
     if ((document->getNumErrors() == 0)
+@@ -220,68 +220,12 @@ int L3v2extendedmathASTPlugin::checkNumArguments(const ASTNode* node, std::strin
