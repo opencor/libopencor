@@ -958,6 +958,68 @@ TEST_F(CompilerTest, nestingDepth)
     EXPECT_EQ_ISSUES(mCompiler, expectedIssues(casts(MAX_DEPTH + 1), "Expression is too deeply nested", PREFIX.size() + (MAX_DEPTH * std::string("(double) ").size()) + 1));
 }
 
+TEST_F(CompilerTest, expressionHeight)
+{
+    // Expressions can be high (e.g., a sum with many terms or a piecewise expression with many pieces) up to a certain
+    // height, beyond which an error is reported (rather than risking a stack overflow).
+    // Note: the height of a sum with N terms is N + 1 (since loading the value of x counts as one level) and that of a
+    //       piecewise expression with N pieces is N + 3.
+
+    static constexpr size_t MAX_HEIGHT {1024};
+    static constexpr size_t MAX_TERMS {MAX_HEIGHT - 1};
+    static constexpr size_t MAX_PIECES {MAX_HEIGHT - 3};
+
+    auto sum = [](size_t pTerms) {
+        std::string res {"double f(double x) { return x"};
+
+        for (size_t i {1}; i < pTerms; ++i) {
+            res += " + x";
+        }
+
+        return res + "; }";
+    };
+    auto piecewise = [](size_t pPieces) {
+        std::string res {"double f(double x) { return "};
+
+        for (size_t i {0}; i < pPieces; ++i) {
+            res += "(x < " + std::to_string(i) + ".0) ? " + std::to_string(i) + ".0 : ";
+        }
+
+        return res + "x; }";
+    };
+    auto column = [](const std::string &pCode, char pCharacter, size_t pOccurrence) {
+        size_t res {0};
+
+        for (size_t i {0}; i < pOccurrence; ++i) {
+            res = pCode.find(pCharacter, res) + 1;
+        }
+
+        return res;
+    };
+
+    ASSERT_TRUE(mCompiler->compile(sum(MAX_TERMS)));
+    EXPECT_EQ(static_cast<double>(MAX_TERMS), function<UnaryFunction>(mCompiler, "f")(1.0));
+
+    auto code {sum(MAX_TERMS + 1)};
+
+    EXPECT_FALSE(mCompiler->compile(code));
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues(code, "Expression is too deeply nested", column(code, '+', MAX_TERMS)));
+
+    ASSERT_TRUE(mCompiler->compile(piecewise(MAX_PIECES)));
+    EXPECT_EQ(5.0, function<UnaryFunction>(mCompiler, "f")(4.5));
+    EXPECT_EQ(2000.0, function<UnaryFunction>(mCompiler, "f")(2000.0));
+
+    code = piecewise(MAX_PIECES + 1);
+
+    EXPECT_FALSE(mCompiler->compile(code));
+    EXPECT_EQ_ISSUES(mCompiler, expectedIssues(code, "Expression is too deeply nested", column(code, '?', 1)));
+
+    // Much higher expressions, which used to result in a stack overflow.
+
+    EXPECT_FALSE(mCompiler->compile(sum(100000)));
+    EXPECT_FALSE(mCompiler->compile(piecewise(100000)));
+}
+
 TEST_F(CompilerTest, constantExpressions)
 {
     // Constant expressions are evaluated (as Clang does) unless their evaluation has undefined behaviour and conditions

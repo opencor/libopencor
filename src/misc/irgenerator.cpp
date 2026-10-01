@@ -238,7 +238,8 @@ private:
 };
 
 // Note: types, declarators, expressions, and the code that we generate for them are naturally recursive, which is fine
-//       since our expressions cannot be nested too deeply (see MAX_NESTING_DEPTH).
+//       since our expressions cannot be nested too deeply nor be too high (see MAX_NESTING_DEPTH and
+//       MAX_EXPRESSION_HEIGHT).
 // NOLINTBEGIN(misc-no-recursion)
 
 std::string typeName(TypePtr pType)
@@ -395,6 +396,7 @@ struct Expr
     size_t field {0};
     Cast cast {Cast::LOAD};
     std::vector<ExprPtr> operands;
+    size_t height {1}; // The height of the expression's tree (see MAX_EXPRESSION_HEIGHT).
 };
 
 struct Stmt
@@ -496,6 +498,15 @@ constexpr std::array TYPE_KEYWORDS {
 // stack overflow (as Clang does, which default bracket depth is also 256).
 
 constexpr size_t MAX_NESTING_DEPTH {256};
+
+// The maximum height of the tree of our expressions, beyond which we report an error rather than risk a stack overflow
+// when generating some code for them (or when evaluating or deleting them). Indeed, unlike their nesting depth, the
+// height of our expressions can grow without us recursing when parsing them, e.g. a + b + ... + z is a left-deep tree
+// and c1 ? v1 : c2 ? v2 : ... : vn (i.e. a piecewise expression) a right-deep tree.
+// Note: the height of a sum is (about) its number of terms and that of a piecewise expression its number of pieces,
+//       both of which are typically much smaller than our maximum height.
+
+constexpr size_t MAX_EXPRESSION_HEIGHT {1024};
 
 constexpr std::array TWO_CHARACTER_PUNCTUATORS {
     std::string_view {"->"},
@@ -1472,13 +1483,34 @@ private:
         return res;
     }
 
+    static void addOperand(Expr &pExpr, ExprPtr pOperand)
+    {
+        pExpr.height = std::max(pExpr.height, pOperand->height + 1);
+
+        pExpr.operands.push_back(std::move(pOperand));
+    }
+
+    ExprPtr checkHeight(const Token &pToken, ExprPtr pExpr)
+    {
+        // Make sure that the given expression is not too high (see MAX_EXPRESSION_HEIGHT).
+        // Note: we do this for every expression that we build without recursing, i.e. for our assignments, conditional
+        //       operators, and binary operators (see parseAssignment(), parseConditional(), and parseBinary()), as well
+        //       as for our unary operators, casts, and postfix expressions (see parseCast()).
+
+        if (pExpr->height > MAX_EXPRESSION_HEIGHT) {
+            return failExpr(pToken, "Expression is too deeply nested");
+        }
+
+        return pExpr;
+    }
+
     static ExprPtr newCast(ExprPtr pExpr, Expr::Cast pCast, TypePtr pType)
     {
         auto res {newExpr(Expr::Kind::CAST, pType, pExpr->token)};
 
         res->cast = pCast;
 
-        res->operands.push_back(std::move(pExpr));
+        addOperand(*res, std::move(pExpr));
 
         return res;
     }
@@ -1606,10 +1638,10 @@ private:
 
         auto res {newExpr(Expr::Kind::ASSIGNMENT, pLhs->type, pToken)};
 
-        res->operands.push_back(std::move(pLhs));
-        res->operands.push_back(std::move(rhs));
+        addOperand(*res, std::move(pLhs));
+        addOperand(*res, std::move(rhs));
 
-        return res;
+        return checkHeight(pToken, std::move(res));
     }
 
     ExprPtr parseConditional()
@@ -1680,11 +1712,11 @@ private:
 
         auto res {newExpr(Expr::Kind::CONDITIONAL, type, pQuestionToken)};
 
-        res->operands.push_back(std::move(pCondition));
-        res->operands.push_back(std::move(trueExpr));
-        res->operands.push_back(std::move(falseExpr));
+        addOperand(*res, std::move(pCondition));
+        addOperand(*res, std::move(trueExpr));
+        addOperand(*res, std::move(falseExpr));
 
-        return res;
+        return checkHeight(pQuestionToken, std::move(res));
     }
 
     ExprPtr parseBinary()
@@ -1749,10 +1781,10 @@ private:
 
             auto res {newExpr(Expr::Kind::LOGICAL, mTypes.intType(), pToken)};
 
-            res->operands.push_back(std::move(lhs));
-            res->operands.push_back(std::move(rhs));
+            addOperand(*res, std::move(lhs));
+            addOperand(*res, std::move(rhs));
 
-            return res;
+            return checkHeight(pToken, std::move(res));
         }
 
         if (!isArithmetic(lhs->type) || !isArithmetic(rhs->type)
@@ -1764,10 +1796,10 @@ private:
         auto isArithmeticOperator {(op == "+") || (op == "-") || (op == "*") || (op == "/")};
         auto res {newExpr(Expr::Kind::BINARY, (isArithmeticOperator || isXor) ? type : mTypes.intType(), pToken)};
 
-        res->operands.push_back(convertArithmetic(std::move(lhs), type));
-        res->operands.push_back(convertArithmetic(std::move(rhs), type));
+        addOperand(*res, convertArithmetic(std::move(lhs), type));
+        addOperand(*res, convertArithmetic(std::move(rhs), type));
 
-        return res;
+        return checkHeight(pToken, std::move(res));
     }
 
     ExprPtr parseCast()
@@ -1837,7 +1869,7 @@ private:
             prefixes.pop_back();
         }
 
-        return expr;
+        return (expr != nullptr) ? checkHeight(current(), std::move(expr)) : nullptr;
     }
 
     LLVM_ATTRIBUTE_NOINLINE TypePtr parseTypeName()
@@ -1907,7 +1939,7 @@ private:
 
             auto res {newExpr(Expr::Kind::ADDRESS, mTypes.pointerTo(pOperand->type), pToken)};
 
-            res->operands.push_back(std::move(pOperand));
+            addOperand(*res, std::move(pOperand));
 
             return res;
         }
@@ -1921,7 +1953,7 @@ private:
 
         auto res {newExpr(Expr::Kind::UNARY, isMinus ? operand->type : mTypes.intType(), pToken)};
 
-        res->operands.push_back(std::move(operand));
+        addOperand(*res, std::move(operand));
 
         return res;
     }
@@ -1954,8 +1986,8 @@ private:
 
         res->isLvalue = true;
 
-        res->operands.push_back(std::move(base));
-        res->operands.push_back(std::move(index));
+        addOperand(*res, std::move(base));
+        addOperand(*res, std::move(index));
 
         return res;
     }
@@ -2019,10 +2051,10 @@ private:
         auto res {newExpr(Expr::Kind::CALL, type->element, pToken)};
 
         res->operands.reserve(1 + pArgs.size());
-        res->operands.push_back(std::move(callee));
+        addOperand(*res, std::move(callee));
 
         for (auto &arg : pArgs) {
-            res->operands.push_back(std::move(arg));
+            addOperand(*res, std::move(arg));
         }
 
         return res;
@@ -2053,7 +2085,7 @@ private:
         res->isLvalue = true;
         res->field = static_cast<size_t>(field - fields.begin());
 
-        res->operands.push_back(std::move(base));
+        addOperand(*res, std::move(base));
 
         return res;
     }
