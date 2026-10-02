@@ -28,6 +28,12 @@ class CellmlFileRuntime::Impl: public Logger::Impl
 public:
     CompilerPtr mCompiler {nullptr};
 #ifdef __EMSCRIPTEN__
+    // A unique identifier for our WebAssembly code, so that each JavaScript worker can cache its compiled version (see
+    // initialiseWorkerWasmJS()).
+    // Note: we don't use the address of our WebAssembly code since, once we are deleted, another runtime may reuse it.
+
+    int mWasmModuleId {0};
+
     // The size, in bytes, of the stack of our WebAssembly instances (see initialiseWorkerWasm()), i.e. the size that our
     // compiler tells us our WebAssembly code needs plus a safety margin.
 
@@ -47,6 +53,8 @@ public:
 
     explicit Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver);
 #ifdef __EMSCRIPTEN__
+    ~Impl() override;
+
     void initialiseWorkerWasm() const;
 #endif
 

@@ -19,11 +19,28 @@ limitations under the License.
 
 #include "cellmlfile.h"
 
+#ifdef __EMSCRIPTEN__
+#    include <atomic>
+#endif
 #include <format>
+#ifdef __EMSCRIPTEN__
+#    include <mutex>
+#endif
 #include <unordered_set>
 #include <vector>
 
 namespace libOpenCOR {
+
+#ifdef __EMSCRIPTEN__
+// The identifiers of the WebAssembly code of our live runtimes, so that our JavaScript workers can remove from their
+// cache the compiled WebAssembly code of the runtimes that have been deleted (see initialiseWorkerWasmJS()).
+
+namespace {
+std::atomic<int> sWasmModuleIdCounter {0}; // NOLINT
+std::mutex sLiveWasmModuleIdsMutex; // NOLINT
+std::unordered_set<int> sLiveWasmModuleIds; // NOLINT
+} // namespace
+#endif
 
 CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
@@ -241,7 +258,14 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
             return;
         }
 
+        mWasmModuleId = ++sWasmModuleIdCounter;
         mWasmStackSize = WASM_STACK_MARGIN_SIZE + wasmStackSize;
+
+        {
+            const std::scoped_lock lock(sLiveWasmModuleIdsMutex);
+
+            sLiveWasmModuleIds.insert(mWasmModuleId);
+        }
 #else
 #    ifdef CODE_COVERAGE_ENABLED
         mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile));
@@ -322,23 +346,67 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 }
 
 #ifdef __EMSCRIPTEN__
+CellmlFileRuntime::Impl::~Impl()
+{
+    // Our WebAssembly code is not live anymore, so our JavaScript workers can remove its compiled version from their
+    // cache (see initialiseWorkerWasmJS()).
+
+    const std::scoped_lock lock(sLiveWasmModuleIdsMutex);
+
+    sLiveWasmModuleIds.erase(mWasmModuleId);
+}
+#endif
+
+#ifdef __EMSCRIPTEN__
 // Lazily create a WebAssembly.Module + Instance in the current thread's private JavaScript scope and install its
 // exported functions into the current thread's WebAssembly table, so C++ can call them directly through function
-// pointers without any JavaScript round trip. If some table slots have already been allocated in that table, then reuse
-// them rather than grow the table again, which would otherwise both grow the table unboundedly and keep previously
-// created WebAssembly instances alive forever.
+// pointers without any JavaScript round trip. The WebAssembly.Module, i.e. our compiled WebAssembly code, is cached by
+// each JavaScript worker, so that our WebAssembly code is not compiled again each time we (re)initialise an instance
+// task (e.g., at the start of each run), and it is removed from that cache once its runtime has been deleted. If some
+// table slots have already been allocated in that table, then reuse them rather than grow the table again, which would
+// otherwise both grow the table unboundedly and keep previously created WebAssembly instances alive forever.
 // Note: we keep track of our table slots using the table itself rather than the current thread since a table belongs
 //       to a JavaScript worker, which is reused by different threads over time (e.g., each asynchronous run is done in
 //       a new thread, but most likely by the same worker).
 
 // clang-format off
-EM_JS(int, initialiseWorkerWasmJS, (const void* wasmBytesPtr, size_t wasmBytesSize, const void* wasmStackTop), {
-    // Create a WebAssembly.Module + Instance in the current thread's private JavaScript scope, so C++ can call its
-    // exported functions directly through the current thread's WebAssembly table.
+EM_JS(int, initialiseWorkerWasmJS, (int wasmModuleId, const void* wasmBytesPtr, size_t wasmBytesSize,
+                                   const int* liveWasmModuleIdsPtr, size_t liveWasmModuleIdsCount,
+                                   const void* wasmStackTop), {
+    // Remove, from the current JavaScript worker's cache, the compiled WebAssembly code of the runtimes that have been
+    // deleted, i.e. the runtimes which identifier is not in the given list of live identifiers anymore.
+
+    let wasmModules = globalThis.libOpenCORWasmModules;
+
+    if (wasmModules === undefined) {
+        wasmModules = new Map();
+
+        globalThis.libOpenCORWasmModules = wasmModules;
+    }
+
+    const liveWasmModuleIds = new Set(new Int32Array(HEAPU8.buffer, liveWasmModuleIdsPtr, liveWasmModuleIdsCount));
+
+    for (const id of wasmModules.keys()) {
+        if (!liveWasmModuleIds.has(id)) {
+            wasmModules.delete(id);
+        }
+    }
+
+    // Retrieve our compiled WebAssembly code from the current JavaScript worker's cache, compiling (and caching) it if
+    // needed.
+
+    let wasmModule = wasmModules.get(wasmModuleId);
+
+    if (wasmModule === undefined) {
+        wasmModule = new WebAssembly.Module(new Uint8Array(HEAPU8.buffer, wasmBytesPtr, wasmBytesSize));
+
+        wasmModules.set(wasmModuleId, wasmModule);
+    }
+
+    // Create a WebAssembly.Instance in the current thread's private JavaScript scope, so C++ can call its exported
+    // functions directly through the current thread's WebAssembly table.
     // Note: our instance has its own stack (see initialiseWorkerWasm()), the top of which must be 16-byte aligned.
 
-    const wasmBytes = new Uint8Array(HEAPU8.buffer, wasmBytesPtr, wasmBytesSize);
-    const wasmModule = new WebAssembly.Module(wasmBytes);
     const wasmInstance = new WebAssembly.Instance(wasmModule, {
         env: {
             __linear_memory: wasmMemory,
@@ -462,7 +530,17 @@ void CellmlFileRuntime::Impl::initialiseWorkerWasm() const
         sWasmStack.resize(wasmStackSize);
     }
 
-    sWasmFunctionBase = initialiseWorkerWasmJS(mWasmModule.data(), mWasmModule.size(), sWasmStack.data() + sWasmStack.size());
+    std::vector<int> liveWasmModuleIds;
+
+    {
+        const std::scoped_lock lock(sLiveWasmModuleIdsMutex);
+
+        liveWasmModuleIds.assign(sLiveWasmModuleIds.begin(), sLiveWasmModuleIds.end());
+    }
+
+    sWasmFunctionBase = initialiseWorkerWasmJS(mWasmModuleId, mWasmModule.data(), mWasmModule.size(),
+                                               liveWasmModuleIds.data(), liveWasmModuleIds.size(),
+                                               sWasmStack.data() + sWasmStack.size());
 }
 
 // The table slot offsets of the functions of our WebAssembly instances (see initialiseWorkerWasmJS()):
