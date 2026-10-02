@@ -151,6 +151,19 @@ else()
         list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack" -ffunction-sections -fdata-sections)
     endif()
 
+    # Build OpenSSL for x86-64-v3 on Intel, like our other third-party libraries (see X86_64_V3_COMPILER_FLAGS in
+    # src/CMakeLists.txt and cmake/packages.cmake), something that we need to do ourselves since OpenSSL is not built
+    # using CMake.
+    # Note: OpenSSL's Configure script only accepts compiler options that start with "-", so we replace the leading "/"
+    #       of MSVC's options with "-" (which MSVC also accepts).
+
+    if(X86_64_V3_COMPILER_FLAGS)
+        separate_arguments(OPENSSL_X86_64_V3_COMPILER_FLAGS UNIX_COMMAND "${X86_64_V3_COMPILER_FLAGS}")
+
+        list(TRANSFORM OPENSSL_X86_64_V3_COMPILER_FLAGS REPLACE "^/" "-")
+        list(APPEND CONFIG_OPTIONS ${OPENSSL_X86_64_V3_COMPILER_FLAGS})
+    endif()
+
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
