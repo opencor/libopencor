@@ -852,6 +852,7 @@ TEST_F(CompilerTest, errors)
         {"double f(double x) { return x(1.0); }", "Called object type 'double' is not a function or function pointer", 30},
         {"double f(double *p) { return p(1.0); }", "Called object type 'double *' is not a function or function pointer", 31},
         {"double f(double x) { return f(x, x); }", "Expected 1 argument(s), got 2", 30},
+        {"double g(); double f(double x) { return g(x); }", "Expected 0 argument(s), got 1", 42},
         {"double f(double x) { return f(x; }", "Expected ')'", 32},
         {"double f(double x) { return f(; }", "Expected expression", 31},
         {"double f(double *p) { return f(1.0); }", "Cannot convert 'double' to 'double *'", 32},
@@ -1068,7 +1069,6 @@ double integerConversions(double a, int i, size_t n) { int j = a; size_t m = i; 
 double voidParameters(void) { return 1.0; }
 double arrayParameters(double a[2], double b[3]) { return a[1] + b[0]; }
 double functionParameters(double f(double), double (*g)(double), double x) { return f(x) + g(x); }
-double unprototypedFunctionPointer(double (*f)(), double x) { return f(x, x); }
 double declaredThenDefined(double);
 double declaredThenDefined(double x) { return 2.0 * x; }
 double callDeclaredThenDefined(double x) { return declaredThenDefined(x); }
@@ -1140,12 +1140,8 @@ double addressOfFunction(double x) { double (*f)(double) = &cos; return f(x); }
     auto thrice = [](double pX) {
         return 3.0 * pX; // NOLINT
     };
-    auto add = [](double pX, double pY) {
-        return pX + pY;
-    };
 
     EXPECT_EQ(5.0 * 7.0, function<double (*)(double (*)(double), double (*)(double), double)>(mCompiler, "functionParameters")(twice, thrice, 7.0));
-    EXPECT_EQ(2.0 * 7.0, function<double (*)(double (*)(double, double), double)>(mCompiler, "unprototypedFunctionPointer")(add, 7.0));
 
     for (auto x : {-2.5, 0.0, 1.5}) {
         EXPECT_TRUE(closeDouble((x > 0.0) ? std::cos(x) : std::sin(x), function<UnaryFunction>(mCompiler, "functionPointerSelect")(x)));
@@ -1222,8 +1218,7 @@ TEST_F(CompilerTest, targets)
 {
     // Our IR generator doesn't have any platform-specific code path, but some of the LLVM IR that it generates depends
     // on the target, so check it for a target other than the one on which we are running, i.e. WebAssembly (where long
-    // is 32 bits, where large arrays are further aligned, where functions without a prototype are flagged as such, and
-    // where our functions are hidden).
+    // is 32 bits, where large arrays are further aligned, and where our functions are hidden).
 
     static const std::string CODE {R"(typedef unsigned long size_t;
 extern size_t count();
@@ -1237,7 +1232,6 @@ double f(size_t n) { double small[1]; double large[2]; small[0] = 1.0; large[1] 
     target.longBits = 32; // NOLINT
     target.largeArrayMinBits = 128; // NOLINT
     target.largeArrayAlignment = 128; // NOLINT
-    target.unprototypedDeclarationAttributes = {{"no-prototype", ""}};
     target.definitionVisibility = 1; // llvm::GlobalValue::HiddenVisibility.
 
     std::string error;
@@ -1249,8 +1243,8 @@ double f(size_t n) { double small[1]; double large[2]; small[0] = 1.0; large[1] 
     EXPECT_NE(std::string::npos, ir.find("alloca [1 x double], align 8\n"));
     EXPECT_NE(std::string::npos, ir.find("alloca [2 x double], align 16\n"));
     EXPECT_NE(std::string::npos, ir.find("zext i32 %7 to i64\n  %9 = icmp ne i64 %8, 0\n"));
-    EXPECT_NE(std::string::npos, ir.find("declare i32 @count(...) #2\n"));
-    EXPECT_NE(std::string::npos, ir.find("attributes #2 = { \"no-prototype\" }\n"));
+    EXPECT_NE(std::string::npos, ir.find("declare i32 @count()"));
+    EXPECT_EQ(std::string::npos, ir.find("no-prototype"));
 
     // Some code that cannot be compiled.
 

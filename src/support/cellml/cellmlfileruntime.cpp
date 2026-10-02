@@ -184,7 +184,7 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long uintptr_t;
 typedef unsigned long size_t;
 
-extern uintptr_t nlaSolverAddress();
+extern uintptr_t nlaSolverAddress(void);
 extern void nlaSolve(uintptr_t nlaSolverAddress, size_t objectiveFunctionIndex, double *u, size_t n, void *data);
 )");
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
@@ -194,7 +194,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, size_t objectiveFunctionIndex, 
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long long uintptr_t;
 typedef unsigned long long size_t;
 
-extern uintptr_t nlaSolverAddress();
+extern uintptr_t nlaSolverAddress(void);
 extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(double *, double *, void *),
                      double *u, size_t n, void *data);
 )");
@@ -202,7 +202,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long uintptr_t;
 typedef unsigned long size_t;
 
-extern uintptr_t nlaSolverAddress();
+extern uintptr_t nlaSolverAddress(void);
 extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(double *, double *, void *),
                      double *u, size_t n, void *data);
 )");

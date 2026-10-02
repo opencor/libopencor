@@ -532,7 +532,6 @@ bool Compiler::Impl::compile(const std::string &pCode, const Strings &pEntryPoin
 
 #ifdef __EMSCRIPTEN__
         res.functionAttributes.emplace_back("target-features", FEATURES);
-        res.unprototypedDeclarationAttributes.emplace_back("no-prototype", "");
 
         res.moduleFlags = {{ERROR, "wchar_size", 4}};
         res.largeArrayMinBits = 128; // NOLINT

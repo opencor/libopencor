@@ -102,7 +102,6 @@ struct Type
     TypePtr element {nullptr}; // POINTER (pointee), ARRAY (element), and FUNCTION (return type).
     uint64_t count {0}; // ARRAY.
     std::vector<TypePtr> params; // FUNCTION.
-    bool isUnprototyped {false}; // FUNCTION declared with () rather than with a list of parameters (or with (void)).
     std::vector<Field> fields; // STRUCT.
     std::string name; // INTEGER and STRUCT.
 };
@@ -181,16 +180,15 @@ public:
         return res;
     }
 
-    TypePtr functionOf(TypePtr pReturnType, const std::vector<TypePtr> &pParams, bool pIsUnprototyped)
+    TypePtr functionOf(TypePtr pReturnType, const std::vector<TypePtr> &pParams)
     {
-        auto &res {mFunctions[{pReturnType, pParams, pIsUnprototyped}]};
+        auto &res {mFunctions[{pReturnType, pParams}]};
 
         if (res == nullptr) {
             auto *type {newType(Type::Kind::FUNCTION)};
 
             type->element = pReturnType;
             type->params = pParams;
-            type->isUnprototyped = pIsUnprototyped;
 
             res = type;
         }
@@ -207,7 +205,7 @@ private:
     std::deque<Type> mTypes;
     std::map<TypePtr, TypePtr> mPointers;
     std::map<std::pair<TypePtr, uint64_t>, TypePtr> mArrays;
-    std::map<std::tuple<TypePtr, std::vector<TypePtr>, bool>, TypePtr> mFunctions;
+    std::map<std::pair<TypePtr, std::vector<TypePtr>>, TypePtr> mFunctions;
 
     TypePtr mVoid;
     TypePtr mDouble;
@@ -905,7 +903,7 @@ private:
         for (const auto &function : BUILTINS) {
             if (function.name == pName) {
                 auto *res {newSymbol(Symbol::Kind::FUNCTION, pName,
-                                     mTypes.functionOf(mTypes.doubleType(), std::vector<TypePtr>(function.paramCount, mTypes.doubleType()), false))};
+                                     mTypes.functionOf(mTypes.doubleType(), std::vector<TypePtr>(function.paramCount, mTypes.doubleType())))};
 
                 res->builtin = &function;
 
@@ -1077,7 +1075,6 @@ private:
         {
             uint64_t arraySize; // 0 for function parameters.
             std::vector<TypePtr> params;
-            bool isUnprototyped;
         };
 
         std::vector<Suffix> suffixes;
@@ -1097,12 +1094,11 @@ private:
                     return false;
                 }
 
-                suffixes.push_back({size, {}, false});
+                suffixes.push_back({size, {}});
             } else if (isToken("(")) {
                 std::vector<Param> params;
-                auto isUnprototyped {false};
 
-                if (!parseParams(params, isUnprototyped)) {
+                if (!parseParams(params)) {
                     return false;
                 }
 
@@ -1118,7 +1114,7 @@ private:
                     pDeclarator.params = params;
                 }
 
-                suffixes.push_back({0, paramTypes, isUnprototyped});
+                suffixes.push_back({0, paramTypes});
             } else {
                 break;
             }
@@ -1134,7 +1130,7 @@ private:
             }
 
             type = isFunction ?
-                       mTypes.functionOf(type, suffix->params, suffix->isUnprototyped) :
+                       mTypes.functionOf(type, suffix->params) :
                        mTypes.arrayOf(type, suffix->arraySize);
         }
 
@@ -1143,17 +1139,15 @@ private:
         return true;
     }
 
-    bool parseParams(std::vector<Param> &pParams, bool &pIsUnprototyped)
+    bool parseParams(std::vector<Param> &pParams)
     {
         // Function parameters, i.e. (), (void), or a list of (possibly abstract) parameter declarations.
-        // Note: as in C17, () means that the function has no prototype, i.e. that it can be called with any number of
-        //       arguments, but a function definition with () has no parameters.
+        // Note: as in C23, () means that the function has no parameters, i.e. it is the same as (void). (Our generator
+        //       profile never declares a function without a prototype, so there is no need for us to support them.)
 
         ++mPosition;
 
-        pIsUnprototyped = accept(")");
-
-        if (pIsUnprototyped || acceptSequence({"void", ")"})) {
+        if (accept(")") || acceptSequence({"void", ")"})) {
             return true;
         }
 
@@ -2033,15 +2027,12 @@ private:
 
         type = type->element;
 
-        if ((pArgs.size() != type->params.size()) && !type->isUnprototyped) {
+        if (pArgs.size() != type->params.size()) {
             return failExpr(pToken, std::format("Expected {} argument(s), got {}", type->params.size(), pArgs.size()));
         }
 
         for (size_t i {0}; i < pArgs.size(); ++i) {
-            // Note: the arguments of a function without a prototype are passed as they are (the default argument
-            //       promotions having no effect on our types).
-
-            pArgs[i] = type->isUnprototyped ? rvalue(std::move(pArgs[i])) : convert(std::move(pArgs[i]), type->params[i]);
+            pArgs[i] = convert(std::move(pArgs[i]), type->params[i]);
 
             if (pArgs[i] == nullptr) {
                 return nullptr;
@@ -2298,7 +2289,7 @@ private:
         return llvm::ConstantInt::get(mModule.getDataLayout().getIntPtrType(mContext), 0);
     }
 
-    llvm::FunctionType *llvmFunctionType(TypePtr pType, bool pIsVarArg)
+    llvm::FunctionType *llvmFunctionType(TypePtr pType)
     {
         std::vector<llvm::Type *> paramTypes;
 
@@ -2308,7 +2299,7 @@ private:
             paramTypes.push_back(llvmType(paramType));
         }
 
-        return llvm::FunctionType::get(llvmType(pType->element), paramTypes, pIsVarArg);
+        return llvm::FunctionType::get(llvmType(pType->element), paramTypes, false);
     }
 
     // Type-based alias analysis (TBAA) metadata, as generated by Clang (see CodeGenTBAA.cpp), i.e. using struct-path
@@ -2492,17 +2483,10 @@ private:
         // Return the LLVM function for the given symbol, declaring it if needed.
 
         if (pSymbol->value == nullptr) {
-            // Note: as Clang does, a function without a prototype that is only declared is variadic.
-
-            auto isUnprototypedDeclaration {pSymbol->type->isUnprototyped && !pSymbol->isDefined};
-            auto *res {llvm::Function::Create(llvmFunctionType(pSymbol->type, isUnprototypedDeclaration),
-                                              llvm::GlobalValue::ExternalLinkage, pSymbol->name, mModule)};
+            auto *res {llvm::Function::Create(llvmFunctionType(pSymbol->type), llvm::GlobalValue::ExternalLinkage,
+                                              pSymbol->name, mModule)};
 
             addAttributes(res, mTarget.functionAttributes);
-
-            if (isUnprototypedDeclaration) {
-                addAttributes(res, mTarget.unprototypedDeclarationAttributes);
-            }
 
             for (auto &arg : res->args()) {
                 arg.addAttr(llvm::Attribute::NoUndef);
@@ -3330,23 +3314,7 @@ private:
             return mBuilder.CreateIntrinsic(builtin->intrinsic, {mBuilder.getDoubleTy()}, args);
         }
 
-        // Note: as Clang does, a function without a prototype is called using the type of the arguments.
-
-        const auto *functionType {callee.type->element};
-        auto *callType {llvmFunctionType(functionType, false)};
-
-        if (functionType->isUnprototyped) {
-            std::vector<llvm::Type *> argTypes;
-
-            argTypes.reserve(args.size());
-
-            for (auto *arg : args) {
-                argTypes.push_back(arg->getType());
-            }
-
-            callType = llvm::FunctionType::get(callType->getReturnType(), argTypes, false);
-        }
-
+        auto *callType {llvmFunctionType(callee.type->element)};
         auto *res {mBuilder.CreateCall(callType, calleeValue, args)};
 
         // Note: as Clang does, only a call to one of our mathematical functions has some attributes (those of its

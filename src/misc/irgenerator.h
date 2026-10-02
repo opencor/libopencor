@@ -46,8 +46,6 @@ struct IrGeneratorTarget
     unsigned int largeArrayMinBits {0}; // The minimum size, in bits, of an array that is to be aligned on...
     unsigned int largeArrayAlignment {0}; // ... this many bits (if not 0).
     std::vector<std::pair<std::string, std::string>> functionAttributes; // For all our functions.
-    std::vector<std::pair<std::string, std::string>> unprototypedDeclarationAttributes; // For the functions that we only
-                                                                                        // declare, using ().
     std::vector<std::tuple<unsigned int, std::string, unsigned int>> moduleFlags; // An llvm::Module::ModFlagBehavior
                                                                                   // value, a name, and a value.
     unsigned int uwtable {0}; // An llvm::UWTableKind value, for the functions that we define.
