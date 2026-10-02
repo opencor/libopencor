@@ -402,9 +402,10 @@ std::string patchWasmSharedMemory(UnsignedChars &pWasmModule)
 } // namespace
 
 #ifdef __EMSCRIPTEN__
-bool Compiler::Impl::compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize)
+bool Compiler::Impl::compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize,
+                             const Strings &pEntryPoints)
 #else
-bool Compiler::Impl::compile(const std::string &pCode)
+bool Compiler::Impl::compile(const std::string &pCode, const Strings &pEntryPoints)
 #endif
 {
     // Reset ourselves.
@@ -652,6 +653,24 @@ bool Compiler::Impl::compile(const std::string &pCode)
         return false;
     }
 
+    // Give internal linkage to the functions defined in our code, except to its entry points (and, for our WASM
+    // version, to its exported functions), if any were given. This allows LLVM to remove a function once it has been
+    // inlined everywhere, which results in less code to compile and, for our WASM version, a smaller module.
+    // Note: an internal function cannot have a non-default visibility.
+
+    if (!pEntryPoints.empty()) {
+        for (auto &function : *module) {
+            if (!function.isDeclaration()
+#ifdef __EMSCRIPTEN__
+                && !function.hasFnAttribute("wasm-export-name")
+#endif
+                && (std::ranges::find(pEntryPoints, function.getName().str()) == pEntryPoints.end())) {
+                function.setLinkage(llvm::GlobalValue::InternalLinkage);
+                function.setVisibility(llvm::GlobalValue::DefaultVisibility);
+            }
+        }
+    }
+
     // Optimise our LLVM IR.
 
     optimise(*module, *targetMachine);
@@ -863,14 +882,15 @@ CompilerPtr Compiler::create()
 }
 
 #ifdef __EMSCRIPTEN__
-bool Compiler::compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize)
+bool Compiler::compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize,
+                       const Strings &pEntryPoints)
 {
-    return pimpl()->compile(pCode, pWasmModule, pWasmStackSize);
+    return pimpl()->compile(pCode, pWasmModule, pWasmStackSize, pEntryPoints);
 }
 #else
-bool Compiler::compile(const std::string &pCode)
+bool Compiler::compile(const std::string &pCode, const Strings &pEntryPoints)
 {
-    return pimpl()->compile(pCode);
+    return pimpl()->compile(pCode, pEntryPoints);
 }
 
 bool Compiler::addFunction(const std::string &pName, void *pFunction)

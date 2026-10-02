@@ -41,9 +41,10 @@ public:
     static CompilerPtr create();
 
 #ifdef __EMSCRIPTEN__
-    bool compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize);
+    bool compile(const std::string &pCode, UnsignedChars &pWasmModule, size_t &pWasmStackSize,
+                 const Strings &pEntryPoints = {});
 #else
-    bool compile(const std::string &pCode);
+    bool compile(const std::string &pCode, const Strings &pEntryPoints = {});
 
     bool addFunction(const std::string &pName, void *pFunction);
 

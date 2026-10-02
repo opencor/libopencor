@@ -241,6 +241,11 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 #endif
 
         // Compile the generated code.
+        // Note: only our four methods need to be accessible from outside of our generated code (our objective functions
+        //       are only ever passed to nlaSolve() by our generated code), so we let our compiler know about them, so that
+        //       all our other functions (e.g., findRoot0()) can be made internal.
+
+        static const Strings ENTRY_POINTS {"initialiseArrays", "computeComputedConstants", "computeRates", "computeVariables"};
 
         mCompiler = Compiler::create();
 
@@ -250,7 +255,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 
         size_t wasmStackSize {0};
 
-        if (!mCompiler->compile(implementationCode, mWasmModule, wasmStackSize)) {
+        if (!mCompiler->compile(implementationCode, mWasmModule, wasmStackSize, ENTRY_POINTS)) {
             // The compilation failed, so add the issues it generated.
 
             addIssues(mCompiler, "Compiler");
@@ -268,9 +273,9 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
         }
 #else
 #    ifdef CODE_COVERAGE_ENABLED
-        mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile));
+        mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile), ENTRY_POINTS);
 #    else
-        if (!mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile))) {
+        if (!mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile), ENTRY_POINTS)) {
             // The compilation failed, so add the issues it generated.
 
             addIssues(mCompiler, "Compiler");
