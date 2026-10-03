@@ -59,6 +59,28 @@ def test_invalid_cellml_file():
     assert_issues(instance, expected_issues)
 
 
+def test_cellml_file_with_units_prefix_out_of_range():
+    # Note: libCellML handles such a units prefix by catching the std::out_of_range exception thrown by std::stoi(), so
+    #       this checks that exceptions can be caught everywhere in libOpenCOR, including in our third-party libraries.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Model: the CellML file is invalid.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "Task | Model | CellML | Analyser: prefix '92233720368547758077876856757465433' of a unit referencing 'second' in units 'my_units' is out of the integer range.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/units_prefix_out_of_range.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_issues)
+
+
 def test_overconstrained_cellml_file():
     expected_issues = [
         [

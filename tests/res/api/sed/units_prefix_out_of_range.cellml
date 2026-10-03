@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="my_model" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+    <!-- Model with a units prefix that is out of the integer range, which libCellML handles by catching the
+    std::out_of_range exception thrown by std::stoi() (both when parsing and when validating the model). -->
+    <units name="my_units">
+        <unit prefix="92233720368547758077876856757465433" units="second"/>
+    </units>
+    <component name="my_component">
+        <variable name="x" units="my_units" initial_value="1"/>
+    </component>
+</model>

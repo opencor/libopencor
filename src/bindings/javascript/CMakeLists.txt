@@ -59,14 +59,23 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package.types.in.json ${CMAKE_CURRENT_BINARY_DIR}/../../package.types.json @ONLY)
     else()
         # Build our JavaScript bindings.
-        # Note: the C/C++ flags enable Emscripten's thread and shared memory support, as well as WebAssembly SIMD
-        #       (-msimd128) which is supported by all major browsers. Indeed, the compiler can then auto-vectorise our
-        #       code and that of our third-party libraries (e.g., SUNDIALS' dense linear algebra), but
-        #       auto-vectorisation is not enabled by default for WebAssembly.
+        # Note #1: the C/C++ flags enable Emscripten's thread and shared memory support, as well as WebAssembly SIMD
+        #          (-msimd128) which is supported by all major browsers. Indeed, the compiler can then auto-vectorise
+        #          our code and that of our third-party libraries (e.g., SUNDIALS' dense linear algebra), but
+        #          auto-vectorisation is not enabled by default for WebAssembly.
+        # Note #2: the C/C++ and linker flags also enable WebAssembly exception handling (-fwasm-exceptions), which is
+        #          supported by all major browsers (and by Node.js). Indeed, Emscripten otherwise aborts on any C++
+        #          exception, even one that would be caught. This means that something that works natively would abort
+        #          in our WASM version (e.g., libCellML handles a units prefix that is out of the integer range by
+        #          catching the std::out_of_range exception thrown by std::stoi()). Unlike Emscripten's
+        #          JavaScript-based exception handling, WebAssembly exception handling has no runtime cost when no
+        #          exception is thrown.
+        # Note #3: those flags are also used to build our third-party libraries (see packages.cmake), so that they are
+        #          all built with exception handling too.
 
-        set(EMSCRIPTEN_COMPILER_FLAGS "-matomics -mbulk-memory -msimd128 -pthread -sSHARED_MEMORY=1")
-        set(EMSCRIPTEN_EXE_LINKER_FLAGS "-sALLOW_TABLE_GROWTH -sSHARED_MEMORY=1")
-        set(EMSCRIPTEN_SHARED_LINKER_FLAGS "-sSHARED_MEMORY=1")
+        set(EMSCRIPTEN_COMPILER_FLAGS "-fwasm-exceptions -matomics -mbulk-memory -msimd128 -pthread -sSHARED_MEMORY=1")
+        set(EMSCRIPTEN_EXE_LINKER_FLAGS "-fwasm-exceptions -sALLOW_TABLE_GROWTH -sSHARED_MEMORY=1")
+        set(EMSCRIPTEN_SHARED_LINKER_FLAGS "-fwasm-exceptions -sSHARED_MEMORY=1")
 
         set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
 

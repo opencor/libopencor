@@ -54,6 +54,23 @@ TEST(InstanceSedTest, invalidCellmlFile)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+TEST(InstanceSedTest, cellmlFileWithUnitsPrefixOutOfRange)
+{
+    // Note: libCellML handles such a units prefix by catching the std::out_of_range exception thrown by std::stoi(), so
+    //       this checks that exceptions can be caught everywhere in libOpenCOR, including in our third-party libraries.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is invalid."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: prefix '92233720368547758077876856757465433' of a unit referencing 'second' in units 'my_units' is out of the integer range."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/units_prefix_out_of_range.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
 TEST(InstanceSedTest, overconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{

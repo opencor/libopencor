@@ -278,11 +278,27 @@ set(SOURCE_FILES
 #          std::function's layout depends on _HAS_STATIC_RTTI), so we only do this for GCC and Clang.
 # Note #4: our WASM version doesn't have that problem either (it doesn't use LLVM's ORC-based JIT) and Emscripten's
 #          Embind requires RTTI.
+# Note #5: without RTTI, Clang emits, in those files, a local copy of the typeinfo of the standard exceptions that
+#          libc++'s inline code may throw (e.g., std::out_of_range for std::vector::at()). The linker then uses that
+#          copy for the whole of libOpenCOR, including for the catch clauses of our third-party libraries (e.g.,
+#          libCellML's catch (std::out_of_range &) around std::stoi()). However, libc++'s type_info comparison never
+#          considers such a copy equal to libc++'s own typeinfo, which is what an exception thrown from within libc++
+#          (e.g., by std::stoi()) uses, so such an exception would never be caught (e.g., libCellML's parser would
+#          terminate the process on a units prefix that is out of the int range). Those files don't use exceptions, so
+#          we also compile them without exceptions on macOS, which means that no such typeinfo gets emitted (libc++
+#          supports mixing files compiled with and without exceptions). This is not needed on Linux since libstdc++'s
+#          throwing code isn't inline and its type_info comparison relies on names.
 
 if(NOT EMSCRIPTEN AND NOT BUILDING_USING_MSVC)
+    set(NO_RTTI_COMPILE_OPTIONS -fno-rtti)
+
+    if(APPLE)
+        list(APPEND NO_RTTI_COMPILE_OPTIONS -fno-exceptions)
+    endif()
+
     set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
                                 ${CMAKE_CURRENT_SOURCE_DIR}/misc/irgenerator.cpp
-                                PROPERTIES COMPILE_OPTIONS -fno-rtti)
+                                PROPERTIES COMPILE_OPTIONS "${NO_RTTI_COMPILE_OPTIONS}")
 endif()
 
 set(INTERNAL_HEADER_FILES
