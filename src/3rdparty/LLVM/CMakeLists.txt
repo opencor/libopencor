@@ -138,49 +138,49 @@ if(LIBOPENCOR_PREBUILT_LLVM)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         40d4f7d09179fc5c906b9404778c5986c0e6565f)
+                         e45e31d2a995833b9717f006a88410e1bf8cc103)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     3fa20e1e6c5d2ff8b09b39c5fe7ddce078b0e827)
+                                     8f3148b572aef0f39aab4026cbef9facccc35e9c)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     4031383abfad015fb9cb2f216678a8c9d69baac2)
+                                     13c553bb46e5ff3d2fdb6a53a2bdfa30eeb09cef)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     c30dabe9a2a839329e346c1ca8d97c0913698621)
+                                     d0cc8fb14724811cfe07c418b595c8f411c8ebac)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     1c8eb411fc7c6a93a1aa16e10f2a73c6c9c4ad57)
+                                     32007627351d1e3fbafd1926d4f50a4b0bb0f387)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 805f288ace2370613b029449f91527a5d7ad349b)
+                                 d81b9cd812c85d9c7e4695235342e9a570b1c4ec)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 423ff4add5c7c2aaad59506417a54e93befb533b)
+                                 10caa0fb75da8227d5074be200c363a76b4f3583)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 78dc7556c3a1665c5906721cc0ab618bc21173a5)
+                                 f76cc9edadfe2ad3d5928d970676ebee701d0b8a)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 57caf0baef5b67e2ecb88a18353a925f99959750)
+                                 f1d5ce80cb4a5f431f0c8ec64ac1975aa00d1729)
             endif()
         endif()
     endif()
@@ -191,20 +191,28 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     #          generate some machine code for it (see src/misc/compiler.cpp)).
     # Note #2: we never give LLVM any profile data or vector library, never use LTO, nor enable any optimisation through
     #          a command-line option, a target option or a pipeline tuning option that is off by default (other than SLP
-    #          vectorisation for our native versions), and our code is never optimised for size nor uses OpenMP or
-    #          coroutines, so we don't need the optimisations that LLVM's default pipelines only perform in those cases
-    #          (see LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS below). Our code never contains any loops either (CellML's
-    #          mathematics has no iteration constructs and libCellML generates one assignment per equation), so we don't
-    #          need LLVM's loop optimisations (see LLVM_ENABLE_LOOP_OPTIMIZATIONS below). Similarly, our code never
-    #          contains any inline assembly, debug information, exception handling, garbage collection, stack maps,
-    #          patch points, statepoints, stack protection or fake uses, and we never need basic block sections or
-    #          textual assembly (see LLVM_ENABLE_OPTIONAL_CODE_GENERATION below). We also never debug LLVM itself (see
+    #          vectorisation for our native versions), and our code is never optimised for size nor uses OpenMP,
+    #          coroutines, Objective-C ARC, allocation tokens or alignment assumptions, so we don't need the
+    #          optimisations that LLVM's default pipelines only perform in those cases (see
+    #          LLVM_ENABLE_OPTIONAL_OPTIMIZATIONS below). Our code never contains any loops either (CellML's mathematics
+    #          has no iteration constructs and libCellML generates one assignment per equation), so we don't need LLVM's
+    #          loop optimisations (see LLVM_ENABLE_LOOP_OPTIMIZATIONS below), and we always skip dead store elimination
+    #          since it never removes anything from our code (see src/misc/compiler.cpp and
+    #          LLVM_ENABLE_DEAD_STORE_ELIMINATION below). Similarly, our code never contains any debug information (see
+    #          LLVM_ENABLE_DEBUG_INFORMATION below), inline assembly, exception handling, Swift error handling, garbage
+    #          collection, stack maps, patch points, statepoints, stack protection or fake uses, and we never need basic
+    #          block sections, SFrame unwind tables, Windows secure hot patching or textual assembly (see
+    #          LLVM_ENABLE_OPTIONAL_CODE_GENERATION below). We also never debug LLVM itself (see
     #          LLVM_ENABLE_DEBUGGING_FACILITIES below), always generate optimised code (see
     #          LLVM_ENABLE_UNOPTIMIZED_CODE_GENERATION below), only generate code for (and, for our native versions, JIT
-    #          it on) the platform for which we build LLVM, so we only need its object format and its target (see
-    #          LLVM_ENABLE_ALL_OBJECT_FORMATS and LLVM_ENABLE_ALL_TARGETS_SUPPORT below), and never use ORC's concurrent
-    #          compilation (see LLVM_ENABLE_OPTIONAL_JIT_FEATURES below). Finally, our WASM version doesn't use SLP
-    #          vectorisation (see src/misc/compiler.cpp and LLVM_ENABLE_SLP_VECTORIZER below). None of this changes the
+    #          it on) the platform for which we build LLVM, so we only need its object format, and only its relocatable
+    #          object files (and, for ELF, only those of its class and data encoding), and its target (see
+    #          LLVM_ENABLE_ALL_OBJECT_FORMATS and LLVM_ENABLE_ALL_TARGETS_SUPPORT below), and never use static
+    #          initialisers, ORC's concurrent compilation or resource tracker transfers, nor JIT arm64e code (see
+    #          LLVM_ENABLE_OPTIONAL_JIT_FEATURES below). We also never parse LLVM's command-line options, so we don't
+    #          need them to be registered (see LLVM_ENABLE_COMMAND_LINE_OPTIONS below). Finally, our WASM version
+    #          doesn't use SLP vectorisation (see src/misc/compiler.cpp and LLVM_ENABLE_SLP_VECTORIZER below), so its
+    #          code never contains any vector operations (see LLVM_ENABLE_VECTOR_IR below). None of this changes the
     #          code that LLVM generates for us.
     # Note #3: libOpenCOR never uses LLVM's RTTI (we don't derive from any of LLVM's classes nor use dynamic_cast or
     #          typeid on them), so we build LLVM without RTTI, whatever the platform. We also compile the only files
@@ -224,6 +232,10 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
 
         set(LLVM_ENABLE_SLP_VECTORIZER
             -DLLVM_ENABLE_SLP_VECTORIZER=OFF
+        )
+
+        set(LLVM_ENABLE_VECTOR_IR
+            -DLLVM_ENABLE_VECTOR_IR=OFF
         )
     else()
         if(INTEL_MODE)
@@ -249,17 +261,20 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
         endif()
     endif()
 
-    # Build our WASM version of LLVM with size optimisation.
+    # Build our WASM version of LLVM with size optimisation and as LLVM bitcode (-flto), so that it gets optimised as a
+    # whole (and stripped of whatever we don't use) when we link our .wasm file (see src/CMakeLists.txt).
     # Note #1: this doesn't affect the quality of the code that LLVM generates for us. It only affects its own size
     #          and, to some extent, how fast it can compile code.
     # Note #2: we only do this for our WASM version, which size is what matters most to us since our Web OpenCOR
     #          dynamically imports it. OpenCOR keeps LLVM's default release flags so that they compile our models as
     #          fast as possible.
+    # Note #3: building LLVM as LLVM bitcode makes our .wasm file smaller. We only do this for LLVM since also doing it
+    #          for our other third-party libraries, or for libOpenCOR itself, makes our .wasm file bigger again.
 
     if(EMSCRIPTEN)
         set(LLVM_RELEASE_FLAGS
-            "-DCMAKE_CXX_FLAGS_RELEASE=-Oz -DNDEBUG"
-            "-DCMAKE_C_FLAGS_RELEASE=-Oz -DNDEBUG"
+            "-DCMAKE_CXX_FLAGS_RELEASE=-Oz -flto -DNDEBUG"
+            "-DCMAKE_C_FLAGS_RELEASE=-Oz -flto -DNDEBUG"
         )
     endif()
 
@@ -320,8 +335,11 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DLLVM_ENABLE_ASSERTIONS=OFF
             -DLLVM_ENABLE_BACKTRACES=OFF
             -DLLVM_ENABLE_BINDINGS=OFF
+            -DLLVM_ENABLE_COMMAND_LINE_OPTIONS=OFF
             -DLLVM_ENABLE_CRASH_OVERRIDES=OFF
+            -DLLVM_ENABLE_DEAD_STORE_ELIMINATION=OFF
             -DLLVM_ENABLE_DEBUGGING_FACILITIES=OFF
+            -DLLVM_ENABLE_DEBUG_INFORMATION=OFF
             -DLLVM_ENABLE_DIA_SDK=OFF
             -DLLVM_ENABLE_LIBEDIT=OFF
             -DLLVM_ENABLE_LIBPFM=OFF
@@ -341,6 +359,7 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             -DLLVM_ENABLE_TELEMETRY=OFF
             -DLLVM_ENABLE_UNOPTIMIZED_CODE_GENERATION=OFF
             -DLLVM_ENABLE_UNWIND_TABLES=OFF
+            ${LLVM_ENABLE_VECTOR_IR}
             -DLLVM_ENABLE_WARNINGS=OFF
             -DLLVM_ENABLE_ZLIB=OFF
             -DLLVM_ENABLE_ZSTD=OFF
