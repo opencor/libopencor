@@ -24,49 +24,49 @@ if(LIBOPENCOR_PREBUILT_ZIPPER)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         ab06db31708e8de29f4c0e5744028cdebc36a051)
+                         806b6769f1ae8f950dbd899b58d1aeb768242749)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     58c80587ec2e926f534dad28ac2bd51270a7478d)
+                                     01b2f27bf41c7e5528e4c3b89991cf6759aa97b2)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     4342c6af925245d06c099647d1abc94413dfd790)
+                                     31e49981811ffa99afba1839d5018e5079b9993c)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     30f92acc56e7ae6ca51fa7f7c8db358d6e645de3)
+                                     a3ff288953fe2260cfb21eeeb959b1b4e78dfa01)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     b69909d36c98248a367e55071dc4ff77803efd7f)
+                                     724d53a92d69f18b8773d27e9eef83d5c6b4af75)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 c191906c1143e8fbaf3d99efa624d88728d22757)
+                                 21d8747141296310cdbb513ad8dd10dd21752583)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 c345999013e5dca311f6567ea5a264476d6218af)
+                                 f300fad8c4ff62f4f1cc9f97c2b658bcbf0ccdf4)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 c2c699b0644ebfd4b934ec3dd49b12d787ca7782)
+                                 1581851c1df731d148871fbaf60da2024132e6c0)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 2aad270e975e23afc8a79fcb67be784a09151088)
+                                 90c87b54cc0490b2657a7c47436435f724240eb9)
             endif()
         endif()
     endif()
@@ -74,10 +74,6 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     # Build our package.
     # Note: unlike for the other packages, we don't use a URL to retrieve zipper's source code since it contains a
     #       submodule (minizip) and we need to make sure that it is retrieved.
-
-    if(APPLE)
-        set(PACKAGE_C_FLAGS -Wno-implicit-function-declaration)
-    endif()
 
     build_package(${PACKAGE_NAME}
         GIT_REPOSITORY
@@ -88,8 +84,6 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
             minizip
         GIT_SUBMODULES_RECURSE
             ON
-        CMAKE_CACHE_ARGS
-            -DCMAKE_C_FLAGS:STRING=${PACKAGE_C_FLAGS}
         CMAKE_ARGS
             -DBUILD_TEST=OFF
             ${CMAKE_ARGS}

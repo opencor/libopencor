@@ -68,6 +68,11 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
     auto realStep {mStep};
     auto realHalfStep {HALF * realStep};
 
+    // Note: our rates are up to date when we get called (see SolverOde::Impl::solve()), so we don't need to compute
+    //       them for our first step.
+
+    auto firstStep {true};
+
     while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
 
@@ -76,9 +81,13 @@ bool SolverHeun::Impl::solve(double &pVoi, double pVoiEnd)
             realHalfStep = HALF * realStep;
         }
 
-        // Compute f(t_n, Y_n).
+        // Compute f(t_n, Y_n), if needed.
 
-        computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        if (!firstStep) {
+            computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        }
+
+        firstStep = false;
 
         // Compute k and Y_n + h * k.
 

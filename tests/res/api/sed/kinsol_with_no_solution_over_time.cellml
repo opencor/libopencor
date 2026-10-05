@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="my_model" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+    <!-- DAE with two NLA systems, the first of which only has a solution until t = ln(2) while the second one always
+         has a solution
+    Variables:
+     • t: voi
+     • x: 0 -> 2 * (1 - exp(-t))
+     • a: 1 -> sqrt(1 - x)
+     • b: 1 -> ?
+    Equations:
+     • dx/dt = 1 + a * a (i.e. 2 - x)
+     • a * a + x = 1
+     • b * b * b + b = x
+    -->
+    <component name="my_component">
+        <variable name="t" units="dimensionless"/>
+        <variable initial_value="0" name="x" units="dimensionless"/>
+        <variable initial_value="1" name="a" units="dimensionless"/>
+        <variable initial_value="1" name="b" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x</ci>
+                </apply>
+                <apply>
+                    <plus/>
+                    <cn cellml:units="dimensionless">1</cn>
+                    <apply>
+                        <times/>
+                        <ci>a</ci>
+                        <ci>a</ci>
+                    </apply>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>a</ci>
+                        <ci>a</ci>
+                    </apply>
+                    <ci>x</ci>
+                </apply>
+                <cn cellml:units="dimensionless">1</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>b</ci>
+                        <ci>b</ci>
+                        <ci>b</ci>
+                    </apply>
+                    <ci>b</ci>
+                </apply>
+                <ci>x</ci>
+            </apply>
+        </math>
+    </component>
+</model>

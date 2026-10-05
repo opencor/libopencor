@@ -630,6 +630,131 @@ def test_math():
     )
 
 
+def test_math_with_voi():
+    # Note: unlike in the math test, our mathematical functions are evaluated at run time rather than possibly at
+    #       compile time. Also, LLVM may optimise 2^t to exp2(t), in which case exp2() must be available to our model.
+
+    output_end_time = 10.0
+    number_of_steps = 10
+
+    file = loc.File(utils.resource_path("api/sed/math_with_voi.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.output_end_time = output_end_time
+    simulation.number_of_steps = number_of_steps
+
+    instance = document.instantiate()
+    instance_task = instance.tasks[0]
+
+    assert instance_task.state_count == 1
+    assert instance_task.constant_count == 0
+    assert instance_task.computed_constant_count == 0
+    assert instance_task.algebraic_variable_count == 35
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    # At t = 0, our algebraic variables have the same values as the computed constants of the math test.
+
+    algebraic_values = [
+        243.0,
+        3.0,
+        7.0,
+        20.085536923187668,
+        1.0986122886681098,
+        0.47712125471966244,
+        4.0,
+        3.0,
+        3.0,
+        5.0,
+        3.0,
+        0.14112000805986721,
+        -0.98999249660044542,
+        -0.1425465430742778,
+        -1.0101086659079939,
+        7.0861673957371867,
+        -7.0152525514345339,
+        10.017874927409903,
+        10.067661995777765,
+        0.99505475368673046,
+        0.099327927419433207,
+        0.099821569668822732,
+        1.0049698233136892,
+        0.3046926540153975,
+        1.266103672779499,
+        1.2490457723982544,
+        1.2309594173407747,
+        0.33983690945412193,
+        0.32175055439664219,
+        1.8184464592320668,
+        1.7627471740390861,
+        0.30951960420311175,
+        1.8738202425274144,
+        0.32745015023725843,
+        0.34657359027997264,
+    ]
+    algebraic_abs_tols = [
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+        0.0000001,
+    ]
+
+    assert_values(
+        instance_task,
+        0,
+        [0.0],
+        [0.0000001],
+        [1.0],
+        [0.0000001],
+        [],
+        [],
+        [],
+        [],
+        algebraic_values,
+        algebraic_abs_tols,
+    )
+
+    # At t = 10, x = (2^10-1)/ln(2).
+
+    assert math.isclose(
+        instance_task.state(0)[number_of_steps], 1475.8770268294097, abs_tol=0.01
+    )
+
+
 def test_kinsol_with_inf_and_or_nan_values():
     expected_issues = [
         [
@@ -645,6 +770,79 @@ def test_kinsol_with_inf_and_or_nan_values():
     instance = document.instantiate()
 
     assert_issues(instance, expected_issues)
+
+
+def test_kinsol_with_no_solution():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task instance | KINSOL: the linear solver's setup function failed in an unrecoverable manner.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/kinsol_with_no_solution.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_issues)
+
+
+def test_kinsol_with_no_solution_over_time():
+    # The first NLA system of our model only has a solution until t = ln(2) while its second NLA system always has a
+    # solution, so our simulation should fail at t = ln(2), whether we use a fixed-step ODE solver or CVODE.
+    # Note #1: we cannot check the full description of CVODE's error since it includes the step size, which may vary
+    #          from one platform to another.
+    # Note #2: KINSOL reuses the Jacobian of an NLA system from one solve to the next, which, with CVODE (which solves
+    #          our NLA systems many times per step), results in KINSOL failing because of its line search rather than
+    #          because of its maximum number of iterations.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | KINSOL: the maximum number of iterations was reached before convergence.",
+        ],
+    ]
+    cvode_kinsol_error = "Task | KINSOL: the line search algorithm was unable to find an iterate sufficiently distinct from the current iterate."
+    cvode_error_start = "Task | CVODE: at t = 0.6931"
+    last_valid_index = 6
+
+    file = loc.File(
+        utils.resource_path("api/sed/kinsol_with_no_solution_over_time.cellml")
+    )
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    forward_euler = loc.SolverForwardEuler()
+
+    simulation.output_end_time = 2.0
+    simulation.number_of_steps = 20
+
+    forward_euler.step = 0.01
+
+    simulation.ode_solver = forward_euler
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert_issues(instance, expected_issues)
+    assert not math.isnan(instance.tasks[0].voi[last_valid_index])
+    assert math.isnan(instance.tasks[0].voi[last_valid_index + 1])
+
+    simulation.ode_solver = loc.SolverCvode()
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert len(instance.issues) == 2
+    assert instance.issues[0].description == cvode_kinsol_error
+    assert instance.issues[1].description.startswith(cvode_error_start)
+    assert not math.isnan(instance.tasks[0].voi[last_valid_index])
+    assert math.isnan(instance.tasks[0].voi[last_valid_index + 1])
 
 
 def test_sedml_file_nla_algorithm_and_nla_algorithm():

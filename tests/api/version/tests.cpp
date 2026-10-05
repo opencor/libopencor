@@ -59,16 +59,10 @@ TEST(VersionTest, libOpenCOR)
     EXPECT_EQ(versionString, libOpenCOR::versionString());
 }
 
-TEST(VersionTest, Clang)
-{
-    EXPECT_EQ(0x220108U, libOpenCOR::clangVersion());
-    EXPECT_EQ("22.1.8", libOpenCOR::clangVersionString());
-}
-
 TEST(VersionTest, libCellML)
 {
-    EXPECT_EQ(0x000603U, libOpenCOR::libcellmlVersion());
-    EXPECT_EQ("0.6.3", libOpenCOR::libcellmlVersionString());
+    EXPECT_EQ(0x000701U, libOpenCOR::libcellmlVersion());
+    EXPECT_EQ("0.7.1", libOpenCOR::libcellmlVersionString());
 }
 
 TEST(VersionTest, libCOMBINE)

@@ -20,6 +20,8 @@ limitations under the License.
 
 #include <libopencor>
 
+#include <cmath>
+
 TEST(CoverageSedTest, initialise)
 {
     static const std::string expectedSerialisation {R"(<?xml version="1.0" encoding="UTF-8"?>
@@ -587,6 +589,73 @@ TEST(CoverageSedTest, math)
     EXPECT_EQ_VALUES(instanceTask, 0, {}, {}, {}, {}, {}, {}, COMPUTED_CONSTANT_VALUES, COMPUTED_CONSTANT_ABS_TOLS, {}, {});
 }
 
+TEST(CoverageSedTest, mathWithVoi)
+{
+    // Note: unlike in the math test, our mathematical functions are evaluated at run time rather than possibly at
+    //       compile time. Also, LLVM may optimise 2^t to exp2(t), in which case exp2() must be available to our model.
+
+    static const auto OUTPUT_END_TIME {10.0};
+    static const auto NUMBER_OF_STEPS {10};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/math_with_voi.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setOutputEndTime(OUTPUT_END_TIME);
+    simulation->setNumberOfSteps(NUMBER_OF_STEPS);
+
+    auto instance {document->instantiate()};
+    const auto &instanceTask {instance->tasks()[0]};
+
+    EXPECT_EQ(instanceTask->stateCount(), 1U);
+    EXPECT_EQ(instanceTask->constantCount(), 0U);
+    EXPECT_EQ(instanceTask->computedConstantCount(), 0U);
+    EXPECT_EQ(instanceTask->algebraicVariableCount(), 35U);
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    // At t = 0, our algebraic variables have the same values as the computed constants of the math test.
+
+    static const auto STATE_VALUES {std::vector<double>({0.0})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.0000001})};
+    static const auto RATE_VALUES {std::vector<double>({1.0})};
+    static const auto RATE_ABS_TOLS {std::vector<double>({0.0000001})};
+    static const auto ALGEBRAIC_VALUES {std::vector<double>({243.0, 3.0, 7.0, 20.085536923187668, 1.0986122886681098,
+                                                             0.47712125471966244, 4.0, 3.0, 3.0, 5.0, 3.0,
+                                                             0.14112000805986721, -0.98999249660044542,
+                                                             -0.1425465430742778, -1.0101086659079939,
+                                                             7.0861673957371867, -7.0152525514345339,
+                                                             10.017874927409903, 10.067661995777765,
+                                                             0.99505475368673046, 0.099327927419433207,
+                                                             0.099821569668822732, 1.0049698233136892,
+                                                             0.30469265401539747, 1.266103672779499,
+                                                             1.2490457723982544, 1.2309594173407747,
+                                                             0.33983690945412193, 0.32175055439664219,
+                                                             1.8184464592320668, 1.7627471740390861,
+                                                             0.30951960420311175, 1.8738202425274144,
+                                                             0.32745015023725843, 0.34657359027997264})};
+    static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0000001, 0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001, 0.0000001, 0.0000001,
+                                                               0.0000001, 0.0000001})};
+
+    EXPECT_EQ_VALUES(instanceTask, 0, STATE_VALUES, STATE_ABS_TOLS, RATE_VALUES, RATE_ABS_TOLS, {}, {}, {}, {}, ALGEBRAIC_VALUES, ALGEBRAIC_ABS_TOLS);
+
+    // At t = 10, x = (2^10-1)/ln(2).
+
+    static const auto X_VALUE {1475.8770268294097};
+    static const auto X_ABS_TOL {0.01};
+
+    EXPECT_NEAR(instanceTask->state(0)[NUMBER_OF_STEPS], X_VALUE, X_ABS_TOL);
+}
+
 TEST(CoverageSedTest, KinsolWithInfAndOrNanValues)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
@@ -598,6 +667,76 @@ TEST(CoverageSedTest, KinsolWithInfAndOrNanValues)
     auto instance = document->instantiate();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, KinsolWithNoSolution)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::ERROR, "Task instance | KINSOL: the linear solver's setup function failed in an unrecoverable manner."},
+    };
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_no_solution.cellml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+    auto instance = document->instantiate();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
+TEST(CoverageSedTest, KinsolWithNoSolutionOverTime)
+{
+    // The first NLA system of our model only has a solution until t = ln(2) while its second NLA system always has a
+    // solution, so our simulation should fail at t = ln(2), whether we use a fixed-step ODE solver or CVODE.
+    // Note #1: we cannot check the full description of CVODE's error since it includes the step size, which may vary
+    //          from one platform to another.
+    // Note #2: KINSOL reuses the Jacobian of an NLA system from one solve to the next, which, with CVODE (which solves
+    //          our NLA systems many times per step), results in KINSOL failing because of its line search rather than
+    //          because of its maximum number of iterations.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES = {
+        {libOpenCOR::Issue::Type::ERROR, "Task | KINSOL: the maximum number of iterations was reached before convergence."},
+    };
+    static const std::string CVODE_KINSOL_ERROR {"Task | KINSOL: the line search algorithm was unable to find an iterate sufficiently distinct from the current iterate."};
+    static const std::string CVODE_ERROR_START {"Task | CVODE: at t = 0.6931"};
+    static constexpr auto OUTPUT_END_TIME {2.0};
+    static constexpr auto NUMBER_OF_STEPS {20};
+    static constexpr auto STEP {0.01};
+    static constexpr auto LAST_VALID_INDEX {6};
+
+    auto file = libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/kinsol_with_no_solution_over_time.cellml"));
+    auto document = libOpenCOR::SedDocument::create(file);
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    auto forwardEuler {libOpenCOR::SolverForwardEuler::create()};
+
+    simulation->setOutputEndTime(OUTPUT_END_TIME);
+    simulation->setNumberOfSteps(NUMBER_OF_STEPS);
+
+    forwardEuler->setStep(STEP);
+
+    simulation->setOdeSolver(forwardEuler);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+    EXPECT_FALSE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX]));
+    EXPECT_TRUE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX + 1]));
+
+    simulation->setOdeSolver(libOpenCOR::SolverCvode::create());
+
+    instance = document->instantiate();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    ASSERT_EQ(instance->issueCount(), 2U);
+    EXPECT_EQ(instance->issue(0)->description(), CVODE_KINSOL_ERROR);
+    EXPECT_EQ(instance->issue(1)->description().substr(0, CVODE_ERROR_START.size()), CVODE_ERROR_START);
+    EXPECT_FALSE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX]));
+    EXPECT_TRUE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX + 1]));
 }
 
 TEST(CoverageSedTest, sedmlFileNlaAlgorithmAndNlaAlgorithm)

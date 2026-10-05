@@ -44,6 +44,7 @@ def test_step_value_with_invalid_number():
 
 
 def forward_euler_solve(
+    step,
     state_values,
     state_abs_tols,
     rate_values,
@@ -60,7 +61,7 @@ def forward_euler_solve(
     simulation = document.simulations[0]
     solver = loc.SolverForwardEuler()
 
-    solver.step = 0.0123
+    solver.step = step
 
     simulation.ode_solver = solver
 
@@ -81,7 +82,7 @@ def forward_euler_solve(
 
 state_values = [-63.787727, 0.134748, 0.984255, 0.741178]
 state_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
-rate_values = [49.73577, -0.127963, -0.051257, 0.098331]
+rate_values = [49.723292, -0.127811, -0.051436, 0.09812]
 rate_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
 constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
@@ -115,6 +116,7 @@ algebraic_abs_tols = [
 
 def test_solve():
     forward_euler_solve(
+        0.0123,
         state_values,
         state_abs_tols,
         rate_values,
@@ -124,5 +126,34 @@ def test_solve():
         computed_constant_values,
         computed_constant_abs_tols,
         algebraic_values,
+        algebraic_abs_tols,
+    )
+
+
+def test_solve_with_several_steps_per_output_point():
+    # Note: the output interval is 0.001, hence our step means that we have several steps per output point.
+
+    forward_euler_solve(
+        0.00023,
+        [-63.86285, 0.134946, 0.984315, 0.741021],
+        state_abs_tols,
+        [49.719825, -0.128045, -0.051096, 0.098444],
+        rate_abs_tols,
+        constant_values,
+        constant_abs_tols,
+        computed_constant_values,
+        computed_constant_abs_tols,
+        [
+            0.0,
+            -15.974955,
+            -823.479865,
+            789.734995,
+            3.967708,
+            0.115136,
+            0.002873,
+            0.967273,
+            0.541106,
+            0.056262,
+        ],
         algebraic_abs_tols,
     )

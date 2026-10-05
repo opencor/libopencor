@@ -28,49 +28,49 @@ if(LIBOPENCOR_PREBUILT_LIBSBML)
     if(EMSCRIPTEN)
         retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                          ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                         a5548423665edde4e2d88a9db1b15d9d4abeadb3)
+                         2a210182d9379a5152bdb83bf88c19f12f49459a)
     else()
         if(WIN32)
             if(RELEASE_MODE)
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     27876adefeba2d0e38da978e6c425f7b303a42a6)
+                                     836690060798ba1a75dcea0176094b58cf5dfe5f)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     ffc13b7e8a0e1ebf410579c09d80a212f4c69998)
+                                     657edf21254a7c08dcf7162a8992403b4f17e7e0)
                 endif()
             else()
                 if(INTEL_MODE)
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     c880538369168005bcd80daea453c7b32d95661e)
+                                     dcbe4814650891ea30de2fa9609ef65ab1bddc5d)
                 else()
                     retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                      ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                     d12c16ff4a2b8c667160ca8cb2378e332e089bb1)
+                                     5f6685436848f14ee9d35404bc0a0f0769ab84a7)
                 endif()
             endif()
         elseif(APPLE)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b0fbee2b7a45a35b3cb6751352e56bfc8f111bba)
+                                 9e8d005cbc817722136ac1b6ee6dea9a420f7b57)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 f3199a109ee56ea2e467ee34c6aca824d63363bb)
+                                 632d461f01083ba1812be23b755045e70a02e845)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 3c936c1696294b602aa39dad9a6a255866c2f9bd)
+                                 9abe4bd94e0a3ac743b07ae00c55527bd1effe09)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 762d5c39d46a55fc894522ba99ad53c22a3ea1b3)
+                                 3d4c2e58955c13a953d3f0a7f0af412a9f872320)
             endif()
         endif()
     endif()
@@ -88,9 +88,14 @@ elseif(NOT ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
         -DZLIB_LIBRARY=${CMAKE_CURRENT_BINARY_DIR}/zlib.not.used
     )
 
+    # Apply our patches to libSBML's source code (see README.md).
+
+    patch_package_args(${PACKAGE_NAME} ${RELEASE_TAG} LIBSBML_PATCH_ARGS)
+
     build_package(${PACKAGE_NAME}
         URL
             https://github.com/opencor/${PACKAGE_REPOSITORY}/archive/refs/tags/${RELEASE_TAG}.tar.gz
+        ${LIBSBML_PATCH_ARGS}
         DOWNLOAD_NO_PROGRESS ON
         CMAKE_ARGS
             ${CMAKE_ARGS}

@@ -52,6 +52,11 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
     size_t voiCounter {0};
     auto realStep {mStep};
 
+    // Note: our rates are up to date when we get called (see SolverOde::Impl::solve()), so we don't need to compute
+    //       them for our first step.
+
+    auto firstStep {true};
+
     while (!fuzzyCompare(pVoi, pVoiEnd)) {
         // Check that the step is correct.
 
@@ -59,9 +64,13 @@ bool SolverForwardEuler::Impl::solve(double &pVoi, double pVoiEnd)
             realStep = pVoiEnd - pVoi;
         }
 
-        // Compute f(t_n, Y_n).
+        // Compute f(t_n, Y_n), if needed.
 
-        computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        if (!firstStep) {
+            computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
+        }
+
+        firstStep = false;
 
         // Compute Y_n+1.
 

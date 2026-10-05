@@ -15,7 +15,6 @@
 
 import libopencor as loc
 import math
-import platform
 import time
 import utils
 from utils import assert_issues
@@ -54,6 +53,28 @@ def test_invalid_cellml_file():
     ]
 
     file = loc.File(utils.resource_path("error.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_issues)
+
+
+def test_cellml_file_with_units_prefix_out_of_range():
+    # Note: libCellML handles such a units prefix by catching the std::out_of_range exception thrown by std::stoi(), so
+    #       this checks that exceptions can be caught everywhere in libOpenCOR, including in our third-party libraries.
+
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Model: the CellML file is invalid.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "Task | Model | CellML | Analyser: prefix '92233720368547758077876856757465433' of a unit referencing 'second' in units 'my_units' is out of the integer range.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/units_prefix_out_of_range.cellml"))
     document = loc.SedDocument(file)
     instance = document.instantiate()
 
@@ -509,11 +530,7 @@ def run_ode_model():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            (
-                "Task | CVODE: at t = 0.00140013827899707, mxstep steps taken before reaching tout."
-                if platform.system() == "Darwin"
-                else "Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout."
-            ),
+            "Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout.",
         ],
     ]
 
@@ -665,6 +682,30 @@ def test_dae_model_with_no_ode_or_nla_solver():
     assert_issues(instance, expected_issues)
 
 
+def test_dae_model_with_failing_ode_solver():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | CVODE: at t = 1.08537561647883e-09, mxstep steps taken before reaching tout.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/dae.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    cvode = simulation.ode_solver
+
+    cvode.maximum_number_of_steps = 1
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert_issues(instance, expected_issues)
+
+
 def test_combine_archive():
     file = loc.File(utils.resource_path("cellml_2.omex"))
     document = loc.SedDocument(file)
@@ -805,6 +846,7 @@ def test_simulation_with_initial_time():
     instance.run()
 
     assert not instance.has_issues
+    assert instance.progress == 1.0
 
     instance_task = instance.tasks[0]
     voi = instance_task.voi

@@ -505,5 +505,5 @@ jobs:
         uses: codespell-project/actions-codespell@v2
         with:
           check_filenames: true
-          skip: ./extern
+          skip: ./extern,*.patch
           exclude_file: .codespellexclude

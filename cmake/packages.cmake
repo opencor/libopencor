@@ -52,6 +52,45 @@ function(check_required_packages PACKAGE)
     endif()
 endfunction()
 
+function(patch_package_args PACKAGE_NAME RELEASE_TAG PATCH_ARGS)
+    # Return, in PATCH_ARGS, the build_package() arguments that apply the patches in the patches folder of the calling
+    # CMakeLists.txt file to the source code of the given package (see applypatches.cmake).
+    # Note: we use the SHA-1 value of our patches and of the script that applies them in the name of the file to which
+    #       ExternalProject downloads the package's source code, so that any change to our patches or to
+    #       applypatches.cmake results in the package's source code being downloaded, extracted, and patched afresh
+    #       (ExternalProject only re-runs its patch step when the patch command itself changes and, even then, in the
+    #       source directory that it previously patched). We also make sure that such a change results in CMake being
+    #       re-run.
+
+    set(PATCHES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/patches)
+    set(APPLY_PATCHES_SCRIPT ${CMAKE_SOURCE_DIR}/cmake/applypatches.cmake)
+
+    file(GLOB_RECURSE PATCH_FILES ${PATCHES_DIR}/*.patch)
+
+    set(PATCHES_SHA1S)
+
+    foreach(PATCH_FILE IN LISTS PATCH_FILES ITEMS ${APPLY_PATCHES_SCRIPT})
+        get_filename_component(PATCH_NAME ${PATCH_FILE} NAME)
+        file(SHA1 ${PATCH_FILE} PATCH_SHA1)
+
+        string(APPEND PATCHES_SHA1S "${PATCH_NAME}=${PATCH_SHA1}\n")
+
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${PATCH_FILE})
+    endforeach()
+
+    string(SHA1 PATCHES_SHA1 "${PATCHES_SHA1S}")
+
+    set(${PATCH_ARGS}
+        DOWNLOAD_NAME
+            ${RELEASE_TAG}.${PATCHES_SHA1}.tar.gz
+        PATCH_COMMAND
+            ${CMAKE_COMMAND} -DPACKAGE_NAME=${PACKAGE_NAME}
+                             -DSOURCE_DIR=<SOURCE_DIR>
+                             -DPATCHES_DIR=${PATCHES_DIR}
+                             -P ${APPLY_PATCHES_SCRIPT}
+        PARENT_SCOPE)
+endfunction()
+
 function(build_package PACKAGE_NAME)
     # Configure and run a CMake script to build the package for us.
 
@@ -208,7 +247,7 @@ function(retrieve_package PACKAGE_NAME PACKAGE_VERSION PACKAGE_REPOSITORY RELEAS
         set(PACKAGE_URL "https://github.com/opencor/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
 
         if("${PACKAGE_NAME}" STREQUAL "libCellML")
-            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/6c970b7/${PACKAGE_FILE}")
+            set(PACKAGE_URL "https://github.com/agarny/${PACKAGE_REPOSITORY}/releases/download/${RELEASE_TAG}/${PACKAGE_FILE}")
         endif()
 
         set(ATTEMPT 1)
@@ -339,9 +378,30 @@ set(PREBUILT_DIR "${PREBUILT_DIR}" CACHE INTERNAL "Prebuilt directory.")
 
 include(ExternalProject)
 
+# On Linux, build our third-party libraries as position-independent code and put each of their functions and data in
+# its own section, so that the linker can remove the ones that we don't use when building libOpenCOR (see --gc-sections
+# in src/CMakeLists.txt and src/bindings/python/CMakeLists.txt). Indeed, the linker can only remove whole sections and,
+# without this, all the functions of an object file would be in the same section.
+# Note: there is no need for this on Windows (MSVC does it by default in release mode) or on macOS (the linker removes
+#       unused functions and data anyway, see -dead_strip in src/CMakeLists.txt).
+
 if(NOT WIN32 AND NOT APPLE AND NOT EMSCRIPTEN)
-    set(CMAKE_C_FLAGS_ARGS -DCMAKE_C_FLAGS=-fPIC)
-    set(CMAKE_CXX_FLAGS_ARGS -DCMAKE_CXX_FLAGS=-fPIC)
+    set(THIRD_PARTY_C_FLAGS "-fPIC -ffunction-sections -fdata-sections")
+    set(THIRD_PARTY_CXX_FLAGS "-fPIC -ffunction-sections -fdata-sections")
+endif()
+
+# Build our third-party libraries for x86-64-v3 on Intel (see X86_64_V3_COMPILER_FLAGS in src/CMakeLists.txt).
+# Note: setting CMAKE_C_FLAGS/CMAKE_CXX_FLAGS replaces the default flags that CMake would otherwise use (e.g., /EHsc for
+#       MSVC), so we start from those default flags.
+
+if(X86_64_V3_COMPILER_FLAGS)
+    string(STRIP "${CMAKE_C_FLAGS_INIT} ${THIRD_PARTY_C_FLAGS} ${X86_64_V3_COMPILER_FLAGS}" THIRD_PARTY_C_FLAGS)
+    string(STRIP "${CMAKE_CXX_FLAGS_INIT} ${THIRD_PARTY_CXX_FLAGS} ${X86_64_V3_COMPILER_FLAGS}" THIRD_PARTY_CXX_FLAGS)
+endif()
+
+if(THIRD_PARTY_C_FLAGS)
+    set(CMAKE_C_FLAGS_ARGS -DCMAKE_C_FLAGS=${THIRD_PARTY_C_FLAGS})
+    set(CMAKE_CXX_FLAGS_ARGS -DCMAKE_CXX_FLAGS=${THIRD_PARTY_CXX_FLAGS})
 endif()
 
 set(CMAKE_ARGS

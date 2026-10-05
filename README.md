@@ -1,6 +1,5 @@
 [libOpenCOR](https://opencor.ws/libopencor/) is a library that can be used to organise, edit, simulate, and analyse [CellML](https://cellml.org/) files. Here are a few links, which you might find useful:
 
-- [What is new?](https://opencor.ws/libopencor/whatIsNew.html)
 - [API documentation](https://opencor.ws/libopencor/api/index.html)
 - [User documentation](https://opencor.ws/libopencor/user/index.html)
 - [Developer documentation](https://opencor.ws/libopencor/developer/index.html)

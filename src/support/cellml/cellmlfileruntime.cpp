@@ -19,10 +19,28 @@ limitations under the License.
 
 #include "cellmlfile.h"
 
+#ifdef __EMSCRIPTEN__
+#    include <atomic>
+#endif
 #include <format>
+#ifdef __EMSCRIPTEN__
+#    include <mutex>
+#endif
 #include <unordered_set>
+#include <vector>
 
 namespace libOpenCOR {
+
+#ifdef __EMSCRIPTEN__
+// The identifiers of the WebAssembly code of our live runtimes, so that our JavaScript workers can remove from their
+// cache the compiled WebAssembly code of the runtimes that have been deleted (see initialiseWorkerWasmJS()).
+
+namespace {
+std::atomic<int> sWasmModuleIdCounter {0}; // NOLINT
+std::mutex sLiveWasmModuleIdsMutex; // NOLINT
+std::unordered_set<int> sLiveWasmModuleIds; // NOLINT
+} // namespace
+#endif
 
 CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaPtr &pNlaSolver)
 {
@@ -70,48 +88,55 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         static constexpr auto WITH_EXTERNAL_VARIABLES {false};
 
-#ifdef __EMSCRIPTEN__
-        // Allocate the memory needed by our objective functions using thread-local static buffers.
+        // Restrict-qualify the pointer parameters of computeRates() and computeVariables() since they never point to
+        // the same array (i.e. our ODE solvers and SedInstanceTask never pass the same array twice), something that
+        // allows LLVM to optimise our code further (e.g., by not reloading the value of a state after having computed
+        // a rate).
 
-        if (pNlaSolver != nullptr) {
-            if (differentialModel) {
-                generatorProfile->setFindRootMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                          R"(void findRoot[INDEX](double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraicVariables)
-{
-    static RootFindingInfo rfiStorage;
-    static double u[[SIZE]];
-
-    RootFindingInfo *rfi = &rfiStorage;
-
-    rfi->voi = voi;
-    rfi->states = states;
-    rfi->rates = rates;
-    rfi->constants = constants;
-    rfi->computedConstants = computedConstants;
-    rfi->algebraicVariables = algebraicVariables;
-
-[CODE]
-}
-)");
-            } else {
-                generatorProfile->setFindRootMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                          R"(void findRoot[INDEX](double *constants, double *computedConstants, double *algebraicVariables)
-{
-    static RootFindingInfo rfiStorage;
-    static double u[[SIZE]];
-
-    RootFindingInfo *rfi = &rfiStorage;
-
-    rfi->constants = constants;
-    rfi->computedConstants = computedConstants;
-    rfi->algebraicVariables = algebraicVariables;
-
-[CODE]
-}
-)");
-            }
+        if (differentialModel) {
+            generatorProfile->setImplementationComputeRatesMethodString(WITH_EXTERNAL_VARIABLES,
+                                                                        "void computeRates(double voi, double * restrict states, double * restrict rates, double * restrict constants, double * restrict computedConstants, double * restrict algebraicVariables)\n"
+                                                                        "{\n"
+                                                                        "[CODE]"
+                                                                        "}\n");
+            generatorProfile->setImplementationComputeVariablesMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                                            "void computeVariables(double voi, double * restrict states, double * restrict rates, double * restrict constants, double * restrict computedConstants, double * restrict algebraicVariables)\n"
+                                                                            "{\n"
+                                                                            "[CODE]"
+                                                                            "}\n");
         }
 
+        // Similarly, restrict-qualify the u and f parameters of our objective functions since they never point to the
+        // same array (i.e. KINSOL always passes its current iterate and its own residual vector), something that allows
+        // LLVM not to reload the value of an unknown after having computed a residual, this in a function that KINSOL
+        // calls repeatedly.
+
+        if (differentialModel) {
+            generatorProfile->setObjectiveFunctionMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                               "void objectiveFunction[INDEX](double * restrict u, double * restrict f, void *data)\n"
+                                                               "{\n"
+                                                               "    double voi = ((RootFindingInfo *) data)->voi;\n"
+                                                               "    double *states = ((RootFindingInfo *) data)->states;\n"
+                                                               "    double *rates = ((RootFindingInfo *) data)->rates;\n"
+                                                               "    double *constants = ((RootFindingInfo *) data)->constants;\n"
+                                                               "    double *computedConstants = ((RootFindingInfo *) data)->computedConstants;\n"
+                                                               "    double *algebraicVariables = ((RootFindingInfo *) data)->algebraicVariables;\n"
+                                                               "\n"
+                                                               "[CODE]"
+                                                               "}\n");
+        } else {
+            generatorProfile->setObjectiveFunctionMethodString(differentialModel, WITH_EXTERNAL_VARIABLES,
+                                                               "void objectiveFunction[INDEX](double * restrict u, double * restrict f, void *data)\n"
+                                                               "{\n"
+                                                               "    double *constants = ((RootFindingInfo *) data)->constants;\n"
+                                                               "    double *computedConstants = ((RootFindingInfo *) data)->computedConstants;\n"
+                                                               "    double *algebraicVariables = ((RootFindingInfo *) data)->algebraicVariables;\n"
+                                                               "\n"
+                                                               "[CODE]"
+                                                               "}\n");
+        }
+
+#ifdef __EMSCRIPTEN__
         // Export our various methods.
 
         auto exportJavaScriptName = [](const std::string &pName) -> std::string {
@@ -150,8 +175,8 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
 
         if (pNlaSolver != nullptr) {
             // Note: both uintptr_t and size_t are defined as follows:
-            //        - Emscripten (wasm32): unsigned int (which is the same as unsigned long on 32 bits and is what we
-            //          need to use here since malloc() expects an unsigned long);
+            //        - Emscripten (wasm32): unsigned int (which is the same as unsigned long on 32 bits, which is what we
+            //          use here);
             //        - Windows (64 bits): unsigned long long; and
             //        - Linux/macOS (64 bits): unsigned long.
 
@@ -159,20 +184,17 @@ CellmlFileRuntime::Impl::Impl(const CellmlFilePtr &pCellmlFile, const SolverNlaP
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long uintptr_t;
 typedef unsigned long size_t;
 
-extern void *malloc(size_t size);
-extern void free(void *ptr);
-
-extern uintptr_t nlaSolverAddress();
-extern void nlaSolve(uintptr_t nlaSolverAddress, size_t computeObjectiveFunctionIndex, uintptr_t u, size_t n, uintptr_t data);
+extern uintptr_t nlaSolverAddress(void);
+extern void nlaSolve(uintptr_t nlaSolverAddress, size_t objectiveFunctionIndex, double *u, size_t n, void *data);
 )");
             generatorProfile->setNlaSolveCallString(differentialModel, WITH_EXTERNAL_VARIABLES,
-                                                    "nlaSolve(nlaSolverAddress(), [INDEX], (uintptr_t) u, [SIZE], (uintptr_t) rfi);\n");
+                                                    "nlaSolve(nlaSolverAddress(), [INDEX], u, [SIZE], &rfi);\n");
 #else
 #    ifdef BUILDING_USING_MSVC
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long long uintptr_t;
 typedef unsigned long long size_t;
 
-extern uintptr_t nlaSolverAddress();
+extern uintptr_t nlaSolverAddress(void);
 extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(double *, double *, void *),
                      double *u, size_t n, void *data);
 )");
@@ -180,7 +202,7 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
             generatorProfile->setExternNlaSolveMethodString(R"(typedef unsigned long uintptr_t;
 typedef unsigned long size_t;
 
-extern uintptr_t nlaSolverAddress();
+extern uintptr_t nlaSolverAddress(void);
 extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(double *, double *, void *),
                      double *u, size_t n, void *data);
 )");
@@ -219,22 +241,41 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 #endif
 
         // Compile the generated code.
+        // Note: only our four methods need to be accessible from outside of our generated code (our objective functions
+        //       are only ever passed to nlaSolve() by our generated code), so we let our compiler know about them, so that
+        //       all our other functions (e.g., findRoot0()) can be made internal.
+
+        static const Strings ENTRY_POINTS {"initialiseArrays", "computeComputedConstants", "computeRates", "computeVariables"};
 
         mCompiler = Compiler::create();
 
 #ifdef __EMSCRIPTEN__
-        if (!mCompiler->compile(implementationCode, mWasmModule)) {
+        // Note: our WebAssembly instances have their own stack (see initialiseWorkerWasm()), the size of which is what
+        //       our compiler tells us our WebAssembly code needs plus some safety margin.
+
+        size_t wasmStackSize {0};
+
+        if (!mCompiler->compile(implementationCode, mWasmModule, wasmStackSize, ENTRY_POINTS)) {
             // The compilation failed, so add the issues it generated.
 
             addIssues(mCompiler, "Compiler");
 
             return;
         }
+
+        mWasmModuleId = ++sWasmModuleIdCounter;
+        mWasmStackSize = WASM_STACK_MARGIN_SIZE + wasmStackSize;
+
+        {
+            const std::scoped_lock lock(sLiveWasmModuleIdsMutex);
+
+            sLiveWasmModuleIds.insert(mWasmModuleId);
+        }
 #else
 #    ifdef CODE_COVERAGE_ENABLED
-        mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile));
+        mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile), ENTRY_POINTS);
 #    else
-        if (!mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile))) {
+        if (!mCompiler->compile(generator->implementationCode(pCellmlFile->analyserModel(), generatorProfile), ENTRY_POINTS)) {
             // The compilation failed, so add the issues it generated.
 
             addIssues(mCompiler, "Compiler");
@@ -312,48 +353,90 @@ extern void nlaSolve(uintptr_t nlaSolverAddress, void (*objectiveFunction)(doubl
 #ifdef __EMSCRIPTEN__
 CellmlFileRuntime::Impl::~Impl()
 {
-    cleanupWorkerWasm();
-}
+    // Our WebAssembly code is not live anymore, so our JavaScript workers can remove its compiled version from their
+    // cache (see initialiseWorkerWasmJS()).
 
+    const std::scoped_lock lock(sLiveWasmModuleIdsMutex);
+
+    sLiveWasmModuleIds.erase(mWasmModuleId);
+}
+#endif
+
+#ifdef __EMSCRIPTEN__
 // Lazily create a WebAssembly.Module + Instance in the current thread's private JavaScript scope and install its
 // exported functions into the current thread's WebAssembly table, so C++ can call them directly through function
-// pointers without any JavaScript round trip. If the current thread has already been initialised (see
-// wasmFunctionBase), then reuse its existing table slots rather than grow the table again, which would otherwise
-// both grow the table unboundedly and keep previously created WebAssembly instances alive forever.
+// pointers without any JavaScript round trip. The WebAssembly.Module, i.e. our compiled WebAssembly code, is cached by
+// each JavaScript worker, so that our WebAssembly code is not compiled again each time we (re)initialise an instance
+// task (e.g., at the start of each run), and it is removed from that cache once its runtime has been deleted. If some
+// table slots have already been allocated in that table, then reuse them rather than grow the table again, which would
+// otherwise both grow the table unboundedly and keep previously created WebAssembly instances alive forever.
+// Note: we keep track of our table slots using the table itself rather than the current thread since a table belongs
+//       to a JavaScript worker, which is reused by different threads over time (e.g., each asynchronous run is done in
+//       a new thread, but most likely by the same worker).
 
 // clang-format off
-EM_JS(int, initialiseWorkerWasmJS, (const void* wasmBytesPtr, size_t wasmBytesSize, int wasmFunctionBase), {
-    // Create a WebAssembly.Module + Instance in the current thread's private JavaScript scope, so C++ can call its
-    // exported functions directly through the current thread's WebAssembly table.
+EM_JS(int, initialiseWorkerWasmJS, (int wasmModuleId, const void* wasmBytesPtr, size_t wasmBytesSize,
+                                   const int* liveWasmModuleIdsPtr, size_t liveWasmModuleIdsCount,
+                                   const void* wasmStackTop), {
+    // Remove, from the current JavaScript worker's cache, the compiled WebAssembly code of the runtimes that have been
+    // deleted, i.e. the runtimes which identifier is not in the given list of live identifiers anymore.
 
-    const wasmBytes = new Uint8Array(HEAPU8.buffer, wasmBytesPtr, wasmBytesSize);
-    const wasmModule = new WebAssembly.Module(wasmBytes);
+    let wasmModules = globalThis.libOpenCORWasmModules;
+
+    if (wasmModules === undefined) {
+        wasmModules = new Map();
+
+        globalThis.libOpenCORWasmModules = wasmModules;
+    }
+
+    const liveWasmModuleIds = new Set(new Int32Array(HEAPU8.buffer, liveWasmModuleIdsPtr, liveWasmModuleIdsCount));
+
+    for (const id of wasmModules.keys()) {
+        if (!liveWasmModuleIds.has(id)) {
+            wasmModules.delete(id);
+        }
+    }
+
+    // Retrieve our compiled WebAssembly code from the current JavaScript worker's cache, compiling (and caching) it if
+    // needed.
+
+    let wasmModule = wasmModules.get(wasmModuleId);
+
+    if (wasmModule === undefined) {
+        wasmModule = new WebAssembly.Module(new Uint8Array(HEAPU8.buffer, wasmBytesPtr, wasmBytesSize));
+
+        wasmModules.set(wasmModuleId, wasmModule);
+    }
+
+    // Create a WebAssembly.Instance in the current thread's private JavaScript scope, so C++ can call its exported
+    // functions directly through the current thread's WebAssembly table.
+    // Note: our instance has its own stack (see initialiseWorkerWasm()), the top of which must be 16-byte aligned.
+
     const wasmInstance = new WebAssembly.Instance(wasmModule, {
         env: {
             __linear_memory: wasmMemory,
             __indirect_function_table: wasmTable,
+            __stack_pointer: new WebAssembly.Global({ value: "i32", mutable: true }, wasmStackTop & ~15),
 
             // Some standard C library functions.
 
-            free: _free,
-            malloc: _malloc,
             memset: _memset,
 
-            // NLA solve function.
+            // NLA solve functions.
+            // Note: these are exports of our main WebAssembly module, so they are called directly.
 
-            nlaSolverAddress: function() {
-                return globalThis.runtime.nlaSolverAddress;
-            },
-            nlaSolve: function(nlaSolverAddress, objectiveFunctionIndex, u, n, data) {
-                Module.nlaSolve(nlaSolverAddress, objectiveFunctionIndex, u, n, data);
-            },
+            nlaSolverAddress: _nlaSolverAddress,
+            nlaSolve: _wasmNlaSolve,
 
             // Arithmetic operators.
+            // Note: LLVM may optimise pow(b, x), where b is a power of two (e.g., 2.0, 4.0, or 0.5), to exp2(n*x), so we
+            //       also need exp2().
 
             pow: _pow,
             sqrt: _sqrt,
             fabs: _fabs,
             exp: _exp,
+            exp2: _exp2,
             log: _log,
             log10: _log10,
             ceil: _ceil,
@@ -384,108 +467,111 @@ EM_JS(int, initialiseWorkerWasmJS, (const void* wasmBytesPtr, size_t wasmBytesSi
     // them), in an order known to our getters:
     //   - Slot 0: initialiseArrays();
     //   - Slot 1: computeComputedConstants();
-    //   - Slot 2: computeRates() (only exported by differential models, so the slot is left empty otherwise); and
-    //   - Slot 3: computeVariables().
+    //   - Slot 2: computeRates() (only exported by differential models, so the slot is left empty otherwise);
+    //   - Slot 3: computeVariables(); and
+    //   - Slot 4+i: objectiveFunction<i>() (see wasmNlaSolve()).
 
     const functionNames = ["initialiseArrays", "computeComputedConstants", "computeRates", "computeVariables"];
-    const objectiveFunctionNames = [];
+    const objectiveFunctionIndices = [];
 
     for (const key in exports) {
         if (key.indexOf("objectiveFunction") === 0) {
-            objectiveFunctionNames.push(key);
+            objectiveFunctionIndices.push(parseInt(key.substring(17), 10));
         }
     }
 
-    // Reuse our existing table slots if the current thread has already been initialised, otherwise grow the table (and
-    // only grow it further should more slots be needed than were previously allocated).
+    // Reuse the table slots that we have already allocated in this table, if there are enough of them, otherwise
+    // allocate new ones (and release the old ones).
 
-    const functionCount = functionNames.length + objectiveFunctionNames.length;
-    let base = wasmFunctionBase;
+    const functionCount = functionNames.length + ((objectiveFunctionIndices.length === 0) ? 0 : (Math.max(...objectiveFunctionIndices) + 1));
+    let slots = wasmTable.libOpenCORSlots;
 
-    if (base === 0) {
-        base = wasmTable.grow(functionCount);
-    } else if (base + functionCount > wasmTable.length) {
-        wasmTable.grow(base + functionCount - wasmTable.length);
-    }
-
-    for (let i = 0; i < functionNames.length; ++i) {
-        const func = exports[functionNames[i]];
-
-        if (func !== undefined) {
-            wasmTable.set(base + i, func);
+    if ((slots === undefined) || (slots.count < functionCount)) {
+        if (slots !== undefined) {
+            for (let i = 0; i < slots.count; ++i) {
+                wasmTable.set(slots.base + i, null);
+            }
         }
+
+        slots = { base: wasmTable.grow(functionCount), count: functionCount };
+
+        wasmTable.libOpenCORSlots = slots;
     }
 
-    // Do the same for our various objective functions, recording their table slots by NLA system index, so that C++
-    // can resolve them without any JavaScript round trip.
+    // Install our functions, installing each objective function at a slot determined by its NLA system index, so that
+    // C++ can compute its table slot (see wasmNlaSolve()). Also, clear the slots that we don't need (e.g., the slot of
+    // computeRates() for an algebraic model), so that no previously created WebAssembly instance is kept alive.
 
-    const computeObjectiveFunctionSlots = {};
-    let slot = base + functionNames.length;
+    for (let i = 0; i < slots.count; ++i) {
+        const func = (i < functionNames.length) ? exports[functionNames[i]] : exports["objectiveFunction" + (i - functionNames.length)];
 
-    for (const key of objectiveFunctionNames) {
-        wasmTable.set(slot, exports[key]);
-
-        computeObjectiveFunctionSlots[parseInt(key.substring(17), 10)] = slot;
-
-        ++slot;
+        wasmTable.set(slots.base + i, (func === undefined) ? null : func);
     }
 
-    // Keep a small per-thread runtime record so that the generated code can resolve the NLA solver address and C++
-    // can resolve objective-function table slots.
-
-    globalThis.runtime = {
-        nlaSolverAddress: 0,
-        computeObjectiveFunctionSlots
-    };
-
-    return base;
+    return slots.base;
 }); // clang-format on
 
 // The base index, in the current thread's WebAssembly table, of the current thread's runtime functions (each thread
 // lazily creates its own WebAssembly instance, see initialiseWorkerWasmJS()). This is thread-local since the table
-// slots are only valid on the thread on which they were installed, and it persists across re-initialisations on that
-// thread so that its table slots can be reused (see the wasmFunctionBase parameter of initialiseWorkerWasmJS()).
+// slots are only valid on the thread on which they were installed.
 // Note: the function pointers returned by computeRates(), initialiseArraysForDifferentialModel(), etc. are computed
 //       from this thread-local base. They must only be called from the current thread (calling them from a different
 //       thread, which has its own WebAssembly instance with different table slots, will silently execute the wrong
 //       code). Solvers that cache these function pointers (see SolverOde::mComputeRates and
 //       SolverCvodeUserData::computeRates) inherit this thread-affinity constraint.
+// Similarly, sWasmStack is the stack of the current thread's WebAssembly instance (see initialiseWorkerWasmJS()). It is
+// shared by all our instances on the current thread (since only one of them can be used at a time) and only ever grows.
 
 namespace {
 thread_local int sWasmFunctionBase = 0; // NOLINT
+thread_local std::vector<double> sWasmStack; // NOLINT
 } // namespace
 
 void CellmlFileRuntime::Impl::initialiseWorkerWasm() const
 {
-    sWasmFunctionBase = initialiseWorkerWasmJS(mWasmModule.data(), mWasmModule.size(), sWasmFunctionBase);
-}
+    const auto wasmStackSize {(mWasmStackSize + sizeof(double) - 1) / sizeof(double)};
 
-void CellmlFileRuntime::Impl::cleanupWorkerWasm() const
-{
-    // clang-format off
-    EM_ASM({
-        delete globalThis.runtime;
-    }); // clang-format on
-}
+    if (sWasmStack.size() < wasmStackSize) {
+        sWasmStack.resize(wasmStackSize);
+    }
 
-void CellmlFileRuntime::Impl::setNlaSolverAddress(uintptr_t pAddress) const
-{
-    // clang-format off
-    EM_ASM({
-        globalThis.runtime.nlaSolverAddress = $0;
-    }, pAddress); // clang-format on
+    std::vector<int> liveWasmModuleIds;
+
+    {
+        const std::scoped_lock lock(sLiveWasmModuleIdsMutex);
+
+        liveWasmModuleIds.assign(sLiveWasmModuleIds.begin(), sLiveWasmModuleIds.end());
+    }
+
+    sWasmFunctionBase = initialiseWorkerWasmJS(mWasmModuleId, mWasmModule.data(), mWasmModule.size(),
+                                               liveWasmModuleIds.data(), liveWasmModuleIds.size(),
+                                               sWasmStack.data() + sWasmStack.size());
 }
 
 // The table slot offsets of the functions of our WebAssembly instances (see initialiseWorkerWasmJS()):
 //   - Slot 0: initialiseArrays();
 //   - Slot 1: computeComputedConstants();
-//   - Slot 2: computeRates() (differential models only); and
-//   - Slot 3: computeVariables().
+//   - Slot 2: computeRates() (differential models only);
+//   - Slot 3: computeVariables(); and
+//   - Slot 4+i: objectiveFunction<i>().
 
 static constexpr intptr_t INITIALISE_ARRAYS_TABLE_OFFSET = 0;
 static constexpr intptr_t COMPUTE_COMPUTED_CONSTANTS_TABLE_OFFSET = 1;
 static constexpr intptr_t COMPUTE_RATES_TABLE_OFFSET = 2;
 static constexpr intptr_t COMPUTE_VARIABLES_TABLE_OFFSET = 3;
+static constexpr intptr_t OBJECTIVE_FUNCTIONS_TABLE_OFFSET = 4;
+
+// The function that our generated code calls to solve an NLA system (see initialiseWorkerWasmJS()), with the objective
+// function given by its NLA system index. It is called directly from WebAssembly and it simply resolves the table slot
+// of the objective function (a function pointer being a table slot in WebAssembly) before calling nlaSolve().
+// Note: like nlaSolve(), this function must not let an exception escape since it is called from our compiled code.
+
+extern "C" void wasmNlaSolve(uintptr_t pNlaSolverAddress, size_t pObjectiveFunctionIndex, double *pU, size_t pN, void *pData) noexcept
+{
+    nlaSolve(pNlaSolverAddress,
+             reinterpret_cast<SolverNla::ComputeObjectiveFunction>(sWasmFunctionBase + OBJECTIVE_FUNCTIONS_TABLE_OFFSET + static_cast<intptr_t>(pObjectiveFunctionIndex)),
+             pU, pN, pData);
+}
 
 CellmlFileRuntime::InitialiseArraysForAlgebraicModel CellmlFileRuntime::Impl::initialiseArraysForAlgebraicModel() const
 {
@@ -587,16 +673,6 @@ CellmlFileRuntimePtr CellmlFileRuntime::create(const CellmlFilePtr &pCellmlFile,
 void CellmlFileRuntime::initialiseWorkerWasm() const
 {
     pimpl()->initialiseWorkerWasm();
-}
-
-void CellmlFileRuntime::cleanupWorkerWasm() const
-{
-    pimpl()->cleanupWorkerWasm();
-}
-
-void CellmlFileRuntime::setNlaSolverAddress(uintptr_t pAddress) const
-{
-    pimpl()->setNlaSolverAddress(pAddress);
 }
 #endif
 

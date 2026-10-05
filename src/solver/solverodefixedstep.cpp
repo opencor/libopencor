@@ -18,6 +18,8 @@ limitations under the License.
 
 #include "sedml/SedAlgorithm.h"
 
+#include <cmath>
+
 namespace libOpenCOR {
 
 // Solver.

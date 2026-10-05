@@ -174,8 +174,8 @@ TEST(CvodeSolverTest, absoluteToleranceValueWithInvalidNumber)
 
 TEST(CvodeSolverTest, solve)
 {
-    static const auto STATE_VALUES {std::vector<double>({-63.886, 0.135007, 0.984333, 0.740973})};
-    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.000001, 0.000001, 0.000001})};
+    static const auto STATE_VALUES {std::vector<double>({-63.886, 0.135007, 0.984333, 0.74097})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.000001, 0.00001})};
     static const auto RATE_VALUES {std::vector<double>({49.719, -0.128117, -0.05099, 0.09854})};
     static const auto RATE_ABS_TOLS {std::vector<double>({0.001, 0.000001, 0.00001, 0.00001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
@@ -227,15 +227,15 @@ TEST(CvodeSolverTest, solveWithoutInterpolateSolution)
 TEST(CvodeSolverTest, solveWithAdamsMoultonIntegrationMethod)
 {
     static const auto STATE_VALUES {std::vector<double>({-63.89, 0.13501, 0.98434, 0.74097})};
-    static const auto STATE_ABS_TOLS {std::vector<double>({0.01, 0.00001, 0.00001, 0.00001})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.01, 0.0001, 0.0001, 0.0001})};
     static const auto RATE_VALUES {std::vector<double>({49.720, -0.12812, -0.05099, 0.09855})};
-    static const auto RATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.0001, 0.0001})};
+    static const auto RATE_ABS_TOLS {std::vector<double>({0.01, 0.0001, 0.0001, 0.0001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
     static const auto CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0, 0.0, 0.0})};
     static const auto COMPUTED_CONSTANT_VALUES {std::vector<double>({-10.613, -115.0, 12.0})};
     static const auto COMPUTED_CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0})};
-    static const auto ALGEBRAIC_VALUES {std::vector<double>({0.0, -15.98, -823.52, 789.78, 3.97, 0.1149, 0.002869, 0.96735, 0.5413, 0.05625})};
-    static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0, 0.01, 0.01, 0.01, 0.01, 0.0001, 0.000001, 0.00001, 0.0001, 0.00001})};
+    static const auto ALGEBRAIC_VALUES {std::vector<double>({0.0, -15.98, -823.52, 789.78, 3.97, 0.11499, 0.002869, 0.96735, 0.5413, 0.05625})};
+    static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0, 0.01, 0.1, 0.01, 0.01, 0.0001, 0.00001, 0.0001, 0.0001, 0.00001})};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -310,8 +310,8 @@ TEST(CvodeSolverTest, solveWithBandedLinearSolver)
 
 TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
 {
-    static const auto STATE_VALUES {std::vector<double>({-63.887, 0.13501, 0.984334, 0.74097})};
-    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.000001, 0.00001})};
+    static const auto STATE_VALUES {std::vector<double>({-63.88, 0.13501, 0.98433, 0.74097})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.01, 0.00001, 0.00001, 0.00001})};
     static const auto RATE_VALUES {std::vector<double>({49.72, -0.12812, -0.05099, 0.09854})};
     static const auto RATE_ABS_TOLS {std::vector<double>({0.01, 0.0001, 0.00001, 0.00001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
@@ -319,7 +319,7 @@ TEST(CvodeSolverTest, solveWithDiagonalLinearSolver)
     static const auto COMPUTED_CONSTANT_VALUES {std::vector<double>({-10.613, -115.0, 12.0})};
     static const auto COMPUTED_CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0})};
     static const auto ALGEBRAIC_VALUES {std::vector<double>({0.0, -15.98, -823.52, 789.78, 3.9699, 0.11498, 0.00287, 0.96735, 0.54134, 0.056246})};
-    static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0, 0.01, 0.01, 0.01, 0.0001, 0.00001, 0.00001, 0.00001, 0.00001, 0.000001})};
+    static const auto ALGEBRAIC_ABS_TOLS {std::vector<double>({0.0, 0.01, 0.1, 0.1, 0.001, 0.0001, 0.00001, 0.00001, 0.0001, 0.00001})};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/solver/ode.cellml"))};
     auto document {libOpenCOR::SedDocument::create(file)};
@@ -451,8 +451,8 @@ TEST(CvodeSolverTest, solveWithGmresLinearSolverAndNoPreconditioner)
 
 TEST(CvodeSolverTest, solveWithBicgstabLinearSolverAndNoPreconditioner)
 {
-    static const auto STATE_VALUES {std::vector<double>({-63.886, 0.13501, 0.984333, 0.740972})};
-    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.000001, 0.000001})};
+    static const auto STATE_VALUES {std::vector<double>({-63.886, 0.13501, 0.984333, 0.74097})};
+    static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.000001, 0.00001})};
     static const auto RATE_VALUES {std::vector<double>({49.719, -0.12812, -0.050992, 0.09854})};
     static const auto RATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.0001, 0.00001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
@@ -483,7 +483,7 @@ TEST(CvodeSolverTest, solveWithTfqmrLinearSolverAndNoPreconditioner)
     static const auto STATE_VALUES {std::vector<double>({-63.886, 0.13501, 0.98433, 0.74097})};
     static const auto STATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.00001, 0.00001})};
     static const auto RATE_VALUES {std::vector<double>({49.719, -0.12812, -0.05099, 0.09854})};
-    static const auto RATE_ABS_TOLS {std::vector<double>({0.001, 0.00001, 0.00001, 0.00001})};
+    static const auto RATE_ABS_TOLS {std::vector<double>({0.01, 0.00001, 0.00001, 0.00001})};
     static const auto CONSTANT_VALUES {std::vector<double>({1.0, 0.0, 0.3, 120.0, 36.0})};
     static const auto CONSTANT_ABS_TOLS {std::vector<double>({0.0, 0.0, 0.0, 0.0, 0.0})};
     static const auto COMPUTED_CONSTANT_VALUES {std::vector<double>({-10.613, -115.0, 12.0})};

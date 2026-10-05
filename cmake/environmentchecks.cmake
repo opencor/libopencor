@@ -15,32 +15,19 @@
 # Make sure that we are using a supported compiler.
 
 if(WIN32)
-    if(    "${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC"
-       AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC"
-       AND MSVC_TOOLSET_VERSION EQUAL 143)
+    if(MSVC AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
         set(BUILDING_USING_MSVC TRUE)
     else()
-        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using MSVC 2022 on Windows.")
+        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using MSVC on Windows.")
     endif()
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    set(BUILDING_USING_CLANG TRUE)
 elseif(APPLE)
-    if(   (    "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
-           AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-       OR (    "${CMAKE_C_COMPILER_ID}" STREQUAL "AppleClang"
-           AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"))
-        set(BUILDING_USING_CLANG TRUE)
-    else()
-        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using (Apple) Clang on macOS.")
-    endif()
+    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using (Apple) Clang on macOS.")
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    set(BUILDING_USING_GNU TRUE)
 else()
-    if(    "${CMAKE_C_COMPILER_ID}" STREQUAL "GNU"
-       AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        set(BUILDING_USING_GNU TRUE)
-    elseif(    "${CMAKE_C_COMPILER_ID}" STREQUAL "Clang"
-           AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        set(BUILDING_USING_CLANG TRUE)
-    else()
-        message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using GNU or Clang on Linux.")
-    endif()
+    message(FATAL_ERROR "${CMAKE_PROJECT_NAME} can only be built using GNU or Clang on Linux.")
 endif()
 
 # Make sure that we are building libOpenCOR in 64-bit mode.

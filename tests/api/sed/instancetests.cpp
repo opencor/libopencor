@@ -54,6 +54,23 @@ TEST(InstanceSedTest, invalidCellmlFile)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+TEST(InstanceSedTest, cellmlFileWithUnitsPrefixOutOfRange)
+{
+    // Note: libCellML handles such a units prefix by catching the std::out_of_range exception thrown by std::stoi(), so
+    //       this checks that exceptions can be caught everywhere in libOpenCOR, including in our third-party libraries.
+
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model: the CellML file is invalid."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Model | CellML | Analyser: prefix '92233720368547758077876856757465433' of a unit referencing 'second' in units 'my_units' is out of the integer range."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/units_prefix_out_of_range.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
 TEST(InstanceSedTest, overconstrainedCellmlFile)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
@@ -533,17 +550,7 @@ TEST(InstanceSedTest, startRunAfterPreviousRunCompleted)
 TEST(InstanceSedTest, odeModel)
 {
     const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
-#ifdef BUILDING_ON_INTEL
         {libOpenCOR::Issue::Type::ERROR, "Task | CVODE: at t = 0.00140013827899996, mxstep steps taken before reaching tout."},
-#else
-        {libOpenCOR::Issue::Type::ERROR,
-#    ifdef BUILDING_ON_WINDOWS
-         "Task | CVODE: at t = 0.00140013827899821, mxstep steps taken before reaching tout."
-#    else
-         "Task | CVODE: at t = 0.00140013827899707, mxstep steps taken before reaching tout."
-#    endif
-        },
-#endif
     }};
 
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
@@ -678,6 +685,30 @@ TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
     simulation->setNlaSolver(nullptr);
 
     auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
+TEST(InstanceSedTest, daeModelWithFailingOdeSolver)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | CVODE: at t = 1.08537561647883e-09, mxstep steps taken before reaching tout."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+    const auto &cvode {std::dynamic_pointer_cast<libOpenCOR::SolverCvode>(simulation->odeSolver())};
+
+    static const auto NOK_MAXIMUM_NUMBER_OF_STEPS {1};
+
+    cvode->setMaximumNumberOfSteps(NOK_MAXIMUM_NUMBER_OF_STEPS);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
 
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
@@ -823,6 +854,7 @@ TEST(InstanceSedTest, simulationWithInitialTime)
     instance->run();
 
     EXPECT_FALSE(instance->hasIssues());
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
 
     static const auto VOI_SIZE {50001U};
     static const auto VOI_START {0.0};

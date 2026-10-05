@@ -20,12 +20,25 @@ import os
 import pathlib
 import platform
 import pytest
+import re
 
 ResourceLocation = "@RESOURCE_LOCATION@"
 
 
 RemoteBasePath = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res"
 RemoteFile = "https://raw.githubusercontent.com/opencor/libopencor/master/tests/res/cellml_2.cellml"
+
+
+def normalise_description(description):
+    # Normalise the value of any time (t = ...) and step size (h = ...) in the given description so that differences at
+    # the last few significant digits are ignored. Indeed, the exact value of a time or step size can vary slightly
+    # depending on the platform and the CPU used to generate the model code.
+
+    return re.sub(
+        r"([th] = )([-+0-9.eE]+)",
+        lambda match: match.group(1) + f"{float(match.group(2)):g}",
+        description,
+    )
 
 
 def assert_issues(logger, expected_issues):
@@ -35,7 +48,9 @@ def assert_issues(logger, expected_issues):
 
     for i in range(len(issues)):
         assert issues[i].type == expected_issues[i][0]
-        assert issues[i].description == expected_issues[i][1]
+        assert normalise_description(issues[i].description) == normalise_description(
+            expected_issues[i][1]
+        )
 
         if issues[i].type == loc.Issue.Type.Error:
             assert issues[i].type_as_string == "Error"

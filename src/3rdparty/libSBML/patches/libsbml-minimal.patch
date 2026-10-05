@@ -1,0 +1,153 @@
+diff --git a/src/sbml/conversion/SBMLConverterRegistry.cpp b/src/sbml/conversion/SBMLConverterRegistry.cpp
+index ace0cbc..3d003fb 100644
+--- a/src/sbml/conversion/SBMLConverterRegistry.cpp
++++ b/src/sbml/conversion/SBMLConverterRegistry.cpp
+@@ -53,7 +53,9 @@
+ #include <sbml/util/util.h>
+ 
+ // for now convertes to be used have to be included once!
+-#include <sbml/conversion/RegisterConverters.cpp>
++// libOpenCOR: don't register libSBML's converters since libOpenCOR never converts SBML documents, while
++//             registering them means that most of libSBML ends up in libOpenCOR.
++// #include <sbml/conversion/RegisterConverters.cpp>
+ 
+ using namespace std;
+ LIBSBML_CPP_NAMESPACE_BEGIN
+diff --git a/src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathASTPlugin.cpp b/src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathASTPlugin.cpp
+index 76cae48..7224fce 100644
+--- a/src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathASTPlugin.cpp
++++ b/src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathASTPlugin.cpp
+@@ -220,68 +220,12 @@ int L3v2extendedmathASTPlugin::checkNumArguments(const ASTNode* node, std::strin
+   return -1;
+ }
+ 
+-double L3v2extendedmathASTPlugin::evaluateASTNode(const ASTNode * node, const Model * m) const
++double L3v2extendedmathASTPlugin::evaluateASTNode(const ASTNode *, const Model *) const
+ {
+-  double result = numeric_limits<double>::quiet_NaN();
+-  switch(node->getType()) {
+-  case AST_FUNCTION_REM:
+-    if (node->getNumChildren() < 2) result = 0.0;
+-    else
+-    {
+-      double dividend = SBMLTransforms::evaluateASTNode(node->getChild(0), m);
+-      double divisor = SBMLTransforms::evaluateASTNode(node->getChild(1), m);
+-      double quotient = floor(dividend / divisor);
+-
+-      result = dividend - (quotient * divisor);
+-    }
+-    break;
+-
+-  case AST_FUNCTION_MIN:
+-    result = SBMLTransforms::evaluateASTNode(node->getChild(0), m);
+-    for (unsigned int j = 1; j < node->getNumChildren(); j++)
+-    {
+-      double nextValue = SBMLTransforms::evaluateASTNode(node->getChild(j), m);
+-      if (nextValue < result) result = nextValue;
+-    }
+-    break;
+-
+-  case AST_FUNCTION_MAX:
+-    result = SBMLTransforms::evaluateASTNode(node->getChild(0), m);
+-    for (unsigned int j = 1; j < node->getNumChildren(); j++)
+-    {
+-      double nextValue = SBMLTransforms::evaluateASTNode(node->getChild(j), m);
+-      if (nextValue > result) result = nextValue;
+-    }
+-    break;
+-
+-  case AST_LOGICAL_IMPLIES:
+-  {
+-    if (node->getNumChildren() == 0)
+-      result = 0.0;
+-    else if (node->getNumChildren() == 1)
+-      result = SBMLTransforms::evaluateASTNode(node->getChild(0), m);
+-    else
+-      result = (double)((!(SBMLTransforms::evaluateASTNode(node->getChild(0), m)))
+-        || (SBMLTransforms::evaluateASTNode(node->getChild(1), m)));
+-  }
+-  break;
+-
+-  case AST_FUNCTION_QUOTIENT:
+-    if (node->getNumChildren() < 2) result = 0.0;
+-    else 
+-    {      
+-      result = floor(SBMLTransforms::evaluateASTNode(node->getChild(0), m) /
+-        SBMLTransforms::evaluateASTNode(node->getChild(1), m));
+-    }
+-    break;
++  // libOpenCOR: libOpenCOR never evaluates SBML math, while evaluating it means that libSBML's SBMLTransforms and SBML
++  //             model classes end up in libOpenCOR.
+ 
+-  case AST_FUNCTION_RATE_OF:
+-  default:
+-    result = numeric_limits<double>::quiet_NaN();
+-    break;
+-
+-  }
+-  return result;
++  return numeric_limits<double>::quiet_NaN();
+ }
+ 
+ /** 
+@@ -328,36 +272,12 @@ L3v2extendedmathASTPlugin::getUnitDefinitionFromRateOf(UnitFormulaFormatter* uff
+ }
+ 
+ 
+-UnitDefinition * L3v2extendedmathASTPlugin::getUnitDefinitionFromPackage(UnitFormulaFormatter* uff, const ASTNode * node, bool inKL, int reactNo) const
++UnitDefinition * L3v2extendedmathASTPlugin::getUnitDefinitionFromPackage(UnitFormulaFormatter*, const ASTNode *, bool, int) const
+ {
+-  UnitDefinition* ud = NULL;
+-  switch (node->getType())
+-  {
+-  case AST_FUNCTION_MIN:
+-  case AST_FUNCTION_MAX:
+-    ud = uff->getUnitDefinitionFromArgUnitsReturnFunction(node, inKL, reactNo);
+-    break;
++  // libOpenCOR: libOpenCOR never checks the units of SBML math, while checking them means that libSBML's
++  //             UnitFormulaFormatter and SBML model classes end up in libOpenCOR.
+ 
+-  case AST_FUNCTION_REM:
+-    ud = getUnitDefinitionFromRem(uff, node, inKL, reactNo);
+-    break;
+-
+-  case AST_FUNCTION_RATE_OF:
+-    ud = getUnitDefinitionFromRateOf(uff, node, inKL, reactNo);
+-    break;
+-
+-  case AST_FUNCTION_QUOTIENT:
+-    ud = uff->getUnitDefinitionFromDivide(node, inKL, reactNo);
+-    break;
+-
+-  case AST_LOGICAL_IMPLIES:
+-    ud = uff->getUnitDefinitionFromDimensionlessReturnFunction(node, inKL, reactNo);
+-    break;
+-
+-  default:
+-    break;
+-  }
+-  return ud;
++  return NULL;
+ }
+ 
+ bool L3v2extendedmathASTPlugin::isLogical(ASTNodeType_t type) const
+diff --git a/src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathExtension.cpp b/src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathExtension.cpp
+index dc3f15e..4d69bb3 100644
+--- a/src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathExtension.cpp
++++ b/src/sbml/packages/l3v2extendedmath/extension/L3v2extendedmathExtension.cpp
+@@ -413,13 +413,8 @@ L3v2extendedmathExtension::init()
+   packageURIs.push_back(getXmlnsL3V1V1());
+   packageURIs.push_back(getXmlnsL3V2());
+ 
+-  SBaseExtensionPoint sbmldocExtPoint("core", SBML_DOCUMENT);
+-
+-  SBasePluginCreator<L3v2extendedmathSBMLDocumentPlugin,
+-    L3v2extendedmathExtension> sbmldocPluginCreator(sbmldocExtPoint,
+-      packageURIs);
+-
+-  l3v2extendedmathExtension.addSBasePluginCreator(&sbmldocPluginCreator);
++  // libOpenCOR: don't register our SBML document plugin since libOpenCOR never handles SBML documents, while
++  //             registering it means that libSBML's validators and SBML reader end up in libOpenCOR.
+   
+   L3v2extendedmathASTPlugin math(getXmlnsL3V1V1());
+   l3v2extendedmathExtension.setASTBasePlugin(&math);

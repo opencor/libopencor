@@ -59,6 +59,23 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
         configure_file(${CMAKE_CURRENT_SOURCE_DIR}/package.types.in.json ${CMAKE_CURRENT_BINARY_DIR}/../../package.types.json @ONLY)
     else()
         # Build our JavaScript bindings.
+        # Note #1: the C/C++ flags enable Emscripten's thread and shared memory support, as well as WebAssembly SIMD
+        #          (-msimd128) which is supported by all major browsers. Indeed, the compiler can then auto-vectorise
+        #          our code and that of our third-party libraries (e.g., SUNDIALS' dense linear algebra), but
+        #          auto-vectorisation is not enabled by default for WebAssembly.
+        # Note #2: the C/C++ and linker flags also enable WebAssembly exception handling (-fwasm-exceptions), which is
+        #          supported by all major browsers (and by Node.js). Indeed, Emscripten otherwise aborts on any C++
+        #          exception, even one that would be caught. This means that something that works natively would abort
+        #          in our WASM version (e.g., libCellML handles a units prefix that is out of the integer range by
+        #          catching the std::out_of_range exception thrown by std::stoi()). Unlike Emscripten's
+        #          JavaScript-based exception handling, WebAssembly exception handling has no runtime cost when no
+        #          exception is thrown.
+        # Note #3: those flags are also used to build our third-party libraries (see packages.cmake), so that they are
+        #          all built with exception handling too.
+
+        set(EMSCRIPTEN_COMPILER_FLAGS "-fwasm-exceptions -matomics -mbulk-memory -msimd128 -pthread -sSHARED_MEMORY=1")
+        set(EMSCRIPTEN_EXE_LINKER_FLAGS "-fwasm-exceptions -sALLOW_TABLE_GROWTH -sSHARED_MEMORY=1")
+        set(EMSCRIPTEN_SHARED_LINKER_FLAGS "-fwasm-exceptions -sSHARED_MEMORY=1")
 
         set(JAVASCRIPT_BINDINGS_TARGET ${CMAKE_PROJECT_NAME}_JavaScript CACHE INTERNAL "JavaScript bindings target.")
 
@@ -67,10 +84,10 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                                                                   -DBUILDCACHE_EXE=${BUILDCACHE_EXE}
                                                                   -DCCACHE_EXE=${CCACHE_EXE}
                                                                   -DCLCACHE_EXE=${CLCACHE_EXE}
-                                                                  -DCMAKE_C_FLAGS=-matomics\ -mbulk-memory\ -pthread\ -sSHARED_MEMORY=1
-                                                                  -DCMAKE_CXX_FLAGS=-matomics\ -mbulk-memory\ -pthread\ -sSHARED_MEMORY=1
-                                                                  -DCMAKE_EXE_LINKER_FLAGS=-sALLOW_TABLE_GROWTH\ -sINITIAL_TABLE=65536\ -sSHARED_MEMORY=1
-                                                                  -DCMAKE_SHARED_LINKER_FLAGS=-sSHARED_MEMORY=1
+                                                                  "-DCMAKE_C_FLAGS=${EMSCRIPTEN_COMPILER_FLAGS}"
+                                                                  "-DCMAKE_CXX_FLAGS=${EMSCRIPTEN_COMPILER_FLAGS}"
+                                                                  "-DCMAKE_EXE_LINKER_FLAGS=${EMSCRIPTEN_EXE_LINKER_FLAGS}"
+                                                                  "-DCMAKE_SHARED_LINKER_FLAGS=${EMSCRIPTEN_SHARED_LINKER_FLAGS}"
                                                                   -DEMCMAKE_EXE=${EMCMAKE_EXE}
                                                                   -DLIBOPENCOR_BUILD_TYPE=${LIBOPENCOR_BUILD_TYPE}
                                                                   -DLIBOPENCOR_COMPILER_CACHING=${LIBOPENCOR_COMPILER_CACHING}
@@ -81,7 +98,7 @@ if(EMSCRIPTEN OR LIBOPENCOR_JAVASCRIPT_BINDINGS)
                                                                   -DLIBOPENCOR_PREBUILT_LIBSBML=${LIBOPENCOR_PREBUILT_LIBSBML}
                                                                   -DLIBOPENCOR_PREBUILT_LIBSEDML=${LIBOPENCOR_PREBUILT_LIBSEDML}
                                                                   -DLIBOPENCOR_PREBUILT_LIBXML2=${LIBOPENCOR_PREBUILT_LIBXML2}
-                                                                  -DLIBOPENCOR_PREBUILT_LLVMCLANG=${LIBOPENCOR_PREBUILT_LLVMCLANG}
+                                                                  -DLIBOPENCOR_PREBUILT_LLVM=${LIBOPENCOR_PREBUILT_LLVM}
                                                                   -DLIBOPENCOR_PREBUILT_SUNDIALS=${LIBOPENCOR_PREBUILT_SUNDIALS}
                                                                   -DLIBOPENCOR_PREBUILT_ZIPPER=${LIBOPENCOR_PREBUILT_ZIPPER}
                                                                   -DLIBOPENCOR_PREBUILT_ZLIB=${LIBOPENCOR_PREBUILT_ZLIB}

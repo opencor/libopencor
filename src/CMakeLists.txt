@@ -64,16 +64,31 @@ if(RELEASE_MODE AND NOT BUILDING_USING_MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-math-errno -fno-trapping-math")
 endif()
 
-# Enable auto-vectorisation (useful for fixed-step solver loops on x86-64 release builds).
-# Note: we use -march=x86-64-v3 (AVX2) rather than -march=native so that binaries built on one x86-64 machine run on any
-#       other modern x86-64 machine. x86-64-v3 is supported by all CPUs since Intel Haswell (2013) and AMD Excavator
-#       (2015). For ARM64, the compiler defaults already include NEON/ASIMD.
+# Target x86-64-v3 (i.e. AVX2, FMA, etc.) on Intel, so that the compiler can auto-vectorise our code and that of our
+# third-party libraries (e.g., SUNDIALS' dense linear algebra which is where most of the simulation time is spent).
+# Note #1: we use x86-64-v3 rather than the host CPU so that binaries built on one x86-64 machine run on any other
+#          modern x86-64 machine. x86-64-v3 is supported by all CPUs since Intel Haswell (2013) and AMD Excavator
+#          (2015). For ARM64, the compiler defaults already include NEON/ASIMD.
+# Note #2: MSVC only uses FMA instructions if it is allowed to contract floating-point operations, hence /fp:contract.
+# Note #3: we use those flags whatever the build type, so that our release and debug builds give the same results.
+# Note #4: the flags are also passed on to our third-party libraries (see packages.cmake and, for SUNDIALS, which uses
+#          CMAKE_C_FLAGS, src/3rdparty/SUNDIALS/CMakeLists.txt).
+# Note #5: on macOS, we may build for Intel on an ARM machine. Some third-party libraries (e.g., SUNDIALS) run checks
+#          that use CMAKE_C_FLAGS but not CMAKE_OSX_ARCHITECTURES, i.e. that compile for the host architecture which
+#          fails with -march=x86-64-v3 on an ARM machine. So, we use -Xarch_x86_64 to only use -march=x86-64-v3 when
+#          compiling for Intel.
 
-if(RELEASE_MODE AND NOT EMSCRIPTEN AND NOT BUILDING_USING_MSVC)
-    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64|amd64")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64-v3")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64-v3")
+if(INTEL_MODE AND NOT EMSCRIPTEN)
+    if(BUILDING_USING_MSVC)
+        set(X86_64_V3_COMPILER_FLAGS "/arch:AVX2 /fp:contract")
+    elseif(APPLE)
+        set(X86_64_V3_COMPILER_FLAGS "-Xarch_x86_64 -march=x86-64-v3")
+    else()
+        set(X86_64_V3_COMPILER_FLAGS "-march=x86-64-v3")
     endif()
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${X86_64_V3_COMPILER_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${X86_64_V3_COMPILER_FLAGS}")
 endif()
 
 # Enable link-time optimisation (LTO) for release builds to allow cross translation unit inlining and devirtualisation.
@@ -85,6 +100,9 @@ if(RELEASE_MODE AND NOT EMSCRIPTEN AND NOT LIBOPENCOR_CODE_ANALYSIS)
 endif()
 
 # Build our different third-party libraries.
+# Note: for Emscripten, our C/C++ flags are those that src/bindings/javascript/CMakeLists.txt passes on to the
+#       Emscripten build that it kicks off, so our third-party libraries are built with the same flags as libOpenCOR
+#       (see packages.cmake which passes them on to each third-party library).
 
 add_subdirectory(3rdparty)
 
@@ -171,6 +189,7 @@ set(API_MODULE_FILE ${GIT_API_MODULE_FILE})
 set(INTERNAL_SOURCE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/file/filemanager.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/irgenerator.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode.cpp
@@ -247,9 +266,45 @@ set(SOURCE_FILES
     ${INTERNAL_SOURCE_FILES}
 )
 
+# Compile the only files that include LLVM headers without RTTI, as is LLVM itself (see
+# src/3rdparty/LLVM/CMakeLists.txt).
+# Note #1: with RTTI, compilers may emit the typeinfo of some of the LLVM classes that are fully defined in LLVM's
+#          headers (e.g., GCC in release mode, for classes derived from llvm::orc::MaterializationUnit and
+#          llvm::vfs::FileSystem, and Clang in debug mode, for llvm::ErrorInfo<>) and that typeinfo references the
+#          typeinfo of LLVM classes that LLVM doesn't provide since it is built without RTTI.
+# Note #2: those files don't use RTTI (e.g., dynamic_cast or typeid) and nothing uses RTTI on the classes that they
+#          define (e.g., Compiler).
+# Note #3: MSVC doesn't have that problem and to mix /GR and /GR- files is not safe with MSVC's STL (e.g.,
+#          std::function's layout depends on _HAS_STATIC_RTTI), so we only do this for GCC and Clang.
+# Note #4: our WASM version doesn't have that problem either (it doesn't use LLVM's ORC-based JIT) and Emscripten's
+#          Embind requires RTTI.
+# Note #5: without RTTI, Clang emits, in those files, a local copy of the typeinfo of the standard exceptions that
+#          libc++'s inline code may throw (e.g., std::out_of_range for std::vector::at()). The linker then uses that
+#          copy for the whole of libOpenCOR, including for the catch clauses of our third-party libraries (e.g.,
+#          libCellML's catch (std::out_of_range &) around std::stoi()). However, libc++'s type_info comparison never
+#          considers such a copy equal to libc++'s own typeinfo, which is what an exception thrown from within libc++
+#          (e.g., by std::stoi()) uses, so such an exception would never be caught (e.g., libCellML's parser would
+#          terminate the process on a units prefix that is out of the int range). Those files don't use exceptions, so
+#          we also compile them without exceptions on macOS, which means that no such typeinfo gets emitted (libc++
+#          supports mixing files compiled with and without exceptions). This is not needed on Linux since libstdc++'s
+#          throwing code isn't inline and its type_info comparison relies on names.
+
+if(NOT EMSCRIPTEN AND NOT BUILDING_USING_MSVC)
+    set(NO_RTTI_COMPILE_OPTIONS -fno-rtti)
+
+    if(APPLE)
+        list(APPEND NO_RTTI_COMPILE_OPTIONS -fno-exceptions)
+    endif()
+
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.cpp
+                                ${CMAKE_CURRENT_SOURCE_DIR}/misc/irgenerator.cpp
+                                PROPERTIES COMPILE_OPTIONS "${NO_RTTI_COMPILE_OPTIONS}")
+endif()
+
 set(INTERNAL_HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/compiler.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/irgenerator.h
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/utils.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solver_p.h
     ${CMAKE_CURRENT_SOURCE_DIR}/solver/solvercvode_p.h
@@ -308,28 +363,23 @@ if(EMSCRIPTEN)
                    ${SOURCE_FILES}
                    ${HEADER_FILES})
 
-    # Preserve Emscripten thread/shared-memory support for libOpenCOR and for its third-party libraries.
-
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -matomics -mbulk-memory -pthread -sSHARED_MEMORY=1" CACHE STRING "Emscripten C flags" FORCE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -matomics -mbulk-memory -pthread -sSHARED_MEMORY=1" CACHE STRING "Emscripten C++ flags" FORCE)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -sALLOW_TABLE_GROWTH -sINITIAL_TABLE=65536 -sSHARED_MEMORY=1" CACHE STRING "Emscripten exe linker flags" FORCE)
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -sSHARED_MEMORY=1" CACHE STRING "Emscripten shared linker flags" FORCE)
-
     # Set the flags for our generated .js and .wasm files.
     # Note #1: for compiling, we use -O3 to get the best performance, -matomics to enable atomic operations,
     #          -mbulk-memory to enable bulk memory operations, -pthread to enable native threading support,
     #          -sSHARED_MEMORY=1 to enable shared memory support, and -DNDEBUG to disable debugging information (it is
     #          not needed in production).
-    # Note #2: for linking, we use -O3 to get the best performance, -flto to enable link-time optimisation, -pthread to
-    #          enable native threading support, -sALLOW_TABLE_GROWTH to allow the WebAssembly table to grow,
-    #          -sASSERTIONS=0 to disable assertions (they are not needed in production), -sEXPORT_ES6=1 to export ES6
-    #          modules, -sEXPORTED_FUNCTIONS to export the functions we need, -sEXPORTED_RUNTIME_METHODS to export the
-    #          runtime methods we need, -sINITIAL_MEMORY=2GB to have enough memory for "big" models,
-    #          -sINITIAL_TABLE=65536 to have enough space for our WebAssembly table, -sINLINING_LIMIT to increase the
-    #          inlining limit, -sMODULARIZE=1 to generate a module factory function, -sSHARED_MEMORY=1 to enable shared
-    #          memory support, -sSTACK_SIZE=8MB to reserve a reasonable amount of memory for the stack at startup (which
-    #          is needed for "big" models), --bind to generate the necessary Embind bindings, and --emit-tsd to generate
-    #          a TypeScript type definitions file.
+    # Note #2: for linking, we use -O2 (rather than -O3) since our compressed .wasm file is then smaller with no loss of
+    #          performance (and it links faster), -flto to use the LTO version of Emscripten's system libraries and to
+    #          optimise LLVM, which we build as LLVM bitcode (see src/3rdparty/LLVM/CMakeLists.txt; our other object
+    #          files are not LTO ones), -pthread to enable native threading support, -sALLOW_TABLE_GROWTH to allow the
+    #          WebAssembly table to grow, -sASSERTIONS=0 to disable assertions (they are not needed in production),
+    #          -sEXPORT_ES6=1 to export ES6 modules, -sEXPORTED_FUNCTIONS to export the functions we need (i.e. those
+    #          needed by the WebAssembly modules that we generate for our models, see initialiseWorkerWasmJS()),
+    #          -sEXPORTED_RUNTIME_METHODS to export the runtime methods we need, -sINITIAL_MEMORY=2GB to have enough
+    #          memory for "big" models, -sMODULARIZE=1 to generate a module factory function, -sSHARED_MEMORY=1 to
+    #          enable shared memory support, -sSTACK_SIZE=8MB to reserve a reasonable amount of memory for the stack at
+    #          startup (which is needed for "big" models), --bind to generate the necessary Embind bindings, and
+    #          --emit-tsd to generate a TypeScript type definitions file.
     # Note #3: for linking, we used to have -sALLOW_MEMORY_GROWTH=1, -sINITIAL_MEMORY=256MB, and -sMAXIMUM_MEMORY=2GB,
     #          but we now support threading and to allow memory growth might non-WASM code to run slowly. So, now, we
     #          use -sINITIAL_MEMORY=2GB and don't allow memory growth.
@@ -344,17 +394,15 @@ if(EMSCRIPTEN)
                            -sSHARED_MEMORY=1
                            -DNDEBUG)
     target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
-                        -O3
+                        -O2
                         -flto
                         -pthread
                         -sALLOW_TABLE_GROWTH
                         -sASSERTIONS=0
                         -sEXPORT_ES6=1
-                        -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_pow,_sqrt,_fabs,_exp,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
+                        -sEXPORTED_FUNCTIONS=[_free,_malloc,_memset,_nlaSolverAddress,_wasmNlaSolve,_pow,_sqrt,_fabs,_exp,_exp2,_log,_log10,_ceil,_floor,_fmin,_fmax,_fmod,_sin,_cos,_tan,_sinh,_cosh,_tanh,_asin,_acos,_atan,_asinh,_acosh,_atanh]
                         -sEXPORTED_RUNTIME_METHODS=HEAPU8
                         -sINITIAL_MEMORY=2GB
-                        -sINITIAL_TABLE=65536
-                        -sINLINING_LIMIT
                         -sMODULARIZE=1
                         -sSHARED_MEMORY=1
                         -sSTACK_SIZE=8MB
@@ -458,11 +506,18 @@ else()
             message(FATAL_ERROR "staticarchiveextractor could not be built.")
         endif()
 
-        # Retrieve the path to our various packages.
+        # Retrieve the path to the libraries of the packages that we use.
+        # Note: we only look for them in the directories of those packages since PREBUILT_DIR may contain other packages
+        #       (e.g., one that has since been renamed), which libraries we must not merge into our static library.
 
         set(PACKAGES_DIR ${CMAKE_BINARY_DIR}/packages)
+        set(PACKAGES)
 
-        file(GLOB_RECURSE PACKAGES ${PREBUILT_DIR}/*${CMAKE_STATIC_LIBRARY_SUFFIX})
+        foreach(AVAILABLE_PACKAGE ${AVAILABLE_PACKAGES})
+            file(GLOB_RECURSE AVAILABLE_PACKAGE_LIBRARIES ${PREBUILT_DIR}/${AVAILABLE_PACKAGE}/*${CMAKE_STATIC_LIBRARY_SUFFIX})
+
+            list(APPEND PACKAGES ${AVAILABLE_PACKAGE_LIBRARIES})
+        endforeach()
 
         # Extract the object files from our various packages, handling duplicate object names.
 
@@ -571,6 +626,48 @@ elseif(BUILDING_USING_CLANG)
 
     if(XCODE_VERSION VERSION_LESS 15.0)
         add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,-undefined,error)
+    endif()
+endif()
+
+# On Linux, in release mode (unless we are doing code coverage), put each of our functions and data in its own section,
+# so that the linker can remove the ones that we don't use, be it when linking our shared library or our Python module
+# (which embeds our static library). Our third-party libraries are built the same way (see THIRD_PARTY_C_FLAGS in
+# cmake/packages.cmake).
+
+if(NOT WIN32 AND NOT APPLE AND NOT EMSCRIPTEN AND RELEASE_MODE AND NOT LIBOPENCOR_CODE_COVERAGE)
+    add_compiler_flags(${CMAKE_PROJECT_NAME} -ffunction-sections -fdata-sections)
+endif()
+
+# Only export our own symbols from our shared library and, in release mode (unless we are doing code coverage, so as not
+# to affect our code coverage reports), have the linker remove the code that we don't use and discard our local symbols.
+# Note #1: our third-party libraries (e.g., LLVM) are static libraries which symbols have default visibility. So,
+#          without this, our shared library would export all of them, which would prevent the linker from removing any
+#          of their code that we don't use and, on Linux, would allow another copy of LLVM in the same process (e.g.,
+#          one from another Python module) to interpose its symbols with ours.
+# Note #2: on Windows, a DLL only exports the symbols that are explicitly marked as such and, in release mode, MSVC's
+#          linker removes unreferenced code by default, so there is nothing for us to do.
+# Note #3: on macOS, there is no equivalent of --exclude-libs, so we only export the symbols that have "libOpenCOR" in
+#          their (mangled) name. This is fine since our own code is built with hidden visibility (see
+#          CXX_VISIBILITY_PRESET above), so the only symbols of ours that could be exported are those that we export on
+#          purpose and they are all in the libOpenCOR namespace.
+
+if(LIBOPENCOR_SHARED_LIBS AND NOT EMSCRIPTEN)
+    if(APPLE)
+        set(EXPORTED_SYMBOLS_FILE ${CMAKE_CURRENT_BINARY_DIR}/exportedsymbols.txt)
+
+        file(WRITE ${EXPORTED_SYMBOLS_FILE} "*libOpenCOR*\n")
+
+        add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,-exported_symbols_list,${EXPORTED_SYMBOLS_FILE})
+
+        if(RELEASE_MODE AND NOT LIBOPENCOR_CODE_COVERAGE)
+            add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,-dead_strip -Wl,-x)
+        endif()
+    elseif(NOT WIN32)
+        add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,--exclude-libs,ALL)
+
+        if(RELEASE_MODE AND NOT LIBOPENCOR_CODE_COVERAGE)
+            add_linker_flags(${CMAKE_PROJECT_NAME} -Wl,--gc-sections -Wl,-x)
+        endif()
     endif()
 endif()
 

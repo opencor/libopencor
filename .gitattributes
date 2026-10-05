@@ -1,0 +1,4 @@
+# Patches are applied with git apply, which requires LF line endings, so make sure that they are always checked out with
+# LF line endings, whatever the platform (e.g., Git on Windows checks out text files with CRLF line endings by default).
+
+*.patch text eol=lf

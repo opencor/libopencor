@@ -28,7 +28,19 @@ class CellmlFileRuntime::Impl: public Logger::Impl
 public:
     CompilerPtr mCompiler {nullptr};
 #ifdef __EMSCRIPTEN__
+    // A unique identifier for our WebAssembly code, so that each JavaScript worker can cache its compiled version (see
+    // initialiseWorkerWasmJS()).
+    // Note: we don't use the address of our WebAssembly code since, once we are deleted, another runtime may reuse it.
+
+    int mWasmModuleId {0};
+
+    // The size, in bytes, of the stack of our WebAssembly instances (see initialiseWorkerWasm()), i.e. the size that our
+    // compiler tells us our WebAssembly code needs plus a safety margin.
+
+    static constexpr size_t WASM_STACK_MARGIN_SIZE {65536};
+
     UnsignedChars mWasmModule;
+    size_t mWasmStackSize {WASM_STACK_MARGIN_SIZE};
 #endif
 
     InitialiseArraysForAlgebraicModel mInitialiseArraysForAlgebraicModel {nullptr};
@@ -44,9 +56,6 @@ public:
     ~Impl() override;
 
     void initialiseWorkerWasm() const;
-    void cleanupWorkerWasm() const;
-
-    void setNlaSolverAddress(uintptr_t pAddress) const;
 #endif
 
     CellmlFileRuntime::InitialiseArraysForAlgebraicModel initialiseArraysForAlgebraicModel() const;

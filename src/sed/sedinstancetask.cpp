@@ -240,14 +240,12 @@ void SedInstanceTask::Impl::initialise()
     mRuntime->initialiseWorkerWasm();
 #endif
 
-    // Set the NLA solver address so JIT-compiled code can resolve it at runtime.
+    // Set the NLA solver address so that our compiled code can resolve it at runtime and forget about any NLA system
+    // that could not be solved in a previous run.
 
     if (mNlaSolver != nullptr) {
-#ifdef __EMSCRIPTEN__
-        mRuntime->setNlaSolverAddress(reinterpret_cast<uintptr_t>(mNlaSolver.get()));
-#else
         setNlaSolverAddress(reinterpret_cast<uintptr_t>(mNlaSolver.get()));
-#endif
+        resetNlaSolveFailed();
     }
 
     // Initialise our model, which means that for an ODE/DAE model we need to initialise our states, rates, and
@@ -273,9 +271,9 @@ void SedInstanceTask::Impl::initialise()
         mRuntime->computeVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
     }
 
-    // Make sure that the NLA solver, should it have been used, didn't report any issues.
+    // Make sure that our NLA systems, if any, could all be solved.
 
-    if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+    if ((mNlaSolver != nullptr) && nlaSolveFailed()) {
         addIssues(mNlaSolver, mNlaSolver->name());
 
         return;
@@ -336,6 +334,7 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
     auto *odeSolverPimpl {mOdeSolver->pimpl()};
     size_t voiCounter {0};
 
+    const auto computeRates = mRuntime->computeRates();
     const auto computeVariablesForDifferentialModel = mRuntime->computeVariablesForDifferentialModel();
 
     while (!fuzzyCompare(mVoi, pVoiEnd)) {
@@ -368,6 +367,13 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
         // Update our model's state.
 
         if (!odeSolverPimpl->solve(mVoi, std::min(pVoiStart + static_cast<double>(++voiCounter) * pVoiInterval, pVoiEnd))) {
+            // Note: an NLA system that could not be solved is a likely reason for our ODE solver to have failed (see
+            //       rhsFunction() in solvercvode.cpp).
+
+            if ((mNlaSolver != nullptr) && nlaSolveFailed()) {
+                addIssues(mNlaSolver, mNlaSolver->name());
+            }
+
             addIssues(mOdeSolver, mOdeSolver->name());
 
             guard();
@@ -375,29 +381,35 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
             return;
         }
 
+        // Compute our rates and variables at the point that we have reached, i.e. the point that we are going to
+        // report.
+        // Note #1: this also means that our rates are up to date the next time we call our ODE solver (see
+        //          SolverOde::Impl::solve()).
+        // Note #2: we compute our variables even when we don't track our results (i.e. when we run our simulation from
+        //          its initial time to its output start time). Indeed, computeVariables() may solve some NLA systems,
+        //          which use the current value of their unknowns as an initial guess, so computing them at each output
+        //          interval keeps that initial guess close to the solution. Otherwise, computeVariables() is cheap since
+        //          most of our algebraic variables are computed by computeRates().
+
+        computeRates(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         computeVariablesForDifferentialModel(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
 
-        //---GRY--- WE NEED TO CHECK FOR POSSIBLE NLA ISSUES, BUT FOR CODE COVERAGE WE NEED A MODEL THAT WOULD TRIGGER
-        //          NLA ISSUES HERE, WHICH WE DON'T HAVE YET HENCE WE DISABLE THE FOLLOWING CODE WHEN DOING CODE
-        //          COVERAGE.
+        // Make sure that our NLA systems, if any, could all be solved, be it by our ODE solver or by us.
 
-#ifndef CODE_COVERAGE_ENABLED
-        if ((mNlaSolver != nullptr) && mNlaSolver->hasIssues()) {
+        if ((mNlaSolver != nullptr) && nlaSolveFailed()) {
             addIssues(mNlaSolver, mNlaSolver->name());
 
             guard();
 
             return;
         }
-#endif
 
-        // Update our progress.
-
-        mCompletedSteps.fetch_add(1, std::memory_order_relaxed);
-
-        // Track our results, if needed.
+        // Update our progress and track our results, if needed.
+        // Note: our progress is only about the steps for which we track our results (see run() below).
 
         if (pTrackResults) {
+            mCompletedSteps.fetch_add(1, std::memory_order_relaxed);
+
             trackResults(++index);
         }
     }

@@ -16,11 +16,12 @@ limitations under the License.
 
 #include "solvercvode_p.h"
 
-#include "cvodes/cvodes.h"
-#include "cvodes/cvodes_bandpre.h"
-#include "cvodes/cvodes_diag.h"
+#include "cvode/cvode.h"
+#include "cvode/cvode_bandpre.h"
+#include "cvode/cvode_diag.h"
 #include "nvector/nvector_serial.h"
 #include "sedml/SedAlgorithm.h"
+#include "solvernla_p.h"
 #include "sunlinsol/sunlinsol_band.h"
 #include "sunlinsol/sunlinsol_dense.h"
 #include "sunlinsol/sunlinsol_spbcgs.h"
@@ -28,6 +29,7 @@ limitations under the License.
 #include "sunlinsol/sunlinsol_sptfqmr.h"
 #include "sunnonlinsol/sunnonlinsol_fixedpoint.h"
 
+#include <cmath>
 #include <utility>
 
 namespace libOpenCOR {
@@ -99,12 +101,18 @@ void errorHandler(int pLine, const char *pFunction, const char *pFile, const cha
 
 int rhsFunction(double pVoi, N_Vector pStates, N_Vector pRates, void *pUserData)
 {
+    // Compute our rates and, if an NLA system could not be solved, let CVODE know that our rates could not be computed
+    // (a recoverable error since we might be able to solve our NLA systems with a smaller step, in which case CVODE
+    // calls us again).
+
     auto *userData {static_cast<SolverCvodeUserData *>(pUserData)};
+
+    resetNlaSolveFailed();
 
     userData->computeRates(pVoi, N_VGetArrayPointer_Serial(pStates), N_VGetArrayPointer_Serial(pRates),
                            userData->constants, userData->computedConstants, userData->algebraicVariables);
 
-    return 0;
+    return nlaSolveFailed() ? 1 : 0;
 }
 
 } // namespace
@@ -862,10 +870,6 @@ bool SolverCvode::Impl::solve(double &pVoi, double pVoiEnd)
 
         return false;
     }
-
-    // Make sure the rates are up to date.
-
-    computeRates(pVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraic);
 
     return true;
 }

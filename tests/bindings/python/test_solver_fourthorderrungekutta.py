@@ -44,6 +44,7 @@ def test_step_value_with_invalid_number():
 
 
 def fourth_order_runge_kutta_solve(
+    step,
     state_values,
     state_abs_tols,
     rate_values,
@@ -60,7 +61,7 @@ def fourth_order_runge_kutta_solve(
     simulation = document.simulations[0]
     solver = loc.SolverFourthOrderRungeKutta()
 
-    solver.step = 0.0123
+    solver.step = step
 
     simulation.ode_solver = solver
 
@@ -81,7 +82,7 @@ def fourth_order_runge_kutta_solve(
 
 state_values = [-63.821233, 0.134844, 0.984267, 0.741105]
 state_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
-rate_values = [49.702735, -0.127922, -0.051225, 0.098266]
+rate_values = [49.702732, -0.127922, -0.051225, 0.098266]
 rate_abs_tols = [0.000001, 0.000001, 0.000001, 0.000001]
 constant_values = [1.0, 0.0, 0.3, 120.0, 36.0]
 constant_abs_tols = [0.0, 0.0, 0.0, 0.0, 0.0]
@@ -115,6 +116,7 @@ algebraic_abs_tols = [
 
 def test_solve():
     fourth_order_runge_kutta_solve(
+        0.0123,
         state_values,
         state_abs_tols,
         rate_values,
@@ -124,5 +126,34 @@ def test_solve():
         computed_constant_values,
         computed_constant_abs_tols,
         algebraic_values,
+        algebraic_abs_tols,
+    )
+
+
+def test_solve_with_several_steps_per_output_point():
+    # Note: the output interval is 0.001, hence our step means that we have several steps per output point.
+
+    fourth_order_runge_kutta_solve(
+        0.00023,
+        [-63.877006, 0.134985, 0.984324, 0.740991],
+        state_abs_tols,
+        [49.717088, -0.12809, -0.051025, 0.098505],
+        rate_abs_tols,
+        constant_values,
+        constant_abs_tols,
+        computed_constant_values,
+        computed_constant_abs_tols,
+        [
+            0.0,
+            -15.979202,
+            -823.500731,
+            789.762845,
+            3.969036,
+            0.115045,
+            0.002871,
+            0.967318,
+            0.541245,
+            0.056253,
+        ],
         algebraic_abs_tols,
     )

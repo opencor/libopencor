@@ -26,42 +26,42 @@ if(LIBOPENCOR_PREBUILT_OPENSSL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 40307b2d211297948e9a58dcc2a4620fb96712a5)
+                                 5083a22125d7ab2bc68b2a63275ef41c5fd6d75e)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 5426fa6d6e82d062736736b2b3a39b580d791f54)
+                                 b1699f5cb9b30e04079d2309ffe8bcd8f48ec271)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 ea5657e94b1f391e991a8edf7e42c41e760ddd26)
+                                 fd4088750d2d7f7e1146f656f7c72e82031e631a)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 fb9ca26faf1c1643183262e98e7c38fedc6fa535)
+                                 468925470176a8d760a5e880acbb5410aab19f96)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f266f77bfe238c0714daee27df8e0ef938f0a00a)
+                             ab45c6f3050634eb4e4cd64ee1c970608e744260)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             cf4fa1aeac45f584c24d0ad5cde70e8ddd0a9fcf)
+                             f18906f318092ce07ecc58bcd4cca8586d3cace0)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             b8301e4ca3cee1e4f6cf90b29c64857f14273244)
+                             e341eb50386e75cb4a969116b7d8646af3bee227)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             f63b191509678142efd04c5c6529e881209bcec1)
+                             aa382a1a8ada45ab0c022b24a171fbc4b6f0f5e5)
         endif()
     endif()
 else()
@@ -87,10 +87,35 @@ else()
         find_package(Perl REQUIRED QUIET)
     endif()
 
-    set(CONFIG_OPTIONS no-shared no-tests no-threads --prefix=${INSTALL_DIR})
+    # Configure OpenSSL.
+    # Note: OpenSSL is only used by libcurl, which libOpenCOR only uses to download files over HTTPS. So, we only keep
+    #       what a TLS 1.2/1.3 client needs (e.g., RSA, EC, X25519/X448, AES, ChaCha20-Poly1305, SHA-2/3, HKDF, and
+    #       ML-KEM) and disable everything else (e.g., the OpenSSL command-line tool, the legacy provider, engines,
+    #       deprecated APIs, TLS 1.0/1.1, DTLS, QUIC, error strings, the automatic loading of OpenSSL's configuration
+    #       file, and many algorithms that are either obsolete or not used by TLS). This matters since OpenSSL's default
+    #       provider references every algorithm that is built, so the linker cannot remove the ones that we don't use.
+
+    set(CONFIG_OPTIONS no-shared no-tests
+                       no-apps no-argon2 no-aria no-autoload-config no-bf no-blake2 no-camellia no-cast no-cmp no-cms
+                       no-comp no-ct no-deprecated no-des no-docs no-dsa no-dtls no-ec2m no-engine no-err no-gost
+                       no-http no-idea no-legacy no-md4 no-mdc2 no-ml-dsa no-module no-nextprotoneg no-ocb no-ocsp
+                       no-psk no-quic no-rc2 no-rc4 no-rc5 no-rfc3779 no-rmd160 no-scrypt no-seed no-siphash no-siv
+                       no-slh-dsa no-sm2 no-sm3 no-sm4 no-srp no-srtp no-ssl-trace no-ssl3 no-tls-deprecated-ec no-tls1
+                       no-tls1_1 no-ts no-ui-console no-whirlpool
+                       --prefix=${INSTALL_DIR})
 
     if(WIN32)
         list(APPEND CONFIG_OPTIONS no-asm)
+
+        # On ARM, MSVC 2026 may call __chkstk() before saving the link register in a function's prologue, meaning that
+        # the function then returns into its own prologue and crashes. This is notably the case for
+        # tls_parse_all_extensions(), i.e. every TLS handshake. OpenSSL builds with /Gs0, i.e. it probes the stack in
+        # every function with a stack frame, so we restore MSVC's default threshold (i.e. /Gs4096), which avoids the
+        # issue.
+
+        if(NOT INTEL_MODE)
+            list(APPEND CONFIG_OPTIONS -Gs4096)
+        endif()
 
         if(RELEASE_MODE)
             if(INTEL_MODE)
@@ -120,7 +145,23 @@ else()
             set(PLATFORM linux-aarch64)
         endif()
 
-        list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack")
+        # Put each function and data in its own section, so that the linker can remove the ones that we don't use (see
+        # THIRD_PARTY_C_FLAGS in cmake/packages.cmake).
+
+        list(APPEND CONFIG_OPTIONS "-Wa,--noexecstack" -ffunction-sections -fdata-sections)
+    endif()
+
+    # Build OpenSSL for x86-64-v3 on Intel, like our other third-party libraries (see X86_64_V3_COMPILER_FLAGS in
+    # src/CMakeLists.txt and cmake/packages.cmake), something that we need to do ourselves since OpenSSL is not built
+    # using CMake.
+    # Note: OpenSSL's Configure script only accepts compiler options that start with "-", so we replace the leading "/"
+    #       of MSVC's options with "-" (which MSVC also accepts).
+
+    if(X86_64_V3_COMPILER_FLAGS)
+        separate_arguments(OPENSSL_X86_64_V3_COMPILER_FLAGS UNIX_COMMAND "${X86_64_V3_COMPILER_FLAGS}")
+
+        list(TRANSFORM OPENSSL_X86_64_V3_COMPILER_FLAGS REPLACE "^/" "-")
+        list(APPEND CONFIG_OPTIONS ${OPENSSL_X86_64_V3_COMPILER_FLAGS})
     endif()
 
     build_package(${PACKAGE_NAME}

@@ -136,3 +136,42 @@ def test_parallel_async_lifecycle():
     for instance in instances:
         assert instance.status == loc.SedInstance.Status.Idle
         assert not instance.has_issues
+
+
+def test_parallel_instances_with_nla_systems():
+    # Make sure that simulations of a model with NLA systems don't interfere with one another when run in parallel, i.e.
+    # that they give the same results as when run sequentially.
+
+    INSTANCE_COUNT = 3
+
+    cellml_file = loc.File(utils.resource_path("api/sed/dae/model.cellml"))
+    sedml_file = loc.File(utils.resource_path("api/sed/dae/model.sedml"))
+    document = loc.SedDocument(sedml_file)
+
+    def results(instance):
+        instance_task = instance.tasks[0]
+
+        return [list(instance_task.state(0)), list(instance_task.algebraic_variable(0))]
+
+    sequential_instance = document.instantiate()
+
+    sequential_instance.run()
+
+    assert not sequential_instance.has_issues
+
+    expected_results = results(sequential_instance)
+    instances = []
+
+    for _ in range(INSTANCE_COUNT):
+        instances.append(document.instantiate())
+
+    for instance in instances:
+        assert instance.start_run() is True
+
+    for instance in instances:
+        assert instance.wait_for_run() > 0.0
+
+    for instance in instances:
+        assert instance.progress == 1.0
+        assert not instance.has_issues
+        assert results(instance) == expected_results

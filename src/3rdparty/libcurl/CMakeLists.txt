@@ -30,46 +30,64 @@ if(LIBOPENCOR_PREBUILT_LIBCURL)
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 7caa5983ec3e73d56599abc322ac735d69c553ed)
+                                 93e615f0b8d37e1c5b9d137c07c8208e1e91c2e0)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 b0edf62d583e67d103f44dec59422a9691adf730)
+                                 7026f4c861aa11bbd20c2e03783e10753a8198e1)
             endif()
         else()
             if(INTEL_MODE)
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 18e3cc098e1ee07dde8fd4d6af2fa7c88a7c6706)
+                                 a63607630737ddc07e441e81cb75d1e37bfa3bd7)
             else()
                 retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                                  ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                                 93a33eebc0458d5cb51b70e2692a8875a211e306)
+                                 c8f8502a5461fe8234bac38d8e66785fe0e64df2)
             endif()
         endif()
     elseif(APPLE)
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             0c98e2c0597fe3e4e69503518ce358a8cfebaa89)
+                             66fa033d35b6b05e1143b704fc007f2ed2d00f0e)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             9c79cd7e51e80f8540f0ed828e78f6ab69691e3f)
+                             920519b5ce7e9845d44e00224f4fa74f92032618)
         endif()
     else()
         if(INTEL_MODE)
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             bf2cd15376132d146d0b13ee35a95cb9967b6e81)
+                             79c2650e289ed89c13497cea1926c9401b21662f)
         else()
             retrieve_package(${PACKAGE_NAME} ${PACKAGE_VERSION}
                              ${PACKAGE_REPOSITORY} ${RELEASE_TAG}
-                             90a10d85a6b32d9c67534274a5f095fb574ccfa1)
+                             d668704bba25e567cb8cdd871f509a84149c13c1)
         endif()
     endif()
 else()
     # Build our package.
+    # Note #1: libOpenCOR only uses libcurl to download files over HTTP(S) (following redirects, if needed), so we only
+    #          build its HTTP(S) support and disable the features that we don't use (e.g., cookies, HSTS, DoH, MIME,
+    #          WebSockets, and most authentication methods, incl. NTLM) as well as libcurl's verbose strings (since we
+    #          never report libcurl's messages). We don't need zlib either since we never ask for compressed content.
+    #          However, we keep proxy support (and Basic authentication) since libcurl honours the http_proxy,
+    #          https_proxy, and no_proxy environment variables, which some users may rely on.
+    # Note #2: we prepend our OpenSSL include directory to CMAKE_C_FLAGS so that it comes before any other include
+    #          directory. Otherwise, on macOS (Intel), libcurl gets compiled against Homebrew's OpenSSL headers (in
+    #          /usr/local/include), which are configured differently from our OpenSSL (e.g., with engine and OCSP
+    #          support), and linking against our OpenSSL libraries then fails.
+
+    if(THIRD_PARTY_C_FLAGS)
+        set(LIBCURL_C_FLAGS ${THIRD_PARTY_C_FLAGS})
+    else()
+        set(LIBCURL_C_FLAGS ${CMAKE_C_FLAGS_INIT})
+    endif()
+
+    string(STRIP "-I${OPENSSL_INCLUDE_DIR} ${LIBCURL_C_FLAGS}" LIBCURL_C_FLAGS)
 
     build_package(${PACKAGE_NAME}
         URL
@@ -79,21 +97,47 @@ else()
             -DCURL_BROTLI=OFF
             -DCURL_ZSTD=OFF
             -DBUILD_CURL_EXE=OFF
+            -DBUILD_EXAMPLES=OFF
             -DBUILD_LIBCURL_DOCS=OFF
+            -DBUILD_MISC_DOCS=OFF
             -DBUILD_TESTING=OFF
             ${CMAKE_ARGS}
+            -DCMAKE_C_FLAGS=${LIBCURL_C_FLAGS}
             -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+            -DCURL_DISABLE_ALTSVC=ON
+            -DCURL_DISABLE_AWS=ON
+            -DCURL_DISABLE_BEARER_AUTH=ON
+            -DCURL_DISABLE_BINDLOCAL=ON
+            -DCURL_DISABLE_COOKIES=ON
+            -DCURL_DISABLE_DIGEST_AUTH=ON
+            -DCURL_DISABLE_DOH=ON
+            -DCURL_DISABLE_FORM_API=ON
+            -DCURL_DISABLE_GETOPTIONS=ON
+            -DCURL_DISABLE_HEADERS_API=ON
+            -DCURL_DISABLE_HSTS=ON
+            -DCURL_DISABLE_KERBEROS_AUTH=ON
             -DCURL_DISABLE_LDAP=ON
+            -DCURL_DISABLE_MIME=ON
+            -DCURL_DISABLE_NEGOTIATE_AUTH=ON
+            -DCURL_DISABLE_NETRC=ON
+            -DCURL_DISABLE_NTLM=ON
+            -DCURL_DISABLE_OPENSSL_AUTO_LOAD_CONFIG=ON
+            -DCURL_DISABLE_PARSEDATE=ON
+            -DCURL_DISABLE_PROGRESS_METER=ON
+            -DCURL_DISABLE_SHA512_256=ON
+            -DCURL_DISABLE_SRP=ON
+            -DCURL_DISABLE_VERBOSE_STRINGS=ON
+            -DCURL_DISABLE_WEBSOCKETS=ON
             -DCURL_USE_LIBPSL=OFF
+            -DCURL_USE_LIBSSH2=OFF
             -DCURL_USE_OPENSSL=ON
+            -DCURL_ZLIB=OFF
             -DENABLE_CURL_MANUAL=OFF
-            -DLIBSSH2_INCLUDE_DIR=${LIBSSH2_INCLUDE_DIR}
-            -DLIBSSH2_LIBRARY=${LIBSSH2_LIBRARY_FILE}
+            -DENABLE_UNIX_SOCKETS=OFF
+            -DHTTP_ONLY=ON
             -DOPENSSL_ROOT_DIR=${OPENSSL_ROOT_DIR}
             -DUSE_LIBIDN2=OFF
             -DUSE_NGHTTP2=OFF
-            -DZLIB_INCLUDE_DIR=${ZLIB_INCLUDE_DIR}
-            -DZLIB_LIBRARY=${ZLIB_LIBRARY_FILE}
     )
 
     # Patch some of our CMake configuration files.
@@ -110,12 +154,11 @@ else()
 
     file(READ ${CONFIG_FILE} FILE_CONTENTS)
 
-    string(REPLACE "CURL::libssh2" "${LIBSSH2_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "CURL::OpenSSL_Crypto" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "CURL::OpenSSL_SSL" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "CURL::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "OpenSSL::Crypto" "${OPENSSL_LIBCRYPTO_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
+    string(REPLACE "OpenSSL::SSL" "${OPENSSL_LIBSSL_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
     string(REPLACE "Threads::Threads" "" FILE_CONTENTS "${FILE_CONTENTS}")
-    string(REPLACE "ZLIB::ZLIB" "${ZLIB_LIBRARY}" FILE_CONTENTS "${FILE_CONTENTS}")
 
     if(APPLE)
         string(REGEX REPLACE "/Applications/Xcode.*\.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/lib" "$<LINK_ONLY:" FILE_CONTENTS "${FILE_CONTENTS}")

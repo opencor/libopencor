@@ -37,11 +37,11 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     # Check whether we need to provide glibc compatibility wrappers for __isoc23_strtol(), __isoc23_strtoll(),
     # __isoc23_strtoul(), __isoc23_strtoull() (glibc 2.38+), and arc4random(), arc4random_buf(), arc4random_uniform()
-    # (glibc 2.36+). These are referenced by our prebuilt LLVM+Clang and libssh2 libraries which are compiled using
-    # glibc 2.38+ (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that use glibc
-    # 2.38+, so we need compatibility wrappers to build Python wheels. Each symbol group is guarded independently so
-    # that only the wrappers for actually missing functions are compiled into the module, avoiding weak-symbol
-    # interposition against the native glibc implementation.
+    # (glibc 2.36+). These are referenced by our prebuilt LLVM and libcurl libraries which are compiled using glibc
+    # 2.38+ (Ubuntu 24.04 LTS on GitHub Actions), but there are currently no versions of manylinux that use glibc 2.38+,
+    # so we need compatibility wrappers to build Python wheels. Each symbol group is guarded independently so that only
+    # the wrappers for actually missing functions are compiled into the module, avoiding weak-symbol interposition
+    # against the native glibc implementation.
 
     set(ACTUAL_PYTHON_SOURCE_FILES ${PYTHON_SOURCE_FILES})
 
@@ -94,6 +94,28 @@ if(LIBOPENCOR_PYTHON_BINDINGS)
 
     target_link_libraries(${PYTHON_BINDINGS_TARGET} PRIVATE
                           $<TARGET_NAME:${CMAKE_PROJECT_NAME}>)
+
+    # Only export our Python module's initialisation function and, in release mode on Linux, have the linker remove the
+    # code that we don't use (nanobind already does this on macOS).
+    # Note: our Python module embeds libOpenCOR's static library which embeds all of our third-party libraries and which
+    #       symbols have default visibility. So, without this, our Python module would export all of them, which would
+    #       prevent the linker from removing any of their code that we don't use and, on Linux, would allow another copy
+    #       of LLVM in the same Python process (e.g., one from another Python module) to interpose its symbols with
+    #       ours. On Windows, a DLL only exports the symbols that are explicitly marked as such, so there is nothing for
+    #       us to do.
+
+    if(APPLE)
+        target_link_options(${PYTHON_BINDINGS_TARGET} PRIVATE
+                            -Wl,-exported_symbol,_PyInit_module)
+    elseif(NOT WIN32)
+        target_link_options(${PYTHON_BINDINGS_TARGET} PRIVATE
+                            -Wl,--exclude-libs,ALL)
+
+        if(RELEASE_MODE)
+            target_link_options(${PYTHON_BINDINGS_TARGET} PRIVATE
+                                -Wl,--gc-sections)
+        endif()
+    endif()
 
     add_custom_command(TARGET ${PYTHON_BINDINGS_TARGET} POST_BUILD
                        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PYTHON_BINDINGS_TARGET}>

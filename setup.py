@@ -30,7 +30,7 @@ setup(
     author="libOpenCOR contributors",
     url="https://opencor.ws/libopencor/",
     license="Apache-2.0",
-    python_requires=">=3.12, <3.15",
+    python_requires=">=3.12",
     install_requires=["numpy"],
     packages=["libopencor"],
     package_dir={"": "src/bindings/python"},
@@ -42,6 +42,11 @@ setup(
     ],
     cmake_install_dir="src/bindings/python/libopencor",
     exclude_package_data={"": ["bin/*", "cmake/*", "include/*", "lib/*"]},
+    options={"bdist_wheel": {"py_limited_api": "cp312"}},
+    # Note: our Python module only uses Python's stable ABI (see STABLE_ABI in src/bindings/python/CMakeLists.txt),
+    #       which nanobind supports from Python 3.12, so tag our wheel as such (i.e. cp312-abi3) rather than as a wheel
+    #       for the version of Python with which it was built. This means that a wheel built with Python 3.12 can also
+    #       be used with later versions of Python.
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",

@@ -51,14 +51,9 @@ test.describe('Version tests', () => {
     assert.strictEqual(loc.versionString(), `${majorVersion}.${date}.${patchVersion}`);
   });
 
-  test('Clang', () => {
-    assert.strictEqual(loc.clangVersion(), 0x220108);
-    assert.strictEqual(loc.clangVersionString(), '22.1.8');
-  });
-
   test('libCellML', () => {
-    assert.strictEqual(loc.libcellmlVersion(), 0x000603);
-    assert.strictEqual(loc.libcellmlVersionString(), '0.6.3');
+    assert.strictEqual(loc.libcellmlVersion(), 0x000701);
+    assert.strictEqual(loc.libcellmlVersionString(), '0.7.1');
   });
 
   test('libCOMBINE', () => {

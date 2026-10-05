@@ -361,6 +361,10 @@ export function updatePlottingAreaAndAxesInfo(pointCount = 0) {
 }
 
 function formattedIssueDescription(issue) {
+  if (issue.startsWith('CellML') || issue.startsWith('SED-ML') || issue.startsWith('COMBINE')) {
+    return issue;
+  }
+
   return issue.charAt(0).toLowerCase() + issue.slice(1);
 }
 
@@ -525,7 +529,6 @@ $(() => {
 
     // Versions page.
 
-    $('#Clang').html(loc.clangVersionString());
     $('#libCellML').html(loc.libcellmlVersionString());
     $('#libCOMBINE').html(loc.libcombineVersionString());
     $('#libOpenCOR').html(loc.versionString());

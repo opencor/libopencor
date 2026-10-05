@@ -20,20 +20,34 @@ limitations under the License.
 
 namespace libOpenCOR {
 
-#ifdef __EMSCRIPTEN__
-void nlaSolve(uintptr_t pNlaSolverAddress, intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pData)
-{
-    reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pComputeObjectiveFunctionIndex, pU, pN, pData);
-}
-#else
 namespace {
 thread_local uintptr_t sNlaSolverAddress = 0; // NOLINT
+thread_local bool sNlaSolveFailed = false; // NOLINT
 } // namespace
 
 void nlaSolve(uintptr_t pNlaSolverAddress, void (*pObjectiveFunction)(double *, double *, void *),
-              double *pU, size_t pN, void *pData)
+              double *pU, size_t pN, void *pData) noexcept
 {
-    reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunction, pU, pN, pData); // NOLINT
+    // Solve the given NLA system, unless an NLA system could not be solved since resetNlaSolveFailed() was last called.
+    // Indeed, our model would then be computed using some wrong values anyway and the NLA solver would remove the
+    // issues that explain why an NLA system could not be solved (since it removes its issues each time it is used),
+    // should it then successfully solve another (or the same) NLA system.
+    // Note: this function is called from our compiled code, so it must not let an exception escape. Indeed, unwinding
+    //       through the frames of our compiled code is not supported (and, on Windows, it terminates the process).
+
+    if (!sNlaSolveFailed) {
+        sNlaSolveFailed = !reinterpret_cast<SolverNla *>(pNlaSolverAddress)->solve(pObjectiveFunction, pU, pN, pData); // NOLINT
+    }
+}
+
+bool nlaSolveFailed()
+{
+    return sNlaSolveFailed;
+}
+
+void resetNlaSolveFailed()
+{
+    sNlaSolveFailed = false;
 }
 
 extern "C" uintptr_t nlaSolverAddress()
@@ -45,7 +59,6 @@ void setNlaSolverAddress(uintptr_t pAddress)
 {
     sNlaSolverAddress = pAddress;
 }
-#endif
 
 SolverNla::Impl::Impl(const std::string &pId, const std::string &pName)
     : Solver::Impl(pId, pName)
@@ -72,16 +85,9 @@ Solver::Type SolverNla::type() const noexcept
     return Type::NLA;
 }
 
-#ifdef __EMSCRIPTEN__
-bool SolverNla::solve(intptr_t pComputeObjectiveFunctionIndex, double *pU, size_t pN, void *pUserData)
-{
-    return pimpl()->solve(pComputeObjectiveFunctionIndex, pU, pN, pUserData);
-}
-#else
 bool SolverNla::solve(ComputeObjectiveFunction pComputeObjectiveFunction, double *pU, size_t pN, void *pUserData)
 {
     return pimpl()->solve(pComputeObjectiveFunction, pU, pN, pUserData);
 }
-#endif
 
 } // namespace libOpenCOR

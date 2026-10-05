@@ -19,6 +19,7 @@ limitations under the License.
 #include "libopencor/export.h"
 
 #include <cstdint>
+#include <string>
 
 /**
  * Some functions to retrieve the version of libOpenCOR.
@@ -43,24 +44,6 @@ uint64_t LIBOPENCOR_EXPORT version();
  */
 
 const std::string LIBOPENCOR_EXPORT &versionString();
-
-/**
- * Return the version of Clang as a number.
- *
- * @return A number that represents the version of Clang.
- */
-
-unsigned int LIBOPENCOR_EXPORT clangVersion();
-
-/**
- * Return the version of Clang as a string. The version string is in the format x.y.z, where the "."s are literal, and
- * x, y, and z represent counting numbers, in which case x is the major version, y the minor version, and z the patch
- * level.
- *
- * @return A string that represents the version of Clang.
- */
-
-const std::string LIBOPENCOR_EXPORT &clangVersionString();
 
 /**
  * Return the version of libCellML as a number.

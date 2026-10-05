@@ -18,14 +18,14 @@ include(packages)
 
 # Keep track of which packages are to be built.
 
-set(PACKAGES libCellML libCOMBINE libNuML libSBML libSEDML libxml2 LLVMClang SUNDIALS zipper zlib)
+set(PACKAGES libCellML libCOMBINE libNuML libSBML libSEDML libxml2 LLVM SUNDIALS zipper zlib)
 
 if(EMSCRIPTEN OR ONLY_BUILD_JAVASCRIPT_THIRD_PARTY_LIBRARIES)
     set(WASM_MODE TRUE)
 endif()
 
 if(NOT WASM_MODE)
-    list(APPEND PACKAGES libcurl libssh2 OpenSSL)
+    list(APPEND PACKAGES libcurl OpenSSL)
 endif()
 
 set(PACKAGES_TO_BUILD)
@@ -52,20 +52,14 @@ set(DEPENDENT_PACKAGES_TO_BUILD "" CACHE INTERNAL "Dependent packages to be buil
 
 check_dependent_packages(libxml2 libCellML libSBML)
 
-if(WASM_MODE)
-    check_dependent_packages(zlib libCellML libCOMBINE zipper)
-else()
-    check_dependent_packages(OpenSSL libcurl libssh2)
-    check_dependent_packages(zlib libCellML libCOMBINE libcurl zipper)
+check_dependent_packages(zlib libCellML libCOMBINE zipper)
+
+if(NOT WASM_MODE)
+    check_dependent_packages(OpenSSL libcurl)
 endif()
 
 check_dependent_packages(libSBML libCOMBINE libNuML libSEDML)
 check_dependent_packages(libNuML libSEDML)
-
-if(NOT WASM_MODE)
-    check_dependent_packages(libssh2 libcurl)
-endif()
-
 check_dependent_packages(zipper libCOMBINE)
 
 if(NOT "${DEPENDENT_PACKAGES_TO_BUILD}" STREQUAL "")
@@ -81,17 +75,13 @@ endif()
 check_required_packages(libSBML libxml2)
 check_required_packages(libNuML libSBML)
 
-if(NOT WASM_MODE)
-    check_required_packages(libssh2 OpenSSL)
-endif()
-
 check_required_packages(zipper zlib)
 
 check_required_packages(libCellML libxml2 zlib)
 check_required_packages(libCOMBINE libSBML libxml2 zipper zlib)
 
 if(NOT WASM_MODE)
-    check_required_packages(libcurl libssh2 OpenSSL zlib)
+    check_required_packages(libcurl OpenSSL)
 endif()
 
 check_required_packages(libSEDML libNuML libSBML)
@@ -118,11 +108,6 @@ add_package(zlib)
 
 add_package(libSBML) # Requires libxml2.
 add_package(libNuML) # Requires libSBML.
-
-if(NOT WASM_MODE)
-    add_package(libssh2) # Requires OpenSSL and zlib.
-endif()
-
 add_package(zipper) # Requires zlib.
 
 # Required third-party libraries.
@@ -131,10 +116,10 @@ add_package(libCellML) # Requires libxml2 and zlib.
 add_package(libCOMBINE) # Requires libSBML, libxml2, zipper, and zlib.
 
 if(NOT WASM_MODE)
-    add_package(libcurl) # Requires libssh2, OpenSSL, and zlib.
+    add_package(libcurl) # Requires OpenSSL.
 endif()
 
 add_package(libSEDML) # Requires libNuML and libSBML.
 
-add_package(LLVMClang)
+add_package(LLVM)
 add_package(SUNDIALS)

@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="my_model" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+    <!-- Algebraic equation with one non-isolated unknown and no solution
+    Variables:
+     • a: 1 -> ?
+    Equation:
+     • a - a + 1 = 0
+    -->
+    <component name="my_component">
+        <variable initial_value="1" name="a" units="dimensionless"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <minus/>
+                        <ci>a</ci>
+                        <ci>a</ci>
+                    </apply>
+                    <cn cellml:units="dimensionless">1</cn>
+                </apply>
+                <cn cellml:units="dimensionless">0</cn>
+            </apply>
+        </math>
+    </component>
+</model>

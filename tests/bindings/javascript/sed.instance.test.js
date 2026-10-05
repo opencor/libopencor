@@ -67,6 +67,26 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
+  test('CellML file with units prefix out of range', () => {
+    // Note: libCellML handles such a units prefix by catching the std::out_of_range exception thrown by std::stoi(), so
+    //       this checks that exceptions can be caught everywhere in libOpenCOR, including in our third-party libraries.
+
+    const file = new loc.File(utils.resourcePath('api/sed/units_prefix_out_of_range.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, 'Task | Model: the CellML file is invalid.'],
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Model | CellML | Analyser: prefix '92233720368547758077876856757465433' of a unit referencing 'second' in units 'my_units' is out of the integer range."
+      ]
+    ]);
+  });
+
   test('Overconstrained CellML file', () => {
     const file = new loc.File(utils.resourcePath('api/sed/overconstrained.cellml'));
 
@@ -148,6 +168,8 @@ test.describe('Sed instance tests', () => {
   });
 
   test('Asynchronous run lifecycle', async () => {
+    const WAIT_ITERATIONS = 60000;
+
     const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
 
     file.setContents(utils.fileContents(file.path));
@@ -157,7 +179,7 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.startRun(), true);
 
-    for (let i = 0; i < 200; ++i) {
+    for (let i = 0; i < WAIT_ITERATIONS; ++i) {
       if (instance.status === loc.SedInstance.Status.IDLE) {
         break;
       }
@@ -742,6 +764,28 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
+  test('DAE model with failing ODE solver', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/dae.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations[0];
+    const cvode = simulation.odeSolver;
+
+    cvode.maximumNumberOfSteps = 1;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assertIssues(loc, instance, [
+      [loc.Issue.Type.ERROR, 'Task | CVODE: at t = 1.08537561647883e-09, mxstep steps taken before reaching tout.']
+    ]);
+  });
+
   test('COMBINE archive', () => {
     const file = new loc.File(utils.resourcePath('cellml_2.omex'));
 
@@ -904,6 +948,7 @@ test.describe('Sed instance tests', () => {
     instance.run();
 
     assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(instance.progress, 1.0);
 
     const instanceTask = instance.tasks[0];
     const voi = instanceTask.voi;
