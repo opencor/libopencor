@@ -157,13 +157,6 @@ void Logger::Impl::addWarning(const std::string &pDescription)
 
 void Logger::Impl::removeAllIssues()
 {
-    // Note: there is nothing to remove if we don't have any issues, in which case there is no need to lock our mutex
-    //       which matters since, for instance, our solvers remove all their issues each time they are used.
-
-    if (mIssueCount.load(std::memory_order_acquire) == 0) {
-        return;
-    }
-
     const std::scoped_lock<std::mutex> lock(mMutex);
 
     mIssues.clear();
