@@ -29,6 +29,7 @@ limitations under the License.
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <unordered_set>
 
 namespace libOpenCOR {
 
@@ -192,6 +193,66 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
         mAlgebraicVariableNames[i] = name(algebraicVariables[i]->variable());
         mAlgebraicVariableUnits[i] = algebraicVariables[i]->variable()->units()->name();
     }
+
+    // Keep track of the variables (i.e. states, constants, and algebraic variables) that are initialised using another
+    // variable (i.e. a state, a constant, a computed constant, or an algebraic variable), so that we can reinitialise
+    // them when applying our changes (see applyChanges()).
+
+    auto variableValue = [this](const libcellml::AnalyserVariablePtr &pAnalyserVariable) -> double * {
+        const auto index {pAnalyserVariable->index()};
+
+        switch (pAnalyserVariable->type()) {
+        case libcellml::AnalyserVariable::Type::STATE:
+            return mStates + index; // NOLINT
+        case libcellml::AnalyserVariable::Type::CONSTANT:
+            return mConstants + index; // NOLINT
+        case libcellml::AnalyserVariable::Type::COMPUTED_CONSTANT:
+            return mComputedConstants + index; // NOLINT
+        default: // libcellml::AnalyserVariable::Type::ALGEBRAIC_VARIABLE.
+            return mAlgebraicVariables + index; // NOLINT
+        }
+    };
+    std::unordered_set<const double *> handledVariables;
+    auto addInitialisation = [&](auto &pSelf, const libcellml::AnalyserVariablePtr &pAnalyserVariable) { // NOLINT
+        auto *variable {variableValue(pAnalyserVariable)};
+
+        if ((pAnalyserVariable->type() == libcellml::AnalyserVariable::Type::COMPUTED_CONSTANT)
+            || !handledVariables.insert(variable).second) {
+            return;
+        }
+
+        auto initialisingVariable {pAnalyserVariable->initialisingVariable()};
+
+        if (initialisingVariable == nullptr) {
+            return;
+        }
+
+        auto initialValueVariable {owningComponent(initialisingVariable)->variable(initialisingVariable->initialValue())};
+
+        if (initialValueVariable == nullptr) {
+            return;
+        }
+
+        auto initialValueAnalyserVariable {mAnalyserModel->analyserVariable(initialValueVariable)};
+
+        pSelf(pSelf, initialValueAnalyserVariable);
+
+        mInitialisations.push_back({variable, variableValue(initialValueAnalyserVariable),
+                                    libcellml::Units::scalingFactor(pAnalyserVariable->variable()->units(), initialisingVariable->units())
+                                        * libcellml::Units::scalingFactor(initialValueVariable->units(), initialValueAnalyserVariable->variable()->units())});
+    };
+
+    for (const auto &state : mAnalyserModel->states()) {
+        addInitialisation(addInitialisation, state);
+    }
+
+    for (const auto &constant : constants) {
+        addInitialisation(addInitialisation, constant);
+    }
+
+    for (const auto &algebraicVariable : algebraicVariables) {
+        addInitialisation(addInitialisation, algebraicVariable);
+    }
 }
 
 void SedInstanceTask::Impl::trackResults(size_t pIndex)
@@ -218,6 +279,10 @@ void SedInstanceTask::Impl::trackResults(size_t pIndex)
 
 void SedInstanceTask::Impl::applyChanges()
 {
+    // Retrieve our changes (see SedChangeAttribute::Impl::apply()).
+
+    mChanges.clear();
+
     for (const auto &change : mModel->changes()) {
         //---GRY--- AT THIS STAGE, WE ONLY SUPPORT ChangeAttribute CHANGES, HENCE WE ASSERT (FOR NOW) THAT change IS
         //          INDEED A SedChangeAttribute OBJECT.
@@ -230,6 +295,40 @@ void SedInstanceTask::Impl::applyChanges()
 
         addIssues(changeAttribute, "Change attribute");
     }
+
+    // Apply our changes, which means setting our changed variables and reinitialising the variables that are
+    // initialised using another variable since our generated code initialised them before we could apply our changes.
+    // We need to do this both before computing our computed constants (since they may depend on a changed variable or
+    // a variable that is initialised using another variable) and after (since our generated code initialises a
+    // variable that depends on a computed constant when computing our computed constants, which means that it may
+    // override a change to that variable).
+
+    auto isChangedVariable = [this](const double *pVariable) {
+        return std::ranges::any_of(mChanges, [pVariable](const auto &pChange) {
+            return pChange.first == pVariable;
+        });
+    };
+    auto setVariables = [&]() {
+        for (const auto &[variable, value] : mChanges) {
+            *variable = value;
+        }
+
+        for (const auto &initialisation : mInitialisations) {
+            if (!isChangedVariable(initialisation.variable)) {
+                *initialisation.variable = initialisation.scalingFactor * *initialisation.initialValue;
+            }
+        }
+    };
+
+    setVariables();
+
+    if (mSedUniformTimeCourse != nullptr) {
+        mRuntime->computeComputedConstantsForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
+    } else {
+        mRuntime->computeComputedConstantsForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
+    }
+
+    setVariables();
 }
 
 void SedInstanceTask::Impl::initialise()
@@ -260,14 +359,15 @@ void SedInstanceTask::Impl::initialise()
         mRuntime->initialiseArraysForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
     }
 
+    // Apply our changes.
+    // Note: this also computes our computed constants (see applyChanges()).
+
     applyChanges();
 
     if (mSedUniformTimeCourse != nullptr) {
-        mRuntime->computeComputedConstantsForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         mRuntime->computeRates()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
         mRuntime->computeVariablesForDifferentialModel()(mVoi, mStates, mRates, mConstants, mComputedConstants, mAlgebraicVariables);
     } else {
-        mRuntime->computeComputedConstantsForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
         mRuntime->computeVariablesForAlgebraicModel()(mConstants, mComputedConstants, mAlgebraicVariables);
     }
 

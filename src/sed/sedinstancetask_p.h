@@ -27,6 +27,8 @@ limitations under the License.
 #include <condition_variable>
 #include <mutex>
 #include <span>
+#include <utility>
+#include <vector>
 
 namespace libOpenCOR {
 
@@ -51,6 +53,16 @@ struct SedInstanceTaskResults
     Doubles computedConstants;
     Doubles algebraicVariables;
 };
+
+struct SedInstanceTaskInitialisation
+{
+    double *variable {nullptr};
+    const double *initialValue {nullptr};
+    double scalingFactor {1.0};
+};
+
+using SedInstanceTaskInitialisations = std::vector<SedInstanceTaskInitialisation>;
+using SedInstanceTaskChanges = std::vector<std::pair<double *, double>>;
 
 using SedInstanceTaskWeakPtr = std::weak_ptr<SedInstanceTask>;
 
@@ -84,6 +96,9 @@ public:
     Doubles mConstantDoubles;
     Doubles mComputedConstantDoubles;
     Doubles mAlgebraicVariableDoubles;
+
+    SedInstanceTaskInitialisations mInitialisations;
+    SedInstanceTaskChanges mChanges;
 
     SedInstanceTaskResults mResults;
 
