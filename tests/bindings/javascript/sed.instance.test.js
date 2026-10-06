@@ -983,4 +983,190 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.hasIssues, true);
   });
+
+  test('Changes to variables used to initialise other variables', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/variables_initialised_using_variables.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+    const model = document.model(0);
+    const instanceTask = instance.tasks[0];
+
+    const initialValue = (name) => {
+      for (let i = 0; i < instanceTask.stateCount; ++i) {
+        if (instanceTask.stateName(i) === name) {
+          return instanceTask.state(i)[0];
+        }
+      }
+
+      for (let i = 0; i < instanceTask.constantCount; ++i) {
+        if (instanceTask.constantName(i) === name) {
+          return instanceTask.constant(i)[0];
+        }
+      }
+
+      for (let i = 0; i < instanceTask.computedConstantCount; ++i) {
+        if (instanceTask.computedConstantName(i) === name) {
+          return instanceTask.computedConstant(i)[0];
+        }
+      }
+
+      return Number.NaN;
+    };
+
+    const checkInitialValues = (expectedInitialValues) => {
+      instance.run();
+
+      assert.strictEqual(instance.hasIssues, false);
+
+      for (const [name, expectedInitialValue] of Object.entries(expectedInitialValues)) {
+        assert.ok(Math.abs(initialValue(name) - expectedInitialValue) <= 1e-12 * Math.abs(expectedInitialValue), name);
+      }
+    };
+
+    // No changes.
+
+    checkInitialValues({
+      'main/x': 3.0,
+      'main/y': 3.0,
+      'main/k2': 3.0,
+      'main/k3': 3.0,
+      'main/cc': 6.0,
+      'main/z': 6.0,
+      'main/w': 6.0,
+      'main/v': 3.0,
+      'main/u': 0.005,
+      'main/q': 0.005,
+      'main/r': 2.0
+    });
+
+    // Change a constant that is used (directly or indirectly) to initialise some variables.
+
+    model.addChange(new loc.SedChangeAttribute('main', 'k', '5.0'));
+
+    checkInitialValues({
+      'main/x': 5.0,
+      'main/y': 5.0,
+      'main/k2': 5.0,
+      'main/k3': 5.0,
+      'main/cc': 10.0,
+      'main/z': 10.0,
+      'main/w': 10.0,
+      'main/v': 5.0,
+      'main/u': 0.005,
+      'main/q': 0.005,
+      'main/r': 2.0
+    });
+
+    // Change a state that is used (directly or indirectly) to initialise some variables.
+
+    model.addChange(new loc.SedChangeAttribute('main', 'x', '7.0'));
+
+    checkInitialValues({
+      'main/x': 7.0,
+      'main/y': 7.0,
+      'main/k2': 5.0,
+      'main/k3': 7.0,
+      'main/cc': 14.0,
+      'main/z': 14.0,
+      'main/w': 14.0,
+      'main/v': 5.0,
+      'main/u': 0.005,
+      'main/q': 0.005,
+      'main/r': 2.0
+    });
+
+    // Change a state that is initialised using a computed constant.
+
+    model.addChange(new loc.SedChangeAttribute('main', 'z', '1.0'));
+
+    checkInitialValues({
+      'main/x': 7.0,
+      'main/y': 7.0,
+      'main/k2': 5.0,
+      'main/k3': 7.0,
+      'main/cc': 14.0,
+      'main/z': 1.0,
+      'main/w': 1.0,
+      'main/v': 5.0,
+      'main/u': 0.005,
+      'main/q': 0.005,
+      'main/r': 2.0
+    });
+
+    // Change a constant that is initialised using a state.
+
+    model.addChange(new loc.SedChangeAttribute('main', 'k3', '2.0'));
+
+    checkInitialValues({
+      'main/x': 7.0,
+      'main/y': 7.0,
+      'main/k2': 5.0,
+      'main/k3': 2.0,
+      'main/cc': 4.0,
+      'main/z': 1.0,
+      'main/w': 1.0,
+      'main/v': 5.0,
+      'main/u': 0.005,
+      'main/q': 0.005,
+      'main/r': 2.0
+    });
+
+    // Change some constants that are used to initialise some variables in another component and with different units.
+
+    model.addChange(new loc.SedChangeAttribute('initialisation', 'u_init', '2.0'));
+    model.addChange(new loc.SedChangeAttribute('initialisation', 'p', '4.0'));
+
+    checkInitialValues({
+      'main/x': 7.0,
+      'main/y': 7.0,
+      'main/k2': 5.0,
+      'main/k3': 2.0,
+      'main/cc': 4.0,
+      'main/z': 1.0,
+      'main/w': 1.0,
+      'main/v': 5.0,
+      'main/u': 0.002,
+      'main/q': 0.004,
+      'main/r': 2.0
+    });
+
+    // Change a constant that is used to initialise a variable in the same component but with different units.
+
+    model.addChange(new loc.SedChangeAttribute('main', 's', '4.0'));
+
+    checkInitialValues({
+      'main/x': 7.0,
+      'main/y': 7.0,
+      'main/k2': 5.0,
+      'main/k3': 2.0,
+      'main/cc': 4.0,
+      'main/z': 1.0,
+      'main/w': 1.0,
+      'main/v': 5.0,
+      'main/u': 0.002,
+      'main/q': 0.004,
+      'main/r': 4.0
+    });
+
+    // Remove all our changes.
+
+    model.removeAllChanges();
+
+    checkInitialValues({
+      'main/x': 3.0,
+      'main/y': 3.0,
+      'main/k2': 3.0,
+      'main/k3': 3.0,
+      'main/cc': 6.0,
+      'main/z': 6.0,
+      'main/w': 6.0,
+      'main/v': 3.0,
+      'main/u': 0.005,
+      'main/q': 0.005,
+      'main/r': 2.0
+    });
+  });
 });

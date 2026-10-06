@@ -880,3 +880,197 @@ def test_simulation_with_initial_time_failing():
     instance.run()
 
     assert instance.has_issues
+
+
+def test_changes_to_variables_used_to_initialise_other_variables():
+    file = loc.File(
+        utils.resource_path("api/sed/variables_initialised_using_variables.cellml")
+    )
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+    model = document.model(0)
+    instance_task = instance.tasks[0]
+
+    def initial_value(name):
+        for i in range(instance_task.state_count):
+            if instance_task.state_name(i) == name:
+                return instance_task.state(i)[0]
+
+        for i in range(instance_task.constant_count):
+            if instance_task.constant_name(i) == name:
+                return instance_task.constant(i)[0]
+
+        for i in range(instance_task.computed_constant_count):
+            if instance_task.computed_constant_name(i) == name:
+                return instance_task.computed_constant(i)[0]
+
+        return math.nan
+
+    def check_initial_values(expected_initial_values):
+        instance.run()
+
+        assert not instance.has_issues
+
+        for name, expected_initial_value in expected_initial_values.items():
+            assert math.isclose(
+                initial_value(name), expected_initial_value, rel_tol=1e-12
+            ), name
+
+    # No changes.
+
+    check_initial_values(
+        {
+            "main/x": 3.0,
+            "main/y": 3.0,
+            "main/k2": 3.0,
+            "main/k3": 3.0,
+            "main/cc": 6.0,
+            "main/z": 6.0,
+            "main/w": 6.0,
+            "main/v": 3.0,
+            "main/u": 0.005,
+            "main/q": 0.005,
+            "main/r": 2.0,
+        }
+    )
+
+    # Change a constant that is used (directly or indirectly) to initialise some variables.
+
+    model.add_change(loc.SedChangeAttribute("main", "k", "5.0"))
+
+    check_initial_values(
+        {
+            "main/x": 5.0,
+            "main/y": 5.0,
+            "main/k2": 5.0,
+            "main/k3": 5.0,
+            "main/cc": 10.0,
+            "main/z": 10.0,
+            "main/w": 10.0,
+            "main/v": 5.0,
+            "main/u": 0.005,
+            "main/q": 0.005,
+            "main/r": 2.0,
+        }
+    )
+
+    # Change a state that is used (directly or indirectly) to initialise some variables.
+
+    model.add_change(loc.SedChangeAttribute("main", "x", "7.0"))
+
+    check_initial_values(
+        {
+            "main/x": 7.0,
+            "main/y": 7.0,
+            "main/k2": 5.0,
+            "main/k3": 7.0,
+            "main/cc": 14.0,
+            "main/z": 14.0,
+            "main/w": 14.0,
+            "main/v": 5.0,
+            "main/u": 0.005,
+            "main/q": 0.005,
+            "main/r": 2.0,
+        }
+    )
+
+    # Change a state that is initialised using a computed constant.
+
+    model.add_change(loc.SedChangeAttribute("main", "z", "1.0"))
+
+    check_initial_values(
+        {
+            "main/x": 7.0,
+            "main/y": 7.0,
+            "main/k2": 5.0,
+            "main/k3": 7.0,
+            "main/cc": 14.0,
+            "main/z": 1.0,
+            "main/w": 1.0,
+            "main/v": 5.0,
+            "main/u": 0.005,
+            "main/q": 0.005,
+            "main/r": 2.0,
+        }
+    )
+
+    # Change a constant that is initialised using a state.
+
+    model.add_change(loc.SedChangeAttribute("main", "k3", "2.0"))
+
+    check_initial_values(
+        {
+            "main/x": 7.0,
+            "main/y": 7.0,
+            "main/k2": 5.0,
+            "main/k3": 2.0,
+            "main/cc": 4.0,
+            "main/z": 1.0,
+            "main/w": 1.0,
+            "main/v": 5.0,
+            "main/u": 0.005,
+            "main/q": 0.005,
+            "main/r": 2.0,
+        }
+    )
+
+    # Change some constants that are used to initialise some variables in another component and with different units.
+
+    model.add_change(loc.SedChangeAttribute("initialisation", "u_init", "2.0"))
+    model.add_change(loc.SedChangeAttribute("initialisation", "p", "4.0"))
+
+    check_initial_values(
+        {
+            "main/x": 7.0,
+            "main/y": 7.0,
+            "main/k2": 5.0,
+            "main/k3": 2.0,
+            "main/cc": 4.0,
+            "main/z": 1.0,
+            "main/w": 1.0,
+            "main/v": 5.0,
+            "main/u": 0.002,
+            "main/q": 0.004,
+            "main/r": 2.0,
+        }
+    )
+
+    # Change a constant that is used to initialise a variable in the same component but with different units.
+
+    model.add_change(loc.SedChangeAttribute("main", "s", "4.0"))
+
+    check_initial_values(
+        {
+            "main/x": 7.0,
+            "main/y": 7.0,
+            "main/k2": 5.0,
+            "main/k3": 2.0,
+            "main/cc": 4.0,
+            "main/z": 1.0,
+            "main/w": 1.0,
+            "main/v": 5.0,
+            "main/u": 0.002,
+            "main/q": 0.004,
+            "main/r": 4.0,
+        }
+    )
+
+    # Remove all our changes.
+
+    model.remove_all_changes()
+
+    check_initial_values(
+        {
+            "main/x": 3.0,
+            "main/y": 3.0,
+            "main/k2": 3.0,
+            "main/k3": 3.0,
+            "main/cc": 6.0,
+            "main/z": 6.0,
+            "main/w": 6.0,
+            "main/v": 3.0,
+            "main/u": 0.005,
+            "main/q": 0.005,
+            "main/r": 2.0,
+        }
+    )

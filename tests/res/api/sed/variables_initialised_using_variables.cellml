@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<model name="variables_initialised_using_variables" xmlns="http://www.cellml.org/cellml/2.0#" xmlns:cellml="http://www.cellml.org/cellml/2.0#">
+    <!-- Variables initialised using other variables:
+     • x (state): k (constant)
+     • y (state): x (state)
+     • k2 (constant): k (constant)
+     • k3 (constant): x (state)
+     • z (state): cc (computed constant)
+     • w (state): z (state)
+     • a (algebraic variable): k (constant)
+     • v (state): a (algebraic variable)
+     • u (state, V): u_init (constant, mV) in another component
+     • q (constant, V): p (constant, mV) defined in another component
+     • r (state, mV): s (constant, V) in the same component (i.e. no scaling, just like in the generated code)
+    -->
+    <units name="mV">
+        <unit prefix="milli" units="volt"/>
+    </units>
+    <component name="main">
+        <variable name="t" units="dimensionless"/>
+        <variable name="k" units="dimensionless" initial_value="3"/>
+        <variable name="x" units="dimensionless" initial_value="k"/>
+        <variable name="y" units="dimensionless" initial_value="x"/>
+        <variable name="k2" units="dimensionless" initial_value="k"/>
+        <variable name="k3" units="dimensionless" initial_value="x"/>
+        <variable name="cc" units="dimensionless"/>
+        <variable name="z" units="dimensionless" initial_value="cc"/>
+        <variable name="w" units="dimensionless" initial_value="z"/>
+        <variable name="a" units="dimensionless" initial_value="k"/>
+        <variable name="v" units="dimensionless" initial_value="a"/>
+        <variable name="u" units="volt" interface="public"/>
+        <variable name="p" units="volt" interface="public"/>
+        <variable name="q" units="volt" initial_value="p"/>
+        <variable name="s" units="volt" initial_value="2"/>
+        <variable name="r" units="mV" initial_value="s"/>
+        <math xmlns="http://www.w3.org/1998/Math/MathML">
+            <apply>
+                <eq/>
+                <ci>cc</ci>
+                <apply>
+                    <times/>
+                    <cn cellml:units="dimensionless">2</cn>
+                    <ci>k3</ci>
+                </apply>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <plus/>
+                    <apply>
+                        <times/>
+                        <ci>a</ci>
+                        <ci>a</ci>
+                        <ci>a</ci>
+                    </apply>
+                    <ci>a</ci>
+                </apply>
+                <ci>x</ci>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>x</ci>
+                </apply>
+                <cn cellml:units="dimensionless">0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>y</ci>
+                </apply>
+                <cn cellml:units="dimensionless">0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>z</ci>
+                </apply>
+                <cn cellml:units="dimensionless">0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>w</ci>
+                </apply>
+                <cn cellml:units="dimensionless">0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>v</ci>
+                </apply>
+                <cn cellml:units="dimensionless">0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>u</ci>
+                </apply>
+                <cn cellml:units="volt">0</cn>
+            </apply>
+            <apply>
+                <eq/>
+                <apply>
+                    <diff/>
+                    <bvar>
+                        <ci>t</ci>
+                    </bvar>
+                    <ci>r</ci>
+                </apply>
+                <cn cellml:units="mV">0</cn>
+            </apply>
+        </math>
+    </component>
+    <component name="initialisation">
+        <variable name="u_init" units="mV" initial_value="5"/>
+        <variable name="u" units="mV" initial_value="u_init" interface="public"/>
+        <variable name="p" units="mV" initial_value="5" interface="public"/>
+    </component>
+    <connection component_1="main" component_2="initialisation">
+        <map_variables variable_1="u" variable_2="u"/>
+        <map_variables variable_1="p" variable_2="p"/>
+    </connection>
+</model>

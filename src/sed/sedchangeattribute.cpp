@@ -128,7 +128,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
 
     for (size_t i {0}; i < stateCount; ++i) {
         if (instanceTaskPimpl->stateName(i) == changeName) {
-            instanceTaskPimpl->mStates[i] = toDouble(newValue()); // NOLINT
+            instanceTaskPimpl->mChanges.emplace_back(instanceTaskPimpl->mStates + i, toDouble(newValue())); // NOLINT
 
             isParameterSet = true;
 
@@ -139,7 +139,7 @@ void SedChangeAttribute::Impl::apply(const SedInstanceTaskPtr &pInstanceTask,
     if (!isParameterSet) {
         for (size_t i {0}; i < constantCount; ++i) {
             if (instanceTaskPimpl->constantName(i) == changeName) {
-                instanceTaskPimpl->mConstants[i] = toDouble(newValue()); // NOLINT
+                instanceTaskPimpl->mChanges.emplace_back(instanceTaskPimpl->mConstants + i, toDouble(newValue())); // NOLINT
 
                 isParameterSet = true;
 
