@@ -187,8 +187,8 @@ jobs:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
           CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
           # Note: our Linux third-party libraries are built in the same manylinux containers (see
-          #       buildThirdPartyLibrary.yml), so they must be kept in sync with the above images (and the version of
-          #       cibuildwheel that we use).
+          #       buildThirdPartyLibrary.yml) and our Linux Python wheels are also built in CI (see ci.yml), so they
+          #       must be kept in sync with the above images (and the version of cibuildwheel that we use).
           CIBW_SKIP: '*musllinux*'
       - name: Upload Python wheel artifacts
         uses: actions/upload-artifact@v4

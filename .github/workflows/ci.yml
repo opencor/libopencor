@@ -491,6 +491,40 @@ jobs:
       - name: pip uninstall libOpenCOR
         if: ${{ matrix.pip_install_test_and_uninstall == 'ON' }}
         run: uv pip uninstall --system libopencor
+  python_wheels:
+    # Note: we build our Linux Python wheels in the same way as in cd.yml to make sure that they can be built in their
+    #       manylinux container. Indeed, building a wheel requires importing our Python module (to generate its
+    #       stubs), something that would fail if one of our third-party libraries referenced a glibc symbol that is
+    #       not available in that container.
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: 'Linux Python wheel (Intel)'
+            os: ubuntu-24.04
+          - name: 'Linux Python wheel (ARM)'
+            os: ubuntu-24.04-arm
+    steps:
+      - name: Set the timezone to New Zealand
+        uses: szenius/set-timezone@v2.0
+        with:
+          timezoneLinux: 'Pacific/Auckland'
+      - name: Check out libOpenCOR
+        uses: actions/checkout@v4
+      - name: Free disk space
+        run: |
+          sudo rm -rf /opt/hostedtoolcache
+          sudo docker image prune --all --force
+      - name: Build Python wheel
+        uses: pypa/cibuildwheel@v3.2.0
+        env:
+          CIBW_ARCHS: auto64
+          CIBW_BUILD: 'cp312-*'
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux_2_34
+          CIBW_MANYLINUX_AARCH64_IMAGE: manylinux_2_34
+          CIBW_SKIP: '*musllinux*'
   spell_check:
     name: Spell check
     runs-on: ubuntu-24.04
