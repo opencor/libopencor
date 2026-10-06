@@ -404,9 +404,16 @@ if(THIRD_PARTY_C_FLAGS)
     set(CMAKE_CXX_FLAGS_ARGS -DCMAKE_CXX_FLAGS=${THIRD_PARTY_CXX_FLAGS})
 endif()
 
+# Note: we set CMAKE_INSTALL_LIBDIR to lib since, on some Linux distributions (e.g., the AlmaLinux-based manylinux
+#       container in which we build our Linux third-party libraries), GNUInstallDirs would otherwise use lib64. We also
+#       specify its type since, otherwise, a third-party library that sets it as a PATH cache variable (e.g., libSEDML)
+#       would have CMake convert it to an absolute path relative to the build directory rather than to the install
+#       prefix.
+
 set(CMAKE_ARGS
     -DBUILD_SHARED_LIBS=OFF
     -DCMAKE_BUILD_TYPE=${LIBOPENCOR_BUILD_TYPE}
+    -DCMAKE_INSTALL_LIBDIR:PATH=lib
     ${CMAKE_C_FLAGS_ARGS}
     ${CMAKE_CXX_FLAGS_ARGS}
 )
