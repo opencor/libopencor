@@ -94,6 +94,8 @@ else()
     #       deprecated APIs, TLS 1.0/1.1, DTLS, QUIC, error strings, the automatic loading of OpenSSL's configuration
     #       file, and many algorithms that are either obsolete or not used by TLS). This matters since OpenSSL's default
     #       provider references every algorithm that is built, so the linker cannot remove the ones that we don't use.
+    # Note: we set --libdir to lib since, on some platforms (e.g., linux-x86_64), OpenSSL would otherwise use lib64 (see
+    #       CMAKE_INSTALL_LIBDIR in cmake/packages.cmake).
 
     set(CONFIG_OPTIONS no-shared no-tests
                        no-apps no-argon2 no-aria no-autoload-config no-bf no-blake2 no-camellia no-cast no-cmp no-cms
@@ -102,6 +104,7 @@ else()
                        no-psk no-quic no-rc2 no-rc4 no-rc5 no-rfc3779 no-rmd160 no-scrypt no-seed no-siphash no-siv
                        no-slh-dsa no-sm2 no-sm3 no-sm4 no-srp no-srtp no-ssl-trace no-ssl3 no-tls-deprecated-ec no-tls1
                        no-tls1_1 no-ts no-ui-console no-whirlpool
+                       --libdir=lib
                        --prefix=${INSTALL_DIR})
 
     if(WIN32)
@@ -175,17 +178,6 @@ else()
         INSTALL_COMMAND
             ${MAKE_NMAKE_COMMAND} install_sw
     )
-
-    # On Linux, we need to rename the library folder from lib64 to lib, but only when building for the Intel
-    # architecture.
-
-    if(NOT WIN32 AND NOT APPLE AND INTEL_MODE)
-        if(EXISTS "${INSTALL_DIR}/lib")
-            file(REMOVE_RECURSE "${INSTALL_DIR}/lib")
-        endif()
-
-        file(RENAME "${INSTALL_DIR}/lib64" "${INSTALL_DIR}/lib")
-    endif()
 
     # Create our package.
 
