@@ -20,6 +20,7 @@ limitations under the License.
 
 #include <chrono>
 #include <cmath>
+#include <limits>
 #include <thread>
 
 TEST(InstanceSedTest, noFile)
@@ -922,7 +923,7 @@ TEST(InstanceSedTest, changesToVariablesUsedToInitialiseOtherVariables)
             }
         }
 
-        return NAN;
+        return std::numeric_limits<double>::quiet_NaN();
     };
 
     auto checkInitialValues = [&](const std::vector<std::pair<std::string, double>> &pExpectedInitialValues) {
@@ -937,48 +938,48 @@ TEST(InstanceSedTest, changesToVariablesUsedToInitialiseOtherVariables)
 
     // No changes.
 
-    checkInitialValues({{"main/x", 3.0}, {"main/y", 3.0}, {"main/k2", 3.0}, {"main/k3", 3.0}, {"main/cc", 6.0}, {"main/z", 6.0}, {"main/w", 6.0}, {"main/v", 3.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}});
+    checkInitialValues({{"main/x", 3.0}, {"main/y", 3.0}, {"main/k2", 3.0}, {"main/k3", 3.0}, {"main/cc", 6.0}, {"main/z", 6.0}, {"main/w", 6.0}, {"main/v", 3.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}}); // NOLINT
 
     // Change a constant that is used (directly or indirectly) to initialise some variables.
 
     model->addChange(libOpenCOR::SedChangeAttribute::create("main", "k", "5.0"));
 
-    checkInitialValues({{"main/x", 5.0}, {"main/y", 5.0}, {"main/k2", 5.0}, {"main/k3", 5.0}, {"main/cc", 10.0}, {"main/z", 10.0}, {"main/w", 10.0}, {"main/v", 5.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}});
+    checkInitialValues({{"main/x", 5.0}, {"main/y", 5.0}, {"main/k2", 5.0}, {"main/k3", 5.0}, {"main/cc", 10.0}, {"main/z", 10.0}, {"main/w", 10.0}, {"main/v", 5.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}}); // NOLINT
 
     // Change a state that is used (directly or indirectly) to initialise some variables.
 
     model->addChange(libOpenCOR::SedChangeAttribute::create("main", "x", "7.0"));
 
-    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 7.0}, {"main/cc", 14.0}, {"main/z", 14.0}, {"main/w", 14.0}, {"main/v", 5.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}});
+    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 7.0}, {"main/cc", 14.0}, {"main/z", 14.0}, {"main/w", 14.0}, {"main/v", 5.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}}); // NOLINT
 
     // Change a state that is initialised using a computed constant.
 
     model->addChange(libOpenCOR::SedChangeAttribute::create("main", "z", "1.0"));
 
-    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 7.0}, {"main/cc", 14.0}, {"main/z", 1.0}, {"main/w", 1.0}, {"main/v", 5.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}});
+    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 7.0}, {"main/cc", 14.0}, {"main/z", 1.0}, {"main/w", 1.0}, {"main/v", 5.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}}); // NOLINT
 
     // Change a constant that is initialised using a state.
 
     model->addChange(libOpenCOR::SedChangeAttribute::create("main", "k3", "2.0"));
 
-    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 2.0}, {"main/cc", 4.0}, {"main/z", 1.0}, {"main/w", 1.0}, {"main/v", 5.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}});
+    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 2.0}, {"main/cc", 4.0}, {"main/z", 1.0}, {"main/w", 1.0}, {"main/v", 5.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}}); // NOLINT
 
     // Change some constants that are used to initialise some variables in another component and with different units.
 
     model->addChange(libOpenCOR::SedChangeAttribute::create("initialisation", "u_init", "2.0"));
     model->addChange(libOpenCOR::SedChangeAttribute::create("initialisation", "p", "4.0"));
 
-    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 2.0}, {"main/cc", 4.0}, {"main/z", 1.0}, {"main/w", 1.0}, {"main/v", 5.0}, {"main/u", 0.002}, {"main/q", 0.004}, {"main/r", 2.0}});
+    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 2.0}, {"main/cc", 4.0}, {"main/z", 1.0}, {"main/w", 1.0}, {"main/v", 5.0}, {"main/u", 0.002}, {"main/q", 0.004}, {"main/r", 2.0}}); // NOLINT
 
     // Change a constant that is used to initialise a variable in the same component but with different units.
 
     model->addChange(libOpenCOR::SedChangeAttribute::create("main", "s", "4.0"));
 
-    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 2.0}, {"main/cc", 4.0}, {"main/z", 1.0}, {"main/w", 1.0}, {"main/v", 5.0}, {"main/u", 0.002}, {"main/q", 0.004}, {"main/r", 4.0}});
+    checkInitialValues({{"main/x", 7.0}, {"main/y", 7.0}, {"main/k2", 5.0}, {"main/k3", 2.0}, {"main/cc", 4.0}, {"main/z", 1.0}, {"main/w", 1.0}, {"main/v", 5.0}, {"main/u", 0.002}, {"main/q", 0.004}, {"main/r", 4.0}}); // NOLINT
 
     // Remove all our changes.
 
     model->removeAllChanges();
 
-    checkInitialValues({{"main/x", 3.0}, {"main/y", 3.0}, {"main/k2", 3.0}, {"main/k3", 3.0}, {"main/cc", 6.0}, {"main/z", 6.0}, {"main/w", 6.0}, {"main/v", 3.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}});
+    checkInitialValues({{"main/x", 3.0}, {"main/y", 3.0}, {"main/k2", 3.0}, {"main/k3", 3.0}, {"main/cc", 6.0}, {"main/z", 6.0}, {"main/w", 6.0}, {"main/v", 3.0}, {"main/u", 0.005}, {"main/q", 0.005}, {"main/r", 2.0}}); // NOLINT
 }
