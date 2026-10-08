@@ -620,6 +620,54 @@ def test_ode_model_with_non_uniform_time_course_simulation():
     assert_issues(instance, steady_state_expected_issues)
 
 
+def test_ode_model_with_invalid_number_of_steps():
+    zero_steps_expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but 0 is provided.",
+        ],
+    ]
+    negative_steps_expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but -100 is provided.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.number_of_steps = 0
+
+    instance = document.instantiate()
+
+    assert_issues(instance, zero_steps_expected_issues)
+
+    simulation.number_of_steps = -100
+
+    instance = document.instantiate()
+
+    assert_issues(instance, negative_steps_expected_issues)
+
+    # Running the instance should not do anything, but it should still leave it idle.
+
+    assert instance.start_run() is True
+    assert instance.wait_for_run() == 0.0
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert_issues(instance, negative_steps_expected_issues)
+
+    # Make sure that the number of steps is not reported as invalid anymore once it has been fixed.
+
+    simulation.number_of_steps = 1000
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+
+
 def test_nla_model():
     expected_issues = [
         [

@@ -634,6 +634,49 @@ TEST(InstanceSedTest, odeModelWithNonUniformTimeCourseSimulation)
     EXPECT_EQ_ISSUES(instance, STEADY_STATE_EXPECTED_ISSUES);
 }
 
+TEST(InstanceSedTest, odeModelWithInvalidNumberOfSteps)
+{
+    static const libOpenCOR::ExpectedIssues ZERO_STEPS_EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but 0 is provided."},
+    }};
+    static const libOpenCOR::ExpectedIssues NEGATIVE_STEPS_EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but -100 is provided."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(0);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, ZERO_STEPS_EXPECTED_ISSUES);
+
+    simulation->setNumberOfSteps(-100); // NOLINT
+
+    instance = document->instantiate();
+
+    EXPECT_EQ_ISSUES(instance, NEGATIVE_STEPS_EXPECTED_ISSUES);
+
+    // Running the instance should not do anything, but it should still leave it idle.
+
+    EXPECT_TRUE(instance->startRun());
+    EXPECT_EQ(instance->waitForRun(), 0.0);
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_EQ_ISSUES(instance, NEGATIVE_STEPS_EXPECTED_ISSUES);
+
+    // Make sure that the number of steps is not reported as invalid anymore once it has been fixed.
+
+    simulation->setNumberOfSteps(1000); // NOLINT
+
+    instance = document->instantiate();
+
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+}
+
 TEST(InstanceSedTest, nlaModel)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{

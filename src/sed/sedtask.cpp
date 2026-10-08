@@ -79,7 +79,7 @@ bool SedTask::Impl::isValid()
 
     // Make sure that the simulation is valid for the model.
 
-    if (!mSimulation->pimpl()->isValid(mModel, std::dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) != nullptr)) {
+    if (!mSimulation->pimpl()->isValid(mModel, std::dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation))) {
         addIssues(mSimulation, "Simulation");
     }
 
