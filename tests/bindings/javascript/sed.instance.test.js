@@ -772,6 +772,169 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instanceTask.voi.length, 501);
   });
 
+  test('ODE model with invalid times', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    // Initial time after the output start time.
+
+    simulation.initialTime = 5.0;
+    simulation.outputStartTime = 0.0;
+    simulation.outputEndTime = 50.0;
+
+    let instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 5, 0, and 50 are provided."
+      ]
+    ]);
+
+    // Output start time equal to the output end time.
+
+    simulation.initialTime = 0.0;
+    simulation.outputStartTime = 5.0;
+    simulation.outputEndTime = 5.0;
+
+    instance = document.instantiate();
+
+    const outputEndTimeExpectedIssues = [
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 0, 5, and 5 are provided."
+      ]
+    ];
+
+    assertIssues(loc, instance, outputEndTimeExpectedIssues);
+
+    // Both invalid times and an invalid number of steps.
+
+    simulation.numberOfSteps = 0;
+
+    instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 0, 5, and 5 are provided."
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but 0 is provided."
+      ]
+    ]);
+
+    // Non-finite times.
+
+    simulation.outputEndTime = Number.NaN;
+    simulation.numberOfSteps = 10;
+
+    instance = document.instantiate();
+
+    assert.strictEqual(instance.errorCount, 1);
+
+    simulation.outputEndTime = Number.POSITIVE_INFINITY;
+
+    instance = document.instantiate();
+
+    assert.strictEqual(instance.errorCount, 1);
+
+    // Valid times, but then made invalid after instantiation.
+
+    simulation.outputStartTime = 0.0;
+    simulation.outputEndTime = 50.0;
+    simulation.numberOfSteps = 50;
+
+    instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(instance.progress, 1.0);
+
+    simulation.outputStartTime = 5.0;
+    simulation.outputEndTime = 5.0;
+
+    assert.strictEqual(instance.run(), 0.0);
+    assertIssues(loc, instance, outputEndTimeExpectedIssues);
+    assert.strictEqual(instance.progress, 0.0);
+
+    // Valid times again.
+
+    simulation.outputStartTime = 0.0;
+    simulation.outputEndTime = 50.0;
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(instance.progress, 1.0);
+  });
+
+  test('ODE model results reused when run again', () => {
+    // Note: our results are returned as views on the WebAssembly heap, so make sure that they remain valid when running
+    //       an instance again with the same number of steps.
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const instance = document.instantiate();
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    const instanceTask = instance.tasks[0];
+    const voi = instanceTask.voi;
+    const state = instanceTask.state(0);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(voi.byteOffset, instanceTask.voi.byteOffset);
+    assert.strictEqual(state.byteOffset, instanceTask.state(0).byteOffset);
+    assert.strictEqual(voi[voi.length - 1], instanceTask.voi[voi.length - 1]);
+    assert.strictEqual(state[state.length - 1], instanceTask.state(0)[state.length - 1]);
+  });
+
+  test('ODE model with rounding error on output end time', () => {
+    // Note: with an output start time of -1, an output end time of 0, and 49 steps, the time of the last step is
+    //       computed as -1 + 49 * (1 / 49), which is not exactly 0 due to rounding errors. This used to result in an
+    //       extra step being taken and its results being written past the end of our results arrays.
+
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.initialTime = -1.0;
+    simulation.outputStartTime = -1.0;
+    simulation.outputEndTime = 0.0;
+    simulation.numberOfSteps = 49;
+
+    const instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(instance.progress, 1.0);
+
+    const voi = instance.tasks[0].voi;
+
+    assert.strictEqual(voi.length, 50);
+    assert.strictEqual(voi[0], -1.0);
+    assert.strictEqual(voi[voi.length - 1], 0.0);
+  });
+
   test('NLA model', () => {
     const file = new loc.File(utils.resourcePath('api/sed/nla.cellml'));
 

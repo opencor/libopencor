@@ -704,6 +704,160 @@ TEST(InstanceSedTest, odeModelWithInvalidNumberOfSteps)
     EXPECT_EQ(instanceTask->voi().size(), 501);
 }
 
+TEST(InstanceSedTest, odeModelWithInvalidTimes)
+{
+    static const libOpenCOR::ExpectedIssues INITIAL_TIME_EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 5, 0, and 50 are provided."},
+    }};
+    static const libOpenCOR::ExpectedIssues OUTPUT_END_TIME_EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 0, 5, and 5 are provided."},
+    }};
+    static const libOpenCOR::ExpectedIssues TIMES_AND_STEPS_EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 0, 5, and 5 are provided."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but 0 is provided."},
+    }};
+
+    static const auto FIVE {5.0};
+    static const auto FIFTY {50.0};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    // Initial time after the output start time.
+
+    simulation->setInitialTime(FIVE);
+    simulation->setOutputStartTime(0.0);
+    simulation->setOutputEndTime(FIFTY);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, INITIAL_TIME_EXPECTED_ISSUES);
+
+    // Output start time equal to the output end time.
+
+    simulation->setInitialTime(0.0);
+    simulation->setOutputStartTime(FIVE);
+    simulation->setOutputEndTime(FIVE);
+
+    instance = document->instantiate();
+
+    EXPECT_EQ_ISSUES(instance, OUTPUT_END_TIME_EXPECTED_ISSUES);
+
+    // Both invalid times and an invalid number of steps.
+
+    simulation->setNumberOfSteps(0);
+
+    instance = document->instantiate();
+
+    EXPECT_EQ_ISSUES(instance, TIMES_AND_STEPS_EXPECTED_ISSUES);
+
+    // Non-finite times.
+
+    simulation->setOutputEndTime(std::numeric_limits<double>::quiet_NaN());
+    simulation->setNumberOfSteps(10); // NOLINT
+
+    instance = document->instantiate();
+
+    EXPECT_EQ(instance->errorCount(), 1);
+
+    simulation->setOutputEndTime(std::numeric_limits<double>::infinity());
+
+    instance = document->instantiate();
+
+    EXPECT_EQ(instance->errorCount(), 1);
+
+    // Valid times, but then made invalid after instantiation.
+
+    simulation->setOutputStartTime(0.0);
+    simulation->setOutputEndTime(FIFTY);
+    simulation->setNumberOfSteps(static_cast<int>(FIFTY));
+
+    instance = document->instantiate();
+
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+
+    simulation->setOutputStartTime(FIVE);
+    simulation->setOutputEndTime(FIVE);
+
+    EXPECT_EQ(instance->run(), 0.0);
+    EXPECT_EQ_ISSUES(instance, OUTPUT_END_TIME_EXPECTED_ISSUES);
+    EXPECT_EQ(instance->progress(), 0.0);
+
+    // Valid times again.
+
+    simulation->setOutputStartTime(0.0);
+    simulation->setOutputEndTime(FIFTY);
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+}
+
+TEST(InstanceSedTest, odeModelResultsReusedWhenRunAgain)
+{
+    // Note: our Python bindings return zero-copy NumPy arrays, so make sure that our results are not reallocated when
+    //       running an instance again with the same number of steps.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    auto instance {document->instantiate()};
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    const auto &instanceTask {instance->tasks()[0]};
+    const auto voi {instanceTask->voi()};
+    const auto state {instanceTask->state(0)};
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_EQ(instanceTask->voi().data(), voi.data());
+    EXPECT_EQ(instanceTask->state(0).data(), state.data());
+    EXPECT_EQ(voi[voi.size() - 1], instanceTask->voi()[voi.size() - 1]);
+    EXPECT_EQ(state[state.size() - 1], instanceTask->state(0)[state.size() - 1]);
+}
+
+TEST(InstanceSedTest, odeModelWithRoundingErrorOnOutputEndTime)
+{
+    // Note: with an output start time of -1, an output end time of 0, and 49 steps, the time of the last step is computed
+    //       as -1 + 49 * (1 / 49), which is not exactly 0 due to rounding errors. This used to result in an extra step
+    //       being taken and its results being written past the end of our results arrays.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    static const auto INITIAL_TIME {-1.0};
+    static const auto OUTPUT_END_TIME {0.0};
+    static const auto NUMBER_OF_STEPS {49};
+
+    simulation->setInitialTime(INITIAL_TIME);
+    simulation->setOutputStartTime(INITIAL_TIME);
+    simulation->setOutputEndTime(OUTPUT_END_TIME);
+    simulation->setNumberOfSteps(NUMBER_OF_STEPS);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_FALSE(instance->hasIssues());
+
+    instance->run();
+
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_DOUBLE_EQ(instance->progress(), 1.0);
+
+    const auto &voi {instance->tasks()[0]->voi()};
+
+    EXPECT_EQ(voi.size(), NUMBER_OF_STEPS + 1);
+    EXPECT_EQ(voi[0], INITIAL_TIME);
+    EXPECT_EQ(voi[voi.size() - 1], OUTPUT_END_TIME);
+}
+
 TEST(InstanceSedTest, nlaModel)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{

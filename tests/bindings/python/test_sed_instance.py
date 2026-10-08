@@ -695,6 +695,168 @@ def test_ode_model_with_invalid_number_of_steps():
     assert len(instance_task.voi) == 501
 
 
+def test_ode_model_with_invalid_times():
+    initial_time_expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 5, 0, and 50 are provided.",
+        ],
+    ]
+    output_end_time_expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 0, 5, and 5 are provided.",
+        ],
+    ]
+    times_and_steps_expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires finite times such that initialTime <= outputStartTime < outputEndTime but 0, 5, and 5 are provided.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but 0 is provided.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    # Initial time after the output start time.
+
+    simulation.initial_time = 5.0
+    simulation.output_start_time = 0.0
+    simulation.output_end_time = 50.0
+
+    instance = document.instantiate()
+
+    assert_issues(instance, initial_time_expected_issues)
+
+    # Output start time equal to the output end time.
+
+    simulation.initial_time = 0.0
+    simulation.output_start_time = 5.0
+    simulation.output_end_time = 5.0
+
+    instance = document.instantiate()
+
+    assert_issues(instance, output_end_time_expected_issues)
+
+    # Both invalid times and an invalid number of steps.
+
+    simulation.number_of_steps = 0
+
+    instance = document.instantiate()
+
+    assert_issues(instance, times_and_steps_expected_issues)
+
+    # Non-finite times.
+
+    simulation.output_end_time = math.nan
+    simulation.number_of_steps = 10
+
+    instance = document.instantiate()
+
+    assert instance.error_count == 1
+
+    simulation.output_end_time = math.inf
+
+    instance = document.instantiate()
+
+    assert instance.error_count == 1
+
+    # Valid times, but then made invalid after instantiation.
+
+    simulation.output_start_time = 0.0
+    simulation.output_end_time = 50.0
+    simulation.number_of_steps = 50
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+    assert instance.progress == 1.0
+
+    simulation.output_start_time = 5.0
+    simulation.output_end_time = 5.0
+
+    assert instance.run() == 0.0
+    assert_issues(instance, output_end_time_expected_issues)
+    assert instance.progress == 0.0
+
+    # Valid times again.
+
+    simulation.output_start_time = 0.0
+    simulation.output_end_time = 50.0
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+    assert instance.progress == 1.0
+
+
+def test_ode_model_results_reused_when_run_again():
+    # Note: our results are returned as zero-copy NumPy arrays, so make sure that they remain valid when running an
+    #       instance again with the same number of steps.
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.run()
+
+    assert not instance.has_issues
+
+    instance_task = instance.tasks[0]
+    voi = instance_task.voi
+    state = instance_task.state(0)
+
+    instance.run()
+
+    assert not instance.has_issues
+    assert (
+        voi.__array_interface__["data"][0]
+        == instance_task.voi.__array_interface__["data"][0]
+    )
+    assert (
+        state.__array_interface__["data"][0]
+        == instance_task.state(0).__array_interface__["data"][0]
+    )
+    assert voi[-1] == instance_task.voi[-1]
+    assert state[-1] == instance_task.state(0)[-1]
+
+
+def test_ode_model_with_rounding_error_on_output_end_time():
+    # Note: with an output start time of -1, an output end time of 0, and 49 steps, the time of the last step is computed
+    #       as -1 + 49 * (1 / 49), which is not exactly 0 due to rounding errors. This used to result in an extra step
+    #       being taken and its results being written past the end of our results arrays.
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+
+    simulation.initial_time = -1.0
+    simulation.output_start_time = -1.0
+    simulation.output_end_time = 0.0
+    simulation.number_of_steps = 49
+
+    instance = document.instantiate()
+
+    assert not instance.has_issues
+
+    instance.run()
+
+    assert not instance.has_issues
+    assert instance.progress == 1.0
+
+    voi = instance.tasks[0].voi
+
+    assert len(voi) == 50
+    assert voi[0] == -1.0
+    assert voi[-1] == 0.0
+
+
 def test_nla_model():
     expected_issues = [
         [

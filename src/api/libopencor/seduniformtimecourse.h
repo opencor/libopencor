@@ -30,6 +30,7 @@ namespace libOpenCOR {
 class LIBOPENCOR_EXPORT SedUniformTimeCourse: public SedSimulation
 {
     friend class SedInstanceTask;
+    friend class SedSimulation;
 
 public:
     /**

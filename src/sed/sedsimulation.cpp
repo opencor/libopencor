@@ -22,8 +22,6 @@ limitations under the License.
 #include "solvernla_p.h"
 #include "solverode_p.h"
 
-#include "utils.h"
-
 namespace libOpenCOR {
 
 static constexpr auto ID_PREFIX {"simulation"};
@@ -31,25 +29,6 @@ static constexpr auto ID_PREFIX {"simulation"};
 SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
     : SedBase::Impl(pDocument->pimpl()->uniqueId(ID_PREFIX))
 {
-}
-
-std::string SedSimulation::Impl::invalidNumberOfStepsError(const SedModelPtr &pModel, int pNumberOfSteps) const
-{
-    const auto &modelId = pModel->pimpl()->mId;
-    const auto numberOfSteps {toString(pNumberOfSteps)};
-    std::string res;
-
-    res.reserve(mId.size() + modelId.size() + numberOfSteps.size() + 112); // NOLINT
-
-    res += "Simulation '";
-    res += mId;
-    res += "' is to be used with model '";
-    res += modelId;
-    res += "' which requires a strictly positive number of steps but ";
-    res += numberOfSteps;
-    res += " is provided.";
-
-    return res;
 }
 
 bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, const SedUniformTimeCoursePtr &pUniformTimeCourse)
@@ -77,8 +56,7 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, const SedUniformTim
 
     removeAllIssues();
 
-    // Make sure that we are a uniform time course simulation with a strictly positive number of steps if our model is
-    // an ODE/DAE model.
+    // Make sure that we are a valid uniform time course simulation if our model is an ODE/DAE model.
     //---GRY--- WE DON'T CURRENTLY SUPPORT OTHER TYPES OF SIMULATION FOR ODE/DAE MODELS.
 
     if ((modelType == libcellml::AnalyserModel::Type::ODE)
@@ -95,8 +73,10 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, const SedUniformTim
             error += "' which (currently) requires a uniform time course simulation.";
 
             addError(error);
-        } else if (pUniformTimeCourse->numberOfSteps() <= 0) {
-            addError(invalidNumberOfStepsError(pModel, pUniformTimeCourse->numberOfSteps()));
+        } else {
+            for (const auto &error : pUniformTimeCourse->pimpl()->validationErrors(pModel)) {
+                addError(error);
+            }
         }
     }
 
