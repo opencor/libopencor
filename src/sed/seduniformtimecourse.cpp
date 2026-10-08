@@ -18,6 +18,9 @@ limitations under the License.
 
 #include "utils.h"
 
+#include "libopencor/sedmodel.h"
+
+#include <cmath>
 #include <memory>
 
 namespace libOpenCOR {
@@ -25,6 +28,61 @@ namespace libOpenCOR {
 SedUniformTimeCourse::Impl::Impl(const SedDocumentPtr &pDocument)
     : SedSimulation::Impl(pDocument)
 {
+}
+
+Strings SedUniformTimeCourse::Impl::validationErrors(const SedModelPtr &pModel) const
+{
+    // Make sure that our times are finite and such that initialTime <= outputStartTime < outputEndTime, and that our
+    // number of steps is strictly positive.
+    // Note: we are validated both when instantiating a document (see SedSimulation::Impl::isValid()) and when running
+    //       an instance task (see SedInstanceTask::Impl::run()) since our times and number of steps may have been
+    //       changed in between.
+
+    const auto &modelId = pModel->id();
+    Strings res;
+
+    if (!std::isfinite(mInitialTime) || !std::isfinite(mOutputStartTime) || !std::isfinite(mOutputEndTime)
+        || (mInitialTime > mOutputStartTime) || (mOutputStartTime >= mOutputEndTime)) {
+        const auto initialTime {toString(mInitialTime)};
+        const auto outputStartTime {toString(mOutputStartTime)};
+        const auto outputEndTime {toString(mOutputEndTime)};
+        std::string error;
+
+        error.reserve(mId.size() + modelId.size() + initialTime.size() + outputStartTime.size() + outputEndTime.size() + 152); // NOLINT
+
+        error += "Simulation '";
+        error += mId;
+        error += "' is to be used with model '";
+        error += modelId;
+        error += "' which requires finite times such that initialTime <= outputStartTime < outputEndTime but ";
+        error += initialTime;
+        error += ", ";
+        error += outputStartTime;
+        error += ", and ";
+        error += outputEndTime;
+        error += " are provided.";
+
+        res.push_back(error);
+    }
+
+    if (mNumberOfSteps <= 0) {
+        const auto numberOfSteps {toString(mNumberOfSteps)};
+        std::string error;
+
+        error.reserve(mId.size() + modelId.size() + numberOfSteps.size() + 112); // NOLINT
+
+        error += "Simulation '";
+        error += mId;
+        error += "' is to be used with model '";
+        error += modelId;
+        error += "' which requires a strictly positive number of steps but ";
+        error += numberOfSteps;
+        error += " is provided.";
+
+        res.push_back(error);
+    }
+
+    return res;
 }
 
 double SedUniformTimeCourse::Impl::initialTime() const

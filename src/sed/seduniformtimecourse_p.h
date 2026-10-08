@@ -32,6 +32,8 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument);
 
+    Strings validationErrors(const SedModelPtr &pModel) const;
+
     double initialTime() const;
     void setInitialTime(double pInitialTime);
 

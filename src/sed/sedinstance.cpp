@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "libopencor/seddocument.h"
 
+#include <atomic>
 #include <chrono>
 #include <exception>
 #include <memory>
@@ -200,13 +201,32 @@ bool SedInstance::Impl::startRun()
 
     mRunning.store(true, std::memory_order_release);
 
-    mRunFuture = std::async(std::launch::async, [this]() {
-        const auto result = run();
+    // Start our run in a separate thread.
+    // Note #1: we must be flagged as not running anymore once our run is done, even if run() throws an exception (it
+    //          reports a failure as an issue, but it might still throw, e.g., std::bad_alloc when restoring our
+    //          issues), hence we use a guard to do so. Otherwise, we would be stuck in RUNNING.
+    // Note #2: std::async() may throw an exception (e.g., std::system_error if no thread could be created), in which
+    //          case we must also be flagged as not running anymore. We have no way to trigger such an exception in our
+    //          tests, hence we ignore our try...catch statement during code coverage.
 
+#ifndef CODE_COVERAGE_ENABLED
+    try {
+#endif
+        mRunFuture = std::async(std::launch::async, [this]() {
+            auto resetRunning = [](std::atomic<bool> *pRunning) {
+                pRunning->store(false, std::memory_order_release);
+            };
+            const std::unique_ptr<std::atomic<bool>, decltype(resetRunning)> runningGuard {&mRunning, resetRunning};
+
+            return run();
+        });
+#ifndef CODE_COVERAGE_ENABLED
+    } catch (...) {
         mRunning.store(false, std::memory_order_release);
 
-        return result;
-    });
+        throw;
+    }
+#endif
 
     return true;
 }
