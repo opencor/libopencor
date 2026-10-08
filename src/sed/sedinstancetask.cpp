@@ -526,12 +526,24 @@ double SedInstanceTask::Impl::run()
     auto startTime {std::chrono::high_resolution_clock::now()};
 
     // Reset our progress counters.
+    // Note: we retrieve our number of steps only once since it is used in several places below.
 
     const auto *sedUniformTimeCoursePimpl {mDifferentialModel ? mSedUniformTimeCourse->pimpl() : nullptr};
-    const auto totalSteps {mDifferentialModel ? static_cast<size_t>(sedUniformTimeCoursePimpl->mNumberOfSteps) : 1};
+    const auto numberOfSteps {mDifferentialModel ? sedUniformTimeCoursePimpl->mNumberOfSteps : 1};
+    const auto totalSteps {(numberOfSteps > 0) ? static_cast<size_t>(numberOfSteps) : 0};
 
     mCompletedSteps.store(0, std::memory_order_relaxed);
     mTotalSteps.store(totalSteps, std::memory_order_relaxed);
+
+    // Make sure that our number of steps is valid.
+    // Note: our number of steps was validated when we were instantiated (see SedSimulation::Impl::isValid()), but it
+    //       may have been changed since then.
+
+    if (numberOfSteps <= 0) {
+        addIssue(Issue::Type::ERROR, sedUniformTimeCoursePimpl->invalidNumberOfStepsError(mModel, numberOfSteps), "Simulation");
+
+        return 0.0;
+    }
 
     // (Re)initialise our model.
     // Note: reinitialise our model because we initialised it when we created the instance task.
@@ -544,7 +556,7 @@ double SedInstanceTask::Impl::run()
         // Run our simulation from the initial time to the output start time, without tracking our results, but only if
         // the output start time is after the initial time.
 
-        const auto voiInterval {(sedUniformTimeCoursePimpl->mOutputEndTime - sedUniformTimeCoursePimpl->mOutputStartTime) / sedUniformTimeCoursePimpl->mNumberOfSteps};
+        const auto voiInterval {(sedUniformTimeCoursePimpl->mOutputEndTime - sedUniformTimeCoursePimpl->mOutputStartTime) / numberOfSteps};
 
         if (!fuzzyCompare(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime)) {
             run(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime, voiInterval, false);
@@ -555,17 +567,28 @@ double SedInstanceTask::Impl::run()
         }
 
         // Initialise our results structure.
+        // Note: we release our previous results first (to limit our peak memory usage) and only then allocate our new
+        //       results, which we do into a local structure that we move into ours once all of its arrays have been
+        //       allocated. This means that should an allocation fail (e.g., std::bad_alloc), our results structure
+        //       would be left empty rather than with an inconsistent results size and arrays of mismatched sizes (which
+        //       would result in out-of-bounds accesses when retrieving our results).
 
         const auto resultsSize {totalSteps + 1};
 
-        mResults.resultsSize = resultsSize;
+        mResults = {};
 
-        mResults.voi.resize(resultsSize);
-        mResults.states.resize(mStateCount * resultsSize);
-        mResults.rates.resize(mStateCount * resultsSize);
-        mResults.constants.resize(mConstantCount * resultsSize);
-        mResults.computedConstants.resize(mComputedConstantCount * resultsSize);
-        mResults.algebraicVariables.resize(mAlgebraicVariableCount * resultsSize);
+        SedInstanceTaskResults results;
+
+        results.resultsSize = resultsSize;
+
+        results.voi.resize(resultsSize);
+        results.states.resize(mStateCount * resultsSize);
+        results.rates.resize(mStateCount * resultsSize);
+        results.constants.resize(mConstantCount * resultsSize);
+        results.computedConstants.resize(mComputedConstantCount * resultsSize);
+        results.algebraicVariables.resize(mAlgebraicVariableCount * resultsSize);
+
+        mResults = std::move(results);
 
         // Run our simulation from the output start time to the output end time, tracking our results.
 

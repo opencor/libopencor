@@ -675,6 +675,33 @@ TEST(InstanceSedTest, odeModelWithInvalidNumberOfSteps)
     EXPECT_FALSE(instance->hasIssues());
     EXPECT_GT(instance->run(), 0.0);
     EXPECT_FALSE(instance->hasIssues());
+
+    // Make sure that an invalid number of steps is reported when running an instance even if it was valid when the
+    // instance was created.
+
+    const auto &instanceTask {instance->tasks()[0]};
+
+    simulation->setNumberOfSteps(0);
+
+    EXPECT_EQ(instance->run(), 0.0);
+    EXPECT_EQ_ISSUES(instance, ZERO_STEPS_EXPECTED_ISSUES);
+    EXPECT_EQ(instanceTask->voi().size(), 1001);
+
+    simulation->setNumberOfSteps(-100); // NOLINT
+
+    EXPECT_TRUE(instance->startRun());
+    EXPECT_EQ(instance->waitForRun(), 0.0);
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::IDLE);
+    EXPECT_EQ_ISSUES(instance, NEGATIVE_STEPS_EXPECTED_ISSUES);
+    EXPECT_EQ(instanceTask->voi().size(), 1001);
+
+    // Make sure that the instance can be run again once the number of steps has been fixed.
+
+    simulation->setNumberOfSteps(500); // NOLINT
+
+    EXPECT_GT(instance->run(), 0.0);
+    EXPECT_FALSE(instance->hasIssues());
+    EXPECT_EQ(instanceTask->voi().size(), 501);
 }
 
 TEST(InstanceSedTest, nlaModel)

@@ -667,6 +667,33 @@ def test_ode_model_with_invalid_number_of_steps():
     assert instance.run() > 0.0
     assert not instance.has_issues
 
+    # Make sure that an invalid number of steps is reported when running an instance even if it was valid when the
+    # instance was created.
+
+    instance_task = instance.tasks[0]
+
+    simulation.number_of_steps = 0
+
+    assert instance.run() == 0.0
+    assert_issues(instance, zero_steps_expected_issues)
+    assert len(instance_task.voi) == 1001
+
+    simulation.number_of_steps = -100
+
+    assert instance.start_run() is True
+    assert instance.wait_for_run() == 0.0
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert_issues(instance, negative_steps_expected_issues)
+    assert len(instance_task.voi) == 1001
+
+    # Make sure that the instance can be run again once the number of steps has been fixed.
+
+    simulation.number_of_steps = 500
+
+    assert instance.run() > 0.0
+    assert not instance.has_issues
+    assert len(instance_task.voi) == 501
+
 
 def test_nla_model():
     expected_issues = [
