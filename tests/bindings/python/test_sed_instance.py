@@ -490,6 +490,38 @@ def test_pause_run_then_stop_run():
     assert not instance.has_issues
 
 
+def test_delete_paused_instance():
+    SIMULATION_PROPERTY = 1000000
+    WAIT_ITERATIONS = 60000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
+
+    instance = document.instantiate()
+    instance_task = instance.tasks[0]
+
+    assert instance.start_run() is True
+
+    for _ in range(WAIT_ITERATIONS):
+        if instance.progress > 0.0:
+            break
+
+        time.sleep(0.001)
+
+    instance.pause_run()
+
+    assert instance.status == loc.SedInstance.Status.Paused
+
+    # Delete our paused instance, something that would hang if our run was not stopped first.
+
+    del instance
+
+    assert instance_task.progress < 1.0
+
+
 def test_pause_run_and_resume_run_with_natural_completion():
     moderate_step_count = 50000
     WAIT_ITERATIONS = 60000

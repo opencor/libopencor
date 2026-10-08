@@ -258,14 +258,28 @@ void SedInstance::Impl::pauseRun()
 
 void SedInstance::Impl::resumeRun()
 {
-    mRunControl.fetch_and(~INSTANCE_RUN_CONTROL_PAUSE, std::memory_order_relaxed);
+    // Note: our control flags must be updated while holding our pause mutex. Otherwise, a paused task could check them
+    //       (and find that it is still paused), we could then update them and notify our pause condition variable, and
+    //       only then would the task start waiting on our pause condition variable, i.e. it would never be woken up.
+
+    {
+        const std::scoped_lock<std::mutex> pauseLock(mPauseMutex);
+
+        mRunControl.fetch_and(~INSTANCE_RUN_CONTROL_PAUSE, std::memory_order_relaxed);
+    }
 
     mPauseConditionVariable.notify_all();
 }
 
 void SedInstance::Impl::stopRun()
 {
-    mRunControl.fetch_or(INSTANCE_RUN_CONTROL_STOP, std::memory_order_relaxed);
+    // Note: see the note in resumeRun().
+
+    {
+        const std::scoped_lock<std::mutex> pauseLock(mPauseMutex);
+
+        mRunControl.fetch_or(INSTANCE_RUN_CONTROL_STOP, std::memory_order_relaxed);
+    }
 
     mPauseConditionVariable.notify_all();
 }
@@ -319,13 +333,16 @@ SedInstance::SedInstance(const SedDocumentPtr &pDocument)
 SedInstance::~SedInstance()
 {
     // Make sure that the instance is not running before we delete it.
-    // Note: run() reports a failure as an issue rather than throw an exception, so waitForRun() should never throw, but
-    //       an exception must never escape a destructor (it would result in std::terminate() being called), hence we
-    //       make sure of it.
+    // Note #1: we stop any run before waiting for it since a paused run would otherwise never complete, i.e. we would
+    //          wait for it forever.
+    // Note #2: run() reports a failure as an issue rather than throw an exception, so waitForRun() should never throw,
+    //          but an exception must never escape a destructor (it would result in std::terminate() being called),
+    //          hence we make sure of it.
 
 #ifndef CODE_COVERAGE_ENABLED
     try {
 #endif
+        pimpl()->stopRun();
         pimpl()->waitForRun();
 #ifndef CODE_COVERAGE_ENABLED
     } catch (...) { // NOLINT(bugprone-empty-catch)

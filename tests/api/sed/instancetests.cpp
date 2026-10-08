@@ -501,6 +501,42 @@ TEST(InstanceSedTest, pauseRunThenStopRun)
     EXPECT_FALSE(instance->hasIssues());
 }
 
+TEST(InstanceSedTest, deletePausedInstance)
+{
+    static const auto SIMULATION_PROPERTY {1000000};
+    static const auto WAIT_ITERATIONS = 60000;
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create(file)};
+    const auto &simulation {std::dynamic_pointer_cast<libOpenCOR::SedUniformTimeCourse>(document->simulations()[0])};
+
+    simulation->setNumberOfSteps(SIMULATION_PROPERTY);
+    simulation->setOutputEndTime(static_cast<double>(SIMULATION_PROPERTY));
+
+    auto instance {document->instantiate()};
+    const auto instanceTask {instance->tasks()[0]};
+
+    EXPECT_TRUE(instance->startRun());
+
+    for (size_t i {0}; i < WAIT_ITERATIONS; ++i) {
+        if (instance->progress() > 0.0) {
+            break;
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+
+    instance->pauseRun();
+
+    EXPECT_EQ(instance->status(), libOpenCOR::SedInstance::Status::PAUSED);
+
+    // Delete our paused instance, something that would hang if our run was not stopped first.
+
+    instance.reset();
+
+    EXPECT_LT(instanceTask->progress(), 1.0);
+}
+
 TEST(InstanceSedTest, pauseRunAndResumeRunWithNaturalCompletion)
 {
     static const auto MODERATE_STEP_COUNT {50000};
