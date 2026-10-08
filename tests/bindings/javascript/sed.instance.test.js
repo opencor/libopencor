@@ -653,6 +653,46 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
+  test('ODE model with non-uniform time course simulation', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument();
+    const model = new loc.SedModel(document, file);
+    const oneStep = new loc.SedOneStep(document);
+    const steadyState = new loc.SedSteadyState(document);
+    const task = new loc.SedTask(document, model, oneStep);
+
+    oneStep.odeSolver = new loc.SolverCvode();
+    steadyState.odeSolver = new loc.SolverCvode();
+
+    document.addModel(model);
+    document.addSimulation(oneStep);
+    document.addSimulation(steadyState);
+    document.addTask(task);
+
+    let instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which (currently) requires a uniform time course simulation."
+      ]
+    ]);
+
+    task.simulation = steadyState;
+
+    instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation2' is to be used with model 'model1' which (currently) requires a uniform time course simulation."
+      ]
+    ]);
+  });
+
   test('NLA model', () => {
     const file = new loc.File(utils.resourcePath('api/sed/nla.cellml'));
 

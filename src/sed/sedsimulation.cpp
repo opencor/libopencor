@@ -30,7 +30,7 @@ SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
 {
 }
 
-bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
+bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, bool pUniformTimeCourse)
 {
     auto modelType {pModel->pimpl()->mFile->pimpl()->mCellmlFile->type()};
     const auto &modelId = pModel->pimpl()->mId;
@@ -50,6 +50,27 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel)
 
         addError(error);
     };
+
+    // Make sure that we are a uniform time course simulation if our model is an ODE/DAE model.
+    //---GRY--- WE DON'T CURRENTLY SUPPORT OTHER TYPES OF SIMULATION FOR ODE/DAE MODELS.
+
+    if (((modelType == libcellml::AnalyserModel::Type::ODE)
+         || (modelType == libcellml::AnalyserModel::Type::DAE))
+        && !pUniformTimeCourse) {
+        std::string error;
+
+        error.reserve(mId.size() + modelId.size() + 96); // NOLINT
+
+        error += "Simulation '";
+        error += mId;
+        error += "' is to be used with model '";
+        error += modelId;
+        error += "' which (currently) requires a uniform time course simulation.";
+
+        addError(error);
+    }
+
+    // Make sure that we have the solver(s) required by our model.
 
     if ((modelType == libcellml::AnalyserModel::Type::ODE) && (mOdeSolver == nullptr)) {
         addMissingSolverError("ODE");
