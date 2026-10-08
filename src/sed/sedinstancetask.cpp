@@ -567,17 +567,28 @@ double SedInstanceTask::Impl::run()
         }
 
         // Initialise our results structure.
+        // Note: we release our previous results first (to limit our peak memory usage) and only then allocate our new
+        //       results, which we do into a local structure that we move into ours once all of its arrays have been
+        //       allocated. This means that should an allocation fail (e.g., std::bad_alloc), our results structure
+        //       would be left empty rather than with an inconsistent results size and arrays of mismatched sizes (which
+        //       would result in out-of-bounds accesses when retrieving our results).
 
         const auto resultsSize {totalSteps + 1};
 
-        mResults.resultsSize = resultsSize;
+        mResults = {};
 
-        mResults.voi.resize(resultsSize);
-        mResults.states.resize(mStateCount * resultsSize);
-        mResults.rates.resize(mStateCount * resultsSize);
-        mResults.constants.resize(mConstantCount * resultsSize);
-        mResults.computedConstants.resize(mComputedConstantCount * resultsSize);
-        mResults.algebraicVariables.resize(mAlgebraicVariableCount * resultsSize);
+        SedInstanceTaskResults results;
+
+        results.resultsSize = resultsSize;
+
+        results.voi.resize(resultsSize);
+        results.states.resize(mStateCount * resultsSize);
+        results.rates.resize(mStateCount * resultsSize);
+        results.constants.resize(mConstantCount * resultsSize);
+        results.computedConstants.resize(mComputedConstantCount * resultsSize);
+        results.algebraicVariables.resize(mAlgebraicVariableCount * resultsSize);
+
+        mResults = std::move(results);
 
         // Run our simulation from the output start time to the output end time, tracking our results.
 
