@@ -92,6 +92,10 @@ SedInstanceTask::Impl::Impl(const SedAbstractTaskPtr &pTask)
     mSimulation = task->pimpl()->mSimulation;
     mSedUniformTimeCourse = mDifferentialModel ? std::dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) : nullptr;
 
+    // Note: SedTask::Impl::isValid() ensures that an ODE/DAE model is used with a uniform time course simulation.
+
+    ASSERT_EQ(mDifferentialModel, (mSedUniformTimeCourse != nullptr));
+
     const auto &odeSolver {mSimulation->odeSolver()};
     const auto &nlaSolver {mSimulation->nlaSolver()};
 

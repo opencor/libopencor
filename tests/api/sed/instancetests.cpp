@@ -599,6 +599,41 @@ TEST(InstanceSedTest, odeModelWithNoOdeSolver)
     EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
 }
 
+TEST(InstanceSedTest, odeModelWithNonUniformTimeCourseSimulation)
+{
+    static const libOpenCOR::ExpectedIssues ONE_STEP_EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which (currently) requires a uniform time course simulation."},
+    }};
+    static const libOpenCOR::ExpectedIssues STEADY_STATE_EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation2' is to be used with model 'model1' which (currently) requires a uniform time course simulation."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+    auto document {libOpenCOR::SedDocument::create()};
+    auto model {libOpenCOR::SedModel::create(document, file)};
+    auto oneStep {libOpenCOR::SedOneStep::create(document)};
+    auto steadyState {libOpenCOR::SedSteadyState::create(document)};
+    auto task {libOpenCOR::SedTask::create(document, model, oneStep)};
+
+    oneStep->setOdeSolver(libOpenCOR::SolverCvode::create());
+    steadyState->setOdeSolver(libOpenCOR::SolverCvode::create());
+
+    document->addModel(model);
+    document->addSimulation(oneStep);
+    document->addSimulation(steadyState);
+    document->addTask(task);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, ONE_STEP_EXPECTED_ISSUES);
+
+    task->setSimulation(steadyState);
+
+    instance = document->instantiate();
+
+    EXPECT_EQ_ISSUES(instance, STEADY_STATE_EXPECTED_ISSUES);
+}
+
 TEST(InstanceSedTest, nlaModel)
 {
     static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
@@ -684,6 +719,29 @@ TEST(InstanceSedTest, daeModelWithNoOdeOrNlaSolver)
 
     simulation->setOdeSolver(nullptr);
     simulation->setNlaSolver(nullptr);
+
+    auto instance {document->instantiate()};
+
+    EXPECT_EQ_ISSUES(instance, EXPECTED_ISSUES);
+}
+
+TEST(InstanceSedTest, daeModelWithNonUniformTimeCourseSimulation)
+{
+    static const libOpenCOR::ExpectedIssues EXPECTED_ISSUES {{
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which (currently) requires a uniform time course simulation."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."},
+        {libOpenCOR::Issue::Type::ERROR, "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."},
+    }};
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/dae.cellml"))};
+    auto document {libOpenCOR::SedDocument::create()};
+    auto model {libOpenCOR::SedModel::create(document, file)};
+    auto oneStep {libOpenCOR::SedOneStep::create(document)};
+    auto task {libOpenCOR::SedTask::create(document, model, oneStep)};
+
+    document->addModel(model);
+    document->addSimulation(oneStep);
+    document->addTask(task);
 
     auto instance {document->instantiate()};
 

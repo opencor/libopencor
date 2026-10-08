@@ -18,6 +18,7 @@ limitations under the License.
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
 #include "sedtask_p.h"
+#include "seduniformtimecourse_p.h"
 
 #include "utils.h"
 
@@ -78,7 +79,7 @@ bool SedTask::Impl::isValid()
 
     // Make sure that the simulation is valid for the model.
 
-    if (!mSimulation->pimpl()->isValid(mModel)) {
+    if (!mSimulation->pimpl()->isValid(mModel, std::dynamic_pointer_cast<SedUniformTimeCourse>(mSimulation) != nullptr)) {
         addIssues(mSimulation, "Simulation");
     }
 

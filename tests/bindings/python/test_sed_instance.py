@@ -580,6 +580,46 @@ def test_ode_model_with_no_ode_solver():
     assert_issues(instance, expected_issues)
 
 
+def test_ode_model_with_non_uniform_time_course_simulation():
+    one_step_expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which (currently) requires a uniform time course simulation.",
+        ],
+    ]
+    steady_state_expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation2' is to be used with model 'model1' which (currently) requires a uniform time course simulation.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument()
+    model = loc.SedModel(document, file)
+    one_step = loc.SedOneStep(document)
+    steady_state = loc.SedSteadyState(document)
+    task = loc.SedTask(document, model, one_step)
+
+    one_step.ode_solver = loc.SolverCvode()
+    steady_state.ode_solver = loc.SolverCvode()
+
+    document.add_model(model)
+    document.add_simulation(one_step)
+    document.add_simulation(steady_state)
+    document.add_task(task)
+
+    instance = document.instantiate()
+
+    assert_issues(instance, one_step_expected_issues)
+
+    task.simulation = steady_state
+
+    instance = document.instantiate()
+
+    assert_issues(instance, steady_state_expected_issues)
+
+
 def test_nla_model():
     expected_issues = [
         [
@@ -676,6 +716,37 @@ def test_dae_model_with_no_ode_or_nla_solver():
 
     simulation.ode_solver = None
     simulation.nla_solver = None
+
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_issues)
+
+
+def test_dae_model_with_non_uniform_time_course_simulation():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which (currently) requires a uniform time course simulation.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/dae.cellml"))
+    document = loc.SedDocument()
+    model = loc.SedModel(document, file)
+    one_step = loc.SedOneStep(document)
+    task = loc.SedTask(document, model, one_step)
+
+    document.add_model(model)
+    document.add_simulation(one_step)
+    document.add_task(task)
 
     instance = document.instantiate()
 

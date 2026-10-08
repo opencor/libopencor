@@ -30,7 +30,7 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument);
 
-    bool isValid(const SedModelPtr &pModel);
+    bool isValid(const SedModelPtr &pModel, bool pUniformTimeCourse);
 
     const SolverOdePtr &odeSolver() const;
     void setOdeSolver(const SolverOdePtr &pOdeSolver);
