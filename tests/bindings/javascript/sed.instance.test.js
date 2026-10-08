@@ -804,6 +804,38 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
+  test('DAE model with non-uniform time course simulation', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/dae.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument();
+    const model = new loc.SedModel(document, file);
+    const oneStep = new loc.SedOneStep(document);
+    const task = new loc.SedTask(document, model, oneStep);
+
+    document.addModel(model);
+    document.addSimulation(oneStep);
+    document.addTask(task);
+
+    const instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which (currently) requires a uniform time course simulation."
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided."
+      ],
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided."
+      ]
+    ]);
+  });
+
   test('DAE model with failing ODE solver', () => {
     const file = new loc.File(utils.resourcePath('api/sed/dae.cellml'));
 

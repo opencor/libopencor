@@ -722,6 +722,37 @@ def test_dae_model_with_no_ode_or_nla_solver():
     assert_issues(instance, expected_issues)
 
 
+def test_dae_model_with_non_uniform_time_course_simulation():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which (currently) requires a uniform time course simulation.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an ODE solver but none is provided.",
+        ],
+        [
+            loc.Issue.Type.Error,
+            "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires an NLA solver but none is provided.",
+        ],
+    ]
+
+    file = loc.File(utils.resource_path("api/sed/dae.cellml"))
+    document = loc.SedDocument()
+    model = loc.SedModel(document, file)
+    one_step = loc.SedOneStep(document)
+    task = loc.SedTask(document, model, one_step)
+
+    document.add_model(model)
+    document.add_simulation(one_step)
+    document.add_task(task)
+
+    instance = document.instantiate()
+
+    assert_issues(instance, expected_issues)
+
+
 def test_dae_model_with_failing_ode_solver():
     expected_issues = [
         [
