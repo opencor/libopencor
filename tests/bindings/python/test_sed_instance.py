@@ -333,6 +333,74 @@ def test_stop_run_when_not_running():
     assert instance.progress == 0.0
 
 
+def test_stop_run_when_not_running_does_not_affect_next_run():
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    instance = document.instantiate()
+
+    instance.stop_run()
+    instance.run()
+
+    assert instance.progress == 1.0
+    assert not instance.has_issues
+
+    instance.stop_run()
+
+    assert instance.start_run() is True
+    assert instance.wait_for_run() > 0.0
+    assert instance.progress == 1.0
+    assert not instance.has_issues
+
+
+def test_stop_run_right_after_start_run():
+    SIMULATION_PROPERTY = 1000000
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    instance.stop_run()
+    instance.wait_for_run()
+
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert instance.progress < 1.0
+    assert not instance.has_issues
+
+
+def test_pause_run_right_after_start_run():
+    SIMULATION_PROPERTY = 1000000
+    PAUSE_SLEEP = 0.05
+
+    file = loc.File(utils.resource_path("cellml_2.cellml"))
+    document = loc.SedDocument(file)
+    simulation = document.simulations[0]
+    simulation.number_of_steps = SIMULATION_PROPERTY
+    simulation.output_end_time = float(SIMULATION_PROPERTY)
+
+    instance = document.instantiate()
+
+    assert instance.start_run() is True
+
+    instance.pause_run()
+
+    time.sleep(PAUSE_SLEEP)
+
+    assert instance.status == loc.SedInstance.Status.Paused
+
+    instance.stop_run()
+    instance.wait_for_run()
+
+    assert instance.status == loc.SedInstance.Status.Idle
+    assert instance.progress < 1.0
+    assert not instance.has_issues
+
+
 def test_pause_run_and_resume_run():
     SIMULATION_PROPERTY = 1000000
     WAIT_ITERATIONS = 60000

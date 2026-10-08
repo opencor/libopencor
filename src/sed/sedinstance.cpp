@@ -130,9 +130,11 @@ double SedInstance::Impl::run()
         mWarningCount.store(mWarnings.size(), std::memory_order_release);
     }
 
-    // Reset our control flags and make sure that they are passed to each task so that they can be used by them.
-
-    mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
+    // Make sure that our control flags are passed to each task so that they can be used by them.
+    // Note: our control flags are reset by our callers (see SedInstance::run() and startRun()) rather than here.
+    //       Indeed, when called from startRun(), we are run on a separate thread, i.e. some time after startRun() has
+    //       returned. So, if we were to reset our control flags here, a stop or pause requested in between would be
+    //       lost.
 
     for (const auto &task : mTasks) {
         task->pimpl()->mRunControl = &mRunControl;
@@ -198,6 +200,10 @@ bool SedInstance::Impl::startRun()
 
         mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
     }
+
+    // Reset our control flags (see the note in run()).
+
+    mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
 
     mRunning.store(true, std::memory_order_release);
 
@@ -345,6 +351,10 @@ SedInstance::Status SedInstance::status() const noexcept
 
 double SedInstance::run()
 {
+    // Reset our control flags (see the note in SedInstance::Impl::run()).
+
+    pimpl()->mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
+
     return pimpl()->run();
 }
 
