@@ -767,6 +767,21 @@ TEST(InstanceSedTest, odeModelWithInvalidTimes)
 
     EXPECT_EQ(instance->errorCount(), 1);
 
+    simulation->setInitialTime(-std::numeric_limits<double>::infinity());
+    simulation->setOutputStartTime(0.0);
+    simulation->setOutputEndTime(FIFTY);
+
+    instance = document->instantiate();
+
+    EXPECT_EQ(instance->errorCount(), 1);
+
+    simulation->setInitialTime(0.0);
+    simulation->setOutputStartTime(std::numeric_limits<double>::quiet_NaN());
+
+    instance = document->instantiate();
+
+    EXPECT_EQ(instance->errorCount(), 1);
+
     // Valid times, but then made invalid after instantiation.
 
     simulation->setOutputStartTime(0.0);

@@ -480,9 +480,7 @@ void SedInstanceTask::Impl::run(double pVoiStart, double pVoiEnd, double pVoiInt
 
         auto voiTarget {pVoiStart + static_cast<double>(++voiCounter) * pVoiInterval};
 
-        voiEndReached = pTrackResults ?
-                            (voiCounter == lastVoiCounter) :
-                            ((voiTarget >= pVoiEnd) || fuzzyCompare(voiTarget, pVoiEnd));
+        voiEndReached = pTrackResults ? (voiCounter == lastVoiCounter) : (voiTarget >= pVoiEnd);
         voiTarget = voiEndReached ? pVoiEnd : std::min(voiTarget, pVoiEnd);
 
         // Update our model's state.

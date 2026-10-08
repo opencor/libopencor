@@ -766,6 +766,21 @@ def test_ode_model_with_invalid_times():
 
     assert instance.error_count == 1
 
+    simulation.initial_time = -math.inf
+    simulation.output_start_time = 0.0
+    simulation.output_end_time = 50.0
+
+    instance = document.instantiate()
+
+    assert instance.error_count == 1
+
+    simulation.initial_time = 0.0
+    simulation.output_start_time = math.nan
+
+    instance = document.instantiate()
+
+    assert instance.error_count == 1
+
     # Valid times, but then made invalid after instantiation.
 
     simulation.output_start_time = 0.0

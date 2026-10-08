@@ -844,6 +844,21 @@ test.describe('Sed instance tests', () => {
 
     assert.strictEqual(instance.errorCount, 1);
 
+    simulation.initialTime = Number.NEGATIVE_INFINITY;
+    simulation.outputStartTime = 0.0;
+    simulation.outputEndTime = 50.0;
+
+    instance = document.instantiate();
+
+    assert.strictEqual(instance.errorCount, 1);
+
+    simulation.initialTime = 0.0;
+    simulation.outputStartTime = Number.NaN;
+
+    instance = document.instantiate();
+
+    assert.strictEqual(instance.errorCount, 1);
+
     // Valid times, but then made invalid after instantiation.
 
     simulation.outputStartTime = 0.0;
