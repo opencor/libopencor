@@ -33,6 +33,25 @@ SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
 {
 }
 
+std::string SedSimulation::Impl::invalidNumberOfStepsError(const SedModelPtr &pModel, int pNumberOfSteps) const
+{
+    const auto &modelId = pModel->pimpl()->mId;
+    const auto numberOfSteps {toString(pNumberOfSteps)};
+    std::string res;
+
+    res.reserve(mId.size() + modelId.size() + numberOfSteps.size() + 112); // NOLINT
+
+    res += "Simulation '";
+    res += mId;
+    res += "' is to be used with model '";
+    res += modelId;
+    res += "' which requires a strictly positive number of steps but ";
+    res += numberOfSteps;
+    res += " is provided.";
+
+    return res;
+}
+
 bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, const SedUniformTimeCoursePtr &pUniformTimeCourse)
 {
     auto modelType {pModel->pimpl()->mFile->pimpl()->mCellmlFile->type()};
@@ -77,20 +96,7 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, const SedUniformTim
 
             addError(error);
         } else if (pUniformTimeCourse->numberOfSteps() <= 0) {
-            const auto numberOfSteps {toString(pUniformTimeCourse->numberOfSteps())};
-            std::string error;
-
-            error.reserve(mId.size() + modelId.size() + numberOfSteps.size() + 112); // NOLINT
-
-            error += "Simulation '";
-            error += mId;
-            error += "' is to be used with model '";
-            error += modelId;
-            error += "' which requires a strictly positive number of steps but ";
-            error += numberOfSteps;
-            error += " is provided.";
-
-            addError(error);
+            addError(invalidNumberOfStepsError(pModel, pUniformTimeCourse->numberOfSteps()));
         }
     }
 

@@ -526,12 +526,24 @@ double SedInstanceTask::Impl::run()
     auto startTime {std::chrono::high_resolution_clock::now()};
 
     // Reset our progress counters.
+    // Note: we retrieve our number of steps only once since it is used in several places below.
 
     const auto *sedUniformTimeCoursePimpl {mDifferentialModel ? mSedUniformTimeCourse->pimpl() : nullptr};
-    const auto totalSteps {mDifferentialModel ? static_cast<size_t>(sedUniformTimeCoursePimpl->mNumberOfSteps) : 1};
+    const auto numberOfSteps {mDifferentialModel ? sedUniformTimeCoursePimpl->mNumberOfSteps : 1};
+    const auto totalSteps {(numberOfSteps > 0) ? static_cast<size_t>(numberOfSteps) : 0};
 
     mCompletedSteps.store(0, std::memory_order_relaxed);
     mTotalSteps.store(totalSteps, std::memory_order_relaxed);
+
+    // Make sure that our number of steps is valid.
+    // Note: our number of steps was validated when we were instantiated (see SedSimulation::Impl::isValid()), but it
+    //       may have been changed since then.
+
+    if (numberOfSteps <= 0) {
+        addIssue(Issue::Type::ERROR, sedUniformTimeCoursePimpl->invalidNumberOfStepsError(mModel, numberOfSteps), "Simulation");
+
+        return 0.0;
+    }
 
     // (Re)initialise our model.
     // Note: reinitialise our model because we initialised it when we created the instance task.
@@ -544,7 +556,7 @@ double SedInstanceTask::Impl::run()
         // Run our simulation from the initial time to the output start time, without tracking our results, but only if
         // the output start time is after the initial time.
 
-        const auto voiInterval {(sedUniformTimeCoursePimpl->mOutputEndTime - sedUniformTimeCoursePimpl->mOutputStartTime) / sedUniformTimeCoursePimpl->mNumberOfSteps};
+        const auto voiInterval {(sedUniformTimeCoursePimpl->mOutputEndTime - sedUniformTimeCoursePimpl->mOutputStartTime) / numberOfSteps};
 
         if (!fuzzyCompare(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime)) {
             run(sedUniformTimeCoursePimpl->mInitialTime, sedUniformTimeCoursePimpl->mOutputStartTime, voiInterval, false);

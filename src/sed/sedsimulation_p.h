@@ -30,6 +30,8 @@ public:
 
     explicit Impl(const SedDocumentPtr &pDocument);
 
+    std::string invalidNumberOfStepsError(const SedModelPtr &pModel, int pNumberOfSteps) const;
+
     bool isValid(const SedModelPtr &pModel, const SedUniformTimeCoursePtr &pUniformTimeCourse);
 
     const SolverOdePtr &odeSolver() const;

@@ -705,12 +705,14 @@ test.describe('Sed instance tests', () => {
 
     let instance = document.instantiate();
 
-    assertIssues(loc, instance, [
+    const zeroStepsExpectedIssues = [
       [
         loc.Issue.Type.ERROR,
         "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but 0 is provided."
       ]
-    ]);
+    ];
+
+    assertIssues(loc, instance, zeroStepsExpectedIssues);
 
     simulation.numberOfSteps = -100;
 
@@ -741,6 +743,33 @@ test.describe('Sed instance tests', () => {
     assert.strictEqual(instance.hasIssues, false);
     assert.ok(instance.run() > 0.0);
     assert.strictEqual(instance.hasIssues, false);
+
+    // Make sure that an invalid number of steps is reported when running an instance even if it was valid when the
+    // instance was created.
+
+    const instanceTask = instance.tasks[0];
+
+    simulation.numberOfSteps = 0;
+
+    assert.strictEqual(instance.run(), 0.0);
+    assertIssues(loc, instance, zeroStepsExpectedIssues);
+    assert.strictEqual(instanceTask.voi.length, 1001);
+
+    simulation.numberOfSteps = -100;
+
+    assert.strictEqual(instance.startRun(), true);
+    assert.strictEqual(instance.waitForRun(), 0.0);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assertIssues(loc, instance, negativeStepsExpectedIssues);
+    assert.strictEqual(instanceTask.voi.length, 1001);
+
+    // Make sure that the instance can be run again once the number of steps has been fixed.
+
+    simulation.numberOfSteps = 500;
+
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+    assert.strictEqual(instanceTask.voi.length, 501);
   });
 
   test('NLA model', () => {
