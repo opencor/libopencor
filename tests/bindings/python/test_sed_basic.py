@@ -109,15 +109,97 @@ def test_combine_archive_with_no_manifest_file():
     assert_issues(document, expected_issues)
 
 
-def test_combine_archive_with_no_master_file():
+def test_combine_archive_with_no_master_file_and_one_cellml_file():
+    file = loc.File(
+        utils.resource_path("api/sed/no_master_file_with_one_cellml_file.omex")
+    )
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert document.simulations[0].output_end_time == 1000.0
+
+    instance = document.instantiate()
+
+    instance.run()
+
+    assert not instance.has_issues
+
+
+def test_combine_archive_with_no_master_file_and_one_unknown_cellml_file():
     expected_issues = [
         [
             loc.Issue.Type.Error,
-            "A simulation experiment description cannot be created using a COMBINE archive with no master file.",
+            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
         ],
     ]
 
-    file = loc.File(utils.resource_path("api/sed/no_master_file.omex"))
+    file = loc.File(
+        utils.resource_path("api/sed/no_master_file_with_one_unknown_cellml_file.omex")
+    )
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_no_master_file_and_several_cellml_files():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with no master file, no SED-ML file, and several CellML files.",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/no_master_file_with_several_cellml_files.omex")
+    )
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_no_master_file_and_one_sedml_file():
+    file = loc.File(
+        utils.resource_path("api/sed/no_master_file_with_one_sedml_file.omex")
+    )
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert document.simulations[0].output_end_time == 50.0
+
+    instance = document.instantiate()
+
+    instance.run()
+
+    assert not instance.has_issues
+
+
+def test_combine_archive_with_no_master_file_and_one_unknown_sedml_file():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/no_master_file_with_one_unknown_sedml_file.omex")
+    )
+    document = loc.SedDocument(file)
+
+    assert_issues(document, expected_issues)
+
+
+def test_combine_archive_with_no_master_file_and_several_sedml_files():
+    expected_issues = [
+        [
+            loc.Issue.Type.Error,
+            "A simulation experiment description cannot be created using a COMBINE archive with no master file and several SED-ML files.",
+        ],
+    ]
+
+    file = loc.File(
+        utils.resource_path("api/sed/no_master_file_with_several_sedml_files.omex")
+    )
     document = loc.SedDocument(file)
 
     assert_issues(document, expected_issues)

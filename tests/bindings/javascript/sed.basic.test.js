@@ -129,8 +129,25 @@ test.describe('Sed basic tests', () => {
     ]);
   });
 
-  test('COMBINE archive with no master file', () => {
-    const file = new loc.File(utils.resourcePath('api/sed/no_master_file.omex'));
+  test('COMBINE archive with no master file and one CellML file', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_cellml_file.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.simulations.get(0).outputEndTime, 1000);
+
+    const instance = document.instantiate();
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('COMBINE archive with no master file and one unknown CellML file', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_unknown_cellml_file.omex'));
 
     file.setContents(utils.fileContents(file.path));
 
@@ -139,7 +156,69 @@ test.describe('Sed basic tests', () => {
     assertIssues(loc, document, [
       [
         loc.Issue.Type.ERROR,
-        'A simulation experiment description cannot be created using a COMBINE archive with no master file.'
+        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+      ]
+    ]);
+  });
+
+  test('COMBINE archive with no master file and several CellML files', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_several_cellml_files.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.ERROR,
+        'A simulation experiment description cannot be created using a COMBINE archive with no master file, no SED-ML file, and several CellML files.'
+      ]
+    ]);
+  });
+
+  test('COMBINE archive with no master file and one SED-ML file', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_sedml_file.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.simulations.get(0).outputEndTime, 50);
+
+    const instance = document.instantiate();
+
+    instance.run();
+
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
+  test('COMBINE archive with no master file and one unknown SED-ML file', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_one_unknown_sedml_file.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.ERROR,
+        'A simulation experiment description cannot be created using a COMBINE archive with an unknown master file (only CellML and SED-ML master files are supported).'
+      ]
+    ]);
+  });
+
+  test('COMBINE archive with no master file and several SED-ML files', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/no_master_file_with_several_sedml_files.omex'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+
+    assertIssues(loc, document, [
+      [
+        loc.Issue.Type.ERROR,
+        'A simulation experiment description cannot be created using a COMBINE archive with no master file and several SED-ML files.'
       ]
     ]);
   });

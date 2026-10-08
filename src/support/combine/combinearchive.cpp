@@ -22,7 +22,29 @@ limitations under the License.
 #include "combine/combinearchive.h"
 #include "omex/CaContent.h"
 
+#include <regex>
+
 namespace libOpenCOR {
+
+namespace {
+
+bool isCellmlFormat(const std::string &pFormat)
+{
+    // Note: we accept versioned formats (e.g., cellml.1.0 or cellml.2.0).
+
+    static const std::regex CELLML_FORMAT_REGEX {R"(^http://identifiers\.org/combine\.specifications/cellml(\..*)?$)"};
+
+    return std::regex_match(pFormat, CELLML_FORMAT_REGEX);
+}
+
+bool isSedmlFormat(const std::string &pFormat)
+{
+    static const std::string SEDML_FORMAT {"http://identifiers.org/combine.specifications/sed-ml"};
+
+    return pFormat == SEDML_FORMAT;
+}
+
+} // namespace
 
 CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents)
     : mArchiveContents(std::move(pArchiveContents))
@@ -37,6 +59,9 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
     mFiles.reserve(fileCount);
     mFileNames.reserve(fileCount);
 
+    FilePtr cellmlFile;
+    FilePtr sedmlFile;
+
     for (int i {0}; i < mArchive->getNumEntries(); ++i) {
         const auto *entry {mArchive->getEntry(i)};
         auto location {entry->getLocation()};
@@ -50,6 +75,50 @@ CombineArchive::Impl::Impl(const FilePtr &pFile, libcombine::CombineArchive *pAr
         if (entry->getMaster()) {
             mMasterFile = file;
         }
+
+        // Determine the type of the file using its contents or, if they are not recognised (e.g., malformed XML), using
+        // the format specified in the manifest. This means that a broken SED-ML file is still considered to be a SED-ML
+        // file and, as such, cannot be silently ignored in favour of a CellML file.
+
+        auto fileType {file->type()};
+
+        if (fileType == File::Type::UNKNOWN_FILE) {
+            const auto &format {entry->getFormat()};
+
+            if (isCellmlFormat(format)) {
+                fileType = File::Type::CELLML_FILE;
+            } else if (isSedmlFormat(format)) {
+                fileType = File::Type::SEDML_FILE;
+            }
+        }
+
+        if (fileType == File::Type::CELLML_FILE) {
+            if (mCellmlFileCount == 0) {
+                cellmlFile = file;
+            }
+
+            ++mCellmlFileCount;
+        } else if (fileType == File::Type::SEDML_FILE) {
+            if (mSedmlFileCount == 0) {
+                sedmlFile = file;
+            }
+
+            ++mSedmlFileCount;
+        }
+    }
+
+    // Determine the master file, if none was specified.
+    // Note: the master attribute is optional, so if no master file was specified then we consider the SED-ML file to be
+    //       the master file, if there is only one SED-ML file, or the CellML file to be the master file, if there is no
+    //       SED-ML file and only one CellML file. Otherwise, it is up to the user (or a tool like Web OpenCOR) to decide
+    //       which file should be used.
+
+    if (mMasterFile == nullptr) {
+        if (mSedmlFileCount == 1) {
+            mMasterFile = sedmlFile;
+        } else if ((mSedmlFileCount == 0) && (mCellmlFileCount == 1)) {
+            mMasterFile = cellmlFile;
+        }
     }
 }
 
@@ -61,6 +130,16 @@ CombineArchive::Impl::~Impl()
 const FilePtr &CombineArchive::Impl::masterFile() const
 {
     return mMasterFile;
+}
+
+size_t CombineArchive::Impl::cellmlFileCount() const
+{
+    return mCellmlFileCount;
+}
+
+size_t CombineArchive::Impl::sedmlFileCount() const
+{
+    return mSedmlFileCount;
 }
 
 bool CombineArchive::Impl::hasFiles() const
@@ -174,6 +253,16 @@ CombineArchivePtr CombineArchive::create(const FilePtr &pFile)
 const FilePtr &CombineArchive::masterFile() const
 {
     return pimpl()->masterFile();
+}
+
+size_t CombineArchive::cellmlFileCount() const
+{
+    return pimpl()->cellmlFileCount();
+}
+
+size_t CombineArchive::sedmlFileCount() const
+{
+    return pimpl()->sedmlFileCount();
 }
 
 bool CombineArchive::hasFiles() const

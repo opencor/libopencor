@@ -44,6 +44,8 @@ public:
     static CombineArchivePtr create(const FilePtr &pFile);
 
     const FilePtr &masterFile() const;
+    size_t cellmlFileCount() const;
+    size_t sedmlFileCount() const;
 
     bool hasFiles() const;
     size_t fileCount() const;

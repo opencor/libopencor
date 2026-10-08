@@ -32,11 +32,15 @@ public:
     std::vector<FilePtr> mFiles;
     std::vector<std::string> mFileNames;
     FilePtr mMasterFile;
+    size_t mCellmlFileCount {0};
+    size_t mSedmlFileCount {0};
 
     explicit Impl(const FilePtr &pFile, libcombine::CombineArchive *pArchive, UnsignedChars &&pArchiveContents);
     ~Impl() override;
 
     const FilePtr &masterFile() const;
+    size_t cellmlFileCount() const;
+    size_t sedmlFileCount() const;
     bool hasFiles() const;
     size_t fileCount() const;
     const Strings &fileNames() const;
