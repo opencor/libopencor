@@ -90,10 +90,17 @@ void SedDocument::Impl::initialiseFromSedmlFile(const SedDocumentPtr &pOwner, co
 
 void SedDocument::Impl::initialiseFromCombineArchive(const SedDocumentPtr &pOwner, const FilePtr &pFile)
 {
-    const auto &masterFile {pFile->pimpl()->mCombineArchive->masterFile()};
+    const auto &combineArchive {pFile->pimpl()->mCombineArchive};
+    const auto &masterFile {combineArchive->masterFile()};
 
     if (masterFile == nullptr) {
-        addError("A simulation experiment description cannot be created using a COMBINE archive with no master file.");
+        if (combineArchive->sedmlFileCount() > 1) {
+            addError("A simulation experiment description cannot be created using a COMBINE archive with no master file and several SED-ML files.");
+        } else if (combineArchive->cellmlFileCount() > 1) {
+            addError("A simulation experiment description cannot be created using a COMBINE archive with no master file, no SED-ML file, and several CellML files.");
+        } else {
+            addError("A simulation experiment description cannot be created using a COMBINE archive with no master file.");
+        }
     } else {
         auto masterFileType {masterFile->type()};
 
