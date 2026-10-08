@@ -18,8 +18,11 @@ limitations under the License.
 #include "seddocument_p.h"
 #include "sedmodel_p.h"
 #include "sedsimulation_p.h"
+#include "seduniformtimecourse_p.h"
 #include "solvernla_p.h"
 #include "solverode_p.h"
+
+#include "utils.h"
 
 namespace libOpenCOR {
 
@@ -30,7 +33,7 @@ SedSimulation::Impl::Impl(const SedDocumentPtr &pDocument)
 {
 }
 
-bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, bool pUniformTimeCourse)
+bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, const SedUniformTimeCoursePtr &pUniformTimeCourse)
 {
     auto modelType {pModel->pimpl()->mFile->pimpl()->mCellmlFile->type()};
     const auto &modelId = pModel->pimpl()->mId;
@@ -51,23 +54,44 @@ bool SedSimulation::Impl::isValid(const SedModelPtr &pModel, bool pUniformTimeCo
         addError(error);
     };
 
-    // Make sure that we are a uniform time course simulation if our model is an ODE/DAE model.
+    // Reset our issues so that they are not reported again should we be validated again.
+
+    removeAllIssues();
+
+    // Make sure that we are a uniform time course simulation with a strictly positive number of steps if our model is
+    // an ODE/DAE model.
     //---GRY--- WE DON'T CURRENTLY SUPPORT OTHER TYPES OF SIMULATION FOR ODE/DAE MODELS.
 
-    if (((modelType == libcellml::AnalyserModel::Type::ODE)
-         || (modelType == libcellml::AnalyserModel::Type::DAE))
-        && !pUniformTimeCourse) {
-        std::string error;
+    if ((modelType == libcellml::AnalyserModel::Type::ODE)
+        || (modelType == libcellml::AnalyserModel::Type::DAE)) {
+        if (pUniformTimeCourse == nullptr) {
+            std::string error;
 
-        error.reserve(mId.size() + modelId.size() + 96); // NOLINT
+            error.reserve(mId.size() + modelId.size() + 96); // NOLINT
 
-        error += "Simulation '";
-        error += mId;
-        error += "' is to be used with model '";
-        error += modelId;
-        error += "' which (currently) requires a uniform time course simulation.";
+            error += "Simulation '";
+            error += mId;
+            error += "' is to be used with model '";
+            error += modelId;
+            error += "' which (currently) requires a uniform time course simulation.";
 
-        addError(error);
+            addError(error);
+        } else if (pUniformTimeCourse->numberOfSteps() <= 0) {
+            const auto numberOfSteps {toString(pUniformTimeCourse->numberOfSteps())};
+            std::string error;
+
+            error.reserve(mId.size() + modelId.size() + numberOfSteps.size() + 112); // NOLINT
+
+            error += "Simulation '";
+            error += mId;
+            error += "' is to be used with model '";
+            error += modelId;
+            error += "' which requires a strictly positive number of steps but ";
+            error += numberOfSteps;
+            error += " is provided.";
+
+            addError(error);
+        }
     }
 
     // Make sure that we have the solver(s) required by our model.

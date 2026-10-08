@@ -21,6 +21,7 @@ limitations under the License.
 #include "libopencor/seddocument.h"
 
 #include <chrono>
+#include <exception>
 #include <memory>
 
 namespace libOpenCOR {
@@ -140,22 +141,38 @@ double SedInstance::Impl::run()
     }
 
     // Run all the tasks associated with this instance unless they have some issues.
+    // Note: a task may throw an exception (e.g., std::bad_alloc if its results cannot be allocated), in which case we
+    //       report it as an error rather than let it escape. Indeed, run() may be called from startRun(), i.e. on a
+    //       separate thread, and an escaping exception would leave us in a state from which we cannot recover. Also,
+    //       we have no way to trigger such an exception in our tests, hence we ignore our try...catch statement during
+    //       code coverage.
 
     auto res {0.0};
 
-    for (const auto &task : mTasks) {
-        if (!task->hasIssues()) {
-            res += task->pimpl()->run();
+#ifndef CODE_COVERAGE_ENABLED
+    try {
+#endif
+        for (const auto &task : mTasks) {
+            if (!task->hasIssues()) {
+                res += task->pimpl()->run();
 
-            if (task->hasIssues()) {
-                addIssues(task, "Task");
+                if (task->hasIssues()) {
+                    addIssues(task, "Task");
 
-                // Reset the issues of the task so that they are not reported again should the instance be run again.
+                    // Reset the issues of the task so that they are not reported again should the instance be run
+                    // again.
 
-                task->pimpl()->removeAllIssues();
+                    task->pimpl()->removeAllIssues();
+                }
             }
         }
+#ifndef CODE_COVERAGE_ENABLED
+    } catch (const std::exception &exception) {
+        addError(std::string("The simulation failed: ") + exception.what() + ".");
+    } catch (...) {
+        addError("The simulation failed.");
     }
+#endif
 
     // Reset and make sure that our control flags are no longer passed to each task.
 
@@ -275,7 +292,20 @@ SedInstance::SedInstance(const SedDocumentPtr &pDocument)
 
 SedInstance::~SedInstance()
 {
-    pimpl()->waitForRun(); // To ensure that the instance is not running before we delete it.
+    // Make sure that the instance is not running before we delete it.
+    // Note: run() reports a failure as an issue rather than throw an exception, so waitForRun() should never throw, but
+    //       an exception must never escape a destructor (it would result in std::terminate() being called), hence we
+    //       make sure of it.
+
+#ifndef CODE_COVERAGE_ENABLED
+    try {
+#endif
+        pimpl()->waitForRun();
+#ifndef CODE_COVERAGE_ENABLED
+    } catch (...) { // NOLINT(bugprone-empty-catch)
+        // There is nothing more that we can do since we are being deleted.
+    }
+#endif
 }
 
 SedInstance::Impl *SedInstance::pimpl()

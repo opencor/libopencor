@@ -693,6 +693,56 @@ test.describe('Sed instance tests', () => {
     ]);
   });
 
+  test('ODE model with invalid number of steps', () => {
+    const file = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    file.setContents(utils.fileContents(file.path));
+
+    const document = new loc.SedDocument(file);
+    const simulation = document.simulations.get(0);
+
+    simulation.numberOfSteps = 0;
+
+    let instance = document.instantiate();
+
+    assertIssues(loc, instance, [
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but 0 is provided."
+      ]
+    ]);
+
+    simulation.numberOfSteps = -100;
+
+    instance = document.instantiate();
+
+    const negativeStepsExpectedIssues = [
+      [
+        loc.Issue.Type.ERROR,
+        "Task | Simulation: simulation 'simulation1' is to be used with model 'model1' which requires a strictly positive number of steps but -100 is provided."
+      ]
+    ];
+
+    assertIssues(loc, instance, negativeStepsExpectedIssues);
+
+    // Running the instance should not do anything, but it should still leave it idle.
+
+    assert.strictEqual(instance.startRun(), true);
+    assert.strictEqual(instance.waitForRun(), 0.0);
+    assert.strictEqual(instance.status, loc.SedInstance.Status.IDLE);
+    assertIssues(loc, instance, negativeStepsExpectedIssues);
+
+    // Make sure that the number of steps is not reported as invalid anymore once it has been fixed.
+
+    simulation.numberOfSteps = 1000;
+
+    instance = document.instantiate();
+
+    assert.strictEqual(instance.hasIssues, false);
+    assert.ok(instance.run() > 0.0);
+    assert.strictEqual(instance.hasIssues, false);
+  });
+
   test('NLA model', () => {
     const file = new loc.File(utils.resourcePath('api/sed/nla.cellml'));
 

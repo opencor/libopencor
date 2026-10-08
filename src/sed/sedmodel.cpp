@@ -41,6 +41,12 @@ const FilePtr &SedModel::Impl::file() const
 
 bool SedModel::Impl::isValid()
 {
+    // Reset our issues so that they are not reported again should we be validated again.
+
+    removeAllIssues();
+
+    // Make sure that the CellML file is valid.
+
     switch (mFile->pimpl()->mCellmlFile->type()) {
     case libcellml::AnalyserModel::Type::INVALID:
         addError("The CellML file is invalid.");
