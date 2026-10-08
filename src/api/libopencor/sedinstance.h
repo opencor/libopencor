@@ -24,6 +24,9 @@ namespace libOpenCOR {
  * @brief The SedInstance class.
  *
  * The SedInstance class is used to describe an instance of a simulation experiment description.
+ *
+ * Deleting an instance stops any run in progress (be it running or paused) and waits for it to stop, so the results of
+ * a task that is kept beyond the deletion of its instance may be incomplete.
  */
 
 class LIBOPENCOR_EXPORT SedInstance: public Logger
@@ -115,7 +118,7 @@ public:
     /**
      * @brief Stop any currently-running instance.
      *
-     * Stop any currently-running instance.
+     * Stop any currently-running instance. This is also done when an instance is deleted.
      */
 
     void stopRun();

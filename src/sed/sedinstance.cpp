@@ -130,9 +130,11 @@ double SedInstance::Impl::run()
         mWarningCount.store(mWarnings.size(), std::memory_order_release);
     }
 
-    // Reset our control flags and make sure that they are passed to each task so that they can be used by them.
-
-    mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
+    // Make sure that our control flags are passed to each task so that they can be used by them.
+    // Note: our control flags are reset by our callers (see SedInstance::run() and startRun()) rather than here.
+    //       Indeed, when called from startRun(), we are run on a separate thread, i.e. some time after startRun() has
+    //       returned. So, if we were to reset our control flags here, a stop or pause requested in between would be
+    //       lost.
 
     for (const auto &task : mTasks) {
         task->pimpl()->mRunControl = &mRunControl;
@@ -199,6 +201,10 @@ bool SedInstance::Impl::startRun()
         mLastRunElapsedTime.store(mRunFuture.get(), std::memory_order_relaxed);
     }
 
+    // Reset our control flags (see the note in run()).
+
+    mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
+
     mRunning.store(true, std::memory_order_release);
 
     // Start our run in a separate thread.
@@ -252,14 +258,28 @@ void SedInstance::Impl::pauseRun()
 
 void SedInstance::Impl::resumeRun()
 {
-    mRunControl.fetch_and(~INSTANCE_RUN_CONTROL_PAUSE, std::memory_order_relaxed);
+    // Note: our control flags must be updated while holding our pause mutex. Otherwise, a paused task could check them
+    //       (and find that it is still paused), we could then update them and notify our pause condition variable, and
+    //       only then would the task start waiting on our pause condition variable, i.e. it would never be woken up.
+
+    {
+        const std::scoped_lock<std::mutex> pauseLock(mPauseMutex);
+
+        mRunControl.fetch_and(~INSTANCE_RUN_CONTROL_PAUSE, std::memory_order_relaxed);
+    }
 
     mPauseConditionVariable.notify_all();
 }
 
 void SedInstance::Impl::stopRun()
 {
-    mRunControl.fetch_or(INSTANCE_RUN_CONTROL_STOP, std::memory_order_relaxed);
+    // Note: see the note in resumeRun().
+
+    {
+        const std::scoped_lock<std::mutex> pauseLock(mPauseMutex);
+
+        mRunControl.fetch_or(INSTANCE_RUN_CONTROL_STOP, std::memory_order_relaxed);
+    }
 
     mPauseConditionVariable.notify_all();
 }
@@ -313,13 +333,16 @@ SedInstance::SedInstance(const SedDocumentPtr &pDocument)
 SedInstance::~SedInstance()
 {
     // Make sure that the instance is not running before we delete it.
-    // Note: run() reports a failure as an issue rather than throw an exception, so waitForRun() should never throw, but
-    //       an exception must never escape a destructor (it would result in std::terminate() being called), hence we
-    //       make sure of it.
+    // Note #1: we stop any run before waiting for it since a paused run would otherwise never complete, i.e. we would
+    //          wait for it forever.
+    // Note #2: run() reports a failure as an issue rather than throw an exception, so waitForRun() should never throw,
+    //          but an exception must never escape a destructor (it would result in std::terminate() being called),
+    //          hence we make sure of it.
 
 #ifndef CODE_COVERAGE_ENABLED
     try {
 #endif
+        pimpl()->stopRun();
         pimpl()->waitForRun();
 #ifndef CODE_COVERAGE_ENABLED
     } catch (...) { // NOLINT(bugprone-empty-catch)
@@ -345,6 +368,10 @@ SedInstance::Status SedInstance::status() const noexcept
 
 double SedInstance::run()
 {
+    // Reset our control flags (see the note in SedInstance::Impl::run()).
+
+    pimpl()->mRunControl.store(INSTANCE_RUN_CONTROL_NONE, std::memory_order_relaxed);
+
     return pimpl()->run();
 }
 
