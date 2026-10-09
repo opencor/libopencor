@@ -133,6 +133,39 @@ TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileInWorkingDirectory)
     EXPECT_EQ(document->models()[0]->file()->path(), libOpenCOR::resourcePath("api/sed/cellml_2.cellml"));
 }
 
+TEST(BasicSedTest, remoteSedmlFileWithRelativeCellmlFile)
+{
+    // A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
+    // fragment of the SED-ML file's URL contain some forward slashes.
+
+    auto file {libOpenCOR::File::create("https://example.com/simulations/simulation.sedml?a=b/c#d/e", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("../models/./model.cellml").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.com/models/model.cellml", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, remoteSedmlFileWithoutPathWithRelativeCellmlFile)
+{
+    // A relative model source is relative to the root of a remote SED-ML file which URL has no path.
+
+    auto file {libOpenCOR::File::create("https://example.com?a=b/c", false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("model.cellml").c_str()));
+
+    auto neededFile {libOpenCOR::File::create("https://example.com/model.cellml", false)};
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
 TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)
 {
     auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/remote_cellml_file.sedml"))};

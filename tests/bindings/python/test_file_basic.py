@@ -103,6 +103,28 @@ def test_non_existing_relative_local_file_with_leading_parent_directories():
     assert_issues(file, expected_non_existing_file_issues)
 
 
+def test_too_long_local_file_name():
+    # A file name that is too long for the file system must not result in an exception being thrown.
+
+    TOO_LONG_NAME_LENGTH = 5000
+
+    file = loc.File("/" + "a" * TOO_LONG_NAME_LENGTH)
+
+    assert file.type == loc.File.Type.IrretrievableFile
+    assert file.contents == []
+    assert_issues(file, expected_non_existing_file_issues)
+
+
+def test_local_directory():
+    # A directory is not a file, but it must not result in an exception being thrown.
+
+    file = loc.File(utils.resource_path("api"))
+
+    assert file.type == loc.File.Type.UnknownFile
+    assert file.contents == []
+    assert_issues(file, expected_no_issues)
+
+
 def test_url_based_local_file():
     file_path = utils.resource_path("file.txt")
 

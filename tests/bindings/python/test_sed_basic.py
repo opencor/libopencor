@@ -127,6 +127,37 @@ def test_sedml_file_with_relative_cellml_file_in_working_directory():
     )
 
 
+def test_remote_sedml_file_with_relative_cellml_file():
+    # A relative model source is relative to the remote SED-ML file, whatever the platform and even if the query and/or
+    # fragment of the SED-ML file's URL contain some forward slashes.
+
+    file = loc.File("https://example.com/simulations/simulation.sedml?a=b/c#d/e", False)
+
+    file.contents = utils.text_to_list(sedml_contents("../models/./model.cellml"))
+
+    needed_file = loc.File("https://example.com/models/model.cellml", False)
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+
+def test_remote_sedml_file_without_path_with_relative_cellml_file():
+    # A relative model source is relative to the root of a remote SED-ML file which URL has no path.
+
+    file = loc.File("https://example.com?a=b/c", False)
+
+    file.contents = utils.text_to_list(sedml_contents("model.cellml"))
+
+    needed_file = loc.File("https://example.com/model.cellml", False)
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+
 def test_sedml_file_with_remote_cellml_file():
     file = loc.File(utils.resource_path("api/sed/remote_cellml_file.sedml"))
     document = loc.SedDocument(file)

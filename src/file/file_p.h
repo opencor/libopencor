@@ -38,10 +38,10 @@ public:
     std::string mUrl;
 
     bool mTypeChecked {false};
-
     bool mRetrieveContents {true};
     bool mContentsRetrieved {false};
     UnsignedChars mContents;
+    bool mDownloaded {false};
 
     CellmlFilePtr mCellmlFile;
     SedmlFilePtr mSedmlFile;

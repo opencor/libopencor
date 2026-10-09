@@ -118,6 +118,30 @@ TEST(BasicFileTest, nonExistingRelativeLocalFileWithLeadingParentDirectories)
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
+TEST(BasicFileTest, tooLongLocalFileName)
+{
+    // A file name that is too long for the file system must not result in an exception being thrown.
+
+    static constexpr auto TOO_LONG_NAME_LENGTH {5000};
+
+    auto file {libOpenCOR::File::create("/" + std::string(TOO_LONG_NAME_LENGTH, 'a'))};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
+}
+
+TEST(BasicFileTest, localDirectory)
+{
+    // A directory is not a file, but it must not result in an exception being thrown.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api"))};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::UNKNOWN_FILE);
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, expectedNoIssues());
+}
+
 TEST(BasicFileTest, urlBasedLocalFile)
 {
     auto filePath {libOpenCOR::resourcePath("file.txt")};

@@ -53,15 +53,34 @@ limitations under the License.
 namespace libOpenCOR {
 
 SedmlFile::Impl::Impl(const FilePtr &pFile, libsedml::SedDocument *pDocument)
-    : mLocation(pathToString(stringToPath(pFile->url().empty() ?
-                                              pFile->fileName() :
-                                              pFile->url())
-                                 .parent_path()))
-    , mDocument(pDocument)
+    : mDocument(pDocument)
     , mContents(toString(pFile->contents()))
 {
-    if (!mLocation.empty()) {
-        mLocation += "/";
+    // Determine the location of the SED-ML file, i.e. what a relative model source is relative to.
+    // Note: for a remote SED-ML file, we must not use std::filesystem::path since its separators are platform specific
+    //       (e.g., "https://example.com/dir" would become "https:\\example.com\dir" on Windows) and since the query
+    //       and/or fragment of the URL, if any, may contain forward slashes.
+
+    const auto &url {pFile->url()};
+
+    if (url.empty()) {
+        mLocation = pathToString(stringToPath(pFile->fileName()).parent_path());
+
+        if (!mLocation.empty()) {
+            mLocation += "/";
+        }
+    } else {
+        // Note: the URL may have no path (e.g., "https://example.com?a=b"), in which case its location is its root
+        //       (e.g., "https://example.com/").
+
+        static constexpr std::string_view SCHEME_SEPARATOR {"://"};
+
+        auto urlWithoutQueryAndFragment {url.substr(0, url.find_first_of("?#"))};
+        auto pathPos {urlWithoutQueryAndFragment.find('/', urlWithoutQueryAndFragment.find(SCHEME_SEPARATOR) + SCHEME_SEPARATOR.size())};
+
+        mLocation = (pathPos == std::string::npos) ?
+                        urlWithoutQueryAndFragment + "/" :
+                        urlWithoutQueryAndFragment.substr(0, urlWithoutQueryAndFragment.rfind('/') + 1);
     }
 }
 

@@ -65,6 +65,28 @@ test.describe('File basic tests', () => {
     assertIssues(loc, file, expectedNoIssues);
   });
 
+  test('Too long local file name', () => {
+    // A file name that is too long for the file system must not result in an exception being thrown.
+
+    const TOO_LONG_NAME_LENGTH = 5000;
+
+    const file = new loc.File(`/${'a'.repeat(TOO_LONG_NAME_LENGTH)}`);
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+  });
+
+  test('Local directory', () => {
+    // A directory is not a file, but it must not result in an exception being thrown.
+
+    const file = new loc.File(utils.resourcePath('api'));
+
+    assert.strictEqual(file.type.value, loc.File.Type.UNKNOWN_FILE.value);
+    assert.deepStrictEqual(file.contents(), Uint8Array.from([]));
+    assertIssues(loc, file, expectedNoIssues);
+  });
+
   test('Remote file', () => {
     const file = new loc.File(utils.REMOTE_FILE);
 

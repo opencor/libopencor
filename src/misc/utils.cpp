@@ -599,7 +599,9 @@ std::tuple<bool, std::filesystem::path> downloadFile(const std::string &pUrl)
         return {true, filePath};
     }
 
-    std::filesystem::remove(filePath);
+    std::error_code errorCode;
+
+    std::filesystem::remove(filePath, errorCode);
 
     return NO_TUPLE;
 }
@@ -616,7 +618,16 @@ UnsignedChars fileContents(const std::filesystem::path &pFilePath)
         return NO_UNSIGNED_CHARS;
     }
 
-    const auto fileSize {std::filesystem::file_size(pFilePath)};
+    // Note: we use the std::error_code version of std::filesystem::file_size() so that nothing gets thrown (e.g., if
+    //       the file is actually a directory, which can be opened on some platforms).
+
+    std::error_code errorCode;
+    const auto fileSize {std::filesystem::file_size(pFilePath, errorCode)};
+
+    if (errorCode) {
+        return NO_UNSIGNED_CHARS;
+    }
+
     UnsignedChars contents;
 
     contents.resize(fileSize);
