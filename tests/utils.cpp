@@ -70,7 +70,7 @@ void expectEqualIssues(const LoggerPtr &pLogger, const ExpectedIssues &pExpected
 {
     const auto &issues {pLogger->issues()};
 
-    EXPECT_EQ(issues.size(), pExpectedIssues.size());
+    GTEST_ASSERT_EQ(issues.size(), pExpectedIssues.size());
 
     for (size_t i {0}; i < issues.size(); ++i) {
         EXPECT_EQ(issues[i]->type(), pExpectedIssues[i].type);

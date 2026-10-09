@@ -732,7 +732,7 @@ TEST(CoverageSedTest, KinsolWithNoSolutionOverTime)
 
     instance->run();
 
-    ASSERT_EQ(instance->issueCount(), 2U);
+    GTEST_ASSERT_EQ(instance->issueCount(), 2U);
     EXPECT_EQ(instance->issue(0)->description(), CVODE_KINSOL_ERROR);
     EXPECT_EQ(instance->issue(1)->description().substr(0, CVODE_ERROR_START.size()), CVODE_ERROR_START);
     EXPECT_FALSE(std::isnan(instance->tasks()[0]->voi()[LAST_VALID_INDEX]));
