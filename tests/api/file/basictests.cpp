@@ -18,8 +18,11 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <atomic>
 #include <filesystem>
+#include <fstream>
 #include <libopencor>
+#include <thread>
 
 namespace {
 
@@ -95,6 +98,26 @@ TEST(BasicFileTest, nonExistingRelativeLocalFile)
     EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
 }
 
+TEST(BasicFileTest, nonExistingRelativeLocalFileWithLeadingParentDirectories)
+{
+    auto file {libOpenCOR::File::create("../models/./lorenz.cellml")};
+
+    EXPECT_EQ(file->type(), libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(file->fileName(), R"(..\models\lorenz.cellml)");
+#else
+    EXPECT_EQ(file->fileName(), "../models/lorenz.cellml");
+#endif
+    EXPECT_EQ(file->url(), "");
+#ifdef BUILDING_ON_WINDOWS
+    EXPECT_EQ(file->path(), R"(..\models\lorenz.cellml)");
+#else
+    EXPECT_EQ(file->path(), "../models/lorenz.cellml");
+#endif
+    EXPECT_TRUE(file->contents().empty());
+    EXPECT_EQ_ISSUES(file, expectedNonExistingFileIssues());
+}
+
 TEST(BasicFileTest, urlBasedLocalFile)
 {
     auto filePath {libOpenCOR::resourcePath("file.txt")};
@@ -132,6 +155,77 @@ TEST(BasicFileTest, encodedRemoteFile)
     EXPECT_EQ(file->url(), "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml");
     EXPECT_EQ(file->path(), "https://models.physiomeproject.org/workspace/aed/@@rawfile/d4accf8429dbf5bdd5dfa1719790f361f5baddbe/FAIRDO BG example 3.1.cellml");
     EXPECT_FALSE(file->contents().empty());
+}
+
+TEST(BasicFileTest, remoteFileWithDotSegments)
+{
+    auto file {libOpenCOR::File::create("https://example.com/a/./b/../../c/model.cellml", false)};
+
+    EXPECT_EQ(file->url(), "https://example.com/c/model.cellml");
+    EXPECT_EQ(file->path(), "https://example.com/c/model.cellml");
+}
+
+TEST(BasicFileTest, remoteFileMatchingLocalFile)
+{
+    // The host and path of a URL must never be resolved as a local file, even if such a local file exists.
+
+    auto origDir {std::filesystem::current_path()};
+    auto tempDir {std::filesystem::temp_directory_path() / "libopencor_remote_file_matching_local_file"};
+
+    std::filesystem::create_directories(tempDir / "example.com");
+    std::ofstream(tempDir / "example.com" / "model.cellml").close();
+
+    std::filesystem::current_path(tempDir);
+
+    auto url {libOpenCOR::File::create("https://example.com/model.cellml", false)->url()};
+
+    std::filesystem::current_path(origDir);
+    std::filesystem::remove_all(tempDir);
+
+    EXPECT_EQ(url, "https://example.com/model.cellml");
+}
+
+TEST(BasicFileTest, concurrentFileCreations)
+{
+    // Creating a file must never change the current working directory since it is shared by all the threads of the
+    // process. Also, the file manager must cope with files that get looked up while they are being destroyed by another
+    // thread.
+
+    static constexpr auto FILE_CREATION_COUNT {1000};
+
+    auto origDir {std::filesystem::current_path()};
+    std::atomic<bool> done {false};
+    std::atomic<bool> workingDirectoryChanged {false};
+    std::thread checker([&] {
+        auto &fileManager {libOpenCOR::FileManager::instance()};
+
+        while (!done) {
+            if (std::filesystem::current_path() != origDir) {
+                workingDirectoryChanged = true;
+            }
+
+            fileManager.file("https://example.com/model.cellml");
+            fileManager.files();
+        }
+    });
+    auto createFiles {[] {
+        for (int i {0}; i < FILE_CREATION_COUNT; ++i) {
+            libOpenCOR::File::create("https://example.com/model.cellml", false);
+            libOpenCOR::File::create("non_existing_dir/../non_existing_file.txt", false);
+        }
+    }};
+    std::thread thread1(createFiles);
+    std::thread thread2(createFiles);
+
+    thread1.join();
+    thread2.join();
+
+    done = true;
+
+    checker.join();
+
+    EXPECT_FALSE(workingDirectoryChanged);
+    EXPECT_EQ(std::filesystem::current_path(), origDir);
 }
 
 TEST(BasicFileTest, localVirtualFile)

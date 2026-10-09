@@ -16,7 +16,24 @@ limitations under the License.
 
 #include "tests/utils.h"
 
+#include <filesystem>
 #include <libopencor>
+
+namespace {
+
+std::string sedmlContents(const std::string &pModelSource)
+{
+    return R"(<?xml version='1.0' encoding='UTF-8'?>
+<sedML level="1" version="3" xmlns="http://sed-ml.org/sed-ml/level1/version3">
+    <listOfModels>
+        <model id="model" language="urn:sedml:language:cellml" source=")"
+           + pModelSource + R"("/>
+    </listOfModels>
+</sedML>
+)";
+}
+
+} // namespace
 
 TEST(BasicSedTest, noFile)
 {
@@ -71,6 +88,49 @@ TEST(BasicSedTest, sedmlFileWithAbsoluteCellmlFile)
     document = libOpenCOR::SedDocument::create(file);
 
     EXPECT_FALSE(document->hasIssues());
+}
+
+TEST(BasicSedTest, sedmlFileWithRelativeCellmlFile)
+{
+    // A relative model source is relative to the SED-ML file and its leading ".." components must be kept.
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/relative_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("../../cellml_2.cellml").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file()->path(), libOpenCOR::resourcePath("cellml_2.cellml"));
+
+    auto neededFile {libOpenCOR::File::create(libOpenCOR::resourcePath("cellml_2.cellml"))};
+
+    document = libOpenCOR::SedDocument::create(file);
+
+    EXPECT_FALSE(document->hasIssues());
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file(), neededFile);
+}
+
+TEST(BasicSedTest, sedmlFileWithRelativeCellmlFileInWorkingDirectory)
+{
+    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the
+    // current working directory contains a file with that name.
+
+    auto origDir {std::filesystem::current_path()};
+
+    std::filesystem::current_path(libOpenCOR::resourcePath());
+
+    auto file {libOpenCOR::File::create(libOpenCOR::resourcePath("api/sed/relative_cellml_file.sedml"), false)};
+
+    file->setContents(libOpenCOR::charArrayToUnsignedChars(sedmlContents("cellml_2.cellml").c_str()));
+
+    auto document {libOpenCOR::SedDocument::create(file)};
+
+    std::filesystem::current_path(origDir);
+
+    EXPECT_EQ(document->models().size(), 1U);
+    EXPECT_EQ(document->models()[0]->file()->path(), libOpenCOR::resourcePath("api/sed/cellml_2.cellml"));
 }
 
 TEST(BasicSedTest, sedmlFileWithRemoteCellmlFile)

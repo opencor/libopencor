@@ -36,6 +36,7 @@ public:
 
     static Impl &instance();
 
+    FilePtr managedFile(bool pIsLocalFile, const std::string &pFileNameOrUrl, FilePtrs &pLockedFiles) const;
     FilePtr manage(const FilePtr &pFile);
     void unmanage(File *pFile);
 

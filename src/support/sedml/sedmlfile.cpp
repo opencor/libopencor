@@ -355,8 +355,13 @@ void SedmlFile::Impl::populateDocument(const SedDocumentPtr &pDocument)
 
     for (unsigned int i {0}; i < mDocument->getNumModels(); ++i) {
         auto source {mDocument->getModel(i)->getSource()};
-        auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source)};
-        auto modelSource {(isLocalFile && stringToPath(fileNameOrUrl).is_relative()) ?
+
+        // Note: a relative model source is relative to the SED-ML file, not to the current working directory, so we
+        //       must not canonicalise it before we know whether it is relative (a model source that exists relative to
+        //       the current working directory would otherwise become absolute).
+
+        auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(source, false)};
+        auto modelSource {(isLocalFile && !stringToPath(fileNameOrUrl).has_root_directory()) ?
                               mLocation + fileNameOrUrl :
                               fileNameOrUrl};
 #ifdef __EMSCRIPTEN__

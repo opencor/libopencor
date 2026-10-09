@@ -168,12 +168,14 @@ if(Python_EXECUTABLE)
 endif()
 
 # Check some compiler flags.
+# Note: we use -fprofile-update=atomic since some of our tests are multithreaded and non-atomic profile counters would
+#       then get corrupted (e.g., a covered branch could be reported as not covered).
 
 include(CheckCXXCompilerFlag)
 
 set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
 
-set(CODE_COVERAGE_COMPILER_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+set(CODE_COVERAGE_COMPILER_FLAGS "-fprofile-instr-generate -fcoverage-mapping -fprofile-update=atomic")
 set(CODE_COVERAGE_LINKER_FLAGS "-fprofile-instr-generate")
 set(CMAKE_REQUIRED_FLAGS ${CODE_COVERAGE_COMPILER_FLAGS})
 

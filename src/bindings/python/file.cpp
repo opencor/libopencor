@@ -35,7 +35,11 @@ void fileApi(nb::module_ &m)
         .value("CombineArchive", libOpenCOR::File::Type::COMBINE_ARCHIVE)
         .value("IrretrievableFile", libOpenCOR::File::Type::IRRETRIEVABLE_FILE);
 
-    file.def(nb::new_(&libOpenCOR::File::create), "Create a File object.", nb::arg("file_name_or_url"), nb::arg("retrieve_contents") = true)
+    // Note: we release the GIL when creating a file, as well as when retrieving managed files, since it may take a
+    //       while (e.g., when downloading a remote file) and since it allows other Python threads to create files
+    //       concurrently.
+
+    file.def(nb::new_(&libOpenCOR::File::create), "Create a File object.", nb::arg("file_name_or_url"), nb::arg("retrieve_contents") = true, nb::call_guard<nb::gil_scoped_release>())
         .def_prop_ro("type", &libOpenCOR::File::type, "Return the type.")
         .def_prop_ro("file_name", &libOpenCOR::File::fileName, "Return the file name.")
         .def_prop_ro("url", &libOpenCOR::File::url, "Return the URL.")
@@ -63,9 +67,9 @@ void fileApi(nb::module_ &m)
         .def("reset", &libOpenCOR::FileManager::reset, "Reset the file manager.")
         .def_prop_ro("has_files", &libOpenCOR::FileManager::hasFiles, "Return whether there are some managed files.")
         .def_prop_ro("file_count", &libOpenCOR::FileManager::fileCount, "Return the number of managed files.")
-        .def_prop_ro("files", &libOpenCOR::FileManager::files, "Return the managed files.")
-        .def("file", nb::overload_cast<size_t>(&libOpenCOR::FileManager::file, nb::const_), "Return the managed file at the given index.", nb::arg("index"))
-        .def("file", nb::overload_cast<const std::string &>(&libOpenCOR::FileManager::file, nb::const_), "Return the managed file with the given name or URL.", nb::arg("file_name_or_url"))
+        .def_prop_ro("files", &libOpenCOR::FileManager::files, "Return the managed files.", nb::call_guard<nb::gil_scoped_release>())
+        .def("file", nb::overload_cast<size_t>(&libOpenCOR::FileManager::file, nb::const_), "Return the managed file at the given index.", nb::arg("index"), nb::call_guard<nb::gil_scoped_release>())
+        .def("file", nb::overload_cast<const std::string &>(&libOpenCOR::FileManager::file, nb::const_), "Return the managed file with the given name or URL.", nb::arg("file_name_or_url"), nb::call_guard<nb::gil_scoped_release>())
         .def("__len__", &libOpenCOR::FileManager::fileCount)
         .def("__iter__", [](const libOpenCOR::FileManager &self) {
             return nb::iter(nb::cast(self.files()));

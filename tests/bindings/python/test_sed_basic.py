@@ -14,8 +14,19 @@
 
 
 import libopencor as loc
+import os
 import utils
 from utils import assert_issues
+
+
+def sedml_contents(model_source):
+    return f"""<?xml version='1.0' encoding='UTF-8'?>
+<sedML level="1" version="3" xmlns="http://sed-ml.org/sed-ml/level1/version3">
+    <listOfModels>
+        <model id="model" language="urn:sedml:language:cellml" source="{model_source}"/>
+    </listOfModels>
+</sedML>
+"""
 
 
 def test_no_file():
@@ -73,6 +84,47 @@ def test_sedml_file_with_absolute_cellml_file():
     document = loc.SedDocument(file)
 
     assert not document.has_issues
+
+
+def test_sedml_file_with_relative_cellml_file():
+    file = loc.File(utils.resource_path("api/sed/relative_cellml_file.sedml"), False)
+
+    file.contents = utils.text_to_list(sedml_contents("../../cellml_2.cellml"))
+
+    document = loc.SedDocument(file)
+
+    assert len(document.models) == 1
+    assert document.models[0].file.path == utils.resource_path("cellml_2.cellml")
+
+    needed_file = loc.File(utils.resource_path("cellml_2.cellml"))
+
+    document = loc.SedDocument(file)
+
+    assert not document.has_issues
+    assert len(document.models) == 1
+    assert document.models[0].file == needed_file
+
+
+def test_sedml_file_with_relative_cellml_file_in_working_directory():
+    # A relative model source is relative to the SED-ML file, not to the current working directory, even if the
+    # current working directory contains a file with that name.
+
+    orig_dir = os.getcwd()
+
+    os.chdir(utils.resource_path())
+
+    file = loc.File(utils.resource_path("api/sed/relative_cellml_file.sedml"), False)
+
+    file.contents = utils.text_to_list(sedml_contents("cellml_2.cellml"))
+
+    document = loc.SedDocument(file)
+
+    os.chdir(orig_dir)
+
+    assert len(document.models) == 1
+    assert document.models[0].file.path == utils.resource_path(
+        "api/sed/cellml_2.cellml"
+    )
 
 
 def test_sedml_file_with_remote_cellml_file():

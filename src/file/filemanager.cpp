@@ -31,8 +31,37 @@ FileManager::Impl &FileManager::Impl::instance()
     return instance;
 }
 
+FilePtr FileManager::Impl::managedFile(bool pIsLocalFile, const std::string &pFileNameOrUrl, FilePtrs &pLockedFiles) const
+{
+    // Return the managed file, if any, with the given name or URL.
+    // Note #1: our caller must hold our lock.
+    // Note #2: a file may expire at any time (i.e. even while we hold our lock) since another thread may release its
+    //          last reference to it (it will then get unmanaged by its destructor), so we ignore it. We do this without
+    //          a branch of our own since such a branch would only ever be taken when threads race, i.e. it could not be
+    //          reliably tested.
+    // Note #3: another thread may also release its last reference to a file while we have it locked, in which case
+    //          releasing our reference would destroy the file and its destructor would try to get our lock, i.e. we
+    //          would deadlock. So, we keep track of the files that we lock and our caller must only release them after
+    //          having released our lock.
+
+    for (const auto &file : mFiles) {
+        pLockedFiles.push_back(file.lock());
+    }
+
+    std::erase(pLockedFiles, nullptr);
+
+    for (const auto &lockedFile : pLockedFiles) {
+        if (pIsLocalFile ? lockedFile->fileName() == pFileNameOrUrl : lockedFile->url() == pFileNameOrUrl) {
+            return lockedFile;
+        }
+    }
+
+    return nullptr;
+}
+
 FilePtr FileManager::Impl::manage(const FilePtr &pFile)
 {
+    FilePtrs lockedFiles; // Note: it must be declared before our lock (see managedFile()).
     const std::unique_lock<std::shared_mutex> lock(mMutex);
 
     // Opportunistically remove any expired entries and correct our file count.
@@ -51,26 +80,24 @@ FilePtr FileManager::Impl::manage(const FilePtr &pFile)
 
     const bool isLocalFile = pFile->url().empty();
     const auto &fileNameOrUrl = isLocalFile ? pFile->fileName() : pFile->url();
-
-    for (const auto &file : mFiles) {
-        auto managedFile {file.lock()};
-
-        if (isLocalFile ? managedFile->fileName() == fileNameOrUrl : managedFile->url() == fileNameOrUrl) {
-            return managedFile;
-        }
-    }
+    auto res {managedFile(isLocalFile, fileNameOrUrl, lockedFiles)};
 
     // No duplicate found, so manage the new file.
 
-    mFiles.emplace_back(pFile);
+    if (res == nullptr) {
+        mFiles.emplace_back(pFile);
 
-    ++mFileCount;
+        ++mFileCount;
 
-    return pFile;
+        res = pFile;
+    }
+
+    return res;
 }
 
 void FileManager::Impl::unmanage(File *pFile)
 {
+    FilePtrs lockedFiles; // Note: it must be declared before our lock (see managedFile()).
     const std::unique_lock<std::shared_mutex> lock(mMutex);
 
     // Iteratively unmanage the file and all its child files.
@@ -95,10 +122,16 @@ void FileManager::Impl::unmanage(File *pFile)
 
         // Unmanage the current file.
 
-        const auto removeEnd = std::ranges::remove_if(mFiles.begin(), mFiles.end(), [&file](const auto &managedFile) {
-                                   auto managedFilePtr {managedFile.lock()};
+        const auto removeEnd = std::ranges::remove_if(mFiles.begin(), mFiles.end(), [&file, &lockedFiles](const auto &fileEntry) {
+                                   auto managedFilePtr {fileEntry.lock()};
 
-                                   return (managedFilePtr == nullptr) || (managedFilePtr.get() == file);
+                                   if (managedFilePtr == nullptr) {
+                                       return true;
+                                   }
+
+                                   lockedFiles.push_back(managedFilePtr);
+
+                                   return managedFilePtr.get() == file;
                                }).begin();
 
         mFileCount -= static_cast<size_t>(mFiles.end() - removeEnd);
@@ -133,13 +166,16 @@ size_t FileManager::Impl::fileCount() const
 
 FilePtrs FileManager::Impl::files() const
 {
+    FilePtrs res; // Note: it must be declared before our lock (see managedFile()).
     const std::shared_lock<std::shared_mutex> lock(mMutex);
 
-    FilePtrs res;
+    // Note: a file may expire at any time, so we ignore it (see managedFile()).
 
     for (const auto &file : mFiles) {
         res.push_back(file.lock());
     }
+
+    std::erase(res, nullptr);
 
     return res;
 }
@@ -167,8 +203,6 @@ FilePtr FileManager::Impl::fileFromFileNameOrUrl(const std::string &pFileNameOrU
 FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #endif
 {
-    const std::shared_lock<std::shared_mutex> lock(mMutex);
-
 #if __clang_major__ < 16
     auto [tIsLocalFile, tFileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
     auto isLocalFile {tIsLocalFile};
@@ -176,16 +210,10 @@ FilePtr FileManager::Impl::file(const std::string &pFileNameOrUrl) const
 #else
     auto [isLocalFile, fileNameOrUrl] {retrieveFileInfo(pFileNameOrUrl)};
 #endif
+    FilePtrs lockedFiles; // Note: it must be declared before our lock (see managedFile()).
+    const std::shared_lock<std::shared_mutex> lock(mMutex);
 
-    for (const auto &file : mFiles) {
-        auto managedFile {file.lock()};
-
-        if (isLocalFile ? managedFile->fileName() == fileNameOrUrl : managedFile->url() == fileNameOrUrl) {
-            return managedFile;
-        }
-    }
-
-    return nullptr;
+    return managedFile(isLocalFile, fileNameOrUrl, lockedFiles);
 }
 
 FileManager &FileManager::instance()

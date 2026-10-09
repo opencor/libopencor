@@ -23,6 +23,16 @@ import { assertIssues } from './utils.js';
 
 const loc = await libOpenCOR();
 
+function sedmlContents(modelSource) {
+  return new TextEncoder().encode(`<?xml version='1.0' encoding='UTF-8'?>
+<sedML level="1" version="3" xmlns="http://sed-ml.org/sed-ml/level1/version3">
+    <listOfModels>
+        <model id="model" language="urn:sedml:language:cellml" source="${modelSource}"/>
+    </listOfModels>
+</sedML>
+`);
+}
+
 test.describe('Sed basic tests', () => {
   test.beforeEach(() => {
     loc.FileManager.instance().reset();
@@ -86,6 +96,45 @@ test.describe('Sed basic tests', () => {
     document = new loc.SedDocument(file);
 
     assert.strictEqual(document.hasIssues, false);
+  });
+
+  test('SED-ML file with relative CellML file', () => {
+    const file = new loc.File(utils.resourcePath('api/sed/relative_cellml_file.sedml'));
+
+    file.setContents(sedmlContents('../../cellml_2.cellml'));
+
+    let document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.path, utils.resourcePath('cellml_2.cellml'));
+
+    const neededFile = new loc.File(utils.resourcePath('cellml_2.cellml'));
+
+    document = new loc.SedDocument(file);
+
+    assert.strictEqual(document.hasIssues, false);
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.isAliasOf(neededFile), true);
+  });
+
+  test('SED-ML file with relative CellML file in working directory', () => {
+    // A relative model source is relative to the SED-ML file, not to the current working directory, even if the
+    // current working directory contains a file with that name.
+
+    const origDir = process.cwd();
+
+    process.chdir(utils.resourcePath());
+
+    const file = new loc.File(utils.resourcePath('api/sed/relative_cellml_file.sedml'));
+
+    file.setContents(sedmlContents('cellml_2.cellml'));
+
+    const document = new loc.SedDocument(file);
+
+    process.chdir(origDir);
+
+    assert.strictEqual(document.models.length, 1);
+    assert.strictEqual(document.models[0].file.path, utils.resourcePath('api/sed/cellml_2.cellml'));
   });
 
   test('SED-ML file with remote CellML file', () => {
