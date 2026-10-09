@@ -86,22 +86,24 @@ jobs:
       BUILDCACHE_LOG_FILE: ""
     steps:
       - name: Set the timezone to New Zealand
-        uses: szenius/set-timezone@v2.0
-        with:
-          timezoneWindows: 'New Zealand Standard Time'
-          timezoneLinux: 'Pacific/Auckland'
-          timezoneMacos: 'Pacific/Auckland'
+        shell: bash
+        run: |
+          case "${RUNNER_OS}" in
+            Windows) MSYS_NO_PATHCONV=1 tzutil /s "New Zealand Standard Time" ;;
+            Linux) sudo timedatectl set-timezone Pacific/Auckland ;;
+            macOS) sudo systemsetup -settimezone Pacific/Auckland ;;
+          esac
       - name: Check out libOpenCOR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: opencor/buildcache-action@v1
+        uses: opencor/buildcache-action@v3
         with:
           cache_key: cd-${{ matrix.os }}-${{ matrix.build_type }}-${{ matrix.shared_libs }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: TheMrMilchmann/setup-msvc-dev@v4.1.0
         with:
           arch: ${{ matrix.arch }}
       - name: Install GCC 16
@@ -124,13 +126,13 @@ jobs:
           cpack
       - name: Upload libOpenCOR artifacts
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.name }}
           path: ./build/libOpenCOR-*
       - name: Release libOpenCOR
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ./build/libOpenCOR-*
   python_wheels:
@@ -156,13 +158,15 @@ jobs:
             os: macos-15
     steps:
       - name: Set the timezone to New Zealand
-        uses: szenius/set-timezone@v2.0
-        with:
-          timezoneWindows: 'New Zealand Standard Time'
-          timezoneLinux: 'Pacific/Auckland'
-          timezoneMacos: 'Pacific/Auckland'
+        shell: bash
+        run: |
+          case "${RUNNER_OS}" in
+            Windows) MSYS_NO_PATHCONV=1 tzutil /s "New Zealand Standard Time" ;;
+            Linux) sudo timedatectl set-timezone Pacific/Auckland ;;
+            macOS) sudo systemsetup -settimezone Pacific/Auckland ;;
+          esac
       - name: Check out libOpenCOR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Free disk space
         if: ${{ runner.os == 'Linux' }}
         run: |
@@ -170,7 +174,7 @@ jobs:
           sudo docker image prune --all --force
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: TheMrMilchmann/setup-msvc-dev@v4.1.0
         with:
           arch: ${{ matrix.arch }}
       - name: Build Python wheels
@@ -191,13 +195,13 @@ jobs:
           #       must be kept in sync with the above images (and the version of cibuildwheel that we use).
           CIBW_SKIP: '*musllinux*'
       - name: Upload Python wheel artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.name }}
           path: ./wheelhouse/*.whl
       - name: Release Python wheels
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ./wheelhouse/*.whl
   python_pypi:
@@ -208,7 +212,7 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - name: Download Python wheels
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           pattern: "*Python wheels*"
           path: ./dist
@@ -226,13 +230,11 @@ jobs:
       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - name: Set the timezone to New Zealand
-        uses: szenius/set-timezone@v2.0
-        with:
-          timezoneLinux: 'Pacific/Auckland'
+        run: sudo timedatectl set-timezone Pacific/Auckland
       - name: Check out libOpenCOR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 'lts/*'
           registry-url: 'https://registry.npmjs.org'
@@ -248,24 +250,24 @@ jobs:
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: opencor/buildcache-action@v1
+        uses: opencor/buildcache-action@v3
         with:
           cache_key: cd-webassembly
       - name: Install Emscripten
-        uses: mymindstorm/setup-emsdk@v14
+        uses: emscripten-core/setup-emsdk@v16
       - name: Configure libOpenCOR
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=Release -DCODE_ANALYSIS=OFF -DCODE_COVERAGE=OFF -DDOCUMENTATION=OFF -DJAVASCRIPT_BINDINGS=ON -DJAVASCRIPT_UNIT_TESTING=OFF -DMEMORY_CHECKS=OFF -DPYTHON_BINDINGS=OFF -DPYTHON_UNIT_TESTING=OFF -DSHARED_LIBS=OFF -DUNIT_TESTING=OFF
       - name: Build WebAssembly
         run: cmake --build build
       - name: Upload WebAssembly artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: WebAssembly
           path: ./build/libopencor-*.tgz
       - name: Release WebAssembly
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: ./build/libopencor-*.tgz
       - name: Compress WebAssembly using Brotli

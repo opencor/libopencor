@@ -63,10 +63,12 @@ jobs:
     steps:
       - name: Set the timezone to New Zealand
         if: ${{ runner.os != 'Linux' }}
-        uses: szenius/set-timezone@v2.0
-        with:
-          timezoneWindows: 'New Zealand Standard Time'
-          timezoneMacos: 'Pacific/Auckland'
+        shell: bash
+        run: |
+          case "${RUNNER_OS}" in
+            Windows) MSYS_NO_PATHCONV=1 tzutil /s "New Zealand Standard Time" ;;
+            macOS) sudo systemsetup -settimezone Pacific/Auckland ;;
+          esac
       - name: Set up the manylinux container
         if: ${{ runner.os == 'Linux' }}
         shell: bash
@@ -74,16 +76,16 @@ jobs:
           echo "TZ=Pacific/Auckland" >> "$GITHUB_ENV"
           dnf install -y git make openssl-libs perl-core
       - name: Check out libOpenCOR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: opencor/buildcache-action@v1
+        uses: opencor/buildcache-action@v3
         with:
           cache_key: ${{ inputs.third_party_library_name }}-${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.build_type }}
       - name: Configure MSVC
         if: ${{ runner.os == 'Windows' }}
-        uses: ilammy/msvc-dev-cmd@v1
+        uses: TheMrMilchmann/setup-msvc-dev@v4.1.0
         with:
           arch: ${{ matrix.arch }}
       - name: Configure libOpenCOR (for LLVM)
@@ -98,7 +100,7 @@ jobs:
         run: cmake -G Ninja -S . -B build -DBUILD_TYPE=${{ matrix.build_type }} -DONLY_BUILD_THIRD_PARTY_LIBRARIES=ON -DPREBUILT_LIBCELLML=OFF -DPREBUILT_LIBCOMBINE=OFF -DPREBUILT_LIBCURL=OFF -DPREBUILT_LIBNUML=OFF -DPREBUILT_LIBSBML=OFF -DPREBUILT_LIBSEDML=OFF -DPREBUILT_LIBXML2=OFF -DPREBUILT_OPENSSL=OFF -DPREBUILT_SUNDIALS=OFF -DPREBUILT_ZIPPER=OFF -DPREBUILT_ZLIB=OFF
       - name: Upload library artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.name }}
           path: ./build/*.tar.gz
@@ -113,15 +115,13 @@ jobs:
       BUILDCACHE_LOG_FILE: ""
     steps:
       - name: Set the timezone to New Zealand
-        uses: szenius/set-timezone@v2.0
-        with:
-          timezoneMacos: 'Pacific/Auckland'
+        run: sudo systemsetup -settimezone Pacific/Auckland
       - name: Check out libOpenCOR
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Install CMake and Ninja
         uses: lukka/get-cmake@latest
       - name: Install buildcache
-        uses: opencor/buildcache-action@v1
+        uses: opencor/buildcache-action@v3
         with:
           cache_key: webassembly
       - name: Install Emscripten
@@ -136,7 +136,7 @@ jobs:
         run: cmake --build build
       - name: Upload WebAssembly artifact
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: WebAssembly
           path: ./build/*.tar.gz
